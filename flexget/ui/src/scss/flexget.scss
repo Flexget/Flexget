@@ -5,8 +5,9 @@
 // Components
 @import "../components/sidenav/sidenav";
 @import "../components/auth/login";
+@import "../components/database/database";
 @import "../blocks/error/error-dialog";
-
+@import "../blocks/pagination/pagination";
 
 body {
   background: $flexget-background-color;
@@ -67,4 +68,12 @@ md-input-container .hint {
 
 .text-center {
   text-align: center;
+}
+
+.operation-toolbar {
+  font-size: 16px;
+}
+
+.md-errors-spacer:empty {
+  display: none;
 }

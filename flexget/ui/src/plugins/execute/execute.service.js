@@ -13,22 +13,22 @@
             executeTasks: executeTasks
         };
 
-        function getTasks() {
-            return $http.get('/api/tasks/')
-                .then(getTasksComplete)
+        function getTasks(params) {
+            return $http.get('/api/tasks/', {
+                params: params,
+                etagCache: true
+            })
                 .catch(callFailed);
-
-            function getTasksComplete(response) {
-                return response.data;
-            }
         }
 
         function getQueue() {
-            return $http.get('/api/tasks/queue/', { ignoreLoadingBar: true })
-                .then(getQueueComplete)
+            return $http.get('/api/tasks/queue/', {
+                ignoreLoadingBar: true
+            })
+                .then(callCompleted)
                 .catch(callFailed);
-
-            function getQueueComplete(response) {
+            
+            function callCompleted(response) {
                 return response.data;
             }
         }
@@ -37,7 +37,7 @@
             var deferred = $q.defer();
 
             var stream = oboe({
-                url: '/api/tasks/execute/',
+                url: 'api/tasks/execute/',
                 body: options,
                 method: 'POST'
             }).done(function () {
@@ -45,6 +45,11 @@
             }).fail(function (error) {
                 deferred.reject(error);
             });
+            
+            deferred.promise.tasks = function (callback) {
+                stream.on('node', 'tasks', callback);
+                return deferred.promise;
+            };
 
             deferred.promise.log = function (callback) {
                 stream.on('node', 'log', callback);

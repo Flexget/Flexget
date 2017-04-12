@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import urlparse
 
 import logging
@@ -94,6 +94,7 @@ class Sickbeard(object):
                                      % (parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path, e))
         entries = []
         for _, show in list(json['data'].items()):
+            log.debug('processing show: {}'.format(show))
             fg_qualities = ''  # Initializes the quality parameter
             if show['paused'] and config.get('only_monitored'):
                 continue
@@ -103,6 +104,10 @@ class Sickbeard(object):
                 show_url = '%s:%s/api/%s/?cmd=show&tvdbid=%s' % (config['base_url'], config['port'],
                                                                  config['api_key'], show['tvdbid'])
                 show_json = task.requests.get(show_url).json()
+                log.debug('processing show data: %s', show_json['data'])
+                if 'quality_details' not in show_json['data']:
+                    log.error('Corrupt data returned, skipping: %s', show_json['data'])
+                    continue
                 fg_qualities = self.quality_requirement_builder(show_json['data']['quality_details']['initial'])
             entry = Entry(title=show['show_name'],
                           url='',

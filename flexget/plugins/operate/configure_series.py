@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -54,6 +54,7 @@ class ConfigureSeries(FilterSeriesBase):
                 'settings': self.settings_schema,
                 'from': {'$ref': '/schema/plugins?phase=input'}
             },
+            'required': ['from'],
             'additionalProperties': False
         }
 
@@ -106,7 +107,7 @@ class ConfigureSeries(FilterSeriesBase):
 
         # Make a series config with the found series
         # Turn our dict of series with settings into a list of one item dicts
-        series_config = {'generated_series': [dict([s]) for s in series.items()]}
+        series_config = {'generated_series': [dict([x]) for x in series.items()]}
         # If options were specified, add them to the series config
         if 'settings' in config:
             series_config['settings'] = {'generated_series': config['settings']}

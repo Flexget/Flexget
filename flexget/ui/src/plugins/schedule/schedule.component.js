@@ -43,9 +43,13 @@
         }
 
         function getSchedules() {
-            schedulesService.getSchedules().then(function (data) {
-                vm.models = data;
-            });
+            schedulesService.getSchedules()
+                .then(setSchedule)
+                .cached(setSchedule);
+        }
+        
+        function setSchedule(response) {
+            vm.models = response.data;
         }
     }
 }());

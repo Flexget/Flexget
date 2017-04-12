@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from future.moves.urllib.parse import quote
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -105,4 +105,4 @@ class Limetorrents(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Limetorrents, 'limetorrents', groups=['search'], api_ver=2)
+    plugin.register(Limetorrents, 'limetorrents', interfaces=['search'], api_ver=2)

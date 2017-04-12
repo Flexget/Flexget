@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import quote
 
 import re
@@ -78,7 +78,7 @@ class UrlRewriteTorrentleech(object):
         url = entry['url']
         if url.endswith('.torrent'):
             return False
-        if url.startswith('http://torrentleech.org/'):
+        if url.startswith('https://www.torrentleech.org/'):
             return True
         return False
 
@@ -88,7 +88,7 @@ class UrlRewriteTorrentleech(object):
             log.error("Didn't actually get a URL...")
         else:
             log.debug("Got the URL: %s" % entry['url'])
-        if entry['url'].startswith('http://torrentleech.org/torrents/browse/index/query/'):
+        if entry['url'].startswith('https://www.torrentleech.org/torrents/browse/index/query/'):
             # use search
             results = self.search(task, entry)
             if not results:
@@ -104,10 +104,10 @@ class UrlRewriteTorrentleech(object):
         rss_key = config['rss_key']
 
         # build the form request:
-        data = {'username': config['username'], 'password': config['password'], 'remember_me': 'on', 'submit': 'submit'}
+        data = {'username': config['username'], 'password': config['password']}
         # POST the login form:
         try:
-            login = requests.post('https://torrentleech.org/', data=data)
+            login = requests.post('https://www.torrentleech.org/user/account/login/', data=data)
         except RequestException as e:
             raise PluginError('Could not connect to torrentleech: %s', str(e))
 
@@ -127,7 +127,7 @@ class UrlRewriteTorrentleech(object):
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string).replace(":", "")
             # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-            url = ('http://torrentleech.org/torrents/browse/index/query/' +
+            url = ('https://www.torrentleech.org/torrents/browse/index/query/' +
                    quote(query.encode('utf-8')) + filter_url)
             log.debug('Using %s as torrentleech search url' % url)
 
@@ -147,7 +147,7 @@ class UrlRewriteTorrentleech(object):
                 # parse link and split along /download/12345 and /name.torrent
                 download_url = re.search('(/download/\d+)/(.+\.torrent)', torrent_url)
                 # change link to rss and splice in rss_key
-                torrent_url = 'http://torrentleech.org/rss' + download_url.group(1) + '/' \
+                torrent_url = 'https://www.torrentleech.org/rss' + download_url.group(1) + '/' \
                               + rss_key + '/' + download_url.group(2)
                 log.debug('RSS-ified download link: %s' % torrent_url)
                 entry['url'] = torrent_url
@@ -171,4 +171,4 @@ class UrlRewriteTorrentleech(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteTorrentleech, 'torrentleech', groups=['urlrewriter', 'search'], api_ver=2)
+    plugin.register(UrlRewriteTorrentleech, 'torrentleech', interfaces=['urlrewriter', 'search'], api_ver=2)

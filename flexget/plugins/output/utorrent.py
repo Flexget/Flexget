@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import os
 from logging import getLogger
@@ -145,14 +145,14 @@ class PluginUtorrent(object):
             else:
                 entry.fail('Fail to add `%s` to utorrent' % entry['url'])
 
-    def on_task_exit(self, task, config):
-        """Make sure all temp files are cleaned up when task exits"""
+    def on_task_learn(self, task, config):
+        """ Make sure all temp files are cleaned up when entries are learned """
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
             download = plugin.get_plugin_by_name('download')
             download.instance.cleanup_temp_files(task)
 
-    on_task_abort = on_task_exit
+    on_task_abort = on_task_learn
 
 
 @event('plugin.register')

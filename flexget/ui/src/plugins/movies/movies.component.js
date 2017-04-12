@@ -10,7 +10,7 @@
             controller: moviesController
         });
 
-    function moviesController($document, $mdDialog, $mdPanel, $sce, addMovieService, moviesService) {
+    function moviesController($document, $mdDialog, $mdPanel, $sce, $scope, addMovieService, moviesService) {
         var vm = this;
 
         vm.lists = [];
@@ -18,6 +18,7 @@
         vm.deleteList = deleteList;
         vm.newList = newList;
         vm.searchMovies = searchMovies;
+        vm.loadMovies = loadMovies;
 
         vm.searchtext = "";
 
@@ -51,9 +52,13 @@
         }
 
         function getMovieLists() {
-            moviesService.getLists().then(function (data) {
-                vm.lists = data.movie_lists;
-            });
+            moviesService.getLists()
+                .then(setLists)
+                .cached(setLists);
+        }
+        
+        function setLists(response) {
+            vm.lists = response.data;
         }
 
         function deleteList($event, list) {
@@ -99,6 +104,10 @@
                     vm.lists.push(newList);
                 }
             });
+        }
+
+        function loadMovies(data) {
+            $scope.$emit('load-movies', { page: data });
         }
     }
 }());

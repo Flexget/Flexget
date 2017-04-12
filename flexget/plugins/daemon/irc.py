@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import, with_statement
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
+from future.moves.urllib.parse import quote
 
 import os
 import re
@@ -10,7 +11,6 @@ from xml.etree.ElementTree import parse
 import io
 from uuid import uuid4
 import time
-import urllib
 from datetime import datetime, timedelta
 
 from flexget.entry import Entry
@@ -22,8 +22,7 @@ from flexget.utils import requests
 from flexget.utils.tools import get_config_hash
 
 try:
-    from irc_bot.irc_bot import IRCBot
-    from irc_bot.irc_bot import partial
+    from irc_bot.irc_bot import IRCBot, partial
     from irc_bot import irc_bot
 except ImportError as e:
     irc_bot = None
@@ -215,10 +214,16 @@ class IRCConnection(IRCBot):
         log.debug('Announcers: %s', self.announcer_list)
         log.debug('Ignore Lines: %d', len(self.ignore_lines))
         log.debug('Message Regexs: %d', len(self.multilinepatterns) + len(self.linepatterns))
-        for rx, vals in self.multilinepatterns:
-            log.debug('    Multilinepattern "%s" extracts %s', rx.pattern, vals)
-        for rx, vals in self.linepatterns:
-            log.debug('    Linepattern "%s" extracts %s', rx.pattern, vals)
+        for rx, vals, optional in self.multilinepatterns:
+            msg = '    Multilinepattern "%s" extracts %s'
+            if optional:
+                msg += ' (optional)'
+            log.debug(msg, rx.pattern, vals)
+        for rx, vals, optional in self.linepatterns:
+            msg = '    Linepattern "%s" extracts %s'
+            if optional:
+                msg += ' (optional)'
+            log.debug(msg, rx.pattern, vals)
 
         # Init the IRC Bot
         ircbot_config = {'servers': self.server_list, 'port': config['port'], 'channels': channel_list,
@@ -232,6 +237,7 @@ class IRCConnection(IRCBot):
         self.inject_before_shutdown = False
         self.entry_queue = []
         self.line_cache = {}
+        self.processing_message = False  # if set to True, it means there's a message processing queued
         self.thread = create_thread(self.connection_name, self)
 
     @classmethod
@@ -306,8 +312,8 @@ class IRCConnection(IRCBot):
                 # Try to see if it's not found due to case sensitivity
                 trackers = requests.get('https://api.github.com/repos/autodl-community/'
                                         'autodl-trackers/git/trees/master?recursive=1').json().get('tree', [])
-                for tracker in trackers:
-                    name = tracker.get('path', '')
+                for t in trackers:
+                    name = t.get('path', '')
                     if not name.endswith('.tracker') or name.lower() != tracker_name.lower():
                         continue
                     tracker = requests.get(base_url + name)
@@ -316,7 +322,8 @@ class IRCConnection(IRCBot):
             except (requests.RequestException, IOError) as e:
                 raise TrackerFileError(e)
         if not tracker:
-            raise TrackerFileError('Unable to find %s on disk or Github' % tracker_config_file)
+            raise TrackerFileError('Unable to find %s on disk or Github. Did you spell it correctly?' %
+                                   tracker_config_file)
 
         # If we got this far, let's save our work :)
         save_path = os.path.join(base_dir, tracker_name)
@@ -332,13 +339,14 @@ class IRCConnection(IRCBot):
         """
         Parses the patterns and creates a tuple with the compiled regex pattern and the variables it produces
         :param patterns: list of regex patterns as .tracker XML
-        :return: list of (regex, variables)-pairs
+        :return: list of (regex, variables, optional)-pairs
         """
         result = []
         for pattern in patterns:
             rx = re.compile(pattern.find('regex').get('value'), re.UNICODE | re.MULTILINE)
             vals = [var.get('name') for idx, var in enumerate(pattern.find('vars'))]
-            result.append((rx, vals))
+            optional = True if pattern.get('optional', 'false').lower() == 'true' else False
+            result.append((rx, vals, optional))
         return result
 
     def quit(self):
@@ -360,7 +368,7 @@ class IRCConnection(IRCBot):
         if tasks:
             if isinstance(tasks, basestring):
                 tasks = [tasks]
-            log.info('Injecting %d entries into tasks %s', len(self.entry_queue), ', '.join(tasks))
+            log.debug('Injecting %d entries into tasks %s', len(self.entry_queue), ', '.join(tasks))
             manager.execute(options={'tasks': tasks, 'cron': True, 'inject': self.entry_queue, 'allow_manual': True},
                             priority=5)
 
@@ -381,7 +389,7 @@ class IRCConnection(IRCBot):
                     log.info('Entry "%s" did not match any task regexp.', entry['title'])
 
             for task, entries in tasks_entry_map.items():
-                log.info('Injecting %d entries into task "%s"', len(entries), task)
+                log.debug('Injecting %d entries into task "%s"', len(entries), task)
                 manager.execute(options={'tasks': [task], 'cron': True, 'inject': entries, 'allow_manual': True},
                                 priority=5)
 
@@ -401,78 +409,7 @@ class IRCConnection(IRCBot):
             else:
                 self.run_tasks()
 
-    def parse_privmsg(self, nickname, channel, message):
-        """
-        Parses a public message and generates an entry if the message matches the regex or contains a url
-        :param nickname: Nickname of who sent the message
-        :param channel: Channel where the message was receivied
-        :param message: Message text
-        :return:
-        """
-
-        # Clean up the message
-        message = MESSAGE_CLEAN.sub('', message)
-
-        # If we have announcers defined, ignore any messages not from them
-        if self.announcer_list and nickname not in self.announcer_list:
-            log.debug('Ignoring message: from non-announcer %s', nickname)
-            return
-
-        # If it's listed in ignore lines, skip it
-        for (rx, expected) in self.ignore_lines:
-            if rx.match(message) and expected:
-                log.debug('Ignoring message: matched ignore line')
-                return
-
-        # Create the entry
-        entry = Entry(irc_raw_message=message)
-
-        # Run the config regex patterns over the message
-        matched_linepatterns = self.match_message_patterns(self.linepatterns, message)
-        matched_multilinepatterns = self.match_message_patterns(self.multilinepatterns, message, multiline=True)
-
-        if matched_linepatterns:
-            match_found = True
-            entry.update(matched_linepatterns)
-        elif matched_multilinepatterns:
-            match_found = True
-            entry.update(matched_multilinepatterns)
-        else:
-            log.warning('Received message doesn\'t match any regexes.')
-            return None
-
-        # Generate the entry and process it through the linematched rules
-        if self.tracker_config is not None and match_found:
-            entry.update(self.process_tracker_config_rules(entry))
-        elif self.tracker_config is not None:
-            log.error('Failed to parse message. Skipping.')
-            return None
-
-        # If we have a torrentname, use it as the title
-        entry['title'] = entry.get('irc_torrentname', message)
-
-        # If we have a URL, use it
-        if 'irc_torrenturl' in entry:
-            entry['url'] = entry['irc_torrenturl']
-        else:
-            # find a url...
-            url_match = URL_MATCHER.findall(message)
-            if url_match:
-                # We have a URL(s)!, generate an entry
-                urls = list(url_match)
-                url = urls[-1]
-                entry.update({
-                    'urls': urls,
-                    'url': url,
-                })
-
-        log.debug('Entry after processing: %s', dict(entry))
-        if not entry.get('url'):
-            log.error('Parsing message failed. No url found.')
-            return None
-        return entry
-
-    def match_message_patterns(self, patterns, msg, multiline=False):
+    def match_message_patterns(self, patterns, msg):
         """
         Tries to match the message to the list of patterns. Supports multiline messages.
         :param patterns: list of (regex, variable)-pairs
@@ -481,18 +418,17 @@ class IRCConnection(IRCBot):
         :return: A dict of the variables and their extracted values
         """
         result = {}
-        for rx, vals in patterns:
+        for rx, vals, _ in patterns:
             log.debug('Using pattern %s to parse message vars', rx.pattern)
             match = rx.search(msg)
             if match:
                 val_names = [irc_prefix(val.lower()) for val in vals]
-                val_values = [strip_whitespace(x) for x in match.groups()]
+                val_values = [strip_whitespace(x) or '' for x in match.groups()]
                 result.update(dict(zip(val_names, val_values)))
                 log.debug('Found: %s', dict(zip(val_names, val_values)))
-                if not multiline:
-                    break
+                break
             else:
-                log.debug('No matches found')
+                log.debug('No matches found for %s in %s', rx.pattern, msg)
         return result
 
     def process_tracker_config_rules(self, entry, rules=None):
@@ -527,10 +463,10 @@ class IRCConnection(IRCBot):
                         elif self.config.get(varname):
                             value = self.config.get(varname)
                         else:
-                            log.error('Missing variable %s from config, skipping rule', varname)
+                            log.error('Missing variable %s from config, skipping rule', irc_prefix(varname))
                             break
                         if element.tag == 'varenc':
-                            value = urllib.quote(value)
+                            value = quote(value.encode('utf-8'))
                         result += value
                     else:
                         log.error('Unsupported var operation %s, skipping rule', element.tag)
@@ -632,7 +568,7 @@ class IRCConnection(IRCBot):
                 target_var = irc_prefix(rule.get('varName'))
                 target_val = rule.get('newValue')
                 if source_var and regex and target_var and target_val:
-                    if source_var in fields and re.match(regex, fields[source_var]):
+                    if source_var in fields and re.search(regex, fields[source_var]):
                         fields[target_var] = target_val
                 else:
                     log.error('Option missing on setregex, skipping rule')
@@ -656,7 +592,7 @@ class IRCConnection(IRCBot):
     def on_privmsg(self, msg):
         """
         Appends messages for the specific channel in the line cache. Schedules a message processing after 1s to
-        handle multiline announcements. Might fail since 1s delay is arbitrarily chosen
+        handle multiline announcements.
         :param msg: IRCMessage object
         :return:
         """
@@ -665,29 +601,186 @@ class IRCConnection(IRCBot):
         if not irc_bot.is_channel(channel):
             log.debug('Received msg is not a channel msg: %s', msg)
             return
-        if channel not in self.line_cache:
-            self.line_cache[channel] = {}
-        if nickname not in self.line_cache[channel]:
-            self.line_cache[channel][nickname] = []
+        # set some defaults
+        self.line_cache.setdefault(channel, {})
+        self.line_cache[channel].setdefault(nickname, [])
+
         self.line_cache[channel][nickname].append(msg.arguments[1])
-        if len(self.line_cache[channel][nickname]) == 1:
+        if not self.processing_message:
             # Schedule a parse of the message in 1 second (for multilines)
             self.schedule.queue_command(1, partial(self.process_message, nickname, channel))
+            self.processing_message = True
 
     def process_message(self, nickname, channel):
         """
         Pops lines from the line cache and passes them to be parsed
-        :param nickname: Nickname of who sent hte message
-        :param channel: Channel where the message originated from
+        :param str nickname: Nickname of who sent the message
+        :param str channel: Channel where the message originated from
         :return: None
         """
-        lines = u'\n'.join(self.line_cache[channel][nickname])
-        self.line_cache[channel][nickname] = []
-        log.debug('Received line: %s', lines)
-        entry = self.parse_privmsg(nickname, channel, lines)
-        if entry:
+        # If we have announcers defined, ignore any messages not from them
+        if self.announcer_list and nickname not in self.announcer_list:
+            log.debug('Ignoring message: from non-announcer %s', nickname)
+            return
+
+        # Clean up the messages
+        lines = [MESSAGE_CLEAN.sub('', line) for line in self.line_cache[channel][nickname]]
+
+        log.debug('Received line(s): %s', u'\n'.join(lines))
+
+        # Generate some entries
+        if self.linepatterns:
+            entries = self.entries_from_linepatterns(lines)
+        elif self.multilinepatterns:
+            entries, lines = self.entries_from_multilinepatterns(lines)
+        else:
+            entries = self.entries_from_lines(lines)
+
+        for entry in entries:
+            # Process the generated entry through the linematched rules
+            if self.tracker_config is not None and entry:
+                entry.update(self.process_tracker_config_rules(entry))
+            elif self.tracker_config is not None:
+                log.error('Failed to parse message(s).')
+                return
+
+            entry['title'] = entry.get('irc_torrentname')
+
+            entry['url'] = entry.get('irc_torrenturl')
+
+            log.debug('Entry after processing: %s', dict(entry))
+            if not entry['url'] or not entry['title']:
+                log.error('Parsing message failed. Title=%s, url=%s.', entry['title'], entry['url'])
+                continue
+
             log.verbose('IRC message in %s generated an entry: %s', channel, entry)
             self.queue_entry(entry)
+
+        # reset the line cache
+        if self.multilinepatterns and lines:
+            self.line_cache[channel][nickname] = lines
+            log.debug('Left over lines: %s', '\n'.join(lines))
+        else:
+            self.line_cache[channel][nickname] = []
+
+        self.processing_message = False
+
+    def entries_from_linepatterns(self, lines):
+        """
+
+        :param lines: list of lines from irc
+        :return list: list of entries generated from lines
+        """
+        entries = []
+        for line in lines:
+            # If it's listed in ignore lines, skip it
+            for rx, expected in self.ignore_lines:
+                if rx.match(line) and expected:
+                    log.debug('Ignoring message: matched ignore line')
+                    continue
+
+            entry = Entry(irc_raw_message=line)
+
+            match = self.match_message_patterns(self.linepatterns, line)
+
+            # Generate the entry and process it through the linematched rules
+            if not match:
+                log.error('Failed to parse message. Skipping.')
+                continue
+
+            entry.update(match)
+
+            entries.append(entry)
+
+        return entries
+
+    def entries_from_multilinepatterns(self, lines):
+        """
+
+        :param lines: list of lines
+        :return list: list of entries generated from lines
+        """
+        entries = []
+        rest = []  # contains the rest of the lines
+        while len(lines) > 0:
+            entry = Entry()
+            raw_message = ''
+            matched_lines = []
+            for idx, (rx, vals, optional) in enumerate(self.multilinepatterns):
+                log.debug('Using pattern %s to parse message vars', rx.pattern)
+                # find the next candidate line
+                line = ''
+                for l in list(lines):
+                    # skip ignored lines
+                    for ignore_rx, expected in self.ignore_lines:
+                        if ignore_rx.match(l) and expected:
+                            log.debug('Ignoring message: matched ignore line')
+                            lines.remove(l)
+                            break
+                    else:
+                        line = l
+                        break
+
+                raw_message += '\n' + line
+                match = self.match_message_patterns([(rx, vals, optional)], line)
+                if match:
+                    entry.update(match)
+                    matched_lines.append(line)
+                    lines.remove(line)
+                elif optional:
+                    log.debug('No match for optional extract pattern found.')
+                elif not line:
+                    rest = matched_lines + lines
+                    break
+                elif idx == 0:  # if it's the first regex that fails, then it's probably just garbage
+                    log.error('No matches found for pattern %s', rx.pattern)
+                    lines.remove(line)
+                    rest = lines
+                    break
+                else:
+                    log.error('No matches found for pattern %s', rx.pattern)
+                    rest = lines
+                    break
+
+            else:
+                entry['irc_raw_message'] = raw_message
+
+                entries.append(entry)
+                continue
+
+        return entries, rest
+
+    def entries_from_lines(self, lines):
+        """
+
+        :param lines: list of lines
+        :return list: list of entries generated from lines
+        """
+        entries = []
+        for line in lines:
+            entry = Entry(irc_raw_message=line)
+
+            # Use the message as title
+            entry['title'] = line
+
+            # find a url...
+            url_match = URL_MATCHER.findall(line)
+            if url_match:
+                # We have a URL(s)!, generate an entry
+                urls = list(url_match)
+                url = urls[-1]
+                entry.update({
+                    'urls': urls,
+                    'url': url,
+                })
+
+            if not entry.get('url'):
+                log.error('Parsing message failed. No url found.')
+                continue
+
+            entries.append(entry)
+
+        return entries
 
     def is_connected(self):
         return self.connected
@@ -756,9 +849,12 @@ class IRCConnectionManager(object):
         self.stop_connections(self.wait)
         irc_connections = {}
 
-    def restart_connections(self):
-        for name, connection in irc_connections.items():
-            self.restart_connection(name, connection.config)
+    def restart_connections(self, name=None):
+        if name:
+            self.restart_connection(name)
+        else:
+            for name, connection in irc_connections.items():
+                self.restart_connection(name, connection.config)
 
     def restart_connection(self, name, config=None):
         if not config:
@@ -790,9 +886,12 @@ class IRCConnectionManager(object):
         for conn_name, connection in irc_connections.items():
             connection.thread.start()
 
-    def stop_connections(self, wait):
-        for name in irc_connections.keys():
+    def stop_connections(self, wait, name=None):
+        if name:
             self.stop_connection(name, wait)
+        else:
+            for name in irc_connections.keys():
+                self.stop_connection(name, wait)
 
     def stop_connection(self, name, wait=False):
         if irc_connections[name].is_alive():
@@ -803,21 +902,26 @@ class IRCConnectionManager(object):
         self.wait = wait
         self.shutdown_event.set()
 
-    def status_all(self):
-        status = {}
-        for name in irc_connections.keys():
-            status.update(self.status(name))
+    def status(self, name=None):
+        status = []
+        if name:
+            if name not in irc_connections:
+                raise ValueError('%s is not a valid irc connection' % name)
+            else:
+                status.append(self.status_dict(name))
+        else:
+            for n in irc_connections.keys():
+                status.append(self.status_dict(n))
         return status
 
-    def status(self, name):
-        if name not in irc_connections:
-            raise ValueError('%s is not a valid irc connection' % name)
+    def status_dict(self, name):
         status = {name: {}}
         connection = irc_connections[name]
-        status[name]['thread'] = 'alive' if connection.is_alive() else 'dead'
-        status[name]['channels'] = connection.channels
+        status[name]['alive'] = connection.is_alive()
+        status[name]['channels'] = [{key: value} for key, value in connection.channels.items()]
         status[name]['connected_channels'] = connection.connected_channels
-        status[name]['server'] = (connection.servers[0], connection.port)
+        status[name]['server'] = connection.servers[0]
+        status[name]['port'] = connection.port
 
         return status
 

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -77,4 +77,4 @@ class PluginBlurayLookup(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginBlurayLookup, 'bluray_lookup', api_ver=2, groups=['movie_metainfo'])
+    plugin.register(PluginBlurayLookup, 'bluray_lookup', api_ver=2, interfaces=['task', 'movie_metainfo'])

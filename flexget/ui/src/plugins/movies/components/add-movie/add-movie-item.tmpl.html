@@ -1,6 +1,6 @@
 <md-list-item flex class="list">
     <img ng-src="{{ vm.movie.thumbnail }}"/>
-    <span flex class="title">{{ vm.movie.name }} ({{ vm.movie.year }})</span>
+    <a flex ng-href="{{ vm.movie.url }}" target="_blank" class="title md-subhead">{{ vm.movie.name }} ({{ vm.movie.year }})</a>
     <md-input-container>
         <md-select ng-model="vm.selectedList"
                 placeholder="Movie list">

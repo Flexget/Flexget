@@ -42,10 +42,20 @@
             }
         }
 
+        function sortStreamTasks(taskData) {
+            var notOrdered = angular.copy(vm.streamTasks);
+            vm.streamTasks = [];
+
+            for (var i = 0; i < taskData.length; i++) {
+                var emptyTask = $filter('filter')(notOrdered, { name: taskData[i].name });
+                vm.streamTasks.push(emptyTask[0]);
+            }
+        }
+
         function startStream() {
             vm.options.progress = true;
             vm.options.summary = true;
-            vm.options.log = true;
+            //vm.options['loglevel'] = 'info';
             vm.options['entry_dump'] = true;
 
             stream = executeService.executeTasks(vm.options);
@@ -53,7 +63,12 @@
             stream.log(logNode)
                 .progress(progressNode)
                 .summary(summaryNode)
-                .entryDump(entryDumpNode);
+                .entryDump(entryDumpNode)
+                .tasks(setTasks);
+            
+            function setTasks(taskData) {
+                sortStreamTasks(taskData);
+            }
 
             function progressNode(progress) {
                 var filtered = $filter('filter')(vm.streamTasks, { status: '!complete' });

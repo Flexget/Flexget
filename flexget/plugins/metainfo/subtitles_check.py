@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import os
 import logging
@@ -51,14 +51,22 @@ class MetainfoSubs(object):
         if entry.get('subtitles', eval_lazy=False) or not ('location' in entry) or \
                 ('$RECYCLE.BIN' in entry['location']) or not os.path.exists(entry['location']):
             return
-        from subliminal.core import search_external_subtitles
+        from subliminal import scan_video
+        from subliminal.core import search_external_subtitles, refine
         try:
-            subtitles = list(search_external_subtitles(entry['location']).values())
+            video = scan_video(entry['location'])
+            # grab external and internal subtitles
+            subtitles = video.subtitle_languages
+            refiner = ('metadata',)
+            refine(video, episode_refiners=refiner, movie_refiners=refiner)
+            subtitles |= set(search_external_subtitles(entry['location']).values())
             if subtitles:
+                # convert to human-readable strings
+                subtitles = [str(l) for l in subtitles]
                 entry['subtitles'] = subtitles
                 log.debug('Found subtitles %s for %s', '/'.join(subtitles), entry['title'])
         except Exception as e:
-            log.debug('Error checking local subtitles for %s: %s' % (entry['title'], e))
+            log.error('Error checking local subtitles for %s: %s', entry['title'], e)
 
 
 @event('plugin.register')

@@ -25,9 +25,13 @@
         }
 
         function loadReleases() {
-            seriesService.loadReleases(vm.show, vm.episode).then(function (data) {
-                vm.releases = data.releases;
-            });
+            seriesService.loadReleases(vm.show, vm.episode)
+                .then(setReleases)
+                .cached(setReleases);
+        }
+        
+        function setReleases(response) {
+            vm.releases = response.data;
         }
 
         function cancel() {

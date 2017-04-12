@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import pytest
@@ -143,6 +143,9 @@ class TestSeriesParser(object):
 
         s = parse(name='Something', data='Something - Ep VIII')
         assert (s.season == 1 and s.episode == 8), 'failed to parse %s' % s
+
+        s = parse(name='Something', data='Something - E01')
+        assert (s.season == 1 and s.episode == 1), 'failed to parse %s' % s
 
     def test_season_episode_of_total(self, parse):
         """SeriesParser: season X YofZ"""
@@ -376,7 +379,7 @@ class TestSeriesParser(object):
                 # There's nothing that can be done with those failing cases with the
                 # current
                 # "grab leftmost occurrence of highest quality-like thing" algorithm.
-                if int(mock_ep1) >= int(mock_ep2):
+                if int(mock_ep1) >= int(mock_ep2) or int(mock_ep2) > 999:
                     continue
 
                 s = parse('FooBar - %s %s-FlexGet' % (mock_ep1, quality2.name), name='FooBar')

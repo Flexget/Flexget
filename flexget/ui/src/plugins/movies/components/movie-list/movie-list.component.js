@@ -11,7 +11,9 @@
             bindings: {
                 list: '<',
                 deleteMovieList: '&',
-                tabIndex: '<'
+                tabIndex: '<',
+                linkHeader: '=',
+                currentPage: '='
             }
         });
 
@@ -23,57 +25,54 @@
         vm.$onDestroy = destroy;
         vm.tabSelected = tabSelected;
         vm.tabDeselected = tabDeselected;
-        vm.loadMovies = loadMovies;
         vm.deleteMovie = deleteMovie;
-        vm.updateListPage = updateListPage;
 
-        var listener;
-        var currentTab = false;
-
+        var loadMoviesListener, addMovieToListListener;
         var options = {
-            page: 1,
-            'page_size': 10,
+            'per_page': 10,
             order: 'asc'
         };
 
         function tabSelected() {
-            loadMovies();
-            currentTab = true;
+            loadMovies(1);
+            loadMoviesListener = $rootScope.$on('load-movies', function (event, args) {
+                loadMovies(args.page);
+            });
+            addMovieToListListener = $rootScope.$on('movie-added-list:' + vm.list.id, function () {
+                loadMovies(vm.currentPage);
+            })
         }
 
         function tabDeselected() {
-            currentTab = false;
+            loadMoviesListener();
+            addMovieToListListener();
         }
         
         function activate() {
             //Hack to make the movies from the first tab load (md-on-select not firing for initial tab)
             if (vm.tabIndex === 0) {
-                loadMovies();
-                currentTab = true;
+                tabSelected();
             }
-
-            listener = $rootScope.$on('movie-added-list:' + vm.list.id, function () {
-                if (currentTab) {
-                    loadMovies();
-                }
-            });
         }
 
         function destroy() {
-            if (listener) {
-                listener();
-            }
+            loadMoviesListener ? loadMoviesListener() : null;
+            addMovieToListListener ? addMovieToListListener() : null;
         }
 
-        function loadMovies() {
+        function loadMovies(page) {
+            options.page = page;
             moviesService.getListMovies(vm.list.id, options)
-                .then(function (data) {
-                    vm.movies = data.movies;
-
-                    vm.currentPage = data.page;
-                    vm.totalMovies = data.total_number_of_movies;
-                    vm.pageSize = data.number_of_movies;
+                .then(setMovies)
+                .cached(setMovies)
+                .finally(function () {
+                    vm.currentPage = options.page;
                 });
+        }
+
+        function setMovies(response) {
+            vm.movies = response.data;
+            vm.linkHeader = response.headers().link;
         }
 
         function deleteMovie(list, movie) {
@@ -86,17 +85,9 @@
             $mdDialog.show(confirm).then(function () {
                 moviesService.deleteMovie(list.id, movie.id)
                     .then(function () {
-                        var index = vm.movies.indexOf(movie);
-                        vm.movies.splice(index, 1);
+                        loadMovies(vm.currentPage);
                     });
             });
-        }
-
-        //Call from the pagination to update the page to the selected page
-        function updateListPage (index) {
-            options.page = index;
-
-            loadMovies();
         }
     }
 }());

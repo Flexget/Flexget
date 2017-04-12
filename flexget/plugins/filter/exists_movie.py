@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -130,6 +130,7 @@ class FilterExistsMovie(object):
                 if config.get('lookup') == 'imdb':
                     try:
                         imdb_id = imdb_lookup.imdb_id_lookup(movie_title=movie.name,
+                                                             movie_year=movie.year,
                                                              raw_title=item,
                                                              session=task.session)
                         if imdb_id in path_ids:
@@ -193,4 +194,4 @@ class FilterExistsMovie(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(FilterExistsMovie, 'exists_movie', groups=['exists'], api_ver=2)
+    plugin.register(FilterExistsMovie, 'exists_movie', interfaces=['task'], api_ver=2)

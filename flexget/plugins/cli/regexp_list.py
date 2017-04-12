@@ -1,10 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from argparse import ArgumentParser, ArgumentTypeError
 import re
-
-from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import options
 from flexget.event import event
@@ -15,7 +13,7 @@ from flexget.plugins.list.regexp_list import get_regexp_lists, get_list_by_exact
 
 
 def do_cli(manager, options):
-    """Handle irc cli"""
+    """Handle regexp-list cli"""
     action_map = {
         'all': action_all,
         'list': action_list,
@@ -54,11 +52,11 @@ def action_list(options):
         for regexp in regexps:
             regexp_row = [regexp.regexp or '']
             table_data.append(regexp_row)
+    try:
         table = TerminalTable(options.table_type, table_data)
-        try:
-            console(table.output)
-        except TerminalTableError as e:
-            console('ERROR: %s' % str(e))
+        console(table.output)
+    except TerminalTableError as e:
+        console('ERROR: %s' % str(e))
 
 
 def action_add(options):
@@ -117,7 +115,7 @@ def register_parser_arguments():
     regexp_parser.add_argument('regexp', type=regexp_type, help="The regexp")
 
     list_name_parser = ArgumentParser(add_help=False)
-    list_name_parser.add_argument('list_name', nargs='?', help='Name of regexp list to operate on')
+    list_name_parser.add_argument('list_name', nargs='?', help='Name of regexp list to operate on', default='regexps')
     # Register subcommand
     parser = options.register_command('regexp-list', do_cli, help='View and manage regexp lists')
     # Set up our subparsers

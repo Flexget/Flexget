@@ -1,0 +1,48 @@
+<md-sidenav class="md-sidenav-right md-whiteframe-z2" md-component-id="database">
+    <md-toolbar class="md-theme-light">
+        <h1 class="md-toolbar-tools">Database Management</h1>
+    </md-toolbar>
+    
+    <section layout="column" layout-padding>
+        <section layout="column">
+            <span>
+                Cleaning up removes all old/un-needed data from the database.
+            </span>
+            <md-button class="md-primary md-raised" flex ng-click="vm.cleanup()">
+                Cleanup
+            </md-button>
+        </section>
+
+        <md-divider></md-divider>
+
+        <section layout="column">
+            <span>
+                Vacuuming potentially increases performance and decreases database size.
+            </span>
+            <md-button class="md-primary md-raised" flex ng-click="vm.vacuum()">
+                Vacuum
+            </md-button>
+        </section>
+
+        <md-divider></md-divider>
+
+        <section layout="column">
+            <span>
+                Reset the database of a specific plugin.
+            </span>
+            <md-autocomplete
+                md-items="plugin in vm.searchPlugin(searchText)"
+                md-search-text="searchText"
+                md-selected-item="vm.selectedPlugin"
+                md-floating-label="Select plugin"
+                md-min-length="0">
+                <md-item-template>
+                    <span md-highlight-text="searchText">{{ plugin }}</span>
+                </md-item-template>
+            </md-autocomplete>
+            <md-button class="md-primary md-raised" flex ng-disabled="!vm.selectedPlugin" ng-click="vm.resetPlugin()">
+                Reset plugin
+            </md-button>
+        </section>
+    </section>
+</md-sidenav>

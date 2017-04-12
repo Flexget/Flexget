@@ -1,0 +1,6 @@
+tasks:
+  test:
+    rss:
+      url: http://test/rss
+    mock:
+      - title: entry 1

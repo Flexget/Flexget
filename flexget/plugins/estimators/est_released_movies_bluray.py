@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
+import datetime
 
 from flexget import plugin
 from flexget.event import event
@@ -22,6 +23,10 @@ class EstimatesMoviesBluray(object):
         movie_name = entry['movie_name']
         movie_year = entry.get('movie_year')
 
+        if movie_year is not None and movie_year > datetime.datetime.now().year:
+            log.debug('Skipping Blu-ray.com lookup since movie year is %s', movie_year)
+            return
+
         log.debug('Searching Blu-ray.com for release date of {} ({})'.format(movie_name, movie_year))
 
         release_date = None
@@ -40,4 +45,4 @@ class EstimatesMoviesBluray(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EstimatesMoviesBluray, 'est_movies_bluray', groups=['estimate_release'], api_ver=2)
+    plugin.register(EstimatesMoviesBluray, 'est_movies_bluray', interfaces=['estimate_release'], api_ver=2)

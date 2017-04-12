@@ -6,7 +6,7 @@
                 <p style="color: orange" class="text-success text-center" ng-if="vm.timeout">Your session timed out</p>
 
                 <p style="color: red" class="text-center">{{ vm.error }}</p>
-                <md-input-container class="md-block">
+                <md-input-container class="md-block" ng-init="vm.credentials.username = 'flexget'">
                     <label>Username</label>
                     <input id="username" ng-model="vm.credentials.username" required>
                 </md-input-container>

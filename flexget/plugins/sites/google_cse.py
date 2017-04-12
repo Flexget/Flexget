@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import parse_qs, urlparse
 
 import re
@@ -93,5 +93,5 @@ class UrlRewriteGoogle(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteGoogleCse, 'google_cse', groups=['urlrewriter'], api_ver=2)
-    plugin.register(UrlRewriteGoogle, 'google', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteGoogleCse, 'google_cse', interfaces=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteGoogle, 'google', interfaces=['urlrewriter'], api_ver=2)

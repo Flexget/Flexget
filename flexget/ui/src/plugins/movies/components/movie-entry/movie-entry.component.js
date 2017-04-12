@@ -25,7 +25,9 @@
 
         function getMetadata() {
             var params = {
-                year: vm.movie.year
+                year: vm.movie.year,
+                title: vm.movie.title,
+                include_posters: true
             };
 
             vm.movie.movies_list_ids.forEach(function (id) {
@@ -34,9 +36,13 @@
                 params = angular.extend(params, newid);
             });
 
-            moviesService.getMovieMetadata(vm.movie.title, params).then(function (data) {
-                vm.metadata = data;
-            });
+            moviesService.getMovieMetadata(params)
+                .then(setMetadata)
+                .cached(setMetadata);
+        }
+          
+        function setMetadata(response) {
+            vm.metadata = response.data;
         }
     }
 }());

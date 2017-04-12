@@ -1,20 +1,18 @@
 """Contains miscellaneous helpers"""
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib import request
 from future.utils import PY2
-from html.entities import name2codepoint
-from past.builtins import basestring
 
+import logging
 import ast
 import copy
-import locale
-import logging
 import hashlib
+import locale
 import operator
-import sys
 import os
 import re
+import sys
 from collections import MutableMapping
 from datetime import timedelta, datetime
 from pprint import pformat
@@ -22,6 +20,8 @@ from pprint import pformat
 import flexget
 import queue
 import requests
+
+from html.entities import name2codepoint
 
 log = logging.getLogger('utils')
 
@@ -97,7 +97,8 @@ def _htmldecode(text):
     if isinstance(text, str):
         uchr = chr
     else:
-        uchr = lambda value: value > 127 and chr(value) or chr(value)
+        def uchr(value):
+            value > 127 and chr(value) or chr(value)
 
     def entitydecode(match, uchr=uchr):
         entity = match.group(1)
@@ -151,19 +152,19 @@ def _xmlcharref_encode(unicode_data, encoding):
 
 def merge_dict_from_to(d1, d2):
     """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
-    for k, v in list(d1.items()):
+    for k, v in d1.items():
         if k in d2:
             if isinstance(v, type(d2[k])):
                 if isinstance(v, dict):
                     merge_dict_from_to(d1[k], d2[k])
                 elif isinstance(v, list):
                     d2[k].extend(copy.deepcopy(v))
-                elif isinstance(v, (basestring, bool, int, float, type(None))):
+                elif isinstance(v, (str, bool, int, float, type(None))):
                     pass
                 else:
                     raise Exception('Unknown type: %s value: %s in dictionary' % (type(v), repr(v)))
-            elif (isinstance(v, (basestring, bool, int, float, type(None))) and
-                      isinstance(d2[k], (basestring, bool, int, float, type(None)))):
+            elif (isinstance(v, (str, bool, int, float, type(None))) and
+                      isinstance(d2[k], (str, bool, int, float, type(None)))):
                 # Allow overriding of non-container types with other non-container types
                 pass
             else:
@@ -206,7 +207,7 @@ class ReList(list):
 
     def __getitem__(self, k):
         item = list.__getitem__(self, k)
-        if isinstance(item, basestring):
+        if isinstance(item, str):
             item = re.compile(item, re.IGNORECASE | re.UNICODE)
             self[k] = item
         return item
@@ -405,6 +406,8 @@ def split_title_year(title):
     """Splits title containing a year into a title, year pair."""
     if not title:
         return
+    if not re.search(r'\d{4}', title):
+        return title, None
     match = re.search(r'(.*?)\(?(\d{4})?\)?$', title)
     title = match.group(1).strip()
     if match.group(2):
@@ -442,7 +445,7 @@ def parse_filesize(text_size, si=True):
     """
     prefix_order = {'': 0, 'k': 1, 'm': 2, 'g': 3, 't': 4, 'p': 5}
 
-    parsed_size = re.match('(\d+(?:\.\d+)?)(?:\s*)((?:[ptgmk]i?)?b)', text_size.strip().lower(), flags=re.UNICODE)
+    parsed_size = re.match('(\d+(?:[.,\s]\d+)*)(?:\s*)((?:[ptgmk]i?)?b)', text_size.strip().lower(), flags=re.UNICODE)
     if not parsed_size:
         raise ValueError('%s does not look like a file size' % text_size)
     amount = parsed_size.group(1)
@@ -456,7 +459,7 @@ def parse_filesize(text_size, si=True):
     if unit not in prefix_order:
         raise ValueError('%s does not look like a file size' % text_size)
     order = prefix_order[unit]
-    amount = float(amount.replace(',', ''))
+    amount = float(amount.replace(',', '').replace(' ', ''))
     base = 1000 if si else 1024
     return (amount * (base ** order)) / 1024 ** 2
 
@@ -471,3 +474,35 @@ def get_config_hash(config):
         return hashlib.md5(pformat(config).encode('utf-8')).hexdigest()
     else:
         return hashlib.md5(str(config).encode('utf-8')).hexdigest()
+
+
+def parse_episode_identifier(ep_id):
+    """
+    Parses series episode identifier, raises ValueError if it fails
+
+    :param ep_id: Value to parse
+    :return: Return identifier type: `sequence`, `ep` or `date`
+    :raises ValueError: If ep_id does not match any valid types
+    """
+    error = None
+    identified_by = None
+    if isinstance(ep_id, int):
+        if ep_id <= 0:
+            error = 'sequence type episode must be higher than 0'
+        identified_by = 'sequence'
+    elif re.match(r'(?i)^S\d{1,4}E\d{1,3}$', ep_id):
+        identified_by = 'ep'
+    elif re.match(r'\d{4}-\d{2}-\d{2}', ep_id):
+        identified_by = 'date'
+    else:
+        # Check if a sequence identifier was passed as a string
+        try:
+            ep_id = int(ep_id)
+            if ep_id <= 0:
+                error = 'sequence type episode must be higher than 0'
+            identified_by = 'sequence'
+        except ValueError:
+            error = '`%s` is not a valid episode identifier.' % ep_id
+    if error:
+        raise ValueError(error)
+    return identified_by

@@ -1,11 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import datetime
 import re
 
 from sqlalchemy import Column, Unicode, DateTime
+from requests.exceptions import TooManyRedirects
 
 from flexget import plugin, db_schema
 from flexget.entry import Entry
@@ -141,10 +142,18 @@ class SearchMoreThanTV(object):
         :return:
         """
         cookies = self.get_login_cookie(username, password, force=force)
+        invalid_cookie = False
 
-        response = requests.get(url, params=params, cookies=cookies)
+        try:
+            response = requests.get(url, params=params, cookies=cookies)
+            if self.base_url + 'login.php' in response.url:
+                invalid_cookie = True
+        except TooManyRedirects:
+            # Apparently it endlessly redirects if the cookie is invalid?
+            log.debug('MoreThanTV request failed: Too many redirects. Invalid cookie?')
+            invalid_cookie = True
 
-        if self.base_url + 'login.php' in response.url:
+        if invalid_cookie:
             if self.errors:
                 raise plugin.PluginError('MoreThanTV login cookie is invalid. Login page received?')
             self.errors = True
@@ -177,7 +186,7 @@ class SearchMoreThanTV(object):
             response = requests.post(url, data={'username': username, 'password': password, 'login': 'Log in',
                                                 'keeplogged': '1'}, timeout=30)
         except RequestException as e:
-            raise plugin.PluginError('MoreThanTV login failed: %s', e)
+            raise plugin.PluginError('MoreThanTV login failed: %s' % e)
 
         if 'Your username or password was incorrect.' in response.text:
             raise plugin.PluginError('MoreThanTV login failed: Your username or password was incorrect.')
@@ -217,7 +226,7 @@ class SearchMoreThanTV(object):
                        'order_way': config['order_way'], 'action': 'basic', 'group_results': 0})
 
         for search_string in entry.get('search_strings', [entry['title']]):
-            params['searchstr'] = search_string
+            params['searchstr'] = search_string.replace("'", "")
             log.debug('Using search params: %s', params)
             try:
                 page = self.get(self.base_url + 'torrents.php', params, config['username'], config['password'])
@@ -256,4 +265,4 @@ class SearchMoreThanTV(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SearchMoreThanTV, 'morethantv', groups=['search'], api_ver=2)
+    plugin.register(SearchMoreThanTV, 'morethantv', interfaces=['search'], api_ver=2)

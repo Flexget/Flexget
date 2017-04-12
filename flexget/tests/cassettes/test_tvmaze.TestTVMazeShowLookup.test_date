@@ -1,50 +1,78 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=the%20daily%20show%20(with%20jon%20stewart
-  response:
-    body: {string: !!python/unicode '{"id":249,"url":"http://www.tvmaze.com/shows/249/the-daily-show-with-jon-stewart","name":"The
-        Daily Show with Jon Stewart","type":"Talk Show","language":"English","genres":["Comedy"],"status":"Ended","runtime":30,"premiered":"1996-07-22","schedule":{"time":"23:00","days":["Monday","Tuesday","Wednesday","Thursday"]},"rating":{"average":8.7},"weight":1,"network":{"id":23,"name":"Comedy
-        Central","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":5714,"thetvdb":71256,"imdb":"tt0115147"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/4598.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/4598.jpg"},"summary":"<p>One
-        anchor, several correspondents, zero credibility.</p><p> If you''re tired
-        of the stodginess of the evening newscasts and you can''t bear to sit through
-        the spinmeisters and shills on the 24-hour cable news network, don''t miss
-        The Daily Show with Jon Stewart, the nightly half-hour series unburdened by
-        objectivity, journalistic integrity or even accuracy.</p>","updated":1462293042,"_links":{"self":{"href":"http://api.tvmaze.com/shows/249"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/201574"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:17 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/249/episodesbydate?date=2012-06-06
-  response:
-    body: {string: !!python/unicode '[{"id":20471,"url":"http://www.tvmaze.com/episodes/20471/the-daily-show-with-jon-stewart-2012-06-06-michael-fassbender","name":"Michael
-        Fassbender","season":2012,"number":73,"airdate":"2012-06-06","airtime":"23:00","airstamp":"2012-06-06T23:00:00-04:00","runtime":30,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/20471"}}}]'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:17 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
-    status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=the+daily+show+%28with+jon+stewart%29
+    response:
+      body:
+        string: !!binary |
+          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
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 26 Mar 2017 11:09:47 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/shows/249/episodesbydate?date=2012-06-06
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA3WQwWrDMAyGX2XobNdOUlbwA+zW225jDLVRZ2+2Eyxnpit59zkJY9thIBDo//5f
+          Qk83cD2YVu8PjYApeTBgcx6NUqWUXf4I+Em78xAUjY6HnlitrMqWZI/OXyXbocjispVvQ5ScqWDK
+          stVNK/X9UsGdLZKXF2Q+UewpgYCIgequ46bdPfzWmJCHuFzVtJWcwqlazKETgC71mBfjT34Nq+Ps
+          1ry2M1pvE84Yxj/k46pWQOr9hqUpbsZOC3ABX2t0nLwXwFMImK7VX9NevIvvDOYGTP6ydJuo9u9X
+          4ej+fxXM8/z8BY+8oW5oAQAA
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 26 Mar 2017 11:09:47 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
 version: 1

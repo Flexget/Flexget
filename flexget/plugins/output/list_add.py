@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -15,7 +15,7 @@ class ListAdd(object):
         'type': 'array',
         'items': {
             'allOf': [
-                {'$ref': '/schema/plugins?group=list'},
+                {'$ref': '/schema/plugins?interface=list'},
                 {
                     'maxProperties': 1,
                     'error_maxProperties': 'Plugin options within list_add plugin must be indented 2 more spaces than '
@@ -36,7 +36,13 @@ class ListAdd(object):
                 if thelist.immutable:
                     raise plugin.PluginError(thelist.immutable)
 
+    # Run later in the phase, to capture any entry fields that might change during the output phase
+    @plugin.priority(0)
     def on_task_output(self, task, config):
+        if not len(task.accepted) > 0:
+            log.debug('no accepted entries, nothing to add')
+            return
+
         for item in config:
             for plugin_name, plugin_config in item.items():
                 thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)

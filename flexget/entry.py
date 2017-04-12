@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.utils import PY2, native_str, text_type
 
 import copy
@@ -8,7 +8,7 @@ import logging
 
 from flexget.plugin import PluginError
 from flexget.utils.lazy_dict import LazyDict, LazyLookup
-from flexget.utils.template import render_from_entry
+from flexget.utils.template import render_from_entry, FlexGetTemplate
 
 log = logging.getLogger('entry')
 
@@ -282,14 +282,15 @@ class Entry(LazyDict):
         """
         Renders a template string based on fields in the entry.
 
-        :param string template: A template string that uses jinja2 or python string replacement format.
+        :param template: A template string or FlexGetTemplate that uses jinja2 or python string replacement format.
         :return: The result of the rendering.
         :rtype: string
         :raises RenderError: If there is a problem.
         """
-        if not isinstance(template, str):
-            raise ValueError('Trying to render non string template, got %s' % repr(template))
-        log.trace('rendering: %s' % template)
+        if not isinstance(template, (str, FlexGetTemplate)):
+            raise ValueError(
+                'Trying to render non string template or unrecognized template format, got %s' % repr(template))
+        log.trace('rendering: %s', template)
         return render_from_entry(template, self)
 
     def __eq__(self, other):

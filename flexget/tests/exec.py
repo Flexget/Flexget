@@ -5,7 +5,7 @@ A file will be created in the output directory with the given filename.
 If there are more arguments to the script, they will be written 1 per line to the file.
 """
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import sys
 import os
 

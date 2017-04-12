@@ -10,26 +10,57 @@
             controller: historyController
         });
 
-    function historyController(historyService) {
+    function historyController($filter, historyService) {
         var vm = this;
 
         vm.$onInit = activate;
-        vm.search = search;
+        vm.getHistory = getHistory;
+        vm.changeOrder = changeOrder;
+
+        vm.sortOptions = [
+            "Task",
+            "Filename",
+            "Url",
+            "Title",
+            "Time",
+            "Details"
+        ];
+
+        vm.sortOption = "Time";
+        vm.searchTerm = "";
+        vm.order = "desc";
 
         function activate() {
             getHistory();
         }
 
-        function search() {
-            return historyService.getHistoryForTask({ task: vm.taskName }).then(function (data) {
-                vm.entries = data.entries;
-            });
+        function changeOrder() {
+            vm.order === 'desc' ? setOrder('asc') : setOrder('desc');
+
+            function setOrder(direction) {
+                vm.order = direction;
+                getHistory();
+            }
         }
 
-        function getHistory() {
-            return historyService.getHistory().then(function (data) {
-                vm.entries = data.entries;
-            });
+        function getHistory(page) {
+            var options = {
+                page: page || 1,
+                task: vm.searchTerm || undefined,
+                sort_by: $filter('lowercase')(vm.sortOption),
+                order: vm.order
+            }
+            historyService.getHistory(options)
+                .then(setEntries)
+                .cached(setEntries)
+                .finally(function (data) {
+                    vm.currentPage = options.page;
+                });
+        }
+        
+        function setEntries(response) {
+            vm.entries = response.data;
+            vm.linkHeader = response.headers().link;
         }
     }
 }());

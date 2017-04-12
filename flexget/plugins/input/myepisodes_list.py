@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -11,7 +11,9 @@ from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.utils.soup import get_soup
 
-log = logging.getLogger('myepisodes')
+from requests import RequestException
+
+log = logging.getLogger('myepisodes_list')
 
 URL = 'http://www.myepisodes.com/'
 
@@ -55,10 +57,13 @@ class MyEpisodesList(object):
                 'password': password,
                 'action': 'Login'
             }
-            loginsrc = task.requests.post(URL + 'login.php?action=login', data=params).content
-            if str(username) not in loginsrc:
-                raise plugin.PluginWarning(('Login to myepisodes.com failed, please check '
-                                            'your account data or see if the site is down.'), log)
+            try:
+                loginsrc = task.requests.post(URL + 'login.php', data=params)
+                if 'login' in loginsrc.url:
+                    raise plugin.PluginWarning(('Login to myepisodes.com failed, please check '
+                                                'your account data or see if the site is down.'), log)
+            except RequestException as e:
+                raise plugin.PluginError("Error logging in to myepisodes: %s" % e)
 
         page = task.requests.get(URL + "myshows/manage/").content
         try:
@@ -101,4 +106,4 @@ class MyEpisodesList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(MyEpisodesList, 'myepisodes_list', api_ver=2, groups=['list'])
+    plugin.register(MyEpisodesList, 'myepisodes_list', api_ver=2, interfaces=['task'])

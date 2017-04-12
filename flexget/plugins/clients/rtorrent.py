@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.xmlrpc import client as xmlrpc_client
-from future.moves.urllib.parse import urlparse
+from future.moves.urllib.parse import urlparse, urljoin
 from future.utils import native_str
 
 import logging
@@ -17,6 +17,8 @@ from flexget.event import event
 from flexget.entry import Entry
 from flexget.config_schema import one_or_more
 from flexget.utils.bittorrent import Torrent, is_torrent_file
+
+from requests.auth import HTTPDigestAuth, HTTPBasicAuth
 
 log = logging.getLogger('rtorrent')
 
@@ -34,6 +36,63 @@ class _Method(object):
 
     def __call__(self, *args):
         return self.__send(self.__name, args)
+
+
+class HTTPDigestTransport(xmlrpc_client.Transport):
+    """
+    Transport that uses requests to support Digest authentication.
+    """
+
+    def __init__(self, scheme, digest_auth, username, password, session, *args, **kwargs):
+        self.__scheme = scheme
+        self.__session = session
+        self.__digest_auth = digest_auth
+        self.__username = username
+        self.__password = password
+        self.verbose = 0
+        xmlrpc_client.Transport.__init__(self, *args, **kwargs)  # old style class
+
+    def request(self, host, handler, request_body, verbose=False):
+        return self.single_request(host, handler, request_body, verbose)
+
+    def single_request(self, host, handler, request_body, verbose=0):
+        url = urljoin('{0}://{1}'.format(self.__scheme, host), handler)
+
+        auth = self.get_auth()
+        response = self.send_request(url, auth, request_body)
+
+        # if status code is 401, it means we used the wrong auth method
+        if response.status_code == 401:
+            log.warning('%s auth failed. Retrying with %s. Please change your config.',
+                        'Digest' if self.__digest_auth else 'Basic',
+                        'Basic' if self.__digest_auth else 'Digest')
+            self.__digest_auth = not self.__digest_auth
+
+            auth = self.get_auth()
+            response = self.send_request(url, auth, request_body)
+
+        response.raise_for_status()
+
+        return self.parse_response(response)
+
+    def get_auth(self):
+        if self.__digest_auth:
+            return HTTPDigestAuth(self.__username, self.__password)
+        return HTTPBasicAuth(self.__username, self.__password)
+    
+    def send_request(self, url, auth, data):
+        return self.__session.post(url, auth=auth, data=data, raise_status=False)
+
+    def parse_response(self, response):
+        p, u = self.getparser()
+
+        if self.verbose:
+            log.info('body: %s', repr(response))
+
+        p.feed(response.content)
+        p.close()
+
+        return u.close()
 
 
 class SCGITransport(xmlrpc_client.Transport):
@@ -176,7 +235,7 @@ class RTorrent(object):
         'state', 'complete',
         'bytes_done', 'down.rate', 'left_bytes',
         'ratio',
-        'base_path',
+        'base_path', 'load_date'
     )
 
     required_fields = (
@@ -185,7 +244,7 @@ class RTorrent(object):
         'base_path'
     )
 
-    def __init__(self, uri, username=None, password=None):
+    def __init__(self, uri, username=None, password=None, digest_auth=None, session=None):
         """
         New connection to rTorrent
 
@@ -196,25 +255,13 @@ class RTorrent(object):
         self.uri = uri
         self.username = username
         self.password = password
+        self.digest_auth = digest_auth
         self._version = None
 
         parsed_uri = urlparse(uri)
 
-        # Reformat uri with username and password for HTTP(s) Auth
-        if self.username and self.password:
-            if parsed_uri.scheme not in ['http', 'https']:
-                raise IOError('Username and password only supported on http(s)')
-
-            data = {
-                'scheme': parsed_uri.scheme,
-                'hostname': parsed_uri.hostname,
-                'port': parsed_uri.port,
-                'path': parsed_uri.path,
-                'query': parsed_uri.query,
-                'username': self.username,
-                'password': self.password,
-            }
-            self.uri = '%(scheme)s://%(username)s:%(password)s@%(hostname)s%(path)s%(query)s' % data
+        if self.username and self.password and parsed_uri.scheme not in ['http', 'https']:
+            raise IOError('Username and password only supported on http(s)')
 
         # Determine the proxy server
         if parsed_uri.scheme in ['http', 'https']:
@@ -227,7 +274,12 @@ class RTorrent(object):
         else:
             raise IOError('Unsupported scheme %s for uri %s' % (parsed_uri.scheme, self.uri))
 
-        self._server = sp(self.uri)
+        # Use a special transport if http(s)
+        if parsed_uri.scheme in ['http', 'https']:
+            self._server = sp(self.uri, transport=HTTPDigestTransport(parsed_uri.scheme, self.digest_auth,
+                                                                      self.username, self.password, session))
+        else:
+            self._server = sp(self.uri)
 
     def _clean_fields(self, fields, reverse=False):
         if not fields:
@@ -402,7 +454,9 @@ class RTorrentPluginBase(object):
         try:
             client = RTorrent(os.path.expanduser(config['uri']),
                               username=config.get('username'),
-                              password=config.get('password'))
+                              password=config.get('password'),
+                              digest_auth=config['digest_auth'],
+                              session=task.requests)
             if client.version < [0, 9, 2]:
                 log.error('rtorrent version >=0.9.2 required, found {0}'.format('.'.join(map(str, client.version))))
                 task.abort('rtorrent version >=0.9.2 required, found {0}'.format('.'.join(map(str, client.version))))
@@ -418,6 +472,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             'uri': {'type': 'string'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
+            'digest_auth': {'type': 'boolean', 'default': False},
             'start': {'type': 'boolean', 'default': True},
             'mkdir': {'type': 'boolean', 'default': True},
             'action': {'type': 'string', 'emun': ['update', 'delete', 'add'], 'default': 'add'},
@@ -436,13 +491,14 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
     }
 
     def _verify_load(self, client, info_hash):
-        e = IOError()
+        ex = IOError()
         for _ in range(0, 5):
             try:
                 return client.torrent(info_hash, fields=['hash'])
             except (IOError, xmlrpc_client.Error) as e:
+                ex = e
                 sleep(0.5)
-        raise e
+        raise ex
 
     @plugin.priority(120)
     def on_task_download(self, task, config):
@@ -456,14 +512,16 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
     def on_task_output(self, task, config):
         client = RTorrent(os.path.expanduser(config['uri']),
                           username=config.get('username'),
-                          password=config.get('password'))
+                          password=config.get('password'),
+                          digest_auth=config['digest_auth'],
+                          session=task.requests)
 
         for entry in task.accepted:
-            if task.options.test:
-                log.info('Would add %s to rTorrent' % entry['url'])
-                continue
 
             if config['action'] == 'add':
+                if task.options.test:
+                    log.info('Would add %s to rTorrent', entry['url'])
+                    continue
                 try:
                     options = self._build_options(config, entry)
                 except RenderError as e:
@@ -479,9 +537,15 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                 continue
 
             if config['action'] == 'delete':
+                if task.options.test:
+                    log.info('Would delete %s (%s) from rTorrent', entry['title'], entry['torrent_info_hash'])
+                    continue
                 self.delete_entry(client, entry)
 
             if config['action'] == 'update':
+                if task.options.test:
+                    log.info('Would update %s (%s) in rTorrent', entry['title'], entry['torrent_info_hash'])
+                    continue
                 self.update_entry(client, entry, config)
 
     def delete_entry(self, client, entry):
@@ -542,6 +606,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
         if entry['url'].startswith('magnet:'):
             torrent_raw = 'd10:magnet-uri%d:%se' % (len(entry['url']), entry['url'])
+            torrent_raw = torrent_raw.encode('ascii')
         else:
             # Check that file is downloaded
             if 'file' not in entry:
@@ -596,14 +661,14 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
         except (IOError, xmlrpc_client.Error) as e:
             entry.fail('Failed to verify torrent loaded: %s' % str(e))
 
-    def on_task_exit(self, task, config):
-        """ Make sure all temp files are cleaned up when task exists """
+    def on_task_learn(self, task, config):
+        """ Make sure all temp files are cleaned up when entries are learned """
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
             download = plugin.get_plugin_by_name('download')
             download.instance.cleanup_temp_files(task)
 
-    on_task_abort = on_task_exit
+    on_task_abort = on_task_learn
 
 
 class RTorrentInputPlugin(RTorrentPluginBase):
@@ -613,6 +678,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
             'uri': {'type': 'string'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
+            'digest_auth': {'type': 'boolean', 'default': False},
             'view': {'type': 'string', 'default': 'main'},
             'fields': one_or_more({'type': 'string', 'enum': list(RTorrent.default_fields)}),
         },
@@ -623,7 +689,9 @@ class RTorrentInputPlugin(RTorrentPluginBase):
     def on_task_input(self, task, config):
         client = RTorrent(os.path.expanduser(config['uri']),
                           username=config.get('username'),
-                          password=config.get('password'))
+                          password=config.get('password'),
+                          digest_auth=config['digest_auth'],
+                          session=task.requests)
 
         fields = config.get('fields')
 

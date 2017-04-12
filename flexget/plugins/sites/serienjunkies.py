@@ -1,6 +1,6 @@
 # coding=utf-8
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import re
 import logging
@@ -53,6 +53,11 @@ class UrlRewriteSerienjunkies(object):
         'additionalProperties': False
     }
 
+    def on_task_start(self, task, config):
+        self.config = config or {}
+        self.config.setdefault('hoster', DEFAULT_HOSTER)
+        self.config.setdefault('language', DEFAULT_LANGUAGE)
+
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
@@ -65,10 +70,6 @@ class UrlRewriteSerienjunkies(object):
         series_url = entry['url']
         search_title = re.sub('\[.*\] ', '', entry['title'])
 
-        self.config = task.config.get('serienjunkies') or {}
-        self.config.setdefault('hoster', DEFAULT_HOSTER)
-        self.config.setdefault('language', DEFAULT_LANGUAGE)
-
         download_urls = self.parse_downloads(series_url, search_title)
         if not download_urls:
             entry.reject('No Episode found')
@@ -77,9 +78,9 @@ class UrlRewriteSerienjunkies(object):
             entry['description'] = ", ".join(download_urls)
 
         # Debug Information
-        log.debug('TV Show URL: %s' % series_url)
-        log.debug('Episode: %s' % search_title)
-        log.debug('Download URL: %s' % download_urls)
+        log.debug('TV Show URL: %s', series_url)
+        log.debug('Episode: %s', search_title)
+        log.debug('Download URL: %s', download_urls)
 
     @plugin.internet(log)
     def parse_downloads(self, series_url, search_title):
@@ -109,18 +110,18 @@ class UrlRewriteSerienjunkies(object):
             # find episode language
             episode_lang = episode.find_previous('strong', text=re.compile('Sprache')).next_sibling
             if not episode_lang:
-                log.warning('No language found for: %s' % series_url)
+                log.warning('No language found for: %s', series_url)
                 continue
 
             # filter language
             if not self.check_language(episode_lang):
-                log.warning('languages not matching: %s <> %s' % (self.config['language'], episode_lang))
+                log.warning('languages not matching: %s <> %s', self.config['language'], episode_lang)
                 continue
 
             # find download links
             links = episode.find_all('a')
             if not links:
-                log.warning('No links found for: %s' % series_url)
+                log.warning('No links found for: %s', series_url)
                 continue
 
             for link in links:
@@ -165,10 +166,7 @@ class UrlRewriteSerienjunkies(object):
 
     def check_language(self, languages):
         # Cut additional Subtitles
-        try:
-            languages = languages[:languages.index("+")]
-        except IndexError:
-            pass
+        languages = languages.split('|', 1)[0]
 
         language_list = re.split(r'[,&]', languages)
 
@@ -194,4 +192,4 @@ class UrlRewriteSerienjunkies(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteSerienjunkies, 'serienjunkies', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteSerienjunkies, 'serienjunkies', interfaces=['urlrewriter', 'task'], api_ver=2)

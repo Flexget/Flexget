@@ -1,0 +1,29 @@
+<movie>
+  <id>tt2316801</id>
+  <title>A Bela e a Fera</title>
+      <actor>
+        <name>Vincent Cassel</name>
+        <role>La bête</role>
+        <thumb>http://image.tmdb.org/t/p/original/yTTyX7xziiMibm0nzcH5z6xxLLv.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Léa Seydoux</name>
+        <role>La belle</role>
+        <thumb>http://image.tmdb.org/t/p/original/19gU2MSmsauB9TIh8gcd8JzvD2g.jpg</thumb>
+    </actor>
+    <actor>
+        <name>André Dussollier</name>
+        <role>Belle's father</role>
+        <thumb>http://image.tmdb.org/t/p/original/rKZXoZJBUMKRbACbAGEat7wvAr7.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Eduardo Noriega</name>
+        <role>Perducas</role>
+        <thumb>http://image.tmdb.org/t/p/original/5B1D3MChVAZ5z7cypJbCbSGgDge.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Myriam Charleins</name>
+        <role>Astrid</role>
+        <thumb>http://image.tmdb.org/t/p/original/ifdV5J1OrWzv88TK0qqUDTg3OE9.jpg</thumb>
+    </actor>
+</movie>

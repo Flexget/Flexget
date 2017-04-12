@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from future.utils import PY3
 
 import logging
 import csv
@@ -61,7 +62,10 @@ class InputCSV(object):
         except RequestException as e:
             raise plugin.PluginError('Error fetching `%s`: %s' % (config['url'], e))
         # CSV module needs byte strings, we'll convert back to unicode later
-        page = r.text.encode('utf-8').splitlines()
+        if PY3:
+            page = r.text.splitlines()
+        else:
+            page = r.text.encode('utf-8').splitlines()
         for row in csv.reader(page):
             if not row:
                 continue
@@ -69,7 +73,10 @@ class InputCSV(object):
             for name, index in list(config.get('values', {}).items()):
                 try:
                     # Convert the value back to unicode
-                    entry[name] = row[index - 1].decode('utf-8').strip()
+                    if PY3:
+                        entry[name] = row[index - 1].strip()
+                    else:
+                        entry[name] = row[index - 1].decode('utf-8').strip()
                 except IndexError:
                     raise plugin.PluginError('Field `%s` index is out of range' % name)
 

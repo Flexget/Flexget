@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -71,7 +71,7 @@ class AppleTrailers(object):
     }
 
     def broken(self, error_message):
-        raise plugin.PluginError('Plugin is most likely broken. Got: %s', error_message)
+        raise plugin.PluginError('Plugin is most likely broken. Got: %s' % error_message)
 
     @plugin.priority(127)
     @cached('apple_trailers')
@@ -83,7 +83,7 @@ class AppleTrailers(object):
         try:
             r = task.requests.get(self.rss_url)
         except RequestException as e:
-            raise plugin.PluginError('Retrieving Apple Trailers RSS feed failed: %s', e.args[0])
+            raise plugin.PluginError('Retrieving Apple Trailers RSS feed failed: %s' % e)
 
         rss = feedparser.parse(r.content)
 
@@ -100,7 +100,7 @@ class AppleTrailers(object):
             entry = Entry()
             movie_url = item['link']
             entry['title'] = item['title']
-            entry['movie_name'], entry['apple_trailers_name'] = entry['title'].split(' - ')
+            entry['movie_name'], entry['apple_trailers_name'] = entry['title'].split(' - ', 1)
             if not trailers.get(movie_url):
                 try:
                     movie_page = task.requests.get(movie_url).text
@@ -117,7 +117,7 @@ class AppleTrailers(object):
                     log.error('Failed to get trailer %s: %s', entry['title'], e.args[0])
                     continue
             else:
-                movie_data = trailers['movie_url']['json']
+                movie_data = trailers[movie_url]['json']
             genres = {genre.get('name') for genre in movie_data.get('details').get('genres')}
             config_genres = set(config.get('genres', []))
             if genres and config_genres and not set.intersection(config_genres, genres):

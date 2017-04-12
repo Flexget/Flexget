@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from future.moves.urllib.parse import quote
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -132,4 +132,4 @@ class Site1337x(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Site1337x, '1337x', groups=['urlrewriter', 'search'], api_ver=2)
+    plugin.register(Site1337x, '1337x', interfaces=['urlrewriter', 'search'], api_ver=2)

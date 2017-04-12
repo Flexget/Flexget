@@ -20,23 +20,21 @@
                       </div>
                   </div>
                   <div ng-if="task.status == 'complete'">
-                      <md-list>
-                          <md-subheader class="md-no-sticky text-center">
-                              <span>Accepted {{ task.accepted }}</span>
-                              <span>Rejected {{ task.rejected }}</span>
-                              <span>Failed {{ task.failed }}</span>
-                              <span>Undecided {{ task.undecided }}</span>
-                          </md-subheader>
-                          <md-list-item class="md-2-line" ng-repeat="entry in task.entries">
-                              <md-icon class="fa fa-check-circle"></md-icon>
-                              <h4> {{ entry.title }} </h4>
-                                  <small>
-                                      {{ entry.accepted_by }}{{ entry.rejected_by }}{{ entry.failed_by }}</small>
-                          </md-list-item>
-                      </md-list>
-                      <div flex>
-                          {{ entry.title }}
-                      </div>
+                    <md-subheader class="md-no-sticky text-center">
+                        <span>Accepted: {{ task.accepted }}</span>
+                        <span>Rejected: {{ task.rejected }}</span>
+                        <span>Failed: {{ task.failed }}</span>
+                        <span>Undecided: {{ task.undecided }}</span>
+                    </md-subheader>
+                    <md-list>
+                        <md-list-item class="md-2-line" ng-repeat="entry in task.entries">
+                            <md-icon class="fa fa-lg" ng-class="{ 'fa-check-circle': entry.accepted_by, 'fa-question-circle': !entry.accepted_by }"></md-icon>
+                            <div class="md-list-item-text">
+                                <h3>{{ entry.title }}</h3>
+                                <p>{{ entry.accepted_by }}</p>
+                            </div>
+                        </md-list-item>
+                    </md-list>  
                   </div>
               </div>
           </md-tab-body>

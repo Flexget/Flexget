@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -18,7 +18,7 @@ log = logging.getLogger('search_btn')
 class SearchBTN(object):
     schema = {'type': 'string'}
     # Advertised limit is 150/hour (24s/request average). This may need some tweaking.
-    request_limiter = TokenBucketLimiter('api.btnapps.net', 100, '25 seconds')
+    request_limiter = TokenBucketLimiter('api.broadcasthe.net/', 100, '25 seconds')
 
     def search(self, task, entry, config):
         task.requests.add_domain_limiter(self.request_limiter)
@@ -27,14 +27,19 @@ class SearchBTN(object):
         searches = entry.get('search_strings', [entry['title']])
 
         if 'series_name' in entry:
-            search = {'category': 'Episode'}
+            if entry.get('season_pack_lookup', False):
+                search = {'category': 'Season'}
+            else:
+                search = {'category': 'Episode'}
             if 'tvdb_id' in entry:
                 search['tvdb'] = entry['tvdb_id']
             elif 'tvrage_id' in entry:
                 search['tvrage'] = entry['tvrage_id']
             else:
                 search['series'] = entry['series_name']
-            if 'series_id' in entry:
+            if entry.get('season_pack_lookup', False) and 'series_season' in entry:
+                search['name'] = 'Season %s' % entry['series_season']
+            elif 'series_id' in entry:
                 # BTN wants an ep style identifier even for sequence shows
                 if entry.get('series_id_type') == 'sequence':
                     search['name'] = 'S01E%02d' % entry['series_id']
@@ -51,12 +56,15 @@ class SearchBTN(object):
         for search in searches:
             data = json.dumps({'method': 'getTorrents', 'params': [api_key, search], 'id': 1})
             try:
-                r = task.requests.post('http://api.btnapps.net/',
+                r = task.requests.post('https://api.broadcasthe.net/',
                                        data=data, headers={'Content-type': 'application/json'})
             except requests.RequestException as e:
                 log.error('Error searching btn: %s' % e)
                 continue
-            content = r.json()
+            try:
+                content = r.json()
+            except ValueError as e:
+                raise plugin.PluginError('Error searching btn. Maybe it\'s down?. %s' % str(e))
             if not content or not content['result']:
                 log.debug('No results from btn')
                 if content and content.get('error'):
@@ -88,4 +96,4 @@ class SearchBTN(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SearchBTN, 'btn', groups=['search'], api_ver=2)
+    plugin.register(SearchBTN, 'btn', interfaces=['search'], api_ver=2)

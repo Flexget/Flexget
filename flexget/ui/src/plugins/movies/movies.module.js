@@ -7,8 +7,7 @@
             'ngMaterial',
             'ngSanitize',
 
-            'angular-cache',
-
+            'blocks.pagination',            
             'blocks.exception',
             'blocks.router'
         ]);

@@ -10,6 +10,7 @@
             'components.home',
             'components.sidenav',
             'components.toolbar',
-            'components.user'
+            'components.user',
+            'components.database'
         ]);
 }());

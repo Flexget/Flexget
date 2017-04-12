@@ -9,33 +9,39 @@
     function configService($http, exception, $q) {
         return {
             getRawConfig: getRawConfig,
-            saveRawConfig: saveRawConfig
+            saveRawConfig: saveRawConfig,
+            getVariables: getVariables,
+            saveVariables: saveVariables
         };
 
         function getRawConfig() {
-            return $http.get('/api/server/raw_config')
-                .then(getRawConfigComplete)
+            return $http.get('/api/server/raw_config', {
+                etagCache: true
+            })
                 .catch(callFailed);
-
-            function getRawConfigComplete(response) {
-                return response.data;
-            }
         }
 
         function saveRawConfig(encoded) {
             return $http.post('/api/server/raw_config', {
                 'raw_config': encoded
             })
-                .then(saveRawConfigComplete)
-                .catch(saveRawConfigFailed);
+                .catch(saveFailed);
+        }
 
-            function saveRawConfigComplete() {
-                return;
-            }
+        function getVariables() {
+            return $http.get('/api/variables/', {
+                etagCache: true
+            })
+                .catch(callFailed);
+        }
 
-            function saveRawConfigFailed(response) {
-                return $q.reject(response.data);
-            }
+        function saveVariables(variables) {
+            return $http.put('/api/variables/', variables)
+                .catch(saveFailed);
+        }
+
+        function saveFailed(response) {
+            return $q.reject(response.data);
         }
 
         function callFailed(error) {

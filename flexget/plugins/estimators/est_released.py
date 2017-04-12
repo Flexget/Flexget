@@ -21,7 +21,7 @@ class EstimateRelease(object):
         """
 
         log.debug(entry['title'])
-        estimators = [e.instance.estimate for e in plugin.get_plugins(group='estimate_release')]
+        estimators = [e.instance.estimate for e in plugin.get_plugins(interface='estimate_release')]
         for estimator in sorted(
                 estimators, key=lambda e: getattr(e, 'priority', plugin.DEFAULT_PRIORITY), reverse=True
         ):
@@ -33,4 +33,4 @@ class EstimateRelease(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EstimateRelease, 'estimate_release', api_ver=2)
+    plugin.register(EstimateRelease, 'estimate_release', api_ver=2, interfaces=[])

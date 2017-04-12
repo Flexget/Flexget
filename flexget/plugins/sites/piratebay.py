@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import quote
 
 import re
@@ -9,7 +9,6 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugins.internal.urlrewriting import UrlRewritingError
-from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
 from flexget.utils.tools import parse_filesize
@@ -88,10 +87,10 @@ class UrlRewritePirateBay(object):
             entry['url'] = results[0]['url']
         else:
             # parse download page
-            entry['url'] = self.parse_download_page(entry['url'])
+            entry['url'] = self.parse_download_page(entry['url'], task.requests)
 
     @plugin.internet(log)
-    def parse_download_page(self, url):
+    def parse_download_page(self, url, requests):
         page = requests.get(url).content
         try:
             soup = get_soup(page)
@@ -126,12 +125,14 @@ class UrlRewritePirateBay(object):
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
-            # TPB search doesn't like dashes
-            query = query.replace('-', ' ')
+
+            # TPB search doesn't like dashes or quotes
+            query = query.replace('-', ' ').replace("'", " ")
+
             # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
             url = 'http://thepiratebay.%s/search/%s%s' % (CUR_TLD, quote(query.encode('utf-8')), filter_url)
             log.debug('Using %s as piratebay search url' % url)
-            page = requests.get(url).content
+            page = task.requests.get(url).content
             soup = get_soup(page)
             for link in soup.find_all('a', attrs={'class': 'detLink'}):
                 entry = Entry()
@@ -145,10 +146,13 @@ class UrlRewritePirateBay(object):
                 entry['torrent_leeches'] = int(tds[-1].contents[0])
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
                 # Parse content_size
-                size = link.find_next(attrs={'class': 'detDesc'}).get_text()
-                size = re.search('Size (\d+(\.\d+)?\xa0(?:[PTGMK])iB)', size)
-
-                entry['content_size'] = parse_filesize(size.group(1))
+                size_text = link.find_next(attrs={'class': 'detDesc'}).get_text()
+                if size_text:
+                    size = re.search('Size (\d+(\.\d+)?\xa0(?:[PTGMK])?i?B)', size_text)
+                    if size:
+                        entry['content_size'] = parse_filesize(size.group(1))
+                    else:
+                        log.error('Malformed search result? Title: "%s", No size? %s', entry['title'], size_text)
 
                 entries.add(entry)
 
@@ -165,4 +169,4 @@ class UrlRewritePirateBay(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewritePirateBay, 'piratebay', groups=['urlrewriter', 'search'], api_ver=2)
+    plugin.register(UrlRewritePirateBay, 'piratebay', interfaces=['urlrewriter', 'search'], api_ver=2)

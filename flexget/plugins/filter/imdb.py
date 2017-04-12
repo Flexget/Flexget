@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -59,6 +59,14 @@ class FilterImdb(object):
       reject_directors:
         - nm0093051
 
+      # accept all movies by these writers
+      accept_writers:
+        - nm0000318
+
+      # reject movies by these writers
+      reject_writers:
+        - nm0093051
+
       # reject movies/TV shows with any of these ratings
       reject_mpaa_ratings:
         - PG_13
@@ -87,6 +95,8 @@ class FilterImdb(object):
             'accept_actors': {'type': 'array', 'items': {'type': 'string'}},
             'reject_directors': {'type': 'array', 'items': {'type': 'string'}},
             'accept_directors': {'type': 'array', 'items': {'type': 'string'}},
+            'reject_writers': {'type': 'array', 'items': {'type': 'string'}},
+            'accept_writers': {'type': 'array', 'items': {'type': 'string'}},
             'reject_mpaa_ratings': {'type': 'array', 'items': {'type': 'string'}},
             'accept_mpaa_ratings': {'type': 'array', 'items': {'type': 'string'}}
         },
@@ -190,6 +200,22 @@ class FilterImdb(object):
                 for director_id, director_name in entry.get('imdb_directors', {}).items():
                     if director_id in accepted or director_name in accepted:
                         log.debug('Accepting because of accept_directors %s' % director_name or director_id)
+                        force_accept = True
+                        break
+
+            if 'reject_writers' in config:
+                rejected = config['reject_writers']
+                for writer_id, writer_name in entry.get('imdb_writers', {}).items():
+                    if writer_id in rejected or writer_name in rejected:
+                        reasons.append('reject_writers %s' % writer_name or writer_id)
+                        break
+
+            # Accept if the writer is in the accept list, but do not reject if the writer is unknown
+            if 'accept_writers' in config:
+                accepted = config['accept_writers']
+                for writer_id, writer_name in entry.get('imdb_writers', {}).items():
+                    if writer_id in accepted or writer_name in accepted:
+                        log.debug('Accepting because of accept_writers %s' % writer_name or writer_id)
                         force_accept = True
                         break
 

@@ -3,12 +3,10 @@ describe('Service: Seen', function () {
     beforeEach(function () {
         bard.appModule('plugins.seen');
 
-        /* global $httpBackend, seenService, exception, CacheFactory, $q */
-        bard.inject('$httpBackend', 'seenService', 'exception', 'CacheFactory', '$q');
+        /* global $httpBackend, seenService, exception, $q */
+        bard.inject('$httpBackend', 'seenService', 'exception', '$q');
 
         sinon.stub(exception, 'catcher').returns($q.reject({ message: 'Request failed' }));
-
-        CacheFactory.clearAll();
     });
 
     it('should exist', function () {

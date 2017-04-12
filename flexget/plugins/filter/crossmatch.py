@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -57,22 +57,21 @@ class CrossMatch(object):
                 try:
                     result = method(task, input_config)
                 except plugin.PluginError as e:
-                    log.warning('Error during input plugin %s: %s' % (input_name, e))
+                    log.warning('Error during input plugin %s: %s', input_name, e)
                     continue
                 if result:
                     match_entries.extend(result)
                 else:
-                    log.warning('Input %s did not return anything' % input_name)
+                    log.warning('Input %s did not return anything', input_name)
                     continue
 
         # perform action on intersecting entries
         for entry in task.entries:
             for generated_entry in match_entries:
-                log.trace('checking if %s matches %s' % (entry['title'], generated_entry['title']))
+                log.trace('checking if %s matches %s', entry['title'], generated_entry['title'])
                 common = self.entry_intersects(entry, generated_entry, fields, config.get('exact'))
                 if common:
-                    msg = 'intersects with %s on field(s) %s' % \
-                          (generated_entry['title'], ', '.join(common))
+                    msg = 'intersects with %s on field(s) %s' % (generated_entry['title'], ', '.join(common))
                     for key in generated_entry:
                         if key not in entry:
                             entry[key] = generated_entry[key]
@@ -95,23 +94,18 @@ class CrossMatch(object):
         common_fields = []
 
         for field in fields:
-            # TODO: simplify if seems to work (useless debug)
-            log.trace('checking field %s' % field)
-            v1 = e1.get(field, object())
-            v2 = e2.get(field, object())
-            log.trace('v1: %r' % v1)
-            log.trace('v2: %r' % v2)
+            # Doesn't really make sense to match if field is not in both entries
+            if field not in e1 or field not in e2:
+                log.trace('field %s is not in both entries', field)
+                continue
 
-            if not exact:
-                if v2 in v1:
-                    common_fields.append(field)
-                else:
-                    log.trace('not matching')
+            v1 = e1[field]
+            v2 = e2[field]
+
+            if (not exact and v2 in v1) or v1 == v2:
+                common_fields.append(field)
             else:
-                if v1 == v2:
-                    common_fields.append(field)
-                else:
-                    log.trace('not matching')
+                log.trace('not matching')
 
         return common_fields
 

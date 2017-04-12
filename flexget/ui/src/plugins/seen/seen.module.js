@@ -4,8 +4,7 @@
 
     angular
         .module('plugins.seen', [
-            'angular-cache',
-
+            'blocks.pagination',
             'blocks.exception',
             'blocks.router'
         ]);

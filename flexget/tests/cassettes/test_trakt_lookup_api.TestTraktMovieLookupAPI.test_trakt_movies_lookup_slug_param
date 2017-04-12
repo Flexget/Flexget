@@ -2,13 +2,13 @@ interactions:
 - request:
     body: null
     headers:
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [!!python/unicode 2]
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/the-matrix-reloaded-2003?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/the-matrix-reloaded-2003?extended=full
   response:
-    body: {string: !!python/unicode '{"title":"The Matrix Reloaded","year":2003,"ids":{"trakt":482,"slug":"the-matrix-reloaded-2003","imdb":"tt0234215","tmdb":604},"tagline":"Free
+    body: {string: '{"title":"The Matrix Reloaded","year":2003,"ids":{"trakt":482,"slug":"the-matrix-reloaded-2003","imdb":"tt0234215","tmdb":604},"tagline":"Free
         your mind.","overview":"Six months after the events depicted in The Matrix,
         Neo has proved to be a good omen for the free humans, as more and more humans
         are being freed from the matrix and brought to Zion, the one and only stronghold
@@ -20,25 +20,25 @@ interactions:
         by the Oracle to find the Keymaker who would help them reach the Source.  Meanwhile
         Neo''s recurrent dreams depicting Trinity''s death have got him worried and
         as if it was not enough, Agent Smith has somehow escaped deletion, has become
-        more powerful than before and has fixed Neo as his next target.","released":"2003-05-06","runtime":138,"trailer":"http://youtube.com/watch?v=zsgrsiZoymA","homepage":null,"rating":7.52102,"votes":9159,"updated_at":"2016-08-01T09:02:43.000Z","language":"en","available_translations":["en","de","cs","ru","fr","zh","it","hu","tr","es","pt","sv","fi","nl","pl","sk","he","da","ja","el","bg","th","ko","uk","ro","fa","ca"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/482/fanarts/original/4928db3308.jpg","medium":"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/482/fanarts/thumb/4928db3308.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/482/posters/original/b908a87fb1.jpg","medium":"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/482/posters/thumb/b908a87fb1.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/482/logos/original/05211ae7b0.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/482/cleararts/original/53d6b06b5b.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/482/banners/original/7845b15228.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/482/thumbs/original/0c65446ae0.jpg"}}}'}
+        more powerful than before and has fixed Neo as his next target.","released":"2003-05-15","runtime":138,"trailer":"http://youtube.com/watch?v=zsgrsiZoymA","homepage":"http://whatisthematrix.warnerbros.com/","rating":7.52289,"votes":9872,"updated_at":"2016-10-26T08:59:22.000Z","language":"en","available_translations":["bg","ca","cs","da","de","el","en","es","fa","fi","fr","he","hu","it","ja","ko","nl","pl","pt","ro","ru","sk","sv","th","tr","uk","zh"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R"}'}
     headers:
-      cache-control: ['public, max-age=28800']
-      cf-cache-status: [MISS]
-      cf-ray: [2d04030166272318-FRA]
-      connection: [keep-alive]
-      content-type: [application/json; charset=utf-8]
-      date: ['Wed, 10 Aug 2016 14:07:01 GMT']
-      etag: [W/"469e4bc417cec3f44284b67fa818916d"]
-      expires: ['Wed, 10 Aug 2016 22:07:01 GMT']
-      last-modified: ['Mon, 01 Aug 2016 09:02:43 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=db7c25e55db4576c783200ebe5d3449d71470838021; expires=Thu,
-          10-Aug-17 14:07:01 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-frame-options: [SAMEORIGIN]
-      x-request-id: [60c2968b-7c64-4497-bb12-ced9e64fb743]
-      x-runtime: ['0.011091']
-      x-xss-protection: [1; mode=block]
+      CF-Cache-Status: [MISS]
+      CF-RAY: [312a5a70be0c3ccb-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 12:24:40 GMT']
+      ETag: [W/"0c217c653f171c9625cf9ee28f4fc05e"]
+      Expires: ['Sat, 17 Dec 2016 20:24:40 GMT']
+      Last-Modified: ['Wed, 26 Oct 2016 08:59:22 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=dd489414d6d33a620a5d6acdf17684d161481977479; expires=Sun,
+          17-Dec-17 12:24:39 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [cd4a2fab-b1d3-42e0-bc69-a1ac5a79a2ab]
+      X-Runtime: ['0.010987']
+      X-XSS-Protection: [1; mode=block]
     status: {code: 200, message: OK}
 version: 1

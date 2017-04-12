@@ -5,6 +5,7 @@
     "angular-material": "~1.1.0",
     "angular-ui-router": "~1.0.0-alpha.5",
     "angular-filter": "~0.5.8",
+    "angular-sanitize": "~1.5.8",
     "angular-schema-form": "~0.8.13",
     "font-awesome": "~4.6.3",
     "angular-ui-grid": "~3.1.1",
@@ -20,11 +21,13 @@
     "angular-ui-ace": "~0.2.3",
     "angular-utf8-base64": "~0.0.5",
     "angular-messages": "~1.5.6",
+    "ngclipboard": "~1.1.1",
+    "angular-http-etag": "git://github.com/Tommatheussen/angular-http-etag.git#c047ec6",
+    "angular-link-header-parser": "~1.0.2",
     "angular-cache": "~4.6.0",
-    "ngclipboard": "~1.1.1"
-  },
-  "resolutions": {
-    "angular": "~1.5.6"
+    "md-data-table": "~2.1.0",
+    "yaml.js": "^0.2.8",
+    "angular-aria": "~1.5.8"
   },
   "devDependencies": {
     "angular-mocks": "^1.5.5",
@@ -48,6 +51,15 @@
         "src-min-noconflict/mode-yaml.js",
         "src-min-noconflict/theme*"
       ]
+    },
+    "angular-link-header-parser": {
+      "main": [
+        "release/angular-link-header-parser.js"
+      ]
     }
+  },
+  "resolutions": {
+    "jquery": "~2.2.4",
+    "angular": "~1.5.8"
   }
 }

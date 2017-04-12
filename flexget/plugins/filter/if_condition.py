@@ -1,29 +1,20 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves import builtins
-from past.builtins import basestring
 
 import logging
-import re
 import datetime
 from copy import copy
+
+from jinja2 import UndefinedError
 
 from flexget import plugin
 from flexget.event import event
 from flexget.task import Task
 from flexget.entry import Entry
+from flexget.utils.template import evaluate_expression
 
 log = logging.getLogger('if')
-
-
-def safer_eval(statement, locals):
-    """A safer eval function. Does not allow __ or try statements, only includes certain 'safe' builtins."""
-    allowed_builtins = ['True', 'False', 'str', 'bytes', 'int', 'float', 'len', 'any', 'all', 'sorted']
-    for name in allowed_builtins:
-        locals[name] = getattr(builtins, name)
-    if re.search(r'__|try\s*:|lambda', statement):
-        raise ValueError('`__`, lambda or try blocks not allowed in if statements.')
-    return eval(statement, {'__builtins__': None}, locals)
 
 
 class FilterIf(object):
@@ -54,16 +45,16 @@ class FilterIf(object):
                             'now': datetime.datetime.now()})
         try:
             # Restrict eval namespace to have no globals and locals only from eval_locals
-            passed = safer_eval(condition, eval_locals)
+            passed = evaluate_expression(condition, eval_locals)
             if passed:
                 log.debug('%s matched requirement %s' % (entry['title'], condition))
             return passed
-        except NameError as e:
+        except UndefinedError as e:
             # Extract the name that did not exist
             missing_field = e.args[0].split('\'')[1]
             log.debug('%s does not contain the field %s' % (entry['title'], missing_field))
         except Exception as e:
-            log.error('Error occured while evaluating statement `%s`. (%s)' % (condition, e))
+            log.error('Error occurred while evaluating statement `%s`. (%s)' % (condition, e))
 
     def __getattr__(self, item):
         """Provides handlers for all phases."""
@@ -80,8 +71,8 @@ class FilterIf(object):
                 'fail': Entry.fail}
             for item in config:
                 requirement, action = list(item.items())[0]
-                passed_entries = [e for e in task.entries if self.check_condition(requirement, e)]
-                if isinstance(action, basestring):
+                passed_entries = (e for e in task.entries if self.check_condition(requirement, e))
+                if isinstance(action, str):
                     if not phase == 'filter':
                         continue
                     # Simple entry action (accept, reject or fail) was specified as a string

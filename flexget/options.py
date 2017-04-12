@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import sys
 import copy
@@ -115,7 +115,7 @@ class InjectAction(Action):
         if values:
             kwargs['url'] = values.pop(0)
         else:
-            kwargs['url'] = 'http://localhost/inject/%s' % ''.join(random.sample(string.letters + string.digits, 30))
+            kwargs['url'] = 'http://localhost/inject/%s' % ''.join(random.sample(string.ascii_letters + string.digits, 30))
         if 'force' in [v.lower() for v in values]:
             kwargs['immortal'] = True
         entry = Entry(**kwargs)
@@ -447,11 +447,13 @@ class CoreArgumentParser(ArgumentParser):
         daemon_parser.add_subparsers(title='actions', metavar='<action>', dest='action')
         start_parser = daemon_parser.add_subparser('start', help='start the daemon')
         start_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
+        start_parser.add_argument('--autoreload-config', action='store_true',
+                                  help='automatically reload the config from disk if the daemon detects any changes')
         stop_parser = daemon_parser.add_subparser('stop', help='shutdown the running daemon')
         stop_parser.add_argument('--wait', action='store_true',
                                  help='wait for all queued tasks to finish before stopping daemon')
         daemon_parser.add_subparser('status', help='check if a daemon is running')
-        daemon_parser.add_subparser('reload', help='causes a running daemon to reload the config from disk')
+        daemon_parser.add_subparser('reload-config', help='causes a running daemon to reload the config from disk')
 
     def add_subparsers(self, **kwargs):
         # The subparsers should not be CoreArgumentParsers
@@ -469,6 +471,3 @@ class CoreArgumentParser(ArgumentParser):
         # Set the 'allow_manual' flag to True for any usage of the CLI
         setattr(result, 'allow_manual', True)
         return result
-
-
-

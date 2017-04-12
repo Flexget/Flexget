@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import functools
@@ -41,11 +41,8 @@ class PluginTraktLookup(object):
     trakt_series_air_time
     trakt_series_content_rating
     trakt_series_genres
-    trakt_series_banner_url
-    trakt_series_fanart_url
     trakt_series_imdb_url
     trakt_series_trakt_url
-    trakt_series_images
     imdb_id
     tvdb_id
     trakt_series_actors
@@ -61,10 +58,8 @@ class PluginTraktLookup(object):
     trakt_ep_overview
     trakt_ep_first_aired_epoch
     trakt_ep_first_aired_iso
-    trakt_ep_image_url
     trakt_ep_id
     trakt_ep_tvdb_id
-    trakt_ep_images
 
 
     """
@@ -89,7 +84,7 @@ class PluginTraktLookup(object):
         'trakt_genres': lambda i: [db_genre.name for db_genre in i.genres],
         'trakt_series_network': 'network',
         'imdb_url': lambda series: series.imdb_id and 'http://www.imdb.com/title/%s' % series.imdb_id,
-        'trakt_series_url': lambda series: series.slug and 'http://trakt.tv/shows/%s' % series.slug,
+        'trakt_series_url': lambda series: series.slug and 'https://trakt.tv/shows/%s' % series.slug,
         'trakt_series_country': 'country',
         'trakt_series_status': 'status',
         'trakt_series_overview': 'overview',
@@ -98,10 +93,6 @@ class PluginTraktLookup(object):
         'trakt_series_language': 'language',
         'trakt_series_aired_episodes': 'aired_episodes',
         'trakt_series_episodes': lambda show: [episodes.title for episodes in show.episodes],
-        'trakt_series_poster_full': 'image_poster_full',
-        'trakt_series_poster_medium': 'image_poster_medium',
-        'trakt_series_poster_thumb': 'image_poster_thumb',
-        'trakt_series_thumb': 'image_thumb_full',
         'trakt_languages': 'translation_languages',
     }
 
@@ -126,9 +117,6 @@ class PluginTraktLookup(object):
         'trakt_season': 'season',
         'trakt_episode': 'number',
         'trakt_ep_id': lambda ep: 'S%02dE%02d' % (ep.season, ep.number),
-        'trakt_ep_screenshot_full': 'image_screenshot_full',
-        'trakt_ep_screenshot_medium': 'image_screenshot_medium',
-        'trakt_ep_screenshot_thumb': 'image_screenshot_thumb',
     }
 
     # Movie info
@@ -152,16 +140,6 @@ class PluginTraktLookup(object):
         'trakt_language': 'language',
         'trakt_genres': lambda i: [db_genre.name for db_genre in i.genres],
         'trakt_languages': 'translation_languages',
-        'trakt_fanart_full': 'image_fanart_full',
-        'trakt_fanart_medium': 'image_fanart_medium',
-        'trakt_fanart_thumb': 'image_fanart_thumb',
-        'trakt_poster_full': 'image_poster_full',
-        'trakt_poster_medium': 'image_poster_medium',
-        'trakt_poster_thumb': 'image_poster_thumb',
-        'trakt_logo': 'image_logo_full',
-        'trakt_clearart': 'image_clearart_full',
-        'trakt_banner': 'image_banner_full',
-        'trakt_thumb': 'image_thumb_full'
     }
 
     movie_translate_map = {
@@ -431,4 +409,4 @@ class PluginTraktLookup(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTraktLookup, 'trakt_lookup', api_ver=3, groups=['series_metainfo', 'movie_metainfo'])
+    plugin.register(PluginTraktLookup, 'trakt_lookup', api_ver=2, interfaces=['task', 'series_metainfo', 'movie_metainfo'])

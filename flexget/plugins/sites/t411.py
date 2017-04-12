@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -154,5 +154,5 @@ class T411LookupPlugin(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(T411InputPlugin, 't411', groups=['search', 'input'], api_ver=2)
+    plugin.register(T411InputPlugin, 't411', interfaces=['task', 'search'], api_ver=2)
     plugin.register(T411LookupPlugin, 't411_lookup', api_ver=2)

@@ -10,25 +10,45 @@
             controller: seenController
         });
 
-    function seenController(seenService) {
+    function seenController($mdDialog, $sce, seenService) {
         var vm = this;
 
         vm.$onInit = activate;
         vm.deleteEntry = deleteEntry;
+        vm.getSeen = getSeen;
+        
+        var options = {};
 
         function activate() {
-            getSeen();
+            getSeen(1);
         }
 
-        function getSeen() {
-            return seenService.getSeen().then(function (data) {
-                vm.entries = data.seen_entries;
-            });
+        function getSeen(page) {
+            options.page = page;
+            seenService.getSeen(options)
+                .then(setEntries)
+                .cached(setEntries)
+                .finally(function () {
+                    vm.currentPage = options.page;
+                });
+            
+            function setEntries(response) {
+                vm.entries = response.data;
+                vm.linkHeader = response.headers().link;
+            };
         }
 
         function deleteEntry(entry) {
-            seenService.deleteEntryById(entry.id).then(function () {
-                getSeen();
+            var confirm = $mdDialog.confirm()
+                .title('Confirm forgetting Seen Entry.')
+                .htmlContent($sce.trustAsHtml('Are you sure you want to delete <b>' + entry.title + '</b>?'))
+                .ok('Forget')
+                .cancel('No');
+
+            $mdDialog.show(confirm).then(function () {
+                seenService.deleteEntryById(entry.id).then(function () {
+                    getSeen(options.page);
+                });
             });
         }
     }

@@ -1,295 +1,437 @@
 interactions:
-  - request:
-      body: '{"apikey": "4D297D8CFDE0E105", "username": "flexget", "userkey": "80FB8BD0720CA5EC"}'
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Content-Length: ['84']
-        Content-Type: [application/json]
-        User-Agent: [FlexGet/2.1.4.dev (www.flexget.com)]
-      method: POST
-      uri: https://api.thetvdb.com/login
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAAxTOy7JjQACA4f15ilT2OSWNhLMzTaJFEHfZKJdGN4IjEUzNu09l+y+++v9+bTbb
-          Z1fjx/Zns8WLVqXnjJhEc7wV7Q2CRvSw+QyiA6r70Iea+I0XrcGqREyqMAbNgCHfONNFI2qbGtGO
-          2O3cYCVvcvhp4pIEeZEEJwbRbjbkiDVcjzPketGhts+AvyTB7WPxV1dar86b5KHRZC1fpYH3GWnT
-          s8/dgc+gB/Nt0Ly+amutK2y5mo2bM3FG+nIpOvukXqThnOSqVhjCM4sHHkZFMvQAVf2BeSUOaSeZ
-          y56rV90aKkx+eErFMCGMnZMa908SKksaRRbwXLOrsDLDyCOttqguk/BTa1kxZ/Eia9mlDztYtqTw
-          fUF6d3S4QUGwqzvo8BMQ6Ve6MqI1ggP3i73K3Mv+APcSm1uES7EaB56Q/WGPKqFpi+Lf2D5Cdnw/
-          TjpzEMtSVxQeRRIsW70b5rtlvi9d2lhxR+j1bM6Di0Wnfrry6eEY5U7mASqY3EkCd4j2l+o2Egjq
-          PlqPLyvdcfGEDAzMkoYsu0syjTsUpnC+vEpLVwHNpnlWe6pO43v79e8/AAAA//8DAJjLzA8IAgAA
-      headers:
-        CF-RAY: [2bcb405e35b02792-FRA]
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [application/json]
-        Date: ['Sun, 03 Jul 2016 15:08:12 GMT']
-        Server: [cloudflare-nginx]
-        Set-Cookie: ['__cfduid=df487dff2b7dc8a3c93917de6923998691467558491; expires=Mon,
-            03-Jul-17 15:08:11 GMT; path=/; domain=.thetvdb.com; HttpOnly']
-        Vary: [Accept-Language]
-        X-Powered-By: [Thundar!]
-        X-Thetvdb-Api-Version: [2.1.0]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Authorization: [Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0Njc2NDQ4OTIsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDY3NTU4NDkyLCJ1c2VyaWQiOjE5MTAzMSwidXNlcm5hbWUiOiJmbGV4Z2V0In0.NjdkMJzkLE3gzOlTd0_cipgyfoRFHKAqGadHJfN8tc_q5CYfaqp2Ihp60uaSimvD4ctzUhQlj8vVXFb9Xai0RdikeptiXEybYYP2UTOoheExCYUimJyHT0a5vmPP_4P593PRgVCoCgmifVV8AwojqQC88RhZ2oet2iArAM09Ps264reUhO1DVqC1A3dPi4beH_WU8cB37HijbmI_r_R7C3swnFL069ggLEE5IYACgmLoqxZPOwKoblP_oijMGOxqTe9SktTDFnSNg-D52If0dSaWTqY1KhQsiC2kpYz7uPb-4_vINe2OgjX33-acJ46fO8GKugPLH2jcvxxHpjHvsw]
-        Connection: [keep-alive]
-        User-Agent: [FlexGet/2.1.4.dev (www.flexget.com)]
-      method: GET
-      uri: https://api.thetvdb.com/user/favorites
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA6rmUlBQSkksSVSyUqjmUlBQUFBKSyzLL8osSS1WslKIBgspKCiZW1gYmCjpwLgW
-          JpYmZgiuoZmJqYkhgm9ubGRqiqTa0NDCUgnMi+VSUKjlqgUAAAD//wMA2+BqwXcAAAA=
-      headers:
-        CF-RAY: [2bcb4064448b0f3f-FRA]
-        Cache-Control: ['private, max-age=0']
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [application/json]
-        Date: ['Sun, 03 Jul 2016 15:08:13 GMT']
-        Server: [cloudflare-nginx]
-        Set-Cookie: ['__cfduid=d050140c52e285fffcb1e25015c4433e01467558492; expires=Mon,
-            03-Jul-17 15:08:12 GMT; path=/; domain=.thetvdb.com; HttpOnly']
-        Vary: [Accept-Language]
-        X-Powered-By: [Thundar!]
-        X-Thetvdb-Api-Version: [2.1.0]
-      status: {code: 200, message: OK}
-  - request:
-      body: '{"apikey": "4D297D8CFDE0E105"}'
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Content-Length: ['30']
-        Content-Type: [application/json]
-        User-Agent: [FlexGet/2.1.4.dev (www.flexget.com)]
-      method: POST
-      uri: https://api.thetvdb.com/login
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAAwTByZKiMAAA0Ht/heV9utjUoW+ytAQ1gCQE5kIBQhOWsK9T8+/z3t+Pw+E4NmXK
-          jl+HY7qZeXxLqEVNF++AhxQMgL1OiQrOoGx9TzXlz3Qzq9S4UqvQOVgkAtQcyULPAdRVCYqGvuq1
-          SvV39VbBAGp5i8g7i8g3B4pmhVogQoQlqJV75nxCHMD+FacgxVl217p2aqIuDms8i5ndK8gCrtJ7
-          nvFr8/IMsMvWXUdWYeK4jzSb6OjxxuyN6PQTN46/qUtEyxdNuofEEOGk1nWkTKwGnD5Fsgl5XO28
-          JYhaq2idZEfA3cjvMD6JVlzBPSkUXr7byk/da/F67/50o1wUTyQKhq7Z83p56tzaSnzi74jEAcQ0
-          OZ9dz0Y4YudJNK/u7Azz8ri839PjbLJ8mCPjO2+8FufsIfqozKZBVvTiNTy7ky7YW+QLI9clVB0w
-          s4hZ1WS8+daSB317uxYKI/Il9NQaQn5yIUIplReBY94QQtligWbKebW7cURCpKiZeFX7pPTRohvL
-          8ePffwAAAP//AwBZfMdu1wEAAA==
-      headers:
-        CF-RAY: [2bcb4067bce8047f-FRA]
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [application/json]
-        Date: ['Sun, 03 Jul 2016 15:08:13 GMT']
-        Server: [cloudflare-nginx]
-        Set-Cookie: ['__cfduid=d9bea2e6563fc1472ac427e0bfde6b1211467558493; expires=Mon,
-            03-Jul-17 15:08:13 GMT; path=/; domain=.thetvdb.com; HttpOnly']
-        Vary: [Accept-Language]
-        X-Powered-By: [Thundar!]
-        X-Thetvdb-Api-Version: [2.1.0]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Authorization: [Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0Njc2NDQ4OTMsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDY3NTU4NDkzfQ.NUYNrRbeIeUffKDqpuoaqb_mUv3fPrBTOISBrVVH-yVhfIn7yqAtnlUWQSLefuitV1HvVtT5gboQXyCwaikRicqL4nTW04pSQ4f3lsUeM3Wy2hblz1O23DpBDq4PaISyW8_b53OblNzcjB19KPBgmrDbxKqZqt9jjMT32HEDPvx7ME0xp41cXzTWbYNUic66SVPTUan6u3JASvQsvwL7dduL6JnhsvaHFhoVpUhnL3XTkfus9BEjRsMq5E2PyaX2t0qciCsUnOWJlmWtGXOwhYrpGAjBnW97_VCmNN1uSNTTei9w20nVs_N9OnYDJ9hlzSbaW_TBCf3ACrckXTwEHw]
-        Connection: [keep-alive]
-        User-Agent: [FlexGet/2.1.4.dev (www.flexget.com)]
-      method: GET
-      uri: https://api.thetvdb.com/series/78804
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA2xUy27bSBC8+ysKPO0CkkJLsmXp5sdu4iAPw1Y2h2APbbFFdjLqIWaaEpggQD4k
-          +bl8SUBKlKXdHKeqmt3VU8MvJ0CSkVEyw5cTAEgkS2aYXFyk494WiByE4xtacTJDcuMX5gPeFx5/
-          DNP07M9kJyMnFDkmM3xoARxpG+lOeUTMMC8Y23PEPa8linF2IG1lT+ffy1v2390kj6TKoRk2D1QW
-          siD3rDXUz4fTwccyT46c3TaGk9F4ND3dE0ZWNVaSa68mWonui5YSol1K4Las8dVPR/3heccr28aH
-          Tw15dXWNt8r/Ybb9OjBUarJd7bjbUJKzBj7c5GW2ZrUq8OFiaEVPx4eFsC64/7csTLweb8SvOayF
-          N02XpwVCIkhBTlgxlxXjlQ8ZlsGvYAWjdKRseE7OyTJwjU3hYYHW7CKsCL7KC5Bz8Es0HkCaIZa0
-          YIiikIj55f3N7cMALxgFRRCc1xxOojU1yyCsWWzLFn5VkorX2HYpaM2IBQXO8NFXQbmO2IgVKGQ1
-          wK1GY8qaj2S1aN5r5z1w9egY5vHz2/fAOSsHMv757QdEzYOgvMGjz+oejD6J5vC6Q0sO0Ss5sXrb
-          j2lRYP8R8TrAfMNuzaA2hD2Urop46QvFiypYbzt76ajm7CDcsKKKWFIYdJfsKNq7MiNrk3Q6Pp+c
-          jabD6aR7TxLiDdVvl++Z2zQ9kFUhozo5EMx30bmYjVLcvd6HiqxJbHPb//TvnnewrLLHbfrM0vHo
-          fDoddtRnKodiW/KvuzSdnKWnk4t9qyzjo9S2wFWdzKCVc92rEeP7rvN0MP4ffO0rtebvcpaeAF9P
-          vv4CAAD//wMAwuD+d38EAAA=
-      headers:
-        CF-RAY: [2bcb406b4e932762-FRA]
-        Cache-Control: ['private, max-age=600']
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [application/json]
-        Date: ['Sun, 03 Jul 2016 15:08:14 GMT']
-        Last-Modified: ['Sun, 03 Jul 2016 09:48:17 GMT']
-        Server: [cloudflare-nginx]
-        Set-Cookie: ['__cfduid=dc153555a9f2632f556eaee7e966065a81467558493; expires=Mon,
-            03-Jul-17 15:08:13 GMT; path=/; domain=.thetvdb.com; HttpOnly']
-        Vary: [Accept-Language]
-        X-Powered-By: [Thundar!]
-        X-Thetvdb-Api-Version: [2.1.0]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Authorization: [Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0Njc2NDQ4OTMsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDY3NTU4NDkzfQ.NUYNrRbeIeUffKDqpuoaqb_mUv3fPrBTOISBrVVH-yVhfIn7yqAtnlUWQSLefuitV1HvVtT5gboQXyCwaikRicqL4nTW04pSQ4f3lsUeM3Wy2hblz1O23DpBDq4PaISyW8_b53OblNzcjB19KPBgmrDbxKqZqt9jjMT32HEDPvx7ME0xp41cXzTWbYNUic66SVPTUan6u3JASvQsvwL7dduL6JnhsvaHFhoVpUhnL3XTkfus9BEjRsMq5E2PyaX2t0qciCsUnOWJlmWtGXOwhYrpGAjBnW97_VCmNN1uSNTTei9w20nVs_N9OnYDJ9hlzSbaW_TBCf3ACrckXTwEHw]
-        Connection: [keep-alive]
-        User-Agent: [FlexGet/2.1.4.dev (www.flexget.com)]
-      method: GET
-      uri: https://api.thetvdb.com/series/84946
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA2RSwVLbQAy95ys0e07SteMQ4hsUpjCdANPS9sD0oGRlW8Vep1oZJjB8UL+jP9ax
-          HWeAHvXe6kna955HAMahoknheQQAYNiZFI6TZXI07oFAwhSusCKTgrkVqsjsKSwZAwWTwt3PPbRG
-          70nal7ngtuANlh86tUkeT39tc/NG9bIdZhbzZWQPhKI2raQ5947cAGcsQU9YqOuIbWQnNplE0cB7
-          0sda7lvy4vT6HdqPGUBpvHJ/zdFhbE5eWuiuKwHMmWCFpquG2+oHkgemx+Ef/v4BxXsKwBrAY0WQ
-          SV0BgifOi3UtRV07qDO4oke4lpLQB0DvYFuLCu4ClJwRsActCDBTkgq1aDtaILZ2DkUjwhv0NIVT
-          ytl79jloIURQ1V6L0PfBxfAOPqMKexx3GkKBHXkN79YYA/tN2bhWrWoCb7gDNwVlYQwrFMfwSTDA
-          pXc91e5da0HySqZlIKg0eV4SaA1C64ZL145mgZIfKIz3RVFX1F/f143n3w3Bpim1EZoOPpQY9NvW
-          oXZGR0kSJ/PFbB4PiWMJZ7i7zn4QdWZ/bbzDnXlF3+69jWxqLdysDrajss87775PVicDzJVb9/lQ
-          jeLFcrmIB+oJtzFrT57f2ChOYpscEoPODWG0y4mNJzaB6CiNlmm8ePPmdGdSmNlFNCSclb4MyxxP
-          j/+DP9aN17ZnNgJ4Gb38AwAA//8DABUIHUCmAwAA
-      headers:
-        CF-RAY: [2bcb4071a6160f3f-FRA]
-        Cache-Control: ['private, max-age=600']
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [application/json]
-        Date: ['Sun, 03 Jul 2016 15:08:15 GMT']
-        Last-Modified: ['Thu, 17 Sep 2015 02:35:52 GMT']
-        Server: [cloudflare-nginx]
-        Set-Cookie: ['__cfduid=d4697eb48776184fb823df74da46ca51a1467558494; expires=Mon,
-            03-Jul-17 15:08:14 GMT; path=/; domain=.thetvdb.com; HttpOnly']
-        Vary: [Accept-Language]
-        X-Powered-By: [Thundar!]
-        X-Thetvdb-Api-Version: [2.1.0]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Authorization: [Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0Njc2NDQ4OTMsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDY3NTU4NDkzfQ.NUYNrRbeIeUffKDqpuoaqb_mUv3fPrBTOISBrVVH-yVhfIn7yqAtnlUWQSLefuitV1HvVtT5gboQXyCwaikRicqL4nTW04pSQ4f3lsUeM3Wy2hblz1O23DpBDq4PaISyW8_b53OblNzcjB19KPBgmrDbxKqZqt9jjMT32HEDPvx7ME0xp41cXzTWbYNUic66SVPTUan6u3JASvQsvwL7dduL6JnhsvaHFhoVpUhnL3XTkfus9BEjRsMq5E2PyaX2t0qciCsUnOWJlmWtGXOwhYrpGAjBnW97_VCmNN1uSNTTei9w20nVs_N9OnYDJ9hlzSbaW_TBCf3ACrckXTwEHw]
-        Connection: [keep-alive]
-        User-Agent: [FlexGet/2.1.4.dev (www.flexget.com)]
-      method: GET
-      uri: https://api.thetvdb.com/series/164541
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA2RTTU/bQBC951c87QWQknSdb3wroZQqoqBCy6H0MMTjeIizG+2uE7mI/17ZSSxC
-          Tyu9eTPzZt7sawtQCQVSMV5bAKAkUTGi0WA4iNo7xLMT9t9pxSqGuqYtieBKNtzRak+hXMizVzF+
-          1wA+8HDa05E+29OPo1rV4J99qWcyhl3VaeFoncmc8k87OZ3FsPuyXqgjWd8quarBAoWikqGm1gQx
-          hZiGn4rz4bM4rjMqPR193uk1MxgOW+uWdfLF/Qf0uI0rTJDdOgbDA7hg4/j9Bqau4hwNZzfsNsLb
-          KvM+8IZxM/9KznEIcBwKZzwyu2IEi1vKijbEwLqEXYWkYhJk4pFSyNideCwlz9l18ZAxFlVxYx1s
-          mrLzyGSFkDHmGZl5XdEVpk63W4NAfonUujnjdOfRWRe1pBOPwLSCeLxYMZzgucQ0E4NrixnnednG
-          JRlT4klVr31SeJQ8F1r5NsgkmFljMaOcllRQ97CfnHz4uU4o1AZEg9E4Gk3648nhhMT5Sypv00fm
-          2oQrJwmV6l34Yb/z81hr3N00blCobI6hHn51osEBllXyvLMthGikdXTehP7SuidhF/xyp6PeROtR
-          v2mVJO9vZNjpRYhGcT+K9THnoqwH0cNx81Uk8I+DnMl/4NQWJtTfS7eAt9bbPwAAAP//AwBaTGwJ
-          gAMAAA==
-      headers:
-        CF-RAY: [2bcb407511320f69-FRA]
-        Cache-Control: ['private, max-age=600']
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [application/json]
-        Date: ['Sun, 03 Jul 2016 15:08:16 GMT']
-        Last-Modified: ['Wed, 29 Jun 2016 02:46:18 GMT']
-        Server: [cloudflare-nginx]
-        Set-Cookie: ['__cfduid=d531b2322c832c1265ed37e9a832764a81467558495; expires=Mon,
-            03-Jul-17 15:08:15 GMT; path=/; domain=.thetvdb.com; HttpOnly']
-        Vary: [Accept-Language]
-        X-Powered-By: [Thundar!]
-        X-Thetvdb-Api-Version: [2.1.0]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Authorization: [Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0Njc2NDQ4OTMsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDY3NTU4NDkzfQ.NUYNrRbeIeUffKDqpuoaqb_mUv3fPrBTOISBrVVH-yVhfIn7yqAtnlUWQSLefuitV1HvVtT5gboQXyCwaikRicqL4nTW04pSQ4f3lsUeM3Wy2hblz1O23DpBDq4PaISyW8_b53OblNzcjB19KPBgmrDbxKqZqt9jjMT32HEDPvx7ME0xp41cXzTWbYNUic66SVPTUan6u3JASvQsvwL7dduL6JnhsvaHFhoVpUhnL3XTkfus9BEjRsMq5E2PyaX2t0qciCsUnOWJlmWtGXOwhYrpGAjBnW97_VCmNN1uSNTTei9w20nVs_N9OnYDJ9hlzSbaW_TBCf3ACrckXTwEHw]
-        Connection: [keep-alive]
-        User-Agent: [FlexGet/2.1.4.dev (www.flexget.com)]
-      method: GET
-      uri: https://api.thetvdb.com/series/73255
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA1yST2/TQBDF7/0UT3sBpMQ0aUKk3JACLRKFA+WPhDiMvVN7qL1rzawdRf3yyHZM
-          Kdff23lv3+w+XgDOUyK3x+MFADjxbo/d1Xq7XUzAWIXtEzXs9nA3sTN2Z4lqIWNze/wcAc46brND
-          dj70xA5uBL/OwzmFwDp4lkptJQXVr8fcZbnLfrele5b/YbiWW6+vdpu/QqLUDeHuXfDsZ3wvaumt
-          KE8Tl5eb5Wq1XL2Z9cDpGPVhEN9//oGXX7+8+k+asmaoXUgyld9sZ1hyUP6390GpoafKtydLrKfn
-          jWPP2gsfB6vrCM/cskJCikgVo2E/LAHNOCtsiPcYd7fA3bcXhiZaQhGblutaQgk/ZGa46coKH6lT
-          YVgiNZCNhrlKXQuFhLxLMNKCLEmBg2a4Vi6jnmZ/QkM9qxQPaKuTSSEUcKwixOC5j+KHy+TsTTyj
-          GZ8uw/dKakYlhpwr6iUqCgrIo3pWxAAKSSwWQvViTJ1+QqpU+qHeHwAAAP//ZJPNboMwEITveYpV
-          Lr00EaYEQY/9ObeqaHve4g1YOLaFF1KQ8u6VoaBUvc5Inlnvt2aqWdaoNZmKQoS3ug+zXX+I68ZR
-          U5gJGSzX1IK0JdvWQ6V6gs6BNXsobEWTeVZcT61qNHLnVNmQBCY8hYDBdqZan6ZvRy37W6jpRmuQ
-          Fs41MvVhLwyMDXlQc80WSwKsUBnPc29tywbYTp1pltDTAv5Wo+d3J5EnEkWSpnkm0iRbjke1/gmH
-          l+MnUXMNXDCKX+JWCJGVqYJSfOzEegLqJL9mWpmjRMQiiRdrRBcrns3n1yhKs+zukK8ZUtIfyifh
-          Ydjeg+m0Xi5MMb0tyfle/JMfbWc4DBdnhw3AZXP5AQAA//8DAAV/2RhSBAAA
-      headers:
-        CF-RAY: [2bcb407b3f5c26ae-FRA]
-        Cache-Control: ['private, max-age=600']
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [application/json]
-        Date: ['Sun, 03 Jul 2016 15:08:17 GMT']
-        Last-Modified: ['Sun, 26 Jun 2016 22:54:08 GMT']
-        Server: [cloudflare-nginx]
-        Set-Cookie: ['__cfduid=d5a3543bd0c1405599a1150dcd40f73d11467558496; expires=Mon,
-            03-Jul-17 15:08:16 GMT; path=/; domain=.thetvdb.com; HttpOnly']
-        Vary: [Accept-Language]
-        X-Powered-By: [Thundar!]
-        X-Thetvdb-Api-Version: [2.1.0]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Authorization: [Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0Njc2NDQ4OTMsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDY3NTU4NDkzfQ.NUYNrRbeIeUffKDqpuoaqb_mUv3fPrBTOISBrVVH-yVhfIn7yqAtnlUWQSLefuitV1HvVtT5gboQXyCwaikRicqL4nTW04pSQ4f3lsUeM3Wy2hblz1O23DpBDq4PaISyW8_b53OblNzcjB19KPBgmrDbxKqZqt9jjMT32HEDPvx7ME0xp41cXzTWbYNUic66SVPTUan6u3JASvQsvwL7dduL6JnhsvaHFhoVpUhnL3XTkfus9BEjRsMq5E2PyaX2t0qciCsUnOWJlmWtGXOwhYrpGAjBnW97_VCmNN1uSNTTei9w20nVs_N9OnYDJ9hlzSbaW_TBCf3ACrckXTwEHw]
-        Connection: [keep-alive]
-        User-Agent: [FlexGet/2.1.4.dev (www.flexget.com)]
-      method: GET
-      uri: https://api.thetvdb.com/series/81189
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA2SSTW/bMAyG7/kVhC67OJmduE2TWz8GbAO6FWu3HoodGIu2uMqyIVEtsqL/fZBd
-          Z+12E5+X4iuKfJoBKI2CagtPMwAAxVpt4aQoTjbZCAJ5pvAFW1JbUGee8J5dA2eo1UsGWsZAQW3h
-          7ucL2qFz5NOFxmNvuEL7fig6b5bF4lffqDfVPyVTtS7XxeogCEpMNdUHp+ngVbMPcsqehhvLPD+Z
-          58V8mU+6I3ns/H0STy/P/6GjzQR9dMJjV+XRBBtyPqG7IQRQ5z7lZFN44bHFv+F1DD258Crhxni2
-          lrwawPQf3QP5B6bHZHaLVsjDrWGhDBCC+Ng0Nn2q4cZAqEzXWagMtRzE70EIK0M+Aw6gGRvXBdLw
-          yGIA9QO6ijTY6Bqo0tkv4COBRO8CSAcIlmuCroYqdZJB7zsdq+SGTkMgOzi3JAbb3pBgy44Aq6pr
-          e3RMGnZ7QKg735KHIFGTkww+UwgEV+zuW3TZ+BoxBMhtMgtURT+2FKDGlu3+XYCaHbqK0UIdJXqC
-          HdWdJzAEmikspilYDPK91yjDmIvyeH1UHJXH00oi+3CB+6/1LdEw6uvoNO7VK/nmZbKbbZ7D1eVh
-          5ijsmiTc/Jhfnk6YW70bl0Mk3+SrdbmepN/YL1lG8cNVXuT5ZrU5PlhpTW+WagBne7UFF62ddpmF
-          vk3Om0X5Hz7vopPUab4qZwDPs+c/AAAA//8DABgNH+KaAwAA
-      headers:
-        CF-RAY: [2bcb408169cb2708-FRA]
-        Cache-Control: ['private, max-age=600']
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [application/json]
-        Date: ['Sun, 03 Jul 2016 15:08:18 GMT']
-        Last-Modified: ['Sun, 03 Jul 2016 03:11:09 GMT']
-        Server: [cloudflare-nginx]
-        Set-Cookie: ['__cfduid=da825e3a9da69aa13749479c723eaaa571467558497; expires=Mon,
-            03-Jul-17 15:08:17 GMT; path=/; domain=.thetvdb.com; HttpOnly']
-        Vary: [Accept-Language]
-        X-Powered-By: [Thundar!]
-        X-Thetvdb-Api-Version: [2.1.0]
-      status: {code: 200, message: OK}
+- request:
+    body: '{"username": "flexget", "userkey": "80FB8BD0720CA5EC", "apikey": "4D297D8CFDE0E105"}'
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['84']
+      Content-Type: [application/json]
+      User-Agent: [FlexGet/2.9.16.dev (www.flexget.com)]
+    method: POST
+    uri: https://api.thetvdb.com/login
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAAxTOR7KiQAAA0P2cwnLvr5akzI6oTWhJkjYUSmoygqS5/NS/wKv378/hcJy6Km2P
+        fw/HdFOK1+2NH1ixnzs8IwxH2Fr0W4AMrHrfFRT2J92UOr1z+FFK4CEGBNp1ConBCJu6gmWHrWat
+        UympEwGOsGG32Euy2JMBLLsViTmBnJxEoklognJ+E+4We+avResOt+v2ghMf1e+GLl7e8zfSvG4u
+        FRIugC34wcpGBcPdPQUUO8fZvMjCVF7gzWqcLqwbOe/bcVZUTvqMJR+3fjUoJybw1G3l6GbTtSi8
+        BnjyUoMU+1E2slKbKppFOATa5fa5WhhaZE9JqFF3Wt9XhSGYq1gQIOxAFci5+j2fAezXQehAdlEy
+        T0/06BOby6J4LmXGU8N2tHMa9M6K8rVrA3FG1TeeL+YE7jYCfuF9bUMYZql6RnwiGKqxB6v1krkw
+        fZBJuqzVY1m+on7vI169S3xK8HqWS+YbawUY3Aw7XfXJScqKip1+BCHePmdnnbM+5JlCtht7FsOk
+        3t2mbgmINcSvEqnLSjkbmt2zCCAnvQZc67txdio3i7y5os/k/6XEVQsAAAD//wMAETTwXAgCAAA=
+    headers:
+      CF-RAY: [32e1fe7599336533-SYD]
+      Connection: [keep-alive]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 08 Feb 2017 20:57:26 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d05125b51c61efb165a2b4cfe44156ece1486587446; expires=Thu,
+          08-Feb-18 20:57:26 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+      Vary: [Accept-Language]
+      X-Powered-By: [Thundar!]
+      X-Thetvdb-Api-Version: [2.1.2]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Accept-Language: [en]
+      Authorization: [Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0ODY2NzM4NDYsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDg2NTg3NDQ2LCJ1c2VyaWQiOjE5MTAzMSwidXNlcm5hbWUiOiJmbGV4Z2V0In0.iJy4YqHV-Y49vafvwFCtj7IGRmToZlmFgpnsvJKAErsjBanXkqJ-6YWKyxA5myML_Z8YitWeP3DpsFPfjLtk59NiZ0L7Gr8RiIR3p4ENmKz5MzxJ6268Dh20Zo0kYFgKu110IpxqCo0f7JfWMdM_raQwwJWV4Qatm9o5T-qMoR_gxonYDvNkuav7Qt0HSN0XhWuSPCqvEkU_BdCPKPzYxRbFAZeO3dewxkOwwuDMHp_BKHEBe2BMfgEQciLh0qVfiTokrg34R_hz5OYZiyr1TxvfpZB6hFSmSvDZdlzVmln2IiLNBxE3MFJjvPLSp9N0NTe8YAnXVaf-jyR3GVDX6g]
+      Connection: [keep-alive]
+      User-Agent: [FlexGet/2.9.16.dev (www.flexget.com)]
+    method: GET
+    uri: https://api.thetvdb.com/user/favorites
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA6rmUlBQSkksSVSyUqjmUlBQUFBKSyzLL8osSS1WslKIBgspKCiZW1gYmCjpwLgW
+        JpYmZgiuoZmJqYkhgm9ubGRqiqTa0NDCUgnMi+VSUKjlqgUAAAD//wMA2+BqwXcAAAA=
+    headers:
+      CF-RAY: [32e1fe772e1a6569-SYD]
+      Cache-Control: ['private, max-age=0']
+      Connection: [keep-alive]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 08 Feb 2017 20:57:27 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d259d18cfe434978a734956e935d6d7fd1486587446; expires=Thu,
+          08-Feb-18 20:57:26 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+      Vary: [Accept-Language]
+      X-Powered-By: [Thundar!]
+      X-Thetvdb-Api-Version: [2.1.2]
+    status: {code: 200, message: OK}
+- request:
+    body: '{"apikey": "4D297D8CFDE0E105"}'
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['30']
+      Content-Type: [application/json]
+      User-Agent: [FlexGet/2.9.16.dev (www.flexget.com)]
+    method: POST
+    uri: https://api.thetvdb.com/login
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAAwTBy5KiMAAAwPt8heXdKQQF3JsmgIkBFKPIXCgeEQiBoDCibO2/b/ffr9lsPsia
+        tfM/szn74DJ1ssqv8PkyoaVXoR61wToDSEd1d7sCvPlmHyzYflv53FJ8GKne5K48mPWoETXisgqa
+        t2BWLnKAetRsPkmY35PQVhCXbw8WqkcLzYMn7X76ZlO/O/j24SNhGMibKiPCAGy3SJfuwAkppdJx
+        I0nfnuPbHJMwiM4qnXabaBDmD1b8nA/xwyw27s1dIEsI0sR9CKOsGXXcG0RdFPHz8VoJbIRX8qkP
+        +y7ZOKvpJ3ktzYVxAz0+/eoviz7XSAsTLQal0jk9Vgu1BZlesQdjVk3d/VhiCqIHRy1auzCm2wW3
+        uewVwSDriuJ1cYrAaMdr3j3HEydVb7dkx/exPSi77fFyXqjCuu+oOBaNR+pam2qzzMaa1pr3MqP0
+        SpN7eVkGcbKNwlselgTr4XGSKc6MtLQ8YEJGczp0T/UEpvRwHCIGmOUUer62Lr4+mCPEDVtL9Vef
+        ivnXv/8AAAD//wMA6wKE0tcBAAA=
+    headers:
+      CF-RAY: [32e1fe78bd216599-SYD]
+      Connection: [keep-alive]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 08 Feb 2017 20:57:27 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=dcbdaf9c59ad250d097db78447152c5791486587447; expires=Thu,
+          08-Feb-18 20:57:27 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+      Vary: [Accept-Language]
+      X-Powered-By: [Thundar!]
+      X-Thetvdb-Api-Version: [2.1.2]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Authorization: [Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0ODY2NzM4NDcsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDg2NTg3NDQ3fQ.ezsBKOFKyoDWRoX2oYLeCDnAI6oMtjLLho0pj7abxNGOFjJLWRYS2TzB9Ytl8ZJ0Odjt_q8g9MXM-IEllLm_sWDYcmw6Js7L2-g_rqv4lJ7WVLykKHpa9G4zZav18-7XCsJQu6vETr5I3Wa3_Ch0pGsJ2g2nCc6ieqeeEkTMHwhJTCYqjInI5MD_TA-jFjos0leDepggvUGgR7nwVdprwQjLisFnLBjH_Ft0BAPUS-2lEfBTlPgmNLkk3zk8hcwkTk3Nv8YbVTafhU1R_aAYWXdWhLJ6WPzobJc7bhENC8DeTdTtpr2QCzbKPtYeCeEGg6d5EUO6t8wDJme5o2u6zg]
+      Connection: [keep-alive]
+      User-Agent: [FlexGet/2.9.16.dev (www.flexget.com)]
+    method: GET
+    uri: https://api.thetvdb.com/series/78804
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA2xTy27bSBC8+ysKPGUBSaElxZJ182M38WKTGLaSHBZ7aIstspNRDzHTlMAYAfIh
+        yc/lSwJSoiwle5yq6umunprHEyDJyCiZ4fEEABLJkhkm02k67m2ByEE4vqEVJzMk135hPuBD4fFs
+        mKYv/kh2MnJCkWMyw78tgCNtI90pj4gZ5gVje46447VEMc4OpK3s6fz/8pb9bzfJA6lyaIbNA5WF
+        LMg9bw318/Hp4GOZJ0fObhrDyWg8Oj/dE0ZWNVaSK68mWonui5YSol1I4Las8dVPR/3hWccr28aH
+        Tw15eXmFt8q/MNt+HRgqNdmudtxtKMlZAx9u8iJbs1oV+HAxtKKn4/1CWBfc/0sWJl6PN+LXHNbC
+        m6bL0wIhEaQgJ6yYy4rxjw8ZlsGvYAWjdKRseEnOyTJwjU3hYYHW7CKsCL7KC5Bz8Es0HkCaIZa0
+        YIiikIj5xd31zf0ArxgFRRCc1xxOojU1yyCsWWzLFn5VkorX2HYpaM2IBQXO8NFXQbmO2IgVKGQ1
+        wI1GY8qaS7JaNO+18x64enAM8/jx9VvgnJUDGf/4+h2i5kFQ3uDBZ3UPRp9Ec3jdoSWH6JWcWL3t
+        x7QosL9EvA4w37BbM6gNYQ+lqyL+9oXiVRWst529dFRzdhBuWFFFLCkMukd2FO1dmZG1STodT8+G
+        k+H0bNL9Jwnxmuq3yw/MbZruyaqQUZ0cCOa76ExnoxS3r/ehImsS27z2+/7tyw6WVfawTZ9ZOh6d
+        nZ8PO+ozlUOxLfnnbZpOXqSnk+m+VZbxUWpb4LJOZtDKue7XiPFd1/l8MP4NvvKVWjLDNJ2cAF9O
+        vvwEAAD//wMAiaB3MH8EAAA=
+    headers:
+      CF-RAY: [32e1fe7a4ef06569-SYD]
+      Cache-Control: ['private, max-age=600']
+      Connection: [keep-alive]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 08 Feb 2017 20:57:27 GMT']
+      Last-Modified: ['Sun, 05 Feb 2017 05:34:27 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d2a4277a026a9638050a51a40ef5b7e8c1486587447; expires=Thu,
+          08-Feb-18 20:57:27 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+      Vary: [Accept-Language]
+      X-Powered-By: [Thundar!]
+      X-Thetvdb-Api-Version: [2.1.2]
+    status: {code: 200, message: OK}
+- request:
+    body: '{"apikey": "4D297D8CFDE0E105"}'
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['30']
+      Content-Type: [application/json]
+      User-Agent: [FlexGet/2.9.16.dev (www.flexget.com)]
+    method: POST
+    uri: https://api.thetvdb.com/login
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAAwTBy5KiMAAAwPt8heXdKQQF3JsmgIkBFKPIXCgeEQiBoDCibO2/b/ffr9lsPsia
+        tfM/szn74DJ1ssqv8PkyoaVXoR61wToDSEd1d7sCvPlmHyzYflv53FJ8GKne5K48mPWoETXisgqa
+        t2BWLnKAetRsPkmY35PQVhCXbw8WqkcLzYMn7X76ZlO/O/j24SNhGMibKiPCAGy3SJfuwAkppdJx
+        I0nfnuPbHJMwiM4qnXabaBDmD1b8nA/xwyw27s1dIEsI0sR9CKOsGXXcG0RdFPHz8VoJbIRX8qkP
+        +y7ZOKvpJ3ktzYVxAz0+/eoviz7XSAsTLQal0jk9Vgu1BZlesQdjVk3d/VhiCqIHRy1auzCm2wW3
+        uewVwSDriuJ1cYrAaMdr3j3HEydVb7dkx/exPSi77fFyXqjCuu+oOBaNR+pam2qzzMaa1pr3MqP0
+        SpN7eVkGcbKNwlselgTr4XGSKc6MtLQ8YEJGczp0T/UEpvRwHCIGmOUUer62Lr4+mCPEDVtL9Vef
+        ivnXv/8AAAD//wMA6wKE0tcBAAA=
+    headers:
+      CF-RAY: [32e1fe7bef680b08-SYD]
+      Connection: [keep-alive]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 08 Feb 2017 20:57:27 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=de9fd4eec8e6a4c8756b52d343ec61c441486587447; expires=Thu,
+          08-Feb-18 20:57:27 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+      Vary: [Accept-Language]
+      X-Powered-By: [Thundar!]
+      X-Thetvdb-Api-Version: [2.1.2]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Authorization: [Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0ODY2NzM4NDcsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDg2NTg3NDQ3fQ.ezsBKOFKyoDWRoX2oYLeCDnAI6oMtjLLho0pj7abxNGOFjJLWRYS2TzB9Ytl8ZJ0Odjt_q8g9MXM-IEllLm_sWDYcmw6Js7L2-g_rqv4lJ7WVLykKHpa9G4zZav18-7XCsJQu6vETr5I3Wa3_Ch0pGsJ2g2nCc6ieqeeEkTMHwhJTCYqjInI5MD_TA-jFjos0leDepggvUGgR7nwVdprwQjLisFnLBjH_Ft0BAPUS-2lEfBTlPgmNLkk3zk8hcwkTk3Nv8YbVTafhU1R_aAYWXdWhLJ6WPzobJc7bhENC8DeTdTtpr2QCzbKPtYeCeEGg6d5EUO6t8wDJme5o2u6zg]
+      Connection: [keep-alive]
+      User-Agent: [FlexGet/2.9.16.dev (www.flexget.com)]
+    method: GET
+    uri: https://api.thetvdb.com/series/84946
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA2RSwVLbQAy95ys0e07SteMQ4hsUpjCdANPS9sD0oGRlW8Vep1oZJjB8UL+jP9ax
+        HWeAHvXe6kna955HAMahoknheQQAYNiZFI6TZXI07oFAwhSusCKTgrkVqsjsKSwZAwWTwt3PPbRG
+        70nal7ngtuANlh86tUkeT39tc/NG9bIdZhbzZWQPhKI2raQ5947cAGcsQU9YqOuIbWQnNplE0cB7
+        0sda7lvy4vT6HdqPGUBpvHJ/zdFhbE5eWuiuKwHMmWCFpquG2+oHkgemx+Ef/v4BxXsKwBrAY0WQ
+        SV0BgifOi3UtRV07qDO4oke4lpLQB0DvYFuLCu4ClJwRsActCDBTkgq1aDtaILZ2DkUjwhv0NIVT
+        ytl79jloIURQ1V6L0PfBxfAOPqMKexx3GkKBHXkN79YYA/tN2bhWrWoCb7gDNwVlYQwrFMfwSTDA
+        pXc91e5da0HySqZlIKg0eV4SaA1C64ZL145mgZIfKIz3RVFX1F/f143n3w3Bpim1EZoOPpQY9NvW
+        oXZGR0kSJ/PFbB4PiWMJZ7i7zn4QdWZ/bbzDnXlF3+69jWxqLdysDrajss87775PVicDzJVb9/lQ
+        jeLFcrmIB+oJtzFrT57f2ChOYpscEoPODWG0y4mNJzaB6CiNlmm8ePPmdGdSmNlFNCSclb4MyxxP
+        j/+DP9aN17ZnNgJ4Gb38AwAA//8DABUIHUCmAwAA
+    headers:
+      CF-RAY: [32e1fe7d6e3e65b1-SYD]
+      Cache-Control: ['private, max-age=600']
+      Connection: [keep-alive]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 08 Feb 2017 20:57:28 GMT']
+      Last-Modified: ['Thu, 17 Sep 2015 02:35:52 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=dd0b0202de22d257e20e58a97ef5251081486587447; expires=Thu,
+          08-Feb-18 20:57:27 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+      Vary: [Accept-Language]
+      X-Powered-By: [Thundar!]
+      X-Thetvdb-Api-Version: [2.1.2]
+    status: {code: 200, message: OK}
+- request:
+    body: '{"apikey": "4D297D8CFDE0E105"}'
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['30']
+      Content-Type: [application/json]
+      User-Agent: [FlexGet/2.9.16.dev (www.flexget.com)]
+    method: POST
+    uri: https://api.thetvdb.com/login
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAAwTBSXKqQAAA0H1OYbknhcggf6eMDWEWaN1QMtpMTYAw9K/cPe/9/zgcjjNuiv74
+        73AsduOdahlykBGEBJxsBCbQ+1wmAR40A4wkQ/wsdqMt9CtyaoV25AdjE4u15WoCXduAGiO/29pC
+        ydtcAhPoxP0V5+UrVmlQ482WK8a+V2db9tjS+ySd7mKTC1XCZQSyenpT+dDPlJBqDUfI9Ue9+mK6
+        1RcZ359xLoRMzQcoyDvklUm9dOT+zbFDdVvenDfoRuzu2smdhHEXnztDITiH3JwVA92ivQleM6UK
+        XGzG8kjza7ecRebdhI/e0t3TEt9GyIcXzbxQyEYcLHKhJ2DS5uRlkkyLov1Lab4CVJ2pfvQEI4ZM
+        pqApVlF5FWW3nEhA2GRqcHpqQGTu85vefjRjPGe98KwxPbDzWgmPgVesm0+ljT4Q2sJEQZvI4tFa
+        qiDBPd1HV+9CkF4kDrLlDvpSd2G+TRVaDgQStNtOldbNeC6cSgQ82wLLKfdkHH1gXCGTLV6Ve9R6
+        /Pj9AwAA//8DAMCo73zXAQAA
+    headers:
+      CF-RAY: [32e1fe7efac46533-SYD]
+      Connection: [keep-alive]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 08 Feb 2017 20:57:28 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d7ae08353c886f9228412fa8e97e6ddcb1486587448; expires=Thu,
+          08-Feb-18 20:57:28 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+      Vary: [Accept-Language]
+      X-Powered-By: [Thundar!]
+      X-Thetvdb-Api-Version: [2.1.2]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Authorization: [Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0ODY2NzM4NDgsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDg2NTg3NDQ4fQ.zmHPoK5UFz5czX4HbBF6URcEU-lJO7dHYjwR9bxj8DoTZWd7U2j6SiSdmiQf_jvmzTq54pgBvh5QpHJWPyG1Ps7ry9Zy2-iXtU5tcep0liykSat-F75WKWDr06wmv392hkUYnMHP1vWBrX6U8GK8-iNi5Xed7nzIsGt_aKzcGVVyLEkLSig3-nrQ7JWX2cEisWFifA9DPfszSz4_skob1kIVKyth0xuGJr3cn7Zjo0p4twg7Yp6EMBR-bkHpz0MozEix94orMvgS_on0nVAQ8ziHe_OiNDmXRCm82qKFXMOXICXNlmFCwxJZv5Fz7otN745ET_rrRIJAX2cvQgdQ-w]
+      Connection: [keep-alive]
+      User-Agent: [FlexGet/2.9.16.dev (www.flexget.com)]
+    method: GET
+    uri: https://api.thetvdb.com/series/164541
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA2RTTW8aMRC98yuefEkiAbUJ0LC3hjRNFeVDDW0OTQ8TdpadsNjI9oJolP9e7QKr
+        kJ4svXkz82be+LUFqJQiqQSvLQBQkqoEZtgf9E17iwT2wuGWFqwSqCtakwguZcUdrXYUKoQCB5Xg
+        dw3gAw/HPW30yY5+GNWqBv/sSj2TteyrTjNPy1ymVHzayunMBt2X5UwdyPpeyVUNFimWlQw1djaK
+        LcU2/Ex8iF/Ec51R6enoUafXzGA5rp2f18nnDx/Qwza+tFG26+gP9uCMref3Gxj7inMwnFuxXwmv
+        q8yHyCvGzfQbec8xwnMsvQ3I3YIRHe4oL9sQC+dT9hWSiU2RS0BGMWd/FDCXomDfxSRnzKri1nm4
+        LGMfkMsCMWdMc7LTuqIvbZ3u1haRwhyZ81PG8dajky5qSUcBkWkBCXhxYjnF8wbjXCyuHK65KDZt
+        XJC1Gzyp6nVPCo9SFEKL0AbZFNfOOlxTQXMqqbvfT0Eh/lymFGsDTP9s2O8ZMxruT0h8uKDNXfbI
+        XJtw6SWljXoXnux2Pkq0xv1N4wbFyuYEavKrY/p7WBbp89a2GM1QazNqQn9p2ZO4DX6916Z3pvXw
+        tGmVpu9vZNDpGZhhcmoSfcg539SD6MHn5qtI5B97OWfd/+GxK22sP9igBby13v4BAAD//wMAFvuu
+        rIIDAAA=
+    headers:
+      CF-RAY: [32e1fe808ee765b1-SYD]
+      Cache-Control: ['private, max-age=600']
+      Connection: [keep-alive]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 08 Feb 2017 20:57:28 GMT']
+      Last-Modified: ['Mon, 06 Feb 2017 22:46:36 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d758a75313f68dee920821d00701d6cd11486587448; expires=Thu,
+          08-Feb-18 20:57:28 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+      Vary: [Accept-Language]
+      X-Powered-By: [Thundar!]
+      X-Thetvdb-Api-Version: [2.1.2]
+    status: {code: 200, message: OK}
+- request:
+    body: '{"apikey": "4D297D8CFDE0E105"}'
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['30']
+      Content-Type: [application/json]
+      User-Agent: [FlexGet/2.9.16.dev (www.flexget.com)]
+    method: POST
+    uri: https://api.thetvdb.com/login
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAAwTBSXKqQAAA0H1OYbknhcggf6eMDWEWaN1QMtpMTYAw9K/cPe/9/zgcjjNuiv74
+        73AsduOdahlykBGEBJxsBCbQ+1wmAR40A4wkQ/wsdqMt9CtyaoV25AdjE4u15WoCXduAGiO/29pC
+        ydtcAhPoxP0V5+UrVmlQ482WK8a+V2db9tjS+ySd7mKTC1XCZQSyenpT+dDPlJBqDUfI9Ue9+mK6
+        1RcZ359xLoRMzQcoyDvklUm9dOT+zbFDdVvenDfoRuzu2smdhHEXnztDITiH3JwVA92ivQleM6UK
+        XGzG8kjza7ecRebdhI/e0t3TEt9GyIcXzbxQyEYcLHKhJ2DS5uRlkkyLov1Lab4CVJ2pfvQEI4ZM
+        pqApVlF5FWW3nEhA2GRqcHpqQGTu85vefjRjPGe98KwxPbDzWgmPgVesm0+ljT4Q2sJEQZvI4tFa
+        qiDBPd1HV+9CkF4kDrLlDvpSd2G+TRVaDgQStNtOldbNeC6cSgQ82wLLKfdkHH1gXCGTLV6Ve9R6
+        /Pj9AwAA//8DAMCo73zXAQAA
+    headers:
+      CF-RAY: [32e1fe825ec26599-SYD]
+      Connection: [keep-alive]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 08 Feb 2017 20:57:28 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d34872570f3521a0725320836a512e6471486587448; expires=Thu,
+          08-Feb-18 20:57:28 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+      Vary: [Accept-Language]
+      X-Powered-By: [Thundar!]
+      X-Thetvdb-Api-Version: [2.1.2]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Authorization: [Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0ODY2NzM4NDgsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDg2NTg3NDQ4fQ.zmHPoK5UFz5czX4HbBF6URcEU-lJO7dHYjwR9bxj8DoTZWd7U2j6SiSdmiQf_jvmzTq54pgBvh5QpHJWPyG1Ps7ry9Zy2-iXtU5tcep0liykSat-F75WKWDr06wmv392hkUYnMHP1vWBrX6U8GK8-iNi5Xed7nzIsGt_aKzcGVVyLEkLSig3-nrQ7JWX2cEisWFifA9DPfszSz4_skob1kIVKyth0xuGJr3cn7Zjo0p4twg7Yp6EMBR-bkHpz0MozEix94orMvgS_on0nVAQ8ziHe_OiNDmXRCm82qKFXMOXICXNlmFCwxJZv5Fz7otN745ET_rrRIJAX2cvQgdQ-w]
+      Connection: [keep-alive]
+      User-Agent: [FlexGet/2.9.16.dev (www.flexget.com)]
+    method: GET
+    uri: https://api.thetvdb.com/series/73255
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA2RTXW/TQBB8z69Y+aUgJSZ2vtq8ASkFiVIEaYuEeNj4tvaS8511t3ZIq/53dHac
+        tvA6c7czszf3MACIFApGS3gYAABErKIlLCbpbDbsAE+OyX/BkqIlRB9t7Sk6UKgZPfloCT9bAA48
+        XMar+HDoCVtFLfDrcHmDxpALM3OHVcEZ6jet7ihfxL+rPHqh/ynYitJ0spgeCUGpg3h0bhSpHr5j
+        5+UtO+pujMfTUZKMknnPG5KdddtAfrj6Aa+uv7/+h+q0etDVRrgLP531YE7G0fPcK4clPkW+3Hsh
+        t3+Z2DbkGqZdGHVhQRFV5ICNWJCCoCQVlgBle5fJg72DdndDWN+ceCitF8hsWZHWbHJQQTOGj3Ve
+        wGesHRN4QecBfTtw41hrRiOwqQU8ugy9cAYrF8OFo9y6fT8focSGHGdbqIq954zRwK6wwB4UNZZV
+        MLMh5VkRlO3TxXBbsCYo2MOGCmzYOsjQwMY6RQ6sATTC3maMetiqdk2QwnET4pnWZlag1mRyChLe
+        6iZke76Qqr6/1xQyoYCVghwom4l1HnJuCOoKrIlhbXNqyR1L0boq0KhRxdmWFAhhGQT2tjb5cTT9
+        qciJH0JBJ1qDsrArUKgJ7yIguCUP3Nl0mBFgjmy8dL61zbYgtvVMHYSe+uJHGr1cVwqlbWIyPZ2n
+        k3kyW/Sfh51f4f7q7pZo+7xwgVgfGncsIQqbPCDrm1Fy/AJcqk3XVpHxNEmTadpT91ilLB15/nU8
+        np+eTmZnRw2l6EXLW+DdPlqCqbXufxgLfeuVz+LkP/i9rY2EcOnZZADwOHj8CwAA//8DAINwpblS
+        BAAA
+    headers:
+      CF-RAY: [32e1fe83e9ca19d4-SYD]
+      Cache-Control: ['private, max-age=600']
+      Connection: [keep-alive]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 08 Feb 2017 20:57:29 GMT']
+      Last-Modified: ['Sat, 04 Feb 2017 19:22:37 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=de0103028fb4ea070a3406dfd958757381486587448; expires=Thu,
+          08-Feb-18 20:57:28 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+      Vary: [Accept-Language]
+      X-Powered-By: [Thundar!]
+      X-Thetvdb-Api-Version: [2.1.2]
+    status: {code: 200, message: OK}
+- request:
+    body: '{"apikey": "4D297D8CFDE0E105"}'
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['30']
+      Content-Type: [application/json]
+      User-Agent: [FlexGet/2.9.16.dev (www.flexget.com)]
+    method: POST
+    uri: https://api.thetvdb.com/login
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAAwTByZKiMAAA0Ht/heXdLmVnbmGRBIGwNuLFYgkSVkFagan593nv79dut5+HhvT7
+        P7s9Wc0qM3KKqRlEGzo5FL1Q7/O5igTUPK8/qil/k9VsCQQU1/oRawnjbDbnaM0LdW2D6oH63dIS
+        vWgLFb1QJ69pXJRpfD6ielgc7cE44YN1NI8vve+Twq+DJynEzypOSu5zeeNllSGwElm6iToY0h6L
+        4mxNOPen4gNl3RzJoUcR+KVvtSP8BFpVq1OoZHB+M23Q+QJlk+CTBqtuQaHvRqb//anpArtNWFCg
+        yX4Y2m/9Nd7tpc7NKpfk4gQkXq6dFwcY8Qxtx1UsLjLZtQEesFIc5xPAHFeSzv+QJ3ssKiu5rCEn
+        zLfnAcfb2E52Himb8QRjVh8M4BvwqtmD5K73D0cPkViM97AI7DR2W8E4B90DR8zsbsHMeFx+t2QV
+        HqibjGPZhulD5gZ8q8Yq/1wkOfZOSfe6NGey4etUqouSdlo23mKYmYabjTl7zBcMH0tlmOFT7Gk6
+        g/3Xv/8AAAD//wMA/8a0ytcBAAA=
+    headers:
+      CF-RAY: [32e1fe858a0d19d4-SYD]
+      Connection: [keep-alive]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 08 Feb 2017 20:57:29 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d3c8f2409886194c19bcb6cfab4292c671486587449; expires=Thu,
+          08-Feb-18 20:57:29 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+      Vary: [Accept-Language]
+      X-Powered-By: [Thundar!]
+      X-Thetvdb-Api-Version: [2.1.2]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Authorization: [Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0ODY2NzM4NDksImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDg2NTg3NDQ5fQ.1B5yoQ8BeRbh48Y_tfZ59C2eHh73iz7EAoanO77tLrOcRrdwH9EJqe-nIUAuivCme5rAlCDjaHBbHtv2lSmR6i3YSwaSyELH6nmq2nuVjixHmz6xISD9RTTMvEsq_MxjcJhc89d1A859jNs4A27FHMNPBL4UJ3ykAQALaOWcrAO44femRwep30dhLYKyT46tZp-OWzqlrMcUBzGpAqbj-GARGHXDMo8Py_w4i-U7dq_TdSMaWPl6GFSmgOU2tPzSt2Q4c_L9CH-iPYqqflTag94oOZhqhcwK89WQ1YmsKkFezOXrfCxBamDbqZWHbJGPbqc30cxOHgxhGJTp7niatA]
+      Connection: [keep-alive]
+      User-Agent: [FlexGet/2.9.16.dev (www.flexget.com)]
+    method: GET
+    uri: https://api.thetvdb.com/series/81189
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA1yQzU7DMBCE732Klc9pSUJRS25tQYIDXEDqoeKwxIu91HWqtdMK9eWRk6b83Dzf
+        zO7IexoBKI0RVQWnEQCAYq0qmBfF/DbrQSBhCs+4I1WBWgrhlr2BJWp1TqBjDBRUBZu3M3pH70nS
+        gBHcW67RXXVLx6YsJp97o/5sf0ylajadFdcXI2Js00517zVduj5YQlywUDdR5vl8nBfjMh98T/HY
+        yDaZi6fVP9rXDFBaH7n/1fRmgIa8JLTpJIBaScpkg7wT3OGPfGnDnnz4FXi1ws6RqA4M92gOJAem
+        Yypbo4sksLYcKQOEEKU1xqWjWjYWQm2bxkFtacchyhdEwtqSZMABNKPxTSANR44WUB/Q16TBtd5A
+        nd4ygQeC2IoPEBvAbwAAAP//ZJI9T8MwEIb3/opTF5ZSua3VNt34WpAqKigwX+MzOWE7kX0egtT/
+        jpKQCsR67/Dcq+cFx5agtlB2TWbQxNrksqNhMJDI9WRPUqFvKhL0HAiwLGvfYGAycGoBwdbRU4Qk
+        2VCQGTxSSgQHDp8ew2z4RioCZN/BEpU5DpUSWPTs2qsElgOGktGBzZIjwYlsHQkqAsOU5qMFh0le
+        G4PSa17o7Vpv9VIvxsFxTPfYPtl3ol71Sw4G2+mv+PhjttgpBYf9xTkKh48uOL5d72/GM3tzGsYh
+        ogq12ujNGH1hs2QZwoeDWihVrIr1BWUM/RlVf7htpzsI2blxyyz0PJKLuf53vqtzkK6p2ugJwHly
+        /gYAAP//AwDAoQQGmgMAAA==
+    headers:
+      CF-RAY: [32e1fe870a9c19d4-SYD]
+      Cache-Control: ['private, max-age=600']
+      Connection: [keep-alive]
+      Content-Encoding: [gzip]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 08 Feb 2017 20:57:29 GMT']
+      Last-Modified: ['Tue, 07 Feb 2017 16:17:21 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d3c8f2409886194c19bcb6cfab4292c671486587449; expires=Thu,
+          08-Feb-18 20:57:29 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+      Vary: [Accept-Language]
+      X-Powered-By: [Thundar!]
+      X-Thetvdb-Api-Version: [2.1.2]
+    status: {code: 200, message: OK}
 version: 1

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -43,6 +43,7 @@ class NextTraktEpisodes(object):
             'list': {'type': 'string'},
             'strip_dates': {'type': 'boolean', 'default': False}
         },
+        'required': ['list'],
         'anyOf': [{'required': ['username']}, {'required': ['account']}],
         'error_anyOf': 'At least one of `username` or `account` options are needed.',
         'additionalProperties': False
@@ -53,31 +54,41 @@ class NextTraktEpisodes(object):
             config['username'] = 'me'
         session = get_session(account=config.get('account'))
         listed_series = {}
-        if config.get('list'):
-            args = ('users', config['username'])
-            if config['list'] in ['collection', 'watchlist', 'watched']:
-                args += (config['list'], 'shows')
-            else:
-                args += ('lists', make_list_slug(config['list']), 'items')
-            try:
-                data = session.get(get_api_url(args)).json()
-            except RequestException as e:
-                raise plugin.PluginError('Unable to get trakt list `%s`: %s' % (config['list'], e))
-            if not data:
-                log.warning('The list "%s" is empty.' % config['list'])
-                return
-            for item in data:
-                if item.get('show'):
-                    if not item['show']['title']:
-                        # Seems we can get entries with a blank show title sometimes
-                        log.warning('Found trakt list show with no series name.')
-                        continue
-                    trakt_id = item['show']['ids']['trakt']
-                    listed_series[trakt_id] = {
-                        'series_name': '%s (%s)' % (item['show']['title'], item['show']['year']),
-                        'trakt_id': trakt_id,
-                        'tvdb_id': item['show']['ids']['tvdb'],
-                        'trakt_list': config.get('list')}
+        args = ('users', config['username'])
+        if config['list'] in ['collection', 'watchlist', 'watched']:
+            args += (config['list'], 'shows')
+        else:
+            args += ('lists', make_list_slug(config['list']), 'items')
+        try:
+            data = session.get(get_api_url(args)).json()
+        except RequestException as e:
+            raise plugin.PluginError('Unable to get trakt list `%s`: %s' % (config['list'], e))
+        if not data:
+            log.warning('The list "%s" is empty.' % config['list'])
+            return
+        for item in data:
+            if item.get('show'):
+                if not item['show']['title']:
+                    # Seems we can get entries with a blank show title sometimes
+                    log.warning('Found trakt list show with no series name.')
+                    continue
+                trakt_id = item['show']['ids']['trakt']
+                listed_series[trakt_id] = {
+                    'series_name': '%s (%s)' % (item['show']['title'], item['show']['year']),
+                    'trakt_id': trakt_id,
+                    'trakt_series_name': item['show']['title'],
+                    'trakt_series_year': item['show']['year'],
+                    'trakt_list': config.get('list')}
+                if item['show']['ids'].get('tvdb'):
+                    listed_series[trakt_id]['tvdb_id'] = item['show']['ids']['tvdb']
+                if item['show']['ids'].get('tvrage'):
+                    listed_series[trakt_id]['tvrage_id'] = item['show']['ids']['tvrage']
+                if item['show']['ids'].get('imdb'):
+                    listed_series[trakt_id]['imdb_id'] = item['show']['ids']['imdb']
+                if item['show']['ids'].get('tmdb'):
+                    listed_series[trakt_id]['tmdb_id'] = item['show']['ids']['tmdb']
+                if item['show']['ids'].get('slug'):
+                    listed_series[trakt_id]['trakt_slug'] = item['show']['ids']['slug']
         context = config['context']
         if context == 'collected':
             context = 'collection'
@@ -133,7 +144,7 @@ class NextTraktEpisodes(object):
         entry['series_id_type'] = 'ep'
         entry['series_id'] = 'S%02dE%02d' % (season, episode)
         entry['title'] = entry['series_name'] + ' ' + entry['series_id']
-        entry['url'] = 'http://trakt.tv/shows/%s/seasons/%s/episodes/%s' % (fields['trakt_id'], season, episode)
+        entry['url'] = 'https://trakt.tv/shows/%s/seasons/%s/episodes/%s' % (fields['trakt_id'], season, episode)
         return entry
 
 

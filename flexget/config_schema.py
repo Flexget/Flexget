@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from flexget.utils.template import get_template
 
 from future.moves.urllib.parse import urlparse, parse_qsl
 
@@ -14,7 +15,7 @@ from jsonschema.compat import str_types, int_types
 
 from flexget.event import fire_event
 from flexget.utils import qualities, template
-from flexget.utils.tools import parse_timedelta
+from flexget.utils.tools import parse_timedelta, parse_episode_identifier
 
 schema_paths = {}
 
@@ -162,7 +163,6 @@ def parse_size(size_input):
 
 
 class RefResolver(jsonschema.RefResolver):
-
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('handlers', {'': resolve_ref})
         super(RefResolver, self).__init__(*args, **kwargs)
@@ -251,9 +251,23 @@ def is_path(instance):
 def is_url(instance):
     if not isinstance(instance, str_types):
         return True
-    regexp = ('(' + '|'.join(['ftp', 'http', 'https', 'file', 'udp']) +
+    regexp = ('(' + '|'.join(['ftp', 'http', 'https', 'file', 'udp', 'socks5']) +
               '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?')
     return re.match(regexp, instance)
+
+
+@format_checker.checks('episode_identifier', raises=ValueError)
+def is_episode_identifier(instance):
+    if not isinstance(instance, (str_types, int)):
+        return True
+    return parse_episode_identifier(instance) is not None
+
+
+@format_checker.checks('file_template', raises=ValueError)
+def is_valid_template(instance):
+    if not isinstance(instance, str_types):
+        return True
+    return get_template(instance) is not None
 
 
 def set_error_message(error):

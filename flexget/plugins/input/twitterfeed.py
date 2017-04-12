@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -65,7 +65,7 @@ class TwitterFeed(object):
 
     def on_task_start(self, task, config):
         try:
-            import twitter
+            import twitter  # noqa
         except ImportError:
             raise plugin.PluginError('twitter module required', logger=log)
 
@@ -80,9 +80,9 @@ class TwitterFeed(object):
                                    consumer_secret=config['consumer_secret'],
                                    access_token_key=config['access_token_key'],
                                    access_token_secret=config['access_token_secret'])
-        except twitter.TwitterError as e:
+        except twitter.TwitterError as ex:
             raise plugin.PluginError('Unable to authenticate to twitter for task %s: %s' %
-                                     (task.name, e))
+                                     (task.name, ex))
 
         if config['all_entries']:
             log.debug('Fetching %d last tweets from %s timeline' %

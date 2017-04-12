@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from argparse import ArgumentParser
 
@@ -51,7 +51,6 @@ def reset_plugin(options):
         console('The database for `%s` has been reset.' % plugin)
     except ValueError as e:
         console('Unable to reset %s: %s' % (plugin, e.message))
-
 
 
 @event('options.register')

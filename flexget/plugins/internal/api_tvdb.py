@@ -1,10 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 from datetime import datetime, timedelta
 
-from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime
+from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime, Text
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
@@ -12,7 +12,7 @@ from sqlalchemy.schema import ForeignKey
 from flexget import db_schema
 from flexget.utils import requests
 from flexget.utils.tools import split_title_year
-from flexget.utils.database import with_session, text_date_synonym, json_synonym
+from flexget.utils.database import with_session, text_date_synonym, json_synonym, Session
 from flexget.utils.simple_persistence import SimplePersistence
 
 log = logging.getLogger('api_tvdb')
@@ -32,31 +32,35 @@ class TVDBRequest(object):
     def __init__(self, username=None, account_id=None):
         self.username = username
         self.account_id = account_id
-        self.auth_key = self.username if self.username else 'default'
+        self.auth_key = self.username.lower() if self.username else 'default'
 
     def get_auth_token(self, refresh=False):
-        tokens = persist.get('auth_tokens')
-        if not tokens:
-            tokens = {'default': None}
+        with Session() as session:
+            auth_token = session.query(TVDBTokens).filter(TVDBTokens.name == self.auth_key).first()
+            if not auth_token:
+                auth_token = TVDBTokens()
+                auth_token.name = self.auth_key
 
-        auth_token = tokens.get(self.auth_key)
+            if refresh or auth_token.has_expired():
+                data = {'apikey': TVDBRequest.API_KEY}
+                if self.username:
+                    data['username'] = self.username
+                if self.account_id:
+                    data['userkey'] = self.account_id
 
-        if not auth_token or refresh:
-            data = {'apikey': TVDBRequest.API_KEY}
-            if self.username:
-                data['username'] = self.username
-            if self.account_id:
-                data['userkey'] = self.account_id
+                log.debug('Authenticating to TheTVDB with %s', self.username if self.username else 'api_key')
 
-            log.debug('Authenticating to TheTVDB with %s' % (self.username if self.username else 'api_key'))
+                auth_token.token = requests.post(TVDBRequest.BASE_URL + 'login', json=data).json().get('token')
+                auth_token.refreshed = datetime.now()
+                auth_token = session.merge(auth_token)
 
-            tokens[self.auth_key] = requests.post(TVDBRequest.BASE_URL + 'login', json=data).json().get('token')
-        persist['auth_tokens'] = tokens
-        return tokens[self.auth_key]
+            return auth_token.token
 
     def _request(self, method, endpoint, **params):
         url = TVDBRequest.BASE_URL + endpoint
-        headers = {'Authorization': 'Bearer %s' % self.get_auth_token()}
+        language = params.pop('language', 'en')
+        headers = {'Authorization': 'Bearer %s' % self.get_auth_token(),
+                   'Accept-Language': language}
         data = params.pop('data', None)
 
         result = requests.request(method, url, params=params, headers=headers, raise_status=False, json=data)
@@ -68,7 +72,11 @@ class TVDBRequest(object):
         result = result.json()
 
         if result.get('errors'):
-            raise LookupError('Error processing request on tvdb: %s' % result.get('errors'))
+            log.debug('Result contains errors: %s', result['errors'])
+            # a hack to make sure it doesn't raise exception on a simple invalidLanguage. This is because tvdb
+            # has a tendency to contain bad data and randomly return this error for no reason
+            if len(result['errors']) > 1 or 'invalidLanguage' not in result['errors']:
+                raise LookupError('Error processing request on tvdb: %s' % result['errors'])
 
         return result
 
@@ -100,6 +108,25 @@ genres_table = Table('tvdb_series_genres', Base.metadata,
                      Column('series_id', Integer, ForeignKey('tvdb_series.id')),
                      Column('genre_id', Integer, ForeignKey('tvdb_genres.id')))
 Base.register_table(genres_table)
+
+
+class TVDBTokens(Base):
+    __tablename__ = 'tvdb_tokens'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(Unicode)
+    token = Column(Text)
+    refreshed = Column(DateTime)
+
+    def has_expired(self):
+        if not self.token or not self.refreshed:
+            return True
+
+        seconds = (datetime.now() - self.refreshed).total_seconds()
+        if seconds >= 86400:
+            return True
+
+        return False
 
 
 class TVDBSeries(Base):
@@ -136,7 +163,7 @@ class TVDBSeries(Base):
 
     episodes = relation('TVDBEpisode', backref='series', cascade='all, delete, delete-orphan')
 
-    def __init__(self, tvdb_id):
+    def __init__(self, tvdb_id, language):
         """
         Looks up movie on tvdb and creates a new database model for it.
         These instances should only be added to a session via `session.merge`.
@@ -144,11 +171,11 @@ class TVDBSeries(Base):
         self.id = tvdb_id
 
         try:
-            series = TVDBRequest().get('series/%s' % self.id)
+            series = TVDBRequest().get('series/%s' % self.id, language=language)
         except requests.RequestException as e:
             raise LookupError('Error updating data from tvdb: %s' % e)
 
-        self.language = 'en'
+        self.language = language or 'en'
         self.last_updated = series['lastUpdated']
         self.name = series['seriesName']
         self.rating = float(series['siteRating']) if series['siteRating'] else 0.0
@@ -189,7 +216,7 @@ class TVDBSeries(Base):
 
     def get_actors(self):
         if not self._actors:
-            log.debug('Looking up actors for series %s' % self.name)
+            log.debug('Looking up actors for series %s', self.name)
             try:
                 actors_query = TVDBRequest().get('series/%s/actors' % self.id)
                 self.actors_list = [a['name'] for a in actors_query] if actors_query else []
@@ -203,7 +230,7 @@ class TVDBSeries(Base):
 
     def get_posters(self):
         if not self._posters:
-            log.debug('Getting top 5 posters for series %s' % self.name)
+            log.debug('Getting top 5 posters for series %s', self.name)
             try:
                 poster_query = TVDBRequest().get('series/%s/images/query' % self.id, keyType='poster')
                 self.posters_list = [p['fileName'] for p in poster_query[:5]] if poster_query else []
@@ -268,7 +295,7 @@ class TVDBEpisode(Base):
 
     series_id = Column(Integer, ForeignKey('tvdb_series.id'), nullable=False)
 
-    def __init__(self, series_id, ep_id):
+    def __init__(self, series_id, ep_id, language=None):
         """
         Looks up movie on tvdb and creates a new database model for it.
         These instances should only be added to a session via `session.merge`.
@@ -277,7 +304,7 @@ class TVDBEpisode(Base):
         self.id = ep_id
         self.expired = False
         try:
-            episode = TVDBRequest().get('episodes/%s' % self.id)
+            episode = TVDBRequest().get('episodes/%s' % self.id, language=language)
         except requests.RequestException as e:
             raise LookupError('Error updating data from tvdb: %s' % e)
 
@@ -395,16 +422,16 @@ class TVDBSeriesSearchResult(Base):
     def expired(self):
         log.debug('checking series %s for expiration', self.original_name)
         if datetime.now() - self.created_at >= timedelta(days=SEARCH_RESULT_EXPIRATION_DAYS):
-            log.debug('series %s is expires, should refetch', self.original_name)
+            log.debug('series %s is expires, should re-fetch', self.original_name)
             return True
         log.debug('series %s is not expired', self.original_name)
         return False
 
 
-def find_series_id(name):
+def find_series_id(name, language=None):
     """Looks up the tvdb id for a series"""
     try:
-        series = TVDBRequest().get('search/series', name=name)
+        series = TVDBRequest().get('search/series', name=name, language=language)
     except requests.RequestException as e:
         raise LookupError('Unable to get search results for %s: %s' % (name, e))
 
@@ -457,7 +484,7 @@ def _update_search_strings(series, session, search=None):
 
 
 @with_session
-def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
+def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None, language=None):
     """
     Look up information on a series. Will be returned from cache if available, and looked up online and cached if not.
 
@@ -468,6 +495,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         in the cache.
     :param session: An sqlalchemy session to be used to lookup and store to cache. Commit(s) may occur when passing in
         a session. If one is not supplied it will be created.
+    :param language: Language abbreviation string to be sent to API
 
     :return: Instance of :class:`TVDBSeries` populated with series information. If session was not supplied, this will
         be a detached from the database, so relationships cannot be loaded.
@@ -496,27 +524,27 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         if not only_cached and series.expired:
             log.verbose('Data for %s has expired, refreshing from tvdb', series.name)
             try:
-                updated_series = TVDBSeries(series.id)
+                updated_series = TVDBSeries(series.id, language)
                 series = session.merge(updated_series)
                 _update_search_strings(series, session, search=name)
             except LookupError as e:
                 log.warning('Error while updating from tvdb (%s), using cached data.', e.args[0])
         else:
-            log.debug('Series %s information restored from cache.' % id_str())
+            log.debug('Series %s information restored from cache.', id_str())
     else:
         if only_cached:
             raise LookupError('Series %s not found from cache' % id_str())
         # There was no series found in the cache, do a lookup from tvdb
         log.debug('Series %s not found in cache, looking up from tvdb.', id_str())
         if tvdb_id:
-            series = session.merge(TVDBSeries(tvdb_id))
+            series = session.merge(TVDBSeries(tvdb_id, language))
         elif name:
-            tvdb_id = find_series_id(name)
+            tvdb_id = find_series_id(name, language=language)
             if tvdb_id:
                 series = session.query(TVDBSeries).filter(TVDBSeries.id == tvdb_id).first()
                 if not series:
-                    series = session.merge(TVDBSeries(tvdb_id))
-        if series:
+                    series = session.merge(TVDBSeries(tvdb_id, language))
+        if series and series.name:
             _update_search_strings(series, session, search=name)
 
     if not series:
@@ -529,7 +557,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
 
 @with_session
 def lookup_episode(name=None, season_number=None, episode_number=None, absolute_number=None,
-                   tvdb_id=None, first_aired=None, only_cached=False, session=None):
+                   tvdb_id=None, first_aired=None, only_cached=False, session=None, language=None):
     """
     Look up information on an episode. Will be returned from cache if available, and looked up online and cached if not.
 
@@ -547,6 +575,7 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
     :param session: An sqlalchemy session to be used to lookup and store to cache. Commit(s) may occur when passing in
         a session. If one is not supplied it will be created, however if you need to access relationships you should
         pass one in.
+    :param language: Language abbreviation string to be sent to API
 
     :return: Instance of :class:`TVDBEpisode` populated with series information.
     :raises: :class:`LookupError` if episode cannot be looked up.
@@ -555,7 +584,7 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
     series = lookup_series(name=name, tvdb_id=tvdb_id, only_cached=only_cached, session=session)
 
     if not series:
-        LookupError('Series %s (%s) not found from' % (name, tvdb_id))
+        raise LookupError('Series %s (%s) not found from' % (name, tvdb_id))
 
     ep_description = series.name
     query_params = {}
@@ -590,7 +619,7 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
                 updated_episode = TVDBEpisode(series.id, episode.id)
                 episode = session.merge(updated_episode)
             except LookupError as e:
-                log.warning('Error while updating from tvdb (%s), using cached data.' % str(e))
+                log.warning('Error while updating from tvdb (%s), using cached data.', str(e))
         else:
             log.debug('Using episode info for %s from cache.', ep_description)
     else:
@@ -599,12 +628,12 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
         # There was no episode found in the cache, do a lookup from tvdb
         log.debug('Episode %s not found in cache, looking up from tvdb.', ep_description)
         try:
-            results = TVDBRequest().get('series/%s/episodes/query' % series.id, **query_params)
+            results = TVDBRequest().get('series/%s/episodes/query' % series.id, language=language, **query_params)
             if results:
                 # Check if this episode id is already in our db
                 episode = session.query(TVDBEpisode).filter(TVDBEpisode.id == results[0]['id']).first()
                 if not episode or (episode and episode.expired is not False):
-                    updated_episode = TVDBEpisode(series.id, results[0]['id'])
+                    updated_episode = TVDBEpisode(series.id, results[0]['id'], language=language)
                     episode = session.merge(updated_episode)
 
         except requests.RequestException as e:
@@ -616,7 +645,7 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
 
 
 @with_session
-def search_for_series(search_name=None, imdb_id=None, zap2it_id=None, force_search=None, session=None):
+def search_for_series(search_name=None, imdb_id=None, zap2it_id=None, force_search=None, session=None, language=None):
     """
     Search IMDB using a an identifier, return a list of cached search results. One if `search_name`, `imdb_id` or
     `zap2it_id` is required.
@@ -647,7 +676,7 @@ def search_for_series(search_name=None, imdb_id=None, zap2it_id=None, force_sear
     if not series_search_results or any(series.expired for series in series_search_results):
         try:
             log.debug('trying to fetch TVDB search results from TVDB')
-            fetched_results = TVDBRequest().get(lookup_url)
+            fetched_results = TVDBRequest().get(lookup_url, language=language)
         except requests.RequestException as e:
             raise LookupError('Error searching series from TVDb (%s)' % e)
         series_search_results = [session.merge(TVDBSeriesSearchResult(series, lookup_term)) for series in
@@ -674,7 +703,7 @@ def mark_expired(session):
     try:
         # Calculate seconds since epoch minus a minute for buffer
         last_check_epoch = int((last_check - datetime(1970, 1, 1)).total_seconds()) - 60
-        log.debug("Getting updates from thetvdb (%s)" % last_check_epoch)
+        log.debug("Getting updates from thetvdb (%s)", last_check_epoch)
         updates = TVDBRequest().get('updated/query', fromTime=last_check_epoch)
     except requests.RequestException as e:
         log.error('Could not get update information from tvdb: %s', e)

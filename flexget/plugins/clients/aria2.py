@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import os
@@ -32,7 +32,8 @@ class OutputAria2(object):
             'secret': {'type': 'string', 'default': ''},
             'username': {'type': 'string', 'default': ''}, # NOTE: To be deprecated by aria2
             'password': {'type': 'string', 'default': ''},
-            'path': {'type': 'string', 'format': 'path'},
+            'path': {'type': 'string'},
+            'filename': {'type': 'string'},
             'options': {
                 'type': 'object',
                 'additionalProperties': {'oneOf': [{'type': 'string'}, {'type': 'integer'}]}
@@ -106,14 +107,28 @@ class OutputAria2(object):
         except RenderError as e:
             entry.fail('failed to render \'path\': %s' % e)
             return
+        if 'filename' in config:
+             try:
+                 options['out'] = os.path.expanduser(entry.render(config['filename']))
+             except RenderError as e:
+                 entry.fail('failed to render \'filename\': %s' % e)
+                 return
         secret = None
         if config['secret']:
             secret = 'token:%s' % config['secret']
         # handle torrent files
         if 'torrent' in entry:
+            if 'file' in entry:
+                torrent_file = entry['file']
+            elif 'location' in entry:
+                # in case download plugin moved the file elsewhere
+                torrent_file = entry['location']
+            else:
+                entry.fail('Cannot find torrent file')
+                return
             if secret:
-                return aria2.addTorrent(secret, xmlrpc.client.Binary(open(entry['file'], mode='rb').read()))
-            return aria2.addTorrent(xmlrpc.client.Binary(open(entry['file'], mode='rb').read()))
+                return aria2.addTorrent(secret, xmlrpc.client.Binary(open(torrent_file, mode='rb').read()), [], options)
+            return aria2.addTorrent(xmlrpc.client.Binary(open(torrent_file, mode='rb').read()), [], options)
         # handle everything else (except metalink -- which is unsupported)
         # so magnets, https, http, ftp .. etc
         if secret:

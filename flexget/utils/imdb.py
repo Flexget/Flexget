@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import difflib
@@ -35,6 +35,26 @@ def is_imdb_url(url):
         return
     # Probably should use urlparse.
     return re.match(r'https?://[^/]*imdb\.com/', url)
+
+
+def is_valid_imdb_title_id(value):
+    """
+    Return True if `value` is a valid IMDB ID for titles (movies, series, etc).
+    """
+    if not isinstance(value, basestring):
+        raise TypeError("is_valid_imdb_title_id expects a string but got {0}".format(type(value)))
+    # IMDB IDs for titles have 'tt' followed by 7 digits
+    return re.match('tt[\d]{7}', value) is not None
+
+
+def is_valid_imdb_person_id(value):
+    """
+    Return True if `value` is a valid IMDB ID for a person.
+    """
+    if not isinstance(value, basestring):
+        raise TypeError("is_valid_imdb_person_id expects a string but got {0}".format(type(value)))
+    # An IMDB ID for a person is formed by 'nm' followed by 7 digits
+    return re.match('nm[\d]{7}', value) is not None
 
 
 def extract_id(url):
@@ -98,7 +118,7 @@ class ImdbSearch(object):
                     movies.remove(movie)
                     continue
             if movie['match'] < self.min_match:
-                log.debug('best_match removing %s (min_match)' % movie['name'])
+                log.debug('best_match removing %s (min_match)', movie['name'])
                 movies.remove(movie)
                 continue
 
@@ -228,6 +248,7 @@ class ImdbParser(object):
         self.languages = []
         self.actors = {}
         self.directors = {}
+        self.writers = {}
         self.score = 0.0
         self.votes = 0
         self.year = 0
@@ -309,11 +330,21 @@ class ImdbParser(object):
                 director_name = None
             self.directors[director_id] = director_name
 
+        # get writer(s)
+        for writer in title_overview.select('[itemprop="creator"] > a'):
+            writer_id = extract_id(writer['href'])
+            writer_name = writer.text
+            # tag instead of name
+            if isinstance(writer_name, Tag):
+                writer_name = None
+            self.writers[writer_id] = writer_name
+
         # Details section
         title_details = soup.find('div', attrs={'id': 'titleDetails'})
         if title_details:
             # get languages
-            for link in title_details.find_all('a', href=re.compile('/language/')):
+            for link in title_details.find_all('a', href=re.compile('^/search/title\?title_type=feature'
+                                                                    '&primary_language=')):
                 lang = link.text.strip().lower()
                 if lang not in self.languages:
                     self.languages.append(lang.strip())

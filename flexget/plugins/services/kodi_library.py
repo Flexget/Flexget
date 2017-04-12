@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import json
@@ -20,7 +20,7 @@ class KodiLibrary(object):
             'action': {'type': 'string', 'enum': ['clean', 'scan']},
             'category': {'type': 'string', 'enum': ['audio', 'video']},
             'url': {'type': 'string', 'format': 'url'},
-            'port': {'type': 'integer'},
+            'port': {'type': 'integer', 'default': 8080},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
             'only_on_accepted': {'type': 'boolean', 'default': True}
@@ -34,8 +34,7 @@ class KodiLibrary(object):
         if task.accepted or not config['only_on_accepted']:
             # make the url without trailing slash
             base_url = config['url'][:-1] if config['url'].endswith('/') else config['url']
-            if config.get('port'):
-                base_url += ':{0}'.format(config['port'])
+            base_url += ':{0}'.format(config['port'])
 
             url = base_url + JSON_URI
             # create the params
@@ -57,7 +56,7 @@ class KodiLibrary(object):
                         log.debug('Received error response %s', json.dumps(r))
                         log.error('Kodi JSONRPC failed with unrecognized message: %s', json.dumps(r))
             except RequestException as e:
-                raise plugin.PluginError('Failed to send request to Kodi: %s', e.args[0])
+                raise plugin.PluginError('Failed to send request to Kodi: %s' % e.args[0])
         else:
             log.info('No entries were accepted. No request is sent.')
 

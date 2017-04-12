@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import pickle
@@ -8,6 +8,7 @@ from datetime import datetime
 
 from sqlalchemy import Column, Unicode, select, Integer, DateTime, or_, func
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.elements import and_
 from sqlalchemy.sql.schema import ForeignKey
 
@@ -114,6 +115,7 @@ class DBEntrySet(MutableSet):
     def __iter__(self):
         with Session() as session:
             for e in self._db_list(session).entries.order_by(EntryListEntry.added.desc()).all():
+                log.debug('returning %s', e.entry)
                 yield e.entry
 
     def __contains__(self, entry):
@@ -185,10 +187,26 @@ class EntryList(object):
     def on_task_input(self, task, config):
         return list(DBEntrySet(config))
 
+    def search(self, task, entry, config=None):
+        entries = []
+        with Session() as session:
+            try:
+                entry_list = get_list_by_exact_name(config, session=session)
+            except NoResultFound:
+                log.warning('Entry list with name \'%s\' does not exist', config)
+            else:
+                for search_string in entry.get('search_strings', [entry['title']]):
+                    log.debug('searching for entry that matches %s in entry_list %s', search_string, config)
+                    search_string = search_string.replace(' ', '%').replace('.', '%')
+                    query = entry_list.entries.filter(EntryListEntry.title.like('%' + search_string + '%'))
+                    entries += [e.entry for e in query.all()]
+            finally:
+                return entries
+
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EntryList, 'entry_list', api_ver=2, groups=['list'])
+    plugin.register(EntryList, 'entry_list', api_ver=2, interfaces=['task', 'list', 'search'])
 
 
 @with_session
@@ -222,18 +240,15 @@ def delete_list_by_id(list_id, session=None):
 
 
 @with_session
-def get_entries_by_list_id(list_id, count=False, start=None, stop=None, order_by='title', descending=False,
+def get_entries_by_list_id(list_id, start=None, stop=None, order_by='title', descending=False,
                            session=None):
     log.debug('querying entries from entry list with id %d', list_id)
-    query = session.query(EntryListEntry).join(EntryListList).filter(EntryListList.id == list_id)
-    if count:
-        return query.count()
-    query = query.slice(start, stop).from_self()
+    query = session.query(EntryListEntry).filter(EntryListEntry.list_id == list_id)
     if descending:
         query = query.order_by(getattr(EntryListEntry, order_by).desc())
     else:
         query = query.order_by(getattr(EntryListEntry, order_by))
-    return query.all()
+    return query.slice(start, stop).all()
 
 
 @with_session

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 from difflib import SequenceMatcher
@@ -31,7 +31,7 @@ class PluginSearch(object):
         'type': 'array',
         'items': {
             'allOf': [
-                {'$ref': '/schema/plugins?group=search'},
+                {'$ref': '/schema/plugins?interface=search'},
                 {'maxProperties': 1, 'minProperties': 1}
             ]
         }
@@ -45,7 +45,7 @@ class PluginSearch(object):
             return
 
         plugins = {}
-        for p in plugin.get_plugins(group='search'):
+        for p in plugin.get_plugins(interface='search'):
             plugins[p.name] = p.instance
 
         # search accepted

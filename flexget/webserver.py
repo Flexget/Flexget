@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import hashlib
 import logging
@@ -8,17 +8,14 @@ import socket
 import threading
 
 import cherrypy
-import safe
+import zxcvbn
 from flask import Flask, abort, redirect
 from flask_login import UserMixin
 from sqlalchemy import Column, Integer, Unicode
 from werkzeug.security import generate_password_hash
 
-from flexget.config_schema import register_config_key
-from flexget.event import event
 from flexget.manager import Base
 from flexget.utils.database import with_session
-from flexget.utils.tools import singleton
 
 log = logging.getLogger('web_server')
 
@@ -27,26 +24,6 @@ _app_register = {}
 _default_app = Flask(__name__)
 
 random = random.SystemRandom()
-
-web_config_schema = {
-    'oneOf': [
-        {'type': 'boolean'},
-        {
-            'type': 'object',
-            'properties': {
-                'bind': {'type': 'string', 'format': 'ipv4', 'default': '0.0.0.0'},
-                'port': {'type': 'integer', 'default': 3539},
-                'ssl_certificate': {'type': 'string', 'format': 'string', 'default': ''},
-                'ssl_private_key': {'type': 'string', 'format': 'string', 'default': ''},
-            },
-            'additionalProperties': False,
-            'dependencies': {
-                'ssl_certificate': ['ssl_private_key'],
-                'ssl_private_key': ['ssl_certificate'],
-            }
-        }
-    ]
-}
 
 
 def generate_key():
@@ -119,14 +96,9 @@ class WebSecret(Base):
     value = Column(Unicode)
 
 
-@event('config.register')
-def register_config():
-    register_config_key('web_server', web_config_schema)
-
-
 def register_app(path, application):
     if path in _app_register:
-        raise ValueError('path %s already registered')
+        raise ValueError('path %s already registered' % path)
     _app_register[path] = application
 
 
@@ -144,23 +116,14 @@ def start_page():
     return redirect(_home)
 
 
-@event('manager.daemon.started', -255)  # Low priority so plugins can register apps
-@with_session
-def setup_server(manager, session=None):
+def setup_server(config):
     """ Sets up and starts/restarts the web service. """
-    if not manager.is_daemon:
-        return
-
-    web_server_config = manager.config.get('web_server')
-
-    if not web_server_config:
-        return
-
     web_server = WebServer(
-        bind=web_server_config['bind'],
-        port=web_server_config['port'],
-        ssl_certificate=web_server_config['ssl_certificate'],
-        ssl_private_key=web_server_config['ssl_private_key'],
+        bind=config['bind'],
+        port=config['port'],
+        ssl_certificate=config['ssl_certificate'],
+        ssl_private_key=config['ssl_private_key'],
+        base_url=config['base_url'],
     )
 
     _default_app.secret_key = get_secret()
@@ -170,46 +133,36 @@ def setup_server(manager, session=None):
         log.warning('No password set for web server, create one by using'
                     ' `flexget web passwd <password>`')
 
-    if web_server.is_alive():
-        web_server.stop()
-
     if _app_register:
         web_server.start()
 
-
-@event('manager.shutdown')
-def stop_server(manager):
-    """ Sets up and starts/restarts the webui. """
-    if not manager.is_daemon:
-        return
-    web_server = WebServer()
-    if web_server.is_alive():
-        web_server.stop()
+    return web_server
 
 
-@singleton
 class WebServer(threading.Thread):
     # We use a regular list for periodic jobs, so you must hold this lock while using it
     triggers_lock = threading.Lock()
 
-    def __init__(self, bind='0.0.0.0', port=5050, ssl_certificate=None, ssl_private_key=None):
+    def __init__(self, bind='0.0.0.0', port=5050, ssl_certificate=None, ssl_private_key=None, base_url=''):
         threading.Thread.__init__(self, name='web_server')
         self.bind = str(bind)  # String to remove unicode warning from cherrypy startup
         self.port = port
         self.ssl_certificate = ssl_certificate
         self.ssl_private_key = ssl_private_key
+        self.base_url = base_url
 
     def start(self):
         # If we have already started and stopped a thread, we need to reinitialize it to create a new one
         if not self.is_alive():
-            self.__init__(bind=self.bind, port=self.port, ssl_certificate=self.ssl_certificate, ssl_private_key=self.ssl_private_key)
+            self.__init__(bind=self.bind, port=self.port, ssl_certificate=self.ssl_certificate,
+                ssl_private_key=self.ssl_private_key, base_url=self.base_url)
         threading.Thread.start(self)
 
     def _start_server(self):
         # Mount the WSGI callable object (app) on the root directory
         cherrypy.tree.graft(_default_app, '/')
         for path, registered_app in _app_register.items():
-            cherrypy.tree.graft(registered_app, path)
+            cherrypy.tree.graft(registered_app, self.base_url + path)
 
         cherrypy.log.error_log.propagate = False
         cherrypy.log.access_log.propagate = False
@@ -234,12 +187,9 @@ class WebServer(threading.Thread):
         except socket.gaierror:
             host = '127.0.0.1'
 
-        if self.ssl_certificate and self.ssl_private_key:
-            protocol = 'https'
-        else:
-            protocol = 'http'
+        protocol = 'https' if self.ssl_certificate and self.ssl_private_key else 'http'
 
-        log.info('Web interface available at %s://%s:%s', protocol, host, self.port)
+        log.info('Web interface available at %s://%s:%s%s', protocol, host, self.port, self.base_url)
 
         # Start the CherryPy WSGI web server
         cherrypy.engine.start()
@@ -249,8 +199,13 @@ class WebServer(threading.Thread):
         self._start_server()
 
     def stop(self):
+        global _app_register
+
         log.info('Shutting down web server')
         cherrypy.engine.exit()
+
+        # Unregister apps
+        _app_register = {}
 
 
 @with_session
@@ -265,9 +220,16 @@ def get_user(username='flexget', session=None):
 
 @with_session
 def change_password(username='flexget', password='', session=None):
-    check = safe.check(password)
-    if check.strength not in ['medium', 'strong']:
-        raise WeakPassword('Password {0} is not strong enough'.format(password))
+    check = zxcvbn.zxcvbn(password, user_inputs=[username])
+    if check['score'] < 3:
+        warning = check['feedback']['warning']
+        suggestions = ' '.join(check['feedback']['suggestions'])
+        message = 'Password \'{}\' is not strong enough. '.format(password)
+        if warning:
+            message += warning + ' '
+        if suggestions:
+            message += 'Suggestions: {}'.format(suggestions)
+        raise WeakPassword(message)
 
     user = get_user(username=username, session=session)
     user.password = str(generate_password_hash(password))

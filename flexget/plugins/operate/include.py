@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import io
 import logging
@@ -34,7 +33,7 @@ class PluginInclude(object):
             return
 
         files = config
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             files = [config]
 
         for name in files:
@@ -42,7 +41,7 @@ class PluginInclude(object):
             if not os.path.isabs(name):
                 name = os.path.join(task.manager.config_base, name)
             include = yaml.load(io.open(name, encoding='utf-8'))
-            errors = process_config(include, plugin.plugin_schemas(context='task'))
+            errors = process_config(include, plugin.plugin_schemas(interface='task'))
             if errors:
                 log.error('Included file %s has invalid config:' % name)
                 for error in errors:

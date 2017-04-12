@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -292,4 +292,4 @@ def search(session, text, tags=None, sources=None, desc=False):
 @event('plugin.register')
 def register_plugin():
     plugin.register(Archive, 'archive', api_ver=2)
-    plugin.register(UrlrewriteArchive, 'flexget_archive', groups=['search'], api_ver=2)
+    plugin.register(UrlrewriteArchive, 'flexget_archive', interfaces=['search'], api_ver=2)

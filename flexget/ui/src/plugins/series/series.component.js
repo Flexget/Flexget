@@ -13,13 +13,18 @@
     function seriesController($mdMedia, $mdDialog, $sce, $timeout, seriesService) {
         var vm = this;
 
-        var options = {
-            page: 1,
-            'page_size': 10,
-            'in_config': 'all',
-            'sort_by': 'show_name',
-            'descending': false
-        };
+        vm.sortOptions = [
+            {
+                nice: "Show name",
+                small: "show_name"
+            }, {
+                nice: "Latest download date",
+                small: "last_download_date"
+            }
+        ];
+
+        vm.sortOption = "show_name";
+        vm.order = "asc";
 
         var params = {
             forget: true
@@ -32,57 +37,75 @@
         vm.search = search;
         vm.toggleEpisodes = toggleEpisodes;
         vm.areEpisodesOnShowRow = areEpisodesOnShowRow;
+        vm.getSeries = getSeries;
+        vm.changeOrder = changeOrder;
 
         function activate() {
-            getSeriesList();
+            getSeries();
         }
 
-        function getSeriesList() {
-            seriesService.getShows(options).then(function (data) {
-                vm.series = data.shows;
+        function changeOrder() {
+            vm.order === 'desc' ? setOrder('asc') : setOrder('desc');
 
-                vm.currentPage = data.page;
-                vm.totalShows = data['total_number_of_shows'];
-                vm.pageSize = data['page_size'];
-            });
+            function setOrder(direction) {
+                vm.order = direction;
+                getSeries();
+            }
         }
 
-        function forgetShow(show) {
-            var confirm = $mdDialog.confirm()
-                .title('Confirm forgetting show.')
-                .htmlContent($sce.trustAsHtml('Are you sure you want to completely forget <b>' + show['show_name'] + '</b>?<br /> This will also forget all downloaded releases.'))
-                .ok('Forget')
-                .cancel('No');
-
-            $mdDialog.show(confirm).then(function () {
-                seriesService.deleteShow(show, params).then(function () {
-                    getSeriesList();
+        function getSeries(page) {
+            var options = {
+                'page': page || 1,
+                'per_page': 10,
+                'in_config': 'all',
+                'sort_by': vm.sortOption,
+                'order': vm.order
+            }
+            seriesService.getShows(options)
+                .then(setSeries)
+                .cached(setSeries)
+                .finally(function () {
+                    vm.currentPage = options.page;
                 });
-            });
         }
-
-        //Call from the pagination to update the page to the selected page
-        vm.updateListPage = function (index) {
-            options.page = index;
-
-            getSeriesList();
-        };
-
 
         function search() {
             vm.searchTerm ? searchShows() : emptySearch();
 
             function searchShows() {
-                seriesService.searchShows(vm.searchTerm).then(function (data) {
-                    vm.series = data.shows;
-                });
+                seriesService.searchShows(vm.searchTerm)
+                    .then(setSeries)
+                    .cached(setSeries)
+                    .finally(function () {
+                        vm.currentPage = 1;
+                    });
             }
 
             function emptySearch() {
-                options.page = 1;
-                getSeriesList();
+                getSeries();
             }
         }
+
+        function setSeries(response) {
+            vm.series = response.data;
+            vm.linkHeader = response.headers().link;
+        }
+
+        function forgetShow(show) {
+            var confirm = $mdDialog.confirm()
+                .title('Confirm forgetting show.')
+                .htmlContent($sce.trustAsHtml('Are you sure you want to completely forget <b>' + show.name + '</b>?<br /> This will also forget all downloaded releases.'))
+                .ok('Forget')
+                .cancel('No');
+
+            $mdDialog.show(confirm).then(function () {
+                seriesService.deleteShow(show, params).then(function () {
+                    vm.searchTerm ? search() : getSeries(vm.currentPage);
+                });
+            });
+        }
+
+        
 
         function toggleEpisodes(show) {
             show === vm.selectedShow ? clearShow() : setSelectedShow();

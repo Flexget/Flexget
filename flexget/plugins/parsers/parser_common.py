@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.utils import native_str
 from past.builtins import cmp
 
@@ -69,7 +69,9 @@ def old_assume_quality(guessed_quality, assumed_quality):
 default_ignore_prefixes = [
     '(?:\[[^\[\]]*\])',  # ignores group names before the name, eg [foobar] name
     '(?:HD.720p?:)',
-    '(?:HD.1080p?:)']
+    '(?:HD.1080p?:)',
+    '(?:HD.2160p?:)'
+]
 
 
 def name_to_re(name, ignore_prefixes=None, parser=None):
