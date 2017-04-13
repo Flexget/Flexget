@@ -424,7 +424,6 @@ class OutputDeluge(DelugePlugin):
         config.setdefault('magnetization_timeout', 0)
         config.setdefault('keep_subs', True)  # does nothing without 'content_filename' or 'main_file_only' enabled
         config.setdefault('hide_sparse_files', False)  # does nothing without 'main_file_only' enabled
-        config.setdefault('container_directory', '')
         return config
 
     def __init__(self):
@@ -661,7 +660,7 @@ class OutputDeluge(DelugePlugin):
                             opts.get('main_file_ratio') * 100))
 
                 if config.get('container_directory'):
-                    log.info('Renaming Folder %s to %s' % (status['name'], pathscrub(entry.render(config.get('container_directory')))))
+                    log.info('Renaming Folder %s to %s' % (status['name'], entry.render(config.get('container_directory'))))
                     main_file_dlist.append(client.core.rename_folder(torrent_id, status['name'], pathscrub(entry.render(config.get('container_directory')))))
 
                 return defer.DeferredList(main_file_dlist)
