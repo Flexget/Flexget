@@ -660,7 +660,7 @@ class OutputDeluge(DelugePlugin):
                             opts.get('main_file_ratio') * 100))
 
                 if config.get('container_directory'):
-                    log.info('Renaming Folder %s to %s' % (status['name'], entry.render(config.get('container_directory'))))
+                    log.info('Renaming Folder %s to %s', status['name'], entry.render(config.get('container_directory')))
                     main_file_dlist.append(client.core.rename_folder(torrent_id, status['name'], pathscrub(entry.render(config.get('container_directory')))))
 
                 return defer.DeferredList(main_file_dlist)
