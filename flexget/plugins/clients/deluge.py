@@ -660,8 +660,11 @@ class OutputDeluge(DelugePlugin):
                             opts.get('main_file_ratio') * 100))
 
                 if config.get('container_directory'):
-                    log.info('Renaming Folder %s to %s', status['name'], entry.render(config.get('container_directory')))
-                    main_file_dlist.append(client.core.rename_folder(torrent_id, status['name'], pathscrub(entry.render(config.get('container_directory')))))
+                    if len(status['files']) > 1:
+                        log.info('Renaming Folder %s to %s', status['name'], entry.render(config.get('container_directory')))
+                        main_file_dlist.append(client.core.rename_folder(torrent_id, status['name'], pathscrub(entry.render(config.get('container_directory')))))
+                    else:
+                        log.info('container_directory specified however the number of files is not greater than 1 - skipping rename')
 
                 return defer.DeferredList(main_file_dlist)
 
