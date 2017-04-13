@@ -660,16 +660,20 @@ class OutputDeluge(DelugePlugin):
                             opts.get('main_file_ratio') * 100))
 
                 if config.get('container_directory'):
-                    if len(status['files']) > 1:
-                        log.info('Renaming Folder %s to %s', status['name'], entry.render(config.get('container_directory')))
-                        main_file_dlist.append(client.core.rename_folder(torrent_id, status['name'], pathscrub(entry.render(config.get('container_directory')))))
+                    if opts.get('content_filename') or opts.get('main_file_only'):
+                        folder_structure = big_file_name.split(os.sep)
                     else:
-                        log.info('container_directory specified however the number of files is not greater than 1 - skipping rename')
+                        folder_structure = status['files'][0]['path'].split(os.sep)
+                    if len(folder_structure) > 1:
+                        log.info('Renaming Folder %s to %s', folder_structure[0], entry.render(config.get('container_directory')))
+                        main_file_dlist.append(client.core.rename_folder(torrent_id, folder_structure[0], pathscrub(entry.render(config.get('container_directory')))))
+                    else:
+                        log.info('container_directory specified however the torrent %s does not have a directory structure; skipping folder rename', entry['title'])
 
                 return defer.DeferredList(main_file_dlist)
 
             status_keys = ['files', 'total_size', 'save_path', 'move_on_completed_path',
-                           'move_on_completed', 'progress', 'name']
+                           'move_on_completed', 'progress']
             dlist.append(client.core.get_torrent_status(torrent_id, status_keys).addCallback(on_get_torrent_status))
 
             return defer.DeferredList(dlist)
