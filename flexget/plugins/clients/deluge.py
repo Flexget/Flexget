@@ -662,8 +662,10 @@ class OutputDeluge(DelugePlugin):
                 if config.get('container_directory'):
                     if opts.get('content_filename') or opts.get('main_file_only'):
                         folder_structure = big_file_name.split(os.sep)
-                    else:
+                    elif len(status['files']) > 0:
                         folder_structure = status['files'][0]['path'].split(os.sep)
+                    else:
+                        folder_structure = []
                     if len(folder_structure) > 1:
                         log.verbose('Renaming Folder %s to %s', folder_structure[0], entry.render(config.get('container_directory')))
                         main_file_dlist.append(client.core.rename_folder(torrent_id, folder_structure[0], pathscrub(entry.render(config.get('container_directory')))))
