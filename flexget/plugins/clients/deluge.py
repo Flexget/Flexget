@@ -659,7 +659,8 @@ class OutputDeluge(DelugePlugin):
                             entry['title'],
                             opts.get('main_file_ratio') * 100))
 
-                if config.get('container_directory'):
+                container_directory =  pathscrub(entry.render(entry.get('container_directory', config.get('container_directory', ''))))
+                if container_directory:
                     if opts.get('content_filename'):
                         folder_structure = big_file_name.split(os.sep)
                     elif len(status['files']) > 0:
@@ -667,8 +668,8 @@ class OutputDeluge(DelugePlugin):
                     else:
                         folder_structure = []
                     if len(folder_structure) > 1:
-                        log.verbose('Renaming Folder %s to %s', folder_structure[0], entry.render(config.get('container_directory')))
-                        main_file_dlist.append(client.core.rename_folder(torrent_id, folder_structure[0], pathscrub(entry.render(config.get('container_directory')))))
+                        log.verbose('Renaming Folder %s to %s', folder_structure[0], container_directory)
+                        main_file_dlist.append(client.core.rename_folder(torrent_id, folder_structure[0], container_directory))
                     else:
                         log.debug('container_directory specified however the torrent %s does not have a directory structure; skipping folder rename', entry['title'])
 
