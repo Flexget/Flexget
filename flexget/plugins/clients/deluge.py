@@ -660,7 +660,7 @@ class OutputDeluge(DelugePlugin):
                             opts.get('main_file_ratio') * 100))
 
                 if config.get('container_directory'):
-                    if opts.get('content_filename') or opts.get('main_file_only'):
+                    if opts.get('content_filename'):
                         folder_structure = big_file_name.split(os.sep)
                     elif len(status['files']) > 0:
                         folder_structure = status['files'][0]['path'].split(os.sep)
