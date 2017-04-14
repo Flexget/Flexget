@@ -559,6 +559,7 @@ class OutputDeluge(DelugePlugin):
                     log.debug('Moving storage for %s to %s' % (entry['title'], move_now_path))
                     main_file_dlist.append(client.core.move_storage([torrent_id], move_now_path))
 
+                big_file_name = ''
                 if opts.get('content_filename') or opts.get('main_file_only'):
 
                     def file_exists(filename):
@@ -661,7 +662,7 @@ class OutputDeluge(DelugePlugin):
 
                 container_directory =  pathscrub(entry.render(entry.get('container_directory', config.get('container_directory', ''))))
                 if container_directory:
-                    if opts.get('content_filename'):
+                    if big_file_name:
                         folder_structure = big_file_name.split(os.sep)
                     elif len(status['files']) > 0:
                         folder_structure = status['files'][0]['path'].split(os.sep)
