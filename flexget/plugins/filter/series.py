@@ -1455,6 +1455,10 @@ class FilterSeries(FilterSeriesBase):
             if entry.get('series_name') and entry.get('series_id') is not None and entry.get('series_parser'):
                 found_series.setdefault(entry['series_name'], []).append(entry)
 
+        if task.config.get('all_series', {}).get('parse_only'):
+            log.debug('Skipping filtering of any series because of parse_only')
+            return
+
         for series_item in config:
             with Session() as session:
                 series_name, series_config = list(series_item.items())[0]
