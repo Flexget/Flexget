@@ -219,6 +219,7 @@ class InputRSS(object):
                        task.options.nocache or task.options.retry)
         headers = {}
         if not all_entries:
+            task.no_entries_ok = True
             etag = task.simple_persistence.get('%s_etag' % url_hash, None)
             if etag:
                 log.debug('Sending etag %s for task %s', etag, task.name)
