@@ -42,6 +42,7 @@ class CrossMatch(object):
 
         fields = config['fields']
         action = config['action']
+        all_fields = config['all_fields']
 
         match_entries = []
 
@@ -70,9 +71,8 @@ class CrossMatch(object):
         for entry in task.entries:
             for generated_entry in match_entries:
                 log.trace('checking if %s matches %s', entry['title'], generated_entry['title'])
-                common = self.entry_intersects(entry, generated_entry, fields, config.get('exact'),
-                                               config['all_fields'])
-                if common:
+                common = self.entry_intersects(entry, generated_entry, fields, config.get('exact'))
+                if common and (not all_fields or len(common) == len(fields)):
                     msg = 'intersects with %s on field(s) %s' % (generated_entry['title'], ', '.join(common))
                     for key in generated_entry:
                         if key not in entry:
@@ -82,7 +82,7 @@ class CrossMatch(object):
                     if action == 'accept':
                         entry.accept(msg)
 
-    def entry_intersects(self, e1, e2, fields=None, exact=True, all_fields=False):
+    def entry_intersects(self, e1, e2, fields=None, exact=True):
         """
         :param e1: First :class:`flexget.entry.Entry`
         :param e2: Second :class:`flexget.entry.Entry`
@@ -99,8 +99,7 @@ class CrossMatch(object):
             # Doesn't really make sense to match if field is not in both entries
             if field not in e1 or field not in e2:
                 log.trace('field %s is not in both entries', field)
-                if all_fields:
-                    break
+                continue
 
             v1 = e1[field]
             v2 = e2[field]
@@ -109,14 +108,8 @@ class CrossMatch(object):
                 common_fields.append(field)
             else:
                 log.trace('not matching')
-                if all_fields:
-                    break
 
-        else:
-            return common_fields
-
-        log.debug('Not all fields matched.')
-        return
+        return common_fields
 
 
 @event('plugin.register')
