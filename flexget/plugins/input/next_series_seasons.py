@@ -97,12 +97,14 @@ class NextSeriesSeasons(object):
                     continue
 
                 low_season = 0
+                latest_season_inc = False
 
                 check_downloaded = not config.get('backfill')
                 latest_season = get_latest_release(series, downloaded=check_downloaded)
                 if latest_season:
                     latest_season = latest_season.season + 1 if latest_season.season in series.completed_seasons \
                         else latest_season.season
+                    latest_season_inc = True
                 else:
                     latest_season = low_season + 1
 
@@ -120,9 +122,11 @@ class NextSeriesSeasons(object):
                         entries.append(self.search_entry(series, lookup_season, task))
                     elif latest:
                         entries.append(self.search_entry(series, latest.season, task))
+                    elif latest_season_inc and season == latest_season:
+                        entries.append(self.search_entry(series, season, task))
                     else:
                         if config.get('from_start') or config.get('backfill'):
-                            entries.append(self.search_entry(series, season, 1, task))
+                            entries.append(self.search_entry(series, season, task))
                         else:
                             log.verbose('Series `%s` has no history. Set begin option, '
                                         'or use CLI `series begin` '
