@@ -1174,6 +1174,8 @@ def populate_entry_fields(entry, parser, config):
     entry['series_episodes'] = parser.episodes
     entry['series_id'] = parser.pack_identifier
     entry['series_id_type'] = parser.id_type
+    entry['series_identified_by'] = parser.identified_by
+    entry['series_exact'] = parser.strict_name
 
     # If a config is passed in, also look for 'path' and 'set' options to set more fields
     if config:
