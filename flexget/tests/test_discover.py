@@ -206,29 +206,6 @@ class TestEmitSeriesInDiscover(object):
                 identified_by: ep
                 season_packs: yes
             max_reruns: 0          
-          test_next_series_episodes_no_begin:
-            discover:
-              release_estimations: ignore
-              what:
-              - next_series_episodes: yes
-              from:
-              - test_search: yes
-            series:
-            - My Show 2:
-                identified_by: ep
-            max_reruns: 0          
-          test_next_series_seasons_no_begin:
-            discover:
-              release_estimations: ignore
-              what:
-              - next_series_seasons: yes
-              from:
-              - test_search: yes
-            series:
-            - My Show 2:
-                identified_by: ep
-                season_packs: yes
-            max_reruns: 0          
     """
 
     def test_next_series_episodes_backfill(self, execute_task):
@@ -248,12 +225,6 @@ class TestEmitSeriesInDiscover(object):
         task = execute_task('test_next_series_episodes')
         assert task.find_entry(title='My Show 2 S03E01')
 
-    def test_next_series_episodes_with_completed_season_no_begin(self, execute_task):
-        execute_task('inject_series',
-                     options={'inject': [Entry(title='My Show 2 S02', url=''), Entry(title='My Show 2 S01', url='')]})
-        task = execute_task('test_next_series_episodes_no_begin')
-        assert task.find_entry(title='My Show 2 S03E01')
-
     def test_next_series_episodes_with_uncompleted_season(self, execute_task):
         execute_task('inject_series', options={'inject': [Entry(title='My Show 1 S02 480p', url='')]})
         task = execute_task('test_next_series_episodes_with_unaccepted_season')
@@ -269,9 +240,4 @@ class TestEmitSeriesInDiscover(object):
         task = execute_task('test_next_series_seasons')
         assert task.find_entry(title='My Show 2 S03')
 
-    def test_next_series_seasons_with_completed_seasons_no_begin(self, execute_task):
-        execute_task('inject_series',
-                     options={'inject': [Entry(title='My Show 2 S02', url=''), Entry(title='My Show 2 S01', url='')]})
-        task = execute_task('test_next_series_seasons_no_begin')
-        assert task.find_entry(title='My Show 2 S03')
 
