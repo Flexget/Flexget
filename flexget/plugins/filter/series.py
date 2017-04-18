@@ -1258,7 +1258,12 @@ class FilterSeriesBase(object):
                 'season_packs': {'oneOf': [
                     {'type': 'boolean'},
                     {'type': 'integer'},
-                    {'type': 'string', 'enum': ['always', 'only']}
+                    {'type': 'string', 'enum': ['always', 'only']},
+                    {'type': 'object',
+                     'properties': {
+                         'threshold': {'type': 'integer', 'minimum': 0},
+                         'reject_eps': {'type': 'boolean'}
+                     }}
                 ]}
             },
             'additionalProperties': False
@@ -1290,6 +1295,8 @@ class FilterSeriesBase(object):
                 opts['threshold'] = sys.maxsize
             else:  # 'only'
                 opts['reject_eps'] = True
+        elif isinstance(season_packs, dict):
+            opts = season_packs
         return opts
 
     def apply_group_options(self, config):

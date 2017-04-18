@@ -6,6 +6,7 @@ from io import StringIO
 import pytest
 from jinja2 import Template
 
+from flexget.entry import Entry
 from flexget.logger import capture_output
 from flexget.manager import get_parser
 from flexget.task import TaskAbort
@@ -2067,6 +2068,10 @@ class TestSeriesSeasonPack(object):
               season_packs: always
           - bla:
               season_packs: only
+          - bro:
+              season_packs:
+                threshold: 1
+                reject_eps: yes
       tasks:
         multiple_formats:
           mock:
@@ -2164,6 +2169,14 @@ class TestSeriesSeasonPack(object):
           - title: show.name.s01.720p.HDTV-Group
           all_series:
             season_packs: yes
+        test_with_dict_config_1:
+          mock:
+          - title: bro.s01e01.720p.HDTV-Flexget
+          - title: bro.s01.720p.HDTV-Flexget
+        test_with_dict_config_2:
+          mock:
+          - title: bro.s02.720p.HDTV-Flexget
+          
     """
 
     @pytest.fixture()
@@ -2292,3 +2305,15 @@ class TestSeriesSeasonPack(object):
     def test_all_series(self, execute_task):
         task = execute_task('test_all_series')
         assert task.find_entry('accepted', title='show.name.s01.720p.HDTV-Group')
+
+    def test_advanced_config(self, execute_task):
+        task = execute_task('test_with_dict_config_1')
+        assert not task.find_entry('accepted', title='bro.s01e01.720p.HDTV-Flexget')
+        assert task.find_entry('accepted', title='bro.s01.720p.HDTV-Flexget')
+
+        execute_task('test_with_dict_config_2',
+                     options={'inject': [Entry(title='bro.s02e01.720p.HDTV-Flexget', url='')],
+                              'immortal': True})
+
+        task = execute_task('test_with_dict_config_2')
+        assert task.find_entry('accepted', title='bro.s02.720p.HDTV-Flexget')
