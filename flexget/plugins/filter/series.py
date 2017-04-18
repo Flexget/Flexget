@@ -393,11 +393,15 @@ class Season(Base):
 
     def __lt__(self, other):
         if other is None:
+            log.trace('comparing %s to None', self)
             return False
         if not isinstance(other, (Season, Episode)):
-            raise NotImplementedError
+            log.error('Cannot compare Season to %s', other)
+            return NotImplemented
         if self.identified_by != 'ep':
-            raise NotImplementedError
+            log.error('Can only compare with an \'ep\' style identifier')
+            return NotImplemented
+        log.trace('checking if %s is smaller than %s', self.season, other.season)
         return self.season < other.season
 
     def __hash__(self):
@@ -488,36 +492,49 @@ class Episode(Base):
 
     def __eq__(self, other):
         if other is None:
+            log.trace('comparing %s to None', self)
             return False
         if isinstance(other, Season):
+            log.trace('comparing %s to Season', self)
             return False
         elif not isinstance(other, Episode):
-            raise NotImplementedError
+            log.error('Cannot compare Episode with %s', other)
+            return NotImplemented
         if self.identified_by != other.identified_by:
-            raise NotImplementedError
+            log.error('Cannot compare %s identifier with %s', self.identified_by, other.identified_by)
+            return NotImplemented
+        log.trace('comparing %s with %s', self.identifier, other.identifier)
         return self.identifier == other.identifier
 
     def __lt__(self, other):
         if other is None:
+            log.trace('comparing %s to None', self)
             return False
         elif isinstance(other, Episode):
             if self.identified_by != other.identified_by:
                 if self.identified_by == 'special':
+                    log.trace('Comparing special episode')
                     return False
-                raise NotImplementedError
+                log.error('cannot compare %s with %s', self.identified_by, other.identified_by)
+                return NotImplemented
             if self.identified_by in ['ep', 'sequence']:
+                log.trace('comparing %s and %s', self, other)
                 return self.season < other.season or (self.season == other.season and self.number < other.number)
             elif self.identified_by == 'date':
+                log.trace('comparing %s and %s', self.identifier, other.identifier)
                 return self.identifier < other.identifier
             else:
-                # Can't compare id type identifiers
-                raise NotImplementedError
+                log.error('cannot compare when identifier is %s', self.identified_by)
+                return NotImplemented
         elif isinstance(other, Season):
             if self.identified_by != 'ep':
-                raise NotImplementedError
+                log.error('cannot compare season when identifier is not \'ep\'')
+                return NotImplemented
+            log.trace('comparing %s with %s', self.season, other.season)
             return self.season < other.season
         else:
-            raise NotImplementedError
+            log.error('can only compare with Episode or Season, not %s', other)
+            return NotImplemented
 
     def __hash__(self):
         return self.id
