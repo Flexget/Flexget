@@ -406,7 +406,15 @@ class TelegramNotifier(object):
         fullnames = dict()
         groups = dict()
         for update in updates:
-            chat = update.message.chat if update.message else update.edited_message.chat
+            if update.message:
+                chat = update.message.chat
+            elif update.edited_message:
+                chat = update.edited_message.chat
+            elif update.channel_post:
+                chat = update.channel_post.chat
+            else:
+                raise PluginError('Unknown update type encountered: %s' % update)
+
             if chat.type == 'private':
                 usernames[chat.username] = chat
                 fullnames[(chat.first_name, chat.last_name)] = chat
