@@ -206,6 +206,17 @@ class TestEmitSeriesInDiscover(object):
                 identified_by: ep
                 season_packs: yes
             max_reruns: 0          
+          test_next_series_episodes_no_begin:
+            discover:
+              release_estimations: ignore
+              what:
+              - next_series_episodes: yes
+              from:
+              - test_search: yes
+            series:
+            - My Show 2:
+                identified_by: ep
+            max_reruns: 0          
           test_next_series_seasons_no_begin:
             discover:
               release_estimations: ignore
