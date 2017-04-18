@@ -405,6 +405,7 @@ class OutputDeluge(DelugePlugin):
                     'keep_subs': {'type': 'boolean'},
                     'hide_sparse_files': {'type': 'boolean'},
                     'enabled': {'type': 'boolean'},
+                    'container_directory': {'type': 'string'},
                 },
                 'additionalProperties': False
             }
@@ -558,6 +559,7 @@ class OutputDeluge(DelugePlugin):
                     log.debug('Moving storage for %s to %s' % (entry['title'], move_now_path))
                     main_file_dlist.append(client.core.move_storage([torrent_id], move_now_path))
 
+                big_file_name = ''
                 if opts.get('content_filename') or opts.get('main_file_only'):
 
                     def file_exists(filename):
@@ -657,6 +659,20 @@ class OutputDeluge(DelugePlugin):
                         log.warning('No files in "%s" are > %d%% of content size, no files renamed.' % (
                             entry['title'],
                             opts.get('main_file_ratio') * 100))
+
+                container_directory =  pathscrub(entry.render(entry.get('container_directory', config.get('container_directory', ''))))
+                if container_directory:
+                    if big_file_name:
+                        folder_structure = big_file_name.split(os.sep)
+                    elif len(status['files']) > 0:
+                        folder_structure = status['files'][0]['path'].split(os.sep)
+                    else:
+                        folder_structure = []
+                    if len(folder_structure) > 1:
+                        log.verbose('Renaming Folder %s to %s', folder_structure[0], container_directory)
+                        main_file_dlist.append(client.core.rename_folder(torrent_id, folder_structure[0], container_directory))
+                    else:
+                        log.debug('container_directory specified however the torrent %s does not have a directory structure; skipping folder rename', entry['title'])
 
                 return defer.DeferredList(main_file_dlist)
 
