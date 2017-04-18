@@ -126,7 +126,7 @@ class Manager(object):
         self.db_filename = None
         self.engine = None
         self.lockfile = None
-        self.database_uri = None
+        self.database_uri = os.environ.get('DATABASE_URL')
         self.db_upgraded = False
         self._has_lock = False
         self.is_daemon = False
