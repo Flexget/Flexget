@@ -150,7 +150,7 @@ def remove(manager, options, forget=False):
         except ValueError as e:
             console(e.args[0])
         else:
-            console('Removed episode(s) matching `%s` from series `%s`.' % (identifier, name.capitalize()))
+            console('Removed entities(s) matching `%s` from series `%s`.' % (identifier, name.capitalize()))
     else:
         # remove whole series
         try:

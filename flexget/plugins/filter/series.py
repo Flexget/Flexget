@@ -1024,7 +1024,7 @@ def remove_series(name, forget=False):
 
 def remove_series_entity(name, identifier, forget=False):
     """
-    Remove all entitires by `identifier` from series `name` from database.
+    Remove all entities by `identifier` from series `name` from database.
 
     :param name: Name of series to be removed
     :param identifier: Series identifier to be deleted,
@@ -1049,15 +1049,15 @@ def remove_series_entity(name, identifier, forget=False):
             raise LookupError('Invalid identifier for series {}: {}'.format(series.name, identifier))
 
         removed = False
-        if parsed.season_pack:
+        if parsed.is_season_pack:
             season = session.query(Season).filter(Season.season == parsed.season).filter(
                 Season.series_id == series.id).first()
             if season:
                 removed = True
                 downloaded_releases = remove_entity(season)
         else:
-            episode = session.query(Episode).filter(Episode.identifier == identifier). \
-                filter(Episode.series_id == series.id).first()
+            episode = session.query(Episode).filter(Episode.season == parsed.season).filter(
+                Episode.number == parsed.episode).filter(Episode.series_id == series.id).first()
             if episode:
                 removed = True
                 downloaded_releases = remove_entity(episode)
