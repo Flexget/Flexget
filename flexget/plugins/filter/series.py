@@ -1135,7 +1135,7 @@ def show_seasons(series, start=None, stop=None, count=False, descending=False, s
 def get_all_entities(series, session):
     episodes = show_episodes(series, session=session)
     seasons = show_seasons(series, session=session)
-    return episodes + seasons
+    return sorted(episodes + seasons, key=lambda e: (e.age, e.identifier), reverse=True)
 
 
 def get_releases(episode, downloaded=None, start=None, stop=None, count=False, descending=False, sort_by=None,
