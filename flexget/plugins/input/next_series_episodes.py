@@ -110,12 +110,14 @@ class NextSeriesEpisodes(object):
                     continue
 
                 low_season = 0 if series.identified_by == 'ep' else -1
+                latest_season_inc = False
 
                 check_downloaded = not config.get('backfill')
                 latest_season = get_latest_release(series, downloaded=check_downloaded)
                 if latest_season:
                     latest_season = latest_season.season + 1 if latest_season.season in series.completed_seasons \
                         else latest_season.season
+                    latest_season_inc = True
                 else:
                     latest_season = low_season + 1
 
@@ -161,6 +163,8 @@ class NextSeriesEpisodes(object):
                         # If we have already downloaded the latest known episode, try the next episode
                         if latest_ep_this_season.releases:
                             entries.append(self.search_entry(series, season, latest_ep_this_season.number + 1, task))
+                    elif latest_season_inc and season == latest_season:
+                        entries.append(self.search_entry(series, season, 1, task))
                     else:
                         if config.get('from_start') or config.get('backfill'):
                             entries.append(self.search_entry(series, season, 1, task))
