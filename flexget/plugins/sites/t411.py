@@ -49,8 +49,8 @@ class T411InputPlugin(object):
             'properties': {
                 'category': {'type': 'string'},
                 'terms': one_or_more({'type': 'string'}),
-                'max_results': {'type': 'number', 'default': 100}
-                'search': {'type': 'string'},
+                'max_results': {'type': 'number', 'default': 100},
+                'search': {'type': 'string'}
             },
             'additionalProperties': False
         }
