@@ -40,6 +40,7 @@ class T411InputPlugin(object):
       category: <see available categories on "flexget t411 list-cats">
       terms: <see available terms on "flexget t411 list-terms --category <category name>"
       max_resutls: XXX
+      search: <search query>
     """
 
     def __init__(self):
@@ -49,6 +50,7 @@ class T411InputPlugin(object):
                 'category': {'type': 'string'},
                 'terms': one_or_more({'type': 'string'}),
                 'max_results': {'type': 'number', 'default': 100}
+                'search': {'type': 'string'},
             },
             'additionalProperties': False
         }
@@ -64,6 +66,7 @@ class T411InputPlugin(object):
         query.category_name = config.get('category')
         query.term_names = list(config.get('terms', []))
         query.max_results = config.get('max_results')
+        query.expression = config.get('search')
         return query
 
     @plugin.internet(log)
