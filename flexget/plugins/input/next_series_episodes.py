@@ -146,21 +146,27 @@ class NextSeriesEpisodes(object):
                             start_at_ep = max(latest.number - 10, 1)
                             episodes_this_season = episodes_this_season.filter(Episode.number >= start_at_ep)
                         latest_ep_this_season = episodes_this_season.order_by(desc(Episode.number)).first()
-                        downloaded_this_season = (episodes_this_season.join(Episode.releases).
-                                                  filter(EpisodeRelease.downloaded == True).all())
-                        # Calculate the episodes we still need to get from this season
-                        if series.begin and series.begin.season == season:
-                            start_at_ep = max(start_at_ep, series.begin.number)
-                        eps_to_get = list(range(start_at_ep, latest_ep_this_season.number + 1))
-                        for ep in downloaded_this_season:
-                            try:
-                                eps_to_get.remove(ep.number)
-                            except ValueError:
-                                pass
-                        entries.extend(self.search_entry(series, season, x, task, rerun=False) for x in eps_to_get)
-                        # If we have already downloaded the latest known episode, try the next episode
-                        if latest_ep_this_season.releases:
-                            entries.append(self.search_entry(series, season, latest_ep_this_season.number + 1, task))
+                        if latest_ep_this_season:
+                            downloaded_this_season = (episodes_this_season.join(Episode.releases).
+                                                      filter(EpisodeRelease.downloaded == True).all())
+                            # Calculate the episodes we still need to get from this season
+                            if series.begin and series.begin.season == season:
+                                start_at_ep = max(start_at_ep, series.begin.number)
+                            eps_to_get = list(range(start_at_ep, latest_ep_this_season.number + 1))
+                            for ep in downloaded_this_season:
+                                try:
+                                    eps_to_get.remove(ep.number)
+                                except ValueError:
+                                    pass
+                            entries.extend(self.search_entry(series, season, x, task, rerun=False) for x in eps_to_get)
+                            # If we have already downloaded the latest known episode, try the next episode
+                            if latest_ep_this_season.releases:
+                                entries.append(
+                                    self.search_entry(series, season, latest_ep_this_season.number + 1, task))
+                        else:
+                            # No episode means that latest is a season pack, emit episode 1
+                            entries.append(self.search_entry(series, season, 1, task))
+
                     else:
                         if config.get('from_start') or config.get('backfill'):
                             entries.append(self.search_entry(series, season, 1, task))
