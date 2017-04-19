@@ -5,11 +5,11 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        User-Agent: [FlexGet/1.2.464.dev (www.flexget.com)]
+        User-Agent: [!!python/unicode 'FlexGet/2.10.30.dev (www.flexget.com)']
       method: GET
       uri: http://speedtest.ftp.otenet.gr/files/test100k.db
     response:
-      body: {string: "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+      body: {string: !!python/unicode "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
           \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
           \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
           \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
@@ -2853,13 +2853,13 @@ interactions:
           \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
           \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
           \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
-          \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"}
+          \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"}
       headers:
         accept-ranges: [bytes]
         connection: [Keep-Alive]
         content-length: ['102400']
         content-type: [text/plain; charset=ISO-8859-7]
-        date: ['Thu, 03 Mar 2016 10:44:45 GMT']
+        date: ['Wed, 19 Apr 2017 15:12:27 GMT']
         etag: ['"3c78023-19000-4f95a18114340"']
         keep-alive: ['timeout=15, max=100']
         last-modified: ['Wed, 14 May 2014 11:00:53 GMT']
