@@ -58,7 +58,8 @@ def load_user(username, session=None):
 def check_valid_login():
     # Allow access to root, login and swagger documentation without authentication
     if request.path == '/' or request.path.startswith('/auth/login') or \
-            request.path.startswith('/auth/logout') or request.path.startswith('/swagger'):
+            request.path.startswith('/auth/logout') or request.path.startswith('/swagger') or \
+            request.method == 'OPTIONS':
         return
 
     if not current_user.is_authenticated:
