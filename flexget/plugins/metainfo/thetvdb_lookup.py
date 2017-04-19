@@ -181,8 +181,11 @@ class PluginThetvdbLookup(object):
 
                 # If there is season and ep info as well, register episode lazy fields
                 if entry.get('series_id_type') in ('ep', 'sequence', 'date'):
-                    lazy_episode_lookup = partial(self.lazy_episode_lookup, language=language)
-                    entry.register_lazy_func(lazy_episode_lookup, self.episode_map)
+                    if entry.get('season_pack'):
+                        log.verbose('TheTVDB API does not support season lookup at this time, skipping %s', entry)
+                    else:
+                        lazy_episode_lookup = partial(self.lazy_episode_lookup, language=language)
+                        entry.register_lazy_func(lazy_episode_lookup, self.episode_map)
 
     @property
     def series_identifier(self):
