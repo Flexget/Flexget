@@ -1010,8 +1010,8 @@ def remove_series(name, forget=False):
         if series:
             for s in series:
                 if forget:
-                    for episode in s.episodes:
-                        for release in episode.downloaded_releases:
+                    for entity in (s.episodes + s.seasons):
+                        for release in entity.downloaded_releases:
                             downloaded_releases.append(release.title)
                 session.delete(s)
             session.commit()
@@ -1046,7 +1046,7 @@ def remove_series_entity(name, identifier, forget=False):
         name_to_parse = '{} {}'.format(series.name, identifier)
         parsed = get_plugin_by_name('parsing').instance.parse_series(name_to_parse, name=series.name)
         if not parsed.valid:
-            raise LookupError('Invalid identifier for series {}: {}'.format(series.name, identifier))
+            raise ValueError('Invalid identifier for series {}: {}'.format(series.name, identifier))
 
         removed = False
         if parsed.season_pack:

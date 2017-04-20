@@ -146,7 +146,7 @@ def remove(manager, options, forget=False):
         for identifier in options.episode_id:
             try:
                 remove_series_entity(name, identifier, forget)
-            except (ValueError, LookupError) as e:
+            except ValueError as e:
                 console(e.args[0])
             else:
                 console('Removed entities(s) matching `%s` from series `%s`.' % (identifier, name.capitalize()))
