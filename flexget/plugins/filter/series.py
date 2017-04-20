@@ -1049,7 +1049,7 @@ def remove_series_entity(name, identifier, forget=False):
             raise LookupError('Invalid identifier for series {}: {}'.format(series.name, identifier))
 
         removed = False
-        if parsed.is_season_pack:
+        if parsed.season_pack:
             season = session.query(Season).filter(Season.season == parsed.season).filter(
                 Season.series_id == series.id).first()
             if season:

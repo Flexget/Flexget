@@ -138,10 +138,6 @@ class SeriesParser(TitleParser):
     def is_movie(self):
         return False
 
-    @property
-    def is_season_pack(self):
-        return self.season_pack is True
-
     def _reset(self):
         # parse produces these
         self.season = None
