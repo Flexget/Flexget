@@ -143,14 +143,13 @@ def begin(manager, options):
 def remove(manager, options, forget=False):
     name = options.series_name
     if options.episode_id:
-        # remove by id
-        identifier = options.episode_id
-        try:
-            remove_series_entity(name, identifier, forget)
-        except ValueError as e:
-            console(e.args[0])
-        else:
-            console('Removed entities(s) matching `%s` from series `%s`.' % (identifier, name.capitalize()))
+        for identifier in options.episode_id:
+            try:
+                remove_series_entity(name, identifier, forget)
+            except ValueError as e:
+                console(e.args[0])
+            else:
+                console('Removed entities(s) matching `%s` from series `%s`.' % (identifier, name.capitalize()))
     else:
         # remove whole series
         try:
@@ -293,7 +292,7 @@ def register_parser_arguments():
     forget_parser = subparsers.add_parser('forget', parents=[series_parser],
                                           help='Removes episodes or whole series from the entire database '
                                                '(including seen plugin)')
-    forget_parser.add_argument('episode_id', nargs='?', default=None, help='episode ID to forget (optional)')
+    forget_parser.add_argument('episode_id', nargs='*', default=None, help='Entity ID(s) to forget (optional)')
     delete_parser = subparsers.add_parser('remove', parents=[series_parser],
                                           help='Removes episodes or whole series from the series database only')
     delete_parser.add_argument('episode_id', nargs='?', default=None, help='Episode ID to forget (optional)')
