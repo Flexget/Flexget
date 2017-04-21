@@ -155,19 +155,42 @@ def forget(value):
         log.debug('forget called with %s', value)
         count = 0
         field_count = 0
-        for se in session.query(SeenEntry).filter(or_(SeenEntry.title == value, SeenEntry.task == value)).all():
-            field_count += len(se.fields)
+        for seen_entry in session.query(SeenEntry).filter(or_(SeenEntry.title == value, SeenEntry.task == value)).all():
+            field_count += len(seen_entry.fields)
             count += 1
-            log.debug('forgetting %s', se)
-            session.delete(se)
+            log.debug('forgetting %s', seen_entry)
+            session.delete(seen_entry)
 
-        for sf in session.query(SeenField).filter(SeenField.value == value).all():
-            se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
-            field_count += len(se.fields)
+        for seen_field in session.query(SeenField).filter(SeenField.value == value).all():
+            seen_entry = session.query(SeenEntry).filter(SeenEntry.id == seen_field.seen_entry_id).first()
+            field_count += len(seen_entry.fields)
             count += 1
-            log.debug('forgetting %s', se)
-            session.delete(se)
+            log.debug('forgetting %s', seen_entry)
+            session.delete(seen_entry)
     return count, field_count
+
+
+@event('learn')
+def learn(task, entry, fields=None, reason=None, local=False):
+    """Marks entry as seen"""
+    # no explicit fields given, use default
+    if not fields:
+        fields = ['title', 'url', 'original_url']
+    seen_entry = SeenEntry(entry['title'], str(task.name), reason, local)
+    remembered = []
+    for field in fields:
+        if field not in entry:
+            continue
+        # removes duplicate values (eg. url, original_url are usually same)
+        if entry[field] in remembered:
+            continue
+        remembered.append(entry[field])
+        seen_field = SeenField(str(field), str(entry[field]))
+        seen_entry.fields.append(seen_field)
+        log.debug("Learned '%s' (field: %s, local: %d)", entry[field], field, local)
+    # Only add the entry to the session if it has one of the required fields
+    if seen_entry.fields:
+        task.session.add(seen_entry)
 
 
 @with_session
@@ -238,7 +261,7 @@ class FilterSeen(object):
         """Filter entries already accepted on previous runs."""
         config = self.prepare_config(config)
         if config is False:
-            log.debug('%s is disabled' % self.keyword)
+            log.debug('%s is disabled', self.keyword)
             return
 
         fields = config.get('fields')
@@ -253,12 +276,12 @@ class FilterSeen(object):
                 if entry[field] not in values and entry[field]:
                     values.append(str(entry[field]))
             if values:
-                log.trace('querying for: %s' % ', '.join(values))
+                log.trace('querying for: %s', ', '.join(values))
                 # check if SeenField.value is any of the values
                 found = search_by_field_values(field_value_list=values, task_name=task.name, local=local,
                                                session=task.session)
                 if found:
-                    log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], found.value))
+                    log.debug("Rejecting '%s' '%s' because of seen '%s'", entry['url'], entry['title'], found.value)
                     se = task.session.query(SeenEntry).filter(SeenEntry.id == found.seen_entry_id).one()
                     entry.reject('Entry with %s `%s` is already marked seen in the task %s at %s' %
                                  (found.field, found.value, se.task, se.added.strftime('%Y-%m-%d %H:%M')),
@@ -278,37 +301,16 @@ class FilterSeen(object):
             fields.extend(config)
 
         for entry in task.accepted:
-            self.learn(task, entry, fields=fields, local=local)
+            learn(task, entry, fields=fields, local=local)
             # verbose if in learning mode
             if task.options.learn:
-                log.info("Learned '%s' (will skip this in the future)" % (entry['title']))
-
-    def learn(self, task, entry, fields=None, reason=None, local=False):
-        """Marks entry as seen"""
-        # no explicit fields given, use default
-        if not fields:
-            fields = self.fields
-        se = SeenEntry(entry['title'], str(task.name), reason, local)
-        remembered = []
-        for field in fields:
-            if field not in entry:
-                continue
-            # removes duplicate values (eg. url, original_url are usually same)
-            if entry[field] in remembered:
-                continue
-            remembered.append(entry[field])
-            sf = SeenField(str(field), str(entry[field]))
-            se.fields.append(sf)
-            log.debug("Learned '%s' (field: %s, local: %d)" % (entry[field], field, local))
-        # Only add the entry to the session if it has one of the required fields
-        if se.fields:
-            task.session.add(se)
+                log.info("Learned '%s' (will skip this in the future)", entry['title'])
 
     def forget(self, task, title):
         """Forget SeenEntry with :title:. Return True if forgotten."""
         se = task.session.query(SeenEntry).filter(SeenEntry.title == title).first()
         if se:
-            log.debug("Forgotten '%s' (%s fields)" % (title, len(se.fields)))
+            log.debug("Forgotten '%s' (%s fields)", title, len(se.fields))
             task.session.delete(se)
             return True
 
@@ -355,7 +357,7 @@ def forget_by_id(entry_id, session=None):
     :param session: DB Session
     """
     entry = get_entry_by_id(entry_id, session=session)
-    log.debug('Deleting seen entry with ID {0}'.format(entry_id))
+    log.debug('Deleting seen entry with ID %s', entry_id)
     session.delete(entry)
 
 

@@ -14,7 +14,7 @@ class TestPendingApproval(object):
             pending_approval: yes
     """
 
-    def test_pending_approval(self, execute_task, manager):
+    def test_pending_approval(self, execute_task):
         task = execute_task('test')
         assert len(task.all_entries) == 1
         assert len(task.rejected) == 1
@@ -36,3 +36,28 @@ class TestPendingApproval(object):
         assert len(task.all_entries) == 1
         assert len(task.rejected) == 1
         assert len(task.accepted) == 0
+
+        # Verify that pending entry is not re-added on another execution
+        with Session() as session:
+            pnd_entry = session.query(PendingEntry).first()
+            assert pnd_entry is None
+
+    def test_delete_without_approving(self, execute_task):
+        task = execute_task('test')
+        assert len(task.all_entries) == 1
+        assert len(task.rejected) == 1
+        assert len(task.accepted) == 0
+
+        with Session() as session:
+            pnd_entry = session.query(PendingEntry).first()
+            session.delete(pnd_entry)
+
+        task = execute_task('test')
+        assert len(task.all_entries) == 1
+        assert len(task.rejected) == 1
+        assert len(task.accepted) == 0
+
+        # Verify that pending entry is not re-added on another execution
+        with Session() as session:
+            pnd_entry = session.query(PendingEntry).first()
+            assert pnd_entry is None
