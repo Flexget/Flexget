@@ -44,55 +44,67 @@ class TestImdb(object):
               # test a search in which a movie has lower relevance than tv episodes
               - {title: 'Mad Max Fury Road 2015'}
             imdb:
-              min_votes: 20
+              accept:
+                - min_votes: 20
 
           year:
             mock:
               - {title: 'Princess Mononoke', imdb_url: 'http://www.imdb.com/title/tt0119698/'}
               - {title: 'Taken[2008]DvDrip[Eng]-FOO', imdb_url: 'http://www.imdb.com/title/tt0936501/'}
               - {title: 'Inglourious Basterds 2009', imdb_url: 'http://www.imdb.com/title/tt0361748/'}
+              - {title: 'The Matrix', imdb_url: 'http://www.imdb.com/title/tt0133093/'}
             imdb:
-              min_year: 2003
-              max_year: 2008
+              accept:
+                - min_year: 2003
+                  max_year: 2008
+              reject:
+                - max_year: 1999
 
           actor:
             mock:
               - {title: 'The Matrix', imdb_url: 'http://www.imdb.com/title/tt0133093/'}
               - {title: 'The Terminator', imdb_url: 'http://www.imdb.com/title/tt0088247/'}
             imdb:
-              accept_actors:
-                - nm0000206
-              reject_actors:
-                - nm0000216
+              accept:
+                - actors:
+                  - nm0000206
+              reject:
+                - actors:
+                  - nm0000216
 
           director:
             mock:
               - {title: 'The Matrix', imdb_url: 'http://www.imdb.com/title/tt0133093/'}
               - {title: 'The Terminator', imdb_url: 'http://www.imdb.com/title/tt0088247/'}
             imdb:
-              accept_directors:
-                - nm0905152
-                - nm0905154
-              reject_directors:
-                - nm0000116
+              accept:
+                - directors:
+                  - nm0905152
+                  - nm0905154
+              reject:
+                - directors:
+                  - nm0000116
 
           writer:
             mock:
               - {title: 'Hot Fuzz', imdb_url: 'http://www.imdb.com/title/tt0425112/'}
               - {title: 'The Terminator', imdb_url: 'http://www.imdb.com/title/tt0088247/'}
             imdb:
-              accept_writers:
-                - nm0942367
-                - nm0670408
-              reject_writers:
-                - nm0000116
+              accept:
+                - writers:
+                  - nm0942367
+                  - nm0670408
+              reject:
+                - writers:
+                  - nm0000116
 
           score:
             mock:
               - {title: 'The Matrix', imdb_url: 'http://www.imdb.com/title/tt0133093/'}
               - {title: 'Battlefield Earth', imdb_url: 'http://www.imdb.com/title/tt0185183/'}
             imdb:
-              min_score: 5.0
+              accept:
+                - min_score: 5.0
 
           genre:
             mock:
@@ -100,10 +112,12 @@ class TestImdb(object):
               - {title: 'Terms of Endearment', imdb_url: 'http://www.imdb.com/title/tt0086425/'}
               - {title: 'Frozen', imdb_url: 'http://www.imdb.com/title/tt2294629/'}
             imdb:
-              reject_genres:
-                - drama
-              accept_genres:
-                - sci-fi
+              reject:
+                - genres:
+                  - drama
+              accept:
+                - genres:
+                  - sci-fi
 
           language:
             mock:
@@ -114,10 +128,12 @@ class TestImdb(object):
               - {title: 'Rockstar', imdb_url: 'http://www.imdb.com/title/tt1839596/'}
               - {title: 'The Host', imdb_url: 'http://www.imdb.com/title/tt0468492/'}
             imdb:
-              accept_languages:
-                - english
-              reject_languages:
-                - french
+              accept:
+                - languages:
+                  - english
+              reject:
+                - languages:
+                  - french
           mpaa:
             mock:
             - title: Saw 2004
@@ -125,8 +141,9 @@ class TestImdb(object):
             - title: Aladdin 1992
               imdb_url: http://www.imdb.com/title/tt0103639/
             imdb:
-              reject_mpaa_ratings:
-              - R
+              reject:
+                - mpaa_ratings:
+                  - R
     """
 
     def test_lookup(self, execute_task):
@@ -170,6 +187,8 @@ class TestImdb(object):
             'Mononoke-hime should not have been rejected'
         assert not task.find_entry('accepted', imdb_name='Inglourious Basterds 2009'), \
             'Inglourious Basterds should not have been accepted'
+        assert task.find_entry('rejected', imdb_name='The Matrix'), \
+            'The Matrix should\'ve been rejected'
 
     def test_actors(self, execute_task):
         task = execute_task('actor')
@@ -185,8 +204,8 @@ class TestImdb(object):
 
         assert task.find_entry('accepted', imdb_name='The Matrix'), \
             'The Matrix should\'ve been accepted'
-        assert not task.find_entry('rejected', imdb_name='The Terminator'), \
-            'The The Terminator have been rejected'
+        assert task.find_entry('rejected', imdb_name='The Terminator'), \
+            'The Terminator should have been rejected'
 
     def test_directors(self, execute_task):
         task = execute_task('director')
@@ -239,22 +258,16 @@ class TestImdb(object):
 
     def test_genre(self, execute_task):
         task = execute_task('genre')
-        matrix = (task.find_entry(imdb_name='The Matrix')['imdb_genres'])
-        assert matrix == ['action', 'sci-fi'], \
-            'Could not find genres for The Matrix'
-        toe = (task.find_entry(imdb_name='Terms of Endearment')['imdb_genres'])
-        assert toe == ['comedy', 'drama'], \
-            'Could not find genres for Terms of Endearment'
         frozen = (task.find_entry(imdb_name='Frozen')['imdb_genres'])
-        assert frozen == ['animation', 'adventure', 'comedy', 'family', 'fantasy', 'musical'], \
+        assert frozen == ['comedy', 'animation', 'adventure', 'family', 'fantasy', 'musical'], \
             'Could not find genres for Frozen'
 
         assert task.find_entry('accepted', imdb_name='The Matrix'), \
             'The Matrix should\'ve been accepted'
-        assert not task.find_entry('rejected', title='Terms of Endearment'), \
+        assert task.find_entry('rejected', title='Terms of Endearment'), \
             'Terms of Endearment should have been rejected'
         assert not task.find_entry('rejected', title='Frozen'), \
-            'Frozen should have been rejected'
+            'Frozen should not have been rejected'
 
     def test_language(self, execute_task):
         task = execute_task('language')
