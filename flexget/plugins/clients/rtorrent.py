@@ -1,4 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.xmlrpc import client as xmlrpc_client
 from future.moves.urllib.parse import urlparse, urljoin
@@ -79,7 +79,7 @@ class HTTPDigestTransport(xmlrpc_client.Transport):
         if self.__digest_auth:
             return HTTPDigestAuth(self.__username, self.__password)
         return HTTPBasicAuth(self.__username, self.__password)
-    
+
     def send_request(self, url, auth, data):
         return self.__session.post(url, auth=auth, data=data, raise_status=False)
 
