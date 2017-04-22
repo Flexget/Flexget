@@ -6,6 +6,7 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
+  - "3.6" 
 # Install libyaml for vcr speedup?
 addons:
   apt:
