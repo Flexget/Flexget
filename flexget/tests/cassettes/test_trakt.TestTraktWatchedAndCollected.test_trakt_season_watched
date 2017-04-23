@@ -1,0 +1,134 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/search?type=show&query=Into+The+Badlands
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":71.875755,\"show\":{\"title\":\"Into
+        the Badlands\",\"overview\":\"A mighty warrior and a young boy search for
+        enlightenment in a ruthless territory controlled by feudal barons.\",\"year\":2015,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":82217,\"slug\":\"into-the-badlands\",\"tvdb\":289079,\"imdb\":\"tt3865236\",\"tmdb\":47450,\"tvrage\":49739}}},{\"type\":\"show\",\"score\":5.297183,\"show\":{\"title\":\"The
+        Sparticle Mystery\",\"overview\":\"The Sparticle Mystery follows a group of
+        ten children left to fend for themselves within modern day earth after a science
+        experiment at 'The Sparticle Project' goes wrong, resulting in all those of
+        age 15 and over disappearing into a parallel universe, at precisely 11:11am.Initially
+        the world becomes their exciting playground. With adults' rules, law and order
+        all removed, the youngsters have great fun fulfilling many wishes, including
+        raiding sweetshops etc. However, as the world's resources start to dwindle
+        and daily survival gets harder, the youngsters resolve to bring the adults
+        back by venturing to the top secret 'Sparticle Project'. They are aided in
+        their quest by a number of clues left before the disappearance by a woman
+        named 'Doomsday' Dora, a scientist who worked on the Sparticle Project. Along
+        the way they have many adventures and learn important life skills.\",\"year\":2011,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":37465,\"slug\":\"the-sparticle-mystery\",\"tvdb\":256458,\"imdb\":\"tt1781715\",\"tmdb\":37623,\"tvrage\":null}}},{\"type\":\"show\",\"score\":2.986482,\"show\":{\"title\":\"The
+        Boneyard With George St Pierre\",\"overview\":\"Mixed martial arts superstar
+        Georges St-Pierre is regarded as one of the greatest champions in the history
+        of the sport, but there\u2019s something he loves even more than fighting:
+        dinosaurs and prehistoric beasts. Now, in his first ever break from the ring,
+        Georges is embarking on a globetrotting journey into the heart of modern palaeontology.
+        The iconic athlete live out his childhood dream by tracking down the most
+        vicious predators to ever walk the earth. Over two exciting half hour specials,
+        Georges\u2019 off-grid adventure takes him from the badlands of South Dakota,
+        to the swamps of Alabama, to Argentina\u2019s dinosaur graveyard, Patagonia,
+        in order to reveal the truth about prehistoric life.\",\"year\":2016,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":110198,\"slug\":\"the-boneyard-with-george-st-pierre\",\"tvdb\":315001,\"imdb\":\"tt5792012\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.4886455,\"show\":{\"title\":\"DinoSapien\",\"overview\":\"The
+        program focuses on what would happen if dinosaurs had continued to exist and
+        evolve into more intelligent beings (Lauren mentions in the opening credits
+        \\\"Everyone thinks dinosaurs are extinct, but what if they're wrong?\\\").
+        It is set at Dinosaur Adventure Camp, a dinosaur-themed summer camp in Canada,
+        where Dr. Hillary Slayton lives with her teenage daughter Lauren. Dr Slayton's
+        husband Alan mysteriously disappeared on a fossil expedition into the Badlands
+        and her daughter hasn\u2019t come to terms with his disappearance. Lauren
+        is, however, the first human to encounter one of the evolved dinosaurs, which
+        she eventually gets to know. Throughout the series Dr. Slayton befriends Dr.
+        Aikens (who later turns villainous) and Lauren makes lots of friends before
+        finding out more about dinosaurs and her father's disappearance.\",\"year\":2007,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":15218,\"slug\":\"dinosapien\",\"tvdb\":103191,\"imdb\":\"tt0822975\",\"tmdb\":15283,\"tvrage\":null}}}]"}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [354317416e023cdd-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sun, 23 Apr 2017 19:04:50 GMT']
+      ETag: [W/"16c3cb18fe93460438d4fa8dc47e1688"]
+      Expires: ['Mon, 24 Apr 2017 03:04:50 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d705f811edc750f4f8abf4d5454e65ca01492974290; expires=Mon,
+          23-Apr-18 19:04:50 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Pagination-Item-Count: ['4']
+      X-Pagination-Limit: ['10']
+      X-Pagination-Page: ['1']
+      X-Pagination-Page-Count: ['1']
+      X-Request-Id: [74a72652-129e-4e4a-8654-c374dd9e0d23]
+      X-Runtime: ['0.026161']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      Cookie: [__cfduid=d705f811edc750f4f8abf4d5454e65ca01492974290]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/82217?extended=full
+  response:
+    body: {string: '{"title":"Into the Badlands","year":2015,"ids":{"trakt":82217,"slug":"into-the-badlands","tvdb":289079,"imdb":"tt3865236","tmdb":47450,"tvrage":49739},"overview":"A
+        mighty warrior and a young boy search for enlightenment in a ruthless territory
+        controlled by feudal barons.","first_aired":"2015-11-15T00:00:00.000Z","airs":{"day":"Sunday","time":"22:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"AMC","country":"us","trailer":null,"homepage":"http://www.amc.com/shows/into-the-badlands","status":"returning
+        series","rating":8.15742,"votes":1099,"updated_at":"2017-04-23T11:51:22.000Z","language":"en","available_translations":["bg","cs","da","de","el","en","es","fa","fr","he","hu","ko","nl","pl","pt","ro","ru","tr","uk","zh"],"genres":["action","adventure","drama"],"aired_episodes":11}'}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [35431741ce1d3cdd-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sun, 23 Apr 2017 19:04:50 GMT']
+      ETag: [W/"13075af7fd5ce3224a898fbb05fca722"]
+      Expires: ['Mon, 24 Apr 2017 03:04:50 GMT']
+      Last-Modified: ['Sun, 23 Apr 2017 11:51:22 GMT']
+      Server: [cloudflare-nginx]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [b100c237-f315-48b3-bf77-72bde6f0dea6]
+      X-Runtime: ['0.061001']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/82217/seasons/?extended=full
+  response:
+    body: {string: '[{"number":0,"ids":{"trakt":121665,"tvdb":null,"tmdb":null,"tvrage":null},"rating":8.875,"votes":8,"episode_count":24,"aired_episodes":3,"title":"Specials","overview":null,"first_aired":"2016-12-10T03:00:00.000Z"},{"number":1,"ids":{"trakt":105051,"tvdb":632067,"tmdb":null,"tvrage":null},"rating":7.94611,"votes":167,"episode_count":6,"aired_episodes":6,"title":"Season
+        1","overview":null,"first_aired":"2015-11-16T03:00:00.000Z"},{"number":2,"ids":{"trakt":118719,"tvdb":null,"tmdb":null,"tvrage":null},"rating":8.33333,"votes":18,"episode_count":10,"aired_episodes":5,"title":"Season
+        2","overview":null,"first_aired":"2017-03-20T02:00:00.000Z"}]'}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [35431742b9393cef-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sun, 23 Apr 2017 19:04:50 GMT']
+      ETag: [W/"e451d7fefcaa830cd7ba89ddc8d746bf"]
+      Expires: ['Mon, 24 Apr 2017 03:04:50 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=da6925ef3c3ff86958687c9e579f016ee1492974290; expires=Mon,
+          23-Apr-18 19:04:50 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [27984166-b6e2-405b-a953-de2a8c718f63]
+      X-Runtime: ['0.061357']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1
