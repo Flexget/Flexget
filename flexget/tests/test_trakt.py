@@ -630,3 +630,39 @@ class TestTraktUnicodeLookup(object):
         with Session() as session:
             r = session.query(TraktMovieSearchResult).all()
             assert len(r) == 1, 'Should not have added a new row'
+
+
+@pytest.mark.online
+class TestTraktRatingsLookup(object):
+    config = """
+            templates:
+              global:
+                trakt_lookup:
+                  account: flexgettest
+            tasks:
+              test_trakt_ratings_episode:
+                mock:
+                  - {title: 'Breaking.Bad.S05E14.720p.HDTV-FlexGet'}
+              test_trakt_ratings_season:
+                mock:
+                  - {title: 'The.Expanse.S01.2160p.WEBRip-FlexGet'}
+              test_trakt_ratings_show:
+                mock:
+                  - {title: 'Time.After.Time.2017.S01E01.HDTV-FlexGet'}
+              test_trakt_ratings_movie:
+                mock:
+                  - {title: 'Doctor.Strange.2016.1080p.BluRay.DTS-FlexGet'}
+
+        """
+
+    def test_trakt_ratings_episode(self, execute_task):
+        task = execute_task('test_trakt_ratings_episode')
+
+    def test_trakt_ratings_season(self, execute_task):
+        task = execute_task('test_trakt_ratings_season')
+
+    def test_trakt_ratings_show(self, execute_task):
+        task = execute_task('test_trakt_ratings_show')
+
+    def test_trakt_ratings_movie(self, execute_task):
+        task = execute_task('test_trakt_ratings_movie')
