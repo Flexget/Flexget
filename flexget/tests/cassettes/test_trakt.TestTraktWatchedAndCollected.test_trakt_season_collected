@@ -135,16 +135,16 @@ interactions:
         last great naval campaign in history.\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":64326,\"slug\":\"hell-in-the-pacific\",\"tvdb\":134971,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"}
     headers:
       CF-Cache-Status: [HIT]
-      CF-RAY: [35434d3e8c013d5b-CPH]
+      CF-RAY: [354379fb1b2f3d49-CPH]
       Cache-Control: ['public, max-age=28800']
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Sun, 23 Apr 2017 19:41:41 GMT']
+      Date: ['Sun, 23 Apr 2017 20:12:13 GMT']
       ETag: [W/"626d49b51e7df0b65020f0cac0f5750c"]
-      Expires: ['Mon, 24 Apr 2017 03:41:41 GMT']
+      Expires: ['Mon, 24 Apr 2017 04:12:13 GMT']
       Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d62c0259564bbc9123f8095253336112c1492976501; expires=Mon,
-          23-Apr-18 19:41:41 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Set-Cookie: ['__cfduid=d5cc4750fbbcb66b97399027af958d0a21492978333; expires=Mon,
+          23-Apr-18 20:12:13 GMT; path=/; domain=.trakt.tv; HttpOnly']
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
       X-Frame-Options: [SAMEORIGIN]
@@ -160,7 +160,7 @@ interactions:
     body: null
     headers:
       Content-Type: [application/json]
-      Cookie: [__cfduid=d62c0259564bbc9123f8095253336112c1492976501]
+      Cookie: [__cfduid=d5cc4750fbbcb66b97399027af958d0a21492978333]
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: ['2']
     method: GET
@@ -178,13 +178,13 @@ interactions:
         series","rating":8.31006,"votes":2335,"updated_at":"2017-04-23T10:43:01.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hr","hu","id","it","ko","nl","pl","pt","ro","ru","sv","tr","uk","zh"],"genres":["fantasy","science-fiction","mystery","drama","thriller"],"aired_episodes":23}'}
     headers:
       CF-Cache-Status: [HIT]
-      CF-RAY: [35434d3eec363d5b-CPH]
+      CF-RAY: [354379fb7b4b3d49-CPH]
       Cache-Control: ['public, max-age=28800']
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Sun, 23 Apr 2017 19:41:41 GMT']
+      Date: ['Sun, 23 Apr 2017 20:12:13 GMT']
       ETag: [W/"5984786f9fbe296497ca3d03f4c2717f"]
-      Expires: ['Mon, 24 Apr 2017 03:41:41 GMT']
+      Expires: ['Mon, 24 Apr 2017 04:12:13 GMT']
       Last-Modified: ['Sun, 23 Apr 2017 10:43:01 GMT']
       Server: [cloudflare-nginx]
       Vary: [Accept-Encoding]
@@ -210,16 +210,16 @@ interactions:
         high, the cold war between Earth and Mars is on the brink of an all-out battle.\",\"first_aired\":\"2017-02-09T03:00:00.000Z\"}]"}
     headers:
       CF-Cache-Status: [HIT]
-      CF-RAY: [35434d3fdb113cb3-CPH]
+      CF-RAY: [354379fc692f3d6d-CPH]
       Cache-Control: ['public, max-age=28800']
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Sun, 23 Apr 2017 19:41:41 GMT']
+      Date: ['Sun, 23 Apr 2017 20:12:14 GMT']
       ETag: [W/"678c85cc1af599e9d37f393f67dd6578"]
-      Expires: ['Mon, 24 Apr 2017 03:41:41 GMT']
+      Expires: ['Mon, 24 Apr 2017 04:12:14 GMT']
       Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d88db9dbfc227c699590652e1a87e0e251492976501; expires=Mon,
-          23-Apr-18 19:41:41 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Set-Cookie: ['__cfduid=df959dfb176dcda14639727e5c44ffb0a1492978334; expires=Mon,
+          23-Apr-18 20:12:14 GMT; path=/; domain=.trakt.tv; HttpOnly']
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
       X-Frame-Options: [SAMEORIGIN]
@@ -240,23 +240,23 @@ interactions:
         Expanse","year":2015,"ids":{"trakt":77199,"slug":"the-expanse","tvdb":280619,"imdb":"tt3230854","tmdb":63639,"tvrage":41967}},"seasons":[{"number":1,"episodes":[{"number":1,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":2,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":3,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":4,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":5,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":6,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":7,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":8,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":9,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":10,"collected_at":"2017-04-23T18:44:42.000Z"}]}]},{"last_collected_at":"2016-03-08T21:36:33.000Z","show":{"title":"White
         Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}},"seasons":[{"number":1,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":2,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":15,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":16,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":3,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":15,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":16,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":4,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":15,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":16,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":5,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":6,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"}]}]},{"last_collected_at":"2012-10-01T02:00:00.000Z","show":{"title":"Homeland","year":2011,"ids":{"trakt":1398,"slug":"homeland","tvdb":247897,"imdb":"tt1796960","tmdb":1407,"tvrage":27811}},"seasons":[{"number":2,"episodes":[{"number":1,"collected_at":"2012-10-01T02:00:00.000Z"}]}]}]'}
     headers:
-      CF-RAY: [35434d40bd133cc5-CPH]
+      CF-RAY: [354379fde8283cfb-CPH]
       Cache-Control: ['max-age=0, private, must-revalidate']
-      Cf-Railgun: [2c1bb55934 0.79 0.044417 0030 e6be]
+      Cf-Railgun: [beb0b5926c 0.79 1.497505 0030 e6be]
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Sun, 23 Apr 2017 19:41:42 GMT']
+      Date: ['Sun, 23 Apr 2017 20:12:15 GMT']
       Etag: [W/"f7abaf97f2f38c49bbbd9a3caf2059b5"]
       Last-Modified: ['Sun, 23 Apr 2017 18:44:42 GMT']
       Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d64908d4e50a7ba201d6a0b136186b3761492976501; expires=Mon,
-          23-Apr-18 19:41:41 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Set-Cookie: ['__cfduid=d938d30d4e71e4de35ef2b42112d873a41492978334; expires=Mon,
+          23-Apr-18 20:12:14 GMT; path=/; domain=.trakt.tv; HttpOnly']
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
       X-Frame-Options: [SAMEORIGIN]
       X-Private-User: ['false']
-      X-Request-Id: [caf495e2-4a28-4ab9-8ae4-76ec570ff349]
-      X-Runtime: ['0.029090']
+      X-Request-Id: [c62c0cc9-3fc7-4ad2-94a9-b377291dceeb]
+      X-Runtime: ['0.023645']
       X-Xss-Protection: [1; mode=block]
     status: {code: 200, message: OK}
 version: 1
