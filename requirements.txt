@@ -11,12 +11,11 @@ rpyc
 jinja2
 # There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
 requests>=2.8.0, <3.0
-#Guessit requires python-dateutil<=2.5.2
 python-dateutil>=2.5.3
 jsonschema>=2.0
 path.py>=8.1.1
 pathlib>=1.0
-guessit<=2.0.4
+guessit>=2.1.2
 apscheduler>=3.2.0
 terminaltables>=3.1.0
 colorclass>=2.2.0
