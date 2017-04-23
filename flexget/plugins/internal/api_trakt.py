@@ -512,7 +512,7 @@ class TraktSeason(Base):
 
     @property
     def expired(self):
-        # TODO should episode have its own expiration function?
+        # TODO should season have its own expiration function?
         return False
 
 
