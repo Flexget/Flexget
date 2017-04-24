@@ -1,0 +1,180 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/search?year=2017&query=Time+After+Time&type=show
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":65.16574,\"show\":{\"title\":\"Time
+        After Time\",\"overview\":\"A young H.G. Wells travels through centuries,
+        decades and days in the time machine he created. In the pursuit of the charismatic
+        Dr. John Stevenson, better known as \u201CJack the Ripper,\u201D Wells arrives
+        in modern day New York City, searching for Stevenson after the doctor escapes
+        authorities in Wells\u2019 London home. But instead of the Utopia he imagined,
+        Wells finds a world more aligned with Stevenson\u2019s temperament ...\",\"year\":2017,\"status\":\"canceled\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":107801,\"slug\":\"time-after-time-2017\",\"tvdb\":311898,\"imdb\":\"tt5031234\",\"tmdb\":68002,\"tvrage\":null}}},{\"type\":\"show\",\"score\":3.126195,\"show\":{\"title\":\"The
+        King's Avatar\",\"overview\":\"In the multiplayer online game Glory, Ye Xiu
+        is regarded as a textbook and a top-tier pro-player. However, due to a myriad
+        of reasons, he is kicked from the team. After leaving the pro scene, he finds
+        work in an Internet Cafe as a manager. When Glory launches its tenth server,
+        he throws himself in to the game once more. Possessing ten years of experience,
+        the memories of his past, and an incomplete, self-made weapon, his return
+        along the road to the summit begins!\",\"year\":2017,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":117930,\"slug\":\"the-king-s-avatar\",\"tvdb\":326270,\"imdb\":null,\"tmdb\":71194,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.44842908,\"show\":{\"title\":\"Tangled:
+        The Series\",\"overview\":\"The adventures of Rapunzel, Flynn Rider and their
+        friends in the time between the film, 'Tangled' and the short film, 'Tangled
+        Ever After'.\",\"year\":2017,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":112751,\"slug\":\"tangled-the-series\",\"tvdb\":318990,\"imdb\":\"tt4902964\",\"tmdb\":70047,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.31708723,\"show\":{\"title\":\"The
+        Legend of Flying Daggers\",\"overview\":\"Although Li Huai is the grandson
+        of \u201CXiao Li Fei Dao\u201D Li Xun Huan, he is an illegitimate son, which
+        caused him to roam around the world since young. Many years later, after returning
+        to where he used to live after obtaining a treasure his mother left for him,
+        he was accused of stealing silver from an official and fell into a trap set
+        by the leader of the guards, Han Jun. In those difficult times, a mysterious
+        woman Xue Cai Ye saved him time and again, causing their feelings for each
+        other to grow.\",\"year\":2017,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":115719,\"slug\":\"the-legend-of-flying-daggers\",\"tvdb\":322255,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.29895273,\"show\":{\"title\":\"Prisoners\",\"overview\":\"After
+        a lifetime of mistakes, Linda is sent to serve time in Iceland\u2019s only
+        women\u2019s prison for a vicious assault that leaves her father in a coma.
+        But no-one knows that she harbours a dark secret that could tear her family
+        apart, a secret that could set her free.\",\"year\":2017,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":114838,\"slug\":\"prisoners\",\"tvdb\":321979,\"imdb\":\"tt5881406\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.29895273,\"show\":{\"title\":\"Circle\",\"overview\":\"After
+        Aliens arrive, the story takes place in two time streams: 2017 and 2037. In
+        twenty years, and by 2037, the world has been divided into a \u201CSmart Earth\u201D
+        where artificial intelligence has created a utopian environment in which no
+        diseases or crimes exist, and an \u201COrdinary Earth\u201D where people still
+        suffer from rampant plague and lawlessness.\",\"year\":2017,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":117337,\"slug\":\"circle\",\"tvdb\":324985,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.26158363,\"show\":{\"title\":\"Kemono
+        Friends\",\"overview\":\"The story takes place in Japari Park, an enormous
+        integrated zoo built somewhere in this world. A mysterious substance found
+        there, called \\\"Sand Star,\\\" causes the animals to turn into humanoid
+        beings called \\\"Animal Girls\\\"! These new creatures spend every day peacefully
+        with the zoo's visitors... but after some time, a lost child turns up in the
+        park. The child's attempt to find the way home turns into a great adventure
+        with the Animal Girls!\",\"year\":2017,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":113271,\"slug\":\"kemono-friends\",\"tvdb\":319997,\"imdb\":null,\"tmdb\":69288,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.22532853,\"show\":{\"title\":\"Love,
+        Timeless\",\"overview\":\"Time is a love letter, to whom it may concern. There
+        is no \\\"what if\\\" in life. But what if you are younger by 10 years, what
+        would you want to change? One day, Shi Zhao Yu and Kai Jia received an invitation
+        from their university buddy Ruo Bi to come back to their university days'
+        secret base \\\"Clocktower\\\". This \\\"Clocktower\\\" is, in fact, an abandoned
+        school classroom/lab-the secret base where Zhao Yu, Kai Jia, Ruo Bi, Jun Ren,
+        Hai Meng and Zhi Ni used to get together. On that day, by the time everyone
+        arrived, Ruo Bi was standing on the rooftop outside the clock tower. When
+        everyone was nervously shouting out to Ruo Bi, a light suddenly flashed from
+        the clock on the wall...By the time Zhao Yu opens his eyes again, he is back
+        to the year 2007 when he was in year 2 of University that year. After several
+        failed attempts of trying to get back to the year 2017, Zhao Yu decided to
+        re-enjoy youth, rechallenge the basketball match which he had once lost and
+        also try to pursue the dream girl Ruo Bi whom he once missed the chance. But
+        towards Kai Jia, he can't help it and still cares about her; especially so
+        when Kai Jia and Jun Ren are getting closer and closer... Can Zhao Yu use
+        this chance to learn how to face himself honestly and learn how to love? Cherish
+        the precious things in youth?\",\"year\":2017,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":118484,\"slug\":\"love-timeless\",\"tvdb\":327480,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.22421454,\"show\":{\"title\":\"Anne\",\"overview\":\"A
+        coming-of-age story about an outsider who, against all odds and numerous challenges,
+        fights for love and acceptance and for her place in the world. The series
+        centers on a young orphaned girl in the late 1890\u2019s, who, after an abusive
+        childhood spent in orphanages and the homes of strangers, is mistakenly sent
+        to live with an elderly spinster and her aging brother. Over time, 13-year-old
+        Anne will transform their lives and eventually the small town in which they
+        live with her unique spirit, fierce intellect and brilliant imagination.\",\"year\":2017,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":116043,\"slug\":\"anne\",\"tvdb\":322971,\"imdb\":\"tt5421602\",\"tmdb\":70785,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.22421454,\"show\":{\"title\":\"Married
+        But Available\",\"overview\":\"After experiencing a near-death situation,
+        young couple Au Yeung Chi Chung and Chu Ming Ming hastily get married while
+        vacationing abroad. As fate will have it, they end up working at the same
+        company when they return to Hong Kong. Ming Ming's boss, Sze Lo Ga, had a
+        hurtful relationship with ex-husband Cheung Kin Kwok, causing her to despise
+        marriage and devote all her time to work. She offers Ming Ming a high salary
+        to become her personal assistant. Hoping to improve her life, Ming Ming chooses
+        to conceal her marriage. Chi Chung reluctantly cooperates and must be careful
+        at every step.\",\"year\":2017,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":117469,\"slug\":\"married-but-available\",\"tvdb\":325252,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"}
+    headers:
+      CF-Cache-Status: [MISS]
+      CF-RAY: [3549f197d8263ce9-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Mon, 24 Apr 2017 15:02:28 GMT']
+      ETag: [W/"529081d09d3f72dbf959ce36a9c80585"]
+      Expires: ['Mon, 24 Apr 2017 23:02:28 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=dc5f26cb44c0b6e39d6a323721befc84c1493046147; expires=Tue,
+          24-Apr-18 15:02:27 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Pagination-Item-Count: ['21']
+      X-Pagination-Limit: ['10']
+      X-Pagination-Page: ['1']
+      X-Pagination-Page-Count: ['3']
+      X-Request-Id: [9bc08b5e-78d8-49fb-97c4-b1c3b6a02038]
+      X-Runtime: ['0.029747']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      Cookie: [__cfduid=dc5f26cb44c0b6e39d6a323721befc84c1493046147]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/107801?extended=full
+  response:
+    body: {string: "{\"title\":\"Time After Time\",\"year\":2017,\"ids\":{\"trakt\":107801,\"slug\":\"time-after-time-2017\",\"tvdb\":311898,\"imdb\":\"tt5031234\",\"tmdb\":68002,\"tvrage\":null},\"overview\":\"A
+        young H.G. Wells travels through centuries, decades and days in the time machine
+        he created. In the pursuit of the charismatic Dr. John Stevenson, better known
+        as \u201CJack the Ripper,\u201D Wells arrives in modern day New York City,
+        searching for Stevenson after the doctor escapes authorities in Wells\u2019
+        London home. But instead of the Utopia he imagined, Wells finds a world more
+        aligned with Stevenson\u2019s temperament ...\",\"first_aired\":\"2017-03-06T02:00:00.000Z\",\"airs\":{\"day\":\"Sunday\",\"time\":\"21:00\",\"timezone\":\"America/New_York\"},\"runtime\":60,\"certification\":\"TV-14\",\"network\":\"ABC
+        (US)\",\"country\":\"us\",\"trailer\":\"http://youtube.com/watch?v=rKXOmFUco8A\",\"homepage\":\"http://abc.go.com/shows/time-after-time\",\"status\":\"canceled\",\"rating\":7.05682,\"votes\":88,\"updated_at\":\"2017-04-08T10:39:56.000Z\",\"language\":\"en\",\"available_translations\":[\"el\",\"en\",\"es\",\"fr\",\"tr\"],\"genres\":[\"fantasy\",\"science-fiction\",\"drama\"],\"aired_episodes\":5}"}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [3549f19ac8e33ce9-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Mon, 24 Apr 2017 15:02:28 GMT']
+      ETag: [W/"67e73478a41707dc53777795a8272e83"]
+      Expires: ['Mon, 24 Apr 2017 23:02:28 GMT']
+      Last-Modified: ['Sat, 08 Apr 2017 10:39:56 GMT']
+      Server: [cloudflare-nginx]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [b5ba5ba9-1716-4d04-8f18-495e13d0032a]
+      X-Runtime: ['0.016184']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/users/flexgettest/ratings/shows
+  response:
+    body: {string: '[{"rated_at":"2017-04-23T19:37:10.000Z","rating":1,"type":"show","show":{"title":"Time
+        After Time","year":2017,"ids":{"trakt":107801,"slug":"time-after-time-2017","tvdb":311898,"imdb":"tt5031234","tmdb":68002,"tvrage":null}}}]'}
+    headers:
+      CF-RAY: [3549f19bc8493c95-CPH]
+      Cache-Control: ['max-age=0, private, must-revalidate']
+      Cf-Railgun: [56fb45ad02 stream 0.000000 0200 e6be]
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Mon, 24 Apr 2017 15:02:28 GMT']
+      Etag: [W/"70b794b4200784bce05e1e983a262079"]
+      Last-Modified: ['Sun, 23 Apr 2017 19:37:10 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d219066a216aedbcdc2d6b9ab79bcc4311493046148; expires=Tue,
+          24-Apr-18 15:02:28 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Private-User: ['false']
+      X-Request-Id: [00415923-0ad2-416a-b2c3-a3dda70cb755]
+      X-Runtime: ['0.034601']
+      X-Xss-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1

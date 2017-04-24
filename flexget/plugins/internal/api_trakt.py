@@ -445,7 +445,7 @@ class TraktEpisode(Base):
         self.update(trakt_episode, session)
 
     def update(self, trakt_episode, session):
-        """Updates this record from the trakt media object `trakt_movie` returned by the trakt api."""
+        """Updates this record from the trakt media object `trakt_episode` returned by the trakt api."""
         if self.id and self.id != trakt_episode['ids']['trakt']:
             raise Exception('Tried to update db ep with different ep data')
         elif not self.id:
@@ -466,6 +466,53 @@ class TraktEpisode(Base):
     @property
     def expired(self):
         # TODO should episode have its own expiration function?
+        return False
+
+
+class TraktSeason(Base):
+    __tablename__ = 'trakt_seasons'
+
+    id = Column(Integer, primary_key=True, autoincrement=False)
+    tvdb_id = Column(Integer)
+    tmdb_id = Column(Integer)
+    tvrage_id = Column(Unicode)
+    title = Column(Unicode)
+    number = Column(Integer)
+    episode_count = Column(Integer)
+    aired_episodes = Column(Integer)
+    overview = Column(Unicode)
+    first_aired = Column(DateTime)
+    ratings = Column(Integer)
+    votes = Column(Integer)
+
+    cached_at = Column(DateTime)
+
+    series_id = Column(Integer, ForeignKey('trakt_shows.id'), nullable=False)
+
+    def __init__(self, trakt_season, session):
+        super(TraktSeason, self).__init__()
+        self.update(trakt_season, session)
+
+    def update(self, trakt_season, session):
+        """Updates this record from the trakt media object `trakt_episode` returned by the trakt api."""
+        if self.id and self.id != trakt_season['ids']['trakt']:
+            raise Exception('Tried to update db season with different season data')
+        elif not self.id:
+            self.id = trakt_season['ids']['trakt']
+        self.tmdb_id = trakt_season['ids']['tmdb']
+        self.tvrage_id = trakt_season['ids']['tvrage']
+        self.tvdb_id = trakt_season['ids']['tvdb']
+        self.first_aired = None
+        if trakt_season.get('first_aired'):
+            self.first_aired = dateutil_parse(trakt_season['first_aired'], ignoretz=True)
+        self.cached_at = datetime.now()
+
+        for col in ['title', 'number', 'episode_count', 'aired_episodes', 'ratings', 'votes', 'overview']:
+            setattr(self, col, trakt_season.get(col))
+
+    @property
+    def expired(self):
+        # TODO should season have its own expiration function?
         return False
 
 
@@ -500,6 +547,7 @@ class TraktShow(Base):
     _translation_languages = Column('translation_languages', Unicode)
     translation_languages = json_synonym('_translation_languages')
     episodes = relation(TraktEpisode, backref='show', cascade='all, delete, delete-orphan', lazy='dynamic')
+    seasons = relation(TraktSeason, backref='show', cascade='all, delete, delete-orphan', lazy='dynamic')
     genres = relation(TraktGenre, secondary=show_genres_table)
     _actors = relation(TraktActor, secondary=show_actors_table)
     updated_at = Column(DateTime)
@@ -596,6 +644,33 @@ class TraktShow(Base):
                 episode = TraktEpisode(data, session)
                 self.episodes.append(episode)
         return episode
+
+    def get_season(self, number, session, only_cached=False):
+        # TODO: Does series data being expired mean all season data should be refreshed?
+        season = self.seasons.filter(TraktSeason.number == number).first()
+        if not season or self.expired:
+            url = get_api_url('shows', self.id, 'seasons', '?extended=full')
+            if only_cached:
+                raise LookupError('Season %s not found in cache' % number)
+            log.debug('Season %s not found in cache, looking up from trakt.', number)
+            try:
+                ses = get_session()
+                data = ses.get(url).json()
+            except requests.RequestException:
+                raise LookupError('Error Retrieving Trakt url: %s' % url)
+            if not data:
+                raise LookupError('No data in response from trakt %s' % url)
+            # We fetch all seasons for the given show because we barely get any data otherwise
+            for season_result in data:
+                db_season = self.seasons.filter(TraktSeason.id == season_result['ids']['trakt']).first()
+                if db_season:
+                    db_season.update(season_result, session)
+                else:
+                    db_season = TraktSeason(season_result, session)
+                    self.seasons.append(db_season)
+                if number == season_result['number']:
+                    season = db_season
+        return season
 
     @property
     def expired(self):
@@ -1088,6 +1163,13 @@ class ApiTrakt(object):
                         episodes = [ep['number'] for ep in s['episodes']]
                         in_collection = trakt_data.number in episodes
                         break
+        elif style == 'season':
+            if trakt_data.show.id in cache:
+                series = cache[trakt_data.show.id]
+                for s in series['seasons']:
+                    if trakt_data.number == s['number']:
+                        in_collection = True
+                        break
         else:
             if trakt_data.id in cache:
                 in_collection = True
@@ -1122,6 +1204,13 @@ class ApiTrakt(object):
                         episodes = [ep['number'] for ep in s['episodes']]
                         watched = trakt_data.number in episodes
                         break
+        elif style == 'season':
+            if trakt_data.show.id in cache:
+                series = cache[trakt_data.show.id]
+                for s in series['seasons']:
+                    if trakt_data.number == s['number']:
+                        watched = True
+                        break
         else:
             if trakt_data.id in cache:
                 watched = True
@@ -1143,8 +1232,8 @@ class ApiTrakt(object):
         cache = cache['user_ratings'][style_ident]
         # season ratings are a little annoying and require butchering the code
         if style == 'season' and trakt_data.series_id in cache:
-            if trakt_data.season in cache[trakt_data.series_id]:
-                user_rating = cache[trakt_data.series_id][trakt_data.season]['rating']
+            if trakt_data.number in cache[trakt_data.series_id]:
+                user_rating = cache[trakt_data.series_id][trakt_data.number]['rating']
         if trakt_data.id in cache:
             user_rating = cache[trakt_data.id]['rating']
         log.debug('User rating for entry "%s" is: %s', title, user_rating)

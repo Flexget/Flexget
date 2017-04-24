@@ -64,6 +64,12 @@ class TestTraktShowLookup(object):
               - {title: 'Game.Of.Thrones.S01E02.HDTV.XViD-FlexGet'}
             series:
               - Game Of Thrones
+          test_season_lookup:
+            mock:
+              - {title: 'Fargo.S01.1080p.BluRay-FlexGet'}
+            series:
+              - Fargo:
+                  season_packs: yes
     """
 
     def test_lookup_name(self, execute_task):
@@ -169,6 +175,15 @@ class TestTraktShowLookup(object):
         assert entry['series_name'] == 'Game Of Thrones', 'series lookup failed'
         assert len(entry['trakt_translations']) > 0
 
+    def test_season_lookup(self, execute_task):
+        task = execute_task('test_season_lookup')
+        assert len(task.entries) == 1
+        entry = task.entries[0]
+
+        assert entry['series_name'] == 'Fargo', 'series lookup failed'
+        assert entry['series_season'] == 1 and entry['season_pack'], 'season lookup failed'
+        assert entry['trakt_season_id'] == 61286, 'season lookup failed'
+
 
 @pytest.mark.online
 class TestTraktList(object):
@@ -249,6 +264,24 @@ class TestTraktWatchedAndCollected(object):
               type: shows
             if:
               - trakt_watched: accept
+          test_trakt_season_collected:
+            disable: builtins
+            metainfo_series: yes
+            trakt_lookup:
+              username: flexgettest
+            mock:
+              - {title: 'The.Expanse.S01.720p.BluRay-FlexGet'}
+            if:
+              - trakt_collected: accept
+          test_trakt_season_watched:
+            disable: builtins
+            metainfo_series: yes
+            trakt_lookup:
+              username: flexgettest
+            mock:
+              - {title: 'Into.The.Badlands.S01.720p.BluRay-FlexGet'}
+            if:
+              - trakt_watched: accept
     """
 
     def test_trakt_watched_lookup(self, execute_task):
@@ -296,6 +329,20 @@ class TestTraktWatchedAndCollected(object):
         entry = task.accepted[0]
         assert entry['trakt_series_name'] == 'White Collar', 'wrong series was accepted'
         assert entry['trakt_collected'] == True, 'the whole series should be marked as collected'
+
+    def test_trakt_season_collected(self, execute_task):
+        task = execute_task('test_trakt_season_collected')
+        assert len(task.accepted) == 1, 'Entry should have been accepted as it has been collected'
+        entry = task.accepted[0]
+        assert entry['trakt_series_name'] == 'The Expanse', 'wrong series was accepted'
+        assert entry['trakt_collected'] == True, 'the whole season should be marked as collected'
+
+    def test_trakt_season_watched(self, execute_task):
+        task = execute_task('test_trakt_season_watched')
+        assert len(task.accepted) == 1, 'Entry should have been accepted as it has been watched'
+        entry = task.accepted[0]
+        assert entry['trakt_series_name'] == 'Into the Badlands', 'wrong series was accepted'
+        assert entry['trakt_watched'] == True, 'the whole season should be marked as watched'
 
 
 @pytest.mark.online
@@ -583,3 +630,56 @@ class TestTraktUnicodeLookup(object):
         with Session() as session:
             r = session.query(TraktMovieSearchResult).all()
             assert len(r) == 1, 'Should not have added a new row'
+
+
+@pytest.mark.online
+class TestTraktRatingsLookup(object):
+    config = """
+            templates:
+              global:
+                trakt_lookup:
+                  username: flexgettest
+                metainfo_series: yes
+            tasks:
+              test_trakt_ratings_episode:
+                mock:
+                  - {title: 'Breaking.Bad.S05E14.720p.HDTV-FlexGet'}
+              test_trakt_ratings_season:
+                mock:
+                  - {title: 'The.Expanse.S01.2160p.WEBRip-FlexGet'}
+              test_trakt_ratings_show:
+                mock:
+                  - {title: 'Time.After.Time.2017.S01E01.HDTV-FlexGet'}
+              test_trakt_ratings_movie:
+                mock:
+                  - {title: 'Doctor.Strange.2016.1080p.BluRay.DTS-FlexGet'}
+
+        """
+
+    def test_trakt_ratings_episode(self, execute_task):
+        task = execute_task('test_trakt_ratings_episode')
+        assert len(task.entries) == 1
+        entry = task.entries[0]
+
+        assert entry['trakt_ep_user_rating'] == 10, 'Wrong rating received for Ozymandias'
+
+    def test_trakt_ratings_season(self, execute_task):
+        task = execute_task('test_trakt_ratings_season')
+        assert len(task.entries) == 1
+        entry = task.entries[0]
+
+        assert entry['trakt_season_user_rating'] == 10, 'Wrong rating received for Season 1 of The Expanse'
+
+    def test_trakt_ratings_show(self, execute_task):
+        task = execute_task('test_trakt_ratings_show')
+        assert len(task.entries) == 1
+        entry = task.entries[0]
+
+        assert entry['trakt_series_user_rating'] == 1, 'Wrong rating received for Time After Time 2017'
+
+    def test_trakt_ratings_movie(self, execute_task):
+        task = execute_task('test_trakt_ratings_movie')
+        assert len(task.entries) == 1
+        entry = task.entries[0]
+
+        assert entry['trakt_movie_user_rating'] == 9, 'Wrong rating received for Doctor Strange'

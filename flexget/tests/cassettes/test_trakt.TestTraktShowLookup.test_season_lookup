@@ -1,0 +1,164 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/search?query=Fargo&type=show
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":150.7138,\"show\":{\"title\":\"Fargo\",\"overview\":\"An
+        American black comedy\u2013crime drama anthology television series created
+        and primarily written by Noah Hawley. The show is inspired by the 1996 film
+        of the same name written and directed by the Coen brothers, who serve as executive
+        producers on the series. Each season follows an anthology format, being set
+        in a different era along with a different story, cast and set of characters.\",\"year\":2014,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":60203,\"slug\":\"fargo\",\"tvdb\":269613,\"imdb\":\"tt2802850\",\"tmdb\":60622,\"tvrage\":35276}}},{\"type\":\"show\",\"score\":75.3569,\"show\":{\"title\":\"Tales
+        of Wells Fargo\",\"overview\":\"Tales of Wells Fargo is an American Western
+        television series starring Dale Robertson that ran from March 18, 1957, to
+        June 2, 1962, on NBC. Produced by Revue Productions, the series aired in a
+        half-hour format until its final season when it expanded to an hour. -- WikiPedia\",\"year\":1957,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":13735,\"slug\":\"tales-of-wells-fargo\",\"tvdb\":76545,\"imdb\":\"tt0050066\",\"tmdb\":13795,\"tvrage\":5456}}},{\"type\":\"show\",\"score\":0.8606843,\"show\":{\"title\":\"Heavy
+        Metal Monsters\",\"overview\":\"\u201CHeavy Metal Monsters\u201D combines
+        the power of incredible machines and extreme conditions to show how people
+        survive and work in the world\u2019s worst weather environments \u2013 weather
+        so bad, no sane person would dare to brave it unless they had to. From ice-breaking
+        in the Arctic to saving a community from floods in Fargo, ND, to making desperate
+        repairs to a pipeline in the Gulf of Mexico\u2014it\u2019s engineering on
+        the edge of reason, in the most extreme weather.\",\"year\":2013,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":79533,\"slug\":\"heavy-metal-monsters\",\"tvdb\":279743,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.61477447,\"show\":{\"title\":\"It's
+        Bad for Ya\",\"overview\":\"It's Bad for Ya is the 19th and final album, and
+        14th and final HBO stand-up comedy special by stand-up comedian George Carlin.
+        It was televised live on March 1, 2008 on HBO, less than four months before
+        he died of heart failure at age 71.The album is the follow-up to the 2005
+        HBO special Life Is Worth Losing. Carlin worked on this material since ending
+        his \\\"Life Is Worth Losing\\\" Tour. The working title for this show was
+        The Parade of Useless Bullshit. Filmed in the Wells Fargo Center for the Arts
+        in Santa Rosa, California, the show's stage behind Carlin was designed to
+        represent a cozy living room theme. The CD was released July 29, and the DVD
+        and Blu-ray Disc on November 25.It's Bad For Ya received the Grammy Award
+        for Best Comedy Album, awarded posthumously.\",\"year\":null,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":95312,\"slug\":\"it-s-bad-for-ya\",\"tvdb\":null,\"imdb\":\"tt0963207\",\"tmdb\":20579,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.4918196,\"show\":{\"title\":\"J.J.
+        Starbuck\",\"overview\":\"Welcome to the J.J. Starbuck guide at TV Tome. Dale
+        Robertson, who seemed to have disappeared after Death Valley Days, shows up
+        again with longhorns on his Cadillac as a billionaire businessman who just
+        likes to help good folks, punish bad ones, and homilize in J. J. Starbuck
+        (Tuesdays; 9 to 10 P.M.; NBC), one of several entries from the tireless Stephen
+        J. Cannell. It's been a long time since Tales of Wells Fargo and Death Valley
+        Days, so long that Dale Robertson's predecessor, a certain Mr. Reagan, as
+        host of the latter traded his white hats for the White House. And yet, some
+        things never change; in the 20 years since he left series television, time
+        has stood still for Dale Robertson. His \\\"new\\\" character still wears
+        10-gallon white hats, Roy Rogers jackets and string ties, talks with a Texas
+        accent so thick it would make J.R. gag, and drives a '64 Lincoln Continental
+        with steer horns on the hood and a horn that honks The Eyes of Texas. Did
+        anybody mention the word\",\"year\":1987,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":31397,\"slug\":\"j-j-starbuck\",\"tvdb\":77881,\"imdb\":null,\"tmdb\":31534,\"tvrage\":null}}}]"}
+    headers:
+      CF-Cache-Status: [MISS]
+      CF-RAY: [354331211d8f3c95-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sun, 23 Apr 2017 19:22:30 GMT']
+      ETag: [W/"8773ca3ae1101b25e0fe93bd9be12927"]
+      Expires: ['Mon, 24 Apr 2017 03:22:30 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d3413c4eb304c33203d4964efb07a2d161492975349; expires=Mon,
+          23-Apr-18 19:22:29 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Pagination-Item-Count: ['5']
+      X-Pagination-Limit: ['10']
+      X-Pagination-Page: ['1']
+      X-Pagination-Page-Count: ['1']
+      X-Request-Id: [ce591444-f505-42c5-a33c-761e74851aec]
+      X-Runtime: ['0.014530']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      Cookie: [__cfduid=d3413c4eb304c33203d4964efb07a2d161492975349]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/60203?extended=full
+  response:
+    body: {string: "{\"title\":\"Fargo\",\"year\":2014,\"ids\":{\"trakt\":60203,\"slug\":\"fargo\",\"tvdb\":269613,\"imdb\":\"tt2802850\",\"tmdb\":60622,\"tvrage\":35276},\"overview\":\"An
+        American black comedy\u2013crime drama anthology television series created
+        and primarily written by Noah Hawley. The show is inspired by the 1996 film
+        of the same name written and directed by the Coen brothers, who serve as executive
+        producers on the series. Each season follows an anthology format, being set
+        in a different era along with a different story, cast and set of characters.\",\"first_aired\":\"2014-04-16T02:00:00.000Z\",\"airs\":{\"day\":\"Monday\",\"time\":\"22:00\",\"timezone\":\"America/New_York\"},\"runtime\":43,\"certification\":\"TV-MA\",\"network\":\"FX
+        (US)\",\"country\":\"us\",\"trailer\":\"http://youtube.com/watch?v=gKs8DzjPDMU\",\"homepage\":\"http://www.fxnetworks.com/fargo\",\"status\":\"returning
+        series\",\"rating\":8.84169,\"votes\":7940,\"updated_at\":\"2017-04-23T11:44:57.000Z\",\"language\":\"en\",\"available_translations\":[\"ar\",\"bs\",\"cs\",\"da\",\"de\",\"el\",\"en\",\"es\",\"fi\",\"fr\",\"he\",\"hr\",\"hu\",\"it\",\"ko\",\"nb\",\"nl\",\"pl\",\"pt\",\"ro\",\"ru\",\"sv\",\"tr\",\"uk\",\"zh\"],\"genres\":[\"drama\",\"crime\",\"thriller\"],\"aired_episodes\":21}"}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [35433123ce4f3c95-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sun, 23 Apr 2017 19:22:30 GMT']
+      ETag: [W/"55aa8c48976d335cdc2ce0d5f4806d92"]
+      Expires: ['Mon, 24 Apr 2017 03:22:30 GMT']
+      Last-Modified: ['Sun, 23 Apr 2017 11:44:57 GMT']
+      Server: [cloudflare-nginx]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [620da515-35a8-47fb-92a8-30177d924178]
+      X-Runtime: ['0.011414']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/60203/seasons/?extended=full
+  response:
+    body: {string: "[{\"number\":1,\"ids\":{\"trakt\":61286,\"tvdb\":null,\"tmdb\":60040,\"tvrage\":null},\"rating\":8.97896,\"votes\":903,\"episode_count\":10,\"aired_episodes\":10,\"title\":\"Season
+        1\",\"overview\":\"In January 2006, Lorne Malvo passes through Bemidji, Minnesota
+        and influences put-upon insurance salesman Lester Nygaard with his malice
+        and violence. Meanwhile, Deputy Molly Solverson and Duluth police officer
+        Gus Grimly team up to solve a series of murders they believe may be linked
+        to Malvo and Nygaard.\",\"first_aired\":\"2014-04-16T02:00:00.000Z\"},{\"number\":2,\"ids\":{\"trakt\":61287,\"tvdb\":269613,\"tmdb\":62204,\"tvrage\":null},\"rating\":8.70285,\"votes\":562,\"episode_count\":10,\"aired_episodes\":10,\"title\":\"Season
+        2\",\"overview\":\"Season two's chapter takes you back to 1979 in Sioux Falls,
+        South Dakota and Luverne, Minnesota. Lou Solverson, a young State Police Officer
+        recently back from Vietnam, investigates a case involving a local crime gang,
+        a major mob syndicate and small town beautician Peggy Blumquist along with
+        her husband Ed, the local butcher\u2019s assistant. Helping Lou piece things
+        together is his father-in-law, Sheriff Hank Larsson. The investigation will
+        lead them to a colorful cast of characters that includes Karl Weathers, the
+        town lawyer of Luverne, Minnesota; Joe Bulo, the front man for the northern
+        expansion of a Kansas City crime syndicate with his number two, Mike Milligan;
+        and the Gerhardt crime family currently led by matriarch Floyd Gerhardt.\",\"first_aired\":\"2015-10-13T02:00:00.000Z\"},{\"number\":3,\"ids\":{\"trakt\":140080,\"tvdb\":null,\"tmdb\":83007,\"tvrage\":null},\"rating\":9.33333,\"votes\":6,\"episode_count\":10,\"aired_episodes\":1,\"title\":\"Season
+        3\",\"overview\":\"Emmit Stussy, the Parking Lot King of Minnesota, is a handsome,
+        self-made, real estate mogul and family man - an American success story. His
+        slightly younger brother, Ray Stussy, on the other hand is more of a cautionary
+        tale. Balding, pot-bellied, Ray is the kind of guy who peaked in high school.
+        Now a parole officer, Ray has a huge chip on his shoulder about the hand he's
+        been dealt, and he blames his brother, until the arrival of a mysterious personality
+        changes everything.\",\"first_aired\":\"2017-04-20T02:00:00.000Z\"}]"}
+    headers:
+      CF-Cache-Status: [MISS]
+      CF-RAY: [35433124cb563d3d-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sun, 23 Apr 2017 19:22:30 GMT']
+      ETag: [W/"61ef97b93865a129611a049889cc5dc7"]
+      Expires: ['Mon, 24 Apr 2017 03:22:30 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d958d64ac04e65f14c7cbf0ab5302105d1492975350; expires=Mon,
+          23-Apr-18 19:22:30 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [74b59e18-29c8-4d42-92bc-eb0fb34aa11b]
+      X-Runtime: ['0.036580']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1
