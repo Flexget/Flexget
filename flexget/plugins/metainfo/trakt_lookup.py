@@ -369,6 +369,8 @@ class PluginTraktLookup(object):
                         rating_style = 'series'
                     elif style == 'episode':
                         rating_style = 'ep'
+                    elif style == 'season':
+                        rating_style = 'season'
                     # fetch episode data if style is not series
                     if style == 'episode':
                         item = item.get_episode(entry['series_season'], entry['series_episode'], session)
@@ -421,7 +423,7 @@ class PluginTraktLookup(object):
                 watched_lookup = functools.partial(self.lazy_watched_lookup, config, style)
                 entry.register_lazy_func(collected_lookup, ['trakt_collected'])
                 entry.register_lazy_func(watched_lookup, ['trakt_watched'])
-                if style in ['show', 'episode']:
+                if style in ['show', 'episode', 'season']:
                     # register separate lazy calls to avoid fetching too much unnecessary data
                     entry.register_lazy_func(functools.partial(self.lazy_user_ratings_lookup, config, 'show'),
                                              ['trakt_series_user_rating'])
@@ -446,4 +448,5 @@ class PluginTraktLookup(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTraktLookup, 'trakt_lookup', api_ver=2, interfaces=['task', 'series_metainfo', 'movie_metainfo'])
+    plugin.register(PluginTraktLookup, 'trakt_lookup', api_ver=2, interfaces=['task', 'series_metainfo',
+                                                                              'movie_metainfo'])

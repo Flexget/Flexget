@@ -638,7 +638,8 @@ class TestTraktRatingsLookup(object):
             templates:
               global:
                 trakt_lookup:
-                  account: flexgettest
+                  username: flexgettest
+                metainfo_series: yes
             tasks:
               test_trakt_ratings_episode:
                 mock:
@@ -657,12 +658,28 @@ class TestTraktRatingsLookup(object):
 
     def test_trakt_ratings_episode(self, execute_task):
         task = execute_task('test_trakt_ratings_episode')
+        assert len(task.entries) == 1
+        entry = task.entries[0]
+
+        assert entry['trakt_ep_user_rating'] == 10, 'Wrong rating received for Ozymandias'
 
     def test_trakt_ratings_season(self, execute_task):
         task = execute_task('test_trakt_ratings_season')
+        assert len(task.entries) == 1
+        entry = task.entries[0]
+
+        assert entry['trakt_season_user_rating'] == 10, 'Wrong rating received for Season 1 of The Expanse'
 
     def test_trakt_ratings_show(self, execute_task):
         task = execute_task('test_trakt_ratings_show')
+        assert len(task.entries) == 1
+        entry = task.entries[0]
+
+        assert entry['trakt_series_user_rating'] == 1, 'Wrong rating received for Time After Time 2017'
 
     def test_trakt_ratings_movie(self, execute_task):
         task = execute_task('test_trakt_ratings_movie')
+        assert len(task.entries) == 1
+        entry = task.entries[0]
+
+        assert entry['trakt_movie_user_rating'] == 9, 'Wrong rating received for Doctor Strange'
