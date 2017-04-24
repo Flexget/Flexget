@@ -445,7 +445,7 @@ class TraktEpisode(Base):
         self.update(trakt_episode, session)
 
     def update(self, trakt_episode, session):
-        """Updates this record from the trakt media object `trakt_movie` returned by the trakt api."""
+        """Updates this record from the trakt media object `trakt_episode` returned by the trakt api."""
         if self.id and self.id != trakt_episode['ids']['trakt']:
             raise Exception('Tried to update db ep with different ep data')
         elif not self.id:
@@ -494,7 +494,7 @@ class TraktSeason(Base):
         self.update(trakt_season, session)
 
     def update(self, trakt_season, session):
-        """Updates this record from the trakt media object `trakt_movie` returned by the trakt api."""
+        """Updates this record from the trakt media object `trakt_episode` returned by the trakt api."""
         if self.id and self.id != trakt_season['ids']['trakt']:
             raise Exception('Tried to update db season with different season data')
         elif not self.id:
