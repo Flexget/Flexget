@@ -45,7 +45,7 @@ class RequestAuth(object):
     def on_task_download(self, task, config):
         for entry in task.accepted:
             if entry.get('download_auth'):
-                log.verbose('entry %s already has auth set, skipping', entry)
+                log.debug('entry %s already has auth set, skipping', entry)
                 continue
             for host_config in config:
                 for host, auth_config in host_config.items():
