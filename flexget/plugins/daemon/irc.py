@@ -386,7 +386,7 @@ class IRCConnection(IRCBot):
                                 tasks_entry_map[task] = []
                             tasks_entry_map[task].append(entry)
                 if not matched:
-                    log.info('Entry "%s" did not match any task regexp.', entry['title'])
+                    log.debug('Entry "%s" did not match any task regexp.', entry['title'])
 
             for task, entries in tasks_entry_map.items():
                 log.debug('Injecting %d entries into task "%s"', len(entries), task)
