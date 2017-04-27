@@ -105,3 +105,47 @@ class TestDownloadTemp(object):
         """Download plugin: Temp directory config error [3of3]"""
         task = execute_task('temp_empty', abort_ok=True)
         assert task.aborted
+
+
+@pytest.mark.online
+@pytest.mark.usefixtures('tmpdir')
+class TestDownloadAuth(object):
+    config = """
+        templates:
+          download:
+            disable: builtins
+            mock:
+            - title: digest
+              url: https://httpbin.org/digest-auth/auth/user/passwd/MD5
+            - title: basic
+              url: https://httpbin.org/basic-auth/user/passwd
+            accept_all: yes
+            download:
+              path: __tmp__
+              temp: __tmp__
+            
+        tasks:
+          no_auth:
+            template:
+            - download
+            
+          with_auth:
+            template:
+            - download
+            download_auth:
+            - digest-auth:
+                username: user
+                password: passwd
+                type: digest
+            - basic-auth:
+                username: user
+                password: passwd       
+    """
+
+    def test_download_auth(self, execute_task):
+        """Test download basic and digest auth"""
+        task = execute_task('no_auth')
+        assert len(task.failed) == 2
+
+        task = execute_task('with_auth')
+        assert len(task.accepted) == 2
