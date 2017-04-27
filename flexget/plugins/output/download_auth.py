@@ -8,12 +8,12 @@ from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 from flexget import plugin
 from flexget.event import event
 
-PLUGIN_NAME = 'auth'
+PLUGIN_NAME = 'download_auth'
 
 log = logging.getLogger(PLUGIN_NAME)
 
 
-class RequestAuth(object):
+class DownloadAuth(object):
     host_schema = {
         'additionalProperties': {
             'type': 'object',
@@ -59,4 +59,4 @@ class RequestAuth(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(RequestAuth, PLUGIN_NAME, api_ver=2)
+    plugin.register(DownloadAuth, PLUGIN_NAME, api_ver=2)
