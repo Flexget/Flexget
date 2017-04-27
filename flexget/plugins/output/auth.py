@@ -49,7 +49,7 @@ class RequestAuth(object):
                 continue
             for host_config in config:
                 for host, auth_config in host_config.items():
-                    if re.match(host, entry['url']):
+                    if re.search(host, entry['url'], re.IGNORECASE):
                         auth_type = auth_config['type']
                         username = auth_config['username']
                         password = auth_config['password']
