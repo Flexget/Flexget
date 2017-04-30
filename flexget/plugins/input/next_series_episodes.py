@@ -166,9 +166,8 @@ class NextSeriesEpisodes(object):
                         else:
                             # No episode means that latest is a season pack, emit episode 1
                             entries.append(self.search_entry(series, season, 1, task))
-
                     else:
-                        if config.get('from_start') or config.get('backfill'):
+                        if config.get('from_start') or config.get('backfill') or series.has_history:
                             entries.append(self.search_entry(series, season, 1, task))
                         else:
                             log.verbose('Series `%s` has no history. Set begin option, '
