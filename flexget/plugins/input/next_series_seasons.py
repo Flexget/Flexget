@@ -121,8 +121,8 @@ class NextSeriesSeasons(object):
                     elif latest:
                         entries.append(self.search_entry(series, latest.season, task))
                     else:
-                        if config.get('from_start') or config.get('backfill'):
-                            entries.append(self.search_entry(series, season, 1, task))
+                        if config.get('from_start') or config.get('backfill') or series.has_history:
+                            entries.append(self.search_entry(series, season, task))
                         else:
                             log.verbose('Series `%s` has no history. Set begin option, '
                                         'or use CLI `series begin` '
