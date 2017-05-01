@@ -75,7 +75,9 @@ class Filesystem(object):
                  'mask': {'type': 'string'},
                  'regexp': {'type': 'string', 'format': 'regex'},
                  'recursive': {'oneOf': [{'type': 'integer', 'minimum': 2}, {'type': 'boolean'}]},
-                 'retrieve': one_or_more({'type': 'string', 'enum': retrieval_options}, unique_items=True)
+                 'retrieve': one_or_more({'type': 'string', 'enum': retrieval_options}, unique_items=True), 
+                 'skip_hidden_files': {'type': 'boolean'},
+                 'exclude_regexp': {'type': 'string', 'format': 'regex'}
              },
              'required': ['path'],
              'additionalProperties': False}]
@@ -99,7 +101,9 @@ class Filesystem(object):
         config.setdefault('regexp', '.')
         # Sets the default retrieval option to files
         config.setdefault('retrieve', self.retrieval_options)
-
+        # Sets handing behavior for hidden and dotfiles
+        config.setdefault('skip_hidden_files', self.skip_hidden_files)
+        
         return config
 
     def create_entry(self, filepath, test_mode):
@@ -156,16 +160,16 @@ class Filesystem(object):
         else:
             return folder.walk(errors='ignore')
 
-    def get_entries_from_path(self, path_list, match, recursion, test_mode, get_files, get_dirs, get_symlinks):
+    def get_entries_from_path(self, match, match_exclude, test_mode, get_files, get_dirs, get_symlinks):
         entries = []
 
-        for folder in path_list:
-            log.verbose('Scanning folder %s. Recursion is set to %s.' % (folder, recursion))
+        for folder in config.path_list:
+            log.verbose('Scanning folder %s. Recursion is set to %s.' % (folder, config.recursion))
             folder = Path(folder).expanduser()
             log.debug('Scanning %s' % folder)
             base_depth = len(folder.splitall())
-            max_depth = self.get_max_depth(recursion, base_depth)
-            folder_objects = self.get_folder_objects(folder, recursion)
+            max_depth = self.get_max_depth(config.recursion, base_depth)
+            folder_objects = self.get_folder_objects(folder, config.recursion)
             for path_object in folder_objects:
                 log.debug('Checking if %s qualifies to be added as an entry.' % path_object)
                 try:
@@ -178,12 +182,24 @@ class Filesystem(object):
                 object_depth = len(path_object.splitall())
                 if object_depth <= max_depth:
                     if match(path_object):
+                        if match_exclude(path_object):
+                            log.debug('Object %s matches exclusion regexp, skipping.', path_object)
+                            continue
                         if (path_object.isdir() and get_dirs) or (
                                 path_object.islink() and get_symlinks) or (
                                 path_object.isfile() and not path_object.islink() and get_files):
                             entry = self.create_entry(path_object, test_mode)
                         else:
                             log.debug("Path object's %s type doesn't match requested object types." % path_object)
+                        if config.skip_hidden_files:
+                            if path_object.startswith('.'):
+                                log.debug('Object %s appears to be a hidden file - skipping.', path_object)
+                                continue
+                            if os.name == 'nt':
+                                attributes = win32api.GetFileAttributes(path_object)
+                                if attributes & win32con.FILE_ATTRIBUTE_HIDDEN:
+                                    log.debug('Object %s appears to be a hidden file - skipping.', path_object)
+                                    continue
                         if entry and entry not in entries:
                             entries.append(entry)
 
@@ -195,13 +211,15 @@ class Filesystem(object):
         path_list = config['path']
         test_mode = task.options.test
         match = re.compile(config['regexp'], re.IGNORECASE).match
+        match_exclude = re.compile(config['exclude_regexp'], re.IGNORECASE).match
+        skip_hidden_files = config['skip_hidden_files']
         recursive = config['recursive']
         get_files = 'files' in config['retrieve']
         get_dirs = 'dirs' in config['retrieve']
         get_symlinks = 'symlinks' in config['retrieve']
 
         log.verbose('Starting to scan folders.')
-        return self.get_entries_from_path(path_list, match, recursive, test_mode, get_files, get_dirs, get_symlinks)
+        return self.get_entries_from_path(match, match_exclude, test_mode, get_files, get_dirs, get_symlinks)
 
 
 @event('plugin.register')
