@@ -98,6 +98,7 @@ class NextSeriesSeasons(object):
 
                 low_season = 0
 
+                new_season = None
                 check_downloaded = not config.get('backfill')
                 latest_season = get_latest_release(series, downloaded=check_downloaded)
                 if latest_season:
@@ -105,7 +106,7 @@ class NextSeriesSeasons(object):
                         latest_season = new_season = latest_season.season + 1
                     else:
                         latest_season = latest_season.season
-                        new_season = None
+
                 else:
                     latest_season = low_season + 1
 
