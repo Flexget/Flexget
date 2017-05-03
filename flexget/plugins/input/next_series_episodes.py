@@ -114,8 +114,12 @@ class NextSeriesEpisodes(object):
                 check_downloaded = not config.get('backfill')
                 latest_season = get_latest_release(series, downloaded=check_downloaded)
                 if latest_season:
-                    latest_season = latest_season.season + 1 if latest_season.season in series.completed_seasons \
-                        else latest_season.season
+                    if latest_season.season in series.completed_seasons:
+                        latest_season = new_season = latest_season.season + 1
+                    else:
+                        latest_season = latest_season.season
+                        new_season = None
+
                 else:
                     latest_season = low_season + 1
 
@@ -166,8 +170,11 @@ class NextSeriesEpisodes(object):
                         else:
                             # No episode means that latest is a season pack, emit episode 1
                             entries.append(self.search_entry(series, season, 1, task))
+                    # First iteration of a new season with no show begin and show has downloads
+                    elif new_season and season == new_season and series.has_history:
+                        entries.append(self.search_entry(series, season, 1, task))
                     else:
-                        if config.get('from_start') or config.get('backfill') or series.has_history:
+                        if config.get('from_start') or config.get('backfill'):
                             entries.append(self.search_entry(series, season, 1, task))
                         else:
                             log.verbose('Series `%s` has no history. Set begin option, '
