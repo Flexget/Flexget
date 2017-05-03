@@ -21,6 +21,10 @@ FlexGet
 .. image:: http://isitmaintained.com/badge/resolution/Flexget/Flexget.svg
     :target: http://isitmaintained.com/project/Flexget/Flexget
 
+.. image:: https://badges.gitter.im/Join%20Chat.svg
+   :alt: Join the chat at https://gitter.im/Flexget/Flexget
+   :target: https://gitter.im/Flexget/Flexget?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
 `FlexGet`_ is a multipurpose automation tool for content like torrents, nzbs,
 podcasts, comics, series, movies, etc. It can use different kinds of sources
 like RSS-feeds, html pages, csv files, search engines and there are even
