@@ -171,7 +171,7 @@ class NextSeriesEpisodes(object):
                             # No episode means that latest is a season pack, emit episode 1
                             entries.append(self.search_entry(series, season, 1, task))
                     # First iteration of a new season with no show begin and show has downloads
-                    elif new_season and season == new_season and series.has_history:
+                    elif new_season and season == new_season:
                         entries.append(self.search_entry(series, season, 1, task))
                     else:
                         if config.get('from_start') or config.get('backfill'):

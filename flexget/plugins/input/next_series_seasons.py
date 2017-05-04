@@ -125,7 +125,7 @@ class NextSeriesSeasons(object):
                     elif latest:
                         entries.append(self.search_entry(series, latest.season, task))
                     # First iteration of a new season with no show begin and show has downloads
-                    elif new_season and season == new_season and series.has_history:
+                    elif new_season and season == new_season:
                         entries.append(self.search_entry(series, season, task))
                     else:
                         if config.get('from_start') or config.get('backfill'):

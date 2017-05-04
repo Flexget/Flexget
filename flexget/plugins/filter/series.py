@@ -316,18 +316,6 @@ class Series(Base):
     def completed_seasons(self):
         return [season.season for season in self.seasons if season.completed]
 
-    @property
-    def has_season_downloads(self):
-        return any(season.downloaded_releases for season in self.seasons)
-
-    @property
-    def has_episode_downloads(self):
-        return any(episode.downloaded_releases for episode in self.episodes)
-
-    @property
-    def has_history(self):
-        return self.has_season_downloads or self.has_episode_downloads
-
 
 class Season(Base):
     __tablename__ = 'series_seasons'
