@@ -33,14 +33,18 @@ class TestNextSeriesSeasonSeasonsPack(object):
             series:
             - Test Series 1:
                 identified_by: ep
-                season_packs: only
+                season_packs:
+                    threshold: 1000
+                    reject_eps: yes
             max_reruns: 0
           test_next_series_seasons_season_pack_and_ep:
             next_series_seasons: yes
             series:
             - Test Series 2:
                 identified_by: ep
-                season_packs: only
+                season_packs:
+                    threshold: 1000
+                    reject_eps: yes
             max_reruns: 0
           test_next_series_seasons_season_pack_backfill:
             next_series_seasons:
@@ -49,7 +53,9 @@ class TestNextSeriesSeasonSeasonsPack(object):
             - Test Series 3:
                 identified_by: ep
                 tracking: backfill
-                season_packs: only
+                season_packs:
+                    threshold: 1000
+                    reject_eps: yes
             max_reruns: 0
           test_next_series_seasons_season_pack_and_ep_backfill:
             next_series_seasons:
@@ -58,7 +64,9 @@ class TestNextSeriesSeasonSeasonsPack(object):
             - Test Series 4:
                 identified_by: ep
                 tracking: backfill
-                season_packs: only
+                season_packs:
+                    threshold: 1000
+                    reject_eps: yes
             max_reruns: 0
           test_next_series_seasons_season_pack_backfill_and_begin:
             next_series_seasons:
@@ -68,7 +76,9 @@ class TestNextSeriesSeasonSeasonsPack(object):
                 identified_by: ep
                 tracking: backfill
                 begin: S02E01
-                season_packs: only
+                season_packs:
+                    threshold: 1000
+                    reject_eps: yes
             max_reruns: 0
           test_next_series_seasons_season_pack_and_ep_backfill_and_begin:
             next_series_seasons:
@@ -78,7 +88,9 @@ class TestNextSeriesSeasonSeasonsPack(object):
                 identified_by: ep
                 tracking: backfill
                 begin: S02E01
-                season_packs: only
+                season_packs:
+                    threshold: 1000
+                    reject_eps: yes
             max_reruns: 0
     """
 
