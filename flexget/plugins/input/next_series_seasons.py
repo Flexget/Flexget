@@ -111,6 +111,9 @@ class NextSeriesSeasons(object):
                     latest_season = low_season + 1
 
                 for season in range(latest_season, low_season, -1):
+                    # Don't look for seasons older than begin ep
+                    if series.begin and series.begin.season < season:
+                        break
                     if season in series.completed_seasons:
                         log.debug('season %s is marked as completed, skipping', season)
                         continue
@@ -137,9 +140,6 @@ class NextSeriesSeasons(object):
                             break
                     # Skip older seasons if we are not in backfill mode
                     if not config.get('backfill'):
-                        break
-                    # Don't look for seasons older than begin ep
-                    if series.begin and series.begin.season >= season:
                         break
 
         for reason, series in impossible.items():
