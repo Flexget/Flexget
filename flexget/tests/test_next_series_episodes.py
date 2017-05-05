@@ -236,17 +236,37 @@ class TestNextSeriesEpisodesSeasonPack(object):
                   season_packs: always
               - Test Series 3:
                   season_packs: always
+              - Test Series 4:
+                  season_packs: always
+              - Test Series 5:
+                  season_packs: always
+              - Test Series 6:
+                  season_packs: always
           test_next_series_episodes_season_pack:
             next_series_episodes: yes
             series:
             - Test Series 1:
                 identified_by: ep
             max_reruns: 0
+          test_next_series_episodes_season_pack_and_ep:
+            next_series_episodes: yes
+            series:
+            - Test Series 2:
+                identified_by: ep
+            max_reruns: 0
           test_next_series_episodes_season_pack_backfill:
             next_series_episodes:
               backfill: yes
             series:
-            - Test Series 2:
+            - Test Series 3:
+                identified_by: ep
+                tracking: backfill
+            max_reruns: 0
+          test_next_series_episodes_season_pack_and_ep_backfill:
+            next_series_episodes:
+              backfill: yes
+            series:
+            - Test Series 4:
                 identified_by: ep
                 tracking: backfill
             max_reruns: 0
@@ -254,7 +274,16 @@ class TestNextSeriesEpisodesSeasonPack(object):
             next_series_episodes:
               backfill: yes
             series:
-            - Test Series 3:
+            - Test Series 5:
+                identified_by: ep
+                begin: S02E01
+                tracking: backfill
+            max_reruns: 0
+          test_next_series_episodes_season_pack_and_ep_backfill_and_begin:
+            next_series_episodes:
+              backfill: yes
+            series:
+            - Test Series 6:
                 identified_by: ep
                 begin: S02E01
                 tracking: backfill
@@ -274,29 +303,38 @@ class TestNextSeriesEpisodesSeasonPack(object):
         task = execute_task('test_next_series_episodes_season_pack')
         assert task.find_entry(title='Test Series 1 S03E01')
         assert len(task.all_entries) == 1
+
+    def test_next_series_episodes_season_pack_and_ep(self, execute_task):
+        self.inject_series(execute_task, 'Test Series 2 S02')
         self.inject_series(execute_task, 'Test Series 2 S03E01')
-        task = execute_task('test_next_series_episodes_season_pack')
-        assert task.find_entry(title='Test Series 1 S03E02')
+        task = execute_task('test_next_series_episodes_season_pack_and_ep')
+        assert task.find_entry(title='Test Series 2 S03E02')
         assert len(task.all_entries) == 1
 
     def test_next_series_episodes_season_pack_backfill(self, execute_task):
-        self.inject_series(execute_task, 'Test Series 2 S02')
+        self.inject_series(execute_task, 'Test Series 3 S02')
         task = execute_task('test_next_series_episodes_season_pack_backfill')
-        assert task.find_entry(title='Test Series 2 S01E01')
-        assert task.find_entry(title='Test Series 2 S03E01')
+        assert task.find_entry(title='Test Series 3 S01E01')
+        assert task.find_entry(title='Test Series 3 S03E01')
         assert len(task.all_entries) == 2
-        self.inject_series(execute_task, 'Test Series 2 S03E01')
-        task = execute_task('test_next_series_episodes_season_pack_backfill')
-        assert task.find_entry(title='Test Series 2 S01E01')
-        assert task.find_entry(title='Test Series 2 S03E02')
+
+    def test_next_series_episodes_season_pack_and_ep_backfill(self, execute_task):
+        self.inject_series(execute_task, 'Test Series 4 S02')
+        self.inject_series(execute_task, 'Test Series 4 S03E01')
+        task = execute_task('test_next_series_episodes_season_pack_and_ep_backfill')
+        assert task.find_entry(title='Test Series 4 S01E01')
+        assert task.find_entry(title='Test Series 4 S03E02')
         assert len(task.all_entries) == 2
 
     def test_next_series_episodes_season_pack_backfill_and_begin(self, execute_task):
-        self.inject_series(execute_task, 'Test Series 3 S02')
+        self.inject_series(execute_task, 'Test Series 5 S02')
         task = execute_task('test_next_series_episodes_season_pack_backfill_and_begin')
-        assert task.find_entry(title='Test Series 3 S03E01')
+        assert task.find_entry(title='Test Series 5 S03E01')
         assert len(task.all_entries) == 1
-        self.inject_series(execute_task, 'Test Series 3 S03E01')
-        task = execute_task('test_next_series_episodes_season_pack_backfill_and_begin')
-        assert task.find_entry(title='Test Series 3 S03E02')
+
+    def test_next_series_episodes_season_pack_and_ep_backfill_and_begin(self, execute_task):
+        self.inject_series(execute_task, 'Test Series 6 S02')
+        self.inject_series(execute_task, 'Test Series 6 S03E01')
+        task = execute_task('test_next_series_episodes_season_pack_and_ep_backfill_and_begin')
+        assert task.find_entry(title='Test Series 6 S03E02')
         assert len(task.all_entries) == 1
