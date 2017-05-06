@@ -275,6 +275,25 @@ class InputHtml(object):
             entry['url'] = url
             entry['title'] = title
 
+            # If the element has no classes then None is returned
+            link_classes = link.get('class')
+            if link_classes:
+                entry['html_classes'] = link_classes
+
+            # Get the parent and grandparent HTML nodes of the link node. We
+            # will add extra fields to the entry with the tag and classes of
+            # these nodes to allow filtering the entry in subsequent phases.
+            html_parent = link.parent
+            entry['html_parent'] = html_parent.name
+            parent_classes = html_parent.get('class')
+            if parent_classes:
+                entry['html_parent_classes'] = parent_classes
+            html_grandparent = html_parent.parent
+            entry['html_grandparent'] = html_grandparent.name
+            grandparent_classes = html_grandparent.get('class')
+            if grandparent_classes:
+                entry['html_grandparent_classes'] = html_grandparent.get('class')
+
             if 'username' in config and 'password' in config:
                 entry['download_auth'] = (config['username'], config['password'])
 
