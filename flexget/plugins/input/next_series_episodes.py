@@ -110,22 +110,22 @@ class NextSeriesEpisodes(object):
                     continue
 
                 low_season = 0 if series.identified_by == 'ep' else -1
+                # Don't look for seasons older than begin ep
+                if series.begin and series.begin.season:
+                    low_season = series.begin.season
 
                 new_season = None
                 check_downloaded = not config.get('backfill')
                 latest_season = get_latest_release(series, downloaded=check_downloaded)
                 if latest_season:
-                    if latest_season.season in series.completed_seasons:
+                    if latest_season.season <= low_season:
+                        latest_season = new_season = low_season + 1
+                    elif latest_season.season in series.completed_seasons:
                         latest_season = new_season = latest_season.season + 1
                     else:
                         latest_season = latest_season.season
-
                 else:
                     latest_season = low_season + 1
-
-                # Don't look for seasons older than begin ep
-                if series.begin and series.begin.season < latest_season:
-                    low_season = series.begin.season
 
                 for season in range(latest_season, low_season, -1):
                     if season in series.completed_seasons:
