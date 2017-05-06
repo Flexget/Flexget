@@ -112,7 +112,8 @@ class NextSeriesEpisodes(object):
                 low_season = 0 if series.identified_by == 'ep' else -1
                 # Don't look for seasons older than begin ep
                 if series.begin and series.begin.season and series.begin.season > 1:
-                    low_season = series.begin.season
+                    # begin-1 or the range() loop will never get to the begin season
+                    low_season = max(series.begin.season - 1, 0)
 
                 new_season = None
                 check_downloaded = not config.get('backfill')
@@ -133,7 +134,7 @@ class NextSeriesEpisodes(object):
                         continue
                     log.trace('Evaluating episodes for series %s, season %d', series.name, season)
                     latest = get_latest_release(series, season=season, downloaded=check_downloaded)
-                    if series.begin and (not latest or latest < series.begin):
+                    if series.begin and season == series.begin.season and (not latest or latest < series.begin):
                         # In case series.begin season is already completed, look in next available season
                         lookup_season = series.begin.season
                         ep_number = series.begin.number
@@ -187,6 +188,7 @@ class NextSeriesEpisodes(object):
                             break
                     # Skip older seasons if we are not in backfill mode
                     if not config.get('backfill'):
+                        log.debug('backfill is not enabled; skipping older seasons')
                         break
 
         for reason, series in impossible.items():
