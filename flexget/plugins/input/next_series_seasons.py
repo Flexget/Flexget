@@ -98,7 +98,7 @@ class NextSeriesSeasons(object):
 
                 low_season = 0
                 # Don't look for seasons older than begin ep
-                if series.begin and series.begin.season:
+                if series.begin and series.begin.season and series.begin.season > 1:
                     low_season = series.begin.season
 
                 new_season = None
