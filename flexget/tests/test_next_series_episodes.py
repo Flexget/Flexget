@@ -242,6 +242,8 @@ class TestNextSeriesEpisodesSeasonPack(object):
                   season_packs: always
               - Test Series 6:
                   season_packs: always
+              - Test Series 7:
+                  season_packs: always
           test_next_series_episodes_season_pack:
             next_series_episodes: yes
             series:
@@ -288,6 +290,13 @@ class TestNextSeriesEpisodesSeasonPack(object):
                 begin: S02E01
                 tracking: backfill
             max_reruns: 0
+          test_next_series_episodes_season_pack_from_start:
+            next_series_episodes:
+                from_start: yes
+            series:
+            - Test Series 7:
+                identified_by: ep
+            max_reruns: 0
     """
 
     @pytest.fixture()
@@ -298,43 +307,51 @@ class TestNextSeriesEpisodesSeasonPack(object):
     def inject_series(self, execute_task, release_name):
         execute_task('inject_series', options={'inject': [Entry(title=release_name, url='')], 'disable_tracking': True})
 
-    def test_next_series_episodes_season_pack(self, execute_task):
-        self.inject_series(execute_task, 'Test Series 1 S02')
-        task = execute_task('test_next_series_episodes_season_pack')
-        assert task.find_entry(title='Test Series 1 S03E01')
-        assert len(task.all_entries) == 1
+    @pytest.mark.parametrize("task_name,inject,result_find", [
+        ('test_next_series_episodes_season_pack',
+            ['Test Series 1 S02'],
+            ['Test Series 1 S03E01']),
+        ('test_next_series_episodes_season_pack_and_ep',
+            ['Test Series 2 S02', 'Test Series 2 S03E01'],
+            ['Test Series 2 S03E02']),
+        ('test_next_series_episodes_season_pack_backfill',
+            ['Test Series 3 S02'],
+            ['Test Series 3 S01E01', 'Test Series 3 S03E01']),
+        ('test_next_series_episodes_season_pack_and_ep_backfill',
+            ['Test Series 4 S02', 'Test Series 4 S03E01'],
+            ['Test Series 4 S01E01', 'Test Series 4 S03E02']),
+        ('test_next_series_episodes_season_pack_backfill_and_begin',
+            ['Test Series 5 S02'],
+            ['Test Series 5 S03E01']),
+        ('test_next_series_episodes_season_pack_and_ep_backfill_and_begin',
+            ['Test Series 6 S02', 'Test Series 6 S03E01'],
+            ['Test Series 6 S03E02'])
+    ])
+    def test_next_series_episodes_season_pack(self, execute_task, task_name, inject, result_find):
+        for entity_id in inject:
+            self.inject_series(execute_task, entity_id)
+        task = execute_task(task_name)
+        for result_title in result_find:
+            assert task.find_entry(title=result_title)
+        assert len(task.all_entries) == len(result_find)
 
-    def test_next_series_episodes_season_pack_and_ep(self, execute_task):
-        self.inject_series(execute_task, 'Test Series 2 S02')
-        self.inject_series(execute_task, 'Test Series 2 S03E01')
-        task = execute_task('test_next_series_episodes_season_pack_and_ep')
-        assert task.find_entry(title='Test Series 2 S03E02')
-        assert len(task.all_entries) == 1
-
-    def test_next_series_episodes_season_pack_backfill(self, execute_task):
-        self.inject_series(execute_task, 'Test Series 3 S02')
-        task = execute_task('test_next_series_episodes_season_pack_backfill')
-        assert task.find_entry(title='Test Series 3 S01E01')
-        assert task.find_entry(title='Test Series 3 S03E01')
-        assert len(task.all_entries) == 2
-
-    def test_next_series_episodes_season_pack_and_ep_backfill(self, execute_task):
-        self.inject_series(execute_task, 'Test Series 4 S02')
-        self.inject_series(execute_task, 'Test Series 4 S03E01')
-        task = execute_task('test_next_series_episodes_season_pack_and_ep_backfill')
-        assert task.find_entry(title='Test Series 4 S01E01')
-        assert task.find_entry(title='Test Series 4 S03E02')
-        assert len(task.all_entries) == 2
-
-    def test_next_series_episodes_season_pack_backfill_and_begin(self, execute_task):
-        self.inject_series(execute_task, 'Test Series 5 S02')
-        task = execute_task('test_next_series_episodes_season_pack_backfill_and_begin')
-        assert task.find_entry(title='Test Series 5 S03E01')
-        assert len(task.all_entries) == 1
-
-    def test_next_series_episodes_season_pack_and_ep_backfill_and_begin(self, execute_task):
-        self.inject_series(execute_task, 'Test Series 6 S02')
-        self.inject_series(execute_task, 'Test Series 6 S03E01')
-        task = execute_task('test_next_series_episodes_season_pack_and_ep_backfill_and_begin')
-        assert task.find_entry(title='Test Series 6 S03E02')
-        assert len(task.all_entries) == 1
+    # Tests which require multiple tasks to be executed in order
+    # Each run_parameter is a tuple of lists: [task name, list of series ID(s) to inject, list of result(s) to find]
+    @pytest.mark.parametrize("run_parameters", [
+        (
+         ['test_next_series_episodes_season_pack_from_start',
+            [],
+            ['Test Series 7 S01E01']],
+         ['test_next_series_episodes_season_pack_from_start',
+            [],
+            ['Test Series 7 S01E02']]
+        )
+    ])
+    def test_next_series_episodes_season_pack_multirun(self, execute_task, run_parameters):
+        for this_test in run_parameters:
+            for entity_id in this_test[1]:
+                self.inject_series(execute_task, entity_id)
+            task = execute_task(this_test[0])
+            for result_title in this_test[2]:
+                assert task.find_entry(title=result_title)
+            assert len(task.all_entries) == len(this_test[2])
