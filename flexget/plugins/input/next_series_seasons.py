@@ -97,12 +97,20 @@ class NextSeriesSeasons(object):
                     continue
 
                 low_season = 0
+                # Don't look for seasons older than begin ep
+                if series.begin and series.begin.season and series.begin.season > 1:
+                    low_season = max(series.begin.season - 1, 0)
 
+                new_season = None
                 check_downloaded = not config.get('backfill')
                 latest_season = get_latest_release(series, downloaded=check_downloaded)
                 if latest_season:
-                    latest_season = latest_season.season + 1 if latest_season.season in series.completed_seasons \
-                        else latest_season.season
+                    if latest_season.season <= low_season:
+                        latest_season = new_season = low_season + 1
+                    elif latest_season.season in series.completed_seasons:
+                        latest_season = new_season = latest_season.season + 1
+                    else:
+                        latest_season = latest_season.season
                 else:
                     latest_season = low_season + 1
 
@@ -110,9 +118,9 @@ class NextSeriesSeasons(object):
                     if season in series.completed_seasons:
                         log.debug('season %s is marked as completed, skipping', season)
                         continue
-                    log.trace('Adding episodes for series %s season %d', series.name, season)
+                    log.trace('Evaluating season %s for series %s', season, series.name)
                     latest = get_latest_release(series, season=season, downloaded=check_downloaded)
-                    if series.begin and (not latest or latest < series.begin):
+                    if series.begin and season == series.begin.season and (not latest or latest < series.begin):
                         # In case series.begin season is already completed, look in next available season
                         lookup_season = series.begin.season
                         while lookup_season in series.completed_seasons:
@@ -120,9 +128,12 @@ class NextSeriesSeasons(object):
                         entries.append(self.search_entry(series, lookup_season, task))
                     elif latest:
                         entries.append(self.search_entry(series, latest.season, task))
+                    # First iteration of a new season with no show begin and show has downloads
+                    elif new_season and season == new_season:
+                        entries.append(self.search_entry(series, season, task))
                     else:
                         if config.get('from_start') or config.get('backfill'):
-                            entries.append(self.search_entry(series, season, 1, task))
+                            entries.append(self.search_entry(series, season, task))
                         else:
                             log.verbose('Series `%s` has no history. Set begin option, '
                                         'or use CLI `series begin` '
@@ -130,9 +141,7 @@ class NextSeriesSeasons(object):
                             break
                     # Skip older seasons if we are not in backfill mode
                     if not config.get('backfill'):
-                        break
-                    # Don't look for seasons older than begin ep
-                    if series.begin and series.begin.season >= season:
+                        log.debug('backfill is not enabled; skipping older seasons')
                         break
 
         for reason, series in impossible.items():

@@ -11,7 +11,7 @@ from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, colorize, console
 
 try:
-    from flexget.plugins.filter.series import (Series, remove_series, remove_series_episode, set_series_begin,
+    from flexget.plugins.filter.series import (Series, remove_series, remove_series_entity, set_series_begin,
                                                normalize_series_name, new_entities_after, get_latest_release,
                                                get_series_summary, shows_by_name, show_episodes, shows_by_exact_name,
                                                get_all_entities)
@@ -143,14 +143,13 @@ def begin(manager, options):
 def remove(manager, options, forget=False):
     name = options.series_name
     if options.episode_id:
-        # remove by id
-        identifier = options.episode_id
-        try:
-            remove_series_episode(name, identifier, forget)
-        except ValueError as e:
-            console(e.args[0])
-        else:
-            console('Removed episode(s) matching `%s` from series `%s`.' % (identifier, name.capitalize()))
+        for identifier in options.episode_id:
+            try:
+                remove_series_entity(name, identifier, forget)
+            except ValueError as e:
+                console(e.args[0])
+            else:
+                console('Removed entities(s) matching `%s` from series `%s`.' % (identifier, name.capitalize()))
     else:
         # remove whole series
         try:
@@ -293,7 +292,7 @@ def register_parser_arguments():
     forget_parser = subparsers.add_parser('forget', parents=[series_parser],
                                           help='Removes episodes or whole series from the entire database '
                                                '(including seen plugin)')
-    forget_parser.add_argument('episode_id', nargs='?', default=None, help='episode ID to forget (optional)')
+    forget_parser.add_argument('episode_id', nargs='*', default=None, help='Entity ID(s) to forget (optional)')
     delete_parser = subparsers.add_parser('remove', parents=[series_parser],
                                           help='Removes episodes or whole series from the series database only')
     delete_parser.add_argument('episode_id', nargs='?', default=None, help='Episode ID to forget (optional)')
