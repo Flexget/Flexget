@@ -1,3 +1,11 @@
+<!---
+Before opening an issue, verify these:
+
+- Search if the issue already exist
+- Running daemon? Restart it completely
+- This issue template is there for a reason. Please do not ignore it and fill it correctly no matter how irrelevant you think it may be
+
+--->
 ### Expected behaviour:
 
 ### Actual behaviour:
@@ -22,6 +30,7 @@ use paste service if log is too long
 - Flexget Version:
 - Python Version:
 - Installation method:
+- Using Daemon? 
 - OS and version:
 - Link to crash log:
 
