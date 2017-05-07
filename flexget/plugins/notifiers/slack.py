@@ -26,6 +26,7 @@ class SlackNotifier(object):
         [username: <string>] (override username)
         [icon_emoji: <string>] (override emoji icon)
         [icon_url: <string>] (override emoji icon)
+        [attachments: <array>[<object>]] (send a more complex 'message' as part of the notification)
 
     """
     schema = {
@@ -35,7 +36,74 @@ class SlackNotifier(object):
             'channel': {'type': 'string'},
             'username': {'type': 'string', 'default': 'Flexget'},
             'icon_emoji': {'type': 'string'},
-            'icon_url': {'type': 'string', 'format': 'url'}
+            'icon_url': {'type': 'string', 'format': 'url'},
+            'attachments': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'fallback': {
+                            'type': 'string'
+                        },
+                        'color': {
+                            'type': 'string'
+                        },
+                        'pretext': {
+                            'type': 'string'
+                        },
+                        'author_name': {
+                            'type': 'string'
+                        },
+                        'author_link': {
+                            'type': 'string'
+                        },
+                        'author_icon': {
+                            'type': 'string'
+                        },
+                        'title': {
+                            'type': 'string'
+                        },
+                        'title_link': {
+                            'type': 'string'
+                        },
+                        'text': {
+                            'type': 'string'
+                        },
+                        'fields': {
+                            'type': 'array',
+                            'items': {
+                                'type': 'object',
+                                'properties': {
+                                    'title': {
+                                        'type': 'string'
+                                    },
+                                    'value': {
+                                        'type': 'string'
+                                    },
+                                    'short': {
+                                        'type': 'boolean'
+                                    }
+                                }
+                            }
+                        },
+                        'image_url': {
+                            'type': 'string'
+                        },
+                        'thumb_url': {
+                            'type': 'string'
+                        },
+                        'footer': {
+                            'type': 'string'
+                        },
+                        'footer_icon': {
+                            'type': 'string'
+                        },
+                        'ts': {
+                            'type': 'number'
+                        }
+                    }
+                }
+            }
         },
         'not': {
             'required': ['icon_emoji', 'icon_url']
@@ -49,7 +117,10 @@ class SlackNotifier(object):
         """
         Send a Slack notification
         """
-        notification = {'text': message, 'channel': config.get('channel'), 'username': config.get('username')}
+        notification = {'text': message,
+                        'attachments': config.get('attachments'),
+                        'channel': config.get('channel'),
+                        'username': config.get('username')}
         if config.get('icon_emoji'):
             notification['icon_emoji'] = ':%s:' % config['icon_emoji'].strip(':')
         if config.get('icon_url'):
