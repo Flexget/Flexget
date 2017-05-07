@@ -18,6 +18,8 @@ from flexget.utils.tools import parse_filesize
 log = logging.getLogger('iptorrents')
 
 CATEGORIES = {
+    # All
+    'All': '',
 
     # Movies
     'Movie-all': 72,
@@ -117,7 +119,7 @@ class UrlRewriteIPTorrents(object):
         Search for name from iptorrents
         """
 
-        categories = config.get('category', 'all')
+        categories = config.get('category', 'All')
         # Make sure categories is a list
         if not isinstance(categories, list):
             categories = [categories]
@@ -143,11 +145,19 @@ class UrlRewriteIPTorrents(object):
             soup = get_soup(req.content, parser="html.parser")
             torrents = soup.find('table', {'id': 'torrents'})
 
-            for torrent in torrents.findAll('a', href=re.compile('\.torrent$')):
+            results = torrents.findAll('tr')
+            for torrent in results:
+                if torrent.th and 'ac' in torrent.th.get('class'):
+                    # Header column
+                    continue
+                if torrent.find('td', {'colspan': '99'}):
+                    log.debug('No results found for search %s', search_string)
+                    return
                 entry = Entry()
+                link = torrent.find('a', href=re.compile('download'))['href']
                 entry['url'] = "{base}{link}?torrent_pass={key}".format(
-                    base=BASE_URL, link=torrent['href'], key=config.get('rss_key'))
-                entry['title'] = torrent.findPrevious('a', attrs={'class': 'b'}).text
+                    base=BASE_URL, link=link, key=config.get('rss_key'))
+                entry['title'] = torrent.find('a', href=re.compile('details')).text
 
                 seeders = torrent.findNext('td', {'class': 'ac t_seeders'}).text
                 leechers = torrent.findNext('td', {'class': 'ac t_leechers'}).text
@@ -160,7 +170,7 @@ class UrlRewriteIPTorrents(object):
                 size = re.search('^([\.\d]+) ([GMK]?)B$', size)
 
                 entry['content_size'] = parse_filesize(size.group(0))
-
+                log.debug('Found entry %s', entry)
                 entries.add(entry)
 
         return entries
