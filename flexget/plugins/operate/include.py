@@ -16,16 +16,6 @@ from flexget.utils.tools import MergeException, merge_dict_from_to, get_config_h
 
 plugin_name = 'include'
 log = logging.getLogger(plugin_name)
-Base = db_schema.versioned_base(plugin_name, 0)
-
-
-class LastHash(Base):
-    __tablename__ = 'include_last_hash'
-
-    id = Column(Integer, primary_key=True)
-    task = Column(Unicode)
-    file = Column(Unicode)
-    hash = Column(Unicode)
 
 
 class PluginInclude(object):
@@ -64,23 +54,10 @@ class PluginInclude(object):
                     log.error('[%s] %s', error.json_pointer, error.message)
                 task.abort('Invalid config in included file %s' % file_name)
 
-            new_hash = str(get_config_hash(include))
-            with Session() as session:
-                last_hash = session.query(LastHash).filter(LastHash.task == task.name).filter(
-                    LastHash.file == file_name).first()
-                if not last_hash:
-                    log.debug('no config hash detected for task %s with file %s, creating', task.name, file_name)
-                    last_hash = LastHash(task=task.name, file=file_name)
-                    session.add(last_hash)
-                if last_hash.hash != new_hash:
-                    log.debug('new hash detected, triggering config change event')
-                    task.config_changed()
-                last_hash.hash = new_hash
-
             log.debug('Merging %s into task %s', file_name, task.name)
             # merge
             try:
-                merge_dict_from_to(include, task.config)
+                task.merge_config(include)
             except MergeException:
                 raise plugin.PluginError('Failed to merge include file to task %s, incompatible datatypes' % task.name)
 
