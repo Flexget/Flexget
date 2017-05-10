@@ -589,14 +589,7 @@ class Task(object):
             self.disable_phase('input')
             self.all_entries.extend(copy.deepcopy(self.options.inject))
 
-        with Session() as session:
-            last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
-            config_hash = None
-            if not last_hash:
-                config_hash = last_hash.hash
-            self.config_modified, config_hash = self.check_config_hash(config_hash)
-            if self.config_modified:
-                last_hash.hash = config_hash
+        self.check_config_hash()
 
         # run phases
         try:
