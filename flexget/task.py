@@ -545,8 +545,8 @@ class Task(object):
         try:
             merge_dict_from_to(new_config, self.config)
             self.check_config_hash()
-        except MergeException:
-            raise PluginError('Failed to merge include file to task %s, incompatible datatypes' % self.name)
+        except MergeException as e:
+            raise PluginError('Failed to merge configs for task %s: %s' % (self.name, e))
 
     def check_config_hash(self):
         """
