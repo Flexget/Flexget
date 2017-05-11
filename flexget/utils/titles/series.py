@@ -19,7 +19,7 @@ log = logging.getLogger('seriesparser')
 
 # Forced to INFO !
 # switch to logging.DEBUG if you want to debug this class (produces quite a bit info ..)
-log.setLevel(logging.INFO)
+log.setLevel(logging.DEBUG)
 
 ID_TYPES = ['ep', 'date', 'sequence', 'id']  # may also be 'special'
 
@@ -50,13 +50,14 @@ class SeriesParser(TitleParser):
         'part\s(%s)' % '|'.join(map(str, english_numbers)),
     ]])
     season_pack_regexps = ReList([
-        r's(\d{2,})(?:\s|$)',  # S01
+        # S01 or Season 1 but not Season 1 Episode|Part 2
+        r'(?:season\s?|s)(\d{1,})(?:\s|$)(?!(?:(?:.*?\s)?(?:episode|e|ep|part|pt)\s?(?:\d{1,3}|%s)|(?:\d{1,3})\s?of\s?(?:\d{1,3})))' % roman_numeral_re,
         '(\d{1,3})\s?x\s?all',  # 1xAll
     ])
     unwanted_regexps = ReList([
         '(\d{1,3})\s?x\s?(0+)[^1-9]',  # 5x0
         'S(\d{1,3})D(\d{1,3})',  # S3D1
-        r'(?:season(?:s)|s|series|\b)\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
+        r'(?:s|series|\b)\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
         'disc\s\d'])
     # Make sure none of these are found embedded within a word or other numbers
     date_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
@@ -353,7 +354,7 @@ class SeriesParser(TitleParser):
                 else:
                     log.debug('-> no luck with ep_regexps')
 
-            if self.identified_by == 'ep':
+            if self.identified_by == 'ep' and not self.season_pack:
                 # we should be getting season, ep !
                 # try to look up idiotic numbering scheme 101,102,103,201,202
                 # ressu: Added matching for 0101, 0102... It will fail on
