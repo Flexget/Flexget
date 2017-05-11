@@ -19,7 +19,7 @@ log = logging.getLogger('seriesparser')
 
 # Forced to INFO !
 # switch to logging.DEBUG if you want to debug this class (produces quite a bit info ..)
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 ID_TYPES = ['ep', 'date', 'sequence', 'id']  # may also be 'special'
 
