@@ -9,6 +9,7 @@ from flexget.event import event
 from flexget.entry import Entry
 from flexget.manager import Session
 from flexget.plugins.filter.series import SeriesTask, Series, get_latest_release, get_latest_season_pack_release
+from flexget.plugins.filter.series import get_latest_episode_release
 
 plugin_name = 'next_series_seasons'
 log = logging.getLogger(plugin_name)
@@ -155,10 +156,11 @@ class NextSeriesSeasons(object):
         with Session() as session:
             series = session.query(Series).filter(Series.name == entry['series_name']).first()
             latest = get_latest_season_pack_release(series)
+            latest_ep = get_latest_episode_release(series, season=entry['series_season'])
 
             if entry.accepted:
-                if not entry.get('season_pack'):
-                    log.debug('season lookup produced an episode result, assuming no season match, no need to rerun')
+                if not latest and latest_ep:
+                    log.debug('season lookup produced an episode result; assuming no season match, no need to rerun')
                     return
                 else:
                     log.debug('%s %s was accepted, rerunning to look for next season.', entry['series_name'],
