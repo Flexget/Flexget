@@ -84,7 +84,8 @@ class TraktCalendar(object):
 
     @cached('trakt_calendar', persist='2 hours')
     def on_task_input(self, task, config):
-        start_date = str(dateutil_parse(config['start_date']).date())
+        start_date = dateutil_parse(config['start_date']).date()
+
         url = get_api_url('calendars', 'my' if config.get('account') else 'all', 'shows', start_date, config['days'])
 
         try:
