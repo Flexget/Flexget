@@ -103,7 +103,9 @@ class TraktCalendar(object):
                 e['title'] = '{0} ({1})'.format(e['title'], e['trakt_series_year'])
             e['title'] = '{0} S{1:02d}E{2:02d}'.format(e['title'], e['trakt_season'], e['trakt_episode'])
 
-            e['url'] = '{0}/seasons/{1}/episodes/{2}'.format(e['trakt_series_url'], e['trakt_season'], e['trakt_episode'])
+            e['url'] = '{0}/seasons/{1}/episodes/{2}'.format(e['trakt_series_url'],
+                                                             e['trakt_season'],
+                                                             e['trakt_episode'])
 
             entries.append(e)
 
