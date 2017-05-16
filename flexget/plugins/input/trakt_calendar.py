@@ -11,6 +11,7 @@ from flexget.plugins.internal.api_trakt import get_api_url, get_session
 from flexget.utils.cached_input import cached
 
 from requests import RequestException
+from dateutil.parser import parse as dateutil_parse
 
 log = logging.getLogger('trakt_calendar')
 
@@ -83,8 +84,8 @@ class TraktCalendar(object):
 
     @cached('trakt_calendar', persist='2 hours')
     def on_task_input(self, task, config):
-        url = get_api_url('calendars', 'my' if config.get('account') else 'all', 'shows', config['start_date'],
-                          config['days'])
+        start_date = str(dateutil_parse(config['start_date']).date())
+        url = get_api_url('calendars', 'my' if config.get('account') else 'all', 'shows', start_date, config['days'])
 
         try:
             results = get_session(config.get('account')).get(url, params={'extended': 'full'}).json()
