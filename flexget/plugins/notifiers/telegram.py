@@ -74,16 +74,20 @@ class TelegramNotifier(object):
     Configuration example::
 
     my-task:
-      telegram:
-        bot_token: token
-        template: {{title}}
-        use_markdown: no
-        recipients:
-          - username: my-user-name
-          - group: my-group-name
-          - fullname:
-              first: my-first-name
-              sur: my-sur-name
+      notify:
+        title: {{title}}
+        message: {{title}}
+        entries:
+          via:
+            telegram:
+              bot_token: token
+              use_markdown: no
+              recipients:
+                - username: my-user-name
+                - group: my-group-name
+                - fullname:
+                    first: my-first-name
+                    sur: my-sur-name
 
 
     Bootstrapping and testing the bot::
@@ -98,9 +102,6 @@ class TelegramNotifier(object):
 
     You may use any combination of recipients types (`username`, `group` or `fullname`) - 0 or more of each (but you
     need at least one total...).
-
-    `template`::
-    Optional. The template from the example is the default.
 
     `parse_mode`::
     Optional. Whether the template uses `markdown` or `html` formatting.

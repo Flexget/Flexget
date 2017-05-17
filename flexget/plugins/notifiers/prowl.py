@@ -26,12 +26,15 @@ class ProwlNotifier(object):
 
     Example::
 
-      prowl:
-        api_key: xxxxxxx
-        [application: application name, default FlexGet]
-        [event: event title, default New Release]
-        [priority: -2 - 2 (2 = highest), default 0]
-        [description: notification to send]
+      notify:
+        entries:
+          via:
+            - prowl:
+                api_key: xxxxxxx
+                [application: application name, default FlexGet]
+                [event: event title, default New Release]
+                [priority: -2 - 2 (2 = highest), default 0]
+                [description: notification to send]
 
     """
     schema = {

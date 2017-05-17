@@ -25,13 +25,14 @@ class PushbulletNotifier(object):
     """
     Example::
 
-      pushbullet:
-        apikey: <API_KEY>
-        [device: <DEVICE_IDEN> (can also be a list of device idens, or don't specify any idens to send to all devices)]
-        [email: <EMAIL_ADDRESS> (can also be a list of user email addresses)]
-        [channel: <CHANNEL_TAG> (you can only specify device / email or channel tag. cannot use both.)]
-        [title: <MESSAGE_TITLE>] (default: "{{task}} - Download started" -- accepts Jinja2)
-        [body: <MESSAGE_BODY>] (default: "{{series_name}} {{series_id}}" -- accepts Jinja2)
+    notify:
+      entries:
+        via:
+          pushbullet:
+            apikey: <API_KEY>
+            [device: <DEVICE_IDEN> (can also be a list of device ids, or don't specify any ids to send to all devices)]
+            [email: <EMAIL_ADDRESS> (can also be a list of user email addresses)]
+            [channel: <CHANNEL_TAG> (you can only specify device / email or channel tag, cannot use both)]
 
     Configuration parameters are also supported from entries (eg. through set).
     """
@@ -41,8 +42,6 @@ class PushbulletNotifier(object):
             'api_key': one_or_more({'type': 'string'}),
             'device': one_or_more({'type': 'string'}),
             'email': one_or_more({'type': 'string', 'format': 'email'}),
-            'title': {'type': 'string'},
-            'message': {'type': 'string'},
             'url': {'type': 'string'},
             'channel': {'type': 'string'},
             'file_template': {'type': 'string'},
