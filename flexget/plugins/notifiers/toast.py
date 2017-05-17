@@ -13,6 +13,23 @@ log = logging.getLogger(plugin_name)
 
 
 class NotifyToast(object):
+    """
+    Sends messages via local notification system. You must have a notification system like dbus for Linux.
+    Preliminary support for Windows notifications. Not heavily tested yet.
+
+    Examples:
+
+      notify:
+        entries:
+          via:
+            - toast: yes
+
+      notify:
+        entries:
+          via:
+            - toast:
+                timeout: 5
+    """
     schema = {
         'anyOf': [
             {'type': 'boolean', 'enum': [True]},

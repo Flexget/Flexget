@@ -21,11 +21,14 @@ class NotifyMyAndroidNotifier(object):
     """
     Example::
 
-      notifymyandroid:
-        apikey: xxxxxxx
-        [application: application name, default FlexGet]
-        [event: event title, default New Release]
-        [priority: -2 - 2 (2 = highest), default 0]
+      notify:
+        entries:
+          via:
+            - notifymyandroid:
+                apikey: xxxxxxx
+                [application: application name, default FlexGet]
+                [event: event title, default New Release]
+                [priority: -2 - 2 (2 = highest), default 0]
 
     Configuration parameters are also supported from entries (eg. through set).
     """

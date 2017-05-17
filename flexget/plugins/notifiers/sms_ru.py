@@ -27,9 +27,12 @@ class SMSRuNotifier(object):
 
     Example:
 
-      sms_ru:
-        phone_number: <PHONE_NUMBER> (accepted format example: '79997776655')
-        password: <PASSWORD>
+      notify:
+        entries:
+          via:
+            - sms_ru:
+                phone_number: <PHONE_NUMBER> (accepted format example: '79997776655')
+                password: <PASSWORD>
 
     """
     schema = {
