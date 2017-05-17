@@ -95,9 +95,9 @@ def upgrade(ver, session):
         # Clear out identified_by id series so that they can be auto detected again
         session.execute(update(series_table, series_table.c.identified_by != 'ep', {'identified_by': None}))
         # Warn users about a possible config change needed.
-        log.warning('If you are using `identified_by: id` option for the series plugin for date, '
-                    'or abolute numbered series, you will need to update your config. Two new identified_by modes have '
-                    'been added, `date` and `sequence`. In addition, if you are using auto identified_by, it will'
+        log.warning('If you are using `identified_by: id` for the series plugin for a date-identified '
+                    'or abolute-numbered series, you will need to update your config. Two new identified_by modes have '
+                    'been added: `date` and `sequence`. In addition, if you are using `identified_by: auto`, it will'
                     'be relearned based on upcoming episodes.')
         ver = 5
     if ver == 5:
@@ -758,7 +758,7 @@ def get_latest_season_pack_release(series, downloaded=True, season=None):
 
     latest_season_pack_release = releases.order_by(desc(Season.season)).first()
     if not latest_season_pack_release:
-        log.debug('no downloaded season packs found for series \'%s\', season: %s, downloaded: %s',
+        log.debug('no season packs found for series `%s` with parameters season: %s, downloaded: %s',
                   series.name, season, downloaded)
         return
 
@@ -793,7 +793,7 @@ def get_latest_episode_release(series, downloaded=True, season=None):
         latest_episode_release = releases.order_by(desc(Episode.first_seen.label('ep_first_seen'))).first()
 
     if not latest_episode_release:
-        log.debug('no downloaded episodes found for series \'%s\', season: %s, downloaded: %s',
+        log.debug('no episodes found for series `%s` with parameters season: %s, downloaded: %s',
                   series.name, season, downloaded)
         return
 
@@ -825,7 +825,7 @@ def new_eps_after(series, since_ep, session):
     series_eps = session.query(Episode).join(Episode.series).filter(Series.id == series.id)
     if series.identified_by == 'ep':
         if since_ep.season is None or since_ep.number is None:
-            log.debug('new_eps_after for %s falling back to timestamp because latest dl in non-ep format' %
+            log.debug('new_eps_after for `%s` falling back to timestamp because latest dl in non-ep format',
                       series.name)
             return series_eps.filter(Episode.first_seen > since_ep.first_seen).count(), 'eps'
         count = series_eps.filter((Episode.identified_by == 'ep') &
@@ -836,7 +836,7 @@ def new_eps_after(series, since_ep, session):
     elif series.identified_by == 'id':
         count = series_eps.filter(Episode.first_seen > since_ep.first_seen).count()
     else:
-        log.debug('unsupported identified_by %s', series.identified_by)
+        log.debug('unsupported identified_by `%s`', series.identified_by)
         count = 0
     return count, 'eps'
 
@@ -874,11 +874,11 @@ def store_parser(session, parser, series=None, quality=None):
             filter(Series.name == parser.name). \
             filter(Series.id != None).first()
         if not series:
-            log.debug('adding series %s into db', parser.name)
+            log.debug('adding series `%s` into db', parser.name)
             series = Series()
             series.name = parser.name
             session.add(series)
-            log.debug('-> added %s' % series)
+            log.debug('-> added `%s`', series)
 
     releases = []
     for ix, identifier in enumerate(parser.identifiers):
@@ -890,13 +890,13 @@ def store_parser(session, parser, series=None, quality=None):
                 filter(Season.identifier == identifier) \
                 .first()
             if not season:
-                log.debug('adding season %s into series %s', identifier, parser.season)
+                log.debug('adding season `%s` into series `%s`', identifier, parser.name)
                 season = Season()
                 season.identifier = identifier
                 season.identified_by = parser.id_type
                 season.season = parser.season
                 series.seasons.append(season)
-                log.debug('-> added season %s', season)
+                log.debug('-> added season `%s`', season)
             session.flush()
 
             # Sets the filter_by, and filter_id for later releases query
@@ -911,7 +911,7 @@ def store_parser(session, parser, series=None, quality=None):
                 filter(Episode.identifier == identifier). \
                 filter(Episode.series_id != None).first()
             if not episode:
-                log.debug('adding episode %s into series %s', identifier, parser.name)
+                log.debug('adding episode `%s` into series `%s`', identifier, parser.name)
                 episode = Episode()
                 episode.identifier = identifier
                 episode.identified_by = parser.id_type
@@ -923,7 +923,7 @@ def store_parser(session, parser, series=None, quality=None):
                     episode.season = 0
                     episode.number = parser.id + ix
                 series.episodes.append(episode)  # pylint:disable=E1103
-                log.debug('-> added %s', episode)
+                log.debug('-> added `%s`', episode)
             session.flush()
 
             # Sets the filter_by, and filter_id for later releases query
@@ -945,13 +945,13 @@ def store_parser(session, parser, series=None, quality=None):
             filter(table.proper_count == parser.proper_count). \
             filter(filter_by != None).first()
         if not release:
-            log.debug('adding release %s ', parser)
+            log.debug('adding release `%s`', parser)
             release = table()
             release.quality = quality
             release.proper_count = parser.proper_count
             release.title = parser.data
             entity.releases.append(release)  # pylint:disable=E1103
-            log.debug('-> added %s', release)
+            log.debug('-> added `%s`', release)
         releases.append(release)
     session.flush()  # Make sure autonumber ids are populated
     return releases
@@ -1015,9 +1015,9 @@ def remove_series(name, forget=False):
                             downloaded_releases.append(release.title)
                 session.delete(s)
             session.commit()
-            log.debug('Removed series %s from database.', name)
+            log.debug('Removed series `%s` from database.', name)
         else:
-            raise ValueError('Unknown series %s' % name)
+            raise ValueError('Unknown series `%s`' % name)
     for downloaded_release in downloaded_releases:
         fire_event('forget', downloaded_release)
 
@@ -1034,19 +1034,19 @@ def remove_series_entity(name, identifier, forget=False):
     with Session() as session:
         series = session.query(Series).filter(Series.name == name).first()
         if not series:
-            raise ValueError('Unknown series %s' % name)
+            raise ValueError('Unknown series `%s`' % name)
 
         def remove_entity(entity):
             if not series.begin:
                 series.identified_by = ''  # reset identified_by flag so that it will be recalculated
             session.delete(entity)
-            log.debug('Entity %s from series %s removed from database.', identifier, name)
+            log.debug('Entity `%s` from series `%s` removed from database.', identifier, name)
             return [release.title for release in entity.downloaded_releases]
 
         name_to_parse = '{} {}'.format(series.name, identifier)
         parsed = get_plugin_by_name('parsing').instance.parse_series(name_to_parse, name=series.name)
         if not parsed.valid:
-            raise ValueError('Invalid identifier for series {}: {}'.format(series.name, identifier))
+            raise ValueError('Invalid identifier for series `{}`: `{}`'.format(series.name, identifier))
 
         removed = False
         if parsed.season_pack:
@@ -1062,7 +1062,7 @@ def remove_series_entity(name, identifier, forget=False):
                 removed = True
                 downloaded_releases = remove_entity(episode)
         if not removed:
-            raise ValueError('Unknown identifier %s for series %s' % (identifier, name.capitalize()))
+            raise ValueError('Unknown identifier `%s` for series `%s`' % (identifier, name.capitalize()))
 
     if forget:
         for downloaded_release in downloaded_releases:
@@ -1075,9 +1075,9 @@ def delete_release_by_id(release_id):
         if release:
             session.delete(release)
             session.commit()
-            log.debug('Deleted release ID %s' % release_id)
+            log.debug('Deleted release ID `%s`', release_id)
         else:
-            raise ValueError('Unknown identifier %s for release' % release_id)
+            raise ValueError('Unknown identifier `%s` for release' % release_id)
 
 
 def shows_by_name(normalized_name, session=None):
@@ -1179,8 +1179,8 @@ def populate_entry_fields(entry, parser, config):
     # add series, season and episode to entry
     entry['series_name'] = parser.name
     if 'quality' in entry and entry['quality'] != parser.quality:
-        log.verbose('Found different quality for %s. Was %s, overriding with %s.', entry['title'], entry['quality'],
-                    parser.quality)
+        log.verbose('Found different quality for `%s`. Was `%s`, overriding with `%s`.', entry['title'],
+                    entry['quality'], parser.quality)
     entry['quality'] = parser.quality
     entry['proper'] = parser.proper
     entry['proper_count'] = parser.proper_count
@@ -1205,7 +1205,7 @@ def populate_entry_fields(entry, parser, config):
     if config:
         # set custom download path
         if 'path' in config:
-            log.debug('setting %s custom path to %s', entry['title'], config.get('path'))
+            log.debug('setting custom path for `%s` to `%s`', entry['title'], config.get('path'))
             # Just add this to the 'set' dictionary, so that string replacement is done cleanly
             config.setdefault('set', {}).update(path=config['path'])
 
@@ -1350,7 +1350,7 @@ class FilterSeriesBase(object):
                     series_settings['watched'] = {'season': int(season), 'episode': int(episode)}
                 # Convert enough to target for backwards compatibility
                 if 'enough' in series_settings:
-                    log.warning('Series setting `enough` has been renamed to `target` please update your config.')
+                    log.warning('Series setting `enough` has been renamed to `target`. Please update your config.')
                     series_settings.setdefault('target', series_settings['enough'])
                 # Add quality: 720p if timeframe is specified with no target
                 if 'timeframe' in series_settings and 'qualities' not in series_settings:
@@ -1382,9 +1382,9 @@ class FilterSeriesBase(object):
                     unique_series[series] = series_settings
                 else:
                     if kwargs.get('log_once'):
-                        log_once('Series %s is already configured in series plugin' % series, log)
+                        log_once('Series `%s` is already configured in series plugin' % series, log)
                     else:
-                        log.warning('Series %s is configured multiple times in series plugin.', series)
+                        log.warning('Series `%s` is configured multiple times in series plugin.', series)
                     # Combine the config dicts for both instances of the show
                     unique_series[series].update(series_settings)
         # Turn our all_series dict back into a list
@@ -1443,7 +1443,7 @@ class FilterSeries(FilterSeriesBase):
         try:
             self.backlog = plugin.get_plugin_by_name('backlog')
         except plugin.DependencyError:
-            log.warning('Unable utilize backlog plugin, episodes may slip trough timeframe')
+            log.warning('Unable to utilize backlog plugin, so episodes may slip through timeframe.')
 
     def auto_exact(self, config):
         """Automatically enable exact naming option for series that look like a problem"""
@@ -1460,7 +1460,7 @@ class FilterSeries(FilterSeriesBase):
                 if (name.lower().startswith(series_name.lower())) and \
                         (name.lower() != series_name.lower()):
                     if 'exact' not in series_config:
-                        log.verbose('Auto enabling exact matching for series %s (reason %s)', series_name, name)
+                        log.verbose('Auto enabling exact matching for series `%s` (reason: `%s`)', series_name, name)
                         series_config['exact'] = True
 
     # Run after metainfo_quality and before metainfo_series
@@ -1470,11 +1470,11 @@ class FilterSeries(FilterSeriesBase):
         self.auto_exact(config)
         for series_item in config:
             series_name, series_config = list(series_item.items())[0]
-            log.trace('series_name: %s series_config: %s', series_name, series_config)
+            log.trace('series_name: `%s`, series_config: `%s`', series_name, series_config)
             start_time = time.clock()
             self.parse_series(task.entries, series_name, series_config)
             took = time.clock() - start_time
-            log.trace('parsing %s took %s', series_name, took)
+            log.trace('parsing `%s` took %s', series_name, took)
 
     def on_task_filter(self, task, config):
         """Filter series"""
@@ -1492,18 +1492,18 @@ class FilterSeries(FilterSeriesBase):
             with Session() as session:
                 series_name, series_config = list(series_item.items())[0]
                 if series_config.get('parse_only'):
-                    log.debug('Skipping filtering of series %s because of parse_only', series_name)
+                    log.debug('Skipping filtering of series `%s` because of parse_only', series_name)
                     continue
                 # Make sure number shows (e.g. 24) are turned into strings
                 series_name = str(series_name)
                 db_series = session.query(Series).filter(Series.name == series_name).first()
                 if not db_series:
-                    log.debug('adding series %s into db', series_name)
+                    log.debug('adding series `%s` into db', series_name)
                     db_series = Series()
                     db_series.name = series_name
                     db_series.identified_by = series_config.get('identified_by', 'auto')
                     session.add(db_series)
-                    log.debug('-> added %s' % db_series)
+                    log.debug('-> added `%s`', db_series)
                     session.flush()  # Flush to get an id on series before adding alternate names.
                     alts = series_config.get('alternate_name', [])
                     if not isinstance(alts, list):
@@ -1526,7 +1526,7 @@ class FilterSeries(FilterSeriesBase):
 
                 # If we didn't find any episodes for this series, continue
                 if not series_entries:
-                    log.trace('No entries found for %s this run.', series_name)
+                    log.trace('No entries found for `%s` this run.', series_name)
                     continue
 
                 # configuration always overrides everything
@@ -1535,16 +1535,16 @@ class FilterSeries(FilterSeriesBase):
                 # if series doesn't have identified_by flag already set, calculate one now that new eps are added to db
                 if not db_series.identified_by or db_series.identified_by == 'auto':
                     db_series.identified_by = auto_identified_by(db_series)
-                    log.debug('identified_by set to \'%s\' based on series history', db_series.identified_by)
+                    log.debug('identified_by set to `%s` based on series history', db_series.identified_by)
 
-                log.trace('series_name: %s series_config: %s', series_name, series_config)
+                log.trace('series_name: `%s`, series_config: `%s`', series_name, series_config)
 
                 start_time = time.clock()
 
                 self.process_series(task, series_entries, series_config)
 
                 took = time.clock() - start_time
-                log.trace('processing %s took %s', series_name, took)
+                log.trace('processing `%s` took %s', series_name, took)
 
     def parse_series(self, entries, series_name, config):
         """
@@ -1597,7 +1597,7 @@ class FilterSeries(FilterSeriesBase):
                 continue
             parsed.field = 'title'
 
-            log.debug('%s detected as %s, field: %s', entry['title'], parsed, parsed.field)
+            log.debug('`%s` detected as `%s`, field: `%s`', entry['title'], parsed, parsed.field)
             populate_entry_fields(entry, parsed, config)
 
     def process_series(self, task, series_entries, config):
@@ -1644,7 +1644,7 @@ class FilterSeries(FilterSeriesBase):
             # check that a season ack for this season wasn't already accepted in this task run
             if entity.season in accepted_seasons:
                 for entry in entries:
-                    entry.reject('already accepted season pack for season %s in this task' % entity.season)
+                    entry.reject('already accepted season pack for season `%s` in this task' % entity.season)
                 continue
 
             # reject entity that have been marked as watched in config file
@@ -1718,7 +1718,7 @@ class FilterSeries(FilterSeriesBase):
 
             best = entries[0]
             log.debug('continuing w. entities: %s', [e['title'] for e in entries])
-            log.debug('best entity is: %s', best['title'])
+            log.debug('best entity is: `%s`', best['title'])
 
             # episode tracking. used only with season and sequence based series
             if entity.identified_by in ['ep', 'sequence']:
@@ -1758,7 +1758,7 @@ class FilterSeries(FilterSeriesBase):
             # need to reject all other episode/season packs for an accepted season during the task,
             # can't wait for task learn phase
             if entity.is_season:
-                log.debug('adding season number %s to accepted seasons or this task', entity.season)
+                log.debug('adding season number `%s` to accepted seasons for this task', entity.season)
                 accepted_seasons.append(entity.season)
 
     def process_propers(self, config, episode, entries):
@@ -1802,7 +1802,7 @@ class FilterSeries(FilterSeriesBase):
                 return pass_filter
 
         downloaded_qualities = dict((d.quality, d.proper_count) for d in episode.downloaded_releases)
-        log.debug('propers - downloaded qualities: %s' % downloaded_qualities)
+        log.debug('propers - downloaded qualities: %s', downloaded_qualities)
 
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for entry in best_propers:
@@ -1827,7 +1827,7 @@ class FilterSeries(FilterSeriesBase):
         # scan for quality
         for entry in entries:
             if req.allows(entry['quality']):
-                log.debug('Series accepting. %s meets quality %s', entry['title'], req)
+                log.debug('Accepted by series. `%s` meets quality requirement `%s`.', entry['title'], req)
                 entry.accept('target quality')
                 return True
 
@@ -1870,9 +1870,9 @@ class FilterSeries(FilterSeriesBase):
         if latest:
             # reject any entity if a season pack for this season was already downloaded
             if entity.season in entity.series.completed_seasons:
-                log.debug('season %s already completed for this series', entity.season)
+                log.debug('season `%s` already completed for this series', entity.season)
                 for entry in entries:
-                    entry.reject('season %s is already completed' % entity.season)
+                    entry.reject('season `%s` is already completed' % entity.season)
                 return True
 
             # Test if episode threshold has been met
@@ -1900,7 +1900,7 @@ class FilterSeries(FilterSeriesBase):
                                                 latest.number + grace)))):
                     log.debug('too new! rejecting all occurrences')
                     for entry in entries:
-                        entry.reject('Too much in the future from latest downloaded entity %s. '
+                        entry.reject('Too much in the future from latest downloaded entity `%s`. '
                                      'See `--disable-tracking` if this should be downloaded.' % latest.identifier)
                     return True
 
@@ -1945,7 +1945,7 @@ class FilterSeries(FilterSeriesBase):
             hours += diff.days * 24
             minutes, _ = divmod(remainder, 60)
 
-            log.info('Timeframe waiting %s for %02dh:%02dmin, currently best is %s',
+            log.info('`%s`: timeframe waiting for %02dh:%02dmin. Currently best is `%s`.',
                      episode.series.name, hours, minutes, best['title'])
 
             # add best entry to backlog (backlog is able to handle duplicate adds)
@@ -1969,7 +1969,7 @@ class FilterSeries(FilterSeriesBase):
         wanted_qualities = set([qualities.Requirements(name) for name in config.get('qualities', [])])
         # Compute the requirements from our set that have not yet been fulfilled
         still_needed = [req for req in wanted_qualities if not any(req.allows(qual) for qual in downloaded_qualities)]
-        log.debug('Wanted qualities: %s', wanted_qualities)
+        log.debug('wanted qualities: %s', wanted_qualities)
 
         def wanted(quality):
             """Returns True if we want this quality based on the config options."""
@@ -1980,9 +1980,9 @@ class FilterSeries(FilterSeriesBase):
 
         for entry in entries:
             quality = entry['quality']
-            log.debug('ep: %s quality: %s', entry['title'], quality)
+            log.debug('ep: `%s`, quality: `%s`', entry['title'], quality)
             if not wanted(quality):
-                log.debug('%s is unwanted quality', quality)
+                log.debug('`%s` is an unwanted quality', quality)
                 continue
             if any(req.allows(quality) for req in still_needed):
                 # Don't get worse qualities in upgrade mode
@@ -2011,10 +2011,10 @@ class FilterSeries(FilterSeriesBase):
                         ep_num = (session.query(EpisodeRelease).filter(EpisodeRelease.id.in_(entry['series_releases'])).
                                   update({'downloaded': True}, synchronize_session=False))
 
-                log.debug('marking %s episode releases and %s season releases as downloaded for %s', ep_num, season_num,
-                          entry)
+                log.debug('marking %s episode releases and %s season releases as downloaded for `%s`', ep_num,
+                          season_num, entry)
             else:
-                log.debug('%s is not a series', entry['title'])
+                log.debug('`%s` is not a series', entry['title'])
 
 
 class SeriesDBManager(FilterSeriesBase):
@@ -2047,15 +2047,15 @@ class SeriesDBManager(FilterSeriesBase):
                     db_series.alternate_names = [alt for alt in db_series.alternate_names if alt.alt_name in alts]
                     # Add/update the possibly new alternate names
                 else:
-                    log.debug('adding series %s into db (on_task_start)', series_name)
+                    log.debug('adding series `%s` into db (on_task_start)', series_name)
                     db_series = Series()
                     db_series.name = series_name
                     session.add(db_series)
                     session.flush()  # flush to get id on series before creating alternate names
-                    log.debug('-> added %s' % db_series)
+                    log.debug('-> added `%s`', db_series)
                 for alt in alts:
                     _add_alt_name(alt, db_series, series_name, session)
-                log.debug('connecting series %s to task %s', db_series.name, task.name)
+                log.debug('connecting series `%s` to task `%s`', db_series.name, task.name)
                 db_series.in_tasks.append(SeriesTask(task.name))
                 if series_config.get('identified_by', 'auto') != 'auto':
                     db_series.identified_by = series_config['identified_by']
@@ -2077,17 +2077,17 @@ def _add_alt_name(alt, db_series, series_name, session):
     elif db_series_alt:
         if not db_series_alt.series:
             # Not sure how this can happen
-            log.debug('Found an alternate name not attached to series. Re-attatching %s to %s' % (alt, series_name))
+            log.debug('Found an alternate name not attached to series. Re-attatching `%s` to `%s`.', alt, series_name)
             db_series.alternate_names.append(db_series_alt)
         else:
             # Alternate name already exists for another series. Not good.
-            raise plugin.PluginError('Error adding alternate name for %s. %s is already associated with %s. '
+            raise plugin.PluginError('Error adding alternate name for `%s`: `%s` is already associated with `%s`. '
                                      'Check your settings.' % (series_name, alt, db_series_alt.series.name))
     else:
-        log.debug('adding alternate name %s for %s into db' % (alt, series_name))
+        log.debug('adding alternate name `%s` for `%s` into db', alt, series_name)
         db_series_alt = AlternateNames(alt)
         db_series.alternate_names.append(db_series_alt)
-        log.debug('-> added %s' % db_series_alt)
+        log.debug('-> added %s', db_series_alt)
 
 
 def set_alt_names(alt_names, db_series, session):
@@ -2096,15 +2096,15 @@ def set_alt_names(alt_names, db_series, session):
         db_series_alt = session.query(AlternateNames).filter(AlternateNames.alt_name == alt_name).first()
         if db_series_alt:
             if not db_series_alt.series_id == db_series.id:
-                raise plugin.PluginError('Error adding alternate name for %s. "%s" is already associated with %s. '
+                raise plugin.PluginError('Error adding alternate name for `%s`: `%s` is already associated with `%s`. '
                                          'Check your settings.' % (db_series.name, alt_name, db_series_alt.series.name))
             else:
-                log.debug('alternate name %s already associated with series %s, no change needed', alt_name,
+                log.debug('alternate name `%s` already associated with series `%s`, no change needed', alt_name,
                           db_series.name)
                 db_alt_names.append(db_series_alt)
         else:
             db_alt_names.append(AlternateNames(alt_name))
-            log.debug('adding alternate name %s to series %s', alt_name, db_series.name)
+            log.debug('adding alternate name `%s` to series `%s`', alt_name, db_series.name)
     db_series.alternate_names[:] = db_alt_names
 
 
