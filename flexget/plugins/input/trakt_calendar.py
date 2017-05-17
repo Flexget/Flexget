@@ -97,7 +97,7 @@ class TraktCalendar(object):
         except RequestException as e:
             raise plugin.PluginError('Error while fetching calendar: {0}'.format(e))
 
-        entries = []
+        entries = set()
         for result in results:
             e = Entry()
             e.update_using_map(self.series_map, result['show'])
@@ -117,9 +117,9 @@ class TraktCalendar(object):
                                                                  e['trakt_season'],
                                                                  e['trakt_episode'])
 
-            entries.append(e)
+            entries.add(e)
 
-        return entries
+        return list(entries)
 
 
 @event('plugin.register')
