@@ -12,7 +12,6 @@ from datetime import datetime
 
 import jsonschema
 from jsonschema.compat import str_types, int_types
-from dateutil.parser import parse as dateutil_parse
 
 from flexget.event import fire_event
 from flexget.utils import qualities, template
@@ -160,12 +159,6 @@ def parse_size(size_input):
         return int(1024 ** prefixes.index(unit) * value)
 
 
-def parse_date(date_input):
-    try:
-        return dateutil_parse(date_input)
-    except ValueError:
-        raise ValueError("should be in ISO 8601 format eg. YYYY-MM-DD")
-
 # Public API end here, the rest should not be used outside this module
 
 
@@ -275,13 +268,6 @@ def is_valid_template(instance):
     if not isinstance(instance, str_types):
         return True
     return get_template(instance) is not None
-
-
-@format_checker.checks('date', raises=ValueError)
-def is_valid_date(date_string):
-    if not isinstance(date_string, str_types):
-        return True
-    return parse_date(date_string)
 
 
 def set_error_message(error):

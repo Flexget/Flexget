@@ -11,7 +11,6 @@ from flexget.plugins.internal.api_trakt import get_api_url, get_session
 from flexget.utils.cached_input import cached
 
 from requests import RequestException
-from dateutil.parser import parse as dateutil_parse
 
 log = logging.getLogger('trakt_calendar')
 
@@ -20,8 +19,7 @@ class TraktCalendar(object):
     schema = {
         'type': 'object',
         'properties': {
-            'start_date': {'type': 'string', 'format': 'date',
-                           'default': str(datetime.datetime.now().date())},
+            'start_day': {'type': 'integer', 'default': 0},
             'days': {'type': 'integer', 'default': 7},
             'account': {'type': 'string'},
             'strip_year': {'type': 'boolean', 'default': False},
@@ -87,12 +85,15 @@ class TraktCalendar(object):
 
     @cached('trakt_calendar', persist='2 hours')
     def on_task_input(self, task, config):
-        start_date = dateutil_parse(config['start_date']).date()
+        start_date = datetime.datetime.now().date() + datetime.timedelta(days=config['start_day'])
+        log.debug('Start date for calendar: %s, end date: %s', start_date,
+                  start_date + datetime.timedelta(days=config['days']))
 
         url = get_api_url('calendars', 'my' if config.get('account') else 'all', 'shows', start_date, config['days'])
 
         try:
             results = get_session(config.get('account')).get(url, params={'extended': 'full'}).json()
+            log.debug('Found %s calendar entries', len(results))
         except RequestException as e:
             raise plugin.PluginError('Error while fetching calendar: {0}'.format(e))
 
