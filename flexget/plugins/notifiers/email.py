@@ -40,44 +40,57 @@ class EmailNotifier(object):
 
     Config basic example::
 
-      email:
-        from: xxx@xxx.xxx
-        to: xxx@xxx.xxx
-        smtp_host: smtp.host.com
+      notify:
+        entries:
+          via:
+            - email:
+                from: xxx@xxx.xxx
+                to: xxx@xxx.xxx
+                smtp_host: smtp.host.com
 
     Config example with smtp login::
 
-      email:
-        from: xxx@xxx.xxx
-        to: xxx@xxx.xxx
-        smtp_host: smtp.host.com
-        smtp_port: 25
-        smtp_login: true
-        smtp_username: my_smtp_login
-        smtp_password: my_smtp_password
-        smtp_tls: true
+      notify:
+        entries:
+          via:
+            - email:
+                from: xxx@xxx.xxx
+                to: xxx@xxx.xxx
+                smtp_host: smtp.host.com
+                smtp_port: 25
+                smtp_login: true
+                smtp_username: my_smtp_login
+                smtp_password: my_smtp_password
+                smtp_tls: true
 
     GMAIL example::
 
-      from: from@gmail.com
-      to: to@gmail.com
-      smtp_host: smtp.gmail.com
-      smtp_port: 587
-      smtp_login: true
-      smtp_username: gmailUser
-      smtp_password: gmailPassword
-      smtp_tls: true
+      notify:
+        entries:
+          via:
+            - email:
+                from: from@gmail.com
+                to: to@gmail.com
+                smtp_host: smtp.gmail.com
+                smtp_port: 587
+                smtp_login: true
+                smtp_username: gmailUser
+                smtp_password: gmailPassword
+                smtp_tls: true
 
     Default values for the config elements::
 
-      email:
-        smtp_host: localhost
-        smtp_port: 25
-        smtp_login: False
-        smtp_username:
-        smtp_password:
-        smtp_tls: False
-        smtp_ssl: False
+      notify:
+        entries:
+          via:
+            - email:
+                smtp_host: localhost
+                smtp_port: 25
+                smtp_login: False
+                smtp_username:
+                smtp_password:
+                smtp_tls: False
+                smtp_ssl: False
     """
 
     def __init__(self):

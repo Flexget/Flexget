@@ -20,12 +20,15 @@ class SlackNotifier(object):
     """
     Example:
 
-      slack:
-        web_hook_url: <string>
-        [channel: <string>] (override channel, use "@username" or "#channel")
-        [username: <string>] (override username)
-        [icon_emoji: <string>] (override emoji icon)
-        [icon_url: <string>] (override emoji icon)
+      notify:
+        entries:
+          via:
+            - slack:
+                web_hook_url: <string>
+                [channel: <string>] (override channel, use "@username" or "#channel")
+                [username: <string>] (override username)
+                [icon_emoji: <string>] (override emoji icon)
+                [icon_url: <string>] (override emoji icon)
 
     """
     schema = {

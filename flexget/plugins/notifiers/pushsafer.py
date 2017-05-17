@@ -23,17 +23,18 @@ class PushsaferNotifier(object):
     """
     Example::
 
-      pushsafer:
-        private_key: <string> your private key (can also be a alias key) - Required
-        title: <string> (default: task name)
-        body: <string> (default: '{{series_name}} {{series_id}}' )
-        url: <string> (default: '{{imdb_url}}')
-        url_title: <string> (default: (none))
-        device: <string> ypur device or device group id (default: (none))
-        icon: <integer> (default is 1)
-        sound: <integer> (default is (none))
-        vibration: <integer> (default is 0)
-        timetolive: <integer> (default: (none))
+      notify:
+        entries:
+          via:
+            - pushsafer:
+                private_key: <string> your private key (can also be a alias key) - Required
+                url: <string> (default: '{{imdb_url}}')
+                url_title: <string> (default: (none))
+                device: <string> ypur device or device group id (default: (none))
+                icon: <integer> (default is 1)
+                sound: <integer> (default is (none))
+                vibration: <integer> (default is 0)
+                timetolive: <integer> (default: (none))
 
     """
     schema = {'type': 'object',
