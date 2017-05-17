@@ -21,11 +21,14 @@ class TraktCalendar(object):
         'type': 'object',
         'properties': {
             'start_date': {'type': 'string', 'format': 'date',
-                           'default': str(datetime.datetime.now().date() - datetime.timedelta(days=7))},
+                           'default': str(datetime.datetime.now().date())},
             'days': {'type': 'integer', 'default': 7},
             'account': {'type': 'string'},
-            'strip_year': {'type': 'boolean', 'default': False}
-        }
+            'strip_year': {'type': 'boolean', 'default': False},
+            'type': {'type': 'string', 'enum': ['shows', 'episodes']}
+        },
+        'required': ['type'],
+        'additionalProperties': False
     }
 
     # Series info
@@ -97,16 +100,21 @@ class TraktCalendar(object):
         for result in results:
             e = Entry()
             e.update_using_map(self.series_map, result['show'])
-            e.update_using_map(self.episode_map, result['episode'])
+            if config['type'] == 'episodes':
+                e.update_using_map(self.episode_map, result['episode'])
 
             e['title'] = e['trakt_series_name']
             if not config['strip_year']:
                 e['title'] = '{0} ({1})'.format(e['title'], e['trakt_series_year'])
-            e['title'] = '{0} S{1:02d}E{2:02d}'.format(e['title'], e['trakt_season'], e['trakt_episode'])
+                
+            e['url'] = e['trakt_series_url']
+            
+            if config['type'] == 'episodes':
+                e['title'] = '{0} S{1:02d}E{2:02d}'.format(e['title'], e['trakt_season'], e['trakt_episode'])
 
-            e['url'] = '{0}/seasons/{1}/episodes/{2}'.format(e['trakt_series_url'],
-                                                             e['trakt_season'],
-                                                             e['trakt_episode'])
+                e['url'] = '{0}/seasons/{1}/episodes/{2}'.format(e['url'],
+                                                                 e['trakt_season'],
+                                                                 e['trakt_episode'])
 
             entries.append(e)
 
