@@ -108,7 +108,7 @@ class PluginTemplate(object):
 
             # Merge
             try:
-                task.merge_config(template_config, plugin_name, details=template)
+                task.merge_config(template_config)
             except MergeException as exc:
                 raise plugin.PluginError('Failed to merge template %s to task %s. Error: %s' %
                                          (template, task.name, exc.value))

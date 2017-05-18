@@ -461,6 +461,9 @@ class Task(object):
                 finally:
                     fire_event('task.execute.after_plugin', self, plugin.name)
                 self.session = None
+        # check config hash for changes at the end of 'start' phase
+        if phase == 'start':
+            self.check_config_hash()
 
     def __run_plugin(self, plugin, phase, args=None, kwargs=None):
         """
@@ -543,14 +546,13 @@ class Task(object):
         """
         self.config_modified = True
 
-    def merge_config(self, new_config, plugin_name, details=None):
+    def merge_config(self, new_config):
         try:
             merge_dict_from_to(new_config, self.config)
-            self.check_config_hash(plugin_name, details)
         except MergeException as e:
             raise PluginError('Failed to merge configs for task %s: %s' % (self.name, e))
 
-    def check_config_hash(self, plugin_name=None, details=None):
+    def check_config_hash(self):
         """
         Checks the task's config hash and updates the hash if necessary.
         """
@@ -563,14 +565,9 @@ class Task(object):
             else:
                 log.error('BUG: No prepared_config on rerun, please report.')
         with Session() as session:
-            last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name)
-            if plugin_name:
-                last_hash = last_hash.filter(TaskConfigHash.plugin == plugin_name)
-            if details:
-                last_hash.filter(TaskConfigHash.details == details)
-            last_hash = last_hash.first()
+            last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
             if not last_hash:
-                session.add(TaskConfigHash(task=self.name, hash=config_hash, plugin=plugin_name, details=details))
+                session.add(TaskConfigHash(task=self.name, hash=config_hash))
                 self.config_changed()
             elif last_hash.hash != config_hash:
                 last_hash.hash = config_hash
@@ -595,8 +592,6 @@ class Task(object):
             # If entries are passed for this execution (eg. rerun), disable the input phase
             self.disable_phase('input')
             self.all_entries.extend(copy.deepcopy(self.options.inject))
-
-        self.check_config_hash()
 
         # run phases
         try:
