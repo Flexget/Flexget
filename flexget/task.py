@@ -550,7 +550,7 @@ class Task(object):
         except MergeException as e:
             raise PluginError('Failed to merge configs for task %s: %s' % (self.name, e))
 
-    def check_config_hash(self, plugin_name, details):
+    def check_config_hash(self, plugin_name=None, details=None):
         """
         Checks the task's config hash and updates the hash if necessary.
         """
@@ -563,8 +563,9 @@ class Task(object):
             else:
                 log.error('BUG: No prepared_config on rerun, please report.')
         with Session() as session:
-            last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).filter(
-                TaskConfigHash.plugin == plugin_name)
+            last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name)
+            if plugin_name:
+                last_hash = last_hash.filter(TaskConfigHash.plugin == plugin_name)
             if details:
                 last_hash.filter(TaskConfigHash.details == details)
             last_hash = last_hash.first()
