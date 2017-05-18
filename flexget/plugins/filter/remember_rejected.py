@@ -77,8 +77,8 @@ class FilterRememberRejected(object):
         entry.reject('message', remember=True)
     """
 
-    @plugin.priority(0)
-    def on_task_start(self, task, config):
+    @plugin.priority(-255)
+    def on_task_input(self, task, config):
         """Purge remembered entries if the config has changed."""
         with Session() as session:
             # See if the task has changed since last run
@@ -98,8 +98,6 @@ class FilterRememberRejected(object):
                     log.debug('%s entries have expired from remember_rejected table.' % deleted)
                     task.config_changed()
 
-    @plugin.priority(-255)
-    def on_task_input(self, task, config):
         for entry in task.all_entries:
             entry.on_reject(self.on_entry_reject)
 
