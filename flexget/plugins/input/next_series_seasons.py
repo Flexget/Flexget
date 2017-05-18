@@ -71,6 +71,8 @@ class NextSeriesSeasons(object):
         if isinstance(config, bool):
             config = {}
 
+        DIFF_NO_SERIES_BEGIN = 15
+        DIFF_GAP_TOO_BIG = 30
         if task.is_rerun:
             # Just return calculated next eps on reruns
             entries = self.rerun_entries
@@ -115,8 +117,8 @@ class NextSeriesSeasons(object):
                 else:
                     latest_season = low_season + 1
 
-                if (latest_season - low_season > 15 and not series.begin) or (series.begin and
-                    latest_season - series.begin.season > 30):
+                if (latest_season - low_season > DIFF_NO_SERIES_BEGIN and not series.begin) or (series.begin and
+                    latest_season - series.begin.season > DIFF_GAP_TOO_BIG):
                     if series.begin:
                         log.error('Series `%s` has a begin episode set (`%s`), but the season currently being processed '
                                   '(%s) is %s seasons later than it. To prevent emitting incorrect seasons, this ' 
