@@ -36,8 +36,6 @@ class TaskConfigHash(Base):
 
     id = Column(Integer, primary_key=True)
     task = Column('name', Unicode, index=True, nullable=False)
-    plugin = Column('plugin', Unicode, index=True, nullable=False)
-    details = Column('plugin', Unicode)
     hash = Column('hash', String)
 
     def __repr__(self):

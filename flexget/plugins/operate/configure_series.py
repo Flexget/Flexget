@@ -94,9 +94,6 @@ class ConfigureSeries(FilterSeriesBase):
         # Merge our series config in with the base series config
         self.merge_config(task, series_config)
 
-        # Set the config_modified flag if the list of shows changed since last time
-        task.check_config_hash()
-
 
 @event('plugin.register')
 def register_plugin():
