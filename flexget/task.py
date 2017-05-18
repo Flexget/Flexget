@@ -36,6 +36,8 @@ class TaskConfigHash(Base):
 
     id = Column(Integer, primary_key=True)
     task = Column('name', Unicode, index=True, nullable=False)
+    plugin = Column('plugin', Unicode, index=True, nullable=False)
+    details = Column('plugin', Unicode)
     hash = Column('hash', String)
 
     def __repr__(self):
@@ -541,14 +543,14 @@ class Task(object):
         """
         self.config_modified = True
 
-    def merge_config(self, new_config):
+    def merge_config(self, new_config, plugin_name, details=None):
         try:
             merge_dict_from_to(new_config, self.config)
-            self.check_config_hash()
+            self.check_config_hash(plugin_name, details)
         except MergeException as e:
             raise PluginError('Failed to merge configs for task %s: %s' % (self.name, e))
 
-    def check_config_hash(self):
+    def check_config_hash(self, plugin_name, details):
         """
         Checks the task's config hash and updates the hash if necessary.
         """
@@ -561,9 +563,13 @@ class Task(object):
             else:
                 log.error('BUG: No prepared_config on rerun, please report.')
         with Session() as session:
-            last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
+            last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).filter(
+                TaskConfigHash.plugin == plugin_name)
+            if details:
+                last_hash.filter(TaskConfigHash.details == details)
+            last_hash = last_hash.first()
             if not last_hash:
-                session.add(TaskConfigHash(task=self.name, hash=config_hash))
+                session.add(TaskConfigHash(task=self.name, hash=config_hash, plugin=plugin_name, details=details))
                 self.config_changed()
             elif last_hash.hash != config_hash:
                 last_hash.hash = config_hash

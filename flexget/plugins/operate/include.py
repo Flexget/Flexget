@@ -6,13 +6,11 @@ import logging
 import os
 
 import yaml
-from sqlalchemy import Column, Integer, Unicode
 
-from flexget import plugin, db_schema
+from flexget import plugin
 from flexget.config_schema import one_or_more, process_config
 from flexget.event import event
-from flexget.manager import Session
-from flexget.utils.tools import MergeException, merge_dict_from_to, get_config_hash
+from flexget.utils.tools import MergeException
 
 plugin_name = 'include'
 log = logging.getLogger(plugin_name)
@@ -41,23 +39,23 @@ class PluginInclude(object):
             files = [config]
 
         for file_name in files:
-            file_name = os.path.expanduser(file_name)
-            if not os.path.isabs(file_name):
-                file_name = os.path.join(task.manager.config_base, file_name)
-            with io.open(file_name, encoding='utf-8') as inc_file:
+            file = os.path.expanduser(file_name)
+            if not os.path.isabs(file):
+                file = os.path.join(task.manager.config_base, file)
+            with io.open(file, encoding='utf-8') as inc_file:
                 include = yaml.load(inc_file)
                 inc_file.flush()
             errors = process_config(include, plugin.plugin_schemas(interface='task'))
             if errors:
-                log.error('Included file %s has invalid config:', file_name)
+                log.error('Included file %s has invalid config:', file)
                 for error in errors:
                     log.error('[%s] %s', error.json_pointer, error.message)
-                task.abort('Invalid config in included file %s' % file_name)
+                task.abort('Invalid config in included file %s' % file)
 
-            log.debug('Merging %s into task %s', file_name, task.name)
+            log.debug('Merging %s into task %s', file, task.name)
             # merge
             try:
-                task.merge_config(include)
+                task.merge_config(include, plugin_name, details=file_name)
             except MergeException:
                 raise plugin.PluginError('Failed to merge include file to task %s, incompatible datatypes' % task.name)
 

@@ -1,18 +1,15 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 
-from sqlalchemy import Column, Integer, String, Unicode
-
-from flexget import options, plugin, db_schema
-from flexget.event import event
+from flexget import options, plugin
 from flexget.config_schema import register_config_key
-from flexget.manager import Session
-from flexget.utils.tools import MergeException, merge_dict_from_to
+from flexget.event import event
+from flexget.utils.tools import MergeException
 
-log = logging.getLogger('template')
+plugin_name = 'template'
+log = logging.getLogger(plugin_name)
 
 
 class PluginTemplate(object):
@@ -58,7 +55,7 @@ class PluginTemplate(object):
     def prepare_config(self, config):
         if config is None or isinstance(config, bool):
             config = []
-        elif isinstance(config, basestring):
+        elif isinstance(config, str):
             config = [config]
         return config
 
@@ -111,7 +108,7 @@ class PluginTemplate(object):
 
             # Merge
             try:
-                task.merge_config(template_config)
+                task.merge_config(template_config, plugin_name, details=template)
             except MergeException as exc:
                 raise plugin.PluginError('Failed to merge template %s to task %s. Error: %s' %
                                          (template, task.name, exc.value))
