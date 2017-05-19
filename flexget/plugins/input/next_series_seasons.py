@@ -14,6 +14,8 @@ from flexget.plugins.filter.series import get_latest_episode_release
 plugin_name = 'next_series_seasons'
 log = logging.getLogger(plugin_name)
 
+MAX_SEASON_DIFF_WITHOUT_BEGIN = 15
+MAX_SEASON_DIFF_WITH_BEGIN = 30
 
 class NextSeriesSeasons(object):
     """
@@ -115,11 +117,25 @@ class NextSeriesSeasons(object):
                 else:
                     latest_season = low_season + 1
 
+                if (latest_season - low_season > MAX_SEASON_DIFF_WITHOUT_BEGIN and not series.begin) or (series.begin and
+                    latest_season - series.begin.season > MAX_SEASON_DIFF_WITH_BEGIN):
+                    if series.begin:
+                        log.error('Series `%s` has a begin episode set (`%s`), but the season currently being processed '
+                                  '(%s) is %s seasons later than it. To prevent emitting incorrect seasons, this ' 
+                                  'series will not emit unless the begin episode is adjusted to a season that is less '
+                                  'than %s seasons from season %s.', series.name, series.begin.identifier, latest_season,
+                                  (latest_season - series.begin.season), MAX_SEASON_DIFF_WITH_BEGIN, latest_season)
+                    else:
+                        log.error('Series `%s` does not have a begin episode set and continuing this task would result '                                   'in more than %s seasons being emitted. To prevent emitting incorrect seasons, this '
+                                  'series will not emit unless the begin episode is set in your series config or by '
+                                  'using the CLI subcommand `series begin "%s" <SxxExx>`.', series.name,
+                                  MAX_SEASON_DIFF_WITHOUT_BEGIN, series.name)
+                    continue
                 for season in range(latest_season, low_season, -1):
                     if season in series.completed_seasons:
                         log.debug('season %s is marked as completed, skipping', season)
                         continue
-                    log.trace('Evaluating season %s for series %s', season, series.name)
+                    log.trace('Evaluating season %s for series `%s`', season, series.name)
                     latest = get_latest_release(series, season=season, downloaded=check_downloaded)
                     if series.begin and season == series.begin.season and (not latest or latest < series.begin):
                         # In case series.begin season is already completed, look in next available season
@@ -136,9 +152,9 @@ class NextSeriesSeasons(object):
                         if config.get('from_start') or config.get('backfill'):
                             entries.append(self.search_entry(series, season, task))
                         else:
-                            log.verbose('Series `%s` has no history. Set begin option, '
-                                        'or use CLI `series begin` '
-                                        'subcommand to set first episode to emit', series.name)
+                            log.verbose('Series `%s` has no history. Set the begin option in your config, '
+                                        'or use the CLI subcommand `series begin "%s" <SxxExx>` '
+                                        'to set the first episode to emit', series.name, series.name)
                             break
                     # Skip older seasons if we are not in backfill mode
                     if not config.get('backfill'):
