@@ -165,7 +165,7 @@ class NextSeriesSeasons(object):
                 else:
                     log.debug('%s %s was accepted, rerunning to look for next season.', entry['series_name'],
                               entry['series_id'])
-                    if not [entry for entry in self.rerun_entries if entry.get('series_season') == latest.season + 1]:
+                    if not any(e.get('series_season') == latest.season + 1 for e in self.rerun_entries):
                         self.rerun_entries.append(self.search_entry(series, latest.season + 1, task))
                     # Increase rerun limit by one if we have matches, this way
                     # we keep searching as long as matches are found!
