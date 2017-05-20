@@ -10,6 +10,7 @@ import re
 
 log = logging.getLogger('sort_by')
 
+RE_ARTICLES = '^(the|a|an)\s'
 
 class PluginSortBy(object):
     """
@@ -52,8 +53,7 @@ class PluginSortBy(object):
     }
 
     def on_task_filter(self, task, config):
-        re_articles = '^(the|a|an)\s'
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             field = config
             reverse = False
             ignore_articles = False
@@ -68,8 +68,7 @@ class PluginSortBy(object):
             task.all_entries.reverse()
             return
         
-        if not isinstance(ignore_articles, bool):
-            re_articles = ignore_articles
+        re_articles = ignore_articles if not isinstance(ignore_articles, bool) else RE_ARTICLES
 
         if ignore_articles:
             task.all_entries.sort(key=lambda e: re.sub(re_articles, '', e.get(field, 0), flags=re.IGNORECASE),
