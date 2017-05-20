@@ -66,7 +66,7 @@ class BlurayMovie(Base):
             title_year = title
 
         params = {
-            'search': 'bluraymovies',
+            'section': 'bluraymovies',
             'country': 'ALL',
             'keyword': title,
             '_': str(int(time.time() * 1000))
