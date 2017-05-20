@@ -6,6 +6,7 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
+import re
 
 log = logging.getLogger('sort_by')
 
@@ -37,27 +38,44 @@ class PluginSortBy(object):
                 'type': 'object',
                 'properties': {
                     'field': {'type': 'string'},
-                    'reverse': {'type': 'boolean'}},
+                    'reverse': {'type': 'boolean'},
+                    'ignore_articles': {
+                        'oneOf': [
+                            {'type': 'boolean'},
+                            {'type': 'string', 'format': 'regex'}
+                        ]
+                    }
+                },
                 'additionalProperties': False
             }
         ]
     }
 
     def on_task_filter(self, task, config):
+        re_articles = '^(the|a|an)\s'
         if isinstance(config, basestring):
             field = config
             reverse = False
+            ignore_articles = False
         else:
             field = config.get('field', None)
             reverse = config.get('reverse', False)
+            ignore_articles = config.get('ignore_articles', False)
 
         log.debug('sorting entries by: %s' % config)
 
         if not field:
             task.all_entries.reverse()
             return
+        
+        if not isinstance(ignore_articles, bool):
+            re_articles = ignore_articles
 
-        task.all_entries.sort(key=lambda e: e.get(field, 0), reverse=reverse)
+        if ignore_articles:
+            task.all_entries.sort(key=lambda e: re.sub(re_articles, '', e.get(field, 0), flags=re.IGNORECASE),
+                                  reverse=reverse)
+        else:
+            task.all_entries.sort(key=lambda e: e.get(field, 0), reverse=reverse)
 
 
 @event('plugin.register')
