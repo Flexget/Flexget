@@ -511,6 +511,10 @@ class Episode(Base):
             log.trace('comparing %s to None', self)
             return False
         elif isinstance(other, Episode):
+            if self.identified_by is None or other.identified_by is None:
+                bad_ep = other if other.identified_by is None else self
+                log.error('cannot compare episode without an identifier type: %s', bad_ep)
+                return False
             if self.identified_by != other.identified_by:
                 if self.identified_by == 'special':
                     log.trace('Comparing special episode')
