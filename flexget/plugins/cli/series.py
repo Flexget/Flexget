@@ -204,6 +204,8 @@ def display_details(options):
         table_data = [header]
         entities = get_all_entities(series, session=session)
         for entity in entities:
+            if not entity.releases:
+                continue
             if entity.identifier is None:
                 identifier = colorize(ERROR_COLOR, 'MISSING')
                 age = ''
