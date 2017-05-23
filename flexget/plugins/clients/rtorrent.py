@@ -129,7 +129,7 @@ class SCGITransport(xmlrpc_client.Transport):
 
             self.verbose = verbose
 
-            sock.send(request_body.encode())
+            sock.sendall(request_body.encode())
 
             return self.parse_response(sock.makefile())
         finally:
