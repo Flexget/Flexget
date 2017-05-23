@@ -9,19 +9,27 @@ class TestInclude(object):
         tasks:
           include_test:
             include:
-            - {{ tmpfile }}
+            - {{ tmpfile_1 }}
+            - {{ tmpfile_2 }}
     """
 
     @pytest.fixture
     def config(self, tmpdir):
-        f = tmpdir.mkdir('include').join('foo.yml')
-        f.write("""
+        test_dir = tmpdir.mkdir('include')
+        file_1 = test_dir.join('foo.yml')
+        file_2 = test_dir.join('baz.yml')
+        file_1.write("""
             mock:
             - title: foo
         """)
-        return Template(self._config).render({'tmpfile': f.strpath})
+        file_2.write("""
+            mock:
+            - title: baz
+        """)
+        return Template(self._config).render({'tmpfile_1': file_1.strpath, 'tmpfile_2': file_2.strpath})
 
     def test_include(self, execute_task):
         task = execute_task('include_test')
-        assert len(task.all_entries) == 1
+        assert len(task.all_entries) == 2
         assert task.find_entry(title='foo')
+        assert task.find_entry(title='baz')
