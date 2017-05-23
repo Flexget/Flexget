@@ -57,7 +57,9 @@ class UrlRewriteNewPCT(object):
         except requests.exceptions.RequestException as e:
             raise UrlRewritingError(e)
         try:
-            soup = get_soup(page.text)
+            html = page.text
+            html = html.replace('\n', '').replace('\r', '')
+            soup = get_soup(html)
         except Exception as e:
             raise UrlRewritingError(e)
 
