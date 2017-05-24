@@ -716,7 +716,7 @@ class OutputDeluge(DelugePlugin):
                         dlist = []
                         for label in labels:
                             if label not in d_labels:
-                                log.debug('Adding the label `%s` to deluge' % label)
+                                log.debug('Adding the label `%s` to deluge', label)
                                 dlist.append(client.label.add(label))
                         return defer.DeferredList(dlist)
 
