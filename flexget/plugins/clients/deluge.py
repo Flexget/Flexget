@@ -700,7 +700,6 @@ class OutputDeluge(DelugePlugin):
                     log.error('Error rendering label `%s`: %s', label, e)
                     continue
                 labels.add(label)
-                entry['label'] = label
         label_deferred = defer.succeed(True)
         if labels:
             # Make sure the label plugin is available and enabled, then add appropriate labels
