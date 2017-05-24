@@ -57,9 +57,7 @@ class UrlRewriteNewPCT(object):
         except requests.exceptions.RequestException as e:
             raise UrlRewritingError(e)
         try:
-            html = page.text
-            html = html.replace('\n', '').replace('\r', '')
-            soup = get_soup(html)
+            soup = get_soup(page.text)
         except Exception as e:
             raise UrlRewritingError(e)
 
@@ -67,7 +65,7 @@ class UrlRewriteNewPCT(object):
             torrent_id_prog = re.compile(r'descargar-torrent/(.+)/')
             torrent_ids = soup.findAll(href=torrent_id_prog)
         else:
-            torrent_id_prog = re.compile("(?:parametros\s*=\s*.*?)'(?:torrentID|id)'\s*:\s*'(\d+)'")
+            torrent_id_prog = re.compile("(?:parametros\s*=\s*\n?)\s*{\s*\n(?:\s*'\w+'\s*:.*\n)+\s*'(?:torrentID|id)'\s*:\s*'(\d+)'")
             torrent_ids = soup.findAll(text=torrent_id_prog)
 
         if len(torrent_ids) == 0:
