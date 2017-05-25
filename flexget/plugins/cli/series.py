@@ -128,7 +128,7 @@ def begin(manager, options):
                 console('Series `%s` was not found in the database.' % series_name)
             else:
                 series = series[0]
-                remove_series_begin(series)
+                series.begin = None
                 console('The begin episode for `%s` has been forgotten.' % series.name)
                 session.commit()
                 manager.config_changed()

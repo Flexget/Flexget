@@ -102,7 +102,7 @@ class ObjectsContainer(object):
         'type': 'object',
         'properties': {
             'begin_episode':
-                {'type': ['string', 'integer'], 'format': 'episode_or_season_identifier'},
+                {'type': ['string', 'integer'], 'format': 'episode_or_season_id'},
             'alternate_names': {'type': 'array', 'items': {'type': 'string'}}
         },
         'anyOf': [

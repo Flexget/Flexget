@@ -22,7 +22,7 @@ class ObjectContainer(object):
             'path': {'type': 'string', 'format': 'path'},
             'url': {'type': 'string', 'format': 'url'},
             'episode_identifier': {'type': 'string', 'format': 'episode_identifier'},
-            'episode_or_season_identifier': {'type': 'string', 'format': 'episode_or_season_identifier'}
+            'episode_or_season_id': {'type': 'string', 'format': 'episode_or_season_id'}
         }
     }
 
