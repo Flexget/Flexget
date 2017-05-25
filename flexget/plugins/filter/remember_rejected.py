@@ -79,27 +79,33 @@ class FilterRememberRejected(object):
 
     @plugin.priority(0)
     def on_task_start(self, task, config):
+        with Session() as session:
+            remember_task = session.query(RememberTask).filter(RememberTask.name == task.name).first()
+            if not remember_task:
+                # Create this task in the db if not present
+                session.add(RememberTask(name=task.name))
+
+    @plugin.priority(-255)
+    def on_task_input(self, task, config):
         """Purge remembered entries if the config has changed."""
         with Session() as session:
             # See if the task has changed since last run
-            old_task = session.query(RememberTask).filter(RememberTask.name == task.name).first()
-            if not task.is_rerun and old_task and task.config_modified:
+            remember_task = session.query(RememberTask).filter(RememberTask.name == task.name).first()
+            if not task.is_rerun and remember_task and task.config_modified:
                 log.debug('Task config has changed since last run, purging remembered entries.')
-                session.delete(old_task)
-                old_task = None
-            if not old_task:
+                session.delete(remember_task)
+                remember_task = None
+            if not remember_task:
                 # Create this task in the db if not present
                 session.add(RememberTask(name=task.name))
             elif not task.is_rerun:
                 # Delete expired items if this is not a rerun
-                deleted = session.query(RememberEntry).filter(RememberEntry.task_id == old_task.id). \
+                deleted = session.query(RememberEntry).filter(RememberEntry.task_id == remember_task.id). \
                     filter(RememberEntry.expires < datetime.now()).delete()
                 if deleted:
                     log.debug('%s entries have expired from remember_rejected table.' % deleted)
                     task.config_changed()
 
-    @plugin.priority(-255)
-    def on_task_input(self, task, config):
         for entry in task.all_entries:
             entry.on_reject(self.on_entry_reject)
 
