@@ -100,7 +100,10 @@ class TestQualityParser(object):
         ('Test.File.DTSHD', 'dtshd'),
         ('Test.File.DTS', 'dts'),
         ('Test.File.truehd', 'truehd'),
-        ('Test.File.DTSHDMA', 'dtshd')
+        ('Test.File.DTSHDMA', 'dtshd'),
+        ('Test.File.DD+5.1', 'dd+5.1'),
+        ('Test.File.DDP5.1', 'dd+5.1'),
+        ('Test.File.DD5.1', 'dd5.1')
     ])
     def test_quality_failures(self, parser, test_quality):
         quality = parser().parse_movie(test_quality[0]).quality
@@ -133,6 +136,17 @@ class TestFilterQuality(object):
             quality: "<=cam <HR"
           min_max:
             quality: HR-720i
+          test_dd_audio:
+            template: no_global
+            series:
+              - My Show:
+                  quality: dd5.1+
+              - My Second Show:
+                  quality: dd+5.1
+            mock:
+              - {title: 'My Show S01E01 720p HDTV DD+5.1'}
+              - {title: 'My Second Show S01E05 720p HDTV DD+5.1'}
+              - {title: 'My Second Show S01E05 720p HDTV DD5.1'}
     """
 
     @pytest.fixture(scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'])
@@ -183,3 +197,33 @@ class TestFilterQuality(object):
         assert entry in task.accepted, 'HR should be accepted'
         assert len(task.rejected) == 3, 'wrong number of entries rejected'
         assert len(task.accepted) == 1, 'wrong number of entries accepted'
+
+
+class TestQualityAudio(object):
+    config = """
+        tasks:
+          test_dd_audio:
+            series:
+              - My Show:
+                  quality: dd5.1+
+              - My Second Show:
+                  quality: dd+5.1
+            mock:
+              - {title: 'My Show S01E01 720p HDTV DD+5.1'}
+              - {title: 'My Second Show S01E05 720p HDTV DD+5.1'}
+              - {title: 'My Second Show S01E05 720p HDTV DD5.1'}
+    """
+
+    def test_dd_audio(self, execute_task):
+        task = execute_task('test_dd_audio')
+        entry = task.find_entry('accepted', title='My Show S01E01 720p HDTV DD+5.1')
+        assert entry, 'Entry "My Show S01E01 720p HDTV DD+5.1" should have been accepted'
+        assert entry['quality'].audio == 'dd+5.1', 'audio should have been parsed as dd+5.1'
+
+        entry = task.find_entry('undecided', title='My Second Show S01E05 720p HDTV DD5.1')
+        assert entry, 'Entry "My Second Show S01E05 720p HDTV DD5.1" should have been undecided because worse quality'
+        assert entry['quality'].audio == 'dd5.1', 'audio should have been parsed as dd5.1'
+
+        entry = task.find_entry('accepted', title='My Second Show S01E05 720p HDTV DD+5.1')
+        assert entry, 'Entry "My Second Show S01E05 720p HDTV DD+5.1" should have been rejected because best quality'
+        assert entry['quality'].audio == 'dd+5.1', 'audio should have been parsed as dd+5.1'

@@ -162,6 +162,8 @@ _audios = [
     QualityComponent('audio', 10, 'mp3'),
     # TODO: No idea what order these should go in or if we need different regexps
     QualityComponent('audio', 20, 'aac', 'aac%s?' % channels),
+    # Because of the 'channels' regex, DD+5.1 is attempted first such that the + sign is not ignored
+    QualityComponent('audio', 35, 'dd+5.1', 'dd[p+]%s' % channels),
     QualityComponent('audio', 30, 'dd5.1', 'dd%s' % channels),
     QualityComponent('audio', 40, 'ac3', 'ac3%s?' % channels),
     QualityComponent('audio', 50, 'flac', 'flac%s?' % channels),
