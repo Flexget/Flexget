@@ -217,3 +217,22 @@ class TestFormatChecker(object):
 
         errors = schema_match(base_message, data)
         assert not errors
+
+    def test_episode_or_season_identifier(self, api_client, schema_match):
+        payload1 = {'episode_or_season_identifier': 's01'}
+
+        rsp = api_client.json_post('/format_check/', data=json.dumps(payload1))
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        payload2 = {'episode_or_season_identifier': 'bla'}
+
+        rsp = api_client.json_post('/format_check/', data=json.dumps(payload2))
+        assert rsp.status_code == 422, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors

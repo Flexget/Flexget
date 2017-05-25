@@ -972,9 +972,11 @@ def set_series_begin(series, ep_id):
     # If identified_by is not explicitly specified, auto-detect it based on begin identifier
     # TODO: use some method of series parser to do the identifier parsing
     session = Session.object_session(series)
-    identified_by = parse_episode_identifier(ep_id)
+    identified_by = parse_episode_identifier(ep_id, identify_season=True)
     if identified_by == 'ep':
         ep_id = ep_id.upper()
+        if 'E' not in ep_id:
+            ep_id += 'E01'
     if series.identified_by not in ['auto', '', None]:
         if identified_by != series.identified_by:
             raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`' %

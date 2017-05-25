@@ -21,7 +21,8 @@ class ObjectContainer(object):
             'file': {'type': 'string', 'format': 'file'},
             'path': {'type': 'string', 'format': 'path'},
             'url': {'type': 'string', 'format': 'url'},
-            'episode_identifier': {'type': 'string', 'format': 'episode_identifier'}
+            'episode_identifier': {'type': 'string', 'format': 'episode_identifier'},
+            'episode_or_season_identifier': {'type': 'string', 'format': 'episode_or_season_identifier'}
         }
     }
 

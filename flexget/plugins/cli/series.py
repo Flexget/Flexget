@@ -135,7 +135,7 @@ def begin(manager, options):
         except ValueError as e:
             console(e)
         else:
-            console('Episodes for `%s` will be accepted starting with `%s`' % (series.name, ep_id))
+            console('Releases for `%s` will be accepted starting with `%s`' % (series.name, ep_id))
             session.commit()
         manager.config_changed()
 
@@ -290,7 +290,8 @@ def register_parser_arguments():
                                          help='set the episode to start getting a series from')
     begin_parser.add_argument('episode_id', metavar='<episode ID>',
                               help='Episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, '
-                                   'depending on how the series is numbered)')
+                                   'depending on how the series is numbered). You can also enter a season ID such as '
+                                   ' S02.')
     forget_parser = subparsers.add_parser('forget', parents=[series_parser],
                                           help='Removes episodes or whole series from the entire database '
                                                '(including seen plugin)')
