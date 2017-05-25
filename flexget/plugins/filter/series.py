@@ -1002,6 +1002,13 @@ def set_series_begin(series, ep_id):
         session.flush()
     series.begin = episode
 
+def remove_series_begin(series):
+    """
+    Remove begin episode link for series
+    
+    :param Series series: series instance
+    """
+    series.begin = None
 
 def remove_series(name, forget=False):
     """
@@ -1262,7 +1269,7 @@ class FilterSeriesBase(object):
                 # Strict naming
                 'exact': {'type': 'boolean'},
                 # Begin takes an ep, sequence or date identifier
-                'begin': {'type': ['string', 'integer'], 'format': 'episode_identifier'},
+                'begin': {'type': ['string', 'integer'], 'format': 'episode_or_season_identifier'},
                 'from_group': one_or_more({'type': 'string'}),
                 'parse_only': {'type': 'boolean'},
                 'special_ids': one_or_more({'type': 'string'}),
