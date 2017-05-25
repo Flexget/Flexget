@@ -1136,13 +1136,14 @@ def show_seasons(series, start=None, stop=None, count=False, descending=False, s
     return seasons.slice(start, stop).from_self().all()
 
 
-def get_all_entities(series, session, sort_by='seen', reverse=False):
+def get_all_entities(series, session, sort_by='age', reverse=False):
     episodes = show_episodes(series, session=session)
     seasons = show_seasons(series, session=session)
-    if sort_by == 'entity':
-        return sorted(episodes + seasons, key=lambda e: (e.identifier), reverse=reverse)
+    if sort_by == 'identifier':
+        key = lambda e: e.identifier
     else:
-        return sorted(episodes + seasons, key=lambda e: (e.first_seen or datetime.min, e.identifier), reverse=reverse)
+        key = lambda e: (e.first_seen or datetime.min, e.identifier)
+    return sorted(episodes + seasons, key=key, reverse=reverse)
 
 
 def get_releases(episode, downloaded=None, start=None, stop=None, count=False, descending=False, sort_by=None,
