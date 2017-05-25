@@ -157,7 +157,7 @@ _codecs = [
     QualityComponent('codec', 40, 'h265', '[hx].?265|hevc'),
     QualityComponent('codec', 50, '10bit', '10.?bit|hi10p')
 ]
-channels = '(?:(?:[^\w+]?7[\W_]?1)|(?:[^\w+]?5[\W_]?1)|(?:[^\w+]?2[\W_]?(?:0|ch)))'
+channels = '(?:(?:[^\w+]?[1-7][\W_]?(?:0|1|ch)))'
 _audios = [
     QualityComponent('audio', 10, 'mp3'),
     # TODO: No idea what order these should go in or if we need different regexps

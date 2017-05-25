@@ -205,6 +205,7 @@ class TestQualityAudio(object):
             quality: "dd+5.1"
             mock:
               - {title: 'My Show S01E05 720p HDTV DD+7.1'}
+              - {title: 'My Show S01E05 720p HDTV DD+5.0'}
           test_dd_audio_min:
             quality: ">dd5.1"
             mock:
@@ -224,9 +225,12 @@ class TestQualityAudio(object):
         assert entry, 'Entry "My Show S01E05 720p HDTV DD+7.1" should not have been rejected'
         assert entry['quality'].audio == 'dd+5.1', 'audio "dd+7.1" should have been parsed as dd+5.1'
 
+        entry = task.find_entry('undecided', title='My Show S01E05 720p HDTV DD+5.0')
+        assert entry['quality'].audio == 'dd+5.1', 'audio "dd+5.0" should have been parsed as dd+5.1'
+
     def test_dd_audio_min(self, execute_task):
         task = execute_task('test_dd_audio_min')
-        #assert len(task.rejected) == 1, 'should have rejected one'
+        assert len(task.rejected) == 1, 'should have rejected one'
         entry = task.find_entry('undecided', title='My Show S01E05 720p HDTV DD+2.0')
         assert entry, 'Entry "My Show S01E05 720p HDTV DD+2.0" should not have been rejected'
         assert entry['quality'].audio == 'dd+5.1', 'audio should have been parsed as dd+5.1'
