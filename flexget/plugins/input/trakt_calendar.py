@@ -22,7 +22,7 @@ class TraktCalendar(object):
             'start_day': {'type': 'integer', 'default': 0},
             'days': {'type': 'integer', 'default': 7},
             'account': {'type': 'string'},
-            'strip_year': {'type': 'boolean', 'default': False},
+            'strip_dates': {'type': 'boolean', 'default': False},
             'type': {'type': 'string', 'enum': ['shows', 'episodes']}
         },
         'required': ['type'],
@@ -105,7 +105,7 @@ class TraktCalendar(object):
                 e.update_using_map(self.episode_map, result['episode'])
 
             e['title'] = e['trakt_series_name']
-            if not config['strip_year']:
+            if not config['strip_dates']:
                 e['title'] = '{0} ({1})'.format(e['title'], e['trakt_series_year'])
                 
             e['url'] = e['trakt_series_url']
