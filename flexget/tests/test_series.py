@@ -2317,3 +2317,65 @@ class TestSeriesSeasonPack(object):
 
         task = execute_task('test_with_dict_config_2')
         assert task.find_entry('accepted', title='bro.s02.720p.HDTV-Flexget')
+
+
+class TestSeriesDDAudio(object):
+    _config = """
+      templates:
+        global:
+          parsing:
+            series: internal
+      tasks:
+        min_quality:
+          mock:
+            - {title: 'MinQATest.S01E01.720p.XViD.DD5.1-FlexGet'}
+            - {title: 'MinQATest.S01E01.720p.XViD.DDP5.1-FlexGet'}
+          series:
+            - MinQATest:
+                quality: ">dd5.1"
+
+        max_quality:
+          mock:
+            - {title: 'MaxQATest.S01E01.720p.XViD.DD5.1-FlexGet'}
+            - {title: 'MaxQATest.S01E01.720p.XViD.DD+5.1-FlexGet'}
+          series:
+            - MaxQATest:
+                quality: "<=dd5.1"
+
+        test_channels:
+          mock:
+            - {title: 'Channels.S01E01.1080p.HDTV.DD+2.0-FlexGet'}
+            - {title: 'Channels.S01E01.1080p.HDTV.DD+5.1-FlexGet'}
+            - {title: 'Channels.S01E01.1080p.HDTV.DD+7.1-FlexGet'}
+          series:
+            - Channels:
+                quality: dd+5.1
+
+
+    """
+
+    @pytest.fixture()
+    def config(self):
+        """Overrides outer config fixture since season pack support does not work with guessit parser"""
+        return self._config
+
+    def test_min_quality(self, execute_task):
+        """Series plugin: min_quality"""
+        task = execute_task('min_quality')
+        assert task.find_entry('accepted', title='MinQATest.S01E01.720p.XViD.DDP5.1-FlexGet'), \
+            'MinQATest.S01E01.720p.XViD.DDP5.1-FlexGet should have been accepted'
+        assert len(task.accepted) == 1, 'should have accepted only two'
+
+    def test_max_quality(self, execute_task):
+        """Series plugin: max_quality"""
+        task = execute_task('max_quality')
+        assert task.find_entry('accepted', title='MaxQATest.S01E01.720p.XViD.DD5.1-FlexGet'), \
+            'MaxQATest.S01E01.720p.XViD.DD5.1-FlexGet should have been accepted'
+        assert len(task.accepted) == 1, 'should have accepted only one'
+
+    def test_channels(self, execute_task):
+        """Series plugin: max_quality"""
+        task = execute_task('test_channels')
+        assert task.find_entry(title='Channels.S01E01.1080p.HDTV.DD+7.1-FlexGet'), \
+            'Channels.S01E01.1080p.HDTV.DD+7.1-FlexGet should have been accepted'
+        assert len(task.accepted) == 1, 'should have accepted only one'
