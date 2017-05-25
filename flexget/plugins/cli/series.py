@@ -15,7 +15,7 @@ try:
     from flexget.plugins.filter.series import (Series, remove_series, remove_series_entity, set_series_begin,
                                                normalize_series_name, new_entities_after, get_latest_release,
                                                get_series_summary, shows_by_name, show_episodes, shows_by_exact_name,
-                                               get_all_entities, remove_series_begin)
+                                               get_all_entities)
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
