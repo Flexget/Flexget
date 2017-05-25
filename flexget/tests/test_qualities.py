@@ -100,7 +100,9 @@ class TestQualityParser(object):
         ('Test.File.DTSHD', 'dtshd'),
         ('Test.File.DTS', 'dts'),
         ('Test.File.truehd', 'truehd'),
-        ('Test.File.DTSHDMA', 'dtshd')
+        ('Test.File.DTSHDMA', 'dtshd'),
+        ('Test.File.DD2.0', 'dd5.1'),
+        ('Test.File.AC35.1', 'ac3')
     ])
     def test_quality_failures(self, parser, test_quality):
         quality = parser().parse_movie(test_quality[0]).quality
@@ -113,7 +115,11 @@ class TestQualityInternalParser(object):
     @pytest.mark.parametrize("test_quality", [
         ('Test.File.DD+5.1', 'dd+5.1'),
         ('Test.File.DDP5.1', 'dd+5.1'),
-        ('Test.File.DD5.1', 'dd5.1')
+        ('Test.File.DDP7.1', 'dd+5.1'),
+        ('Test.File.DD5.1', 'dd5.1'),
+        ('Test.File.DD4.0', 'dd5.1'),
+        ('Test.File.DD2.1', 'dd5.1'),
+        ('Test.File.FLAC1.0', 'flac'),
     ])
     def test_quality_failures(self, test_quality):
         quality = ParserInternal().parse_movie(test_quality[0]).quality

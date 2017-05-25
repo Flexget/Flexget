@@ -2356,7 +2356,7 @@ class TestSeriesDDAudio(object):
 
     @pytest.fixture()
     def config(self):
-        """Overrides outer config fixture since season pack support does not work with guessit parser"""
+        """Overrides outer config fixture since DD+ and arbitrary channels support does not work with guessit parser"""
         return self._config
 
     def test_min_quality(self, execute_task):
