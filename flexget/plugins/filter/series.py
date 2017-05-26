@@ -968,6 +968,7 @@ def set_series_begin(series, ep_id):
     :param Series series: Series instance
     :param ep_id: Integer for sequence mode, SxxEyy for episodic and yyyy-mm-dd for date.
     :raises ValueError: If malformed ep_id or series in different mode
+    :return: tuple containing identified_by and identity_type
     """
     # If identified_by is not explicitly specified, auto-detect it based on begin identifier
     # TODO: use some method of series parser to do the identifier parsing
@@ -1001,6 +1002,7 @@ def set_series_begin(series, ep_id):
         # Need to flush to get an id on new Episode before assigning it as series begin
         session.flush()
     series.begin = episode
+    return (identified_by, entity_type)
 
 
 def remove_series(name, forget=False):
