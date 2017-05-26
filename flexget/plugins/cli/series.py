@@ -197,6 +197,8 @@ def get_latest_status(episode):
 def display_details(options):
     """Display detailed series information, ie. series show NAME"""
     name = options.series_name
+    sort_by = options.sort_by
+    reverse = options.order
     with Session() as session:
         name = normalize_series_name(name)
         # Sort by length of name, so that partial matches always show shortest matching title
@@ -214,9 +216,9 @@ def display_details(options):
                        ' {}'.format(name, ', '.join(s.name for s in matches[1:])))
             if not options.table_type == 'porcelain':
                 console(warning)
-        header = ['Entity ID', 'Latest age', 'Release titles', 'Release Quality', 'Proper']
+        header = ['Identifier', 'Last seen', 'Release titles', 'Release Quality', 'Proper']
         table_data = [header]
-        entities = get_all_entities(series, session=session)
+        entities = get_all_entities(series, session=session, sort_by=sort_by, reverse=reverse)
         for entity in entities:
             if not entity.releases:
                 continue
@@ -300,8 +302,14 @@ def register_parser_arguments():
     order.add_argument('--descending', dest='order', action='store_true', help='Sort in descending order')
     order.add_argument('--ascending', dest='order', action='store_false', help='Sort in ascending order')
 
-    subparsers.add_parser('show', parents=[series_parser, table_parser],
-                          help='Show the releases FlexGet has seen for a given series ')
+    show_parser = subparsers.add_parser('show', parents=[series_parser, table_parser],
+                          help='Show the releases FlexGet has seen for a given series')
+    show_parser.add_argument('--sort-by', choices=('age', 'identifier'), default='age',
+                             help='Choose releases list sort: age (default) or identifier')
+    show_order = show_parser.add_mutually_exclusive_group(required=False)
+    show_order.add_argument('--descending', dest='order', action='store_true', help='Sort in descending order')
+    show_order.add_argument('--ascending', dest='order', action='store_false', help='Sort in ascending order')
+
     begin_parser = subparsers.add_parser('begin', parents=[series_parser],
                                          help='set the episode to start getting a series from')
     begin_opts = begin_parser.add_mutually_exclusive_group(required=True)

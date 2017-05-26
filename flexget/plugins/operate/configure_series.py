@@ -14,15 +14,6 @@ from flexget.plugins.filter.series import FilterSeriesBase
 from flexget.utils.tools import get_config_hash
 
 log = logging.getLogger('configure_series')
-Base = db_schema.versioned_base('import_series', 0)
-
-
-class LastHash(Base):
-    __tablename__ = 'import_series_last_hash'
-
-    id = Column(Integer, primary_key=True)
-    task = Column(Unicode)
-    hash = Column(Unicode)
 
 
 class ConfigureSeries(FilterSeriesBase):
@@ -89,17 +80,6 @@ class ConfigureSeries(FilterSeriesBase):
                             log.debug('not setting series option %s for %s. errors: %s' % (key, entry['title'], errors))
                         else:
                             s[key] = entry['configure_series_' + key]
-
-        # Set the config_modified flag if the list of shows changed since last time
-        new_hash = str(get_config_hash(series))
-        with Session() as session:
-            last_hash = session.query(LastHash).filter(LastHash.task == task.name).first()
-            if not last_hash:
-                last_hash = LastHash(task=task.name)
-                session.add(last_hash)
-            if last_hash.hash != new_hash:
-                task.config_changed()
-            last_hash.hash = new_hash
 
         if not series:
             log.info('Did not get any series to generate series configuration')

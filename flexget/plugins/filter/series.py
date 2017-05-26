@@ -1138,10 +1138,14 @@ def show_seasons(series, start=None, stop=None, count=False, descending=False, s
     return seasons.slice(start, stop).from_self().all()
 
 
-def get_all_entities(series, session):
+def get_all_entities(series, session, sort_by='age', reverse=False):
     episodes = show_episodes(series, session=session)
     seasons = show_seasons(series, session=session)
-    return sorted(episodes + seasons, key=lambda e: (e.first_seen or datetime.min, e.identifier))
+    if sort_by == 'identifier':
+        key = lambda e: e.identifier
+    else:
+        key = lambda e: (e.first_seen or datetime.min, e.identifier)
+    return sorted(episodes + seasons, key=key, reverse=reverse)
 
 
 def get_releases(episode, downloaded=None, start=None, stop=None, count=False, descending=False, sort_by=None,
@@ -2028,10 +2032,6 @@ class SeriesDBManager(FilterSeriesBase):
 
     @plugin.priority(0)
     def on_task_start(self, task, config):
-        if not task.config_modified:
-            log.trace('not task.config_modified, returning')
-            return
-
         # Clear all series from this task
         with Session() as session:
             session.query(SeriesTask).filter(SeriesTask.name == task.name).delete()
