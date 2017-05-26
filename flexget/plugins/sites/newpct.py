@@ -65,7 +65,7 @@ class UrlRewriteNewPCT(object):
             torrent_id_prog = re.compile(r'descargar-torrent/(.+)/')
             torrent_ids = soup.findAll(href=torrent_id_prog)
         else:
-            torrent_id_prog = re.compile("'(?:torrentID|id)'\s*:\s*'(\d+)'")
+            torrent_id_prog = re.compile("'(?:torrentID|id=\'content-torrent\')'\s*:\s*'(\d+)'")
             torrent_ids = soup.findAll(text=torrent_id_prog)
 
         if len(torrent_ids) == 0:
