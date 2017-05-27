@@ -4,7 +4,7 @@ pylint
 coverage
 flake8
 mock
-requests
+requests~=2.16.2
 vcrpy>=1.7.4
 virtualenv
 boto3
