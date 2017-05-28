@@ -10,7 +10,7 @@ pynzb
 rpyc
 jinja2
 # There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
-requests==2.15.1
+requests~=2.16.3
 #Guessit requires python-dateutil<=2.5.2
 python-dateutil>=2.5.3
 jsonschema>=2.0
