@@ -142,11 +142,11 @@ def begin(manager, options):
             else:
                 series = series[0]
             try:
-                set_series_begin(series, ep_id)
+                _, entity_type = set_series_begin(series, ep_id)
             except ValueError as e:
                 console(e)
             else:
-                if re.match(r'(?i)^S\d{1,4}$', ep_id):
+                if entity_type == 'season':
                     console('`%s` was identified as a season.' % ep_id)
                     ep_id += 'E01'
                 console('Releases for `%s` will be accepted starting with `%s`.' % (series.name, ep_id))
