@@ -21,10 +21,9 @@ config.plugins = [
   new webpack.optimize.CommonsChunkPlugin({ name: ['vendor', 'manifest'], minChunks: Infinity }),
   new webpack.optimize.MinChunkSizePlugin({ minChunkSize: 8192 }),
   new HtmlWebpackPlugin({
-    title: 'Society of Software Engineers',
+    title: 'Flexget',
     filename: '../index.html',
-    template: './app/index.ejs',
-    urlRoot: 'https://sse.rit.edu',
+    template: './src/index.ejs',
   }),
   new webpack.optimize.UglifyJsPlugin({
     compress: {
