@@ -152,7 +152,7 @@ class UrlRewriteIPTorrents(object):
                     continue
                 if torrent.find('td', {'colspan': '99'}):
                     log.debug('No results found for search %s', search_string)
-                    return
+                    break
                 entry = Entry()
                 link = torrent.find('a', href=re.compile('download'))['href']
                 entry['url'] = "{base}{link}?torrent_pass={key}".format(
