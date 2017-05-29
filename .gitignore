@@ -31,11 +31,10 @@ pip-*.tar.gz
 *.noseids
 .coverage
 tests/cover/
-flexget/ui/node_modules/
-flexget/ui/bower_components/
-flexget/ui/.tmp/
-flexget/ui/app/
-flexget/ui/coverage/
+bower_components/
+.tmp
+app/
+coverage/
 cherrypy
 pip-selfcheck.json
 npm-debug.log
