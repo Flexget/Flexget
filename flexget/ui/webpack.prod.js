@@ -12,7 +12,7 @@ config.output = {
     publicPath: '/assets/',
 };
 config.plugins = [
-  new FaviconsWebpackPlugin(path.resolve('./src/favicon.ico')),
+  new FaviconsWebpackPlugin(path.resolve('./src/favicon.png')),
   new webpack.DefinePlugin({
     'process.env': {
       NODE_ENV: JSON.stringify('production'),
@@ -50,4 +50,6 @@ config.plugins = [
 config.module.rules.push({
   test: /\.s?css$/,
   loader: ExtractTextPlugin.extract(['css-loader', 'resolve-url-loader', 'sass-loader']),
-};
+});
+
+module.exports = config;

@@ -1,0 +1,63 @@
+{
+  "name": "flexget",
+  "version": "1.0.0",
+  "description": "Flexget Web UI",
+  "main": "index.js",
+  "scripts": {
+    "start": "NODE_ENV=development BABEL_ENV=development node ./server.js",
+    "build": "NODE_ENV=production BABEL_ENV=production webpack --config webpack.prod.js",
+    "debug": "DEBUG=true npm run build",
+    "lint": "eslint --ext .js --ext .jsx src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Flexget/Flexget.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Flexget/Flexget/issues"
+  },
+  "homepage": "https://github.com/Flexget/Flexget#readme",
+  "devDependencies": {
+    "babel-core": "^6.24.1",
+    "babel-eslint": "^7.2.3",
+    "babel-loader": "^7.0.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "css-loader": "^0.28.3",
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb": "^15.0.1",
+    "eslint-import-resolver-webpack": "^0.8.1",
+    "eslint-plugin-import": "^2.3.0",
+    "eslint-plugin-jsx-a11y": "^5.0.3",
+    "eslint-plugin-react": "^7.0.1",
+    "extract-text-webpack-plugin": "^2.1.0",
+    "favicons-webpack-plugin": "0.0.7",
+    "file-loader": "^0.11.1",
+    "html-loader": "^0.4.5",
+    "html-webpack-plugin": "^2.28.0",
+    "markdown-loader": "^2.0.0",
+    "node-sass": "^4.5.3",
+    "resolve-url-loader": "^2.0.2",
+    "sass-loader": "^6.0.5",
+    "style-loader": "^0.18.1",
+    "url-loader": "^0.5.8",
+    "webpack": "^2.6.1",
+    "webpack-bundle-analyzer": "^2.8.2",
+    "webpack-dev-server": "^2.4.5"
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.23.0",
+    "history": "^4.6.1",
+    "prop-types": "^15.5.10",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4",
+    "react-redux": "^5.0.5",
+    "react-router": "^4.1.1",
+    "react-router-dom": "^4.1.1",
+    "redux": "^3.6.0",
+    "redux-devtools": "^3.4.0"
+  }
+}

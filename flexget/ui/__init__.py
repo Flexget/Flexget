@@ -17,7 +17,6 @@ debug = False
 app_base = None
 
 ui_base = os.path.dirname(os.path.realpath(__file__))
-ui_src = os.path.join(ui_base, 'src')
 ui_dist = os.path.join(ui_base, 'dist')
 
 webui_app = Flask(__name__)
@@ -27,25 +26,21 @@ webui_app.url_path = '/'
 
 @webui_app.route('/<path:path>')
 def serve_app(path):
-    return send_from_directory(app_base, path)
+    return send_from_directory(ui_dist, path)
 
 
 @webui_app.route('/')
 def root():
-    return send_from_directory(app_base, 'index.html')
+    return send_from_directory(ui_dist, 'index.html')
 
 def register_web_ui(mgr):
     global manager, app_base, debug
     manager = mgr
 
-    if not app_base:
-        app_base = ui_dist
-        if not os.path.exists(app_base):
-            log.fatal('Failed to start web ui,'
-                      ' this can happen if you are running from GitHub version and forgot to run the web ui build, '
-                      'see http://flexget.com/wiki/Web-UI for instructions')
-
-            app_base = None
+    if not os.path.exists(ui_dist):
+        log.fatal('Failed to start web ui,'
+                  ' this can happen if you are running from GitHub version and forgot to run the web ui build, '
+                  'see http://flexget.com/wiki/Web-UI for instructions')
 
     register_app(webui_app.url_path, webui_app)
     register_home('%s/' % webui_app.url_path)

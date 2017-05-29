@@ -72,7 +72,7 @@ def build_webui():
 
     # Cleanup previous builds
     click.echo('cleaning previous builds')
-    for folder in ['bower_components' 'node_modules']:
+    for folder in ['node_modules']:
         folder = os.path.join(cwd, folder)
         if os.path.exists(folder):
             click.echo('Deleting recursively {}'.format(folder))
@@ -83,12 +83,8 @@ def build_webui():
     subprocess.check_call('npm install', cwd=cwd, shell=True)
 
     # Build the ui
-    click.echo('running `bower install`')
-    subprocess.check_call('bower install -p', cwd=cwd, shell=True)
-
-    # Build the ui
-    click.echo('running `gulp buildapp`')
-    subprocess.check_call('gulp buildapp', cwd=cwd, shell=True)
+    click.echo('running `npm run build`')
+    subprocess.check_call('npm run build', cwd=cwd, shell=True)
 
 
 if __name__ == '__main__':

@@ -2,20 +2,20 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const webpack = require('webpack');
 const path = require('path');
-const config = require('./weback.shared');
+const config = require('./webpack.shared');
 
 config.entry.main.push(
   'webpack/hot/dev-server',
-  `webpack-dev-server/client?http://localhost:${process.env.PORT}`,
+  `webpack-dev-server/client?http://localhost:${process.env.PORT || 8000}`
 );
-config.ouput = {
+config.output = {
   path: __dirname,
-  fliename: '[name].bundle.js',
-  publicPath: '/'.
+  filename: '[name].bundle.js',
+  publicPath: '/',
 };
 config.devtool = 'source-map';
 config.plugins = [
-  new FaviconsWebpackPlugin(path.resolve('./src/favicon.ico')),
+  new FaviconsWebpackPlugin(path.resolve('./src/favicon.png')),
   new webpack.HotModuleReplacementPlugin(),
   new webpack.NoEmitOnErrorsPlugin(),
   new webpack.NamedModulesPlugin(),
@@ -33,8 +33,5 @@ config.module.rules.push({
   test: /\.s?css$/,
   loaders: ['style-loader', 'css-loader', 'resolve-url-loader', 'sass-loader'],
 });
-config.devServer = {
-  proxy: {
-    '/api': process.env.SERVER || 'http://localhost:5050
-  }
-}
+
+module.exports = config;
