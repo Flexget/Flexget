@@ -34,7 +34,7 @@ class MagnetBtih(object):
                     if info_hash_search:
                         b32hash = info_hash_search.group(1).upper()
                         b16hash = base64.b16encode(base64.b32decode(b32hash))
-                        entry['torrent_info_hash'] = b16hash.upper()
+                        entry['torrent_info_hash'] = b16hash.decode('ascii').upper()
                         break
 
 @event('plugin.register')
