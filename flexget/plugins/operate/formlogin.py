@@ -59,7 +59,11 @@ class FormLogin(object):
         username = config['username']
         password = config['password']
 
-        br = mechanize.Browser(factory=mechanize.RobustFactory())
+        try:
+            br = mechanize.Browser(factory=mechanize.RobustFactory())
+        except Exception:
+            br = mechanize.Browser()
+
         br.add_handler(SanitizeHandler())
         br.set_handle_robots(False)
         try:
