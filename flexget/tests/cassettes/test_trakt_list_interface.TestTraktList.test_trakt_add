@@ -126,4 +126,94 @@ interactions:
       X-Sort-How: [asc]
       X-Xss-Protection: [1; mode=block]
     status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Authorization: [Bearer 336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22]
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/users/me/watchlist/shows
+  response:
+    body: {string: ''}
+    headers:
+      CF-RAY: [366b149edd9e3ca1-CPH]
+      Cache-Control: ['max-age=0, private, no-cache, no-store, must-revalidate']
+      Cf-Railgun: [11bcb0f996 99.99 0.022128 0030 e6be]
+      Connection: [close]
+      Content-Type: [text/html]
+      Date: ['Mon, 29 May 2017 17:12:47 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d6e99c077d04df8a49df9d72746e47e291496077967; expires=Tue,
+          29-May-18 17:12:47 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      Www-Authenticate: ['Bearer realm="Doorkeeper", error="invalid_token", error_description="The
+          access token expired"']
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [195b9916-db18-4909-913b-f59fdfd13875]
+      X-Runtime: ['0.011871']
+      X-Xss-Protection: [1; mode=block]
+    status: {code: 401, message: Unauthorized}
+- request:
+    body: null
+    headers:
+      Authorization: [Bearer 336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22]
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/users/me/watchlist/shows
+  response:
+    body: {string: ''}
+    headers:
+      CF-RAY: [366b26d06c9e3d1f-CPH]
+      Cache-Control: ['max-age=0, private, no-cache, no-store, must-revalidate']
+      Cf-Railgun: [38abc71b28 99.99 0.010214 0030 e6be]
+      Connection: [close]
+      Content-Type: [text/html]
+      Date: ['Mon, 29 May 2017 17:25:12 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d7caf5975fb8e70ef1a27962ff7f364cf1496078712; expires=Tue,
+          29-May-18 17:25:12 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      Www-Authenticate: ['Bearer realm="Doorkeeper", error="invalid_token", error_description="The
+          access token expired"']
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [baae9f84-aa8f-48f8-810a-be8073a3371e]
+      X-Runtime: ['0.006441']
+      X-Xss-Protection: [1; mode=block]
+    status: {code: 401, message: Unauthorized}
+- request:
+    body: null
+    headers:
+      Authorization: [Bearer 336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22]
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/users/me/watchlist/shows
+  response:
+    body: {string: ''}
+    headers:
+      CF-RAY: [366b90fced3d3d07-CPH]
+      Cache-Control: ['max-age=0, private, no-cache, no-store, must-revalidate']
+      Cf-Railgun: [699f736f22 99.99 0.014020 0030 e6be]
+      Connection: [close]
+      Content-Type: [text/html]
+      Date: ['Mon, 29 May 2017 18:37:41 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=dc85cc6d06873fcc5d8f6e6c144cf9b6b1496083061; expires=Tue,
+          29-May-18 18:37:41 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      Www-Authenticate: ['Bearer realm="Doorkeeper", error="invalid_token", error_description="The
+          access token expired"']
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [bb51ce9f-ca6b-4064-b63d-f1e99c79ee43]
+      X-Runtime: ['0.011105']
+      X-Xss-Protection: [1; mode=block]
+    status: {code: 401, message: Unauthorized}
 version: 1
