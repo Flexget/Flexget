@@ -28,8 +28,8 @@ jobs:
     - python: "2.7" # don't want to run this for each python version so picking one
       before_install: nvm install 7
       install:
-        - cd ./flexget/ui && npm install
-      script: cd ./flexget/ui && npm run lint # will run tests as well when that's ready
+        - cd flexget/ui && npm install
+      script: cd nflexget/ui && npm run lint # will run tests as well when that's ready
 notifications:
   email: false
   webhooks:
