@@ -20,6 +20,16 @@ except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
 
+# Enviroment variables to set defaults for `series list` and `series show`
+ENV_SHOW_SORTBY_FIELD = 'FLEXGET_SERIES_SHOW_SORTBY_FIELD'
+ENV_SHOW_SORTBY_ORDER = 'FLEXGET_SERIES_SHOW_SORTBY_ORDER'
+ENV_LIST_CONFIGURED = 'FLEXGET_SERIES_LIST_CONFIGURED'
+ENV_LIST_PREMIERES = 'FLEXGET_SERIES_LIST_PREMIERES'
+ENV_LIST_STATUS = 'FLEXGET_SERIES_LIST_STATUS'
+ENV_LIST_NUMDAYS = 'FLEXGET_SERIES_LIST_NUMDAYS'
+ENV_LIST_SORTBY_FIELD = 'FLEXGET_SERIES_LIST_SORTBY_FIELD'
+ENV_LIST_SORTBY_ORDER = 'FLEXGET_SERIES_LIST_SORTBY_ORDER'
+# Colors for console output
 SORT_COLUMN_COLOR = 'yellow'
 NEW_EP_COLOR = 'green'
 FRESH_EP_COLOR = 'yellow'
@@ -51,26 +61,26 @@ def display_summary(options):
     :param options: argparse options from the CLI
     """
     porcelain = options.table_type == 'porcelain'
-    configured = options.configured or os.environ.get('FLEXGET_SERIES_LIST_CONFIGURED', 'configured')
-    premieres = True if (os.environ.get('FLEXGET_SERIES_LIST_PREMIERES') == 'yes' or
+    configured = options.configured or os.environ.get(ENV_LIST_CONFIGURED, 'configured')
+    premieres = True if (os.environ.get(ENV_LIST_PREMIERES) == 'yes' or
                          options.premieres == 'premieres') else False
-    sort_by = options.sort_by or os.environ.get('FLEXGET_SERIES_LIST_SORTBY_FIELD', 'name')
+    sort_by = options.sort_by or os.environ.get(ENV_LIST_SORTBY_FIELD, 'name')
     if options.order is not None:
         descending = True if options.order == 'desc' else False
     else:
-        descending = True if os.environ.get('FLEXGET_SERIES_LIST_SORTBY_ORDER') == 'desc' else False
+        descending = True if os.environ.get(ENV_LIST_SORTBY_ORDER) == 'desc' else False
     with Session() as session:
         kwargs = {'configured': configured,
                   'premieres': premieres,
                   'session': session,
                   'sort_by': sort_by,
                   'descending': descending}
-        if options.new or os.environ.get('FLEXGET_SERIES_LIST_STATUS') == 'new':
+        if options.new or os.environ.get(ENV_LIST_STATUS) == 'new':
             kwargs['status'] = 'new'
-            kwargs['days'] = options.new or int(os.environ.get('FLEXGET_SERIES_LIST_NUMDAYS', 7))
-        elif options.stale or os.environ.get('FLEXGET_SERIES_LIST_STATUS') == 'stale':
+            kwargs['days'] = options.new or int(os.environ.get(ENV_LIST_NUMDAYS, 7))
+        elif options.stale or os.environ.get(ENV_LIST_STATUS) == 'stale':
             kwargs['status'] = 'stale'
-            kwargs['days'] = options.stale or int(os.environ.get('FLEXGET_SERIES_LIST_NUMDAYS', 365))
+            kwargs['days'] = options.stale or int(os.environ.get(ENV_LIST_NUMDAYS, 365))
         if sort_by == 'name':
             kwargs['sort_by'] = 'show_name'
         else:
@@ -192,11 +202,11 @@ def get_latest_status(episode):
 def display_details(options):
     """Display detailed series information, ie. series show NAME"""
     name = options.series_name
-    sort_by = options.sort_by or os.environ.get('FLEXGET_SERIES_SORTBY_FIELD', 'age')
+    sort_by = options.sort_by or os.environ.get(ENV_SHOW_SORTBY_FIELD, 'age')
     if options.order is not None:
         reverse = True if options.order == 'desc' else False
     else:
-        reverse = True if os.environ.get('FLEXGET_SERIES_SORTBY_ORDER') == 'desc' else False
+        reverse = True if os.environ.get(ENV_SHOW_SORTBY_ORDER) == 'desc' else False
     with Session() as session:
         name = normalize_series_name(name)
         # Sort by length of name, so that partial matches always show shortest matching title
