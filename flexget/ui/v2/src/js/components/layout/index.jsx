@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles, createStyleSheet } from 'material-ui/styles';
+import Logo from 'components/layout/logo';
 
 const SIDEBAR_WIDTH = '190px';
 const HEADER_HEIGHT = '50px';
@@ -20,13 +21,18 @@ const styleSheet = createStyleSheet('Layout', theme => ({
   },
   header: {
     display: 'flex',
-    flexDirection: 'row',
-    height: HEADER_HEIGHT,
+    minHeight: HEADER_HEIGHT,
+    flexDirection: 'column',
+    [theme.media[1024]]: {
+      flexDirection: 'row',
+    },
   },
   logo: {
-    width: SIDEBAR_WIDTH,
+    minWidth: SIDEBAR_WIDTH,
+    height: HEADER_HEIGHT,
   },
   navbar: {
+    height: HEADER_HEIGHT,
     flex: 1,
   },
   sidebar: {
@@ -41,7 +47,7 @@ const Layout = ({ children, classes }) => (
   <div className={classes.layout}>
     <div className={classes.header}>
       <div className={classes.logo}>
-        LOGO
+        <Logo />
       </div>
       <div className={classes.navbar}>
         navbar

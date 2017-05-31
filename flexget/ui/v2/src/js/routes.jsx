@@ -16,6 +16,9 @@ const theme = createMuiTheme({
     accent: blueGrey,
     error: red,
   }),
+  media: {
+    1024: '@media (min-width: 1023px)',
+  },
 });
 
 const Root = () => (
