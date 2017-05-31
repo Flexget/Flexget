@@ -3,6 +3,7 @@ const path = require('path');
 module.exports = {
   entry: {
     main: [
+      'babel-polyfill',
       './src/js/app.jsx',
     ],
     vendor: [

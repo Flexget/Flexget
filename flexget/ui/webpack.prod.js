@@ -49,7 +49,7 @@ config.plugins = [
 ];
 config.module.rules.push({
   test: /\.s?css$/,
-  loader: ExtractTextPlugin.extract(['css-loader', 'resolve-url-loader', 'sass-loader']),
+  loader: ExtractTextPlugin.extract(['css-loader', 'resolve-url-loader']),
 });
 
 module.exports = config;

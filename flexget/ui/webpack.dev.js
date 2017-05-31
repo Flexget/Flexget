@@ -31,7 +31,7 @@ config.plugins = [
 ];
 config.module.rules.push({
   test: /\.s?css$/,
-  loaders: ['style-loader', 'css-loader', 'resolve-url-loader', 'sass-loader'],
+  loaders: ['style-loader', 'css-loader', 'resolve-url-loader'],
 });
 
 module.exports = config;

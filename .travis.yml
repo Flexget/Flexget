@@ -32,6 +32,7 @@ jobs:
       install:
         - npm install
       script: npm run lint # will run tests as well when that's ready
+      after_success: skip # will upload coverage when that's ready
 notifications:
   email: false
   webhooks:
