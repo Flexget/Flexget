@@ -305,4 +305,4 @@ def register_parser_arguments():
     forget_parser.add_argument('episode_id', nargs='*', default=None, help='Entity ID(s) to forget (optional)')
     delete_parser = subparsers.add_parser('remove', parents=[series_parser],
                                           help='Removes episodes or whole series from the series database only')
-    delete_parser.add_argument('episode_id', nargs='?', default=None, help='Episode ID to forget (optional)')
+    delete_parser.add_argument('episode_id', nargs='*', default=None, help='Episode ID to forget (optional)')
