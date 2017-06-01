@@ -49,7 +49,8 @@ class PendingEntry(Base):
 
 
 class PendingApproval(object):
-    schema = {'type': 'boolean'}
+    schema = {'type': 'boolean',
+              'deprecated': 'pending_approval is deprecated, switch to using pending_list'}
 
     @staticmethod
     def _item_query(entry, task, session):
