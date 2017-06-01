@@ -244,7 +244,7 @@ class ValidationError(APIError):
     status_code = 422
     description = 'Validation error'
 
-    response_model = api.inherit('validation_error', APIError.response_model, {
+    response_model = api.schema_model('validation_error', {
         'type': 'object',
         'properties': {
             'validation_errors': {
