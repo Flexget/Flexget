@@ -12,7 +12,7 @@ const styleSheet = createStyleSheet('InfoCard', theme => ({
     margin: '0 auto',
   },
   cardHeader: {
-    backgroundColor: theme.palette.primary[500],
+    backgroundColor: theme.palette.primary[800],
   },
   boldText: {
     fontWeight: 'bold',

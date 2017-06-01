@@ -12,13 +12,13 @@ import { orange, blueGrey, red } from 'material-ui/styles/colors';
 
 const theme = createMuiTheme({
   palette: createPalette({
-    primary: orange,
+    primary: {
+      ...orange,
+      contrastDefaultColor: 'light',
+    },
     accent: blueGrey,
     error: red,
   }),
-  media: {
-    1024: '@media (min-width: 1023px)',
-  },
 });
 
 const Root = () => (

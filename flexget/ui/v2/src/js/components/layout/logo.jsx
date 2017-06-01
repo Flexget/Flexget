@@ -1,19 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import headerImage from 'images/header.png';
 import { withStyles, createStyleSheet } from 'material-ui/styles';
 
 const styleSheet = createStyleSheet('Logo', theme => ({
   logo: {
     background: `${theme.palette.accent[900]} url(${headerImage}) no-repeat center`,
-    backgroundSize: '175px',
+    backgroundSize: 175,
     transition: 'width 0.5s ease',
     height: '100%',
     width: '100%',
   },
 }));
 
-const Logo = ({ classes }) => <div className={classes.logo} />;
+const Logo = ({ classes }) => (
+  <Link to="/">
+    <div className={classes.logo} />
+  </Link>
+);
+
 
 Logo.propTypes = {
   classes: PropTypes.object.isRequired,

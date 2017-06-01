@@ -2,9 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles, createStyleSheet } from 'material-ui/styles';
 import Logo from 'components/layout/logo';
+import Navbar from 'components/layout/navbar';
 
-const SIDEBAR_WIDTH = '190px';
-const HEADER_HEIGHT = '50px';
+const SIDEBAR_WIDTH = 190;
+const HEADER_HEIGHT = 50;
+const PADDING = 10;
 
 const styleSheet = createStyleSheet('Layout', theme => ({
   layout: {
@@ -12,18 +14,23 @@ const styleSheet = createStyleSheet('Layout', theme => ({
     fontFamily: 'Roboto',
     display: 'flex',
     flexDirection: 'column',
-    height: '100vh',
+    height: '100%',
+    minHeight: '100vh',
   },
   main: {
     display: 'flex',
     flexDirection: 'row',
+    marginTop: HEADER_HEIGHT,
     height: '100%',
   },
   header: {
     display: 'flex',
     minHeight: HEADER_HEIGHT,
     flexDirection: 'column',
-    [theme.media[1024]]: {
+    zIndex: 2,
+    position: 'fixed',
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
       flexDirection: 'row',
     },
   },
@@ -37,9 +44,13 @@ const styleSheet = createStyleSheet('Layout', theme => ({
   },
   sidebar: {
     width: SIDEBAR_WIDTH,
+    padding: PADDING,
   },
   content: {
     flex: 1,
+    position: 'relative',
+    overflowY: 'auto',
+    padding: PADDING,
   },
 }));
 
@@ -50,7 +61,7 @@ const Layout = ({ children, classes }) => (
         <Logo />
       </div>
       <div className={classes.navbar}>
-        navbar
+        <Navbar />
       </div>
     </div>
     <div className={classes.main}>
