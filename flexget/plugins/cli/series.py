@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import argparse
+import os
 from datetime import timedelta
 
 from colorclass.toggles import disable_all_colors
@@ -19,8 +20,17 @@ except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
 
-
+# Enviroment variables to set defaults for `series list` and `series show`
+ENV_SHOW_SORTBY_FIELD = 'FLEXGET_SERIES_SHOW_SORTBY_FIELD'
+ENV_SHOW_SORTBY_ORDER = 'FLEXGET_SERIES_SHOW_SORTBY_ORDER'
+ENV_LIST_CONFIGURED = 'FLEXGET_SERIES_LIST_CONFIGURED'
+ENV_LIST_PREMIERES = 'FLEXGET_SERIES_LIST_PREMIERES'
+ENV_LIST_STATUS = 'FLEXGET_SERIES_LIST_STATUS'
+ENV_LIST_NUMDAYS = 'FLEXGET_SERIES_LIST_NUMDAYS'
+ENV_LIST_SORTBY_FIELD = 'FLEXGET_SERIES_LIST_SORTBY_FIELD'
+ENV_LIST_SORTBY_ORDER = 'FLEXGET_SERIES_LIST_SORTBY_ORDER'
 ENV_ADD_QUALITY = 'FLEXGET_SERIES_ADD_QUALITY'
+# Colors for console output
 SORT_COLUMN_COLOR = 'yellow'
 NEW_EP_COLOR = 'green'
 FRESH_EP_COLOR = 'yellow'
@@ -54,19 +64,27 @@ def display_summary(options):
     :param options: argparse options from the CLI
     """
     porcelain = options.table_type == 'porcelain'
+    configured = options.configured or os.environ.get(ENV_LIST_CONFIGURED, 'configured')
+    premieres = True if (os.environ.get(ENV_LIST_PREMIERES) == 'yes' or
+                         options.premieres) else False
+    sort_by = options.sort_by or os.environ.get(ENV_LIST_SORTBY_FIELD, 'name')
+    if options.order is not None:
+        descending = True if options.order == 'desc' else False
+    else:
+        descending = True if os.environ.get(ENV_LIST_SORTBY_ORDER) == 'desc' else False
     with Session() as session:
-        kwargs = {'configured': options.configured,
-                  'premieres': options.premieres,
+        kwargs = {'configured': configured,
+                  'premieres': premieres,
                   'session': session,
-                  'sort_by': options.sort_by,
-                  'descending': options.order}
-        if options.new:
+                  'sort_by': sort_by,
+                  'descending': descending}
+        if options.new or os.environ.get(ENV_LIST_STATUS) == 'new':
             kwargs['status'] = 'new'
-            kwargs['days'] = options.new
-        elif options.stale:
+            kwargs['days'] = options.new or int(os.environ.get(ENV_LIST_NUMDAYS, 7))
+        elif options.stale or os.environ.get(ENV_LIST_STATUS) == 'stale':
             kwargs['status'] = 'stale'
-            kwargs['days'] = options.stale
-        if options.sort_by == 'name':
+            kwargs['days'] = options.stale or int(os.environ.get(ENV_LIST_NUMDAYS, 365))
+        if sort_by == 'name':
             kwargs['sort_by'] = 'show_name'
         else:
             kwargs['sort_by'] = 'last_download_date'
@@ -187,8 +205,11 @@ def get_latest_status(episode):
 def display_details(options):
     """Display detailed series information, ie. series show NAME"""
     name = options.series_name
-    sort_by = options.sort_by
-    reverse = options.order
+    sort_by = options.sort_by or os.environ.get(ENV_SHOW_SORTBY_FIELD, 'age')
+    if options.order is not None:
+        reverse = True if options.order == 'desc' else False
+    else:
+        reverse = True if os.environ.get(ENV_SHOW_SORTBY_ORDER) == 'desc' else False
     with Session() as session:
         name = normalize_series_name(name)
         # Sort by length of name, so that partial matches always show shortest matching title
@@ -300,7 +321,6 @@ def register_parser_arguments():
     list_parser = subparsers.add_parser('list', parents=[table_parser],
                                         help='List a summary of the different series being tracked')
     list_parser.add_argument('configured', nargs='?', choices=['configured', 'unconfigured', 'all'],
-                             default='configured',
                              help='Limit list to series that are currently in the config or not (default: %(default)s)')
     list_parser.add_argument('--premieres', action='store_true',
                              help='limit list to series which only have episode 1 (and maybe also 2) downloaded')
@@ -310,19 +330,20 @@ def register_parser_arguments():
     list_parser.add_argument('--stale', nargs='?', type=int, metavar='DAYS', const=365,
                              help='Limit list to series which have not seen a release in %(const)s days. number of '
                                   'days can be overridden with %(metavar)s')
-    list_parser.add_argument('--sort-by', choices=('name', 'age'), default='name',
-                             help='Choose list sort attribute')
+    list_parser.add_argument('--sort-by', choices=('name', 'age'), help='Choose list sort attribute')
     order = list_parser.add_mutually_exclusive_group(required=False)
-    order.add_argument('--descending', dest='order', action='store_true', help='Sort in descending order')
-    order.add_argument('--ascending', dest='order', action='store_false', help='Sort in ascending order')
+    order.add_argument('--descending', dest='order', action='store_const', const='desc', help='Sort in descending order')
+    order.add_argument('--ascending', dest='order', action='store_const', const='asc', help='Sort in ascending order')
 
     show_parser = subparsers.add_parser('show', parents=[series_parser, table_parser],
                           help='Show the releases FlexGet has seen for a given series')
-    show_parser.add_argument('--sort-by', choices=('age', 'identifier'), default='age',
+    show_parser.add_argument('--sort-by', choices=('age', 'identifier'),
                              help='Choose releases list sort: age (default) or identifier')
     show_order = show_parser.add_mutually_exclusive_group(required=False)
-    show_order.add_argument('--descending', dest='order', action='store_true', help='Sort in descending order')
-    show_order.add_argument('--ascending', dest='order', action='store_false', help='Sort in ascending order')
+    show_order.add_argument('--descending', dest='order', action='store_const', const='desc',
+                            help='Sort in descending order')
+    show_order.add_argument('--ascending', dest='order', action='store_const', const='asc',
+                            help='Sort in ascending order')
 
     begin_parser = subparsers.add_parser('begin', parents=[series_parser],
                                          help='set the episode to start getting a series from')
