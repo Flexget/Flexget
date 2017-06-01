@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from future.moves.urllib.parse import urlparse
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
@@ -34,6 +35,9 @@ class OutputAria2(object):
             'password': {'type': 'string', 'default': ''},
             'path': {'type': 'string'},
             'filename': {'type': 'string'},
+            'keep_structure': {'type': 'boolean', 'default': False},
+            'render_options': {'type': 'boolean', 'default': False},
+            'uri': {'type': 'string'},
             'options': {
                 'type': 'object',
                 'additionalProperties': {'oneOf': [{'type': 'string'}, {'type': 'integer'}]}
@@ -56,10 +60,10 @@ class OutputAria2(object):
             return xmlrpc.client.ServerProxy(url).aria2
         except xmlrpc.client.ProtocolError as err:
             raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s'
-                              % (url, err.errcode, err.errmsg), log)
+                                     % (url, err.errcode, err.errmsg), log)
         except xmlrpc.client.Fault as err:
             raise plugin.PluginError('XML-RPC fault: Unable to connect to aria2 daemon at %s: %s'
-                              % (url, err.faultString), log)
+                                     % (url, err.faultString), log)
         except socket_error as e:
             raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s' % (url, e), log)
         except:
@@ -83,36 +87,76 @@ class OutputAria2(object):
         aria2 = self.aria2_connection(config['server'], config['port'],
                                       config['username'], config['password'])
         for entry in task.accepted:
-            if task.options.test:
-                log.verbose('Would add `%s` to aria2.', entry['title'])
-                continue
-            try:
-                self.add_entry(aria2, entry, config)
-            except socket_error as se:
-                entry.fail('Unable to reach Aria2: %s', se)
-            except xmlrpc.client.Fault as err:
-                log.critical('Fault code %s message %s', err.faultCode, err.faultString)
-                entry.fail('Aria2 communication Fault')
-            except Exception as e:
-                log.debug('Exception type %s', type(e), exc_info=True)
-                raise
+            # check for content_files first, then use url or title if not
+            if 'content_files' not in entry:
+                if entry['url']:
+                    entry['content_files'] = [entry['url']]
+                else:
+                    entry['content_files'] = [entry['title']]
+            else:
+                if not isinstance(entry['content_files'], list):
+                    entry['content_files'] = [entry['content_files']]
+            for current_file in entry['content_files']:
+                # expose current filename for rendering purposes
+                entry['current_file'] = current_file
+                if task.options.test:
+                    log.verbose('Would add `%s` to aria2.', entry['current_file'])
+                    continue
+                try:
+                    self.add_entry(aria2, entry, config)
+                except socket_error as se:
+                    entry.fail('Unable to reach Aria2: %s', se)
+                except xmlrpc.client.Fault as err:
+                    log.critical('Fault code %s message %s', err.faultCode, err.faultString)
+                    entry.fail('Aria2 communication Fault')
+                except Exception as e:
+                    log.debug('Exception type %s', type(e), exc_info=True)
+                    raise
+                else:
+                    log.verbose('Added to aria2: `%s`', entry['current_file'])
 
     def add_entry(self, aria2, entry, config):
         """
         Add entry to Aria2
         """
+        # reset every loop or it won't work correctly after the first
         options = config['options']
         try:
             options['dir'] = os.path.expanduser(entry.render(config['path']).rstrip('/'))
         except RenderError as e:
             entry.fail('failed to render \'path\': %s' % e)
             return
+        if config['keep_structure']:
+            # TODO: consider case where current_file is a URL using urlparse,
+            #       to strip out protocol & hostname
+            options['dir'] = os.path.join(options['dir'], os.path.dirname(entry['current_file']))
         if 'filename' in config:
-             try:
-                 options['out'] = os.path.expanduser(entry.render(config['filename']))
-             except RenderError as e:
-                 entry.fail('failed to render \'filename\': %s' % e)
-                 return
+            try:
+                options['out'] = os.path.expanduser(entry.render(config['filename']))
+            except RenderError as e:
+                entry.fail('failed to render \'filename\': %s' % e)
+                return
+        if 'uri' in config:
+            try:
+                aria2url = entry.render(config['uri'])
+            except RenderError as e:
+                entry.fail('failed to render \'URI\': %s' % e)
+                return
+        elif entry['url']:
+            aria2url = entry['url']
+        else:
+            aria2url = ''
+        if config['render_options']:
+            for opt_key, opt_value in options.items():
+                if opt_key == 'dir' or opt_key == 'out':
+                    # these were already rendered, don't re-render
+                    continue
+                try:
+                    options[opt_key] = entry.render(opt_value)
+                except RenderError as e:
+                    entry.fail('failed to render \'%s\': %s' % opt_key, e)
+                    return
+
         secret = None
         if config['secret']:
             secret = 'token:%s' % config['secret']
@@ -131,9 +175,14 @@ class OutputAria2(object):
             return aria2.addTorrent(xmlrpc.client.Binary(open(torrent_file, mode='rb').read()), [], options)
         # handle everything else (except metalink -- which is unsupported)
         # so magnets, https, http, ftp .. etc
+        if not aria2url:
+            entry.fail('uri option is not set and URL is not present in entry; unable to determine what to download')
+            return
         if secret:
-            return aria2.addUri(secret, [entry['url']], options)
-        return aria2.addUri([entry['url']], options)
+            log.debug(aria2url)
+            log.debug(options)
+            return aria2.addUri(secret, [aria2url], options)
+        return aria2.addUri([aria2url], options)
 
 
 @event('plugin.register')
