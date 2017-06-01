@@ -66,7 +66,7 @@ def display_summary(options):
     porcelain = options.table_type == 'porcelain'
     configured = options.configured or os.environ.get(ENV_LIST_CONFIGURED, 'configured')
     premieres = True if (os.environ.get(ENV_LIST_PREMIERES) == 'yes' or
-                         options.premieres == 'premieres') else False
+                         options.premieres) else False
     sort_by = options.sort_by or os.environ.get(ENV_LIST_SORTBY_FIELD, 'name')
     if options.order is not None:
         descending = True if options.order == 'desc' else False
@@ -322,7 +322,7 @@ def register_parser_arguments():
                                         help='List a summary of the different series being tracked')
     list_parser.add_argument('configured', nargs='?', choices=['configured', 'unconfigured', 'all'],
                              help='Limit list to series that are currently in the config or not (default: %(default)s)')
-    list_parser.add_argument('--premieres', action='store_const', const='premieres',
+    list_parser.add_argument('--premieres', action='store_true',
                              help='limit list to series which only have episode 1 (and maybe also 2) downloaded')
     list_parser.add_argument('--new', nargs='?', type=int, metavar='DAYS', const=7,
                              help='Limit list to series with a release seen in last %(const)s days. number of days can '
