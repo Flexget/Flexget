@@ -141,25 +141,38 @@ def display_summary(options):
 def begin(manager, options):
     series_name = options.series_name
     series_name = series_name.replace(r'\!', '!')
-    ep_id = options.episode_id
     normalized_name = normalize_series_name(series_name)
     with Session() as session:
         series = shows_by_exact_name(normalized_name, session)
-        if not series:
-            console('Series not yet in database, adding `%s`' % series_name)
-            series = Series()
-            series.name = series_name
-            session.add(series)
-        else:
-            series = series[0]
-        try:
-            set_series_begin(series, ep_id)
-        except ValueError as e:
-            console(e)
-        else:
-            console('Episodes for `%s` will be accepted starting with `%s`' % (series.name, ep_id))
-            session.commit()
-        manager.config_changed()
+        if options.forget:
+            if not series:
+                console('Series `%s` was not found in the database.' % series_name)
+            else:
+                series = series[0]
+                series.begin = None
+                console('The begin episode for `%s` has been forgotten.' % series.name)
+                session.commit()
+                manager.config_changed()
+        elif options.episode_id:
+            ep_id = options.episode_id
+            if not series:
+                console('Series not yet in database. Adding `%s`.' % series_name)
+                series = Series()
+                series.name = series_name
+                session.add(series)
+            else:
+                series = series[0]
+            try:
+                _, entity_type = set_series_begin(series, ep_id)
+            except ValueError as e:
+                console(e)
+            else:
+                if entity_type == 'season':
+                    console('`%s` was identified as a season.' % ep_id)
+                    ep_id += 'E01'
+                console('Releases for `%s` will be accepted starting with `%s`.' % (series.name, ep_id))
+                session.commit()
+            manager.config_changed()
 
 
 def remove(manager, options, forget=False):
@@ -267,10 +280,12 @@ def display_details(options):
                        ' Few duplicate downloads can happen with different numbering schemes\n'
                        ' during this time.')
         else:
-            footer += '\n Series uses `%s` mode to identify episode numbering (identified_by).' % series.identified_by
-        footer += ' \n See option `identified_by` for more information.'
+            footer += '\n `%s` uses `%s` mode to identify episode numbering.' % (series.name, series.identified_by)
+        begin_text = 'option'
         if series.begin:
-            footer += ' \n Begin episode for this series set to `%s`.' % series.begin.identifier
+            footer += ' \n Begin for `%s` is set to `%s`.' % (series.name, series.begin.identifier)
+            begin_text = 'and `begin` options'
+        footer += ' \n See `identified_by` %s for more information.' % begin_text
     try:
         table = TerminalTable(options.table_type, table_data, table_title, drop_columns=[4, 3, 1])
         console(table.output)
@@ -347,9 +362,12 @@ def register_parser_arguments():
 
     begin_parser = subparsers.add_parser('begin', parents=[series_parser],
                                          help='set the episode to start getting a series from')
-    begin_parser.add_argument('episode_id', metavar='<episode ID>',
+    begin_opts = begin_parser.add_mutually_exclusive_group(required=True)
+    begin_opts.add_argument('--forget', dest='forget', action='store_true', help='Forget begin episode', required=False)
+    begin_opts.add_argument('episode_id', metavar='<episode ID>',
                               help='Episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, '
-                                   'depending on how the series is numbered)')
+                                   'depending on how the series is numbered). You can also enter a season ID such as '
+                                   ' S02.', nargs='?', default='')
 
     addshow_parser = subparsers.add_parser('add', parents=[series_parser],
                                            help='Add episode(s) and season(s) to series history')

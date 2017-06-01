@@ -1478,6 +1478,13 @@ class TestBegin(object):
               - {title: 'WTest.S02E03.HDTV.XViD-FlexGet'}
               - {title: 'W2Test.S02E03.HDTV.XViD-FlexGet'}
         tasks:
+          season_id_test:
+            template: eps
+            series:
+              - WTest:
+                  begin: S02
+              - W2Test:
+                  begin: S03
           before_ep_test:
             template: eps
             series:
@@ -1546,6 +1553,13 @@ class TestBegin(object):
                 begin: S03E01
 
     """
+
+    def test_season_id(self, execute_task):
+        task = execute_task('season_id_test')
+        assert task.find_entry('accepted', title='WTest.S02E03.HDTV.XViD-FlexGet'), 'Entry should have been ' \
+               'accepted, it\'s after the begin episode'
+        assert task.find_entry('rejected', title='W2Test.S02E03.HDTV.XViD-FlexGet'), 'Entry should have been ' \
+               'rejected, it\'s before the begin episode'
 
     def test_before_ep(self, execute_task):
         task = execute_task('before_ep_test')

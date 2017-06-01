@@ -476,7 +476,7 @@ def get_config_hash(config):
         return hashlib.md5(str(config).encode('utf-8')).hexdigest()
 
 
-def parse_episode_identifier(ep_id):
+def parse_episode_identifier(ep_id, identify_season=False):
     """
     Parses series episode identifier, raises ValueError if it fails
 
@@ -486,12 +486,16 @@ def parse_episode_identifier(ep_id):
     """
     error = None
     identified_by = None
+    entity_type = 'episode'
     if isinstance(ep_id, int):
         if ep_id <= 0:
             error = 'sequence type episode must be higher than 0'
         identified_by = 'sequence'
     elif re.match(r'(?i)^S\d{1,4}E\d{1,3}$', ep_id):
         identified_by = 'ep'
+    elif re.match(r'(?i)^S\d{1,4}$', ep_id) and identify_season:
+        identified_by = 'ep'
+        entity_type = 'season'
     elif re.match(r'\d{4}-\d{2}-\d{2}', ep_id):
         identified_by = 'date'
     else:
@@ -505,4 +509,4 @@ def parse_episode_identifier(ep_id):
             error = '`%s` is not a valid episode identifier.' % ep_id
     if error:
         raise ValueError(error)
-    return identified_by
+    return (identified_by, entity_type)
