@@ -14,11 +14,13 @@ try:
     from flexget.plugins.filter.series import (Series, remove_series, remove_series_entity, set_series_begin,
                                                normalize_series_name, new_entities_after, get_latest_release,
                                                get_series_summary, shows_by_name, show_episodes, shows_by_exact_name,
-                                               get_all_entities)
+                                               get_all_entities, add_series_entity)
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
 
+
+ENV_ADD_QUALITY = 'FLEXGET_SERIES_ADD_QUALITY'
 SORT_COLUMN_COLOR = 'yellow'
 NEW_EP_COLOR = 'green'
 FRESH_EP_COLOR = 'yellow'
@@ -42,6 +44,8 @@ def do_cli(manager, options):
         remove(manager, options, forget=True)
     elif options.series_action == 'begin':
         begin(manager, options)
+    elif options.series_action == 'add':
+        add(manager, options)
 
 
 def display_summary(options):
@@ -256,6 +260,32 @@ def display_details(options):
         console(footer)
 
 
+def add(manager, options):
+    series_name = options.series_name
+    entity_ids = options.entity_id
+    quality = options.quality or os.environ.get(ENV_ADD_QUALITY, None)
+    series_name = series_name.replace(r'\!', '!')
+    normalized_name = normalize_series_name(series_name)
+    with Session() as session:
+        series = shows_by_exact_name(normalized_name, session)
+        if not series:
+            console('Series not yet in database, adding `%s`' % series_name)
+            series = Series()
+            series.name = series_name
+            session.add(series)
+        else:
+            series = series[0]
+        for ent_id in entity_ids:
+            try:
+                add_series_entity(session, series, ent_id, quality=quality)
+            except ValueError as e:
+                console(e.args[0])
+            else:
+                console('Added entity `%s` to series `%s`.' % (ent_id, series.name.title()))
+        session.commit()
+    manager.config_changed()
+
+
 @event('options.register')
 def register_parser_arguments():
     # Register the command
@@ -299,6 +329,14 @@ def register_parser_arguments():
     begin_parser.add_argument('episode_id', metavar='<episode ID>',
                               help='Episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, '
                                    'depending on how the series is numbered)')
+
+    addshow_parser = subparsers.add_parser('add', parents=[series_parser],
+                                           help='Add episode(s) and season(s) to series history')
+    addshow_parser.add_argument('entity_id', nargs='+', default=None, metavar='<entity_id>',
+                                help='Episode or season entity ID(s) to add')
+    addshow_parser.add_argument('--quality', default=None, metavar='<quality>',
+                                help='Quality string to be stored for all entity ID(s)')
+
     forget_parser = subparsers.add_parser('forget', parents=[series_parser],
                                           help='Removes episodes or whole series from the entire database '
                                                '(including seen plugin)')
