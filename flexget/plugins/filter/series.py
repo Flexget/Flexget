@@ -1005,6 +1005,30 @@ def set_series_begin(series, ep_id):
     return (identified_by, entity_type)
 
 
+def add_series_entity(session, series, identifier, quality=None):
+    """
+    Adds entity identified by `identifier` to series `name` in database.
+
+    :param series: Series in database to add entity to.
+    :param identifier: Series identifier to be added.
+    :param quality: If supplied, this will override the quality from the series parser.
+    """
+    name_to_parse = '{} {}'.format(series.name, identifier)
+    if quality:
+        name_to_parse += ' {}'.format(quality)
+    parsed = get_plugin_by_name('parsing').instance.parse_series(name_to_parse, name=series.name)
+    if not parsed.valid:
+        raise ValueError('Invalid identifier for series `{}`: `{}`.'.format(series.name, identifier))
+
+    added = store_parser(session, parsed, series=series)
+    if not added:
+        raise ValueError('Unable to add `%s` to series `%s`.' % (identifier, series.name.capitalize()))
+    else:
+        for release in added:
+            release.downloaded = True
+        log.debug('Entity `%s` from series `%s` added to database.', identifier, series.name)
+
+
 def remove_series(name, forget=False):
     """
     Remove a whole series `name` from database.
