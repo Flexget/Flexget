@@ -17,6 +17,8 @@ jsonschema>=2.0
 path.py>=8.1.1
 pathlib>=1.0
 guessit<=2.0.4
+# Rebulk changes how guessit works higher than 0.8.2
+rebulk==0.8.2
 apscheduler>=3.2.0
 terminaltables>=3.1.0
 colorclass>=2.2.0
