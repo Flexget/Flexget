@@ -17,11 +17,12 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.database import entry_synonym, with_session
 
-log = logging.getLogger('pending_list')
-Base = versioned_base('pending_list', 0)
+plugin_name = 'pending_list'
+log = logging.getLogger(plugin_name)
+Base = versioned_base(plugin_name, 0)
 
 
-@db_schema.upgrade('pending_list')
+@db_schema.upgrade(plugin_name)
 def upgrade(ver, session):
     ver = 0
     return ver
@@ -62,7 +63,7 @@ class PendingListEntry(Base):
 
     def __repr__(self):
         return '<PendingListEntry,title=%s,original_url=%s,approved=%s>' % (
-        self.title, self.original_url, self.approved)
+            self.title, self.original_url, self.approved)
 
     def to_dict(self):
         return {
@@ -172,7 +173,7 @@ class PendingList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PendingList, 'pending_list', api_ver=2, groups=['list'])
+    plugin.register(PendingList, plugin_name, api_ver=2, groups=['list'])
 
 
 @with_session

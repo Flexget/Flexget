@@ -8,11 +8,14 @@ from math import ceil
 from flask import jsonify, request
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.plugins.list.pending_list import get_pending_lists, get_list_by_exact_name, PendingListList, \
-    get_list_by_id, delete_list_by_id, get_entries_by_list_id, get_entry_by_title, PendingListEntry, get_entry_by_id
+from flexget.plugins.list.pending_list import (
+    get_pending_lists, get_list_by_exact_name, PendingListList, get_list_by_id, delete_list_by_id,
+    get_entries_by_list_id, get_entry_by_title, PendingListEntry, get_entry_by_id
+)
 from flexget.api import api, APIResource
-from flexget.api.app import NotFoundError, base_message_schema, success_response, etag, pagination_headers, \
-    Conflict, BadRequest
+from flexget.api.app import (
+    NotFoundError, base_message_schema, success_response, etag, pagination_headers, Conflict,
+    BadRequest)
 
 log = logging.getLogger('pending_list')
 
@@ -58,12 +61,22 @@ class ObjectsContainer(object):
         }
     }
 
+    operation_object = {
+        'type': 'object',
+        'properties': {
+            'operation': {'type': 'string', 'enum': ['approve', 'reject']}
+        },
+        'required': ['operation'],
+        'additionalProperties': False
+    }
+
     pending_lists_entries_return_object = {'type': 'array', 'items': pending_list_entry_base_object}
 
 
 pending_list_object_schema = api.schema('pending_list.return_list', ObjectsContainer.pending_list_base_object)
 pending_list_input_object_schema = api.schema('pending_list.input_list', ObjectsContainer.pending_list_input_object)
 pending_list_return_lists_schema = api.schema('pending_list.return_lists', ObjectsContainer.pending_list_return_lists)
+pending_list_operation_schema = api.schema('pending_list.operation_schema', ObjectsContainer.operation_object)
 
 list_parser = api.parser()
 list_parser.add_argument('name', help='Filter results by list name')
@@ -258,22 +271,22 @@ class PendingListEntryAPI(APIResource):
 
     @api.validate(model=base_entry_schema)
     @api.response(201, model=pending_list_entry_base_schema)
-    @api.doc(description='Sent entry data will override any existing entry data the existed before')
+    @api.validate(pending_list_operation_schema)
+    @api.doc(description='Approve or reject an entry\'s status')
     def put(self, list_id, entry_id, session=None):
-        """ Sets entry object's entry data """
+        """Sets entry object's pending status"""
         try:
             entry = get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
             raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
         data = request.json
-        entry.entry = data
-        if data.get('title'):
-            entry.title = data['title']
-        if data.get('original_url'):
-            entry.original_url = data['original_url']
-        if data.get('approved'):
-            entry.approved = data['approved']
+        approved = data['operation'] == 'approve'
+        operation_text = 'approved' if approved else 'pending'
+        if entry.approved is approved:
+            raise BadRequest('Entry with id {} is already {}'.format(entry_id, operation_text))
+
+        entry.approved = approved
         session.commit()
-        resp = jsonify(entry.to_dict())
-        resp.status_code = 201
-        return resp
+        rsp = jsonify(entry.to_dict())
+        rsp.status_code = 201
+        return rsp
