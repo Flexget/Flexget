@@ -19,6 +19,8 @@ except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
 
+
+ENV_ADD_QUALITY = 'FLEXGET_SERIES_ADD_QUALITY'
 SORT_COLUMN_COLOR = 'yellow'
 NEW_EP_COLOR = 'green'
 FRESH_EP_COLOR = 'yellow'
@@ -261,7 +263,7 @@ def display_details(options):
 def add(manager, options):
     series_name = options.series_name
     entity_ids = options.entity_id
-    quality = options.quality
+    quality = options.quality or os.environ.get(ENV_ADD_QUALITY, None)
     series_name = series_name.replace(r'\!', '!')
     normalized_name = normalize_series_name(series_name)
     with Session() as session:
