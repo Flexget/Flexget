@@ -1010,11 +1010,13 @@ def add_series_entity(session, series, identifier, quality=None):
     :param quality: If supplied, this will override the quality from the series parser.
     """
     name_to_parse = '{} {}'.format(series.name, identifier)
+    if quality:
+        name_to_parse += ' {}'.format(quality)
     parsed = get_plugin_by_name('parsing').instance.parse_series(name_to_parse, name=series.name)
     if not parsed.valid:
         raise ValueError('Invalid identifier for series `{}`: `{}`.'.format(series.name, identifier))
 
-    added = store_parser(session, parsed, series=series, quality=quality)
+    added = store_parser(session, parsed, series=series)
     if not added:
         raise ValueError('Unable to add `%s` to series `%s`.' % (identifier, series.name.capitalize()))
     else:
