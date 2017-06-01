@@ -3,13 +3,15 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import xml.etree.ElementTree as ET
+
 import requests
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from requests.exceptions import RequestException
+from flexget.utils.tools import merge_by_prefix
 
 plugin_name = 'notifymyandroid'
 log = logging.getLogger(plugin_name)
@@ -47,10 +49,12 @@ class NotifyMyAndroidNotifier(object):
         'additionalProperties': False
     }
 
-    def notify(self, title, message, config):
+    def notify(self, title, message, config, entry=None):
         """
         Send a Notifymyandroid notification
         """
+        if entry:
+            merge_by_prefix(plugin_name + '_', dict(entry), config)
         notification = {'event': title, 'description': message, 'application': config.get('application'),
                         'priority': config.get('priority'), 'developerkey': config.get('developer_key'),
                         'url': config.get('url')}

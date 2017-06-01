@@ -4,12 +4,14 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import datetime
 import logging
 
+from requests.exceptions import RequestException
+
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
-from requests.exceptions import RequestException
+from flexget.utils.tools import merge_by_prefix
 
 plugin_name = 'pushover'
 log = logging.getLogger(plugin_name)
@@ -62,14 +64,25 @@ class PushoverNotifier(object):
         'additionalProperties': False
     }
 
-    def notify(self, title, message, config):
+    def notify(self, title, message, config, entry=None):
         """
         Sends a Pushover notification
 
         :param str title: the message's title
         :param str message: the message to send
         :param dict config: The pushover config
+        :param Entry: Passed entry. Can be used to override config
         """
+
+        # Enables using 'set' plugin to override plugin config, using plugin name and underscore as prefix
+        # Example:
+        #
+        # set:
+        #   pushover_url: http://newurl.com
+        #
+
+        if entry:
+            merge_by_prefix(plugin_name + '_', dict(entry), config)
         notification = {'token': config.get('api_key'), 'message': message, 'title': title,
                         'device': config.get('device'), 'priority': config.get('priority'), 'url': config.get('url'),
                         'url_title': config.get('url_title'), 'sound': config.get('sound'),

@@ -1,10 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from time import sleep
-
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
+
 from flexget.plugin import PluginWarning
 from flexget.plugins.notifiers.pushover import PushoverNotifier
 
