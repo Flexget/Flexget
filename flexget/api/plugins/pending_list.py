@@ -269,9 +269,8 @@ class PendingListEntryAPI(APIResource):
         session.delete(entry)
         return success_response('successfully deleted entry %d' % entry.id)
 
-    @api.validate(model=base_entry_schema)
     @api.response(201, model=pending_list_entry_base_schema)
-    @api.validate(pending_list_operation_schema)
+    @api.validate(model=pending_list_operation_schema)
     @api.doc(description='Approve or reject an entry\'s status')
     def put(self, list_id, entry_id, session=None):
         """Sets entry object's pending status"""

@@ -216,7 +216,7 @@ class TestPendingListAPI(object):
         for field, value in entry_data.items():
             assert data.get(field) == value
 
-        new_entry_data = {'title': 'title2', 'original_url': 'http://test2.com', 'approved': True}
+        new_entry_data = {'operation': 'approve'}
 
         # Change specific entry from list
         rsp = api_client.json_put('/pending_list/1/entries/1/', data=json.dumps(new_entry_data))
@@ -226,8 +226,7 @@ class TestPendingListAPI(object):
         errors = schema_match(OC.pending_list_entry_base_object, data)
         assert not errors
 
-        for field, value in new_entry_data.items():
-            assert data.get(field) == value
+        assert data['approved']
 
         # Try to change non-existent entry from list
         rsp = api_client.json_put('/pending_list/1/entries/10/', data=json.dumps(new_entry_data))

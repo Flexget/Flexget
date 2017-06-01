@@ -173,7 +173,7 @@ class PendingList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PendingList, plugin_name, api_ver=2, groups=['list'])
+    plugin.register(PendingList, plugin_name, api_ver=2, interfaces=['list'])
 
 
 @with_session
