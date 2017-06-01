@@ -262,7 +262,6 @@ def add(manager, options):
     series_name = options.series_name
     entity_ids = options.entity_id
     quality = options.quality
-    downloaded = not options.not_downloaded
     series_name = series_name.replace(r'\!', '!')
     normalized_name = normalize_series_name(series_name)
     with Session() as session:
@@ -276,7 +275,7 @@ def add(manager, options):
             series = series[0]
         for ent_id in entity_ids:
             try:
-                add_series_entity(session, series, ent_id, quality=quality, downloaded=downloaded)
+                add_series_entity(session, series, ent_id, quality=quality)
             except ValueError as e:
                 console(e.args[0])
             else:
@@ -335,8 +334,6 @@ def register_parser_arguments():
                                 help='Episode or season entity ID(s) to add')
     addshow_parser.add_argument('--quality', default=None, metavar='<quality>',
                                 help='Quality string to be stored for all entity ID(s)')
-    addshow_parser.add_argument('--not-downloaded', action='store_true', dest='not_downloaded',
-                                help='Do not mark entity ID(s) as downloaded')
 
     forget_parser = subparsers.add_parser('forget', parents=[series_parser],
                                           help='Removes episodes or whole series from the entire database '
