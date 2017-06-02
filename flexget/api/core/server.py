@@ -101,7 +101,7 @@ class ServerReloadAPI(APIResource):
     @api.response(501, model=yaml_error_schema, description='YAML syntax error')
     @api.response(502, model=config_validation_schema, description='Config validation error')
     @api.response(200, model=base_message_schema, description='Newly reloaded config')
-    def get(self, session=None):
+    def post(self, session=None):
         """ Reload Flexget config """
         log.info('Reloading config from disk.')
         try:
@@ -141,7 +141,7 @@ shutdown_parser.add_argument('force', type=inputs.boolean, default=False, help='
 class ServerShutdownAPI(APIResource):
     @api.doc(parser=shutdown_parser)
     @api.response(200, model=base_message_schema, description='Shutdown requested')
-    def get(self, session=None):
+    def post(self, session=None):
         """ Shutdown Flexget Daemon """
         args = shutdown_parser.parse_args()
         self.manager.shutdown(args['force'])

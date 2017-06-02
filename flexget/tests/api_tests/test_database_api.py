@@ -11,28 +11,28 @@ class TestDatabaseAPI(object):
     config = 'tasks: {}'
 
     def test_database_methods(self, api_client, schema_match):
-        rsp = api_client.get('/database/cleanup/')
+        rsp = api_client.json_post('/database/cleanup/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
         assert not errors
 
-        rsp = api_client.get('/database/vacuum/')
+        rsp = api_client.json_post('/database/vacuum/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
         assert not errors
 
-        rsp = api_client.get('/database/reset_plugin/?plugin_name=bla')
+        rsp = api_client.json_post('/database/reset_plugin/?plugin_name=bla')
         assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
         assert not errors
 
-        rsp = api_client.get('/database/reset_plugin/?plugin_name=tvmaze')
+        rsp = api_client.json_post('/database/reset_plugin/?plugin_name=tvmaze')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 

@@ -36,7 +36,7 @@ class TestServerAPI(object):
 
     @patch.object(MockManager, 'load_config')
     def test_reload(self, mocked_load_config, api_client, schema_match):
-        rsp = api_client.get('/server/reload/')
+        rsp = api_client.json_post('/server/reload/')
         assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -46,7 +46,7 @@ class TestServerAPI(object):
 
     @patch.object(Manager, 'shutdown')
     def test_shutdown(self, mocked_shutdown, api_client, schema_match):
-        rsp = api_client.get('/server/shutdown/')
+        rsp = api_client.json_post('/server/shutdown/', data=json.dumps({}))
         assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
 

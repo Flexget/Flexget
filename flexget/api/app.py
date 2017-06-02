@@ -22,7 +22,7 @@ from werkzeug.http import generate_etag
 
 from . import __path__
 
-__version__ = '1.1.2'
+__version__ = '1.2.0'
 
 log = logging.getLogger('api')
 

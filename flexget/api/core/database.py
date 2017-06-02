@@ -23,9 +23,8 @@ plugins_schema = api.schema('plugins_list', ObjectsContainer.plugin_list)
 
 @db_api.route('/cleanup/')
 class DBCleanup(APIResource):
-    @etag
     @api.response(200, model=base_message_schema)
-    def get(self, session=None):
+    def post(self, session=None):
         """ Make all plugins clean un-needed data from the database """
         self.manager.db_cleanup(force=True)
         return success_response('DB Cleanup finished')
@@ -33,9 +32,8 @@ class DBCleanup(APIResource):
 
 @db_api.route('/vacuum/')
 class DBVacuum(APIResource):
-    @etag
     @api.response(200, model=base_message_schema)
-    def get(self, session=None):
+    def post(self, session=None):
         """ Potentially increase performance and decrease database size"""
         session.execute('VACUUM')
         session.commit()
@@ -52,7 +50,7 @@ class DBPluginReset(APIResource):
     @api.response(200, model=base_message_schema)
     @api.response(BadRequest)
     @api.doc(parser=plugin_parser)
-    def get(self, session=None):
+    def post(self, session=None):
         """ Reset the DB of a specific plugin """
         args = plugin_parser.parse_args()
         plugin = args['plugin_name']
