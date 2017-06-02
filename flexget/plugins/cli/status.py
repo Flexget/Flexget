@@ -3,6 +3,7 @@ from builtins import *  # noqa
 
 import datetime
 from datetime import timedelta
+import os
 
 from colorclass.toggles import disable_all_colors
 from flexget import options
