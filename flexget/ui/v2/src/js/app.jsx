@@ -1,14 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Root from 'routes';
+import Root from 'root';
 import 'normalize.css';
-import 'css/main.css';
 
 ReactDOM.render(<Root />, document.getElementById('react'));
 
 if (module.hot) {
-  module.hot.accept('./routes', () => {
-    const NewRoot = require('./routes').default; // eslint-disable-line global-require
+  module.hot.accept('./root', () => {
+    const NewRoot = require('./root').default; // eslint-disable-line global-require
     ReactDOM.render(<NewRoot />, document.getElementById('react'));
   });
 }

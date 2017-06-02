@@ -20,5 +20,6 @@ module.exports = {
   },
   rules: {
     'react/forbid-prop-types': 'off',
+    'react/jsx-no-bind': 'off',
   }
 };

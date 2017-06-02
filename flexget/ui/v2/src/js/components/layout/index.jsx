@@ -1,16 +1,34 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles, createStyleSheet } from 'material-ui/styles';
 import Logo from 'components/layout/logo';
 import Navbar from 'components/layout/navbar';
+import SideNav from 'components/layout/sidenav';
 
 const SIDEBAR_WIDTH = 190;
 const HEADER_HEIGHT = 50;
+const MOBILE_HEADER_HEIGHT = (HEADER_HEIGHT * 2) - 2;
 const PADDING = 10;
 
+const scrollMixin = theme => ({
+  overflowY: 'auto',
+  height: `calc(100vh - ${MOBILE_HEADER_HEIGHT}px)`,
+  [theme.breakpoints.up('sm')]: {
+    height: `calc(100vh - ${HEADER_HEIGHT}px)`,
+  },
+});
 const styleSheet = createStyleSheet('Layout', theme => ({
+  '@global': {
+    body: {
+      height: '100%',
+      width: '100%',
+      backgroundColor: theme.palette.background.default,
+    },
+    a: {
+      textDecoration: 'none',
+    },
+  },
   layout: {
-    backgroundColor: theme.palette.background.default,
     fontFamily: 'Roboto',
     display: 'flex',
     flexDirection: 'column',
@@ -20,8 +38,11 @@ const styleSheet = createStyleSheet('Layout', theme => ({
   main: {
     display: 'flex',
     flexDirection: 'row',
-    marginTop: HEADER_HEIGHT,
-    height: '100%',
+    marginTop: MOBILE_HEADER_HEIGHT,
+    flex: 1,
+    [theme.breakpoints.up('sm')]: {
+      marginTop: HEADER_HEIGHT,
+    },
   },
   header: {
     display: 'flex',
@@ -35,7 +56,6 @@ const styleSheet = createStyleSheet('Layout', theme => ({
     },
   },
   logo: {
-    minWidth: SIDEBAR_WIDTH,
     height: HEADER_HEIGHT,
   },
   navbar: {
@@ -43,41 +63,60 @@ const styleSheet = createStyleSheet('Layout', theme => ({
     flex: 1,
   },
   sidebar: {
-    width: SIDEBAR_WIDTH,
-    padding: PADDING,
+    ...scrollMixin(theme),
   },
   content: {
     flex: 1,
-    position: 'relative',
-    overflowY: 'auto',
+    ...scrollMixin(theme),
+  },
+  pageWrap: {
     padding: PADDING,
   },
 }));
 
-const Layout = ({ children, classes }) => (
-  <div className={classes.layout}>
-    <div className={classes.header}>
-      <div className={classes.logo}>
-        <Logo />
-      </div>
-      <div className={classes.navbar}>
-        <Navbar />
-      </div>
-    </div>
-    <div className={classes.main}>
-      <div className={classes.sidebar}>
-        SIDEBAR
-      </div>
-      <div className={classes.content}>
-        { children }
-      </div>
-    </div>
-  </div>
-);
+class Layout extends Component {
+  static propTypes = {
+    children: PropTypes.node.isRequired,
+    classes: PropTypes.object.isRequired,
+  };
 
-Layout.propTypes = {
-  children: PropTypes.node.isRequired,
-  classes: PropTypes.object.isRequired,
-};
+  state = {
+    sideBarOpen: false,
+  };
+
+  toggleSideBar = () => {
+    this.setState({
+      sideBarOpen: !this.state.sideBarOpen,
+    });
+  }
+
+  render() {
+    const { children, classes } = this.props;
+    const { sideBarOpen } = this.state;
+
+    return (
+      <div className={classes.layout}>
+        <header className={classes.header}>
+          <div className={classes.logo}>
+            <Logo sideBarOpen={sideBarOpen} />
+          </div>
+          <nav className={classes.navbar}>
+            <Navbar toggle={this.toggleSideBar} />
+          </nav>
+        </header>
+        <main className={classes.main}>
+          <aside className={classes.sideBar}>
+            <SideNav sideBarOpen={sideBarOpen} />
+          </aside>
+          <section className={classes.content}>
+            <div className={classes.pageWrap}>
+              { children }
+            </div>
+          </section>
+        </main>
+      </div>
+    );
+  }
+}
 
 export default withStyles(styleSheet)(Layout);

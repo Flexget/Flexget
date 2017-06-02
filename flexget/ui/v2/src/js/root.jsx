@@ -6,20 +6,8 @@ import { Provider } from 'react-redux';
 import Layout from 'components/layout';
 import { Route, Switch } from 'react-router-dom';
 import { ConnectedRouter } from 'connected-react-router';
-import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
-import createPalette from 'material-ui/styles/palette';
-import { orange, blueGrey, red } from 'material-ui/styles/colors';
-
-const theme = createMuiTheme({
-  palette: createPalette({
-    primary: {
-      ...orange,
-      contrastDefaultColor: 'light',
-    },
-    accent: blueGrey,
-    error: red,
-  }),
-});
+import { MuiThemeProvider } from 'material-ui/styles';
+import theme from 'theme';
 
 const Root = () => (
   <Provider store={store}>

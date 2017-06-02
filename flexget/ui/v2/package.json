@@ -51,6 +51,7 @@
   },
   "dependencies": {
     "babel-polyfill": "^6.23.0",
+    "classnames": "^2.2.5",
     "connected-react-router": "^4.2.1",
     "font-awesome": "^4.7.0",
     "history": "^4.6.1",
