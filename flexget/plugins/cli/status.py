@@ -13,6 +13,9 @@ from flexget.terminal import TerminalTable, TerminalTableError, table_parser, co
 from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
 
+# environment variables to set defaults
+ENV_LIST_LIMIT = 'FLEXGET_STATUS_LIST_LIMIT'
+
 
 def do_cli(manager, options):
     if options.table_type == 'porcelain':
@@ -24,6 +27,7 @@ def do_cli(manager, options):
 
 
 def do_cli_task(manager, options):
+    limit = options.limit or int(os.environ.get(ENV_LIST_LIMIT, 50))
     header = ['Start', 'Duration', 'Produced', 'Accepted', 'Rejected', 'Failed', 'Abort Reason']
     table_data = [header]
     with Session() as session:
@@ -33,7 +37,7 @@ def do_cli_task(manager, options):
             console('Task name `%s` does not exists or does not have any records' % options.task)
             return
         else:
-            query = task.executions.order_by(desc(TaskExecution.start))[:options.limit]
+            query = task.executions.order_by(desc(TaskExecution.start))[:limit]
             for ex in reversed(query):
                 start = ex.start.strftime('%Y-%m-%d %H:%M')
                 start = colorize('green', start) if ex.succeeded else colorize('red', start)
@@ -111,5 +115,5 @@ def do_cli_summary(manager, options):
 def register_parser_arguments():
     parser = options.register_command('status', do_cli, help='View task health status', parents=[table_parser])
     parser.add_argument('--task', action='store', metavar='TASK', help='Limit to results in specified %(metavar)s')
-    parser.add_argument('--limit', action='store', type=int, metavar='NUM', default=50,
+    parser.add_argument('--limit', action='store', type=int, metavar='NUM', default=None,
                         help='Limit to %(metavar)s results')

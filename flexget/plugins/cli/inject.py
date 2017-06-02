@@ -3,6 +3,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import argparse
 import cgi
+import os
 import string
 import random
 import yaml
@@ -13,9 +14,15 @@ from flexget.event import event
 from flexget.terminal import console
 from flexget.utils import requests
 
+# environment variables to set defaults
+ENV_FORCE = 'FLEXGET_INJECT_FORCE'
+ENV_ACCEPT = 'FLEXGET_INJECT_ACCEPT'
+
 
 @event('manager.subcommand.inject')
 def do_cli(manager, options):
+    force = True if (os.environ.get(ENV_FORCE).lower() in ['yes', 'true'] or options.short) else False
+    accept = True if (os.environ.get(ENV_ACCEPT).lower() in ['yes', 'true'] or options.short) else False
     if not options.url:
         # Determine if first positional argument is a URL or a title
         if '://' in options.title:
@@ -36,9 +43,9 @@ def do_cli(manager, options):
         entry['url'] = options.url
     else:
         entry['url'] = 'http://localhost/inject/%s' % ''.join(random.sample(string.ascii_letters + string.digits, 30))
-    if options.force:
+    if force:
         entry['immortal'] = True
-    if options.accept:
+    if accept:
         entry.accept(reason='accepted by CLI inject')
     if options.fields:
         for key, value in options.fields:

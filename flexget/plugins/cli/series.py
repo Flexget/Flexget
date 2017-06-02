@@ -20,7 +20,7 @@ except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
 
-# Enviroment variables to set defaults for `series list` and `series show`
+# Enviroment variables to set defaults
 ENV_SHOW_SORTBY_FIELD = 'FLEXGET_SERIES_SHOW_SORTBY_FIELD'
 ENV_SHOW_SORTBY_ORDER = 'FLEXGET_SERIES_SHOW_SORTBY_ORDER'
 ENV_LIST_CONFIGURED = 'FLEXGET_SERIES_LIST_CONFIGURED'
@@ -65,8 +65,7 @@ def display_summary(options):
     """
     porcelain = options.table_type == 'porcelain'
     configured = options.configured or os.environ.get(ENV_LIST_CONFIGURED, 'configured')
-    premieres = True if (os.environ.get(ENV_LIST_PREMIERES) == 'yes' or
-                         options.premieres) else False
+    premieres = True if (os.environ.get(ENV_LIST_PREMIERES).lower() in ['yes', 'true'] or options.premieres) else False
     sort_by = options.sort_by or os.environ.get(ENV_LIST_SORTBY_FIELD, 'name')
     if options.order is not None:
         descending = True if options.order == 'desc' else False
@@ -218,11 +217,11 @@ def get_latest_status(episode):
 def display_details(options):
     """Display detailed series information, ie. series show NAME"""
     name = options.series_name
-    sort_by = options.sort_by or os.environ.get(ENV_SHOW_SORTBY_FIELD, 'age')
+    sort_by = options.sort_by or os.environ.get(ENV_SHOW_SORTBY_FIELD, 'age').lower()
     if options.order is not None:
         reverse = True if options.order == 'desc' else False
     else:
-        reverse = True if os.environ.get(ENV_SHOW_SORTBY_ORDER) == 'desc' else False
+        reverse = True if os.environ.get(ENV_SHOW_SORTBY_ORDER).lower() == 'desc' else False
     with Session() as session:
         name = normalize_series_name(name)
         # Sort by length of name, so that partial matches always show shortest matching title
