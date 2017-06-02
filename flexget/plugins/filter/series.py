@@ -968,13 +968,16 @@ def set_series_begin(series, ep_id):
     :param Series series: Series instance
     :param ep_id: Integer for sequence mode, SxxEyy for episodic and yyyy-mm-dd for date.
     :raises ValueError: If malformed ep_id or series in different mode
+    :return: tuple containing identified_by and identity_type
     """
     # If identified_by is not explicitly specified, auto-detect it based on begin identifier
     # TODO: use some method of series parser to do the identifier parsing
     session = Session.object_session(series)
-    identified_by = parse_episode_identifier(ep_id)
+    identified_by, entity_type = parse_episode_identifier(ep_id, identify_season=True)
     if identified_by == 'ep':
         ep_id = ep_id.upper()
+        if entity_type == 'season':
+            ep_id += 'E01'
     if series.identified_by not in ['auto', '', None]:
         if identified_by != series.identified_by:
             raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`' %
@@ -999,6 +1002,31 @@ def set_series_begin(series, ep_id):
         # Need to flush to get an id on new Episode before assigning it as series begin
         session.flush()
     series.begin = episode
+    return (identified_by, entity_type)
+
+
+def add_series_entity(session, series, identifier, quality=None):
+    """
+    Adds entity identified by `identifier` to series `name` in database.
+
+    :param series: Series in database to add entity to.
+    :param identifier: Series identifier to be added.
+    :param quality: If supplied, this will override the quality from the series parser.
+    """
+    name_to_parse = '{} {}'.format(series.name, identifier)
+    if quality:
+        name_to_parse += ' {}'.format(quality)
+    parsed = get_plugin_by_name('parsing').instance.parse_series(name_to_parse, name=series.name)
+    if not parsed.valid:
+        raise ValueError('Invalid identifier for series `{}`: `{}`.'.format(series.name, identifier))
+
+    added = store_parser(session, parsed, series=series)
+    if not added:
+        raise ValueError('Unable to add `%s` to series `%s`.' % (identifier, series.name.capitalize()))
+    else:
+        for release in added:
+            release.downloaded = True
+        log.debug('Entity `%s` from series `%s` added to database.', identifier, series.name)
 
 
 def remove_series(name, forget=False):
@@ -1264,7 +1292,7 @@ class FilterSeriesBase(object):
                 # Strict naming
                 'exact': {'type': 'boolean'},
                 # Begin takes an ep, sequence or date identifier
-                'begin': {'type': ['string', 'integer'], 'format': 'episode_identifier'},
+                'begin': {'type': ['string', 'integer'], 'format': 'episode_or_season_id'},
                 'from_group': one_or_more({'type': 'string'}),
                 'parse_only': {'type': 'boolean'},
                 'special_ids': one_or_more({'type': 'string'}),
