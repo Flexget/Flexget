@@ -5,7 +5,6 @@ import Logo from 'components/layout/logo';
 import Navbar from 'components/layout/navbar';
 import SideNav from 'components/layout/sidenav';
 
-const SIDEBAR_WIDTH = 190;
 const HEADER_HEIGHT = 50;
 const MOBILE_HEADER_HEIGHT = (HEADER_HEIGHT * 2) - 2;
 const PADDING = 10;

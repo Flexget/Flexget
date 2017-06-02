@@ -144,8 +144,8 @@ class SideNav extends Component {
   render() {
     const { classes, sideBarOpen } = this.props;
     return (
-      <Paper className={
-        classNames(
+      <Paper
+        className={classNames(
           classes.listWrapper,
           { [classes.sideNavMini]: !sideBarOpen },
         )}
