@@ -25,14 +25,14 @@ class TestDatabaseAPI(object):
         errors = schema_match(base_message, data)
         assert not errors
 
-        rsp = api_client.json_post('/database/reset_plugin/?plugin_name=bla')
+        rsp = api_client.json_post('/database/reset_plugin/?plugin_name=bla', data=json.dumps({}))
         assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
         assert not errors
 
-        rsp = api_client.json_post('/database/reset_plugin/?plugin_name=tvmaze')
+        rsp = api_client.json_post('/database/reset_plugin/?plugin_name=tvmaze', data=json.dumps({}))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
