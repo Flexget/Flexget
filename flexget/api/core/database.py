@@ -46,7 +46,6 @@ plugin_parser.add_argument('plugin_name', required=True, help='Name of plugin to
 
 @db_api.route('/reset_plugin/')
 class DBPluginReset(APIResource):
-    @etag
     @api.response(200, model=base_message_schema)
     @api.response(BadRequest)
     @api.doc(parser=plugin_parser)
