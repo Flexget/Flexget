@@ -254,7 +254,7 @@ class Torrent(object):
     @property
     def name(self):
         """Return name of the torrent"""
-        return self.content['info'].get('name', False)
+        return self.content['info'].get('name', '')
 
     @property
     def size(self):
