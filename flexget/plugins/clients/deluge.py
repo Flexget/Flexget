@@ -268,9 +268,9 @@ class InputDeluge(DelugePlugin):
         'total_payload_download': 'total_payload_download',
         'total_payload_upload': 'total_payload_upload',
         'total_peers': 'total_peers',
-        'total_seeds': 'total_seeds', 
+        'total_seeds': 'total_seeds',
         'total_uploaded': 'total_uploaded',
-        'total_wanted': 'total_wanted', 
+        'total_wanted': 'total_wanted',
         'tracker': 'tracker',
         'tracker_host': 'tracker_host',
         'tracker_status': 'tracker_status',
@@ -559,9 +559,7 @@ class OutputDeluge(DelugePlugin):
                     log.debug('Moving storage for %s to %s' % (entry['title'], move_now_path))
                     main_file_dlist.append(client.core.move_storage([torrent_id], move_now_path))
 
-                big_file_name = ''
-                if opts.get('content_filename') or opts.get('main_file_only'):
-
+                if entry.get('modified_content_files'):
                     def file_exists(filename):
                         # Checks the download path as well as the move completed path for existence of the file
                         if os.path.exists(os.path.join(status['save_path'], filename)):
@@ -593,87 +591,22 @@ class OutputDeluge(DelugePlugin):
                                                      [(file['index'], new_name)]))
                         log.debug('File %s in %s renamed to %s' % (file['path'], entry['title'], new_name))
 
-                    # find a file that makes up more than main_file_ratio (default: 90%) of the total size
-                    main_file = None
-                    for file in status['files']:
-                        if file['size'] > (status['total_size'] * opts.get('main_file_ratio')):
-                            main_file = file
-                            break
+                    file_priorities = []
+                    for current_file in status['files']:
+                        if entry['modified_content_files'].get(current_file['path']):
+                            modified_file = entry['modified_content_files'].get(current_file['path'])
+                            file_priorities.append(1 if modified_file['download'] == 1 else 0)
 
-                    if main_file is not None:
-                        # proceed with renaming only if such a big file is found
-
-                        # find the subtitle file
-                        keep_subs = opts.get('keep_subs')
-                        sub_file = None
-                        if keep_subs:
-                            sub_exts = [".srt", ".sub"]
-                            for file in status['files']:
-                                ext = os.path.splitext(file['path'])[1]
-                                if ext in sub_exts:
-                                    sub_file = file
-                                    break
-
-                        # check for single file torrents so we dont add unnecessary folders
-                        if (os.path.dirname(main_file['path']) is not ("" or "/")):
-                            # check for top folder in user config
-                            if (opts.get('content_filename') and os.path.dirname(opts['content_filename']) is not ""):
-                                top_files_dir = os.path.dirname(opts['content_filename']) + "/"
-                            else:
-                                top_files_dir = os.path.dirname(main_file['path']) + "/"
+                            if modified_file['new_path'] and modified_file['new_path'] != current_file['path']:
+                                new_filename = unused_name(modified_file['new_path'])
+                                rename(current_file, new_filename)
                         else:
-                            top_files_dir = "/"
+                            pass
+                            #log.debug('File %s not found in modified_content_files:\n%s', current_file['path'], entry['modified_content_files'])
 
-                        if opts.get('content_filename'):
-                            # rename the main file
-                            big_file_name = (top_files_dir +
-                                             os.path.basename(opts['content_filename']) +
-                                             os.path.splitext(main_file['path'])[1])
-                            big_file_name = unused_name(big_file_name)
-                            rename(main_file, big_file_name)
-
-                            # rename subs along with the main file
-                            if sub_file is not None and keep_subs:
-                                sub_file_name = (os.path.splitext(big_file_name)[0] +
-                                                 os.path.splitext(sub_file['path'])[1])
-                                rename(sub_file, sub_file_name)
-
-                        if opts.get('main_file_only'):
-                            # download only the main file (and subs)
-                            file_priorities = [1 if f == main_file or (f == sub_file and keep_subs) else 0
-                                               for f in status['files']]
-                            main_file_dlist.append(
-                                client.core.set_torrent_file_priorities(torrent_id, file_priorities))
-
-                            if opts.get('hide_sparse_files'):
-                                # hide the other sparse files that are not supposed to download but are created anyway
-                                # http://dev.deluge-torrent.org/ticket/1827
-                                # Made sparse files behave better with deluge http://flexget.com/ticket/2881
-                                sparse_files = [f for f in status['files']
-                                                if f != main_file and (f != sub_file or (not keep_subs))]
-                                rename_pairs = [(f['index'],
-                                                 top_files_dir + ".sparse_files/" + os.path.basename(f['path']))
-                                                for f in sparse_files]
-                                main_file_dlist.append(client.core.rename_files(torrent_id, rename_pairs))
-                    else:
-                        log.warning('No files in "%s" are > %d%% of content size, no files renamed.' % (
-                            entry['title'],
-                            opts.get('main_file_ratio') * 100))
-
-                container_directory =  pathscrub(entry.render(entry.get('container_directory', config.get('container_directory', ''))))
-                if container_directory:
-                    if big_file_name:
-                        folder_structure = big_file_name.split(os.sep)
-                    elif len(status['files']) > 0:
-                        folder_structure = status['files'][0]['path'].split(os.sep)
-                    else:
-                        folder_structure = []
-                    if len(folder_structure) > 1:
-                        log.verbose('Renaming Folder %s to %s', folder_structure[0], container_directory)
-                        main_file_dlist.append(client.core.rename_folder(torrent_id, folder_structure[0], container_directory))
-                    else:
-                        log.debug('container_directory specified however the torrent %s does not have a directory structure; skipping folder rename', entry['title'])
-
+                    if file_priorities:
+                        main_file_dlist.append(
+                            client.core.set_torrent_file_priorities(torrent_id, file_priorities))
                 return defer.DeferredList(main_file_dlist)
 
             status_keys = ['files', 'total_size', 'save_path', 'move_on_completed_path',
