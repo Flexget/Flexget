@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles, createStyleSheet } from 'material-ui/styles';
-import Logo from 'components/layout/logo';
-import Navbar from 'components/layout/navbar';
-import SideNav from 'components/layout/sidenav';
+import Logo from 'components/layout/Logo';
+import Navbar from 'containers/layout/Navbar';
+import SideNav from 'components/layout/Sidenav';
 
 const HEADER_HEIGHT = 50;
 const MOBILE_HEADER_HEIGHT = (HEADER_HEIGHT * 2) - 2;
@@ -21,14 +21,14 @@ const styleSheet = createStyleSheet('Layout', theme => ({
     body: {
       height: '100%',
       width: '100%',
-      backgroundColor: theme.palette.background.default,
+      backgroundColor: theme.palette.background.contentFrame,
+      fontFamily: 'Roboto',
     },
     a: {
       textDecoration: 'none',
     },
   },
   layout: {
-    fontFamily: 'Roboto',
     display: 'flex',
     flexDirection: 'column',
     height: '100%',
@@ -77,11 +77,20 @@ class Layout extends Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     classes: PropTypes.object.isRequired,
+    loggedIn: PropTypes.bool.isRequired,
+    checkLogin: PropTypes.func.isRequired,
   };
 
   state = {
     sideBarOpen: false,
   };
+
+  componentDidMount() {
+    const { loggedIn, checkLogin } = this.props;
+    if (!loggedIn) {
+      checkLogin();
+    }
+  }
 
   toggleSideBar = () => {
     this.setState({

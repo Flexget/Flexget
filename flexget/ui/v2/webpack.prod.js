@@ -8,8 +8,8 @@ const config = require('./webpack.shared');
 
 config.output = {
   path: path.join(__dirname, 'dist', 'assets'),
-    filename: '[name].[chunkhash].js',
-    publicPath: '/assets/',
+  filename: '[name].[chunkhash].js',
+  publicPath: '/assets/',
 };
 config.plugins = [
   new FaviconsWebpackPlugin(path.resolve('./src/favicon.png')),

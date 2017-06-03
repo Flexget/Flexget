@@ -1,0 +1,40 @@
+function status(response) {
+  return response.json().then((data) => {
+    if (response.status >= 200 && response.status < 300) {
+      return data;
+    }
+    const err = new Error(data.message);
+    err.status = response.status;
+    throw err;
+  });
+}
+
+function request(resource, method, body) {
+  return fetch(`/api${resource}`, {
+    method,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    credentials: 'same-origin',
+    body: JSON.stringify(body),
+  })
+    .then(status);
+}
+
+export function get(resource) {
+  return request(resource, 'get');
+}
+
+export function post(resource, body) {
+  return request(resource, 'post', body);
+}
+
+export function put(resource, body) {
+  return request(resource, 'put', body);
+}
+
+export function del(resource) {
+  return request(resource, 'delete');
+}
+

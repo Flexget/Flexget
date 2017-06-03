@@ -32,6 +32,7 @@ class Navbar extends Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
     toggle: PropTypes.func.isRequired,
+    logout: PropTypes.func.isRequired,
   };
 
   state = {
@@ -46,7 +47,7 @@ class Navbar extends Component {
   })
 
   render() {
-    const { classes, toggle } = this.props;
+    const { classes, toggle, logout } = this.props;
     const { anchorEl, open } = this.state;
 
     return (
@@ -100,7 +101,7 @@ class Navbar extends Component {
               <Icon className={`${classes.menuIcon} fa fa-database`} />
               Database
             </MenuItem>
-            <MenuItem>
+            <MenuItem onClick={logout}>
               <Icon className={`${classes.menuIcon} fa fa-sign-out`} />
               Logout
             </MenuItem>

@@ -1,10 +1,6 @@
 import React from 'react';
-import InfoCard from 'components/home/info-card';
+import InfoCard from 'components/home/InfoCard';
 
-const Home = () => (
-  <div>
-    <InfoCard />
-  </div>
-);
+const Home = () => <InfoCard />;
 
 export default Home;

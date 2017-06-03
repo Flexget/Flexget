@@ -4,6 +4,7 @@ module.exports = {
   entry: {
     main: [
       'babel-polyfill',
+      'whatwg-fetch',
       './src/js/app.jsx',
     ],
     vendor: [
@@ -47,6 +48,6 @@ module.exports = {
         loader: 'url-loader?limit=8192',
       },
 
-    ]
-  }
+    ],
+  },
 };

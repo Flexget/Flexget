@@ -46,11 +46,11 @@ const InfoCard = ({ classes }) => (
       </p>
       <p>
         More information: <a
-          href="http://flexget.com/wiki/Web-UI"
+          href="http://flexget.com/wiki/Web-UI/v2"
           target="_blank"
           rel="noopener noreferrer"
         >
-          http://flexget.com/wiki/Web-UI
+          http://flexget.com/wiki/Web-UI/v2
         </a>
       </p>
       <p>

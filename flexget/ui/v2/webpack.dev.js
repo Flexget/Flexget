@@ -8,6 +8,7 @@ config.entry.main.push(
   'webpack/hot/dev-server',
   `webpack-dev-server/client?http://localhost:${process.env.PORT || 8000}`
 );
+
 config.output = {
   path: __dirname,
   filename: '[name].bundle.js',
@@ -21,7 +22,7 @@ config.plugins = [
   new webpack.NamedModulesPlugin(),
   new webpack.DefinePlugin({
     'process.env': {
-      NODE_ENV: JSON.stringify('development')
+      NODE_ENV: JSON.stringify('development'),
     },
   }),
   new HtmlWebpackPlugin({
