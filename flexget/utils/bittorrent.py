@@ -252,6 +252,11 @@ class Torrent(object):
         return files
 
     @property
+    def name(self):
+        """Return name of the torrent"""
+        return self.content['info'].get('name', False)
+
+    @property
     def size(self):
         """Return total size of the torrent"""
         size = 0
