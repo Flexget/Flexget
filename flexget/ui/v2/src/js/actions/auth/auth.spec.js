@@ -36,7 +36,7 @@ describe('actions/auth', () => {
         .post('/api/auth/login', {});
 
       return store.dispatch(auth.login(credentials))
-        .then(() => { // return of async actions
+        .then(() => {
           expect(store.getActions()).toEqual(expectedActions);
         });
     });
@@ -61,7 +61,7 @@ describe('actions/auth', () => {
         .post('/api/auth/login', 401);
 
       return store.dispatch(auth.login(credentials))
-        .then(() => { // return of async actions
+        .then(() => {
           expect(store.getActions()).toEqual(expectedActions);
         });
     });
@@ -81,7 +81,7 @@ describe('actions/auth', () => {
         .get('/api/server/version', {});
 
       return store.dispatch(auth.checkLogin())
-        .then(() => { // return of async actions
+        .then(() => {
           expect(store.getActions()).toEqual(expectedActions);
         });
     });
@@ -94,7 +94,7 @@ describe('actions/auth', () => {
         .get('/api/server/version', 401);
 
       return store.dispatch(auth.checkLogin())
-        .then(() => { // return of async actions
+        .then(() => {
           expect(store.getActions()).toEqual(expectedActions);
         });
     });
@@ -121,7 +121,7 @@ describe('actions/auth', () => {
         .get('/api/auth/logout', {});
 
       return store.dispatch(auth.logout())
-        .then(() => { // return of async actions
+        .then(() => {
           expect(store.getActions()).toEqual(expectedActions);
         });
     });
@@ -146,7 +146,7 @@ describe('actions/auth', () => {
         .get('/api/auth/logout', 401);
 
       return store.dispatch(auth.logout())
-        .then(() => { // return of async actions
+        .then(() => {
           expect(store.getActions()).toEqual(expectedActions);
         });
     });
