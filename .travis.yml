@@ -31,8 +31,10 @@ jobs:
         - cd flexget/ui/v2/
       install:
         - npm install
-      script: npm run lint # will run tests as well when that's ready
-      after_success: skip # will upload coverage when that's ready
+      script:
+        - npm run lint
+        - npm test -- --coverage
+      after_success: npm run cov
 notifications:
   email: false
   webhooks:

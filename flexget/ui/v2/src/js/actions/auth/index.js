@@ -9,17 +9,15 @@ const createAction = utils.createAction(AUTH);
 const loading = utils.createLoading(AUTH);
 
 export function checkLogin() {
-  return (dispatch) => {
-    get('/server/version')
+  return dispatch => get('/server/version')
       .then(() => dispatch(createAction(LOGIN)))
       .catch(() => {});
-  };
 }
 
 export function login(credentials) {
   return (dispatch) => {
     dispatch(loading(LOGIN));
-    post('/auth/login', credentials)
+    return post('/auth/login', credentials)
       .then(() => dispatch(createAction(LOGIN)))
       .catch(err => dispatch(createAction(LOGIN, err)));
   };
@@ -28,8 +26,8 @@ export function login(credentials) {
 export function logout() {
   return (dispatch) => {
     dispatch(loading(LOGOUT));
-    get('/auth/logout')
+    return get('/auth/logout')
       .then(() => dispatch(createAction(LOGOUT)))
-      .then(err => dispatch(createAction(LOGOUT, err)));
+      .catch(err => dispatch(createAction(LOGOUT, err)));
   };
 }

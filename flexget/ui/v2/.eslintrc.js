@@ -1,11 +1,15 @@
 module.exports = {
   extends: [
-    "airbnb",
+    'airbnb',
   ],
   parser: "babel-eslint",
+  plugins: [
+    'jest',
+  ],
   env: {
     browser: true,
     node: true,
+    'jest/globals': true,
   },
   ecmaFeatures: {
     jsx: true,
@@ -14,7 +18,7 @@ module.exports = {
   settings: {
     'import/resolver': {
       webpack: {
-        config: "webpack.shared.js"
+        config: 'webpack.shared.js'
       }
     }
   },
