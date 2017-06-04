@@ -60,7 +60,7 @@ class PluginTemplate(object):
         return config
 
     @plugin.priority(257)
-    def on_task_start(self, task, config):
+    def on_task_preparation(self, task, config):
         if config is False:  # handles 'template: no' form to turn off template on this task
             return
         # implements --template NAME
