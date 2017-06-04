@@ -1,0 +1,35 @@
+FeedParser>=5.2.1
+SQLAlchemy >=1.0.9, <1.999
+PyYAML
+# Beautifulsoup 4.5+ is required to support different versions of html5lib
+beautifulsoup4>=4.5
+html5lib>=0.11
+PyRSS2Gen
+pynzb
+#PY3 progressbar
+rpyc
+jinja2
+# There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
+requests~=2.16.3
+#Guessit requires python-dateutil<=2.5.2
+python-dateutil>=2.5.3
+jsonschema>=2.0
+path.py>=8.1.1
+pathlib>=1.0; python_version<'3.4'
+guessit<=2.0.4
+# Rebulk changes how guessit works higher than 0.8.2
+rebulk==0.8.2
+apscheduler>=3.2.0
+terminaltables>=3.1.0
+colorclass>=2.2.0
+# WebUI Requirements
+cherrypy>=3.7.0
+flask>=0.7
+flask-restful>=0.3.3
+flask-restplus==0.8.6
+flask-compress>=1.2.1
+flask-login>=0.4.0
+flask-cors>=2.1.2
+pyparsing>=2.0.3
+zxcvbn-python
+future>=0.15.2
