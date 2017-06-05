@@ -6,6 +6,7 @@ import pytest
 from flexget.plugins.list.imdb_list import ImdbEntrySet
 
 
+@pytest.mark.skip(reason="It rarely works")
 @pytest.mark.online
 class TestIMDBListTypes(object):
     imdb_config = {'login': 'siysbijz@sharklasers.com',
