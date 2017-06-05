@@ -2058,6 +2058,10 @@ class SeriesDBManager(FilterSeriesBase):
 
     @plugin.priority(0)
     def on_task_start(self, task, config):
+        # Only operate if task changed
+        if not task.config_modified:
+            return
+
         # Clear all series from this task
         with Session() as session:
             session.query(SeriesTask).filter(SeriesTask.name == task.name).delete()

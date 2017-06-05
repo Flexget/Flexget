@@ -459,8 +459,8 @@ class Task(object):
                 finally:
                     fire_event('task.execute.after_plugin', self, plugin.name)
                 self.session = None
-        # check config hash for changes at the end of 'start' phase
-        if phase == 'start':
+        # check config hash for changes at the end of 'prepare' phase
+        if phase == 'prepare':
             self.check_config_hash()
 
     def __run_plugin(self, plugin, phase, args=None, kwargs=None):
@@ -601,8 +601,8 @@ class Task(object):
                             log.info('Plugin %s is not executed because %s phase is disabled (e.g. --test)' %
                                      (plugin.name, phase))
                     continue
-                if phase == 'start' and self.is_rerun:
-                    log.debug('skipping task_start during rerun')
+                if phase in ('start', 'prepare') and self.is_rerun:
+                    log.debug('skipping phase %s during rerun', phase)
                 elif phase == 'exit' and self._rerun and self._rerun_count < self.max_reruns:
                     log.debug('not running task_exit yet because task will rerun')
                 else:
