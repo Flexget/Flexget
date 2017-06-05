@@ -7,7 +7,7 @@ html5lib>=0.11
 PyRSS2Gen
 pynzb
 #PY3 progressbar
-rpyc
+rpyc==3.3.0
 jinja2
 # There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
 requests~=2.16.3
