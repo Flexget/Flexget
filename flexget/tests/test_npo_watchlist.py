@@ -34,6 +34,7 @@ class TestNpoWatchlistInfo(object):
 
         assert task.find_entry(url='http://www.npo.nl/als-de-dijken-breken-official-trailer-2016/26-10-2016/POMS_EO_5718640') is None  # a trailer for the series, that should not be listed
 
+    @pytest.mark.skip(reason='Not a very good test since data changes over time')
     def test_npo3_lookup(self, execute_task):
         """npo_watchlist: Test npo3 lookup (ONLINE)"""
 
