@@ -155,7 +155,7 @@ DEFAULT_PRIORITY = 128
 
 # task phases, in order of their execution; note that this can be extended by
 # registering new phases at runtime
-task_phases = ['preparation', 'start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'learn', 'exit']
+task_phases = ['prepare', 'start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'learn', 'exit']
 
 # map phase names to method names
 phase_methods = {

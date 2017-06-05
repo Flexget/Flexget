@@ -459,8 +459,8 @@ class Task(object):
                 finally:
                     fire_event('task.execute.after_plugin', self, plugin.name)
                 self.session = None
-        # check config hash for changes at the end of 'preparation' phase
-        if phase == 'preparation':
+        # check config hash for changes at the end of 'prepare' phase
+        if phase == 'prepare':
             self.check_config_hash()
 
     def __run_plugin(self, plugin, phase, args=None, kwargs=None):

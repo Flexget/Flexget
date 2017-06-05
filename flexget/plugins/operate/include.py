@@ -30,7 +30,7 @@ class PluginInclude(object):
     schema = one_or_more({'type': 'string'})
 
     @plugin.priority(256)
-    def on_task_preparation(self, task, config):
+    def on_task_prepare(self, task, config):
         if not config:
             return
 

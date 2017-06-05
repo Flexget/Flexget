@@ -49,7 +49,7 @@ class ConfigureSeries(FilterSeriesBase):
             'additionalProperties': False
         }
 
-    def on_task_preparation(self, task, config):
+    def on_task_prepare(self, task, config):
 
         series = {}
         for input_name, input_config in config.get('from', {}).items():
