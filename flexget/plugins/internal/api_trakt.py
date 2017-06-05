@@ -670,6 +670,8 @@ class TraktShow(Base):
                     self.seasons.append(db_season)
                 if number == season_result['number']:
                     season = db_season
+            if not season:
+                raise LookupError('Season %s not found for show %s' % (number, self.title))
         return season
 
     @property
