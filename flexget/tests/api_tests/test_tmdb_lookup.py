@@ -38,7 +38,7 @@ class TestTMDBMovieLookupAPI(object):
             assert data.get(field) == value
 
     def test_tmdb_movies_lookup_year_param(self, api_client, schema_match):
-        rsp = api_client.get('/tmdb/movies/?title=the matrix&year=2003')
+        rsp = api_client.get('/tmdb/movies/?title=the matrix reloaded&year=2003')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
