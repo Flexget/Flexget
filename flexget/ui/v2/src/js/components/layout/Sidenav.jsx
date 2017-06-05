@@ -13,7 +13,7 @@ const styleSheet = createStyleSheet('SideNav', theme => ({
   listWrapper: {
     backgroundColor: theme.palette.accent[900],
     minHeight: '100vh',
-    transition: theme.transitions.create('width'),
+    transition: theme.transitions.create(['width', 'visibility']),
     width: 190,
     borderRadius: 0,
     [theme.breakpoints.up('sm')]: {

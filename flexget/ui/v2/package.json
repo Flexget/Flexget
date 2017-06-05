@@ -10,7 +10,7 @@
     "lint": "eslint --ext .js --ext .jsx src",
     "test": "jest",
     "test:watch": "jest --watch",
-    "cov": "codacy-coverage coverage/lcov.info"
+    "cov": "cat coverage/lcov.info | codacy-coverage"
   },
   "repository": {
     "type": "git",

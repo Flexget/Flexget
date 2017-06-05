@@ -6,20 +6,14 @@ import { withStyles, createStyleSheet } from 'material-ui/styles';
 import LoginCard from 'containers/login/LoginCard';
 
 const styleSheet = createStyleSheet('LoginPage', theme => ({
-  '@global': {
-    body: {
-      height: '100%',
-      width: '100%',
-      backgroundColor: theme.palette.background.contentFrame,
-      fontFamily: 'Roboto',
-    },
-    a: {
-      textDecoration: 'none',
-    },
-  },
   logo: {
     background: `transparent url(${headerImage}) no-repeat center`,
     minHeight: 90,
+    backgroundSize: '100% auto',
+    margin: '0 10px',
+    [theme.breakpoints.up('sm')]: {
+      backgroundSize: 'auto',
+    },
   },
 }));
 

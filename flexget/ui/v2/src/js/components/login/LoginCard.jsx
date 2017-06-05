@@ -8,8 +8,11 @@ import TextField from 'components/common/TextField';
 
 const styleSheet = createStyleSheet('LoginCard', theme => ({
   card: {
-    width: 400,
-    margin: '0 auto',
+    maxWidth: 400,
+    margin: '0 10px',
+    [theme.breakpoints.up('sm')]: {
+      margin: '0 auto',
+    },
   },
   error: {
     color: theme.palette.error[500],

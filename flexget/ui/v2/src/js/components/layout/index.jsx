@@ -17,17 +17,6 @@ const scrollMixin = theme => ({
   },
 });
 const styleSheet = createStyleSheet('Layout', theme => ({
-  '@global': {
-    body: {
-      height: '100%',
-      width: '100%',
-      backgroundColor: theme.palette.background.contentFrame,
-      fontFamily: 'Roboto',
-    },
-    a: {
-      textDecoration: 'none',
-    },
-  },
   layout: {
     display: 'flex',
     flexDirection: 'column',
