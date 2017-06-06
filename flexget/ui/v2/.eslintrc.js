@@ -27,5 +27,13 @@ module.exports = {
     'react/jsx-no-bind': 'off',
     'import/no-extraneous-dependencies':[ 'error', { devDependencies: true } ],
     'import/prefer-default-export': 'off',
+    'comma-dangle': ['error', {
+      arrays: 'always-multiline',
+      objects: 'always-multiline',
+      imports: 'always-multiline',
+      exports: 'always-multiline',
+      functions: 'ignore',
+    }],
+    'import/no-named-as-default': 'off',
   }
 };

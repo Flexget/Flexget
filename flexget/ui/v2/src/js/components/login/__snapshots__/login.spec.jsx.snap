@@ -1,0 +1,127 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/login renders correctly when logged in 1`] = `null`;
+
+exports[`components/login renders correctly when logged out 1`] = `
+<div>
+  <div
+    className="LoginPage-logo-1437845348"
+  />
+  <div
+    className="MuiPaper-paper-2677686717 MuiPaper-dp2-317043508 MuiPaper-rounded-418257787 MuiCard-card-772068234 LoginCard-card-1186187333"
+  >
+    <form
+      onSubmit={[Function]}
+    >
+      <div
+        className="MuiCardContent-cardContent-741240096"
+      >
+        <div
+          className="LoginCard-error-2118832568"
+        />
+        <div
+          className="MuiFormControl-root-2422010352"
+          onBlur={[Function]}
+          onChange={[Function]}
+          onDragStart={[Function]}
+          onDrop={[Function]}
+          onFocus={[Function]}
+          required={false}
+        >
+          <label
+            className="MuiFormLabel-root-1338640695 MuiInputLabel-root-2962008059 MuiInputLabel-formControl-3454588320 MuiInputLabel-animated-1605689251"
+          >
+            Username
+          </label>
+          <div
+            className="MuiInput-wrapper-1702064583 MuiInput-formControl-497090363 MuiInput-inkbar-965396523 MuiInput-underline-565166322"
+          >
+            <input
+              aria-required={undefined}
+              className="MuiInput-input-3855742665 MuiInput-singleline-2607927053"
+              defaultValue={undefined}
+              disabled={false}
+              id="username"
+              name="username"
+              onBlur={[Function]}
+              onChange={[Function]}
+              onFocus={[Function]}
+              onKeyDown={undefined}
+              onKeyUp={undefined}
+              placeholder={undefined}
+              rows={undefined}
+              type="text"
+              value=""
+            />
+          </div>
+        </div>
+        <div
+          className="MuiFormControl-root-2422010352"
+          onBlur={[Function]}
+          onChange={[Function]}
+          onDragStart={[Function]}
+          onDrop={[Function]}
+          onFocus={[Function]}
+          required={false}
+        >
+          <label
+            className="MuiFormLabel-root-1338640695 MuiInputLabel-root-2962008059 MuiInputLabel-formControl-3454588320 MuiInputLabel-animated-1605689251"
+          >
+            Password
+          </label>
+          <div
+            className="MuiInput-wrapper-1702064583 MuiInput-formControl-497090363 MuiInput-inkbar-965396523 MuiInput-underline-565166322"
+          >
+            <input
+              aria-required={undefined}
+              className="MuiInput-input-3855742665 MuiInput-singleline-2607927053"
+              defaultValue={undefined}
+              disabled={false}
+              id="password"
+              name="password"
+              onBlur={[Function]}
+              onChange={[Function]}
+              onFocus={[Function]}
+              onKeyDown={undefined}
+              onKeyUp={undefined}
+              placeholder={undefined}
+              rows={undefined}
+              type="Password"
+              value=""
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        className="MuiCardActions-cardActions-1345515364"
+      >
+        <button
+          className="MuiButtonBase-buttonBase-3477017037 MuiButton-root-2253430263 LoginCard-button-2980890619 MuiCardActions-actionSpacing-2598224809"
+          disabled={false}
+          onBlur={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onTouchEnd={[Function]}
+          onTouchStart={[Function]}
+          role="button"
+          tabIndex="0"
+          type="submit"
+        >
+          <span
+            className="MuiButton-label-49836587"
+          >
+            Login
+          </span>
+          <span
+            className="MuiTouchRipple-root-3868442396"
+          />
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+`;

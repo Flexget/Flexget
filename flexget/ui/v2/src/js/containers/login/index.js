@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import LoginPage from 'components/login';
 
-function mapStateToProps({ auth }) {
+export function mapStateToProps({ auth }) {
   return {
     redirectToReferrer: !!auth.loggedIn,
   };

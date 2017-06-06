@@ -24,7 +24,7 @@ const styleSheet = createStyleSheet('LoginCard', theme => ({
   },
 }));
 
-const LoginCard = ({ classes, handleSubmit, errorStatus }) => (
+export const LoginCard = ({ classes, handleSubmit, errorStatus }) => (
   <Card className={classes.card}>
     <form onSubmit={handleSubmit}>
       <CardContent>

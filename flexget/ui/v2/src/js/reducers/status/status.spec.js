@@ -27,13 +27,7 @@ describe('reducers/status', () => {
           type: TEST,
           namespace: NAMESPACE,
         },
-      })).toEqual({
-        loading: {
-          TEST: NAMESPACE,
-        },
-        error: null,
-        info: null,
-      });
+      })).toMatchSnapshot();
     });
 
     it('should set loading status when not empty', () => {
@@ -49,14 +43,7 @@ describe('reducers/status', () => {
           type: 'OTHER',
           namespace: NAMESPACE,
         },
-      })).toEqual({
-        loading: {
-          TEST: NAMESPACE,
-          OTHER: NAMESPACE,
-        },
-        error: null,
-        info: null,
-      });
+      })).toMatchSnapshot();
     });
     it('should not change if already loading that action', () => {
       expect(reducer({
@@ -71,13 +58,7 @@ describe('reducers/status', () => {
           type: TEST,
           namespace: NAMESPACE,
         },
-      })).toEqual({
-        loading: {
-          TEST: NAMESPACE,
-        },
-        error: null,
-        info: null,
-      });
+      })).toMatchSnapshot();
     });
   });
 
@@ -87,13 +68,7 @@ describe('reducers/status', () => {
       payload: {
         message: 'something',
       },
-    })).toEqual({
-      loading: {},
-      error: {
-        message: 'something',
-      },
-      info: null,
-    });
+    })).toMatchSnapshot();
   });
 
   it('should handle INFO_STATUS', () => {
@@ -102,27 +77,15 @@ describe('reducers/status', () => {
       payload: {
         message: 'something',
       },
-    })).toEqual({
-      loading: {},
-      error: null,
-      info: 'something',
-    });
+    })).toMatchSnapshot();
   });
 
-  it('should handle CLOSE_STATUS', () => {
-    expect(reducer(undefined, { type: CLOSE_STATUS })).toEqual({
-      loading: {},
-      error: null,
-      info: null,
-    });
+  it('should clear state on CLOSE_STATUS', () => {
+    expect(reducer(undefined, { type: CLOSE_STATUS })).toMatchSnapshot();
   });
 
-  it('should handle LOCATION_CHANGE', () => {
-    expect(reducer(undefined, { type: LOCATION_CHANGE })).toEqual({
-      loading: {},
-      error: null,
-      info: null,
-    });
+  it('should clear state on LOCATION_CHANGE', () => {
+    expect(reducer(undefined, { type: LOCATION_CHANGE })).toMatchSnapshot();
   });
 
   it('should handle loding done', () => {
@@ -134,10 +97,6 @@ describe('reducers/status', () => {
       info: null,
     }, {
       type: TEST,
-    })).toEqual({
-      loading: {},
-      error: null,
-      info: null,
-    });
+    })).toMatchSnapshot();
   });
 });

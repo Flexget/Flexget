@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { login } from 'actions/auth';
 import LoginCard from 'components/login/LoginCard';
 
-function mapStateToProps({ status }) {
+export function mapStateToProps({ status }) {
   return {
     initialValues: {
       username: 'flexget',

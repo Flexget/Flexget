@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/layout/Logo adds logoMini class without sideBarOpen 1`] = `
+<a
+  href="/"
+  onClick={[Function]}
+>
+  <div
+    className="Logo-logo-2286036472 Logo-logoMini-3005040939"
+  />
+</a>
+`;
+
+exports[`components/layout/Logo renders correctly with sideBarOpen 1`] = `
+<a
+  href="/"
+  onClick={[Function]}
+>
+  <div
+    className="Logo-logo-2286036472"
+  />
+</a>
+`;

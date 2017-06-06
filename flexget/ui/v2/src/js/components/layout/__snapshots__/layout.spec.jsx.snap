@@ -1,0 +1,621 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/layout renders correctly 1`] = `
+<div
+  className="Layout-layout-3122214184"
+>
+  <header
+    className="Layout-header-1991456543"
+  >
+    <div
+      className="Layout-logo-2896339287"
+    >
+      <a
+        href="/"
+        onClick={[Function]}
+      >
+        <div
+          className="Logo-logo-2286036472 Logo-logoMini-3005040939"
+        />
+      </a>
+    </div>
+    <nav
+      className="Layout-navbar-908616392"
+    >
+      <div
+        className="MuiPaper-paper-2677686717 MuiPaper-dp4-941451405 MuiAppBar-appBar-1743332029 MuiAppBar-primary-15947162 Navbar-appBar-3881610462"
+      >
+        <div
+          className="MuiToolbar-root-3627194460 MuiToolbar-gutters-344431791 Navbar-toolbar-465295589"
+        >
+          <button
+            className="MuiButtonBase-buttonBase-3477017037 MuiIconButton-iconButton-3609702008 Navbar-icon-2539079880"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+            role="button"
+            tabIndex="0"
+            type="button"
+          >
+            <span
+              className="MuiIconButton-label-2320069359"
+            >
+              <span
+                aria-hidden="true"
+                className="material-icons MuiIcon-root-3402991258 MuiIconButton-icon-156099627 fa fa-bars"
+              />
+            </span>
+            <span
+              className="MuiTouchRipple-root-3868442396"
+            />
+          </button>
+          <div
+            className="Navbar-spacer-3298558061"
+          />
+          <a
+            href="/config"
+            onClick={[Function]}
+          >
+            <button
+              aria-label="Config"
+              className="MuiButtonBase-buttonBase-3477017037 MuiIconButton-iconButton-3609702008 Navbar-icon-2539079880"
+              disabled={false}
+              onBlur={[Function]}
+              onFocus={[Function]}
+              onKeyDown={[Function]}
+              onKeyUp={[Function]}
+              onMouseDown={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onTouchEnd={[Function]}
+              onTouchStart={[Function]}
+              role="button"
+              tabIndex="0"
+              type="button"
+            >
+              <span
+                className="MuiIconButton-label-2320069359"
+              >
+                <span
+                  aria-hidden="true"
+                  className="material-icons MuiIcon-root-3402991258 MuiIconButton-icon-156099627 fa fa-pencil"
+                />
+              </span>
+              <span
+                className="MuiTouchRipple-root-3868442396"
+              />
+            </button>
+          </a>
+          <a
+            href="/log"
+            onClick={[Function]}
+          >
+            <button
+              aria-label="Log"
+              className="MuiButtonBase-buttonBase-3477017037 MuiIconButton-iconButton-3609702008 Navbar-icon-2539079880"
+              disabled={false}
+              onBlur={[Function]}
+              onFocus={[Function]}
+              onKeyDown={[Function]}
+              onKeyUp={[Function]}
+              onMouseDown={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onTouchEnd={[Function]}
+              onTouchStart={[Function]}
+              role="button"
+              tabIndex="0"
+              type="button"
+            >
+              <span
+                className="MuiIconButton-label-2320069359"
+              >
+                <span
+                  aria-hidden="true"
+                  className="material-icons MuiIcon-root-3402991258 MuiIconButton-icon-156099627 fa fa-file-text-o"
+                />
+              </span>
+              <span
+                className="MuiTouchRipple-root-3868442396"
+              />
+            </button>
+          </a>
+          <button
+            aria-label="Manage"
+            className="MuiButtonBase-buttonBase-3477017037 MuiIconButton-iconButton-3609702008 Navbar-icon-2539079880"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+            role="button"
+            tabIndex="0"
+            type="button"
+          >
+            <span
+              className="MuiIconButton-label-2320069359"
+            >
+              <span
+                aria-hidden="true"
+                className="material-icons MuiIcon-root-3402991258 MuiIconButton-icon-156099627 fa fa-cog"
+              />
+            </span>
+            <span
+              className="MuiTouchRipple-root-3868442396"
+            />
+          </button>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <main
+    className="Layout-main-101440188"
+  >
+    <aside
+      className={undefined}
+    >
+      <div
+        className="MuiPaper-paper-2677686717 MuiPaper-dp16-3841796706 MuiPaper-rounded-418257787 SideNav-listWrapper-1187804153 SideNav-sideNavMini-2485013513"
+      >
+        <div
+          className="MuiList-root-43412855 MuiList-padding-392119320"
+        >
+          <a
+            href="/log"
+            onClick={[Function]}
+          >
+            <div
+              className="MuiListItem-listItem-3441122480 MuiListItem-gutters-58642691 MuiListItem-default-132630306 SideNav-listItem-2509608802"
+              disabled={false}
+            >
+              <button
+                className="MuiButtonBase-buttonBase-3477017037 MuiButton-root-2253430263 MuiButton-accent-3482837232 SideNav-button-2847385078"
+                disabled={false}
+                onBlur={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchStart={[Function]}
+                role="button"
+                tabIndex="0"
+                type="button"
+              >
+                <span
+                  className="MuiButton-label-49836587"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="material-icons MuiIcon-root-3402991258 fa fa-file-text-o SideNav-icon-2371623600"
+                  />
+                  <p
+                    className="SideNav-label-470754758 SideNav-labelMini-5987815"
+                  >
+                    Log
+                  </p>
+                </span>
+                <span
+                  className="MuiTouchRipple-root-3868442396"
+                />
+              </button>
+            </div>
+          </a>
+          <a
+            href="/execute"
+            onClick={[Function]}
+          >
+            <div
+              className="MuiListItem-listItem-3441122480 MuiListItem-gutters-58642691 MuiListItem-default-132630306 SideNav-listItem-2509608802"
+              disabled={false}
+            >
+              <button
+                className="MuiButtonBase-buttonBase-3477017037 MuiButton-root-2253430263 MuiButton-accent-3482837232 SideNav-button-2847385078"
+                disabled={false}
+                onBlur={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchStart={[Function]}
+                role="button"
+                tabIndex="0"
+                type="button"
+              >
+                <span
+                  className="MuiButton-label-49836587"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="material-icons MuiIcon-root-3402991258 fa fa-cog SideNav-icon-2371623600"
+                  />
+                  <p
+                    className="SideNav-label-470754758 SideNav-labelMini-5987815"
+                  >
+                    Execute
+                  </p>
+                </span>
+                <span
+                  className="MuiTouchRipple-root-3868442396"
+                />
+              </button>
+            </div>
+          </a>
+          <a
+            href="/config"
+            onClick={[Function]}
+          >
+            <div
+              className="MuiListItem-listItem-3441122480 MuiListItem-gutters-58642691 MuiListItem-default-132630306 SideNav-listItem-2509608802"
+              disabled={false}
+            >
+              <button
+                className="MuiButtonBase-buttonBase-3477017037 MuiButton-root-2253430263 MuiButton-accent-3482837232 SideNav-button-2847385078"
+                disabled={false}
+                onBlur={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchStart={[Function]}
+                role="button"
+                tabIndex="0"
+                type="button"
+              >
+                <span
+                  className="MuiButton-label-49836587"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="material-icons MuiIcon-root-3402991258 fa fa-pencil SideNav-icon-2371623600"
+                  />
+                  <p
+                    className="SideNav-label-470754758 SideNav-labelMini-5987815"
+                  >
+                    Config
+                  </p>
+                </span>
+                <span
+                  className="MuiTouchRipple-root-3868442396"
+                />
+              </button>
+            </div>
+          </a>
+          <a
+            href="/history"
+            onClick={[Function]}
+          >
+            <div
+              className="MuiListItem-listItem-3441122480 MuiListItem-gutters-58642691 MuiListItem-default-132630306 SideNav-listItem-2509608802"
+              disabled={false}
+            >
+              <button
+                className="MuiButtonBase-buttonBase-3477017037 MuiButton-root-2253430263 MuiButton-accent-3482837232 SideNav-button-2847385078"
+                disabled={false}
+                onBlur={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchStart={[Function]}
+                role="button"
+                tabIndex="0"
+                type="button"
+              >
+                <span
+                  className="MuiButton-label-49836587"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="material-icons MuiIcon-root-3402991258 fa fa-history SideNav-icon-2371623600"
+                  />
+                  <p
+                    className="SideNav-label-470754758 SideNav-labelMini-5987815"
+                  >
+                    History
+                  </p>
+                </span>
+                <span
+                  className="MuiTouchRipple-root-3868442396"
+                />
+              </button>
+            </div>
+          </a>
+          <a
+            href="/movies"
+            onClick={[Function]}
+          >
+            <div
+              className="MuiListItem-listItem-3441122480 MuiListItem-gutters-58642691 MuiListItem-default-132630306 SideNav-listItem-2509608802"
+              disabled={false}
+            >
+              <button
+                className="MuiButtonBase-buttonBase-3477017037 MuiButton-root-2253430263 MuiButton-accent-3482837232 SideNav-button-2847385078"
+                disabled={false}
+                onBlur={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchStart={[Function]}
+                role="button"
+                tabIndex="0"
+                type="button"
+              >
+                <span
+                  className="MuiButton-label-49836587"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="material-icons MuiIcon-root-3402991258 fa fa-film SideNav-icon-2371623600"
+                  />
+                  <p
+                    className="SideNav-label-470754758 SideNav-labelMini-5987815"
+                  >
+                    Movies
+                  </p>
+                </span>
+                <span
+                  className="MuiTouchRipple-root-3868442396"
+                />
+              </button>
+            </div>
+          </a>
+          <a
+            href="/pending"
+            onClick={[Function]}
+          >
+            <div
+              className="MuiListItem-listItem-3441122480 MuiListItem-gutters-58642691 MuiListItem-default-132630306 SideNav-listItem-2509608802"
+              disabled={false}
+            >
+              <button
+                className="MuiButtonBase-buttonBase-3477017037 MuiButton-root-2253430263 MuiButton-accent-3482837232 SideNav-button-2847385078"
+                disabled={false}
+                onBlur={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchStart={[Function]}
+                role="button"
+                tabIndex="0"
+                type="button"
+              >
+                <span
+                  className="MuiButton-label-49836587"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="material-icons MuiIcon-root-3402991258 fa fa-check SideNav-icon-2371623600"
+                  />
+                  <p
+                    className="SideNav-label-470754758 SideNav-labelMini-5987815"
+                  >
+                    Pending
+                  </p>
+                </span>
+                <span
+                  className="MuiTouchRipple-root-3868442396"
+                />
+              </button>
+            </div>
+          </a>
+          <a
+            href="/schedule"
+            onClick={[Function]}
+          >
+            <div
+              className="MuiListItem-listItem-3441122480 MuiListItem-gutters-58642691 MuiListItem-default-132630306 SideNav-listItem-2509608802"
+              disabled={false}
+            >
+              <button
+                className="MuiButtonBase-buttonBase-3477017037 MuiButton-root-2253430263 MuiButton-accent-3482837232 SideNav-button-2847385078"
+                disabled={false}
+                onBlur={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchStart={[Function]}
+                role="button"
+                tabIndex="0"
+                type="button"
+              >
+                <span
+                  className="MuiButton-label-49836587"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="material-icons MuiIcon-root-3402991258 fa fa-calendar SideNav-icon-2371623600"
+                  />
+                  <p
+                    className="SideNav-label-470754758 SideNav-labelMini-5987815"
+                  >
+                    Schedule
+                  </p>
+                </span>
+                <span
+                  className="MuiTouchRipple-root-3868442396"
+                />
+              </button>
+            </div>
+          </a>
+          <a
+            href="/seen"
+            onClick={[Function]}
+          >
+            <div
+              className="MuiListItem-listItem-3441122480 MuiListItem-gutters-58642691 MuiListItem-default-132630306 SideNav-listItem-2509608802"
+              disabled={false}
+            >
+              <button
+                className="MuiButtonBase-buttonBase-3477017037 MuiButton-root-2253430263 MuiButton-accent-3482837232 SideNav-button-2847385078"
+                disabled={false}
+                onBlur={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchStart={[Function]}
+                role="button"
+                tabIndex="0"
+                type="button"
+              >
+                <span
+                  className="MuiButton-label-49836587"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="material-icons MuiIcon-root-3402991258 fa fa-eye SideNav-icon-2371623600"
+                  />
+                  <p
+                    className="SideNav-label-470754758 SideNav-labelMini-5987815"
+                  >
+                    Seen
+                  </p>
+                </span>
+                <span
+                  className="MuiTouchRipple-root-3868442396"
+                />
+              </button>
+            </div>
+          </a>
+          <a
+            href="/series"
+            onClick={[Function]}
+          >
+            <div
+              className="MuiListItem-listItem-3441122480 MuiListItem-gutters-58642691 MuiListItem-default-132630306 SideNav-listItem-2509608802"
+              disabled={false}
+            >
+              <button
+                className="MuiButtonBase-buttonBase-3477017037 MuiButton-root-2253430263 MuiButton-accent-3482837232 SideNav-button-2847385078"
+                disabled={false}
+                onBlur={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchStart={[Function]}
+                role="button"
+                tabIndex="0"
+                type="button"
+              >
+                <span
+                  className="MuiButton-label-49836587"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="material-icons MuiIcon-root-3402991258 fa fa-tv SideNav-icon-2371623600"
+                  />
+                  <p
+                    className="SideNav-label-470754758 SideNav-labelMini-5987815"
+                  >
+                    Series
+                  </p>
+                </span>
+                <span
+                  className="MuiTouchRipple-root-3868442396"
+                />
+              </button>
+            </div>
+          </a>
+          <a
+            href="/status"
+            onClick={[Function]}
+          >
+            <div
+              className="MuiListItem-listItem-3441122480 MuiListItem-gutters-58642691 MuiListItem-default-132630306 SideNav-listItem-2509608802"
+              disabled={false}
+            >
+              <button
+                className="MuiButtonBase-buttonBase-3477017037 MuiButton-root-2253430263 MuiButton-accent-3482837232 SideNav-button-2847385078"
+                disabled={false}
+                onBlur={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchStart={[Function]}
+                role="button"
+                tabIndex="0"
+                type="button"
+              >
+                <span
+                  className="MuiButton-label-49836587"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="material-icons MuiIcon-root-3402991258 fa fa-heartbeat SideNav-icon-2371623600"
+                  />
+                  <p
+                    className="SideNav-label-470754758 SideNav-labelMini-5987815"
+                  >
+                    Status
+                  </p>
+                </span>
+                <span
+                  className="MuiTouchRipple-root-3868442396"
+                />
+              </button>
+            </div>
+          </a>
+        </div>
+      </div>
+    </aside>
+    <section
+      className="Layout-content-2806348243"
+    >
+      <div
+        className="Layout-pageWrap-286620979"
+      >
+        <div />
+      </div>
+    </section>
+  </main>
+</div>
+`;

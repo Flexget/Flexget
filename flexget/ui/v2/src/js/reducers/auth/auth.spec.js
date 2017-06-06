@@ -4,32 +4,32 @@ import { ERROR_STATUS } from 'actions/status';
 
 describe('reducers/auth', () => {
   it('should return the initial state', () => {
-    expect(reducer(undefined, {})).toEqual({});
+    expect(reducer(undefined, {})).toMatchSnapshot();
   });
 
-  it('should handle LOGIN', () => {
-    expect(reducer(undefined, { type: LOGIN })).toEqual({ loggedIn: true });
+  it('should login on LOGIN', () => {
+    expect(reducer(undefined, { type: LOGIN })).toMatchSnapshot();
   });
 
-  it('should handle LOGOUT', () => {
-    expect(reducer({ loggedIn: true }, { type: LOGOUT })).toEqual({});
+  it('should logout on LOGOUT', () => {
+    expect(reducer({ loggedIn: true }, { type: LOGOUT })).toMatchSnapshot();
   });
 
-  it('should handle a 401 ERROR_STATUS', () => {
+  it('should logout on a 401 ERROR_STATUS', () => {
     expect(reducer({ loggedIn: true }, {
       type: ERROR_STATUS,
       payload: {
         statusCode: 401,
       },
-    })).toEqual({});
+    })).toMatchSnapshot();
   });
 
-  it('should handle a non 401 ERROR_STATUS', () => {
+  it('should stay logged In on a non 401 ERROR_STATUS', () => {
     expect(reducer({ loggedIn: true }, {
       type: ERROR_STATUS,
       payload: {
         statusCode: 404,
       },
-    })).toEqual({ loggedIn: true });
+    })).toMatchSnapshot();
   });
 });

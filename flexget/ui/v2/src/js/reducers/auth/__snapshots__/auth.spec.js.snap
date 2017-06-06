@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`reducers/auth should login on LOGIN 1`] = `
+Object {
+  "loggedIn": true,
+}
+`;
+
+exports[`reducers/auth should logout on LOGOUT 1`] = `Object {}`;
+
+exports[`reducers/auth should logout on a 401 ERROR_STATUS 1`] = `Object {}`;
+
+exports[`reducers/auth should return the initial state 1`] = `Object {}`;
+
+exports[`reducers/auth should stay logged In on a non 401 ERROR_STATUS 1`] = `
+Object {
+  "loggedIn": true,
+}
+`;

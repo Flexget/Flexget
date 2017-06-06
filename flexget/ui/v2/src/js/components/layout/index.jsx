@@ -66,8 +66,12 @@ class Layout extends Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     classes: PropTypes.object.isRequired,
-    loggedIn: PropTypes.bool.isRequired,
+    loggedIn: PropTypes.bool,
     checkLogin: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    loggedIn: false,
   };
 
   state = {

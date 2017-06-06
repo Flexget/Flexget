@@ -1,0 +1,142 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/layout/Navbar renders correctly 1`] = `
+<div
+  className="MuiPaper-paper-2677686717 MuiPaper-dp4-941451405 MuiAppBar-appBar-1743332029 MuiAppBar-primary-15947162"
+>
+  <div
+    className="MuiToolbar-root-3627194460 MuiToolbar-gutters-344431791"
+  >
+    <button
+      className="MuiButtonBase-buttonBase-3477017037 MuiIconButton-iconButton-3609702008"
+      disabled={false}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      onMouseLeave={[Function]}
+      onMouseUp={[Function]}
+      onTouchEnd={[Function]}
+      onTouchStart={[Function]}
+      role="button"
+      tabIndex="0"
+      type="button"
+    >
+      <span
+        className="MuiIconButton-label-2320069359"
+      >
+        <span
+          aria-hidden="true"
+          className="material-icons MuiIcon-root-3402991258 MuiIconButton-icon-156099627 fa fa-bars"
+        />
+      </span>
+      <span
+        className="MuiTouchRipple-root-3868442396"
+      />
+    </button>
+    <div
+      className={undefined}
+    />
+    <a
+      href="/config"
+      onClick={[Function]}
+    >
+      <button
+        aria-label="Config"
+        className="MuiButtonBase-buttonBase-3477017037 MuiIconButton-iconButton-3609702008"
+        disabled={false}
+        onBlur={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchStart={[Function]}
+        role="button"
+        tabIndex="0"
+        type="button"
+      >
+        <span
+          className="MuiIconButton-label-2320069359"
+        >
+          <span
+            aria-hidden="true"
+            className="material-icons MuiIcon-root-3402991258 MuiIconButton-icon-156099627 fa fa-pencil"
+          />
+        </span>
+        <span
+          className="MuiTouchRipple-root-3868442396"
+        />
+      </button>
+    </a>
+    <a
+      href="/log"
+      onClick={[Function]}
+    >
+      <button
+        aria-label="Log"
+        className="MuiButtonBase-buttonBase-3477017037 MuiIconButton-iconButton-3609702008"
+        disabled={false}
+        onBlur={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchStart={[Function]}
+        role="button"
+        tabIndex="0"
+        type="button"
+      >
+        <span
+          className="MuiIconButton-label-2320069359"
+        >
+          <span
+            aria-hidden="true"
+            className="material-icons MuiIcon-root-3402991258 MuiIconButton-icon-156099627 fa fa-file-text-o"
+          />
+        </span>
+        <span
+          className="MuiTouchRipple-root-3868442396"
+        />
+      </button>
+    </a>
+    <button
+      aria-label="Manage"
+      className="MuiButtonBase-buttonBase-3477017037 MuiIconButton-iconButton-3609702008"
+      disabled={false}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      onMouseLeave={[Function]}
+      onMouseUp={[Function]}
+      onTouchEnd={[Function]}
+      onTouchStart={[Function]}
+      role="button"
+      tabIndex="0"
+      type="button"
+    >
+      <span
+        className="MuiIconButton-label-2320069359"
+      >
+        <span
+          aria-hidden="true"
+          className="material-icons MuiIcon-root-3402991258 MuiIconButton-icon-156099627 fa fa-cog"
+        />
+      </span>
+      <span
+        className="MuiTouchRipple-root-3868442396"
+      />
+    </button>
+  </div>
+</div>
+`;

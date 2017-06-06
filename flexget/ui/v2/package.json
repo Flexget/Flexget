@@ -19,9 +19,20 @@
   "jest": {
     "collectCoverageFrom": [
       "src/**/*.{js,jsx}",
+      "!src/js/store/*.js",
+      "!src/js/reducers/index.js",
+      "!src/js/{app,history,root,theme}.{js,jsx}",
       "!**/node_modules/**",
       "!**/dist/**"
     ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    },
     "moduleFileExtensions": [
       "js",
       "jsx"
@@ -33,8 +44,11 @@
     ],
     "moduleNameMapper": {
       "\\.css$": "identity-obj-proxy",
-      "\\.(gif|ttf|eot|svg)$": "src/js/__mocks__/fileMock.js"
-    }
+      "\\.(gif|ttf|eot|svg|png)$": "<rootDir>/src/js/__mocks__/fileMock.js"
+    },
+    "setupFiles": [
+      "./setupTests.js"
+    ]
   },
   "author": "",
   "license": "MIT",
@@ -55,6 +69,7 @@
     "babel-preset-stage-0": "^6.24.1",
     "codacy-coverage": "^2.0.2",
     "css-loader": "^0.28.3",
+    "enzyme": "^2.8.2",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^15.0.1",
     "eslint-import-resolver-webpack": "^0.8.1",
@@ -70,6 +85,7 @@
     "html-webpack-plugin": "^2.28.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^20.0.4",
+    "jsdom": "^11.0.0",
     "markdown-loader": "^2.0.0",
     "node-sass": "^4.5.3",
     "react-test-renderer": "^15.5.4",
@@ -89,7 +105,7 @@
     "font-awesome": "^4.7.0",
     "history": "^4.6.1",
     "loaders.css": "^0.1.2",
-    "material-ui": "^1.0.0-alpha.15",
+    "material-ui": "^1.0.0-alpha.16",
     "normalize.css": "^7.0.0",
     "prop-types": "^15.5.10",
     "react": "^15.5.4",

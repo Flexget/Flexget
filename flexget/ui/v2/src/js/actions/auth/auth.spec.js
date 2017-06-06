@@ -17,19 +17,6 @@ describe('actions/auth', () => {
 
   describe('login', () => {
     it('dispatches the correct actions on succesful login', () => {
-      const expectedActions = [
-        expect.objectContaining({
-          type: auth.LOGIN,
-          meta: {
-            namespace: auth.AUTH,
-            loading: true,
-          },
-        }),
-        expect.objectContaining({
-          type: auth.LOGIN,
-          error: false,
-        }),
-      ];
       const store = mockStore({ auth: {} });
 
       fetchMock
@@ -37,44 +24,25 @@ describe('actions/auth', () => {
 
       return store.dispatch(auth.login(credentials))
         .then(() => {
-          expect(store.getActions()).toEqual(expectedActions);
+          expect(store.getActions()).toMatchSnapshot();
         });
     });
 
 
     it('dispatches the correct actions on unsuccesful login', () => {
-      const expectedActions = [
-        expect.objectContaining({
-          type: auth.LOGIN,
-          meta: {
-            namespace: auth.AUTH,
-            loading: true,
-          },
-        }),
-        expect.objectContaining({
-          type: auth.LOGIN,
-          error: true,
-        }),
-      ];
       const store = mockStore({ auth: {} });
       fetchMock
-        .post('/api/auth/login', 401);
+        .post('/api/auth/login', { status: 401, body: {} });
 
       return store.dispatch(auth.login(credentials))
         .then(() => {
-          expect(store.getActions()).toEqual(expectedActions);
+          expect(store.getActions()).toMatchSnapshot();
         });
     });
   });
 
   describe('checkLogin', () => {
     it('dispatches the login action if already logged in', () => {
-      const expectedActions = [
-        expect.objectContaining({
-          type: auth.LOGIN,
-          error: false,
-        }),
-      ];
       const store = mockStore({ auth: {} });
 
       fetchMock
@@ -82,39 +50,25 @@ describe('actions/auth', () => {
 
       return store.dispatch(auth.checkLogin())
         .then(() => {
-          expect(store.getActions()).toEqual(expectedActions);
+          expect(store.getActions()).toMatchSnapshot();
         });
     });
 
 
     it('dispatches no actions if not logged in already', () => {
-      const expectedActions = [];
       const store = mockStore({ auth: {} });
       fetchMock
-        .get('/api/server/version', 401);
+        .get('/api/server/version', { status: 401, body: {} });
 
       return store.dispatch(auth.checkLogin())
         .then(() => {
-          expect(store.getActions()).toEqual(expectedActions);
+          expect(store.getActions()).toMatchSnapshot();
         });
     });
   });
 
   describe('logout', () => {
     it('dispatches the correct actions on succesful logout', () => {
-      const expectedActions = [
-        expect.objectContaining({
-          type: auth.LOGOUT,
-          meta: {
-            namespace: auth.AUTH,
-            loading: true,
-          },
-        }),
-        expect.objectContaining({
-          type: auth.LOGOUT,
-          error: false,
-        }),
-      ];
       const store = mockStore({ auth: {} });
 
       fetchMock
@@ -122,32 +76,19 @@ describe('actions/auth', () => {
 
       return store.dispatch(auth.logout())
         .then(() => {
-          expect(store.getActions()).toEqual(expectedActions);
+          expect(store.getActions()).toMatchSnapshot();
         });
     });
 
 
     it('dispatches the correct actions on unsuccesful logout', () => {
-      const expectedActions = [
-        expect.objectContaining({
-          type: auth.LOGOUT,
-          meta: {
-            namespace: auth.AUTH,
-            loading: true,
-          },
-        }),
-        expect.objectContaining({
-          type: auth.LOGOUT,
-          error: true,
-        }),
-      ];
       const store = mockStore({ auth: {} });
       fetchMock
-        .get('/api/auth/logout', 401);
+        .get('/api/auth/logout', { status: 401, body: {} });
 
       return store.dispatch(auth.logout())
         .then(() => {
-          expect(store.getActions()).toEqual(expectedActions);
+          expect(store.getActions()).toMatchSnapshot();
         });
     });
   });

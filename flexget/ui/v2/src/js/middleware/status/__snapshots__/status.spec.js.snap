@@ -1,0 +1,66 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`middleware/status should dispatch ERROR_STATUS if error and not ignore 1`] = `
+Array [
+  Object {
+    "error": true,
+    "payload": Object {
+      "message": "Unauthorized",
+      "namespace": "TEST",
+      "statusCode": 401,
+      "type": "ACTION",
+    },
+    "type": "ERROR_STATUS",
+  },
+]
+`;
+
+exports[`middleware/status should dispatch INFO_STATUS and the original action if message is set 1`] = `
+Array [
+  Object {
+    "payload": Object {
+      "message": "A message",
+      "namespace": "TEST",
+      "type": "ACTION",
+    },
+    "type": "INFO_STATUS",
+  },
+  Object {
+    "error": false,
+    "meta": Object {
+      "ignore": false,
+      "message": "A message",
+      "namespace": "TEST",
+    },
+    "payload": Object {},
+    "type": "ACTION",
+  },
+]
+`;
+
+exports[`middleware/status should dispatch LOADING_STATUS if loading 1`] = `
+Array [
+  Object {
+    "payload": Object {
+      "namespace": "TEST",
+      "type": "ACTION",
+    },
+    "type": "LOADING_STATUS",
+  },
+]
+`;
+
+exports[`middleware/status should not dispatch ERROR_STATUS if error and ignore 1`] = `
+Array [
+  Object {
+    "error": true,
+    "meta": Object {
+      "ignore": true,
+      "message": undefined,
+      "namespace": "TEST",
+    },
+    "payload": [Error: Unauthorized],
+    "type": "ACTION",
+  },
+]
+`;

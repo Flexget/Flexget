@@ -1,0 +1,106 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`actions/auth checkLogin dispatches no actions if not logged in already 1`] = `Array []`;
+
+exports[`actions/auth checkLogin dispatches the login action if already logged in 1`] = `
+Array [
+  Object {
+    "error": false,
+    "meta": Object {
+      "ignore": false,
+      "message": undefined,
+      "namespace": "AUTH",
+    },
+    "payload": undefined,
+    "type": "LOGIN",
+  },
+]
+`;
+
+exports[`actions/auth login dispatches the correct actions on succesful login 1`] = `
+Array [
+  Object {
+    "meta": Object {
+      "loading": true,
+      "namespace": "AUTH",
+    },
+    "type": "LOGIN",
+  },
+  Object {
+    "error": false,
+    "meta": Object {
+      "ignore": false,
+      "message": undefined,
+      "namespace": "AUTH",
+    },
+    "payload": undefined,
+    "type": "LOGIN",
+  },
+]
+`;
+
+exports[`actions/auth login dispatches the correct actions on unsuccesful login 1`] = `
+Array [
+  Object {
+    "meta": Object {
+      "loading": true,
+      "namespace": "AUTH",
+    },
+    "type": "LOGIN",
+  },
+  Object {
+    "error": true,
+    "meta": Object {
+      "ignore": false,
+      "message": undefined,
+      "namespace": "AUTH",
+    },
+    "payload": [Error],
+    "type": "LOGIN",
+  },
+]
+`;
+
+exports[`actions/auth logout dispatches the correct actions on succesful logout 1`] = `
+Array [
+  Object {
+    "meta": Object {
+      "loading": true,
+      "namespace": "AUTH",
+    },
+    "type": "LOGOUT",
+  },
+  Object {
+    "error": false,
+    "meta": Object {
+      "ignore": false,
+      "message": undefined,
+      "namespace": "AUTH",
+    },
+    "payload": undefined,
+    "type": "LOGOUT",
+  },
+]
+`;
+
+exports[`actions/auth logout dispatches the correct actions on unsuccesful logout 1`] = `
+Array [
+  Object {
+    "meta": Object {
+      "loading": true,
+      "namespace": "AUTH",
+    },
+    "type": "LOGOUT",
+  },
+  Object {
+    "error": true,
+    "meta": Object {
+      "ignore": false,
+      "message": undefined,
+      "namespace": "AUTH",
+    },
+    "payload": [Error],
+    "type": "LOGOUT",
+  },
+]
+`;

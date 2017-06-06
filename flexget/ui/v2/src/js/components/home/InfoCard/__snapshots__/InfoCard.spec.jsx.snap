@@ -1,0 +1,189 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/home/InfoCard renders correctly 1`] = `
+<div
+  className="MuiPaper-paper-2677686717 MuiPaper-dp2-317043508 MuiPaper-rounded-418257787 MuiCard-card-772068234 InfoCard-card-2880041734"
+>
+  <div
+    className="MuiCardContent-cardContent-741240096 MuiCardHeader-cardHeader-2322798472 InfoCard-cardHeader-3624283618"
+  >
+    <div
+      className="MuiCardHeader-content-1267998599"
+    >
+      <span
+        className="MuiTypography-text-233331062 MuiTypography-headline-579169135"
+      >
+        Flexget Web Interface
+      </span>
+      <span
+        className="MuiTypography-text-233331062 MuiTypography-body1-2814455093 MuiTypography-secondary-864248976"
+      >
+        Under Development
+      </span>
+    </div>
+  </div>
+  <div
+    className="MuiCardContent-cardContent-741240096"
+  >
+    <p
+      className="InfoCard-boldText-3524915151"
+    >
+      We need your help! If you are a React developer or can help with the layout/design/css then please join in the effort!
+    </p>
+    <p>
+      The interface is not yet ready for end users. Consider this preview only state.
+    </p>
+    <p>
+      If you still use it anyways, please report back to us on how well it works, issues, ideas etc...
+    </p>
+    <p>
+      There is a functional API with documentation available at 
+      <a
+        href="/api"
+      >
+        /api
+      </a>
+    </p>
+    <p>
+      More information: 
+      <a
+        href="http://flexget.com/wiki/Web-UI/v2"
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        http://flexget.com/wiki/Web-UI/v2
+      </a>
+    </p>
+    <p>
+      Gitter Chat: 
+      <a
+        href="https://gitter.im/Flexget/Flexget"
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        https://gitter.im/Flexget/Flexget
+      </a>
+    </p>
+  </div>
+  <div
+    className="MuiCardActions-cardActions-1345515364 InfoCard-cardActions-932422328"
+  >
+    <a
+      aria-label="Github"
+      className="MuiButtonBase-buttonBase-3477017037 MuiIconButton-iconButton-3609702008 MuiCardActions-actionSpacing-2598224809"
+      href="https://github.com/Flexget/Flexget"
+      onBlur={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      onMouseLeave={[Function]}
+      onMouseUp={[Function]}
+      onTouchEnd={[Function]}
+      onTouchStart={[Function]}
+      rel="noopener noreferrer"
+      tabIndex="0"
+      target="_blank"
+    >
+      <span
+        className="MuiIconButton-label-2320069359"
+      >
+        <span
+          aria-hidden="true"
+          className="material-icons MuiIcon-root-3402991258 MuiIconButton-icon-156099627 fa fa-github"
+        />
+      </span>
+      <span
+        className="MuiTouchRipple-root-3868442396"
+      />
+    </a>
+    <a
+      aria-label="Flexget.com"
+      className="MuiButtonBase-buttonBase-3477017037 MuiIconButton-iconButton-3609702008 MuiCardActions-actionSpacing-2598224809"
+      href="https://flexget.com"
+      onBlur={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      onMouseLeave={[Function]}
+      onMouseUp={[Function]}
+      onTouchEnd={[Function]}
+      onTouchStart={[Function]}
+      rel="noopener noreferrer"
+      tabIndex="0"
+      target="_blank"
+    >
+      <span
+        className="MuiIconButton-label-2320069359"
+      >
+        <span
+          aria-hidden="true"
+          className="material-icons MuiIcon-root-3402991258 MuiIconButton-icon-156099627 fa fa-home"
+        />
+      </span>
+      <span
+        className="MuiTouchRipple-root-3868442396"
+      />
+    </a>
+    <a
+      aria-label="Gitter"
+      className="MuiButtonBase-buttonBase-3477017037 MuiIconButton-iconButton-3609702008 MuiCardActions-actionSpacing-2598224809"
+      href="https://gitter.im/Flexget/Flexget"
+      onBlur={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      onMouseLeave={[Function]}
+      onMouseUp={[Function]}
+      onTouchEnd={[Function]}
+      onTouchStart={[Function]}
+      rel="noopener noreferrer"
+      tabIndex="0"
+      target="_blank"
+    >
+      <span
+        className="MuiIconButton-label-2320069359"
+      >
+        <span
+          aria-hidden="true"
+          className="material-icons MuiIcon-root-3402991258 MuiIconButton-icon-156099627 fa fa-comment"
+        />
+      </span>
+      <span
+        className="MuiTouchRipple-root-3868442396"
+      />
+    </a>
+    <a
+      aria-label="Forum"
+      className="MuiButtonBase-buttonBase-3477017037 MuiIconButton-iconButton-3609702008 MuiCardActions-actionSpacing-2598224809"
+      href="https://discuss.flexget.com"
+      onBlur={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      onMouseLeave={[Function]}
+      onMouseUp={[Function]}
+      onTouchEnd={[Function]}
+      onTouchStart={[Function]}
+      rel="noopener noreferrer"
+      tabIndex="0"
+      target="_blank"
+    >
+      <span
+        className="MuiIconButton-label-2320069359"
+      >
+        <span
+          aria-hidden="true"
+          className="material-icons MuiIcon-root-3402991258 MuiIconButton-icon-156099627 fa fa-forumbee"
+        />
+      </span>
+      <span
+        className="MuiTouchRipple-root-3868442396"
+      />
+    </a>
+  </div>
+</div>
+`;

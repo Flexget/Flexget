@@ -28,7 +28,7 @@ const styleSheet = createStyleSheet('Navbar', theme => ({
   },
 }));
 
-class Navbar extends Component {
+export class Navbar extends Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
     toggle: PropTypes.func.isRequired,
@@ -39,7 +39,10 @@ class Navbar extends Component {
     open: false,
   };
 
-  handleRequestClose = () => this.setState({ open: false })
+  handleRequestClose = () => this.setState({
+    open: false,
+    anchorEl: undefined,
+  })
 
   handleMenuClick = event => this.setState({
     open: true,

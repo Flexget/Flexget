@@ -2,13 +2,13 @@ import { connect } from 'react-redux';
 import { checkLogin } from 'actions/auth';
 import Layout from 'components/layout';
 
-function mapStateToProps({ auth }) {
+export function mapStateToProps({ auth }) {
   return {
     loggedIn: !!auth.loggedIn,
   };
 }
 
-function mapDispatchToProps(dispatch) {
+export function mapDispatchToProps(dispatch) {
   return {
     checkLogin: () => dispatch(checkLogin()),
   };
