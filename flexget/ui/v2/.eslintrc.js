@@ -25,5 +25,7 @@ module.exports = {
   rules: {
     'react/forbid-prop-types': 'off',
     'react/jsx-no-bind': 'off',
+    'import/no-extraneous-dependencies':[ 'error', { devDependencies: true } ],
+    'import/prefer-default-export': 'off',
   }
 };

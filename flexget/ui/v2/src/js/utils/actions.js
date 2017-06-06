@@ -1,4 +1,7 @@
-export const createAction = namespace => (type, payload, message, ignore = false) => ({
+export const createAction = namespace => (type, payload, {
+  ignore = false,
+  message,
+} = {}) => ({
   type,
   payload,
   error: (payload instanceof Error),

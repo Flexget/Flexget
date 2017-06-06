@@ -1,4 +1,4 @@
-import { LOADING_STATUS, ERROR_STATUS, INFO_STATUS } from '../actions/status';
+import { LOADING_STATUS, ERROR_STATUS, INFO_STATUS } from 'actions/status';
 
 export default store => next => (action) => {
   if (action.meta && action.meta.loading) {

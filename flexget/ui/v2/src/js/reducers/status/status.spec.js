@@ -19,39 +19,65 @@ describe('reducers/status', () => {
     });
   });
 
-  it('should handle LOADING_STATUS', () => {
-    expect(reducer(undefined, {
-      type: LOADING_STATUS,
-      payload: {
-        type: TEST,
-        namespace: NAMESPACE,
-      },
-    })).toEqual({
-      loading: {
-        TEST: NAMESPACE,
-      },
-      error: null,
-      info: null,
+  describe('LOADING_STATUS', () => {
+    it('should set loading status when initially empty', () => {
+      expect(reducer(undefined, {
+        type: LOADING_STATUS,
+        payload: {
+          type: TEST,
+          namespace: NAMESPACE,
+        },
+      })).toEqual({
+        loading: {
+          TEST: NAMESPACE,
+        },
+        error: null,
+        info: null,
+      });
     });
-    expect(reducer({
-      loading: {
-        TEST: NAMESPACE,
-      },
-      error: null,
-      info: null,
-    }, {
-      type: LOADING_STATUS,
-      payload: {
-        type: 'OTHER',
-        namespace: NAMESPACE,
-      },
-    })).toEqual({
-      loading: {
-        TEST: NAMESPACE,
-        OTHER: NAMESPACE,
-      },
-      error: null,
-      info: null,
+
+    it('should set loading status when not empty', () => {
+      expect(reducer({
+        loading: {
+          TEST: NAMESPACE,
+        },
+        error: null,
+        info: null,
+      }, {
+        type: LOADING_STATUS,
+        payload: {
+          type: 'OTHER',
+          namespace: NAMESPACE,
+        },
+      })).toEqual({
+        loading: {
+          TEST: NAMESPACE,
+          OTHER: NAMESPACE,
+        },
+        error: null,
+        info: null,
+      });
+    });
+    it('should not change if already loading that action', () => {
+      expect(reducer({
+        loading: {
+          TEST: NAMESPACE,
+        },
+        error: null,
+        info: null,
+      }, {
+        type: LOADING_STATUS,
+        payload: {
+          type: TEST,
+          namespace: NAMESPACE,
+        },
+      })).toEqual({
+        loading: {
+          TEST: NAMESPACE,
+        },
+        error: null,
+        info: null,
+      });
     });
   });
 

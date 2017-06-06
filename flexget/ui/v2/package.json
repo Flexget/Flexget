@@ -18,7 +18,7 @@
   },
   "jest": {
     "collectCoverageFrom": [
-      "**/*.{js,jsx}",
+      "src/**/*.{js,jsx}",
       "!**/node_modules/**",
       "!**/dist/**"
     ],
@@ -32,7 +32,7 @@
       "src/js"
     ],
     "moduleNameMapper": {
-      "\\.(css|less)$": "src/js/__mocks__/styleMock.js",
+      "\\.css$": "identity-obj-proxy",
       "\\.(gif|ttf|eot|svg)$": "src/js/__mocks__/fileMock.js"
     }
   },
@@ -68,9 +68,11 @@
     "file-loader": "^0.11.1",
     "html-loader": "^0.4.5",
     "html-webpack-plugin": "^2.28.0",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^20.0.4",
     "markdown-loader": "^2.0.0",
     "node-sass": "^4.5.3",
+    "react-test-renderer": "^15.5.4",
     "redux-mock-store": "^1.2.3",
     "resolve-url-loader": "^2.0.2",
     "sass-loader": "^6.0.5",

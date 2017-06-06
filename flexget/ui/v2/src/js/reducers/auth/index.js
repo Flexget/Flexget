@@ -1,4 +1,5 @@
 import { LOGIN, LOGOUT } from 'actions/auth';
+import { ERROR_STATUS } from 'actions/status';
 
 export default function reducer(state = {}, action) {
   switch (action.type) {
@@ -8,11 +9,11 @@ export default function reducer(state = {}, action) {
       };
     case LOGOUT:
       return {};
-    default:
-      if (action.error && action.payload && action.payload.status === 401) {
+    case ERROR_STATUS:
+      if (action.payload.statusCode === 401) {
         return {};
       }
-
+    default: // eslint-disable-line no-fallthrough
       return state;
   }
 }

@@ -3,7 +3,7 @@ import { connectRouter, routerMiddleware } from 'connected-react-router';
 import history from 'history';
 import thunk from 'redux-thunk';
 import reducer from 'reducers';
-import status from 'store/status';
+import status from 'middleware/status';
 
 const store = createStore(
   connectRouter(history)(reducer),
