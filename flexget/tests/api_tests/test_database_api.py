@@ -17,7 +17,6 @@ class TestDatabaseAPI(object):
         ('vacuum', None, 200, base_message),
         ('plugin_reset', 'bla', 400, base_message),
         ('plugin_reset', 'tvmaze', 200, base_message),
-        ('list_plugins', None, 200, OC.plugin_list),
     ])
     def test_database_methods(self, operation, plugin_name, status, schema, api_client, schema_match):
         payload = {'operation': operation}
@@ -29,4 +28,12 @@ class TestDatabaseAPI(object):
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(schema, data)
+        assert not errors
+
+    def test_database_get_plugins(self, api_client, schema_match):
+        rsp = api_client.get('/database/plugins/')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.plugin_list, data)
         assert not errors

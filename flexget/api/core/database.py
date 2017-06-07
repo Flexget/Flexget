@@ -1,15 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-import logging
-
 from flask import jsonify, request
 
 from flexget.db_schema import reset_schema, plugin_schemas
 from flexget.api import api, APIResource
-from flexget.api.app import base_message_schema, success_response, BadRequest, etag
-
-log = logging.getLogger('database')
+from flexget.api.app import base_message_schema, success_response, BadRequest
 
 db_api = api.namespace('database', description='Manage Flexget DB')
 
@@ -39,6 +35,7 @@ reset_plugin_input_schema = api.schema('db_schema', ObjectsContainer.reset_plugi
 class DBOperation(APIResource):
     @api.response(200, model=base_message_schema)
     def post(self, session=None):
+        """Perform DB operations"""
         data = request.json
         operation = data['operation']
         if operation == 'cleanup':
@@ -48,8 +45,6 @@ class DBOperation(APIResource):
             session.execute('VACUUM')
             session.commit()
             msg = 'DB VACUUM finished'
-        elif operation == 'list_plugins':
-            return jsonify(sorted(list(plugin_schemas)))
         elif operation == 'plugin_reset':
             plugin_name = data['plugin_name']
             try:
@@ -60,10 +55,9 @@ class DBOperation(APIResource):
         return success_response(msg)
 
 
-@db_api.route('/cleanup/')
+@db_api.route('/plugins/')
 class DBCleanup(APIResource):
-    @api.response(200, model=base_message_schema)
-    def post(self, session=None):
-        """ Make all plugins clean un-needed data from the database """
-        self.manager.db_cleanup(force=True)
-        return success_response('DB Cleanup finished')
+    @api.response(200, model=plugins_schema)
+    def get(self, session=None):
+        """List resettable DB plugins"""
+        return jsonify(sorted(list(plugin_schemas)))
