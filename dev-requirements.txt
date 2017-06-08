@@ -1,5 +1,5 @@
 click==6.7
-sphinx
+sphinx==1.6.2
 pylint
 coverage
 flake8
