@@ -1,4 +1,4 @@
-click
+click==6.7
 sphinx
 pylint
 coverage
