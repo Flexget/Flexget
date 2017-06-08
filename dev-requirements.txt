@@ -1,6 +1,6 @@
 click==6.7
 sphinx==1.6.2
-pylint
+pylint==1.7.1
 coverage
 flake8
 mock
