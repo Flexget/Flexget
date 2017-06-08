@@ -13,7 +13,7 @@ pytest>=2.7,!=3.0.2
 pytest-capturelog==0.7
 pytest-xdist==1.16.0
 pytest-runner==2.11.1
-pytest-cov==2.2.1
+pytest-cov==2.5.1
 gitpython
 codacy-coverage>=1.2.18
 pip-tools
