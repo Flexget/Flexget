@@ -2,7 +2,7 @@ click==6.7
 sphinx==1.6.2
 pylint==1.7.1
 coverage==4.4.1
-flake8
+flake8==3.3.0
 mock
 requests~=2.16.3
 vcrpy~=1.11.1  # requests 2.16.3 doesn't work with vcrpy <1.11.1
