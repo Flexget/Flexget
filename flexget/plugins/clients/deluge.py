@@ -236,7 +236,8 @@ class InputDeluge(DelugePlugin):
         'save_path': 'deluge_path',
         'label': 'deluge_label',
         'total_size': ('content_size', lambda size: size / 1024 / 1024),
-        'files': ('content_files', lambda file_dicts: [f['path'] for f in file_dicts])}
+        'files': ('content_files', lambda file_dicts: [f['path'] for f in file_dicts]),
+        'file_sizes': ('content_file_sizes', lambda file_sizes: [f['size'] for f in file_sizes])}
 
     extra_settings_map = {
         'active_time': ('active_time', lambda time: time / 3600),
@@ -398,14 +399,8 @@ class OutputDeluge(DelugePlugin):
                     'removeatratio': {'type': 'boolean'},
                     'addpaused': {'type': 'boolean'},
                     'compact': {'type': 'boolean'},
-                    'content_filename': {'type': 'string'},
-                    'main_file_only': {'type': 'boolean'},
-                    'main_file_ratio': {'type': 'number'},
                     'magnetization_timeout': {'type': 'integer'},
-                    'keep_subs': {'type': 'boolean'},
-                    'hide_sparse_files': {'type': 'boolean'},
                     'enabled': {'type': 'boolean'},
-                    'container_directory': {'type': 'string'},
                 },
                 'additionalProperties': False
             }
@@ -420,10 +415,7 @@ class OutputDeluge(DelugePlugin):
         config.setdefault('path', '')
         config.setdefault('movedone', '')
         config.setdefault('label', '')
-        config.setdefault('main_file_ratio', 0.90)
         config.setdefault('magnetization_timeout', 0)
-        config.setdefault('keep_subs', True)  # does nothing without 'content_filename' or 'main_file_only' enabled
-        config.setdefault('hide_sparse_files', False)  # does nothing without 'main_file_only' enabled
         return config
 
     def __init__(self):
@@ -560,6 +552,7 @@ class OutputDeluge(DelugePlugin):
                     main_file_dlist.append(client.core.move_storage([torrent_id], move_now_path))
 
                 if entry.get('modified_content_files'):
+                    log.debug('entering modified_content_files loop')
                     def file_exists(filename):
                         # Checks the download path as well as the move completed path for existence of the file
                         if os.path.exists(os.path.join(status['save_path'], filename)):
@@ -580,29 +573,30 @@ class OutputDeluge(DelugePlugin):
                                                 os.path.splitext(name)[1]])
                                 counter += 1
                         else:
-                            log.debug('Cannot ensure content_filename is unique '
-                                      'when adding to a remote deluge daemon.')
+                            log.debug('Cannot ensure filename is unique when adding to a remote deluge daemon.')
                         return name
 
-                    def rename(file, new_name):
+                    def rename(file_info, new_name):
                         # Renames a file in torrent
                         main_file_dlist.append(
                             client.core.rename_files(torrent_id,
-                                                     [(file['index'], new_name)]))
-                        log.debug('File %s in %s renamed to %s' % (file['path'], entry['title'], new_name))
+                                                     [(file_info['index'], new_name)]))
+                        log.debug('File `%s` in `%s` renamed to `%s`', file_info['path'], entry['title'], new_name)
 
                     file_priorities = []
-                    for current_file in status['files']:
-                        if entry['modified_content_files'].get(current_file['path']):
-                            modified_file = entry['modified_content_files'].get(current_file['path'])
-                            file_priorities.append(1 if modified_file['download'] == 1 else 0)
-
-                            if modified_file['new_path'] and modified_file['new_path'] != current_file['path']:
-                                new_filename = unused_name(modified_file['new_path'])
-                                rename(current_file, new_filename)
+                    for count, current_file in enumerate(status['files']):
+                        try:
+                            modified_file = entry['modified_content_files'][count]
+                        except:
+                            log.debug('Cannot find file `%s` in modified_content_files', current_file['path'])
+                            continue
+                        file_priorities.append(1 if modified_file['download'] == 1 else 0)
+                        if modified_file['new_path'] and modified_file['new_path'] != current_file['path']:
+                            new_filename = unused_name(modified_file['new_path'])
+                            rename(current_file, new_filename)
                         else:
-                            pass
-                            #log.debug('File %s not found in modified_content_files:\n%s', current_file['path'], entry['modified_content_files'])
+                            log.verbose('Not renaming because `%s` is identical to the existing filename',
+                                        modified_file['new_path'])
 
                     if file_priorities:
                         main_file_dlist.append(
@@ -745,10 +739,6 @@ class OutputDeluge(DelugePlugin):
                 # Make another set of options, that get set after the torrent has been added
                 modify_opts = {
                     'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
-                    'main_file_only': entry.get('main_file_only', config.get('main_file_only', False)),
-                    'main_file_ratio': entry.get('main_file_ratio', config.get('main_file_ratio')),
-                    'hide_sparse_files': entry.get('hide_sparse_files', config.get('hide_sparse_files', True)),
-                    'keep_subs': entry.get('keep_subs', config.get('keep_subs', True))
                 }
                 try:
                     label = entry.render(entry.get('label', config['label']))
@@ -760,11 +750,6 @@ class OutputDeluge(DelugePlugin):
                     modify_opts['movedone'] = pathscrub(os.path.expanduser(movedone))
                 except RenderError as e:
                     log.error('Error setting movedone for %s: %s' % (entry['title'], e))
-                try:
-                    content_filename = entry.get('content_filename', config.get('content_filename', ''))
-                    modify_opts['content_filename'] = pathscrub(entry.render(content_filename))
-                except RenderError as e:
-                    log.error('Error setting content_filename for %s: %s' % (entry['title'], e))
 
                 torrent_id = entry.get('deluge_id') or entry.get('torrent_info_hash')
                 torrent_id = torrent_id and torrent_id.lower()
