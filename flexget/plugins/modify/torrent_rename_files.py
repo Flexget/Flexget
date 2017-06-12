@@ -23,7 +23,6 @@ class TorrentRenameFiles(object):
     """
     Performs renaming operations on `content_files`, or `modified_content_files` if it exists in entry.
 
-
     Hierarchy:
       keep_subs overrides rename_main_file_only
       rename_main_file_only overrides filetypes
@@ -67,21 +66,32 @@ class TorrentRenameFiles(object):
         config.setdefault('filetypes', {})
         return config
 
+    @plugin.priority(128)
     def on_task_modify(self, task, config):
         config = self.prepare_config(config)
         for entry in task.accepted:
+            modified_content_files = []
             if entry.get('modified_content_files'):
-                content_keys = [k for k in entry['modified_content_files'].keys()]
-                content_files = [f['new_path'] for f in entry['modified_content_files']]
+                modified_content_files = entry['modified_content_files']
+                content_files = [f['new_path'] for f in modified_content_files]
+            elif entry.get('content_files'):
+                content_files = [os.path.join(entry['torrent'].name, f) if entry.get('torrent') else f
+                                 for f in entry['content_files']]
+                for count, f in enumerate(content_files):
+                    new_path = os.path.join(entry['torrent'].name, f) if entry.get('torrent') else f
+                    modified_content_files.append({'new_path': new_path,
+                                                   'download': 0 if config.get('main_file_only') else 1})
             else:
-                content_keys = content_files = entry['content_files']
-            # get total torrent size
+                entry.fail('`content_files` not present in entry')
             if entry.get('torrent'):
                 total_size = entry['torrent'].size
-            elif entry.get('content_size'):
+                content_file_sizes = entry['torrent'].get_filelist()
+            elif entry.get('content_size') and entry.get('content_file_sizes'):
                 total_size = entry['content_size'] * 1024 * 1024
+                content_file_sizes = entry['content_file_sizes']
             else:
-                entry.fail('Unable to determine torrent size')
+                entry.fail('Unable to determine torrent or individual file sizes')
+
             file_ratio = total_size * config['main_file_ratio']
             log.debug('Torrent size: %s, main file size minimum: %s', total_size, file_ratio)
 
@@ -89,26 +99,29 @@ class TorrentRenameFiles(object):
             subs_fileid = -1
             top_levels = []
             # loop through to determine main_fileid and if there is a top-level folder
-            for count, t_file in enumerate(entry['torrent'].get_filelist()):
+            for count, t_file in enumerate(content_files):
                 # split path into directory structure
-                structure = t_file['path'][:-1] if t_file['path'] else t_file['name'].split(os.sep)
+                structure = t_file[:-1] if t_file else t_file.split(os.sep)
                 # if there is more than 1 directory, there is a top-level; if so, add it to the list
                 if len(structure) > 1:
                     top_levels.extend([structure[0]])
                 # if this file is greater than main_file_ratio% of the total torrent size, it is the "main" file
-                log.trace('File size is %s for file: %s', t_file['size'], t_file['path'])
-                if t_file['size'] > file_ratio:
-                    log.trace('Greater than main_file_ratio: %s', count)
+                log.trace('File size is %s for file `%s`', content_file_sizes[count], t_file)
+                if content_file_sizes[count] > file_ratio:
+                    log.trace('--> Greater than main_file_ratio')
                     main_fileid = count
-                    if config.get('keep_subs'):
-                        sub_file = None
-                        sub_exts = [".srt", ".sub"]
-                        for count, sub_file in enumerate(entry['content_files']):
-                            if os.path.splitext(sub_file['path'])[1] in sub_exts:
-                                subs_fileid = count
-                                break
+                    if not config.get('keep_subs') or subs_fileid:
+                        break
+                if config.get('keep_subs'):
+                    sub_exts = [".srt", ".sub"]
+                    if os.path.splitext(t_file)[1] in sub_exts:
+                        log.trace('--> Subs file is `%s`', t_file)
+                        subs_fileid = count
+                        if main_fileid:
+                            break
+
             top_level = False
-            if len(set(top_levels)) == 1:
+            if len(set(top_levels)) == 1 and len(content_files) > 1:
                 top_level = True
                 log.trace('Common top level folder detected.')
             if main_fileid < 0:
@@ -123,7 +136,7 @@ class TorrentRenameFiles(object):
                 series_tokens = True
                 log.trace('Series token(s) present, obtaining parser')
                 search_title = entry['title']
-                # no point in generating a parser now if it's a season pack, since in that case it has to be run
+                # no point in finding/creating a parser now if it's a season pack, since in that case it has to be run
                 # for each file
                 if not entry.get('season_pack') and not entry.get('season_pack_lookup'):
                     if entry.get('series_parser'):
@@ -139,15 +152,12 @@ class TorrentRenameFiles(object):
                         tokens_title_parser = get_plugin_by_name('parsing').instance.parse_series(data=search_title)
 
             new_filenames = []
-            files = {}
             os_sep = os.sep
             do_container = False
             if ((config.get('container_only_for_multi') and len(content_files) > 1)
                  or not config.get('container_only_for_multi')):
                 do_container = True
             for count, t_file in enumerate(content_files):
-                torrent_filename = (os.path.join(entry['torrent'].name, content_keys[count])
-                                    if len(content_files) > 1 else content_keys[count])
                 entry_copy = copy(entry)
                 original_pathfile = t_file
                 log.debug('Current file: %s', original_pathfile)
@@ -209,6 +219,7 @@ class TorrentRenameFiles(object):
                     if parser and parser.valid:
                         populate_entry_fields(entry_copy, parser, False)
                         if entry.get('season_pack'):
+                            # if the original entry is a season pack, flag individual file as well for jinja purposes
                             entry_copy['season_pack'] = True
                         if re.search(r'\d{4}', entry_copy['series_name'][-4:]) and config.get('fix_year'):
                             entry_copy['series_name'] = ''.join([entry_copy['series_name'][0:-4], '(',
@@ -217,7 +228,7 @@ class TorrentRenameFiles(object):
                 if not config.get('keep_container') and top_level:
                     log.debug('Existing path: %s', cur_path)
                     removed_container_path = cur_path.split(os.sep)[0]
-                    log.debug('Removed container: %s', removed_container)
+                    log.debug('Removed container: %s', removed_container_path)
                     cur_path = os_sep.join(cur_path.split(os.sep)[1:])
                     log.debug('New path: %s', cur_path)
                     removed_container = True
@@ -228,58 +239,46 @@ class TorrentRenameFiles(object):
                         cur_path = os.path.join(container_directory, cur_path)
                         log.debug('Added container directory. New path: %s', cur_path)
                     except RenderError as e:
-                        log.error('Error rendering container_directory for %s: %s', cur_filename, e)
+                        log.error('Error rendering container_directory for `%s`: %s', cur_filename, e)
                         if removed_container:
                             # this seems silly but it's reversing the change by putting the value
-                            #   of container_directory back to what it was
+                            # of container_directory back to what it was
                             container_directory = removed_container_path
                             cur_path = os.path.join(container_directory, cur_path)
-                            log.debug('Due to failure to add container, readding removed container to path.'
-                                      ' New path: %s', cur_path)
+                            log.debug('Due to failure to add container, readding removed container to path. '
+                                      'New path: %s', cur_path)
 
                 if content_filename and rename_file:
                     try:
                         cur_filename = pathscrub(entry_copy.render(content_filename))
                         log.debug('Rendered filename: %s', cur_filename)
                     except RenderError as e:
-                        log.error('Error rendering content_filename for %s: %s', original_filename, e)
-                    cur_withext = cur_filename + os.path.splitext(original_filename)[1]
-                    log.trace('Filename with extension: %s', cur_withext)
+                        log.error('Error rendering content_filename for `%s`: %s', original_filename, e)
 
-                    if new_filenames.count(os.path.join(cur_path, cur_withext)) > 0:
-                        entry.fail('Duplicate filenames would result from renaming')
                     if cur_filename[-len(original_ext):] != original_ext:
-                        cur_filename = cur_withext
-                        log.trace('Appended extension to filename: %s', cur_filename)
+                        log.trace('Appending extension to `%s`', cur_filename)
+                        cur_filename = ''.join([cur_filename, '.', original_ext])
+                    if new_filenames.count(os.path.join(cur_path, cur_filename)) > 0:
+                        entry.fail('Duplicate filenames would result from renaming')
                     if cur_filename != original_filename:
-                        #cur_withext = cur_filename + original_ext
-                        new_filenames.append(os.path.join(cur_path, cur_withext))
-                        log.verbose('Added file to rename group: %s', os.path.join(cur_path, cur_withext))
-                    #else:
-                        #log.debug('New and old filenames matched, no action taken')
+                        new_filenames.append(os.path.join(cur_path, cur_filename))
+                        log.verbose('File `%s` will be renamed to `%s`', original_pathfile,
+                                    os.path.join(cur_path, cur_filename))
+                    else:
+                        log.debug('New and old filenames matched, no action will be taken')
 
                 # hide sparse files
                 if config.get('main_file_only') and not main_file and config.get('hide_sparse_files'):
                     if not config.get('keep_subs') or not subs_file:
-                        add_path = ''
-                        if container_directory:
-                            add_path = container_directory
-                        elif cur_filename:
-                            add_path = cur_filename
-                        cur_path = os.path.join(['._' + add_path, cur_path])
-                        log.trace('Changed cur_path: %s', cur_path)
+                        top_dir = cur_path.split(os.sep)[0] if len(cur_path.split(os.sep)) > 2 else ''
+                        cur_path = os.path.join(top_dir, '.sparse_files' + add_path, cur_path)
+                        log.trace('Moved file into sparse_file directory: `%s`', cur_path)
 
                 file_info = {'new_path': os.path.join(cur_path, cur_filename),
                              'download': 1 if to_download else 0}
-                # if modified_content_files exists, we'll update it as we go. otherwise, files will put into
-                # modified_content_files after all entries are processed
-                if entry.get('modified_content_files'):
-                    entry['modified_content_files'][torrent_filename].update(file_info)
-                else:
-                    files.update({torrent_filename: file_info})
+                modified_content_files[count].update(file_info)
 
-            if not entry.get('modified_content_files'):
-                entry['modified_content_files'] = files
+            entry['modified_content_files'] = modified_content_files
 
 
 @event('plugin.register')
