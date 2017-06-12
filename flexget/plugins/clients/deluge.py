@@ -590,7 +590,7 @@ class OutputDeluge(DelugePlugin):
                         except:
                             log.debug('Cannot find file `%s` in modified_content_files', current_file['path'])
                             continue
-                        file_priorities.append(1 if modified_file['download'] == 1 else 0)
+                        file_priorities.append(modified_file['download'] if modified_file.get('download') else 1)
                         if modified_file['new_path'] and modified_file['new_path'] != current_file['path']:
                             new_filename = unused_name(modified_file['new_path'])
                             rename(current_file, new_filename)
