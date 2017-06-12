@@ -106,7 +106,7 @@ class Layout extends Component {
           </nav>
         </header>
         <main className={classes.main}>
-          <aside className={classes.sideBar}>
+          <aside className={classes.sidebar}>
             <SideNav sideBarOpen={sideBarOpen} />
           </aside>
           <section className={classes.content}>

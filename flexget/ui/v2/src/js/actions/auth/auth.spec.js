@@ -11,12 +11,10 @@ const credentials = {
 };
 
 describe('actions/auth', () => {
-  afterEach(() => {
-    fetchMock.restore();
-  });
+  afterEach(() => fetchMock.restore());
 
   describe('login', () => {
-    it('dispatches the correct actions on succesful login', () => {
+    it('dispatches the correct actions on successful login', () => {
       const store = mockStore({ auth: {} });
 
       fetchMock
@@ -29,7 +27,7 @@ describe('actions/auth', () => {
     });
 
 
-    it('dispatches the correct actions on unsuccesful login', () => {
+    it('dispatches the correct actions on unsuccessful login', () => {
       const store = mockStore({ auth: {} });
       fetchMock
         .post('/api/auth/login', { status: 401, body: {} });

@@ -118,6 +118,7 @@
     "redux-devtools": "^3.4.0",
     "redux-form": "^6.7.0",
     "redux-thunk": "^2.2.0",
+    "semver-compare": "^1.0.0",
     "whatwg-fetch": "^2.0.3"
   }
 }

@@ -7,15 +7,20 @@ import Button from 'material-ui/Button';
 import List, { ListItem } from 'material-ui/List';
 import Icon from 'material-ui/Icon';
 import Paper from 'material-ui/Paper';
+import Version from 'containers/layout/Version';
 import 'font-awesome/css/font-awesome.css';
 
 const styleSheet = createStyleSheet('SideNav', theme => ({
   listWrapper: {
     backgroundColor: theme.palette.accent[900],
-    minHeight: '100vh',
     transition: theme.transitions.create(['width', 'visibility']),
+    height: '100%',
     width: 190,
     borderRadius: 0,
+    display: 'flex',
+    flex: {
+      direction: 'column',
+    },
     [theme.breakpoints.up('sm')]: {
       width: 190,
     },
@@ -39,6 +44,11 @@ const styleSheet = createStyleSheet('SideNav', theme => ({
   icon: {
     color: theme.palette.accent[200],
   },
+  list: {
+    flex: {
+      grow: 1,
+    },
+  },
   listItem: {
     padding: 0,
     height: 48,
@@ -56,8 +66,8 @@ const styleSheet = createStyleSheet('SideNav', theme => ({
     height: '100%',
     minWidth: 50,
   },
-  paper: {
-    backgroundColor: theme.palette.accent[900],
+  versionHide: {
+    display: 'none',
   },
 }));
 
@@ -151,9 +161,12 @@ class SideNav extends Component {
         )}
         elevation={16}
       >
-        <List>
+        <List className={classes.list}>
           { ::this.renderNavItems() }
         </List>
+        <div className={classNames({ [classes.versionHide]: !sideBarOpen })}>
+          <Version />
+        </div>
       </Paper>
     );
   }

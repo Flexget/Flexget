@@ -17,7 +17,7 @@ Array [
 ]
 `;
 
-exports[`actions/auth login dispatches the correct actions on succesful login 1`] = `
+exports[`actions/auth login dispatches the correct actions on successful login 1`] = `
 Array [
   Object {
     "meta": Object {
@@ -39,7 +39,7 @@ Array [
 ]
 `;
 
-exports[`actions/auth login dispatches the correct actions on unsuccesful login 1`] = `
+exports[`actions/auth login dispatches the correct actions on unsuccessful login 1`] = `
 Array [
   Object {
     "meta": Object {

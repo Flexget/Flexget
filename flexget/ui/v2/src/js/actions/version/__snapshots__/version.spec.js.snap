@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`actions/version getVersion dispatches the correct actions on successful get version 1`] = `
+Array [
+  Object {
+    "meta": Object {
+      "loading": true,
+      "namespace": "VERSION",
+    },
+    "type": "GET_VERSION",
+  },
+  Object {
+    "error": false,
+    "meta": Object {
+      "ignore": false,
+      "message": undefined,
+      "namespace": "VERSION",
+    },
+    "payload": Object {
+      "api_version": "1.1.2",
+      "flexget_version": "2.10.11",
+      "latest_version": "2.10.60",
+    },
+    "type": "GET_VERSION",
+  },
+]
+`;
+
+exports[`actions/version getVersion dispatches the correct actions on unsuccessful get version 1`] = `
+Array [
+  Object {
+    "meta": Object {
+      "loading": true,
+      "namespace": "VERSION",
+    },
+    "type": "GET_VERSION",
+  },
+  Object {
+    "error": true,
+    "meta": Object {
+      "ignore": false,
+      "message": undefined,
+      "namespace": "VERSION",
+    },
+    "payload": [Error],
+    "type": "GET_VERSION",
+  },
+]
+`;

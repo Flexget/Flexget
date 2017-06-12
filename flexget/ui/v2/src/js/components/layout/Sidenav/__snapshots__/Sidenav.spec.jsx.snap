@@ -2,10 +2,10 @@
 
 exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
 <div
-  className="MuiPaper-paper-2677686717 MuiPaper-dp16-3841796706 MuiPaper-rounded-418257787 SideNav-listWrapper-1187804153 SideNav-sideNavMini-2485013513"
+  className="MuiPaper-paper-2677686717 MuiPaper-dp16-3841796706 MuiPaper-rounded-418257787 SideNav-listWrapper-513568510 SideNav-sideNavMini-2485013513"
 >
   <div
-    className="MuiList-root-43412855 MuiList-padding-392119320"
+    className="MuiList-root-43412855 MuiList-padding-392119320 SideNav-list-3036263360"
   >
     <a
       href="/log"
@@ -438,15 +438,40 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       </div>
     </a>
   </div>
+  <div
+    className="SideNav-versionHide-5987815"
+  >
+    <div
+      className="Version-version-3221117096"
+    >
+      <p
+        className="Version-par-2841032265"
+      >
+        Version Info
+      </p>
+      <p
+        className="Version-par-2841032265"
+      >
+        Flexget: 
+         
+         
+      </p>
+      <p
+        className="Version-par-2841032265"
+      >
+        API: 
+      </p>
+    </div>
+  </div>
 </div>
 `;
 
 exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
 <div
-  className="MuiPaper-paper-2677686717 MuiPaper-dp16-3841796706 MuiPaper-rounded-418257787 SideNav-listWrapper-1187804153"
+  className="MuiPaper-paper-2677686717 MuiPaper-dp16-3841796706 MuiPaper-rounded-418257787 SideNav-listWrapper-513568510"
 >
   <div
-    className="MuiList-root-43412855 MuiList-padding-392119320"
+    className="MuiList-root-43412855 MuiList-padding-392119320 SideNav-list-3036263360"
   >
     <a
       href="/log"
@@ -878,6 +903,31 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
         </button>
       </div>
     </a>
+  </div>
+  <div
+    className=""
+  >
+    <div
+      className="Version-version-3221117096"
+    >
+      <p
+        className="Version-par-2841032265"
+      >
+        Version Info
+      </p>
+      <p
+        className="Version-par-2841032265"
+      >
+        Flexget: 
+         
+         
+      </p>
+      <p
+        className="Version-par-2841032265"
+      >
+        API: 
+      </p>
+    </div>
   </div>
 </div>
 `;

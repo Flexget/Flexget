@@ -1,0 +1,79 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/layout/Version renders correctly with latest version 1`] = `
+<div
+  className="Version-version-3221117096"
+>
+  <p
+    className="Version-par-2841032265"
+  >
+    Version Info
+  </p>
+  <p
+    className="Version-par-2841032265"
+  >
+    Flexget: 
+    2.10.60
+     
+     
+  </p>
+  <p
+    className="Version-par-2841032265"
+  >
+    API: 
+    1.1.2
+  </p>
+</div>
+`;
+
+exports[`components/layout/Version renders correctly without latest version 1`] = `
+<div
+  className="Version-version-3221117096"
+>
+  <p
+    className="Version-par-2841032265"
+  >
+    Version Info
+  </p>
+  <p
+    className="Version-par-2841032265"
+  >
+    Flexget: 
+    2.10.11
+     
+    <a
+      className="MuiButtonBase-buttonBase-3477017037 MuiIconButton-iconButton-3609702008"
+      href="https://flexget.com/ChangeLog"
+      onBlur={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      onMouseLeave={[Function]}
+      onMouseUp={[Function]}
+      onTouchEnd={[Function]}
+      onTouchStart={[Function]}
+      tabIndex="0"
+    >
+      <span
+        className="MuiIconButton-label-2320069359"
+      >
+        <span
+          aria-hidden="true"
+          className="material-icons MuiIcon-root-3402991258 MuiIconButton-icon-156099627 fa fa-question-circle-o Version-version-3221117096"
+        />
+      </span>
+      <span
+        className="MuiTouchRipple-root-3868442396"
+      />
+    </a>
+     
+  </p>
+  <p
+    className="Version-par-2841032265"
+  >
+    API: 
+    1.1.2
+  </p>
+</div>
+`;
