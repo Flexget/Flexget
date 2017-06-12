@@ -121,7 +121,7 @@ class TorrentRenameFiles(object):
                             break
 
             top_level = False
-            if len(set(top_levels)) == 1 and len(content_files) > 1:
+            if len(set(top_levels)) == 1:
                 top_level = True
                 log.trace('Common top level folder detected.')
             if main_fileid < 0:
@@ -140,15 +140,15 @@ class TorrentRenameFiles(object):
                 # for each file
                 if not entry.get('season_pack') and not entry.get('season_pack_lookup'):
                     if entry.get('series_parser'):
-                        log.trace('Copying entry parser')
+                        log.debug('Copying entry parser')
                         tokens_title_parser = copy(entry['series_parser'])
                     elif entry.get('series_name'):
-                        log.trace('Creating parser with series name')
+                        log.debug('Creating parser with series name')
                         tokens_title_parser = \
                             get_plugin_by_name('parsing').instance.parse_series(data=search_title,
                                                                                 name=entry['series_name'])
                     else:
-                        log.trace('Creating parser without series name')
+                        log.debug('Creating parser without series name')
                         tokens_title_parser = get_plugin_by_name('parsing').instance.parse_series(data=search_title)
 
             new_filenames = []
@@ -206,7 +206,7 @@ class TorrentRenameFiles(object):
                         # season pack - must run new parser for each file
                         parser = get_plugin_by_name('parsing').instance.parse_series(data=cur_filename,
                                                                                      name=entry_copy['series_name'])
-                    elif not entry_copy['series_parser'] or not entry_copy['series_parser'].valid:
+                    elif not entry_copy.get('series_parser') or not entry_copy['series_parser'].valid:
                         log.trace('Using new parser')
                         if 'series_name' in entry_copy:
                             parser = get_plugin_by_name('parsing').instance.parse_series(data=cur_filename,
