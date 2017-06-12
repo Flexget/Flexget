@@ -16,8 +16,8 @@ from flexget.plugin import get_plugin_by_name
 from flexget.utils.pathscrub import pathscrub
 from flexget.plugins.filter.series import populate_entry_fields
 
-
 log = logging.getLogger('torrent_rename_files')
+
 
 class TorrentRenameFiles(object):
     """
@@ -59,7 +59,7 @@ class TorrentRenameFiles(object):
         config.setdefault('main_file_ratio', 0.90)
         config.setdefault('keep_container', True)
         config.setdefault('container_directory', '')
-        config.setdefault('container_only_for_multi', '')
+        config.setdefault('container_only_for_multi', True)
         config.setdefault('fix_year', False)
         config.setdefault('rename_main_file_only', False)
         config.setdefault('unlisted_filetype_default', True)
