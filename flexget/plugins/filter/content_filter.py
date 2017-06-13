@@ -52,8 +52,8 @@ class FilterContentFilter(object):
         :param entry: Entry to process
         :return: True, if entry was rejected.
         """
-        if 'content_files' in entry:
-            files = entry['content_files']
+        if entry.get('content_files'):
+            files = [f['path'] for f in entry['content_files']]
             log.debug('%s files: %s' % (entry['title'], files))
 
             def matching_mask(files, masks):
