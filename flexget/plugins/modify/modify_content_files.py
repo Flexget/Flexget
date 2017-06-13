@@ -16,17 +16,17 @@ from flexget.plugin import get_plugin_by_name
 from flexget.utils.pathscrub import pathscrub
 from flexget.plugins.filter.series import populate_entry_fields
 
-log = logging.getLogger('torrent_rename_files')
+log = logging.getLogger('modify_content_files')
 
 
-class TorrentRenameFiles(object):
+class ModifyContentFiles(object):
     """
-    Performs renaming operations on `content_files`, or `modified_content_files` if it exists in entry.
+    Performs renaming operations on `content_files`.
 
     Hierarchy:
       keep_subs overrides rename_main_file_only
       rename_main_file_only overrides filetypes
-      filetypes overrides unlisted_filetype_default
+      filetypes override unlisted_filetype_default
     """
     schema = {
         'type': 'object',
@@ -40,13 +40,36 @@ class TorrentRenameFiles(object):
             'content_filename': {'type': 'string'},
             'rename_main_file_only': {'type': 'boolean'},
             'fix_year': {'type': 'boolean'},
-            'unlisted_filetype_default': {'type': 'boolean'},
+            'unlisted_filetype_default': {
+                'oneOf': [
+                    {'type': 'boolean'},
+                    {
+                        'type': 'object',
+                        'properties': {
+                            'rename': {'type': 'boolean'},
+                            'content_filename': {'type': 'string'},
+                            'download': {'type': 'integer'},
+                            'priority': {'type': 'integer'}
+                        },
+                        'additionalProperties': False
+                    }
+                ]
+            },
             'filetypes': {
                 'type': 'object',
                 'additionalProperties': {
                     'oneOf': [
-                        {'type': 'string'},
                         {'type': 'boolean'},
+                        {
+                            'type': 'object',
+                            'properties': {
+                                'rename': {'type': 'boolean'},
+                                'content_filename': {'type': 'string'},
+                                'download': {'type': 'integer'},
+                                'priority': {'type': 'integer'}
+                            },
+                            'additionalProperties': False
+                        }
                     ]
                 }
             }
@@ -71,26 +94,14 @@ class TorrentRenameFiles(object):
         config = self.prepare_config(config)
         for entry in task.accepted:
             modified_content_files = []
-            if entry.get('modified_content_files'):
-                modified_content_files = entry['modified_content_files']
-                content_files = [f['new_path'] for f in modified_content_files]
-            elif entry.get('content_files'):
-                content_files = [os.path.join(entry['torrent'].name, f) if entry.get('torrent') else f
-                                 for f in entry['content_files']]
-                for count, f in enumerate(content_files):
-                    new_path = os.path.join(entry['torrent'].name, f) if entry.get('torrent') else f
-                    modified_content_files.append({'new_path': new_path,
-                                                   'download': 0 if config.get('main_file_only') else 1})
+            if entry.get('content_files'):
+                content_files = entry['content_files']
             else:
                 entry.fail('`content_files` not present in entry')
-            if entry.get('torrent'):
-                total_size = entry['torrent'].size
-                content_file_sizes = entry['torrent'].get_filelist()
-            elif entry.get('content_size') and entry.get('content_file_sizes'):
+            if entry.get('content_size'):
                 total_size = entry['content_size'] * 1024 * 1024
-                content_file_sizes = entry['content_file_sizes']
             else:
-                entry.fail('Unable to determine torrent or individual file sizes')
+                entry.fail('Unable to determine content total size')
 
             file_ratio = total_size * config['main_file_ratio']
             log.debug('Torrent size: %s, main file size minimum: %s', total_size, file_ratio)
@@ -99,14 +110,16 @@ class TorrentRenameFiles(object):
             subs_fileid = -1
             top_levels = []
             # loop through to determine main_fileid and if there is a top-level folder
-            for count, t_file in enumerate(content_files):
+            for count, file_info in enumerate(content_files):
                 # split path into directory structure
-                structure = t_file[:-1] if t_file else t_file.split(os.sep)
+                structure = (file_info['new_path'].split(os.sep) if file_info.get('new_path')
+                             else file_info['path'].split(os.sep))
                 # if there is more than 1 directory, there is a top-level; if so, add it to the list
                 if len(structure) > 1:
                     top_levels.extend([structure[0]])
                 # if this file is greater than main_file_ratio% of the total torrent size, it is the "main" file
-                log.trace('File size is %s for file `%s`', content_file_sizes[count], t_file)
+                log.trace('File size is %s for file `%s`', file_info['content_size'],
+                          file_info['new_path'] if file_info.get('new_path') else file_info['path'])
                 if content_file_sizes[count] > file_ratio:
                     log.trace('--> Greater than main_file_ratio')
                     main_fileid = count
@@ -157,7 +170,7 @@ class TorrentRenameFiles(object):
             if ((config.get('container_only_for_multi') and len(content_files) > 1)
                  or not config.get('container_only_for_multi')):
                 do_container = True
-            for count, t_file in enumerate(content_files):
+            for count, file_info in enumerate(content_files):
                 entry_copy = copy(entry)
                 original_pathfile = t_file
                 log.debug('Current file: %s', original_pathfile)
@@ -166,38 +179,33 @@ class TorrentRenameFiles(object):
                 original_filename = cur_filename = os.path.split(t_file)[1]
                 original_ext = os.path.splitext(original_filename)[1][1:]
 
-                to_download = subs_file = main_file = rename_file = False
                 content_filename = ''
                 if config.get('keep_subs') and count == subs_fileid:
                     log.debug('This is subs file, renaming it.')
-                    subs_file = True
-                    rename_file = True
-                    to_download = True
+                    file_settings.update({'subs_file': True, 'rename': True, 'download': 1})
                 if config.get('rename_main_file_only') and count == main_fileid:
                     log.debug('This is main file, renaming it.')
-                    main_file = True
-                    rename_file = True
-                    to_download = True
-                if original_ext in config.get('filetypes'):
-                    if isinstance(config.get('filetypes')[original_ext], basestring):
-                        log.trace('Custom template present for this filetype.')
-                        content_filename = config.get('filetypes')[original_ext]
-                        rename_file = True
-                        to_download = True
-                    elif config.get('filetypes')[original_ext]:
-                        log.trace('Using content_filename to rename this filetype.')
-                        rename_file = True
-                        to_download = True
-                elif config.get('unlisted_filetype_default'):
-                    log.trace('Filetype is unlisted, but default is to rename all files.')
-                    rename_file = True
-                    to_download = True
-                if rename_file and not content_filename:
-                    if config.get('content_filename'):
-                        log.debug('Using content_filename for renaming template.')
-                        content_filename = config.get('content_filename')
+                    file_settings.update({'main_file': True, 'rename': True, 'download': 1})
+                if original_ext in config.get('filetypes') or config.get('unlisted_filetype_default'):
+                    this_filetype = (config['filetypes'][original_ext] if original_ext in config.get('filetypes')
+                                     else config['unlisted_filetype_default'])
+                    if isinstance(this_filetype, dict):
+                        log.trace('Settings or default settings present for this filetype.')
+                        file_settings.update({'rename': True if this_filetype.get('rename') else False,
+                                              'download': True if this_filetype.get('download') else False,
+                                              'priority': this_filetype['priority'] if
+                                              this_filetype.get('priority') else 0})
+                        if this_filetype.get('content_filename'):
+                            file_settings.update({'content_filename': this_filetype.get['content_filename']})
                     else:
-                        rename_file = False
+                        file_settings = {'rename': True, 'download': 1, 'priority': 1}
+                if file_settings.get('rename') and not file_settings.get('content_filename'):
+                    if entry.get('content_filename', config.get('content_filename')):
+                        log.debug('Using content_filename for renaming template.')
+                        file_settings.update({'content_filename': entry.get('content_filename',
+                                                                            config.get('content_filename'))})
+                    else:
+                        file_settings.update({'rename': False})
                         log.error('Settings indicate to rename file, but content_filename template was not provided.')
 
                 removed_container = ''
@@ -221,7 +229,7 @@ class TorrentRenameFiles(object):
                         if entry.get('season_pack'):
                             # if the original entry is a season pack, flag individual file as well for jinja purposes
                             entry_copy['season_pack'] = True
-                        if re.search(r'\d{4}', entry_copy['series_name'][-4:]) and config.get('fix_year'):
+                        if config.get('fix_year') and re.search(r'\d{4}', entry_copy['series_name'][-4:]):
                             entry_copy['series_name'] = ''.join([entry_copy['series_name'][0:-4], '(',
                                                            entry_copy['series_name'][-4:], ')'])
 
@@ -248,7 +256,7 @@ class TorrentRenameFiles(object):
                             log.debug('Due to failure to add container, readding removed container to path. '
                                       'New path: %s', cur_path)
 
-                if content_filename and rename_file:
+                if file_settings.get('content_filename') and file_settings.get('rename'):
                     try:
                         cur_filename = pathscrub(entry_copy.render(content_filename))
                         log.debug('Rendered filename: %s', cur_filename)
@@ -270,17 +278,20 @@ class TorrentRenameFiles(object):
                 # hide sparse files
                 if config.get('main_file_only') and not main_file and config.get('hide_sparse_files'):
                     if not config.get('keep_subs') or not subs_file:
-                        top_dir = cur_path.split(os.sep)[0] if len(cur_path.split(os.sep)) > 2 else ''
+                        top_dir = cur_path.split(os.sep)[0] if len(cur_path.split(os.sep)) > 1 else ''
                         cur_path = os.path.join(top_dir, '.sparse_files' + add_path, cur_path)
                         log.trace('Moved file into sparse_file directory: `%s`', cur_path)
+                        file_settings.update({'download': 0})
 
-                file_info = {'new_path': os.path.join(cur_path, cur_filename),
-                             'download': 1 if to_download else 0}
-                modified_content_files[count].update(file_info)
+                for key in ['download', 'priority']:
+                    if file_settings.get(key):
+                        content_files[count].update({key: file_settings[key]})
+                if cur_filename != original_filename:
+                    content_files[count].update({'new_path': os.path.join(cur_path, cur_filename)})
 
-            entry['modified_content_files'] = modified_content_files
+            entry['content_files'] = content_files
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(TorrentRenameFiles, 'torrent_rename_files', api_ver=2)
+    plugin.register(ModifyContentFiles, 'modify_content_files', api_ver=2)
