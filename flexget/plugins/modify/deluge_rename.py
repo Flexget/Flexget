@@ -40,40 +40,28 @@ class DelugeRename(object):
         log.debug('keep_subs: %s', keep_subs)
         for entry in task.accepted:
             modified_content_files = []
-            if entry.get('modified_content_files'):
-                modified_content_files = entry['modified_content_files']
-                content_files = [f['new_path'] for f in modified_content_files]
-            elif entry.get('content_files'):
-                content_files = [os.path.join(entry['torrent'].name, f) if entry.get('torrent') else f
-                                 for f in entry['content_files']]
-                modified_content_files = [{'new_path': f, 'download': 0 if config.get('main_file_only') else 1}
-                                          for f in content_files]
-                #for count, f in enumerate(content_files):
-                #    modified_content_files.append({'new_path': f,
-                #                                   'download': 0 if config.get('main_file_only') else 1})
+            if entry.get('content_files'):
+                content_files = entry['content_files']
             else:
                 entry.fail('`content_files` not present in entry')
-            if entry.get('torrent'):
-                total_size = entry['torrent'].size
-                content_file_sizes = entry['torrent'].get_filelist()
-            elif entry.get('content_size') and entry.get('content_file_sizes'):
+            if entry.get('content_size'):
                 total_size = entry['content_size'] * 1024 * 1024
-                content_file_sizes = entry['content_file_sizes']
             else:
-                entry.fail('Unable to determine torrent or individual file sizes')
+                entry.fail('Unable to determine total content size')
             big_file_name = ''
             if config.get('content_filename') or config.get('main_file_only'):
                 # find a file that makes up more than main_file_ratio (default: 90%) of the total size
                 main_file = sub_file = main_file_key = sub_file_key = None
                 sub_exts = [".srt", ".sub"]
-                for count, filename in enumerate(content_files):
-                    if content_file_sizes[count] > (total_size * config.get('main_file_ratio')) and not main_file:
+                for count, file_info in enumerate(content_files):
+                    current_file = file_info['new_path'] if file_info.get('new_path') else file_info['path']
+                    if file_info['size'] > (total_size * config.get('main_file_ratio')) and not main_file:
                         main_file_key = count
-                        main_file = filename
-                    ext = os.path.splitext(filename)[1]
+                        main_file = current_file
+                    ext = os.path.splitext(current_file)[1]
                     if keep_subs and ext in sub_exts and not sub_file:
                         sub_file_key = count
-                        sub_file = filename
+                        sub_file = current_file
 
                 if main_file is not None:
                     # proceed with renaming only if such a big file is found
@@ -92,12 +80,13 @@ class DelugeRename(object):
                     # check for single file torrents so we dont add unnecessary folders
                     if len(content_files) > 1:
                         # check for top folder in user config
+                        top_files_dir = ''
                         if container_directory:
                             top_files_dir = container_directory + '/'
-                        elif config.get('content_filename') and os.path.dirname(config['content_filename']) is not '':
-                            top_files_dir = os.path.dirname(config['content_filename']) + '/'
+                        if config.get('content_filename') and os.path.dirname(content_filename) is not '':
+                            top_files_dir = top_files_dir + os.path.dirname(content_filename) + '/'
                         else:
-                            top_files_dir = os.path.dirname(main_file) + '/'
+                            top_files_dir = top_files_dir + os.path.dirname(main_file) + '/'
                     else:
                         top_files_dir = '/'
 
@@ -107,7 +96,7 @@ class DelugeRename(object):
                                                         os.path.basename(content_filename),
                                                         os.path.splitext(main_file)[1])
                         file_info = {'new_path': big_file_name, 'download': 1}
-                        modified_content_files[main_file_key].update(file_info)
+                        content_files[main_file_key].update(file_info)
                         log.verbose('Main file `%s` will be renamed to `%s`', main_file, big_file_name)
 
                         # rename subs along with the main file
@@ -115,7 +104,7 @@ class DelugeRename(object):
                             sub_file_name = '{}{}'.format(os.path.splitext(big_file_name)[0],
                                                           os.path.splitext(sub_file)[1])
                             file_info = {'new_path': sub_file_name, 'download': 1}
-                            modified_content_files[sub_file_key].update(file_info)
+                            content_files[sub_file_key].update(file_info)
                             log.verbose('Subs file `%s` will be renamed to `%s`', main_file, big_file_name)
 
                     hide_sparse_files = (config.get('main_file_only') and config.get('hide_sparse_files'))
@@ -128,15 +117,15 @@ class DelugeRename(object):
                             if hide_sparse_files and count != main_file_key and (count != sub_file_key
                                                                                  or not keep_subs):
                                 file_path = '{}{}{}'.format(top_files_dir, '.sparse_files/', os.path.basename(f))
-                                modified_content_files[count].update(file_info)
+                                content_files[count].update(file_info)
                             elif container_directory:
                                 file_path = '{}{}'.format(top_files_dir, os.path.basename(f))
                             if filepath:
                                 file_info = {'new_path': file_path}
-                                modified_content_files[count].update(file_info)
+                                content_files[count].update(file_info)
 
                     # update the entry with the results
-                    entry['modified_content_files'] = modified_content_files
+                    entry['content_files'] = content_files
                 else:
                     log.warning('No files in `%s` are > %d%% of content size, no files renamed.',
                                 entry['title'], config.get('main_file_ratio') * 100)
