@@ -169,7 +169,9 @@ class ModifyContentFiles(object):
                                      else config['unlisted_filetype_default'])
                     if isinstance(this_filetype, dict):
                         log.trace('Settings or default settings present for this filetype.')
-                        file_settings.update({'rename': True if this_filetype.get('rename') else False,
+                        file_settings.update({'rename': True if this_filetype.get('rename',
+                                                                                  this_filetype.get('content_filename'))
+                                                                                  else False,
                                               'download': True if this_filetype.get('download') else False,
                                               'priority': this_filetype['priority'] if
                                               this_filetype.get('priority') else 0})
