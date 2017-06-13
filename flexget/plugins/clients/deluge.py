@@ -551,8 +551,7 @@ class OutputDeluge(DelugePlugin):
                     log.debug('Moving storage for %s to %s' % (entry['title'], move_now_path))
                     main_file_dlist.append(client.core.move_storage([torrent_id], move_now_path))
 
-                if entry.get('modified_content_files'):
-                    log.debug('entering modified_content_files loop')
+                if entry.get('content_files'):
                     def file_exists(filename):
                         # Checks the download path as well as the move completed path for existence of the file
                         if os.path.exists(os.path.join(status['save_path'], filename)):
@@ -583,16 +582,26 @@ class OutputDeluge(DelugePlugin):
                                                      [(file_info['index'], new_name)]))
                         log.debug('File `%s` in `%s` renamed to `%s`', file_info['path'], entry['title'], new_name)
 
+                    set_top_level = False
+                    if len(status['files']) > 1:
+                        top_levels = [f['new_path'].split(os.sep)[0] if f.get('new_path')
+                                     else f['path'].split(os.sep)[0] for f in entry['content_files']]
+                        if len(set(top_levels)) > 1:
+                            set_top_level = True
+                            log.warning('Appending top-level folder `%s` to all torrent paths as multiple top-level '
+                                        'folders were found, and this is not allowed per the torrent spec.')
                     file_priorities = []
                     for count, current_file in enumerate(status['files']):
                         try:
-                            modified_file = entry['modified_content_files'][count]
+                            modified_file = entry['content_files'][count]
                         except:
-                            log.debug('Cannot find file `%s` in modified_content_files', current_file['path'])
+                            log.error('Cannot find file `%s` in `content_files`', current_file['path'])
                             continue
-                        file_priorities.append(modified_file['download'] if modified_file.get('download') else 1)
-                        if modified_file['new_path'] and modified_file['new_path'] != current_file['path']:
-                            new_filename = unused_name(modified_file['new_path'])
+                        file_priorities.append(modified_file.get('priority', modified_file.get('download', 1)))
+                        if set_top_level or (modified_file.get('new_path')
+                                             and modified_file['new_path'] != current_file['path']):
+                            new_filename = unused_name(os.join(status['name'], top_levels[count]) if set_top_level
+                                                       else modified_file['new_path'])
                             rename(current_file, new_filename)
                         else:
                             log.verbose('Not renaming because `%s` is identical to the existing filename',
