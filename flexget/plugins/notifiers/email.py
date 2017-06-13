@@ -8,7 +8,7 @@ import socket
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
-from smtplib import SMTPAuthenticationError, SMTPServerDisconnected
+from smtplib import SMTPAuthenticationError, SMTPServerDisconnected, SMTPSenderRefused
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -181,7 +181,7 @@ class EmailNotifier(object):
             try:
                 self.mail_server.sendmail(email['From'], config['to'], email.as_string())
                 break
-            except SMTPServerDisconnected as e:
+            except (SMTPServerDisconnected, SMTPSenderRefused) as e:
                 if not connection_error:
                     self.connect_to_smtp_server(config)
                     connection_error = e
