@@ -93,7 +93,6 @@ class ModifyContentFiles(object):
     def on_task_modify(self, task, config):
         config = self.prepare_config(config)
         for entry in task.accepted:
-            modified_content_files = []
             if entry.get('content_files'):
                 content_files = entry['content_files']
             else:
@@ -111,24 +110,23 @@ class ModifyContentFiles(object):
             top_levels = []
             # loop through to determine main_fileid and if there is a top-level folder
             for count, file_info in enumerate(content_files):
+                base_file = file_info['new_path'] if file_info.get('new_path') else file_info['path']
                 # split path into directory structure
-                structure = (file_info['new_path'].split(os.sep) if file_info.get('new_path')
-                             else file_info['path'].split(os.sep))
+                structure = base_file.split(os.sep)
                 # if there is more than 1 directory, there is a top-level; if so, add it to the list
                 if len(structure) > 1:
                     top_levels.extend([structure[0]])
                 # if this file is greater than main_file_ratio% of the total torrent size, it is the "main" file
-                log.trace('File size is %s for file `%s`', file_info['content_size'],
-                          file_info['new_path'] if file_info.get('new_path') else file_info['path'])
-                if content_file_sizes[count] > file_ratio:
+                log.trace('File size is %s for file `%s`', file_info['size'], base_file)
+                if file_info['size'] > file_ratio:
                     log.trace('--> Greater than main_file_ratio')
                     main_fileid = count
                     if not config.get('keep_subs') or subs_fileid:
                         break
                 if config.get('keep_subs'):
                     sub_exts = [".srt", ".sub"]
-                    if os.path.splitext(t_file)[1] in sub_exts:
-                        log.trace('--> Subs file is `%s`', t_file)
+                    if os.path.splitext(base_file)[1] in sub_exts:
+                        log.trace('--> Subs file is `%s`', base_file)
                         subs_fileid = count
                         if main_fileid:
                             break
@@ -144,26 +142,6 @@ class ModifyContentFiles(object):
             else:
                 log.trace('main_fileid: %s', main_fileid)
 
-            series_tokens = False
-            if config.get('content_filename') and 'series_' in config['content_filename']:
-                series_tokens = True
-                log.trace('Series token(s) present, obtaining parser')
-                search_title = entry['title']
-                # no point in finding/creating a parser now if it's a season pack, since in that case it has to be run
-                # for each file
-                if not entry.get('season_pack') and not entry.get('season_pack_lookup'):
-                    if entry.get('series_parser'):
-                        log.debug('Copying entry parser')
-                        tokens_title_parser = copy(entry['series_parser'])
-                    elif entry.get('series_name'):
-                        log.debug('Creating parser with series name')
-                        tokens_title_parser = \
-                            get_plugin_by_name('parsing').instance.parse_series(data=search_title,
-                                                                                name=entry['series_name'])
-                    else:
-                        log.debug('Creating parser without series name')
-                        tokens_title_parser = get_plugin_by_name('parsing').instance.parse_series(data=search_title)
-
             new_filenames = []
             os_sep = os.sep
             do_container = False
@@ -172,14 +150,14 @@ class ModifyContentFiles(object):
                 do_container = True
             for count, file_info in enumerate(content_files):
                 entry_copy = copy(entry)
-                original_pathfile = t_file
+                base_file = file_info['new_path'] if file_info.get('new_path') else file_info['path']
+                original_pathfile = base_file
                 log.debug('Current file: %s', original_pathfile)
 
-                original_path = cur_path = os.path.split(t_file)[0]
-                original_filename = cur_filename = os.path.split(t_file)[1]
+                original_path = cur_path = os.path.split(base_file)[0]
+                original_filename = cur_filename = os.path.split(base_file)[1]
                 original_ext = os.path.splitext(original_filename)[1][1:]
 
-                content_filename = ''
                 if config.get('keep_subs') and count == subs_fileid:
                     log.debug('This is subs file, renaming it.')
                     file_settings.update({'subs_file': True, 'rename': True, 'download': 1})
@@ -209,7 +187,9 @@ class ModifyContentFiles(object):
                         log.error('Settings indicate to rename file, but content_filename template was not provided.')
 
                 removed_container = ''
-                if series_tokens and (config.get('container_directory') or content_filename):
+
+                if 'series_' in (file_settings.get('content_filename') or config.get('container_directory')):
+                # if series_tokens and (config.get('container_directory') or content_filename):
                     if entry_copy.get('season_pack') or entry_copy.get('season_pack_lookup'):
                         # season pack - must run new parser for each file
                         parser = get_plugin_by_name('parsing').instance.parse_series(data=cur_filename,
@@ -258,10 +238,10 @@ class ModifyContentFiles(object):
 
                 if file_settings.get('content_filename') and file_settings.get('rename'):
                     try:
-                        cur_filename = pathscrub(entry_copy.render(content_filename))
-                        log.debug('Rendered filename: %s', cur_filename)
+                        cur_filename = pathscrub(entry_copy.render(file_settings.get('content_filename', '')))
+                        log.debug('Rendered filename: `%s`', cur_filename)
                     except RenderError as e:
-                        log.error('Error rendering content_filename for `%s`: %s', original_filename, e)
+                        log.error('Error rendering `content_filename` for `%s`: %s', original_filename, e)
 
                     if cur_filename[-len(original_ext):] != original_ext:
                         log.trace('Appending extension to `%s`', cur_filename)
