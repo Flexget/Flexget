@@ -31,7 +31,8 @@ class NextSeriesSeasons(object):
                 'type': 'object',
                 'properties': {
                     'from_start': {'type': 'boolean', 'default': False},
-                    'backfill': {'type': 'boolean', 'default': False}
+                    'backfill': {'type': 'boolean', 'default': False},
+                    'threshold': {'type': 'integer', 'minimum': 0}
                 },
                 'additionalProperties': False
             }
@@ -80,6 +81,8 @@ class NextSeriesSeasons(object):
             return entries
         else:
             self.rerun_entries = []
+
+        threshold = config.get('threshold', None)
 
         entries = []
         impossible = {}
@@ -134,6 +137,9 @@ class NextSeriesSeasons(object):
                 for season in range(latest_season, low_season, -1):
                     if season in series.completed_seasons:
                         log.debug('season %s is marked as completed, skipping', season)
+                        continue
+                    if threshold is not None and series.episodes_for_season(season) > threshold:
+                        log.debug('season %s has met threshold of threshold of %s, skipping', season, threshold)
                         continue
                     log.trace('Evaluating season %s for series `%s`', season, series.name)
                     latest = get_latest_release(series, season=season, downloaded=check_downloaded)
