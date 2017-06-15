@@ -236,8 +236,7 @@ class InputDeluge(DelugePlugin):
         'save_path': 'deluge_path',
         'label': 'deluge_label',
         'total_size': ('content_size', lambda size: size / 1024 / 1024),
-        'files': ('content_files', lambda file_dicts: [f['path'] for f in file_dicts]),
-        'file_sizes': ('content_file_sizes', lambda file_sizes: [f['size'] for f in file_sizes])}
+        'files': ('content_files', lambda file_dicts: [{'path': f['path'], 'size': f['size']} for f in file_dicts])}
 
     extra_settings_map = {
         'active_time': ('active_time', lambda time: time / 3600),
@@ -604,12 +603,16 @@ class OutputDeluge(DelugePlugin):
                                                        else modified_file['new_path'])
                             rename(current_file, new_filename)
                         else:
-                            log.verbose('Not renaming because `%s` is identical to the existing filename',
-                                        modified_file['new_path'])
+                            if modified_file.get('new_path'):
+                                log.verbose('Not renaming because `%s` is identical to the existing filename',
+                                            modified_file['new_path'])
+                            else:
+                                log.debug('No renaming requested')
 
                     if file_priorities:
                         main_file_dlist.append(
                             client.core.set_torrent_file_priorities(torrent_id, file_priorities))
+                        log.debug('Setting file priorities for `%s`', entry['title'])
                 return defer.DeferredList(main_file_dlist)
 
             status_keys = ['files', 'total_size', 'save_path', 'move_on_completed_path',
