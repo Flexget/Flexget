@@ -9,11 +9,9 @@ const HEADER_HEIGHT = 50;
 const MOBILE_HEADER_HEIGHT = (HEADER_HEIGHT * 2) - 2;
 const PADDING = 10;
 
-const scrollMixin = theme => ({
+const scrollMixin = (theme, padding = 0) => ({
   overflowY: 'auto',
-  height: `calc(100vh - ${MOBILE_HEADER_HEIGHT}px)`,
   [theme.breakpoints.up('sm')]: {
-    height: `calc(100vh - ${HEADER_HEIGHT}px)`,
   },
 });
 const styleSheet = createStyleSheet('Layout', theme => ({
@@ -55,10 +53,11 @@ const styleSheet = createStyleSheet('Layout', theme => ({
   },
   content: {
     flex: 1,
-    ...scrollMixin(theme),
+    padding: PADDING,
+    ...scrollMixin(theme, PADDING),
   },
   pageWrap: {
-    padding: PADDING,
+
   },
 }));
 
@@ -110,9 +109,7 @@ class Layout extends Component {
             <SideNav sideBarOpen={sideBarOpen} />
           </aside>
           <section className={classes.content}>
-            <div className={classes.pageWrap}>
-              { children }
-            </div>
+            { children }
           </section>
         </main>
       </div>

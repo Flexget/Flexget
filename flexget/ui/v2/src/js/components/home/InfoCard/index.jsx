@@ -8,8 +8,10 @@ import 'font-awesome/css/font-awesome.css';
 
 const styleSheet = createStyleSheet('InfoCard', theme => ({
   card: {
-    width: '50%',
     margin: '0 auto',
+    [theme.breakpoints.up('sm')]: {
+      width: '50%',
+    },
   },
   cardHeader: {
     backgroundColor: theme.palette.primary[800],

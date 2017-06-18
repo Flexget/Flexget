@@ -8,13 +8,13 @@ exports[`components/login renders correctly when logged out 1`] = `
     className="LoginPage-logo-1437845348"
   />
   <div
-    className="MuiPaper-paper-2677686717 MuiPaper-dp2-317043508 MuiPaper-rounded-418257787 MuiCard-card-772068234 LoginCard-card-1186187333"
+    className="MuiPaper-paper-2677686717 MuiPaper-shadow2-317043508 MuiPaper-rounded-418257787 MuiCard-root-772068234 LoginCard-card-1186187333"
   >
     <form
       onSubmit={[Function]}
     >
       <div
-        className="MuiCardContent-cardContent-741240096"
+        className="MuiCardContent-root-741240096"
       >
         <div
           className="LoginCard-error-2118832568"
@@ -34,10 +34,11 @@ exports[`components/login renders correctly when logged out 1`] = `
             Username
           </label>
           <div
-            className="MuiInput-wrapper-1702064583 MuiInput-formControl-497090363 MuiInput-inkbar-965396523 MuiInput-underline-565166322"
+            className="MuiInput-root-1702064583 MuiInput-formControl-497090363 MuiInput-inkbar-965396523 MuiInput-underline-565166322"
           >
             <input
               aria-required={undefined}
+              autoFocus={undefined}
               className="MuiInput-input-3855742665 MuiInput-singleline-2607927053"
               defaultValue={undefined}
               disabled={false}
@@ -70,10 +71,11 @@ exports[`components/login renders correctly when logged out 1`] = `
             Password
           </label>
           <div
-            className="MuiInput-wrapper-1702064583 MuiInput-formControl-497090363 MuiInput-inkbar-965396523 MuiInput-underline-565166322"
+            className="MuiInput-root-1702064583 MuiInput-formControl-497090363 MuiInput-inkbar-965396523 MuiInput-underline-565166322"
           >
             <input
               aria-required={undefined}
+              autoFocus={undefined}
               className="MuiInput-input-3855742665 MuiInput-singleline-2607927053"
               defaultValue={undefined}
               disabled={false}
@@ -93,10 +95,10 @@ exports[`components/login renders correctly when logged out 1`] = `
         </div>
       </div>
       <div
-        className="MuiCardActions-cardActions-1345515364"
+        className="MuiCardActions-root-1345515364"
       >
         <button
-          className="MuiButtonBase-buttonBase-3477017037 MuiButton-root-2253430263 LoginCard-button-2980890619 MuiCardActions-actionSpacing-2598224809"
+          className="MuiButtonBase-root-3477017037 MuiButton-root-2253430263 LoginCard-button-2980890619 MuiCardActions-actionSpacing-2598224809"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}

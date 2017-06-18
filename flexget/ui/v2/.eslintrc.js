@@ -35,5 +35,6 @@ module.exports = {
       functions: 'ignore',
     }],
     'import/no-named-as-default': 'off',
+    'react/no-array-index-key': 'off',
   }
 };

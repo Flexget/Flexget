@@ -42,7 +42,7 @@ exports[`components/layout/Version renders correctly without latest version 1`] 
     2.10.11
      
     <a
-      className="MuiButtonBase-buttonBase-3477017037 MuiIconButton-iconButton-3609702008"
+      className="MuiButtonBase-root-3477017037 MuiIconButton-root-3609702008"
       href="https://flexget.com/ChangeLog"
       onBlur={[Function]}
       onFocus={[Function]}

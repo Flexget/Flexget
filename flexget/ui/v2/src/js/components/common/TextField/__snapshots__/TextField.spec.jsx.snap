@@ -8,10 +8,11 @@ exports[`components/common/TextField renders correctly 1`] = `
   required={false}
 >
   <div
-    className="MuiInput-wrapper-1702064583 MuiInput-error-3674946725 MuiInput-formControl-497090363 MuiInput-inkbar-965396523 MuiInput-underline-565166322"
+    className="MuiInput-root-1702064583 MuiInput-error-3674946725 MuiInput-formControl-497090363 MuiInput-inkbar-965396523 MuiInput-underline-565166322"
   >
     <input
       aria-required={undefined}
+      autoFocus={undefined}
       className="MuiInput-input-3855742665 MuiInput-singleline-2607927053"
       defaultValue={undefined}
       disabled={false}

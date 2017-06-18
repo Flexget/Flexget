@@ -7,9 +7,9 @@ import { ConnectedRouter } from 'connected-react-router';
 import { MuiThemeProvider, withStyles, createStyleSheet } from 'material-ui/styles';
 import appTheme from 'theme';
 import PrivateRoute from 'containers/common/PrivateRoute';
-import Home from 'components/home';
 import Layout from 'containers/layout';
-import Login from 'containers/login';
+import { createAsyncComponent } from 'utils/loading';
+
 
 const styleSheet = createStyleSheet('Global', theme => ({
   '@global': {
@@ -27,15 +27,23 @@ const styleSheet = createStyleSheet('Global', theme => ({
 
 const Wrapper = withStyles(styleSheet)(({ children }) => <div>{children}</div>);
 
+const Home = createAsyncComponent(() => import('components/home'));
+const Log = createAsyncComponent(() => import('components/log'));
+const Login = createAsyncComponent(() => import('containers/login'));
+
+
 const Root = () => (
   <Provider store={store}>
     <ConnectedRouter history={history}>
       <MuiThemeProvider theme={appTheme}>
         <Wrapper>
           <Switch>
-            <Route path="/login" component={Login} />
+            <Route path="/login" exact component={Login} />
             <Layout>
-              <PrivateRoute path="/" exact component={Home} />
+              <Switch>
+                <PrivateRoute path="/" exact component={Home} />
+                <PrivateRoute path="/log" exact component={Log} />
+              </Switch>
             </Layout>
           </Switch>
         </Wrapper>

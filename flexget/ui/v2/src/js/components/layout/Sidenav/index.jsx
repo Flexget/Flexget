@@ -135,7 +135,7 @@ class SideNav extends Component {
     return sideNavItems.map(({ link, icon, label }) => (
       <Link to={link} key={link}>
         <ListItem className={classes.listItem}>
-          <Button accent className={classes.button}>
+          <Button color="accent" className={classes.button}>
             <Icon className={classNames('fa', `fa-${icon}`, classes.icon)} />
             <p className={
               classNames(
