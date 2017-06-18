@@ -9,11 +9,6 @@ const HEADER_HEIGHT = 50;
 const MOBILE_HEADER_HEIGHT = (HEADER_HEIGHT * 2) - 2;
 const PADDING = 10;
 
-const scrollMixin = (theme, padding = 0) => ({
-  overflowY: 'auto',
-  [theme.breakpoints.up('sm')]: {
-  },
-});
 const styleSheet = createStyleSheet('Layout', theme => ({
   layout: {
     display: 'flex',
@@ -49,15 +44,12 @@ const styleSheet = createStyleSheet('Layout', theme => ({
     flex: 1,
   },
   sidebar: {
-    ...scrollMixin(theme),
+    overflowY: 'auto',
   },
   content: {
     flex: 1,
     padding: PADDING,
-    ...scrollMixin(theme, PADDING),
-  },
-  pageWrap: {
-
+    overflowY: 'auto',
   },
 }));
 

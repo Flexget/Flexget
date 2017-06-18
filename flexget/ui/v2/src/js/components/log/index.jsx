@@ -9,7 +9,8 @@ const styleSheet = createStyleSheet('Log', theme => ({
   root: {
     padding: 24,
     display: 'flex',
-    height: 'auto',
+    height: '100%',
+    boxSizing: 'border-box',
     flexDirection: 'column',
     [theme.breakpoints.up('sm')]: {
       paddingTop: 0,
