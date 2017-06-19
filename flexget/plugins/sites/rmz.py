@@ -14,11 +14,12 @@ from requests.exceptions import RequestException
 
 log = logging.getLogger('rmz')
 
+
 class UrlRewriteRmz(object):
     """
     rmz.cr (rapidmoviez.com) urlrewriter
     Version 0.1
-    
+
     Configuration
 
     rmz:
@@ -31,10 +32,10 @@ class UrlRewriteRmz(object):
     If more than one valid link is found, the url of the entry is rewritten to
     the first link found. The complete list of valid links is placed in the
     'urls' field of the entry.
-    
+
     Therefore, it is recommended, that you configure your output to use the
     'urls' field instead of the 'url' field.
-    
+
     For example, to use jdownloader 2 as output, you would use the exec plugin:
     exec:
       - echo "text={{urls}}" >> "/path/to/jd2/folderwatch/{{title}}.crawljob"
@@ -43,7 +44,7 @@ class UrlRewriteRmz(object):
     schema = {
         'type': 'object',
         'properties': {
-            'filehosters_re': {'type': 'array', 'items': {'format': 'regexp'} }
+            'filehosters_re': {'type': 'array', 'items': {'format': 'regexp'}}
         },
         'additionalProperties': False
     }
@@ -53,7 +54,7 @@ class UrlRewriteRmz(object):
         'filehosters_re': []
     }
 
-    #grab config
+    # grab config
     def on_task_start(self, task, config):
         self.config = config
 
@@ -75,11 +76,11 @@ class UrlRewriteRmz(object):
         except Exception as e:
             raise UrlRewritingError(str(e))
         link_elements = soup.find_all('pre', class_='links')
-        urls=[]
+        urls = []
         for element in link_elements:
             urls.extend(element.text.splitlines())
         regexps = self.config.get('filehosters_re', [])
-        filtered_urls=[]
+        filtered_urls = []
         for i, url in enumerate(urls):
             urls[i] = normalize_unicode(url)
             for regexp in regexps:
@@ -88,10 +89,11 @@ class UrlRewriteRmz(object):
                     log.debug('Url: "%s" matched filehoster filter: %s', urls[i], regexp)
                     break
             else:
-                log.debug('Url: "%s" does not match any of the given filehoster filters: %s', urls[i], str(regexps))
+                log.debug(
+                    'Url: "%s" does not match any of the given filehoster filters: %s', urls[i], str(regexps))
         if regexps:
             log.debug('Using filehosters_re filters: %s', str(regexps))
-            urls=filtered_urls
+            urls = filtered_urls
         else:
             log.debug('No filehoster filters configured, using all found links.')
         num_links = len(urls)
@@ -101,6 +103,7 @@ class UrlRewriteRmz(object):
             entry['url'] = urls[0]
         else:
             raise UrlRewritingError('No useable links found at %s' % entry['url'])
+
 
 @event('plugin.register')
 def register_plugin():
