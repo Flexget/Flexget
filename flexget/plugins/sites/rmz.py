@@ -51,7 +51,7 @@ class UrlRewriteRmz(object):
 
     # Since the urlrewriter relies on a config, we need to create a default one
     config = {
-        'filehosters_re': None
+        'filehosters_re': []
     }
 
     #grab config
@@ -79,18 +79,17 @@ class UrlRewriteRmz(object):
         urls=[]
         for element in link_elements:
             urls.extend(element.text.splitlines())
-        regexps = self.config.get('filehosters_re')
+        regexps = self.config.get('filehosters_re', [])
         filtered_urls=[]
         for i, url in enumerate(urls):
             urls[i] = url.encode('ascii', 'ignore')
-            if regexps:
-                for regexp in regexps:
-                    if re.search(regexp, urls[i]):
-                        filtered_urls.append(urls[i])
-                        log.debug('Url: "%s" matched filehoster filter: %s', urls[i], regexp)
-                        break
-                else:
-                    log.debug('Url: "%s" does not match any of the given filehoster filters: %s', urls[i], str(regexps))
+            for regexp in regexps:
+                if re.search(regexp, urls[i]):
+                    filtered_urls.append(urls[i])
+                    log.debug('Url: "%s" matched filehoster filter: %s', urls[i], regexp)
+                    break
+            else:
+                log.debug('Url: "%s" does not match any of the given filehoster filters: %s', urls[i], str(regexps))
         if regexps:
             log.debug('Using filehosters_re filters: %s', str(regexps))
             urls=filtered_urls
