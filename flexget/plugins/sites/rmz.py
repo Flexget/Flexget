@@ -8,7 +8,6 @@ from flexget import plugin
 from flexget.event import event
 from flexget.plugins.internal.urlrewriting import UrlRewritingError
 from flexget.utils.soup import get_soup
-from flexget.entry import Entry
 from flexget.utils.search import normalize_unicode
 
 from requests.exceptions import RequestException
@@ -65,7 +64,7 @@ class UrlRewriteRmz(object):
         return re.match(rewritable_regex, url) is not None
 
     @plugin.internet(log)
-   # urlrewriter API
+    # urlrewriter API
     def url_rewrite(self, task, entry):
         try:
             page = task.requests.get(entry['url'])
@@ -82,7 +81,7 @@ class UrlRewriteRmz(object):
         regexps = self.config.get('filehosters_re', [])
         filtered_urls=[]
         for i, url in enumerate(urls):
-            urls[i] = url.encode('ascii', 'ignore')
+            urls[i] = normalize_unicode(url)
             for regexp in regexps:
                 if re.search(regexp, urls[i]):
                     filtered_urls.append(urls[i])
