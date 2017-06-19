@@ -409,11 +409,18 @@ def split_title_year(title):
     if not re.search(r'\d{4}', title):
         return title, None
     match = re.search(r'(.*?)\(?(\d{4})?\)?$', title)
+
     title = match.group(1).strip()
-    if match.group(2):
-        year = int(match.group(2))
-    else:
+    year_match = match.group(2)
+
+    if year_match and not title:
+        # title looks like a year, '2020' for example
+        title = year_match
         year = None
+    elif title and not year_match:
+        year = None
+    else:
+        year = int(year_match)
     return title, year
 
 
