@@ -20,8 +20,10 @@ class UrlRewriteRmz(object):
     
     Configuration
 
-    url_re:
-      - domain\.com
+    rmz:
+      url_re:
+        - domain\.com
+        - domain2\.org
 
     Only add links that match any of the regular expressions listed under url_re.
 
