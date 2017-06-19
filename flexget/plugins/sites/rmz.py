@@ -11,6 +11,8 @@ from flexget.utils.soup import get_soup
 from flexget.entry import Entry
 from flexget.utils.search import normalize_unicode
 
+from requests.exceptions import RequestException
+
 log = logging.getLogger('rmz')
 
 class UrlRewriteRmz(object):
@@ -21,7 +23,7 @@ class UrlRewriteRmz(object):
     Configuration
 
     rmz:
-      link_re:
+      filehosters_re:
         - domain\.com
         - domain2\.org
 
@@ -42,14 +44,14 @@ class UrlRewriteRmz(object):
     schema = {
         'type': 'object',
         'properties': {
-            'links_re': {'type': 'array', 'items': {'format': 'regexp'} }
+            'filehosters_re': {'type': 'array', 'items': {'format': 'regexp'} }
         },
         'additionalProperties': False
     }
 
     # Since the urlrewriter relies on a config, we need to create a default one
     config = {
-        'links_re': None
+        'filehosters_re': None
     }
 
     #grab config
@@ -60,48 +62,42 @@ class UrlRewriteRmz(object):
     def url_rewritable(self, task, entry):
         url = entry['url']
         rewritable_regex = '^https?:\/\/(www.)?(rmz\.cr|rapidmoviez\.(com|eu))\/.*'
-        if re.match(rewritable_regex, url):
-            return True
-        else:
-            return False
+        return re.match(rewritable_regex, url) is not None
 
     @plugin.internet(log)
    # urlrewriter API
     def url_rewrite(self, task, entry):
         try:
             page = task.requests.get(entry['url'])
-        except Exception as e:
-            raise UrlRewritingError(e)
+        except RequestException as e:
+            raise UrlRewritingError(str(e))
         try:
             soup = get_soup(page.text)
         except Exception as e:
-            raise UrlRewritingError(e)
+            raise UrlRewritingError(str(e))
         link_elements = soup.find_all('pre', class_='links')
         urls=[]
         for element in link_elements:
             urls.extend(element.text.splitlines())
-        regexps = self.config.get('links_re', None)
+        regexps = self.config.get('filehosters_re', [])
         if regexps:
-            log.debug('Using links_re filters: %s', str(regexps))
+            log.debug('Using filehosters_re filters: %s', str(regexps))
         else:
-            log.debug('No link filters configured, using all found links.')
-        for i in reversed(range(len(urls))):
-            urls[i]=urls[i].encode('ascii','ignore')
-            if regexps:
-                accept = False
-                for regexp in regexps:
-                    if re.search(regexp, urls[i]):
-                        accept = True
-                        log.debug('Url: "%s" matched filter: %s', urls[i], regexp)
-                        break
-                if not accept:
-                    log.debug('Url: "%s" does not match any of the given filters: %s', urls[i], str(regexps))
-                    del(urls[i])
-        numlinks=len(urls)
-        log.info('Found %d links at %s.',numlinks, entry['url'])
-        if numlinks>0:
+            log.debug('No filehoster filters configured, using all found links.')
+        for i in reversed(enumerate(urls)):
+            urls[i] = urls[i].encode('ascii', 'ignore')
+            for regexp in regexps:
+                if re.search(regexp, urls[i]):
+                    log.debug('Url: "%s" matched filehoster filter: %s', urls[i], regexp)
+                    break
+            else:
+                log.debug('Url: "%s" does not match any of the given filehoster filters: %s', urls[i], str(regexps))
+                del(urls[i])
+        num_links=len(urls)
+        log.info('Found %d links at %s.',num_links, entry['url'])
+        if num_links:
             entry.setdefault('urls', urls)
-            entry['url']=urls[0]
+            entry['url'] = urls[0]
         else:
             raise UrlRewritingError('No useable links found at %s' % entry['url'])
 
