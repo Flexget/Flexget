@@ -84,7 +84,7 @@ class UrlRewriteRmz(object):
             log.debug('Using filehosters_re filters: %s', str(regexps))
         else:
             log.debug('No filehoster filters configured, using all found links.')
-        for i in reversed(enumerate(urls)):
+        for i in reversed(range(len(urls))):
             urls[i] = urls[i].encode('ascii', 'ignore')
             for regexp in regexps:
                 if re.search(regexp, urls[i]):
@@ -93,7 +93,7 @@ class UrlRewriteRmz(object):
             else:
                 log.debug('Url: "%s" does not match any of the given filehoster filters: %s', urls[i], str(regexps))
                 del(urls[i])
-        num_links=len(urls)
+        num_links = len(urls)
         log.info('Found %d links at %s.',num_links, entry['url'])
         if num_links:
             entry.setdefault('urls', urls)
