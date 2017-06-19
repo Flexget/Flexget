@@ -80,19 +80,21 @@ class UrlRewriteRmz(object):
         for element in link_elements:
             urls.extend(element.text.splitlines())
         regexps = self.config.get('filehosters_re', [])
-        if regexps:
-            log.debug('Using filehosters_re filters: %s', str(regexps))
-        else:
-            log.debug('No filehoster filters configured, using all found links.')
-        for i in reversed(range(len(urls))):
-            urls[i] = urls[i].encode('ascii', 'ignore')
+        filtered_urls=[]
+        for i, url in enumerate(urls):
+            urls[i] = url.encode('ascii', 'ignore')
             for regexp in regexps:
                 if re.search(regexp, urls[i]):
+                    filtered_urls.append(urls[i])
                     log.debug('Url: "%s" matched filehoster filter: %s', urls[i], regexp)
                     break
             else:
                 log.debug('Url: "%s" does not match any of the given filehoster filters: %s', urls[i], str(regexps))
-                del(urls[i])
+        if regexps:
+            log.debug('Using filehosters_re filters: %s', str(regexps))
+            urls=filtered_urls
+        else:
+            log.debug('No filehoster filters configured, using all found links.')
         num_links = len(urls)
         log.info('Found %d links at %s.',num_links, entry['url'])
         if num_links:
