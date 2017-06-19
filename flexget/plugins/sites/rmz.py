@@ -96,7 +96,7 @@ class UrlRewriteRmz(object):
         else:
             log.debug('No filehoster filters configured, using all found links.')
         num_links = len(urls)
-        log.verbose('Found %d links at %s.',num_links, entry['url'])
+        log.verbose('Found %d links at %s.', num_links, entry['url'])
         if num_links:
             entry.setdefault('urls', urls)
             entry['url'] = urls[0]
