@@ -1,0 +1,262 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/search?type=show&query=The+Expanse
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":68.07509,\"show\":{\"title\":\"The
+        Expanse\",\"overview\":\"Two hundred years in the future, in a fully colonized
+        solar system, police detective Josephus Miller is given the assignment to
+        find a missing young woman, Julie Mao. Joining his task is James Holden, former
+        first officer of an ice freighter who is involved in an incident caused by
+        the tense relationship between Earth, Mars and the Belt. Far from their struggles
+        in space, United Nations executive Chrisjen Avasarala works to prevent war
+        between Earth and Mars. Soon the three find out that the missing woman is
+        connected to a vast conspiracy that threatens all humanity.\",\"year\":2015,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":77199,\"slug\":\"the-expanse\",\"tvdb\":280619,\"imdb\":\"tt3230854\",\"tmdb\":63639,\"tvrage\":41967}}},{\"type\":\"show\",\"score\":5.8192234,\"show\":{\"title\":\"The
+        Expense\",\"overview\":\"*** If you're gunning for \\\"The Expanse\\\", please
+        learn to write (or copy-paste correctly). If not, let us know in the Forum,
+        and notice the 10/20-episode Minimum requirement for Webshows. Thank you.
+        ***\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":103726,\"slug\":\"the-expense\",\"tvdb\":303677,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":5.546604,\"show\":{\"title\":\"The
+        Normans\",\"overview\":\"In this major series, Professor Robert Bartlett examines
+        the extraordinary expansion and unchecked ambition of the Normans, and shows
+        how they transformed the history of Europe.A Quote from Ralph, Bishop of Orkney\u2018Most
+        famous Normans, as you go into battle, remember your name and your ancestry.
+        No one has resisted you and been unscathed. Bold France melted away in front
+        of you. You conquered and subjugated fertile England. Rich Apulia flourished
+        again when she received you. The celebrated city of Jerusalem and the renowned
+        city of Antioch both submitted to you\u2019 (Ralph, Bishop of Orkney, as recounted
+        by Henry of Huntingdon).\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":37591,\"slug\":\"the-normans\",\"tvdb\":181371,\"imdb\":\"tt1663967\",\"tmdb\":37749,\"tvrage\":null}}},{\"type\":\"show\",\"score\":4.519069,\"show\":{\"title\":\"The
+        Vikings Uncovered\",\"overview\":\"Dan Snow uncovers the lost Vikings in America
+        with space archaeologist Dr Sarah Parcak. Sarah uses satellites 383 miles
+        above the earth to spot ruins as small as 30cm buried beneath the surface.
+        As Sarah searches for Viking sites from Britain to America, Dan explores how
+        they voyaged thousands of miles when most ships never left the shoreline.
+        He also tracks their expansion west, first as raiders and then as settlers
+        and traders throughout Britain and beyond to Iceland and Greenland. In North
+        America they excavate what could be the most westerly Viking settlement ever
+        discovered.\",\"year\":2016,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":106831,\"slug\":\"the-vikings-uncovered\",\"tvdb\":309745,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":4.3827596,\"show\":{\"title\":\"The
+        Jewish Americans\",\"overview\":\"Emmy award-winning filmmaker David Grubin
+        explores the struggle of a tiny minority to integrate itself into the American
+        mainstream while remaining true to their roots in this documentary that begins
+        as 17th Century Jews arrive in New Amsterdam, and traces their journey as
+        they contend with racism and suspicion in a fledgling republic. Ever since
+        the first Jews arrived in America, their efforts to embrace the new culture
+        while simultaneously maintaining tradition has often found them frequently
+        branded as outsiders. When the first Jews landed on American shores in 1654,
+        New Amsterdam governor Peter Stuyvesant attempted to reject them to no avail.
+        Overruled by his superiors in the Netherlands - who claimed that Jews could
+        contribute to the growth of the newly founded colony as well as anyone else
+        - Stuyvesant relented, and a new era was underway. Over the course of the
+        next few centuries, the Jews would play prominent roles in such important
+        phases of United States history as the Civil War and westward expansion. From
+        politics to entertainment, the Jews would continue to display their unique
+        talent for innovation and adaptation in a wide variety of arenas. Yet despite
+        the fact that the separation of church and state would open up a wide world
+        of opportunities for them, the American Jew continued to endure anti-Semitism
+        at the behest of such powerful figures as automotive magnate Henry Ford. Through
+        it all, however, their spirits remained eternally hopeful, and forever unbroken.\",\"year\":2008,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":33989,\"slug\":\"the-jewish-americans\",\"tvdb\":97361,\"imdb\":\"tt1170234\",\"tmdb\":34136,\"tvrage\":18215}}},{\"type\":\"show\",\"score\":4.3146043,\"show\":{\"title\":\"Saving
+        the Bay\",\"overview\":\"Saving the Bay is four one-hour episodes tracing
+        the Bay from its geologic origins following the last Ice Age 10,000 years
+        ago through years of catastrophic exploitation to the restoration efforts
+        of today.From the Gold Rush to the Golden Gate Bridge, through World\u2019s
+        Fairs and World Wars; from Alcatraz and Angel Island to fishing fleets, ferry
+        boats, freighters and foghorns, San Francisco Bay has been central to the
+        identity of one of the world\u2019s leading economic, academic, recreational
+        and cultural regions. Widely acclaimed as one of the world\u2019s most beautiful
+        natural harbors, San Francisco Bay is the premier estuary on the Pacific Coast
+        of both North and South America and is the second most important estuary in
+        the United States after Chesapeake Bay. The volume of water per second moving
+        out the Golden Gate to the Pacific Ocean is up to seven times that of the
+        Mississippi River flowing into the Gulf of Mexico.The Bay is a critical link
+        in the Pacific Flyway for millions of migrating birds. It is home to the first
+        National Bird Sanctuary (Oakland\u2019s Lake Merritt), the last urban fishery
+        (herring) and the largest urban national park in the country (Golden Gate
+        National Recreation Area). San Francisco Bay is also the most invaded aquatic
+        ecosystem in North America.We meet the people who helped shape the Bay \u2014
+        dreamers and schemers, polluters and preservationists, sailors and soldiers,
+        tugboat captains and captains of industry. And we catch up with others who
+        use the Bay \u2014 as their workplace, playground, commute route or valued
+        vista.Saving the Bay is the first television program to tell the story of
+        the San Francisco Bay-Delta estuary and the people who have shaped and reshaped
+        it; from native inhabitants who lived around the Bay for 3,500 years to those
+        who now seek to restore balance to a fabled estuary in the midst of one of
+        the nation\u2019s largest and most vibrant urban centers.We recount how the
+        Bay was almost lost to landfill schemes from the daring to the deranged and
+        celebrate the more recent restoration and expansion of this once threatened
+        treasure.\",\"year\":1969,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":69753,\"slug\":\"saving-the-bay\",\"tvdb\":249438,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":4.073457,\"show\":{\"title\":\"Secrets
+        of the Wild\",\"overview\":\"The wide open spaces -- home to some of the most
+        spectacular wildlife in the world. Across the endless plains of the Serengeti,
+        the crisp white expanses of the Arctic and the windswept, breathtaking Himalayan
+        Plateaux, innovative techniques allow us to access remote habitats and capture
+        rare animal behavior, without disrupting the animals\u2019 daily struggle
+        for survival. We spy on wolves and foxes as they employ novel hunting techniques;
+        on hippos foraging at night; on polar bears courting. \",\"year\":1969,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":78743,\"slug\":\"secrets-of-the-wild\",\"tvdb\":283235,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":4.0053015,\"show\":{\"title\":\"Canada
+        Over the Edge\",\"overview\":\"This series explores the features that define
+        Canada: the most expansive coastline in the world and the world's longest
+        undefended border. It's a never-before-seen view of Canada, rising up and
+        bearing witness to our nation's diversity and beauty. The meeting place of
+        the ocean and land is birthplace of this country's history and the frontline
+        of climate change. Shot in breathtaking HD, Canada: Over the Edge will capture
+        Canada's vast geographical and cultural panorama. It is a testament to our
+        history and a time capsule for our future.\",\"year\":2012,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":79576,\"slug\":\"canada-over-the-edge\",\"tvdb\":284528,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":3.9736588,\"show\":{\"title\":\"The
+        Rise and Fall of the Japanese Empire\",\"overview\":\"Explores Japan's ambitious
+        but destructive attempts to lead the whole of Asia out from the shadow of
+        European and American dominance. Recounting the events of the most significant
+        global conflict in the history of mankind and its equally dramatic aftermath,
+        this two-part special investigates new and challenging insights into a battle
+        that shaped the Asia-Pacific region. From the expansion its sphere of influence
+        in 1895, with the installation of a puppet government in Korea, to the destruction
+        of Pearl Harbour, discover how Japan's burgeoning power in Asia soon brought
+        it into direct conflict with the West culminating in the atomic bomb attacks
+        on Hiroshima and Nagasaki. Focusing on the traumas suffered by the Korean,
+        Chinese, South East Asian and Japanese people as they lived through four decades
+        of bloody conflict, this compelling documentary tells the dramatic story of
+        a proud and ambitious warrior nation, which ultimately paid a terrible price
+        for its audacity.\",\"year\":2011,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":72417,\"slug\":\"the-rise-and-fall-of-the-japanese-empire\",\"tvdb\":272418,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":3.9371467,\"show\":{\"title\":\"Hell
+        In The Pacific\",\"overview\":\"The Pacific War was the largest naval conflict
+        in history.  Across the huge expanses of the Pacific, the two most powerful
+        navies in the world found themselves locked in a death struggle. The war was
+        fought in every possible climate, from Arctic conditions in the Aleutians,
+        to the appalling heat and swelter of the South Pacific. Every conceivable
+        type of naval activity was represented: carrier eviation battles, surface
+        engagements, bitterly fought night-battles, the largest amphibious landing
+        of the entire war, and the stealthy, brutal battles waged by and against submarines.This
+        5-DVD set includes rare combat footage (much of it in original color) and
+        exclusive interviews with veterans from both sides of the war. Also included
+        are rare commentaries from the Doolitttle riders and discussions with a number
+        of key insiders - including one of the planners of the attack on Pearl Harbor
+        a number of Japanese diplomats. This is the complete and unique story of the
+        last great naval campaign in history.\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":64326,\"slug\":\"hell-in-the-pacific\",\"tvdb\":134971,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [354379fb1b2f3d49-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sun, 23 Apr 2017 20:12:13 GMT']
+      ETag: [W/"626d49b51e7df0b65020f0cac0f5750c"]
+      Expires: ['Mon, 24 Apr 2017 04:12:13 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d5cc4750fbbcb66b97399027af958d0a21492978333; expires=Mon,
+          23-Apr-18 20:12:13 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Pagination-Item-Count: ['59']
+      X-Pagination-Limit: ['10']
+      X-Pagination-Page: ['1']
+      X-Pagination-Page-Count: ['6']
+      X-Request-Id: [86af8811-a4fe-4ba0-bc80-52c87e01e64c]
+      X-Runtime: ['0.063102']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      Cookie: [__cfduid=d5cc4750fbbcb66b97399027af958d0a21492978333]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/77199?extended=full
+  response:
+    body: {string: '{"title":"The Expanse","year":2015,"ids":{"trakt":77199,"slug":"the-expanse","tvdb":280619,"imdb":"tt3230854","tmdb":63639,"tvrage":41967},"overview":"Two
+        hundred years in the future, in a fully colonized solar system, police detective
+        Josephus Miller is given the assignment to find a missing young woman, Julie
+        Mao. Joining his task is James Holden, former first officer of an ice freighter
+        who is involved in an incident caused by the tense relationship between Earth,
+        Mars and the Belt. Far from their struggles in space, United Nations executive
+        Chrisjen Avasarala works to prevent war between Earth and Mars. Soon the three
+        find out that the missing woman is connected to a vast conspiracy that threatens
+        all humanity.","first_aired":"2015-11-23T00:00:00.000Z","airs":{"day":"Wednesday","time":"22:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"Syfy","country":"us","trailer":"http://youtube.com/watch?v=ydKmedH336Q","homepage":"http://www.syfy.com/theexpanse","status":"returning
+        series","rating":8.31006,"votes":2335,"updated_at":"2017-04-23T10:43:01.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hr","hu","id","it","ko","nl","pl","pt","ro","ru","sv","tr","uk","zh"],"genres":["fantasy","science-fiction","mystery","drama","thriller"],"aired_episodes":23}'}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [354379fb7b4b3d49-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sun, 23 Apr 2017 20:12:13 GMT']
+      ETag: [W/"5984786f9fbe296497ca3d03f4c2717f"]
+      Expires: ['Mon, 24 Apr 2017 04:12:13 GMT']
+      Last-Modified: ['Sun, 23 Apr 2017 10:43:01 GMT']
+      Server: [cloudflare-nginx]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [a0b4f55c-5e1a-45ef-8b0b-003ac87434a6]
+      X-Runtime: ['0.112552']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/77199/seasons/?extended=full
+  response:
+    body: {string: "[{\"number\":0,\"ids\":{\"trakt\":121210,\"tvdb\":null,\"tmdb\":73651,\"tvrage\":null},\"rating\":8.72727,\"votes\":11,\"episode_count\":29,\"aired_episodes\":29,\"title\":\"\xC9pisodes
+        sp\xE9ciaux\",\"overview\":null,\"first_aired\":\"2015-12-15T03:00:00.000Z\"},{\"number\":1,\"ids\":{\"trakt\":83179,\"tvdb\":582849,\"tmdb\":69635,\"tvrage\":null},\"rating\":8.24784,\"votes\":347,\"episode_count\":10,\"aired_episodes\":10,\"title\":\"Season
+        1\",\"overview\":null,\"first_aired\":\"2015-12-15T03:00:00.000Z\"},{\"number\":2,\"ids\":{\"trakt\":123109,\"tvdb\":669028,\"tmdb\":79720,\"tvrage\":null},\"rating\":8.71014,\"votes\":69,\"episode_count\":13,\"aired_episodes\":13,\"title\":\"Season
+        2\",\"overview\":\"Season 2 kicks off with interplanetary tensions at an all-time
+        high, the cold war between Earth and Mars is on the brink of an all-out battle.\",\"first_aired\":\"2017-02-09T03:00:00.000Z\"}]"}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [354379fc692f3d6d-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sun, 23 Apr 2017 20:12:14 GMT']
+      ETag: [W/"678c85cc1af599e9d37f393f67dd6578"]
+      Expires: ['Mon, 24 Apr 2017 04:12:14 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=df959dfb176dcda14639727e5c44ffb0a1492978334; expires=Mon,
+          23-Apr-18 20:12:14 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [c5725fb0-4413-44a4-a9a9-bfeeb7202042]
+      X-Runtime: ['0.030855']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/users/flexgettest/collection/shows
+  response:
+    body: {string: '[{"last_collected_at":"2017-04-23T18:44:42.000Z","show":{"title":"The
+        Expanse","year":2015,"ids":{"trakt":77199,"slug":"the-expanse","tvdb":280619,"imdb":"tt3230854","tmdb":63639,"tvrage":41967}},"seasons":[{"number":1,"episodes":[{"number":1,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":2,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":3,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":4,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":5,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":6,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":7,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":8,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":9,"collected_at":"2017-04-23T18:44:42.000Z"},{"number":10,"collected_at":"2017-04-23T18:44:42.000Z"}]}]},{"last_collected_at":"2016-03-08T21:36:33.000Z","show":{"title":"White
+        Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}},"seasons":[{"number":1,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":2,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":15,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":16,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":3,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":15,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":16,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":4,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":15,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":16,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":5,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":6,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"}]}]},{"last_collected_at":"2012-10-01T02:00:00.000Z","show":{"title":"Homeland","year":2011,"ids":{"trakt":1398,"slug":"homeland","tvdb":247897,"imdb":"tt1796960","tmdb":1407,"tvrage":27811}},"seasons":[{"number":2,"episodes":[{"number":1,"collected_at":"2012-10-01T02:00:00.000Z"}]}]}]'}
+    headers:
+      CF-RAY: [354379fde8283cfb-CPH]
+      Cache-Control: ['max-age=0, private, must-revalidate']
+      Cf-Railgun: [beb0b5926c 0.79 1.497505 0030 e6be]
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sun, 23 Apr 2017 20:12:15 GMT']
+      Etag: [W/"f7abaf97f2f38c49bbbd9a3caf2059b5"]
+      Last-Modified: ['Sun, 23 Apr 2017 18:44:42 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d938d30d4e71e4de35ef2b42112d873a41492978334; expires=Mon,
+          23-Apr-18 20:12:14 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Private-User: ['false']
+      X-Request-Id: [c62c0cc9-3fc7-4ad2-94a9-b377291dceeb]
+      X-Runtime: ['0.023645']
+      X-Xss-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1

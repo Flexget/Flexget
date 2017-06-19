@@ -1,5 +1,9 @@
-Issues
-======
+# Feature requests
+
+Use [feathub](http://feathub.com/Flexget/Flexget) for feature requests. 
+
+# Issues
+
 
 If you are looking for help, rather than reporting a problem, please use the [forum.](http://discuss.flexget.com)
 
@@ -17,8 +21,7 @@ Before submitting an issue, make sure you:
         <config or log here>
         ```
 
-Pull Requests
-=============
+# Pull Requests
 
 For help, see GitHub's guides on [forking a repo](https://help.github.com/articles/fork-a-repo/) and
 [pull requests.](https://help.github.com/articles/using-pull-requests/)
@@ -31,9 +34,9 @@ When submitting pull requests:
   [UpgradeActions](http://flexget.com/wiki/UpgradeActions) page upon merging anyway.
 - Make separate PRs for separate ideas. The smaller each PR is the easier it is to get it reviewed and merged.
   You don't want a bugfix to get held up by a new feature you also added.
-  
-Commit messages
-===============
+  
+# Commit messages
+
 If you want a commit to automatically create an entry in the [changelog](http://flexget.com/ChangeLog) you need to prefix with with square brackets and one of the following tags, followed by plugin name:
 - `add`, `added` or `feature` for the `Added` category
 - `change`, `changed` or `update` for the `Changed` category
@@ -46,7 +49,6 @@ Example:
 
 Note that the changelog can always be updated manually, but sticking to this structure allows for easier generation.
 
-Wiki
-====
+# Wiki
 
 Updating the wiki is also a valuable way to contribute. The wiki can be found at <http://flexget.com>

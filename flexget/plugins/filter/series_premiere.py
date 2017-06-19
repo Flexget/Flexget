@@ -61,7 +61,7 @@ class FilterSeriesPremiere(FilterSeriesBase):
         guessed_series = {}
         for entry in task.entries:
             if guess_entry(entry, allow_seasonless=allow_seasonless, config=group_settings):
-                if entry['series_season'] == 1 and entry['series_episode'] in desired_eps:
+                if not entry['season_pack'] and entry['series_season'] == 1 and entry['series_episode'] in desired_eps:
                     normalized_name = normalize_series_name(entry['series_name'])
                     db_series = task.session.query(Series).filter(Series.name == normalized_name).first()
                     if db_series and db_series.in_tasks:
@@ -70,10 +70,10 @@ class FilterSeriesPremiere(FilterSeriesBase):
         # Reject any further episodes in those series
         for entry in task.entries:
             for series in guessed_series.values():
-                if entry.get('series_name') == series and not (
-                        entry.get('series_season') == 1 and
-                        entry.get('series_episode') in desired_eps):
-                    entry.reject('Non premiere episode in a premiere series')
+                if entry.get('series_name') == series and \
+                        (entry.get('season_pack') or not (
+                        entry.get('series_season') == 1 and entry.get('series_episode') in desired_eps)):
+                    entry.reject('Non premiere episode or season pack in a premiere series')
         # Since we are running after task start phase, make sure not to merge into the config multiple times on reruns
         if not task.is_rerun:
             # Combine settings and series into series plugin config format

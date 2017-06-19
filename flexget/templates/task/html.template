@@ -349,4 +349,5 @@ div.clear {
 
     </body>
 </html>
+{% else %} Task did not produce any entries
 {% endif %}

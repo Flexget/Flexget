@@ -10,7 +10,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
 from flexget.manager import Session
-from flexget.plugins.filter.series import SeriesTask, Series, Episode, Release, get_latest_release
+from flexget.plugins.filter.series import SeriesTask, Series, Episode, EpisodeRelease, get_latest_release
 
 log = logging.getLogger('next_series_episodes')
 
@@ -45,9 +45,7 @@ class NextSeriesEpisodes(object):
 
     def sequence_identifiers(self, episode):
         # Use a set to remove doubles, which will happen depending on number of digits in episode
-        return set(['%d' % episode,
-                    '%02d' % episode,
-                    '%03d' % episode])
+        return {'%d' % episode, '%02d' % episode, '%03d' % episode}
 
     def search_entry(self, series, season, episode, task, rerun=True):
         # Extract the alternate names for the series
@@ -72,6 +70,7 @@ class NextSeriesEpisodes(object):
                       series_alternate_names=alts,  # Not sure if this field is useful down the road.
                       series_season=season,
                       series_episode=episode,
+                      season_pack_lookup=False,
                       series_id=series_id,
                       series_id_type=series.identified_by)
         if rerun:
@@ -111,19 +110,39 @@ class NextSeriesEpisodes(object):
                     continue
 
                 low_season = 0 if series.identified_by == 'ep' else -1
+                # Don't look for seasons older than begin ep
+                if series.begin and series.begin.season and series.begin.season > 1:
+                    # begin-1 or the range() loop will never get to the begin season
+                    low_season = max(series.begin.season - 1, 0)
 
+                new_season = None
                 check_downloaded = not config.get('backfill')
                 latest_season = get_latest_release(series, downloaded=check_downloaded)
                 if latest_season:
-                    latest_season = latest_season.season
+                    if latest_season.season <= low_season:
+                        latest_season = new_season = low_season + 1
+                    elif latest_season.season in series.completed_seasons:
+                        latest_season = new_season = latest_season.season + 1
+                    else:
+                        latest_season = latest_season.season
                 else:
                     latest_season = low_season + 1
 
                 for season in range(latest_season, low_season, -1):
-                    log.trace('Adding episodes for series %s season %d', series.name, season)
+                    if season in series.completed_seasons:
+                        log.debug('season %s is marked as completed, skipping', season)
+                        continue
+                    log.trace('Evaluating episodes for series %s, season %d', series.name, season)
                     latest = get_latest_release(series, season=season, downloaded=check_downloaded)
-                    if series.begin and (not latest or latest < series.begin):
-                        entries.append(self.search_entry(series, series.begin.season, series.begin.number, task))
+                    if series.begin and season == series.begin.season and (not latest or latest < series.begin):
+                        # In case series.begin season is already completed, look in next available season
+                        lookup_season = series.begin.season
+                        ep_number = series.begin.number
+                        while lookup_season in series.completed_seasons:
+                            lookup_season += 1
+                            # If season number was bumped, start looking for ep 1
+                            ep_number = 1
+                        entries.append(self.search_entry(series, lookup_season, ep_number, task))
                     elif latest and not config.get('backfill'):
                         entries.append(self.search_entry(series, latest.season, latest.number + 1, task))
                     elif latest:
@@ -136,36 +155,42 @@ class NextSeriesEpisodes(object):
                             start_at_ep = max(latest.number - 10, 1)
                             episodes_this_season = episodes_this_season.filter(Episode.number >= start_at_ep)
                         latest_ep_this_season = episodes_this_season.order_by(desc(Episode.number)).first()
-                        downloaded_this_season = (episodes_this_season.join(Episode.releases).
-                                                  filter(Release.downloaded == True).all())
-                        # Calculate the episodes we still need to get from this season
-                        if series.begin and series.begin.season == season:
-                            start_at_ep = max(start_at_ep, series.begin.number)
-                        eps_to_get = list(range(start_at_ep, latest_ep_this_season.number + 1))
-                        for ep in downloaded_this_season:
-                            try:
-                                eps_to_get.remove(ep.number)
-                            except ValueError:
-                                pass
-                        entries.extend(self.search_entry(series, season, x, task, rerun=False) for x in eps_to_get)
-                        # If we have already downloaded the latest known episode, try the next episode
-                        if latest_ep_this_season.releases:
-                            entries.append(self.search_entry(series, season, latest_ep_this_season.number + 1, task))
+                        if latest_ep_this_season:
+                            downloaded_this_season = (episodes_this_season.join(Episode.releases).
+                                                      filter(EpisodeRelease.downloaded == True).all())
+                            # Calculate the episodes we still need to get from this season
+                            if series.begin and series.begin.season == season:
+                                start_at_ep = max(start_at_ep, series.begin.number)
+                            eps_to_get = list(range(start_at_ep, latest_ep_this_season.number + 1))
+                            for ep in downloaded_this_season:
+                                try:
+                                    eps_to_get.remove(ep.number)
+                                except ValueError:
+                                    pass
+                            entries.extend(self.search_entry(series, season, x, task, rerun=False) for x in eps_to_get)
+                            # If we have already downloaded the latest known episode, try the next episode
+                            if latest_ep_this_season.releases:
+                                entries.append(
+                                    self.search_entry(series, season, latest_ep_this_season.number + 1, task))
+                        else:
+                            # No episode means that latest is a season pack, emit episode 1
+                            entries.append(self.search_entry(series, season, 1, task))
+                    # First iteration of a new season with no show begin and show has downloads
+                    elif new_season and season == new_season:
+                        entries.append(self.search_entry(series, season, 1, task))
                     else:
                         if config.get('from_start') or config.get('backfill'):
                             entries.append(self.search_entry(series, season, 1, task))
                         else:
                             log.verbose('Series `%s` has no history. Set begin option, '
                                         'or use CLI `series begin` '
-                                        'subcommand to set first episode to emit' % series.name)
+                                        'subcommand to set first episode to emit', series.name)
                             break
                     # Skip older seasons if we are not in backfill mode
                     if not config.get('backfill'):
+                        log.debug('backfill is not enabled; skipping older seasons')
                         break
-                    # Don't look for seasons older than begin ep
-                    if series.begin and series.begin.season >= season:
-                        break
-        
+
         for reason, series in impossible.items():
             log.verbose('Series `%s` with identified_by value `%s` are not supported. ',
                         ', '.join(sorted(series)), reason)
@@ -177,7 +202,7 @@ class NextSeriesEpisodes(object):
         with Session() as session:
             series = session.query(Series).filter(Series.name == entry['series_name']).first()
             latest = get_latest_release(series)
-            db_release = (session.query(Release).join(Release.episode).join(Episode.series).
+            db_release = (session.query(EpisodeRelease).join(EpisodeRelease.episode).join(Episode.series).
                           filter(Series.name == entry['series_name']).
                           filter(Episode.season == entry['series_season']).
                           filter(Episode.number == entry['series_episode']).first())
@@ -198,7 +223,7 @@ class NextSeriesEpisodes(object):
                 # There are know releases of this episode, but none were accepted
                 return
             elif latest and identified_by == 'ep' and (
-                    entry['series_season'] == latest.season and entry['series_episode'] == latest.number + 1):
+                            entry['series_season'] == latest.season and entry['series_episode'] == latest.number + 1):
                 # We searched for next predicted episode of this season unsuccessfully, try the next season
                 self.rerun_entries.append(self.search_entry(series, latest.season + 1, 1, task))
                 log.debug('%s %s not found, rerunning to look for next season' %

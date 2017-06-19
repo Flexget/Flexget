@@ -7,7 +7,7 @@ interactions:
       Connection: [keep-alive]
       User-Agent: [!!python/unicode 'FlexGet/1.2.379.dev (www.flexget.com)']
     method: GET
-    uri: http://api.t411.li/categories/tree/
+    uri: https://api.t411.al/categories/tree/
   response:
     body: {string: !!python/unicode '{"210":{"id":"210","pid":"0","name":"Film\/Vid\u00e9o","cats":{"402":{"id":"402","pid":"210","name":"Vid\u00e9o-clips"},"433":{"id":"433","pid":"210","name":"S\u00e9rie
         TV"},"455":{"id":"455","pid":"210","name":"Animation"},"631":{"id":"631","pid":"210","name":"Film"},"633":{"id":"633","pid":"210","name":"Concert"},"634":{"id":"634","pid":"210","name":"Documentaire"},"635":{"id":"635","pid":"210","name":"Spectacle"},"636":{"id":"636","pid":"210","name":"Sport"},"637":{"id":"637","pid":"210","name":"Animation

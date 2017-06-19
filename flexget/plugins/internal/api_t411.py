@@ -120,7 +120,7 @@ class FriendlySearchQuery(object):
         self.term_names.append("Episode %02d" % episode)
 
 
-T411API_DOMAIN_URL = "api.t411.li"
+T411API_DOMAIN_URL = "api.t411.al"
 T411API_CATEGORY_TREE_PATH = "/categories/tree/"
 T411API_AUTH_PATH = "/auth"
 T411API_TERMS_PATH = "/terms/tree/"
@@ -187,14 +187,14 @@ class T411RestClient(object):
     """A REST client for T411 API"""
 
     @staticmethod
-    def template_url(url_scheme='http'):
+    def template_url(url_scheme='https'):
         return url_scheme + '://' + T411API_DOMAIN_URL + '%s'
 
     @staticmethod
-    def download_url(torrent_id, url_scheme='http'):
+    def download_url(torrent_id, url_scheme='https'):
         return (T411RestClient.template_url(url_scheme) % T411API_DOWNLOAD_PATH) + str(torrent_id)
 
-    def __init__(self, username=None, password=None, url_scheme='http'):
+    def __init__(self, username=None, password=None, url_scheme='https'):
         self.credentials = {'username': username, 'password': password}
         self.api_token = None
         self.api_template_url = url_scheme + '://' + T411API_DOMAIN_URL + '%s'

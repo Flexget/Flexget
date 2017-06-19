@@ -23,7 +23,7 @@ var mockHistoryData = (function () {
 					'task': 'FillMovieQueue',
 					'time': '2016-05-24T03:52:01.924238',
 					'title': 'Autumn (2009)',
-					'url': 'http://trakt.tv/movie/autumn-2009'
+					'url': 'https://trakt.tv/movies/autumn-2009'
 				},
 				{
 					'details': 'Accepted by list_accept',
@@ -32,7 +32,7 @@ var mockHistoryData = (function () {
 					'task': 'RemoveCollectedMovies',
 					'time': '2016-05-24T03:00:09.372575',
 					'title': 'The Cell 2 (2009)',
-					'url': 'http://trakt.tv/movie/the-cell-2-2009'
+					'url': 'https://trakt.tv/movies/the-cell-2-2009'
 				}
 			],
 			'pages': 114

@@ -121,7 +121,7 @@ class TestDownload(object):
           test:
             mock:
               - title: README
-                url: https://github.com/Flexget/Flexget/raw/master/README.rst
+                url: https://github.com/Flexget/Flexget/raw/develop/README.MD
                 filename: flexget_test_data
             accept_all: true
             download:

@@ -49,9 +49,9 @@ class TestTraktList(object):
     def db_auth(self, manager):
         kwargs = {
             'account': 'flexget_list_test',
-            'access_token': '336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22',
-            'refresh_token': 'f07c967d834673f5e61cba0942f177fbf839528241db9cb6dfb5a51dd267692f',
-            'created': 1481976079,
+            'access_token': '690dd940c75b133b56c58cd05d5de45c94224874c81e6777efbf7e6762ce016b',
+            'refresh_token': '22147838f28bf3d758a6c17bb67760ab66063dca55ad2eab2e1e4dab5e4769cf',
+            'created': 1496091336,
             'expires': 7776000
         }
 
@@ -68,8 +68,8 @@ class TestTraktList(object):
         assert entries == sorted([
             {
                 'trakt_show_slug': 'castle',
-                'original_url': 'http://trakt.tv/shows/castle/seasons/8/episodes/15',
-                'url': 'http://trakt.tv/shows/castle/seasons/8/episodes/15',
+                'original_url': 'https://trakt.tv/shows/castle/seasons/8/episodes/15',
+                'url': 'https://trakt.tv/shows/castle/seasons/8/episodes/15',
                 'series_season': 8,
                 'tvdb_id': 83462,
                 'series_name': 'Castle (2009)',
@@ -86,10 +86,10 @@ class TestTraktList(object):
             },
             {
                 'movie_name': 'Deadpool',
-                'original_url': 'http://trakt.tv/movie/deadpool-2016',
+                'original_url': 'https://trakt.tv/movies/deadpool-2016',
                 'tmdb_id': 293660,
                 'title': 'Deadpool (2016)',
-                'url': 'http://trakt.tv/movie/deadpool-2016',
+                'url': 'https://trakt.tv/movies/deadpool-2016',
                 'trakt_movie_id': 190430,
                 'trakt_movie_name': 'Deadpool',
                 'imdb_id': 'tt1431045',
@@ -101,8 +101,8 @@ class TestTraktList(object):
                 'trakt_show_slug': 'the-walking-dead',
                 'tmdb_id': 1402,
                 'title': 'The Walking Dead (2010)',
-                'url': 'http://trakt.tv/show/the-walking-dead',
-                'original_url': 'http://trakt.tv/show/the-walking-dead',
+                'url': 'https://trakt.tv/shows/the-walking-dead',
+                'original_url': 'https://trakt.tv/shows/the-walking-dead',
                 'series_name': 'The Walking Dead (2010)',
                 'trakt_show_id': 1393,
                 'tvdb_id': 153021,
@@ -140,8 +140,8 @@ class TestTraktList(object):
         trakt_set.clear()
 
         entry = Entry(**{u'trakt_show_slug': u'game-of-thrones',
-                         u'original_url': u'http://trakt.tv/shows/game-of-thrones/seasons/4/episodes/5',
-                         u'url': u'http://trakt.tv/shows/game-of-thrones/seasons/4/episodes/5', u'series_season': 4,
+                         u'original_url': u'https://trakt.tv/shows/game-of-thrones/seasons/4/episodes/5',
+                         u'url': u'https://trakt.tv/shows/game-of-thrones/seasons/4/episodes/5', u'series_season': 4,
                          u'tvdb_id': 121361, u'series_name': u'Game of Thrones (2011)', u'imdb_id': u'tt0944947',
                          u'series_id': u'S04E05', u'series_episode': 5, u'trakt_episode_id': 73674,
                          u'title': u'Game of Thrones (2011) S04E05 First of His Name', u'trakt_show_id': 1390,

@@ -1,0 +1,222 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/search?query=Breaking+Bad&type=show
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":64.94347,\"show\":{\"title\":\"Breaking
+        Bad\",\"overview\":\"Walter White, a struggling high school chemistry teacher,
+        is diagnosed with advanced lung cancer. He turns to a life of crime, producing
+        and selling methamphetamine accompanied by a former student, Jesse Pinkman,
+        with the aim of securing his family's financial future before he dies.\",\"year\":2008,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1388,\"slug\":\"breaking-bad\",\"tvdb\":81189,\"imdb\":\"tt0903747\",\"tmdb\":1396,\"tvrage\":18164}}},{\"type\":\"show\",\"score\":34.37072,\"show\":{\"title\":\"Breaking
+        Boston\",\"overview\":\"\\\"Breaking Boston\\\" follows a group of four blue-collar
+        women in their twenties trying to break the cycle of their peers in a town
+        where education, employment and opportunities are hard to come by. Each one
+        of them has already hit rock bottom via destructive relationships or bad choices,
+        but they're all leaning on each other and looking for a way out.\",\"year\":2014,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":76361,\"slug\":\"breaking-boston\",\"tvdb\":278764,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":34.27463,\"show\":{\"title\":\"Breaking
+        In\",\"overview\":\"Contra Security, corporate America's answer to \\\"The
+        A-Team\\\", gives clients a sense of security by first ripping it away. The
+        firm is led by OZ, a larger-than-life head honcho who is a man of mystery
+        and master of manipulation. The members of the odd squad include alluring
+        bad girl Melanie, who is in charge of lock-picking, safe-cracking and heart-breaking;
+        and Cash, a fanboy who specializes in strategy, logistics and office pranks
+        only a mad genius could think up.Oz's newest recruit, plucked right out of
+        college, is lovable and charming computer hacker Cameron Price. Unfortunately
+        for Cameron, cracking into state-of-the-art security systems is a lot easier
+        than dealing with his co-workers. Between Melanie's sex appeal and Cash's
+        hazing, Cameron has more than a few obstacles to overcome if he wants to cement
+        his status as part of the team and become Oz's go-to guy.\",\"year\":2011,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":34392,\"slug\":\"breaking-in\",\"tvdb\":206751,\"imdb\":\"tt1630574\",\"tmdb\":34541,\"tvrage\":26082}}},{\"type\":\"show\",\"score\":31.103735,\"show\":{\"title\":\"Talking
+        Bad\",\"overview\":\"Talking Bad is a weekly, half-hour live after-show and
+        companion piece for AMC's Emmy Award-winning series, Breaking Bad. Hosted
+        by Chris Hardwick, Talking Bad will analyze and examine every detail of Breaking
+        Bad\u2019s final eight episodes.Talking Bad features Hardwick spending time
+        with fans, actors, producers and television enthusiasts, recapping the most
+        recent Breaking Bad episode, and taking questions and comments from viewers.
+        Fans may continue to engage with the after-show following the on-air conclusion,
+        online, at amc.com for more videos, weekly polls and photo galleries of the
+        guests featured on the series.\",\"year\":2013,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":72145,\"slug\":\"talking-bad\",\"tvdb\":272219,\"imdb\":\"tt3115468\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":24.136374,\"show\":{\"title\":\"Donal
+        MacIntyre: Breaking Crime\",\"overview\":\"The investigative journalist explores
+        the world of youth crime, examining its causes and the ripple effect on the
+        wider community, as well as looking at what drives young people to choose
+        a bad path. He meets those at the heart of the issue, including offenders,
+        reformed criminals, the families and communities, and individuals making a
+        difference.\",\"year\":2015,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":94493,\"slug\":\"donal-macintyre-breaking-crime\",\"tvdb\":290284,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":21.712479,\"show\":{\"title\":\"Good
+        Times, Bad Times\",\"overview\":\"Goede tijden, slechte tijden, English: Good
+        times, bad times, also known as GTST, is the longest-running Dutch soap opera,
+        which began on 1 October 1990 on RTL4. The programme was the first daily soap
+        in the Netherlands. GTST is broadcast Monday to Friday at 20:00. Around 1.5
+        million viewers watch each episode. It is the highest rated soap opera in
+        the Netherlands.The soap mainly revolves around the lives of the families
+        Alberts, Sanders, De Jong, Van Houten and Bouwhuis. It all takes place in
+        the fictional town of Meerdijk. Like any other soap, marriage, divorce, kidnapping
+        and business are a few of the ingredients of GTST, although in recent years,
+        GTST has become known for writing and producing more controversial storylines.
+        GTST is also known for having a summer break each year, ending a season sometime
+        in June with a cliffhanger, only to resume three months later in September.\",\"year\":1990,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":11837,\"slug\":\"good-times-bad-times\",\"tvdb\":104271,\"imdb\":\"tt0096597\",\"tmdb\":11890,\"tvrage\":19056}}},{\"type\":\"show\",\"score\":1.3865765,\"show\":{\"title\":\"What
+        About Brian\",\"overview\":\"From the producers of Lost and Alias and the
+        screenwriter of City of Angels and For Love of the Game comes a contemporary,
+        heartwarming ensemble show about a group of supportive friends in various
+        stages of romantic relationships and friendships living in Los Angeles. There
+        are the just-married Nic and Angelo, the seemingly happily married Dave and
+        Deena and the newly-engaged Marjorie and Adam. But -- what about Brian? Of
+        this close-knit group of friends, everyone else has paired off, while Brian
+        has emerged as the last bachelor standing. At 34, regardless of his run of
+        bad luck in matters of the heart, Brian still holds out hope that one day
+        he'll open the door and be blinded by love. However questions about his fate
+        have been popping up more frequently in his head. The most pressing question
+        is - and it's one that only he can answer -- could all of his problems stem
+        from the fact that he is harboring a crush on the picture-perfect Marjorie,
+        his best friend's girl? Adam, Brian's best friend since childhood, was going
+        to break up with Marjorie but found himself proposing to her instead. He's
+        a lawyer and Marjorie is a pediatric surgeon. Their busy lifestyles leave
+        them little time to plan their upcoming wedding and, oddly enough, that seems
+        to have given them more time to re-evaluate whether they're indeed doing the
+        right thing. Brian's fortysomething sister, Nic, and her boy-toy husband,
+        Angelo, are trying hard to start a family, but something's not right. Nic's
+        high-stress work as a record executive and Angelo's fledgling acting career
+        have created some anxiety in the new marriage. Now they're torn between conceiving
+        a child the old-fashioned way or using modern medicine to speed up the process.
+        Dave, who runs a video game business with Brian called Zap Monkey, is married
+        to stay-at-home mom Deena. They've been together for 13 years, have three
+        little girls and a lackluster sex life. This prompts the frustrated and unconventional
+        Deena to suggest to the more content Dave that they consider having an open
+        marriage. Like all married people and their single friends, they can't wait
+        for Brian to join their \\\"club,\\\" though they're not exactly sure why.\",\"year\":2006,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":3513,\"slug\":\"what-about-brian\",\"tvdb\":79290,\"imdb\":\"tt0460693\",\"tmdb\":3535,\"tvrage\":6930}}},{\"type\":\"show\",\"score\":0.46773857,\"show\":{\"title\":\"It
+        Could Be Worse\",\"overview\":\"Jacob Gordon can't catch a break. A struggling
+        actor with a personal life to match. His epic streak of bad luck just might
+        change when he's cast in a Broadway musical; \\\"The Ice Queen\\\", opposite
+        stage and screen royalty Veronica Bailey.\",\"year\":2013,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":75749,\"slug\":\"it-could-be-worse\",\"tvdb\":276831,\"imdb\":\"tt2811844\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.46773857,\"show\":{\"title\":\"Murder
+        Police\",\"overview\":\"Mario Sanchez aspires to be a good cop, but his efforts
+        to solve crimes are constantly put in jeopardy by his own clumsiness and the
+        incompetence of his fellow detectives, including his partner, Tommy Margaretti,
+        a tough, rule-breaking bad cop who can't interrogate a suspect without beating
+        him up.\",\"year\":2013,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":58459,\"slug\":\"murder-police\",\"tvdb\":268894,\"imdb\":\"tt2557040\",\"tmdb\":58846,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.46773857,\"show\":{\"title\":\"ShenZhen\",\"overview\":\"Song
+        Xiao Lei faces a bad break up and lost his job. With the help of his friend
+        Hua Qiang, he decides to start a new life, including finding a new home. Xiao
+        Lei somehow ends up living in an apartment with Hu Li Li, Li Mei Dai, and
+        Bai Jing Jing, three girls with different personalities.\",\"year\":2014,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":104232,\"slug\":\"shenzhen\",\"tvdb\":287588,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [3549e8f589e33cdd-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Mon, 24 Apr 2017 14:56:34 GMT']
+      ETag: [W/"3d5b18e488416c9174788ccfeb3cb37b"]
+      Expires: ['Mon, 24 Apr 2017 22:56:34 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=de31cab3ffc0d2c6a348e7ea134df9afa1493045794; expires=Tue,
+          24-Apr-18 14:56:34 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Pagination-Item-Count: ['33']
+      X-Pagination-Limit: ['10']
+      X-Pagination-Page: ['1']
+      X-Pagination-Page-Count: ['4']
+      X-Request-Id: [fc7e7f9a-9db5-44ab-9123-1bd392d55313]
+      X-Runtime: ['0.026203']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      Cookie: [__cfduid=de31cab3ffc0d2c6a348e7ea134df9afa1493045794]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/1388?extended=full
+  response:
+    body: {string: '{"title":"Breaking Bad","year":2008,"ids":{"trakt":1388,"slug":"breaking-bad","tvdb":81189,"imdb":"tt0903747","tmdb":1396,"tvrage":18164},"overview":"Walter
+        White, a struggling high school chemistry teacher, is diagnosed with advanced
+        lung cancer. He turns to a life of crime, producing and selling methamphetamine
+        accompanied by a former student, Jesse Pinkman, with the aim of securing his
+        family''s financial future before he dies.","first_aired":"2008-01-20T00:00:00.000Z","airs":{"day":"Sunday","time":"21:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-MA","network":"AMC","country":"us","trailer":"http://youtube.com/watch?v=XZ8daibM3AE","homepage":"http://www.amc.com/shows/breaking-bad","status":"ended","rating":9.42247,"votes":45083,"updated_at":"2017-04-20T09:18:05.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","et","fa","fi","fr","he","hr","hu","it","ja","ko","lt","nl","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"genres":["drama","crime","suspense","thriller"],"aired_episodes":62}'}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [3549e8f5d9f13cdd-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Mon, 24 Apr 2017 14:56:34 GMT']
+      ETag: [W/"62177d0ac1b56f60830e49dd633d8811"]
+      Expires: ['Mon, 24 Apr 2017 22:56:34 GMT']
+      Last-Modified: ['Thu, 20 Apr 2017 09:18:05 GMT']
+      Server: [cloudflare-nginx]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [82f1d87f-e4d7-4df2-8495-ebdd74c57251]
+      X-Runtime: ['0.025475']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/1388/seasons/5/episodes/14/?extended=full
+  response:
+    body: {string: '{"season":5,"number":14,"title":"Ozymandias","ids":{"trakt":73541,"tvdb":4553040,"imdb":"tt2301451","tmdb":62162,"tvrage":0},"number_abs":60,"overview":"Everyone
+        copes with radically changed circumstances.","rating":9.12704,"votes":5022,"first_aired":"2013-09-16T01:00:00.000Z","updated_at":"2017-04-24T11:48:25.000Z","available_translations":["ar","bg","bs","cs","da","de","el","en","es","et","fa","fi","fr","he","hr","hu","it","ja","ko","lt","nl","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"runtime":47}'}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [3549e8f6d8873ccb-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Mon, 24 Apr 2017 14:56:34 GMT']
+      Expires: ['Mon, 24 Apr 2017 22:56:34 GMT']
+      Last-Modified: ['Mon, 24 Apr 2017 11:48:25 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=dae7934df665d51112d1e7e36544a604c1493045794; expires=Tue,
+          24-Apr-18 14:56:34 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [83403687-1a2f-4989-ae91-fc3a8748e749]
+      X-Runtime: ['0.012624']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/users/flexgettest/ratings/episodes
+  response:
+    body: {string: '[{"rated_at":"2017-04-23T19:36:34.000Z","rating":10,"type":"episode","episode":{"season":5,"number":14,"title":"Ozymandias","ids":{"trakt":73541,"tvdb":4553040,"imdb":"tt2301451","tmdb":62162,"tvrage":0}},"show":{"title":"Breaking
+        Bad","year":2008,"ids":{"trakt":1388,"slug":"breaking-bad","tvdb":81189,"imdb":"tt0903747","tmdb":1396,"tvrage":18164}}}]'}
+    headers:
+      CF-RAY: [3549e8f7ba103cb9-CPH]
+      Cache-Control: ['max-age=0, private, must-revalidate']
+      Cf-Railgun: [a8ccd18243 stream 0.000000 0200 e6be]
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Mon, 24 Apr 2017 14:56:34 GMT']
+      Etag: [W/"6e3f9ff01ffe5e77e9cdab3e80f1cd95"]
+      Last-Modified: ['Sun, 23 Apr 2017 19:36:34 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d84275ce036aae02f95095248988638b11493045794; expires=Tue,
+          24-Apr-18 14:56:34 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Private-User: ['false']
+      X-Request-Id: [e2866355-a608-42cd-91e8-db2e7b603ae6]
+      X-Runtime: ['0.028116']
+      X-Xss-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1

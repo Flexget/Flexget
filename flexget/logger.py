@@ -10,6 +10,7 @@ import sys
 import threading
 import uuid
 import warnings
+import os
 
 from flexget import __version__
 from flexget.utils.tools import io_encoding
@@ -18,6 +19,9 @@ from flexget.utils.tools import io_encoding
 TRACE = 5
 # A level more detailed than INFO
 VERBOSE = 15
+# environment variables to modify rotating log parameters from defaults of 1 MB and 9 files
+ENV_MAXBYTES = 'FLEXGET_LOG_MAXBYTES'
+ENV_MAXCOUNT = 'FLEXGET_LOG_MAXCOUNT'
 
 # Stores `task`, logging `session_id`, and redirected `output` stream in a thread local context
 local_context = threading.local()
@@ -198,7 +202,9 @@ def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
 
     formatter = FlexGetFormatter()
     if to_file:
-        file_handler = logging.handlers.RotatingFileHandler(filename, maxBytes=1000 * 1024, backupCount=9)
+        file_handler = logging.handlers.RotatingFileHandler(filename,
+                                                            maxBytes=int(os.environ.get(ENV_MAXBYTES, 1000 * 1024)),
+                                                            backupCount=int(os.environ.get(ENV_MAXCOUNT, 9)))
         file_handler.setFormatter(formatter)
         file_handler.setLevel(level)
         logger.addHandler(file_handler)

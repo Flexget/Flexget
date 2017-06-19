@@ -104,3 +104,26 @@ class TestTemplateRerun(object):
     def test_rerun(self, execute_task):
         task = execute_task('test_rerun')
         assert len(task.config['series']) == 1
+
+
+class TestTemplateChange(object):
+    config = """
+        templates:
+          a:
+            mock:
+            - title: foo
+        tasks:
+          test_config_change:
+            mock:
+            - title: bar
+            template: a
+    """
+
+    def test_template_change_trigger_config_change(self, execute_task, manager):
+        task = execute_task('test_config_change')
+        assert len(task.all_entries) == 2
+
+        manager.config['templates']['a']['mock'].append({'title': 'baz}'})
+        task = execute_task('test_config_change')
+        assert task.config_modified
+        assert len(task.all_entries) == 3

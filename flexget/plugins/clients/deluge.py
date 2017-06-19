@@ -405,6 +405,7 @@ class OutputDeluge(DelugePlugin):
                     'keep_subs': {'type': 'boolean'},
                     'hide_sparse_files': {'type': 'boolean'},
                     'enabled': {'type': 'boolean'},
+                    'container_directory': {'type': 'string'},
                 },
                 'additionalProperties': False
             }
@@ -558,6 +559,7 @@ class OutputDeluge(DelugePlugin):
                     log.debug('Moving storage for %s to %s' % (entry['title'], move_now_path))
                     main_file_dlist.append(client.core.move_storage([torrent_id], move_now_path))
 
+                big_file_name = ''
                 if opts.get('content_filename') or opts.get('main_file_only'):
 
                     def file_exists(filename):
@@ -658,6 +660,20 @@ class OutputDeluge(DelugePlugin):
                             entry['title'],
                             opts.get('main_file_ratio') * 100))
 
+                container_directory =  pathscrub(entry.render(entry.get('container_directory', config.get('container_directory', ''))))
+                if container_directory:
+                    if big_file_name:
+                        folder_structure = big_file_name.split(os.sep)
+                    elif len(status['files']) > 0:
+                        folder_structure = status['files'][0]['path'].split(os.sep)
+                    else:
+                        folder_structure = []
+                    if len(folder_structure) > 1:
+                        log.verbose('Renaming Folder %s to %s', folder_structure[0], container_directory)
+                        main_file_dlist.append(client.core.rename_folder(torrent_id, folder_structure[0], container_directory))
+                    else:
+                        log.debug('container_directory specified however the torrent %s does not have a directory structure; skipping folder rename', entry['title'])
+
                 return defer.DeferredList(main_file_dlist)
 
             status_keys = ['files', 'total_size', 'save_path', 'move_on_completed_path',
@@ -674,9 +690,16 @@ class OutputDeluge(DelugePlugin):
         # dlist is a list of deferreds that must complete before we exit
         dlist = []
         # loop through entries to get a list of labels to add
-        labels = set([format_label(entry['label']) for entry in task.accepted if entry.get('label')])
-        if config.get('label'):
-            labels.add(format_label(config['label']))
+        labels = set()
+        for entry in task.accepted:
+            if entry.get('label', config.get('label')):
+                try:
+                    label = format_label(entry.render(entry.get('label', config.get('label'))))
+                    log.debug('Rendered label: %s', label)
+                except RenderError as e:
+                    log.error('Error rendering label `%s`: %s', label, e)
+                    continue
+                labels.add(label)
         label_deferred = defer.succeed(True)
         if labels:
             # Make sure the label plugin is available and enabled, then add appropriate labels
@@ -692,7 +715,7 @@ class OutputDeluge(DelugePlugin):
                         dlist = []
                         for label in labels:
                             if label not in d_labels:
-                                log.debug('Adding the label %s to deluge' % label)
+                                log.debug('Adding the label `%s` to deluge', label)
                                 dlist.append(client.label.add(label))
                         return defer.DeferredList(dlist)
 
@@ -741,7 +764,7 @@ class OutputDeluge(DelugePlugin):
                         except Exception as err:
                             log.error('wait_for_metadata Error: %s' % err)
                             break
-                        if len(status['files']) > 0:
+                        if status.get('files'):
                             log.info('"%s" magnetization successful' % (entry['title']))
                             break
                     else:
@@ -788,13 +811,17 @@ class OutputDeluge(DelugePlugin):
                             add_opts['stop_at_ratio'] = True
                 # Make another set of options, that get set after the torrent has been added
                 modify_opts = {
-                    'label': format_label(entry.get('label', config['label'])),
                     'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
                     'main_file_only': entry.get('main_file_only', config.get('main_file_only', False)),
                     'main_file_ratio': entry.get('main_file_ratio', config.get('main_file_ratio')),
                     'hide_sparse_files': entry.get('hide_sparse_files', config.get('hide_sparse_files', True)),
                     'keep_subs': entry.get('keep_subs', config.get('keep_subs', True))
                 }
+                try:
+                    label = entry.render(entry.get('label', config['label']))
+                    modify_opts['label'] = format_label(label)
+                except RenderError as e:
+                    log.error('Error setting label for `%s`: %s', entry['title'], e)
                 try:
                     movedone = entry.render(entry.get('movedone', config['movedone']))
                     modify_opts['movedone'] = pathscrub(os.path.expanduser(movedone))

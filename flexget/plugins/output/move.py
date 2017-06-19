@@ -91,12 +91,15 @@ class BaseFileOps(object):
             try:
                 # check location
                 if not os.path.exists(src):
-                    raise plugin.PluginWarning('location `%s` does not exists (anymore).' % src)
+                    self.log.warning('location `%s` does not exists (anymore).' % src)
+                    continue
                 if src_isdir:
                     if not config.get('allow_dir'):
-                        raise plugin.PluginWarning('location `%s` is a directory.' % src)
+                        self.log.warning('location `%s` is a directory.' % src)
+                        continue
                 elif not os.path.isfile(src):
-                    raise plugin.PluginWarning('location `%s` is not a file.' % src)
+                    self.log.warning('location `%s` is not a file.' % src)
+                    continue
                 # search for namesakes
                 siblings = {}  # dict of (path=ext) pairs
                 if not src_isdir and 'along' in config:
@@ -119,7 +122,7 @@ class BaseFileOps(object):
                             siblings.update(get_siblings(ext, filename_no_ext, filename_ext, subdir_path))
                 # execute action in subclasses
                 self.handle_entry(task, config, entry, siblings)
-            except OSError as err:
+            except (OSError, IOError) as err:
                 entry.fail(str(err))
                 continue
 

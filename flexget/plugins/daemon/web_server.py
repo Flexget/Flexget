@@ -29,7 +29,8 @@ web_config_schema = {
                          'maximum': 65536},
                 'ssl_certificate': {'type': 'string'},
                 'ssl_private_key': {'type': 'string'},
-                'web_ui': {'type': 'boolean'}
+                'web_ui': {'type': 'boolean'},
+                'base_url': {'type': 'string'},
             },
             'additionalProperties': False,
             'dependencies': {
@@ -53,6 +54,13 @@ def prepare_config(config):
     config.setdefault('ssl_certificate', None)
     config.setdefault('ssl_private_key', None)
     config.setdefault('web_ui', True)
+    config.setdefault('base_url', '')
+    if config['base_url']:
+        if not config['base_url'].startswith('/'):
+            config['base_url'] = '/' + config['base_url']
+        if config['base_url'].endswith('/'):
+            config['base_url'] = config['base_url'][:-1]
+    
     return config
 
 

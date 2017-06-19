@@ -60,10 +60,16 @@ class Notify(object):
                 'properties': {
                     'title': {
                         'type': 'string',
-                        'default': '[FlexGet] {{task.name}}:'
-                                   '{%if task.failed %} {{task.failed|length}} failed entries.{% endif %}'
-                                   '{% if task.accepted %} {{task.accepted|length}} new entries downloaded.{% endif %}'},
+                        'default': '{% if not task.failed and not task.accepted %} Task {{task.name}} did not'
+                                   ' produce any entries.'
+                                   '{% else %} [FlexGet] {{task.name}}:'
+                                   '{% if task.failed %} {{task.failed|length}} failed entries.{% endif %}'
+                                   '{% if task.accepted %} {{task.accepted|length}} new entries downloaded.{% endif %}'
+                                   '{% endif %}'
+                    },
+                    'message': {'type': 'string'},
                     'template': {'type': 'string', 'default': 'default.template'},
+                    'always_send': {'type': 'boolean', 'default': False},
                     'via': VIA_SCHEMA
                 },
                 'required': ['via'],
@@ -109,26 +115,29 @@ class Notify(object):
             entries = list(itertools.chain(*(getattr(task, what) for what in config['entries']['what'])))
             if not entries:
                 log.debug('No entries to notify about.')
-                return
-            # If a file template is defined, it overrides message
-            if config['entries'].get('template'):
-                try:
-                    message = get_template(config['entries']['template'], scope='entry')
-                except ValueError:
-                    raise plugin.PluginError('Cannot locate template on disk: %s' % config['entries']['template'])
             else:
-                message = config['entries']['message']
-            for entry in entries:
-                self.send_notification(config['entries']['title'], message, config['entries']['via'],
-                                       template_renderer=entry.render)
+                # If a file template is defined, it overrides message
+                if config['entries'].get('template'):
+                    try:
+                        message = get_template(config['entries']['template'], scope='entry')
+                    except ValueError:
+                        raise plugin.PluginError('Cannot locate template on disk: %s' % config['entries']['template'])
+                else:
+                    message = config['entries']['message']
+                for entry in entries:
+                    self.send_notification(config['entries']['title'], message, config['entries']['via'],
+                                           template_renderer=entry.render)
         if 'task' in config:
-            if not (task.accepted or task.failed):
+            if not (task.accepted or task.failed) and not config['task']['always_send']:
                 log.verbose('No accepted or failed entries, not sending a notification.')
                 return
-            try:
-                template = get_template(config['task']['template'], scope='task')
-            except ValueError:
-                raise plugin.PluginError('Cannot locate template on disk: %s' % config['task']['template'])
+            if config['task'].get('message'):
+                template = config['task']['message']
+            else:
+                try:
+                    template = get_template(config['task']['template'], scope='task')
+                except ValueError:
+                    raise plugin.PluginError('Cannot locate template on disk: %s' % config['task']['template'])
             self.send_notification(config['task']['title'], template, config['task']['via'],
                                    template_renderer=task.render)
 

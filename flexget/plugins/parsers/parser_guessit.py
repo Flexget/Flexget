@@ -289,6 +289,11 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
     def valid_strict(self):
         return True
 
+    @property
+    def season_pack(self):
+        # Guessit does not support season pack
+        return False
+
 
 def _id_regexps_function(input_string, context):
     ret = []

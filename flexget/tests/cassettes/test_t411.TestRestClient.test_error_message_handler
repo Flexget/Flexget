@@ -7,7 +7,7 @@ interactions:
       Connection: [keep-alive]
       User-Agent: [!!python/unicode 'FlexGet/1.2.415.dev (www.flexget.com)']
     method: GET
-    uri: http://api.t411.li/torrents/details/666666
+    uri: https://api.t411.al/torrents/details/666666
   response:
     body: {string: !!python/unicode '{"error":"Invalid token","code":202}'}
     headers:
@@ -17,7 +17,7 @@ interactions:
       date: ['Tue, 26 Jan 2016 20:45:57 GMT']
       server: [cloudflare-nginx]
       set-cookie: ['__cfduid=d7298a571b0b0d2dac2faae901d4b95061453841157; expires=Wed,
-          25-Jan-17 20:45:57 GMT; path=/; domain=.t411.li; HttpOnly']
+          25-Jan-17 20:45:57 GMT; path=/; domain=.t411.al; HttpOnly']
       t411-node: [webus1]
       vary: [Accept-Encoding]
       x-powered-by: [PHP/5.5.30-1+deb.sury.org~trusty+1]
