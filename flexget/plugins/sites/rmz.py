@@ -21,7 +21,7 @@ class UrlRewriteRmz(object):
     Configuration
 
     rmz:
-      url_re:
+      link_re:
         - domain\.com
         - domain2\.org
 
