@@ -34,8 +34,8 @@ class ObjectsContainer(object):
     retry_entries_list_object = {'type': 'array', 'items': retry_failed_entry_object}
 
 
-retry_failed_entry_schema = api.schema('retry_failed_entry_schema', ObjectsContainer.retry_failed_entry_object)
-retry_entries_list_schema = api.schema('retry_entries_list_schema', ObjectsContainer.retry_entries_list_object)
+retry_failed_entry_schema = api.schema_model('retry_failed_entry_schema', ObjectsContainer.retry_failed_entry_object)
+retry_entries_list_schema = api.schema_model('retry_entries_list_schema', ObjectsContainer.retry_entries_list_object)
 
 sort_choices = ('failure_time', 'id', 'title', 'url', 'reason', 'count', 'retry_time')
 failed_parser = api.pagination_parser(sort_choices=sort_choices)

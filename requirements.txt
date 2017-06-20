@@ -19,7 +19,7 @@ flask-compress==1.4.0
 flask-cors==3.0.2
 flask-login==0.4.0
 flask-restful==0.3.6
-flask-restplus==0.8.6
+flask-restplus==0.10.1
 flask==0.12.2
 future==0.16.0
 guessit==2.0.4
@@ -42,7 +42,7 @@ pyyaml==3.12
 rebulk==0.8.2
 requests==2.16.5
 rpyc==3.3.0
-six==1.10.0               # via apscheduler, cheroot, cherrypy, flask-cors, flask-restful, html5lib, python-dateutil, rebulk, tempora
+six==1.10.0               # via apscheduler, cheroot, cherrypy, flask-cors, flask-restful, flask-restplus, html5lib, python-dateutil, rebulk, tempora
 sqlalchemy==1.1.10
 tempora==1.7              # via portend
 terminaltables==3.1.0
