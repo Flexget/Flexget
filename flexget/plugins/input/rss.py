@@ -382,6 +382,16 @@ class InputRSS(object):
                 # fields dict may be modified during this loop, so loop over a copy (fields.items())
                 for rss_field, flexget_field in list(fields.items()):
                     if rss_field in entry:
+                        if rss_field == 'content':
+                            content_str = ''
+                            for content in entry[rss_field]:
+                                try:
+                                    content_str += decode_html(content.value)
+                                except UnicodeDecodeError:
+                                    log.warning('Failed to decode entry `%s` field `%s`', ea['title'], rss_field)
+                            ea[flexget_field] = content_str
+                            log.debug('Field `%s` set to `%s` for `%s`', rss_field, ea[rss_field], ea['title'])
+                            continue
                         if not isinstance(getattr(entry, rss_field), str):
                             # Error if this field is not a string
                             log.error('Cannot grab non text field `%s` from rss.', rss_field)
