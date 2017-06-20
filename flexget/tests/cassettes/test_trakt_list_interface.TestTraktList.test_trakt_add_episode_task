@@ -134,4 +134,94 @@ interactions:
       X-Sort-How: [asc]
       X-Xss-Protection: [1; mode=block]
     status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Authorization: [Bearer 336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22]
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/users/me/watchlist/episodes
+  response:
+    body: {string: ''}
+    headers:
+      CF-RAY: [366b14c43f8a3d61-CPH]
+      Cache-Control: ['max-age=0, private, no-cache, no-store, must-revalidate']
+      Cf-Railgun: [55fa7ec491 99.99 0.006817 0030 e6be]
+      Connection: [close]
+      Content-Type: [text/html]
+      Date: ['Mon, 29 May 2017 17:12:53 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=dadef92e1aa89ece232507d6ee7f59a961496077973; expires=Tue,
+          29-May-18 17:12:53 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      Www-Authenticate: ['Bearer realm="Doorkeeper", error="invalid_token", error_description="The
+          access token expired"']
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [f7f485c4-be31-4e75-a7b4-12602752d0d7]
+      X-Runtime: ['0.004879']
+      X-Xss-Protection: [1; mode=block]
+    status: {code: 401, message: Unauthorized}
+- request:
+    body: null
+    headers:
+      Authorization: [Bearer 336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22]
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/users/me/watchlist/episodes
+  response:
+    body: {string: ''}
+    headers:
+      CF-RAY: [366b26f59a343cdd-CPH]
+      Cache-Control: ['max-age=0, private, no-cache, no-store, must-revalidate']
+      Cf-Railgun: [96638993cb 99.99 0.022377 0030 e6be]
+      Connection: [close]
+      Content-Type: [text/html]
+      Date: ['Mon, 29 May 2017 17:25:18 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d47b03b4fc81692f5291e61a034211eb01496078718; expires=Tue,
+          29-May-18 17:25:18 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      Www-Authenticate: ['Bearer realm="Doorkeeper", error="invalid_token", error_description="The
+          access token expired"']
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [199775f7-c2af-4b0c-a7e5-f84e0e050ca7]
+      X-Runtime: ['0.011040']
+      X-Xss-Protection: [1; mode=block]
+    status: {code: 401, message: Unauthorized}
+- request:
+    body: null
+    headers:
+      Authorization: [Bearer 336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22]
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/users/me/watchlist/episodes
+  response:
+    body: {string: ''}
+    headers:
+      CF-RAY: [366b912269cc3cb3-CPH]
+      Cache-Control: ['max-age=0, private, no-cache, no-store, must-revalidate']
+      Cf-Railgun: [2034a59558 99.99 0.054518 0030 e6be]
+      Connection: [close]
+      Content-Type: [text/html]
+      Date: ['Mon, 29 May 2017 18:37:47 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d5b399a774d804d1323c06960a1488fc51496083067; expires=Tue,
+          29-May-18 18:37:47 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      Www-Authenticate: ['Bearer realm="Doorkeeper", error="invalid_token", error_description="The
+          access token expired"']
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [671957de-9341-4931-bf5c-afb4795cb274]
+      X-Runtime: ['0.008790']
+      X-Xss-Protection: [1; mode=block]
+    status: {code: 401, message: Unauthorized}
 version: 1

@@ -26,9 +26,9 @@ class ObjectsContainer(object):
     reset_plugin_input['properties']['plugin_name'] = {'type': 'string'}
 
 
-plugins_schema = api.schema('plugins_list', ObjectsContainer.plugin_list)
-input_schema = api.schema('db_schema', ObjectsContainer.database_input_object)
-reset_plugin_input_schema = api.schema('db_schema', ObjectsContainer.reset_plugin_input)
+plugins_schema = api.schema_model('plugins_list', ObjectsContainer.plugin_list)
+input_schema = api.schema_model('db_schema', ObjectsContainer.database_input_object)
+reset_plugin_input_schema = api.schema_model('db_schema', ObjectsContainer.reset_plugin_input)
 
 
 @db_api.route('/')

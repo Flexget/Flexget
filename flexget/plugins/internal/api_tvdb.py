@@ -504,7 +504,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None, lang
     if not (name or tvdb_id):
         raise LookupError('No criteria specified for tvdb lookup')
 
-    log.debug('Looking up tvdb information for %s %s', name, tvdb_id)
+    log.debug('Looking up tvdb information for \'%s\'. TVDB ID: %s', name, tvdb_id)
 
     series = None
 

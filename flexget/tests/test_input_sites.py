@@ -24,6 +24,7 @@ class TestInputSites(object):
 
     """)
 
+    @pytest.mark.skip(reason='Missing a usable urlrewriter for uploadgig?')
     def test_sceper(self, execute_task):
         task = execute_task('test_sceper')
         assert task.entries, 'no entries created / site may be down'

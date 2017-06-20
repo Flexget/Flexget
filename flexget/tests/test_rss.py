@@ -146,6 +146,7 @@ class TestInputRSS(object):
         assert entry['other:field'] == 'otherfield'
 
 
+@pytest.mark.xfail(reason="silverorange changed some stuff")
 @pytest.mark.online
 class TestRssOnline(object):
     config = """
