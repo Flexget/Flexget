@@ -44,7 +44,9 @@
         }
 
         function doReload() {
-            return $http.post('/api/server/reload/')
+            return $http.post('/api/server/manage/', {
+                operation: 'reload'
+            })
                 .then(reloadSuccess)
                 .catch(reloadFailed);
 
@@ -68,7 +70,9 @@
         function doShutdown() {
             $window.stop(); //Stop any http connections
 
-            return $http.post('/api/server/shutdown/')
+            return $http.post('/api/server/manage/', {
+                operation: 'shutdown'
+            })
                 .then(shutdownSuccess)
                 .catch(shutdownFailed);
 
