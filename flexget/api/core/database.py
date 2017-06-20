@@ -16,23 +16,21 @@ class ObjectsContainer(object):
     database_input_object = {
         'type': 'object',
         'properties': {
-            'operation': {'type': 'string', 'enum': ['cleanup', 'vacuum', 'list_plugins', 'plugin_reset']}
+            'operation': {'type': 'string', 'enum': ['cleanup', 'vacuum', 'list_plugins', 'plugin_reset']},
+            'plugin_name': {'type': 'string'}
         },
-        'required': ['operation_name'],
+        'required': ['operation'],
         'additionalProperties': False
     }
-
-    reset_plugin_input = database_input_object.copy()
-    reset_plugin_input['properties']['plugin_name'] = {'type': 'string'}
 
 
 plugins_schema = api.schema_model('plugins_list', ObjectsContainer.plugin_list)
 input_schema = api.schema_model('db_schema', ObjectsContainer.database_input_object)
-reset_plugin_input_schema = api.schema_model('db_schema', ObjectsContainer.reset_plugin_input)
 
 
 @db_api.route('/')
 class DBOperation(APIResource):
+    @api.validate(input_schema)
     @api.response(200, model=base_message_schema)
     def post(self, session=None):
         """Perform DB operations"""
@@ -46,7 +44,9 @@ class DBOperation(APIResource):
             session.commit()
             msg = 'DB VACUUM finished'
         elif operation == 'plugin_reset':
-            plugin_name = data['plugin_name']
+            plugin_name = data.get('plugin_name')
+            if not plugin_name:
+                raise BadRequest('\'plugin_name\' attribute must be used when trying to reset plugin')
             try:
                 reset_schema(plugin_name)
                 msg = 'Plugin {} DB reset was successful'.format(plugin_name)
