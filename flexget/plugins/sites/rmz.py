@@ -27,7 +27,7 @@ class UrlRewriteRmz(object):
         - domain\.com
         - domain2\.org
 
-    Only add links that match any of the regular expressions listed under url_re.
+    Only add links that match any of the regular expressions listed under filehosters_re.
 
     If more than one valid link is found, the url of the entry is rewritten to
     the first link found. The complete list of valid links is placed in the
@@ -76,7 +76,10 @@ class UrlRewriteRmz(object):
         except Exception as e:
             raise UrlRewritingError(str(e))
         link_elements = soup.find_all('pre', class_='links')
-        urls = []
+        if entry['urls']:
+            urls = list(entry['urls'])
+        else:
+            urls = []
         for element in link_elements:
             urls.extend(element.text.splitlines())
         regexps = self.config.get('filehosters_re', [])
@@ -89,8 +92,8 @@ class UrlRewriteRmz(object):
                     log.debug('Url: "%s" matched filehoster filter: %s', urls[i], regexp)
                     break
             else:
-                log.debug(
-                    'Url: "%s" does not match any of the given filehoster filters: %s', urls[i], str(regexps))
+                if regexps:
+                    log.debug('Url: "%s" does not match any of the given filehoster filters: %s', urls[i], str(regexps))
         if regexps:
             log.debug('Using filehosters_re filters: %s', str(regexps))
             urls = filtered_urls
@@ -99,7 +102,7 @@ class UrlRewriteRmz(object):
         num_links = len(urls)
         log.verbose('Found %d links at %s.', num_links, entry['url'])
         if num_links:
-            entry.setdefault('urls', urls)
+            entry['urls'] = urls
             entry['url'] = urls[0]
         else:
             raise UrlRewritingError('No useable links found at %s' % entry['url'])
