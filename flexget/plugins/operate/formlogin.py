@@ -59,7 +59,8 @@ class FormLogin(object):
         username = config['username']
         password = config['password']
 
-        br = mechanize.Browser()
+        br = mechanize.Browser(factory=mechanize.RobustFactory())
+
         br.add_handler(SanitizeHandler())
         br.set_handle_robots(False)
         try:
