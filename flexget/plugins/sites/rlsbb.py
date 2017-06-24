@@ -170,5 +170,4 @@ class UrlRewriteRlsbb(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteRlsbb, 'rlsbb', interfaces=[
-                    'urlrewriter', 'task'], api_ver=2)
+    plugin.register(UrlRewriteRlsbb, 'rlsbb', interfaces=['urlrewriter', 'task'], api_ver=2)
