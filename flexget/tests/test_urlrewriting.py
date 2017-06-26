@@ -53,10 +53,10 @@ class TestURLRewriters(object):
         task = execute_task('test')
         entry = task.find_entry(title='nyaa')
         urlrewriter = self.get_urlrewriter('nyaa')
-        assert entry['url'] == 'http://www.nyaa.se/?page=torrentinfo&tid=12345'
+        assert entry['url'] == 'https://www.nyaa.si/view/12345'
         assert urlrewriter.url_rewritable(task, entry)
         urlrewriter.url_rewrite(task, entry)
-        assert entry['url'] == 'http://www.nyaa.se/?page=download&tid=12345'
+        assert entry['url'] == 'https://www.nyaa.si/download/12345.torrent'
 
     def test_cinemageddon(self, execute_task):
         task = execute_task('test')
