@@ -19,7 +19,7 @@ class TestURLRewriters(object):
               - {title: 'tbp torrent', url: 'http://torrents.thepiratebay.se/8492471/Test.torrent'}
               - {title: 'tbp torrent subdomain', url: 'http://torrents.thepiratebay.se/8492471/Test.avi'}
               - {title: 'tbp torrent bad subdomain', url: 'http://torrent.thepiratebay.se/8492471/Test.avi'}
-              - {title: 'nyaa', url: 'http://www.nyaa.se/?page=torrentinfo&tid=12345'}
+              - {title: 'nyaa', url: 'https://www.nyaa.si/view/15'}
               - {title: 'cinemageddon download', url: 'http://cinemageddon.net/details.php?id=1234'}
     """
 
