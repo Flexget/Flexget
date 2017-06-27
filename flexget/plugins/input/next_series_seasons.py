@@ -82,7 +82,7 @@ class NextSeriesSeasons(object):
         else:
             self.rerun_entries = []
 
-        threshold = config.get('threshold', None)
+        threshold = config.get('threshold')
 
         entries = []
         impossible = {}
@@ -124,7 +124,7 @@ class NextSeriesSeasons(object):
                     latest_season - series.begin.season > MAX_SEASON_DIFF_WITH_BEGIN):
                     if series.begin:
                         log.error('Series `%s` has a begin episode set (`%s`), but the season currently being processed '
-                                  '(%s) is %s seasons later than it. To prevent emitting incorrect seasons, this ' 
+                                  '(%s) is %s seasons later than it. To prevent emitting incorrect seasons, this '
                                   'series will not emit unless the begin episode is adjusted to a season that is less '
                                   'than %s seasons from season %s.', series.name, series.begin.identifier, latest_season,
                                   (latest_season - series.begin.season), MAX_SEASON_DIFF_WITH_BEGIN, latest_season)
