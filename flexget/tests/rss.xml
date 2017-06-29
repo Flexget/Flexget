@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:other="http://localhost/flexget">
+<rss version="2.0" xmlns:other="http://localhost/flexget"
+xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>FlexGet RSS test</title>
     <ttl>15</ttl>
@@ -63,6 +64,23 @@
       <other:Field>otherfield</other:Field>
       <other:title>alt title</other:title>
       <other:link>http://localhost/altlink</other:link>
+    </item>
+
+    <item>
+      <title>Content</title>
+      <link>http://localhost/content</link>
+      <pubDate>Sun, 28 Dec 2008 14:20:00 -0200</pubDate>
+      <description>Description, content</description>
+      <content:encoded><![CDATA[<p>test content:encoded</p>]]></content:encoded>
+    </item>
+
+    <item>
+      <title>Multiple content items</title>
+      <link>http://localhost/multi_content</link>
+      <pubDate>Sun, 28 Dec 2008 14:20:00 -0200</pubDate>
+      <description>Description, multi_content</description>
+      <content:encoded><![CDATA[<p>test content1</p>]]></content:encoded>
+      <content:encoded><![CDATA[<p>test content2</p>]]></content:encoded>
     </item>
 
     <item>
