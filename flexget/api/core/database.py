@@ -16,7 +16,7 @@ class ObjectsContainer(object):
     database_input_object = {
         'type': 'object',
         'properties': {
-            'operation': {'type': 'string', 'enum': ['cleanup', 'vacuum', 'list_plugins', 'plugin_reset']},
+            'operation': {'type': 'string', 'enum': ['cleanup', 'vacuum', 'plugin_reset']},
             'plugin_name': {'type': 'string'}
         },
         'required': ['operation'],
