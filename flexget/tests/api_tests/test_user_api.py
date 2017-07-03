@@ -36,7 +36,7 @@ class TestUserAPI(object):
         assert not errors
 
     def test_change_token(self, execute_task, api_client, schema_match):
-        rsp = api_client.get('user/token/')
+        rsp = api_client.json_put('user/token/')
         assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
 
