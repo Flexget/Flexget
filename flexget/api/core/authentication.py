@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import base64
@@ -114,7 +115,7 @@ class LoginAPI(APIResource):
 @auth_api.route('/logout/')
 class LogoutAPI(APIResource):
     @api.response(200, 'Logout successful', model=base_message_schema)
-    def get(self, session=None):
+    def post(self, session=None):
         """ Logout and clear session cookies """
         flask_session.clear()
         resp = success_response('User logged out')

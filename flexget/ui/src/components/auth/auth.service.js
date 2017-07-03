@@ -71,7 +71,7 @@
         }
 
         function logout() {
-            return $http.get('/api/auth/logout/')
+            return $http.post('/api/auth/logout/')
                 .then(logoutComplete)
                 .catch(callFailed);
 
