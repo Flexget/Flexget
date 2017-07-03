@@ -371,20 +371,22 @@ Base.register_table(movie_actors_table)
 
 
 def get_db_actors(ident, style):
-    actors = []
+    actors = {}
     url = get_api_url(style + 's', ident, 'people')
     req_session = get_session()
     try:
         results = req_session.get(url, params={'extended': 'full'}).json()
         with Session() as session:
             for result in results.get('cast'):
-
                 trakt_id = result.get('person').get('ids').get('trakt')
+                # sometimes an actor can occur twice in the list by mistake. This check is to avoid this unlikely event
+                if trakt_id in actors:
+                    continue
                 actor = session.query(TraktActor).filter(TraktActor.id == trakt_id).first()
                 if not actor:
                     actor = TraktActor(result.get('person'), session)
-                actors.append(actor)
-        return actors
+                actors[trakt_id] = actor
+        return list(actors.values())
     except requests.RequestException as e:
         log.debug('Error searching for actors for trakt id %s', e)
         return
@@ -670,6 +672,8 @@ class TraktShow(Base):
                     self.seasons.append(db_season)
                 if number == season_result['number']:
                     season = db_season
+            if not season:
+                raise LookupError('Season %s not found for show %s' % (number, self.title))
         return season
 
     @property

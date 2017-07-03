@@ -38,9 +38,9 @@ class ObjectsContainer(object):
     }
 
 
-pending_entry_schema = api.schema('pending.entry', ObjectsContainer.pending_entry_object)
-pending_entry_list_schema = api.schema('pending.entry_list', ObjectsContainer.pending_entry_list)
-operation_schema = api.schema('pending.operation', ObjectsContainer.operation_object)
+pending_entry_schema = api.schema_model('pending.entry', ObjectsContainer.pending_entry_object)
+pending_entry_list_schema = api.schema_model('pending.entry_list', ObjectsContainer.pending_entry_list)
+operation_schema = api.schema_model('pending.operation', ObjectsContainer.operation_object)
 
 filter_parser = api.parser()
 filter_parser.add_argument('task_name', help='Filter by task name')

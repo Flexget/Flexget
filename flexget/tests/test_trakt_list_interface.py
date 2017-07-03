@@ -49,9 +49,9 @@ class TestTraktList(object):
     def db_auth(self, manager):
         kwargs = {
             'account': 'flexget_list_test',
-            'access_token': '336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22',
-            'refresh_token': 'f07c967d834673f5e61cba0942f177fbf839528241db9cb6dfb5a51dd267692f',
-            'created': 1481976079,
+            'access_token': '690dd940c75b133b56c58cd05d5de45c94224874c81e6777efbf7e6762ce016b',
+            'refresh_token': '22147838f28bf3d758a6c17bb67760ab66063dca55ad2eab2e1e4dab5e4769cf',
+            'created': 1496091336,
             'expires': 7776000
         }
 
