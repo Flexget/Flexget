@@ -26,7 +26,7 @@ export function login(credentials) {
 export function logout() {
   return (dispatch) => {
     dispatch(loading(LOGOUT));
-    return get('/auth/logout')
+    return post('/auth/logout')
       .then(() => dispatch(createAction(LOGOUT)))
       .catch(err => dispatch(createAction(LOGOUT, err)));
   };

@@ -7,7 +7,7 @@ import {
 } from 'actions/log';
 import Header from 'components/log/Header';
 
-function mapStateToProps({ log }) {
+export function mapStateToProps({ log }) {
   return {
     connected: log.connected,
     lines: log.lines,

@@ -6,20 +6,32 @@ import 'react-virtualized/styles.css';
 
 const styleSheet = createStyleSheet('LogTable', () => ({
   table: {
-    overflowY: 'scroll',
+    fontSize: 10,
+  },
+  error: {
+    backgroundColor: '#f2dede',
+  },
+  critical: {
+    backgroundColor: '#f2dede',
+  },
+  warning: {
+    backgroundColor: '#fcf8e3',
   },
 }));
 
-const LogTable = ({ messages }) => (
+const LogTable = ({ messages, classes }) => (
   <AutoSizer>
     {({ height, width }) => (
       <Table
+        className={classes.table}
         rowCount={messages.length}
-        rowHeight={50}
+        rowHeight={20}
         headerHeight={50}
         width={width}
         height={height}
         rowGetter={({ index }) => messages[index]}
+        rowClassName={({ index }) => messages[index] && classes[messages[index]
+          .log_level.toLowerCase()]}
       >
         <Column
           label="Time"
@@ -60,6 +72,7 @@ LogTable.propTypes = {
     log_level: PropTypes.string,
     plugin: PropTypes.string,
   })).isRequired,
+  classes: PropTypes.object.isRequired,
 };
 
 export default withStyles(styleSheet)(LogTable);
