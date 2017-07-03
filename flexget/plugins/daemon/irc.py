@@ -679,6 +679,7 @@ class IRCConnection(IRCBot):
                 if rx.match(line) and expected:
                     log.debug('Ignoring message: matched ignore line')
                     ignore = True
+                    break
             if ignore:
                 continue
 
