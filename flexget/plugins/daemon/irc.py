@@ -689,7 +689,7 @@ class IRCConnection(IRCBot):
 
             # Generate the entry and process it through the linematched rules
             if not match:
-                log.error('Failed to parse message. Skipping.')
+                log.error('Failed to parse message. Skipping: %s', line)
                 continue
 
             entry.update(match)
