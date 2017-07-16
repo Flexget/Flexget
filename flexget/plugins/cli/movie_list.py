@@ -15,6 +15,30 @@ from flexget.plugins.list.movie_list import get_list_by_exact_name, get_movie_li
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 from flexget.utils.tools import split_title_year
 
+def list_to_comma_separated_string(the_list):
+    """ Returns a comma separated string of a list """
+
+    # If the input is not a list, convert it to a list
+    if not isinstance(the_list, list):
+        return str(the_list)
+
+    return ', '.join(the_list)
+
+# These are custom fields that are printed during the "list" command.
+# The field is queried from the custom data entry stored with each
+# movie entry in the database.
+CUSTOM_FIELDS = [
+    # Structure of each tuple
+    #
+    # Index 0: Header name
+    # Index 1: Attribute name in the custom data entry
+    # Index 2: Default display value (if attribute is not found)
+    # Index 3: (optional) Callable that transform the value in 
+    #          the attribute to something more humanly readable
+    #          in the printed cell
+
+    ('Quality requirement', 'quality_req', '', list_to_comma_separated_string), 
+]
 
 def lookup_movie(title, session, identifiers=None):
     try:
@@ -106,12 +130,35 @@ def movie_list_list(options):
             return
     header = ['#', 'Movie Name', 'Movie year']
     header += MovieListBase().supported_ids
+
+    for custom_field in CUSTOM_FIELDS:
+        header.append(custom_field[0])
+
     table_data = [header]
     movies = get_movies_by_list_id(movie_list.id, order_by='added', descending=True, session=session)
     for movie in movies:
         movie_row = [movie.id, movie.title, movie.year or '']
         for identifier in MovieListBase().supported_ids:
             movie_row.append(movie.identifiers.get(identifier, ''))
+
+        for custom_field in CUSTOM_FIELDS:
+            # If the database was upgraded, any previous entries in the list
+            # does not have any custom entry data, so check isvalid().
+            if movie.the_entry.isvalid():
+                if custom_field[1] in movie.the_entry:
+                    value = movie.the_entry[custom_field[1]]
+                    if len(custom_field) >= 4 and custom_field[3]:
+                        value = custom_field[3](value)
+
+                    movie_row.append(value)
+                else:
+                    # The attribute did not exists for this entry.
+                    # Set the default value
+                    movie_row.append(custom_field[2])
+            else:
+                # Probably an entry from an old database
+                movie_row.append('')
+
         table_data.append(movie_row)
     title = '{} Movies in movie list: `{}`'.format(len(movies), options.list_name)
     try:
