@@ -70,7 +70,7 @@ describe('actions/auth', () => {
       const store = mockStore({ auth: {} });
 
       fetchMock
-        .get('/api/auth/logout', {});
+        .post('/api/auth/logout', {});
 
       return store.dispatch(auth.logout())
         .then(() => {
@@ -82,7 +82,7 @@ describe('actions/auth', () => {
     it('dispatches the correct actions on unsuccesful logout', () => {
       const store = mockStore({ auth: {} });
       fetchMock
-        .get('/api/auth/logout', { status: 401, body: {} });
+        .post('/api/auth/logout', { status: 401, body: {} });
 
       return store.dispatch(auth.logout())
         .then(() => {

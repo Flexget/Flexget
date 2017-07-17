@@ -1,0 +1,77 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/log/Header renders correctly 1`] = `
+<div
+  className="LogHeader-root-1400901008"
+>
+  <div>
+    <h2
+      className="MuiTypography-root-233331062 MuiTypography-title-2106356098"
+    >
+      Server Log
+    </h2>
+    <h3
+      className="MuiTypography-root-233331062 MuiTypography-subheading-2119063702 LogHeader-grey-968767187"
+    >
+      Streaming
+    </h3>
+  </div>
+  <div
+    className="LogHeader-spacer-3036263360"
+  />
+  <div
+    className="LogHeader-textFieldWrapper-3760854782"
+  >
+    <span
+      aria-hidden="true"
+      className="material-icons MuiIcon-root-3402991258 fa fa-filter LogHeader-grey-968767187"
+    />
+    <div
+      className="MuiFormControl-root-2422010352 LogHeader-input-691557382"
+      onBlur={[Function]}
+      onChange={[Function]}
+      onFocus={[Function]}
+      required={false}
+    >
+      <label
+        className="MuiFormLabel-root-1338640695 MuiInputLabel-root-2962008059 MuiInputLabel-formControl-3454588320 MuiInputLabel-animated-1605689251"
+      >
+        Filter
+      </label>
+      <div
+        className="MuiInput-root-1702064583 MuiInput-formControl-497090363 MuiInput-inkbar-965396523 MuiInput-underline-565166322"
+      >
+        <input
+          aria-required={undefined}
+          autoFocus={undefined}
+          className="MuiInput-input-3855742665 MuiInput-singleline-2607927053"
+          defaultValue={undefined}
+          disabled={false}
+          id="filter"
+          name={undefined}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onKeyDown={undefined}
+          onKeyPress={[Function]}
+          onKeyUp={undefined}
+          placeholder={undefined}
+          rows={undefined}
+          type="text"
+          value=""
+        />
+      </div>
+      <p
+        className="MuiFormHelperText-root-237074020"
+      >
+        Supports operators and, or, (), and "str"
+      </p>
+    </div>
+    <span
+      aria-hidden="true"
+      className="material-icons MuiIcon-root-3402991258 fa fa-ellipsis-v LogHeader-grey-968767187 LogHeader-pointer-501421307"
+      onClick={[Function]}
+    />
+  </div>
+</div>
+`;

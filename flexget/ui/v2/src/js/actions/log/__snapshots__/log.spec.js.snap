@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`actions/log clearLogs dispatches the correct acction when clearing logs 1`] = `
+Array [
+  Object {
+    "error": false,
+    "meta": Object {
+      "ignore": false,
+      "message": undefined,
+      "namespace": "LOG",
+    },
+    "payload": undefined,
+    "type": "LOG_CLEAR",
+  },
+]
+`;
+
+exports[`actions/log setLines dispatches the correct acction when setting lines 1`] = `
+Array [
+  Object {
+    "error": false,
+    "meta": Object {
+      "ignore": false,
+      "message": undefined,
+      "namespace": "LOG",
+    },
+    "payload": 400,
+    "type": "LOG_LINES",
+  },
+]
+`;
+
+exports[`actions/log setQuery dispatches the correct acction when setting query 1`] = `
+Array [
+  Object {
+    "error": false,
+    "meta": Object {
+      "ignore": false,
+      "message": undefined,
+      "namespace": "LOG",
+    },
+    "payload": 400,
+    "type": "LOG_QUERY",
+  },
+]
+`;
