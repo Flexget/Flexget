@@ -1,26 +1,50 @@
 from __future__ import unicode_literals, division, absolute_import
 
 import logging
+import pickle
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from collections import MutableSet
 from datetime import datetime
 
-from sqlalchemy import Column, Unicode, Integer, ForeignKey, func, DateTime
+from sqlalchemy import Column, Unicode, Integer, ForeignKey, func, DateTime, select
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
 
-from flexget import plugin
+from flexget import plugin, db_schema
 from flexget.db_schema import versioned_base, with_session
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
 from flexget.plugins.parsers.parser_common import normalize_name, remove_dirt
 from flexget.utils.tools import split_title_year
+from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
+                                            create_index)
+from flexget.utils import json, qualities
+from flexget.utils.database import entry_synonym
 
 log = logging.getLogger('movie_list')
-Base = versioned_base('movie_list', 0)
+Base = versioned_base('movie_list', 1)
 
+
+@db_schema.upgrade('movie_list')
+def upgrade(ver, session):
+    if None is ver:
+        ver = 0
+    if ver == 0:
+        table = table_schema('movie_list_movies', session)
+        table_add_column(table, 'json', Unicode, session)
+        # Make sure we get the new schema with the added column
+        table = table_schema('movie_list_movies', session)
+
+        # Just set it to empty string to indicate that there's no custom entry data
+        stmt = table.update().values(json=u'')
+        session.execute(stmt)
+
+        ver = 1
+    return ver
 
 class MovieListBase(object):
     """
@@ -59,6 +83,8 @@ class MovieListMovie(Base):
     title = Column(Unicode)
     year = Column(Integer)
     list_id = Column(Integer, ForeignKey(MovieListList.id), nullable=False)
+    _json = Column('json', Unicode)
+    the_entry = entry_synonym('_json')
     ids = relationship('MovieListID', backref='movie', cascade='all, delete, delete-orphan')
 
     def __repr__(self):
@@ -84,7 +110,8 @@ class MovieListMovie(Base):
             'title': self.title,
             'year': self.year,
             'list_id': self.list_id,
-            'movies_list_ids': [movie_list_id.to_dict() for movie_list_id in self.ids]
+            'movies_list_ids': [movie_list_id.to_dict() for movie_list_id in self.ids],
+            'entry': dict(self.the_entry)
         }
 
     @property
@@ -127,8 +154,14 @@ class MovieList(MutableSet):
         if not isinstance(config, dict):
             config = {'list_name': config}
         config.setdefault('strip_year', False)
+        config.setdefault('check_quality', False)
+        config.setdefault('force_quality_req', '')
         self.list_name = config.get('list_name')
         self.strip_year = config.get('strip_year')
+        self.check_quality = config.get('check_quality')
+        self.force_quality_requirements = config.get('force_quality_req')
+        if not isinstance(self.force_quality_requirements, list):
+            self.force_quality_requirements = [self.force_quality_requirements]
 
         db_list = self._db_list(session)
         if not db_list:
@@ -158,6 +191,15 @@ class MovieList(MutableSet):
             for id_name in MovieListBase().supported_ids:
                 if id_name in entry:
                     db_movie.ids.append(MovieListID(id_name=id_name, id_value=entry[id_name]))
+            
+            if len(self.force_quality_requirements) > 0 and self.force_quality_requirements[0]:
+                # Even if the entry has a 'quality_req' set, this will override it
+                entry['quality_req'] = self.force_quality_requirements
+
+            # Also save the entry itself as it might contain optional/custom 
+            # data (such quality requirements) that we also need to consider
+            # during matching
+            db_movie.the_entry = entry
             log.debug('adding entry %s', entry)
             db_list.movies.append(db_movie)
             session.commit()
@@ -172,6 +214,35 @@ class MovieList(MutableSet):
 
     def __contains__(self, entry):
         return self._find_entry(entry) is not None
+
+    def _check_quality(self, entry, list_item):
+        """Check if the quality of the entry satisfies the (optional) quality requirement of the list item """
+
+        if not self.check_quality:
+            # We're not checking quality. So just say OK.
+            return True
+
+        if not 'quality_req' in list_item.the_entry:
+            log.debug('the list item %s did not have any quality requirements', list_item)
+            return True
+
+        if not 'quality' in entry or entry.get('quality') is None:
+            # TODO: maybe add a setting here to control what to do in this case. fail or pass?
+            log.debug('tried to check quality of entry %s but it had no \'quality\' field', entry)
+            return True
+
+        requirements = list_item.the_entry['quality_req']
+
+        if not isinstance(requirements, list):
+            requirements = [requirements]
+
+        reqs = [qualities.Requirements(req) for req in requirements]
+
+        if not any(req.allows(entry['quality']) for req in reqs):
+            log.debug('%s does not match quality requirement %s' % (entry['quality'], reqs))
+            return False
+
+        return True
 
     @with_session
     def _find_entry(self, entry, session=None):
@@ -226,6 +297,12 @@ class MovieList(MutableSet):
     @with_session
     def get(self, entry, session):
         match = self._find_entry(entry=entry, session=session)
+
+        if match:
+            if not self._check_quality(entry=entry, list_item=match):
+                log.debug('Quality of entry %s did not satisfy the list item\'s quality requirement', entry)
+                return None
+
         return match.to_entry() if match else None
 
 
@@ -236,7 +313,9 @@ class PluginMovieList(object):
         {'type': 'object',
          'properties': {
              'list_name': {'type': 'string'},
-             'strip_year': {'type': 'boolean'}
+             'strip_year': {'type': 'boolean'},
+             'check_quality': {'type': 'boolean', 'default': False},
+             'force_quality_req': one_or_more( {'type': 'string', 'format': 'quality_requirements'} )
          },
          'required': ['list_name'],
          'additionalProperties': False

@@ -109,10 +109,20 @@ class TestListInterface(object):
           add_for_list_queue:
             mock:
               - {title: 'The 5th Wave', url: "", imdb_id: "tt2304933"}
-              - {title: 'Drumline', url: "", imdb_id: "tt0303933"}
+              - {title: 'Drumline', url: "", imdb_id: "tt0303933", quality_req: "1080p bluray" }
             accept_all: yes
             list_add:
               - movie_list: test_list_queue
+
+          add_for_list_queue_forced_quality_req:
+            mock:
+              - {title: 'Despicable Me', url: "", imdb_id: "tt1323594"}
+              - {title: 'Waking Life', url: "", imdb_id: "tt0243017"}
+            accept_all: yes
+            list_add:
+              - movie_list:
+                  list_name: test_list_queue
+                  force_quality_req: 720p bluray
 
           test_list_queue:
             mock:
@@ -125,9 +135,35 @@ class TestListInterface(object):
               - {title: 'Drumline 2002 DVDRip x264-FuzerHD',
                  url: "http://mock.url/Drumline 2002 DVDRip x264-FuzerHD.torrent",
                  imdb_id: "tt0303933"}
+              - {title: 'Despicable Me 2010 DVDRip x264-SomeGroup',
+                 url: "http://mock.url/Despicable Me 2010 DVDRip x264-SomeGroup",
+                 imdb_id: "tt1323594"}
+              - {title: 'Despicable Me 2010 COMPLETE BLURAY-SomeGroup',
+                 url: "http://mock.url/Despicable Me 2010 COMPLETE BLURAY-SomeGroup",
+                 imdb_id: "tt1323594"}
+              - {title: 'Despicable Me 2010 720p BluRay x264-SomeGroup',
+                 url: "http://mock.url/Despicable Me 2010 720p BluRay x264-SomeGroup",
+                 imdb_id: "tt1323594"}
+              - {title: 'Waking Life 2001 1080p BluRay x264-SomeGroup',
+                 url: "http://mock.url/Waking Life 2001 1080p BluRay x264-SomeGroup",
+                 imdb_id: "tt0243017"}
             list_match:
               from:
-                - movie_list: test_list_queue
+                - movie_list:
+                    list_name: test_list_queue
+                    check_quality: yes
+              single_match: yes
+
+          test_list_queue_no_quality_check:
+            mock:
+              - {title: 'Waking Life 2001 1080p BluRay x264-SomeGroup',
+                 url: "http://mock.url/Waking Life 2001 1080p BluRay x264-SomeGroup",
+                 imdb_id: "tt0243017"}
+            list_match:
+              from:
+                - movie_list:
+                    list_name: test_list_queue
+                    check_quality: no
               single_match: yes
 
           get_for_list_queue:
@@ -281,14 +317,36 @@ class TestListInterface(object):
     def test_list_queue(self, execute_task):
         # List queue test is based off movie_list and not entry_list since it entry_list matching is a
         # lot more strict so it doesn't make sense to use it with it
+
+        # This task will add two movies to the list, one with a quality requirement 
+        # and one without.
         task = execute_task('add_for_list_queue')
         assert len(task.entries) == 2
 
+        # This task adds two movies with a forced quality requirement "720p bluray"
+        task = execute_task('add_for_list_queue_forced_quality_req')
+        assert len(task.entries) == 2
+
+        # This task produces movie entries that we try to match with our list. 
+        # Quality check is enabled, so only two movies should be accepted. (See assertions below)
         task = execute_task('test_list_queue')
+        assert len(task.accepted) == 2
+
+        # "Drumline" has quality requirement "1080p bluray" so it should have been accepted
+        assert task.find_entry(category='accepted',title="Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD")
+        # "Despicable Me" has quality requirement "720p bluray" so it should have been accepted
+        assert task.find_entry(category='accepted', title="Despicable Me 2010 720p BluRay x264-SomeGroup")
+        # "Waking Life" should not be accepted because the entry is not satisfying its quality requirement (720p bluray)
+        assert not task.find_entry(category='accepted', title="Waking Life 2001 1080p BluRay x264-SomeGroup")
+
+        # This task will produce the "Waking Life 2001 1080p BluRay x264-SomeGroup" entry again, 
+        # but now without quality check in list_match. So it should be accepted this time.
+        task = execute_task('test_list_queue_no_quality_check')
         assert len(task.accepted) == 1
+        assert task.find_entry(category='accepted', title="Waking Life 2001 1080p BluRay x264-SomeGroup")
 
-        assert task.find_entry(title="Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD")
-
+        # Previously accepted movies should now have been removed from the list and only 
+        # one (The 5th Wave) should remain in there
         task = execute_task('get_for_list_queue')
         assert len(task.entries) == 1
 
