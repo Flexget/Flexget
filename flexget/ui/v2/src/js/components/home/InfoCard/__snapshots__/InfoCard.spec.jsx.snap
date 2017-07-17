@@ -2,7 +2,7 @@
 
 exports[`components/home/InfoCard renders correctly 1`] = `
 <div
-  className="MuiPaper-paper-2677686717 MuiPaper-shadow2-317043508 MuiPaper-rounded-418257787 MuiCard-root-772068234 InfoCard-card-4287018379"
+  className="MuiPaper-root-2758040674 MuiPaper-shadow2-317043508 MuiPaper-rounded-418257787 MuiCard-root-772068234 InfoCard-card-4287018379"
 >
   <div
     className="MuiCardContent-root-741240096 MuiCardHeader-root-2322798472 InfoCard-cardHeader-3624283618"
@@ -70,7 +70,7 @@ exports[`components/home/InfoCard renders correctly 1`] = `
   >
     <a
       aria-label="Github"
-      className="MuiButtonBase-root-3477017037 MuiIconButton-root-3609702008 MuiCardActions-actionSpacing-2598224809"
+      className="MuiButtonBase-root-3177716317 MuiIconButton-root-3609702008 MuiCardActions-actionSpacing-2598224809"
       href="https://github.com/Flexget/Flexget"
       onBlur={[Function]}
       onFocus={[Function]}
@@ -99,7 +99,7 @@ exports[`components/home/InfoCard renders correctly 1`] = `
     </a>
     <a
       aria-label="Flexget.com"
-      className="MuiButtonBase-root-3477017037 MuiIconButton-root-3609702008 MuiCardActions-actionSpacing-2598224809"
+      className="MuiButtonBase-root-3177716317 MuiIconButton-root-3609702008 MuiCardActions-actionSpacing-2598224809"
       href="https://flexget.com"
       onBlur={[Function]}
       onFocus={[Function]}
@@ -128,7 +128,7 @@ exports[`components/home/InfoCard renders correctly 1`] = `
     </a>
     <a
       aria-label="Gitter"
-      className="MuiButtonBase-root-3477017037 MuiIconButton-root-3609702008 MuiCardActions-actionSpacing-2598224809"
+      className="MuiButtonBase-root-3177716317 MuiIconButton-root-3609702008 MuiCardActions-actionSpacing-2598224809"
       href="https://gitter.im/Flexget/Flexget"
       onBlur={[Function]}
       onFocus={[Function]}
@@ -157,7 +157,7 @@ exports[`components/home/InfoCard renders correctly 1`] = `
     </a>
     <a
       aria-label="Forum"
-      className="MuiButtonBase-root-3477017037 MuiIconButton-root-3609702008 MuiCardActions-actionSpacing-2598224809"
+      className="MuiButtonBase-root-3177716317 MuiIconButton-root-3609702008 MuiCardActions-actionSpacing-2598224809"
       href="https://discuss.flexget.com"
       onBlur={[Function]}
       onFocus={[Function]}

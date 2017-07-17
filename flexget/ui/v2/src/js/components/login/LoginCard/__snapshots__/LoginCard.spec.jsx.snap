@@ -2,19 +2,19 @@
 
 exports[`components/login/LoginCard renders correctly 1`] = `
 <div
-  className="MuiPaper-paper-2677686717 MuiPaper-shadow2-317043508 MuiPaper-rounded-418257787 MuiCard-root-772068234 LoginCard-card-1186187333"
+  className="MuiPaper-root-2758040674 MuiPaper-shadow2-317043508 MuiPaper-rounded-418257787 MuiCard-root-772068234 LoginCard-card-1186187333"
 >
   <form
     onSubmit={[Function]}
   >
     <div
-      className="MuiCardContent-root-741240096"
+      className="MuiCardContent-root-741240096 LoginCard-cardContent-66468927"
     >
       <div
         className="LoginCard-error-2118832568"
       />
       <div
-        className="MuiFormControl-root-2422010352"
+        className="MuiFormControl-root-3719765767 LoginCard-field-1507101732"
         onBlur={[Function]}
         onChange={[Function]}
         onDragStart={[Function]}
@@ -23,17 +23,18 @@ exports[`components/login/LoginCard renders correctly 1`] = `
         required={false}
       >
         <label
-          className="MuiFormLabel-root-1338640695 MuiInputLabel-root-2962008059 MuiInputLabel-formControl-3454588320 MuiInputLabel-animated-1605689251"
+          className="MuiFormLabel-root-1338640695 MuiInputLabel-root-2962008059 MuiInputLabel-formControl-2201459172 MuiInputLabel-animated-1605689251"
         >
           Username
         </label>
         <div
-          className="MuiInput-root-1702064583 MuiInput-formControl-497090363 MuiInput-inkbar-965396523 MuiInput-underline-565166322"
+          className="MuiInput-root-4262591601 MuiInput-formControl-583691922 MuiInput-inkbar-171024778 MuiInput-underline-892978022"
         >
           <input
             aria-required={undefined}
+            autoComplete={undefined}
             autoFocus={undefined}
-            className="MuiInput-input-3855742665 MuiInput-singleline-2607927053"
+            className="MuiInput-input-3582851417 MuiInput-inputSingleline-2607927053"
             defaultValue={undefined}
             disabled={false}
             id="username"
@@ -51,7 +52,7 @@ exports[`components/login/LoginCard renders correctly 1`] = `
         </div>
       </div>
       <div
-        className="MuiFormControl-root-2422010352"
+        className="MuiFormControl-root-3719765767 LoginCard-field-1507101732"
         onBlur={[Function]}
         onChange={[Function]}
         onDragStart={[Function]}
@@ -60,17 +61,18 @@ exports[`components/login/LoginCard renders correctly 1`] = `
         required={false}
       >
         <label
-          className="MuiFormLabel-root-1338640695 MuiInputLabel-root-2962008059 MuiInputLabel-formControl-3454588320 MuiInputLabel-animated-1605689251"
+          className="MuiFormLabel-root-1338640695 MuiInputLabel-root-2962008059 MuiInputLabel-formControl-2201459172 MuiInputLabel-animated-1605689251"
         >
           Password
         </label>
         <div
-          className="MuiInput-root-1702064583 MuiInput-formControl-497090363 MuiInput-inkbar-965396523 MuiInput-underline-565166322"
+          className="MuiInput-root-4262591601 MuiInput-formControl-583691922 MuiInput-inkbar-171024778 MuiInput-underline-892978022"
         >
           <input
             aria-required={undefined}
+            autoComplete={undefined}
             autoFocus={undefined}
-            className="MuiInput-input-3855742665 MuiInput-singleline-2607927053"
+            className="MuiInput-input-3582851417 MuiInput-inputSingleline-2607927053"
             defaultValue={undefined}
             disabled={false}
             id="password"
@@ -92,7 +94,7 @@ exports[`components/login/LoginCard renders correctly 1`] = `
       className="MuiCardActions-root-1345515364"
     >
       <button
-        className="MuiButtonBase-root-3477017037 MuiButton-root-2253430263 LoginCard-button-2980890619 MuiCardActions-actionSpacing-2598224809"
+        className="MuiButtonBase-root-3177716317 MuiButton-root-325725483 LoginCard-button-2980890619 MuiCardActions-actionSpacing-2598224809"
         disabled={false}
         onBlur={[Function]}
         onFocus={[Function]}

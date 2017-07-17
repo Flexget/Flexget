@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Root from 'root';
-import 'typeface-roboto';
+import 'typeface-roboto'; // eslint-disable-line import/extensions
 import 'normalize.css';
 
 ReactDOM.render(<Root />, document.getElementById('react'));

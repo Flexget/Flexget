@@ -1,14 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`components/layout/Navbar renders correctly 1`] = `
-<div
-  className="MuiPaper-paper-2677686717 MuiPaper-shadow4-941451405 MuiAppBar-root-2668177540 MuiAppBar-positionFixed-2227438490 MuiAppBar-colorPrimary-15947162"
+<header
+  className="MuiPaper-root-2758040674 MuiPaper-shadow4-941451405 MuiAppBar-root-2668177540 MuiAppBar-positionFixed-2227438490 MuiAppBar-colorPrimary-15947162 mui-fixed"
 >
   <div
-    className="MuiToolbar-root-3627194460 MuiToolbar-gutters-344431791"
+    className="MuiToolbar-root-1760419744 MuiToolbar-gutters-344431791"
   >
     <button
-      className="MuiButtonBase-root-3477017037 MuiIconButton-root-3609702008"
+      className="MuiButtonBase-root-3177716317 MuiIconButton-root-3609702008"
       disabled={false}
       onBlur={[Function]}
       onClick={[Function]}
@@ -45,7 +45,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
     >
       <button
         aria-label="Config"
-        className="MuiButtonBase-root-3477017037 MuiIconButton-root-3609702008"
+        className="MuiButtonBase-root-3177716317 MuiIconButton-root-3609702008"
         disabled={false}
         onBlur={[Function]}
         onFocus={[Function]}
@@ -79,7 +79,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
     >
       <button
         aria-label="Log"
-        className="MuiButtonBase-root-3477017037 MuiIconButton-root-3609702008"
+        className="MuiButtonBase-root-3177716317 MuiIconButton-root-3609702008"
         disabled={false}
         onBlur={[Function]}
         onFocus={[Function]}
@@ -109,7 +109,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
     </a>
     <button
       aria-label="Manage"
-      className="MuiButtonBase-root-3477017037 MuiIconButton-root-3609702008"
+      className="MuiButtonBase-root-3177716317 MuiIconButton-root-3609702008"
       disabled={false}
       onBlur={[Function]}
       onClick={[Function]}
@@ -138,5 +138,5 @@ exports[`components/layout/Navbar renders correctly 1`] = `
       />
     </button>
   </div>
-</div>
+</header>
 `;

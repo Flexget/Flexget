@@ -22,12 +22,21 @@ const styleSheet = createStyleSheet('LoginCard', theme => ({
   button: {
     width: '100%',
   },
+  cardContent: {
+    display: 'flex',
+    flex: {
+      direction: 'column',
+    },
+  },
+  field: {
+    paddingBottom: 10,
+  },
 }));
 
 export const LoginCard = ({ classes, handleSubmit, errorStatus }) => (
   <Card className={classes.card}>
     <form onSubmit={handleSubmit}>
-      <CardContent>
+      <CardContent className={classes.cardContent}>
         <div className={classes.error}>
           {errorStatus.message}
         </div>
@@ -36,6 +45,7 @@ export const LoginCard = ({ classes, handleSubmit, errorStatus }) => (
           component={TextField}
           id="username"
           label="Username"
+          className={classes.field}
         />
         <Field
           name="password"
@@ -43,6 +53,7 @@ export const LoginCard = ({ classes, handleSubmit, errorStatus }) => (
           id="password"
           label="Password"
           type="Password"
+          className={classes.field}
         />
       </CardContent>
       <CardActions>
