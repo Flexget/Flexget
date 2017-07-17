@@ -216,6 +216,7 @@ class TorrentAlive(object):
             log.debug('Checking for seeds for %s:' % entry['title'])
             torrent = entry.get('torrent')
             if torrent:
+                log.debug('started examining torrent: %s', torrent)
                 seeds = 0
                 info_hash = torrent.info_hash
                 announce_list = torrent.content.get('announce-list')
