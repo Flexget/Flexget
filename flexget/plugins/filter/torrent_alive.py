@@ -249,6 +249,7 @@ class TorrentAlive(object):
                 else:
                     log.warning('Torrent %s does not seem to have a tracker specified, cannot check for seeders',
                                 entry['title'])
+                    return
 
                 # Reject if needed
                 if seeds < min_seeds:
