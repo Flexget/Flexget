@@ -3,13 +3,16 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
 import sys
+import os
+
+from jinja2 import Template
 
 
 # TODO more checks: fail_html, etc.
 @pytest.mark.online
 @pytest.mark.usefixtures('tmpdir')
 class TestDownload(object):
-    config = """
+    _config = """
         tasks:
           path_and_temp:
             mock:
@@ -29,7 +32,21 @@ class TestDownload(object):
               - {title: 'entry 3', url: 'http://speedtest.ftp.otenet.gr/files/test100k.db'}
             accept_all: yes
             download: __tmp__
+          just_temp:
+            mock:
+              - {title: 'entry 4', url: 'http://speedtest.ftp.otenet.gr/files/test100k.db'}
+            accept_all: yes
+            download:
+              path: {{ temp_path_1 }}
+              temp: {{ temp_path_2 }}
       """
+
+    @pytest.fixture
+    def config(self, tmpdir):
+        temp_path_1 = tmpdir.mkdir('temp_path_1')
+        temp_path_2 = tmpdir.mkdir('temp_path_2')
+
+        return Template(self._config).render({'temp_path_1': temp_path_1.strpath, 'temp_path_2': temp_path_2.strpath})
 
     def test_path_and_temp(self, execute_task):
         """Download plugin: Path and Temp directories set"""
@@ -45,6 +62,15 @@ class TestDownload(object):
         """Download plugin: Path directory set as string"""
         task = execute_task('just_string')
         assert not task.aborted, 'Task should not have aborted'
+
+    def test_just_temp(self, execute_task, manager):
+        task = execute_task('just_temp')
+        assert not task.aborted, 'Task should not have aborted'
+
+        temp_path = manager.config['tasks']['just_temp']['download']['temp']
+        assert not os.listdir(temp_path)
+        entry = task.find_entry(title='entry 4')
+        assert not entry.get('file')
 
 
 # TODO: Fix this test
