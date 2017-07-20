@@ -26,7 +26,7 @@ config.plugins = [
     },
   }),
   new HtmlWebpackPlugin({
-    title: 'Flexget',
+    title: 'FlexGet Manager v2',
     template: './src/index.ejs',
   }),
 ];

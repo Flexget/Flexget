@@ -1,0 +1,141 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`actions/server dismissReload dispatches the correct action 1`] = `
+Object {
+  "error": false,
+  "meta": Object {
+    "ignore": false,
+    "message": undefined,
+    "namespace": "SERVER",
+  },
+  "payload": undefined,
+  "type": "SERVER_RELOAD_DISMISS",
+}
+`;
+
+exports[`actions/server dismissShutdown dispatches the correct action 1`] = `
+Object {
+  "error": false,
+  "meta": Object {
+    "ignore": false,
+    "message": undefined,
+    "namespace": "SERVER",
+  },
+  "payload": undefined,
+  "type": "SERVER_SHUTDOWN_DISMISS",
+}
+`;
+
+exports[`actions/server dismissShutdownPrompt dispatches the correct action 1`] = `
+Object {
+  "error": false,
+  "meta": Object {
+    "ignore": false,
+    "message": undefined,
+    "namespace": "SERVER",
+  },
+  "payload": undefined,
+  "type": "SERVER_SHUTDOWN_PROMOPT_DISMISS",
+}
+`;
+
+exports[`actions/server reloadServer dispatches the correct action on successful server reload 1`] = `
+Array [
+  Object {
+    "meta": Object {
+      "loading": true,
+      "namespace": "SERVER",
+    },
+    "type": "SERVER_RELOAD",
+  },
+  Object {
+    "error": true,
+    "meta": Object {
+      "ignore": false,
+      "message": undefined,
+      "namespace": "SERVER",
+    },
+    "payload": [FetchError: invalid json response body at /api/server/manage reason: Unexpected end of JSON input],
+    "type": "SERVER_RELOAD",
+  },
+]
+`;
+
+exports[`actions/server reloadServer dispatches the correct action on unsuccessful server reload 1`] = `
+Array [
+  Object {
+    "meta": Object {
+      "loading": true,
+      "namespace": "SERVER",
+    },
+    "type": "SERVER_RELOAD",
+  },
+  Object {
+    "error": true,
+    "meta": Object {
+      "ignore": false,
+      "message": undefined,
+      "namespace": "SERVER",
+    },
+    "payload": [Error: error],
+    "type": "SERVER_RELOAD",
+  },
+]
+`;
+
+exports[`actions/server showShutdownPrompt dispatches the correct action 1`] = `
+Object {
+  "error": false,
+  "meta": Object {
+    "ignore": false,
+    "message": undefined,
+    "namespace": "SERVER",
+  },
+  "payload": undefined,
+  "type": "SERVER_SHUTDOWN_PROMPT",
+}
+`;
+
+exports[`actions/server shutdownServer dispatches the correct action on successful server shutdown 1`] = `
+Array [
+  Object {
+    "meta": Object {
+      "loading": true,
+      "namespace": "SERVER",
+    },
+    "type": "SERVER_SHUTDOWN",
+  },
+  Object {
+    "error": true,
+    "meta": Object {
+      "ignore": false,
+      "message": undefined,
+      "namespace": "SERVER",
+    },
+    "payload": [FetchError: invalid json response body at /api/server/manage reason: Unexpected end of JSON input],
+    "type": "SERVER_SHUTDOWN",
+  },
+]
+`;
+
+exports[`actions/server shutdownServer dispatches the correct action on unsuccessful server shutdown 1`] = `
+Array [
+  Object {
+    "meta": Object {
+      "loading": true,
+      "namespace": "SERVER",
+    },
+    "type": "SERVER_SHUTDOWN",
+  },
+  Object {
+    "error": true,
+    "meta": Object {
+      "ignore": false,
+      "message": undefined,
+      "namespace": "SERVER",
+    },
+    "payload": [Error: error],
+    "type": "SERVER_SHUTDOWN",
+  },
+]
+`;

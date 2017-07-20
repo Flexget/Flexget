@@ -21,7 +21,7 @@ config.plugins = [
   new webpack.optimize.CommonsChunkPlugin({ name: ['vendor', 'manifest'], minChunks: Infinity }),
   new webpack.optimize.MinChunkSizePlugin({ minChunkSize: 8192 }),
   new HtmlWebpackPlugin({
-    title: 'Flexget',
+    title: 'FlexGet Manager v2',
     filename: '../index.html',
     template: './src/index.ejs',
   }),
