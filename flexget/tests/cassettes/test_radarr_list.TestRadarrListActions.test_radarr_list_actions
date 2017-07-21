@@ -1,0 +1,1280 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/profile
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA+2bW2+iUBCA3/kVhOeSVbx1902FrKau3YBts2n6cLJF1yxiFyGu2fS/l5ta6YCG
+        cdKSnQdj5HK+zJnDwJfBe0mW/4UfWVZcsbCVL7LSdTfKRbLpZ+Avp9NwY3JIuGX+GP7Sahfb39uT
+        ek7giY3avKw9KfG+53SIJ8+e2p5nP07EbBUduR177tuLaMN9OtQWEe76Ewhn7m9ecffsHfoAf+P+
+        dpdrV9nte94fpgjHWa7t6OSpcFa2lDniRLDWBMl31+bVd3M4nhxj+15QGt0C0f3uN0poG4ROjJFh
+        /Rj3KcmdXHJ/ODYoyZ9Bsml8HV6PuyNK8iVI1m91q28Scusg1tInt5TB5sVKyWzkQVXK+YXTemf0
+        9NGrYkkTMVwq31RqGji8sFJ4q9OmhMOVehAuarWjkYYNF+ok3cRouFynE07MhstmPOH1Gu1Cgy/r
+        ZMap2fB9Kp1y8sDhy9u0F8FfcngdXm1xxrV6m5ZdVFPJ4fBST3NOTW/AVTXJOTVcg2/bPVPVh9YV
+        5ZznrHSxVgdHHxkOHvnj74dUQBzhzgIxi8ey3ZkzX/3auUmMldIxM35k6axHrEesR6xHVMFWTI8w
+        ZYP9CIJ/bD/C5BsrSBg22pAwcKwiYdhoR8LA8ZKECh1tSRg6WpNQcLQnoeh4UULlHW1KqIdhlCqh
+        pv19XEmTYFca6ElhLRam3VWSX5TZl87JLi1MKCrOmFBonDKh0DhnQqEx0oQqQqWtCRVuWW1CQSvq
+        TaiY0eKEoqPNCUPn1lLFWkvsTeVCZ2/KwNmb2JvO7k0NKdebkousWJx2NaKgPrA5nZPN5sTmRFmG
+        2JzYnMjoVTYnbjqVgPN7eSXV6b99L4/FqWzaWZwO4iYWp6YEi9ON43siIheL0z5b+ZlicTonm8WJ
+        xYmyDLE4sTiR0Vmc5DcpZ3EiYnPXKYuvSteJ/9RUhl7hPzVVUJxaUl7HSVblqKx+OqXxxG/ssT6x
+        PrE+sT6xPh2nV1mf+I09bjqdxOamUwbOTacKNJ1YnU5Xp7YUnfHwAtK8Xs8zTwAA
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:06 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/movie
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA4uOBQApu0wNAgAAAA==
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:06 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/movies/lookup/imdb?imdbId=tt1690953
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA11TyW7bMBC95ysInS1LUZYivhk10hZdgzgFmqKHkTWWJuZWipSgBv73cnFjNwBB
+        gG/eLHyPfD5jLLNkOWYLlq2w17SBmiP7jKzKZiHaK2PX/xjNkSGODPqDX+WK+p2nlAmyYF0fMgxy
+        hB6bRFUDmoFwDJF3xjHqmcGNcWSxYfXEbIdsKS3l34lzIMk+IbQOmVWsQ65Zg8DZSLZjwLQa0Wwd
+        ZxJH1juNhm0MCZLA56kbybckUUAcpCrPL/LyOq+u1mW5iOvxQBPQYuD89CfGnuPu8U2Ydj3peHOt
+        eosmJsSgMzzAnbV6URSxxNyKpp4r0xa20IUy1IZZit2d+TE93r3fjbuHtvrIH1bTMImnm9ulnj/p
+        NosV937/Fadp1Ci5gsZLtmBb4D1GeEIwHgi3iOcO+luKphw52qitxz40Lz5osN299yKZN0kQtEmX
+        FkqSVeZVF68eCSeWAxCHmjjZKWTaGg5S9YdQ7GyNS2lbxRs0X0DEPolqnPcxAmmUIE6c7Obi8up6
+        9vLw7rlr/39aucC8yiMtlWpRmmRQkshCe3KCJmmVlWV5nsf12mEDlmTMSeZmg7Kx4GVVVrMDBNyF
+        ad/MSw/sU2nuPZc+ecD4BU66/nYQ1Pl2KvnZ/i/jXqFJUAMAAA==
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:07 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/rootfolder
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA4vmUlCoBmIFBaWCxJIMJSsFJf3c/LLM1GJ9JR2IeFpRampwQWJyKlDS3NDCyMLU
+        3MjS3NIIKl2al5tYUJCa4pafk5JaVAxUFB0LlcpMAfIMgexarlgA/vnsnmkAAAA=
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:07 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: !!python/unicode '{"monitored": true, "title": "Despicable Me 2", "titleSlug":
+      "despicable-me-2-93456", "qualityProfileId": 1, "tmdbId": 93456, "rootFolderPath":
+      "/movies/", "images": [{"coverType": "poster", "url": "http://image.tmdb.org/t/p/original/kQrYyZQHkwkUg2KlUDyvymj9FAp.jpg"}]}'
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['269']
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: POST
+    uri: http://192.168.0.60:7878/api/movie
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA21SXUvDMBR991eUPilY12Zz3QYiogg++AEbCIoPd+tdvZo0NUknc+y/m4/ZTV0L
+        obk55/bcc7I6iKLYkOEYj6L4CnVNM5hyjG4xYvGxO9VSmckPotgixBZBX3hfXZF+t5A0lAyYRjuG
+        mUJAkYASXenZ7qJo5Vdbn8kFqsmy9v1rqQ0qT/CHjeKu3LnFguDSITt91gmok7e6POegzaMig2f9
+        rn1ZfjoY5Gl4Yt9lbdcXr6CQnxWXUGBhe86Ba/TlJYJqhb+CviY/6xZQg3n1KoRcEOrOH5uiw/Qo
+        jFgrObfkG9c/a6lj64UfzplCswAVsiIjlZdiVBN+JKgi0YiLBRCHKXEyy98W6s2RF9jS5pIXqO5A
+        7Atxq041lSGPCaPOOEK1J1mBm1yNKKZ+lmG3d9o/bq/KmDflb0oiMGGJhwVqiZUKYQfrDZQ7OyhC
+        BjFLszxJ84RlE9YdZYNRmp/0hsNBjz2FPsBt0JW1bYFe6U6TjwacQQ//PCf32WcH62/JXw/S3QIA
+        AA==
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:07 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 201, message: Created}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/movies/lookup/imdb?imdbId=tt2752772
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA11STY/TMBC976+wcuGyTdLQot3eKlbAolUBtQItiMN07Sam/gj2OCWs+t+xxwWq
+        SpEjv/fm642frxgrUKISxYIVa2mkR+FYU1wnwluHm7+kvyTlb/HB3Em/j2ydIQQMPomdUAK84Flq
+        B+EGKQ6JWbLRBtMybbGLycBwlv54kIZ5a3wkBsGkQcuAueBAsc4GLxh2gC8iDW4vONtZx7gA7Mpc
+        QprX0ggNVL2pp/NJfTOZ3m7qekHf15NMQyuS5lu8MfZMZ8SfUoubsadJe5vmpAAig1MJ7hD7RVVR
+        ihI135bWtRVWfWWdbKUBVS3F+0fbHB4+P7xa9ft3v/ov9z2+3X66q1flj74tKOMxnt+pG24PRlng
+        0acF24HyguBRgItAmoLuHfg3kpbwX9M7u4vYPf9nfh/NWMcF0Ah8NKDlUx5aWyPRuosqOu5TB70c
+        QCrYSiVxTJG4hZNV/kRRZXQhh+2s4sKtQFOdLHXBoCQgt5LMoc6am5ezWR6CHtlahfb8LU2aSZbk
+        PK0wLm8n+4PQnt2AZ6OKuq6nE/ou1+sApaGYvNlisEgJ5/Xs+oSACqnTeTmLwDFnVrEXE2MHQc/9
+        rOjPAMmZj+d2Xx3/AKj7Faw3AwAA
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:08 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/rootfolder
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA4vmUlCoBmIFBaWCxJIMJSsFJf3c/LLM1GJ9JR2IeFpRampwQWJyKlDS3NDCyMLU
+        2MLQzNgIKl2al5tYUJCa4pafk5JaVAxUFB0LlcpMAfIMgexarlgANSGLcmkAAAA=
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:08 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: !!python/unicode '{"monitored": true, "title": "Sinister 2", "titleSlug":
+      "sinister-2-283445", "qualityProfileId": 1, "tmdbId": 283445, "rootFolderPath":
+      "/movies/", "images": [{"coverType": "poster", "url": "http://image.tmdb.org/t/p/original/AeJYo2wLVL6NpkHxpWIptGbQD0N.jpg"}]}'
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['261']
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: POST
+    uri: http://192.168.0.60:7878/api/movie
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA2VS20rDQBR871eEPCk0za1NQ0FEFMEHL9CCoPhw2mzTo3uJu5tKLf67e6lpbRNY
+        ds/MmcyZzbYXBKFGTUk4CcIpclSayCAL+xZQQurZH6iOQfwmj/wG1YdBE1/SoFtlyXoOnoUMamJL
+        r+YUBFu3mvpCrImcbRon3Qgr7Boc2Epqy/E9qRCuLTMu8tizBu9NfUlB6WeJmlwUuXmz8agsy8Q/
+        oVP5Meubc1CJL04FVKQymkugirjyhoDsjK9A3aIbc09oQK+cCybWSFS8Dyc4S879dI0US9N3Z6XT
+        rmtqYvCRmQ0uPJUJjlpI50LL1n+DGU3Wsqs1IIU5UtSb/+mpHeS8dW1LQSsiH4Ad3dremGy5Rgf7
+        AReUAD+5yt1NalbN3QhZmQ+Ho373T0xpWx/yoyzyFN9XEy793fqkNdQHJ6h85GGWpOMoGUdZOsvy
+        SVpOknKQFkkyKl+8DlCjzU1Ua+IsHoh8tmBDeTrJGe22yHs/v8D9DgjCAgAA
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:08 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 201, message: Created}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/movies/lookup/imdb?imdbId=tt2554274
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA11T204bMRB95ytGec5lQ1sEeaNQJF4AlUhIrfowG8/uGnzZ2rOJFoTUr+mH9Us6
+        ttMSIVmWfOZ+zvjlCGDCmg1NVjC5CNpG7+CO8GkyTaboA6//mTd7c/9m1s906y51fBJ7VSBGHmJy
+        D2QII6ni6rcUtpp2yXLtgDsCbJiCRe7AN4DQoNVmBA7YkhqngA4w9jpo1wIO3PkAOgL74KAm3hE5
+        MJIVGjF0FGDTaaM67xU0QZNTkkDlOky2l660tJ4L2TFKYe2HCH7gqBWFOazDmAqxB4ob7ClHtp2P
+        HFNUKtBj5ClEwaWPuKOeAXc4phiETtKlIGSoA8lQFKdQGyIV//z6nXsJZMnWFOK8UKLdhXZkMbN1
+        XC0/zZbVbPlhXVWrfL7t3awQkny+ywvgJd+CbxKl67HP2vQ+zZQDsnEIJsEdc79aLHKKOVtVz31o
+        F7zoFz7oVjs0i/7i8fSZ7PLm8vz2UvG2w7OHqy+fT/TD1/lj305yxle5f+RulN8541GJriuRzETK
+        8EgYBEhT5HeH8UrntXnz6YNvBLtW/5elF57uRZo8ghqdbMCmDG290yL1uypWO20He75FbbDWRvOY
+        IrnGPVVxb8qVOQwlrPFGNL5Bm+sU1zA41hkorSRycmcyQnVahsgf494M7cH2z9L2z4pTydSSC0Wf
+        whBje/BCVaiaVFW1nOXzXuAgu+lyTNF2svWcEy6Pz06newjNkJo9mX8U4LWkNiK5k+At5T96UPXn
+        gImcu0PGj17/Agv72RXuAwAA
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:08 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/rootfolder
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA4vmUlCoBmIFBaWCxJIMJSsFJf3c/LLM1GJ9JR2IeFpRampwQWJyKlDS3NDCyMLE
+        yMDMwMIAKl2al5tYUJCa4pafk5JaVAxUFB0LlcpMAfIMgexarlgAFgJEn2kAAAA=
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:08 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: !!python/unicode '{"monitored": true, "title": "Crimson Peak", "titleSlug":
+      "crimson-peak-201085", "qualityProfileId": 1, "tmdbId": 201085, "rootFolderPath":
+      "/movies/", "images": [{"coverType": "poster", "url": "http://image.tmdb.org/t/p/original/pCj8zem1NDAODdtvha9WFEB6iWR.jpg"}]}'
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['265']
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: POST
+    uri: http://192.168.0.60:7878/api/movie
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA2VSTU/CQBC9+yuanjShtAWEhpvBmHhQSeCk8TC0SxnZj7q7rUHCf3c/sK1y2XTn
+        vTf75k2PV0EQatSUhPMgXEhkSvBgSWAfDiykhNTrXzg/w1UH4zd54feo9gZPfEmDrpWl6w14FjIo
+        iS29mVsQHN1p6rloiFwfKte8EkoT6QQOrCW15fiJFAgLy4ynk9izhh9VGTriyZzv7pFCfHEqoCCF
+        kW2BKuLKBwKy9bYD9YBulo5Qgd65h5hokKi4n0Fwndz4ESoptkb5aJunrW5lZnXm7dCYeyoTHLWQ
+        zoeWtX+FIUdWs7sGkMIGKerD34jUGXLuWtlW0ILIZ2AX6+msyZprdAQ/ZE4J8P8761amWbFxY4yS
+        NMluB+0PsKJ12VNEVhJ5kleWhEu/Rp+4hrJ3g8JHHxrJLEpm0Shdj8bzNJsn2TCbZtn41bcBajbI
+        TV4NcS57PT5rsMksL8JG+zmdXJ1+AO+aJGGwAgAA
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:09 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 201, message: Created}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/movies/lookup/imdb?imdbId=tt1431045
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA11U207bQBB971eM8pyLCSotvFFSJKQWEKAiqPowsSf2wHrH7K4TUoTU3+jv9Us6
+        uxtoimRZ3jMz58xt/fQOYBA4GBocwGBGWHUiZjCMsBcXrl5M1f8m/klndsb+Xm1FhgKG3kdXR4bQ
+        U5VdZUluybSKlk8Rhr4TC1/RLcnAkbRc+j+/fkMrPkBvS7FLsoHFogHUj1FDToYw+3w4Oz87+wKB
+        jPEQGgJxXLMFH8StQRawENeSg8uOStbgY3EleZCOHAZeEoTeWZVXn5Isasw1VgTXbLzYIawaAVwE
+        JZgT2xp8P7+jMmhAUAM4qXsCelQ2bjVBzQADaKFL1Wi4hRWHBrAstXjV07CG0ESiTlbk/BCwki7k
+        zNFEHaoFXjo+hkNNvsosDXuwtAKcs+HAKoC20hwqdPdDCCv2kd+T9RTrbvpW3PCVSs9WdSpZ2STW
+        ok3FWUJn1lCRD07WMUGVMbygcR4U2yO21GKa4bTY2RsV01Gxf1UUB+m53bi1WFP0+a4ngKf0VryM
+        g75ad2lbOh0muRSQjL0zEW5C6A4mk0QxDm01H4urJ2HSTfIs0UzYfnvYPb54KG9OLszU4Ee+5fub
+        m8fj04vxXVcPEuOzvn+kbGKVRnSOlfIv0HhK8FprVSBWkc4N+mNOi/zPp3OyUOykel3hDkNzqWuc
+        F35tUXczF92KZV2zNyotW2779nCJbPKs1jEyzHHTKr8xJeXg+hy2EFORO8U26WRXpzPjBORUYnNS
+        ZtP93b29DRbv4qXp6+37OMoOmaUm6/JscncC1lsnrHKbBkVR7IzS83a48abYFJPnOlhKSIT773Mn
+        I4Smj4l+GO8q8Jyp40LbdM3SH2NL9aHH2Jjz7W6/e/4Ln4UsIngEAAA=
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:09 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/rootfolder
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA4vmUlCoBmIFBaWCxJIMJSsFJf3c/LLM1GJ9JR2IeFpRampwQWJyKlDS3NDCCARN
+        zY0soNKlebmJBQWpKW75OSmpRcVARdGxUKnMFCDPEMiu5YoFAFxTCdtpAAAA
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:09 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: !!python/unicode '{"monitored": true, "title": "Deadpool", "titleSlug":
+      "deadpool-293660", "qualityProfileId": 1, "tmdbId": 293660, "rootFolderPath":
+      "/movies/", "images": [{"coverType": "poster", "url": "http://image.tmdb.org/t/p/original/inVq3FRqcYIRl2la8iZikYYxFNR.jpg"}]}'
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['257']
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: POST
+    uri: http://192.168.0.60:7878/api/movie
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA3VS20rDQBB971eEPCnY5kZzKYiIRfDBC7QgKD5Mu9t0dDcbdzeVWvrv7sXeEBMI
+        2XPOTM6cyaYXBKFGzWg4CsIxBdIKwcILCysh9XRHkVMKv+ljM0b1YbjYQxp0p6xUz8CrkENNLfRq
+        TkGwcU+Dz8WKyum6dY1boTSVrsCRnWQWju4pQbixyigfRl41eG/rKwZKP0vU9DLPzJ0Ww7KsYn+F
+        rsvWPN+cAyK+GiaAUGJ6LoAp6uA1Bbk3vgR1i27Ig6AFvXQuuFghVdEumOAsPveztVIsTNWdbZzs
+        ayYmBDeVTQPnXspFg1pI50HLzn+BY4O849crQAYzZKjXp9mpX8o525ctBCNUPgA/2dfBluwajY70
+        w80ZheafJWpOZs5/WmV57vXuV5iwrj6W973AV9W0kX6pPmIN9dEJiM86TOOk6MdFP02maTZKylFc
+        DYqqzPLqxfcBZhbamJRW1Pk7avLZgc3j6U/EaF/zYW/7AznxB5O3AgAA
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:09 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 201, message: Created}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/profile
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA+2bW2+iUBCA3/kVhOeSVbx1902FrKau3YBts2n6cLJF1yxiFyGu2fS/l5ta6YCG
+        cdKSnQdj5HK+zJnDwJfBe0mW/4UfWVZcsbCVL7LSdTfKRbLpZ+Avp9NwY3JIuGX+GP7Sahfb39uT
+        ek7giY3avKw9KfG+53SIJ8+e2p5nP07EbBUduR177tuLaMN9OtQWEe76Ewhn7m9ecffsHfoAf+P+
+        dpdrV9nte94fpgjHWa7t6OSpcFa2lDniRLDWBMl31+bVd3M4nhxj+15QGt0C0f3uN0poG4ROjJFh
+        /Rj3KcmdXHJ/ODYoyZ9Bsml8HV6PuyNK8iVI1m91q28Scusg1tInt5TB5sVKyWzkQVXK+YXTemf0
+        9NGrYkkTMVwq31RqGji8sFJ4q9OmhMOVehAuarWjkYYNF+ok3cRouFynE07MhstmPOH1Gu1Cgy/r
+        ZMap2fB9Kp1y8sDhy9u0F8FfcngdXm1xxrV6m5ZdVFPJ4fBST3NOTW/AVTXJOTVcg2/bPVPVh9YV
+        5ZznrHSxVgdHHxkOHvnj74dUQBzhzgIxi8ey3ZkzX/3auUmMldIxM35k6axHrEesR6xHVMFWTI8w
+        ZYP9CIJ/bD/C5BsrSBg22pAwcKwiYdhoR8LA8ZKECh1tSRg6WpNQcLQnoeh4UULlHW1KqIdhlCqh
+        pv19XEmTYFca6ElhLRam3VWSX5TZl87JLi1MKCrOmFBonDKh0DhnQqEx0oQqQqWtCRVuWW1CQSvq
+        TaiY0eKEoqPNCUPn1lLFWkvsTeVCZ2/KwNmb2JvO7k0NKdebkousWJx2NaKgPrA5nZPN5sTmRFmG
+        2JzYnMjoVTYnbjqVgPN7eSXV6b99L4/FqWzaWZwO4iYWp6YEi9ON43siIheL0z5b+ZlicTonm8WJ
+        xYmyDLE4sTiR0Vmc5DcpZ3EiYnPXKYuvSteJ/9RUhl7hPzVVUJxaUl7HSVblqKx+OqXxxG/ssT6x
+        PrE+sT6xPh2nV1mf+I09bjqdxOamUwbOTacKNJ1YnU5Xp7YUnfHwAtK8Xs8zTwAA
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:10 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/movie
+  response:
+    body:
+      string: !!binary |
+        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
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:10 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/profile
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA+2bW2+iUBCA3/kVhOeSVbx1902FrKau3YBts2n6cLJF1yxiFyGu2fS/l5ta6YCG
+        cdKSnQdj5HK+zJnDwJfBe0mW/4UfWVZcsbCVL7LSdTfKRbLpZ+Avp9NwY3JIuGX+GP7Sahfb39uT
+        ek7giY3avKw9KfG+53SIJ8+e2p5nP07EbBUduR177tuLaMN9OtQWEe76Ewhn7m9ecffsHfoAf+P+
+        dpdrV9nte94fpgjHWa7t6OSpcFa2lDniRLDWBMl31+bVd3M4nhxj+15QGt0C0f3uN0poG4ROjJFh
+        /Rj3KcmdXHJ/ODYoyZ9Bsml8HV6PuyNK8iVI1m91q28Scusg1tInt5TB5sVKyWzkQVXK+YXTemf0
+        9NGrYkkTMVwq31RqGji8sFJ4q9OmhMOVehAuarWjkYYNF+ok3cRouFynE07MhstmPOH1Gu1Cgy/r
+        ZMap2fB9Kp1y8sDhy9u0F8FfcngdXm1xxrV6m5ZdVFPJ4fBST3NOTW/AVTXJOTVcg2/bPVPVh9YV
+        5ZznrHSxVgdHHxkOHvnj74dUQBzhzgIxi8ey3ZkzX/3auUmMldIxM35k6axHrEesR6xHVMFWTI8w
+        ZYP9CIJ/bD/C5BsrSBg22pAwcKwiYdhoR8LA8ZKECh1tSRg6WpNQcLQnoeh4UULlHW1KqIdhlCqh
+        pv19XEmTYFca6ElhLRam3VWSX5TZl87JLi1MKCrOmFBonDKh0DhnQqEx0oQqQqWtCRVuWW1CQSvq
+        TaiY0eKEoqPNCUPn1lLFWkvsTeVCZ2/KwNmb2JvO7k0NKdebkousWJx2NaKgPrA5nZPN5sTmRFmG
+        2JzYnMjoVTYnbjqVgPN7eSXV6b99L4/FqWzaWZwO4iYWp6YEi9ON43siIheL0z5b+ZlicTonm8WJ
+        xYmyDLE4sTiR0Vmc5DcpZ3EiYnPXKYuvSteJ/9RUhl7hPzVVUJxaUl7HSVblqKx+OqXxxG/ssT6x
+        PrE+sT6xPh2nV1mf+I09bjqdxOamUwbOTacKNJ1YnU5Xp7YUnfHwAtK8Xs8zTwAA
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:10 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/movie
+  response:
+    body:
+      string: !!binary |
+        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
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:10 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['0']
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: DELETE
+    uri: http://192.168.0.60:7878/api/movie/63
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA6uuBQBDv6ajAgAAAA==
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:10 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/profile
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA+2bW2+iUBCA3/kVhOeSVbx1902FrKau3YBts2n6cLJF1yxiFyGu2fS/l5ta6YCG
+        cdKSnQdj5HK+zJnDwJfBe0mW/4UfWVZcsbCVL7LSdTfKRbLpZ+Avp9NwY3JIuGX+GP7Sahfb39uT
+        ek7giY3avKw9KfG+53SIJ8+e2p5nP07EbBUduR177tuLaMN9OtQWEe76Ewhn7m9ecffsHfoAf+P+
+        dpdrV9nte94fpgjHWa7t6OSpcFa2lDniRLDWBMl31+bVd3M4nhxj+15QGt0C0f3uN0poG4ROjJFh
+        /Rj3KcmdXHJ/ODYoyZ9Bsml8HV6PuyNK8iVI1m91q28Scusg1tInt5TB5sVKyWzkQVXK+YXTemf0
+        9NGrYkkTMVwq31RqGji8sFJ4q9OmhMOVehAuarWjkYYNF+ok3cRouFynE07MhstmPOH1Gu1Cgy/r
+        ZMap2fB9Kp1y8sDhy9u0F8FfcngdXm1xxrV6m5ZdVFPJ4fBST3NOTW/AVTXJOTVcg2/bPVPVh9YV
+        5ZznrHSxVgdHHxkOHvnj74dUQBzhzgIxi8ey3ZkzX/3auUmMldIxM35k6axHrEesR6xHVMFWTI8w
+        ZYP9CIJ/bD/C5BsrSBg22pAwcKwiYdhoR8LA8ZKECh1tSRg6WpNQcLQnoeh4UULlHW1KqIdhlCqh
+        pv19XEmTYFca6ElhLRam3VWSX5TZl87JLi1MKCrOmFBonDKh0DhnQqEx0oQqQqWtCRVuWW1CQSvq
+        TaiY0eKEoqPNCUPn1lLFWkvsTeVCZ2/KwNmb2JvO7k0NKdebkousWJx2NaKgPrA5nZPN5sTmRFmG
+        2JzYnMjoVTYnbjqVgPN7eSXV6b99L4/FqWzaWZwO4iYWp6YEi9ON43siIheL0z5b+ZlicTonm8WJ
+        xYmyDLE4sTiR0Vmc5DcpZ3EiYnPXKYuvSteJ/9RUhl7hPzVVUJxaUl7HSVblqKx+OqXxxG/ssT6x
+        PrE+sT6xPh2nV1mf+I09bjqdxOamUwbOTacKNJ1YnU5Xp7YUnfHwAtK8Xs8zTwAA
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:10 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/movie
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA81X227bRhB991cs9NQCJkVSEkUKKArDzsVonBi12gIJ8rASR+Im5C6zuxTBFgX6
+        Nf2wfklnV6REWVIlGw0QX2CQc2ZmZ/bMHPnDBSF/4C8hPc10Br0J6d2AKticzjIgd0CC3uXaroTU
+        0xaTbDF5F8N+h3f8hqnPCPLal5rqUhkvCRlQBUkLFyuQKwaVsb2SJWGKSJjLkmlIyKwmOgVyxTVz
+        fmVZRhknb4AuSyBakBSygiRAM1IxnRJKClGBXJQZ4VARVRYgyVyynHGauW0+xq8Zh5zawwSeP3C8
+        0AmG0yCYeB7+vG+BRVorLC/7eX3gDdz3HW88tdgunOV0CSboB/vcttTa5qbIaV3YIIVQGmTjZs2l
+        zIyhfwcJo9cG2w+D/hrnfiqWP2ZU6d8kduSHcIDfwXgURWNv/dVr4vx5eSLvjHJ+Tt417mje6HFe
+        +/dj04UKZgrxJmyqdTHp96uqcrdMycGdi7zfNi0RFc8ETZAOE7KgmYLGUAOV+Mo0vHmTUvWSWeLt
+        4EQ5LWcwlRRt8taE6b34afApju5f01d3G07qMmHCGH/hDOtUyJl7NtelxCtr75vq1LYjF8hH1X80
+        AuQ77/sNVIoF5rPp/I77A7Lc1m7ozuYtPBecaSFtkVqW7dmRlywv86sVnp3OWMZ0bXz1jG44pRqj
+        rbvjuhBZAvItzQ8Na/ekssTRsag4al6ZS73lC/FQ83lD6jEy2gn8aTCY+NHEi1xvPB6Nog235zgB
+        /MDc5xBs6Z/M1u3X2g9jLx4NWpNuTfFgOArblybaQ1YudyM6OTiBY4Gt+xK43Bms3hX2Dfsr+IbM
+        vWuRQ1Jvn1/SnGV1b4ebmi5tmPaZJmveHejA2B3GcTQMNh2QmI9b93a8eiuh7bGGwcDf5F3RrDRN
+        GrveRWcqezTDWeYYZAW2jzv1HF62+4YJGdzslvSlpIY29wf4yMxDGFw0Z3i84K9xLyrByT3Qzwe3
+        +7wBFF3A81f7LbebnC6wD3h5KRELXNgLe03IbNydSX1JKCcUS5bYa0JLnQpp9ABnh5MZ6AqAkwyj
+        kgUaUrPdU5YlqRAJWUgGPMEAic2jIS+05cg6UV6bZcpEqYgotWI4PS6ZytokQiUBNacFWM9lintX
+        GS+ToMBhuSQK3+M5VAWFJrSitfGhJMVwxolqMpOARYG6JHhZkKh//vrbnkXijOQzXDhH9Wfk+J7j
+        B+fqT+h4gePFX11/hqf0J/46+jM8oT9t2ifpT8NlQ2W73J+qQaMna5D4Ur5ni3dvoxfLfQ16A7jT
+        EirrkxrUndJvWICOHXOrPr4fny0/sRtGQRzFR+Snc5mHxCcYjYbBeLgnPpjHi9qL3FGfJqBjIjpr
+        2HHtubOLpKM001TiB9MOsVF7uKaqA3ktpBQdwI2kOX22NkVuFEbR4Bxp8geetydNoTs8X5p2ZOJp
+        0jM8Jj03QJNCiOzIPxWPjP8tOV2u/r8LcHRiAZ5YRKe2SlvK4ZWy/1l03ZVveAccOuJ2/ttyH3+S
+        3L3s7bDGgzD0Dg1r6+KsIfuD+oyJit1xHA3C7cI5OBJnE39kiH/x8V+qVjDdVw8AAA==
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:10 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/profile
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA+2bW2+iUBCA3/kVhOeSVbx1902FrKau3YBts2n6cLJF1yxiFyGu2fS/l5ta6YCG
+        cdKSnQdj5HK+zJnDwJfBe0mW/4UfWVZcsbCVL7LSdTfKRbLpZ+Avp9NwY3JIuGX+GP7Sahfb39uT
+        ek7giY3avKw9KfG+53SIJ8+e2p5nP07EbBUduR177tuLaMN9OtQWEe76Ewhn7m9ecffsHfoAf+P+
+        dpdrV9nte94fpgjHWa7t6OSpcFa2lDniRLDWBMl31+bVd3M4nhxj+15QGt0C0f3uN0poG4ROjJFh
+        /Rj3KcmdXHJ/ODYoyZ9Bsml8HV6PuyNK8iVI1m91q28Scusg1tInt5TB5sVKyWzkQVXK+YXTemf0
+        9NGrYkkTMVwq31RqGji8sFJ4q9OmhMOVehAuarWjkYYNF+ok3cRouFynE07MhstmPOH1Gu1Cgy/r
+        ZMap2fB9Kp1y8sDhy9u0F8FfcngdXm1xxrV6m5ZdVFPJ4fBST3NOTW/AVTXJOTVcg2/bPVPVh9YV
+        5ZznrHSxVgdHHxkOHvnj74dUQBzhzgIxi8ey3ZkzX/3auUmMldIxM35k6axHrEesR6xHVMFWTI8w
+        ZYP9CIJ/bD/C5BsrSBg22pAwcKwiYdhoR8LA8ZKECh1tSRg6WpNQcLQnoeh4UULlHW1KqIdhlCqh
+        pv19XEmTYFca6ElhLRam3VWSX5TZl87JLi1MKCrOmFBonDKh0DhnQqEx0oQqQqWtCRVuWW1CQSvq
+        TaiY0eKEoqPNCUPn1lLFWkvsTeVCZ2/KwNmb2JvO7k0NKdebkousWJx2NaKgPrA5nZPN5sTmRFmG
+        2JzYnMjoVTYnbjqVgPN7eSXV6b99L4/FqWzaWZwO4iYWp6YEi9ON43siIheL0z5b+ZlicTonm8WJ
+        xYmyDLE4sTiR0Vmc5DcpZ3EiYnPXKYuvSteJ/9RUhl7hPzVVUJxaUl7HSVblqKx+OqXxxG/ssT6x
+        PrE+sT6xPh2nV1mf+I09bjqdxOamUwbOTacKNJ1YnU5Xp7YUnfHwAtK8Xs8zTwAA
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:10 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/movie
+  response:
+    body:
+      string: !!binary |
+        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
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:10 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/profile
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA+2bW2+iUBCA3/kVhOeSVbx1902FrKau3YBts2n6cLJF1yxiFyGu2fS/l5ta6YCG
+        cdKSnQdj5HK+zJnDwJfBe0mW/4UfWVZcsbCVL7LSdTfKRbLpZ+Avp9NwY3JIuGX+GP7Sahfb39uT
+        ek7giY3avKw9KfG+53SIJ8+e2p5nP07EbBUduR177tuLaMN9OtQWEe76Ewhn7m9ecffsHfoAf+P+
+        dpdrV9nte94fpgjHWa7t6OSpcFa2lDniRLDWBMl31+bVd3M4nhxj+15QGt0C0f3uN0poG4ROjJFh
+        /Rj3KcmdXHJ/ODYoyZ9Bsml8HV6PuyNK8iVI1m91q28Scusg1tInt5TB5sVKyWzkQVXK+YXTemf0
+        9NGrYkkTMVwq31RqGji8sFJ4q9OmhMOVehAuarWjkYYNF+ok3cRouFynE07MhstmPOH1Gu1Cgy/r
+        ZMap2fB9Kp1y8sDhy9u0F8FfcngdXm1xxrV6m5ZdVFPJ4fBST3NOTW/AVTXJOTVcg2/bPVPVh9YV
+        5ZznrHSxVgdHHxkOHvnj74dUQBzhzgIxi8ey3ZkzX/3auUmMldIxM35k6axHrEesR6xHVMFWTI8w
+        ZYP9CIJ/bD/C5BsrSBg22pAwcKwiYdhoR8LA8ZKECh1tSRg6WpNQcLQnoeh4UULlHW1KqIdhlCqh
+        pv19XEmTYFca6ElhLRam3VWSX5TZl87JLi1MKCrOmFBonDKh0DhnQqEx0oQqQqWtCRVuWW1CQSvq
+        TaiY0eKEoqPNCUPn1lLFWkvsTeVCZ2/KwNmb2JvO7k0NKdebkousWJx2NaKgPrA5nZPN5sTmRFmG
+        2JzYnMjoVTYnbjqVgPN7eSXV6b99L4/FqWzaWZwO4iYWp6YEi9ON43siIheL0z5b+ZlicTonm8WJ
+        xYmyDLE4sTiR0Vmc5DcpZ3EiYnPXKYuvSteJ/9RUhl7hPzVVUJxaUl7HSVblqKx+OqXxxG/ssT6x
+        PrE+sT6xPh2nV1mf+I09bjqdxOamUwbOTacKNJ1YnU5Xp7YUnfHwAtK8Xs8zTwAA
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:10 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/movie
+  response:
+    body:
+      string: !!binary |
+        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
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:10 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['0']
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: DELETE
+    uri: http://192.168.0.60:7878/api/movie/62
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA6uuBQBDv6ajAgAAAA==
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:10 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/profile
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA+2bW2+iUBCA3/kVhOeSVbx1902FrKau3YBts2n6cLJF1yxiFyGu2fS/l5ta6YCG
+        cdKSnQdj5HK+zJnDwJfBe0mW/4UfWVZcsbCVL7LSdTfKRbLpZ+Avp9NwY3JIuGX+GP7Sahfb39uT
+        ek7giY3avKw9KfG+53SIJ8+e2p5nP07EbBUduR177tuLaMN9OtQWEe76Ewhn7m9ecffsHfoAf+P+
+        dpdrV9nte94fpgjHWa7t6OSpcFa2lDniRLDWBMl31+bVd3M4nhxj+15QGt0C0f3uN0poG4ROjJFh
+        /Rj3KcmdXHJ/ODYoyZ9Bsml8HV6PuyNK8iVI1m91q28Scusg1tInt5TB5sVKyWzkQVXK+YXTemf0
+        9NGrYkkTMVwq31RqGji8sFJ4q9OmhMOVehAuarWjkYYNF+ok3cRouFynE07MhstmPOH1Gu1Cgy/r
+        ZMap2fB9Kp1y8sDhy9u0F8FfcngdXm1xxrV6m5ZdVFPJ4fBST3NOTW/AVTXJOTVcg2/bPVPVh9YV
+        5ZznrHSxVgdHHxkOHvnj74dUQBzhzgIxi8ey3ZkzX/3auUmMldIxM35k6axHrEesR6xHVMFWTI8w
+        ZYP9CIJ/bD/C5BsrSBg22pAwcKwiYdhoR8LA8ZKECh1tSRg6WpNQcLQnoeh4UULlHW1KqIdhlCqh
+        pv19XEmTYFca6ElhLRam3VWSX5TZl87JLi1MKCrOmFBonDKh0DhnQqEx0oQqQqWtCRVuWW1CQSvq
+        TaiY0eKEoqPNCUPn1lLFWkvsTeVCZ2/KwNmb2JvO7k0NKdebkousWJx2NaKgPrA5nZPN5sTmRFmG
+        2JzYnMjoVTYnbjqVgPN7eSXV6b99L4/FqWzaWZwO4iYWp6YEi9ON43siIheL0z5b+ZlicTonm8WJ
+        xYmyDLE4sTiR0Vmc5DcpZ3EiYnPXKYuvSteJ/9RUhl7hPzVVUJxaUl7HSVblqKx+OqXxxG/ssT6x
+        PrE+sT6xPh2nV1mf+I09bjqdxOamUwbOTacKNJ1YnU5Xp7YUnfHwAtK8Xs8zTwAA
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:10 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/movie
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA82X627bNhSA/+cpDvxrAyxbkm+ygWFIkwYN0NRBY6BDi/6gpWOLjUSqJGVFGwbs
+        NfYCe7A9yQ4py5VzQdNiA5YLEuncyHP7kg8nAL/RN0DPcJNhbwG9M8VzLQVcI7vt9RuhlsqsWoV4
+        r1B0FfivuBTnXN+Sht++NMyU2poozJBpTFp1uUO141hZ2aUAkyKwjUGVM5OC3ACDDct5VoNRbItJ
+        3QcmgOmCKy62wEqTSgVcg5FKwBpNhSggI6+wIUGKCuKUZ0kqZQIbxVEk5CBxcQzmBZ2L0wVcoLzW
+        FJjLUoMsjeYJqgGsVG0DGQmoY1ags9ymUhttrWyAgmnTB03v6Ry6wsIAq1htbRik5M4aMQNrhXQp
+        1H1YZ4iJ/vuPv9xZFOaYr1HpQZsULs64wJy5jIV+MPEC3wvCVRgufJ++3reKRVprHrPsbZPVvfrU
+        80PPn6+cbled55RD6/SDe24r7mSxrcSqLpyTQtpU7M2cuFSZFQyvMOHszOoOp+Nhozf4VGx/zigL
+        7xQ3+NN0RJ/hbBJFc7/56O39/N7/Stw1E+I5cRu9p+K2Yb/EdT8/7rNQ4VqTvnWbGlMshsOqqgb7
+        XratnEvqyEEs82GbuERWIpMsob5dUENmGveCGpmiV7ZG+zcp0xfcjceRnixX5RpXipFMXVo3Pfm5
+        fM83yzfRy+1heEyZcGmFr3FLvcpUDdc8NqWisrU1pyZyKXHH1MPulMIP/o8HPSU3FMzFCjq2N9Tz
+        7vJ2KHncqudScBoid0OjyvbgORc8L/PTHR2crXnGTW1tzZodmkrvhe7SHdONzGiE3rD8wTLpHlOV
+        wnCnEgTz/Ttb00uxkTe1iPc9PfP8mRcGq3C0CKKFPx9Mo3AezQ+tHdMAiPuLqbuXeJ6sm7wbE04m
+        43A2bkWmFVEcP2oL6dbgTVZuOw4969Fr1FprqpM6GqrelVsk9aGNe6tU8SzrNHbvggnDdEfllVRK
+        dhTOFctZ76hvDdu6MO0zS5p+fCQ90SCaRtHokB1FlRbOup283k4ad+pg5PuHqDuWlTaB08H4pDOw
+        PZbRhQQ52aHL8dF1jzBxdOLPJbMNc/1IJ3L7MLVRXIz76DlHlhRSZo9iJ7kv/H7kvLACKAs6/hVT
+        O8zgTOY8pt38J+S03KAUsRQ7FBYTLKN9bbhHS1/24fzl6fn1cvmaOJJl2nFBKr7lAjTNUW3pQAjK
+        CRA3BcacjC+kipGwUaByqQSaa0HhSSdGYWf9Ha0YeMczSmcfqlQ2LCSuWQbpcv0JY0MGjixKbksE
+        vCNvND/CNJChq+4oRspzqDghlMUxXZ/ikVmKVA5yVMiKaEMkTWRhmpO7AgNuJbSZH8ApHT5pvKRE
+        NoEVNBuAto4DFwNaULd9MBXX1r9GQayzVCxzqfoHV/QsKI5doi5YTgi3lxO0PInsCWqjZG0PSGEy
+        vsEnQdiQLbJt/kwQjr1w8p+DcPIVED4E0r8DwkkHhN/Cuo28a+DhILfnyP2pegbzpt/MvOWbVy/Y
+        mVds9O1D5q0qO2dI/XZGv5Q0DxfyDshzTlOpCqncH2tPcfDQbf9fBj52xA7//Oi5/Av8wXgcjcLZ
+        E/y7X8su/ILxKPDHk4fwm4+m03Z7HsGv9eY1Kk+D7zTuFMg+JztXSPzyitYr/RX/5fmtpG0Q43eT
+        bj6YzaPRdP4c1M0no/kD1M0Go+ej7h6W6M0v3hX9w7F0i18v4AmFxwSHZgi+EZoTC82Tj/8AtF0/
+        g7INAAA=
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:11 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['0']
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: DELETE
+    uri: http://192.168.0.60:7878/api/movie/64
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA6uuBQBDv6ajAgAAAA==
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:11 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/profile
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA+2bW2+iUBCA3/kVhOeSVbx1902FrKau3YBts2n6cLJF1yxiFyGu2fS/l5ta6YCG
+        cdKSnQdj5HK+zJnDwJfBe0mW/4UfWVZcsbCVL7LSdTfKRbLpZ+Avp9NwY3JIuGX+GP7Sahfb39uT
+        ek7giY3avKw9KfG+53SIJ8+e2p5nP07EbBUduR177tuLaMN9OtQWEe76Ewhn7m9ecffsHfoAf+P+
+        dpdrV9nte94fpgjHWa7t6OSpcFa2lDniRLDWBMl31+bVd3M4nhxj+15QGt0C0f3uN0poG4ROjJFh
+        /Rj3KcmdXHJ/ODYoyZ9Bsml8HV6PuyNK8iVI1m91q28Scusg1tInt5TB5sVKyWzkQVXK+YXTemf0
+        9NGrYkkTMVwq31RqGji8sFJ4q9OmhMOVehAuarWjkYYNF+ok3cRouFynE07MhstmPOH1Gu1Cgy/r
+        ZMap2fB9Kp1y8sDhy9u0F8FfcngdXm1xxrV6m5ZdVFPJ4fBST3NOTW/AVTXJOTVcg2/bPVPVh9YV
+        5ZznrHSxVgdHHxkOHvnj74dUQBzhzgIxi8ey3ZkzX/3auUmMldIxM35k6axHrEesR6xHVMFWTI8w
+        ZYP9CIJ/bD/C5BsrSBg22pAwcKwiYdhoR8LA8ZKECh1tSRg6WpNQcLQnoeh4UULlHW1KqIdhlCqh
+        pv19XEmTYFca6ElhLRam3VWSX5TZl87JLi1MKCrOmFBonDKh0DhnQqEx0oQqQqWtCRVuWW1CQSvq
+        TaiY0eKEoqPNCUPn1lLFWkvsTeVCZ2/KwNmb2JvO7k0NKdebkousWJx2NaKgPrA5nZPN5sTmRFmG
+        2JzYnMjoVTYnbjqVgPN7eSXV6b99L4/FqWzaWZwO4iYWp6YEi9ON43siIheL0z5b+ZlicTonm8WJ
+        xYmyDLE4sTiR0Vmc5DcpZ3EiYnPXKYuvSteJ/9RUhl7hPzVVUJxaUl7HSVblqKx+OqXxxG/ssT6x
+        PrE+sT6xPh2nV1mf+I09bjqdxOamUwbOTacKNJ1YnU5Xp7YUnfHwAtK8Xs8zTwAA
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:11 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/movie
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA41V247bNhB9368Y6KkFfJHt9RUoio23iwboxkHWwBYN8kBLY4sJxVFJSlq3KNDf
+        yO/lSzqkLK29TdD6Aos8c58z4/dXAH/yFyBy0imMVhDdokgLIhX1GsCScdsWTF+C8g/c6FtpPzEa
+        t5dOuNJ6cYMKhcW0FacKTSWx9tgrD0BZkIZ7YSpUsKZcJvbL358hJ+ug1AnpCrWTpIUCwQ/9DA31
+        4Panm9u3m80v4FApCy5DICMPUoN1ZI5Ae9iTydHAQ4GJZOU7MglaoAKNcLJCcKXR7J5lEtSCdR5F
+        ivAolSXdgzojEHvHBnYo9QFsufuIiWMFxwAYOpQI+MTWZM4BcgTCAadasY9M5lBLl4FIEk6f/bFa
+        hkJ5QwXVaGwPREqFayIXyvvBA0Fb+QHccPBpYyWTFjTWIHZSSSfZgdApx5AK86kHrpbW27eoLfq8
+        szIn0+tM8Vmzn5RqHZzlQofkNAqjjpCidYaOPkB2o+QeB22rpF5LjbkIfRzHo1k/HvfjxXY8WcUx
+        f35rBYvsaGUi1Lum18/i1/3xdBtkz8VlLg7ojb4P55Z/AUs8P7bHIhgpmANoTmoBLo3ywPAeUynW
+        XnY4mw4bucHH4vCjEtY9Gunwh9mE3+P5dLGMT6/oZOev3n/43Qmt/4/fRs777UyH3w+nRGvcWQ7F
+        a2bOFavhsK7rwZ6ecuIRsIOE8mHzOHw5Vb5dipiQKWvvhbJ4Ao7cNr7y9T3dZMLeyTCbF3JUbssd
+        bo1gzLz2ZqLNm59fiXW/2POsdoNappI8uK39nCHzbc0PJc/DHT0BW855Kk1BfmpIdy0XLgsVOcXf
+        se27+PtOxtCenQffozO9B14OoSh+S8ikFc9JS57dkLEzZZtILrXMy/ym4kSaCTh6XbcTHZ/sCQxF
+        OFPdk0rRvBH5xVY7D9HwbMgAj+LF6c5T6LXe08NRJycqz/vxvD8eeeaPFqtRPLi+XkzG847RCfNe
+        f3NDyjzdNQ1wbnQ9GcXX0xZyLTReTmazdnuGRfygysO5tX4j0moeUJuLIYpukrMG+XNahUbi8xWv
+        V0yPz+d3xNsgweiCtU4cgt32LNKGhf8uRLwczJeLyWzZFcKTRAf1draiilyIczmdLDvHlVClr9V8
+        MLk6G8kobEId9nMo50WCL/6W+ObX/j1q2ITFb1fwDYGvAR0ZRpfJ/14Kz7C3X6Gu9IfZ9MpP+Yd/
+        AN8b/E03BwAA
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:11 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['0']
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: DELETE
+    uri: http://192.168.0.60:7878/api/movie/65
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA6uuBQBDv6ajAgAAAA==
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:11 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/profile
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA+2bW2+iUBCA3/kVhOeSVbx1902FrKau3YBts2n6cLJF1yxiFyGu2fS/l5ta6YCG
+        cdKSnQdj5HK+zJnDwJfBe0mW/4UfWVZcsbCVL7LSdTfKRbLpZ+Avp9NwY3JIuGX+GP7Sahfb39uT
+        ek7giY3avKw9KfG+53SIJ8+e2p5nP07EbBUduR177tuLaMN9OtQWEe76Ewhn7m9ecffsHfoAf+P+
+        dpdrV9nte94fpgjHWa7t6OSpcFa2lDniRLDWBMl31+bVd3M4nhxj+15QGt0C0f3uN0poG4ROjJFh
+        /Rj3KcmdXHJ/ODYoyZ9Bsml8HV6PuyNK8iVI1m91q28Scusg1tInt5TB5sVKyWzkQVXK+YXTemf0
+        9NGrYkkTMVwq31RqGji8sFJ4q9OmhMOVehAuarWjkYYNF+ok3cRouFynE07MhstmPOH1Gu1Cgy/r
+        ZMap2fB9Kp1y8sDhy9u0F8FfcngdXm1xxrV6m5ZdVFPJ4fBST3NOTW/AVTXJOTVcg2/bPVPVh9YV
+        5ZznrHSxVgdHHxkOHvnj74dUQBzhzgIxi8ey3ZkzX/3auUmMldIxM35k6axHrEesR6xHVMFWTI8w
+        ZYP9CIJ/bD/C5BsrSBg22pAwcKwiYdhoR8LA8ZKECh1tSRg6WpNQcLQnoeh4UULlHW1KqIdhlCqh
+        pv19XEmTYFca6ElhLRam3VWSX5TZl87JLi1MKCrOmFBonDKh0DhnQqEx0oQqQqWtCRVuWW1CQSvq
+        TaiY0eKEoqPNCUPn1lLFWkvsTeVCZ2/KwNmb2JvO7k0NKdebkousWJx2NaKgPrA5nZPN5sTmRFmG
+        2JzYnMjoVTYnbjqVgPN7eSXV6b99L4/FqWzaWZwO4iYWp6YEi9ON43siIheL0z5b+ZlicTonm8WJ
+        xYmyDLE4sTiR0Vmc5DcpZ3EiYnPXKYuvSteJ/9RUhl7hPzVVUJxaUl7HSVblqKx+OqXxxG/ssT6x
+        PrE+sT6xPh2nV1mf+I09bjqdxOamUwbOTacKNJ1YnU5Xp7YUnfHwAtK8Xs8zTwAA
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:11 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.16.5]
+      X-Api-Key: [!!python/unicode a76ab21e674a4c88a4d757f21eb91edd]
+    method: GET
+    uri: http://192.168.0.60:7878/api/movie
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA4uOBQApu0wNAgAAAA==
+    headers:
+      access-control-allow-methods: ['GET, OPTIONS, PATCH, POST, PUT, DELETE']
+      access-control-allow-origin: ['*']
+      cache-control: ['no-cache, no-store, must-revalidate']
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Fri, 21 Jul 2017 23:18:11 GMT']
+      expires: ['0']
+      keep-alive: ['timeout=15,max=100']
+      pragma: [no-cache]
+      server: [Mono-HTTPAPI/1.0]
+      x-applicationversion: [0.2.0.778]
+    status: {code: 200, message: OK}
+version: 1
