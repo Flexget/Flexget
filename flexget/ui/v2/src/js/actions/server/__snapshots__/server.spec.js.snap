@@ -1,44 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`actions/server dismissReload dispatches the correct action 1`] = `
-Object {
-  "error": false,
-  "meta": Object {
-    "ignore": false,
-    "message": undefined,
-    "namespace": "SERVER",
-  },
-  "payload": undefined,
-  "type": "SERVER_RELOAD_DISMISS",
-}
-`;
-
-exports[`actions/server dismissShutdown dispatches the correct action 1`] = `
-Object {
-  "error": false,
-  "meta": Object {
-    "ignore": false,
-    "message": undefined,
-    "namespace": "SERVER",
-  },
-  "payload": undefined,
-  "type": "SERVER_SHUTDOWN_DISMISS",
-}
-`;
-
-exports[`actions/server dismissShutdownPrompt dispatches the correct action 1`] = `
-Object {
-  "error": false,
-  "meta": Object {
-    "ignore": false,
-    "message": undefined,
-    "namespace": "SERVER",
-  },
-  "payload": undefined,
-  "type": "SERVER_SHUTDOWN_PROMOPT_DISMISS",
-}
-`;
-
 exports[`actions/server reloadServer dispatches the correct action on successful server reload 1`] = `
 Array [
   Object {
@@ -81,19 +42,6 @@ Array [
     "type": "SERVER_RELOAD",
   },
 ]
-`;
-
-exports[`actions/server showShutdownPrompt dispatches the correct action 1`] = `
-Object {
-  "error": false,
-  "meta": Object {
-    "ignore": false,
-    "message": undefined,
-    "namespace": "SERVER",
-  },
-  "payload": undefined,
-  "type": "SERVER_SHUTDOWN_PROMPT",
-}
 `;
 
 exports[`actions/server shutdownServer dispatches the correct action on successful server shutdown 1`] = `

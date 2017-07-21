@@ -10,7 +10,7 @@ function renderLayout(checkLogin = jest.fn(), loggedIn = true) {
     <Layout loggedIn={loggedIn} checkLogin={checkLogin}>
       <div />
     </Layout>
-  )), { version: {} });
+  )), { version: {}, status: { loading: {} } });
 }
 describe('components/layout', () => {
   beforeEach(() => {

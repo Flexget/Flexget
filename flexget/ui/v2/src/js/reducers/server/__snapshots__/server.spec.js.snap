@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`reducers/server should return the initial state 1`] = `
-Object {
-  "reload": false,
-  "shutdown": false,
-  "shutdownPrompt": false,
-}
-`;

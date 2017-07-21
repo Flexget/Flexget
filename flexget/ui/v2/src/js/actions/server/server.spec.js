@@ -63,28 +63,4 @@ describe('actions/server', () => {
         });
     });
   });
-
-  describe('dismissReload', () => {
-    it('dispatches the correct action', () => {
-      expect(store.dispatch(dismissReload())).toMatchSnapshot();
-    });
-  });
-
-  describe('showShutdownPrompt', () => {
-    it('dispatches the correct action', () => {
-      expect(store.dispatch(showShutdownPrompt())).toMatchSnapshot();
-    });
-  });
-
-  describe('dismissShutdownPrompt', () => {
-    it('dispatches the correct action', () => {
-      expect(store.dispatch(dismissShutdownPrompt())).toMatchSnapshot();
-    });
-  });
-
-  describe('dismissShutdown', () => {
-    it('dispatches the correct action', () => {
-      expect(store.dispatch(dismissShutdown())).toMatchSnapshot();
-    });
-  });
 });

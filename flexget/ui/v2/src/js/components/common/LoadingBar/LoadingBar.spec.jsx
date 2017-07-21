@@ -1,17 +1,18 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import renderer from 'react-test-renderer';
 import LoadingBar from 'components/common/LoadingBar';
+import { themed } from 'utils/tests';
 
 describe('components/common/LoadingBar', () => {
   it('should render properly when loading', () => {
     expect(
-      shallow(<LoadingBar loading />)
+      renderer.create(themed(<LoadingBar loading />))
     ).toMatchSnapshot();
   });
 
   it('should render properly when not loading', () => {
     expect(
-      shallow(<LoadingBar />)
+      renderer.create(themed(<LoadingBar loading />))
     ).toMatchSnapshot();
   });
 });

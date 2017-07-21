@@ -7,6 +7,13 @@ import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
 import Icon from 'material-ui/Icon';
 import Menu, { MenuItem } from 'material-ui/Menu';
+import Dialog, {
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from 'material-ui/Dialog';
+import Button from 'material-ui/Button';
 import 'font-awesome/css/font-awesome.css';
 
 const styleSheet = createStyleSheet('Navbar', theme => ({
@@ -33,25 +40,47 @@ export class Navbar extends Component {
     classes: PropTypes.object.isRequired,
     toggle: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
+    reloadServer: PropTypes.func.isRequired,
+    shutdownServer: PropTypes.func.isRequired,
   };
 
   state = {
-    open: false,
+    menuOpen: false,
+    shutdownPrompt: false,
   };
 
-  handleRequestClose = () => this.setState({
-    open: false,
+  handleMenuRequestClose = () => this.setState({
+    menuOpen: false,
     anchorEl: undefined,
   })
 
   handleMenuClick = event => this.setState({
-    open: true,
+    menuOpen: true,
     anchorEl: event.currentTarget,
   })
 
+  handleReloadClick = () => {
+    this.props.reloadServer();
+    this.handleMenuRequestClose();
+  }
+
+  handleShutdownPromptClick = () => {
+    this.setState({ shutdownPrompt: true });
+    this.handleMenuRequestClose();
+  }
+
+  handleShutdownClick = () => {
+    this.props.shutdownServer();
+    this.handleShutdownRequestClose();
+  }
+
+  handleShutdownRequestClose = () => this.setState({
+    shutdownPrompt: false,
+  });
+
   render() {
     const { classes, toggle, logout } = this.props;
-    const { anchorEl, open } = this.state;
+    const { anchorEl, menuOpen, shutdownPrompt } = this.state;
 
     return (
       <AppBar className={classes.appBar}>
@@ -89,15 +118,21 @@ export class Navbar extends Component {
           <Menu
             id="nav-menu"
             anchorEl={anchorEl}
-            open={open}
-            onRequestClose={this.handleRequestClose}
+            open={menuOpen}
+            onRequestClose={this.handleMenuRequestClose}
           >
             <MenuItem>
-              <Icon className={`${classes.menuIcon} fa fa-refresh`} />
+              <Icon
+                className={`${classes.menuIcon} fa fa-refresh`}
+                onClick={this.handleReloadClick}
+              />
               Reload
             </MenuItem>
             <MenuItem>
-              <Icon className={`${classes.menuIcon} fa fa-power-off`} />
+              <Icon
+                className={`${classes.menuIcon} fa fa-power-off`}
+                onClick={this.handleShutdownPromptClick}
+              />
               Shutdown
             </MenuItem>
             <MenuItem>
@@ -109,6 +144,22 @@ export class Navbar extends Component {
               Logout
             </MenuItem>
           </Menu>
+          <Dialog open={shutdownPrompt} onRequestClose={this.handleShutdownRequestClose}>
+            <DialogTitle>Shutdown</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Are you sure you want to shutdown FlexGet?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.handleShutdownRequestClose} color="primary">
+                Cancel
+              </Button>
+              <Button onClick={this.handleShutdownClick} color="primary">
+                Shutdown
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Toolbar>
       </AppBar>
     );

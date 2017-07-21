@@ -4,6 +4,7 @@ import { withStyles, createStyleSheet } from 'material-ui/styles';
 import Logo from 'components/layout/Logo';
 import Navbar from 'containers/layout/Navbar';
 import SideNav from 'components/layout/Sidenav';
+import LoadingBar from 'containers/common/LoadingBar';
 
 const HEADER_HEIGHT = 50;
 const MOBILE_HEADER_HEIGHT = (HEADER_HEIGHT * 2) - 2;
@@ -94,6 +95,7 @@ class Layout extends Component {
           </div>
           <nav className={classes.navbar}>
             <Navbar toggle={this.toggleSideBar} />
+            <LoadingBar />
           </nav>
         </header>
         <main className={classes.main}>
