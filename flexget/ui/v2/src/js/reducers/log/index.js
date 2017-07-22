@@ -10,7 +10,7 @@ import {
 const initState = {
   messages: [],
   connected: false,
-  lines: '400',
+  lines: '200',
   query: '',
 };
 

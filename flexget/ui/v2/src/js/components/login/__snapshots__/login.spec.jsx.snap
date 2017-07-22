@@ -29,7 +29,7 @@ exports[`components/login renders correctly when logged out 1`] = `
           required={false}
         >
           <label
-            className="MuiFormLabel-root-1338640695 MuiInputLabel-root-2962008059 MuiInputLabel-formControl-2201459172 MuiInputLabel-animated-1605689251"
+            className="MuiFormLabel-root-1338640695 MuiInputLabel-root-2962008059 MuiInputLabel-formControl-3697561538 MuiInputLabel-animated-1605689251"
           >
             Username
           </label>
@@ -40,7 +40,7 @@ exports[`components/login renders correctly when logged out 1`] = `
               aria-required={undefined}
               autoComplete={undefined}
               autoFocus={undefined}
-              className="MuiInput-input-3582851417 MuiInput-inputSingleline-2607927053"
+              className="MuiInput-input-373113963 MuiInput-inputSingleline-2607927053"
               defaultValue={undefined}
               disabled={false}
               id="username"
@@ -67,7 +67,7 @@ exports[`components/login renders correctly when logged out 1`] = `
           required={false}
         >
           <label
-            className="MuiFormLabel-root-1338640695 MuiInputLabel-root-2962008059 MuiInputLabel-formControl-2201459172 MuiInputLabel-animated-1605689251"
+            className="MuiFormLabel-root-1338640695 MuiInputLabel-root-2962008059 MuiInputLabel-formControl-3697561538 MuiInputLabel-animated-1605689251"
           >
             Password
           </label>
@@ -78,7 +78,7 @@ exports[`components/login renders correctly when logged out 1`] = `
               aria-required={undefined}
               autoComplete={undefined}
               autoFocus={undefined}
-              className="MuiInput-input-3582851417 MuiInput-inputSingleline-2607927053"
+              className="MuiInput-input-373113963 MuiInput-inputSingleline-2607927053"
               defaultValue={undefined}
               disabled={false}
               id="password"

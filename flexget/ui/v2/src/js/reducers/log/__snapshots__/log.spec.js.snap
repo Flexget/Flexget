@@ -3,7 +3,7 @@
 exports[`reducers/log should add the messages to the existing messages 1`] = `
 Object {
   "connected": false,
-  "lines": "400",
+  "lines": "200",
   "messages": Array [
     Array [
       "some messages",
@@ -16,7 +16,7 @@ Object {
 exports[`reducers/log should return the initial state 1`] = `
 Object {
   "connected": false,
-  "lines": "400",
+  "lines": "200",
   "messages": Array [],
   "query": "",
 }

@@ -121,17 +121,15 @@ export class Navbar extends Component {
             open={menuOpen}
             onRequestClose={this.handleMenuRequestClose}
           >
-            <MenuItem>
+            <MenuItem onClick={this.handleReloadClick}>
               <Icon
                 className={`${classes.menuIcon} fa fa-refresh`}
-                onClick={this.handleReloadClick}
               />
               Reload
             </MenuItem>
-            <MenuItem>
+            <MenuItem onClick={this.handleShutdownPromptClick}>
               <Icon
                 className={`${classes.menuIcon} fa fa-power-off`}
-                onClick={this.handleShutdownPromptClick}
               />
               Shutdown
             </MenuItem>

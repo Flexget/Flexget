@@ -5,6 +5,8 @@ import Logo from 'components/layout/Logo';
 import Navbar from 'containers/layout/Navbar';
 import SideNav from 'components/layout/Sidenav';
 import LoadingBar from 'containers/common/LoadingBar';
+import ErrorStatus from 'containers/common/ErrorStatus';
+import InfoStatus from 'containers/common/InfoStatus';
 
 const HEADER_HEIGHT = 50;
 const MOBILE_HEADER_HEIGHT = (HEADER_HEIGHT * 2) - 2;
@@ -105,6 +107,8 @@ class Layout extends Component {
           <section className={classes.content}>
             { children }
           </section>
+          <ErrorStatus />
+          <InfoStatus />
         </main>
       </div>
     );

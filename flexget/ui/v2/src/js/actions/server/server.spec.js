@@ -4,10 +4,6 @@ import configureMockStore from 'redux-mock-store';
 import {
   reloadServer,
   shutdownServer,
-  dismissReload,
-  showShutdownPrompt,
-  dismissShutdownPrompt,
-  dismissShutdown,
 } from 'actions/server';
 
 const middlewares = [thunk];

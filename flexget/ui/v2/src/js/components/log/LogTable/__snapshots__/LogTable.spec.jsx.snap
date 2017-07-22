@@ -98,6 +98,7 @@ ShallowWrapper {
           "sheetOrder": Array [
             "MuiTextarea",
             "MuiInput",
+            "MuiInputLabel",
             "MuiGrid",
             "MuiCollapse",
             "MuiFade",
