@@ -22,6 +22,7 @@
       "!src/js/store/*.js",
       "!src/js/reducers/index.js",
       "!src/js/{app,history,root,theme}.{js,jsx}",
+      "!src/js/{components,containers}/splash/*.{js,jsx}",
       "!**/node_modules/**",
       "!**/dist/**"
     ],
@@ -121,6 +122,7 @@
     "redux-form": "^6.8.0",
     "redux-thunk": "^2.2.0",
     "semver-compare": "^1.0.0",
+    "spinkit": "^1.2.5",
     "typeface-roboto": "0.0.22",
     "whatwg-fetch": "^2.0.3"
   }
