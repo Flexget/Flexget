@@ -88,7 +88,7 @@ class Symlink(object):
                     os.mkdir(d)
                 except OSError as e:
                     # Raised when it already exists, but are there other cases?
-                    log.debug('Failed to create subdir %s: %s', dir, e)
+                    log.debug('Failed to create subdir %s: %s', d, e)
             for f in files:
                 src_file = os.path.join(root, f)
                 dst_file = os.path.join(dst_dir, f)
