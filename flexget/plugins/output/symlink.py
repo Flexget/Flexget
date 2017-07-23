@@ -88,6 +88,7 @@ class Symlink(object):
             for f in files:
                 src_file = os.path.join(root, f)
                 dst_file = os.path.join(dest_dir, f)
+                log.debug('Hardlinking %s to %s', src_file, dst_file)
                 os.link(src_file, dst_file)
 
 
