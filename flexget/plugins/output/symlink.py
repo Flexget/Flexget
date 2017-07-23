@@ -43,6 +43,7 @@ class Symlink(object):
         if not config:
             return
         config = self.prepare_config(config)
+        existing = config['existing']
         for entry in task.accepted:
             if 'location' not in entry:
                 entry.fail('Does not have location field for symlinking')
@@ -50,9 +51,10 @@ class Symlink(object):
             lnkfrom = entry['location']
             name = os.path.basename(lnkfrom)
             lnkto = os.path.join(config['to'], name)
-            if os.path.exists(lnkto):
+            # Only softlinks will be skipped if they exist
+            if os.path.exists(lnkto) and config['type'] == 'soft':
                 msg = 'Symlink destination %s already exists' % lnkto
-                if config.get('existing', 'fail') == 'ignore':
+                if existing == 'ignore':
                     log.verbose(msg)
                 else:
                     entry.fail(msg)
@@ -63,13 +65,13 @@ class Symlink(object):
                     os.symlink(lnkfrom, lnkto)
                 else:
                     if os.path.isdir(lnkfrom):
-                        self.hard_link_dir(lnkfrom, lnkto)
+                        self.hard_link_dir(lnkfrom, lnkto, existing)
                     else:
                         os.link(lnkfrom, lnkto)
             except OSError as e:
                 entry.fail('Failed to create %slink, %s' % (config['type'], e))
 
-    def hard_link_dir(self, path, destination):
+    def hard_link_dir(self, path, destination, existing):
         if not os.path.exists(destination):
             try:
                 os.mkdir(destination)
@@ -78,7 +80,7 @@ class Symlink(object):
                 log.debug('Failed to create destination dir %s: %s', destination, e)
         # 'recursively' traverse and hard link
         working_dir = os.getcwd()
-        os.chdir(path)  # change dir to make it easier
+        os.chdir(path)  # change working dir to make dir joins easier
         for root, dirs, files in os.walk('.'):
             dst_dir = os.path.abspath(os.path.join(destination, root))
             for dir in dirs:
@@ -91,7 +93,13 @@ class Symlink(object):
                 src_file = os.path.join(root, f)
                 dst_file = os.path.join(dst_dir, f)
                 log.debug('Hardlinking %s to %s', src_file, dst_file)
-                os.link(src_file, dst_file)
+                try:
+                    os.link(src_file, dst_file)
+                except OSError as e:
+                    log.debug('Failed to create hardlink for file %s: %s', f, e)
+                    if existing == 'fail':
+                        raise
+
         os.chdir(working_dir)
 
 
