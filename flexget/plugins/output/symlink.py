@@ -51,8 +51,8 @@ class Symlink(object):
             lnkfrom = entry['location']
             name = os.path.basename(lnkfrom)
             lnkto = os.path.join(config['to'], name)
-            # Only softlinks will be skipped if they exist
-            if os.path.exists(lnkto) and config['type'] == 'soft':
+            # Hardlinks for dirs will not be failed here
+            if os.path.exists(lnkto) and (config['type'] == 'soft' or os.path.isfile(lnkfrom)):
                 msg = 'Symlink destination %s already exists' % lnkto
                 if existing == 'ignore':
                     log.verbose(msg)
@@ -98,7 +98,7 @@ class Symlink(object):
                 except OSError as e:
                     log.debug('Failed to create hardlink for file %s: %s', f, e)
                     if existing == 'fail':
-                        raise
+                        raise  # reraise to fail the entry in the calling function
 
         os.chdir(working_dir)
 
