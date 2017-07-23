@@ -48,7 +48,7 @@ class Symlink(object):
                 entry.fail('Does not have location field for symlinking')
                 continue
             lnkfrom = entry['location']
-            name = os.path.split(lnkfrom.rstrip('/'))[1]
+            name = os.path.basename(lnkfrom)
             lnkto = os.path.join(config['to'], name)
             if os.path.exists(lnkto):
                 msg = 'Symlink destination already exists'
