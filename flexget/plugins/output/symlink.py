@@ -51,7 +51,7 @@ class Symlink(object):
             name = os.path.basename(lnkfrom)
             lnkto = os.path.join(config['to'], name)
             if os.path.exists(lnkto):
-                msg = 'Symlink destination already exists'
+                msg = 'Symlink destination %s already exists' % lnkto
                 if config.get('existing', 'fail') == 'ignore':
                     log.verbose(msg)
                 else:
