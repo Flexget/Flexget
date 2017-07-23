@@ -77,8 +77,10 @@ class Symlink(object):
                 # Raised when it already exists, but are there other cases?
                 log.debug('Failed to create destination dir %s: %s', destination, e)
         # 'recursively' traverse and hard link
-        for root, dirs, files in os.walk(path):
-            dest_dir = os.path.join(destination, root)
+        working_dir = os.getcwd()
+        os.chdir(path)  # change dir to make it easier
+        for root, dirs, files in os.walk('.'):
+            dst_dir = os.path.abspath(os.path.join(destination, root))
             for dir in dirs:
                 try:
                     os.mkdir(dir)
@@ -87,9 +89,10 @@ class Symlink(object):
                     log.debug('Failed to create subdir %s: %s', dir, e)
             for f in files:
                 src_file = os.path.join(root, f)
-                dst_file = os.path.join(dest_dir, f)
+                dst_file = os.path.join(dst_dir, f)
                 log.debug('Hardlinking %s to %s', src_file, dst_file)
                 os.link(src_file, dst_file)
+        os.chdir(working_dir)
 
 
 @event('plugin.register')
