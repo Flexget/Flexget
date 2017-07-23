@@ -4,12 +4,13 @@ import { MemoryRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
+import theme from 'theme';
 
 const mockStore = configureMockStore([thunk]);
 
 export function themed(component) {
   return (
-    <MuiThemeProvider>
+    <MuiThemeProvider theme={theme} >
       { component }
     </MuiThemeProvider>
   );

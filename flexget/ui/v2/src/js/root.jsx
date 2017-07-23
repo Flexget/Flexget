@@ -30,6 +30,7 @@ const Wrapper = withStyles(styleSheet)(({ children }) => <div>{children}</div>);
 const Home = createAsyncComponent(() => import('components/home'));
 const Log = createAsyncComponent(() => import('components/log'));
 const Login = createAsyncComponent(() => import('containers/login'));
+const Series = createAsyncComponent(() => import('components/series'));
 
 
 const Root = () => (
@@ -43,6 +44,7 @@ const Root = () => (
               <Switch>
                 <PrivateRoute path="/" exact component={Home} />
                 <PrivateRoute path="/log" exact component={Log} />
+                <PrivateRoute path="/series" exact component={Series} />
               </Switch>
             </Layout>
           </Switch>

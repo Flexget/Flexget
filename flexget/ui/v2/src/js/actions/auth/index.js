@@ -5,8 +5,8 @@ export const AUTH = 'AUTH';
 export const LOGIN = 'LOGIN';
 export const LOGOUT = 'LOGOUT';
 
-const createAction = utils.createAction(AUTH);
-const loading = utils.createLoading(AUTH);
+export const createAction = utils.createAction(AUTH);
+export const loading = utils.createLoading(AUTH);
 
 export function checkLogin() {
   return dispatch => get('/server/version')

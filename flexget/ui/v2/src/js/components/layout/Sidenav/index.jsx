@@ -65,6 +65,8 @@ const styleSheet = createStyleSheet('SideNav', theme => ({
     width: '100%',
     height: '100%',
     minWidth: 50,
+    paddingTop: 0,
+    paddingBottom: 0,
   },
   versionHide: {
     display: 'none',

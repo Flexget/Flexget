@@ -2,50 +2,50 @@
 
 exports[`components/log/Header renders correctly 1`] = `
 <div
-  className="LogHeader-root-1400901008"
+  className="LogHeader-root-1"
 >
   <div>
     <h2
-      className="MuiTypography-root-233331062 MuiTypography-title-2106356098"
+      className="MuiTypography-root-8 MuiTypography-title-e"
     >
       Server Log
     </h2>
     <h3
-      className="MuiTypography-root-233331062 MuiTypography-subheading-2119063702 LogHeader-grey-968767187"
+      className="MuiTypography-root-8 MuiTypography-subheading-f LogHeader-grey-2"
     >
       Streaming
     </h3>
   </div>
   <div
-    className="LogHeader-spacer-3036263360"
+    className="LogHeader-spacer-3"
   />
   <div
-    className="LogHeader-textFieldWrapper-3760854782"
+    className="LogHeader-textFieldWrapper-4"
   >
     <span
       aria-hidden="true"
-      className="material-icons MuiIcon-root-3402991258 fa fa-filter LogHeader-grey-968767187"
+      className="material-icons MuiIcon-root-u fa fa-filter LogHeader-grey-2"
     />
     <div
-      className="MuiFormControl-root-3719765767 LogHeader-input-691557382"
+      className="MuiFormControl-root-11 LogHeader-input-5"
       onBlur={[Function]}
       onChange={[Function]}
       onFocus={[Function]}
       required={false}
     >
       <label
-        className="MuiFormLabel-root-1338640695 MuiInputLabel-root-2962008059 MuiInputLabel-formControl-3697561538 MuiInputLabel-animated-1605689251"
+        className="MuiFormLabel-root-1a MuiInputLabel-root-15 MuiInputLabel-formControl-16 MuiInputLabel-animated-18"
       >
         Filter
       </label>
       <div
-        className="MuiInput-root-4262591601 MuiInput-formControl-583691922 MuiInput-inkbar-171024778 MuiInput-underline-892978022"
+        className="MuiInput-root-1e MuiInput-formControl-1f MuiInput-inkbar-1g MuiInput-underline-1m"
       >
         <input
           aria-required={undefined}
           autoComplete={undefined}
           autoFocus={undefined}
-          className="MuiInput-input-373113963 MuiInput-inputSingleline-2607927053"
+          className="MuiInput-input-1i MuiInput-inputSingleline-1p"
           defaultValue={undefined}
           disabled={false}
           id="filter"
@@ -63,14 +63,14 @@ exports[`components/log/Header renders correctly 1`] = `
         />
       </div>
       <p
-        className="MuiFormHelperText-root-3554229948"
+        className="MuiFormHelperText-root-1s"
       >
         Supports operators and, or, (), and "str"
       </p>
     </div>
     <span
       aria-hidden="true"
-      className="material-icons MuiIcon-root-3402991258 fa fa-ellipsis-v LogHeader-grey-968767187 LogHeader-pointer-501421307"
+      className="material-icons MuiIcon-root-u fa fa-ellipsis-v LogHeader-grey-2 LogHeader-pointer-7"
       onClick={[Function]}
     />
   </div>

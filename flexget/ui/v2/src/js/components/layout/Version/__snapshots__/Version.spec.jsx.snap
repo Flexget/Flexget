@@ -2,15 +2,15 @@
 
 exports[`components/layout/Version renders correctly with latest version 1`] = `
 <div
-  className="Version-version-3221117096"
+  className="Version-version-1"
 >
   <p
-    className="Version-par-2841032265"
+    className="Version-par-2"
   >
     Version Info
   </p>
   <p
-    className="Version-par-2841032265"
+    className="Version-par-2"
   >
     Flexget: 
     2.10.60
@@ -18,7 +18,7 @@ exports[`components/layout/Version renders correctly with latest version 1`] = `
      
   </p>
   <p
-    className="Version-par-2841032265"
+    className="Version-par-2"
   >
     API: 
     1.1.2
@@ -28,21 +28,21 @@ exports[`components/layout/Version renders correctly with latest version 1`] = `
 
 exports[`components/layout/Version renders correctly without latest version 1`] = `
 <div
-  className="Version-version-3221117096"
+  className="Version-version-1"
 >
   <p
-    className="Version-par-2841032265"
+    className="Version-par-2"
   >
     Version Info
   </p>
   <p
-    className="Version-par-2841032265"
+    className="Version-par-2"
   >
     Flexget: 
     2.10.11
      
     <a
-      className="MuiButtonBase-root-3177716317 MuiIconButton-root-3609702008"
+      className="MuiButtonBase-root-c MuiIconButton-root-3"
       href="https://flexget.com/ChangeLog"
       onBlur={[Function]}
       onFocus={[Function]}
@@ -56,21 +56,21 @@ exports[`components/layout/Version renders correctly without latest version 1`] 
       tabIndex="0"
     >
       <span
-        className="MuiIconButton-label-2320069359"
+        className="MuiIconButton-label-9"
       >
         <span
           aria-hidden="true"
-          className="material-icons MuiIcon-root-3402991258 MuiIconButton-icon-156099627 fa fa-question-circle-o Version-version-3221117096"
+          className="material-icons MuiIcon-root-e MuiIconButton-icon-a fa fa-question-circle-o Version-version-1"
         />
       </span>
       <span
-        className="MuiTouchRipple-root-3868442396"
+        className="MuiTouchRipple-root-l"
       />
     </a>
      
   </p>
   <p
-    className="Version-par-2841032265"
+    className="Version-par-2"
   >
     API: 
     1.1.2

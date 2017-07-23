@@ -2,13 +2,13 @@
 
 exports[`components/layout/Navbar renders correctly 1`] = `
 <header
-  className="MuiPaper-root-2758040674 MuiPaper-shadow4-941451405 MuiAppBar-root-2668177540 MuiAppBar-positionFixed-2227438490 MuiAppBar-colorPrimary-15947162 mui-fixed"
+  className="MuiPaper-root-8 MuiPaper-shadow4-e MuiAppBar-root-1 MuiAppBar-positionFixed-2 MuiAppBar-colorPrimary-6 mui-fixed"
 >
   <div
-    className="MuiToolbar-root-1760419744 MuiToolbar-gutters-344431791"
+    className="MuiToolbar-root-z MuiToolbar-gutters-10"
   >
     <button
-      className="MuiButtonBase-root-3177716317 MuiIconButton-root-3609702008"
+      className="MuiButtonBase-root-1a MuiIconButton-root-11"
       disabled={false}
       onBlur={[Function]}
       onClick={[Function]}
@@ -25,15 +25,15 @@ exports[`components/layout/Navbar renders correctly 1`] = `
       type="button"
     >
       <span
-        className="MuiIconButton-label-2320069359"
+        className="MuiIconButton-label-17"
       >
         <span
           aria-hidden="true"
-          className="material-icons MuiIcon-root-3402991258 MuiIconButton-icon-156099627 fa fa-bars"
+          className="material-icons MuiIcon-root-1c MuiIconButton-icon-18 fa fa-bars"
         />
       </span>
       <span
-        className="MuiTouchRipple-root-3868442396"
+        className="MuiTouchRipple-root-1j"
       />
     </button>
     <div
@@ -45,7 +45,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
     >
       <button
         aria-label="Config"
-        className="MuiButtonBase-root-3177716317 MuiIconButton-root-3609702008"
+        className="MuiButtonBase-root-1a MuiIconButton-root-11"
         disabled={false}
         onBlur={[Function]}
         onFocus={[Function]}
@@ -61,15 +61,15 @@ exports[`components/layout/Navbar renders correctly 1`] = `
         type="button"
       >
         <span
-          className="MuiIconButton-label-2320069359"
+          className="MuiIconButton-label-17"
         >
           <span
             aria-hidden="true"
-            className="material-icons MuiIcon-root-3402991258 MuiIconButton-icon-156099627 fa fa-pencil"
+            className="material-icons MuiIcon-root-1c MuiIconButton-icon-18 fa fa-pencil"
           />
         </span>
         <span
-          className="MuiTouchRipple-root-3868442396"
+          className="MuiTouchRipple-root-1j"
         />
       </button>
     </a>
@@ -79,7 +79,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
     >
       <button
         aria-label="Log"
-        className="MuiButtonBase-root-3177716317 MuiIconButton-root-3609702008"
+        className="MuiButtonBase-root-1a MuiIconButton-root-11"
         disabled={false}
         onBlur={[Function]}
         onFocus={[Function]}
@@ -95,21 +95,21 @@ exports[`components/layout/Navbar renders correctly 1`] = `
         type="button"
       >
         <span
-          className="MuiIconButton-label-2320069359"
+          className="MuiIconButton-label-17"
         >
           <span
             aria-hidden="true"
-            className="material-icons MuiIcon-root-3402991258 MuiIconButton-icon-156099627 fa fa-file-text-o"
+            className="material-icons MuiIcon-root-1c MuiIconButton-icon-18 fa fa-file-text-o"
           />
         </span>
         <span
-          className="MuiTouchRipple-root-3868442396"
+          className="MuiTouchRipple-root-1j"
         />
       </button>
     </a>
     <button
       aria-label="Manage"
-      className="MuiButtonBase-root-3177716317 MuiIconButton-root-3609702008"
+      className="MuiButtonBase-root-1a MuiIconButton-root-11"
       disabled={false}
       onBlur={[Function]}
       onClick={[Function]}
@@ -126,15 +126,15 @@ exports[`components/layout/Navbar renders correctly 1`] = `
       type="button"
     >
       <span
-        className="MuiIconButton-label-2320069359"
+        className="MuiIconButton-label-17"
       >
         <span
           aria-hidden="true"
-          className="material-icons MuiIcon-root-3402991258 MuiIconButton-icon-156099627 fa fa-cog"
+          className="material-icons MuiIcon-root-1c MuiIconButton-icon-18 fa fa-cog"
         />
       </span>
       <span
-        className="MuiTouchRipple-root-3868442396"
+        className="MuiTouchRipple-root-1j"
       />
     </button>
   </div>

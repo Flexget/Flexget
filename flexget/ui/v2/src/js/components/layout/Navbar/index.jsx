@@ -25,7 +25,7 @@ const styleSheet = createStyleSheet('Navbar', theme => ({
   },
   toolbar: {
     backgroundColor: theme.palette.primary[800],
-    height: '100%',
+    minHeight: 50,
   },
   icon: {
     color: theme.palette.getContrastText(theme.palette.primary[800]),
