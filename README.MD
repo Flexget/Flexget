@@ -61,8 +61,3 @@ Clone the repo with this command:
 
 Detailed instructions are available on [flexget.com](https://flexget.com/GitHubInstall).
 
-## Install using Docker 
-
-Docker can be used to install and run FlexGet:
-
-    docker run -it -v /home/<username>/.flexget:/root/.flexget --rm toilal/flexget
