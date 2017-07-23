@@ -83,9 +83,9 @@ class Symlink(object):
         os.chdir(path)  # change working dir to make dir joins easier
         for root, dirs, files in os.walk('.'):
             dst_dir = os.path.abspath(os.path.join(destination, root))
-            for dir in dirs:
+            for d in dirs:
                 try:
-                    os.mkdir(dir)
+                    os.mkdir(d)
                 except OSError as e:
                     # Raised when it already exists, but are there other cases?
                     log.debug('Failed to create subdir %s: %s', dir, e)
