@@ -32,7 +32,8 @@ class TestSymlink(object):
               link_type: 'hard'
     """
 
-    def setup_method(self, test_method, tmpdir):
+    @pytest.fixture
+    def create_tmp_dirs(self, tmpdir):
         # Create required dirs for tests
         tmp = tmpdir.mkdir(dirname)
 
