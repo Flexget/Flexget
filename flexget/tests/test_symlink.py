@@ -23,6 +23,7 @@ class TestSymlink(object):
         templates:
           global:
             accept_all: yes
+            disable: builtins
         tasks:
           test_hardlink:
             mock:
