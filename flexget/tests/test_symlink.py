@@ -2,10 +2,10 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import os
-import shutil
 import stat
 
 import pytest
+from jinja2 import Template
 
 dirname = 'symlink_test_dir'
 subdirs = ['hardlink', 'softlink']
@@ -19,30 +19,45 @@ def is_hard_link(file1, file2):
 
 @pytest.mark.skipif(os.name != 'posix', reason='symlinks only work on posix')
 class TestSymlink(object):
-    config = """
+    _config = """
         templates:
           global:
             accept_all: yes
         tasks:
           test_hardlink:
             mock:
-              - {title: 'test1.mkv', location: '__tmp__/symlink_test_dir/test1.mkv'}
+              - {title: 'test1.mkv', location: '{{tmpdir_1}}/test1.mkv'}
             symlink:
-              to: '__tmp__/symlink_test_dir/hardlink'
+              to: '{{tmpdir_1}}/hardlink'
+              link_type: 'hard'
+          test_hardlink_dir:
+            mock:
+              - {title: 'test2', location: '{{tmpdir_1}}/test2'}
+            symlink:
+              to: '{{tmpdir_1}}/hardlink'
               link_type: 'hard'
     """
 
     @pytest.fixture
-    def create_tmp_dirs(self, tmpdir):
-        # Create required dirs for tests
-        tmp = tmpdir.mkdir(dirname)
+    def config(self, tmpdir):
+        test_dir = tmpdir.mkdir(dirname)
+        test_dir.mkdir('hardlink')
 
-        for subdir in subdirs:
-            tmp.mkdir(subdir)
+        return Template(self._config).render({'tmpdir_1': test_dir.strpath})
 
     def test_hardlink(self, execute_task, tmpdir):
         tmpdir.join(dirname).join('test1.mkv').write('')
         execute_task('test_hardlink')
-        org_file = tmpdir.join(dirname).join('test1.mkv')
-        assert os.path.exists(org_file), 'test1.mkv should exist'
-        assert is_hard_link(org_file, tmpdir.join(dirname).join('hardlink').join('test1.mkv'))
+        hardlink = tmpdir.join(dirname).join('hardlink').join('test1.mkv')
+
+        assert os.path.exists(hardlink), '%s should exist' % hardlink.strpath
+        assert is_hard_link(tmpdir.join(dirname).join('test1.mkv'), hardlink)
+
+    def test_hardlink_dir(self, execute_task, tmpdir):
+        tmp = tmpdir.join(dirname).mkdir('test2')
+        test2 = tmp.join('test2.mkv').write('')
+        execute_task('test_hardlink_dir')
+        hardlink_dir = tmpdir.join(dirname).join('hardlink').join('test2')
+
+        assert os.path.exists(hardlink_dir), '%s should exist' % hardlink_dir.strpath
+        assert is_hard_link(test2, hardlink_dir.join('test2.mkv'))
