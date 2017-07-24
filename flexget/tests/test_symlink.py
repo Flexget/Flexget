@@ -50,7 +50,7 @@ class TestSymlink(object):
             symlink:
               to: '{{tmpdir_1}}/softlink'
               link_type: 'soft'
-          test_softlink_dir:
+          test_softlink_fail:
             mock:
               - {title: 'test1.mkv', location: '{{tmpdir_1}}/test1.mkv'}
               - {title: 'test1', location: '{{tmpdir_1}}/test1'}
@@ -94,22 +94,24 @@ class TestSymlink(object):
         assert len(task.failed) == 1, 'should have failed test1.mkv'
 
     def test_softlink(self, execute_task, tmpdir):
-        f = tmpdir.join(dirname).join('test1.mkv')
-        f.write('')
-        d = tmpdir.join(dirname).mkdir('test1')
+        tmpdir.join(dirname).join('test1.mkv').write('')
+        tmpdir.join(dirname).mkdir('test1')
         execute_task('test_softlink')
 
+        softlink = tmpdir.join(dirname).join('softlink')
+        f = softlink.join('test1.mkv')
+        d = softlink.join('test1')
         assert os.path.exists(f.strpath), '%s should exist' % f.strpath
         assert os.path.exists(d.strpath), '%s should exist' % d.strpath
-        assert os.path.islink(f), '%s should be a softlink' % f.strpath
-        assert os.path.islink(d), '%s should be a softlink' % d.strpath
+        assert os.path.islink(f.strpath), '%s should be a softlink' % f.strpath
+        assert os.path.islink(d.strpath), '%s should be a softlink' % d.strpath
 
     def test_softlink_fail(self, execute_task, tmpdir):
         tmpdir.join(dirname).join('test1.mkv').write('')
         tmpdir.join(dirname).mkdir('test1')
 
-        tmpdir.join(dirname).mkdir('softlink').join('test1.mkv').write('')
-        tmpdir.join(dirname).mkdir('softlink').mkdir('test1')
+        tmpdir.join(dirname).join('softlink').join('test1.mkv').write('')
+        tmpdir.join(dirname).join('softlink').mkdir('test1')
         task = execute_task('test_softlink_fail')
 
         assert len(task.failed) == 2, 'Should have failed both entries since they already exist'
