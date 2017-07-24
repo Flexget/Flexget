@@ -8,8 +8,8 @@ class TestAbortIfExists(object):
           global:
             disable: [seen]
             mock:
-              - {title: 'test', location: 'mock://some_file.lftp-get-status}
-              - {title: 'test2', location: 'mock://some_file.mkv}
+              - {title: 'test', location: 'mock://some_file.lftp-get-status'}
+              - {title: 'test2', location: 'mock://some_file.mkv'}
         tasks:
           test_abort:
             abort_if_exists:
