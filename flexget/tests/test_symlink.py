@@ -50,8 +50,8 @@ class TestSymlink(object):
         execute_task('test_hardlink')
         hardlink = tmpdir.join(dirname).join('hardlink').join('test1.mkv')
 
-        assert os.path.exists(hardlink), '%s should exist' % hardlink.strpath
-        assert is_hard_link(tmpdir.join(dirname).join('test1.mkv'), hardlink)
+        assert os.path.exists(hardlink.strpath), '%s should exist' % hardlink.strpath
+        assert is_hard_link(tmpdir.join(dirname).join('test1.mkv').strpath, hardlink.strpath)
 
     def test_hardlink_dir(self, execute_task, tmpdir):
         tmp = tmpdir.join(dirname).mkdir('test2')
@@ -59,5 +59,5 @@ class TestSymlink(object):
         execute_task('test_hardlink_dir')
         hardlink_dir = tmpdir.join(dirname).join('hardlink').join('test2')
 
-        assert os.path.exists(hardlink_dir), '%s should exist' % hardlink_dir.strpath
-        assert is_hard_link(test2, hardlink_dir.join('test2.mkv'))
+        assert os.path.exists(hardlink_dir.strpath), '%s should exist' % hardlink_dir.strpath
+        assert is_hard_link(test2.strpath, hardlink_dir.join('test2.mkv').strpath)
