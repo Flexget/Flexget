@@ -37,7 +37,7 @@ class TestSymlink(object):
         tmp = tmpdir.mkdir(dirname)
 
         for subdir in subdirs:
-            tmp.mkdir(os.path.join(dirname, subdir))
+            tmp.mkdir(subdir)
 
     def test_hardlink(self, execute_task, tmpdir):
         tmpdir.join(dirname).join('test1.mkv').write('')
