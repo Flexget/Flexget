@@ -53,9 +53,8 @@ def radarr_quality_to_flexget_quality_req(radarr_quality):
     # QUALITIES_MAP has its keys in lower case
     radarr_quality = radarr_quality.lower()
     if not radarr_quality in QUALITIES_MAP:
-        log.warning(
-            'Did not find a suitible translation for Radarr quality \'%s\'',
-            radarr_quality)
+        log.warning('Did not find a suitible translation for Radarr quality \'%s\'',
+                    radarr_quality)
         return None
 
     flexget_quality_req_string = QUALITIES_MAP[radarr_quality]
@@ -63,23 +62,22 @@ def radarr_quality_to_flexget_quality_req(radarr_quality):
     try:
         return Requirements(flexget_quality_req_string)
     except ValueError:
-        log.error(
-            'Failed to convert %s into a valid quality requirement',
-            flexget_quality_req_string)
+        log.error('Failed to convert %s into a valid quality requirement',
+                  flexget_quality_req_string)
         return None
 def get_flexget_qualities(profile, cutoff_only=False):
     quality_requirements = []
     if cutoff_only:
         name = profile['cutoff']['name']
         quality_req = radarr_quality_to_flexget_quality_req(name)
-        if not quality_req is None:
+        if quality_req:
             quality_requirements.append(quality_req)
     else:
         for quality in profile['items']:
             if quality['allowed']:
                 name = quality['quality']['name']
                 quality_req = radarr_quality_to_flexget_quality_req(name)
-                if not quality_req is None:
+                if quality_req:
                     quality_requirements.append(quality_req)
 
     return quality_requirements
@@ -109,14 +107,11 @@ class RadarrSet(MutableSet):
     def __len__(self):
         return len(self.items)
 
-    def discard(self, value):
-        if not value:
+    def discard(self, entry):
+        if not entry:
             return
 
-        if not isinstance(value, Entry):
-            raise TypeError()
-
-        matching_entry = self.__find_matching_entry(value)
+        matching_entry = self.__find_matching_entry(entry)
         if matching_entry:
             movie_id = matching_entry['radarr_id']
             response = self.service.delete_movie(movie_id)
@@ -124,75 +119,37 @@ class RadarrSet(MutableSet):
             # Clear the cache
             self._movie_entries = None
         else:
-            log.debug('Could not find any matching movie to remove for entry %s', value)
+            log.debug('Could not find any matching movie to remove for entry %s', entry)
 
     def __ior__(self, other):
         for entry in other:
-            if not isinstance(entry, Entry):
-                raise TypeError()
-
             self.add(entry)
 
     def __contains__(self, entry):
-        if not value:
+        if not entry:
             return False
 
-        if not isinstance(value, Entry):
-            raise TypeError()
+        matching_entry = self.__find_matching_entry(entry)
 
-        matching_entry = self.__find_matching_entry(value)
-
-        return not matching_entry is None
+        return matching_entry is not None
 
     def add(self, entry):
-
-        if not isinstance(entry, Entry):
-            raise TypeError()
 
         # The easiest way to add a movie to Radarr is to
         # first use the lookup API. Using that we will get
         # a json response which gives us most of the input
-        # we need for the PUT request.
+        # we need for the POST request.
 
-        result = None
-
-        # If the entry has a IMDB id, use that for lookup
-        if not result and 'imdb_id' in entry:
-            imdb_id = entry['imdb_id']
-            result = self.service.lookup_by_imdb(imdb_id)
-            if len(result) == 0:
-                result = None
-
-        # If the entry has a TMDB id, use that for lookup
-        if not result and 'tmdb_id' in entry:
-            tmdb_id = entry['tmdb_id']
-            result = self.service.lookup_by_tmdb(tmdb_id)
-            if len(result) == 0:
-                result = None
-
-        # Could not lookup by id. Try to use the title.
-        # However, we can only accept any results if it's
-        # one item, otherwise we don't know which to select.
-        if not result:
-            title = entry['title']
-            results = self.service.lookup_by_term(title)
-            if len(result) > 1:
-                log.debug(
-                    'The lookup for \'%s\' returned %d results. Using the first result \'%s\'.',
-                    title,
-                    len(results),
-                    results[0]['title']
-                )
-                result = results[0]
-            elif len(result) == 0:
-                result = None
+        result = self.__lookup_movie(entry.get('title'),
+                                     entry.get('imdb_id'),
+                                     entry.get('tmdb_id'))
 
         if result:
-            rootfolders = self.service.get_rootfolders()
-            rootFolderPath = rootfolders[0]['path']
+            rootFolders = self.service.get_root_folders()
+            rootFolderPath = rootFolders[0]['path']
 
-            # TODO: should we let the user affect this one, 
-            # or try to parse the 'quality' value somehow?
+            # TODO: should we let the user affect this one,
+            # or try to parse the 'quality' entry somehow?
             qualityProfileId = 1
 
             try:
@@ -205,15 +162,14 @@ class RadarrSet(MutableSet):
                     rootFolderPath)
                 log.verbose('Added movie %ls to Radarr list', result['title'])
             except RadarrMovieAlreadyExistsError:
-                log.warning(
-                    'Could not add movie %ls because it already exists on Radarr',
-                    result['title']
-                    )
+                log.warning('Could not add movie %ls because it already exists on Radarr',
+                            result['title'])
+            except RadarrRequestError as ex:
+                log.error('The movie add command raised exception: %s', ex)
         else:
-            log.verbose(
-                'The lookup for entry %s did not return any results.'
-                'Can not add the movie in Radarr.',
-                entry)
+            log.verbose('The lookup for entry %s did not return any results.'
+                        'Can not add the movie in Radarr.',
+                        entry)
 
     def _from_iterable(self, it):
         # The following implementation is what's done in every other
@@ -222,7 +178,6 @@ class RadarrSet(MutableSet):
         # However, thats a classmethod and this does not even match its signature
         # https://blog.devzero.com/2013/01/28/how-to-override-a-class-method-in-python/
 
-        # TODO: is this the right answer? the returned object won't have our custom __contains__ logic
         return set(it)
 
     def get(self, entry):
@@ -345,6 +300,51 @@ class RadarrSet(MutableSet):
             entries.append(entry)
 
         return entries
+
+    def __lookup_movie(self, title=None, imdb_id=None, tmdb_id=None):
+        """
+        Uses Radarr's API to lookup a movie, prioritizing IMDB/TMDB
+        ids and as a last resort search for the title
+        """
+
+        # If the entry has a IMDB id, use that for lookup
+        if imdb_id:
+            try:
+                result = self.service.lookup_by_imdb(imdb_id)
+                # lookup_by_imdb returns an empty dictionary in case no match is found
+                if result:
+                    return result
+            except RadarrRequestError as ex:
+                log.error('The IMDB lookup raised exception: %s', ex)
+
+        # If the entry has a TMDB id, use that for lookup
+        if tmdb_id:
+            try:
+                result = self.service.lookup_by_tmdb(tmdb_id)
+                # lookup_by_tmdb returns an empty dictionary in case no match is found
+                if result:
+                    return result
+            except RadarrRequestError as ex:
+                log.error('The TMDB lookup raised exception: %s', ex)
+
+        # Could not lookup by id. Try to use the title.
+        # However, we can only accept any results if it's
+        # one item, otherwise we don't know which to select.
+        if title:
+            try:
+                results = self.service.lookup_by_term(title)
+                if len(results) > 1:
+                    log.debug(
+                        'The lookup for \'%s\' returned %d results. Using the first result \'%s\'.',
+                        title,
+                        len(results),
+                        results[0]['title']
+                    )
+                    return results[0]
+            except RadarrRequestError as ex:
+                log.error('The search term lookup raised exception: %s', ex)
+
+        return None
 
 class RadarrList(object):
     """ List plugin for Radarr that also works as an input plugin """

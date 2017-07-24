@@ -80,18 +80,17 @@ def request_post_json(url, headers, data):
             errorMessage = None
             try:
                 json_response = response.json()
-                if len(json_response) > 0:
+                if len(json_response) > 0 and 'errorMessage' in json_response[0]:
                     errorMessage = json_response[0]['errorMessage']
-            except:
-                # Response wasn't JSON it seems
-                pass
+            except ValueError:
+                # Raised by response.json() if JSON couln't be decoded
+                log.error('Radarr returned non-JSON error result: %s', response.content)
 
-            raise RadarrRequestError(
-                'Invalid response received from Radarr: %s' % 
-                response.content,
-                log,
-                status_code=response.status_code,
-                error_message=errorMessage)
+            raise RadarrRequestError('Invalid response received from Radarr: %s' %
+                                     response.content,
+                                     log,
+                                     status_code=response.status_code,
+                                     error_message=errorMessage)
 
     except RequestException as e:
         raise RadarrRequestError('Unable to connect to Radarr at %s. Error: %s' % (url, e))
@@ -108,19 +107,19 @@ def request_put_json(url, headers):
 class RadarrAPIService:
     """ Handles all communication with the Radarr REST API """
 
-    def __init__(self, api_key, base_url, port = None):
+    def __init__(self, api_key, base_url, port=None):
         self.api_key = api_key
         parsed_base_url = urlparse(base_url)
 
-        if not parsed_base_url.port is None:
+        if parsed_base_url.port:
             port = int(parsed_base_url.port)
 
-        self.api_url = '%s://%s:%s%s/api/' % ( 
+        self.api_url = '%s://%s:%s%s/api/' % (
             parsed_base_url.scheme,
             parsed_base_url.netloc,
             port,
             parsed_base_url.path)
-    
+
     def get_profiles(self):
         """ Gets all profiles """
         request_url = self.api_url + 'profile'
@@ -135,7 +134,7 @@ class RadarrAPIService:
         json_response = request_get_json(request_url, headers)
         return json_response
 
-    def get_rootfolders(self):
+    def get_root_folders(self):
         """ Gets the root folders """
         request_url = self.api_url + 'rootfolder'
         headers = self.__create_default_headers()
@@ -172,11 +171,10 @@ class RadarrAPIService:
         headers = self.__create_default_headers()
         json_response = request_get_json(request_url, headers)
         return json_response
-    def add_movie(
-            self,
-            title, qualityProfileId, titleSlug,
-            images, tmdbId, rootFolderPath,
-            monitored=True, addOptions=None):
+    def add_movie(self,
+                  title, qualityProfileId, titleSlug,
+                  images, tmdbId, rootFolderPath,
+                  monitored=True, addOptions=None):
         """ Adds a movie """
         request_url = self.api_url + 'movie'
         headers = self.__create_default_headers()
