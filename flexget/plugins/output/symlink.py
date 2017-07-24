@@ -20,7 +20,7 @@ class Symlink(object):
                 'properties': {
                     'to': {'type': 'string', 'format': 'path'},
                     'existing': {'type': 'string', 'enum': ['ignore', 'fail']},
-                    'type': {'type': 'string', 'enum': ['soft', 'hard']}
+                    'link_type': {'type': 'string', 'enum': ['soft', 'hard']}
                 },
                 'required': ['to'],
                 'additionalProperties': False
@@ -34,7 +34,7 @@ class Symlink(object):
             config = {'to': config}
 
         config.setdefault('existing', 'fail')
-        config.setdefault('type', 'soft')
+        config.setdefault('link_type', 'soft')
 
         return config
 
@@ -52,16 +52,16 @@ class Symlink(object):
             name = os.path.basename(lnkfrom)
             lnkto = os.path.join(config['to'], name)
             # Hardlinks for dirs will not be failed here
-            if os.path.exists(lnkto) and (config['type'] == 'soft' or os.path.isfile(lnkfrom)):
+            if os.path.exists(lnkto) and (config['link_type'] == 'soft' or os.path.isfile(lnkfrom)):
                 msg = 'Symlink destination %s already exists' % lnkto
                 if existing == 'ignore':
                     log.verbose(msg)
                 else:
                     entry.fail(msg)
                 continue
-            log.verbose('%slink `%s` to `%s`', config['type'], lnkfrom, lnkto)
+            log.verbose('%slink `%s` to `%s`', config['link_type'], lnkfrom, lnkto)
             try:
-                if config['type'] == 'soft':
+                if config['link_type'] == 'soft':
                     os.symlink(lnkfrom, lnkto)
                 else:
                     if os.path.isdir(lnkfrom):
@@ -69,7 +69,7 @@ class Symlink(object):
                     else:
                         os.link(lnkfrom, lnkto)
             except OSError as e:
-                entry.fail('Failed to create %slink, %s' % (config['type'], e))
+                entry.fail('Failed to create %slink, %s' % (config['link_type'], e))
 
     def hard_link_dir(self, path, destination, existing):
         if not os.path.exists(destination):
