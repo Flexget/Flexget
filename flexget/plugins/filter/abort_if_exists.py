@@ -5,9 +5,9 @@ import re
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('abort_exists')
+log = logging.getLogger('abort_if_exists')
 
-class PluginAbortExists(object):
+class PluginAbortIfExists(object):
     """Aborts a task if an entry field matches the regexp"""
 
     schema = {
@@ -35,4 +35,4 @@ class PluginAbortExists(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginAbortExists, 'abort_exists', api_ver=2)
+    plugin.register(PluginAbortIfExists, 'abort_if_exists', api_ver=2)
