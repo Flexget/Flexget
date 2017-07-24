@@ -29,6 +29,7 @@ class PluginAbortExists(object):
             # if pattern matches any entry
             if field not in entry:
                 log.debug('Field %s not found. Skipping.', field)
+                continue
             if abort_re.search(entry[field]):
                 task.abort('An entry contained %s in field %s. Abort!' % (config['regexp'], field))
 
