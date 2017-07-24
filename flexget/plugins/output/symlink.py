@@ -105,6 +105,7 @@ class Symlink(object):
 
 @event('plugin.register')
 def register_plugin():
-    if os.name != 'posix':
+    if os.name == 'nt':
+        log.trace('Symlinks not supported on Windows. Skipping Symlink plugin register.')
         return
     plugin.register(Symlink, 'symlink', api_ver=2)
