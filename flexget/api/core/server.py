@@ -87,42 +87,59 @@ class ObjectsContainer(object):
         }
     }
 
+    server_manage = {
+        'type': 'object',
+        'properties': {
+            'operation': {'type': 'string', 'enum': ['reload', 'shutdown']},
+            'force': {'type': 'boolean'}
+        },
+        'required': ['operation'],
+        'additionalProperties': False
+    }
 
-yaml_error_schema = api.schema('yaml_error_schema', ObjectsContainer.yaml_error_response)
-config_validation_schema = api.schema('config_validation_schema', ObjectsContainer.config_validation_error)
-pid_schema = api.schema('server.pid', ObjectsContainer.pid_object)
-raw_config_schema = api.schema('raw_config', ObjectsContainer.raw_config_object)
-version_schema = api.schema('server.version', ObjectsContainer.version_object)
-dump_threads_schema = api.schema('server.dump_threads', ObjectsContainer.dump_threads_object)
+
+yaml_error_schema = api.schema_model('yaml_error_schema', ObjectsContainer.yaml_error_response)
+config_validation_schema = api.schema_model('config_validation_schema', ObjectsContainer.config_validation_error)
+pid_schema = api.schema_model('server.pid', ObjectsContainer.pid_object)
+raw_config_schema = api.schema_model('raw_config', ObjectsContainer.raw_config_object)
+version_schema = api.schema_model('server.version', ObjectsContainer.version_object)
+dump_threads_schema = api.schema_model('server.dump_threads', ObjectsContainer.dump_threads_object)
+server_manage_schema = api.schema_model('server.manage', ObjectsContainer.server_manage)
 
 
-@server_api.route('/reload/')
+@server_api.route('/manage/')
 class ServerReloadAPI(APIResource):
+    @api.validate(server_manage_schema)
     @api.response(501, model=yaml_error_schema, description='YAML syntax error')
     @api.response(502, model=config_validation_schema, description='Config validation error')
-    @api.response(200, model=base_message_schema, description='Newly reloaded config')
-    def get(self, session=None):
-        """ Reload Flexget config """
-        log.info('Reloading config from disk.')
-        try:
-            self.manager.load_config(output_to_console=False)
-        except YAMLError as e:
-            if hasattr(e, 'problem') and hasattr(e, 'context_mark') and hasattr(e, 'problem_mark'):
-                error = {}
-                if e.problem is not None:
-                    error.update({'reason': e.problem})
-                if e.context_mark is not None:
-                    error.update({'line': e.context_mark.line, 'column': e.context_mark.column})
-                if e.problem_mark is not None:
-                    error.update({'line': e.problem_mark.line, 'column': e.problem_mark.column})
-                raise APIError(message='Invalid YAML syntax', payload=error)
-        except ValueError as e:
-            errors = []
-            for er in e.errors:
-                errors.append({'error': er.message,
-                               'config_path': er.json_pointer})
-            raise APIError('Error loading config: %s' % e.args[0], payload={'errors': errors})
-        return success_response('Config successfully reloaded from disk')
+    @api.response(200, model=base_message_schema)
+    def post(self, session=None):
+        """ Manage server operations """
+        data = request.json
+        if data['operation'] == 'reload':
+            try:
+                self.manager.load_config(output_to_console=False)
+            except YAMLError as e:
+                if hasattr(e, 'problem') and hasattr(e, 'context_mark') and hasattr(e, 'problem_mark'):
+                    error = {}
+                    if e.problem is not None:
+                        error.update({'reason': e.problem})
+                    if e.context_mark is not None:
+                        error.update({'line': e.context_mark.line, 'column': e.context_mark.column})
+                    if e.problem_mark is not None:
+                        error.update({'line': e.problem_mark.line, 'column': e.problem_mark.column})
+                    raise APIError(message='Invalid YAML syntax', payload=error)
+            except ValueError as e:
+                errors = []
+                for er in e.errors:
+                    errors.append({'error': er.message,
+                                   'config_path': er.json_pointer})
+                raise APIError('Error loading config: %s' % e.args[0], payload={'errors': errors})
+            response = 'Config successfully reloaded from disk'
+        else:
+            self.manager.shutdown(data.get('force'))
+            response = 'Shutdown requested'
+        return success_response(response)
 
 
 @server_api.route('/pid/')
@@ -131,21 +148,6 @@ class ServerPIDAPI(APIResource):
     def get(self, session=None):
         """ Get server PID """
         return jsonify({'pid': os.getpid()})
-
-
-shutdown_parser = api.parser()
-shutdown_parser.add_argument('force', type=inputs.boolean, default=False, help='Ignore tasks in the queue')
-
-
-@server_api.route('/shutdown/')
-class ServerShutdownAPI(APIResource):
-    @api.doc(parser=shutdown_parser)
-    @api.response(200, model=base_message_schema, description='Shutdown requested')
-    def get(self, session=None):
-        """ Shutdown Flexget Daemon """
-        args = shutdown_parser.parse_args()
-        self.manager.shutdown(args['force'])
-        return success_response('Shutdown requested')
 
 
 @server_api.route('/config/')

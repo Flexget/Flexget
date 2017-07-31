@@ -63,7 +63,7 @@ class ObjectsContainer(object):
 
 description = 'Either title, TMDB ID or IMDB ID are required for a lookup'
 
-return_schema = api.schema('tmdb_search_schema', ObjectsContainer.movie_object)
+return_schema = api.schema_model('tmdb_search_schema', ObjectsContainer.movie_object)
 
 tmdb_parser = api.parser()
 tmdb_parser.add_argument('title', help='Movie title')

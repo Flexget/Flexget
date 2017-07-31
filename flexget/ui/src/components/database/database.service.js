@@ -27,20 +27,25 @@
         }
 
         function cleanup() {
-            return $http.get('/api/database/cleanup/')
+            return $http.post('/api/database/', {
+                operation: 'cleanup'
+            })
                 .then(callSucceeded)
                 .catch(callFailed);
         }
 
         function vacuum() {
-            return $http.get('/api/database/vacuum/')
+            return $http.post('/api/database/', {
+                operation: 'vacuum'
+            })
                 .then(callSucceeded)
                 .catch(callFailed);
         }
 
         function resetPlugin(params) {
-            return $http.get('/api/database/reset_plugin', {
-                params: params
+            return $http.post('/api/database/', {
+                operation: 'plugin_reset',
+                plugin_name: params
             })
                 .then(callSucceeded)
                 .catch(callFailed);

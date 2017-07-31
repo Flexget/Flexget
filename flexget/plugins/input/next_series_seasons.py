@@ -31,7 +31,8 @@ class NextSeriesSeasons(object):
                 'type': 'object',
                 'properties': {
                     'from_start': {'type': 'boolean', 'default': False},
-                    'backfill': {'type': 'boolean', 'default': False}
+                    'backfill': {'type': 'boolean', 'default': False},
+                    'threshold': {'type': 'integer', 'minimum': 0}
                 },
                 'additionalProperties': False
             }
@@ -81,6 +82,8 @@ class NextSeriesSeasons(object):
         else:
             self.rerun_entries = []
 
+        threshold = config.get('threshold')
+
         entries = []
         impossible = {}
         with Session() as session:
@@ -121,7 +124,7 @@ class NextSeriesSeasons(object):
                     latest_season - series.begin.season > MAX_SEASON_DIFF_WITH_BEGIN):
                     if series.begin:
                         log.error('Series `%s` has a begin episode set (`%s`), but the season currently being processed '
-                                  '(%s) is %s seasons later than it. To prevent emitting incorrect seasons, this ' 
+                                  '(%s) is %s seasons later than it. To prevent emitting incorrect seasons, this '
                                   'series will not emit unless the begin episode is adjusted to a season that is less '
                                   'than %s seasons from season %s.', series.name, series.begin.identifier, latest_season,
                                   (latest_season - series.begin.season), MAX_SEASON_DIFF_WITH_BEGIN, latest_season)
@@ -134,6 +137,9 @@ class NextSeriesSeasons(object):
                 for season in range(latest_season, low_season, -1):
                     if season in series.completed_seasons:
                         log.debug('season %s is marked as completed, skipping', season)
+                        continue
+                    if threshold is not None and series.episodes_for_season(season) > threshold:
+                        log.debug('season %s has met threshold of threshold of %s, skipping', season, threshold)
                         continue
                     log.trace('Evaluating season %s for series `%s`', season, series.name)
                     latest = get_latest_release(series, season=season, downloaded=check_downloaded)

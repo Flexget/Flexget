@@ -86,37 +86,15 @@ class TestParseFilesize(object):
 
 
 class TestSplitYearTitle(object):
-    def test_split_year_title_no_year(self):
-        movie = 'The Matrix'
-        expected = 'The Matrix', None
-        assert split_title_year(movie) == expected
-
-    def test_split_year_title_year(self):
-        movie = 'The Matrix 1999'
-        expected = 'The Matrix', 1999
-        assert split_title_year(movie) == expected
-
-    def test_split_year_title_year_parenthesis(self):
-        movie = 'The Matrix (1999)'
-        expected = 'The Matrix', 1999
-        assert split_title_year(movie) == expected
-
-    def test_split_year_title_year_colon(self):
-        movie = 'The Matrix - 1999'
-        expected = 'The Matrix -', 1999
-        assert split_title_year(movie) == expected
-
-    def test_split_year_title_year_scene(self):
-        movie = 'The.Matrix.1999'
-        expected = 'The.Matrix.', 1999
-        assert split_title_year(movie) == expected
-
-    def test_split_year_title_parenthesis_no_year(self):
-        movie = 'The Human Centipede III (Final Sequence)'
-        expected = 'The Human Centipede III (Final Sequence)', None
-        assert split_title_year(movie) == expected
-
-    def test_split_year_title_parenthesis_and_year(self):
-        movie = 'The Human Centipede III (Final Sequence) (2015)'
-        expected = 'The Human Centipede III (Final Sequence)', 2015
-        assert split_title_year(movie) == expected
+    @pytest.mark.parametrize('title, expected_title, expected_year', [
+        ('The Matrix', 'The Matrix', None),
+        ('The Matrix 1999', 'The Matrix', 1999),
+        ('The Matrix (1999)', 'The Matrix', 1999),
+        ('The Matrix - 1999', 'The Matrix -', 1999),
+        ('The.Matrix.1999', 'The.Matrix.', 1999),
+        ('The Human Centipede III (Final Sequence)', 'The Human Centipede III (Final Sequence)', None),
+        ('The Human Centipede III (Final Sequence) (2015)', 'The Human Centipede III (Final Sequence)', 2015),
+        ('2020', '2020', None)
+    ])
+    def test_split_year_title(self, title, expected_title, expected_year):
+        assert split_title_year(title) == (expected_title, expected_year)

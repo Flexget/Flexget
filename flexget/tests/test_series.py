@@ -1556,10 +1556,10 @@ class TestBegin(object):
 
     def test_season_id(self, execute_task):
         task = execute_task('season_id_test')
-        assert task.find_entry('accepted', title='WTest.S02E03.HDTV.XViD-FlexGet'), 'Entry should have been ' \
-               'accepted, it\'s after the begin episode'
-        assert task.find_entry('rejected', title='W2Test.S02E03.HDTV.XViD-FlexGet'), 'Entry should have been ' \
-               'rejected, it\'s before the begin episode'
+        assert task.find_entry('accepted', title='WTest.S02E03.HDTV.XViD-FlexGet'), \
+            'Entry should have been accepted, it\'s after the begin episode'
+        assert task.find_entry('rejected', title='W2Test.S02E03.HDTV.XViD-FlexGet'), \
+            'Entry should have been rejected, it\'s before the begin episode'
 
     def test_before_ep(self, execute_task):
         task = execute_task('before_ep_test')
@@ -1902,6 +1902,13 @@ class TestSpecials(object):
             series:
             - the show:
                 assume_special: False
+                
+          special_looks_like_season_pack:
+            mock:
+            - title: Doctor.Who.S07.Special.The.Science.of.Doctor.Who.WS.XviD-Flexget
+            series:
+            - Doctor Who
+            
     """
 
     def test_prefer_specials(self, execute_task):
@@ -1929,6 +1936,14 @@ class TestSpecials(object):
         entry = task.find_entry(title='the show SOMETHING')
         assert entry.get('series_id_type') != 'special', 'Entry which should not have been flagged as a special was.'
         assert not entry.accepted, 'Entry which should not have been accepted was.'
+
+    def test_special_looks_like_a_season_pack(self, execute_task):
+        """Make sure special episodes are not being parsed as season packs"""
+        task = execute_task('special_looks_like_season_pack')
+        entry = task.find_entry(title='Doctor.Who.S07.Special.The.Science.of.Doctor.Who.WS.XviD-Flexget')
+        assert entry.get('series_id_type') == 'special', 'Entry should have been flagged as a special'
+        assert not entry['season_pack'], 'Entry should not have been flagged as a season pack'
+        assert entry.accepted, 'Entry which should not have been accepted was.'
 
 
 class TestAlternateNames(object):

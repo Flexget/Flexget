@@ -9,7 +9,7 @@ vcrpy~=1.11.1  # requests 2.16.3 doesn't work with vcrpy <1.11.1
 virtualenv==15.1.0
 boto3==1.4.4
 wheel==0.29.0
-pytest>=2.7,!=3.0.2
+pytest>=3.,!=3.0.2
 pytest-capturelog==0.7
 pytest-xdist==1.16.0
 pytest-runner==2.11.1
