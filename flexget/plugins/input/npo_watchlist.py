@@ -207,10 +207,10 @@ class NPOWatchlist(object):
 
     def _get_favorites_entries(self, task, config, page):
         max_age = config.get('max_episode_age_days')
-        if max_age < 3:
-            return self._get_recent_entries(task, config, page)
-        elif max_age >= 3:
+        if max_age >= 3:
             log.warning('If max_episode_age_days is 3 days or more, the plugin will still check all series')
+        elif max_age > -1:
+            return self._get_recent_entries(task, config, page)
         
         series = page.find('div', attrs={'id': 'component-grid-favourite-series'})
 
