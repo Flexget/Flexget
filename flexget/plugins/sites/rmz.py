@@ -76,7 +76,7 @@ class UrlRewriteRmz(object):
         except Exception as e:
             raise UrlRewritingError(str(e))
         link_elements = soup.find_all('pre', class_='links')
-        if entry['urls']:
+        if 'urls' in entry:
             urls = list(entry['urls'])
         else:
             urls = []
