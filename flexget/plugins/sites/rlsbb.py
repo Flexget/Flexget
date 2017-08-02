@@ -116,8 +116,9 @@ class UrlRewriteRlsbb(object):
         for regexp in self.config.get('link_text_re'):
             link_elements.extend(soup.find_all('a', string=re.compile(regexp)))
         log.debug('Original urls: %s', str(entry['urls']))
-        if entry['urls']:
+        if 'urls' in entry:
             urls = list(entry['urls'])
+            log.debug('Original urls: %s', str(entry['urls']))
         else:
             urls = []
         log.debug('Found link elements: %s', str(link_elements))
@@ -159,7 +160,6 @@ class UrlRewriteRlsbb(object):
         else:
             log.debug('No filehoster filters configured, using all found links.')
         num_links = len(urls)
-        log.debug('Original urls: %s', str(entry['urls']))
         log.verbose('Found %d links at %s.', num_links, entry['url'])
         if num_links:
             entry['urls'] = urls
