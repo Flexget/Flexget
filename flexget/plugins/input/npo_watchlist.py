@@ -73,10 +73,10 @@ class NPOWatchlist(object):
         if 'isAuthenticatedUser' in requests.cookies:
             log.debug('Already logged in')
             return
-    
+
         login_url = 'https://www.npo.nl/login'
         login_api_url = 'https://www.npo.nl/api/login'
-        
+
         login_response = requests.get(login_url)
         if login_response.url != login_url:
             raise plugin.PluginError('Unexpected login page: {}'.format(login_response.url))
@@ -101,7 +101,7 @@ class NPOWatchlist(object):
 
     def _get_page(self, task, config, url):
         self._login(task, config)
-            
+
         page_response = requests.get(url)
         if page_response.url != url:
             raise plugin.PluginError('Unexpected page: {} (expected {})'.format(page_response.url, url))
@@ -117,31 +117,32 @@ class NPOWatchlist(object):
         log.info('Retrieving series info for %s', episode_name)
         response = requests.get(episode_url)
         page = get_soup(response.content)
-        
+
         series_url = page.find('a', class_='npo-episode-header-program-info')['href']
-        
+
         if series_url not in self._series_info:
             response = requests.get(series_url)
             page = get_soup(response.content)
-            
+
             series_info = self._parse_series_info(task, config, page, series_url)
             self._series_info[series_url] = series_info
-        
+
         return self._series_info[series_url]
-        
+
     def _parse_series_info(self, task, config, page, series_url):
         tvseries = page.find('section', class_='npo-header-episode-meta')
         series_info = Entry()  # create a stub to store the common values for all episodes of this series
         series_info['npo_url'] = series_url
         series_info['npo_name'] = tvseries.find('h1').text
         series_info['npo_description'] = tvseries.find('div', id='metaContent').find('p').text
+        series_info['npo_language'] = 'nl'  # hard-code the language as if in NL, for loookup plugins
         return series_info
 
     def _get_series_episodes(self, task, config, series_name, series_url):
         log.info('Retrieving new episodes for %s', series_name)
         response = requests.get(series_url)
         page = get_soup(response.content)
-        
+
         series_info = self._parse_series_info(task, config, page, series_url)
         episodes = page.find('div', id='component-grid-episodes')
         entries = self._parse_tiles(task, config, episodes, series_info)
@@ -150,17 +151,17 @@ class NPOWatchlist(object):
             log.warning('No episodes found for %s', series_name)
 
         return entries
-        
+
     def _parse_tiles(self, task, config, tiles, series_info = None):
         max_age = config.get('max_episode_age_days')
         entries = list()
-        
+
         for list_item in tiles.findAll('div', class_='npo-asset-tile-container'):
             url = list_item.find('a')['href']
             episode_name = next(list_item.find('h2').stripped_strings)
             timer = next(list_item.find('div', class_='npo-asset-tile-timer').stripped_strings)
             remove_url = list_item.find('div', class_='npo-asset-tile-delete')
-            
+
             episode_id = url.split('/')[-1]
             title = '{} ({})'.format(episode_name, episode_id)
 
@@ -171,18 +172,18 @@ class NPOWatchlist(object):
 
             entry_date = url.split('/')[4]
             entry_date = self._parse_date(entry_date)
-            
+
             if max_age >= 0 and (date.today() - entry_date) > timedelta(days=max_age):
                 log.debug('Skipping %s, aired on %s', title, entry_date)
                 continue
-                
+
             if not series_info:
                 tile_series_info = self._get_series_info(task, config, episode_name, url)
             else:
                 tile_series_info = series_info
-                
+
             series_name = tile_series_info['npo_name']
-            
+
             e = Entry()
             e['url'] = url
             e['title'] = title
@@ -193,8 +194,10 @@ class NPOWatchlist(object):
             e['npo_url'] = tile_series_info['npo_url']
             e['npo_name'] = tile_series_info['npo_name']
             e['npo_description'] = tile_series_info['npo_description']
+            e['npo_language'] = tile_series_info['npo_language']
             e['npo_runtime'] = timer.strip('min').strip()
-            
+            e['language'] = tile_series_info['npo_language']
+
             if remove_url and remove_url['data-link']:
                 e['remove_url'] = remove_url['data-link']
 
@@ -211,34 +214,34 @@ class NPOWatchlist(object):
             log.warning('If max_episode_age_days is 3 days or more, the plugin will still check all series')
         elif max_age > -1:
             return self._get_recent_entries(task, config, page)
-        
+
         series = page.find('div', attrs={'id': 'component-grid-favourite-series'})
 
         entries = list()
         for list_item in series.findAll('div', class_='npo-ankeiler-tile-container'):
             url = list_item.find('a')['href']
             series_name = next(list_item.find('h2').stripped_strings)
-            
+
             entries += self._get_series_episodes(task, config, series_name, url)
-    
+
         return entries
-        
+
     def _get_recent_entries(self, task, config, page):
         max_age = config.get('max_episode_age_days')
-        
+
         episodes = page.find('div', id='grid-favourite-episodes-today')
         entries = self._parse_tiles(task, config, episodes)
-        
+
         if max_age >= 1:
             episodes = page.find('div', id='grid-favourite-episodes-yesterday')
             entries += self._parse_tiles(task, config, episodes)
-        
+
         if max_age >= 2:
             episodes = page.find('div', id='grid-favourite-episodes-day-before-yesterday')
             entries += self._parse_tiles(task, config, episodes)
-        
+
         return entries
-    
+
 
     def on_task_input(self, task, config):
         email = config.get('email')
@@ -274,7 +277,7 @@ class NPOWatchlist(object):
             except HTTPError as error:
                 log.error('Failed to remove %s, got status %s', e['title'], error.response.status_code)
             else:
-                if delete_response.status_code != 200:
+                if delete_response.status_code != requests.codes.ok:
                     log.warning('Failed to remove %s, got status %s', e['title'], delete_response.status_code)
 
 
