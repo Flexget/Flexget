@@ -20,6 +20,7 @@ class TestNpoWatchlistInfo(object):
               password: 'Fl3xg3t'
     """
 
+    @pytest.mark.skip(reason='npo.nl deleted all accounts, test account needs to be recreated')
     def test_npostd_lookup(self, execute_task):
         """npo_watchlist: Test npostd lookup (ONLINE)"""
 
@@ -61,6 +62,7 @@ class TestNpoWatchlistLanguageTheTVDBLookup(object):
             thetvdb_lookup: yes
     """
 
+    @pytest.mark.skip(reason='npo.nl deleted all accounts, test account needs to be recreated')
     def test_tvdblang_lookup(self, execute_task):
         """npo_watchlist: Test npo tvdb language lookup (ONLINE)"""
 
