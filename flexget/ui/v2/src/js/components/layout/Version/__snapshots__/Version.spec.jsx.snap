@@ -42,7 +42,7 @@ exports[`components/layout/Version renders correctly without latest version 1`] 
     2.10.11
      
     <a
-      className="MuiButtonBase-root-c MuiIconButton-root-3"
+      className="MuiButtonBase-root-12 MuiIconButton-root-3"
       href="https://flexget.com/ChangeLog"
       onBlur={[Function]}
       onFocus={[Function]}
@@ -60,11 +60,11 @@ exports[`components/layout/Version renders correctly without latest version 1`] 
       >
         <span
           aria-hidden="true"
-          className="material-icons MuiIcon-root-e MuiIconButton-icon-a fa fa-question-circle-o Version-version-1"
+          className="material-icons MuiIcon-root-14 MuiIconButton-icon-10 fa fa-question-circle-o Version-version-1"
         />
       </span>
       <span
-        className="MuiTouchRipple-root-l"
+        className="MuiTouchRipple-root-21"
       />
     </a>
      

@@ -6,7 +6,6 @@ Array [
     "error": true,
     "payload": Object {
       "message": "Unauthorized",
-      "namespace": "TEST",
       "statusCode": 401,
       "type": "ACTION",
     },
@@ -20,7 +19,6 @@ Array [
   Object {
     "payload": Object {
       "message": "A message",
-      "namespace": "TEST",
       "type": "ACTION",
     },
     "type": "INFO_STATUS",
@@ -28,9 +26,7 @@ Array [
   Object {
     "error": false,
     "meta": Object {
-      "ignore": false,
       "message": "A message",
-      "namespace": "TEST",
     },
     "payload": Object {},
     "type": "ACTION",
@@ -42,7 +38,6 @@ exports[`middleware/status should dispatch LOADING_STATUS if loading 1`] = `
 Array [
   Object {
     "payload": Object {
-      "namespace": "TEST",
       "type": "ACTION",
     },
     "type": "LOADING_STATUS",
@@ -54,13 +49,12 @@ exports[`middleware/status should not dispatch ERROR_STATUS if error and ignore 
 Array [
   Object {
     "error": true,
-    "meta": Object {
-      "ignore": true,
-      "message": undefined,
-      "namespace": "TEST",
+    "payload": Object {
+      "message": "Unauthorized",
+      "statusCode": 401,
+      "type": "ACTION",
     },
-    "payload": [Error: Unauthorized],
-    "type": "ACTION",
+    "type": "ERROR_STATUS",
   },
 ]
 `;

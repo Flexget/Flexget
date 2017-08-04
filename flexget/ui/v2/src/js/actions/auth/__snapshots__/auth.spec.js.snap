@@ -7,12 +7,10 @@ Array [
   Object {
     "error": false,
     "meta": Object {
-      "ignore": false,
       "message": undefined,
-      "namespace": "AUTH",
     },
     "payload": undefined,
-    "type": "LOGIN",
+    "type": "@flexget/auth/LOGIN",
   },
 ]
 `;
@@ -20,21 +18,18 @@ Array [
 exports[`actions/auth login dispatches the correct actions on successful login 1`] = `
 Array [
   Object {
-    "meta": Object {
-      "loading": true,
-      "namespace": "AUTH",
+    "payload": Object {
+      "type": "@flexget/auth/LOGIN",
     },
-    "type": "LOGIN",
+    "type": "LOADING_STATUS",
   },
   Object {
     "error": false,
     "meta": Object {
-      "ignore": false,
       "message": undefined,
-      "namespace": "AUTH",
     },
     "payload": undefined,
-    "type": "LOGIN",
+    "type": "@flexget/auth/LOGIN",
   },
 ]
 `;
@@ -42,21 +37,18 @@ Array [
 exports[`actions/auth login dispatches the correct actions on unsuccessful login 1`] = `
 Array [
   Object {
-    "meta": Object {
-      "loading": true,
-      "namespace": "AUTH",
+    "payload": Object {
+      "type": "@flexget/auth/LOGIN",
     },
-    "type": "LOGIN",
+    "type": "LOADING_STATUS",
   },
   Object {
     "error": true,
     "meta": Object {
-      "ignore": false,
       "message": undefined,
-      "namespace": "AUTH",
     },
     "payload": [Error],
-    "type": "LOGIN",
+    "type": "@flexget/auth/LOGIN",
   },
 ]
 `;
@@ -64,21 +56,18 @@ Array [
 exports[`actions/auth logout dispatches the correct actions on succesful logout 1`] = `
 Array [
   Object {
-    "meta": Object {
-      "loading": true,
-      "namespace": "AUTH",
+    "payload": Object {
+      "type": "@flexget/auth/LOGOUT",
     },
-    "type": "LOGOUT",
+    "type": "LOADING_STATUS",
   },
   Object {
     "error": false,
     "meta": Object {
-      "ignore": false,
       "message": undefined,
-      "namespace": "AUTH",
     },
     "payload": undefined,
-    "type": "LOGOUT",
+    "type": "@flexget/auth/LOGOUT",
   },
 ]
 `;
@@ -86,21 +75,18 @@ Array [
 exports[`actions/auth logout dispatches the correct actions on unsuccesful logout 1`] = `
 Array [
   Object {
-    "meta": Object {
-      "loading": true,
-      "namespace": "AUTH",
+    "payload": Object {
+      "type": "@flexget/auth/LOGOUT",
     },
-    "type": "LOGOUT",
+    "type": "LOADING_STATUS",
   },
   Object {
     "error": true,
     "meta": Object {
-      "ignore": false,
       "message": undefined,
-      "namespace": "AUTH",
     },
     "payload": [Error],
-    "type": "LOGOUT",
+    "type": "@flexget/auth/LOGOUT",
   },
 ]
 `;

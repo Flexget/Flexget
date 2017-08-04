@@ -1,12 +1,9 @@
-import * as utils from 'utils/actions';
+import { createAction, loading } from 'utils/actions';
 import { get, post } from 'utils/fetch';
 
-export const AUTH = 'AUTH';
-export const LOGIN = 'LOGIN';
-export const LOGOUT = 'LOGOUT';
-
-export const createAction = utils.createAction(AUTH);
-export const loading = utils.createLoading(AUTH);
+const PREFIX = '@flexget/auth/';
+export const LOGIN = `${PREFIX}LOGIN`;
+export const LOGOUT = `${PREFIX}LOGOUT`;
 
 export function checkLogin() {
   return dispatch => get('/server/version')

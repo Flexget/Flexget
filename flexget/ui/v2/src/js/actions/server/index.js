@@ -1,18 +1,16 @@
-import * as utils from 'utils/actions';
+import { createAction, loading } from 'utils/actions';
 import { post } from 'utils/fetch';
 
-export const SERVER = 'SERVER';
-export const SERVER_RELOAD = 'SERVER_RELOAD';
-export const SERVER_SHUTDOWN = 'SERVER_SHUTDOWN';
+const PREFIX = '@flexget/server/';
+export const SERVER_RELOAD = `${PREFIX}SERVER_RELOAD`;
+export const SERVER_SHUTDOWN = `${PREFIX}SERVER_SHUTDOWN`;
 
-const createAction = utils.createAction(SERVER);
-const loading = utils.createLoading(SERVER);
 
 function manageServer(action, operation) {
   return (dispatch) => {
     dispatch(loading(action));
     return post('/server/manage', { operation })
-      .then(({ message }) => dispatch(createAction(action, {}, { message })))
+      .then(({ data }) => dispatch(createAction(action, {}, { message: data.message })))
       .catch(err => dispatch(createAction(action, err)));
   };
 }

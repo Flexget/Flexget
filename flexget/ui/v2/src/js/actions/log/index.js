@@ -1,15 +1,13 @@
 import oboe from 'oboe';
-import * as utils from 'utils/actions';
+import { createAction } from 'utils/actions';
 
-export const LOG = 'LOG';
-export const LOG_START = 'LOG_START';
-export const LOG_MESSAGE = 'LOG_MESSAGE';
-export const LOG_DISCONNECT = 'LOG_DISCONNECT';
-export const LOG_LINES = 'LOG_LINES';
-export const LOG_QUERY = 'LOG_QUERY';
-export const LOG_CLEAR = 'LOG_CLEAR';
-
-const createAction = utils.createAction(LOG);
+const PREFIX = '@flexget/log/';
+export const LOG_START = `${PREFIX}LOG_START`;
+export const LOG_MESSAGE = `${PREFIX}LOG_MESSAGE`;
+export const LOG_DISCONNECT = `${PREFIX}LOG_DISCONNECT`;
+export const LOG_LINES = `${PREFIX}LOG_LINES`;
+export const LOG_QUERY = `${PREFIX}LOG_QUERY`;
+export const LOG_CLEAR = `${PREFIX}LOG_CLEAR`;
 
 export function startLogStream() {
   return (dispatch, getState) => {
@@ -47,3 +45,4 @@ export function setQuery(query) {
 export function clearLogs() {
   return createAction(LOG_CLEAR);
 }
+

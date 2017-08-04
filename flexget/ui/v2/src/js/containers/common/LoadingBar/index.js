@@ -1,10 +1,9 @@
 import { connect } from 'react-redux';
 import LoadingBar from 'components/common/LoadingBar';
 
-export function mapStateToProps({ status }, { types } = {}) {
-  const namespaces = Object.values(status.loading);
+export function mapStateToProps({ status }, { prefix = '@flexget' } = {}) {
   return {
-    loading: !!(types ? types.find(type => namespaces.includes(type)) : namespaces.length !== 0),
+    loading: !!(Object.keys(status.loading).find(type => type.startsWith(prefix))),
   };
 }
 

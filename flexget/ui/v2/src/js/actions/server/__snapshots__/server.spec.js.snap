@@ -3,21 +3,18 @@
 exports[`actions/server reloadServer dispatches the correct action on successful server reload 1`] = `
 Array [
   Object {
-    "meta": Object {
-      "loading": true,
-      "namespace": "SERVER",
+    "payload": Object {
+      "type": "@flexget/server/SERVER_RELOAD",
     },
-    "type": "SERVER_RELOAD",
+    "type": "LOADING_STATUS",
   },
   Object {
     "error": true,
     "meta": Object {
-      "ignore": false,
       "message": undefined,
-      "namespace": "SERVER",
     },
     "payload": [FetchError: invalid json response body at /api/server/manage reason: Unexpected end of JSON input],
-    "type": "SERVER_RELOAD",
+    "type": "@flexget/server/SERVER_RELOAD",
   },
 ]
 `;
@@ -25,21 +22,18 @@ Array [
 exports[`actions/server reloadServer dispatches the correct action on unsuccessful server reload 1`] = `
 Array [
   Object {
-    "meta": Object {
-      "loading": true,
-      "namespace": "SERVER",
+    "payload": Object {
+      "type": "@flexget/server/SERVER_RELOAD",
     },
-    "type": "SERVER_RELOAD",
+    "type": "LOADING_STATUS",
   },
   Object {
     "error": true,
     "meta": Object {
-      "ignore": false,
       "message": undefined,
-      "namespace": "SERVER",
     },
     "payload": [Error: error],
-    "type": "SERVER_RELOAD",
+    "type": "@flexget/server/SERVER_RELOAD",
   },
 ]
 `;
@@ -47,21 +41,18 @@ Array [
 exports[`actions/server shutdownServer dispatches the correct action on successful server shutdown 1`] = `
 Array [
   Object {
-    "meta": Object {
-      "loading": true,
-      "namespace": "SERVER",
+    "payload": Object {
+      "type": "@flexget/server/SERVER_SHUTDOWN",
     },
-    "type": "SERVER_SHUTDOWN",
+    "type": "LOADING_STATUS",
   },
   Object {
     "error": true,
     "meta": Object {
-      "ignore": false,
       "message": undefined,
-      "namespace": "SERVER",
     },
     "payload": [FetchError: invalid json response body at /api/server/manage reason: Unexpected end of JSON input],
-    "type": "SERVER_SHUTDOWN",
+    "type": "@flexget/server/SERVER_SHUTDOWN",
   },
 ]
 `;
@@ -69,21 +60,18 @@ Array [
 exports[`actions/server shutdownServer dispatches the correct action on unsuccessful server shutdown 1`] = `
 Array [
   Object {
-    "meta": Object {
-      "loading": true,
-      "namespace": "SERVER",
+    "payload": Object {
+      "type": "@flexget/server/SERVER_SHUTDOWN",
     },
-    "type": "SERVER_SHUTDOWN",
+    "type": "LOADING_STATUS",
   },
   Object {
     "error": true,
     "meta": Object {
-      "ignore": false,
       "message": undefined,
-      "namespace": "SERVER",
     },
     "payload": [Error: error],
-    "type": "SERVER_SHUTDOWN",
+    "type": "@flexget/server/SERVER_SHUTDOWN",
   },
 ]
 `;

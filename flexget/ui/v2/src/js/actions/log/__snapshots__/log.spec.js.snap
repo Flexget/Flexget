@@ -5,12 +5,10 @@ Array [
   Object {
     "error": false,
     "meta": Object {
-      "ignore": false,
       "message": undefined,
-      "namespace": "LOG",
     },
     "payload": undefined,
-    "type": "LOG_CLEAR",
+    "type": "@flexget/log/LOG_CLEAR",
   },
 ]
 `;
@@ -20,12 +18,10 @@ Array [
   Object {
     "error": false,
     "meta": Object {
-      "ignore": false,
       "message": undefined,
-      "namespace": "LOG",
     },
     "payload": 400,
-    "type": "LOG_LINES",
+    "type": "@flexget/log/LOG_LINES",
   },
 ]
 `;
@@ -35,12 +31,10 @@ Array [
   Object {
     "error": false,
     "meta": Object {
-      "ignore": false,
       "message": undefined,
-      "namespace": "LOG",
     },
     "payload": 400,
-    "type": "LOG_QUERY",
+    "type": "@flexget/log/LOG_QUERY",
   },
 ]
 `;

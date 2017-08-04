@@ -1,17 +1,14 @@
-import * as utils from 'utils/actions';
+import { createAction, loading } from 'utils/actions';
 import { get } from 'utils/fetch';
 
-export const VERSION = 'VERSION';
-export const GET_VERSION = 'GET_VERSION';
-
-const createAction = utils.createAction(VERSION);
-const loading = utils.createLoading(VERSION);
+const PREFIX = '@flexget/version/';
+export const GET_VERSION = `${PREFIX}GET_VERSION`;
 
 export function getVersion() {
   return (dispatch) => {
     dispatch(loading(GET_VERSION));
     return get('/server/version')
-      .then(version => dispatch(createAction(GET_VERSION, version)))
+      .then(({ data }) => dispatch(createAction(GET_VERSION, data)))
       .catch(err => dispatch(createAction(GET_VERSION, err)));
   };
 }

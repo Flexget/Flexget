@@ -15,7 +15,7 @@ Object {
   "error": null,
   "info": null,
   "loading": Object {
-    "TEST": "NAMESPACE",
+    "TEST": true,
   },
 }
 `;
@@ -25,7 +25,7 @@ Object {
   "error": null,
   "info": null,
   "loading": Object {
-    "OTHER": "NAMESPACE",
+    "OTHER": true,
     "TEST": "NAMESPACE",
   },
 }

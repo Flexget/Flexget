@@ -1,21 +1,19 @@
-export const createAction = namespace => (type, payload, {
-  ignore = false,
+import { LOADING_STATUS } from 'actions/status';
+
+export const createAction = (type, payload, {
   message,
 } = {}) => ({
   type,
   payload,
   error: (payload instanceof Error),
   meta: {
-    ignore,
     message,
-    namespace,
   },
 });
 
-export const createLoading = namespace => type => ({
-  type,
-  meta: {
-    namespace,
-    loading: true,
+export const loading = type => ({
+  type: LOADING_STATUS,
+  payload: {
+    type,
   },
 });

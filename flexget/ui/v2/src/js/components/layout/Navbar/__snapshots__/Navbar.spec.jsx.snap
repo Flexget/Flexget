@@ -2,13 +2,13 @@
 
 exports[`components/layout/Navbar renders correctly 1`] = `
 <header
-  className="MuiPaper-root-8 MuiPaper-shadow4-e MuiAppBar-root-1 MuiAppBar-positionFixed-2 MuiAppBar-colorPrimary-6 mui-fixed"
+  className="MuiPaper-root-8 MuiPaper-shadow4-14 MuiAppBar-root-1 MuiAppBar-positionFixed-2 MuiAppBar-colorPrimary-6 mui-fixed"
 >
   <div
-    className="MuiToolbar-root-z MuiToolbar-gutters-10"
+    className="MuiToolbar-root-35 MuiToolbar-gutters-36"
   >
     <button
-      className="MuiButtonBase-root-1a MuiIconButton-root-11"
+      className="MuiButtonBase-root-46 MuiIconButton-root-37"
       disabled={false}
       onBlur={[Function]}
       onClick={[Function]}
@@ -25,15 +25,15 @@ exports[`components/layout/Navbar renders correctly 1`] = `
       type="button"
     >
       <span
-        className="MuiIconButton-label-17"
+        className="MuiIconButton-label-43"
       >
         <span
           aria-hidden="true"
-          className="material-icons MuiIcon-root-1c MuiIconButton-icon-18 fa fa-bars"
+          className="material-icons MuiIcon-root-48 MuiIconButton-icon-44 fa fa-bars"
         />
       </span>
       <span
-        className="MuiTouchRipple-root-1j"
+        className="MuiTouchRipple-root-55"
       />
     </button>
     <div
@@ -45,7 +45,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
     >
       <button
         aria-label="Config"
-        className="MuiButtonBase-root-1a MuiIconButton-root-11"
+        className="MuiButtonBase-root-46 MuiIconButton-root-37"
         disabled={false}
         onBlur={[Function]}
         onFocus={[Function]}
@@ -61,15 +61,15 @@ exports[`components/layout/Navbar renders correctly 1`] = `
         type="button"
       >
         <span
-          className="MuiIconButton-label-17"
+          className="MuiIconButton-label-43"
         >
           <span
             aria-hidden="true"
-            className="material-icons MuiIcon-root-1c MuiIconButton-icon-18 fa fa-pencil"
+            className="material-icons MuiIcon-root-48 MuiIconButton-icon-44 fa fa-pencil"
           />
         </span>
         <span
-          className="MuiTouchRipple-root-1j"
+          className="MuiTouchRipple-root-55"
         />
       </button>
     </a>
@@ -79,7 +79,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
     >
       <button
         aria-label="Log"
-        className="MuiButtonBase-root-1a MuiIconButton-root-11"
+        className="MuiButtonBase-root-46 MuiIconButton-root-37"
         disabled={false}
         onBlur={[Function]}
         onFocus={[Function]}
@@ -95,21 +95,21 @@ exports[`components/layout/Navbar renders correctly 1`] = `
         type="button"
       >
         <span
-          className="MuiIconButton-label-17"
+          className="MuiIconButton-label-43"
         >
           <span
             aria-hidden="true"
-            className="material-icons MuiIcon-root-1c MuiIconButton-icon-18 fa fa-file-text-o"
+            className="material-icons MuiIcon-root-48 MuiIconButton-icon-44 fa fa-file-text-o"
           />
         </span>
         <span
-          className="MuiTouchRipple-root-1j"
+          className="MuiTouchRipple-root-55"
         />
       </button>
     </a>
     <button
       aria-label="Manage"
-      className="MuiButtonBase-root-1a MuiIconButton-root-11"
+      className="MuiButtonBase-root-46 MuiIconButton-root-37"
       disabled={false}
       onBlur={[Function]}
       onClick={[Function]}
@@ -126,15 +126,15 @@ exports[`components/layout/Navbar renders correctly 1`] = `
       type="button"
     >
       <span
-        className="MuiIconButton-label-17"
+        className="MuiIconButton-label-43"
       >
         <span
           aria-hidden="true"
-          className="material-icons MuiIcon-root-1c MuiIconButton-icon-18 fa fa-cog"
+          className="material-icons MuiIcon-root-48 MuiIconButton-icon-44 fa fa-cog"
         />
       </span>
       <span
-        className="MuiTouchRipple-root-1j"
+        className="MuiTouchRipple-root-55"
       />
     </button>
   </div>

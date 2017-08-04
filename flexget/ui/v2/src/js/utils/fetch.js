@@ -1,7 +1,7 @@
 function status(response) {
   return response.json().then((data) => {
     if (response.status >= 200 && response.status < 300) {
-      return data;
+      return { data, headers: response.headers };
     }
     const err = new Error(data.message);
     err.status = response.status;

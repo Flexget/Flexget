@@ -22,7 +22,7 @@ export default (state = initState, action) => {
         ...state,
         loading: {
           ...state.loading,
-          [action.payload.type]: action.payload.namespace,
+          [action.payload.type]: true,
         },
       };
     case ERROR_STATUS:
