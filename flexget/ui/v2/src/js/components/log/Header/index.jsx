@@ -66,7 +66,7 @@ class Header extends Component {
     this.stop();
   }
 
-  start = () => (this.stream = this.props.start())
+  start = () => { this.stream = this.props.start(); }
   stop = () => this.stream && this.stream.abort()
   reload = () => {
     this.stop();
