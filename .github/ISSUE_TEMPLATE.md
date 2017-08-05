@@ -21,7 +21,7 @@ Please don't just say "it doesn't crash" or "it works". Explain what the expecte
 
 #### Config:
 ```
-paste relevant config
+paste FULL config and remove any personal info
 use paste service like http://dpaste.de or http://pastebin.com if config is too long
 ```
   

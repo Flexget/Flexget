@@ -14,6 +14,7 @@ from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.utils.tools import parse_timedelta
 
 SCHEMA_VER = 3
+FAIL_LIMIT = 100
 
 log = logging.getLogger('failed')
 Base = db_schema.versioned_base('failed', SCHEMA_VER)
@@ -98,7 +99,10 @@ class PluginFailed(object):
                 "type": "object",
                 "properties": {
                     "retry_time": {"type": "string", "format": "interval", "default": "1 hour"},
-                    "max_retries": {"type": "integer", "minimum": 0, "default": 3},
+                    "max_retries": {"type": "integer",
+                                    "minimum": 0,
+                                    "maximum": FAIL_LIMIT,
+                                    "default": 3},
                     "retry_time_multiplier": {
                         # Allow turning off the retry multiplier with 'no' as well as 1
                         "oneOf": [{"type": "number", "minimum": 0}, {"type": "boolean"}],
@@ -160,13 +164,16 @@ class PluginFailed(object):
             if not item:
                 item = FailedEntry(entry['title'], entry['original_url'], reason)
                 item.count = 0
+            if item.count > FAIL_LIMIT:
+                log.error('entry with title \'%s\' has failed over %s times', entry['title'], FAIL_LIMIT)
+                return
             retry_time = self.retry_time(item.count, config)
             item.retry_time = datetime.now() + retry_time
             item.count += 1
             item.tof = datetime.now()
             item.reason = reason
             session.merge(item)
-            log.debug('Marking %s in failed list. Has failed %s times.' % (item.title, item.count))
+            log.debug('Marking %s in failed list. Has failed %s times.', item.title, item.count, )
             if self.backlog and item.count <= config['max_retries']:
                 self.backlog.instance.add_backlog(entry.task, entry, amount=retry_time, session=session)
             entry.task.rerun(plugin='retry_failed')

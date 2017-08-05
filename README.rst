@@ -1,25 +1,25 @@
 FlexGet
 =======
 .. image:: https://api.travis-ci.org/Flexget/Flexget.png?branch=master
-    :target: https://travis-ci.org/Flexget/Flexget
+:target: https://travis-ci.org/Flexget/Flexget
 
 .. image:: https://img.shields.io/pypi/v/Flexget.svg
-    :target: https://pypi.python.org/pypi/Flexget
+:target: https://pypi.python.org/pypi/Flexget
 
 .. image:: https://img.shields.io/pypi/dm/Flexget.svg
-    :target: https://pypi.python.org/pypi/Flexget
+:target: https://pypi.python.org/pypi/Flexget
 
 .. image:: https://api.codacy.com/project/badge/Grade/81e8ae42c7544dc48853102b1b7f88d5
-    :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Grade
+:target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Grade
 
 .. image:: https://api.codacy.com/project/badge/Coverage/81e8ae42c7544dc48853102b1b7f88d5
-    :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Coverage
+:target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Coverage
 
 .. image:: https://img.shields.io/gitter/room/nwjs/nw.js.svg
-    :target: https://gitter.im/Flexget/Flexget
+:target: https://gitter.im/Flexget/Flexget
 
 .. image:: http://isitmaintained.com/badge/resolution/Flexget/Flexget.svg
-    :target: http://isitmaintained.com/project/Flexget/Flexget
+:target: http://isitmaintained.com/project/Flexget/Flexget
 
 `FlexGet`_ is a multipurpose automation tool for content like torrents, nzbs,
 podcasts, comics, series, movies, etc. It can use different kinds of sources
@@ -115,11 +115,4 @@ You may place the config file in your checkout directory, or in ``~/.flexget``
 If you don't want to use virtualenv there's ``flexget_vanilla.py`` file which
 can be used to run FlexGet without virtualenv, note that you will need to
 install all required dependencies yourself.
-
-Install using Docker (Linux only)
----------------------------------
-
-Docker can be used to install and run FlexGet::
-
-    docker run -it -v /home/<username>/.flexget:/root/.flexget --rm toilal/flexget
 

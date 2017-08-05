@@ -318,7 +318,8 @@ class SeriesParser(TitleParser):
 
         if self.identified_by in ['ep', 'auto'] and not self.valid:
             season_pack_match = self.parse_season_packs(data_stripped)
-            if season_pack_match:
+            # If a title looks like a special, give it precendance over season pack
+            if season_pack_match and not self.special:
                 if self.strict_name:
                     if season_pack_match['match'].start() > 1:
                         return

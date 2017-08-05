@@ -39,6 +39,9 @@ To get a sense of the many things that can be done with FlexGet you can take a l
 
 **Bugs:** https://github.com/Flexget/Flexget/issues
 
+### Feature requests
+[![Feature Requests](http://feathub.com/Flexget/Flexget?format=svg)](http://feathub.com/Flexget/Flexget)
+
 ## Base system requirements
 
 FlexGet requires Python v2.7, 3.3, 3.4, or 3.5. It *may* run on 3.6 but we do not support that version at this time.
@@ -58,8 +61,3 @@ Clone the repo with this command:
 
 Detailed instructions are available on [flexget.com](https://flexget.com/GitHubInstall).
 
-## Install using Docker 
-
-Docker can be used to install and run FlexGet:
-
-    docker run -it -v /home/<username>/.flexget:/root/.flexget --rm toilal/flexget

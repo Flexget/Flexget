@@ -1310,7 +1310,10 @@ class FilterSeriesBase(object):
                      'properties': {
                          'threshold': {'type': 'integer', 'minimum': 0},
                          'reject_eps': {'type': 'boolean'}
-                     }}
+                     },
+                     'required': ['threshold', 'reject_eps'],
+                     'additionalProperties': False
+                     }
                 ]}
             },
             'additionalProperties': False
