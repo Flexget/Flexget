@@ -88,13 +88,10 @@ class NPOWatchlist(object):
             email = config.get('email')
             password = config.get('password')
 
-            try:
-                profile_response = requests.post(login_api_url,
-                                                 {'_token': token,
-                                                  'username': email,
-                                                  'password': password})
-            except RequestException as e:
-                raise plugin.PluginError('Request error: %s' % e.args[0])
+            profile_response = requests.post(login_api_url,
+                                             {'_token': token,
+                                              'username': email,
+                                              'password': password})
 
             if 'isAuthenticatedUser' not in profile_response.cookies:
                 raise plugin.PluginError('Failed to login. Check username and password.')
