@@ -77,36 +77,41 @@ class NPOWatchlist(object):
         login_url = 'https://www.npo.nl/login'
         login_api_url = 'https://www.npo.nl/api/login'
 
-        login_response = requests.get(login_url)
-        if login_response.url != login_url:
-            raise plugin.PluginError('Unexpected login page: {}'.format(login_response.url))
-
-        login_page = get_soup(login_response.content)
-        token = login_page.find('input', attrs={'name': '_token'})['value']
-
-        email = config.get('email')
-        password = config.get('password')
-
         try:
-            profile_response = requests.post(login_api_url,
-                                                  {'_token': token,
-                                                   'username': email,
-                                                   'password': password})
+            login_response = requests.get(login_url)
+            if login_response.url != login_url:
+                raise plugin.PluginError('Unexpected login page: {}'.format(login_response.url))
+
+            login_page = get_soup(login_response.content)
+            token = login_page.find('input', attrs={'name': '_token'})['value']
+
+            email = config.get('email')
+            password = config.get('password')
+
+            try:
+                profile_response = requests.post(login_api_url,
+                                                      {'_token': token,
+                                                       'username': email,
+                                                       'password': password})
+            except RequestException as e:
+                raise plugin.PluginError('Request error: %s' % e.args[0])
+
+            if 'isAuthenticatedUser' not in profile_response.cookies:
+                raise plugin.PluginError('Failed to login. Check username and password.')
         except RequestException as e:
             raise plugin.PluginError('Request error: %s' % e.args[0])
-
-        if 'isAuthenticatedUser' not in profile_response.cookies:
-            raise plugin.PluginError('Failed to login. Check username and password.')
-
 
     def _get_page(self, task, config, url):
         self._login(task, config)
 
-        page_response = requests.get(url)
-        if page_response.url != url:
-            raise plugin.PluginError('Unexpected page: {} (expected {})'.format(page_response.url, url))
+        try:
+            page_response = requests.get(url)
+            if page_response.url != url:
+                raise plugin.PluginError('Unexpected page: {} (expected {})'.format(page_response.url, url))
 
-        return page_response
+            return page_response
+        except RequestException as e:
+            raise plugin.PluginError('Request error: %s' % e.args[0])
 
     def _get_watchlist_entries(self, task, config, page):
         watchlist = page.find('div', attrs={'id': 'component-grid-watchlist'})
@@ -115,19 +120,22 @@ class NPOWatchlist(object):
     _series_info = dict()
     def _get_series_info(self, task, config, episode_name, episode_url):
         log.info('Retrieving series info for %s', episode_name)
-        response = requests.get(episode_url)
-        page = get_soup(response.content)
-
-        series_url = page.find('a', class_='npo-episode-header-program-info')['href']
-
-        if series_url not in self._series_info:
-            response = requests.get(series_url)
+        try:
+            response = requests.get(episode_url)
             page = get_soup(response.content)
 
-            series_info = self._parse_series_info(task, config, page, series_url)
-            self._series_info[series_url] = series_info
+            series_url = page.find('a', class_='npo-episode-header-program-info')['href']
 
-        return self._series_info[series_url]
+            if series_url not in self._series_info:
+                response = requests.get(series_url)
+                page = get_soup(response.content)
+
+                series_info = self._parse_series_info(task, config, page, series_url)
+                self._series_info[series_url] = series_info
+
+            return self._series_info[series_url]
+        except RequestException as e:
+            raise plugin.PluginError('Request error: %s' % e.args[0])
 
     def _parse_series_info(self, task, config, page, series_url):
         tvseries = page.find('section', class_='npo-header-episode-meta')
@@ -140,17 +148,20 @@ class NPOWatchlist(object):
 
     def _get_series_episodes(self, task, config, series_name, series_url):
         log.info('Retrieving new episodes for %s', series_name)
-        response = requests.get(series_url)
-        page = get_soup(response.content)
+        try:
+            response = requests.get(series_url)
+            page = get_soup(response.content)
 
-        series_info = self._parse_series_info(task, config, page, series_url)
-        episodes = page.find('div', id='component-grid-episodes')
-        entries = self._parse_tiles(task, config, episodes, series_info)
+            series_info = self._parse_series_info(task, config, page, series_url)
+            episodes = page.find('div', id='component-grid-episodes')
+            entries = self._parse_tiles(task, config, episodes, series_info)
 
-        if not entries:
-            log.warning('No episodes found for %s', series_name)
+            if not entries:
+                log.warning('No episodes found for %s', series_name)
 
-        return entries
+            return entries
+        except RequestException as e:
+            raise plugin.PluginError('Request error: %s' % e.args[0])
 
     def _parse_tiles(self, task, config, tiles, series_info = None):
         max_age = config.get('max_episode_age_days')
