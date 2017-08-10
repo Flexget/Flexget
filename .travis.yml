@@ -19,7 +19,7 @@ install:
   - pip install -r dev-requirements.txt
   - pip install -r dev-requirements-extras.txt
 # command to run tests, e.g. python setup.py test
-script: py.test --cov flexget --cov-report xml -n 3
+script: py.test --cov flexget --cov-report xml
 after_success:
   - python-codacy-coverage -r coverage.xml
 env: VCR_RECORD_MODE=none
