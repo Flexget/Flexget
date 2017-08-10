@@ -90,9 +90,9 @@ class NPOWatchlist(object):
 
             try:
                 profile_response = requests.post(login_api_url,
-                                                      {'_token': token,
-                                                       'username': email,
-                                                       'password': password})
+                                                 {'_token': token,
+                                                  'username': email,
+                                                  'password': password})
             except RequestException as e:
                 raise plugin.PluginError('Request error: %s' % e.args[0])
 
@@ -118,6 +118,7 @@ class NPOWatchlist(object):
         return self._parse_tiles(task, config, watchlist)
 
     _series_info = dict()
+
     def _get_series_info(self, task, config, episode_name, episode_url):
         log.info('Retrieving series info for %s', episode_name)
         try:
@@ -163,7 +164,7 @@ class NPOWatchlist(object):
         except RequestException as e:
             raise plugin.PluginError('Request error: %s' % e.args[0])
 
-    def _parse_tiles(self, task, config, tiles, series_info = None):
+    def _parse_tiles(self, task, config, tiles, series_info=None):
         max_age = config.get('max_episode_age_days')
         entries = list()
 
@@ -252,7 +253,6 @@ class NPOWatchlist(object):
             entries += self._parse_tiles(task, config, episodes)
 
         return entries
-
 
     def on_task_input(self, task, config):
         email = config.get('email')
