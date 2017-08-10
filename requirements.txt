@@ -9,7 +9,7 @@ apscheduler==3.3.1
 babelfish==0.5.5          # via guessit
 beautifulsoup4==4.6.0
 certifi==2017.4.17        # via requests
-chardet==3.0.3            # via requests
+chardet==3.0.4            # via requests
 cheroot==5.5.0            # via cherrypy
 cherrypy==10.2.2
 click==6.7                # via flask
@@ -22,7 +22,7 @@ flask-restful==0.3.6
 flask-restplus==0.10.1
 flask==0.12.2
 future==0.16.0
-guessit==2.0.4
+guessit==2.1.4
 html5lib==0.999999999
 idna==2.5                 # via requests
 itsdangerous==0.24        # via flask
