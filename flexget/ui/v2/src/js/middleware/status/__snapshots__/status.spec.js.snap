@@ -37,9 +37,10 @@ Array [
 exports[`middleware/status should dispatch LOADING_STATUS if loading 1`] = `
 Array [
   Object {
-    "payload": Object {
+    "meta": Object {
       "type": "ACTION",
     },
+    "payload": Object {},
     "type": "LOADING_STATUS",
   },
 ]

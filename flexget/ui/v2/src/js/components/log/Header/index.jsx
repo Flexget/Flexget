@@ -44,37 +44,39 @@ const ENTER_KEY = 13;
 class Header extends Component {
   static propTypes = {
     start: PropTypes.func.isRequired,
+    stop: PropTypes.func.isRequired,
     connected: PropTypes.bool.isRequired,
     classes: PropTypes.object.isRequired,
-    setQuery: PropTypes.func.isRequired,
-    query: PropTypes.string.isRequired,
     clearLogs: PropTypes.func.isRequired,
-    lines: PropTypes.string.isRequired,
-    setLines: PropTypes.func.isRequired,
   };
 
   state = {
     open: false,
+    lines: '200',
+    query: '',
   };
 
 
   componentDidMount() {
-    this.start();
+    this.reload();
   }
 
   componentWillUnmount() {
-    this.stop();
+    this.props.stop();
   }
 
-  start = () => { this.stream = this.props.start(); }
-  stop = () => this.stream && this.stream.abort()
   reload = () => {
-    this.stop();
-    this.start();
+    const { connected, start, stop } = this.props;
+    const { lines, query } = this.state;
+
+    if (connected) {
+      stop();
+    }
+    start({ lines, query });
   }
   clearLogs = () => this.props.clearLogs()
-  handleLines = event => this.props.setLines(event.target.value)
-  handleQuery = event => this.props.setQuery(event.target.value)
+  handleLines = event => this.setState({ lines: event.target.value })
+  handleQuery = event => this.setState({ query: event.target.value })
   handleKeyPress = event => event.which === ENTER_KEY && this.reload()
   handleRequestClose = () => this.setState({
     open: false,
@@ -87,8 +89,8 @@ class Header extends Component {
   })
 
   render() {
-    const { connected, classes, query, lines } = this.props;
-    const { anchorEl, open } = this.state;
+    const { connected, classes, stop } = this.props;
+    const { anchorEl, open, query, lines } = this.state;
     const helperText = 'Supports operators and, or, (), and "str"';
 
     return (
@@ -139,7 +141,7 @@ class Header extends Component {
             <Icon className={`${classes.menuIcon} fa fa-eraser`} />
             Clear
           </MenuItem>
-          <MenuItem onClick={connected ? this.stop : this.start}>
+          <MenuItem onClick={connected ? stop : this.reload}>
             <Icon className={
               classNames(classes.menuIcon, 'fa', {
                 'fa-play': !connected,

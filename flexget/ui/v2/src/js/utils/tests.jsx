@@ -3,10 +3,9 @@ import { MuiThemeProvider } from 'material-ui/styles';
 import { MemoryRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
 import theme from 'theme';
 
-const mockStore = configureMockStore([thunk]);
+const mockStore = configureMockStore();
 
 export function themed(component) {
   return (

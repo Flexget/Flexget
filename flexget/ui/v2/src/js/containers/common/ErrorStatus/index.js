@@ -5,7 +5,7 @@ import { clearStatus } from 'actions/status';
 export function mapStateToProps({ status }) {
   return {
     open: !!status.error,
-    message: status.error,
+    message: status.error && status.error.message,
   };
 }
 

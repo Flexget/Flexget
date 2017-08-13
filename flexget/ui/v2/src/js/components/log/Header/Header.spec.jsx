@@ -9,11 +9,10 @@ describe('components/log/Header', () => {
       themed(<Header
         start={jest.fn()}
         connected
-        setQuery={jest.fn()}
+        stop={jest.fn()}
         query=""
-        clearLogs={jest.fn()}
         lines="400"
-        setLines={jest.fn()}
+        clearLogs={jest.fn()}
       />)
     ).toJSON();
     expect(tree).toMatchSnapshot();

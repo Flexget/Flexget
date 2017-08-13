@@ -36,5 +36,6 @@ module.exports = {
     }],
     'import/no-named-as-default': 'off',
     'react/no-array-index-key': 'off',
+    'no-constant-condition': 'off',
   }
 };

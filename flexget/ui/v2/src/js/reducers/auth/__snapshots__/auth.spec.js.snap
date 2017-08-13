@@ -1,5 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`reducers/auth should login on GET_VERSION 1`] = `
+Object {
+  "loggedIn": true,
+}
+`;
+
 exports[`reducers/auth should login on LOGIN 1`] = `
 Object {
   "loggedIn": true,

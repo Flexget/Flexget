@@ -2,7 +2,7 @@
 
 exports[`containers/common/ErrorStatus should be correct if an error status should be displayed 1`] = `
 Object {
-  "message": "Error Status",
+  "message": undefined,
   "open": true,
 }
 `;

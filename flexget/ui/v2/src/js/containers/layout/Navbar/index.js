@@ -1,13 +1,14 @@
 import { connect } from 'react-redux';
-import { logout } from 'actions/auth';
-import { reloadServer, shutdownServer } from 'actions/server';
+import { LOGOUT } from 'actions/auth';
+import { SERVER_RELOAD, SERVER_SHUTDOWN } from 'actions/server';
+import { request } from 'utils/actions';
 import Navbar from 'components/layout/Navbar';
 
 function mapDispatchToProps(dispatch) {
   return {
-    logout: () => dispatch(logout()),
-    reloadServer: () => dispatch(reloadServer()),
-    shutdownServer: () => dispatch(shutdownServer()),
+    logout: () => dispatch(request(LOGOUT)),
+    reloadServer: () => dispatch(request(SERVER_RELOAD)),
+    shutdownServer: () => dispatch(request(SERVER_SHUTDOWN)),
   };
 }
 

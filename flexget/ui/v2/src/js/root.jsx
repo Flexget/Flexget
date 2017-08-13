@@ -1,5 +1,5 @@
 import React from 'react';
-import store from 'store';
+import createStore from 'store';
 import history from 'history';
 import { Provider } from 'react-redux';
 import { Route, Switch } from 'react-router-dom';
@@ -7,7 +7,7 @@ import { ConnectedRouter } from 'connected-react-router';
 import { MuiThemeProvider, withStyles, createStyleSheet } from 'material-ui/styles';
 import appTheme from 'theme';
 import PrivateRoute from 'containers/common/PrivateRoute';
-import Layout from 'containers/layout';
+import Layout from 'components/layout';
 import { createAsyncComponent } from 'utils/loading';
 
 
@@ -34,7 +34,7 @@ const Series = createAsyncComponent(() => import('components/series'));
 
 
 const Root = () => (
-  <Provider store={store}>
+  <Provider store={createStore()}>
     <ConnectedRouter history={history}>
       <MuiThemeProvider theme={appTheme}>
         <Wrapper>

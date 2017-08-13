@@ -8,7 +8,6 @@ import { LOCATION_CHANGE } from 'connected-react-router';
 import reducer from 'reducers/status';
 
 const TEST = 'TEST';
-const NAMESPACE = 'NAMESPACE';
 
 describe('reducers/status', () => {
   it('should return the initial state', () => {
@@ -23,9 +22,8 @@ describe('reducers/status', () => {
     it('should set loading status when initially empty', () => {
       expect(reducer(undefined, {
         type: LOADING_STATUS,
-        payload: {
+        meta: {
           type: TEST,
-          namespace: NAMESPACE,
         },
       })).toMatchSnapshot();
     });
@@ -33,30 +31,28 @@ describe('reducers/status', () => {
     it('should set loading status when not empty', () => {
       expect(reducer({
         loading: {
-          TEST: NAMESPACE,
+          TEST: true,
         },
         error: null,
         info: null,
       }, {
         type: LOADING_STATUS,
-        payload: {
+        meta: {
           type: 'OTHER',
-          namespace: NAMESPACE,
         },
       })).toMatchSnapshot();
     });
     it('should not change if already loading that action', () => {
       expect(reducer({
         loading: {
-          TEST: NAMESPACE,
+          TEST: true,
         },
         error: null,
         info: null,
       }, {
         type: LOADING_STATUS,
-        payload: {
+        meta: {
           type: TEST,
-          namespace: NAMESPACE,
         },
       })).toMatchSnapshot();
     });
@@ -91,7 +87,7 @@ describe('reducers/status', () => {
   it('should handle loding done', () => {
     expect(reducer({
       loading: {
-        TEST: NAMESPACE,
+        TEST: true,
       },
       error: null,
       info: null,

@@ -60,8 +60,6 @@ class Layout extends Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     classes: PropTypes.object.isRequired,
-    loggedIn: PropTypes.bool,
-    checkLogin: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -71,13 +69,6 @@ class Layout extends Component {
   state = {
     sideBarOpen: false,
   };
-
-  componentDidMount() {
-    const { loggedIn, checkLogin } = this.props;
-    if (!loggedIn) {
-      checkLogin();
-    }
-  }
 
   toggleSideBar = () => {
     this.setState({

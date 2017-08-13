@@ -15,14 +15,11 @@ const initState = {
 export default (state = initState, action) => {
   switch (action.type) {
     case LOADING_STATUS:
-      if (state.loading[action.payload.type]) {
-        return state;
-      }
       return {
         ...state,
         loading: {
           ...state.loading,
-          [action.payload.type]: true,
+          [action.meta.type]: true,
         },
       };
     case ERROR_STATUS:
