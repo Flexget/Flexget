@@ -8,7 +8,7 @@ aniso8601==1.2.1          # via flask-restful, flask-restplus
 apscheduler==3.3.1
 babelfish==0.5.5          # via guessit
 beautifulsoup4==4.6.0
-certifi==2017.4.17        # via requests
+certifi==2017.7.27.1        # via requests
 chardet==3.0.3            # via requests
 cheroot==5.5.0            # via cherrypy
 cherrypy==10.2.2
