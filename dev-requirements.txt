@@ -1,6 +1,6 @@
 click
 sphinx
-pylint
+pylint==1.7.2
 coverage
 flake8
 mock
