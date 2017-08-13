@@ -10,7 +10,7 @@ virtualenv
 boto3
 wheel
 pytest>=3.0,!=3.0.2
-pytest-capturelog
+pytest-capturelog==0.7
 pytest-xdist==1.19.1
 pytest-runner
 pytest-cov==2.2.1
