@@ -2,7 +2,7 @@ click
 sphinx
 pylint
 coverage
-flake8
+flake8==3.4.1
 mock
 requests~=2.16.3
 vcrpy~=1.11.1  # requests 2.16.3 doesn't work with vcrpy <1.11.1
