@@ -11,10 +11,6 @@ module.exports = {
     node: true,
     'jest/globals': true,
   },
-  ecmaFeatures: {
-    jsx: true,
-    es6: true,
-  },
   settings: {
     'import/resolver': {
       webpack: {

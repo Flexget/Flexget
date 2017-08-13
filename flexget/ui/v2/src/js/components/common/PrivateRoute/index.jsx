@@ -6,16 +6,16 @@ const PrivateRoute = ({ component: Component, loggedIn, ...rest }) => (
   <Route
     {...rest}
     render={props => (
-    loggedIn ? (
-      <Component {...props} />
-    ) : (
-      <Redirect
-        to={{
-          pathname: '/login',
-          state: { from: props.location }, // eslint-disable-line react/prop-types
-        }}
-      />
-    )
+      loggedIn ? (
+        <Component {...props} />
+      ) : (
+        <Redirect
+          to={{
+            pathname: '/login',
+            state: { from: props.location }, // eslint-disable-line react/prop-types
+          }}
+        />
+      )
     )}
   />
 );

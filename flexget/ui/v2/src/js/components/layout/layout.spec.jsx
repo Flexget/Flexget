@@ -14,7 +14,7 @@ function renderLayout() {
 describe('components/layout', () => {
   beforeEach(() => {
     fetchMock
-        .get('/api/server/version', {});
+      .get('/api/server/version', {});
   });
 
   it('renders correctly', () => {

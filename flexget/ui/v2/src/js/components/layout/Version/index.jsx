@@ -37,10 +37,10 @@ class Version extends Component {
         <p className={classes.par}>Version Info</p>
         <p className={classes.par}>Flexget: { flexget } {
           latest && semver(latest, flexget) === 1 && (
-          <IconButton href="https://flexget.com/ChangeLog">
-            <Icon className={`fa fa-question-circle-o ${classes.version}`} />
-          </IconButton>
-        ) } </p>
+            <IconButton href="https://flexget.com/ChangeLog">
+              <Icon className={`fa fa-question-circle-o ${classes.version}`} />
+            </IconButton>
+          ) } </p>
         <p className={classes.par}>API: { api }</p>
       </div>
     );
