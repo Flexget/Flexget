@@ -36,7 +36,7 @@ portend==1.8              # via cherrypy
 pynzb==0.1.0
 pyparsing==2.2.0
 pyrss2gen==1.1
-python-dateutil==2.6.0
+python-dateutil==2.6.1
 pytz==2017.2              # via apscheduler, flask-restful, flask-restplus, tempora, tzlocal
 pyyaml==3.12
 rebulk==0.8.2
