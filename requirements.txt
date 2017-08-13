@@ -50,4 +50,4 @@ tzlocal==1.4              # via apscheduler
 urllib3==1.21.1           # via requests
 webencodings==0.5.1       # via html5lib
 werkzeug==0.12.2          # via flask
-zxcvbn-python==4.4.14
+zxcvbn-python==4.4.15
