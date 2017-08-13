@@ -1,7 +1,7 @@
 click
 sphinx
 pylint
-coverage
+coverage==4.4.1
 flake8
 mock
 requests~=2.16.3
