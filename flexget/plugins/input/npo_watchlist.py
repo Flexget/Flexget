@@ -165,55 +165,56 @@ class NPOWatchlist(object):
         max_age = config.get('max_episode_age_days')
         entries = list()
 
-        for list_item in tiles.findAll('div', class_='npo-asset-tile-container'):
-            url = list_item.find('a')['href']
-            episode_name = next(list_item.find('h2').stripped_strings)
-            timer = next(list_item.find('div', class_='npo-asset-tile-timer').stripped_strings)
-            remove_url = list_item.find('div', class_='npo-asset-tile-delete')
+        if tiles is not None:
+            for list_item in tiles.findAll('div', class_='npo-asset-tile-container'):
+                url = list_item.find('a')['href']
+                episode_name = next(list_item.find('h2').stripped_strings)
+                timer = next(list_item.find('div', class_='npo-asset-tile-timer').stripped_strings)
+                remove_url = list_item.find('div', class_='npo-asset-tile-delete')
 
-            episode_id = url.split('/')[-1]
-            title = '{} ({})'.format(episode_name, episode_id)
+                episode_id = url.split('/')[-1]
+                title = '{} ({})'.format(episode_name, episode_id)
 
-            not_available = list_item.find('div', class_='npo-asset-tile-availability')['data-to']
-            if not_available:
-                log.debug('Skipping %s, no longer available', title)
-                continue
+                not_available = list_item.find('div', class_='npo-asset-tile-availability')['data-to']
+                if not_available:
+                    log.debug('Skipping %s, no longer available', title)
+                    continue
 
-            entry_date = url.split('/')[4]
-            entry_date = self._parse_date(entry_date)
+                entry_date = url.split('/')[4]
+                entry_date = self._parse_date(entry_date)
 
-            if max_age >= 0 and (date.today() - entry_date) > timedelta(days=max_age):
-                log.debug('Skipping %s, aired on %s', title, entry_date)
-                continue
+                if max_age >= 0 and (date.today() - entry_date) > timedelta(days=max_age):
+                    log.debug('Skipping %s, aired on %s', title, entry_date)
+                    continue
 
-            if not series_info:
-                tile_series_info = self._get_series_info(task, config, episode_name, url)
-            else:
-                tile_series_info = series_info
+                if not series_info:
+                    tile_series_info = self._get_series_info(task, config, episode_name, url)
+                else:
+                    tile_series_info = series_info
 
-            series_name = tile_series_info['npo_name']
+                series_name = tile_series_info['npo_name']
 
-            e = Entry()
-            e['url'] = url
-            e['title'] = title
-            e['series_name'] = series_name
-            e['series_name_plain'] = self._convert_plain(series_name)
-            e['series_date'] = entry_date
-            e['series_id_type'] = 'date'
-            e['npo_url'] = tile_series_info['npo_url']
-            e['npo_name'] = tile_series_info['npo_name']
-            e['npo_description'] = tile_series_info['npo_description']
-            e['npo_language'] = tile_series_info['npo_language']
-            e['npo_runtime'] = timer.strip('min').strip()
-            e['language'] = tile_series_info['npo_language']
+                e = Entry()
+                e['url'] = url
+                e['title'] = title
+                e['series_name'] = series_name
+                e['series_name_plain'] = self._convert_plain(series_name)
+                e['series_date'] = entry_date
+                e['series_id_type'] = 'date'
+                e['npo_url'] = tile_series_info['npo_url']
+                e['npo_name'] = tile_series_info['npo_name']
+                e['npo_description'] = tile_series_info['npo_description']
+                e['npo_language'] = tile_series_info['npo_language']
+                e['npo_runtime'] = timer.strip('min').strip()
+                e['language'] = tile_series_info['npo_language']
 
-            if remove_url and remove_url['data-link']:
-                e['remove_url'] = remove_url['data-link']
+                if remove_url and remove_url['data-link']:
+                    e['remove_url'] = remove_url['data-link']
 
-                if config.get('remove_accepted'):
-                    e.on_complete(self.entry_complete, task=task)
+                    if config.get('remove_accepted'):
+                        e.on_complete(self.entry_complete, task=task)
 
-            entries.append(e)
+                entries.append(e)
 
         return entries
 
