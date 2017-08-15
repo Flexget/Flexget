@@ -40,7 +40,7 @@ python-dateutil==2.6.0
 pytz==2017.2              # via apscheduler, flask-restful, flask-restplus, tempora, tzlocal
 pyyaml==3.12
 rebulk==0.8.2
-requests==2.16.5
+requests==2.18.3
 rpyc==3.3.0
 six==1.10.0               # via apscheduler, cheroot, cherrypy, flask-cors, flask-restful, flask-restplus, html5lib, python-dateutil, rebulk, tempora
 sqlalchemy==1.1.10
