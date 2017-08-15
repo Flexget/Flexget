@@ -47,7 +47,7 @@ sqlalchemy==1.1.10
 tempora==1.7              # via portend
 terminaltables==3.1.0
 tzlocal==1.4              # via apscheduler
-urllib3==1.21.1           # via requests
+urllib3==1.22           # via requests
 webencodings==0.5.1       # via html5lib
 werkzeug==0.12.2          # via flask
 zxcvbn-python==4.4.15
