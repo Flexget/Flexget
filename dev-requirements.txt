@@ -12,7 +12,7 @@ wheel
 pytest>=3.0,!=3.0.2
 pytest-capturelog
 pytest-xdist==1.19.1
-pytest-runner
+pytest-runner==2.11.1
 pytest-cov==2.2.1
 gitpython
 codacy-coverage>=1.2.18
