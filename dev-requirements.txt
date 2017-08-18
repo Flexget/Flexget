@@ -8,7 +8,7 @@ requests~=2.16.3
 vcrpy~=1.11.1  # requests 2.16.3 doesn't work with vcrpy <1.11.1
 virtualenv
 boto3
-wheel
+wheel==0.29.0
 pytest>=3.0,!=3.0.2
 pytest-capturelog
 pytest-xdist==1.20.0
