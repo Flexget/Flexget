@@ -1,7 +1,7 @@
 sphinx==1.6.3
 click==6.7
 pylint
-coverage
+coverage==4.4.1
 flake8
 mock==2.0.0
 requests~=2.16.3
