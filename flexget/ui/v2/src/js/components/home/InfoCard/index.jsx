@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Card, { CardActions, CardContent, CardHeader } from 'material-ui/Card';
-import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
 import IconButton from 'material-ui/IconButton';
 import Icon from 'material-ui/Icon';
 import 'font-awesome/css/font-awesome.css';
 
-const styleSheet = createStyleSheet('InfoCard', theme => ({
+const styleSheet = theme => ({
   card: {
     margin: '0 auto',
     [theme.breakpoints.up('sm')]: {
@@ -22,7 +22,7 @@ const styleSheet = createStyleSheet('InfoCard', theme => ({
   cardActions: {
     justifyContent: 'center',
   },
-}));
+});
 
 const InfoCard = ({ classes }) => (
   <Card className={classes.card}>

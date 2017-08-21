@@ -1,4 +1,4 @@
-import { GET_SERIES } from 'actions/series/shows';
+import { GET_SHOWS } from 'actions/series/shows';
 
 const initState = {
   totalCount: 0,
@@ -7,10 +7,10 @@ const initState = {
 
 export default function reducer(state = initState, { type, payload }) {
   switch (type) {
-    case GET_SERIES:
+    case GET_SHOWS:
       return {
         totalCount: payload.headers.get('total-count'),
-        items: [...state.items, payload.data.items],
+        items: payload.data,
       };
     default:
       return state;

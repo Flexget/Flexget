@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames';
-import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
 import Button from 'material-ui/Button';
 import List, { ListItem } from 'material-ui/List';
 import Icon from 'material-ui/Icon';
@@ -10,19 +10,21 @@ import Paper from 'material-ui/Paper';
 import Version from 'containers/layout/Version';
 import 'font-awesome/css/font-awesome.css';
 
-const styleSheet = createStyleSheet('SideNav', theme => ({
+const styleSheet = theme => ({
   listWrapper: {
     backgroundColor: theme.palette.accent[900],
     transition: theme.transitions.create(['width', 'visibility']),
-    height: '100%',
-    width: 190,
+    height: 'auto',
+    width: '100vw',
     borderRadius: 0,
     display: 'flex',
     flex: {
       direction: 'column',
     },
     [theme.breakpoints.up('sm')]: {
+      height: 'calc(100% - 50px)',
       width: 190,
+      position: 'fixed',
     },
   },
   sideNavMini: {
@@ -37,9 +39,14 @@ const styleSheet = createStyleSheet('SideNav', theme => ({
     color: theme.palette.accent[200],
     flex: 1,
     textTransform: 'none',
+    visibility: 'visible',
+    opacity: 1,
+    transition: theme.transitions.create(['visibility', 'opacity']),
   },
   labelMini: {
-    display: 'none',
+    opacity: 0,
+    visibility: 'hidden',
+    width: 0,
   },
   icon: {
     color: theme.palette.accent[200],
@@ -71,7 +78,7 @@ const styleSheet = createStyleSheet('SideNav', theme => ({
   versionHide: {
     display: 'none',
   },
-}));
+});
 
 const sideNavItems = [
   {
@@ -130,13 +137,23 @@ class SideNav extends Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
     sideBarOpen: PropTypes.bool.isRequired,
+    toggle: PropTypes.func.isRequired,
   };
+
+  toggleOnMobile() {
+    if (
+      window.matchMedia &&
+      window.matchMedia('(max-width: 600px)').matches
+    ) {
+      this.props.toggle();
+    }
+  }
 
   renderNavItems() {
     const { classes, sideBarOpen } = this.props;
     return sideNavItems.map(({ link, icon, label }) => (
       <Link to={link} key={link}>
-        <ListItem className={classes.listItem}>
+        <ListItem className={classes.listItem} onClick={::this.toggleOnMobile}>
           <Button color="accent" className={classes.button}>
             <Icon className={classNames('fa', `fa-${icon}`, classes.icon)} />
             <p className={

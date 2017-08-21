@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
 import Header from 'containers/log/Header';
 import LogTable from 'containers/log/LogTable';
 
-const styleSheet = createStyleSheet('Log', theme => ({
+const styleSheet = theme => ({
   root: {
     padding: 24,
     display: 'flex',
@@ -22,7 +22,7 @@ const styleSheet = createStyleSheet('Log', theme => ({
       grow: 1,
     },
   },
-}));
+});
 
 const LogPage = ({ classes }) => (
   <Paper className={classes.root} elevation={4}>

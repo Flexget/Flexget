@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
 import { AutoSizer, Table, Column } from 'react-virtualized';
 import 'react-virtualized/styles.css';
 
-const styleSheet = createStyleSheet('LogTable', () => ({
+const styleSheet = () => ({
   table: {
     fontSize: 10,
   },
@@ -17,7 +17,7 @@ const styleSheet = createStyleSheet('LogTable', () => ({
   warning: {
     backgroundColor: '#fcf8e3',
   },
-}));
+});
 
 const LogTable = ({ messages, classes }) => (
   <AutoSizer>

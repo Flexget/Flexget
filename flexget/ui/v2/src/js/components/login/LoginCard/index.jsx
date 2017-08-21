@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 import Button from 'material-ui/Button';
 import Card, { CardActions, CardContent } from 'material-ui/Card';
-import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
 import TextField from 'components/common/TextField';
 
-const styleSheet = createStyleSheet('LoginCard', theme => ({
+const styleSheet = theme => ({
   card: {
     maxWidth: 400,
     margin: '0 10px',
@@ -31,7 +31,7 @@ const styleSheet = createStyleSheet('LoginCard', theme => ({
   field: {
     paddingBottom: 10,
   },
-}));
+});
 
 export const LoginCard = ({ classes, handleSubmit, errorStatus }) => (
   <Card className={classes.card}>

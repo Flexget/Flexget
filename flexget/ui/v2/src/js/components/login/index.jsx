@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Redirect } from 'react-router-dom';
 import headerImage from 'images/header.png';
-import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
 import LoginCard from 'containers/login/LoginCard';
 
-const styleSheet = createStyleSheet('LoginPage', theme => ({
+const styleSheet = theme => ({
   logo: {
     background: `transparent url(${headerImage}) no-repeat center`,
     minHeight: 90,
@@ -15,7 +15,7 @@ const styleSheet = createStyleSheet('LoginPage', theme => ({
       backgroundSize: 'auto',
     },
   },
-}));
+});
 
 const LoginPage = ({ classes, redirectToReferrer, location }) => {
   const { from } = location.state || { from: { pathname: '/' } };

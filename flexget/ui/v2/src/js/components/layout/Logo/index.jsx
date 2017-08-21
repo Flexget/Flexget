@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 import headerImage from 'images/header.png';
-import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
 
-const styleSheet = createStyleSheet('Logo', theme => ({
+const styleSheet = theme => ({
   logo: {
     background: `${theme.palette.accent[900]} url(${headerImage}) no-repeat center`,
     backgroundSize: 175,
@@ -21,7 +21,7 @@ const styleSheet = createStyleSheet('Logo', theme => ({
       width: 50,
     },
   },
-}));
+});
 
 const Logo = ({ classes, sideBarOpen }) => (
   <Link to="/">

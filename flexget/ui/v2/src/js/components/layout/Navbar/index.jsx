@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
@@ -16,7 +16,7 @@ import Dialog, {
 import Button from 'material-ui/Button';
 import 'font-awesome/css/font-awesome.css';
 
-const styleSheet = createStyleSheet('Navbar', theme => ({
+const styleSheet = theme => ({
   appBar: {
     position: 'static',
   },
@@ -33,7 +33,7 @@ const styleSheet = createStyleSheet('Navbar', theme => ({
   menuIcon: {
     paddingRight: 30,
   },
-}));
+});
 
 export class Navbar extends Component {
   static propTypes = {

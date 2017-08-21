@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
 import { LinearProgress } from 'material-ui/Progress';
 
-const styleSheet = createStyleSheet('LoadingBar', theme => ({
+const styleSheet = theme => ({
   root: {
     position: 'relative',
     overflow: 'hidden',
@@ -18,7 +18,7 @@ const styleSheet = createStyleSheet('LoadingBar', theme => ({
     transition: 'transform 0.2s linear',
     backgroundColor: theme.palette.accent[500],
   },
-}));
+});
 
 
 const LoadingBar = ({ loading, classes }) => {

@@ -8,19 +8,19 @@ exports[`components/login renders correctly when logged out 1`] = `
     className="LoginPage-logo-1"
   />
   <div
-    className="MuiPaper-root-8 MuiPaper-shadow2-12 MuiPaper-rounded-9 MuiCard-root-7 LoginCard-card-2"
+    className="MuiPaper-root-7 MuiPaper-shadow2-11 MuiPaper-rounded-8 LoginCard-card-2"
   >
     <form
       onSubmit={[Function]}
     >
       <div
-        className="MuiCardContent-root-35 LoginCard-cardContent-5"
+        className="MuiCardContent-root-34 LoginCard-cardContent-5"
       >
         <div
           className="LoginCard-error-3"
         />
         <div
-          className="MuiFormControl-root-36 LoginCard-field-6"
+          className="MuiFormControl-root-35 LoginCard-field-6"
           onBlur={[Function]}
           onChange={[Function]}
           onDragStart={[Function]}
@@ -29,19 +29,19 @@ exports[`components/login renders correctly when logged out 1`] = `
           required={false}
         >
           <label
-            className="MuiFormLabel-root-45 MuiInputLabel-root-40 MuiInputLabel-formControl-41 MuiInputLabel-animated-43"
+            className="MuiFormLabel-root-44 MuiInputLabel-root-39 MuiInputLabel-formControl-40 MuiInputLabel-animated-42"
             htmlFor="username"
           >
             Username
           </label>
           <div
-            className="MuiInput-root-49 MuiInput-formControl-50 MuiInput-inkbar-51 MuiInput-underline-57"
+            className="MuiInput-root-48 MuiInput-formControl-49 MuiInput-inkbar-50 MuiInput-underline-56"
           >
             <input
               aria-required={undefined}
               autoComplete={undefined}
               autoFocus={undefined}
-              className="MuiInput-input-53 MuiInput-inputSingleline-60"
+              className="MuiInput-input-52 MuiInput-inputSingleline-59"
               defaultValue={undefined}
               disabled={false}
               id="username"
@@ -59,7 +59,7 @@ exports[`components/login renders correctly when logged out 1`] = `
           </div>
         </div>
         <div
-          className="MuiFormControl-root-36 LoginCard-field-6"
+          className="MuiFormControl-root-35 LoginCard-field-6"
           onBlur={[Function]}
           onChange={[Function]}
           onDragStart={[Function]}
@@ -68,19 +68,19 @@ exports[`components/login renders correctly when logged out 1`] = `
           required={false}
         >
           <label
-            className="MuiFormLabel-root-45 MuiInputLabel-root-40 MuiInputLabel-formControl-41 MuiInputLabel-animated-43"
+            className="MuiFormLabel-root-44 MuiInputLabel-root-39 MuiInputLabel-formControl-40 MuiInputLabel-animated-42"
             htmlFor="password"
           >
             Password
           </label>
           <div
-            className="MuiInput-root-49 MuiInput-formControl-50 MuiInput-inkbar-51 MuiInput-underline-57"
+            className="MuiInput-root-48 MuiInput-formControl-49 MuiInput-inkbar-50 MuiInput-underline-56"
           >
             <input
               aria-required={undefined}
               autoComplete={undefined}
               autoFocus={undefined}
-              className="MuiInput-input-53 MuiInput-inputSingleline-60"
+              className="MuiInput-input-52 MuiInput-inputSingleline-59"
               defaultValue={undefined}
               disabled={false}
               id="password"
@@ -99,10 +99,10 @@ exports[`components/login renders correctly when logged out 1`] = `
         </div>
       </div>
       <div
-        className="MuiCardActions-root-63"
+        className="MuiCardActions-root-62"
       >
         <button
-          className="MuiButtonBase-root-79 MuiButton-root-65 LoginCard-button-4 MuiCardActions-actionSpacing-64"
+          className="MuiButtonBase-root-78 MuiButton-root-64 LoginCard-button-4 MuiCardActions-actionSpacing-63"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -118,12 +118,12 @@ exports[`components/login renders correctly when logged out 1`] = `
           type="submit"
         >
           <span
-            className="MuiButton-label-67"
+            className="MuiButton-label-66"
           >
             Login
           </span>
           <span
-            className="MuiTouchRipple-root-81"
+            className="MuiTouchRipple-root-80"
           />
         </button>
       </div>

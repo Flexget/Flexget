@@ -4,14 +4,14 @@ import history from 'history';
 import { Provider } from 'react-redux';
 import { Route, Switch } from 'react-router-dom';
 import { ConnectedRouter } from 'connected-react-router';
-import { MuiThemeProvider, withStyles, createStyleSheet } from 'material-ui/styles';
+import { MuiThemeProvider, withStyles } from 'material-ui/styles';
 import appTheme from 'theme';
 import PrivateRoute from 'containers/common/PrivateRoute';
 import Layout from 'components/layout';
 import { createAsyncComponent } from 'utils/loading';
 
 
-const styleSheet = createStyleSheet('Global', theme => ({
+const styleSheet = theme => ({
   '@global': {
     body: {
       height: '100%',
@@ -23,14 +23,14 @@ const styleSheet = createStyleSheet('Global', theme => ({
       textDecoration: 'none',
     },
   },
-}));
+});
 
 const Wrapper = withStyles(styleSheet)(({ children }) => <div>{children}</div>);
 
 const Home = createAsyncComponent(() => import('components/home'));
 const Log = createAsyncComponent(() => import('components/log'));
 const Login = createAsyncComponent(() => import('containers/login'));
-const Series = createAsyncComponent(() => import('components/series'));
+const Series = createAsyncComponent(() => import('containers/series'));
 
 
 const Root = () => (

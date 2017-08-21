@@ -2,7 +2,7 @@
 
 exports[`components/log/Header renders correctly 1`] = `
 <div
-  className="LogHeader-root-1"
+  className="Header-root-1"
 >
   <div>
     <h2
@@ -11,23 +11,23 @@ exports[`components/log/Header renders correctly 1`] = `
       Server Log
     </h2>
     <h3
-      className="MuiTypography-root-8 MuiTypography-subheading-15 LogHeader-grey-2"
+      className="MuiTypography-root-8 MuiTypography-subheading-15 Header-grey-2"
     >
       Streaming
     </h3>
   </div>
   <div
-    className="LogHeader-spacer-3"
+    className="Header-spacer-3"
   />
   <div
-    className="LogHeader-textFieldWrapper-4"
+    className="Header-textFieldWrapper-4"
   >
     <span
       aria-hidden="true"
-      className="material-icons MuiIcon-root-30 fa fa-filter LogHeader-grey-2"
+      className="material-icons MuiIcon-root-30 fa fa-filter Header-grey-2"
     />
     <div
-      className="MuiFormControl-root-37 LogHeader-input-5"
+      className="MuiFormControl-root-37 Header-input-5"
       onBlur={[Function]}
       onChange={[Function]}
       onFocus={[Function]}
@@ -71,7 +71,7 @@ exports[`components/log/Header renders correctly 1`] = `
     </div>
     <span
       aria-hidden="true"
-      className="material-icons MuiIcon-root-30 fa fa-ellipsis-v LogHeader-grey-2 LogHeader-pointer-7"
+      className="material-icons MuiIcon-root-30 fa fa-ellipsis-v Header-grey-2 Header-pointer-7"
       onClick={[Function]}
     />
   </div>

@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
 import Icon from 'material-ui/Icon';
 import Menu, { MenuItem } from 'material-ui/Menu';
 import TextField from 'material-ui/TextField';
 import Typography from 'material-ui/Typography';
 
-const styleSheet = createStyleSheet('LogHeader', theme => ({
+const styleSheet = theme => ({
   root: {
     display: 'block',
     [theme.breakpoints.up('sm')]: {
@@ -37,7 +37,7 @@ const styleSheet = createStyleSheet('LogHeader', theme => ({
   pointer: {
     cursor: 'pointer',
   },
-}));
+});
 
 const ENTER_KEY = 13;
 

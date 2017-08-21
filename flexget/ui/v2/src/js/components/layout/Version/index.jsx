@@ -3,17 +3,17 @@ import PropTypes from 'prop-types';
 import semver from 'semver-compare';
 import IconButton from 'material-ui/IconButton';
 import Icon from 'material-ui/Icon';
-import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
 import 'font-awesome/css/font-awesome.css';
 
-const styleSheet = createStyleSheet('Version', theme => ({
+const styleSheet = theme => ({
   version: {
     color: theme.palette.error[500],
   },
   par: {
     margin: 0,
   },
-}));
+});
 
 class Version extends Component {
   static propTypes = {

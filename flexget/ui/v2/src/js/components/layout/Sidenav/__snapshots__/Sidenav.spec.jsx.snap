@@ -14,6 +14,7 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
@@ -57,6 +58,7 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
@@ -100,6 +102,7 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
@@ -143,6 +146,7 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
@@ -186,6 +190,7 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
@@ -229,6 +234,7 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
@@ -272,6 +278,7 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
@@ -315,6 +322,7 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
@@ -358,6 +366,7 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
@@ -401,6 +410,7 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
@@ -480,6 +490,7 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
@@ -523,6 +534,7 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
@@ -566,6 +578,7 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
@@ -609,6 +622,7 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
@@ -652,6 +666,7 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
@@ -695,6 +710,7 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
@@ -738,6 +754,7 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
@@ -781,6 +798,7 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
@@ -824,6 +842,7 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
@@ -867,6 +886,7 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       <li
         className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
         disabled={false}
+        onClick={[Function]}
       >
         <button
           className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"

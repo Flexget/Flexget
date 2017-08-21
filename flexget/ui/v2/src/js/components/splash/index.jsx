@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import headerImage from 'images/header.png';
 import PropTypes from 'prop-types';
-import { withStyles, createStyleSheet } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
 import 'spinkit/css/spinkit.css';
 
-const styleSheet = createStyleSheet('Global', theme => ({
+const styleSheet = theme => ({
   '@global': {
     body: {
       height: '100%',
@@ -25,7 +25,7 @@ const styleSheet = createStyleSheet('Global', theme => ({
       backgroundSize: 'auto',
     },
   },
-}));
+});
 
 class SplashScreen extends Component {
   static propTypes = {
