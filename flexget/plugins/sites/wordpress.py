@@ -4,6 +4,7 @@ from future.moves.urllib.parse import urlencode
 
 import logging
 
+import re
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginWarning, PluginError
@@ -11,15 +12,9 @@ from requests import Session
 from requests import Request, RequestException
 from requests.utils import dict_from_cookiejar
 
+WORDPRESS_COOKIES = r'wordpress(?!_test)[A-z0-9]*'
+
 log = logging.getLogger('wordpress_auth')
-
-
-class WPLoginException(Exception):
-    def __init__(self, message=''):
-        self._message = message
-
-    def __str__(self):
-        return self._message
 
 
 class WPLoginHeaders(dict):
@@ -55,26 +50,35 @@ class WPLoginRequest(Request):
 class WPSession(Session):
     def __init__(self):
         super(WPSession, self).__init__()
+        self.max_redirects = 5
 
 
-def get_auth(session, prep_request):
+def get_cookies(session, prep_request):
+    # retrieve cookies
     try:
-        res = session.send(prep_request)
+        resp = session.send(prep_request)
     except RequestException as err:
         log.error('%s', err)
-        raise WPLoginException('Issue connecting to %s:' % (prep_request.url,))
-    if not res.ok:
-        log.error('%s', res)
-        raise WPLoginException('Issue connecting to %s: %s' % (prep_request.url, res))
+        raise PluginError('Issue connecting to %s' % (prep_request.url,))
+    if not resp.ok:
+        log.error('%s', resp)
+        raise PluginError('Issue connecting to %s: %s' % (prep_request.url, resp))
 
-    cookies = dict_from_cookiejar(res.cookies)
-    for h_res in res.history:
-        cookies.update(dict_from_cookiejar(h_res.cookies))
+    # collect cookies
+    cookies = dict_from_cookiejar(resp.cookies)
+    for h_resp in resp.history:
+        cookies.update(dict_from_cookiejar(h_resp.cookies))
+
+    # validate cookies
+    num_matches = sum([1 for key in cookies.keys() if re.match(WORDPRESS_COOKIES, key, re.IGNORECASE)])
+    if num_matches < 1:
+        log.warning('No recognized WordPress cookies found. Perhaps username/password is invalid?')
+        raise PluginWarning('No recognized WordPress cookies obtained')
 
     return cookies
 
 
-class PluginWordpress(object):
+class PluginWordPress(object):
     schema = {'type': 'object',
               'properties': {
                   'url': {'type': 'string', 'oneOf': [{'format': 'url'}]},
@@ -91,11 +95,11 @@ class PluginWordpress(object):
         username = config['username']
         password = config['password']
         try:
-            get_auth(WPSession(), WPLoginRequest(url, username=username, password=password).prepare())
-        except WPLoginException as err:
-            raise PluginError(str(err))
+            cookies = get_cookies(WPSession(), WPLoginRequest(url, username=username, password=password).prepare())
+        except Exception:
+            raise
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginWordpress, 'wordpress_auth', api_ver=2)
+    plugin.register(PluginWordPress, 'wordpress_auth', api_ver=2)
