@@ -32,6 +32,10 @@ def construct_wp_login_request(url, username='', password='', redirect='/wp-admi
     return Request(method='POST', url=url, headers=headers, data=urlencode(data).encode('UTF-8')).prepare()
 
 
+def match_wordpress_cookie(key):
+    return re.match(r'wordpress(?!_test)[A-z0-9]*', key, re.IGNORECASE)
+
+
 def send_request(session, prep_request, redirects=5):
     try:
         session.max_redirects = redirects
@@ -54,16 +58,9 @@ def collect_cookies_from_response(response):
     return cookies
 
 
-def _match_valid_wordpress_cookies(cookies):
-    def match(key):
-        return re.match(r'wordpress(?!_test)[A-z0-9]*', key, re.IGNORECASE)
-
-    return [{key, value} for key, value in cookies.items() if match(key)]
-
-
-def validate_cookies(cookies):
-    matches = _match_valid_wordpress_cookies(cookies)
-    if len(matches) < 1:
+def validate_cookies(cookies, matcher):
+    cnt_matches = sum([1 for key in cookies.keys() if matcher(key)])
+    if cnt_matches < 1:
         log.warning('No recognized WordPress cookies found. Perhaps username/password is invalid?')
 
 
@@ -96,7 +93,7 @@ class PluginWordPress(object):
 
         resp = send_request(Session(), construct_wp_login_request(url, username=username, password=password))
         cookies = collect_cookies_from_response(resp)
-        validate_cookies(cookies)
+        validate_cookies(cookies, match_wordpress_cookie)
         task.requests.add_cookiejar(cookiejar_from_dict(cookies))
 
 
