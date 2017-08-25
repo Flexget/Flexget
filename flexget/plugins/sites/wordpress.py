@@ -48,10 +48,13 @@ def _send_request(session, prep_request):
         response = session.send(prep_request)
     except RequestException as err:
         log.error('%s', err)
+        session.close()
         raise PluginError('Issue connecting to %s' % (prep_request.url,))
     if not response.ok:
         log.error('%s', response)
+        session.close()
         raise PluginError('Issue connecting to %s: %s' % (prep_request.url, response))
+    session.close()
     return response
 
 
