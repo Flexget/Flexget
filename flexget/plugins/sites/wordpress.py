@@ -15,7 +15,7 @@ from requests.utils import dict_from_cookiejar, cookiejar_from_dict
 log = logging.getLogger('wordpress_auth')
 
 
-def get_wp_login_request(url, username='', password='', redirect='/wp-admin/'):
+def construct_wp_login_request(url, username='', password='', redirect='/wp-admin/'):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) '
                       'Chrome/50.0.2661.102 Safari/537.36',
@@ -32,28 +32,22 @@ def get_wp_login_request(url, username='', password='', redirect='/wp-admin/'):
     return Request(method='POST', url=url, headers=headers, data=urlencode(data).encode('UTF-8')).prepare()
 
 
-def get_wp_login_session(redirects=5):
-    s = Session()
-    s.max_redirects = redirects
-    return s
-
-
-def _send_request(session, prep_request):
+def send_request(session, prep_request, redirects=5):
     try:
+        session.max_redirects = redirects
         response = session.send(prep_request)
+        if not response.ok:
+            log.error('%s', response)
+            raise PluginError('Issue connecting to %s: %s' % (prep_request.url, response))
+        session.close()
+        return response
     except RequestException as err:
+        session.close()
         log.error('%s', err)
-        session.close()
         raise PluginError('Issue connecting to %s' % (prep_request.url,))
-    if not response.ok:
-        log.error('%s', response)
-        session.close()
-        raise PluginError('Issue connecting to %s: %s' % (prep_request.url, response))
-    session.close()
-    return response
 
 
-def _collect_cookies_from_response(response):
+def collect_cookies_from_response(response):
     cookies = dict_from_cookiejar(response.cookies)
     for h_resp in response.history:
         cookies.update(dict_from_cookiejar(h_resp.cookies))
@@ -67,17 +61,10 @@ def _match_valid_wordpress_cookies(cookies):
     return [{key, value} for key, value in cookies.items() if match(key)]
 
 
-def _validate_cookies(cookies):
+def validate_cookies(cookies):
     matches = _match_valid_wordpress_cookies(cookies)
     if len(matches) < 1:
         log.warning('No recognized WordPress cookies found. Perhaps username/password is invalid?')
-
-
-def get_cookies(session, prep_request):
-    resp = _send_request(session, prep_request)
-    cookies = _collect_cookies_from_response(resp)
-    _validate_cookies(cookies)
-    return cookies
 
 
 class PluginWordPress(object):
@@ -106,7 +93,10 @@ class PluginWordPress(object):
         url = config['url']
         username = config['username']
         password = config['password']
-        cookies = get_cookies(get_wp_login_session(), get_wp_login_request(url, username=username, password=password))
+
+        resp = send_request(Session(), construct_wp_login_request(url, username=username, password=password))
+        cookies = collect_cookies_from_response(resp)
+        validate_cookies(cookies)
         task.requests.add_cookiejar(cookiejar_from_dict(cookies))
 
 
