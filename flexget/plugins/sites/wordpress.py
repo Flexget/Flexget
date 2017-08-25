@@ -12,8 +12,6 @@ from requests import Session
 from requests import Request, RequestException
 from requests.utils import dict_from_cookiejar, cookiejar_from_dict
 
-__author__ = 'transverberate'
-
 log = logging.getLogger('wordpress_auth')
 
 
@@ -93,6 +91,16 @@ def get_cookies(session, prep_request):
 
 
 class PluginWordPress(object):
+    """
+    Supports accessing feeds and media that require wordpress account credentials
+    Usage:
+
+    wordpress_auth:
+      url: 'your wordpress blog login page (ex http://example.org/wp-login.php)'
+      username: 'your username'
+      password: 'your password'
+    """
+
     schema = {'type': 'object',
               'properties': {
                   'url': {'type': 'string', 'oneOf': [{'format': 'url'}]},

@@ -6,13 +6,12 @@ import pytest
 
 from requests import RequestException
 from requests.utils import cookiejar_from_dict
-from http.cookiejar import CookieJar
+from requests.cookies import RequestsCookieJar
 
 from flexget.task import TaskAbort
 
 
 class TestWordPress(object):
-
     config = """
         tasks:
           test:
@@ -26,6 +25,7 @@ class TestWordPress(object):
         with pytest.raises(TaskAbort):
             def mocked_send(*args, **kwargs):
                 return mock.Mock(ok=False)
+
             monkeypatch.setattr('flexget.plugins.sites.wordpress.WPSession.send', mocked_send)
             execute_task('test')
 
@@ -51,11 +51,10 @@ class TestWordPress(object):
         valid_cookies = {'wordpress_logged_in_a32b6': '16a85284e4ee53f4933760b08b2bc82c', 'wordpress_sec': 'test_value'}
 
         def mocked_send(*args, **kwargs):
-            return mock.Mock(cookies=CookieJar(), history=[
+            return mock.Mock(cookies=RequestsCookieJar(), history=[
                 mock.Mock(cookies=cookiejar_from_dict(valid_cookies))
             ])
 
         monkeypatch.setattr('flexget.plugins.sites.wordpress.WPSession.send', mocked_send)
         task = execute_task('test')
         assert len(task.requests.cookies) > 0, 'No cookies found within response'
-
