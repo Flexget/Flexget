@@ -7,7 +7,7 @@ import logging
 import re
 from flexget import plugin
 from flexget.event import event
-from flexget.plugin import PluginWarning, PluginError
+from flexget.plugin import PluginError
 from requests import Session
 from requests import Request, RequestException
 from requests.utils import dict_from_cookiejar, cookiejar_from_dict
@@ -15,40 +15,32 @@ from requests.utils import dict_from_cookiejar, cookiejar_from_dict
 log = logging.getLogger('wordpress_auth')
 
 
-class WPLoginHeaders(dict):
-    def __init__(self, **kwargs):
-        super(WPLoginHeaders, self).__init__({
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) '
-                          'Chrome/50.0.2661.102 Safari/537.36',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'DNT': '1'
-        })
+def _get_wp_login_data(username='', password='', redirect='/wp-admin/'):
+    data = {
+        'log': username,
+        'pwd': password,
+        'wp-submit': 'Log In',
+        'testcookie': '1',
+        'redirect_to': redirect
+    }
+    return bytes(urlencode(data).encode('UTF-8'))
 
 
-class WPLoginData(dict):
-    def __init__(self, username='', password='', redirect='/wp-admin/'):
-        super(WPLoginData, self).__init__({
-            'log': username,
-            'pwd': password,
-            'wp-submit': 'Log In',
-            'testcookie': '1',
-            'redirect_to': redirect
-        })
-
-    def encode(self):
-        return bytes(urlencode(self).encode('UTF-8'))
+def get_wp_login_request(url, username='', password=''):
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/50.0.2661.102 Safari/537.36',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'DNT': '1'
+    }
+    return Request(method='POST', url=url, headers=headers,
+                   data=_get_wp_login_data(username=username, password=password)).prepare()
 
 
-class WPLoginRequest(Request):
-    def __init__(self, url, username='', password=''):
-        super(WPLoginRequest, self).__init__(method='POST', url=url, headers=WPLoginHeaders(),
-                                             data=WPLoginData(username=username, password=password).encode())
-
-
-class WPSession(Session):
-    def __init__(self):
-        super(WPSession, self).__init__()
-        self.max_redirects = 5
+def get_wp_login_session(redirects=5):
+    s = Session()
+    s.max_redirects = redirects
+    return s
 
 
 def _send_request(session, prep_request):
@@ -116,7 +108,7 @@ class PluginWordPress(object):
         url = config['url']
         username = config['username']
         password = config['password']
-        cookies = get_cookies(WPSession(), WPLoginRequest(url, username=username, password=password).prepare())
+        cookies = get_cookies(get_wp_login_session(), get_wp_login_request(url, username=username, password=password))
         task.requests.add_cookiejar(cookiejar_from_dict(cookies))
 
 
