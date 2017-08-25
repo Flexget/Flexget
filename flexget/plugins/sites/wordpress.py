@@ -15,7 +15,13 @@ from requests.utils import dict_from_cookiejar, cookiejar_from_dict
 log = logging.getLogger('wordpress_auth')
 
 
-def _get_wp_login_data(username='', password='', redirect='/wp-admin/'):
+def get_wp_login_request(url, username='', password='', redirect='/wp-admin/'):
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/50.0.2661.102 Safari/537.36',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'DNT': '1'
+    }
     data = {
         'log': username,
         'pwd': password,
@@ -23,18 +29,7 @@ def _get_wp_login_data(username='', password='', redirect='/wp-admin/'):
         'testcookie': '1',
         'redirect_to': redirect
     }
-    return bytes(urlencode(data).encode('UTF-8'))
-
-
-def get_wp_login_request(url, username='', password=''):
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) '
-                      'Chrome/50.0.2661.102 Safari/537.36',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'DNT': '1'
-    }
-    return Request(method='POST', url=url, headers=headers,
-                   data=_get_wp_login_data(username=username, password=password)).prepare()
+    return Request(method='POST', url=url, headers=headers, data=urlencode(data).encode('UTF-8')).prepare()
 
 
 def get_wp_login_session(redirects=5):
