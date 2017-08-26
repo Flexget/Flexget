@@ -8,7 +8,6 @@ import re
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginError
-from requests import Session
 from requests import Request, RequestException
 from requests.utils import dict_from_cookiejar, cookiejar_from_dict
 
@@ -34,21 +33,6 @@ def construct_wp_login_request(url, username='', password='', redirect='/wp-admi
 
 def match_wordpress_cookie(key):
     return re.match(r'wordpress(?!_test)[A-z0-9]*', key, re.IGNORECASE)
-
-
-def send_request(session, prep_request, redirects=5):
-    try:
-        session.max_redirects = redirects
-        response = session.send(prep_request)
-        if not response.ok:
-            log.error('%s', response)
-            raise PluginError('Issue connecting to %s: %s' % (prep_request.url, response))
-        session.close()
-        return response
-    except RequestException as err:
-        session.close()
-        log.error('%s', err)
-        raise PluginError('Issue connecting to %s' % (prep_request.url,))
 
 
 def collect_cookies_from_response(response):
@@ -90,11 +74,17 @@ class PluginWordPress(object):
         url = config['url']
         username = config['username']
         password = config['password']
-
-        resp = send_request(Session(), construct_wp_login_request(url, username=username, password=password))
-        cookies = collect_cookies_from_response(resp)
-        validate_cookies(cookies, match_wordpress_cookie)
-        task.requests.add_cookiejar(cookiejar_from_dict(cookies))
+        try:
+            response = task.requests.send(construct_wp_login_request(url, username=username, password=password))
+            if not response.ok:
+                log.error('%s', response)
+                raise PluginError('Issue connecting to %s: %s' % (url, response))
+            cookies = collect_cookies_from_response(response)
+            validate_cookies(cookies, match_wordpress_cookie)
+            task.requests.add_cookiejar(cookiejar_from_dict(cookies))
+        except RequestException as err:
+            log.error('%s', err)
+            raise PluginError('Issue connecting to %s' % (url,))
 
 
 @event('plugin.register')
