@@ -40,7 +40,7 @@ def collect_cookies(response):
 
 def get_valid_cookies(cookies):
     def is_wp_cookie(key):
-        return re.match(r'wordpress(?!_test)[A-z0-9]*', key, re.IGNORECASE)
+        return re.match(r'(wordpress|wp)(?!_test)[A-z0-9]*', key, re.IGNORECASE)
 
     valid_cookies = {key: value for key, value in cookies.items() if is_wp_cookie(key)}
     return cookiejar_from_dict(valid_cookies)
