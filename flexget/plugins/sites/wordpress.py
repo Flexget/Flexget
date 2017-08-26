@@ -14,7 +14,7 @@ from requests.utils import dict_from_cookiejar, cookiejar_from_dict
 log = logging.getLogger('wordpress_auth')
 
 
-def construct_wp_login_request(url, username='', password='', redirect='/wp-admin/'):
+def construct_request(url, username='', password='', redirect='/wp-admin/'):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) '
                       'Chrome/50.0.2661.102 Safari/537.36',
@@ -31,21 +31,19 @@ def construct_wp_login_request(url, username='', password='', redirect='/wp-admi
     return Request(method='POST', url=url, headers=headers, data=urlencode(data).encode('UTF-8')).prepare()
 
 
-def match_wordpress_cookie(key):
-    return re.match(r'wordpress(?!_test)[A-z0-9]*', key, re.IGNORECASE)
-
-
-def collect_cookies_from_response(response):
+def collect_cookies(response):
     cookies = dict_from_cookiejar(response.cookies)
     for h_resp in response.history:
         cookies.update(dict_from_cookiejar(h_resp.cookies))
-    return cookies
+    return cookiejar_from_dict(cookies)
 
 
-def validate_cookies(cookies, matcher):
-    cnt_matches = sum([1 for key in cookies.keys() if matcher(key)])
-    if cnt_matches < 1:
-        log.warning('No recognized WordPress cookies found. Perhaps username/password is invalid?')
+def get_valid_cookies(cookies):
+    def is_wp_cookie(key):
+        return re.match(r'wordpress(?!_test)[A-z0-9]*', key, re.IGNORECASE)
+
+    valid_cookies = {key: value for key, value in cookies.items() if is_wp_cookie(key)}
+    return cookiejar_from_dict(valid_cookies)
 
 
 class PluginWordPress(object):
@@ -75,16 +73,17 @@ class PluginWordPress(object):
         username = config['username']
         password = config['password']
         try:
-            response = task.requests.send(construct_wp_login_request(url, username=username, password=password))
+            response = task.requests.send(construct_request(url, username=username, password=password))
             if not response.ok:
-                log.error('%s', response)
-                raise PluginError('Issue connecting to %s: %s' % (url, response))
-            cookies = collect_cookies_from_response(response)
-            validate_cookies(cookies, match_wordpress_cookie)
-            task.requests.add_cookiejar(cookiejar_from_dict(cookies))
+                raise RequestException(str(response))
+            cookies = collect_cookies(response)
+            if len(get_valid_cookies(cookies)) < 1:
+                raise RequestException('No recognized WordPress cookies found. Perhaps username/password is invalid?')
+            task.requests.add_cookiejar(cookies)
+
         except RequestException as err:
             log.error('%s', err)
-            raise PluginError('Issue connecting to %s' % (url,))
+            raise PluginError('WordPress Authentication at %s failed' % (url,))
 
 
 @event('plugin.register')

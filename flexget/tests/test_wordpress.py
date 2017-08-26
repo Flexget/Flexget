@@ -38,13 +38,11 @@ class TestWordPress(object):
             monkeypatch.setattr('requests.Session.send', mock.Mock(side_effect=RequestException))
             execute_task('test')
 
-    def test_log_writes_warning_for_no_valid_cookies(self, execute_task, monkeypatch):
-        invalid_cookies = {'__cfduid': '16a85284e4ee53f4933760b08b2bc82c', 'wordpress_test_cookie': 'test+cookie'}
-        _mock_session_response(mock.Mock(cookies=cookiejar_from_dict(invalid_cookies), history=[]), monkeypatch)
-        mock_log_warning = mock.Mock()
-        monkeypatch.setattr('flexget.plugins.sites.wordpress.log.warning', mock_log_warning)
-        execute_task('test')
-        mock_log_warning.assert_called()
+    def test_task_aborts_when_response_has_no_valid_cookies(self, execute_task, monkeypatch):
+        with pytest.raises(TaskAbort):
+            invalid_cookies = {'__cfduid': '16a85284e4ee53f4933760b08b2bc82c', 'wordpress_test_cookie': 'test+cookie'}
+            _mock_session_response(mock.Mock(cookies=cookiejar_from_dict(invalid_cookies), history=[]), monkeypatch)
+            execute_task('test')
 
     def test_cookies_collected_across_redirects(self, execute_task, monkeypatch):
         valid_cookies = {'wordpress_logged_in_a32b6': '16a85284e4ee53f4933760b08b2bc82c', 'wordpress_sec': 'test_value'}
