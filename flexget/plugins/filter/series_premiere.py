@@ -42,8 +42,6 @@ class FilterSeriesPremiere(FilterSeriesBase):
         if not config:
             # Don't run when we are disabled
             return
-        if task.is_rerun:
-            return
         # Generate the group settings for series plugin
         group_settings = {}
         allow_seasonless = False
@@ -60,7 +58,7 @@ class FilterSeriesPremiere(FilterSeriesBase):
         # Make a set of unique series according to series name normalization rules
         guessed_series = {}
         for entry in task.entries:
-            if guess_entry(entry, allow_seasonless=allow_seasonless, config=group_settings):
+            if guess_entry(entry, allow_seasonless=allow_seasonless, config=group_settings, force=True):
                 if not entry['season_pack'] and entry['series_season'] == 1 and entry['series_episode'] in desired_eps:
                     normalized_name = normalize_series_name(entry['series_name'])
                     db_series = task.session.query(Series).filter(Series.name == normalized_name).first()
@@ -74,13 +72,12 @@ class FilterSeriesPremiere(FilterSeriesBase):
                         (entry.get('season_pack') or not (
                         entry.get('series_season') == 1 and entry.get('series_episode') in desired_eps)):
                     entry.reject('Non premiere episode or season pack in a premiere series')
-        # Since we are running after task start phase, make sure not to merge into the config multiple times on reruns
-        if not task.is_rerun:
-            # Combine settings and series into series plugin config format
-            allseries = {'settings': {'series_premiere': group_settings},
-                         'series_premiere': list(guessed_series.values())}
-            # Merge the our config in to the main series config
-            self.merge_config(task, allseries)
+
+        # Combine settings and series into series plugin config format
+        allseries = {'settings': {'series_premiere': group_settings},
+                     'series_premiere': list(guessed_series.values())}
+        # Merge the our config in to the main series config
+        self.merge_config(task, allseries)
 
 
 @event('plugin.register')
