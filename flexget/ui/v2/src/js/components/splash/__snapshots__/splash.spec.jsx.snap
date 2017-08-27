@@ -1,0 +1,79 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/splash renders correctly 1`] = `
+.c1 {
+  margin: 10rem auto;
+  width: 5rem;
+  height: 4rem;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.c2 {
+  background-color: #ff9800;
+  height: 100%;
+  width: 0.6rem;
+  display: inline-block;
+  margin: 0.1rem;
+  -webkit-animation: eUnCpy 1.2s infinite ease-in-out;
+  animation: eUnCpy 1.2s infinite ease-in-out;
+}
+
+.c3 {
+  -webkit-animation-delay: -1.1s;
+  animation-delay: -1.1s;
+}
+
+.c4 {
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s;
+}
+
+.c5 {
+  -webkit-animation-delay: -0.9s;
+  animation-delay: -0.9s;
+}
+
+.c6 {
+  -webkit-animation-delay: -0.8s;
+  animation-delay: -0.8s;
+}
+
+.c0 {
+  background: transparent url(test-file-stub) no-repeat center;
+  min-height: 9rem;
+  background-size: 100% auto;
+  margin: 0 1rem;
+}
+
+@media (min-width:600px) {
+  .c0 {
+    background-size: auto;
+  }
+}
+
+<div>
+  <div
+    className="c0"
+  />
+  <div
+    className="c1"
+  >
+    <div
+      className="c2"
+    />
+    <div
+      className="c3 c2"
+    />
+    <div
+      className="c4 c2"
+    />
+    <div
+      className="c5 c2"
+    />
+    <div
+      className="c6 c2"
+    />
+  </div>
+</div>
+`;

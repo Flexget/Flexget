@@ -1,14 +1,33 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`components/layout/Navbar renders correctly 1`] = `
+.c0 {
+  position: static;
+}
+
+.c3 {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.c1 {
+  background-color: #ef6c00;
+  min-height: 5rem;
+}
+
+.c2 {
+  color: rgba(255,255,255,1);
+}
+
 <header
-  className="MuiPaper-root-8 MuiPaper-shadow4-14 MuiAppBar-root-1 MuiAppBar-positionFixed-2 MuiAppBar-colorPrimary-6 mui-fixed css-NavAppBar-b79v8y0 css-f6mahz"
+  className="MuiPaper-root-8 MuiPaper-shadow4-14 MuiAppBar-root-1 MuiAppBar-positionFixed-2 MuiAppBar-colorPrimary-6 mui-fixed c0"
 >
   <div
-    className="MuiToolbar-root-35 MuiToolbar-gutters-36 css-NavToolbar-b79v8y2 css-i6u520"
+    className="MuiToolbar-root-35 MuiToolbar-gutters-36 c1"
   >
     <button
-      className="MuiButtonBase-root-46 MuiIconButton-root-37 css-NavIcon-b79v8y3 css-1l4orv7"
+      className="MuiButtonBase-root-46 MuiIconButton-root-37 c2"
       disabled={false}
       onBlur={[Function]}
       onClick={[Function]}
@@ -37,7 +56,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
       />
     </button>
     <div
-      className="css-Spacer-b79v8y1 css-18kwbx0"
+      className="c3"
     />
     <a
       href="/config"
@@ -45,7 +64,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
     >
       <button
         aria-label="Config"
-        className="MuiButtonBase-root-46 MuiIconButton-root-37 css-NavIcon-b79v8y3 css-1l4orv7"
+        className="MuiButtonBase-root-46 MuiIconButton-root-37 c2"
         disabled={false}
         onBlur={[Function]}
         onFocus={[Function]}
@@ -79,7 +98,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
     >
       <button
         aria-label="Log"
-        className="MuiButtonBase-root-46 MuiIconButton-root-37 css-NavIcon-b79v8y3 css-1l4orv7"
+        className="MuiButtonBase-root-46 MuiIconButton-root-37 c2"
         disabled={false}
         onBlur={[Function]}
         onFocus={[Function]}
@@ -109,7 +128,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
     </a>
     <button
       aria-label="Manage"
-      className="MuiButtonBase-root-46 MuiIconButton-root-37 css-NavIcon-b79v8y3 css-1l4orv7"
+      className="MuiButtonBase-root-46 MuiIconButton-root-37 c2"
       disabled={false}
       onBlur={[Function]}
       onClick={[Function]}

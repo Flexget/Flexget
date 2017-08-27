@@ -17,39 +17,6 @@
     "type": "git",
     "url": "git+https://github.com/Flexget/Flexget.git"
   },
-  "jest": {
-    "collectCoverageFrom": [
-      "src/**/*.{js,jsx}",
-      "!src/js/store/*.js",
-      "!src/js/{app,history,root,theme}.{js,jsx}",
-      "!**/node_modules/**",
-      "!**/dist/**"
-    ],
-    "coverageThreshold": {
-      "global": {
-        "branches": 40,
-        "functions": 40,
-        "lines": 40,
-        "statements": 40
-      }
-    },
-    "moduleFileExtensions": [
-      "js",
-      "jsx"
-    ],
-    "moduleDirectories": [
-      "node_modules",
-      "src",
-      "src/js"
-    ],
-    "moduleNameMapper": {
-      "\\.css$": "identity-obj-proxy",
-      "\\.(gif|ttf|eot|svg|png)$": "<rootDir>/src/js/__mocks__/fileMock.js"
-    },
-    "setupFiles": [
-      "./setupTests.js"
-    ]
-  },
   "author": "",
   "license": "MIT",
   "bugs": {
@@ -62,6 +29,7 @@
     "babel-jest": "^20.0.3",
     "babel-loader": "^7.1.1",
     "babel-plugin-dynamic-import-node": "^1.0.2",
+    "babel-plugin-styled-components": "^1.1.7",
     "babel-plugin-syntax-dynamic-import": "^6.18.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.8",
@@ -86,6 +54,7 @@
     "html-webpack-plugin": "^2.30.1",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^20.0.4",
+    "jest-styled-components": "^4.4.1",
     "jsdom": "^11.1.0",
     "markdown-loader": "^2.0.1",
     "node-sass": "^4.5.3",
@@ -108,7 +77,6 @@
     "babel-preset-flow": "^6.23.0",
     "classnames": "^2.2.5",
     "connected-react-router": "^4.2.3",
-    "emotion": "^7.2.0",
     "font-awesome": "^4.7.0",
     "history": "^4.6.3",
     "jss": "^8.1.0",
@@ -132,6 +100,7 @@
     "redux-form": "^6.8.0",
     "redux-saga": "^0.15.6",
     "semver-compare": "^1.0.0",
+    "styled-components": "^2.1.2",
     "typeface-roboto": "0.0.22",
     "whatwg-fetch": "^2.0.3"
   }

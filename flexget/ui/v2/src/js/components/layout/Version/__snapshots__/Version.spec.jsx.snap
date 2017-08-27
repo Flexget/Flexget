@@ -1,16 +1,24 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`components/layout/Version renders correctly with latest version 1`] = `
+.c0 {
+  composes: color:#f44336;
+}
+
+.c1 {
+  margin: 0;
+}
+
 <div
-  className="css-Wrapper-f238mn0 css-fdqscn"
+  className="c0"
 >
   <p
-    className="css-Line-f238mn1 css-6x29zm"
+    className="c1"
   >
     Version Info
   </p>
   <p
-    className="css-Line-f238mn1 css-6x29zm"
+    className="c1"
   >
     Flexget: 
     2.10.60
@@ -18,7 +26,7 @@ exports[`components/layout/Version renders correctly with latest version 1`] = `
      
   </p>
   <p
-    className="css-Line-f238mn1 css-6x29zm"
+    className="c1"
   >
     API: 
     1.1.2
@@ -27,16 +35,24 @@ exports[`components/layout/Version renders correctly with latest version 1`] = `
 `;
 
 exports[`components/layout/Version renders correctly without latest version 1`] = `
+.c0 {
+  composes: color:#f44336;
+}
+
+.c1 {
+  margin: 0;
+}
+
 <div
-  className="css-Wrapper-f238mn0 css-fdqscn"
+  className="c0"
 >
   <p
-    className="css-Line-f238mn1 css-6x29zm"
+    className="c1"
   >
     Version Info
   </p>
   <p
-    className="css-Line-f238mn1 css-6x29zm"
+    className="c1"
   >
     Flexget: 
     2.10.11
@@ -60,7 +76,7 @@ exports[`components/layout/Version renders correctly without latest version 1`] 
       >
         <span
           aria-hidden="true"
-          className="material-icons MuiIcon-root-12 MuiIconButton-icon-8 fa fa-question-circle-o css-fdqscn"
+          className="material-icons MuiIcon-root-12 MuiIconButton-icon-8 fa fa-question-circle-o color:,#f44336"
         />
       </span>
       <span
@@ -70,7 +86,7 @@ exports[`components/layout/Version renders correctly without latest version 1`] 
      
   </p>
   <p
-    className="css-Line-f238mn1 css-6x29zm"
+    className="c1"
   >
     API: 
     1.1.2

@@ -1,8 +1,59 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`components/log/Header renders correctly 1`] = `
+.c0 {
+  display: block;
+}
+
+.c4 {
+  composes: color:#757575;
+}
+
+.c6 {
+  cursor: pointer;
+}
+
+.c1 {
+  composes: color:#757575;
+}
+
+.c2 {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.c3 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: baseline;
+  -webkit-box-align: baseline;
+  -ms-flex-align: baseline;
+  align-items: baseline;
+}
+
+.c5 {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+@media (min-width:600px) {
+  .c0 {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-align-items: baseline;
+    -webkit-box-align: baseline;
+    -ms-flex-align: baseline;
+    align-items: baseline;
+  }
+}
+
 <div
-  className="css-Wrapper-c9ywwi0 css-1spwrqm"
+  className="c0"
 >
   <div>
     <h2
@@ -11,23 +62,23 @@ exports[`components/log/Header renders correctly 1`] = `
       Server Log
     </h2>
     <h3
-      className="MuiTypography-root-1 MuiTypography-subheading-8 css-GreyType-c9ywwi3 css-obbjaa"
+      className="MuiTypography-root-1 MuiTypography-subheading-8 c1"
     >
       Streaming
     </h3>
   </div>
   <div
-    className="css-Spacer-c9ywwi4 css-18kwbx0"
+    className="c2"
   />
   <div
-    className="css-TextFieldWrapper-c9ywwi5 css-156bdsk"
+    className="c3"
   >
     <span
       aria-hidden="true"
-      className="material-icons MuiIcon-root-23 css-GreyIcon-c9ywwi1 fa fa-filter css-obbjaa"
+      className="material-icons MuiIcon-root-23 fa fa-filter c4"
     />
     <div
-      className="MuiFormControl-root-30 css-FilterField-c9ywwi6 css-92d7gr"
+      className="MuiFormControl-root-30 c5"
       onBlur={[Function]}
       onChange={[Function]}
       onFocus={[Function]}
@@ -71,7 +122,7 @@ exports[`components/log/Header renders correctly 1`] = `
     </div>
     <span
       aria-hidden="true"
-      className="material-icons MuiIcon-root-23 css-GreyIcon-c9ywwi1 css-GreyClickableIcon-c9ywwi2 fa fa-ellipsis-v css-1bq7oks"
+      className="material-icons MuiIcon-root-23 fa fa-ellipsis-v c6 c4"
       onClick={[Function]}
     />
   </div>

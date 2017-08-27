@@ -1,4 +1,4 @@
-import styled, { css } from 'emotion/react';
+import styled, { css } from 'styled-components';
 import theme from 'theme';
 
 export const version = css`color: ${theme.palette.error[500]}`;

@@ -1,4 +1,4 @@
-import styled from 'emotion/react';
+import styled from 'styled-components';
 import { CardMedia } from 'material-ui/Card';
 import theme from 'theme';
 

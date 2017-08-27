@@ -1,4 +1,4 @@
-import styled from 'emotion/react';
+import styled from 'styled-components';
 import Paper from 'material-ui/Paper';
 import theme from 'theme';
 

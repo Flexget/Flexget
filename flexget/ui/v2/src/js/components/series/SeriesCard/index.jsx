@@ -14,10 +14,7 @@ const SeriesCard = ({ show }) => (
       image={show.lookup.tvdb.banner ? `/api/cached?url=${show.lookup.tvdb.banner}` : ''}
       title={show.lookup.tvdb.series_name}
     >
-      <Image
-        src={blank}
-        alt=""
-      />
+      <Image src={blank} alt="" />
     </Media>
     <CardContent>
       <Typography type="headline" component="h2">

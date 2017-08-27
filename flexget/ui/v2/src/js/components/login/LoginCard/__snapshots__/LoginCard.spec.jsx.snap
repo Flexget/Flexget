@@ -1,20 +1,55 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`components/login/LoginCard renders correctly 1`] = `
+.c0 {
+  max-width: 40rem;
+  margin: 0 1rem;
+}
+
+.c2 {
+  color: #f44336;
+  text-align: center;
+  padding: 1rem;
+}
+
+.c4 {
+  width: 100%;
+}
+
+.c1 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.c3 {
+  padding-bottom: 1rem;
+}
+
+@media (min-width:600px) {
+  .c0 {
+    margin: 0 auto;
+  }
+}
+
 <div
-  className="MuiPaper-root-1 MuiPaper-shadow2-5 MuiPaper-rounded-2 css-Card-2s8vmr0 css-cln3dh"
+  className="MuiPaper-root-1 MuiPaper-shadow2-5 MuiPaper-rounded-2 c0"
 >
   <form
     onSubmit={[Function]}
   >
     <div
-      className="MuiCardContent-root-28 css-Content-2s8vmr3 css-5tfs3d"
+      className="MuiCardContent-root-28 c1"
     >
       <div
-        className="css-ErrorMessage-2s8vmr1 css-11u184"
+        className="c2"
       />
       <div
-        className="MuiFormControl-root-29 css-LoginField-2s8vmr4 css-1ptahss"
+        className="MuiFormControl-root-29 c3"
         onBlur={[Function]}
         onChange={[Function]}
         onDragStart={[Function]}
@@ -53,7 +88,7 @@ exports[`components/login/LoginCard renders correctly 1`] = `
         </div>
       </div>
       <div
-        className="MuiFormControl-root-29 css-LoginField-2s8vmr4 css-1ptahss"
+        className="MuiFormControl-root-29 c3"
         onBlur={[Function]}
         onChange={[Function]}
         onDragStart={[Function]}
@@ -96,7 +131,7 @@ exports[`components/login/LoginCard renders correctly 1`] = `
       className="MuiCardActions-root-56"
     >
       <button
-        className="MuiButtonBase-root-72 MuiButton-root-58 css-LoginButton-2s8vmr2 MuiCardActions-actionSpacing-57 css-1mfq5q8"
+        className="MuiButtonBase-root-72 MuiButton-root-58 MuiCardActions-actionSpacing-57 c4"
         disabled={false}
         onBlur={[Function]}
         onFocus={[Function]}

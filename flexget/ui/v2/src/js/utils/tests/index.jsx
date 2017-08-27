@@ -30,3 +30,13 @@ export function provider(component, state = {}) {
     </Provider>
   );
 }
+
+export class Headers {
+  constructor(obj) {
+    this.headers = obj || {};
+  }
+
+  get(key) {
+    return this.headers[key];
+  }
+}

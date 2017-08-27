@@ -1,11 +1,36 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`components/home renders correctly 1`] = `
+.c0 {
+  margin: 0 auto;
+}
+
+.c1 {
+  background-color: #ef6c00;
+}
+
+.c2 {
+  font-weight: bold;
+}
+
+.c3 {
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+@media (min-width:600px) {
+  .c0 {
+    width: 50%;
+  }
+}
+
 <div
-  className="MuiPaper-root-1 MuiPaper-shadow2-5 MuiPaper-rounded-2 css-InfoCardWrapper-10yi1cj0 css-16hxv79"
+  className="MuiPaper-root-1 MuiPaper-shadow2-5 MuiPaper-rounded-2 c0"
 >
   <div
-    className="MuiCardContent-root-33 MuiCardHeader-root-28 css-InfoCardHeader-10yi1cj1 css-118iags"
+    className="MuiCardContent-root-33 MuiCardHeader-root-28 c1"
   >
     <div
       className="MuiCardHeader-content-30"
@@ -26,7 +51,7 @@ exports[`components/home renders correctly 1`] = `
     className="MuiCardContent-root-33"
   >
     <p
-      className="css-BoldParagraph-10yi1cj2 css-vfearj"
+      className="c2"
     >
       We need your help! If you are a React developer or can help with the layout/design/css then please join in the effort!
     </p>
@@ -66,7 +91,7 @@ exports[`components/home renders correctly 1`] = `
     </p>
   </div>
   <div
-    className="MuiCardActions-root-56 css-InfoCardActions-10yi1cj3 css-awzhlo"
+    className="MuiCardActions-root-56 c3"
   >
     <a
       aria-label="Github"

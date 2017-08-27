@@ -17,4 +17,4 @@ global.navigator = {
 };
 copyProps(window, global);
 
-console.error = jest.fn();
+console.error = jest.fn(); // eslint-disable-line no-console

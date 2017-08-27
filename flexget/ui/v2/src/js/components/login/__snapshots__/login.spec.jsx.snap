@@ -3,24 +3,72 @@
 exports[`components/login renders correctly when logged in 1`] = `null`;
 
 exports[`components/login renders correctly when logged out 1`] = `
+.c1 {
+  max-width: 40rem;
+  margin: 0 1rem;
+}
+
+.c3 {
+  color: #f44336;
+  text-align: center;
+  padding: 1rem;
+}
+
+.c5 {
+  width: 100%;
+}
+
+.c2 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.c4 {
+  padding-bottom: 1rem;
+}
+
+.c0 {
+  background: transparent url(test-file-stub) no-repeat center;
+  min-height: 9rem;
+  background-size: 100% auto;
+  margin: 0 1rem;
+}
+
+@media (min-width:600px) {
+  .c1 {
+    margin: 0 auto;
+  }
+}
+
+@media (min-width:600px) {
+  .c0 {
+    background-size: auto;
+  }
+}
+
 <div>
   <div
-    className="css-Logo-1g5i0oy0 css-2rbmmk"
+    className="c0"
   />
   <div
-    className="MuiPaper-root-1 MuiPaper-shadow2-5 MuiPaper-rounded-2 css-Card-2s8vmr0 css-cln3dh"
+    className="MuiPaper-root-1 MuiPaper-shadow2-5 MuiPaper-rounded-2 c1"
   >
     <form
       onSubmit={[Function]}
     >
       <div
-        className="MuiCardContent-root-28 css-Content-2s8vmr3 css-5tfs3d"
+        className="MuiCardContent-root-28 c2"
       >
         <div
-          className="css-ErrorMessage-2s8vmr1 css-11u184"
+          className="c3"
         />
         <div
-          className="MuiFormControl-root-29 css-LoginField-2s8vmr4 css-1ptahss"
+          className="MuiFormControl-root-29 c4"
           onBlur={[Function]}
           onChange={[Function]}
           onDragStart={[Function]}
@@ -59,7 +107,7 @@ exports[`components/login renders correctly when logged out 1`] = `
           </div>
         </div>
         <div
-          className="MuiFormControl-root-29 css-LoginField-2s8vmr4 css-1ptahss"
+          className="MuiFormControl-root-29 c4"
           onBlur={[Function]}
           onChange={[Function]}
           onDragStart={[Function]}
@@ -102,7 +150,7 @@ exports[`components/login renders correctly when logged out 1`] = `
         className="MuiCardActions-root-56"
       >
         <button
-          className="MuiButtonBase-root-72 MuiButton-root-58 css-LoginButton-2s8vmr2 MuiCardActions-actionSpacing-57 css-1mfq5q8"
+          className="MuiButtonBase-root-72 MuiButton-root-58 MuiCardActions-actionSpacing-57 c5"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}

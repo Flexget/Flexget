@@ -5,7 +5,7 @@ import {
 import SeriesPage from 'components/series';
 import { request } from 'utils/actions';
 
-function mapStateToProps({ series }) {
+export function mapStateToProps({ series }) {
   return {
     shows: series.shows.items,
   };

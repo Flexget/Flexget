@@ -1,4 +1,4 @@
-import styled from 'emotion/react';
+import styled from 'styled-components';
 import Grid from 'material-ui/Grid';
 
 export const GridCard = styled(Grid)`
