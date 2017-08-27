@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
-import { LOGOUT } from 'actions/auth';
-import { SERVER_RELOAD, SERVER_SHUTDOWN } from 'actions/server';
+import { LOGOUT } from 'store/auth/actions';
+import { SERVER_RELOAD, SERVER_SHUTDOWN } from 'store/server/actions';
 import { request } from 'utils/actions';
 import Navbar from 'components/layout/Navbar';
 
@@ -13,4 +13,3 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(null, mapDispatchToProps)(Navbar);
-

@@ -21,9 +21,7 @@
     "collectCoverageFrom": [
       "src/**/*.{js,jsx}",
       "!src/js/store/*.js",
-      "!src/js/reducers/index.js",
       "!src/js/{app,history,root,theme}.{js,jsx}",
-      "!src/js/{components,containers}/splash/*.{js,jsx}",
       "!**/node_modules/**",
       "!**/dist/**"
     ],

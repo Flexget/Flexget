@@ -9,7 +9,7 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
     className="MuiList-root-28 MuiList-padding-29 css-NavList-1uojgra2 css-18kwbx0"
   >
     <a
-      href="/log"
+      href="/config"
       onClick={[Function]}
     >
       <li
@@ -38,13 +38,13 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-file-text-o css-1y2l9le"
+              className="material-icons MuiIcon-root-57 fa fa-pencil css-1y2l9le"
             />
             <p
               className="css-Label-1uojgra1 css-1hgrgsx"
               open={false}
             >
-              Log
+              Config
             </p>
           </span>
           <span
@@ -99,51 +99,6 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       </li>
     </a>
     <a
-      href="/config"
-      onClick={[Function]}
-    >
-      <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
-        disabled={false}
-        onClick={[Function]}
-      >
-        <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
-          disabled={false}
-          onBlur={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchStart={[Function]}
-          role="button"
-          tabIndex="0"
-          type="button"
-        >
-          <span
-            className="MuiButton-label-43"
-          >
-            <span
-              aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-pencil css-1y2l9le"
-            />
-            <p
-              className="css-Label-1uojgra1 css-1hgrgsx"
-              open={false}
-            >
-              Config
-            </p>
-          </span>
-          <span
-            className="MuiTouchRipple-root-64"
-          />
-        </button>
-      </li>
-    </a>
-    <a
       href="/history"
       onClick={[Function]}
     >
@@ -180,6 +135,51 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
               open={false}
             >
               History
+            </p>
+          </span>
+          <span
+            className="MuiTouchRipple-root-64"
+          />
+        </button>
+      </li>
+    </a>
+    <a
+      href="/log"
+      onClick={[Function]}
+    >
+      <li
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
+        disabled={false}
+        onClick={[Function]}
+      >
+        <button
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
+          disabled={false}
+          onBlur={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onTouchEnd={[Function]}
+          onTouchStart={[Function]}
+          role="button"
+          tabIndex="0"
+          type="button"
+        >
+          <span
+            className="MuiButton-label-43"
+          >
+            <span
+              aria-hidden="true"
+              className="material-icons MuiIcon-root-57 fa fa-file-text-o css-1y2l9le"
+            />
+            <p
+              className="css-Label-1uojgra1 css-1hgrgsx"
+              open={false}
+            >
+              Log
             </p>
           </span>
           <span
@@ -496,7 +496,7 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
     className="MuiList-root-28 MuiList-padding-29 css-NavList-1uojgra2 css-18kwbx0"
   >
     <a
-      href="/log"
+      href="/config"
       onClick={[Function]}
     >
       <li
@@ -525,13 +525,13 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-file-text-o css-1y2l9le"
+              className="material-icons MuiIcon-root-57 fa fa-pencil css-1y2l9le"
             />
             <p
               className="css-Label-1uojgra1 css-1lwlcmp"
               open={true}
             >
-              Log
+              Config
             </p>
           </span>
           <span
@@ -586,51 +586,6 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       </li>
     </a>
     <a
-      href="/config"
-      onClick={[Function]}
-    >
-      <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
-        disabled={false}
-        onClick={[Function]}
-      >
-        <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
-          disabled={false}
-          onBlur={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchStart={[Function]}
-          role="button"
-          tabIndex="0"
-          type="button"
-        >
-          <span
-            className="MuiButton-label-43"
-          >
-            <span
-              aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-pencil css-1y2l9le"
-            />
-            <p
-              className="css-Label-1uojgra1 css-1lwlcmp"
-              open={true}
-            >
-              Config
-            </p>
-          </span>
-          <span
-            className="MuiTouchRipple-root-64"
-          />
-        </button>
-      </li>
-    </a>
-    <a
       href="/history"
       onClick={[Function]}
     >
@@ -667,6 +622,51 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
               open={true}
             >
               History
+            </p>
+          </span>
+          <span
+            className="MuiTouchRipple-root-64"
+          />
+        </button>
+      </li>
+    </a>
+    <a
+      href="/log"
+      onClick={[Function]}
+    >
+      <li
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
+        disabled={false}
+        onClick={[Function]}
+      >
+        <button
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
+          disabled={false}
+          onBlur={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onTouchEnd={[Function]}
+          onTouchStart={[Function]}
+          role="button"
+          tabIndex="0"
+          type="button"
+        >
+          <span
+            className="MuiButton-label-43"
+          >
+            <span
+              aria-hidden="true"
+              className="material-icons MuiIcon-root-57 fa fa-file-text-o css-1y2l9le"
+            />
+            <p
+              className="css-Label-1uojgra1 css-1lwlcmp"
+              open={true}
+            >
+              Log
             </p>
           </span>
           <span

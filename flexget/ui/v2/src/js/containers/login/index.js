@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import LoginPage from 'components/login';
-import { GET_VERSION } from 'actions/version';
+import { GET_VERSION } from 'store/version/actions';
 
 export function mapStateToProps({ auth, status }) {
   return {

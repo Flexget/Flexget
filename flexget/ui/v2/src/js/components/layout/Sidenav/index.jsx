@@ -17,9 +17,9 @@ import {
 
 const sideNavItems = [
   {
-    link: '/log',
-    icon: 'file-text-o',
-    label: 'Log',
+    link: '/config',
+    icon: 'pencil',
+    label: 'Config',
   },
   {
     link: '/execute',
@@ -27,14 +27,14 @@ const sideNavItems = [
     label: 'Execute',
   },
   {
-    link: '/config',
-    icon: 'pencil',
-    label: 'Config',
-  },
-  {
     link: '/history',
     icon: 'history',
     label: 'History',
+  },
+  {
+    link: '/log',
+    icon: 'file-text-o',
+    label: 'Log',
   },
   {
     link: '/movies',
