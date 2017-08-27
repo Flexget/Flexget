@@ -27,7 +27,8 @@ jobs:
   include:
     - python: "2.7" # don't want to run this for each python version so picking one
       before_install:
-        - nvm install 7
+        - nvm install 8
+        - npm install -g npm@5.2.0
         - cd flexget/ui/v2/
       install:
         - npm install

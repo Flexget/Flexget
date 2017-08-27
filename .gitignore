@@ -44,5 +44,6 @@ npm-debug.log
 node_modules/
 !raw_config.yml
 !variables.yml
+!.travis.yml
 cached_resources/
 pyvenv.cfg
