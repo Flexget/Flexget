@@ -2,19 +2,19 @@
 
 exports[`components/login/LoginCard renders correctly 1`] = `
 <div
-  className="MuiPaper-root-6 MuiPaper-shadow2-10 MuiPaper-rounded-7 LoginCard-card-1"
+  className="MuiPaper-root-1 MuiPaper-shadow2-5 MuiPaper-rounded-2 css-Card-2s8vmr0 css-cln3dh"
 >
   <form
     onSubmit={[Function]}
   >
     <div
-      className="MuiCardContent-root-33 LoginCard-cardContent-4"
+      className="MuiCardContent-root-28 css-Content-2s8vmr3 css-5tfs3d"
     >
       <div
-        className="LoginCard-error-2"
+        className="css-ErrorMessage-2s8vmr1 css-11u184"
       />
       <div
-        className="MuiFormControl-root-34 LoginCard-field-5"
+        className="MuiFormControl-root-29 css-LoginField-2s8vmr4 css-1ptahss"
         onBlur={[Function]}
         onChange={[Function]}
         onDragStart={[Function]}
@@ -23,19 +23,19 @@ exports[`components/login/LoginCard renders correctly 1`] = `
         required={false}
       >
         <label
-          className="MuiFormLabel-root-43 MuiInputLabel-root-38 MuiInputLabel-formControl-39 MuiInputLabel-animated-41"
+          className="MuiFormLabel-root-38 MuiInputLabel-root-33 MuiInputLabel-formControl-34 MuiInputLabel-animated-36"
           htmlFor="username"
         >
           Username
         </label>
         <div
-          className="MuiInput-root-47 MuiInput-formControl-48 MuiInput-inkbar-49 MuiInput-underline-55"
+          className="MuiInput-root-42 MuiInput-formControl-43 MuiInput-inkbar-44 MuiInput-underline-50"
         >
           <input
             aria-required={undefined}
             autoComplete={undefined}
             autoFocus={undefined}
-            className="MuiInput-input-51 MuiInput-inputSingleline-58"
+            className="MuiInput-input-46 MuiInput-inputSingleline-53"
             defaultValue={undefined}
             disabled={false}
             id="username"
@@ -53,7 +53,7 @@ exports[`components/login/LoginCard renders correctly 1`] = `
         </div>
       </div>
       <div
-        className="MuiFormControl-root-34 LoginCard-field-5"
+        className="MuiFormControl-root-29 css-LoginField-2s8vmr4 css-1ptahss"
         onBlur={[Function]}
         onChange={[Function]}
         onDragStart={[Function]}
@@ -62,19 +62,19 @@ exports[`components/login/LoginCard renders correctly 1`] = `
         required={false}
       >
         <label
-          className="MuiFormLabel-root-43 MuiInputLabel-root-38 MuiInputLabel-formControl-39 MuiInputLabel-animated-41"
+          className="MuiFormLabel-root-38 MuiInputLabel-root-33 MuiInputLabel-formControl-34 MuiInputLabel-animated-36"
           htmlFor="password"
         >
           Password
         </label>
         <div
-          className="MuiInput-root-47 MuiInput-formControl-48 MuiInput-inkbar-49 MuiInput-underline-55"
+          className="MuiInput-root-42 MuiInput-formControl-43 MuiInput-inkbar-44 MuiInput-underline-50"
         >
           <input
             aria-required={undefined}
             autoComplete={undefined}
             autoFocus={undefined}
-            className="MuiInput-input-51 MuiInput-inputSingleline-58"
+            className="MuiInput-input-46 MuiInput-inputSingleline-53"
             defaultValue={undefined}
             disabled={false}
             id="password"
@@ -93,10 +93,10 @@ exports[`components/login/LoginCard renders correctly 1`] = `
       </div>
     </div>
     <div
-      className="MuiCardActions-root-61"
+      className="MuiCardActions-root-56"
     >
       <button
-        className="MuiButtonBase-root-77 MuiButton-root-63 LoginCard-button-3 MuiCardActions-actionSpacing-62"
+        className="MuiButtonBase-root-72 MuiButton-root-58 css-LoginButton-2s8vmr2 MuiCardActions-actionSpacing-57 css-1mfq5q8"
         disabled={false}
         onBlur={[Function]}
         onFocus={[Function]}
@@ -112,12 +112,12 @@ exports[`components/login/LoginCard renders correctly 1`] = `
         type="submit"
       >
         <span
-          className="MuiButton-label-65"
+          className="MuiButton-label-60"
         >
           Login
         </span>
         <span
-          className="MuiTouchRipple-root-79"
+          className="MuiTouchRipple-root-74"
         />
       </button>
     </div>

@@ -2,13 +2,13 @@
 
 exports[`components/layout/Navbar renders correctly 1`] = `
 <header
-  className="MuiPaper-root-8 MuiPaper-shadow4-14 MuiAppBar-root-1 MuiAppBar-positionFixed-2 MuiAppBar-colorPrimary-6 mui-fixed"
+  className="MuiPaper-root-8 MuiPaper-shadow4-14 MuiAppBar-root-1 MuiAppBar-positionFixed-2 MuiAppBar-colorPrimary-6 mui-fixed css-NavAppBar-b79v8y0 css-f6mahz"
 >
   <div
-    className="MuiToolbar-root-35 MuiToolbar-gutters-36"
+    className="MuiToolbar-root-35 MuiToolbar-gutters-36 css-NavToolbar-b79v8y2 css-i6u520"
   >
     <button
-      className="MuiButtonBase-root-46 MuiIconButton-root-37"
+      className="MuiButtonBase-root-46 MuiIconButton-root-37 css-NavIcon-b79v8y3 css-1l4orv7"
       disabled={false}
       onBlur={[Function]}
       onClick={[Function]}
@@ -37,7 +37,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
       />
     </button>
     <div
-      className={undefined}
+      className="css-Spacer-b79v8y1 css-18kwbx0"
     />
     <a
       href="/config"
@@ -45,7 +45,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
     >
       <button
         aria-label="Config"
-        className="MuiButtonBase-root-46 MuiIconButton-root-37"
+        className="MuiButtonBase-root-46 MuiIconButton-root-37 css-NavIcon-b79v8y3 css-1l4orv7"
         disabled={false}
         onBlur={[Function]}
         onFocus={[Function]}
@@ -79,7 +79,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
     >
       <button
         aria-label="Log"
-        className="MuiButtonBase-root-46 MuiIconButton-root-37"
+        className="MuiButtonBase-root-46 MuiIconButton-root-37 css-NavIcon-b79v8y3 css-1l4orv7"
         disabled={false}
         onBlur={[Function]}
         onFocus={[Function]}
@@ -109,7 +109,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
     </a>
     <button
       aria-label="Manage"
-      className="MuiButtonBase-root-46 MuiIconButton-root-37"
+      className="MuiButtonBase-root-46 MuiIconButton-root-37 css-NavIcon-b79v8y3 css-1l4orv7"
       disabled={false}
       onBlur={[Function]}
       onClick={[Function]}

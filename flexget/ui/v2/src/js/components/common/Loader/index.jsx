@@ -26,14 +26,13 @@ Loader.propTypes = {
   isLoading: PropTypes.bool,
   timedOut: PropTypes.bool,
   pastDelay: PropTypes.bool,
-  error: PropTypes.bool,
+  error: PropTypes.object, // eslint-disable-line react/require-default-props
 };
 
 Loader.defaultProps = {
   isLoading: false,
   timedOut: false,
   pastDelay: false,
-  error: false,
 };
 
 export default Loader;

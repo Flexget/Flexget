@@ -1,41 +1,26 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import Card, { CardActions, CardContent, CardHeader } from 'material-ui/Card';
-import { withStyles } from 'material-ui/styles';
+import { CardContent } from 'material-ui/Card';
 import IconButton from 'material-ui/IconButton';
 import Icon from 'material-ui/Icon';
+import {
+  InfoCardWrapper,
+  InfoCardHeader,
+  BoldParagraph,
+  InfoCardActions,
+} from 'components/home/InfoCard/styles';
 import 'font-awesome/css/font-awesome.css';
 
-const styleSheet = theme => ({
-  card: {
-    margin: '0 auto',
-    [theme.breakpoints.up('sm')]: {
-      width: '50%',
-    },
-  },
-  cardHeader: {
-    backgroundColor: theme.palette.primary[800],
-  },
-  boldText: {
-    fontWeight: 'bold',
-  },
-  cardActions: {
-    justifyContent: 'center',
-  },
-});
-
-const InfoCard = ({ classes }) => (
-  <Card className={classes.card}>
-    <CardHeader
-      className={classes.cardHeader}
+const InfoCard = () => (
+  <InfoCardWrapper>
+    <InfoCardHeader
       title="Flexget Web Interface"
       subheader="Under Development"
     />
     <CardContent>
-      <p className={classes.boldText}>
+      <BoldParagraph>
         We need your help! If you are a React developer or can help with the layout/design/css
         then please join in the effort!
-      </p>
+      </BoldParagraph>
       <p>
         The interface is not yet ready for end users. Consider this preview only state.
       </p>
@@ -65,7 +50,7 @@ const InfoCard = ({ classes }) => (
         </a>
       </p>
     </CardContent>
-    <CardActions className={classes.cardActions}>
+    <InfoCardActions>
       <IconButton
         aria-label="Github"
         href="https://github.com/Flexget/Flexget"
@@ -98,12 +83,8 @@ const InfoCard = ({ classes }) => (
       >
         <Icon className="fa fa-forumbee" />
       </IconButton>
-    </CardActions>
-  </Card>
+    </InfoCardActions>
+  </InfoCardWrapper>
 );
 
-InfoCard.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
-
-export default withStyles(styleSheet)(InfoCard);
+export default InfoCard;

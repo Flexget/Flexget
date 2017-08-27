@@ -8,11 +8,11 @@ ShallowWrapper {
     "findWhereUnwrapped": [Function],
   },
   "length": 1,
-  "node": <withStyles(LogTable)
+  "node": <LogTable
     messages={Array []}
 />,
   "nodes": Array [
-    <withStyles(LogTable)
+    <LogTable
       messages={Array []}
 />,
   ],
@@ -387,7 +387,7 @@ ShallowWrapper {
                       }
         }
 >
-        <withStyles(LogTable)
+        <LogTable
                 messages={Array []}
         />
 </MuiThemeProvider>,
@@ -407,7 +407,7 @@ ShallowWrapper {
         },
         "outerTheme": null,
         "props": Object {
-          "children": <withStyles(LogTable)
+          "children": <LogTable
             messages={Array []}
 />,
           "theme": Object {
@@ -793,11 +793,11 @@ ShallowWrapper {
       "_pendingReplaceState": false,
       "_pendingStateQueue": null,
       "_renderedComponent": NoopInternalComponent {
-        "_currentElement": <withStyles(LogTable)
+        "_currentElement": <LogTable
           messages={Array []}
 />,
         "_debugID": 2,
-        "_renderedOutput": <withStyles(LogTable)
+        "_renderedOutput": <LogTable
           messages={Array []}
 />,
       },
@@ -1176,7 +1176,7 @@ ShallowWrapper {
           }
     }
 >
-    <withStyles(LogTable)
+    <LogTable
         messages={Array []}
     />
 </MuiThemeProvider>,

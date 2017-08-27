@@ -2,34 +2,35 @@
 
 exports[`components/layout renders correctly 1`] = `
 <div
-  className="Layout-layout-1"
+  className="css-Wrapper-ldzn8u0 css-1fvkt0b"
 >
   <header
-    className="Layout-header-3"
+    className="css-Header-ldzn8u2 css-2b1rud"
   >
     <div
-      className="Layout-logo-4"
+      className="css-LogoWrapper-ldzn8u3 css-1rht7o"
     >
       <a
         href="/"
         onClick={[Function]}
       >
         <div
-          className="Logo-logo-9 Logo-logoMini-10"
+          className="css-NavLogo-pmb2010 css-1oup17m"
+          open={false}
         />
       </a>
     </div>
     <nav
-      className="Layout-navbar-5"
+      className="css-Nav-ldzn8u4 css-3nlkj5"
     >
       <header
-        className="MuiPaper-root-23 MuiPaper-shadow4-29 MuiAppBar-root-16 MuiAppBar-positionFixed-17 MuiAppBar-colorPrimary-21 mui-fixed Navbar-appBar-11"
+        className="MuiPaper-root-8 MuiPaper-shadow4-14 MuiAppBar-root-1 MuiAppBar-positionFixed-2 MuiAppBar-colorPrimary-6 mui-fixed css-NavAppBar-b79v8y0 css-f6mahz"
       >
         <div
-          className="MuiToolbar-root-50 MuiToolbar-gutters-51 Navbar-toolbar-13"
+          className="MuiToolbar-root-35 MuiToolbar-gutters-36 css-NavToolbar-b79v8y2 css-i6u520"
         >
           <button
-            className="MuiButtonBase-root-61 MuiIconButton-root-52 Navbar-icon-14"
+            className="MuiButtonBase-root-46 MuiIconButton-root-37 css-NavIcon-b79v8y3 css-1l4orv7"
             disabled={false}
             onBlur={[Function]}
             onClick={[Function]}
@@ -46,19 +47,19 @@ exports[`components/layout renders correctly 1`] = `
             type="button"
           >
             <span
-              className="MuiIconButton-label-58"
+              className="MuiIconButton-label-43"
             >
               <span
                 aria-hidden="true"
-                className="material-icons MuiIcon-root-63 MuiIconButton-icon-59 fa fa-bars"
+                className="material-icons MuiIcon-root-48 MuiIconButton-icon-44 fa fa-bars"
               />
             </span>
             <span
-              className="MuiTouchRipple-root-70"
+              className="MuiTouchRipple-root-55"
             />
           </button>
           <div
-            className="Navbar-spacer-12"
+            className="css-Spacer-b79v8y1 css-18kwbx0"
           />
           <a
             href="/config"
@@ -66,7 +67,7 @@ exports[`components/layout renders correctly 1`] = `
           >
             <button
               aria-label="Config"
-              className="MuiButtonBase-root-61 MuiIconButton-root-52 Navbar-icon-14"
+              className="MuiButtonBase-root-46 MuiIconButton-root-37 css-NavIcon-b79v8y3 css-1l4orv7"
               disabled={false}
               onBlur={[Function]}
               onFocus={[Function]}
@@ -82,15 +83,15 @@ exports[`components/layout renders correctly 1`] = `
               type="button"
             >
               <span
-                className="MuiIconButton-label-58"
+                className="MuiIconButton-label-43"
               >
                 <span
                   aria-hidden="true"
-                  className="material-icons MuiIcon-root-63 MuiIconButton-icon-59 fa fa-pencil"
+                  className="material-icons MuiIcon-root-48 MuiIconButton-icon-44 fa fa-pencil"
                 />
               </span>
               <span
-                className="MuiTouchRipple-root-70"
+                className="MuiTouchRipple-root-55"
               />
             </button>
           </a>
@@ -100,7 +101,7 @@ exports[`components/layout renders correctly 1`] = `
           >
             <button
               aria-label="Log"
-              className="MuiButtonBase-root-61 MuiIconButton-root-52 Navbar-icon-14"
+              className="MuiButtonBase-root-46 MuiIconButton-root-37 css-NavIcon-b79v8y3 css-1l4orv7"
               disabled={false}
               onBlur={[Function]}
               onFocus={[Function]}
@@ -116,21 +117,21 @@ exports[`components/layout renders correctly 1`] = `
               type="button"
             >
               <span
-                className="MuiIconButton-label-58"
+                className="MuiIconButton-label-43"
               >
                 <span
                   aria-hidden="true"
-                  className="material-icons MuiIcon-root-63 MuiIconButton-icon-59 fa fa-file-text-o"
+                  className="material-icons MuiIcon-root-48 MuiIconButton-icon-44 fa fa-file-text-o"
                 />
               </span>
               <span
-                className="MuiTouchRipple-root-70"
+                className="MuiTouchRipple-root-55"
               />
             </button>
           </a>
           <button
             aria-label="Manage"
-            className="MuiButtonBase-root-61 MuiIconButton-root-52 Navbar-icon-14"
+            className="MuiButtonBase-root-46 MuiIconButton-root-37 css-NavIcon-b79v8y3 css-1l4orv7"
             disabled={false}
             onBlur={[Function]}
             onClick={[Function]}
@@ -147,15 +148,15 @@ exports[`components/layout renders correctly 1`] = `
             type="button"
           >
             <span
-              className="MuiIconButton-label-58"
+              className="MuiIconButton-label-43"
             >
               <span
                 aria-hidden="true"
-                className="material-icons MuiIcon-root-63 MuiIconButton-icon-59 fa fa-cog"
+                className="material-icons MuiIcon-root-48 MuiIconButton-icon-44 fa fa-cog"
               />
             </span>
             <span
-              className="MuiTouchRipple-root-70"
+              className="MuiTouchRipple-root-55"
             />
           </button>
         </div>
@@ -163,28 +164,29 @@ exports[`components/layout renders correctly 1`] = `
     </nav>
   </header>
   <main
-    className="Layout-main-2"
+    className="css-Main-ldzn8u1 css-1w42l51"
   >
     <aside
-      className="Layout-sidebar-6"
+      className="css-SideBar-ldzn8u5 css-1enpho3"
     >
       <div
-        className="MuiPaper-root-23 MuiPaper-shadow16-41 MuiPaper-rounded-24 SideNav-listWrapper-89 SideNav-sideNavMini-90"
+        className="MuiPaper-root-8 MuiPaper-shadow16-26 MuiPaper-rounded-9 css-ListWrapper-1uojgra0 css-cv81gj"
+        open={false}
       >
         <ul
-          className="MuiList-root-98 MuiList-padding-99 SideNav-list-94"
+          className="MuiList-root-72 MuiList-padding-73 css-NavList-1uojgra2 css-18kwbx0"
         >
           <a
             href="/log"
             onClick={[Function]}
           >
             <li
-              className="MuiListItem-root-102 MuiListItem-gutters-109 MuiListItem-default-105 SideNav-listItem-95"
+              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 css-NavItem-1uojgra3 css-1remvrh"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="MuiButtonBase-root-61 MuiButton-root-111 MuiButton-flatAccent-115 SideNav-button-96"
+                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 css-NavButton-1uojgra4 css-1gug5qk"
                 disabled={false}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -200,20 +202,21 @@ exports[`components/layout renders correctly 1`] = `
                 type="button"
               >
                 <span
-                  className="MuiButton-label-113"
+                  className="MuiButton-label-87"
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-63 fa fa-file-text-o SideNav-icon-93"
+                    className="material-icons MuiIcon-root-48 fa fa-file-text-o css-1y2l9le"
                   />
                   <p
-                    className="SideNav-label-91 SideNav-labelMini-92"
+                    className="css-Label-1uojgra1 css-1hgrgsx"
+                    open={false}
                   >
                     Log
                   </p>
                 </span>
                 <span
-                  className="MuiTouchRipple-root-70"
+                  className="MuiTouchRipple-root-55"
                 />
               </button>
             </li>
@@ -223,12 +226,12 @@ exports[`components/layout renders correctly 1`] = `
             onClick={[Function]}
           >
             <li
-              className="MuiListItem-root-102 MuiListItem-gutters-109 MuiListItem-default-105 SideNav-listItem-95"
+              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 css-NavItem-1uojgra3 css-1remvrh"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="MuiButtonBase-root-61 MuiButton-root-111 MuiButton-flatAccent-115 SideNav-button-96"
+                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 css-NavButton-1uojgra4 css-1gug5qk"
                 disabled={false}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -244,20 +247,21 @@ exports[`components/layout renders correctly 1`] = `
                 type="button"
               >
                 <span
-                  className="MuiButton-label-113"
+                  className="MuiButton-label-87"
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-63 fa fa-cog SideNav-icon-93"
+                    className="material-icons MuiIcon-root-48 fa fa-cog css-1y2l9le"
                   />
                   <p
-                    className="SideNav-label-91 SideNav-labelMini-92"
+                    className="css-Label-1uojgra1 css-1hgrgsx"
+                    open={false}
                   >
                     Execute
                   </p>
                 </span>
                 <span
-                  className="MuiTouchRipple-root-70"
+                  className="MuiTouchRipple-root-55"
                 />
               </button>
             </li>
@@ -267,12 +271,12 @@ exports[`components/layout renders correctly 1`] = `
             onClick={[Function]}
           >
             <li
-              className="MuiListItem-root-102 MuiListItem-gutters-109 MuiListItem-default-105 SideNav-listItem-95"
+              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 css-NavItem-1uojgra3 css-1remvrh"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="MuiButtonBase-root-61 MuiButton-root-111 MuiButton-flatAccent-115 SideNav-button-96"
+                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 css-NavButton-1uojgra4 css-1gug5qk"
                 disabled={false}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -288,20 +292,21 @@ exports[`components/layout renders correctly 1`] = `
                 type="button"
               >
                 <span
-                  className="MuiButton-label-113"
+                  className="MuiButton-label-87"
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-63 fa fa-pencil SideNav-icon-93"
+                    className="material-icons MuiIcon-root-48 fa fa-pencil css-1y2l9le"
                   />
                   <p
-                    className="SideNav-label-91 SideNav-labelMini-92"
+                    className="css-Label-1uojgra1 css-1hgrgsx"
+                    open={false}
                   >
                     Config
                   </p>
                 </span>
                 <span
-                  className="MuiTouchRipple-root-70"
+                  className="MuiTouchRipple-root-55"
                 />
               </button>
             </li>
@@ -311,12 +316,12 @@ exports[`components/layout renders correctly 1`] = `
             onClick={[Function]}
           >
             <li
-              className="MuiListItem-root-102 MuiListItem-gutters-109 MuiListItem-default-105 SideNav-listItem-95"
+              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 css-NavItem-1uojgra3 css-1remvrh"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="MuiButtonBase-root-61 MuiButton-root-111 MuiButton-flatAccent-115 SideNav-button-96"
+                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 css-NavButton-1uojgra4 css-1gug5qk"
                 disabled={false}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -332,20 +337,21 @@ exports[`components/layout renders correctly 1`] = `
                 type="button"
               >
                 <span
-                  className="MuiButton-label-113"
+                  className="MuiButton-label-87"
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-63 fa fa-history SideNav-icon-93"
+                    className="material-icons MuiIcon-root-48 fa fa-history css-1y2l9le"
                   />
                   <p
-                    className="SideNav-label-91 SideNav-labelMini-92"
+                    className="css-Label-1uojgra1 css-1hgrgsx"
+                    open={false}
                   >
                     History
                   </p>
                 </span>
                 <span
-                  className="MuiTouchRipple-root-70"
+                  className="MuiTouchRipple-root-55"
                 />
               </button>
             </li>
@@ -355,12 +361,12 @@ exports[`components/layout renders correctly 1`] = `
             onClick={[Function]}
           >
             <li
-              className="MuiListItem-root-102 MuiListItem-gutters-109 MuiListItem-default-105 SideNav-listItem-95"
+              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 css-NavItem-1uojgra3 css-1remvrh"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="MuiButtonBase-root-61 MuiButton-root-111 MuiButton-flatAccent-115 SideNav-button-96"
+                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 css-NavButton-1uojgra4 css-1gug5qk"
                 disabled={false}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -376,20 +382,21 @@ exports[`components/layout renders correctly 1`] = `
                 type="button"
               >
                 <span
-                  className="MuiButton-label-113"
+                  className="MuiButton-label-87"
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-63 fa fa-film SideNav-icon-93"
+                    className="material-icons MuiIcon-root-48 fa fa-film css-1y2l9le"
                   />
                   <p
-                    className="SideNav-label-91 SideNav-labelMini-92"
+                    className="css-Label-1uojgra1 css-1hgrgsx"
+                    open={false}
                   >
                     Movies
                   </p>
                 </span>
                 <span
-                  className="MuiTouchRipple-root-70"
+                  className="MuiTouchRipple-root-55"
                 />
               </button>
             </li>
@@ -399,12 +406,12 @@ exports[`components/layout renders correctly 1`] = `
             onClick={[Function]}
           >
             <li
-              className="MuiListItem-root-102 MuiListItem-gutters-109 MuiListItem-default-105 SideNav-listItem-95"
+              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 css-NavItem-1uojgra3 css-1remvrh"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="MuiButtonBase-root-61 MuiButton-root-111 MuiButton-flatAccent-115 SideNav-button-96"
+                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 css-NavButton-1uojgra4 css-1gug5qk"
                 disabled={false}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -420,20 +427,21 @@ exports[`components/layout renders correctly 1`] = `
                 type="button"
               >
                 <span
-                  className="MuiButton-label-113"
+                  className="MuiButton-label-87"
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-63 fa fa-check SideNav-icon-93"
+                    className="material-icons MuiIcon-root-48 fa fa-check css-1y2l9le"
                   />
                   <p
-                    className="SideNav-label-91 SideNav-labelMini-92"
+                    className="css-Label-1uojgra1 css-1hgrgsx"
+                    open={false}
                   >
                     Pending
                   </p>
                 </span>
                 <span
-                  className="MuiTouchRipple-root-70"
+                  className="MuiTouchRipple-root-55"
                 />
               </button>
             </li>
@@ -443,12 +451,12 @@ exports[`components/layout renders correctly 1`] = `
             onClick={[Function]}
           >
             <li
-              className="MuiListItem-root-102 MuiListItem-gutters-109 MuiListItem-default-105 SideNav-listItem-95"
+              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 css-NavItem-1uojgra3 css-1remvrh"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="MuiButtonBase-root-61 MuiButton-root-111 MuiButton-flatAccent-115 SideNav-button-96"
+                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 css-NavButton-1uojgra4 css-1gug5qk"
                 disabled={false}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -464,20 +472,21 @@ exports[`components/layout renders correctly 1`] = `
                 type="button"
               >
                 <span
-                  className="MuiButton-label-113"
+                  className="MuiButton-label-87"
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-63 fa fa-calendar SideNav-icon-93"
+                    className="material-icons MuiIcon-root-48 fa fa-calendar css-1y2l9le"
                   />
                   <p
-                    className="SideNav-label-91 SideNav-labelMini-92"
+                    className="css-Label-1uojgra1 css-1hgrgsx"
+                    open={false}
                   >
                     Schedule
                   </p>
                 </span>
                 <span
-                  className="MuiTouchRipple-root-70"
+                  className="MuiTouchRipple-root-55"
                 />
               </button>
             </li>
@@ -487,12 +496,12 @@ exports[`components/layout renders correctly 1`] = `
             onClick={[Function]}
           >
             <li
-              className="MuiListItem-root-102 MuiListItem-gutters-109 MuiListItem-default-105 SideNav-listItem-95"
+              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 css-NavItem-1uojgra3 css-1remvrh"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="MuiButtonBase-root-61 MuiButton-root-111 MuiButton-flatAccent-115 SideNav-button-96"
+                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 css-NavButton-1uojgra4 css-1gug5qk"
                 disabled={false}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -508,20 +517,21 @@ exports[`components/layout renders correctly 1`] = `
                 type="button"
               >
                 <span
-                  className="MuiButton-label-113"
+                  className="MuiButton-label-87"
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-63 fa fa-eye SideNav-icon-93"
+                    className="material-icons MuiIcon-root-48 fa fa-eye css-1y2l9le"
                   />
                   <p
-                    className="SideNav-label-91 SideNav-labelMini-92"
+                    className="css-Label-1uojgra1 css-1hgrgsx"
+                    open={false}
                   >
                     Seen
                   </p>
                 </span>
                 <span
-                  className="MuiTouchRipple-root-70"
+                  className="MuiTouchRipple-root-55"
                 />
               </button>
             </li>
@@ -531,12 +541,12 @@ exports[`components/layout renders correctly 1`] = `
             onClick={[Function]}
           >
             <li
-              className="MuiListItem-root-102 MuiListItem-gutters-109 MuiListItem-default-105 SideNav-listItem-95"
+              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 css-NavItem-1uojgra3 css-1remvrh"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="MuiButtonBase-root-61 MuiButton-root-111 MuiButton-flatAccent-115 SideNav-button-96"
+                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 css-NavButton-1uojgra4 css-1gug5qk"
                 disabled={false}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -552,20 +562,21 @@ exports[`components/layout renders correctly 1`] = `
                 type="button"
               >
                 <span
-                  className="MuiButton-label-113"
+                  className="MuiButton-label-87"
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-63 fa fa-tv SideNav-icon-93"
+                    className="material-icons MuiIcon-root-48 fa fa-tv css-1y2l9le"
                   />
                   <p
-                    className="SideNav-label-91 SideNav-labelMini-92"
+                    className="css-Label-1uojgra1 css-1hgrgsx"
+                    open={false}
                   >
                     Series
                   </p>
                 </span>
                 <span
-                  className="MuiTouchRipple-root-70"
+                  className="MuiTouchRipple-root-55"
                 />
               </button>
             </li>
@@ -575,12 +586,12 @@ exports[`components/layout renders correctly 1`] = `
             onClick={[Function]}
           >
             <li
-              className="MuiListItem-root-102 MuiListItem-gutters-109 MuiListItem-default-105 SideNav-listItem-95"
+              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 css-NavItem-1uojgra3 css-1remvrh"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="MuiButtonBase-root-61 MuiButton-root-111 MuiButton-flatAccent-115 SideNav-button-96"
+                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 css-NavButton-1uojgra4 css-1gug5qk"
                 disabled={false}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -596,45 +607,46 @@ exports[`components/layout renders correctly 1`] = `
                 type="button"
               >
                 <span
-                  className="MuiButton-label-113"
+                  className="MuiButton-label-87"
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-63 fa fa-heartbeat SideNav-icon-93"
+                    className="material-icons MuiIcon-root-48 fa fa-heartbeat css-1y2l9le"
                   />
                   <p
-                    className="SideNav-label-91 SideNav-labelMini-92"
+                    className="css-Label-1uojgra1 css-1hgrgsx"
+                    open={false}
                   >
                     Status
                   </p>
                 </span>
                 <span
-                  className="MuiTouchRipple-root-70"
+                  className="MuiTouchRipple-root-55"
                 />
               </button>
             </li>
           </a>
         </ul>
         <div
-          className="SideNav-versionHide-97"
+          className="css-NavVersion-1uojgra5 css-10oc3or"
         >
           <div
-            className="Version-version-125"
+            className="css-Wrapper-f238mn0 css-fdqscn"
           >
             <p
-              className="Version-par-126"
+              className="css-Line-f238mn1 css-6x29zm"
             >
               Version Info
             </p>
             <p
-              className="Version-par-126"
+              className="css-Line-f238mn1 css-6x29zm"
             >
               Flexget: 
                
                
             </p>
             <p
-              className="Version-par-126"
+              className="css-Line-f238mn1 css-6x29zm"
             >
               API: 
             </p>
@@ -643,7 +655,8 @@ exports[`components/layout renders correctly 1`] = `
       </div>
     </aside>
     <section
-      className="Layout-content-7"
+      className="css-Content-ldzn8u6 css-1ldoqnx"
+      open={false}
     >
       <div />
     </section>

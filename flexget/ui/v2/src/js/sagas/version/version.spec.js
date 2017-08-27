@@ -1,3 +1,4 @@
+import { delay } from 'redux-saga';
 import { call, put } from 'redux-saga/effects';
 import sagaHelper from 'redux-saga-testing';
 import { getVersion } from 'sagas/version';
@@ -5,10 +6,14 @@ import { get } from 'utils/fetch';
 import { action } from 'utils/actions';
 import { GET_VERSION } from 'actions/version';
 
-describe('sagas/series/shows', () => {
-  describe('getShows', () => {
+describe('sagas/version/', () => {
+  describe('getVersion', () => {
     describe('success', () => {
       const it = sagaHelper(getVersion());
+
+      it('should delay for 500 ms', (result) => {
+        expect(result).toEqual(call(delay, 500));
+      });
 
       it('should call get /server/version', (result) => {
         expect(result).toEqual(call(get, '/server/version'));
@@ -25,6 +30,10 @@ describe('sagas/series/shows', () => {
 
     describe('failure', () => {
       const it = sagaHelper(getVersion());
+
+      it('should delay for 500 ms', (result) => {
+        expect(result).toEqual(call(delay, 500));
+      });
 
       it('should call get /server/version', (result) => {
         expect(result).toEqual(call(get, '/server/version'));

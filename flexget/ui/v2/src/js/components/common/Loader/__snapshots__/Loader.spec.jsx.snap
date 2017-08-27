@@ -106,7 +106,6 @@ ShallowWrapper {
       "_compositeType": 2,
       "_context": Object {},
       "_currentElement": <Loader
-        error={false}
         isLoading={true}
         pastDelay={true}
         timedOut={false}
@@ -118,7 +117,6 @@ ShallowWrapper {
         "_reactInternalInstance": [Circular],
         "context": Object {},
         "props": Object {
-          "error": false,
           "isLoading": true,
           "pastDelay": true,
           "timedOut": false,
@@ -158,7 +156,6 @@ ShallowWrapper {
   },
   "root": [Circular],
   "unrendered": <Loader
-    error={false}
     isLoading={true}
     pastDelay={true}
     timedOut={false}
@@ -189,7 +186,6 @@ ShallowWrapper {
       "_compositeType": 2,
       "_context": Object {},
       "_currentElement": <Loader
-        error={false}
         isLoading={true}
         pastDelay={false}
         timedOut={true}
@@ -201,7 +197,6 @@ ShallowWrapper {
         "_reactInternalInstance": [Circular],
         "context": Object {},
         "props": Object {
-          "error": false,
           "isLoading": true,
           "pastDelay": false,
           "timedOut": true,
@@ -245,7 +240,6 @@ ShallowWrapper {
   },
   "root": [Circular],
   "unrendered": <Loader
-    error={false}
     isLoading={true}
     pastDelay={false}
     timedOut={true}

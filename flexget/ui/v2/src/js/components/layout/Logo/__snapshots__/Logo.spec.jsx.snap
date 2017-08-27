@@ -6,7 +6,8 @@ exports[`components/layout/Logo adds logoMini class without sideBarOpen 1`] = `
   onClick={[Function]}
 >
   <div
-    className="Logo-logo-1 Logo-logoMini-2"
+    className="css-NavLogo-pmb2010 css-1oup17m"
+    open={false}
   />
 </a>
 `;
@@ -17,7 +18,8 @@ exports[`components/layout/Logo renders correctly with sideBarOpen 1`] = `
   onClick={[Function]}
 >
   <div
-    className="Logo-logo-1"
+    className="css-NavLogo-pmb2010 css-1r3h2fj"
+    open={true}
   />
 </a>
 `;

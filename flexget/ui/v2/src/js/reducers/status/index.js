@@ -37,6 +37,7 @@ export default (state = initState, action) => {
     case LOCATION_CHANGE:
       return {
         ...initState,
+        loading: state.loading,
       };
     default:
       if (state.loading[action.type]) {
@@ -52,4 +53,3 @@ export default (state = initState, action) => {
       return state;
   }
 };
-

@@ -7,7 +7,7 @@
     "stage-0",
     "react"
   ],
-  "plugins": ["syntax-dynamic-import"],
+  "plugins": ["syntax-dynamic-import", "emotion"],
   "env": {
     "production": {
       "plugins": [

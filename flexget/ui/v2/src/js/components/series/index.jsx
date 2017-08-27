@@ -2,19 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import SeriesCard from 'components/series/SeriesCard';
 import Grid from 'material-ui/Grid';
-import { withStyles } from 'material-ui/styles';
-
-const styleSheet = () => ({
-  card: {
-    width: '100vw',
-  },
-});
+import { GridCard } from './styles';
 
 class SeriesPage extends Component {
   static propTypes = {
     shows: PropTypes.arrayOf(PropTypes.object).isRequired,
     getShows: PropTypes.func.isRequired,
-    classes: PropTypes.object.isRequired,
   };
 
   componentDidMount() {
@@ -22,19 +15,18 @@ class SeriesPage extends Component {
   }
 
   render() {
-    const { shows, classes } = this.props;
+    const { shows } = this.props;
 
     return (
       <Grid container spacing={24}>
         {shows.map(show => (
-          <Grid item key={show.id} sm={12} md={6} className={classes.card}>
+          <GridCard item key={show.id} sm={12} md={6}>
             <SeriesCard show={show} />
-          </Grid>
+          </GridCard>
         ))}
       </Grid>
     );
   }
 }
 
-export default withStyles(styleSheet)(SeriesPage);
-
+export default SeriesPage;

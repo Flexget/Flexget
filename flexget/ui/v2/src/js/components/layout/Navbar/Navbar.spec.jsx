@@ -1,9 +1,9 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 import { shallow } from 'enzyme';
-import IconButton from 'material-ui/IconButton';
 import { Navbar } from 'components/layout/Navbar';
 import { themed, router } from 'utils/tests';
+import { NavIcon } from './styles';
 
 function renderNavbar(toggle, logout) {
   return router(themed(<Navbar
@@ -34,7 +34,7 @@ describe('components/layout/Navbar', () => {
       shutdownServer={jest.fn()}
     />);
 
-    wrapper.find('.fa-bars').closest(IconButton).simulate('click');
+    wrapper.find('.fa-bars').closest(NavIcon).simulate('click');
     expect(toggle).toHaveBeenCalled();
   });
 
@@ -50,7 +50,7 @@ describe('components/layout/Navbar', () => {
       shutdownServer={jest.fn()}
     />);
 
-    const button = wrapper.find('.fa-cog').closest(IconButton);
+    const button = wrapper.find('.fa-cog').closest(NavIcon);
 
     button.simulate('click', { currentTarget: target });
     expect(wrapper.state().menuOpen).toEqual(true);

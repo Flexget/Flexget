@@ -1,10 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { withStyles } from 'material-ui/styles';
-import AppBar from 'material-ui/AppBar';
-import Toolbar from 'material-ui/Toolbar';
-import IconButton from 'material-ui/IconButton';
 import Icon from 'material-ui/Icon';
 import Menu, { MenuItem } from 'material-ui/Menu';
 import Dialog, {
@@ -15,29 +11,16 @@ import Dialog, {
 } from 'material-ui/Dialog';
 import Button from 'material-ui/Button';
 import 'font-awesome/css/font-awesome.css';
-
-const styleSheet = theme => ({
-  appBar: {
-    position: 'static',
-  },
-  spacer: {
-    flex: 1,
-  },
-  toolbar: {
-    backgroundColor: theme.palette.primary[800],
-    minHeight: 50,
-  },
-  icon: {
-    color: theme.palette.getContrastText(theme.palette.primary[800]),
-  },
-  menuIcon: {
-    paddingRight: 30,
-  },
-});
+import {
+  MenuIcon,
+  NavAppBar,
+  Spacer,
+  NavToolbar,
+  NavIcon,
+} from './styles';
 
 export class Navbar extends Component {
   static propTypes = {
-    classes: PropTypes.object.isRequired,
     toggle: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
     reloadServer: PropTypes.func.isRequired,
@@ -79,42 +62,32 @@ export class Navbar extends Component {
   });
 
   render() {
-    const { classes, toggle, logout } = this.props;
+    const { toggle, logout } = this.props;
     const { anchorEl, menuOpen, shutdownPrompt } = this.state;
 
     return (
-      <AppBar className={classes.appBar}>
-        <Toolbar className={classes.toolbar}>
-          <IconButton
-            className={classes.icon}
-            onClick={toggle}
-          >
+      <NavAppBar>
+        <NavToolbar>
+          <NavIcon onClick={toggle}>
             <Icon className="fa fa-bars" />
-          </IconButton>
-          <div className={classes.spacer} />
+          </NavIcon>
+          <Spacer />
           <Link to="/config">
-            <IconButton
-              className={classes.icon}
-              aria-label="Config"
-            >
+            <NavIcon aria-label="Config">
               <Icon className="fa fa-pencil" />
-            </IconButton>
+            </NavIcon>
           </Link>
           <Link to="/log">
-            <IconButton
-              className={classes.icon}
-              aria-label="Log"
-            >
+            <NavIcon aria-label="Log">
               <Icon className="fa fa-file-text-o" />
-            </IconButton>
+            </NavIcon>
           </Link>
-          <IconButton
-            className={classes.icon}
+          <NavIcon
             aria-label="Manage"
             onClick={this.handleMenuClick}
           >
             <Icon className="fa fa-cog" />
-          </IconButton>
+          </NavIcon>
           <Menu
             id="nav-menu"
             anchorEl={anchorEl}
@@ -122,23 +95,19 @@ export class Navbar extends Component {
             onRequestClose={this.handleMenuRequestClose}
           >
             <MenuItem onClick={this.handleReloadClick}>
-              <Icon
-                className={`${classes.menuIcon} fa fa-refresh`}
-              />
+              <MenuIcon className="fa fa-refresh" />
               Reload
             </MenuItem>
             <MenuItem onClick={this.handleShutdownPromptClick}>
-              <Icon
-                className={`${classes.menuIcon} fa fa-power-off`}
-              />
+              <MenuIcon className="fa fa-power-off" />
               Shutdown
             </MenuItem>
             <MenuItem>
-              <Icon className={`${classes.menuIcon} fa fa-database`} />
+              <MenuIcon className="fa fa-database" />
               Database
             </MenuItem>
             <MenuItem onClick={logout}>
-              <Icon className={`${classes.menuIcon} fa fa-sign-out`} />
+              <MenuIcon className="fa fa-sign-out" />
               Logout
             </MenuItem>
           </Menu>
@@ -158,10 +127,10 @@ export class Navbar extends Component {
               </Button>
             </DialogActions>
           </Dialog>
-        </Toolbar>
-      </AppBar>
+        </NavToolbar>
+      </NavAppBar>
     );
   }
 }
 
-export default withStyles(styleSheet)(Navbar);
+export default Navbar;

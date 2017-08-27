@@ -2,22 +2,23 @@
 
 exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
 <div
-  className="MuiPaper-root-10 MuiPaper-shadow16-28 MuiPaper-rounded-11 SideNav-listWrapper-1 SideNav-sideNavMini-2"
+  className="MuiPaper-root-1 MuiPaper-shadow16-19 MuiPaper-rounded-2 css-ListWrapper-1uojgra0 css-cv81gj"
+  open={false}
 >
   <ul
-    className="MuiList-root-37 MuiList-padding-38 SideNav-list-6"
+    className="MuiList-root-28 MuiList-padding-29 css-NavList-1uojgra2 css-18kwbx0"
   >
     <a
       href="/log"
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -33,20 +34,21 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-file-text-o SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-file-text-o css-1y2l9le"
             />
             <p
-              className="SideNav-label-3 SideNav-labelMini-4"
+              className="css-Label-1uojgra1 css-1hgrgsx"
+              open={false}
             >
               Log
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
@@ -56,12 +58,12 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -77,20 +79,21 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-cog SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-cog css-1y2l9le"
             />
             <p
-              className="SideNav-label-3 SideNav-labelMini-4"
+              className="css-Label-1uojgra1 css-1hgrgsx"
+              open={false}
             >
               Execute
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
@@ -100,12 +103,12 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -121,20 +124,21 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-pencil SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-pencil css-1y2l9le"
             />
             <p
-              className="SideNav-label-3 SideNav-labelMini-4"
+              className="css-Label-1uojgra1 css-1hgrgsx"
+              open={false}
             >
               Config
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
@@ -144,12 +148,12 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -165,20 +169,21 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-history SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-history css-1y2l9le"
             />
             <p
-              className="SideNav-label-3 SideNav-labelMini-4"
+              className="css-Label-1uojgra1 css-1hgrgsx"
+              open={false}
             >
               History
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
@@ -188,12 +193,12 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -209,20 +214,21 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-film SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-film css-1y2l9le"
             />
             <p
-              className="SideNav-label-3 SideNav-labelMini-4"
+              className="css-Label-1uojgra1 css-1hgrgsx"
+              open={false}
             >
               Movies
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
@@ -232,12 +238,12 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -253,20 +259,21 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-check SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-check css-1y2l9le"
             />
             <p
-              className="SideNav-label-3 SideNav-labelMini-4"
+              className="css-Label-1uojgra1 css-1hgrgsx"
+              open={false}
             >
               Pending
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
@@ -276,12 +283,12 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -297,20 +304,21 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-calendar SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-calendar css-1y2l9le"
             />
             <p
-              className="SideNav-label-3 SideNav-labelMini-4"
+              className="css-Label-1uojgra1 css-1hgrgsx"
+              open={false}
             >
               Schedule
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
@@ -320,12 +328,12 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -341,20 +349,21 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-eye SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-eye css-1y2l9le"
             />
             <p
-              className="SideNav-label-3 SideNav-labelMini-4"
+              className="css-Label-1uojgra1 css-1hgrgsx"
+              open={false}
             >
               Seen
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
@@ -364,12 +373,12 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -385,20 +394,21 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-tv SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-tv css-1y2l9le"
             />
             <p
-              className="SideNav-label-3 SideNav-labelMini-4"
+              className="css-Label-1uojgra1 css-1hgrgsx"
+              open={false}
             >
               Series
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
@@ -408,12 +418,12 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -429,45 +439,46 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-heartbeat SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-heartbeat css-1y2l9le"
             />
             <p
-              className="SideNav-label-3 SideNav-labelMini-4"
+              className="css-Label-1uojgra1 css-1hgrgsx"
+              open={false}
             >
               Status
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
     </a>
   </ul>
   <div
-    className="SideNav-versionHide-9"
+    className="css-NavVersion-1uojgra5 css-10oc3or"
   >
     <div
-      className="Version-version-80"
+      className="css-Wrapper-f238mn0 css-fdqscn"
     >
       <p
-        className="Version-par-81"
+        className="css-Line-f238mn1 css-6x29zm"
       >
         Version Info
       </p>
       <p
-        className="Version-par-81"
+        className="css-Line-f238mn1 css-6x29zm"
       >
         Flexget: 
          
          
       </p>
       <p
-        className="Version-par-81"
+        className="css-Line-f238mn1 css-6x29zm"
       >
         API: 
       </p>
@@ -478,22 +489,23 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
 
 exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
 <div
-  className="MuiPaper-root-10 MuiPaper-shadow16-28 MuiPaper-rounded-11 SideNav-listWrapper-1"
+  className="MuiPaper-root-1 MuiPaper-shadow16-19 MuiPaper-rounded-2 css-ListWrapper-1uojgra0 css-yfv61s"
+  open={true}
 >
   <ul
-    className="MuiList-root-37 MuiList-padding-38 SideNav-list-6"
+    className="MuiList-root-28 MuiList-padding-29 css-NavList-1uojgra2 css-18kwbx0"
   >
     <a
       href="/log"
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -509,20 +521,21 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-file-text-o SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-file-text-o css-1y2l9le"
             />
             <p
-              className="SideNav-label-3"
+              className="css-Label-1uojgra1 css-1lwlcmp"
+              open={true}
             >
               Log
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
@@ -532,12 +545,12 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -553,20 +566,21 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-cog SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-cog css-1y2l9le"
             />
             <p
-              className="SideNav-label-3"
+              className="css-Label-1uojgra1 css-1lwlcmp"
+              open={true}
             >
               Execute
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
@@ -576,12 +590,12 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -597,20 +611,21 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-pencil SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-pencil css-1y2l9le"
             />
             <p
-              className="SideNav-label-3"
+              className="css-Label-1uojgra1 css-1lwlcmp"
+              open={true}
             >
               Config
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
@@ -620,12 +635,12 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -641,20 +656,21 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-history SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-history css-1y2l9le"
             />
             <p
-              className="SideNav-label-3"
+              className="css-Label-1uojgra1 css-1lwlcmp"
+              open={true}
             >
               History
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
@@ -664,12 +680,12 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -685,20 +701,21 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-film SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-film css-1y2l9le"
             />
             <p
-              className="SideNav-label-3"
+              className="css-Label-1uojgra1 css-1lwlcmp"
+              open={true}
             >
               Movies
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
@@ -708,12 +725,12 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -729,20 +746,21 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-check SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-check css-1y2l9le"
             />
             <p
-              className="SideNav-label-3"
+              className="css-Label-1uojgra1 css-1lwlcmp"
+              open={true}
             >
               Pending
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
@@ -752,12 +770,12 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -773,20 +791,21 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-calendar SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-calendar css-1y2l9le"
             />
             <p
-              className="SideNav-label-3"
+              className="css-Label-1uojgra1 css-1lwlcmp"
+              open={true}
             >
               Schedule
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
@@ -796,12 +815,12 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -817,20 +836,21 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-eye SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-eye css-1y2l9le"
             />
             <p
-              className="SideNav-label-3"
+              className="css-Label-1uojgra1 css-1lwlcmp"
+              open={true}
             >
               Seen
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
@@ -840,12 +860,12 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -861,20 +881,21 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-tv SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-tv css-1y2l9le"
             />
             <p
-              className="SideNav-label-3"
+              className="css-Label-1uojgra1 css-1lwlcmp"
+              open={true}
             >
               Series
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
@@ -884,12 +905,12 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-41 MuiListItem-gutters-48 MuiListItem-default-44 SideNav-listItem-7"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 css-NavItem-1uojgra3 css-1remvrh"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-64 MuiButton-root-50 MuiButton-flatAccent-54 SideNav-button-8"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 css-NavButton-1uojgra4 css-1gug5qk"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -905,45 +926,46 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           type="button"
         >
           <span
-            className="MuiButton-label-52"
+            className="MuiButton-label-43"
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-66 fa fa-heartbeat SideNav-icon-5"
+              className="material-icons MuiIcon-root-57 fa fa-heartbeat css-1y2l9le"
             />
             <p
-              className="SideNav-label-3"
+              className="css-Label-1uojgra1 css-1lwlcmp"
+              open={true}
             >
               Status
             </p>
           </span>
           <span
-            className="MuiTouchRipple-root-73"
+            className="MuiTouchRipple-root-64"
           />
         </button>
       </li>
     </a>
   </ul>
   <div
-    className=""
+    className="css-NavVersion-1uojgra5 css-1833tui"
   >
     <div
-      className="Version-version-80"
+      className="css-Wrapper-f238mn0 css-fdqscn"
     >
       <p
-        className="Version-par-81"
+        className="css-Line-f238mn1 css-6x29zm"
       >
         Version Info
       </p>
       <p
-        className="Version-par-81"
+        className="css-Line-f238mn1 css-6x29zm"
       >
         Flexget: 
          
          
       </p>
       <p
-        className="Version-par-81"
+        className="css-Line-f238mn1 css-6x29zm"
       >
         API: 
       </p>

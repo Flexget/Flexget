@@ -2,15 +2,15 @@
 
 exports[`components/layout/Version renders correctly with latest version 1`] = `
 <div
-  className="Version-version-1"
+  className="css-Wrapper-f238mn0 css-fdqscn"
 >
   <p
-    className="Version-par-2"
+    className="css-Line-f238mn1 css-6x29zm"
   >
     Version Info
   </p>
   <p
-    className="Version-par-2"
+    className="css-Line-f238mn1 css-6x29zm"
   >
     Flexget: 
     2.10.60
@@ -18,7 +18,7 @@ exports[`components/layout/Version renders correctly with latest version 1`] = `
      
   </p>
   <p
-    className="Version-par-2"
+    className="css-Line-f238mn1 css-6x29zm"
   >
     API: 
     1.1.2
@@ -28,21 +28,21 @@ exports[`components/layout/Version renders correctly with latest version 1`] = `
 
 exports[`components/layout/Version renders correctly without latest version 1`] = `
 <div
-  className="Version-version-1"
+  className="css-Wrapper-f238mn0 css-fdqscn"
 >
   <p
-    className="Version-par-2"
+    className="css-Line-f238mn1 css-6x29zm"
   >
     Version Info
   </p>
   <p
-    className="Version-par-2"
+    className="css-Line-f238mn1 css-6x29zm"
   >
     Flexget: 
     2.10.11
      
     <a
-      className="MuiButtonBase-root-12 MuiIconButton-root-3"
+      className="MuiButtonBase-root-10 MuiIconButton-root-1"
       href="https://flexget.com/ChangeLog"
       onBlur={[Function]}
       onFocus={[Function]}
@@ -56,21 +56,21 @@ exports[`components/layout/Version renders correctly without latest version 1`] 
       tabIndex="0"
     >
       <span
-        className="MuiIconButton-label-9"
+        className="MuiIconButton-label-7"
       >
         <span
           aria-hidden="true"
-          className="material-icons MuiIcon-root-14 MuiIconButton-icon-10 fa fa-question-circle-o Version-version-1"
+          className="material-icons MuiIcon-root-12 MuiIconButton-icon-8 fa fa-question-circle-o css-fdqscn"
         />
       </span>
       <span
-        className="MuiTouchRipple-root-21"
+        className="MuiTouchRipple-root-19"
       />
     </a>
      
   </p>
   <p
-    className="Version-par-2"
+    className="css-Line-f238mn1 css-6x29zm"
   >
     API: 
     1.1.2

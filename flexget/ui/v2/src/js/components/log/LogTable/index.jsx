@@ -1,36 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from 'material-ui/styles';
-import { AutoSizer, Table, Column } from 'react-virtualized';
+import { AutoSizer, Column } from 'react-virtualized';
 import 'react-virtualized/styles.css';
+import { Table, rowClasses } from './styles';
 
-const styleSheet = () => ({
-  table: {
-    fontSize: 10,
-  },
-  error: {
-    backgroundColor: '#f2dede',
-  },
-  critical: {
-    backgroundColor: '#f2dede',
-  },
-  warning: {
-    backgroundColor: '#fcf8e3',
-  },
-});
-
-const LogTable = ({ messages, classes }) => (
+const LogTable = ({ messages }) => (
   <AutoSizer>
     {({ height, width }) => (
       <Table
-        className={classes.table}
         rowCount={messages.length}
         rowHeight={20}
         headerHeight={50}
         width={width}
         height={height}
         rowGetter={({ index }) => messages[index]}
-        rowClassName={({ index }) => messages[index] && classes[messages[index]
+        rowClassName={({ index }) => messages[index] && rowClasses[messages[index]
           .log_level.toLowerCase()]}
       >
         <Column
@@ -72,7 +56,6 @@ LogTable.propTypes = {
     log_level: PropTypes.string,
     plugin: PropTypes.string,
   })).isRequired,
-  classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styleSheet)(LogTable);
+export default LogTable;

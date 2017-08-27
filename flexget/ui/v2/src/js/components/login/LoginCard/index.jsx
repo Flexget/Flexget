@@ -1,72 +1,47 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Field, reduxForm } from 'redux-form';
-import Button from 'material-ui/Button';
-import Card, { CardActions, CardContent } from 'material-ui/Card';
-import { withStyles } from 'material-ui/styles';
+import { reduxForm } from 'redux-form';
+import { CardActions } from 'material-ui/Card';
 import TextField from 'components/common/TextField';
+import {
+  Card,
+  ErrorMessage,
+  LoginButton,
+  Content,
+  LoginField,
+} from './styles';
 
-const styleSheet = theme => ({
-  card: {
-    maxWidth: 400,
-    margin: '0 10px',
-    [theme.breakpoints.up('sm')]: {
-      margin: '0 auto',
-    },
-  },
-  error: {
-    color: theme.palette.error[500],
-    textAlign: 'center',
-    padding: 10,
-  },
-  button: {
-    width: '100%',
-  },
-  cardContent: {
-    display: 'flex',
-    flex: {
-      direction: 'column',
-    },
-  },
-  field: {
-    paddingBottom: 10,
-  },
-});
-
-export const LoginCard = ({ classes, handleSubmit, errorStatus }) => (
-  <Card className={classes.card}>
+export const LoginCard = ({ handleSubmit, errorStatus }) => (
+  <Card>
     <form onSubmit={handleSubmit}>
-      <CardContent className={classes.cardContent}>
-        <div className={classes.error}>
+      <Content>
+        <ErrorMessage>
           {errorStatus.message}
-        </div>
-        <Field
+        </ErrorMessage>
+        <LoginField
           name="username"
           component={TextField}
           id="username"
           label="Username"
-          className={classes.field}
         />
-        <Field
+        <LoginField
           name="password"
           component={TextField}
           id="password"
           label="Password"
           type="Password"
-          className={classes.field}
         />
-      </CardContent>
+      </Content>
       <CardActions>
-        <Button type="submit" className={classes.button}>
+        <LoginButton type="submit">
           Login
-        </Button>
+        </LoginButton>
       </CardActions>
     </form>
   </Card>
 );
 
 LoginCard.propTypes = {
-  classes: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   errorStatus: PropTypes.object,
 };
@@ -77,4 +52,4 @@ LoginCard.defaultProps = {
 
 export default reduxForm({
   form: 'login',
-})(withStyles(styleSheet)(LoginCard));
+})(LoginCard);
