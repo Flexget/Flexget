@@ -11,11 +11,11 @@ import {
 const SeriesCard = ({ show }) => (
   <Card>
     <Media
-      image={show.lookup.tvdb.banner || ''}
+      image={show.lookup.tvdb.banner ? `/api/cached?url=${show.lookup.tvdb.banner}` : ''}
       title={show.lookup.tvdb.series_name}
     >
       <Image
-        src={show.lookup.tvdb.banner || blank}
+        src={blank}
         alt=""
       />
     </Media>
