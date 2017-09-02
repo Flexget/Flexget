@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from 'emotion/react';
 import theme from 'theme';
 
 const HEADER_HEIGHT = 5;

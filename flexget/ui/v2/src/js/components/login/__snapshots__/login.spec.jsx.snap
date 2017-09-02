@@ -3,72 +3,72 @@
 exports[`components/login renders correctly when logged in 1`] = `null`;
 
 exports[`components/login renders correctly when logged out 1`] = `
-.c1 {
-  max-width: 40rem;
-  margin: 0 1rem;
-}
-
-.c3 {
-  color: #f44336;
-  text-align: center;
-  padding: 1rem;
-}
-
-.c5 {
-  width: 100%;
-}
-
-.c2 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-}
-
-.c4 {
-  padding-bottom: 1rem;
-}
-
-.c0 {
+.glamor-1 {
   background: transparent url(test-file-stub) no-repeat center;
   min-height: 9rem;
   background-size: 100% auto;
   margin: 0 1rem;
 }
 
+.glamor-13 {
+  max-width: 40rem;
+  margin: 0 1rem;
+}
+
+.glamor-9 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.glamor-3 {
+  color: #f44336;
+  text-align: center;
+  padding: 1rem;
+}
+
+.glamor-5 {
+  padding-bottom: 1rem;
+}
+
+.glamor-11 {
+  width: 100%;
+}
+
 @media (min-width:600px) {
-  .c1 {
-    margin: 0 auto;
+  .glamor-1 {
+    background-size: auto;
   }
 }
 
 @media (min-width:600px) {
-  .c0 {
-    background-size: auto;
+  .glamor-13 {
+    margin: 0 auto;
   }
 }
 
 <div>
   <div
-    className="c0"
+    className="glamor-0 glamor-1"
   />
   <div
-    className="MuiPaper-root-1 MuiPaper-shadow2-5 MuiPaper-rounded-2 c1"
+    className="MuiPaper-root-1 MuiPaper-shadow2-5 MuiPaper-rounded-2 glamor-12 glamor-13"
   >
     <form
       onSubmit={[Function]}
     >
       <div
-        className="MuiCardContent-root-28 c2"
+        className="MuiCardContent-root-28 glamor-8 glamor-9"
       >
         <div
-          className="c3"
+          className="glamor-2 glamor-3"
         />
         <div
-          className="MuiFormControl-root-29 c4"
+          className="MuiFormControl-root-29 glamor-4 glamor-5"
           onBlur={[Function]}
           onChange={[Function]}
           onDragStart={[Function]}
@@ -107,7 +107,7 @@ exports[`components/login renders correctly when logged out 1`] = `
           </div>
         </div>
         <div
-          className="MuiFormControl-root-29 c4"
+          className="MuiFormControl-root-29 glamor-4 glamor-5"
           onBlur={[Function]}
           onChange={[Function]}
           onDragStart={[Function]}
@@ -150,7 +150,7 @@ exports[`components/login renders correctly when logged out 1`] = `
         className="MuiCardActions-root-56"
       >
         <button
-          className="MuiButtonBase-root-72 MuiButton-root-58 MuiCardActions-actionSpacing-57 c5"
+          className="MuiButtonBase-root-72 MuiButton-root-58 glamor-10 MuiCardActions-actionSpacing-57 glamor-11"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}

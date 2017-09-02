@@ -1,16 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`components/layout/Logo adds logoMini class without sideBarOpen 1`] = `
-.c0 {
+.glamor-1 {
   background: #263238 url(test-file-stub) no-repeat center;
   background-size: 17.5rem;
   height: 100%;
-  -webkit-transition: width 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
-  transition: width 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
+  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 }
 
 @media (min-width:600px) {
-  .c0 {
+  .glamor-1 {
     width: 5rem;
     background-size: 24rem;
   }
@@ -21,23 +21,23 @@ exports[`components/layout/Logo adds logoMini class without sideBarOpen 1`] = `
   onClick={[Function]}
 >
   <div
-    className="c0"
+    className="glamor-0 glamor-1"
     open={false}
   />
 </a>
 `;
 
 exports[`components/layout/Logo renders correctly with sideBarOpen 1`] = `
-.c0 {
+.glamor-1 {
   background: #263238 url(test-file-stub) no-repeat center;
   background-size: 17.5rem;
   height: 100%;
-  -webkit-transition: width 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
-  transition: width 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
+  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 }
 
 @media (min-width:600px) {
-  .c0 {
+  .glamor-1 {
     width: 19rem;
     background-size: 17.5rem;
   }
@@ -48,7 +48,7 @@ exports[`components/layout/Logo renders correctly with sideBarOpen 1`] = `
   onClick={[Function]}
 >
   <div
-    className="c0"
+    className="glamor-0 glamor-1"
     open={true}
   />
 </a>

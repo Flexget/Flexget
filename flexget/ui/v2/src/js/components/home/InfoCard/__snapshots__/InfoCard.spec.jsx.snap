@@ -1,36 +1,35 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`components/home/InfoCard renders correctly 1`] = `
-.c0 {
+.glamor-7 {
   margin: 0 auto;
 }
 
-.c1 {
+.glamor-1 {
   background-color: #ef6c00;
 }
 
-.c2 {
+.glamor-3 {
   font-weight: bold;
 }
 
-.c3 {
+.glamor-5 {
   -webkit-box-pack: center;
-  -webkit-justify-content: center;
   -ms-flex-pack: center;
   justify-content: center;
 }
 
 @media (min-width:600px) {
-  .c0 {
+  .glamor-7 {
     width: 50%;
   }
 }
 
 <div
-  className="MuiPaper-root-1 MuiPaper-shadow2-5 MuiPaper-rounded-2 c0"
+  className="MuiPaper-root-1 MuiPaper-shadow2-5 MuiPaper-rounded-2 glamor-6 glamor-7"
 >
   <div
-    className="MuiCardContent-root-33 MuiCardHeader-root-28 c1"
+    className="MuiCardContent-root-33 MuiCardHeader-root-28 glamor-0 glamor-1"
   >
     <div
       className="MuiCardHeader-content-30"
@@ -51,7 +50,7 @@ exports[`components/home/InfoCard renders correctly 1`] = `
     className="MuiCardContent-root-33"
   >
     <p
-      className="c2"
+      className="glamor-2 glamor-3"
     >
       We need your help! If you are a React developer or can help with the layout/design/css then please join in the effort!
     </p>
@@ -91,7 +90,7 @@ exports[`components/home/InfoCard renders correctly 1`] = `
     </p>
   </div>
   <div
-    className="MuiCardActions-root-56 c3"
+    className="MuiCardActions-root-56 glamor-4 glamor-5"
   >
     <a
       aria-label="Github"

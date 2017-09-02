@@ -1,55 +1,55 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`components/login/LoginCard renders correctly 1`] = `
-.c0 {
+.glamor-11 {
   max-width: 40rem;
   margin: 0 1rem;
 }
 
-.c2 {
+.glamor-7 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.glamor-1 {
   color: #f44336;
   text-align: center;
   padding: 1rem;
 }
 
-.c4 {
-  width: 100%;
-}
-
-.c1 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-}
-
-.c3 {
+.glamor-3 {
   padding-bottom: 1rem;
 }
 
+.glamor-9 {
+  width: 100%;
+}
+
 @media (min-width:600px) {
-  .c0 {
+  .glamor-11 {
     margin: 0 auto;
   }
 }
 
 <div
-  className="MuiPaper-root-1 MuiPaper-shadow2-5 MuiPaper-rounded-2 c0"
+  className="MuiPaper-root-1 MuiPaper-shadow2-5 MuiPaper-rounded-2 glamor-10 glamor-11"
 >
   <form
     onSubmit={[Function]}
   >
     <div
-      className="MuiCardContent-root-28 c1"
+      className="MuiCardContent-root-28 glamor-6 glamor-7"
     >
       <div
-        className="c2"
+        className="glamor-0 glamor-1"
       />
       <div
-        className="MuiFormControl-root-29 c3"
+        className="MuiFormControl-root-29 glamor-2 glamor-3"
         onBlur={[Function]}
         onChange={[Function]}
         onDragStart={[Function]}
@@ -88,7 +88,7 @@ exports[`components/login/LoginCard renders correctly 1`] = `
         </div>
       </div>
       <div
-        className="MuiFormControl-root-29 c3"
+        className="MuiFormControl-root-29 glamor-2 glamor-3"
         onBlur={[Function]}
         onChange={[Function]}
         onDragStart={[Function]}
@@ -131,7 +131,7 @@ exports[`components/login/LoginCard renders correctly 1`] = `
       className="MuiCardActions-root-56"
     >
       <button
-        className="MuiButtonBase-root-72 MuiButton-root-58 MuiCardActions-actionSpacing-57 c4"
+        className="MuiButtonBase-root-72 MuiButton-root-58 glamor-8 MuiCardActions-actionSpacing-57 glamor-9"
         disabled={false}
         onBlur={[Function]}
         onFocus={[Function]}

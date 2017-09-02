@@ -1,82 +1,84 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
-.c6 {
-  composes: color:#f44336;
+.glamor-65 {
+  color: #f44336;
 }
 
-.c7 {
-  margin: 0;
+.glamor-0 {
+  color: #b0bec5;
 }
 
-.c0 {
-  background-color: #263238;
-  -webkit-transition: width 300ms cubic-bezier(0.4,0,0.2,1) 0ms,visibility 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
-  transition: width 300ms cubic-bezier(0.4,0,0.2,1) 0ms,visibility 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
-  height: auto;
-  width: 0;
-  border-radius: 0;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  visibility: hidden;
-}
-
-.c4 {
-  composes: color:#b0bec5;
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-  text-transform: none;
-  visibility: hidden;
-  opacity: 0;
-  -webkit-transition: visibility 300ms cubic-bezier(0.4,0,0.2,1) 0ms,opacity 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
-  transition: visibility 300ms cubic-bezier(0.4,0,0.2,1) 0ms,opacity 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
-  width: 0;
-}
-
-.c1 {
-  -webkit-flex: 1;
+.glamor-57 {
+  -webkit-box-flex: 1;
   -ms-flex: 1;
   flex: 1;
 }
 
-.c2 {
-  padding: 0;
+.glamor-6 {
+  padding: 0px;
   height: 4.8rem;
   border-left: 3px solid transparent;
 }
 
-.c2:hover {
+.glamor-6:hover {
   border-left: 3px solid #ff9800;
 }
 
-.c3 {
+.glamor-4 {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: center;
-  -webkit-justify-content: center;
   -ms-flex-pack: center;
   justify-content: center;
   width: 100%;
   height: 100%;
   min-width: 5rem;
-  padding-top: 0;
-  padding-bottom: 0;
+  padding-top: 0px;
+  padding-bottom: 0px;
 }
 
-.c5 {
+.glamor-59 {
+  margin: 0px;
+}
+
+.glamor-69 {
+  background-color: #263238;
+  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,visibility 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,visibility 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  height: auto;
+  width: 0;
+  border-radius: 0px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  visibility: hidden;
+}
+
+.glamor-2 {
+  color: #b0bec5;
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  text-transform: none;
+  visibility: hidden;
+  opacity: 0;
+  -webkit-transition: visibility 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: visibility 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  width: 0;
+}
+
+.glamor-67 {
   display: none;
 }
 
 @media (min-width:600px) {
-  .c0 {
+  .glamor-69 {
     height: calc(100% - 5rem);
     width: 5rem;
     position: fixed;
@@ -85,23 +87,23 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
 }
 
 <div
-  className="MuiPaper-root-1 MuiPaper-shadow16-19 MuiPaper-rounded-2 c0"
+  className="MuiPaper-root-1 MuiPaper-shadow16-19 MuiPaper-rounded-2 glamor-68 glamor-69"
   open={false}
 >
   <ul
-    className="MuiList-root-28 MuiList-padding-29 c1"
+    className="MuiList-root-28 MuiList-padding-29 glamor-56 glamor-57"
   >
     <a
       href="/config"
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 glamor-5 glamor-6"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 glamor-3 glamor-4"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -121,10 +123,10 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-pencil color: #b0bec5 ;"
+              className="material-icons MuiIcon-root-57 fa fa-pencil glamor-0"
             />
             <p
-              className="c4"
+              className="glamor-1 glamor-2"
               open={false}
             >
               Config
@@ -141,12 +143,12 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 glamor-5 glamor-6"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 glamor-3 glamor-4"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -166,10 +168,10 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-history color: #b0bec5 ;"
+              className="material-icons MuiIcon-root-57 fa fa-history glamor-0"
             />
             <p
-              className="c4"
+              className="glamor-1 glamor-2"
               open={false}
             >
               History
@@ -186,12 +188,12 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 glamor-5 glamor-6"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 glamor-3 glamor-4"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -211,10 +213,10 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-file-text-o color: #b0bec5 ;"
+              className="material-icons MuiIcon-root-57 fa fa-file-text-o glamor-0"
             />
             <p
-              className="c4"
+              className="glamor-1 glamor-2"
               open={false}
             >
               Log
@@ -231,12 +233,12 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 glamor-5 glamor-6"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 glamor-3 glamor-4"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -256,10 +258,10 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-film color: #b0bec5 ;"
+              className="material-icons MuiIcon-root-57 fa fa-film glamor-0"
             />
             <p
-              className="c4"
+              className="glamor-1 glamor-2"
               open={false}
             >
               Movies
@@ -276,12 +278,12 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 glamor-5 glamor-6"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 glamor-3 glamor-4"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -301,10 +303,10 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-check color: #b0bec5 ;"
+              className="material-icons MuiIcon-root-57 fa fa-check glamor-0"
             />
             <p
-              className="c4"
+              className="glamor-1 glamor-2"
               open={false}
             >
               Pending
@@ -321,12 +323,12 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 glamor-5 glamor-6"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 glamor-3 glamor-4"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -346,10 +348,10 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-eye color: #b0bec5 ;"
+              className="material-icons MuiIcon-root-57 fa fa-eye glamor-0"
             />
             <p
-              className="c4"
+              className="glamor-1 glamor-2"
               open={false}
             >
               Seen
@@ -366,12 +368,12 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 glamor-5 glamor-6"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 glamor-3 glamor-4"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -391,10 +393,10 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-tv color: #b0bec5 ;"
+              className="material-icons MuiIcon-root-57 fa fa-tv glamor-0"
             />
             <p
-              className="c4"
+              className="glamor-1 glamor-2"
               open={false}
             >
               Series
@@ -411,12 +413,12 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 glamor-5 glamor-6"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 glamor-3 glamor-4"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -436,10 +438,10 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-tasks color: #b0bec5 ;"
+              className="material-icons MuiIcon-root-57 fa fa-tasks glamor-0"
             />
             <p
-              className="c4"
+              className="glamor-1 glamor-2"
               open={false}
             >
               Tasks
@@ -453,25 +455,25 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
     </a>
   </ul>
   <div
-    className="c5"
+    className="glamor-66 glamor-67"
   >
     <div
-      className="c6"
+      className="glamor-64 glamor-65"
     >
       <p
-        className="c7"
+        className="glamor-58 glamor-59"
       >
         Version Info
       </p>
       <p
-        className="c7"
+        className="glamor-58 glamor-59"
       >
         Flexget: 
          
          
       </p>
       <p
-        className="c7"
+        className="glamor-58 glamor-59"
       >
         API: 
       </p>
@@ -481,82 +483,84 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
 `;
 
 exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
-.c6 {
-  composes: color:#f44336;
+.glamor-65 {
+  color: #f44336;
 }
 
-.c7 {
-  margin: 0;
+.glamor-0 {
+  color: #b0bec5;
 }
 
-.c0 {
+.glamor-69 {
   background-color: #263238;
-  -webkit-transition: width 300ms cubic-bezier(0.4,0,0.2,1) 0ms,visibility 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
-  transition: width 300ms cubic-bezier(0.4,0,0.2,1) 0ms,visibility 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
+  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,visibility 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,visibility 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
   height: auto;
   width: 100vw;
-  border-radius: 0;
+  border-radius: 0px;
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-direction: column;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
   visibility: visible;
 }
 
-.c4 {
-  composes: color:#b0bec5;
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-  text-transform: none;
-  visibility: visible;
-  opacity: 1;
-  -webkit-transition: visibility 300ms cubic-bezier(0.4,0,0.2,1) 0ms,opacity 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
-  transition: visibility 300ms cubic-bezier(0.4,0,0.2,1) 0ms,opacity 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
-  width: auto;
-}
-
-.c1 {
-  -webkit-flex: 1;
+.glamor-57 {
+  -webkit-box-flex: 1;
   -ms-flex: 1;
   flex: 1;
 }
 
-.c2 {
-  padding: 0;
+.glamor-6 {
+  padding: 0px;
   height: 4.8rem;
   border-left: 3px solid transparent;
 }
 
-.c2:hover {
+.glamor-6:hover {
   border-left: 3px solid #ff9800;
 }
 
-.c3 {
+.glamor-4 {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: center;
-  -webkit-justify-content: center;
   -ms-flex-pack: center;
   justify-content: center;
   width: 100%;
   height: 100%;
   min-width: 5rem;
-  padding-top: 0;
-  padding-bottom: 0;
+  padding-top: 0px;
+  padding-bottom: 0px;
 }
 
-.c5 {
+.glamor-2 {
+  color: #b0bec5;
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  text-transform: none;
+  visibility: visible;
+  opacity: 1;
+  -webkit-transition: visibility 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: visibility 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  width: auto;
+}
+
+.glamor-67 {
   display: block;
 }
 
+.glamor-59 {
+  margin: 0px;
+}
+
 @media (min-width:600px) {
-  .c0 {
+  .glamor-69 {
     height: calc(100% - 5rem);
     width: 19rem;
     position: fixed;
@@ -565,23 +569,23 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
 }
 
 <div
-  className="MuiPaper-root-1 MuiPaper-shadow16-19 MuiPaper-rounded-2 c0"
+  className="MuiPaper-root-1 MuiPaper-shadow16-19 MuiPaper-rounded-2 glamor-68 glamor-69"
   open={true}
 >
   <ul
-    className="MuiList-root-28 MuiList-padding-29 c1"
+    className="MuiList-root-28 MuiList-padding-29 glamor-56 glamor-57"
   >
     <a
       href="/config"
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 glamor-5 glamor-6"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 glamor-3 glamor-4"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -601,10 +605,10 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-pencil color: #b0bec5 ;"
+              className="material-icons MuiIcon-root-57 fa fa-pencil glamor-0"
             />
             <p
-              className="c4"
+              className="glamor-1 glamor-2"
               open={true}
             >
               Config
@@ -621,12 +625,12 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 glamor-5 glamor-6"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 glamor-3 glamor-4"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -646,10 +650,10 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-history color: #b0bec5 ;"
+              className="material-icons MuiIcon-root-57 fa fa-history glamor-0"
             />
             <p
-              className="c4"
+              className="glamor-1 glamor-2"
               open={true}
             >
               History
@@ -666,12 +670,12 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 glamor-5 glamor-6"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 glamor-3 glamor-4"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -691,10 +695,10 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-file-text-o color: #b0bec5 ;"
+              className="material-icons MuiIcon-root-57 fa fa-file-text-o glamor-0"
             />
             <p
-              className="c4"
+              className="glamor-1 glamor-2"
               open={true}
             >
               Log
@@ -711,12 +715,12 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 glamor-5 glamor-6"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 glamor-3 glamor-4"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -736,10 +740,10 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-film color: #b0bec5 ;"
+              className="material-icons MuiIcon-root-57 fa fa-film glamor-0"
             />
             <p
-              className="c4"
+              className="glamor-1 glamor-2"
               open={true}
             >
               Movies
@@ -756,12 +760,12 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 glamor-5 glamor-6"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 glamor-3 glamor-4"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -781,10 +785,10 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-check color: #b0bec5 ;"
+              className="material-icons MuiIcon-root-57 fa fa-check glamor-0"
             />
             <p
-              className="c4"
+              className="glamor-1 glamor-2"
               open={true}
             >
               Pending
@@ -801,12 +805,12 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 glamor-5 glamor-6"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 glamor-3 glamor-4"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -826,10 +830,10 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-eye color: #b0bec5 ;"
+              className="material-icons MuiIcon-root-57 fa fa-eye glamor-0"
             />
             <p
-              className="c4"
+              className="glamor-1 glamor-2"
               open={true}
             >
               Seen
@@ -846,12 +850,12 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 glamor-5 glamor-6"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 glamor-3 glamor-4"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -871,10 +875,10 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-tv color: #b0bec5 ;"
+              className="material-icons MuiIcon-root-57 fa fa-tv glamor-0"
             />
             <p
-              className="c4"
+              className="glamor-1 glamor-2"
               open={true}
             >
               Series
@@ -891,12 +895,12 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       onClick={[Function]}
     >
       <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
+        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 glamor-5 glamor-6"
         disabled={false}
         onClick={[Function]}
       >
         <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
+          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 glamor-3 glamor-4"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -916,10 +920,10 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-tasks color: #b0bec5 ;"
+              className="material-icons MuiIcon-root-57 fa fa-tasks glamor-0"
             />
             <p
-              className="c4"
+              className="glamor-1 glamor-2"
               open={true}
             >
               Tasks
@@ -933,25 +937,25 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
     </a>
   </ul>
   <div
-    className="c5"
+    className="glamor-66 glamor-67"
   >
     <div
-      className="c6"
+      className="glamor-64 glamor-65"
     >
       <p
-        className="c7"
+        className="glamor-58 glamor-59"
       >
         Version Info
       </p>
       <p
-        className="c7"
+        className="glamor-58 glamor-59"
       >
         Flexget: 
          
          
       </p>
       <p
-        className="c7"
+        className="glamor-58 glamor-59"
       >
         API: 
       </p>

@@ -9,7 +9,7 @@ import { Provider } from 'react-redux';
 import { Route, Switch } from 'react-router-dom';
 import { ConnectedRouter } from 'connected-react-router';
 import { MuiThemeProvider } from 'material-ui/styles';
-import { injectGlobal } from 'styled-components';
+import { injectGlobal } from 'emotion/react';
 import theme from 'theme';
 import PrivateRoute from 'containers/common/PrivateRoute';
 import Layout from 'components/layout';

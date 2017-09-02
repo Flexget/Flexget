@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled, { css } from 'emotion/react';
 import theme from 'theme';
 import Paper from 'material-ui/Paper';
 import List, { ListItem } from 'material-ui/List';

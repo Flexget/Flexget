@@ -1,140 +1,33 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`components/layout renders correctly 1`] = `
-.c3 {
-  background: #263238 url(test-file-stub) no-repeat center;
-  background-size: 17.5rem;
-  height: 100%;
-  -webkit-transition: width 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
-  transition: width 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
+.glamor-87 {
+  color: #f44336;
 }
 
-.c5 {
-  position: static;
+.glamor-22 {
+  color: #b0bec5;
 }
 
-.c8 {
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-.c6 {
-  background-color: #ef6c00;
-  min-height: 5rem;
-}
-
-.c7 {
-  color: rgba(255,255,255,1);
-}
-
-.c17 {
-  composes: color:#f44336;
-}
-
-.c18 {
-  margin: 0;
-}
-
-.c11 {
-  background-color: #263238;
-  -webkit-transition: width 300ms cubic-bezier(0.4,0,0.2,1) 0ms,visibility 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
-  transition: width 300ms cubic-bezier(0.4,0,0.2,1) 0ms,visibility 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
-  height: auto;
-  width: 0;
-  border-radius: 0;
+.glamor-99 {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-direction: column;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  visibility: hidden;
-}
-
-.c15 {
-  composes: color:#b0bec5;
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-  text-transform: none;
-  visibility: hidden;
-  opacity: 0;
-  -webkit-transition: visibility 300ms cubic-bezier(0.4,0,0.2,1) 0ms,opacity 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
-  transition: visibility 300ms cubic-bezier(0.4,0,0.2,1) 0ms,opacity 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
-  width: 0;
-}
-
-.c12 {
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-.c13 {
-  padding: 0;
-  height: 4.8rem;
-  border-left: 3px solid transparent;
-}
-
-.c13:hover {
-  border-left: 3px solid #ff9800;
-}
-
-.c14 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  min-width: 5rem;
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-.c16 {
-  display: none;
-}
-
-.c0 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: column;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
   height: 100%;
   min-height: 100vh;
 }
 
-.c9 {
+.glamor-21 {
   display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  margin-top: 9.8rem;
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-.c1 {
-  display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   min-height: 5rem;
-  -webkit-flex-direction: column;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
   z-index: 2;
@@ -142,42 +35,160 @@ exports[`components/layout renders correctly 1`] = `
   width: 100%;
 }
 
-.c2 {
+.glamor-3 {
   height: 5rem;
 }
 
-.c4 {
+.glamor-1 {
+  background: #263238 url(test-file-stub) no-repeat center;
+  background-size: 17.5rem;
+  height: 100%;
+  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+
+.glamor-19 {
   height: 5rem;
-  -webkit-flex: 1;
+  -webkit-box-flex: 1;
   -ms-flex: 1;
   flex: 1;
 }
 
-.c10 {
+.glamor-17 {
+  position: static;
+}
+
+.glamor-15 {
+  background-color: #ef6c00;
+  min-height: 5rem;
+}
+
+.glamor-5 {
+  color: rgba(255, 255, 255, 1);
+}
+
+.glamor-7 {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.glamor-97 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  margin-top: 9.8rem;
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.glamor-93 {
   overflow-y: auto;
 }
 
-.c19 {
-  -webkit-flex: 1;
+.glamor-91 {
+  background-color: #263238;
+  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,visibility 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,visibility 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  height: auto;
+  width: 0;
+  border-radius: 0px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  visibility: hidden;
+}
+
+.glamor-28 {
+  padding: 0px;
+  height: 4.8rem;
+  border-left: 3px solid transparent;
+}
+
+.glamor-28:hover {
+  border-left: 3px solid #ff9800;
+}
+
+.glamor-26 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-width: 5rem;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+.glamor-24 {
+  color: #b0bec5;
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  text-transform: none;
+  visibility: hidden;
+  opacity: 0;
+  -webkit-transition: visibility 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: visibility 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  width: 0;
+}
+
+.glamor-89 {
+  display: none;
+}
+
+.glamor-81 {
+  margin: 0px;
+}
+
+.glamor-95 {
+  -webkit-box-flex: 1;
   -ms-flex: 1;
   flex: 1;
   padding: 1rem;
   overflow-y: auto;
   opacity: 1;
-  -webkit-transition: opacity 300ms cubic-bezier(0.4,0,0.2,1) 0ms,margin-left 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
-  transition: opacity 300ms cubic-bezier(0.4,0,0.2,1) 0ms,margin-left 300ms cubic-bezier(0.4,0,0.2,1) 0ms;
+  -webkit-transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,margin-left 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,margin-left 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
   margin-left: 5rem;
 }
 
 @media (min-width:600px) {
-  .c3 {
+  .glamor-21 {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: row;
+    flex-direction: row;
+  }
+}
+
+@media (min-width:600px) {
+  .glamor-1 {
     width: 5rem;
     background-size: 24rem;
   }
 }
 
 @media (min-width:600px) {
-  .c11 {
+  .glamor-97 {
+    margin-top: 5rem;
+  }
+}
+
+@media (min-width:600px) {
+  .glamor-91 {
     height: calc(100% - 5rem);
     width: 5rem;
     position: fixed;
@@ -185,23 +196,9 @@ exports[`components/layout renders correctly 1`] = `
   }
 }
 
-@media (min-width:600px) {
-  .c9 {
-    margin-top: 5rem;
-  }
-}
-
-@media (min-width:600px) {
-  .c1 {
-    -webkit-flex-direction: row;
-    -ms-flex-direction: row;
-    flex-direction: row;
-  }
-}
-
 @media (max-width:599.99px) {
-  .c19 {
-    margin-left: 0;
+  .glamor-95 {
+    margin-left: 0px;
     padding: 1rem;
     opacity: 1;
     display: block;
@@ -209,35 +206,35 @@ exports[`components/layout renders correctly 1`] = `
 }
 
 <div
-  className="c0"
+  className="glamor-98 glamor-99"
 >
   <header
-    className="c1"
+    className="glamor-20 glamor-21"
   >
     <div
-      className="c2"
+      className="glamor-2 glamor-3"
     >
       <a
         href="/"
         onClick={[Function]}
       >
         <div
-          className="c3"
+          className="glamor-0 glamor-1"
           open={false}
         />
       </a>
     </div>
     <nav
-      className="c4"
+      className="glamor-18 glamor-19"
     >
       <header
-        className="MuiPaper-root-8 MuiPaper-shadow4-14 MuiAppBar-root-1 MuiAppBar-positionFixed-2 MuiAppBar-colorPrimary-6 mui-fixed c5"
+        className="MuiPaper-root-8 MuiPaper-shadow4-14 MuiAppBar-root-1 MuiAppBar-positionFixed-2 MuiAppBar-colorPrimary-6 mui-fixed glamor-16 glamor-17"
       >
         <div
-          className="MuiToolbar-root-35 MuiToolbar-gutters-36 c6"
+          className="MuiToolbar-root-35 MuiToolbar-gutters-36 glamor-14 glamor-15"
         >
           <button
-            className="MuiButtonBase-root-46 MuiIconButton-root-37 c7"
+            className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-4 glamor-5"
             disabled={false}
             onBlur={[Function]}
             onClick={[Function]}
@@ -266,7 +263,7 @@ exports[`components/layout renders correctly 1`] = `
             />
           </button>
           <div
-            className="c8"
+            className="glamor-6 glamor-7"
           />
           <a
             href="/config"
@@ -274,7 +271,7 @@ exports[`components/layout renders correctly 1`] = `
           >
             <button
               aria-label="Config"
-              className="MuiButtonBase-root-46 MuiIconButton-root-37 c7"
+              className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-4 glamor-5"
               disabled={false}
               onBlur={[Function]}
               onFocus={[Function]}
@@ -308,7 +305,7 @@ exports[`components/layout renders correctly 1`] = `
           >
             <button
               aria-label="Log"
-              className="MuiButtonBase-root-46 MuiIconButton-root-37 c7"
+              className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-4 glamor-5"
               disabled={false}
               onBlur={[Function]}
               onFocus={[Function]}
@@ -338,7 +335,7 @@ exports[`components/layout renders correctly 1`] = `
           </a>
           <button
             aria-label="Manage"
-            className="MuiButtonBase-root-46 MuiIconButton-root-37 c7"
+            className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-4 glamor-5"
             disabled={false}
             onBlur={[Function]}
             onClick={[Function]}
@@ -371,29 +368,29 @@ exports[`components/layout renders correctly 1`] = `
     </nav>
   </header>
   <main
-    className="c9"
+    className="glamor-96 glamor-97"
   >
     <aside
-      className="c10"
+      className="glamor-92 glamor-93"
     >
       <div
-        className="MuiPaper-root-8 MuiPaper-shadow16-26 MuiPaper-rounded-9 c11"
+        className="MuiPaper-root-8 MuiPaper-shadow16-26 MuiPaper-rounded-9 glamor-90 glamor-91"
         open={false}
       >
         <ul
-          className="MuiList-root-72 MuiList-padding-73 c12"
+          className="MuiList-root-72 MuiList-padding-73 glamor-78 glamor-7"
         >
           <a
             href="/config"
             onClick={[Function]}
           >
             <li
-              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 c13"
+              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 glamor-27 glamor-28"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 c14"
+                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 glamor-25 glamor-26"
                 disabled={false}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -413,10 +410,10 @@ exports[`components/layout renders correctly 1`] = `
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 fa fa-pencil color: #b0bec5 ;"
+                    className="material-icons MuiIcon-root-48 fa fa-pencil glamor-22"
                   />
                   <p
-                    className="c15"
+                    className="glamor-23 glamor-24"
                     open={false}
                   >
                     Config
@@ -433,12 +430,12 @@ exports[`components/layout renders correctly 1`] = `
             onClick={[Function]}
           >
             <li
-              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 c13"
+              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 glamor-27 glamor-28"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 c14"
+                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 glamor-25 glamor-26"
                 disabled={false}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -458,10 +455,10 @@ exports[`components/layout renders correctly 1`] = `
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 fa fa-history color: #b0bec5 ;"
+                    className="material-icons MuiIcon-root-48 fa fa-history glamor-22"
                   />
                   <p
-                    className="c15"
+                    className="glamor-23 glamor-24"
                     open={false}
                   >
                     History
@@ -478,12 +475,12 @@ exports[`components/layout renders correctly 1`] = `
             onClick={[Function]}
           >
             <li
-              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 c13"
+              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 glamor-27 glamor-28"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 c14"
+                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 glamor-25 glamor-26"
                 disabled={false}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -503,10 +500,10 @@ exports[`components/layout renders correctly 1`] = `
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 fa fa-file-text-o color: #b0bec5 ;"
+                    className="material-icons MuiIcon-root-48 fa fa-file-text-o glamor-22"
                   />
                   <p
-                    className="c15"
+                    className="glamor-23 glamor-24"
                     open={false}
                   >
                     Log
@@ -523,12 +520,12 @@ exports[`components/layout renders correctly 1`] = `
             onClick={[Function]}
           >
             <li
-              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 c13"
+              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 glamor-27 glamor-28"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 c14"
+                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 glamor-25 glamor-26"
                 disabled={false}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -548,10 +545,10 @@ exports[`components/layout renders correctly 1`] = `
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 fa fa-film color: #b0bec5 ;"
+                    className="material-icons MuiIcon-root-48 fa fa-film glamor-22"
                   />
                   <p
-                    className="c15"
+                    className="glamor-23 glamor-24"
                     open={false}
                   >
                     Movies
@@ -568,12 +565,12 @@ exports[`components/layout renders correctly 1`] = `
             onClick={[Function]}
           >
             <li
-              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 c13"
+              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 glamor-27 glamor-28"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 c14"
+                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 glamor-25 glamor-26"
                 disabled={false}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -593,10 +590,10 @@ exports[`components/layout renders correctly 1`] = `
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 fa fa-check color: #b0bec5 ;"
+                    className="material-icons MuiIcon-root-48 fa fa-check glamor-22"
                   />
                   <p
-                    className="c15"
+                    className="glamor-23 glamor-24"
                     open={false}
                   >
                     Pending
@@ -613,12 +610,12 @@ exports[`components/layout renders correctly 1`] = `
             onClick={[Function]}
           >
             <li
-              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 c13"
+              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 glamor-27 glamor-28"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 c14"
+                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 glamor-25 glamor-26"
                 disabled={false}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -638,10 +635,10 @@ exports[`components/layout renders correctly 1`] = `
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 fa fa-eye color: #b0bec5 ;"
+                    className="material-icons MuiIcon-root-48 fa fa-eye glamor-22"
                   />
                   <p
-                    className="c15"
+                    className="glamor-23 glamor-24"
                     open={false}
                   >
                     Seen
@@ -658,12 +655,12 @@ exports[`components/layout renders correctly 1`] = `
             onClick={[Function]}
           >
             <li
-              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 c13"
+              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 glamor-27 glamor-28"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 c14"
+                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 glamor-25 glamor-26"
                 disabled={false}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -683,10 +680,10 @@ exports[`components/layout renders correctly 1`] = `
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 fa fa-tv color: #b0bec5 ;"
+                    className="material-icons MuiIcon-root-48 fa fa-tv glamor-22"
                   />
                   <p
-                    className="c15"
+                    className="glamor-23 glamor-24"
                     open={false}
                   >
                     Series
@@ -703,12 +700,12 @@ exports[`components/layout renders correctly 1`] = `
             onClick={[Function]}
           >
             <li
-              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 c13"
+              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 glamor-27 glamor-28"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 c14"
+                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 glamor-25 glamor-26"
                 disabled={false}
                 onBlur={[Function]}
                 onFocus={[Function]}
@@ -728,10 +725,10 @@ exports[`components/layout renders correctly 1`] = `
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 fa fa-tasks color: #b0bec5 ;"
+                    className="material-icons MuiIcon-root-48 fa fa-tasks glamor-22"
                   />
                   <p
-                    className="c15"
+                    className="glamor-23 glamor-24"
                     open={false}
                   >
                     Tasks
@@ -745,25 +742,25 @@ exports[`components/layout renders correctly 1`] = `
           </a>
         </ul>
         <div
-          className="c16"
+          className="glamor-88 glamor-89"
         >
           <div
-            className="c17"
+            className="glamor-86 glamor-87"
           >
             <p
-              className="c18"
+              className="glamor-80 glamor-81"
             >
               Version Info
             </p>
             <p
-              className="c18"
+              className="glamor-80 glamor-81"
             >
               Flexget: 
                
                
             </p>
             <p
-              className="c18"
+              className="glamor-80 glamor-81"
             >
               API: 
             </p>
@@ -772,7 +769,7 @@ exports[`components/layout renders correctly 1`] = `
       </div>
     </aside>
     <section
-      className="c19"
+      className="glamor-94 glamor-95"
       open={false}
     >
       <div />

@@ -54,6 +54,7 @@
     "html-webpack-plugin": "^2.30.1",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^20.0.4",
+    "jest-glamor-react": "^3.1.0",
     "jest-styled-components": "^4.4.1",
     "jsdom": "^11.1.0",
     "markdown-loader": "^2.0.1",
@@ -73,10 +74,12 @@
     "webpack-dev-server": "^2.7.1"
   },
   "dependencies": {
+    "babel-plugin-emotion": "^7.1.0",
     "babel-polyfill": "^6.23.0",
     "babel-preset-flow": "^6.23.0",
     "classnames": "^2.2.5",
     "connected-react-router": "^4.2.3",
+    "emotion": "^7.2.0",
     "font-awesome": "^4.7.0",
     "history": "^4.6.3",
     "jss": "^8.1.0",
@@ -89,6 +92,7 @@
     "qs": "^6.5.0",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
+    "react-emotion": "^7.2.0",
     "react-jss": "^7.1.0",
     "react-loadable": "^4.0.3",
     "react-redux": "^5.0.5",
