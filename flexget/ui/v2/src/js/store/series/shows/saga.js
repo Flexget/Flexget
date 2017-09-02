@@ -10,7 +10,6 @@ export const defaultOptions = {
   lookup: 'tvdb',
   order: 'asc',
   sort_by: 'show_name',
-  in_config: 'all',
 };
 
 export function* getShows({ payload } = {}) {
