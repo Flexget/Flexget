@@ -22,11 +22,6 @@ const sideNavItems = [
     label: 'Config',
   },
   {
-    link: '/execute',
-    icon: 'cog',
-    label: 'Execute',
-  },
-  {
     link: '/history',
     icon: 'history',
     label: 'History',
@@ -47,11 +42,6 @@ const sideNavItems = [
     label: 'Pending',
   },
   {
-    link: '/schedule',
-    icon: 'calendar',
-    label: 'Schedule',
-  },
-  {
     link: '/seen',
     icon: 'eye',
     label: 'Seen',
@@ -62,9 +52,9 @@ const sideNavItems = [
     label: 'Series',
   },
   {
-    link: '/status',
-    icon: 'heartbeat',
-    label: 'Status',
+    link: '/tasks',
+    icon: 'tasks',
+    label: 'Tasks',
   },
 ];
 

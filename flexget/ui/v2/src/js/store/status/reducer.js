@@ -22,12 +22,17 @@ export default (state = initState, action) => {
           [action.meta.type]: true,
         },
       };
-    case ERROR_STATUS:
+    case ERROR_STATUS: {
+      const {
+        [action.payload.type]: omit,
+        ...loading
+      } = state.loading;
       return {
         ...state,
         error: action.payload,
-
+        loading,
       };
+    }
     case INFO_STATUS:
       return {
         ...state,

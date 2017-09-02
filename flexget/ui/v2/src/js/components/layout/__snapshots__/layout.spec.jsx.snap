@@ -429,51 +429,6 @@ exports[`components/layout renders correctly 1`] = `
             </li>
           </a>
           <a
-            href="/execute"
-            onClick={[Function]}
-          >
-            <li
-              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 c13"
-              disabled={false}
-              onClick={[Function]}
-            >
-              <button
-                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 c14"
-                disabled={false}
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseLeave={[Function]}
-                onMouseUp={[Function]}
-                onTouchEnd={[Function]}
-                onTouchStart={[Function]}
-                role="button"
-                tabIndex="0"
-                type="button"
-              >
-                <span
-                  className="MuiButton-label-87"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 fa fa-cog color: #b0bec5 ;"
-                  />
-                  <p
-                    className="c15"
-                    open={false}
-                  >
-                    Execute
-                  </p>
-                </span>
-                <span
-                  className="MuiTouchRipple-root-55"
-                />
-              </button>
-            </li>
-          </a>
-          <a
             href="/history"
             onClick={[Function]}
           >
@@ -654,51 +609,6 @@ exports[`components/layout renders correctly 1`] = `
             </li>
           </a>
           <a
-            href="/schedule"
-            onClick={[Function]}
-          >
-            <li
-              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 c13"
-              disabled={false}
-              onClick={[Function]}
-            >
-              <button
-                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 c14"
-                disabled={false}
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseLeave={[Function]}
-                onMouseUp={[Function]}
-                onTouchEnd={[Function]}
-                onTouchStart={[Function]}
-                role="button"
-                tabIndex="0"
-                type="button"
-              >
-                <span
-                  className="MuiButton-label-87"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 fa fa-calendar color: #b0bec5 ;"
-                  />
-                  <p
-                    className="c15"
-                    open={false}
-                  >
-                    Schedule
-                  </p>
-                </span>
-                <span
-                  className="MuiTouchRipple-root-55"
-                />
-              </button>
-            </li>
-          </a>
-          <a
             href="/seen"
             onClick={[Function]}
           >
@@ -789,7 +699,7 @@ exports[`components/layout renders correctly 1`] = `
             </li>
           </a>
           <a
-            href="/status"
+            href="/tasks"
             onClick={[Function]}
           >
             <li
@@ -818,13 +728,13 @@ exports[`components/layout renders correctly 1`] = `
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 fa fa-heartbeat color: #b0bec5 ;"
+                    className="material-icons MuiIcon-root-48 fa fa-tasks color: #b0bec5 ;"
                   />
                   <p
                     className="c15"
                     open={false}
                   >
-                    Status
+                    Tasks
                   </p>
                 </span>
                 <span

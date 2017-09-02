@@ -10,11 +10,12 @@ function status(response) {
 }
 
 function request(resource, method, body) {
+  const contentType = method === 'get' ? {} : { 'Content-Type': 'application/json' };
   return fetch(`/api${resource}`, {
     method,
     headers: {
       Accept: 'application/json',
-      'Content-Type': 'application/json',
+      ...contentType,
     },
     credentials: 'same-origin',
     body: JSON.stringify(body),
@@ -37,4 +38,3 @@ export function put(resource, body) {
 export function del(resource) {
   return request(resource, 'delete');
 }
-

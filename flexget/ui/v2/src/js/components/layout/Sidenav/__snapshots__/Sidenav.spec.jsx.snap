@@ -137,51 +137,6 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       </li>
     </a>
     <a
-      href="/execute"
-      onClick={[Function]}
-    >
-      <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
-        disabled={false}
-        onClick={[Function]}
-      >
-        <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
-          disabled={false}
-          onBlur={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchStart={[Function]}
-          role="button"
-          tabIndex="0"
-          type="button"
-        >
-          <span
-            className="MuiButton-label-43"
-          >
-            <span
-              aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-cog color: #b0bec5 ;"
-            />
-            <p
-              className="c4"
-              open={false}
-            >
-              Execute
-            </p>
-          </span>
-          <span
-            className="MuiTouchRipple-root-64"
-          />
-        </button>
-      </li>
-    </a>
-    <a
       href="/history"
       onClick={[Function]}
     >
@@ -362,51 +317,6 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       </li>
     </a>
     <a
-      href="/schedule"
-      onClick={[Function]}
-    >
-      <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
-        disabled={false}
-        onClick={[Function]}
-      >
-        <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
-          disabled={false}
-          onBlur={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchStart={[Function]}
-          role="button"
-          tabIndex="0"
-          type="button"
-        >
-          <span
-            className="MuiButton-label-43"
-          >
-            <span
-              aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-calendar color: #b0bec5 ;"
-            />
-            <p
-              className="c4"
-              open={false}
-            >
-              Schedule
-            </p>
-          </span>
-          <span
-            className="MuiTouchRipple-root-64"
-          />
-        </button>
-      </li>
-    </a>
-    <a
       href="/seen"
       onClick={[Function]}
     >
@@ -497,7 +407,7 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
       </li>
     </a>
     <a
-      href="/status"
+      href="/tasks"
       onClick={[Function]}
     >
       <li
@@ -526,13 +436,13 @@ exports[`components/layout/Sidenav adds mini classes without sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-heartbeat color: #b0bec5 ;"
+              className="material-icons MuiIcon-root-57 fa fa-tasks color: #b0bec5 ;"
             />
             <p
               className="c4"
               open={false}
             >
-              Status
+              Tasks
             </p>
           </span>
           <span
@@ -707,51 +617,6 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       </li>
     </a>
     <a
-      href="/execute"
-      onClick={[Function]}
-    >
-      <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
-        disabled={false}
-        onClick={[Function]}
-      >
-        <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
-          disabled={false}
-          onBlur={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchStart={[Function]}
-          role="button"
-          tabIndex="0"
-          type="button"
-        >
-          <span
-            className="MuiButton-label-43"
-          >
-            <span
-              aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-cog color: #b0bec5 ;"
-            />
-            <p
-              className="c4"
-              open={true}
-            >
-              Execute
-            </p>
-          </span>
-          <span
-            className="MuiTouchRipple-root-64"
-          />
-        </button>
-      </li>
-    </a>
-    <a
       href="/history"
       onClick={[Function]}
     >
@@ -932,51 +797,6 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       </li>
     </a>
     <a
-      href="/schedule"
-      onClick={[Function]}
-    >
-      <li
-        className="MuiListItem-root-32 MuiListItem-gutters-39 MuiListItem-default-35 c2"
-        disabled={false}
-        onClick={[Function]}
-      >
-        <button
-          className="MuiButtonBase-root-55 MuiButton-root-41 MuiButton-flatAccent-45 c3"
-          disabled={false}
-          onBlur={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchStart={[Function]}
-          role="button"
-          tabIndex="0"
-          type="button"
-        >
-          <span
-            className="MuiButton-label-43"
-          >
-            <span
-              aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-calendar color: #b0bec5 ;"
-            />
-            <p
-              className="c4"
-              open={true}
-            >
-              Schedule
-            </p>
-          </span>
-          <span
-            className="MuiTouchRipple-root-64"
-          />
-        </button>
-      </li>
-    </a>
-    <a
       href="/seen"
       onClick={[Function]}
     >
@@ -1067,7 +887,7 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
       </li>
     </a>
     <a
-      href="/status"
+      href="/tasks"
       onClick={[Function]}
     >
       <li
@@ -1096,13 +916,13 @@ exports[`components/layout/Sidenav renders correctly with sideBarOpen 1`] = `
           >
             <span
               aria-hidden="true"
-              className="material-icons MuiIcon-root-57 fa fa-heartbeat color: #b0bec5 ;"
+              className="material-icons MuiIcon-root-57 fa fa-tasks color: #b0bec5 ;"
             />
             <p
               className="c4"
               open={true}
             >
-              Status
+              Tasks
             </p>
           </span>
           <span
