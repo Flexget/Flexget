@@ -2,7 +2,7 @@ import styled from 'emotion/react';
 import theme from 'theme';
 
 const HEADER_HEIGHT = 5;
-const MOBILE_HEADER_HEIGHT = (HEADER_HEIGHT * 2) - 0.2;
+const MOBILE_HEADER_HEIGHT = (HEADER_HEIGHT * 2);
 const PADDING = 1;
 
 export const Wrapper = styled.div`
@@ -53,7 +53,6 @@ export const Content = styled.section`
   overflow-y: auto;
   opacity: 1;
   transition: ${theme.transitions.create(['opacity', 'margin-left'])};
-  margin-left: ${({ open }) => (open ? '19rem' : '5rem')};
 
   ${theme.breakpoints.down('sm')} {
     margin-left: 0;

@@ -1,68 +1,33 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
-import classNames from 'classnames';
-import Icon from 'material-ui/Icon';
-import Version from 'containers/layout/Version';
-import 'font-awesome/css/font-awesome.css';
+import Collapse from 'material-ui/transitions/Collapse';
+import Drawer from 'material-ui/Drawer';
+import SideNavEntry from 'components/layout/SideNavEntry';
 import {
-  ListWrapper,
-  Label,
-  colorClass,
-  NavList,
-  NavItem,
-  NavButton,
+  NestedSideNavEntry,
+  DrawerInner,
   NavVersion,
+  NavList,
+  drawerPaper,
+  drawerDocked,
 } from './styles';
+import sideNavItems from './items';
 
-const sideNavItems = [
-  {
-    link: '/config',
-    icon: 'pencil',
-    label: 'Config',
-  },
-  {
-    link: '/history',
-    icon: 'history',
-    label: 'History',
-  },
-  {
-    link: '/log',
-    icon: 'file-text-o',
-    label: 'Log',
-  },
-  {
-    link: '/movies',
-    icon: 'film',
-    label: 'Movies',
-  },
-  {
-    link: '/pending',
-    icon: 'check',
-    label: 'Pending',
-  },
-  {
-    link: '/seen',
-    icon: 'eye',
-    label: 'Seen',
-  },
-  {
-    link: '/series',
-    icon: 'tv',
-    label: 'Series',
-  },
-  {
-    link: '/tasks',
-    icon: 'tasks',
-    label: 'Tasks',
-  },
-];
-
-class SideNav extends Component {
+export default class Sidenav extends Component {
   static propTypes = {
     sideBarOpen: PropTypes.bool.isRequired,
     toggle: PropTypes.func.isRequired,
   };
+
+  state = {
+    open: {},
+  };
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.sideBarOpen && !nextProps.sideBarOpen) {
+      this.setState({ open: {} });
+    }
+  }
 
   toggleOnMobile = () => {
     if (
@@ -73,35 +38,72 @@ class SideNav extends Component {
     }
   }
 
+  handleOnClick = ({ link, label }) => {
+    if (link) {
+      return this.toggleOnMobile;
+    }
+    return () => {
+      this.setState({
+        open: {
+          ...this.state.open,
+          [label]: !this.state.open[label],
+        },
+      });
+
+      if (!this.props.sideBarOpen) {
+        this.props.toggle();
+      }
+    };
+  }
+
   renderNavItems() {
-    const { sideBarOpen } = this.props;
-    return sideNavItems.map(({ link, icon, label }) => (
-      <Link to={link} key={link}>
-        <NavItem onClick={this.toggleOnMobile}>
-          <NavButton color="accent">
-            <Icon className={classNames('fa', `fa-${icon}`, colorClass)} />
-            <Label open={sideBarOpen}>
-              {label}
-            </Label>
-          </NavButton>
-        </NavItem>
-      </Link>
-    ));
+    return sideNavItems.reduce((items, props) => {
+      const list = [
+        ...items,
+        <SideNavEntry
+          key={props.label}
+          onClick={this.handleOnClick(props)}
+          {...props}
+        />,
+      ];
+      if (props.children) {
+        list.push(
+          <Collapse
+            in={this.state.open[props.label]}
+            transitionDuration="auto"
+            unmountOnExit
+            key={`${props.label}-collapse`}
+          >
+            {props.children.map(child => (
+              <NestedSideNavEntry
+                key={child.label}
+                onClick={this.handleOnClick(child)}
+                {...child}
+              />
+            ))}
+          </Collapse>
+        );
+      }
+      return list;
+    }, []);
   }
 
   render() {
     const { sideBarOpen } = this.props;
     return (
-      <ListWrapper elevation={16} open={sideBarOpen}>
-        <NavList>
-          { ::this.renderNavItems() }
-        </NavList>
-        <NavVersion hide={!sideBarOpen}>
-          <Version />
-        </NavVersion>
-      </ListWrapper>
+      <Drawer
+        open={sideBarOpen}
+        type="permanent"
+        classes={{
+          paper: drawerPaper(sideBarOpen),
+          docked: drawerDocked,
+        }}
+      >
+        <DrawerInner>
+          <NavList>{this.renderNavItems()}</NavList>
+          <NavVersion hide={!sideBarOpen} />
+        </DrawerInner>
+      </Drawer>
     );
   }
 }
-
-export default SideNav;

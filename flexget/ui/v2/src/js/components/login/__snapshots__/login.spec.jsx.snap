@@ -77,19 +77,18 @@ exports[`components/login renders correctly when logged out 1`] = `
           required={false}
         >
           <label
-            className="MuiFormLabel-root-38 MuiInputLabel-root-33 MuiInputLabel-formControl-34 MuiInputLabel-animated-36"
+            className="MuiFormLabel-root-39 MuiInputLabel-root-33 MuiInputLabel-formControl-34 MuiInputLabel-animated-37"
             htmlFor="username"
           >
             Username
           </label>
           <div
-            className="MuiInput-root-42 MuiInput-formControl-43 MuiInput-inkbar-44 MuiInput-underline-50"
+            className="MuiInput-root-43 MuiInput-formControl-44 MuiInput-inkbar-45 MuiInput-underline-51"
           >
             <input
-              aria-required={undefined}
               autoComplete={undefined}
               autoFocus={undefined}
-              className="MuiInput-input-46 MuiInput-inputSingleline-53"
+              className="MuiInput-input-47 MuiInput-inputSingleline-54"
               defaultValue={undefined}
               disabled={false}
               id="username"
@@ -100,6 +99,7 @@ exports[`components/login renders correctly when logged out 1`] = `
               onKeyDown={undefined}
               onKeyUp={undefined}
               placeholder={undefined}
+              required={undefined}
               rows={undefined}
               type="text"
               value=""
@@ -116,19 +116,18 @@ exports[`components/login renders correctly when logged out 1`] = `
           required={false}
         >
           <label
-            className="MuiFormLabel-root-38 MuiInputLabel-root-33 MuiInputLabel-formControl-34 MuiInputLabel-animated-36"
+            className="MuiFormLabel-root-39 MuiInputLabel-root-33 MuiInputLabel-formControl-34 MuiInputLabel-animated-37"
             htmlFor="password"
           >
             Password
           </label>
           <div
-            className="MuiInput-root-42 MuiInput-formControl-43 MuiInput-inkbar-44 MuiInput-underline-50"
+            className="MuiInput-root-43 MuiInput-formControl-44 MuiInput-inkbar-45 MuiInput-underline-51"
           >
             <input
-              aria-required={undefined}
               autoComplete={undefined}
               autoFocus={undefined}
-              className="MuiInput-input-46 MuiInput-inputSingleline-53"
+              className="MuiInput-input-47 MuiInput-inputSingleline-54"
               defaultValue={undefined}
               disabled={false}
               id="password"
@@ -139,6 +138,7 @@ exports[`components/login renders correctly when logged out 1`] = `
               onKeyDown={undefined}
               onKeyUp={undefined}
               placeholder={undefined}
+              required={undefined}
               rows={undefined}
               type="Password"
               value=""
@@ -147,10 +147,10 @@ exports[`components/login renders correctly when logged out 1`] = `
         </div>
       </div>
       <div
-        className="MuiCardActions-root-56"
+        className="MuiCardActions-root-57"
       >
         <button
-          className="MuiButtonBase-root-72 MuiButton-root-58 glamor-10 MuiCardActions-actionSpacing-57 glamor-11"
+          className="MuiButtonBase-root-73 MuiButton-root-59 glamor-10 MuiCardActions-actionSpacing-58 glamor-11"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}
@@ -166,12 +166,12 @@ exports[`components/login renders correctly when logged out 1`] = `
           type="submit"
         >
           <span
-            className="MuiButton-label-60"
+            className="MuiButton-label-61"
           >
             Login
           </span>
           <span
-            className="MuiTouchRipple-root-74"
+            className="MuiTouchRipple-root-75"
           />
         </button>
       </div>

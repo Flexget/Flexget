@@ -118,7 +118,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
         >
           <span
             aria-hidden="true"
-            className="material-icons MuiIcon-root-48 MuiIconButton-icon-44 fa fa-file-text-o"
+            className="material-icons MuiIcon-root-48 MuiIconButton-icon-44 fa fa-book"
           />
         </span>
         <span

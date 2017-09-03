@@ -1,15 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`components/layout renders correctly 1`] = `
-.glamor-87 {
-  color: #f44336;
-}
-
-.glamor-22 {
+.glamor-23 {
   color: #b0bec5;
 }
 
-.glamor-99 {
+.glamor-91 {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -43,8 +39,8 @@ exports[`components/layout renders correctly 1`] = `
   background: #263238 url(test-file-stub) no-repeat center;
   background-size: 17.5rem;
   height: 100%;
-  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,background-size 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,background-size 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 }
 
 .glamor-19 {
@@ -73,7 +69,7 @@ exports[`components/layout renders correctly 1`] = `
   flex: 1;
 }
 
-.glamor-97 {
+.glamor-89 {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -81,23 +77,29 @@ exports[`components/layout renders correctly 1`] = `
   -webkit-box-direction: normal;
   -ms-flex-direction: row;
   flex-direction: row;
-  margin-top: 9.8rem;
+  margin-top: 10rem;
   -webkit-box-flex: 1;
   -ms-flex: 1;
   flex: 1;
 }
 
-.glamor-93 {
+.glamor-85 {
   overflow-y: auto;
 }
 
-.glamor-91 {
+.glamor-83 {
+  position: relative;
   background-color: #263238;
-  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,visibility 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,visibility 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  height: auto;
+  height: calc(100vh - 10rem);
   width: 0;
-  border-radius: 0px;
+  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  border-right: none !important;
+}
+
+.glamor-82 {
+  width: inherit;
+  height: inherit;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -105,55 +107,34 @@ exports[`components/layout renders correctly 1`] = `
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
-  visibility: hidden;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
 }
 
-.glamor-28 {
-  padding: 0px;
-  height: 4.8rem;
+.glamor-71 {
+  width: inherit;
+}
+
+.glamor-27 {
   border-left: 3px solid transparent;
+  cursor: pointer;
 }
 
-.glamor-28:hover {
+.glamor-27:hover {
   border-left: 3px solid #ff9800;
 }
 
-.glamor-26 {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  min-width: 5rem;
-  padding-top: 0px;
-  padding-bottom: 0px;
-}
-
-.glamor-24 {
-  color: #b0bec5;
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-  text-transform: none;
-  visibility: hidden;
-  opacity: 0;
-  -webkit-transition: visibility 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  transition: visibility 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  width: 0;
-}
-
-.glamor-89 {
+.glamor-80 {
+  color: #f44336;
   display: none;
 }
 
-.glamor-81 {
+.glamor-73 {
   margin: 0px;
 }
 
-.glamor-95 {
+.glamor-87 {
   -webkit-box-flex: 1;
   -ms-flex: 1;
   flex: 1;
@@ -162,7 +143,6 @@ exports[`components/layout renders correctly 1`] = `
   opacity: 1;
   -webkit-transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,margin-left 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
   transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,margin-left 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  margin-left: 5rem;
 }
 
 @media (min-width:600px) {
@@ -176,28 +156,26 @@ exports[`components/layout renders correctly 1`] = `
 
 @media (min-width:600px) {
   .glamor-1 {
-    width: 5rem;
-    background-size: 24rem;
+    width: 6rem;
+    background-size: 25rem;
   }
 }
 
 @media (min-width:600px) {
-  .glamor-97 {
+  .glamor-89 {
     margin-top: 5rem;
   }
 }
 
 @media (min-width:600px) {
-  .glamor-91 {
-    height: calc(100% - 5rem);
-    width: 5rem;
-    position: fixed;
-    visibility: visible;
+  .glamor-83 {
+    height: calc(100vh - 5rem);
+    width: 6rem;
   }
 }
 
 @media (max-width:599.99px) {
-  .glamor-95 {
+  .glamor-87 {
     margin-left: 0px;
     padding: 1rem;
     opacity: 1;
@@ -206,7 +184,7 @@ exports[`components/layout renders correctly 1`] = `
 }
 
 <div
-  className="glamor-98 glamor-99"
+  className="glamor-90 glamor-91"
 >
   <header
     className="glamor-20 glamor-21"
@@ -325,7 +303,7 @@ exports[`components/layout renders correctly 1`] = `
               >
                 <span
                   aria-hidden="true"
-                  className="material-icons MuiIcon-root-48 MuiIconButton-icon-44 fa fa-file-text-o"
+                  className="material-icons MuiIcon-root-48 MuiIconButton-icon-44 fa fa-book"
                 />
               </span>
               <span
@@ -368,408 +346,206 @@ exports[`components/layout renders correctly 1`] = `
     </nav>
   </header>
   <main
-    className="glamor-96 glamor-97"
+    className="glamor-88 glamor-89"
   >
     <aside
-      className="glamor-92 glamor-93"
+      className="glamor-84 glamor-85"
     >
       <div
-        className="MuiPaper-root-8 MuiPaper-shadow16-26 MuiPaper-rounded-9 glamor-90 glamor-91"
-        open={false}
+        className="MuiDrawer-docked-77"
       >
-        <ul
-          className="MuiList-root-72 MuiList-padding-73 glamor-78 glamor-7"
-        >
-          <a
-            href="/config"
-            onClick={[Function]}
-          >
-            <li
-              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 glamor-27 glamor-28"
-              disabled={false}
-              onClick={[Function]}
-            >
-              <button
-                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 glamor-25 glamor-26"
-                disabled={false}
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseLeave={[Function]}
-                onMouseUp={[Function]}
-                onTouchEnd={[Function]}
-                onTouchStart={[Function]}
-                role="button"
-                tabIndex="0"
-                type="button"
-              >
-                <span
-                  className="MuiButton-label-87"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 fa fa-pencil glamor-22"
-                  />
-                  <p
-                    className="glamor-23 glamor-24"
-                    open={false}
-                  >
-                    Config
-                  </p>
-                </span>
-                <span
-                  className="MuiTouchRipple-root-55"
-                />
-              </button>
-            </li>
-          </a>
-          <a
-            href="/history"
-            onClick={[Function]}
-          >
-            <li
-              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 glamor-27 glamor-28"
-              disabled={false}
-              onClick={[Function]}
-            >
-              <button
-                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 glamor-25 glamor-26"
-                disabled={false}
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseLeave={[Function]}
-                onMouseUp={[Function]}
-                onTouchEnd={[Function]}
-                onTouchStart={[Function]}
-                role="button"
-                tabIndex="0"
-                type="button"
-              >
-                <span
-                  className="MuiButton-label-87"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 fa fa-history glamor-22"
-                  />
-                  <p
-                    className="glamor-23 glamor-24"
-                    open={false}
-                  >
-                    History
-                  </p>
-                </span>
-                <span
-                  className="MuiTouchRipple-root-55"
-                />
-              </button>
-            </li>
-          </a>
-          <a
-            href="/log"
-            onClick={[Function]}
-          >
-            <li
-              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 glamor-27 glamor-28"
-              disabled={false}
-              onClick={[Function]}
-            >
-              <button
-                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 glamor-25 glamor-26"
-                disabled={false}
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseLeave={[Function]}
-                onMouseUp={[Function]}
-                onTouchEnd={[Function]}
-                onTouchStart={[Function]}
-                role="button"
-                tabIndex="0"
-                type="button"
-              >
-                <span
-                  className="MuiButton-label-87"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 fa fa-file-text-o glamor-22"
-                  />
-                  <p
-                    className="glamor-23 glamor-24"
-                    open={false}
-                  >
-                    Log
-                  </p>
-                </span>
-                <span
-                  className="MuiTouchRipple-root-55"
-                />
-              </button>
-            </li>
-          </a>
-          <a
-            href="/movies"
-            onClick={[Function]}
-          >
-            <li
-              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 glamor-27 glamor-28"
-              disabled={false}
-              onClick={[Function]}
-            >
-              <button
-                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 glamor-25 glamor-26"
-                disabled={false}
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseLeave={[Function]}
-                onMouseUp={[Function]}
-                onTouchEnd={[Function]}
-                onTouchStart={[Function]}
-                role="button"
-                tabIndex="0"
-                type="button"
-              >
-                <span
-                  className="MuiButton-label-87"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 fa fa-film glamor-22"
-                  />
-                  <p
-                    className="glamor-23 glamor-24"
-                    open={false}
-                  >
-                    Movies
-                  </p>
-                </span>
-                <span
-                  className="MuiTouchRipple-root-55"
-                />
-              </button>
-            </li>
-          </a>
-          <a
-            href="/pending"
-            onClick={[Function]}
-          >
-            <li
-              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 glamor-27 glamor-28"
-              disabled={false}
-              onClick={[Function]}
-            >
-              <button
-                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 glamor-25 glamor-26"
-                disabled={false}
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseLeave={[Function]}
-                onMouseUp={[Function]}
-                onTouchEnd={[Function]}
-                onTouchStart={[Function]}
-                role="button"
-                tabIndex="0"
-                type="button"
-              >
-                <span
-                  className="MuiButton-label-87"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 fa fa-check glamor-22"
-                  />
-                  <p
-                    className="glamor-23 glamor-24"
-                    open={false}
-                  >
-                    Pending
-                  </p>
-                </span>
-                <span
-                  className="MuiTouchRipple-root-55"
-                />
-              </button>
-            </li>
-          </a>
-          <a
-            href="/seen"
-            onClick={[Function]}
-          >
-            <li
-              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 glamor-27 glamor-28"
-              disabled={false}
-              onClick={[Function]}
-            >
-              <button
-                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 glamor-25 glamor-26"
-                disabled={false}
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseLeave={[Function]}
-                onMouseUp={[Function]}
-                onTouchEnd={[Function]}
-                onTouchStart={[Function]}
-                role="button"
-                tabIndex="0"
-                type="button"
-              >
-                <span
-                  className="MuiButton-label-87"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 fa fa-eye glamor-22"
-                  />
-                  <p
-                    className="glamor-23 glamor-24"
-                    open={false}
-                  >
-                    Seen
-                  </p>
-                </span>
-                <span
-                  className="MuiTouchRipple-root-55"
-                />
-              </button>
-            </li>
-          </a>
-          <a
-            href="/series"
-            onClick={[Function]}
-          >
-            <li
-              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 glamor-27 glamor-28"
-              disabled={false}
-              onClick={[Function]}
-            >
-              <button
-                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 glamor-25 glamor-26"
-                disabled={false}
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseLeave={[Function]}
-                onMouseUp={[Function]}
-                onTouchEnd={[Function]}
-                onTouchStart={[Function]}
-                role="button"
-                tabIndex="0"
-                type="button"
-              >
-                <span
-                  className="MuiButton-label-87"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 fa fa-tv glamor-22"
-                  />
-                  <p
-                    className="glamor-23 glamor-24"
-                    open={false}
-                  >
-                    Series
-                  </p>
-                </span>
-                <span
-                  className="MuiTouchRipple-root-55"
-                />
-              </button>
-            </li>
-          </a>
-          <a
-            href="/tasks"
-            onClick={[Function]}
-          >
-            <li
-              className="MuiListItem-root-76 MuiListItem-gutters-83 MuiListItem-default-79 glamor-27 glamor-28"
-              disabled={false}
-              onClick={[Function]}
-            >
-              <button
-                className="MuiButtonBase-root-46 MuiButton-root-85 MuiButton-flatAccent-89 glamor-25 glamor-26"
-                disabled={false}
-                onBlur={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyUp={[Function]}
-                onMouseDown={[Function]}
-                onMouseLeave={[Function]}
-                onMouseUp={[Function]}
-                onTouchEnd={[Function]}
-                onTouchStart={[Function]}
-                role="button"
-                tabIndex="0"
-                type="button"
-              >
-                <span
-                  className="MuiButton-label-87"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 fa fa-tasks glamor-22"
-                  />
-                  <p
-                    className="glamor-23 glamor-24"
-                    open={false}
-                  >
-                    Tasks
-                  </p>
-                </span>
-                <span
-                  className="MuiTouchRipple-root-55"
-                />
-              </button>
-            </li>
-          </a>
-        </ul>
         <div
-          className="glamor-88 glamor-89"
+          className="MuiPaper-root-8 MuiPaper-shadow0-10 MuiDrawer-paper-72 glamor-83 MuiDrawer-anchorLeft-73"
         >
           <div
-            className="glamor-86 glamor-87"
+            className="glamor-81 glamor-82"
           >
-            <p
-              className="glamor-80 glamor-81"
+            <ul
+              className="MuiList-root-79 MuiList-padding-80 glamor-70 glamor-71"
             >
-              Version Info
-            </p>
-            <p
-              className="glamor-80 glamor-81"
+              <a
+                href="/config"
+                onClick={[Function]}
+              >
+                <li
+                  className="MuiListItem-root-83 MuiListItem-gutters-90 MuiListItem-default-86 glamor-26 glamor-27"
+                  disabled={false}
+                  onClick={[Function]}
+                >
+                  <span
+                    aria-hidden="true"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-92 fa fa-pencil glamor-23"
+                  />
+                  <div
+                    className="MuiListItemText-root-93 MuiListItemText-inset-94 glamor-24 glamor-23"
+                  >
+                    Config
+                  </div>
+                </li>
+              </a>
+              <a
+                href="/history"
+                onClick={[Function]}
+              >
+                <li
+                  className="MuiListItem-root-83 MuiListItem-gutters-90 MuiListItem-default-86 glamor-26 glamor-27"
+                  disabled={false}
+                  onClick={[Function]}
+                >
+                  <span
+                    aria-hidden="true"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-92 fa fa-history glamor-23"
+                  />
+                  <div
+                    className="MuiListItemText-root-93 MuiListItemText-inset-94 glamor-24 glamor-23"
+                  >
+                    History
+                  </div>
+                </li>
+              </a>
+              <a
+                href="/log"
+                onClick={[Function]}
+              >
+                <li
+                  className="MuiListItem-root-83 MuiListItem-gutters-90 MuiListItem-default-86 glamor-26 glamor-27"
+                  disabled={false}
+                  onClick={[Function]}
+                >
+                  <span
+                    aria-hidden="true"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-92 fa fa-book glamor-23"
+                  />
+                  <div
+                    className="MuiListItemText-root-93 MuiListItemText-inset-94 glamor-24 glamor-23"
+                  >
+                    Log
+                  </div>
+                </li>
+              </a>
+              <a
+                href="/movies"
+                onClick={[Function]}
+              >
+                <li
+                  className="MuiListItem-root-83 MuiListItem-gutters-90 MuiListItem-default-86 glamor-26 glamor-27"
+                  disabled={false}
+                  onClick={[Function]}
+                >
+                  <span
+                    aria-hidden="true"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-92 fa fa-film glamor-23"
+                  />
+                  <div
+                    className="MuiListItemText-root-93 MuiListItemText-inset-94 glamor-24 glamor-23"
+                  >
+                    Movies
+                  </div>
+                </li>
+              </a>
+              <a
+                href="/pending"
+                onClick={[Function]}
+              >
+                <li
+                  className="MuiListItem-root-83 MuiListItem-gutters-90 MuiListItem-default-86 glamor-26 glamor-27"
+                  disabled={false}
+                  onClick={[Function]}
+                >
+                  <span
+                    aria-hidden="true"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-92 fa fa-check glamor-23"
+                  />
+                  <div
+                    className="MuiListItemText-root-93 MuiListItemText-inset-94 glamor-24 glamor-23"
+                  >
+                    Pending
+                  </div>
+                </li>
+              </a>
+              <a
+                href="/seen"
+                onClick={[Function]}
+              >
+                <li
+                  className="MuiListItem-root-83 MuiListItem-gutters-90 MuiListItem-default-86 glamor-26 glamor-27"
+                  disabled={false}
+                  onClick={[Function]}
+                >
+                  <span
+                    aria-hidden="true"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-92 fa fa-eye glamor-23"
+                  />
+                  <div
+                    className="MuiListItemText-root-93 MuiListItemText-inset-94 glamor-24 glamor-23"
+                  >
+                    Seen
+                  </div>
+                </li>
+              </a>
+              <a
+                href="/series"
+                onClick={[Function]}
+              >
+                <li
+                  className="MuiListItem-root-83 MuiListItem-gutters-90 MuiListItem-default-86 glamor-26 glamor-27"
+                  disabled={false}
+                  onClick={[Function]}
+                >
+                  <span
+                    aria-hidden="true"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-92 fa fa-tv glamor-23"
+                  />
+                  <div
+                    className="MuiListItemText-root-93 MuiListItemText-inset-94 glamor-24 glamor-23"
+                  >
+                    Series
+                  </div>
+                </li>
+              </a>
+              <li
+                className="MuiListItem-root-83 MuiListItem-gutters-90 MuiListItem-default-86 glamor-26 glamor-27"
+                disabled={false}
+                onClick={[Function]}
+              >
+                <span
+                  aria-hidden="true"
+                  className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-92 fa fa-tasks glamor-23"
+                />
+                <div
+                  className="MuiListItemText-root-93 MuiListItemText-inset-94 glamor-24 glamor-23"
+                >
+                  Tasks
+                </div>
+              </li>
+            </ul>
+            <div
+              className="glamor-78 glamor-79 glamor-80"
             >
-              Flexget: 
-               
-               
-            </p>
-            <p
-              className="glamor-80 glamor-81"
-            >
-              API: 
-            </p>
+              <p
+                className="glamor-72 glamor-73"
+              >
+                Version Info
+              </p>
+              <p
+                className="glamor-72 glamor-73"
+              >
+                Flexget: 
+                 
+                 
+              </p>
+              <p
+                className="glamor-72 glamor-73"
+              >
+                API: 
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </aside>
     <section
-      className="glamor-94 glamor-95"
+      className="glamor-86 glamor-87"
       open={false}
     >
       <div />

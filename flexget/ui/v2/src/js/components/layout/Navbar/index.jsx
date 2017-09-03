@@ -79,7 +79,7 @@ export class Navbar extends Component {
           </Link>
           <Link to="/log">
             <NavIcon aria-label="Log">
-              <Icon className="fa fa-file-text-o" />
+              <Icon className="fa fa-book" />
             </NavIcon>
           </Link>
           <NavIcon

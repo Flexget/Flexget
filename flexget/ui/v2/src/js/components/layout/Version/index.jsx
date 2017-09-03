@@ -14,6 +14,11 @@ class Version extends Component {
       latest: PropTypes.string,
     }).isRequired,
     getVersion: PropTypes.func.isRequired,
+    className: PropTypes.string,
+  };
+
+  static defaultProps = {
+    className: '',
   };
 
   componentDidMount() {
@@ -21,9 +26,9 @@ class Version extends Component {
   }
 
   render() {
-    const { version: { api, flexget, latest } } = this.props;
+    const { version: { api, flexget, latest }, className } = this.props;
     return (
-      <Wrapper>
+      <Wrapper className={className}>
         <Line>Version Info</Line>
         <Line>Flexget: { flexget } {
           latest && semver(latest, flexget) === 1 && (

@@ -33,6 +33,10 @@ injectGlobal`
     text-decoration: none;
   }
 
+  * {
+    box-sizing: border-box;
+  }
+
   *:focus {
     outline: none;
   }
