@@ -93,5 +93,5 @@ class UrlRewriteGoogle(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteGoogleCse, 'google_cse', groups=['urlrewriter'], api_ver=2)
-    plugin.register(UrlRewriteGoogle, 'google', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteGoogleCse, 'google_cse', interfaces=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteGoogle, 'google', interfaces=['urlrewriter'], api_ver=2)

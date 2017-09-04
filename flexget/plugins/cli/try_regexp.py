@@ -66,7 +66,9 @@ class PluginTryRegexp(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTryRegexp, '--try-regexp', builtin=True, api_ver=2)
+    # This plugin runs on task phases, but should not be allowed in the config, so we do not declare the 'task'
+    # interface. This may break if we start checking for the task interface for more than just config schemas.
+    plugin.register(PluginTryRegexp, '--try-regexp', builtin=True, interfaces=[], api_ver=2)
 
 
 @event('options.register')

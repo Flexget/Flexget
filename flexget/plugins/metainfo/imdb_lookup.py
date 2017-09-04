@@ -470,4 +470,4 @@ class ImdbLookup(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ImdbLookup, 'imdb_lookup', api_ver=2, groups=['movie_metainfo'])
+    plugin.register(ImdbLookup, 'imdb_lookup', api_ver=2, interfaces=['task', 'movie_metainfo'])

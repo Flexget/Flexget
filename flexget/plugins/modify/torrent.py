@@ -53,7 +53,7 @@ class TorrentFilename(object):
                 try:
                     torrent = Torrent(data)
                 except SyntaxError as e:
-                    entry.fail('%s - broken or invalid torrent file received' % e.message)
+                    entry.fail('%s - broken or invalid torrent file received' % e.args[0])
                     self.purge(entry)
                     continue
 

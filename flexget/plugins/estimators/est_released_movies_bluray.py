@@ -45,4 +45,4 @@ class EstimatesMoviesBluray(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EstimatesMoviesBluray, 'est_movies_bluray', groups=['estimate_release'], api_ver=2)
+    plugin.register(EstimatesMoviesBluray, 'est_movies_bluray', interfaces=['estimate_release'], api_ver=2)

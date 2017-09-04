@@ -44,4 +44,6 @@ npm-debug.log
 *.yml
 node_modules/
 !raw_config.yml
+!variables.yml
 cached_resources/
+pyvenv.cfg

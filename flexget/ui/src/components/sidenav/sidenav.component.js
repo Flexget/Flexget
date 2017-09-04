@@ -39,7 +39,7 @@
         }
 
         function hasUpdate(current, latest) {
-            return semver(vm.versions.latest_version, vm.versions.flexget_version);
+            return semver(vm.versions.latest_version, vm.versions.flexget_version) === 1;
         }
 
         function isSmallMenu() {

@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import base64
@@ -58,7 +59,8 @@ def load_user(username, session=None):
 def check_valid_login():
     # Allow access to root, login and swagger documentation without authentication
     if request.path == '/' or request.path.startswith('/auth/login') or \
-            request.path.startswith('/auth/logout') or request.path.startswith('/swagger'):
+            request.path.startswith('/auth/logout') or request.path.startswith('/swagger') or \
+            request.method == 'OPTIONS':
         return
 
     if not current_user.is_authenticated:
@@ -68,7 +70,7 @@ def check_valid_login():
 # API Authentication and Authorization
 auth_api = api.namespace('auth', description='Authentication')
 
-login_api_schema = api.schema('auth.login', {
+login_api_schema = api.schema_model('auth.login', {
     'type': 'object',
     'properties': {
         'username': {'type': 'string'},
@@ -113,7 +115,7 @@ class LoginAPI(APIResource):
 @auth_api.route('/logout/')
 class LogoutAPI(APIResource):
     @api.response(200, 'Logout successful', model=base_message_schema)
-    def get(self, session=None):
+    def post(self, session=None):
         """ Logout and clear session cookies """
         flask_session.clear()
         resp = success_response('User logged out')

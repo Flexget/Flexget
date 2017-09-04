@@ -65,7 +65,7 @@ var mockSeenData = (function () {
 							'field_id': 5586,
 							'field_name': 'url',
 							'seen_entry_id': 2978,
-							'value': 'http://trakt.tv/movie/ice-age-collision-course-2016'
+							'value': 'https://trakt.tv/movies/ice-age-collision-course-2016'
 						}
 					],
 					'id': 2978,
@@ -130,7 +130,7 @@ var mockSeenData = (function () {
 							'field_id': 5581,
 							'field_name': 'url',
 							'seen_entry_id': 2975,
-							'value': 'http://trakt.tv/movie/the-hunger-games-mockingjay-part-2-2015'
+							'value': 'https://trakt.tv/movies/the-hunger-games-mockingjay-part-2-2015'
 						}
 					],
 					'id': 2975,

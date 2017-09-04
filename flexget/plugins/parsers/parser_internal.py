@@ -47,4 +47,4 @@ class ParserInternal(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ParserInternal, 'parser_internal', groups=['movie_parser', 'series_parser'], api_ver=2)
+    plugin.register(ParserInternal, 'parser_internal', interfaces=['movie_parser', 'series_parser'], api_ver=2)

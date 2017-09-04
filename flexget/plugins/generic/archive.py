@@ -292,4 +292,4 @@ def search(session, text, tags=None, sources=None, desc=False):
 @event('plugin.register')
 def register_plugin():
     plugin.register(Archive, 'archive', api_ver=2)
-    plugin.register(UrlrewriteArchive, 'flexget_archive', groups=['search'], api_ver=2)
+    plugin.register(UrlrewriteArchive, 'flexget_archive', interfaces=['search'], api_ver=2)

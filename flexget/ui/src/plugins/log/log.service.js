@@ -15,7 +15,7 @@
             var deferred = $q.defer();
 
             var stream = oboe({
-                url: '/api/server/log/' + query,
+                url: 'api/server/log/' + query,
                 method: 'GET'
             }).done(function () {
                 deferred.resolve('finished stream');

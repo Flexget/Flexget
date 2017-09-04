@@ -22,7 +22,7 @@ from flexget.plugin import (
 from flexget.utils import requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimpleTaskPersistence
-from flexget.utils.tools import get_config_hash
+from flexget.utils.tools import get_config_hash, MergeException, merge_dict_from_to
 from flexget.utils.template import render_from_task, FlexGetTemplate
 
 log = logging.getLogger('task')
@@ -459,6 +459,9 @@ class Task(object):
                 finally:
                     fire_event('task.execute.after_plugin', self, plugin.name)
                 self.session = None
+        # check config hash for changes at the end of 'prepare' phase
+        if phase == 'prepare':
+            self.check_config_hash()
 
     def __run_plugin(self, plugin, phase, args=None, kwargs=None):
         """
@@ -541,15 +544,17 @@ class Task(object):
         """
         self.config_modified = True
 
-    def is_config_modified(self, last_hash):
-        """
-        Checks the task's config hash. Returns True/False depending on config has been modified and the config hash
+    def merge_config(self, new_config):
+        try:
+            merge_dict_from_to(new_config, self.config)
+        except MergeException as e:
+            raise PluginError('Failed to merge configs for task %s: %s' % (self.name, e))
 
-        :param str last_hash:
-        :return bool, str: config modified and config hash
+    def check_config_hash(self):
+        """
+        Checks the task's config hash and updates the hash if necessary.
         """
         # Save current config hash and set config_modified flag
-        config_modified = False
         config_hash = get_config_hash(self.config)
         if self.is_rerun:
             # Restore the config to state right after start phase
@@ -557,15 +562,14 @@ class Task(object):
                 self.config = copy.deepcopy(self.prepared_config)
             else:
                 log.error('BUG: No prepared_config on rerun, please report.')
-                config_modified = False
-        elif not last_hash:
-            config_modified = True
-        elif last_hash.hash != config_hash:
-            config_modified = True
-            last_hash.hash = config_hash
-        else:
-            config_modified = False
-        return config_modified, config_hash
+        with Session() as session:
+            last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
+            if not last_hash:
+                session.add(TaskConfigHash(task=self.name, hash=config_hash))
+                self.config_changed()
+            elif last_hash.hash != config_hash:
+                last_hash.hash = config_hash
+                self.config_changed()
 
     def _execute(self):
         """Executes the task without rerunning."""
@@ -587,12 +591,6 @@ class Task(object):
             self.disable_phase('input')
             self.all_entries.extend(copy.deepcopy(self.options.inject))
 
-        with Session() as session:
-            last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
-            self.config_modified, config_hash = self.is_config_modified(last_hash)
-            if self.config_modified:
-                session.add(TaskConfigHash(task=self.name, hash=config_hash))
-
         # run phases
         try:
             for phase in task_phases:
@@ -603,8 +601,8 @@ class Task(object):
                             log.info('Plugin %s is not executed because %s phase is disabled (e.g. --test)' %
                                      (plugin.name, phase))
                     continue
-                if phase == 'start' and self.is_rerun:
-                    log.debug('skipping task_start during rerun')
+                if phase in ('start', 'prepare') and self.is_rerun:
+                    log.debug('skipping phase %s during rerun', phase)
                 elif phase == 'exit' and self._rerun and self._rerun_count < self.max_reruns:
                     log.debug('not running task_exit yet because task will rerun')
                 else:
@@ -662,7 +660,7 @@ class Task(object):
 
     @staticmethod
     def validate_config(config):
-        schema = plugin_schemas(context='task')
+        schema = plugin_schemas(interface='task')
         # Don't validate commented out plugins
         schema['patternProperties'] = {'^_': {}}
         return config_schema.process_config(config, schema)
@@ -698,7 +696,7 @@ class Task(object):
 def register_config_key():
     task_config_schema = {
         'type': 'object',
-        'additionalProperties': plugin_schemas(context='task')
+        'additionalProperties': plugin_schemas(interface='task')
     }
 
     config_schema.register_config_key('tasks', task_config_schema, required=True)

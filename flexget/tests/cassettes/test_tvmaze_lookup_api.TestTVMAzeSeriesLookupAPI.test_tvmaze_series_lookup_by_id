@@ -1,194 +1,46 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.24.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/13
-  response:
-    body: {string: !!python/unicode '{"id":13,"url":"http://www.tvmaze.com/shows/13/the-flash","name":"The
-        Flash","type":"Scripted","language":"English","genres":["Drama","Action","Adventure","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2014-10-07","schedule":{"time":"20:00","days":["Tuesday"]},"rating":{"average":8.3},"weight":18,"network":{"id":5,"name":"The
-        CW","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":36939,"thetvdb":279121,"imdb":"tt3107288"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/63/158168.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/63/158168.jpg"},"summary":"<p>After
-        a particle accelerator causes a freak storm, CSI Investigator Barry Allen
-        is struck by lightning and falls into a coma. Months later he awakens with
-        the power of super speed, granting him the ability to move through Central
-        City like an unseen guardian angel. Though initially excited by his newfound
-        powers, Barry is shocked to discover he is not the only \"meta-human\" who
-        was created in the wake of the accelerator explosion -- and not everyone is
-        using their new powers for good. Barry partners with S.T.A.R. Labs and dedicates
-        his life to protect the innocent. For now, only a few close friends and associates
-        know that Barry is literally the fastest man alive, but it won''t be long
-        before the world learns what Barry Allen has become...<em>The Flash</em>.</p>","updated":1473171671,"_links":{"self":{"href":"http://api.tvmaze.com/shows/13"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/647397"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/816120"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 12 Sep 2016 13:27:57 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.31.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/13
-  response:
-    body: {string: !!python/unicode '{"id":13,"url":"http://www.tvmaze.com/shows/13/the-flash","name":"The
-        Flash","type":"Scripted","language":"English","genres":["Drama","Action","Adventure","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2014-10-07","schedule":{"time":"20:00","days":["Tuesday"]},"rating":{"average":8.3},"weight":18,"network":{"id":5,"name":"The
-        CW","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":36939,"thetvdb":279121,"imdb":"tt3107288"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/75/189985.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/75/189985.jpg"},"summary":"<p>After
-        a particle accelerator causes a freak storm, CSI Investigator Barry Allen
-        is struck by lightning and falls into a coma. Months later he awakens with
-        the power of super speed, granting him the ability to move through Central
-        City like an unseen guardian angel. Though initially excited by his newfound
-        powers, Barry is shocked to discover he is not the only \"meta-human\" who
-        was created in the wake of the accelerator explosion -- and not everyone is
-        using their new powers for good. Barry partners with S.T.A.R. Labs and dedicates
-        his life to protect the innocent. For now, only a few close friends and associates
-        know that Barry is literally the fastest man alive, but it won''t be long
-        before the world learns what Barry Allen has become...<em>The Flash</em>.</p>","updated":1474501284,"_links":{"self":{"href":"http://api.tvmaze.com/shows/13"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/647397"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/816120"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Thu, 22 Sep 2016 11:40:41 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/13
-  response:
-    body: {string: !!python/unicode '{"id":13,"url":"http://www.tvmaze.com/shows/13/the-flash","name":"The
-        Flash","type":"Scripted","language":"English","genres":["Drama","Action","Adventure","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2014-10-07","schedule":{"time":"20:00","days":["Tuesday"]},"rating":{"average":8.3},"weight":16,"network":{"id":5,"name":"The
-        CW","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":36939,"thetvdb":279121,"imdb":"tt3107288"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/75/189985.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/75/189985.jpg"},"summary":"<p>After
-        a particle accelerator causes a freak storm, CSI Investigator Barry Allen
-        is struck by lightning and falls into a coma. Months later he awakens with
-        the power of super speed, granting him the ability to move through Central
-        City like an unseen guardian angel. Though initially excited by his newfound
-        powers, Barry is shocked to discover he is not the only \"meta-human\" who
-        was created in the wake of the accelerator explosion -- and not everyone is
-        using their new powers for good. Barry partners with S.T.A.R. Labs and dedicates
-        his life to protect the innocent. For now, only a few close friends and associates
-        know that Barry is literally the fastest man alive, but it won''t be long
-        before the world learns what Barry Allen has become...<em>The Flash</em>.</p>","updated":1474629345,"_links":{"self":{"href":"http://api.tvmaze.com/shows/13"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/647397"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/816120"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 25 Sep 2016 14:20:29 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/13
-  response:
-    body: {string: !!python/unicode '{"id":13,"url":"http://www.tvmaze.com/shows/13/the-flash","name":"The
-        Flash","type":"Scripted","language":"English","genres":["Drama","Action","Adventure","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2014-10-07","schedule":{"time":"20:00","days":["Tuesday"]},"rating":{"average":8.3},"weight":16,"network":{"id":5,"name":"The
-        CW","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":36939,"thetvdb":279121,"imdb":"tt3107288"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/75/189985.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/75/189985.jpg"},"summary":"<p>After
-        a particle accelerator causes a freak storm, CSI Investigator Barry Allen
-        is struck by lightning and falls into a coma. Months later he awakens with
-        the power of super speed, granting him the ability to move through Central
-        City like an unseen guardian angel. Though initially excited by his newfound
-        powers, Barry is shocked to discover he is not the only \"meta-human\" who
-        was created in the wake of the accelerator explosion -- and not everyone is
-        using their new powers for good. Barry partners with S.T.A.R. Labs and dedicates
-        his life to protect the innocent. For now, only a few close friends and associates
-        know that Barry is literally the fastest man alive, but it won''t be long
-        before the world learns what Barry Allen has become...<em>The Flash</em>.</p>","updated":1474629345,"_links":{"self":{"href":"http://api.tvmaze.com/shows/13"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/647397"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/816120"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 26 Sep 2016 12:20:27 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/13
-  response:
-    body: {string: !!python/unicode '{"id":13,"url":"http://www.tvmaze.com/shows/13/the-flash","name":"The
-        Flash","type":"Scripted","language":"English","genres":["Drama","Action","Adventure","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2014-10-07","schedule":{"time":"20:00","days":["Tuesday"]},"rating":{"average":8.3},"weight":16,"network":{"id":5,"name":"The
-        CW","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":36939,"thetvdb":279121,"imdb":"tt3107288"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/75/189985.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/75/189985.jpg"},"summary":"<p>After
-        a particle accelerator causes a freak storm, CSI Investigator Barry Allen
-        is struck by lightning and falls into a coma. Months later he awakens with
-        the power of super speed, granting him the ability to move through Central
-        City like an unseen guardian angel. Though initially excited by his newfound
-        powers, Barry is shocked to discover he is not the only \"meta-human\" who
-        was created in the wake of the accelerator explosion -- and not everyone is
-        using their new powers for good. Barry partners with S.T.A.R. Labs and dedicates
-        his life to protect the innocent. For now, only a few close friends and associates
-        know that Barry is literally the fastest man alive, but it won''t be long
-        before the world learns what Barry Allen has become...<em>The Flash</em>.</p>","updated":1474629345,"_links":{"self":{"href":"http://api.tvmaze.com/shows/13"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/647397"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/816120"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 26 Sep 2016 12:22:05 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/13
-  response:
-    body: {string: !!python/unicode '{"id":13,"url":"http://www.tvmaze.com/shows/13/the-flash","name":"The
-        Flash","type":"Scripted","language":"English","genres":["Drama","Action","Adventure","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2014-10-07","schedule":{"time":"20:00","days":["Tuesday"]},"rating":{"average":8.3},"weight":16,"network":{"id":5,"name":"The
-        CW","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":36939,"thetvdb":279121,"imdb":"tt3107288"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/75/189985.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/75/189985.jpg"},"summary":"<p>After
-        a particle accelerator causes a freak storm, CSI Investigator Barry Allen
-        is struck by lightning and falls into a coma. Months later he awakens with
-        the power of super speed, granting him the ability to move through Central
-        City like an unseen guardian angel. Though initially excited by his newfound
-        powers, Barry is shocked to discover he is not the only \"meta-human\" who
-        was created in the wake of the accelerator explosion -- and not everyone is
-        using their new powers for good. Barry partners with S.T.A.R. Labs and dedicates
-        his life to protect the innocent. For now, only a few close friends and associates
-        know that Barry is literally the fastest man alive, but it won''t be long
-        before the world learns what Barry Allen has become...<em>The Flash</em>.</p>","updated":1474629345,"_links":{"self":{"href":"http://api.tvmaze.com/shows/13"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/647397"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/816120"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 26 Sep 2016 12:22:22 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/shows/13?embed=seasons
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA91Wa2/bNhT9K5y+7Ist+aH4haJAlq5AgW0FmhTDsBYBLV1bnClSICmrbpH/vnMp
+          J3HWPZqtw4p9kkReXp577uGhPiSqTFbj6SBpnU5WSRVCs8qyruvSsK/le0oLW2e+sp3PxtMsVDTc
+          aOmrZJAYWRNWXFUknh+HwqHhocvCqSZQiSAtzbaVWx791my1iiu3ZBz5ZPVz8szJWiLsvAjKGrxc
+          FopMQcPnqh95O0h8kKFFdPKqNUaZLaJca4Li3WejQdI4qhU5bLdKJqNxPhyPhqM5onxRUdlqhH1I
+          +nDMr0YjTJXyEPe/asnjPXl7g6QycHYEyz25iHmRTjHRkdpWIVlNliiaQmfdjqOYuLMHNFz8iNSF
+          BTh34IgjQ6+NAhniEnWgao4omY/Xl3hnXO+t4e/zmpwqZPYDddc/8R43ce/1RSWNITTHtFoPEnoX
+          yBmpgR9l7Xug09lyCnRoT9iXa0CdL8eT8SBRNX8lIUzHo/lksUiQUtWxtg9JTaVqa0wfm85Eq+K0
+          722jrSx9Fpf4rF9w3VgXnFQhmy+y8fJsuVikvzTcFuvUVgHaI1LeLrkGabblhv0mKwD7tq4lM5o8
+          aZ6eb1C+kKKRDmA1CVkUpNGvYJ0oZOvJY3bjSO6Ex1g9EBeXL8QLsycf1DaGfSOdO4hzrckI5RHm
+          2mIn1gehudGsMSFNKTZSay8UgCEjjoFMxffWhMoLjU46AeHLTu7IeNGpUAmwLxrbYcZuhG8bvPiG
+          qByIrZMQLNJWqo5hcq20CgeB1LXdE8acbbeVuCBoR2pxwZNa7bCDEa3xBKQ4R65U+MaRIp2Kqyou
+          UVCXAtKDoHdFFBoKqVCWoW4DLZY9Jj8QfdlccGWLHRSJ3UvlCwCIxfAaGyI+a5DvDRQS5LBqa2ne
+          JKKrrOikFwW4ZT0rE0OZAS6Yqz/tBb2DeDxOtRgOI52cm7DVAXJn2lvPjGCZcoz1CFNs0MettWV6
+          xMuNNuSOHF+mV+l5+ioV38k1Go3qSqi44JMVi9ZqAzataJwNVPTFKGNsAWJT8Ry5je0GItYHmWDb
+          AigJgoHvlH1G6b0tVEy5QzQgynBPHvoGtTHfXPFGemwdBCgSUqs9DcS6DUIF0VnzdRBrEtqizDWh
+          Lu4zYcLpUmiSjoVzn7vXYwWG1wS1UZqmVwiP3vrVk6x5ihPWNiVzD8fOl6N8sZgvcOqvtTK7aAee
+          9IZtoXKE5+25lo06PdS3Zs5eAO/cK4tD0ygfXekv1h7jcBeM8tl0ueQchh3p8esXZ5PFLHrcNdVr
+          KtFHhu5JemvYnHuHzeHwf3o19fFZPrq/nIZ9kuEYjJkWyR0Iu3NqDB7hvnQlT01w+91eIs9AL5h7
+          cI9AGPfDZ8PR2XC85Mz/+VXw+Zx8kmezERr6WY38QdIHPg72HivauzZDMjeDXhvz5Rku4E9RB0d+
+          rI/JiT4mj9UHVID/jBmr6VQfM9bHJP9f6iMf/Qv6OCY91Uf/o/M3FcKtPtFIPpvls08TSQz9WCXT
+          E5XAKY4/ddz33vSOLjJe/J6LzKJKWA4PVDKPKomZvxQX6Um/+9f6Rz2ITJ40Af+IOQz4U05qDP24
+          CfFAHa08/+Mm9Kgfmnk/dkd///nFmHcP5/PQHrlj2t/e3PwKPRuA1NkNAAA=
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 26 Mar 2017 12:05:27 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
 version: 1

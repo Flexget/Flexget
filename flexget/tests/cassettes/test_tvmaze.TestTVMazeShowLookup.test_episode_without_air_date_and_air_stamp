@@ -1,65 +1,74 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=Firefly
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAA41TTW/bMAz9K4LObux8NEmNokAxLMftEBTbMBQBa9G2VlkyKMmuW/S/j3K6dYcB
-        28kW+fT4+Ei9SK1kudwXmYxkZCnbEPoyz8dxXIShg2dcVK7LfetGnzMsrzVhbSaZSQsd8oXD70CY
-        +hQ4VqT7gIohBmwToUnRj7Yx2rccbNASell+l7dqQBsiIUePlUZb4cVBV0E7y5Ev6AOSlfeZ9AFC
-        5CvMomZiijboVH7LwnvCTiNxopSrolhdFFcXq4IZfNWiioZhL/IM53xZpJSCaZZwIM2/8v41kwRB
-        2yZhYUCaVV8t1pwYUTdtYJe4Zwyjo8cESr5t3l34/JVZK8e6aErpN3furGYrxJEb4J4TQiU37o78
-        nyQ9O5vOtx2SriD/hOPpWyrwOtd9+NCCtchzsdGYTOJTcgQMS+eOhrPI9eVmz2QthkE9yHK33+9Y
-        l+7SQYZQrIv1ZruUTKi7uasX2aHSseP027TPk66UnYcde+NA+XyG+/wMPvWOAoEO+TJfbYti8aNv
-        uAdHutGs6D+5fsFP7JOLaTx/0rFEH7sOkoPyur856AFFG63i2YoJgbzQVnCnoo5pbTIBgtBiAwpF
-        RTgKeHBAisO+A2OE76HCiqAOIpBGL4ITPtKQeIFPLU6c4HGbmTXaR+tGK3qg4IWr52ADBp4mAVYJ
-        HFKhEYh4UUQN86b6xDQiV+MvxNByj4HxvOaJJHJpJxrkT4vd4jrvb9i22CteiPTyNrvdfn25vFxl
-        8mS0fZxH69HUacQtv7V3Z6HXf32TabT8Bgbtosde+3nF/nH5Dcdvel0UW163158y/2KsCgQAAA==
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-encoding: [gzip]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 25 Dec 2016 09:57:17 GMT']
-      server: [nginx/1.10.0 (Ubuntu)]
-      vary: [Accept-Encoding]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/180/episodebynumber?season=1&number=13
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAA32Sz3LUMAzGX8XjC5c03p1CF3Y6fYOeWs47aqwkbv0PySaEzr47chYowwycYkU/
-        ffos+VU7q4/7693u0OlKXh/1XEo+GrMsS1++BviO/ZCCwew4WWSzsWZ0hKNfr/bf9tdXhYBn3ekI
-        AUXg8WfICJyiqEumhiek1qjT4MhCaaCUSFDcVnUJuEDI+hir952mGi/Jm12nXYBJil51QOtqeDN6
-        MTnYuPms2SewbDaczQU+eYiWB8hoDh/N/tOH94eb/jlP0jORm1yEPy7+X71f+EmspTrMaP9SPHea
-        awhAqzi8zXcPMI6UoiIslSKrklT2MFVUD0gYXVnV4sqsQLGoBWwAFwQvfwgIFcgMvgi+IGTREbEg
-        KYl8mVfVLpaWiNSrz3FMVGqU2fpVyVndg+8Uz6giTh6HsnUPKIIi9Fy5qDktGzDI5hQMlFgYKXBN
-        K8AGRkSLtvl6IoQXycmxQb97v2MRCtjfmnwnIz15F1+4rYrRj+07y2N5Wxhk9++Xpc/n8w9dnMUO
-        lQIAAA==
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-encoding: [gzip]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 25 Dec 2016 09:57:17 GMT']
-      server: [nginx/1.10.0 (Ubuntu)]
-      vary: [Accept-Encoding]
-    status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=Firefly
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA8VV227bRhD9lcG+uAVkkZZ8keUggOvWaFO0AaIE6cWGsSJH5MbLXWIvYhjD/96z
+          pByrfQkCBOgTuTOzcz9nH4QqxfJokU9EdFosRR1Cu8yyruumYdvITzwtbJP52nY+g1m2UY43uhcT
+          YWTDuHD9WRD6NglWhVNt4BImWpoqyipJfzKVVr6GsGLj2Ivl3+Ky3LIJ0TGkq0KxKfjwWhVBWQPJ
+          e/aBnRG3E+GDDBFX4KUcHLtogkrhT5F467hR7KBYilmezw7z88NZDg++qLmMGmYPYjSHfpknVSn7
+          IYVrp/Arbh8nwsmgTJVs5ZbdkPX5dA5Fx6qqA7qEmjl01t0no9S34+cuvP4DXguLvFyf1LvuvDMK
+          raAVCkDNyaJM3Xi3wn9K6ZM16XzZsFOFzH7n7u7PFOBxiLu+qqUxjLmYqPVE8MfUEamROirajknO
+          T44XcFZz2JZrsTxbLM6Ql2rSQYSQz/P58emRgEPVDFU9iIZLFRuod9NO/VXF/sBjq60sfTZc8dl4
+          4a61LjipQnaUzU7zfPqhrVCHdapSyOor/D1duUO/bExj2neJVH1sGpk6KV60L6/VlqmOpsSMqWfp
+          PClDqJg2Ma3PhCQ5NlzJkqlw3JFcW+lKiH0jtSbfyoILJzeBglPsKVjy0W2TX4lTzT0UGLsevEZz
+          b2xnqJUueLKbQVhJLT/2JE1JvE2BOukcFoY2cthYnzx1jGj4yhhq1Bhgj3VPTiJCW6oYn5qb6Yus
+          fYnWxbbEYiQEHp+dLeYnRyezibjTytwPI/asN2nUNTD33F3Zqv1RfcZmGjGwsFU2em6VH1btC5d3
+          dsD2PM9Ph7W742bNZcIZInuW3poElXHjF/mXmGK8kMHwiSsORyeHRyjYRDh3I5ZG/oBwl8RrVybV
+          uOpPoP4R/UHp/8I1m3JffDQb4f4/g/Pboes8m83PT8+/Kbz2ff4XX1eyDRKI+k3qwuqGDvBzQG+4
+          N1aXwBr2mTbWgaMooQDrXqTtpy2DjqShrrbJKAGy2LnagQagMj6xBvlatXQjVuBpUGJ/I6Yp3ACn
+          GncTaifExqvK0F+W6VJrxGd6L329js7wRRIfePCAXwOEE2qVtoF+tjjRQTI72Dduoi+iRpLIumAD
+          LqFXMjm8suv1BfVg6gq6AgSLan6VvWama9cjzq5UZKAkniRYleBmDSLYqAI9WKnGGnormwtKqZfK
+          g4QAGQqMQBWThwR2b0Avjr5b21ATLqT24N2ijbPNcFAGVi3eSA4pvcrC3DSgC/TpLYyfErgR318M
+          F9YMXlGbqAkPjcODgsp/QWmS0FYnL4ZuAjgShIo0a27xLekHa++ptND29MGu/YQ0qBL1OFLoMn4n
+          yX2P4SE7BYIbOTF5HYY1cupIkNiFwlk/Thus5u/VjiRxQNSBap/o7WuZ7Jk7wESPt4+P/wCAJ9Qx
+          nwgAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 26 Mar 2017 11:10:54 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/shows/180/episodebynumber?season=1&number=13
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4WSz1LcMAzGX8XjSy8h3h0oW3YY3oAT5bwjYiUx+B+S3TRl9t2rZNuy5cIpVvR9
+          P8mS37Szer+93Gx2ja7k9V6PpeS9MdM0teVHgF/YdikYzI6TRTar1vSOsPfzxfbn9vKiEPCoGx0h
+          oAC+/wkZgVMUumRqeEJaCjUaHFkoi1AsEhS3uk4BFwhZ72P1vtFU4yl5vWm0CzCI6U0HtK6G90bF
+          Ulx33mvNPoFls1rYnAwHD9FyBxnN7pvZ3ny92l23z3mQuonc4CKcXf5T5l/LQVpMtRvRfqAeG801
+          BKBZOr3Ndw/Q95SiIiyVIquSVPYwVFQPSBhdmdXkyqhAsdACLgIuCF7+EBAqkFm8inxCyMIRWJCU
+          RL6Ms1oul6aI1KrH2CcqNcqM/azkrO7BN4pHVBEHj11ZqwcUoICeKxc1pmkVdLJBBR0lFo0Y3MIK
+          Ml8RRkSLdunriRBeJCfHRfSv9hcWUMD21uQ7GevBu/jCy8oYfb98R3k074uD7M639v8L08fj8Tfz
+          tebEnQIAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 26 Mar 2017 11:10:54 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
 version: 1

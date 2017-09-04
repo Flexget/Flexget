@@ -109,8 +109,11 @@ class PluginSubliminal(object):
         from babelfish import Language
         from dogpile.cache.exception import RegionAlreadyConfigured
         import subliminal
+        from subliminal import scan_video, save_subtitles
         from subliminal.cli import MutexLock
+        from subliminal.core import ARCHIVE_EXTENSIONS, scan_archive, refine, search_external_subtitles
         from subliminal.score import episode_scores, movie_scores
+        from subliminal.video import VIDEO_EXTENSIONS
         try:
             subliminal.region.configure('dogpile.cache.dbm',
                                         arguments={
@@ -160,11 +163,17 @@ class PluginSubliminal(object):
                 try:
                     entry_languages = set(entry.get('subtitle_languages', [])) or languages
 
-                    video = subliminal.scan_video(entry['location'])
+                    if entry['location'].endswith(VIDEO_EXTENSIONS):
+                        video = scan_video(entry['location'])
+                    elif entry['location'].endswith(ARCHIVE_EXTENSIONS):
+                        video = scan_archive(entry['location'])
+                    else:
+                        entry.reject('File extension is not a supported video or archive extension')
+                        continue
                     # use metadata refiner to get mkv metadata
                     refiner = ('metadata',)
-                    subliminal.core.refine(video, episode_refiners=refiner, movie_refiners=refiner)
-                    existing_subtitles = set(subliminal.core.search_external_subtitles(entry['location']).values())
+                    refine(video, episode_refiners=refiner, movie_refiners=refiner)
+                    existing_subtitles = set(search_external_subtitles(entry['location']).values())
                     video.subtitle_languages |= existing_subtitles
                     if isinstance(video, subliminal.Episode):
                         title = video.series
@@ -223,7 +232,7 @@ class PluginSubliminal(object):
                     if task.options.test:
                         log.verbose('     FOUND LANGUAGES %s for %s', [str(l.language) for l in subtitle], video.name)
                         continue
-                    subliminal.save_subtitles(video, subtitle, single=single_mode, directory=_directory)
+                    save_subtitles(video, subtitle, single=single_mode, directory=_directory)
 
 
 @event('plugin.register')

@@ -53,6 +53,15 @@ class UrlRewriteSerienjunkies(object):
         'additionalProperties': False
     }
 
+    # Since the urlrewriter relies on a config, we need to create a default one
+    config = {
+        'hoster': DEFAULT_HOSTER,
+        'language': DEFAULT_LANGUAGE
+    }
+
+    def on_task_start(self, task, config):
+        self.config = config
+
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
@@ -64,10 +73,6 @@ class UrlRewriteSerienjunkies(object):
     def url_rewrite(self, task, entry):
         series_url = entry['url']
         search_title = re.sub('\[.*\] ', '', entry['title'])
-
-        self.config = task.config.get('serienjunkies') or {}
-        self.config.setdefault('hoster', DEFAULT_HOSTER)
-        self.config.setdefault('language', DEFAULT_LANGUAGE)
 
         download_urls = self.parse_downloads(series_url, search_title)
         if not download_urls:
@@ -191,4 +196,4 @@ class UrlRewriteSerienjunkies(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteSerienjunkies, 'serienjunkies', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteSerienjunkies, 'serienjunkies', interfaces=['urlrewriter', 'task'], api_ver=2)

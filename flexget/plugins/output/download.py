@@ -481,8 +481,6 @@ class PluginDownload(object):
                         raise plugin.PluginError('Unable to write %s: %s' % (destfile, err))
                     if err.errno != errno.EPERM and err.errno != errno.EACCES:
                         raise
-                else:
-                    del(entry['file'])
 
             # store final destination as output key
             entry['location'] = destfile
@@ -503,7 +501,8 @@ class PluginDownload(object):
             if os.path.exists(entry['file']):
                 log.debug('removing temp file %s from %s', entry['file'], entry['title'])
                 os.remove(entry['file'])
-            shutil.rmtree(os.path.dirname(entry['file']))
+            if os.path.exists(os.path.dirname(entry['file'])):
+                shutil.rmtree(os.path.dirname(entry['file']))
             del (entry['file'])
 
     def cleanup_temp_files(self, task):

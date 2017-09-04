@@ -124,4 +124,4 @@ class Newznab(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Newznab, 'newznab', api_ver=2, groups=['search'])
+    plugin.register(Newznab, 'newznab', api_ver=2, interfaces=['search'])

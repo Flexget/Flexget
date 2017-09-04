@@ -23,4 +23,4 @@ class UrlRewriteShortened(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteShortened, 'shortened', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteShortened, 'shortened', interfaces=['urlrewriter'], api_ver=2)

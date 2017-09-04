@@ -42,4 +42,4 @@ class UrlRewriteKoreus(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteKoreus, 'koreus', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteKoreus, 'koreus', interfaces=['urlrewriter'], api_ver=2)

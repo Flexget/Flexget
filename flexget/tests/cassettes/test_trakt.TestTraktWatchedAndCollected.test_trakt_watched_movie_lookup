@@ -6,9 +6,9 @@ interactions:
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: ['2']
     method: GET
-    uri: https://api.trakt.tv/search?type=movie&year=2015&query=Inside+Out
+    uri: https://api.trakt.tv/search?year=2015&type=movie&query=Inside+Out
   response:
-    body: {string: '[{"type":"movie","score":49.36994,"movie":{"title":"Inside Out","overview":"Growing
+    body: {string: '[{"type":"movie","score":51.328777,"movie":{"title":"Inside Out","overview":"Growing
         up can be a bumpy road, and it''s no exception for Riley, who is uprooted
         from her Midwest life when her father starts a new job in San Francisco. Like
         all of us, Riley is guided by her emotions - Joy, Fear, Anger, Disgust and
@@ -17,35 +17,41 @@ interactions:
         struggle to adjust to a new life in San Francisco, turmoil ensues in Headquarters.
         Although Joy, Riley''s main and most important emotion, tries to keep things
         positive, the emotions conflict on how best to navigate a new city, house
-        and school.","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":98998,"slug":"inside-out-2015","imdb":"tt2096673","tmdb":150540}}},{"type":"movie","score":20.679823,"movie":{"title":"Locked
+        and school.","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":98998,"slug":"inside-out-2015","imdb":"tt2096673","tmdb":150540}}},{"type":"movie","score":21.75486,"movie":{"title":"Locked
         Out","overview":"Spoiled rich kid Greg Mardukas gets home from a long day
         to find out that he has been locked out of his own house. Realizing he won''t
         be able to get inside until his father gets home in a few days, Greg must
-        learn to live in the outdoors for the weekend. Will he survive?","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":220954,"slug":"locked-out-2015","imdb":"","tmdb":340509}}},{"type":"movie","score":17.625078,"movie":{"title":"Out
+        learn to live in the outdoors for the weekend. Will he survive?","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":220954,"slug":"locked-out-2015","imdb":"","tmdb":340509}}},{"type":"movie","score":18.460924,"movie":{"title":"Out
         of Place","overview":"A young person faces internal struggles. What is wrong
-        with him?","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":248610,"slug":"out-of-place-2015","imdb":null,"tmdb":403893}}},{"type":"movie","score":14.527236,"movie":{"title":"Inside
+        with him?","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":248610,"slug":"out-of-place-2015","imdb":null,"tmdb":403893}}},{"type":"movie","score":14.979009,"movie":{"title":"Inside
         Einstein''s Mind: The Enigma of Space and Time","overview":"In November 1915,
         Einstein published his greatest work: General Relativity, the theory that
         transformed our understanding of nature''s laws and the entire history of
         the cosmos. This documentary tells the story of Einstein''s masterpiece, from
         the simple but powerful ideas at the heart of relativity to the revolution
         in cosmology still playing out in today''s labs, revealing Einstein''s brilliance
-        as never before.","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":266268,"slug":"inside-einstein-s-mind-the-enigma-of-space-and-time-2015","imdb":"tt5016974","tmdb":400316}}},{"type":"movie","score":3.1292315,"movie":{"title":"The
+        as never before.","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":266268,"slug":"inside-einstein-s-mind-the-enigma-of-space-and-time-2015","imdb":"tt5016974","tmdb":400316}}},{"type":"movie","score":3.1045113,"movie":{"title":"The
         Intruders","overview":"After the traumatic loss of her mother, a teenaged
         girl tries to uncover the dark secrets behind her new home, in spite of her
-        father''s disbelief.","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":203172,"slug":"the-intruders-2015","imdb":"tt3496372","tmdb":322518}}},{"type":"movie","score":1.9681776,"movie":{"title":"Mind
+        father''s disbelief.","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":203172,"slug":"the-intruders-2015","imdb":"tt3496372","tmdb":322518}}},{"type":"movie","score":2.5870929,"movie":{"title":"Making
+        of Avengers: Age of Ultron","overview":"This explores some of the film''s
+        behind-the-scenes wizardry. From James Spader (as Ultron) and Mark Ruffalo
+        (as the Hulk) in their unflattering performance capture suits to the CGI tinkering
+        involved to make Paul Bettany''s Vision look slightly less human, it''s an
+        interesting but too-short glimpse at one of the year''s most technologically
+        complex movies. It goes back 18 months showing what it was like on set of
+        the film in Italy and Seoul, Sourth Korea; a look at the Avengers Tower; some
+        of the behind-the-scenes early visual effects of Ultron; early concept work
+        for Quicksilver, the Hulk, and Vision; and more.","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":294986,"slug":"making-of-avengers-age-of-ultron-2015","imdb":"tt5180410","tmdb":448377}}},{"type":"movie","score":1.9498966,"movie":{"title":"Mind
         Candy","overview":"This short was released as an extra in the Blu-ray release
         of Disney Pixar''s \"Inside Out.\"  It''s a zany collection clips of the emotions
-        and how they interact.","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":235484,"slug":"mind-candy-2015","imdb":"","tmdb":370082}}},{"type":"movie","score":0.35666338,"movie":{"title":"Containment","overview":"Neighbors
+        and how they interact.","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":235484,"slug":"mind-candy-2015","imdb":"","tmdb":370082}}},{"type":"movie","score":0.37514743,"movie":{"title":"Containment","overview":"Neighbors
         in a block wake one morning to find they have been sealed inside their apartments.
         Can they work together to find out why? Or will they destroy each other in
-        their fight to escape?","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":223348,"slug":"containment-2015","imdb":"tt3561236","tmdb":347548}}},{"type":"movie","score":0.35666338,"movie":{"title":"Necroland","overview":"In
-        an instant, 80% of the worlds population has turned into rage humans and the
-        weather has gone out of control. Inside all of this chaos, the remaining survivors
-        attempt to unravel the answers to this convoluted mystery.","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":155649,"slug":"necroland-2015","imdb":"tt3518152","tmdb":255561}}},{"type":"movie","score":0.35666338,"movie":{"title":"Maxwell","overview":"A
+        their fight to escape?","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":223348,"slug":"containment-2015","imdb":"tt3561236","tmdb":347548}}},{"type":"movie","score":0.37514743,"movie":{"title":"Maxwell","overview":"A
         man is kidnapped and wakes up tied and gagged inside a dark shed. While the
         media call out for witnesses, no one suspects the culprit; a black-coated
-        man named Maxwell.","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":243926,"slug":"maxwell-2015","imdb":"tt5622820","tmdb":400871}}},{"type":"movie","score":0.2853307,"movie":{"title":"A
+        man named Maxwell.","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":243926,"slug":"maxwell-2015","imdb":"tt5622820","tmdb":400871}}},{"type":"movie","score":0.30011797,"movie":{"title":"A
         Girl''s Best Friend","overview":"Penelope, better known as Polka-Dot, is a
         spunky young girl who has a knack for helping people, particularly her ailing
         mother. While out looking for a part-time job, Polka-Dot befriends a hard-nosed
@@ -54,16 +60,16 @@ interactions:
         move forward.","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":207177,"slug":"a-girl-s-best-friend-2015","imdb":"tt4220166","tmdb":326261}}}]'}
     headers:
       CF-Cache-Status: [MISS]
-      CF-RAY: [312a16a20bec3cc5-CPH]
+      CF-RAY: [354378fb9ecd3c95-CPH]
       Cache-Control: ['public, max-age=28800']
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:22 GMT']
-      ETag: [W/"84369f5beed1187b45305f4c0ad9af8c"]
-      Expires: ['Sat, 17 Dec 2016 19:38:22 GMT']
+      Date: ['Sun, 23 Apr 2017 20:11:33 GMT']
+      ETag: [W/"d5f75756ae2fe379b25213f38bcd4a08"]
+      Expires: ['Mon, 24 Apr 2017 04:11:33 GMT']
       Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=deb3aecc5620f1a9e424b5455257b6c0b1481974702; expires=Sun,
-          17-Dec-17 11:38:22 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Set-Cookie: ['__cfduid=d99028024a96f6bf6331db7f40f9c10c71492978293; expires=Mon,
+          23-Apr-18 20:11:33 GMT; path=/; domain=.trakt.tv; HttpOnly']
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
       X-Frame-Options: [SAMEORIGIN]
@@ -71,15 +77,15 @@ interactions:
       X-Pagination-Limit: ['10']
       X-Pagination-Page: ['1']
       X-Pagination-Page-Count: ['3']
-      X-Request-Id: [6b9b4538-ddbd-421f-8083-964d05fe18c8]
-      X-Runtime: ['0.041913']
+      X-Request-Id: [a1835a67-6d8a-45e2-9a9f-e43882e467b4]
+      X-Runtime: ['0.041983']
       X-XSS-Protection: [1; mode=block]
     status: {code: 200, message: OK}
 - request:
     body: null
     headers:
       Content-Type: [application/json]
-      Cookie: [__cfduid=deb3aecc5620f1a9e424b5455257b6c0b1481974702]
+      Cookie: [__cfduid=d99028024a96f6bf6331db7f40f9c10c71492978293]
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: ['2']
     method: GET
@@ -95,23 +101,23 @@ interactions:
         to adjust to a new life in San Francisco, turmoil ensues in Headquarters.
         Although Joy, Riley''s main and most important emotion, tries to keep things
         positive, the emotions conflict on how best to navigate a new city, house
-        and school.","released":"2015-06-19","runtime":94,"trailer":"http://youtube.com/watch?v=_MC3XuMvsDI","homepage":"http://movies.disney.com/inside-out","rating":8.13112,"votes":16123,"updated_at":"2016-11-28T16:30:53.000Z","language":"en","available_translations":["ar","az","bg","bs","ca","cn","cs","da","de","el","en","es","et","fa","fi","fr","he","hu","is","it","ja","ko","lt","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","tw","uk","zh"],"genres":["animation","comedy","family"],"certification":"PG"}'}
+        and school.","released":"2015-06-19","runtime":94,"trailer":"http://youtube.com/watch?v=yRUAzGQ3nSY","homepage":"http://movies.disney.com/inside-out","rating":8.1146,"votes":19381,"updated_at":"2017-04-22T09:44:18.000Z","language":"en","available_translations":["ar","az","bg","bs","ca","cn","cs","da","de","el","en","es","et","fa","fi","fr","he","hr","hu","is","it","ja","ko","lt","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","tw","uk","zh"],"genres":["animation","comedy","family","drama"],"certification":"PG"}'}
     headers:
       CF-Cache-Status: [HIT]
-      CF-RAY: [312a16a4dc3e3cc5-CPH]
+      CF-RAY: [354378ffa8223c95-CPH]
       Cache-Control: ['public, max-age=28800']
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:22 GMT']
-      ETag: [W/"1cf89bc28b175d67c49ae95de18951c7"]
-      Expires: ['Sat, 17 Dec 2016 19:38:22 GMT']
-      Last-Modified: ['Mon, 28 Nov 2016 16:30:53 GMT']
+      Date: ['Sun, 23 Apr 2017 20:11:33 GMT']
+      ETag: [W/"aadabf25bc1720c10c34e09f6a81e342"]
+      Expires: ['Mon, 24 Apr 2017 04:11:33 GMT']
+      Last-Modified: ['Sat, 22 Apr 2017 09:44:18 GMT']
       Server: [cloudflare-nginx]
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
       X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [2135b8a5-c3f8-49bb-a0ef-a13dce2ce30b]
-      X-Runtime: ['0.011745']
+      X-Request-Id: [0f12533b-2900-43eb-b57c-f30696c3442d]
+      X-Runtime: ['0.013548']
       X-XSS-Protection: [1; mode=block]
     status: {code: 200, message: OK}
 - request:
@@ -126,22 +132,22 @@ interactions:
     body: {string: '[{"plays":1,"last_watched_at":"2015-06-19T00:00:00.000Z","movie":{"title":"Inside
         Out","year":2015,"ids":{"trakt":98998,"slug":"inside-out-2015","imdb":"tt2096673","tmdb":150540}}}]'}
     headers:
-      CF-RAY: [312a16a56fbc3c95-CPH]
+      CF-RAY: [3543790099673ce9-CPH]
       Cache-Control: ['max-age=0, private, must-revalidate']
-      Cf-Railgun: [01e402be4f stream 0.000000 0200 e6be]
+      Cf-Railgun: [39cc78d724 7.01 2.211520 0030 e6be]
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:23 GMT']
-      Etag: [W/"6e7ea3198d7dd1cdfe5f5d2209f6bfaa"]
+      Date: ['Sun, 23 Apr 2017 20:11:36 GMT']
+      Etag: [W/"81b6d0b929ae6bfcca8b9de1b6214423"]
       Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=dc54939d73e5d30b0061d417c5b10afc11481974702; expires=Sun,
-          17-Dec-17 11:38:22 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Set-Cookie: ['__cfduid=daaea50f4067d2654624509a57693b9471492978293; expires=Mon,
+          23-Apr-18 20:11:33 GMT; path=/; domain=.trakt.tv; HttpOnly']
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
       X-Frame-Options: [SAMEORIGIN]
       X-Private-User: ['false']
-      X-Request-Id: [658eefe6-0fed-447b-943c-7437b25bd2c7]
-      X-Runtime: ['0.023969']
+      X-Request-Id: [902fb593-d271-4ab1-bb7d-1067543f5d08]
+      X-Runtime: ['0.149962']
       X-Xss-Protection: [1; mode=block]
     status: {code: 200, message: OK}
 - request:
@@ -151,30 +157,30 @@ interactions:
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: ['2']
     method: GET
-    uri: https://api.trakt.tv/search?type=movie&year=1999&query=The+Matrix
+    uri: https://api.trakt.tv/search?year=1999&type=movie&query=The+Matrix
   response:
-    body: {string: "[{\"type\":\"movie\",\"score\":68.96814,\"movie\":{\"title\":\"The
+    body: {string: "[{\"type\":\"movie\",\"score\":70.438225,\"movie\":{\"title\":\"The
         Matrix\",\"overview\":\"Set in the 22nd century, The Matrix tells the story
         of a computer hacker who joins a group of underground insurgents fighting
-        the vast and powerful computers who now rule the earth.\",\"year\":1999,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":481,\"slug\":\"the-matrix-1999\",\"imdb\":\"tt0133093\",\"tmdb\":603}}},{\"type\":\"movie\",\"score\":55.174515,\"movie\":{\"title\":\"Making
+        the vast and powerful computers who now rule the earth.\",\"year\":1999,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":481,\"slug\":\"the-matrix-1999\",\"imdb\":\"tt0133093\",\"tmdb\":603}}},{\"type\":\"movie\",\"score\":56.35058,\"movie\":{\"title\":\"Making
         The Matrix\",\"overview\":\"A promotional making-of documentary for the film
         Matrix, The (1999) that devotes its time to explaining the digital and practical
         effects contained in the film. This is very interesting, seeing as how they're
         giving away the cinematic secrets that they created solely for the this movie,
-        that have now been spoofed and referenced in countless other films.\",\"year\":1999,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":205793,\"slug\":\"making-the-matrix-1999\",\"imdb\":\"tt0365467\",\"tmdb\":325251}}},{\"type\":\"movie\",\"score\":51.173157,\"movie\":{\"title\":\"V-World
+        that have now been spoofed and referenced in countless other films.\",\"year\":1999,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":205793,\"slug\":\"making-the-matrix-1999\",\"imdb\":\"tt0365467\",\"tmdb\":325251}}},{\"type\":\"movie\",\"score\":52.171688,\"movie\":{\"title\":\"V-World
         Matrix\",\"overview\":\"Two friends take a cyber vacation to experience a
         world where they can act out their virtual fantasies! They soon realize they've
         entered a virtual free-for-all. Forbidden fantasies and desires suddenly appear
         in the form of the even deadlier \\\"dark woman\\\". All the players now end
         up in a cyber battle for their lives, and sanity, against a beautiful virtual
-        hunter who has one killer fixation - winning the deadly game they started!\",\"year\":1999,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":158764,\"slug\":\"v-world-matrix-1969\",\"imdb\":\"tt0211096\",\"tmdb\":259464}}},{\"type\":\"movie\",\"score\":4.660685,\"movie\":{\"title\":\"The
+        hunter who has one killer fixation - winning the deadly game they started!\",\"year\":1999,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":158764,\"slug\":\"v-world-matrix-1969\",\"imdb\":\"tt0211096\",\"tmdb\":259464}}},{\"type\":\"movie\",\"score\":4.858747,\"movie\":{\"title\":\"The
         Tricky Master\",\"overview\":\"Undercover cop Leung Foon (Nick Cheung) is
         having trouble taking down the illegal trading operation headed by crime boss
         Ferrari (Wong Jing). So to accomplish his mission, he asks for help from the
         re... read more read more...nowned Master Wong (Stephen Chow), an expert in
         gambling tricks. Although the \\\"Tricky Master\\\" is opposed to getting
         involved, Foon convinces him to help bring down the swindler in a zany comedy
-        that spoofs Enter the Dragon and The Matrix.\",\"year\":1999,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":37624,\"slug\":\"the-tricky-master-1999\",\"imdb\":\"tt0212864\",\"tmdb\":53281}}},{\"type\":\"movie\",\"score\":0.67057604,\"movie\":{\"title\":\"Superstar\",\"overview\":\"Inspired
+        that spoofs Enter the Dragon and The Matrix.\",\"year\":1999,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":37624,\"slug\":\"the-tricky-master-1999\",\"imdb\":\"tt0212864\",\"tmdb\":53281}}},{\"type\":\"movie\",\"score\":0.6916503,\"movie\":{\"title\":\"Superstar\",\"overview\":\"Inspired
         by Yves Klein\u2019s Leap into the Void (1960), Superstar was commissioned
         by Creative Time to be presented on the Jumbotron screen in Times Square,
         New York City. The subject appears perpetually frozen in time while the document
@@ -183,16 +189,16 @@ interactions:
         show a 1/500 second wedge of time.\",\"year\":1999,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":226862,\"slug\":\"superstar-1999-03-03\",\"imdb\":\"\",\"tmdb\":385552}}}]"}
     headers:
       CF-Cache-Status: [MISS]
-      CF-RAY: [312a16a6bea33d6d-CPH]
+      CF-RAY: [354379109ebf3cb3-CPH]
       Cache-Control: ['public, max-age=28800']
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:23 GMT']
-      ETag: [W/"7a1d4e64bd14062fc2dc47a3e220d934"]
-      Expires: ['Sat, 17 Dec 2016 19:38:23 GMT']
+      Date: ['Sun, 23 Apr 2017 20:11:36 GMT']
+      ETag: [W/"ee498721548d4667142ce408b5635de1"]
+      Expires: ['Mon, 24 Apr 2017 04:11:36 GMT']
       Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d3fdcc6fcf99346f4a8ca6680555ca6031481974703; expires=Sun,
-          17-Dec-17 11:38:23 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Set-Cookie: ['__cfduid=da4a5696bfb440cb397a2243796887ef81492978296; expires=Mon,
+          23-Apr-18 20:11:36 GMT; path=/; domain=.trakt.tv; HttpOnly']
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
       X-Frame-Options: [SAMEORIGIN]
@@ -200,15 +206,15 @@ interactions:
       X-Pagination-Limit: ['10']
       X-Pagination-Page: ['1']
       X-Pagination-Page-Count: ['1']
-      X-Request-Id: [8e4db53e-72f6-4f2b-9b3c-51442e977ff1]
-      X-Runtime: ['0.086906']
+      X-Request-Id: [982adf1e-6d48-4f9e-88df-c33b5062ff23]
+      X-Runtime: ['0.043232']
       X-XSS-Protection: [1; mode=block]
     status: {code: 200, message: OK}
 - request:
     body: null
     headers:
       Content-Type: [application/json]
-      Cookie: [__cfduid=d3fdcc6fcf99346f4a8ca6680555ca6031481974703]
+      Cookie: [__cfduid=da4a5696bfb440cb397a2243796887ef81492978296]
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: ['2']
     method: GET
@@ -217,23 +223,23 @@ interactions:
     body: {string: '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
         to the Real World.","overview":"Set in the 22nd century, The Matrix tells
         the story of a computer hacker who joins a group of underground insurgents
-        fighting the vast and powerful computers who now rule the earth.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/matrix","rating":8.89357,"votes":22878,"updated_at":"2016-12-16T08:41:42.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hu","id","it","ja","ko","mk","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"genres":["action","science-fiction"],"certification":"R"}'}
+        fighting the vast and powerful computers who now rule the earth.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/matrix","rating":8.87229,"votes":25276,"updated_at":"2017-04-22T08:48:14.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hr","hu","id","it","ja","ko","mk","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"genres":["action","science-fiction"],"certification":"R"}'}
     headers:
-      CF-Cache-Status: [REVALIDATED]
-      CF-RAY: [312a16a9cee93d6d-CPH]
+      CF-Cache-Status: [HIT]
+      CF-RAY: [35437911ef3e3cb3-CPH]
       Cache-Control: ['public, max-age=28800']
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:24 GMT']
-      ETag: [W/"71bb837d0fdf4e85d8cd6fc76a31fc09"]
-      Expires: ['Sat, 17 Dec 2016 19:38:24 GMT']
-      Last-Modified: ['Fri, 16 Dec 2016 08:41:42 GMT']
+      Date: ['Sun, 23 Apr 2017 20:11:36 GMT']
+      ETag: [W/"142c17f4f26b011acadcab9d865db534"]
+      Expires: ['Mon, 24 Apr 2017 04:11:36 GMT']
+      Last-Modified: ['Sat, 22 Apr 2017 08:48:14 GMT']
       Server: [cloudflare-nginx]
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
       X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [9c974a27-c920-4e4d-971c-06e48254afab]
-      X-Runtime: ['0.012982']
+      X-Request-Id: [03aa1165-6c95-45dd-9913-defc5f6e6677]
+      X-Runtime: ['0.009352']
       X-XSS-Protection: [1; mode=block]
     status: {code: 200, message: OK}
 version: 1

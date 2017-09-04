@@ -7,7 +7,7 @@ interactions:
         Connection: [keep-alive]
         User-Agent: [FlexGet/1.2.379.dev (www.flexget.com)]
       method: GET
-      uri: http://api.t411.li/terms/tree/
+      uri: https://api.t411.al/terms/tree/
     response:
       body: {string: '{"234":{"11":{"type":"Application - Genre","mode":"single","terms":{"190":"Utilitaire","158":"Edition
           multim\u00e9dia","126":"Administration","137":"Aspiration de site","169":"Lecteur
@@ -727,7 +727,7 @@ interactions:
         date: ['Tue, 24 Nov 2015 22:09:17 GMT']
         server: [cloudflare-nginx]
         set-cookie: ['__cfduid=d1519d402486c941d0309da7e9c3bafb41448402957; expires=Wed,
-            23-Nov-16 22:09:17 GMT; path=/; domain=.t411.li; HttpOnly']
+            23-Nov-16 22:09:17 GMT; path=/; domain=.t411.al; HttpOnly']
         t411-node: [webus1]
         transfer-encoding: [chunked]
         vary: [Accept-Encoding]

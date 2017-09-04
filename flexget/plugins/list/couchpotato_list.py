@@ -208,7 +208,7 @@ class CouchPotatoSet(MutableSet):
         if not self._find_entry(entry):
             self._movies = None
             movie = CouchPotatoBase.add_movie(self.config, entry)
-            log.verbose('Successfully added movie %s to CouchPotato', movie['movie']['info']['original_title'])
+            log.verbose('Successfully added movie %s to CouchPotato', movie['info']['original_title'])
         else:
             log.debug('entry %s already exists in couchpotato list', entry)
 
@@ -248,4 +248,4 @@ class CouchPotatoList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(CouchPotatoList, 'couchpotato_list', api_ver=2, groups=['list'])
+    plugin.register(CouchPotatoList, 'couchpotato_list', api_ver=2, interfaces=['task', 'list'])

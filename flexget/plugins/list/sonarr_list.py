@@ -148,14 +148,15 @@ class SonarrSet(MutableSet):
                           slug=show.get('titleSlug'),
                           sonarr_id=show.get('id'),
                           configure_series_target=fg_cutoff)
-            if len(fg_qualities) > 1:
-                entry['configure_series_qualities'] = fg_qualities
-            elif len(fg_qualities) == 1:
-                entry['configure_series_quality'] = fg_qualities[0]
-            else:
-                entry['configure_series_quality'] = fg_qualities
-            if path:
-                entry['configure_series_path'] = path
+            if self.config.get('include_data'):
+                if len(fg_qualities) > 1:
+                    entry['configure_series_qualities'] = fg_qualities
+                elif len(fg_qualities) == 1:
+                    entry['configure_series_quality'] = fg_qualities[0]
+                else:
+                    entry['configure_series_quality'] = fg_qualities
+                if path:
+                    entry['configure_series_path'] = path
             if entry.isvalid():
                 log.debug('returning entry %s', entry)
                 entries.append(entry)
@@ -278,4 +279,4 @@ class SonarrList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SonarrList, 'sonarr_list', api_ver=2, groups=['list'])
+    plugin.register(SonarrList, 'sonarr_list', api_ver=2, interfaces=['task', 'list'])

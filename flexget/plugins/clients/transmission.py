@@ -588,14 +588,14 @@ class PluginTransmission(TransmissionBase):
                 log.error(msg)
                 entry.fail(msg)
 
-    def on_task_exit(self, task, config):
-        """Make sure all temp files are cleaned up when task exits"""
+    def on_task_learn(self, task, config):
+        """ Make sure all temp files are cleaned up when entries are learned """
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
             download = plugin.get_plugin_by_name('download')
             download.instance.cleanup_temp_files(task)
 
-    on_task_abort = on_task_exit
+    on_task_abort = on_task_learn
 
 
 class PluginTransmissionClean(TransmissionBase):
@@ -666,7 +666,7 @@ class PluginTransmissionClean(TransmissionBase):
             downloaded, dummy = self.torrent_info(torrent, config)
             seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
             tracker_hosts = (urlparse(tracker['announce']).hostname for tracker in torrent.trackers)
-            is_clean_all = nrat is None and nfor is None and trans_checks is None
+            is_clean_all = nrat is None and nfor is None and trans_checks is False
             is_minratio_reached = nrat and (nrat <= torrent.ratio)
             is_transmission_seedlimit_unset = trans_checks and seed_ratio_ok is None and idle_limit_ok is None
             is_transmission_seedlimit_reached = trans_checks and seed_ratio_ok is True

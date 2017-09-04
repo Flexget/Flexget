@@ -5,7 +5,7 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.5.8.dev (www.flexget.com)]
+      User-Agent: [FlexGet/2.5.8.dev (www.flexget.com)]
     method: GET
     uri: https://api.themoviedb.org/3/configuration?api_key=bdfc018dbdb7c243dc7cb1454ff74b95
   response:
@@ -41,7 +41,7 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.5.8.dev (www.flexget.com)]
+      User-Agent: [FlexGet/2.5.8.dev (www.flexget.com)]
     method: GET
     uri: https://api.themoviedb.org/3/search/movie?query=the+matrix&api_key=bdfc018dbdb7c243dc7cb1454ff74b95&year=2003
   response:
@@ -90,7 +90,7 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.5.8.dev (www.flexget.com)]
+      User-Agent: [FlexGet/2.5.8.dev (www.flexget.com)]
     method: GET
     uri: https://api.themoviedb.org/3/movie/604?api_key=bdfc018dbdb7c243dc7cb1454ff74b95&append_to_response=alternative_titles
   response:
@@ -136,5 +136,140 @@ interactions:
       x-ratelimit-limit: ['40']
       x-ratelimit-remaining: ['37']
       x-ratelimit-reset: ['1477997063']
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [FlexGet/2.10.56.dev (www.flexget.com)]
+    method: GET
+    uri: https://api.themoviedb.org/3/configuration?api_key=bdfc018dbdb7c243dc7cb1454ff74b95
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA3VS0W7bMAz8Fz0HTdcmW5dfGQaBthhbiCwJFOUgLfrvExmnddbtieT5eKTOfDN+
+        ggGLObyZDgraSsEczMicD9utfnvgyXUPiYYtb/PWbEzBvhLav+jlv/wO+pOjlG3xrzLplzk/Pz62
+        D+cfLxq+PWlM5AcfIZjfGxPSkFb83V54P5+Uvd9peFFsUdprWCvkVBhppfHP7p2C1+5lnTsRSkcf
+        8Msm1/bx+7O0rxsK+xC+Dl3v+kl/35h+hDigPeFF+eBq4MYBT9YBo6ShJHuK6RwtFK3bsyKwn9Gy
+        54ACdj4NBHm8aE48OtC0ugFFr4eiAYn90fetO0Xpa+MJevEpwqRKPWGb62wn/a04t+AatChi9iU5
+        2WvJbKxTh7QCqMa22CScIyHqmXi3riYtB4xIzQbNSIcPFQvbwkBSjWnC3A6qpcuRSuK6q1poxtUF
+        leUlIJ8TnczNY9unGplk75vp+s51rRYKMCPNXp+bgVhUc4AebTpadVSBxPKr2hCnBEqu9uJlm6Sm
+        3CFThuh1vztYVrrChAGbH9d0xlhFotm3uFfaxxQ/kk+nl5pwqAEUyOmE0a4taSZylYRhCD6K3u2p
+        TBBL+LgBnm+W8kyte8kvWbizd5husbST/QP844lDMQQAAA==
+    headers:
+      Access-Control-Allow-Origin: ['*']
+      Access-Control-Expose-Headers: ['ETag, X-RateLimit-Limit, X-RateLimit-Remaining,
+          X-RateLimit-Reset, Retry-After']
+      Cache-Control: ['public, max-age=36000']
+      Connection: [keep-alive]
+      Content-Encoding: [gzip]
+      Content-Length: ['490']
+      Content-Type: [application/json;charset=utf-8]
+      Date: ['Thu, 01 Jun 2017 20:18:55 GMT']
+      ETag: [W/"acd3a349fca1f788ac931639278ad061"]
+      Server: [openresty]
+      Vary: [Accept-Encoding]
+      X-RateLimit-Limit: ['40']
+      X-RateLimit-Remaining: ['39']
+      X-RateLimit-Reset: ['1496348336']
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [FlexGet/2.10.56.dev (www.flexget.com)]
+    method: GET
+    uri: https://api.themoviedb.org/3/search/movie?year=2003&api_key=bdfc018dbdb7c243dc7cb1454ff74b95&query=the+matrix+reloaded
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA31UTW8bNxD9KwNeclmrkhzJsm4OggZt4RaIXSDoBwQuObvLmEsSJFeyEuS/95Fr
+        Kzn1og/OvJk382bmqwiyZ7FfNSJymmxOYv/3VxF8yhwPQeZB7MU/P/GXX6b47su603+q7U7f7n4O
+        t/pjtzHDcfE59KIRUgMs9p20iRvhjxyPhk8AP5hnGr3LQyLZISjlgYmP7HIizcGozJqMo0c838sc
+        zXNDv7OnQSYKEYE0ZU8tk6Tee01+ZEedn+N0kZmGaZQuNQTA6CMcnZ5/zAaS+NmycX111/j0Y0WP
+        NV31b6Of+iGXVH8Z75pq924O5p09U8rRu37wFv+7av7IyaQsneIFzZTNmNh2lbo2SZUuIN9gEqUp
+        cAz+xDGhWGUnXfjUV0oBrEC/Ndbkc6GQUFXJoLzm9JouD4AUdDJ6Nv/AX5LimCX6qLkvTQEoRL5S
+        vncmo6IFvZsy3JxMyBEMq+rj+JRAEFqUgLVhFC917Wm9WTbL5RKpFNIzmLmMbzt3VZu+L3W8dK0y
+        OfkJLYoMQIk5Fm1v1jT4KaYF3aXZE9wCIqSLkpgeg3qYTjLWAWjo3scw8JRq2MdoXOlOSSv10SQ0
+        tj1X6B9RKsuFRGfgWZ5+4/Mon9Db0+BfGA1sw0zowo0eQKqqd8/SnQaDKMj8JsFFTTGiVtLwHl8n
+        tdT6QuRNecN6QOwjYzJzUR+pYjRgViWBVh2ZjIoSOTiwKzPW0F1fAj+MpqIxGxjpwZ+Ik5IBYM2W
+        i2RNtbasYJ8Hug5QN1mQh04td6/jXhw78wxwmUNZJEVOfsZAy9hzXoiy35Zl4oNGl7GX6+Xy+mq5
+        uVptYAOjyAejy/av1s1612yum93N7t9GGC322+Vb7HQ0EFvaQzbZlgjfNxarYL3UrMUPbla6fqrH
+        RbCD4f9hrVRPOvrw/easPveTfTjnx1/V3ePTh0+7dP7Qvl/39tP7l5sTfJisjFBD7K8XN29vN6tN
+        I44+80H5yeEcrW+3N3jBwvjLbap2iBYrt+1i+w1VZp9B+XICV68v5TqW/9/+A0u9s2wpBQAA
+    headers:
+      Access-Control-Allow-Origin: ['*']
+      Access-Control-Expose-Headers: ['ETag, X-RateLimit-Limit, X-RateLimit-Remaining,
+          X-RateLimit-Reset, Retry-After']
+      Cache-Control: ['public, max-age=21600']
+      Connection: [keep-alive]
+      Content-Encoding: [gzip]
+      Content-Length: ['795']
+      Content-Type: [application/json;charset=utf-8]
+      Date: ['Thu, 01 Jun 2017 20:18:56 GMT']
+      Server: [openresty]
+      Vary: [Accept-Encoding]
+      X-RateLimit-Limit: ['40']
+      X-RateLimit-Remaining: ['38']
+      X-RateLimit-Reset: ['1496348345']
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [FlexGet/2.10.56.dev (www.flexget.com)]
+    method: GET
+    uri: https://api.themoviedb.org/3/movie/604?api_key=bdfc018dbdb7c243dc7cb1454ff74b95&append_to_response=alternative_titles
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA31VyXLbOBD9FRQvucgaLdZ6sxM74yR2EsnKeDKVUkFEk4RNAhwAlKyk/O/zAFLL
+        2El8kCV0v+7XCx5+RFxUuYumCc8ttaIVjx+E0eWy5C6LptEf3fu0yudbd/suPrt9eHs3ttu3qze9
+        NL97074v0wgQyrVK7dLpZazznGIntYqmPyIpommvf3raihQvCMFuM2LX3Bn5yF4fPFtRqa0js0+Z
+        Z6f8bSn6i4kpJufjj/+a4etF+vmD+/phl/I5y1m2eLz/fqPvr95Z8XX+963qvP68Fu+tCognQCqR
+        EursDjr1XytKSRmy0fSfmmq3tyd6JtakXGUIyKaO8cFY095ZBv2j+oxEWWZvG48OsHksScXELmWD
+        /9aKMl1QyVNvRlUeMeygXbIQq6X/FTnXQQd73QHM2shUKp4vc67SqkaRb9/e4KTLn/V5huFwQcK7
+        rcmsJW08F1gKrVxmGU/QeuaAIF+zZYJKMCTBpGKHQC12Q5pl3LLSIJBgTrMVMc5SrQVDGYoluo6T
+        GCKWVQVXtsUAKLSBoxL1l9rAOL6uSKo0uAt86iKgi5q3918ZXaWZ86m+omOtYNeqDqZVvmXWGaxe
+        pnP8ToJ5RlZax9HoNqspy8JSngTqQtrYdwH5MmmZrUoypd6QsSg2zivh+YRTZkuwAv2VzKXbegoW
+        VfkMsRZkd+lcBohHWylq8xF/zmIyjqOPglLfFIBKQyexTpX0O9Bm55WDm+IWOUpJcfBRtLEgiFn4
+        gKFhzOzrmrLeoNPCAiNVjPQEZsrhf153Vcg09XU0XQtMNrpCiwwB4GMWfrajHst0ZWybndnaE9xK
+        RLD7SUIYJOohtuEmLECLXWtTZlTZEPbWSOW749NysZYWjV1tA/Sj4XFOnkQi4emP3tO24A/o7SbT
+        DaOM8rImtOfG5iAVpndNXG0yiSjI/MrCJa6MQa1MwLvYbaqvtSHyyp9BETDsNWEznZ8+UhkjwSyM
+        BLNKmHSoyDIFB1J+x1rsLPWB54UMaOwGVjrTG0Y25iXAgnLyI2sF64pi2OuFDguUVDnIY04rSnbr
+        7h0T+Qiw30PuR4qc9IiF5gZa1A7KV1Y5N+AOiWmPTieD7uCFHtL3q8qcf+8lYhEPx2IyviwnYpYM
+        ZLZu9BB3UlRBViDBRcmVbHSt0Z4vkCUIBptBC6wv6xMaV3nxq1VnNPGK1TjffPrCLpSrVxcX2zVO
+        3VHvyOtPXF56wLU/NygWRf4M0h8NjiBzmePyPc/dHY+Pnf7iRsHp3GjrGxQ0sTs59Wr5vyorhXu2
+        U2+rl/3ucLjsenleRAeprqAQPJe8VuRjt8X84LbA8qCCucOuh6t9VpCRMQ8abTB5bmkpYIRvr9Pp
+        n3QGJ0GSjdfMCsej/ngwmYw6XZyBmfRhu32Ivy01mrSX7APfYX8SeAQFb3hcqDSXNgtpcdldBfdo
+        Vuf3Cu447Mp7Xno52eKmsALXyzfq99q/hjzp/SO/1o6WuCImPCLD9rA5Cl3FIk7GeIR4jnkq7uSa
+        6ofF+jd99+1510M7f8Kh94vO/8x1emD8AnRxDGoAV1e/Afwqyw4xDY/b1fXZHbt4hOKHx/llmMvZ
+        y7w9dnKU+NvT03/tCuDHRQkAAA==
+    headers:
+      Access-Control-Allow-Origin: ['*']
+      Access-Control-Expose-Headers: ['ETag, X-RateLimit-Limit, X-RateLimit-Remaining,
+          X-RateLimit-Reset, Retry-After']
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Encoding: [gzip]
+      Content-Length: ['1216']
+      Content-Type: [application/json;charset=utf-8]
+      Date: ['Thu, 01 Jun 2017 20:18:56 GMT']
+      ETag: [W/"20024c7f83e8ef10e8ee11cd367a7251"]
+      Server: [openresty]
+      Vary: [Accept-Encoding]
+      X-Memc: [HIT]
+      X-Memc-Age: ['13570']
+      X-Memc-Expires: ['15230']
+      X-Memc-Key: [6c5eaea2c5d3a505bbca693c69330026]
+      X-RateLimit-Limit: ['40']
+      X-RateLimit-Remaining: ['37']
+      X-RateLimit-Reset: ['1496348345']
     status: {code: 200, message: OK}
 version: 1

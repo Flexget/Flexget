@@ -7,7 +7,7 @@ interactions:
         Connection: [keep-alive]
         User-Agent: [FlexGet/1.2.379.dev (www.flexget.com)]
       method: GET
-      uri: http://api.t411.li/torrents/search/
+      uri: https://api.t411.al/torrents/search/
     response:
       body: {string: '<div class="errorMessage">Missing argument 1 for App\Api\Controllers\TorrentsController::searchAction()</div>
 
@@ -40,7 +40,7 @@ interactions:
         date: ['Tue, 24 Nov 2015 22:07:05 GMT']
         server: [cloudflare-nginx]
         set-cookie: ['__cfduid=d01cd88b10233fbcc956c5d87224d74f61448402824; expires=Wed,
-            23-Nov-16 22:07:04 GMT; path=/; domain=.t411.li; HttpOnly']
+            23-Nov-16 22:07:04 GMT; path=/; domain=.t411.al; HttpOnly']
         t411-node: [webus1]
         transfer-encoding: [chunked]
         vary: [Accept-Encoding]

@@ -38,4 +38,4 @@ class UrlRewriteNnmClub(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteNnmClub, 'nnm-club', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteNnmClub, 'nnm-club', interfaces=['urlrewriter'], api_ver=2)

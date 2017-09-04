@@ -15,7 +15,7 @@ class ListAdd(object):
         'type': 'array',
         'items': {
             'allOf': [
-                {'$ref': '/schema/plugins?group=list'},
+                {'$ref': '/schema/plugins?interface=list'},
                 {
                     'maxProperties': 1,
                     'error_maxProperties': 'Plugin options within list_add plugin must be indented 2 more spaces than '

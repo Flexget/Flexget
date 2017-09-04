@@ -127,4 +127,4 @@ class NewTorrents(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(NewTorrents, 'newtorrents', groups=['urlrewriter', 'search'], api_ver=2)
+    plugin.register(NewTorrents, 'newtorrents', interfaces=['urlrewriter', 'search'], api_ver=2)

@@ -18,6 +18,9 @@ class TaskPriority(object):
 
     schema = {'type': 'integer'}
 
+    def on_task_start(self, task, config):
+        pass
+
 
 @event('plugin.register')
 def register_plugin():

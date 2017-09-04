@@ -1,252 +1,157 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.24.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=The%20X-Files
-  response:
-    body: {string: !!python/unicode '{"id":430,"url":"http://www.tvmaze.com/shows/430/the-x-files","name":"The
-        X-Files","type":"Scripted","language":"English","genres":["Drama","Crime","Science-Fiction","Thriller","Mystery"],"status":"To
-        Be Determined","runtime":60,"premiered":"1993-09-10","schedule":{"time":"20:00","days":["Monday"]},"rating":{"average":8.9},"weight":5,"network":{"id":4,"name":"FOX","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":6312,"thetvdb":77398,"imdb":"tt0106179"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/62/155391.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/62/155391.jpg"},"summary":"<p>Two
-        FBI agents, Fox Mulder the believer and Dana Scully the skeptic, investigate
-        the strange and unexplained while hidden forces work to impede their efforts.</p>","updated":1472402236,"_links":{"self":{"href":"http://api.tvmaze.com/shows/430"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/306788"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 12 Sep 2016 13:27:56 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.24.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=sdfgv35wvg23vg2
-  response:
-    body: {string: !!python/unicode ''}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 12 Sep 2016 13:27:56 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 404, message: Not Found}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.31.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=The%20X-Files
-  response:
-    body: {string: !!python/unicode '{"id":430,"url":"http://www.tvmaze.com/shows/430/the-x-files","name":"The
-        X-Files","type":"Scripted","language":"English","genres":["Drama","Crime","Science-Fiction","Thriller","Mystery"],"status":"To
-        Be Determined","runtime":60,"premiered":"1993-09-10","schedule":{"time":"20:00","days":["Monday"]},"rating":{"average":8.9},"weight":3,"network":{"id":4,"name":"FOX","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":6312,"thetvdb":77398,"imdb":"tt0106179"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/62/155391.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/62/155391.jpg"},"summary":"<p>Two
-        FBI agents, Fox Mulder the believer and Dana Scully the skeptic, investigate
-        the strange and unexplained while hidden forces work to impede their efforts.</p>","updated":1472402236,"_links":{"self":{"href":"http://api.tvmaze.com/shows/430"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/306788"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Thu, 22 Sep 2016 11:40:40 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.31.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=sdfgv35wvg23vg2
-  response:
-    body: {string: !!python/unicode ''}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Thu, 22 Sep 2016 11:40:40 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 404, message: Not Found}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=The%20X-Files
-  response:
-    body: {string: !!python/unicode '{"id":430,"url":"http://www.tvmaze.com/shows/430/the-x-files","name":"The
-        X-Files","type":"Scripted","language":"English","genres":["Drama","Crime","Science-Fiction","Thriller","Mystery"],"status":"To
-        Be Determined","runtime":60,"premiered":"1993-09-10","schedule":{"time":"20:00","days":["Monday"]},"rating":{"average":8.9},"weight":3,"network":{"id":4,"name":"FOX","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":6312,"thetvdb":77398,"imdb":"tt0106179"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/62/155391.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/62/155391.jpg"},"summary":"<p>Two
-        FBI agents, Fox Mulder the believer and Dana Scully the skeptic, investigate
-        the strange and unexplained while hidden forces work to impede their efforts.</p>","updated":1474709944,"_links":{"self":{"href":"http://api.tvmaze.com/shows/430"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/306788"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 25 Sep 2016 14:20:28 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=sdfgv35wvg23vg2
-  response:
-    body: {string: !!python/unicode ''}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 25 Sep 2016 14:20:28 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 404, message: Not Found}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=The%20X-Files
-  response:
-    body: {string: !!python/unicode '{"id":430,"url":"http://www.tvmaze.com/shows/430/the-x-files","name":"The
-        X-Files","type":"Scripted","language":"English","genres":["Drama","Crime","Science-Fiction","Thriller","Mystery"],"status":"To
-        Be Determined","runtime":60,"premiered":"1993-09-10","schedule":{"time":"20:00","days":["Monday"]},"rating":{"average":8.9},"weight":3,"network":{"id":4,"name":"FOX","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":6312,"thetvdb":77398,"imdb":"tt0106179"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/62/155391.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/62/155391.jpg"},"summary":"<p>Two
-        FBI agents, Fox Mulder the believer and Dana Scully the skeptic, investigate
-        the strange and unexplained while hidden forces work to impede their efforts.</p>","updated":1474709944,"_links":{"self":{"href":"http://api.tvmaze.com/shows/430"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/306788"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 26 Sep 2016 12:20:26 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=The%20X-Files
-  response:
-    body: {string: !!python/unicode '{"id":430,"url":"http://www.tvmaze.com/shows/430/the-x-files","name":"The
-        X-Files","type":"Scripted","language":"English","genres":["Drama","Crime","Science-Fiction","Thriller","Mystery"],"status":"To
-        Be Determined","runtime":60,"premiered":"1993-09-10","schedule":{"time":"20:00","days":["Monday"]},"rating":{"average":8.9},"weight":3,"network":{"id":4,"name":"FOX","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":6312,"thetvdb":77398,"imdb":"tt0106179"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/62/155391.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/62/155391.jpg"},"summary":"<p>Two
-        FBI agents, Fox Mulder the believer and Dana Scully the skeptic, investigate
-        the strange and unexplained while hidden forces work to impede their efforts.</p>","updated":1474709944,"_links":{"self":{"href":"http://api.tvmaze.com/shows/430"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/306788"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 26 Sep 2016 12:22:04 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=sdfgv35wvg23vg2
-  response:
-    body: {string: !!python/unicode ''}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 26 Sep 2016 12:22:04 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 404, message: Not Found}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=The%20X-Files
-  response:
-    body: {string: !!python/unicode '{"id":430,"url":"http://www.tvmaze.com/shows/430/the-x-files","name":"The
-        X-Files","type":"Scripted","language":"English","genres":["Drama","Crime","Science-Fiction","Thriller","Mystery"],"status":"To
-        Be Determined","runtime":60,"premiered":"1993-09-10","schedule":{"time":"20:00","days":["Monday"]},"rating":{"average":8.9},"weight":3,"network":{"id":4,"name":"FOX","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":6312,"thetvdb":77398,"imdb":"tt0106179"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/62/155391.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/62/155391.jpg"},"summary":"<p>Two
-        FBI agents, Fox Mulder the believer and Dana Scully the skeptic, investigate
-        the strange and unexplained while hidden forces work to impede their efforts.</p>","updated":1474709944,"_links":{"self":{"href":"http://api.tvmaze.com/shows/430"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/306788"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 26 Sep 2016 12:22:21 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=sdfgv35wvg23vg2
-  response:
-    body: {string: !!python/unicode ''}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 26 Sep 2016 12:22:21 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 404, message: Not Found}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=The+X-Files
+    response:
+      body:
+        string: !!binary |
+          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
+          ZSM//PbbfwOBmZT3vEMAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 26 Mar 2017 12:03:53 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=sdfgv35wvg23vg2
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAAwMAAAAAAAAAAAA=
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 26 Mar 2017 12:03:53 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 404, message: Not Found}
 version: 1

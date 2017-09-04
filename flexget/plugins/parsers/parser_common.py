@@ -69,7 +69,9 @@ def old_assume_quality(guessed_quality, assumed_quality):
 default_ignore_prefixes = [
     '(?:\[[^\[\]]*\])',  # ignores group names before the name, eg [foobar] name
     '(?:HD.720p?:)',
-    '(?:HD.1080p?:)']
+    '(?:HD.1080p?:)',
+    '(?:HD.2160p?:)'
+]
 
 
 def name_to_re(name, ignore_prefixes=None, parser=None):
@@ -466,20 +468,20 @@ class ParsedSerie(ABCMeta(native_str('ParsedSerieABCMeta'), (ParsedVideo,), {}))
                         return False
             if self.identified_by != 'auto' and self.identified_by != self.id_type:
                 return False
+            if self.special or self.assume_special:
+                return True
             if self.complete or (self.identified_by in ['auto', 'ep'] and
-                                 self.season is not None and self.episode is None):
+                                         self.season is not None and self.episode is None):
                 return False
             if self.identified_by in ['auto', 'ep'] and self.episodes > 3:
                 return False
             if self.identified_by in ['ep', 'sequence'] and self.episode is None:
                 return False
             if self.identified_by == 'ep' and (self.episode is None or (self.season is None and
-                                                                        not self.allow_seasonless)):
+                                                                            not self.allow_seasonless)):
                 return False
             if self.identified_by == 'date' and not self.date:
                 return False
-            if self.special or self.assume_special:
-                return True
             if self.regexp_id:
                 return True
             if self.episode is not None or self.season is not None:

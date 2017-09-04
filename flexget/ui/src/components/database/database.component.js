@@ -18,13 +18,13 @@
         vm.vacuum = vacuum;
         vm.searchPlugin = searchPlugin;
         vm.resetPlugin = resetPlugin;
-        
+
         function activate() {
             databaseService.getPlugins()
                 .then(setPlugins)
                 .cached(setPlugins);
         }
-        
+
         function setPlugins(response) {
             vm.plugins = response.data;
         }
@@ -70,9 +70,7 @@
                 .cancel('No');
 
             $mdDialog.show(confirm).then(function () {
-                var params = {
-                    plugin_name: vm.selectedPlugin
-                }
+                var params = vm.selectedPlugin;
                 databaseService.resetPlugin(params)
                     .then(openSuccess);
             });

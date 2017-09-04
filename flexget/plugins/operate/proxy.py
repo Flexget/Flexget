@@ -9,7 +9,7 @@ from flexget.event import event
 
 log = logging.getLogger('proxy')
 
-PROTOCOLS = ['http', 'https', 'ftp']
+PROTOCOLS = ['http', 'https', 'ftp', 'socks5']
 
 
 class Proxy(object):
@@ -42,7 +42,7 @@ class Proxy(object):
         else:
             # Map all protocols to the configured proxy
             proxies = dict((prot, config) for prot in PROTOCOLS)
-        log.verbose('Setting proxy to %s' % proxies)
+        log.verbose('Setting proxy to %s', proxies)
         task.requests.proxies = proxies
 
 

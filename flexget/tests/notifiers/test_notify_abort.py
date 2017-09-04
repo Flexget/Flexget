@@ -1,9 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-import mock
 
-@mock.patch('requests.Session.request')
 class TestNotifyAbort(object):
     config = """
         tasks:
@@ -14,27 +12,31 @@ class TestNotifyAbort(object):
             # causes abort
             abort: yes
 
-            notify_abort:
-              to:
-                - pushover:
-                    user_key: user_key
+            notify:
+              abort:
+                via:
+                  - debug_notification:
+                      user_key: user_key
           no_crash:
             disable: builtins
-            notify_abort:
-              to:
-                - pushover:
-                    user_key: user_key
+            notify:
+              abort:
+                via:
+                  - debug_notification:
+                      user_key: user_key
     """
 
-    def test_notify_abort(self, mocked_request, execute_task):
+    def test_notify_abort(self, execute_task, debug_notifications):
         execute_task('test_abort', abort=True)
-        data = {'message': 'Reason: abort plugin', 'title': 'Task test_abort has aborted!'}
+        data = (
+            'Task test_abort has aborted!',
+            'Reason: abort plugin',
+            {'user_key': 'user_key'}
+        )
 
-        assert mocked_request.called
+        assert debug_notifications[0] == data
+        assert len(debug_notifications) == 1
 
-        for k, v in data.items():
-            assert mocked_request.call_args[1]['data'][k] == v
-
-    def test_no_crash(self, mocked_request, execute_task):
+    def test_no_crash(self, execute_task, debug_notifications):
         execute_task('no_crash')
-        assert not mocked_request.called
+        assert len(debug_notifications) == 0

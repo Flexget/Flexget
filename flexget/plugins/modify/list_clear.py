@@ -16,7 +16,7 @@ class ListClear(object):
         'properties': {
             'what': {'type': 'array', 'items':
                 {'allOf': [
-                    {'$ref': '/schema/plugins?group=list'},
+                    {'$ref': '/schema/plugins?interface=list'},
                     {'maxProperties': 1,
                      'error_maxProperties': 'Plugin options within list_clear plugin must be indented '
                                             '2 more spaces than the first letter of the plugin name.',

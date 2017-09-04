@@ -8,7 +8,7 @@ interactions:
       Content-Type: [application/x-www-form-urlencoded]
       User-Agent: [!!python/unicode 'FlexGet/1.2.379.dev (www.flexget.com)']
     method: POST
-    uri: http://api.t411.li/auth
+    uri: https://api.t411.al/auth
   response:
     body: {string: !!python/unicode '{"token":"12345:123:ASDZXCQWEPOILKJMNB"}'}
     headers:

@@ -89,4 +89,4 @@ class PluginTmdbLookup(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTmdbLookup, 'tmdb_lookup', api_ver=2, groups=['movie_metainfo'])
+    plugin.register(PluginTmdbLookup, 'tmdb_lookup', api_ver=2, interfaces=['task', 'movie_metainfo'])

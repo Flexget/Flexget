@@ -238,7 +238,6 @@ class Session(requests.Session):
         try:
             log.debug('Fetching URL %s with args %s and kwargs %s', url, args, kwargs)
             result = super(Session, self).request(method, url, *args, **kwargs)
-            log.trace('Contents for URL %s: %s', url, result.text)
         except requests.Timeout:
             # Mark this site in known unresponsive list
             set_unresponsive(url)

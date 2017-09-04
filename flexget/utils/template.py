@@ -10,12 +10,11 @@ import re
 import locale
 from copy import copy
 from datetime import datetime, date, time
-from email.utils import parsedate
-from time import mktime
 
 import jinja2.filters
 from jinja2 import (Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader, Template,
                     TemplateNotFound, TemplateSyntaxError)
+from dateutil import parser as dateutil_parse
 
 from flexget.event import event
 from flexget.utils.lazy_dict import LazyDict
@@ -66,7 +65,7 @@ def filter_re_search(val, pattern):
     """Perform a search for given regexp pattern, return the matching portion of the text."""
     if not isinstance(val, basestring):
         return val
-    result = re.search(pattern, val)
+    result = re.search(pattern, val, re.IGNORECASE)
     if result:
         return result.group(0)
     return ''
@@ -81,11 +80,12 @@ def filter_formatdate(val, format):
 
 
 def filter_parsedate(val):
-    """Attempts to parse a date according to the rules in RFC 2822"""
-    return datetime.fromtimestamp(mktime(parsedate(val)))
+    """Attempts to parse a date according to the rules in ISO 8601 and RFC 2822"""
+    return dateutil_parse.parse(val)
 
 
 def filter_date_suffix(date):
+    """Returns a date suffix for a given date"""
     day = int(date[-2:])
     if 4 <= day <= 20 or 24 <= day <= 30:
         suffix = "th"
@@ -115,13 +115,14 @@ def filter_pad(val, width, fillchar='0'):
 
 
 def filter_to_date(date_time_val):
+    """Returns the date from any date-time object"""
     if not isinstance(date_time_val, (datetime, date, time)):
         return date_time_val
     return date_time_val.date()
 
 
-# Override the built-in Jinja default filter to change the `boolean` param to True by default
 def filter_default(value, default_value='', boolean=True):
+    """Override the built-in Jinja default filter to change the `boolean` param to True by default"""
     return jinja2.filters.do_default(value, default_value, boolean)
 
 
@@ -159,6 +160,15 @@ def list_templates(extensions=None):
     if environment is None or not hasattr(environment, 'loader'):
         return
     return environment.list_templates(extensions=extensions)
+
+
+def get_filters():
+    """
+    Returns all built-in and custom Jinja filters in a dict, where the key is the name, and the value is the filter func
+    """
+    if environment is None or not hasattr(environment, 'loader'):
+        return {}
+    return environment.filters.items()
 
 
 def get_template(template_name, scope='task'):
@@ -232,3 +242,17 @@ def render_from_task(template, task):
     """
     variables = {'task': task, 'now': datetime.now(), 'task_name': task.name}
     return render(template, variables)
+
+
+def evaluate_expression(expression, context):
+    """
+    Evaluate a jinja `expression` using a given `context` with support for `LazyDict`s (`Entry`s.)
+
+    :param str expression:  A jinja expression to evaluate
+    :param context: dictlike, supporting LazyDicts
+    """
+    compiled_expr = environment.compile_expression(expression)
+    # If we have a LazyDict, grab the underlying store. Our environment supports LazyFields directly
+    if isinstance(context, LazyDict):
+        context = context.store
+    return compiled_expr(**context)

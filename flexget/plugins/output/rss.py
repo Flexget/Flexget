@@ -189,7 +189,7 @@ class OutputRSS(object):
                     break
 
             try:
-                template = get_template(config['template'])
+                template = get_template(config['template'], scope='task')
             except ValueError as e:
                 raise plugin.PluginError('Invalid template specified: %s' % e)
             try:

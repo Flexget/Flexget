@@ -15,7 +15,9 @@
 
         vm.$onInit = activate;
         vm.updateTheme = updateTheme;
-        vm.saveConfig = saveConfig;
+        vm.saveConfiguration = saveConfiguration;
+        vm.changeContent = changeContent;
+        vm.variables = false;
 
         var aceThemeCache, editor;
 
@@ -24,6 +26,11 @@
             initCache();
 
             setupAceOptions();
+        }
+
+        function changeContent() {
+            vm.variables ? loadConfig() : loadVariables();
+            vm.variables = !vm.variables;
         }
 
         function initCache() {
@@ -38,18 +45,34 @@
 
         function loadConfig() {
             configService.getRawConfig()
-                .then(setConfig)
-                .cached(setConfig);
+                .then(decode)
+                .cached(decode);
+            
+            function decode(response) {
+                var decoded = base64.decode(response.data.raw_config);
+                setConfiguration(decoded);
+            }
         }
 
-        function setConfig(response) {
-            var encoded = response.data.raw_config;
-            vm.config = base64.decode(encoded);
-            saveOriginalConfig();
+        function loadVariables() {
+            configService.getVariables()
+                .then(setVariables)
+                .cached(setVariables);
+            
+            function setVariables(response) {
+                var converted = YAML.stringify(response.data);
+                setConfiguration(converted);
+            }
         }
 
-        function saveOriginalConfig() {
-            vm.origConfig = angular.copy(vm.config);
+        function setConfiguration(config) {
+            vm.configuration = config;
+            editor.focus();
+            saveOriginalValues();
+        }
+
+        function saveOriginalValues() {
+            vm.originalValues = angular.copy(vm.configuration);
         }
 
         function setupAceOptions() {
@@ -74,11 +97,11 @@
             _editor.commands.removeCommands(commandsToRemove);
 
             _editor.commands.addCommand({
-                name: 'saveConfig',
+                name: 'saveConfiguration',
                 bindKey: { win: 'Ctrl-S', mac: 'Command-S' },
                 exec: function () {
-                    if (vm.config !== vm.origConfig) {
-                        saveConfig();
+                    if (vm.configuration !== vm.originalValues) {
+                        saveConfiguration();
                     }
                 }
             });
@@ -95,29 +118,51 @@
             aceThemeCache.put('theme', vm.aceOptions.theme);
         }
 
-        function saveConfig() {
-            var encoded = base64.encode(vm.config);
-            configService.saveRawConfig(encoded)
+        function saveConfiguration() {
+            vm.variables ? saveVariables() : saveConfig();
+        }
+
+        function saveVariables() {
+            var converted = YAML.parse(vm.configuration);
+            configService.saveVariables(converted)
                 .then(function () {
-                    var dialog = $mdDialog.alert()
-                        .title('Update success')
-                        .ok('Ok')
-                        .textContent('Your config file has been successfully updated');
-
-                    $mdDialog.show(dialog).then(function () {
-                        editor.focus();
-                    });;
-
-                    delete vm.errorMessage;
+                    updateSuccess();
+                }, function (error) {
+                    console.log(error);
+                    // TODO: Check errors
                     delete vm.errors;
                     delete vm.yamlError;
-                    
-                    saveOriginalConfig();
+                    vm.errors = error;
+                });
+        }
+
+        function saveConfig() {
+            var encoded = base64.encode(vm.configuration);
+            configService.saveRawConfig(encoded)
+                .then(function () {
+                    updateSuccess();
                 }, function (error) {
                     delete vm.errors;
                     delete vm.yamlError;
                     error.errors ? vm.errors = error.errors : vm.yamlError = error;
                 });
+        }
+
+        function updateSuccess() {
+            var dialog = $mdDialog.alert()
+                .title('Update success')
+                .ok('Ok')
+                .textContent('Your ' + (vm.variables ? 'variables have' : 'config has') + ' been successfully updated');
+                    
+            $mdDialog.show(dialog).then(function () {
+                editor.focus();
+            });
+
+            delete vm.errorMessage;
+            delete vm.errors;
+            delete vm.yamlError;
+                    
+            saveOriginalValues();
         }
     }
 }());

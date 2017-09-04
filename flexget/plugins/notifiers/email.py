@@ -5,18 +5,18 @@ from future.utils import text_to_native_str
 import logging
 import smtplib
 import socket
-
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
+from smtplib import SMTPAuthenticationError, SMTPServerDisconnected, SMTPSenderRefused
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 from flexget.plugin import PluginWarning
 
-__name__ = 'email'
-log = logging.getLogger(__name__)
+plugin_name = 'email'
+log = logging.getLogger(plugin_name)
 
 
 class EmailNotifier(object):
@@ -40,45 +40,93 @@ class EmailNotifier(object):
 
     Config basic example::
 
-      email:
-        from: xxx@xxx.xxx
-        to: xxx@xxx.xxx
-        smtp_host: smtp.host.com
+      notify:
+        entries:
+          via:
+            - email:
+                from: xxx@xxx.xxx
+                to: xxx@xxx.xxx
+                smtp_host: smtp.host.com
 
     Config example with smtp login::
 
-      email:
-        from: xxx@xxx.xxx
-        to: xxx@xxx.xxx
-        smtp_host: smtp.host.com
-        smtp_port: 25
-        smtp_login: true
-        smtp_username: my_smtp_login
-        smtp_password: my_smtp_password
-        smtp_tls: true
+      notify:
+        entries:
+          via:
+            - email:
+                from: xxx@xxx.xxx
+                to: xxx@xxx.xxx
+                smtp_host: smtp.host.com
+                smtp_port: 25
+                smtp_login: true
+                smtp_username: my_smtp_login
+                smtp_password: my_smtp_password
+                smtp_tls: true
 
     GMAIL example::
 
-      from: from@gmail.com
-      to: to@gmail.com
-      smtp_host: smtp.gmail.com
-      smtp_port: 587
-      smtp_login: true
-      smtp_username: gmailUser
-      smtp_password: gmailPassword
-      smtp_tls: true
+      notify:
+        entries:
+          via:
+            - email:
+                from: from@gmail.com
+                to: to@gmail.com
+                smtp_host: smtp.gmail.com
+                smtp_port: 587
+                smtp_login: true
+                smtp_username: gmailUser
+                smtp_password: gmailPassword
+                smtp_tls: true
 
     Default values for the config elements::
 
-      email:
-        smtp_host: localhost
-        smtp_port: 25
-        smtp_login: False
-        smtp_username:
-        smtp_password:
-        smtp_tls: False
-        smtp_ssl: False
+      notify:
+        entries:
+          via:
+            - email:
+                smtp_host: localhost
+                smtp_port: 25
+                smtp_login: False
+                smtp_username:
+                smtp_password:
+                smtp_tls: False
+                smtp_ssl: False
     """
+
+    def __init__(self):
+        self.mail_server = None
+        self.host = None
+        self.port = None
+        self.username = None
+        self.password = None
+        self.ssl = None
+        self.tls = None
+
+    def connect_to_smtp_server(self, config):
+        self.host = config['smtp_host']
+        self.port = config['smtp_port']
+        self.ssl = config['smtp_ssl']
+        self.tls = config['smtp_tls']
+        self.username = config.get('smtp_username')
+        self.password = config.get('smtp_password')
+        try:
+            log.debug('connecting to smtp server %s:%s', self.host, self.port)
+            self.mail_server = smtplib.SMTP_SSL if self.ssl else smtplib.SMTP
+            self.mail_server = self.mail_server(self.host, self.port)
+            if self.tls:
+                self.mail_server.ehlo()
+                self.mail_server.starttls()
+                self.mail_server.ehlo()
+        except (socket.error, OSError) as e:
+            raise PluginWarning(str(e))
+
+        try:
+            if self.username:
+                # Forcing to use `str` type
+                log.debug('logging in to smtp server using username: %s', self.username)
+                self.mail_server.login(text_to_native_str(self.username), text_to_native_str(self.password))
+        except (IOError, SMTPAuthenticationError) as e:
+            raise PluginWarning(str(e))
 
     schema = {
         'type': 'object',
@@ -91,9 +139,6 @@ class EmailNotifier(object):
             'smtp_password': {'type': 'string'},
             'smtp_tls': {'type': 'boolean', 'default': False},
             'smtp_ssl': {'type': 'boolean', 'default': False},
-            'message': {'type': 'string'},
-            'file_template': {'type': 'string'},
-            'title': {'type': 'string'},
             'html': {'type': 'boolean', 'default': False},
         },
         'required': ['to'],
@@ -105,68 +150,45 @@ class EmailNotifier(object):
         'additionalProperties': False,
     }
 
-    def notify(self, to, message, title, smtp_host, smtp_port, smtp_username=None, smtp_password=None, smtp_tls=None,
-               smtp_ssl=None, html=None, **kwargs):
+    def notify(self, title, message, config):
         """
         Send an email notification
 
-        :param str to: email `to` address
         :param str message: message body
         :param str title: message subject
-        :param str smtp_host: smtp_host to use
-        :param int smtp_port: port to use
-        :param str smtp_username: smtp username if authentication is required
-        :param str smtp_password: smtp password if authentication is required
-        :param bool smtp_tls: enable tls
-        :param bool smtp_ssl: enable ssl
-        :param bool html: set content type to `html`
-        :param kwargs: contains the `from` attribute since that is a reserved keyword
+        :param dict config: email plugin config
         """
 
-        if not isinstance(to, list):
-            to = [to]
+        if not isinstance(config['to'], list):
+            config['to'] = [config['to']]
 
         email = MIMEMultipart('alternative')
-        email['To'] = ','.join(to)
-        email['From'] = kwargs['from']
+        email['To'] = ','.join(config['to'])
+        email['From'] = config['from']
         email['Subject'] = title
         email['Date'] = formatdate(localtime=True)
-        content_type = 'html' if html else 'plain'
+        content_type = 'html' if config['html'] else 'plain'
         email.attach(MIMEText(message.encode('utf-8'), content_type, _charset='utf-8'))
 
-        try:
-            log.debug('sending email notification to %s:%s', smtp_host, smtp_port)
-            mailServer = smtplib.SMTP_SSL if smtp_ssl else smtplib.SMTP
-            mailServer = mailServer(smtp_host, smtp_port)
-            if smtp_tls:
-                mailServer.ehlo()
-                mailServer.starttls()
-                mailServer.ehlo()
-        except (socket.error, OSError) as e:
-            raise PluginWarning(str(e))
+        # Making sure mail server connection will remain open per host or username
+        # (in case several mail servers are used in the same task)
+        if not self.mail_server or not (
+                self.host == config['smtp_host'] and self.username == config.get('smtp_username')):
+            self.connect_to_smtp_server(config)
 
-        try:
-            if smtp_username:
-                log.debug('logging in to smtp server using username: %s', smtp_username)
-                mailServer.login(text_to_native_str(smtp_username), text_to_native_str(smtp_password))
-            mailServer.sendmail(email['From'], to, email.as_string())
-        except IOError as e:
-            raise PluginWarning(str(e))
-
-        mailServer.quit()
-
-    # Run last to make sure other outputs are successful before sending notification
-    @plugin.priority(0)
-    def on_task_output(self, task, config):
-        # Send default values for backwards compatibility
-        notify_config = {
-            'to': [{__name__: config}],
-            'scope': 'entries',
-            'what': 'accepted'
-        }
-        plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
+        connection_error = None
+        while True:
+            try:
+                self.mail_server.sendmail(email['From'], config['to'], email.as_string())
+                break
+            except (SMTPServerDisconnected, SMTPSenderRefused) as e:
+                if not connection_error:
+                    self.connect_to_smtp_server(config)
+                    connection_error = e
+                else:
+                    raise PluginWarning('Could not connect to SMTP server: %s' % str(e))
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EmailNotifier, __name__, api_ver=2, groups=['notifiers'])
+    plugin.register(EmailNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])

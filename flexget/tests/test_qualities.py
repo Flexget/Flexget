@@ -30,6 +30,7 @@ class TestQualityParser(object):
 
     @pytest.mark.parametrize("test_quality", [
         ('Test.File 1080p.web', '1080p webdl'),
+        ('Test.File.2160p.web', '2160p webdl'),
         ('Test.File.1080.web-random', '1080p webdl'),
         ('Test.File.1080.webrandom', '1080p'),
         ('Test.File 1080p.web-dl', '1080p webdl'),
@@ -38,6 +39,7 @@ class TestQualityParser(object):
         ('Test.File.720p.bluray', '720p bluray'),
         ('Test.File.720hd.bluray', '720p bluray'),
         ('Test.File.1080p.bluray', '1080p bluray'),
+        ('Test.File.2160p.bluray', '2160p bluray'),
         ('Test.File.1080p.cam', '1080p cam'),
         ('A Movie 2011 TS 576P XviD-DTRG', '576p ts xvid'),
 
@@ -61,6 +63,7 @@ class TestQualityParser(object):
         ('Test.File.web-dl', 'webdl'),
         ('Test.File.720P', '720p'),
         ('Test.File.1920x1080', '1080p'),
+        ('Test.File.3840x2160', '2160p'),
         ('Test.File.1080i', '1080i'),
         ('Test File blurayrip', 'bluray'),
         ('Test.File.br-rip', 'bluray'),
@@ -97,10 +100,29 @@ class TestQualityParser(object):
         ('Test.File.DTSHD', 'dtshd'),
         ('Test.File.DTS', 'dts'),
         ('Test.File.truehd', 'truehd'),
-        ('Test.File.DTSHDMA', 'dtshd')
+        ('Test.File.DTSHDMA', 'dtshd'),
+        ('Test.File.DD2.0', 'dd5.1'),
+        ('Test.File.AC35.1', 'ac3')
     ])
     def test_quality_failures(self, parser, test_quality):
         quality = parser().parse_movie(test_quality[0]).quality
+        assert str(quality) == test_quality[1], ('`%s` quality should be `%s` not `%s`' % (
+            test_quality[0], test_quality[1], quality
+        ))
+
+
+class TestQualityInternalParser(object):
+    @pytest.mark.parametrize("test_quality", [
+        ('Test.File.DD+5.1', 'dd+5.1'),
+        ('Test.File.DDP5.1', 'dd+5.1'),
+        ('Test.File.DDP7.1', 'dd+5.1'),
+        ('Test.File.DD5.1', 'dd5.1'),
+        ('Test.File.DD4.0', 'dd5.1'),
+        ('Test.File.DD2.1', 'dd5.1'),
+        ('Test.File.FLAC1.0', 'flac'),
+    ])
+    def test_quality_failures(self, test_quality):
+        quality = ParserInternal().parse_movie(test_quality[0]).quality
         assert str(quality) == test_quality[1], ('`%s` quality should be `%s` not `%s`' % (
             test_quality[0], test_quality[1], quality
         ))
@@ -180,3 +202,48 @@ class TestFilterQuality(object):
         assert entry in task.accepted, 'HR should be accepted'
         assert len(task.rejected) == 3, 'wrong number of entries rejected'
         assert len(task.accepted) == 1, 'wrong number of entries accepted'
+
+
+class TestQualityAudio(object):
+    config = """
+        tasks:
+          test_dd_audio_channels:
+            quality: "dd+5.1"
+            mock:
+              - {title: 'My Show S01E05 720p HDTV DD+7.1'}
+              - {title: 'My Show S01E05 720p HDTV DD+5.0'}
+          test_dd_audio_min:
+            quality: ">dd5.1"
+            mock:
+              - {title: 'My Show S01E05 720p HDTV DD5.1'}
+              - {title: 'My Show S01E05 720p HDTV DD+2.0'}
+          test_dd_audio_max:
+            quality: "<=dd5.1"
+            mock:
+              - {title: 'My Show S01E05 720p HDTV DD5.1'}
+              - {title: 'My Show S01E05 720p HDTV DD+5.1'}
+              - {title: 'My Show S01E05 720p HDTV DD+7.1'}
+    """
+
+    def test_dd_audio_channels(self, execute_task):
+        task = execute_task('test_dd_audio_channels')
+        entry = task.find_entry('undecided', title='My Show S01E05 720p HDTV DD+7.1')
+        assert entry, 'Entry "My Show S01E05 720p HDTV DD+7.1" should not have been rejected'
+        assert entry['quality'].audio == 'dd+5.1', 'audio "dd+7.1" should have been parsed as dd+5.1'
+
+        entry = task.find_entry('undecided', title='My Show S01E05 720p HDTV DD+5.0')
+        assert entry['quality'].audio == 'dd+5.1', 'audio "dd+5.0" should have been parsed as dd+5.1'
+
+    def test_dd_audio_min(self, execute_task):
+        task = execute_task('test_dd_audio_min')
+        assert len(task.rejected) == 1, 'should have rejected one'
+        entry = task.find_entry('undecided', title='My Show S01E05 720p HDTV DD+2.0')
+        assert entry, 'Entry "My Show S01E05 720p HDTV DD+2.0" should not have been rejected'
+        assert entry['quality'].audio == 'dd+5.1', 'audio should have been parsed as dd+5.1'
+
+    def test_dd_audio_max(self, execute_task):
+        task = execute_task('test_dd_audio_max')
+        assert len(task.rejected) == 2, 'should have rejected two'
+        entry = task.find_entry('undecided', title='My Show S01E05 720p HDTV DD5.1')
+        assert entry, 'Entry "My Show S01E05 720p HDTV DD5.1" should not have been rejected'
+        assert entry['quality'].audio == 'dd5.1', 'audio should have been parsed as dd5.1'

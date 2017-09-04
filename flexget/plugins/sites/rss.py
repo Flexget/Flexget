@@ -45,4 +45,4 @@ class SearchRSS(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SearchRSS, 'search_rss', groups=['search'], api_ver=2)
+    plugin.register(SearchRSS, 'search_rss', interfaces=['search'], api_ver=2)

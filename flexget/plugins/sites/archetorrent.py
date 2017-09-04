@@ -30,4 +30,4 @@ class UrlRewriteArchetorrent(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteArchetorrent, 'archetorrent', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteArchetorrent, 'archetorrent', interfaces=['urlrewriter'], api_ver=2)

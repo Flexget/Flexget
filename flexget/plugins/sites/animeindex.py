@@ -27,4 +27,4 @@ class UrlRewriteAnimeIndex(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteAnimeIndex, 'animeindex', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteAnimeIndex, 'animeindex', interfaces=['urlrewriter'], api_ver=2)

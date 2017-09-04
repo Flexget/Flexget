@@ -71,7 +71,7 @@ class AppleTrailers(object):
     }
 
     def broken(self, error_message):
-        raise plugin.PluginError('Plugin is most likely broken. Got: %s', error_message)
+        raise plugin.PluginError('Plugin is most likely broken. Got: %s' % error_message)
 
     @plugin.priority(127)
     @cached('apple_trailers')
@@ -83,7 +83,7 @@ class AppleTrailers(object):
         try:
             r = task.requests.get(self.rss_url)
         except RequestException as e:
-            raise plugin.PluginError('Retrieving Apple Trailers RSS feed failed: %s', e.args[0])
+            raise plugin.PluginError('Retrieving Apple Trailers RSS feed failed: %s' % e)
 
         rss = feedparser.parse(r.content)
 

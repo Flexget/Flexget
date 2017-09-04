@@ -29,8 +29,8 @@ class ObjectsContainer(object):
     }
 
 
-user_password_input_schema = api.schema('user_password_input', ObjectsContainer.user_password_input)
-user_token_response_schema = api.schema('user_token_response', ObjectsContainer.user_token_response)
+user_password_input_schema = api.schema_model('user_password_input', ObjectsContainer.user_password_input)
+user_token_response_schema = api.schema_model('user_token_response', ObjectsContainer.user_token_response)
 
 
 @user_api.route('/')
@@ -39,8 +39,8 @@ class UserManagementAPI(APIResource):
     @api.validate(model=user_password_input_schema, description='Password change schema')
     @api.response(BadRequest)
     @api.response(200, 'Success', model=base_message_schema)
-    @api.doc(description='Change user password. A medium strength password is required.'
-                         ' See https://github.com/lepture/safe for reference')
+    @api.doc(description='Change user password. A score of at least 3 is needed.'
+                         'See https://github.com/dropbox/zxcvbn for details')
     def put(self, session=None):
         """ Change user password """
         user = current_user
@@ -57,7 +57,7 @@ class UserManagementAPI(APIResource):
 class UserManagementTokenAPI(APIResource):
     @api.response(200, 'Successfully changed user token', user_token_response_schema)
     @api.doc(description='Get new user token')
-    def get(self, session=None):
+    def put(self, session=None):
         """ Change current user token """
         token = generate_token(username=current_user.name, session=session)
         return jsonify({'token': token})

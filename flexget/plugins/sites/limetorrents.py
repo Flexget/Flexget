@@ -105,4 +105,4 @@ class Limetorrents(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Limetorrents, 'limetorrents', groups=['search'], api_ver=2)
+    plugin.register(Limetorrents, 'limetorrents', interfaces=['search'], api_ver=2)

@@ -59,4 +59,4 @@ class EstimatesSeriesInternal(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EstimatesSeriesInternal, 'est_series_internal', groups=['estimate_release'], api_ver=2)
+    plugin.register(EstimatesSeriesInternal, 'est_series_internal', interfaces=['estimate_release'], api_ver=2)

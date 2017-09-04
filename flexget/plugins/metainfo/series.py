@@ -31,13 +31,13 @@ class MetainfoSeries(object):
                 continue
             self.guess_entry(entry)
 
-    def guess_entry(self, entry, allow_seasonless=False, config=None):
+    def guess_entry(self, entry, allow_seasonless=False, config=None, force=False):
         """
         Populates series_* fields for entries that are successfully parsed.
 
         :param dict config: A series config to be used. This will also cause 'path' and 'set' fields to be populated.
         """
-        if entry.get('series_parser') and entry['series_parser'].valid:
+        if not force and entry.get('series_parser') and entry['series_parser'].valid:
             # Return true if we already parsed this, false if series plugin parsed it
             return entry.get('series_guessed')
         parsed = get_plugin_by_name('parsing').instance.parse_series(data=entry['title'], identified_by='auto',

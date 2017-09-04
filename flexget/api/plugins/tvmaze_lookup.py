@@ -87,8 +87,8 @@ class ObjectsContainer(object):
     }
 
 
-tvmaze_series_schema = api.schema('tvmaze_series_schema', ObjectsContainer.tvmaze_series_object)
-tvmaze_episode_schema = api.schema('tvmaze_episode_schema', ObjectsContainer.tvmaze_episode_object)
+tvmaze_series_schema = api.schema_model('tvmaze_series_schema', ObjectsContainer.tvmaze_series_object)
+tvmaze_episode_schema = api.schema_model('tvmaze_episode_schema', ObjectsContainer.tvmaze_episode_object)
 
 
 @tvmaze_api.route('/series/<string:title>/')
