@@ -39,14 +39,14 @@ export default [
     label: 'Tasks',
     children: [
       {
-        link: '/schedule',
-        icon: 'clock-o',
-        label: 'Schedule',
-      },
-      {
         link: '/execute',
         icon: 'cogs',
         label: 'Execute',
+      },
+      {
+        link: '/schedule',
+        icon: 'clock-o',
+        label: 'Schedule',
       },
       {
         link: '/status',
