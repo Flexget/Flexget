@@ -30,10 +30,10 @@ class InputPogDesign(object):
         session = requests.Session()
         data = {'username': config['username'], 'password': config['password'], 'sub_login': 'Account Login'}
         try:
-            r = session.post('http://www.pogdesign.co.uk/cat/login', data=data)
+            r = session.post('https://www.pogdesign.co.uk/cat/login', data=data)
             if 'U / P Invalid' in r.text:
                 raise plugin.PluginError('Invalid username/password for pogdesign.')
-            page = session.get('http://www.pogdesign.co.uk/cat/show-select')
+            page = session.get('https://www.pogdesign.co.uk/cat/show-select')
         except requests.RequestException as e:
             raise plugin.PluginError('Error retrieving source: %s' % e)
         soup = get_soup(page.text)
@@ -60,7 +60,7 @@ class InputPogDesign(object):
 
             e = Entry()
             e['title'] = t
-            e['url'] = 'http://www.pogdesign.co.uk/{0}'.format(row.find_next('a')['href'].lstrip('/'))
+            e['url'] = 'https://www.pogdesign.co.uk/{0}'.format(row.find_next('a')['href'].lstrip('/'))
             entries.append(e)
 
         return entries
