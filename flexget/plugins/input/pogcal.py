@@ -31,7 +31,7 @@ class InputPogDesign(object):
         data = {'username': config['username'], 'password': config['password'], 'sub_login': 'Account Login'}
         try:
             r = session.post('https://www.pogdesign.co.uk/cat/login', data=data)
-            if 'U / P Invalid' in r.text:
+            if 'Login to Your Account' in r.text:
                 raise plugin.PluginError('Invalid username/password for pogdesign.')
             page = session.get('https://www.pogdesign.co.uk/cat/show-select')
         except requests.RequestException as e:
