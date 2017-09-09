@@ -46,6 +46,7 @@ const Home = createAsyncComponent(() => import('components/home'));
 const Log = createAsyncComponent(() => import('components/log'));
 const Login = createAsyncComponent(() => import('containers/login'));
 const Series = createAsyncComponent(() => import('containers/series'));
+const History = createAsyncComponent(() => import('containers/history'));
 
 const jss = create(preset());
 jss.options.createGenerateClassName = createGenerateClassName;
@@ -64,6 +65,7 @@ const Root = () => (
                   <PrivateRoute path="/" exact component={Home} />
                   <PrivateRoute path="/log" exact component={Log} />
                   <PrivateRoute path="/series" exact component={Series} />
+                  <PrivateRoute path="/history" exact component={History} />
                 </Switch>
               </Layout>
             </Switch>

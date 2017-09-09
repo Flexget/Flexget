@@ -22,7 +22,9 @@ class Version extends Component {
   };
 
   componentDidMount() {
-    this.props.getVersion();
+    if (process.env.NODE_ENV === 'production' || !this.props.version.api) {
+      this.props.getVersion();
+    }
   }
 
   render() {

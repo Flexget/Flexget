@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Redirect } from 'react-router-dom';
 import LoginCard from 'containers/login/LoginCard';
-import SplashScreen from 'components/splash';
+import SplashScreen from 'components/login/Splash';
 import { Logo } from './styles';
 
 const LoginPage = ({ redirectToReferrer, location, loading }) => {

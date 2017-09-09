@@ -6,7 +6,7 @@ import { get } from 'utils/fetch';
 import { action } from 'utils/actions';
 import { GET_VERSION } from 'store/version/actions';
 
-describe('sagas/version/', () => {
+describe('sagas/version', () => {
   describe('getVersion', () => {
     describe('success', () => {
       const it = sagaHelper(getVersion());

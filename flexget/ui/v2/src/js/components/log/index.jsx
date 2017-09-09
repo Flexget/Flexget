@@ -1,18 +1,16 @@
 import React from 'react';
 import Header from 'containers/log/Header';
 import LogTable from 'containers/log/LogTable';
-import {
-  LogWrapper,
-  TableWrapper,
-} from './styles';
+import { PaperWrapper } from 'components/common/styles';
+import { TableWrapper } from './styles';
 
 const LogPage = () => (
-  <LogWrapper elevation={4}>
+  <PaperWrapper elevation={4}>
     <Header />
     <TableWrapper>
       <LogTable />
     </TableWrapper>
-  </LogWrapper>
+  </PaperWrapper>
 );
 
 export default LogPage;

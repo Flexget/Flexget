@@ -1,12 +1,12 @@
 import reducer from 'store/version/reducer';
 import { GET_VERSION } from 'store/version/actions';
 
-describe('reducers/auth', () => {
+describe('reducers/version', () => {
   it('should return the initial state', () => {
     expect(reducer(undefined, {})).toMatchSnapshot();
   });
 
-  it('should login on LOGIN', () => {
+  it('should get version on GET_VERSION', () => {
     expect(reducer(undefined, {
       type: GET_VERSION,
       payload: {

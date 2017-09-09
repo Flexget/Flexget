@@ -3,7 +3,6 @@ import theme from 'theme';
 
 const HEADER_HEIGHT = 5;
 const MOBILE_HEADER_HEIGHT = (HEADER_HEIGHT * 2);
-const PADDING = 1;
 
 export const Wrapper = styled.div`
   display: flex;
@@ -15,10 +14,11 @@ export const Wrapper = styled.div`
 export const Main = styled.main`
   display: flex;
   flex-direction: row;
-  margin-top: ${MOBILE_HEADER_HEIGHT}rem;
+  padding-top: ${MOBILE_HEADER_HEIGHT}rem;
   flex: 1;
+  height: 100vh;
   ${theme.breakpoints.up('sm')} {
-    margin-top: ${HEADER_HEIGHT}rem;
+    padding-top: ${HEADER_HEIGHT}rem;
   }
 `;
 
@@ -49,14 +49,13 @@ export const SideBar = styled.aside`
 
 export const Content = styled.section`
   flex: 1;
-  padding: ${PADDING}rem;
   overflow-y: auto;
+  padding: 1rem;
   opacity: 1;
   transition: ${theme.transitions.create(['opacity', 'margin-left'])};
 
   ${theme.breakpoints.down('sm')} {
     margin-left: 0;
-    padding: ${({ open }) => (open ? 0 : `${PADDING}rem`)};
     opacity: ${({ open }) => (open ? 0 : 1)};
     display: ${({ open }) => (open ? 'none' : 'block')};
   }

@@ -8,15 +8,16 @@ import rootSaga from 'store/sagas';
 
 export default () => {
   const sagaMiddleware = createSagaMiddleware();
+  // eslint-disable-next-line no-underscore-dangle
+  const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
   const store = createStore(
     connectRouter(history)(reducer),
-    compose(
+    composeEnhancers(
       applyMiddleware(
         status,
         routerMiddleware(history),
         sagaMiddleware,
       ),
-      window.devToolsExtension ? window.devToolsExtension() : f => f,
     ),
   );
 
