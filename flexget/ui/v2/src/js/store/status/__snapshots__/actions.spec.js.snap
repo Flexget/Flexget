@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`actions/status should create an action to close the status 1`] = `
+exports[`store/status/actions should create an action to close the status 1`] = `
 Object {
   "type": "CLOSE_STATUS",
 }

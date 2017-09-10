@@ -11,10 +11,6 @@ export const NavAppBar = styled(AppBar)`
   position: static;
 `;
 
-export const Spacer = styled.div`
-  flex: 1;
-`;
-
 export const NavToolbar = styled(Toolbar)`
   background-color: ${theme.palette.primary[800]};
   min-height: 5rem;

@@ -4,7 +4,7 @@ import { LOGIN, LOGOUT } from 'store/auth/actions';
 import { ERROR_STATUS } from 'store/status/actions';
 import { GET_VERSION } from 'store/version/actions';
 
-describe('reducers/auth', () => {
+describe('store/auth/reducer', () => {
   it('should return the initial state', () => {
     expect(reducer(undefined, {})).toMatchSnapshot();
   });

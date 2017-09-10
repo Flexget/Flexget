@@ -1,7 +1,7 @@
 import reducer from 'store/version/reducer';
 import { GET_VERSION } from 'store/version/actions';
 
-describe('reducers/version', () => {
+describe('store/version/reducer', () => {
   it('should return the initial state', () => {
     expect(reducer(undefined, {})).toMatchSnapshot();
   });

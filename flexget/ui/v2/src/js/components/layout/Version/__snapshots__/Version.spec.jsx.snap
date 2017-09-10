@@ -69,7 +69,7 @@ exports[`components/layout/Version renders correctly without latest version 1`] 
       onMouseUp={[Function]}
       onTouchEnd={[Function]}
       onTouchStart={[Function]}
-      tabIndex="0"
+      tabIndex={0}
     >
       <span
         className="MuiIconButton-label-7"

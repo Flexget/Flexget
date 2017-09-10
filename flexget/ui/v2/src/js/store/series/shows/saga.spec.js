@@ -7,7 +7,7 @@ import { get } from 'utils/fetch';
 import { action } from 'utils/actions';
 import { GET_SHOWS } from 'store/series/shows/actions';
 
-describe('sagas/series/shows', () => {
+describe('store/series/shows/saga', () => {
   describe('getShows', () => {
     describe('success', () => {
       const it = sagaHelper(getShows());

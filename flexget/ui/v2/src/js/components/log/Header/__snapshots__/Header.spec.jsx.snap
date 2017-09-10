@@ -85,6 +85,8 @@ exports[`components/log/Header renders correctly 1`] = `
       </label>
       <div
         className="MuiInput-root-44 MuiInput-formControl-45 MuiInput-inkbar-46 MuiInput-underline-52"
+        onBlur={[Function]}
+        onFocus={[Function]}
       >
         <input
           autoComplete={undefined}
@@ -94,13 +96,12 @@ exports[`components/log/Header renders correctly 1`] = `
           disabled={false}
           id="filter"
           name={undefined}
-          onBlur={[Function]}
           onChange={[Function]}
-          onFocus={[Function]}
           onKeyDown={undefined}
           onKeyPress={[Function]}
           onKeyUp={undefined}
           placeholder={undefined}
+          readOnly={undefined}
           required={undefined}
           rows={undefined}
           type="text"

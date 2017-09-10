@@ -10,11 +10,11 @@ import Dialog, {
   DialogTitle,
 } from 'material-ui/Dialog';
 import Button from 'material-ui/Button';
+import { Spacer } from 'components/common/styles';
 import 'font-awesome/css/font-awesome.css';
 import {
   MenuIcon,
   NavAppBar,
-  Spacer,
   NavToolbar,
   NavIcon,
 } from './styles';

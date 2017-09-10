@@ -13,3 +13,14 @@ export const PaperWrapper = styled(Paper)`
     padding-top: 0;
   }
 `;
+
+export const Spacer = styled.div`
+  flex: 1;
+`;
+
+export const NoPaddingWrapper = styled.div`
+  height: calc(100% + 2rem);
+  margin: -1rem;
+  display: flex;
+  flex-direction: column;
+`;

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`reducers/status LOADING_STATUS should not change if already loading that action 1`] = `
+exports[`store/status/reducer LOADING_STATUS should not change if already loading that action 1`] = `
 Object {
   "error": null,
   "info": null,
@@ -10,7 +10,7 @@ Object {
 }
 `;
 
-exports[`reducers/status LOADING_STATUS should set loading status when initially empty 1`] = `
+exports[`store/status/reducer LOADING_STATUS should set loading status when initially empty 1`] = `
 Object {
   "error": null,
   "info": null,
@@ -20,7 +20,7 @@ Object {
 }
 `;
 
-exports[`reducers/status LOADING_STATUS should set loading status when not empty 1`] = `
+exports[`store/status/reducer LOADING_STATUS should set loading status when not empty 1`] = `
 Object {
   "error": null,
   "info": null,
@@ -31,7 +31,7 @@ Object {
 }
 `;
 
-exports[`reducers/status should clear state on CLOSE_STATUS 1`] = `
+exports[`store/status/reducer should clear state on CLOSE_STATUS 1`] = `
 Object {
   "error": null,
   "info": null,
@@ -39,7 +39,7 @@ Object {
 }
 `;
 
-exports[`reducers/status should clear state on LOCATION_CHANGE 1`] = `
+exports[`store/status/reducer should clear state on LOCATION_CHANGE 1`] = `
 Object {
   "error": null,
   "info": null,
@@ -47,7 +47,7 @@ Object {
 }
 `;
 
-exports[`reducers/status should handle ERROR_STATUS 1`] = `
+exports[`store/status/reducer should handle ERROR_STATUS 1`] = `
 Object {
   "error": Object {
     "message": "something",
@@ -57,7 +57,7 @@ Object {
 }
 `;
 
-exports[`reducers/status should handle INFO_STATUS 1`] = `
+exports[`store/status/reducer should handle INFO_STATUS 1`] = `
 Object {
   "error": null,
   "info": "something",
@@ -65,7 +65,7 @@ Object {
 }
 `;
 
-exports[`reducers/status should handle loding done 1`] = `
+exports[`store/status/reducer should handle loding done 1`] = `
 Object {
   "error": null,
   "info": null,

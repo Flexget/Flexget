@@ -7,6 +7,5 @@ export const Subheader = styled(ListSubheader)`
 
 export const Wrapper = styled.div`
   overflow-y: scroll;
-  height: calc(100% + 2rem);
-  margin: -1rem;
+  flex: 1;
 `;

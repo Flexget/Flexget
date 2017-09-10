@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { AutoSizer, Column } from 'react-virtualized';
+import { LogShape } from 'store/log/shapes';
 import 'react-virtualized/styles.css';
 import { Table, rowClasses } from './styles';
 
@@ -49,13 +50,7 @@ const LogTable = ({ messages }) => (
 );
 
 LogTable.propTypes = {
-  messages: PropTypes.arrayOf(PropTypes.shape({
-    timestamp: PropTypes.string,
-    message: PropTypes.string,
-    task: PropTypes.string,
-    log_level: PropTypes.string,
-    plugin: PropTypes.string,
-  })).isRequired,
+  messages: PropTypes.arrayOf(LogShape).isRequired,
 };
 
 export default LogTable;

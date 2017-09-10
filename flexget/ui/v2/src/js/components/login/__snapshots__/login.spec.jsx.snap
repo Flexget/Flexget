@@ -84,6 +84,8 @@ exports[`components/login renders correctly when logged out 1`] = `
           </label>
           <div
             className="MuiInput-root-43 MuiInput-formControl-44 MuiInput-inkbar-45 MuiInput-underline-51"
+            onBlur={[Function]}
+            onFocus={[Function]}
           >
             <input
               autoComplete={undefined}
@@ -93,12 +95,11 @@ exports[`components/login renders correctly when logged out 1`] = `
               disabled={false}
               id="username"
               name="username"
-              onBlur={[Function]}
               onChange={[Function]}
-              onFocus={[Function]}
               onKeyDown={undefined}
               onKeyUp={undefined}
               placeholder={undefined}
+              readOnly={undefined}
               required={undefined}
               rows={undefined}
               type="text"
@@ -123,6 +124,8 @@ exports[`components/login renders correctly when logged out 1`] = `
           </label>
           <div
             className="MuiInput-root-43 MuiInput-formControl-44 MuiInput-inkbar-45 MuiInput-underline-51"
+            onBlur={[Function]}
+            onFocus={[Function]}
           >
             <input
               autoComplete={undefined}
@@ -132,12 +135,11 @@ exports[`components/login renders correctly when logged out 1`] = `
               disabled={false}
               id="password"
               name="password"
-              onBlur={[Function]}
               onChange={[Function]}
-              onFocus={[Function]}
               onKeyDown={undefined}
               onKeyUp={undefined}
               placeholder={undefined}
+              readOnly={undefined}
               required={undefined}
               rows={undefined}
               type="Password"
@@ -162,7 +164,7 @@ exports[`components/login renders correctly when logged out 1`] = `
           onTouchEnd={[Function]}
           onTouchStart={[Function]}
           role="button"
-          tabIndex="0"
+          tabIndex={0}
           type="submit"
         >
           <span

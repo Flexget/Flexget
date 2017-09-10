@@ -9,7 +9,7 @@ import reducer from 'store/status/reducer';
 
 const TEST = 'TEST';
 
-describe('reducers/status', () => {
+describe('store/status/reducer', () => {
   it('should return the initial state', () => {
     expect(reducer(undefined, {})).toEqual({
       loading: {},

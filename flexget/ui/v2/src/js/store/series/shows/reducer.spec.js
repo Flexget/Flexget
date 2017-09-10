@@ -2,7 +2,7 @@ import { GET_SHOWS } from 'store/series/shows/actions';
 import reducer from 'store/series/shows/reducer';
 import { Headers } from 'utils/tests';
 
-describe('reducers/series/shows', () => {
+describe('store/series/shows/reducer', () => {
   it('should return the initial state', () => {
     expect(reducer(undefined, {})).toEqual({ totalCount: 0, items: [] });
   });

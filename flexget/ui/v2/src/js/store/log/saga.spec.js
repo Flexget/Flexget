@@ -6,7 +6,7 @@ import { LOG_CONNECT, LOG_DISCONNECT } from 'store/log/actions';
 import saga, { log, logStream } from 'store/log/saga';
 import { action, requesting } from 'utils/actions';
 
-describe('sagas/log', () => {
+describe('store/log/saga', () => {
   describe('saga', () => {
     const it = sagaHelper(saga());
     const mockTask = createMockTask();

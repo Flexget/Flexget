@@ -5,7 +5,7 @@ import { action, request } from 'utils/actions';
 import { SERVER_RELOAD, SERVER_SHUTDOWN } from 'store/server/actions';
 import { manageServer } from 'store/server/saga';
 
-describe('sagas/server', () => {
+describe('store/server/sage', () => {
   describe('manageServer', () => {
     describe('success', () => {
       const it = sagaHelper(manageServer('reload', request(SERVER_RELOAD)));

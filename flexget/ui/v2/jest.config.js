@@ -7,6 +7,7 @@ module.exports = {
     '!src/js/utils/*.{js,jsx}',
     '!**/node_modules/**',
     '!**/dist/**',
+    '!src/js/store/**/shapes.js',
   ],
   coverageThreshold: {
     global: {

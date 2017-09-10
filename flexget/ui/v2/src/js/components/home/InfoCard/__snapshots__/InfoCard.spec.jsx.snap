@@ -106,7 +106,7 @@ exports[`components/home/InfoCard renders correctly 1`] = `
       onTouchEnd={[Function]}
       onTouchStart={[Function]}
       rel="noopener noreferrer"
-      tabIndex="0"
+      tabIndex={0}
       target="_blank"
     >
       <span
@@ -135,7 +135,7 @@ exports[`components/home/InfoCard renders correctly 1`] = `
       onTouchEnd={[Function]}
       onTouchStart={[Function]}
       rel="noopener noreferrer"
-      tabIndex="0"
+      tabIndex={0}
       target="_blank"
     >
       <span
@@ -164,7 +164,7 @@ exports[`components/home/InfoCard renders correctly 1`] = `
       onTouchEnd={[Function]}
       onTouchStart={[Function]}
       rel="noopener noreferrer"
-      tabIndex="0"
+      tabIndex={0}
       target="_blank"
     >
       <span
@@ -193,7 +193,7 @@ exports[`components/home/InfoCard renders correctly 1`] = `
       onTouchEnd={[Function]}
       onTouchStart={[Function]}
       rel="noopener noreferrer"
-      tabIndex="0"
+      tabIndex={0}
       target="_blank"
     >
       <span

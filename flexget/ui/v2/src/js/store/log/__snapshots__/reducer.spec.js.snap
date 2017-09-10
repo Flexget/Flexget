@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`reducers/log should add the messages to the existing messages 1`] = `
+exports[`store/log/reducer should add the messages to the existing messages 1`] = `
 Object {
   "connected": false,
   "messages": Array [
@@ -11,7 +11,7 @@ Object {
 }
 `;
 
-exports[`reducers/log should return the initial state 1`] = `
+exports[`store/log/reducer should return the initial state 1`] = `
 Object {
   "connected": false,
   "messages": Array [],

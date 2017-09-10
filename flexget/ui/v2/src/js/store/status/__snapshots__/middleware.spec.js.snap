@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`middleware/status should dispatch ERROR_STATUS if error and not ignore 1`] = `
+exports[`store/status/middleware should dispatch ERROR_STATUS if error and not ignore 1`] = `
 Array [
   Object {
     "error": true,
@@ -14,7 +14,7 @@ Array [
 ]
 `;
 
-exports[`middleware/status should dispatch INFO_STATUS and the original action if message is set 1`] = `
+exports[`store/status/middleware should dispatch INFO_STATUS and the original action if message is set 1`] = `
 Array [
   Object {
     "payload": Object {
@@ -34,7 +34,7 @@ Array [
 ]
 `;
 
-exports[`middleware/status should dispatch LOADING_STATUS if loading 1`] = `
+exports[`store/status/middleware should dispatch LOADING_STATUS if loading 1`] = `
 Array [
   Object {
     "meta": Object {
@@ -46,7 +46,7 @@ Array [
 ]
 `;
 
-exports[`middleware/status should not dispatch ERROR_STATUS if error and ignore 1`] = `
+exports[`store/status/middleware should not dispatch ERROR_STATUS if error and ignore 1`] = `
 Array [
   Object {
     "error": true,

@@ -8,15 +8,43 @@ ShallowWrapper {
     "findWhereUnwrapped": [Function],
   },
   "length": 1,
-  "node": <Connect(HistoryList)
-    getHistory={[Function]}
-    grouping="time"
-/>,
-  "nodes": Array [
+  "node": <styled(Component)>
+    <Header
+        changeGrouping={[Function]}
+        changeQuery={[Function]}
+        grouping="time"
+        query={
+            Object {
+                "order": "desc",
+                "sort_by": "time",
+              }
+        }
+        restartLoader={[Function]}
+    />
     <Connect(HistoryList)
-      getHistory={[Function]}
-      grouping="time"
-/>,
+        getHistory={[Function]}
+        grouping="time"
+    />
+</styled(Component)>,
+  "nodes": Array [
+    <styled(Component)>
+      <Header
+            changeGrouping={[Function]}
+            changeQuery={[Function]}
+            grouping="time"
+            query={
+                  Object {
+                        "order": "desc",
+                        "sort_by": "time",
+                      }
+            }
+            restartLoader={[Function]}
+      />
+      <Connect(HistoryList)
+            getHistory={[Function]}
+            grouping="time"
+      />
+</styled(Component)>,
   ],
   "options": Object {},
   "renderer": ReactShallowRenderer {
@@ -66,15 +94,43 @@ ShallowWrapper {
       "_pendingReplaceState": false,
       "_pendingStateQueue": null,
       "_renderedComponent": NoopInternalComponent {
-        "_currentElement": <Connect(HistoryList)
-          getHistory={[Function]}
-          grouping="time"
-/>,
+        "_currentElement": <styled(Component)>
+          <Header
+                    changeGrouping={[Function]}
+                    changeQuery={[Function]}
+                    grouping="time"
+                    query={
+                              Object {
+                                        "order": "desc",
+                                        "sort_by": "time",
+                                      }
+                    }
+                    restartLoader={[Function]}
+          />
+          <Connect(HistoryList)
+                    getHistory={[Function]}
+                    grouping="time"
+          />
+</styled(Component)>,
         "_debugID": 2,
-        "_renderedOutput": <Connect(HistoryList)
-          getHistory={[Function]}
-          grouping="time"
-/>,
+        "_renderedOutput": <styled(Component)>
+          <Header
+                    changeGrouping={[Function]}
+                    changeQuery={[Function]}
+                    grouping="time"
+                    query={
+                              Object {
+                                        "order": "desc",
+                                        "sort_by": "time",
+                                      }
+                    }
+                    restartLoader={[Function]}
+          />
+          <Connect(HistoryList)
+                    getHistory={[Function]}
+                    grouping="time"
+          />
+</styled(Component)>,
       },
       "_renderedNodeType": 1,
       "_rootNodeID": 0,

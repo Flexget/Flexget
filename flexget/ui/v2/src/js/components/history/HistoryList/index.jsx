@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { HistoryShape } from 'store/history/shapes';
 import InfiniteScroll from 'react-infinite-scroller';
 import List, { ListItem, ListItemText } from 'material-ui/List';
 import LoadingSpinner from 'components/common/LoadingSpinner';
@@ -8,15 +9,7 @@ import { Subheader, Wrapper } from './styles';
 class HistoryList extends Component {
   static propTypes = {
     grouping: PropTypes.oneOf(['time', 'task']).isRequired,
-    history: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.shape({
-      task: PropTypes.string,
-      title: PropTypes.string,
-      url: PropTypes.string,
-      filename: PropTypes.string,
-      details: PropTypes.string,
-      time: PropTypes.strings,
-      id: PropTypes.number,
-    }))).isRequired,
+    history: PropTypes.objectOf(PropTypes.arrayOf(HistoryShape)).isRequired,
     hasMore: PropTypes.bool,
     getHistory: PropTypes.func.isRequired,
   };

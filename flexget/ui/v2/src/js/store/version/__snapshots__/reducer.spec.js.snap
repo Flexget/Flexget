@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`reducers/version should get version on GET_VERSION 1`] = `
+exports[`store/version/reducer should get version on GET_VERSION 1`] = `
 Object {
   "api": "1.1.2",
   "flexget": "2.10.11",
@@ -8,4 +8,4 @@ Object {
 }
 `;
 
-exports[`reducers/version should return the initial state 1`] = `Object {}`;
+exports[`store/version/reducer should return the initial state 1`] = `Object {}`;

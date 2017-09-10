@@ -6,7 +6,7 @@ const ACTION = 'ACTION';
 const mockStore = configureMockStore([statusMiddleware]);
 const store = mockStore({});
 
-describe('middleware/status', () => {
+describe('store/status/middleware', () => {
   afterEach(() => store.clearActions());
 
   it('should dispatch LOADING_STATUS if loading', () => {

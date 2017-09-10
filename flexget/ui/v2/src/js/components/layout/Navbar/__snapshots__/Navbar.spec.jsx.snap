@@ -40,7 +40,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
       onTouchEnd={[Function]}
       onTouchStart={[Function]}
       role="button"
-      tabIndex="0"
+      tabIndex={0}
       type="button"
     >
       <span
@@ -76,7 +76,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
         onTouchEnd={[Function]}
         onTouchStart={[Function]}
         role="button"
-        tabIndex="0"
+        tabIndex={0}
         type="button"
       >
         <span
@@ -110,7 +110,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
         onTouchEnd={[Function]}
         onTouchStart={[Function]}
         role="button"
-        tabIndex="0"
+        tabIndex={0}
         type="button"
       >
         <span
@@ -141,7 +141,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
       onTouchEnd={[Function]}
       onTouchStart={[Function]}
       role="button"
-      tabIndex="0"
+      tabIndex={0}
       type="button"
     >
       <span

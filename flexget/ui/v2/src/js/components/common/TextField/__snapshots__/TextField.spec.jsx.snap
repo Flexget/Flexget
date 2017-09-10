@@ -9,6 +9,8 @@ exports[`components/common/TextField renders correctly 1`] = `
 >
   <div
     className="MuiInput-root-5 MuiInput-error-8 MuiInput-formControl-6 MuiInput-inkbar-7 MuiInput-underline-13"
+    onBlur={[Function]}
+    onFocus={[Function]}
   >
     <input
       autoComplete={undefined}
@@ -18,12 +20,11 @@ exports[`components/common/TextField renders correctly 1`] = `
       disabled={false}
       id={undefined}
       name={undefined}
-      onBlur={[Function]}
       onChange={[Function]}
-      onFocus={[Function]}
       onKeyDown={undefined}
       onKeyUp={undefined}
       placeholder={undefined}
+      readOnly={undefined}
       required={undefined}
       rows={undefined}
       type="text"

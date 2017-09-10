@@ -40,3 +40,12 @@ export class Headers {
     return this.headers[key];
   }
 }
+
+export function createNodeMock(element) {
+  if (element.type === 'input') {
+    return {
+      focus() {},
+    };
+  }
+  return null;
+}

@@ -6,7 +6,7 @@ import {
   LOG_CLEAR,
 } from 'store/log/actions';
 
-describe('reducers/log', () => {
+describe('store/log/reducer', () => {
   it('should return the initial state', () => {
     expect(reducer(undefined, {})).toMatchSnapshot();
   });
