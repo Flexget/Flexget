@@ -202,7 +202,7 @@ class SearchPassThePopcorn(object):
         params = {}
 
         if 'tags' in config:
-            tags = config['category'] if isinstance(config['category'], list) else [config['category']]
+            tags = config['tags'] if isinstance(config['tags'], list) else [config['tags']]
             params['taglist'] = ',+'.join(tags)
 
         if config.get('release_type') == 'non-scene':
