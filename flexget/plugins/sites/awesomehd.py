@@ -6,7 +6,7 @@ import re
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.requests import Session as RequestSession, TimedLimiter, RequestException
+from flexget.utils.requests import TimedLimiter, RequestException
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
@@ -17,7 +17,7 @@ log = logging.getLogger('awesomehd')
 
 class SearchAwesomeHD(object):
     """
-        AlphaRatio search plugin.
+        AwesomeHD search plugin.
     """
 
     schema = {
