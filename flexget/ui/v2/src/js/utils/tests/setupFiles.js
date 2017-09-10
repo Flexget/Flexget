@@ -16,5 +16,3 @@ global.navigator = {
   userAgent: 'node.js',
 };
 copyProps(window, global);
-
-console.error = jest.fn(); // eslint-disable-line no-console

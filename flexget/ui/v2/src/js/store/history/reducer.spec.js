@@ -3,7 +3,7 @@ import { GET_HISTORY } from 'store/history/actions';
 import { Headers } from 'utils/tests';
 
 
-describe('reducers/history', () => {
+describe('store/history/reducer', () => {
   it('should return the initial state', () => {
     expect(reducer(undefined, {})).toMatchSnapshot();
   });

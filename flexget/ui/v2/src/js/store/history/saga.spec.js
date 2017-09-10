@@ -6,7 +6,7 @@ import { get } from 'utils/fetch';
 import { action } from 'utils/actions';
 import { GET_HISTORY } from 'store/history/actions';
 
-describe('sagas/history', () => {
+describe('store/history/sagas', () => {
   describe('getHistory', () => {
     describe('success', () => {
       const it = sagaHelper(getHistory({ payload: {} }));
