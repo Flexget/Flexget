@@ -37,6 +37,13 @@ class SearchAwesomeHD(object):
         """
             Search for entries on AwesomeHD
         """
+        # need lxml to parse xml
+        try:
+            import lxml  # noqa
+        except ImportError as e:
+            log.debug('Error importing lxml: %s', e)
+            raise plugin.DependencyError('awesomehd', 'lxml', 'lxml module required. ImportError: %s' % e)
+
         # set a domain limit, but allow the user to overwrite it
         if 'awesome-hd.me' not in task.requests.domain_limiters:
             task.requests.add_domain_limiter(TimedLimiter('awesome-hd.me', '5 seconds'))
@@ -64,7 +71,7 @@ class SearchAwesomeHD(object):
             return entries
 
         try:
-            soup = get_soup(response)
+            soup = get_soup(response, 'xml')
             if soup.find('error'):
                 log.error(soup.find('error').get_text())
                 return entries
@@ -92,6 +99,7 @@ class SearchAwesomeHD(object):
             e['release_group'] = result.find('releasegroup').get_text()
             e['freeleech_percent'] = int((1 - float(result.find('freeleech').get_text())) * 100)
             e['encode_status'] = result.find('encodestatus').get_text()
+            e['subtitles'] = result.find('subtitles').get_text().split(', ')
 
             e['url'] = self.base_url + 'torrents.php?action=download&id={}&authkey={}&torrent_pass={}'\
                 .format(e['torrent_id'], authkey, config['passkey'])
