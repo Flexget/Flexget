@@ -120,10 +120,11 @@ class SearchPassThePopcorn(object):
         """
         Wrapper to allow refreshing the cookie if it is invalid for some reason
 
-        :param unicode url:
-        :param dict params:
+        :param unicode url: the url to be requested
+        :param dict params: request params
         :param str username:
         :param str password:
+        :param str passkey: the user's private passkey
         :param bool force: flag used to refresh the cookie forcefully ie. forgo DB lookup
         :return:
         """
@@ -156,6 +157,7 @@ class SearchPassThePopcorn(object):
 
         :param str username:
         :param str password:
+        :param str passkey: the user's private passkey
         :param bool force: if True, then retrieve a fresh cookie instead of looking in the DB
         :return:
         """
