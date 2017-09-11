@@ -8,8 +8,8 @@ describe('components/history/FilterNav', () => {
       <FilterNav
         handleChange={jest.fn()}
         toggleOrder={jest.fn()}
-        grouping='time'
-        sort='time'
+        grouping="time"
+        sort="time"
       />
     ).toJSON();
     expect(tree).toMatchSnapshot();
