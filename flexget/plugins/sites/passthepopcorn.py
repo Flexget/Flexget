@@ -5,6 +5,7 @@ import logging
 
 from requests.exceptions import TooManyRedirects
 from sqlalchemy import Column, Unicode, DateTime
+from dateutil.parser import parse as dateutil_parse
 
 from flexget import plugin, db_schema
 from flexget.config_schema import one_or_more
@@ -14,8 +15,6 @@ from flexget.manager import Session
 from flexget.utils.database import json_synonym
 from flexget.utils.requests import Session as RequestSession, TimedLimiter, RequestException
 from flexget.utils.tools import parse_filesize
-
-from dateutil.parser import parse as dateutil_parse
 
 log = logging.getLogger('passthepopcorn')
 Base = db_schema.versioned_base('passthepopcorn', 0)
@@ -81,6 +80,11 @@ ORDERING = {
     'Bookmark count': 'bookmarks'
 }
 
+RELEASE_TYPES = {
+    'non-scene': 0,
+    'scene': 1,
+    'golden popcorn': 2
+}
 
 class PassThePopcornCookie(Base):
     __tablename__ = 'passthepopcorn_cookie'
@@ -102,12 +106,12 @@ class SearchPassThePopcorn(object):
             'username': {'type': 'string'},
             'password': {'type': 'string'},
             'passkey': {'type': 'string'},
-            'tags': one_or_more({'type': 'string', 'enum': list(TAGS)}, unique_items=True),
+            'tags': one_or_more({'type': 'string', 'enum': TAGS}, unique_items=True),
             'order_by': {'type': 'string', 'enum': list(ORDERING.keys()),
                          'default': 'Time added'},
             'order_desc': {'type': 'boolean', 'default': True},
             'freeleech': {'type': 'boolean', 'default': False},
-            'release_type': {'type': 'string', 'enum': ['golden popcorn', 'non-scene', 'scene']}
+            'release_type': {'type': 'string', 'enum': list(RELEASE_TYPES.keys())}
         },
         'required': ['username', 'password', 'passkey'],
         'additionalProperties': False
@@ -206,13 +210,10 @@ class SearchPassThePopcorn(object):
         if 'tags' in config:
             tags = config['tags'] if isinstance(config['tags'], list) else [config['tags']]
             params['taglist'] = ',+'.join(tags)
-
-        if config.get('release_type') == 'non-scene':
-            params['scene'] = 0
-        elif config.get('release_type') == 'scene':
-            params['scene'] = 1
-        elif config.get('release_type') == 'golden popcorn':
-            params['scene'] = 2
+        
+        release_type = config.get('release_type')
+        if release_type:
+            params['scene'] = RELEASE_TYPES[release_type]
 
         ordering = 'desc' if config['order_desc'] else 'asc'
 
