@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
 import PropTypes from 'prop-types';
 import HistoryList from 'containers/history/HistoryList';
-import Header from 'components/history/Header';
+import FilterNav from 'components/history/FilterNav';
 import { NoPaddingWrapper } from 'components/common/styles';
 
 export default class HistoryPage extends Component {
@@ -11,34 +12,43 @@ export default class HistoryPage extends Component {
 
   state = {
     grouping: 'time',
-    query: {
-      sort_by: 'time',
-      order: 'desc',
-    },
+    sort: 'time',
+    order: 'desc',
   };
 
-  getHistory = page => this.props.getHistory({ page, ...this.state.query })
+  getHistory = page => this.props.getHistory({
+    page,
+    sort_by: this.state.sort,
+    order: this.state.order,
+    task: this.state.task,
+  });
 
-  changeGrouping = grouping => this.setState({ grouping })
+  setScroll = (node) => { this.scroll = node; }
+  restartLoader = () => {
+    findDOMNode(this.scroll).scrollIntoView(); // eslint-disable-line react/no-find-dom-node
+    this.getHistory(1);
+    this.scroll.pageLoaded = 1;
+  }
 
-  changeQuery = query => this.setState({ query })
-
-  restartLoader = () => { this.list.scroller.pageLoaded = 0; }
+  handleChange = key => event => this.setState({ [key]: event.target.value }, this.restartLoader)
+  toggleOrder = () => this.setState({
+    order: (this.state.order === 'asc' ? 'desc' : 'asc'),
+  }, this.restartLoader)
 
   render() {
     const { grouping } = this.state;
 
     return (
       <NoPaddingWrapper>
-        <Header
-          changeQuery={this.changeQuery}
-          changeGrouping={this.changeGrouping}
-          restartLoader={this.restartLoader}
+        <FilterNav
+          handleChange={this.handleChange}
+          toggleOrder={this.toggleOrder}
           {...this.state}
         />
         <HistoryList
           grouping={grouping}
           getHistory={this.getHistory}
+          setScroll={this.setScroll}
           ref={(node) => { this.list = node; }}
         />
       </NoPaddingWrapper>

@@ -56,6 +56,7 @@ exports[`components/layout renders correctly 1`] = `
 
 .glamor-15 {
   background-color: #ef6c00;
+  color: rgba(255, 255, 255, 1);
   min-height: 5rem;
 }
 
@@ -240,6 +241,9 @@ exports[`components/layout renders correctly 1`] = `
               className="MuiTouchRipple-root-55"
             />
           </button>
+          <h2
+            className="MuiTypography-root-62 MuiTypography-title-68 MuiTypography-colorInherit-81"
+          />
           <div
             className="glamor-6 glamor-7"
           />
@@ -352,32 +356,32 @@ exports[`components/layout renders correctly 1`] = `
       className="glamor-84 glamor-85"
     >
       <div
-        className="MuiDrawer-docked-77"
+        className="MuiDrawer-docked-99"
       >
         <div
-          className="MuiPaper-root-8 MuiPaper-shadow0-10 MuiDrawer-paper-72 glamor-83 MuiDrawer-anchorLeft-73"
+          className="MuiPaper-root-8 MuiPaper-shadow0-10 MuiDrawer-paper-94 glamor-83 MuiDrawer-anchorLeft-95"
         >
           <div
             className="glamor-81 glamor-82"
           >
             <ul
-              className="MuiList-root-79 MuiList-padding-80 glamor-70 glamor-71"
+              className="MuiList-root-101 MuiList-padding-102 glamor-70 glamor-71"
             >
               <a
                 href="/config"
                 onClick={[Function]}
               >
                 <li
-                  className="MuiListItem-root-83 MuiListItem-gutters-90 MuiListItem-default-86 glamor-26 glamor-27"
+                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-26 glamor-27"
                   disabled={false}
                   onClick={[Function]}
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-92 fa fa-pencil glamor-23"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-114 fa fa-pencil glamor-23"
                   />
                   <div
-                    className="MuiListItemText-root-93 MuiListItemText-inset-94 glamor-24 glamor-23"
+                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-24 glamor-23"
                   >
                     Config
                   </div>
@@ -388,16 +392,16 @@ exports[`components/layout renders correctly 1`] = `
                 onClick={[Function]}
               >
                 <li
-                  className="MuiListItem-root-83 MuiListItem-gutters-90 MuiListItem-default-86 glamor-26 glamor-27"
+                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-26 glamor-27"
                   disabled={false}
                   onClick={[Function]}
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-92 fa fa-history glamor-23"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-114 fa fa-history glamor-23"
                   />
                   <div
-                    className="MuiListItemText-root-93 MuiListItemText-inset-94 glamor-24 glamor-23"
+                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-24 glamor-23"
                   >
                     History
                   </div>
@@ -408,16 +412,16 @@ exports[`components/layout renders correctly 1`] = `
                 onClick={[Function]}
               >
                 <li
-                  className="MuiListItem-root-83 MuiListItem-gutters-90 MuiListItem-default-86 glamor-26 glamor-27"
+                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-26 glamor-27"
                   disabled={false}
                   onClick={[Function]}
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-92 fa fa-book glamor-23"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-114 fa fa-book glamor-23"
                   />
                   <div
-                    className="MuiListItemText-root-93 MuiListItemText-inset-94 glamor-24 glamor-23"
+                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-24 glamor-23"
                   >
                     Log
                   </div>
@@ -428,16 +432,16 @@ exports[`components/layout renders correctly 1`] = `
                 onClick={[Function]}
               >
                 <li
-                  className="MuiListItem-root-83 MuiListItem-gutters-90 MuiListItem-default-86 glamor-26 glamor-27"
+                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-26 glamor-27"
                   disabled={false}
                   onClick={[Function]}
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-92 fa fa-film glamor-23"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-114 fa fa-film glamor-23"
                   />
                   <div
-                    className="MuiListItemText-root-93 MuiListItemText-inset-94 glamor-24 glamor-23"
+                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-24 glamor-23"
                   >
                     Movies
                   </div>
@@ -448,16 +452,16 @@ exports[`components/layout renders correctly 1`] = `
                 onClick={[Function]}
               >
                 <li
-                  className="MuiListItem-root-83 MuiListItem-gutters-90 MuiListItem-default-86 glamor-26 glamor-27"
+                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-26 glamor-27"
                   disabled={false}
                   onClick={[Function]}
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-92 fa fa-check glamor-23"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-114 fa fa-check glamor-23"
                   />
                   <div
-                    className="MuiListItemText-root-93 MuiListItemText-inset-94 glamor-24 glamor-23"
+                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-24 glamor-23"
                   >
                     Pending
                   </div>
@@ -468,16 +472,16 @@ exports[`components/layout renders correctly 1`] = `
                 onClick={[Function]}
               >
                 <li
-                  className="MuiListItem-root-83 MuiListItem-gutters-90 MuiListItem-default-86 glamor-26 glamor-27"
+                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-26 glamor-27"
                   disabled={false}
                   onClick={[Function]}
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-92 fa fa-eye glamor-23"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-114 fa fa-eye glamor-23"
                   />
                   <div
-                    className="MuiListItemText-root-93 MuiListItemText-inset-94 glamor-24 glamor-23"
+                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-24 glamor-23"
                   >
                     Seen
                   </div>
@@ -488,32 +492,32 @@ exports[`components/layout renders correctly 1`] = `
                 onClick={[Function]}
               >
                 <li
-                  className="MuiListItem-root-83 MuiListItem-gutters-90 MuiListItem-default-86 glamor-26 glamor-27"
+                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-26 glamor-27"
                   disabled={false}
                   onClick={[Function]}
                 >
                   <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-92 fa fa-tv glamor-23"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-114 fa fa-tv glamor-23"
                   />
                   <div
-                    className="MuiListItemText-root-93 MuiListItemText-inset-94 glamor-24 glamor-23"
+                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-24 glamor-23"
                   >
                     Series
                   </div>
                 </li>
               </a>
               <li
-                className="MuiListItem-root-83 MuiListItem-gutters-90 MuiListItem-default-86 glamor-26 glamor-27"
+                className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-26 glamor-27"
                 disabled={false}
                 onClick={[Function]}
               >
                 <span
                   aria-hidden="true"
-                  className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-92 fa fa-tasks glamor-23"
+                  className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-114 fa fa-tasks glamor-23"
                 />
                 <div
-                  className="MuiListItemText-root-93 MuiListItemText-inset-94 glamor-24 glamor-23"
+                  className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-24 glamor-23"
                 >
                   Tasks
                 </div>

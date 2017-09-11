@@ -9,40 +9,32 @@ ShallowWrapper {
   },
   "length": 1,
   "node": <styled(Component)>
-    <Header
-        changeGrouping={[Function]}
-        changeQuery={[Function]}
+    <FilterNav
         grouping="time"
-        query={
-            Object {
-                "order": "desc",
-                "sort_by": "time",
-              }
-        }
-        restartLoader={[Function]}
+        handleChange={[Function]}
+        order="desc"
+        sort="time"
+        toggleOrder={[Function]}
     />
     <Connect(HistoryList)
         getHistory={[Function]}
         grouping="time"
+        setScroll={[Function]}
     />
 </styled(Component)>,
   "nodes": Array [
     <styled(Component)>
-      <Header
-            changeGrouping={[Function]}
-            changeQuery={[Function]}
+      <FilterNav
             grouping="time"
-            query={
-                  Object {
-                        "order": "desc",
-                        "sort_by": "time",
-                      }
-            }
-            restartLoader={[Function]}
+            handleChange={[Function]}
+            order="desc"
+            sort="time"
+            toggleOrder={[Function]}
       />
       <Connect(HistoryList)
             getHistory={[Function]}
             grouping="time"
+            setScroll={[Function]}
       />
 </styled(Component)>,
   ],
@@ -60,22 +52,21 @@ ShallowWrapper {
       "_hostParent": null,
       "_instance": HistoryPage {
         "_reactInternalInstance": [Circular],
-        "changeGrouping": [Function],
-        "changeQuery": [Function],
         "context": Object {},
         "getHistory": [Function],
+        "handleChange": [Function],
         "props": Object {
           "getHistory": [Function],
         },
         "refs": Object {},
         "restartLoader": [Function],
+        "setScroll": [Function],
         "state": Object {
           "grouping": "time",
-          "query": Object {
-            "order": "desc",
-            "sort_by": "time",
-          },
+          "order": "desc",
+          "sort": "time",
         },
+        "toggleOrder": [Function],
         "updater": Object {
           "enqueueCallback": [Function],
           "enqueueCallbackInternal": [Function],
@@ -95,40 +86,32 @@ ShallowWrapper {
       "_pendingStateQueue": null,
       "_renderedComponent": NoopInternalComponent {
         "_currentElement": <styled(Component)>
-          <Header
-                    changeGrouping={[Function]}
-                    changeQuery={[Function]}
+          <FilterNav
                     grouping="time"
-                    query={
-                              Object {
-                                        "order": "desc",
-                                        "sort_by": "time",
-                                      }
-                    }
-                    restartLoader={[Function]}
+                    handleChange={[Function]}
+                    order="desc"
+                    sort="time"
+                    toggleOrder={[Function]}
           />
           <Connect(HistoryList)
                     getHistory={[Function]}
                     grouping="time"
+                    setScroll={[Function]}
           />
 </styled(Component)>,
         "_debugID": 2,
         "_renderedOutput": <styled(Component)>
-          <Header
-                    changeGrouping={[Function]}
-                    changeQuery={[Function]}
+          <FilterNav
                     grouping="time"
-                    query={
-                              Object {
-                                        "order": "desc",
-                                        "sort_by": "time",
-                                      }
-                    }
-                    restartLoader={[Function]}
+                    handleChange={[Function]}
+                    order="desc"
+                    sort="time"
+                    toggleOrder={[Function]}
           />
           <Connect(HistoryList)
                     getHistory={[Function]}
                     grouping="time"
+                    setScroll={[Function]}
           />
 </styled(Component)>,
       },

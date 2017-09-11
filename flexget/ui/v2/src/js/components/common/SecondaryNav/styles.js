@@ -8,7 +8,7 @@ export const SecondaryAppBar = styled(AppBar)`
 `;
 
 export const SecondaryToolbar = styled(Toolbar)`
-  background-color: ${theme.palette.primary[500]};
+  background-color: ${theme.palette.secondary[700]};
   min-height: 5rem;
-  color: ${theme.palette.getContrastText(theme.palette.primary[800])};
+  color: ${theme.palette.getContrastText(theme.palette.secondary[700])};
 `;

@@ -4,6 +4,12 @@ import { SERVER_RELOAD, SERVER_SHUTDOWN } from 'store/server/actions';
 import { request } from 'utils/actions';
 import Navbar from 'components/layout/Navbar';
 
+function mapStateToProps({ router }) {
+  return {
+    pathname: router.location.pathname,
+  };
+}
+
 function mapDispatchToProps(dispatch) {
   return {
     logout: () => dispatch(request(LOGOUT)),
@@ -12,4 +18,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(null, mapDispatchToProps)(Navbar);
+export default connect(mapStateToProps, mapDispatchToProps)(Navbar);

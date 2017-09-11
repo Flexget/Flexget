@@ -7,6 +7,7 @@ exports[`components/layout/Navbar renders correctly 1`] = `
 
 .glamor-11 {
   background-color: #ef6c00;
+  color: rgba(255, 255, 255, 1);
   min-height: 5rem;
 }
 
@@ -55,6 +56,9 @@ exports[`components/layout/Navbar renders correctly 1`] = `
         className="MuiTouchRipple-root-55"
       />
     </button>
+    <h2
+      className="MuiTypography-root-62 MuiTypography-title-68 MuiTypography-colorInherit-81"
+    />
     <div
       className="glamor-2 glamor-3"
     />

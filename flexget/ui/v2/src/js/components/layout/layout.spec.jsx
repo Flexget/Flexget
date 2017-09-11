@@ -9,7 +9,7 @@ function renderLayout() {
     <Layout>
       <div />
     </Layout>
-  )), { version: {}, status: { loading: {} } });
+  )), { router: { location: { } }, version: {}, status: { loading: {} } });
 }
 describe('components/layout', () => {
   beforeEach(() => {
@@ -22,4 +22,3 @@ describe('components/layout', () => {
     expect(tree).toMatchSnapshot();
   });
 });
-

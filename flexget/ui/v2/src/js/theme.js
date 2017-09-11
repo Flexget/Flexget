@@ -9,3 +9,11 @@ export default createMuiTheme({
     type: 'light',
   },
 });
+
+export const darkTheme = createMuiTheme({
+  palette: {
+    primary: orange,
+    secondary: blueGrey,
+    type: 'dark',
+  },
+});

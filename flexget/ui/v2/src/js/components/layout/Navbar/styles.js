@@ -13,6 +13,7 @@ export const NavAppBar = styled(AppBar)`
 
 export const NavToolbar = styled(Toolbar)`
   background-color: ${theme.palette.primary[800]};
+  color: ${theme.palette.getContrastText(theme.palette.primary[800])};
   min-height: 5rem;
 `;
 

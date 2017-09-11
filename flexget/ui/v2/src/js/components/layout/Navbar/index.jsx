@@ -9,6 +9,7 @@ import Dialog, {
   DialogContentText,
   DialogTitle,
 } from 'material-ui/Dialog';
+import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
 import { Spacer } from 'components/common/styles';
 import 'font-awesome/css/font-awesome.css';
@@ -18,9 +19,11 @@ import {
   NavToolbar,
   NavIcon,
 } from './styles';
+import titles from './titles';
 
 export class Navbar extends Component {
   static propTypes = {
+    pathname: PropTypes.string.isRequired,
     toggle: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
     reloadServer: PropTypes.func.isRequired,
@@ -62,7 +65,7 @@ export class Navbar extends Component {
   });
 
   render() {
-    const { toggle, logout } = this.props;
+    const { toggle, logout, pathname } = this.props;
     const { anchorEl, menuOpen, shutdownPrompt } = this.state;
 
     return (
@@ -71,6 +74,9 @@ export class Navbar extends Component {
           <NavIcon onClick={toggle}>
             <Icon className="fa fa-bars" />
           </NavIcon>
+          <Typography type="title" color="inherit">
+            {titles[pathname]}
+          </Typography>
           <Spacer />
           <Link to="/config">
             <NavIcon aria-label="Config">
