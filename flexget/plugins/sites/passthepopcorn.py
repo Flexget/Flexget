@@ -110,7 +110,7 @@ class SearchPassThePopcorn(object):
             'order_by': {'type': 'string', 'enum': list(ORDERING.keys()),
                          'default': 'Time added'},
             'order_desc': {'type': 'boolean', 'default': True},
-            'freeleech': {'type': 'boolean', 'default': False},
+            'freeleech': {'type': 'boolean'},
             'release_type': {'type': 'string', 'enum': list(RELEASE_TYPES.keys())}
         },
         'required': ['username', 'password', 'passkey'],
@@ -215,6 +215,9 @@ class SearchPassThePopcorn(object):
         if release_type:
             params['scene'] = RELEASE_TYPES[release_type]
 
+        if config.get('freeleech'):
+            params['freetorrent'] = int(config['freeleech'])
+
         ordering = 'desc' if config['order_desc'] else 'asc'
 
         entries = set()
@@ -223,8 +226,7 @@ class SearchPassThePopcorn(object):
             'order_by': ORDERING[config['order_by']],
             'order_way': ordering,
             'action': 'advanced',
-            'json': 'noredirect',
-            'freetorrent': int(config['freeleech'])
+            'json': 'noredirect'
         })
 
         search_strings = entry.get('search_strings', [entry['title']])
@@ -245,10 +247,6 @@ class SearchPassThePopcorn(object):
 
             total_results = result['TotalResults']
             log.debug('Total results: %s', total_results)
-
-            if not total_results:
-                log.debug('No results found for %s', search_string)
-                continue
 
             authkey = result['AuthKey']
             passkey = result['PassKey']
