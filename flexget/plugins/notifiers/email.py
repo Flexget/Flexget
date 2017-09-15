@@ -166,10 +166,7 @@ class EmailNotifier(object):
 
         email = MIMEMultipart('alternative')
         email['To'] = ','.join(config['to'])
-        if config['autofrom']:
-            email['From'] = getpass.getuser() + '@' + socket.getfqdn()
-        else:
-            email['From'] = config['from']
+        email['From'] = getpass.getuser() + '@' + socket.getfqdn() if config['autofrom'] else config['from']
         email['Subject'] = title
         email['Date'] = formatdate(localtime=True)
         content_type = 'html' if config['html'] else 'plain'
