@@ -5,7 +5,7 @@ from future.utils import text_to_native_str
 import logging
 import smtplib
 import socket
-import os
+import getpass
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
@@ -167,7 +167,7 @@ class EmailNotifier(object):
         email = MIMEMultipart('alternative')
         email['To'] = ','.join(config['to'])
         if config['autofrom']:
-            email['From'] = os.getlogin() + '@' + socket.getfqdn()
+            email['From'] = getpass.getuser() + '@' + socket.getfqdn()
         else:
             email['From'] = config['from']
         email['Subject'] = title
