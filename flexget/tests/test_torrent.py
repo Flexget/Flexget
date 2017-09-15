@@ -20,8 +20,10 @@ class TestInfoHash(object):
             mock:
               - title: test magnet
                 url: magnet:?xt=urn:btih:2a8959bed2be495bb0e3ea96f497d873d5faed05&dn=some.thing.720p
-              - title: test magnet 2
+              - title: test magnet with base16
                 urls: ['magnet:?xt=urn:btih:2b3959bed2be445bb0e3ea96f497d873d5faed05&dn=some.thing.else.720p']
+              - title: test magnet with base32
+                urls: ['magnet:?xt=urn:btih:WRN7ZT6NKMA6SSXYKAFRUGDDIFJUNKI2&dn=some.thing.else.720p']
     """
 
     def test_infohash(self, execute_task):
@@ -36,6 +38,7 @@ class TestInfoHash(object):
         task = execute_task('test_magnet')
         assert task.all_entries[0]['torrent_info_hash'] == '2A8959BED2BE495BB0E3EA96F497D873D5FAED05'
         assert task.all_entries[1]['torrent_info_hash'] == '2B3959BED2BE445BB0E3EA96F497D873D5FAED05'
+        assert task.all_entries[2]['torrent_info_hash'] == 'B45BFCCFCD5301E94AF8500B1A1863415346A91A'
 
 
 @pytest.mark.usefixtures('tmpdir')

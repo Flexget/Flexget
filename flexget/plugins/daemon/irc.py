@@ -386,7 +386,7 @@ class IRCConnection(IRCBot):
                                 tasks_entry_map[task] = []
                             tasks_entry_map[task].append(entry)
                 if not matched:
-                    log.info('Entry "%s" did not match any task regexp.', entry['title'])
+                    log.debug('Entry "%s" did not match any task regexp.', entry['title'])
 
             for task, entries in tasks_entry_map.items():
                 log.debug('Injecting %d entries into task "%s"', len(entries), task)
@@ -674,10 +674,14 @@ class IRCConnection(IRCBot):
         entries = []
         for line in lines:
             # If it's listed in ignore lines, skip it
+            ignore = False
             for rx, expected in self.ignore_lines:
                 if rx.match(line) and expected:
                     log.debug('Ignoring message: matched ignore line')
-                    continue
+                    ignore = True
+                    break
+            if ignore:
+                continue
 
             entry = Entry(irc_raw_message=line)
 
@@ -685,7 +689,7 @@ class IRCConnection(IRCBot):
 
             # Generate the entry and process it through the linematched rules
             if not match:
-                log.error('Failed to parse message. Skipping.')
+                log.error('Failed to parse message. Skipping: %s', line)
                 continue
 
             entry.update(match)

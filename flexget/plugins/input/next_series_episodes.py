@@ -110,12 +110,21 @@ class NextSeriesEpisodes(object):
                     continue
 
                 low_season = 0 if series.identified_by == 'ep' else -1
+                # Don't look for seasons older than begin ep
+                if series.begin and series.begin.season and series.begin.season > 1:
+                    # begin-1 or the range() loop will never get to the begin season
+                    low_season = max(series.begin.season - 1, 0)
 
+                new_season = None
                 check_downloaded = not config.get('backfill')
                 latest_season = get_latest_release(series, downloaded=check_downloaded)
                 if latest_season:
-                    latest_season = latest_season.season + 1 if latest_season.season in series.completed_seasons \
-                        else latest_season.season
+                    if latest_season.season <= low_season:
+                        latest_season = new_season = low_season + 1
+                    elif latest_season.season in series.completed_seasons:
+                        latest_season = new_season = latest_season.season + 1
+                    else:
+                        latest_season = latest_season.season
                 else:
                     latest_season = low_season + 1
 
@@ -123,9 +132,9 @@ class NextSeriesEpisodes(object):
                     if season in series.completed_seasons:
                         log.debug('season %s is marked as completed, skipping', season)
                         continue
-                    log.trace('Adding episodes for series %s season %d', series.name, season)
+                    log.trace('Evaluating episodes for series %s, season %d', series.name, season)
                     latest = get_latest_release(series, season=season, downloaded=check_downloaded)
-                    if series.begin and (not latest or latest < series.begin):
+                    if series.begin and season == series.begin.season and (not latest or latest < series.begin):
                         # In case series.begin season is already completed, look in next available season
                         lookup_season = series.begin.season
                         ep_number = series.begin.number
@@ -146,21 +155,29 @@ class NextSeriesEpisodes(object):
                             start_at_ep = max(latest.number - 10, 1)
                             episodes_this_season = episodes_this_season.filter(Episode.number >= start_at_ep)
                         latest_ep_this_season = episodes_this_season.order_by(desc(Episode.number)).first()
-                        downloaded_this_season = (episodes_this_season.join(Episode.releases).
-                                                  filter(EpisodeRelease.downloaded == True).all())
-                        # Calculate the episodes we still need to get from this season
-                        if series.begin and series.begin.season == season:
-                            start_at_ep = max(start_at_ep, series.begin.number)
-                        eps_to_get = list(range(start_at_ep, latest_ep_this_season.number + 1))
-                        for ep in downloaded_this_season:
-                            try:
-                                eps_to_get.remove(ep.number)
-                            except ValueError:
-                                pass
-                        entries.extend(self.search_entry(series, season, x, task, rerun=False) for x in eps_to_get)
-                        # If we have already downloaded the latest known episode, try the next episode
-                        if latest_ep_this_season.releases:
-                            entries.append(self.search_entry(series, season, latest_ep_this_season.number + 1, task))
+                        if latest_ep_this_season:
+                            downloaded_this_season = (episodes_this_season.join(Episode.releases).
+                                                      filter(EpisodeRelease.downloaded == True).all())
+                            # Calculate the episodes we still need to get from this season
+                            if series.begin and series.begin.season == season:
+                                start_at_ep = max(start_at_ep, series.begin.number)
+                            eps_to_get = list(range(start_at_ep, latest_ep_this_season.number + 1))
+                            for ep in downloaded_this_season:
+                                try:
+                                    eps_to_get.remove(ep.number)
+                                except ValueError:
+                                    pass
+                            entries.extend(self.search_entry(series, season, x, task, rerun=False) for x in eps_to_get)
+                            # If we have already downloaded the latest known episode, try the next episode
+                            if latest_ep_this_season.releases:
+                                entries.append(
+                                    self.search_entry(series, season, latest_ep_this_season.number + 1, task))
+                        else:
+                            # No episode means that latest is a season pack, emit episode 1
+                            entries.append(self.search_entry(series, season, 1, task))
+                    # First iteration of a new season with no show begin and show has downloads
+                    elif new_season and season == new_season:
+                        entries.append(self.search_entry(series, season, 1, task))
                     else:
                         if config.get('from_start') or config.get('backfill'):
                             entries.append(self.search_entry(series, season, 1, task))
@@ -171,9 +188,7 @@ class NextSeriesEpisodes(object):
                             break
                     # Skip older seasons if we are not in backfill mode
                     if not config.get('backfill'):
-                        break
-                    # Don't look for seasons older than begin ep
-                    if series.begin and series.begin.season >= season:
+                        log.debug('backfill is not enabled; skipping older seasons')
                         break
 
         for reason, series in impossible.items():

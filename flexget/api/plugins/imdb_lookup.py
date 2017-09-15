@@ -27,7 +27,7 @@ class ObjectsContainer(object):
     return_object = {'type': 'array', 'items': movie_object}
 
 
-return_schema = api.schema('imdb_search_schema', ObjectsContainer.return_object)
+return_schema = api.schema_model('imdb_search_schema', ObjectsContainer.return_object)
 
 
 @imdb_api.route('/search/<string:title>/')

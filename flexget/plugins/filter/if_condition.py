@@ -42,6 +42,7 @@ class FilterIf(object):
         eval_locals = copy(entry)
         eval_locals.update({'has_field': lambda f: f in entry,
                             'timedelta': datetime.timedelta,
+                            'utcnow': datetime.datetime.utcnow(),
                             'now': datetime.datetime.now()})
         try:
             # Restrict eval namespace to have no globals and locals only from eval_locals

@@ -50,13 +50,14 @@ class SeriesParser(TitleParser):
         'part\s(%s)' % '|'.join(map(str, english_numbers)),
     ]])
     season_pack_regexps = ReList([
-        r's(\d{2,})(?:\s|$)',  # S01
+        # S01 or Season 1 but not Season 1 Episode|Part 2
+        r'(?:season\s?|s)(\d{1,})(?:\s|$)(?!(?:(?:.*?\s)?(?:episode|e|ep|part|pt)\s?(?:\d{1,3}|%s)|(?:\d{1,3})\s?of\s?(?:\d{1,3})))' % roman_numeral_re,
         '(\d{1,3})\s?x\s?all',  # 1xAll
     ])
     unwanted_regexps = ReList([
         '(\d{1,3})\s?x\s?(0+)[^1-9]',  # 5x0
         'S(\d{1,3})D(\d{1,3})',  # S3D1
-        r'(?:season(?:s)|s|series|\b)\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
+        r'(?:s|series|\b)\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
         'disc\s\d'])
     # Make sure none of these are found embedded within a word or other numbers
     date_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
@@ -137,10 +138,6 @@ class SeriesParser(TitleParser):
     @property
     def is_movie(self):
         return False
-
-    @property
-    def is_season_pack(self):
-        return self.season_pack is True
 
     def _reset(self):
         # parse produces these
@@ -321,7 +318,8 @@ class SeriesParser(TitleParser):
 
         if self.identified_by in ['ep', 'auto'] and not self.valid:
             season_pack_match = self.parse_season_packs(data_stripped)
-            if season_pack_match:
+            # If a title looks like a special, give it precendance over season pack
+            if season_pack_match and not self.special:
                 if self.strict_name:
                     if season_pack_match['match'].start() > 1:
                         return
@@ -357,7 +355,7 @@ class SeriesParser(TitleParser):
                 else:
                     log.debug('-> no luck with ep_regexps')
 
-            if self.identified_by == 'ep':
+            if self.identified_by == 'ep' and not self.season_pack:
                 # we should be getting season, ep !
                 # try to look up idiotic numbering scheme 101,102,103,201,202
                 # ressu: Added matching for 0101, 0102... It will fail on

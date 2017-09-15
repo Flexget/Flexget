@@ -9,10 +9,13 @@ from flexget.event import event
 from flexget.entry import Entry
 from flexget.manager import Session
 from flexget.plugins.filter.series import SeriesTask, Series, get_latest_release, get_latest_season_pack_release
+from flexget.plugins.filter.series import get_latest_episode_release
 
 plugin_name = 'next_series_seasons'
 log = logging.getLogger(plugin_name)
 
+MAX_SEASON_DIFF_WITHOUT_BEGIN = 15
+MAX_SEASON_DIFF_WITH_BEGIN = 30
 
 class NextSeriesSeasons(object):
     """
@@ -28,7 +31,8 @@ class NextSeriesSeasons(object):
                 'type': 'object',
                 'properties': {
                     'from_start': {'type': 'boolean', 'default': False},
-                    'backfill': {'type': 'boolean', 'default': False}
+                    'backfill': {'type': 'boolean', 'default': False},
+                    'threshold': {'type': 'integer', 'minimum': 0}
                 },
                 'additionalProperties': False
             }
@@ -78,6 +82,8 @@ class NextSeriesSeasons(object):
         else:
             self.rerun_entries = []
 
+        threshold = config.get('threshold')
+
         entries = []
         impossible = {}
         with Session() as session:
@@ -97,22 +103,47 @@ class NextSeriesSeasons(object):
                     continue
 
                 low_season = 0
+                # Don't look for seasons older than begin ep
+                if series.begin and series.begin.season and series.begin.season > 1:
+                    low_season = max(series.begin.season - 1, 0)
 
+                new_season = None
                 check_downloaded = not config.get('backfill')
                 latest_season = get_latest_release(series, downloaded=check_downloaded)
                 if latest_season:
-                    latest_season = latest_season.season + 1 if latest_season.season in series.completed_seasons \
-                        else latest_season.season
+                    if latest_season.season <= low_season:
+                        latest_season = new_season = low_season + 1
+                    elif latest_season.season in series.completed_seasons:
+                        latest_season = new_season = latest_season.season + 1
+                    else:
+                        latest_season = latest_season.season
                 else:
                     latest_season = low_season + 1
 
+                if (latest_season - low_season > MAX_SEASON_DIFF_WITHOUT_BEGIN and not series.begin) or (series.begin and
+                    latest_season - series.begin.season > MAX_SEASON_DIFF_WITH_BEGIN):
+                    if series.begin:
+                        log.error('Series `%s` has a begin episode set (`%s`), but the season currently being processed '
+                                  '(%s) is %s seasons later than it. To prevent emitting incorrect seasons, this '
+                                  'series will not emit unless the begin episode is adjusted to a season that is less '
+                                  'than %s seasons from season %s.', series.name, series.begin.identifier, latest_season,
+                                  (latest_season - series.begin.season), MAX_SEASON_DIFF_WITH_BEGIN, latest_season)
+                    else:
+                        log.error('Series `%s` does not have a begin episode set and continuing this task would result '                                   'in more than %s seasons being emitted. To prevent emitting incorrect seasons, this '
+                                  'series will not emit unless the begin episode is set in your series config or by '
+                                  'using the CLI subcommand `series begin "%s" <SxxExx>`.', series.name,
+                                  MAX_SEASON_DIFF_WITHOUT_BEGIN, series.name)
+                    continue
                 for season in range(latest_season, low_season, -1):
                     if season in series.completed_seasons:
                         log.debug('season %s is marked as completed, skipping', season)
                         continue
-                    log.trace('Adding episodes for series %s season %d', series.name, season)
+                    if threshold is not None and series.episodes_for_season(season) > threshold:
+                        log.debug('season %s has met threshold of threshold of %s, skipping', season, threshold)
+                        continue
+                    log.trace('Evaluating season %s for series `%s`', season, series.name)
                     latest = get_latest_release(series, season=season, downloaded=check_downloaded)
-                    if series.begin and (not latest or latest < series.begin):
+                    if series.begin and season == series.begin.season and (not latest or latest < series.begin):
                         # In case series.begin season is already completed, look in next available season
                         lookup_season = series.begin.season
                         while lookup_season in series.completed_seasons:
@@ -120,19 +151,20 @@ class NextSeriesSeasons(object):
                         entries.append(self.search_entry(series, lookup_season, task))
                     elif latest:
                         entries.append(self.search_entry(series, latest.season, task))
+                    # First iteration of a new season with no show begin and show has downloads
+                    elif new_season and season == new_season:
+                        entries.append(self.search_entry(series, season, task))
                     else:
                         if config.get('from_start') or config.get('backfill'):
-                            entries.append(self.search_entry(series, season, 1, task))
+                            entries.append(self.search_entry(series, season, task))
                         else:
-                            log.verbose('Series `%s` has no history. Set begin option, '
-                                        'or use CLI `series begin` '
-                                        'subcommand to set first episode to emit', series.name)
+                            log.verbose('Series `%s` has no history. Set the begin option in your config, '
+                                        'or use the CLI subcommand `series begin "%s" <SxxExx>` '
+                                        'to set the first episode to emit', series.name, series.name)
                             break
                     # Skip older seasons if we are not in backfill mode
                     if not config.get('backfill'):
-                        break
-                    # Don't look for seasons older than begin ep
-                    if series.begin and series.begin.season >= season:
+                        log.debug('backfill is not enabled; skipping older seasons')
                         break
 
         for reason, series in impossible.items():
@@ -146,15 +178,17 @@ class NextSeriesSeasons(object):
         with Session() as session:
             series = session.query(Series).filter(Series.name == entry['series_name']).first()
             latest = get_latest_season_pack_release(series)
+            latest_ep = get_latest_episode_release(series, season=entry['series_season'])
 
             if entry.accepted:
-                if not entry.get('season_pack'):
-                    log.debug('season lookup produced an episode result, assuming no season match, no need to rerun')
+                if not latest and latest_ep:
+                    log.debug('season lookup produced an episode result; assuming no season match, no need to rerun')
                     return
                 else:
                     log.debug('%s %s was accepted, rerunning to look for next season.', entry['series_name'],
                               entry['series_id'])
-                    self.rerun_entries.append(self.search_entry(series, entry['series_season'] + 1, task))
+                    if not any(e.get('series_season') == latest.season + 1 for e in self.rerun_entries):
+                        self.rerun_entries.append(self.search_entry(series, latest.season + 1, task))
                     # Increase rerun limit by one if we have matches, this way
                     # we keep searching as long as matches are found!
                     # TODO: this should ideally be in discover so it would be more generic

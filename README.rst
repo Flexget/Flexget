@@ -6,9 +6,6 @@ FlexGet
 .. image:: https://img.shields.io/pypi/v/Flexget.svg
     :target: https://pypi.python.org/pypi/Flexget
 
-.. image:: https://img.shields.io/pypi/dm/Flexget.svg
-    :target: https://pypi.python.org/pypi/Flexget
-
 .. image:: https://api.codacy.com/project/badge/Grade/81e8ae42c7544dc48853102b1b7f88d5
     :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Grade
 
@@ -72,6 +69,11 @@ For more detailed instructions see the `installation guide`_.
 
 .. _installation guide: https://flexget.com/Install
 
+Feature requests
+----------------
+.. image:: http://feathub.com/Flexget/Flexget?format=svg
+   :target: http://feathub.com/Flexget/Flexget
+
 How to use GIT checkout
 -----------------------
 
@@ -115,11 +117,3 @@ You may place the config file in your checkout directory, or in ``~/.flexget``
 If you don't want to use virtualenv there's ``flexget_vanilla.py`` file which
 can be used to run FlexGet without virtualenv, note that you will need to
 install all required dependencies yourself.
-
-Install using Docker (Linux only)
----------------------------------
-
-Docker can be used to install and run FlexGet::
-
-    docker run -it -v /home/<username>/.flexget:/root/.flexget --rm toilal/flexget
-

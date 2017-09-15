@@ -39,7 +39,7 @@ class MetainfoSeries(object):
         """
         if entry.get('series_parser') and entry['series_parser'].valid:
             # Return true if we already parsed this, false if series plugin parsed it
-            return entry.get('series_guessed')
+            return True
         parsed = get_plugin_by_name('parsing').instance.parse_series(data=entry['title'], identified_by='auto',
                                                                      allow_seasonless=allow_seasonless)
         if parsed and parsed.valid:

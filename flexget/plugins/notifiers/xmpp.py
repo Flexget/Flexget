@@ -14,6 +14,22 @@ log = logging.getLogger(plugin_name)
 
 
 class XMPPNotifier(object):
+    """
+    Sends messages via XMPP. The sleekxmpp library is required to be installed.
+    Install it with: `pip install sleekxmpp`
+
+    All fields are required.
+
+    Example:
+
+      notify:
+        entries:
+          via:
+            - xmpp:
+                sender: sender's JID
+                password: sender's password
+                recipients: recipient's JID or list of JIDs
+    """
     schema = {
         'type': 'object',
         'properties': {

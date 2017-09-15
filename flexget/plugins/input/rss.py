@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.utils import tobytes
-from past.builtins import basestring
 from future.moves.urllib.parse import urlparse, urlsplit
 
 import os
@@ -125,7 +124,7 @@ class InputRSS(object):
 
     def build_config(self, config):
         """Set default values to config"""
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = {'url': config}
         else:
             # Make a copy so that original config is not modified
@@ -142,7 +141,7 @@ class InputRSS(object):
         if config.get('other_fields'):
             other_fields = []
             for item in config['other_fields']:
-                if isinstance(item, basestring):
+                if isinstance(item, str):
                     key, val = item, item
                 else:
                     key, val = list(item.items())[0]
@@ -217,7 +216,7 @@ class InputRSS(object):
         # last run and if caching wasn't disabled with --no-cache argument.
         all_entries = (config['all_entries'] or task.config_modified or
                        task.options.nocache or task.options.retry)
-        headers = {}
+        headers = task.requests.headers
         if not all_entries:
             etag = task.simple_persistence.get('%s_etag' % url_hash, None)
             if etag:
@@ -225,7 +224,7 @@ class InputRSS(object):
                 headers['If-None-Match'] = etag
             modified = task.simple_persistence.get('%s_modified' % url_hash, None)
             if modified:
-                if not isinstance(modified, basestring):
+                if not isinstance(modified, str):
                     log.debug('Invalid date was stored for last modified time.')
                 else:
                     headers['If-Modified-Since'] = modified
@@ -383,7 +382,17 @@ class InputRSS(object):
                 # fields dict may be modified during this loop, so loop over a copy (fields.items())
                 for rss_field, flexget_field in list(fields.items()):
                     if rss_field in entry:
-                        if not isinstance(getattr(entry, rss_field), basestring):
+                        if rss_field == 'content':
+                            content_str = ''
+                            for content in entry[rss_field]:
+                                try:
+                                    content_str += decode_html(content.value)
+                                except UnicodeDecodeError:
+                                    log.warning('Failed to decode entry `%s` field `%s`', ea['title'], rss_field)
+                            ea[flexget_field] = content_str
+                            log.debug('Field `%s` set to `%s` for `%s`', rss_field, ea[rss_field], ea['title'])
+                            continue
+                        if not isinstance(getattr(entry, rss_field), str):
                             # Error if this field is not a string
                             log.error('Cannot grab non text field `%s` from rss.', rss_field)
                             # Remove field from list of fields to avoid repeated error

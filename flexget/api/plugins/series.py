@@ -102,7 +102,7 @@ class ObjectsContainer(object):
         'type': 'object',
         'properties': {
             'begin_episode':
-                {'type': ['string', 'integer'], 'format': 'episode_identifier'},
+                {'type': ['string', 'integer'], 'format': 'episode_or_season_id'},
             'alternate_names': {'type': 'array', 'items': {'type': 'string'}}
         },
         'anyOf': [
@@ -118,16 +118,16 @@ class ObjectsContainer(object):
     series_input_object['required'] = ['name']
 
 
-series_list_schema = api.schema('list_series', ObjectsContainer.series_list_schema)
-series_edit_schema = api.schema('series_edit_schema', ObjectsContainer.series_edit_object)
-series_input_schema = api.schema('series_input_schema', ObjectsContainer.series_input_object)
-show_details_schema = api.schema('show_details', ObjectsContainer.single_series_object)
+series_list_schema = api.schema_model('list_series', ObjectsContainer.series_list_schema)
+series_edit_schema = api.schema_model('series_edit_schema', ObjectsContainer.series_edit_object)
+series_input_schema = api.schema_model('series_input_schema', ObjectsContainer.series_input_object)
+show_details_schema = api.schema_model('show_details', ObjectsContainer.single_series_object)
 
-episode_list_schema = api.schema('episode_list', ObjectsContainer.episode_list_schema)
-episode_schema = api.schema('episode_item', ObjectsContainer.episode_object)
+episode_list_schema = api.schema_model('episode_list', ObjectsContainer.episode_list_schema)
+episode_schema = api.schema_model('episode_item', ObjectsContainer.episode_object)
 
-release_schema = api.schema('release_schema', ObjectsContainer.release_object)
-release_list_schema = api.schema('release_list_schema', ObjectsContainer.release_list_schema)
+release_schema = api.schema_model('release_schema', ObjectsContainer.release_object)
+release_list_schema = api.schema_model('release_list_schema', ObjectsContainer.release_list_schema)
 
 base_series_parser = api.parser()
 base_series_parser.add_argument('begin', type=inputs.boolean, default=True, help='Show series begin episode')
@@ -440,7 +440,7 @@ class SeriesEpisodesAPI(APIResource):
         args = delete_parser.parse_args()
         forget = args.get('forget')
         for episode in show.episodes:
-            series.remove_series_episode(show.name, episode.identifier, forget)
+            series.remove_series_entity(show.name, episode.identifier, forget)
         return success_response('successfully removed all series %s episodes from DB' % show_id)
 
 
@@ -489,7 +489,7 @@ class SeriesEpisodeAPI(APIResource):
             raise BadRequest('episode with id %s does not belong to show %s' % (ep_id, show_id))
 
         args = delete_parser.parse_args()
-        series.remove_series_episode(show.name, episode.identifier, args.get('forget'))
+        series.remove_series_entity(show.name, episode.identifier, args.get('forget'))
 
         return success_response('successfully removed episode %s from show %s' % (ep_id, show_id))
 

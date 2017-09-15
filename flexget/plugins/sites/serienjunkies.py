@@ -53,10 +53,14 @@ class UrlRewriteSerienjunkies(object):
         'additionalProperties': False
     }
 
+    # Since the urlrewriter relies on a config, we need to create a default one
+    config = {
+        'hoster': DEFAULT_HOSTER,
+        'language': DEFAULT_LANGUAGE
+    }
+
     def on_task_start(self, task, config):
-        self.config = config or {}
-        self.config.setdefault('hoster', DEFAULT_HOSTER)
-        self.config.setdefault('language', DEFAULT_LANGUAGE)
+        self.config = config
 
     # urlrewriter API
     def url_rewritable(self, task, entry):

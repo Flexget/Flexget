@@ -1,32 +1,15 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 
-from sqlalchemy import Column, Integer, String, Unicode
-
-from flexget import options, plugin, db_schema
-from flexget.event import event
+from flexget import options, plugin
 from flexget.config_schema import register_config_key
-from flexget.manager import Session
-from flexget.utils.tools import MergeException, merge_dict_from_to
+from flexget.event import event
+from flexget.utils.tools import MergeException
 
-log = logging.getLogger('template')
-Base = db_schema.versioned_base('template_hash', 0)
-
-
-class TemplateConfigHash(Base):
-    """Stores the config hash for tasks so that we can tell if the config has changed since last run."""
-
-    __tablename__ = 'template_config_hash'
-
-    id = Column(Integer, primary_key=True)
-    task = Column('name', Unicode, index=True, nullable=False)
-    hash = Column('hash', String)
-
-    def __repr__(self):
-        return '<TemplateConfigHash(task=%s,hash=%s)>' % (self.task, self.hash)
+plugin_name = 'template'
+log = logging.getLogger(plugin_name)
 
 
 class PluginTemplate(object):
@@ -72,12 +55,12 @@ class PluginTemplate(object):
     def prepare_config(self, config):
         if config is None or isinstance(config, bool):
             config = []
-        elif isinstance(config, basestring):
+        elif isinstance(config, str):
             config = [config]
         return config
 
     @plugin.priority(257)
-    def on_task_start(self, task, config):
+    def on_task_prepare(self, task, config):
         if config is False:  # handles 'template: no' form to turn off template on this task
             return
         # implements --template NAME
@@ -125,19 +108,12 @@ class PluginTemplate(object):
 
             # Merge
             try:
-                merge_dict_from_to(template_config, task.config)
+                task.merge_config(template_config)
             except MergeException as exc:
                 raise plugin.PluginError('Failed to merge template %s to task %s. Error: %s' %
                                          (template, task.name, exc.value))
 
-        # TODO: Better handling of config_modified flag for templates???
-        with Session() as session:
-            last_hash = session.query(TemplateConfigHash).filter(TemplateConfigHash.task == task.name).first()
-            task.config_modified, config_hash = task.is_config_modified(last_hash)
-            if task.config_modified:
-                session.add(TemplateConfigHash(task=task.name, hash=config_hash))
-
-        log.trace('templates: %s' % config)
+        log.trace('templates: %s', config)
 
 
 @event('plugin.register')

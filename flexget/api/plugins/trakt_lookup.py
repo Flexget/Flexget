@@ -97,8 +97,8 @@ class ObjectsContainer(object):
     movie_return_object['required'] += ['tagline', 'released', 'trailer']
 
 
-series_return_schema = api.schema('series_return_schema', ObjectsContainer.series_return_object)
-movie_return_schema = api.schema('movie_return_schema', ObjectsContainer.movie_return_object)
+series_return_schema = api.schema_model('series_return_schema', ObjectsContainer.series_return_object)
+movie_return_schema = api.schema_model('movie_return_schema', ObjectsContainer.movie_return_object)
 
 lookup_parser = api.parser()
 lookup_parser.add_argument('year', type=int, help='Lookup year')

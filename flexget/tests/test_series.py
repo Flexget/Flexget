@@ -6,6 +6,7 @@ from io import StringIO
 import pytest
 from jinja2 import Template
 
+from flexget.entry import Entry
 from flexget.logger import capture_output
 from flexget.manager import get_parser
 from flexget.task import TaskAbort
@@ -1477,6 +1478,13 @@ class TestBegin(object):
               - {title: 'WTest.S02E03.HDTV.XViD-FlexGet'}
               - {title: 'W2Test.S02E03.HDTV.XViD-FlexGet'}
         tasks:
+          season_id_test:
+            template: eps
+            series:
+              - WTest:
+                  begin: S02
+              - W2Test:
+                  begin: S03
           before_ep_test:
             template: eps
             series:
@@ -1545,6 +1553,13 @@ class TestBegin(object):
                 begin: S03E01
 
     """
+
+    def test_season_id(self, execute_task):
+        task = execute_task('season_id_test')
+        assert task.find_entry('accepted', title='WTest.S02E03.HDTV.XViD-FlexGet'), \
+            'Entry should have been accepted, it\'s after the begin episode'
+        assert task.find_entry('rejected', title='W2Test.S02E03.HDTV.XViD-FlexGet'), \
+            'Entry should have been rejected, it\'s before the begin episode'
 
     def test_before_ep(self, execute_task):
         task = execute_task('before_ep_test')
@@ -1887,6 +1902,13 @@ class TestSpecials(object):
             series:
             - the show:
                 assume_special: False
+                
+          special_looks_like_season_pack:
+            mock:
+            - title: Doctor.Who.S07.Special.The.Science.of.Doctor.Who.WS.XviD-Flexget
+            series:
+            - Doctor Who
+            
     """
 
     def test_prefer_specials(self, execute_task):
@@ -1914,6 +1936,14 @@ class TestSpecials(object):
         entry = task.find_entry(title='the show SOMETHING')
         assert entry.get('series_id_type') != 'special', 'Entry which should not have been flagged as a special was.'
         assert not entry.accepted, 'Entry which should not have been accepted was.'
+
+    def test_special_looks_like_a_season_pack(self, execute_task):
+        """Make sure special episodes are not being parsed as season packs"""
+        task = execute_task('special_looks_like_season_pack')
+        entry = task.find_entry(title='Doctor.Who.S07.Special.The.Science.of.Doctor.Who.WS.XviD-Flexget')
+        assert entry.get('series_id_type') == 'special', 'Entry should have been flagged as a special'
+        assert not entry['season_pack'], 'Entry should not have been flagged as a season pack'
+        assert entry.accepted, 'Entry which should not have been accepted was.'
 
 
 class TestAlternateNames(object):
@@ -2067,6 +2097,10 @@ class TestSeriesSeasonPack(object):
               season_packs: always
           - bla:
               season_packs: only
+          - bro:
+              season_packs:
+                threshold: 1
+                reject_eps: yes
       tasks:
         multiple_formats:
           mock:
@@ -2164,6 +2198,14 @@ class TestSeriesSeasonPack(object):
           - title: show.name.s01.720p.HDTV-Group
           all_series:
             season_packs: yes
+        test_with_dict_config_1:
+          mock:
+          - title: bro.s01e01.720p.HDTV-Flexget
+          - title: bro.s01.720p.HDTV-Flexget
+        test_with_dict_config_2:
+          mock:
+          - title: bro.s02.720p.HDTV-Flexget
+          
     """
 
     @pytest.fixture()
@@ -2292,3 +2334,77 @@ class TestSeriesSeasonPack(object):
     def test_all_series(self, execute_task):
         task = execute_task('test_all_series')
         assert task.find_entry('accepted', title='show.name.s01.720p.HDTV-Group')
+
+    def test_advanced_config(self, execute_task):
+        task = execute_task('test_with_dict_config_1')
+        assert not task.find_entry('accepted', title='bro.s01e01.720p.HDTV-Flexget')
+        assert task.find_entry('accepted', title='bro.s01.720p.HDTV-Flexget')
+
+        execute_task('test_with_dict_config_2',
+                     options={'inject': [Entry(title='bro.s02e01.720p.HDTV-Flexget', url='')],
+                              'immortal': True})
+
+        task = execute_task('test_with_dict_config_2')
+        assert task.find_entry('accepted', title='bro.s02.720p.HDTV-Flexget')
+
+
+class TestSeriesDDAudio(object):
+    _config = """
+      templates:
+        global:
+          parsing:
+            series: internal
+      tasks:
+        min_quality:
+          mock:
+            - {title: 'MinQATest.S01E01.720p.XViD.DD5.1-FlexGet'}
+            - {title: 'MinQATest.S01E01.720p.XViD.DDP5.1-FlexGet'}
+          series:
+            - MinQATest:
+                quality: ">dd5.1"
+
+        max_quality:
+          mock:
+            - {title: 'MaxQATest.S01E01.720p.XViD.DD5.1-FlexGet'}
+            - {title: 'MaxQATest.S01E01.720p.XViD.DD+5.1-FlexGet'}
+          series:
+            - MaxQATest:
+                quality: "<=dd5.1"
+
+        test_channels:
+          mock:
+            - {title: 'Channels.S01E01.1080p.HDTV.DD+2.0-FlexGet'}
+            - {title: 'Channels.S01E01.1080p.HDTV.DD+5.1-FlexGet'}
+            - {title: 'Channels.S01E01.1080p.HDTV.DD+7.1-FlexGet'}
+          series:
+            - Channels:
+                quality: dd+5.1
+
+
+    """
+
+    @pytest.fixture()
+    def config(self):
+        """Overrides outer config fixture since DD+ and arbitrary channels support does not work with guessit parser"""
+        return self._config
+
+    def test_min_quality(self, execute_task):
+        """Series plugin: min_quality"""
+        task = execute_task('min_quality')
+        assert task.find_entry('accepted', title='MinQATest.S01E01.720p.XViD.DDP5.1-FlexGet'), \
+            'MinQATest.S01E01.720p.XViD.DDP5.1-FlexGet should have been accepted'
+        assert len(task.accepted) == 1, 'should have accepted only two'
+
+    def test_max_quality(self, execute_task):
+        """Series plugin: max_quality"""
+        task = execute_task('max_quality')
+        assert task.find_entry('accepted', title='MaxQATest.S01E01.720p.XViD.DD5.1-FlexGet'), \
+            'MaxQATest.S01E01.720p.XViD.DD5.1-FlexGet should have been accepted'
+        assert len(task.accepted) == 1, 'should have accepted only one'
+
+    def test_channels(self, execute_task):
+        """Series plugin: max_quality"""
+        task = execute_task('test_channels')
+        assert task.find_entry(title='Channels.S01E01.1080p.HDTV.DD+7.1-FlexGet'), \
+            'Channels.S01E01.1080p.HDTV.DD+7.1-FlexGet should have been accepted'
+        assert len(task.accepted) == 1, 'should have accepted only one'
