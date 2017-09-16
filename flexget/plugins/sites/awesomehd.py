@@ -21,16 +21,27 @@ class SearchAwesomeHD(object):
     """
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'passkey': {'type': 'string'},
-            'only_internal': {'type': 'boolean', 'default': False}
-        },
-        'required': ['passkey'],
-        'additionalProperties': False
+        'oneOf': [
+            {
+                'type': 'object',
+                'properties': {
+                    'passkey': {'type': 'string'},
+                    'only_internal': {'type': 'boolean', 'default': False}
+                },
+                'required': ['passkey'],
+                'additionalProperties': False
+            },
+            {'type': 'string'}
+        ]
     }
 
     base_url = 'https://awesome-hd.me/'
+
+    def prepare_config(self, config):
+        if not isinstance(config, dict):
+            config = {'passkey': config, 'only_internal': False}
+
+        return config
 
     @plugin.internet(log)
     def search(self, task, entry, config):
@@ -43,6 +54,8 @@ class SearchAwesomeHD(object):
         except ImportError as e:
             log.debug('Error importing lxml: %s', e)
             raise plugin.DependencyError('awesomehd', 'lxml', 'lxml module required. ImportError: %s' % e)
+
+        config = self.prepare_config(config)
 
         # set a domain limit, but allow the user to overwrite it
         if 'awesome-hd.me' not in task.requests.domain_limiters:
