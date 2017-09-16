@@ -13,7 +13,6 @@ from flexget.utils.soup import get_soup
 from flexget.entry import Entry
 from flexget.utils.search import normalize_unicode
 
-from bs4.element import Tag
 
 log = logging.getLogger('newpct')
 
@@ -79,7 +78,12 @@ class UrlRewriteNewPCT(object):
         if not torrent_id:
             raise UrlRewritingError('Unable to locate torrent ID from url %s' % url)
 
-        return NEWPCT1_TORRENT_FORMAT.format(torrent_id)
+        if 'newpct1.com' in url:
+            url_format = NEWPCT1_TORRENT_FORMAT
+        else:
+            url_format = NEWPCT_TORRENT_FORMAT
+
+        return url_format.format(torrent_id)
 
     def search(self, task, entry, config=None):
         if not config:
