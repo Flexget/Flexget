@@ -11,6 +11,12 @@ from flexget.plugin import get_plugin_by_name, PluginError
 log = logging.getLogger('torrent_match')
 
 
+class TorrentMatchFile(object):
+    def __init__(self, path, size, root=''):
+        self.path = path
+        self.size = size
+
+
 class TorrentMatch(object):
     """TODO"""
 
@@ -20,7 +26,8 @@ class TorrentMatch(object):
             'what': {'type': 'array', 'items': {
                 'allOf': [{'$ref': '/schema/plugins?phase=input'}, {'maxProperties': 1, 'minProperties': 1}]
             }},
-            'allowed_size_difference': {'type': 'string', 'format': 'percent'}
+            'max_size_difference': {'type': 'string', 'format': 'percent', 'default': '0%'},
+            'name_in_path': {'type': 'boolean', 'default': True}
         },
         'required': ['what'],
         'additionalProperties': False
@@ -60,7 +67,7 @@ class TorrentMatch(object):
                     entry_urls.update(urls)
         return entries
 
-    def get_content_files(self, config, task):
+    def get_local_files(self, config, task):
         cwd = os.getcwd()
         entries = self.execute_inputs(config, task)
         for entry in entries:
@@ -71,10 +78,9 @@ class TorrentMatch(object):
 
             if os.path.isfile(location):
                 entry['files_root'] = ''
-                entry['files']([{
-                    'path': os.path.basename(location),
-                    'size': os.path.getsize(location)
-                }])
+                entry['files']([
+                    TorrentMatchFile(os.path.basename(location), os.path.getsize(location))
+                ])
             elif os.path.isdir(location):
                 # change working dir to make things simpler
                 os.chdir(location)
@@ -85,10 +91,9 @@ class TorrentMatch(object):
                     stripped_root = root.lstrip('.')  # remove the dot
                     for f in files:
                         file_path = os.path.join(stripped_root, f)
-                        entry['files'].append({
-                            'path': os.path.join(entry['files_root'], file_path),
-                            'size': os.path.getsize(file_path)
-                        })
+                        entry['files'].append(
+                            TorrentMatchFile(os.path.join(entry['files_root'], file_path), os.path.getsize(file_path))
+                        )
             else:
                 log.error('Does this happen?')
             os.chdir(cwd)
@@ -105,10 +110,18 @@ class TorrentMatch(object):
                 download = plugin.get_plugin_by_name('download')
                 download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
 
+    def prepare_config(self, config):
+        if not isinstance(config['max_size_difference'], float):
+            config['max_size_difference'] = float(config['max_size_difference'].rstrip('%'))
+
+        return config
+
     # Run first
     @plugin.priority(255)
     def on_task_output(self, task, config):
-        local_entries = self.get_content_files(config, task)
+        config = self.prepare_config(config)
+        max_size_difference = config['max_size_difference']
+        local_entries = self.get_local_files(config, task)
 
         matched_entries = set()
         for entry in task.accepted:
@@ -123,36 +136,35 @@ class TorrentMatch(object):
                 if entry['torrent'].is_multi_file:
                     path = os.path.join(entry['torrent'].name, path)
 
-                torrent_files.append({
-                    'path': path,
-                    'size': item['size']
-                })
+                torrent_files.append(TorrentMatchFile(path, item['size']))
 
             for local_entry in local_entries:
                 local_files = local_entry['files']
 
-                # there should be at least as many local files as torrent files, TODO allow smaller files to be missing
-                if len(torrent_files) > len(local_files):
-                    log.debug('Skipping %s because it has %s files, expected at least %s', local_entry['title'],
-                              len(local_files), len(torrent_files))
-                    continue
-
-                # skip root dir of the local entry if torrent is single file
-                skip_root_dir = not entry['torrent'].is_multi_file and local_entry['files_root']
+                # skip root dir of the local entry if torrent is single file or if name_in_path is false
+                skip_root_dir = not entry['torrent'].is_multi_file and local_entry['files_root'] or \
+                    not config['name_in_path']
 
                 matches = 0
+                missing_size = 0
+                total_size = 0
                 for f in torrent_files:
                     for local_file in local_files:
                         # if f == local_file, break out of inner loop and increment match counter
                         # TODO allow root dir to differ? Requires torrent clients have "do not add name to path"
-                        local_path = local_file['path']
+                        local_path = local_file.path
                         if skip_root_dir:
                             local_path = os.path.relpath(local_path, local_entry['files_root'])
-                        if f['path'] == local_path and f['size'] == local_file['size']:
+                        if f.path == local_path and f.size == local_file.size:
                             matches += 1
                             break
+                    else:
+                        missing_size += f.size
+                    total_size += f.size
+
+                size_difference = missing_size / total_size * 100
                 # as of now, we require that the number of matches is the same as the number of files in torrent
-                if matches == len(torrent_files):
+                if matches == len(torrent_files) or max_size_difference >= size_difference:
                     matched_entries.add(entry)
                     if skip_root_dir:
                         entry['path'] = local_entry['location']
@@ -162,7 +174,7 @@ class TorrentMatch(object):
                     log.debug('Torrent %s matched path %s', entry['title'], entry['path'])
 
         for entry in set(task.accepted).difference(matched_entries):
-            entry.reject('No local files found.')
+            entry.reject('No local files matched {}% of the torrent size'.format(100 - max_size_difference))
 
 
 @event('plugin.register')
