@@ -68,7 +68,7 @@ class TorrentMatch(object):
         return entries
 
     def get_local_files(self, config, task):
-        cwd = os.getcwd()
+        cwd = os.getcwd()  # save the current working directory
         entries = self.execute_inputs(config, task)
         for entry in entries:
             location = entry.get('location')
@@ -77,27 +77,25 @@ class TorrentMatch(object):
                 entry.reject('not a local file')
                 continue
 
+            entry['files'] = []
+
             if os.path.isfile(location):
                 entry['files_root'] = ''
-                entry['files']([
-                    TorrentMatchFile(os.path.basename(location), os.path.getsize(location))
-                ])
-            elif os.path.isdir(location):
+                entry['files'].append(TorrentMatchFile(os.path.basename(location), os.path.getsize(location)))
+            else:
                 # change working dir to make things simpler
                 os.chdir(location)
                 entry['files_root'] = os.path.basename(location)
-                entry['files'] = []
                 # traverse the file tree
                 for root, _, files in os.walk('.'):
                     stripped_root = root.lstrip('.')  # remove the dot
                     for f in files:
                         file_path = os.path.join(stripped_root, f)
-                        entry['files'].append(
-                            TorrentMatchFile(os.path.join(entry['files_root'], file_path), os.path.getsize(file_path))
-                        )
-            else:
-                log.error('Does this happen?')
-            os.chdir(cwd)
+                        entry['files'].append(TorrentMatchFile(os.path.join(entry['files_root'], file_path),
+                                                               os.path.getsize(file_path)))
+
+        # restore the working directory
+        os.chdir(cwd)
 
         return entries
 
