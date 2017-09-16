@@ -62,11 +62,15 @@ class UrlRewriteNewPCT(object):
 
         torrent_id = None
         if 'newpct1.com' in url:
+            url_format = NEWPCT1_TORRENT_FORMAT
+
             torrent_id_prog = re.compile(r'descargar-torrent/(.+)/')
             match = torrent_id_prog.search(soup.text)
             if match:
                 torrent_id = match.group(1)
         else:
+            url_format = NEWPCT_TORRENT_FORMAT
+
             torrent_id_prog = re.compile("(?:parametros\s*=\s*\n?)\s*{\s*\n(?:\s*'\w+'\s*:.*\n)+\s*'(?:torrentID|id)"
                                          "'\s*:\s*'(\d+)'")
             torrent_ids = soup.findAll(text=torrent_id_prog)
@@ -77,11 +81,6 @@ class UrlRewriteNewPCT(object):
 
         if not torrent_id:
             raise UrlRewritingError('Unable to locate torrent ID from url %s' % url)
-
-        if 'newpct1.com' in url:
-            url_format = NEWPCT1_TORRENT_FORMAT
-        else:
-            url_format = NEWPCT_TORRENT_FORMAT
 
         return url_format.format(torrent_id)
 
