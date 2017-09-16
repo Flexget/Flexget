@@ -75,6 +75,7 @@ class TorrentMatch(object):
             if not location or not os.path.exists(location):
                 log.warning('%s is not a local file. Skipping.', entry['title'])
                 entry.reject('not a local file')
+                continue
 
             if os.path.isfile(location):
                 entry['files_root'] = ''
