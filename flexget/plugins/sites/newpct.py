@@ -61,22 +61,25 @@ class UrlRewriteNewPCT(object):
         except Exception as e:
             raise UrlRewritingError(e)
 
+        torrent_id = None
         if 'newpct1.com' in url:
             torrent_id_prog = re.compile(r'descargar-torrent/(.+)/')
-            torrent_ids = soup.findAll(href=torrent_id_prog)
+            match = torrent_id_prog.search(soup.text)
+            if match:
+                torrent_id = match.group(1)
         else:
-            torrent_id_prog = re.compile("(?:parametros\s*=\s*\n?)\s*{\s*\n(?:\s*'\w+'\s*:.*\n)+\s*'(?:torrentID|id)'\s*:\s*'(\d+)'")
+            torrent_id_prog = re.compile("(?:parametros\s*=\s*\n?)\s*{\s*\n(?:\s*'\w+'\s*:.*\n)+\s*'(?:torrentID|id)"
+                                         "'\s*:\s*'(\d+)'")
             torrent_ids = soup.findAll(text=torrent_id_prog)
+            if len(torrent_ids):
+                match = torrent_id_prog.search(torrent_ids[0])
+                if match:
+                    torrent_id = match.group(1)
 
-        if len(torrent_ids) == 0:
+        if not torrent_id:
             raise UrlRewritingError('Unable to locate torrent ID from url %s' % url)
 
-        if 'newpct1.com' in url:
-            torrent_id = torrent_id_prog.search(torrent_ids[0]['href']).group(1)
-            return NEWPCT1_TORRENT_FORMAT.format(torrent_id)
-        else:
-            torrent_id = torrent_id_prog.search(torrent_ids[0]).group(1)
-            return NEWPCT_TORRENT_FORMAT.format(torrent_id)
+        return NEWPCT1_TORRENT_FORMAT.format(torrent_id)
 
     def search(self, task, entry, config=None):
         if not config:
