@@ -12,7 +12,7 @@ log = logging.getLogger('torrent_match')
 
 
 class TorrentMatchFile(object):
-    def __init__(self, path, size, root=''):
+    def __init__(self, path, size):
         self.path = path
         self.size = size
 
