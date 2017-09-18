@@ -73,10 +73,10 @@ class ObjectsContainer(object):
     pending_lists_entries_return_object = {'type': 'array', 'items': pending_list_entry_base_object}
 
 
-pending_list_object_schema = api.schema('pending_list.return_list', ObjectsContainer.pending_list_base_object)
-pending_list_input_object_schema = api.schema('pending_list.input_list', ObjectsContainer.pending_list_input_object)
-pending_list_return_lists_schema = api.schema('pending_list.return_lists', ObjectsContainer.pending_list_return_lists)
-pending_list_operation_schema = api.schema('pending_list.operation_schema', ObjectsContainer.operation_object)
+pending_list_object_schema = api.schema_model('pending_list.return_list', ObjectsContainer.pending_list_base_object)
+pending_list_input_object_schema = api.schema_model('pending_list.input_list', ObjectsContainer.pending_list_input_object)
+pending_list_return_lists_schema = api.schema_model('pending_list.return_lists', ObjectsContainer.pending_list_return_lists)
+pending_list_operation_schema = api.schema_model('pending_list.operation_schema', ObjectsContainer.operation_object)
 
 list_parser = api.parser()
 list_parser.add_argument('name', help='Filter results by list name')
@@ -144,10 +144,10 @@ class PendingListListAPI(APIResource):
         return success_response('list successfully deleted')
 
 
-base_entry_schema = api.schema('base_entry_schema', ObjectsContainer.base_entry_object)
-pending_list_entry_base_schema = api.schema('pending_list.entry_base_schema',
+base_entry_schema = api.schema_model('base_entry_schema', ObjectsContainer.base_entry_object)
+pending_list_entry_base_schema = api.schema_model('pending_list.entry_base_schema',
                                             ObjectsContainer.pending_list_entry_base_object)
-pending_lists_entries_return_schema = api.schema('pending_list.entry_return_schema',
+pending_lists_entries_return_schema = api.schema_model('pending_list.entry_return_schema',
                                                  ObjectsContainer.pending_lists_entries_return_object)
 
 sort_choices = ('id', 'added', 'title', 'original_url', 'list_id', 'approved')
