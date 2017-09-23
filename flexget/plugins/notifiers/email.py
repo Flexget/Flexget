@@ -179,7 +179,9 @@ class EmailNotifier(object):
             self.connect_to_smtp_server(config)
 
         connection_error = None
-        while True:
+        counter = 0
+        max_attempts = config.get('max_attempts') if config.get('max_attempts') else 5
+        for counter in range(max_attempts):
             try:
                 self.mail_server.sendmail(email['From'], config['to'], email.as_string())
                 break
@@ -189,7 +191,11 @@ class EmailNotifier(object):
                     connection_error = e
                 else:
                     raise PluginWarning('Could not connect to SMTP server: %s' % str(e))
-
+            except:
+                log.debug( "Unexpected error:", sys.exc_info()[0])
+                self.mail_server.quit() #Lets clear the connection, and try again
+                self.connect_to_smtp_server(config)
+                raise
 
 @event('plugin.register')
 def register_plugin():
