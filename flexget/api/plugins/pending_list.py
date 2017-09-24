@@ -14,8 +14,8 @@ from flexget.plugins.list.pending_list import (
 )
 from flexget.api import api, APIResource
 from flexget.api.app import (
-    NotFoundError, base_message_schema, success_response, etag, pagination_headers, Conflict,
-    BadRequest)
+    NotFoundError, base_message_schema, success_response, etag, pagination_headers, Conflict, BadRequest
+)
 
 log = logging.getLogger('pending_list')
 
@@ -74,8 +74,10 @@ class ObjectsContainer(object):
 
 
 pending_list_object_schema = api.schema_model('pending_list.return_list', ObjectsContainer.pending_list_base_object)
-pending_list_input_object_schema = api.schema_model('pending_list.input_list', ObjectsContainer.pending_list_input_object)
-pending_list_return_lists_schema = api.schema_model('pending_list.return_lists', ObjectsContainer.pending_list_return_lists)
+pending_list_input_object_schema = api.schema_model('pending_list.input_list',
+                                                    ObjectsContainer.pending_list_input_object)
+pending_list_return_lists_schema = api.schema_model('pending_list.return_lists',
+                                                    ObjectsContainer.pending_list_return_lists)
 pending_list_operation_schema = api.schema_model('pending_list.operation_schema', ObjectsContainer.operation_object)
 
 list_parser = api.parser()
@@ -146,20 +148,20 @@ class PendingListListAPI(APIResource):
 
 base_entry_schema = api.schema_model('base_entry_schema', ObjectsContainer.base_entry_object)
 pending_list_entry_base_schema = api.schema_model('pending_list.entry_base_schema',
-                                            ObjectsContainer.pending_list_entry_base_object)
+                                                  ObjectsContainer.pending_list_entry_base_object)
 pending_lists_entries_return_schema = api.schema_model('pending_list.entry_return_schema',
-                                                 ObjectsContainer.pending_lists_entries_return_object)
+                                                       ObjectsContainer.pending_lists_entries_return_object)
 
 sort_choices = ('id', 'added', 'title', 'original_url', 'list_id', 'approved')
 entries_parser = api.pagination_parser(sort_choices=sort_choices, default='title')
 
 
 @pending_list_api.route('/<int:list_id>/entries/')
+@api.doc(params={'list_id': 'ID of the list'}, parser=entries_parser)
 @api.response(NotFoundError)
 class PendingListEntriesAPI(APIResource):
     @etag
     @api.response(200, model=pending_lists_entries_return_schema)
-    @api.doc(params={'list_id': 'ID of the list'}, parser=entries_parser)
     def get(self, list_id, session=None):
         """ Get entries by list ID """
         try:
