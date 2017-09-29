@@ -33,7 +33,7 @@ class FilterExistsSeries(object):
                 'type': 'object',
                 'properties': {
                     'path': one_or_more({'type': 'string', 'format': 'path'}),
-                    'allow_different_qualities': {'enum': ['better', True, False], 'default': False}
+                    'allow_different_qualities': {'enum': ['better', True, False], 'default': False},
                     'date_dayfirst': {'type': 'boolean', 'default': False},
                     'date_yearfirst': {'type': 'boolean', 'default': False}
                 },
