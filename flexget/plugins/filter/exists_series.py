@@ -91,8 +91,8 @@ class FilterExistsSeries(object):
                     try:
                         disk_parser = get_plugin_by_name('parsing').instance.parse_series(data=filename.name,
                                                                                           name=series_parser.name,
-                                                                                          date_dayfirst=config['date_dayfirst'],
-                                                                                          date_yearfirst=config['date_yearfirst'])
+                                                                                          date_dayfirst=config.get('date_dayfirst'),
+                                                                                          date_yearfirst=config.get('date_yearfirst'))
                     except ParseWarning as pw:
                         disk_parser = pw.parsed
                         log_once(pw.value, logger=log)
