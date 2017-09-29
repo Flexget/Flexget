@@ -34,6 +34,8 @@ class FilterExistsSeries(object):
                 'properties': {
                     'path': one_or_more({'type': 'string', 'format': 'path'}),
                     'allow_different_qualities': {'enum': ['better', True, False], 'default': False}
+                    'date_dayfirst': {'type': 'boolean', 'default': False},
+                    'date_yearfirst': {'type': 'boolean', 'default': False}
                 },
                 'required': ['path'],
                 'additionalProperties': False
@@ -88,7 +90,9 @@ class FilterExistsSeries(object):
                     # run parser on filename data
                     try:
                         disk_parser = get_plugin_by_name('parsing').instance.parse_series(data=filename.name,
-                                                                                          name=series_parser.name)
+                                                                                          name=series_parser.name,
+                                                                                          date_dayfirst=config['date_dayfirst'],
+                                                                                          date_yearfirst=config['date_yearfirst'])
                     except ParseWarning as pw:
                         disk_parser = pw.parsed
                         log_once(pw.value, logger=log)
