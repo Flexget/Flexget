@@ -21,9 +21,6 @@ requests.headers.update({'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windo
 requests.add_domain_limiter(TimedLimiter('newpct1.com', '2 seconds'))
 requests.add_domain_limiter(TimedLimiter('newpct.com', '2 seconds'))
 
-NEWPCT_TORRENT_FORMAT = 'http://www.newpct.com/torrents/{:0>6}.torrent'
-NEWPCT1_TORRENT_FORMAT = 'http://www.newpct1.com/download/{:0>6}.torrent'
-
 
 class UrlRewriteNewPCT(object):
     """NewPCT urlrewriter and search."""
@@ -61,35 +58,23 @@ class UrlRewriteNewPCT(object):
             raise UrlRewritingError(e)
 
         torrent_id = None
-        if 'newpct1.com' in url:
-            url_format = NEWPCT1_TORRENT_FORMAT
 
-            torrent_id_prog = re.compile(r'descargar-torrent/(.+)/')
-            match = torrent_id_prog.search(soup.text)
+        torrent_id_prog = re.compile("window.location.href = \"(.*)\";")
+        torrent_ids = soup.findAll(text=torrent_id_prog)
+        if len(torrent_ids):
+            match = torrent_id_prog.search(torrent_ids[0])
             if match:
                 torrent_id = match.group(1)
-        else:
-            url_format = NEWPCT_TORRENT_FORMAT
+                return torrent_id
 
-            torrent_id_prog = re.compile("(?:parametros\s*=\s*\n?)\s*{\s*\n(?:\s*'\w+'\s*:.*\n)+\s*'(?:torrentID|id)"
-                                         "'\s*:\s*'(\d+)'")
-            torrent_ids = soup.findAll(text=torrent_id_prog)
-            if len(torrent_ids):
-                match = torrent_id_prog.search(torrent_ids[0])
-                if match:
-                    torrent_id = match.group(1)
-
-        if not torrent_id:
-            raise UrlRewritingError('Unable to locate torrent ID from url %s' % url)
-
-        return url_format.format(torrent_id)
+        raise UrlRewritingError('Unable to locate torrent from url %s' % url)
 
     def search(self, task, entry, config=None):
         if not config:
             log.debug('NewPCT disabled')
             return set()
         log.debug('Search NewPCT')
-        url_search = 'http://www.newpct1.com/buscar'
+        url_search = 'http://newpct1.com/buscar'
         results = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
