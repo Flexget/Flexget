@@ -47,7 +47,6 @@ default_search_params = {
     'visibility': 'aliveonly',
     'visiblecategories': 'Action,Adventure,Animation,Biography,Comedy,Crime,Documentary,Drama,Eastern,Family,Fantasy,'
                          'History,Holiday,Horror,Kids,Musical,Mystery,Romance,Sci-Fi,Short,Sports,Thriller,War,Western',
-    'hiddenqualities': 'FLAC,MP3',
     'order': 'DESC',
     'action': 'torrentstable',
     'bookmarks': 'showall',
@@ -73,7 +72,7 @@ class SearchPTN(object):
         'additionalProperties': False
     }
 
-    def create_entries(self, soup, passkey=None, imdb_id=None):
+    def create_entries(self, soup, imdb_id=None):
         entries = []
         links = soup.findAll('a', attrs={'href': re.compile('download\.php\?torrent=\d+')})
         rows = [l.find_parent('tr') for l in links]
@@ -81,7 +80,7 @@ class SearchPTN(object):
             entry = Entry()
             entry['title'] = row.find('a', attrs={'href': re.compile('detail\.php\?id')}).text
             dl_href = row.find('a', attrs={'href': re.compile('download\.php\?torrent=\d+')}).get('href')
-            entry['url'] = 'http://piratethenet.org/' + dl_href + '&passkey=' + passkey
+            entry['url'] = 'http://piratethenet.org' + dl_href
             entry['torrent_seeds'] = int(row.find(title='Number of Seeders').text)
             entry['torrent_leeches'] = int(row.find(title='Number of Leechers').text)
             entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
@@ -94,7 +93,7 @@ class SearchPTN(object):
         return entries
 
     def search(self, task, entry, config):
-        if not session.cookies or not session.passkey:
+        if not session.cookies:
             try:
                 login_params = {'username': config['username'],
                                 'password': config['password'],
@@ -104,12 +103,9 @@ class SearchPTN(object):
                 log.error('Error while logging in to PtN: %s', e)
                 raise plugin.PluginError('Could not log in to PtN')
 
-            # Sorty hacky, we'll just store the passkey on the session
             passkey = re.search('passkey=([\d\w]+)"', r.text)
-            if passkey:
-                session.passkey = passkey.group(1)
-            else:
-                log.error('PtN cookie info invalid')
+            if not passkey:
+                log.error("It doesn't look like PtN login worked properly.")
                 raise plugin.PluginError('PTN cookie info invalid')
 
         search_params = default_search_params.copy()
@@ -136,7 +132,7 @@ class SearchPTN(object):
                     imdb_id = extract_id(imdb_id['href'])
                 if imdb_id and 'imdb_id' in entry and imdb_id != entry['imdb_id']:
                     continue
-                results.update(self.create_entries(movie, passkey=session.passkey, imdb_id=imdb_id))
+                results.update(self.create_entries(movie, imdb_id=imdb_id))
 
         return results
 

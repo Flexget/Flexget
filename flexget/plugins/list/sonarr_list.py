@@ -26,7 +26,10 @@ class SonarrSet(MutableSet):
             'api_key': {'type': 'string'},
             'include_ended': {'type': 'boolean', 'default': True},
             'only_monitored': {'type': 'boolean', 'default': True},
-            'include_data': {'type': 'boolean', 'default': False}
+            'include_data': {'type': 'boolean', 'default': False},
+            'search_missing_episodes': {'type': 'boolean', 'default': True},
+            'ignore_episodes_without_files': {'type': 'boolean', 'default': False},
+            'ignore_episodes_with_files': {'type': 'boolean', 'default': False}
         },
         'required': ['api_key', 'base_url'],
         'additionalProperties': False
@@ -193,6 +196,9 @@ class SonarrSet(MutableSet):
         show['profileId'] = 1
         show['qualityProfileId '] = 1
         show['rootFolderPath'] = rootfolder[0]['path']
+        show['addOptions'] = {"ignoreEpisodesWithFiles": self.config.get('ignore_episodes_with_files'),
+                              "ignoreEpisodesWithoutFiles": self.config.get('ignore_episodes_without_files'),
+                              "searchForMissingEpisodes": self.config.get('search_missing_episodes')}
 
         series_url, series_headers = self.request_builder(self.config.get('base_url'), 'series',
                                                           self.config.get('port'), self.config['api_key'])

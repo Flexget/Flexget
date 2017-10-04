@@ -767,7 +767,8 @@ def get_latest_season_pack_release(series, downloaded=True, season=None):
         log.debug('no season packs found for series `%s` with parameters season: %s, downloaded: %s',
                   series.name, season, downloaded)
         return
-
+    log.debug('latest season pack for series %s, with downloaded set to %s and season set to %s',
+              series, downloaded, season)
     return latest_season_pack_release
 
 
@@ -802,7 +803,8 @@ def get_latest_episode_release(series, downloaded=True, season=None):
         log.debug('no episodes found for series `%s` with parameters season: %s, downloaded: %s',
                   series.name, season, downloaded)
         return
-
+    log.debug('latest episode for series %s, with downloaded set to %s and season set to %s',
+              series, downloaded, season)
     return latest_episode_release
 
 
