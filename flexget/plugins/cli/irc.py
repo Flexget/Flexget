@@ -8,8 +8,7 @@ from flexget import options
 from flexget.event import event
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console, colorize
 try:
-    from irc_bot.irc_bot import IRCChannelStatus
-    from irc_bot import irc_bot
+    from irc_bot.simple_irc_bot import IRCChannelStatus
 except ImportError:
     irc_bot = None
 

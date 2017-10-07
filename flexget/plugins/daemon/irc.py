@@ -22,11 +22,11 @@ from flexget.utils import requests
 from flexget.utils.tools import get_config_hash
 
 try:
-    from irc_bot.irc_bot import IRCBot, partial
-    from irc_bot import irc_bot
+    from irc_bot.simple_irc_bot import SimpleIRCBot, partial
+    from irc_bot import utils as irc_bot
 except ImportError as e:
     irc_bot = None
-    IRCBot = object
+    SimpleIRCBot = object
 
 log = logging.getLogger('irc')
 
@@ -141,7 +141,7 @@ class MissingConfigOption(Exception):
     """Exception thrown when a config option specified in the tracker file is not on the irc config"""
 
 
-class IRCConnection(IRCBot):
+class IRCConnection(SimpleIRCBot):
     def __init__(self, config, config_name):
         self.config = config
         self.connection_name = config_name
@@ -232,7 +232,7 @@ class IRCConnection(IRCBot):
                          'invite_message': config.get('invite_message'),
                          'nickserv_password': config.get('nickserv_password'),
                          'use_ssl': config.get('use_ssl')}
-        IRCBot.__init__(self, ircbot_config)
+        SimpleIRCBot.__init__(self, ircbot_config)
 
         self.inject_before_shutdown = False
         self.entry_queue = []
@@ -248,11 +248,10 @@ class IRCConnection(IRCBot):
         :return: the parsed XML
         """
         try:
-            tracker_config = parse(path).getroot()
+            with io.open(path, 'rb') as xml_file:
+                return parse(xml_file).getroot()
         except Exception as e:
             raise TrackerFileParseError('Unable to parse tracker config file %s: %s' % (path, e))
-        else:
-            return tracker_config
 
     @classmethod
     def retrieve_tracker_config(cls, tracker_config_file):
@@ -356,7 +355,7 @@ class IRCConnection(IRCBot):
         """
         if self.inject_before_shutdown and self.entry_queue:
             self.run_tasks()
-        IRCBot.quit(self)
+        SimpleIRCBot.quit(self)
 
     def run_tasks(self):
         """
@@ -979,7 +978,7 @@ def irc_update_config(manager):
         return
 
     if irc_bot is None:
-        log.error('ImportError: irc_bot module not found. Shutting down daemon.')
+        log.error('ImportError: irc_bot module not found or version is too old. Shutting down daemon.')
         stop_irc(manager)
         manager.shutdown(finish_queue=False)
         return
