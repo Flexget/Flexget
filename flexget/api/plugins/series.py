@@ -32,10 +32,10 @@ def series_details(show, begin=False, latest=False):
     if begin:
         series_dict['begin_episode'] = show.begin.to_dict() if show.begin else None
     if latest:
-        latest_ep = series.get_latest_release(show)
-        series_dict['latest_episode'] = latest_ep.to_dict() if latest_ep else None
-        if latest_ep:
-            series_dict['latest_episode']['latest_release'] = latest_ep.latest_release.to_dict()
+        latest_entity = series.get_latest_release(show)
+        series_dict['latest_entity'] = latest_entity.to_dict() if latest_entity else None
+        if latest_entity:
+            series_dict['latest_entity']['latest_release'] = latest_entity.latest_release.to_dict()
     return series_dict
 
 
