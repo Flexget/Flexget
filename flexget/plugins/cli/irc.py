@@ -8,15 +8,15 @@ from flexget import options
 from flexget.event import event
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console, colorize
 try:
-    from irc_bot.simple_irc_bot import IRCChannelStatus
+    from irc_bot.simple_irc_bot import IRCChannelStatus, SimpleIRCBot
 except ImportError:
-    irc_bot = None
+    SimpleIRCBot = None
 
 
 def do_cli(manager, options):
     """Handle irc cli"""
 
-    if irc_bot is None:
+    if SimpleIRCBot is None:
         console('irc_bot is not installed. install using `pip install irc_bot`.')
         return
 
