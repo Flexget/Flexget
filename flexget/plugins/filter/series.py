@@ -407,6 +407,29 @@ class Season(Base):
     def __hash__(self):
         return self.id
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'identifier': self.identifier,
+            'season': self.season,
+            'identified_by': self.identified_by,
+            'series_id': self.series_id,
+            'first_seen': self.first_seen,
+            'premiere': self.is_premiere,
+            'number_of_releases': len(self.releases)
+        }
+
+    @property
+    def latest_release(self):
+        """
+        :return: Latest downloaded Release or None
+        """
+        if not self.releases:
+            return None
+        return sorted(self.downloaded_releases,
+                      key=lambda rel: rel.first_seen if rel.downloaded else None,
+                      reverse=True)[0]
+
 
 @total_ordering
 class Episode(Base):
