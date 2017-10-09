@@ -10,8 +10,10 @@ from copy import copy
 from datetime import datetime, timedelta
 from functools import total_ordering
 
-from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
-                        desc, select, update, delete, ForeignKey, Index, func, and_, not_)
+from sqlalchemy import (
+    Column, Integer, String, Unicode, DateTime, Boolean, outerjoin, desc, select, update, delete, ForeignKey, Index, func,
+    and_, not_
+)
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.orm import relation, backref, object_session
@@ -25,8 +27,9 @@ from flexget.plugins.parsers import SERIES_ID_TYPES
 from flexget.utils import qualities
 from flexget.utils.database import quality_property, with_session
 from flexget.utils.log import log_once
-from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
-                                            create_index)
+from flexget.utils.sqlalchemy_utils import (
+    table_columns, table_exists, drop_tables, table_schema, table_add_column, create_index
+)
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta, parse_episode_identifier
 
 SCHEMA_VER = 14
@@ -315,6 +318,26 @@ class Series(Base):
     @property
     def completed_seasons(self):
         return [season.season for season in self.seasons if season.completed]
+
+    @hybrid_property
+    def first_seen(self):
+        first_ep = first_season = None
+        if self.episodes:
+            first_ep = min(episode.first_seen for episode in self.episodes)
+        if self.seasons:
+            first_season = min(season.first_seen for season in self.seasons)
+        if first_season or first_ep:
+            if not first_season:
+                return first_ep
+            elif not first_ep:
+                return first_season
+            else:
+                return min([first_season, first_ep])
+
+    @first_seen.expression
+    def first_seen(cls):
+        j = outerjoin(Episode, Season, Episode.series_id == Season.series_id)
+        return select([func.min(Season.first_seen, Episode.first_seen)]).select_from(j).as_scalar()
 
 
 class Season(Base):
@@ -699,7 +722,8 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
     elif configured not in ['configured', 'unconfigured', 'all']:
         raise LookupError('"configured" parameter must be either "configured", "unconfigured", or "all"')
     query = session.query(Series)
-    query = query.outerjoin(Series.episodes).outerjoin(Episode.releases).outerjoin(Series.in_tasks).group_by(Series.id)
+    query = query.outerjoin(Series.episodes).outerjoin(Season.releases).outerjoin(Episode.releases) \
+        .outerjoin(Series.in_tasks).group_by(Series.id)
     if configured == 'configured':
         query = query.having(func.count(SeriesTask.id) >= 1)
     elif configured == 'unconfigured':
@@ -710,11 +734,11 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
     if status == 'new':
         if not days:
             days = 7
-        query = query.having(func.max(Episode.first_seen) > datetime.now() - timedelta(days=days))
+        query = query.having(func.max(Series.first_seen) > datetime.now() - timedelta(days=days))
     if status == 'stale':
         if not days:
             days = 365
-        query = query.having(func.max(Episode.first_seen) < datetime.now() - timedelta(days=days))
+        query = query.having(func.max(Series.first_seen) < datetime.now() - timedelta(days=days))
     if count:
         return query.group_by(Series).count()
     if sort_by == 'show_name':

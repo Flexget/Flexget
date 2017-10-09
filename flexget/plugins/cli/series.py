@@ -12,15 +12,16 @@ from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, colorize, console
 
 try:
-    from flexget.plugins.filter.series import (Series, remove_series, remove_series_entity, set_series_begin,
-                                               normalize_series_name, new_entities_after, get_latest_release,
-                                               get_series_summary, shows_by_name, show_episodes, shows_by_exact_name,
-                                               get_all_entities, add_series_entity)
+    from flexget.plugins.filter.series import (
+        Series, remove_series, remove_series_entity, set_series_begin, normalize_series_name, new_entities_after,
+        get_latest_release, get_series_summary, shows_by_name, show_episodes, shows_by_exact_name, get_all_entities,
+        add_series_entity
+    )
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
 
-# Enviroment variables to set defaults for `series list` and `series show`
+# Environment variables to set defaults for `series list` and `series show`
 ENV_SHOW_SORTBY_FIELD = 'FLEXGET_SERIES_SHOW_SORTBY_FIELD'
 ENV_SHOW_SORTBY_ORDER = 'FLEXGET_SERIES_SHOW_SORTBY_ORDER'
 ENV_LIST_CONFIGURED = 'FLEXGET_SERIES_LIST_CONFIGURED'
@@ -347,11 +348,12 @@ def register_parser_arguments():
                                   'days can be overridden with %(metavar)s')
     list_parser.add_argument('--sort-by', choices=('name', 'age'), help='Choose list sort attribute')
     order = list_parser.add_mutually_exclusive_group(required=False)
-    order.add_argument('--descending', dest='order', action='store_const', const='desc', help='Sort in descending order')
+    order.add_argument('--descending', dest='order', action='store_const', const='desc',
+                       help='Sort in descending order')
     order.add_argument('--ascending', dest='order', action='store_const', const='asc', help='Sort in ascending order')
 
     show_parser = subparsers.add_parser('show', parents=[series_parser, table_parser],
-                          help='Show the releases FlexGet has seen for a given series')
+                                        help='Show the releases FlexGet has seen for a given series')
     show_parser.add_argument('--sort-by', choices=('age', 'identifier'),
                              help='Choose releases list sort: age (default) or identifier')
     show_order = show_parser.add_mutually_exclusive_group(required=False)
@@ -365,9 +367,9 @@ def register_parser_arguments():
     begin_opts = begin_parser.add_mutually_exclusive_group(required=True)
     begin_opts.add_argument('--forget', dest='forget', action='store_true', help='Forget begin episode', required=False)
     begin_opts.add_argument('episode_id', metavar='<episode ID>',
-                              help='Episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, '
-                                   'depending on how the series is numbered). You can also enter a season ID such as '
-                                   ' S02.', nargs='?', default='')
+                            help='Episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, '
+                                 'depending on how the series is numbered). You can also enter a season ID such as '
+                                 ' S02.', nargs='?', default='')
 
     addshow_parser = subparsers.add_parser('add', parents=[series_parser],
                                            help='Add episode(s) and season(s) to series history')
