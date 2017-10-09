@@ -11,8 +11,8 @@ from datetime import datetime, timedelta
 from functools import total_ordering
 
 from sqlalchemy import (
-    Column, Integer, String, Unicode, DateTime, Boolean, outerjoin, desc, select, update, delete, ForeignKey, Index, func,
-    and_, not_
+    Column, Integer, String, Unicode, DateTime, Boolean, desc, select, update, delete, ForeignKey, Index,
+    func, and_, not_
 )
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
@@ -336,8 +336,10 @@ class Series(Base):
 
     @first_seen.expression
     def first_seen(cls):
-        j = outerjoin(Episode, Season, Episode.series_id == Season.series_id)
-        return select([func.min(Season.first_seen, Episode.first_seen)]).select_from(j).as_scalar()
+        s1 = select([Season.first_seen]).where(Season.series_id == cls.id)
+        s2 = select([Episode.first_seen]).where(Episode.series_id == cls.id)
+        q = s1.union(s2).alias("first_seen_union")
+        return select([func.min(q.c.first_seen)]).as_scalar()
 
 
 class Season(Base):
