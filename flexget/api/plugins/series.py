@@ -74,6 +74,9 @@ class ObjectsContainer(object):
                      'series_id', 'number_of_releases']
     }
 
+    season_object = copy.deepcopy(episode_object)
+    del season_object['properties']['number']
+
     single_series_object = {
         'type': 'object',
         'properties': {
@@ -97,6 +100,8 @@ class ObjectsContainer(object):
     series_list_schema = {'type': 'array', 'items': single_series_object}
 
     episode_list_schema = {'type': 'array', 'items': episode_object}
+
+    seasons_list_schema = {'type': 'array', 'items': season_object}
 
     series_edit_object = {
         'type': 'object',
@@ -125,6 +130,9 @@ show_details_schema = api.schema_model('show_details', ObjectsContainer.single_s
 
 episode_list_schema = api.schema_model('episode_list', ObjectsContainer.episode_list_schema)
 episode_schema = api.schema_model('episode_item', ObjectsContainer.episode_object)
+
+season_list_schema = api.schema_model('season_list', ObjectsContainer.seasons_list_schema)
+season_schema = api.schema_model('episode_item', ObjectsContainer.season_object)
 
 release_schema = api.schema_model('release_schema', ObjectsContainer.release_object)
 release_list_schema = api.schema_model('release_list_schema', ObjectsContainer.release_list_schema)
@@ -357,6 +365,91 @@ class SeriesShowAPI(APIResource):
                 # Alternate name already exist for a different show
                 raise Conflict(e.value)
         return jsonify(series_details(show, begin=ep_id is not None))
+
+
+season_parser = api.pagination_parser(add_sort=True)
+
+
+@api.response(NotFoundError)
+@series_api.route('/<int:show_id>/seasons/')
+@api.doc(params={'show_id': 'ID of the show'},
+         description='The \'Series-ID\' header will be appended to the result headers')
+class SeriesSeasonsAPI(APIResource):
+    @etag
+    @api.response(200, 'Seasons retrieved successfully for show', season_list_schema)
+    @api.doc(description='Get all show seasons via its ID', parser=season_parser)
+    def get(self, show_id, session):
+        """ Get episodes by show ID """
+        args = season_parser.parse_args()
+
+        # Pagination and sorting params
+        page = args['page']
+        per_page = args['per_page']
+        sort_order = args['order']
+
+        # Handle max size limit
+        if per_page > 100:
+            per_page = 100
+
+        descending = sort_order == 'desc'
+
+        start = per_page * (page - 1)
+        stop = start + per_page
+
+        kwargs = {
+            'start': start,
+            'stop': stop,
+            'descending': descending,
+            'session': session
+        }
+
+        try:
+            show = series.show_by_id(show_id, session=session)
+        except NoResultFound:
+            raise NotFoundError('show with ID %s not found' % show_id)
+
+        total_items = series.show_seasons(show, count=True, session=session)
+
+        if not total_items:
+            return jsonify([])
+
+        seasons = [season.to_dict() for season in series.show_seasons(show, **kwargs)]
+
+        total_pages = int(ceil(total_items / float(per_page)))
+
+        if total_pages < page and total_pages != 0:
+            raise NotFoundError('page %s does not exist' % page)
+
+        # Actual results in page
+        actual_size = min(per_page, len(seasons))
+
+        # Get pagination headers
+        pagination = pagination_headers(total_pages, total_items, actual_size, request)
+
+        # Created response
+        rsp = jsonify(seasons)
+
+        # Add link header to response
+        rsp.headers.extend(pagination)
+
+        # Add series ID header
+        rsp.headers.extend({'Series-ID': show_id})
+        return rsp
+
+    @api.response(200, 'Successfully forgotten all episodes from show', model=base_message_schema)
+    @api.doc(description='Delete all show episodes via its ID. Deleting an episode will mark it as wanted again',
+             parser=delete_parser)
+    def delete(self, show_id, session):
+        """ Deletes all episodes of a show"""
+        try:
+            show = series.show_by_id(show_id, session=session)
+        except NoResultFound:
+            raise NotFoundError('show with ID %s not found' % show_id)
+        args = delete_parser.parse_args()
+        forget = args.get('forget')
+        for episode in show.episodes:
+            series.remove_series_entity(show.name, episode.identifier, forget)
+        return success_response('successfully removed all series %s episodes from DB' % show_id)
 
 
 episode_parser = api.pagination_parser(add_sort=True)

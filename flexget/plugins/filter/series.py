@@ -438,7 +438,6 @@ class Season(Base):
             'identified_by': self.identified_by,
             'series_id': self.series_id,
             'first_seen': self.first_seen,
-            'premiere': self.is_premiere,
             'number_of_releases': len(self.releases)
         }
 
