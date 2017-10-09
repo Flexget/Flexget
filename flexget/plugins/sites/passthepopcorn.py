@@ -253,7 +253,7 @@ class SearchPassThePopcorn(object):
 
             for movie in result['Movies']:
                 # skip movies that are irrelevant
-                if entry.get('movie_year') and movie['Year'] != entry['movie_year']:
+                if entry.get('movie_year') and int(movie['Year']) != int(entry['movie_year']):
                     log.debug('Movie year %s does not match %s', movie['Year'], entry['movie_year'])
                     continue
                 # imdb id in the json result is without 'tt'
