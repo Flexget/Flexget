@@ -367,7 +367,7 @@ class SeriesShowAPI(APIResource):
         return jsonify(series_details(show, begin=ep_id is not None))
 
 
-season_parser = api.pagination_parser(add_sort=True)
+entity_parser = api.pagination_parser(add_sort=True)
 
 
 @api.response(NotFoundError)
@@ -377,10 +377,10 @@ season_parser = api.pagination_parser(add_sort=True)
 class SeriesSeasonsAPI(APIResource):
     @etag
     @api.response(200, 'Seasons retrieved successfully for show', season_list_schema)
-    @api.doc(description='Get all show seasons via its ID', parser=season_parser)
+    @api.doc(description='Get all show seasons via its ID', parser=entity_parser)
     def get(self, show_id, session):
-        """ Get episodes by show ID """
-        args = season_parser.parse_args()
+        """ Get seasons by show ID """
+        args = entity_parser.parse_args()
 
         # Pagination and sorting params
         page = args['page']
@@ -436,23 +436,70 @@ class SeriesSeasonsAPI(APIResource):
         rsp.headers.extend({'Series-ID': show_id})
         return rsp
 
-    @api.response(200, 'Successfully forgotten all episodes from show', model=base_message_schema)
-    @api.doc(description='Delete all show episodes via its ID. Deleting an episode will mark it as wanted again',
+    @api.response(200, 'Successfully forgotten all seasons from show', model=base_message_schema)
+    @api.doc(description='Delete all show seasons via its ID. Deleting a season will mark it as wanted again',
              parser=delete_parser)
     def delete(self, show_id, session):
-        """ Deletes all episodes of a show"""
+        """ Deletes all seasons of a show"""
         try:
             show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             raise NotFoundError('show with ID %s not found' % show_id)
         args = delete_parser.parse_args()
         forget = args.get('forget')
-        for episode in show.episodes:
-            series.remove_series_entity(show.name, episode.identifier, forget)
-        return success_response('successfully removed all series %s episodes from DB' % show_id)
+        for season in show.seasons:
+            series.remove_series_entity(show.name, season.identifier, forget)
+        return success_response('successfully removed all series %s seasons from DB' % show_id)
 
 
-episode_parser = api.pagination_parser(add_sort=True)
+@api.response(NotFoundError)
+@api.response(BadRequest)
+@series_api.route('/<int:show_id>/seasons/<int:season_id>/')
+@api.doc(params={'show_id': 'ID of the show', 'season_id': 'Season ID'})
+class SeriesSeasonsAPI(APIResource):
+    @etag
+    @api.response(200, 'Season retrieved successfully for show', season_schema)
+    @api.doc(description='Get a specific season via its ID and show ID')
+    def get(self, show_id, season_id, session):
+        """ Get episode by show ID and episode ID"""
+        try:
+            series.show_by_id(show_id, session=session)
+        except NoResultFound:
+            raise NotFoundError('show with ID %s not found' % show_id)
+        try:
+            episode = series.episode_by_id(season_id, session)
+        except NoResultFound:
+            raise NotFoundError('episode with ID %s not found' % season_id)
+        if not series.episode_in_show(show_id, season_id):
+            raise BadRequest('episode with id %s does not belong to show %s' % (season_id, show_id))
+
+        rsp = jsonify(episode.to_dict())
+
+        # Add Series-ID header
+        rsp.headers.extend({'Series-ID': show_id})
+        return rsp
+
+    @api.response(200, 'Episode successfully forgotten for show', model=base_message_schema)
+    @api.doc(description='Delete a specific episode via its ID and show ID. Deleting an episode will mark it as '
+                         'wanted again',
+             parser=delete_parser)
+    def delete(self, show_id, season_id, session):
+        """ Forgets episode by show ID and episode ID """
+        try:
+            show = series.show_by_id(show_id, session=session)
+        except NoResultFound:
+            raise NotFoundError('show with ID %s not found' % show_id)
+        try:
+            episode = series.season_by_id(season_id, session)
+        except NoResultFound:
+            raise NotFoundError('season with ID %s not found' % season_id)
+        if not series.episode_in_show(show_id, season_id):
+            raise BadRequest('season with id %s does not belong to show %s' % (season_id, show_id))
+
+        args = delete_parser.parse_args()
+        series.remove_series_entity(show.name, episode.identifier, args.get('forget'))
+
+        return success_response('successfully removed season %s from show %s' % (season_id, show_id))
 
 
 @api.response(NotFoundError)
@@ -462,10 +509,10 @@ episode_parser = api.pagination_parser(add_sort=True)
 class SeriesEpisodesAPI(APIResource):
     @etag
     @api.response(200, 'Episodes retrieved successfully for show', episode_list_schema)
-    @api.doc(description='Get all show episodes via its ID', parser=episode_parser)
+    @api.doc(description='Get all show episodes via its ID', parser=entity_parser)
     def get(self, show_id, session):
         """ Get episodes by show ID """
-        args = episode_parser.parse_args()
+        args = entity_parser.parse_args()
 
         # Pagination and sorting params
         page = args['page']
@@ -654,10 +701,10 @@ class SeriesReleasesAPI(APIResource):
         }
 
         # Total number of releases
-        total_items = series.get_releases(count=True, **kwargs)
+        total_items = series.get_episode_releases(count=True, **kwargs)
 
         # Release items
-        release_items = [release.to_dict() for release in series.get_releases(**kwargs)]
+        release_items = [release.to_dict() for release in series.get_episode_releases(**kwargs)]
 
         # Total number of pages
         total_pages = int(ceil(total_items / float(per_page)))
@@ -758,7 +805,7 @@ class SeriesReleaseAPI(APIResource):
         except NoResultFound:
             raise NotFoundError('episode with ID %s not found' % ep_id)
         try:
-            release = series.release_by_id(rel_id, session)
+            release = series.episode_release_by_id(rel_id, session)
         except NoResultFound:
             raise NotFoundError('release with ID %s not found' % rel_id)
         if not series.episode_in_show(show_id, ep_id):
@@ -787,7 +834,7 @@ class SeriesReleaseAPI(APIResource):
         except NoResultFound:
             raise NotFoundError('episode with ID %s not found' % ep_id)
         try:
-            release = series.release_by_id(rel_id, session)
+            release = series.episode_release_by_id(rel_id, session)
         except NoResultFound:
             raise NotFoundError('release with ID %s not found' % rel_id)
         if not series.episode_in_show(show_id, ep_id):
@@ -814,7 +861,7 @@ class SeriesReleaseAPI(APIResource):
         except NoResultFound:
             raise NotFoundError('episode with ID %s not found' % ep_id)
         try:
-            release = series.release_by_id(rel_id, session)
+            release = series.episode_release_by_id(rel_id, session)
         except NoResultFound:
             raise NotFoundError('release with ID %s not found' % rel_id)
         if not series.episode_in_show(show_id, ep_id):

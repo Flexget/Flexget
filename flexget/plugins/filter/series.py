@@ -1179,14 +1179,24 @@ def show_by_id(show_id, session=None):
     return session.query(Series).filter(Series.id == show_id).one()
 
 
+def season_by_id(season_id, session=None):
+    """ Return an instance of an season by querying its ID """
+    return session.query(Season).filter(Season.id == season_id).one()
+
+
 def episode_by_id(episode_id, session=None):
     """ Return an instance of an episode by querying its ID """
     return session.query(Episode).filter(Episode.id == episode_id).one()
 
 
-def release_by_id(release_id, session=None):
-    """ Return an instance of a release by querying its ID """
+def episode_release_by_id(release_id, session=None):
+    """ Return an instance of an episode release by querying its ID """
     return session.query(EpisodeRelease).filter(EpisodeRelease.id == release_id).one()
+
+
+def season_release_by_id(release_id, session=None):
+    """ Return an instance of an episode release by querying its ID """
+    return session.query(SeasonRelease).filter(SeasonRelease.id == release_id).one()
 
 
 def show_episodes(series, start=None, stop=None, count=False, descending=False, session=None):
@@ -1224,8 +1234,8 @@ def get_all_entities(series, session, sort_by='age', reverse=False):
     return sorted(episodes + seasons, key=key, reverse=reverse)
 
 
-def get_releases(episode, downloaded=None, start=None, stop=None, count=False, descending=False, sort_by=None,
-                 session=None):
+def get_episode_releases(episode, downloaded=None, start=None, stop=None, count=False, descending=False, sort_by=None,
+                         session=None):
     """ Return all releases for a given episode """
     releases = session.query(EpisodeRelease).filter(EpisodeRelease.episode_id == episode.id)
     if downloaded is not None:
@@ -1240,6 +1250,22 @@ def get_releases(episode, downloaded=None, start=None, stop=None, count=False, d
     return releases.all()
 
 
+def get_season_releases(season, downloaded=None, start=None, stop=None, count=False, descending=False, sort_by=None,
+                        session=None):
+    """ Return all releases for a given season """
+    releases = session.query(SeasonRelease).filter(SeasonRelease.season_id == season.id)
+    if downloaded is not None:
+        releases = releases.filter(SeasonRelease.downloaded == downloaded)
+    if count:
+        return releases.count()
+    releases = releases.slice(start, stop).from_self()
+    if descending:
+        releases = releases.order_by(getattr(SeasonRelease, sort_by).desc())
+    else:
+        releases = releases.order_by(getattr(SeasonRelease, sort_by))
+    return releases.all()
+
+
 def episode_in_show(series_id, episode_id):
     """ Return True if `episode_id` is part of show with `series_id`, else return False """
     with Session() as session:
@@ -1247,11 +1273,25 @@ def episode_in_show(series_id, episode_id):
         return episode.series_id == series_id
 
 
+def season_in_show(series_id, season_id):
+    """ Return True if `episode_id` is part of show with `series_id`, else return False """
+    with Session() as session:
+        season = session.query(Season).filter(Season.id == season_id).one()
+        return season.series_id == series_id
+
+
 def release_in_episode(episode_id, release_id):
     """ Return True if `release_id` is part of episode with `episode_id`, else return False """
     with Session() as session:
         release = session.query(EpisodeRelease).filter(EpisodeRelease.id == release_id).one()
         return release.episode_id == episode_id
+
+
+def release_in_season(season_id, release_id):
+    """ Return True if `release_id` is part of episode with `episode_id`, else return False """
+    with Session() as session:
+        release = session.query(SeasonRelease).filter(SeasonRelease.id == release_id).one()
+        return release.season_id == season_id
 
 
 def populate_entry_fields(entry, parser, config):
