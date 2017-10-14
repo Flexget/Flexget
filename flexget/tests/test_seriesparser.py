@@ -607,3 +607,12 @@ class TestSeriesParser(object):
         assert s.episode == 14
         assert s.quality.name == '720p hdtv h264 aac'
         assert not s.proper, 'detected proper'
+
+    def test_season_pack_fallback_to_episode(self, parse):
+        """SeriesParser: Github issue #1986, s\d{1} parses as invalid season"""
+        s = parse(name='The Show', data='The.Show.S01E01.eps3.0.some.title.720p.x264-NOGRP')
+        assert s.valid
+        assert not s.season_pack
+        assert s.season == 1
+        assert s.episode == 1
+

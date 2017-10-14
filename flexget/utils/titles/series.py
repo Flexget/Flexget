@@ -317,42 +317,41 @@ class SeriesParser(TitleParser):
                 log.debug('-> no luck with date_regexps')
 
         if self.identified_by in ['ep', 'auto'] and not self.valid:
-            season_pack_match = self.parse_season_packs(data_stripped)
-            # If a title looks like a special, give it precendance over season pack
-            if season_pack_match and not self.special:
-                if self.strict_name and season_pack_match['match'].start() > 1:
-                    season_pack_match = None
+            ep_match = self.parse_episode(data_stripped)
+            if ep_match:
+                # strict_name
+                if self.strict_name:
+                    if ep_match['match'].start() > 1:
+                        return
+
+                if ep_match['end_episode'] and ep_match['end_episode'] > ep_match['episode'] + 2:
+                    # This is a pack of too many episodes, ignore it.
+                    log.debug('Series pack contains too many episodes (%d). Rejecting',
+                              ep_match['end_episode'] - ep_match['episode'])
+                    return
+
+                self.season = ep_match['season']
+                self.episode = ep_match['episode']
+                if ep_match['end_episode']:
+                    self.episodes = (ep_match['end_episode'] - ep_match['episode']) + 1
                 else:
-                    self.season = season_pack_match['season']
-                    self.season_pack = True
-                    self.id = 'S%s' % season_pack_match['season']
-                    self.id_type = 'ep'
-                    self.valid = True
-
-            if not season_pack_match:
-                ep_match = self.parse_episode(data_stripped)
-                if ep_match:
-                    # strict_name
-                    if self.strict_name:
-                        if ep_match['match'].start() > 1:
-                            return
-
-                    if ep_match['end_episode'] and ep_match['end_episode'] > ep_match['episode'] + 2:
-                        # This is a pack of too many episodes, ignore it.
-                        log.debug('Series pack contains too many episodes (%d). Rejecting',
-                                  ep_match['end_episode'] - ep_match['episode'])
-                        return
-
-                    self.season = ep_match['season']
-                    self.episode = ep_match['episode']
-                    if ep_match['end_episode']:
-                        self.episodes = (ep_match['end_episode'] - ep_match['episode']) + 1
+                    self.episodes = 1
+                self.id_type = 'ep'
+                self.valid = True
+                if not (self.special and self.prefer_specials):
+                    return
+            else:
+                season_pack_match = self.parse_season_packs(data_stripped)
+                # If a title looks like a special, give it precedence over season pack
+                if season_pack_match and not self.special:
+                    if self.strict_name and season_pack_match['match'].start() > 1:
+                        season_pack_match = None
                     else:
-                        self.episodes = 1
-                    self.id_type = 'ep'
-                    self.valid = True
-                    if not (self.special and self.prefer_specials):
-                        return
+                        self.season = season_pack_match['season']
+                        self.season_pack = True
+                        self.id = 'S%s' % season_pack_match['season']
+                        self.id_type = 'ep'
+                        self.valid = True
                 else:
                     log.debug('-> no luck with ep_regexps')
 
