@@ -345,13 +345,12 @@ class SeriesParser(TitleParser):
                 # If a title looks like a special, give it precedence over season pack
                 if season_pack_match and not self.special:
                     if self.strict_name and season_pack_match['match'].start() > 1:
-                        season_pack_match = None
-                    else:
-                        self.season = season_pack_match['season']
-                        self.season_pack = True
-                        self.id = 'S%s' % season_pack_match['season']
-                        self.id_type = 'ep'
-                        self.valid = True
+                        return
+                    self.season = season_pack_match['season']
+                    self.season_pack = True
+                    self.id = 'S%s' % season_pack_match['season']
+                    self.id_type = 'ep'
+                    self.valid = True
                 else:
                     log.debug('-> no luck with ep_regexps')
 
