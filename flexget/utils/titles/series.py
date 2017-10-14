@@ -320,15 +320,15 @@ class SeriesParser(TitleParser):
             season_pack_match = self.parse_season_packs(data_stripped)
             # If a title looks like a special, give it precendance over season pack
             if season_pack_match and not self.special:
-                if self.strict_name:
-                    if season_pack_match['match'].start() > 1:
-                        return
-                self.season = season_pack_match['season']
-                self.season_pack = True
-                self.id = 'S%s' % season_pack_match['season']
-                self.id_type = 'ep'
-                self.valid = True
-            else:
+                if self.strict_name and season_pack_match['match'].start() <= 1:
+                    self.season = season_pack_match['season']
+                    self.season_pack = True
+                    self.id = 'S%s' % season_pack_match['season']
+                    self.id_type = 'ep'
+                    self.valid = True
+                else:
+                    season_pack_match = None
+            if not season_pack_match:
                 ep_match = self.parse_episode(data_stripped)
                 if ep_match:
                     # strict_name
@@ -577,13 +577,13 @@ class SeriesParser(TitleParser):
                 if len(matches) == 1:
                     # Single season full pack, no parts etc
                     season = int(matches[0])
+                    return {
+                        'season': season,
+                        'match': match
+                    }
                 elif len(matches) == 2:
                     # TODO support other formats of season packs: 1xall, s01-PART1, etc.
                     pass
-                return {
-                    'season': season,
-                    'match': match
-                }
 
     def roman_to_int(self, roman):
         """Converts roman numerals up to 39 to integers"""
