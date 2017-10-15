@@ -30,7 +30,7 @@ ShallowWrapper {
   Symbol(enzyme.__node__): Object {
     "instance": null,
     "key": null,
-    "nodeType": "function",
+    "nodeType": "class",
     "props": Object {
       "children": <InfiniteScroll
         element="div"
@@ -50,11 +50,11 @@ ShallowWrapper {
       >
         <withStyles(List)
           subheader={
-            <Unknown
+            <Styled(withStyles(ListSubheader))
               color="primary"
             >
               2017-09-09
-            </Unknown>
+            </Styled(withStyles(ListSubheader))>
           }
         >
           <withStyles(ListItem)>
@@ -75,11 +75,11 @@ ShallowWrapper {
         "children": Array [
           <withStyles(List)
             subheader={
-              <Unknown
+              <Styled(withStyles(ListSubheader))
                 color="primary"
               >
                 2017-09-09
-              </Unknown>
+              </Styled(withStyles(ListSubheader))>
             }
           >
             <withStyles(ListItem)>
@@ -118,11 +118,11 @@ ShallowWrapper {
                 />
               </withStyles(ListItem)>,
             ],
-            "subheader": <Unknown
+            "subheader": <Styled(withStyles(ListSubheader))
               color="primary"
             >
               2017-09-09
-            </Unknown>,
+            </Styled(withStyles(ListSubheader))>,
           },
           "ref": null,
           "rendered": Array [
@@ -163,7 +163,7 @@ ShallowWrapper {
     Object {
       "instance": null,
       "key": null,
-      "nodeType": "function",
+      "nodeType": "class",
       "props": Object {
         "children": <InfiniteScroll
           element="div"
@@ -183,11 +183,11 @@ ShallowWrapper {
         >
           <withStyles(List)
             subheader={
-              <Unknown
+              <Styled(withStyles(ListSubheader))
                 color="primary"
               >
                 2017-09-09
-              </Unknown>
+              </Styled(withStyles(ListSubheader))>
             }
           >
             <withStyles(ListItem)>
@@ -208,11 +208,11 @@ ShallowWrapper {
           "children": Array [
             <withStyles(List)
               subheader={
-                <Unknown
+                <Styled(withStyles(ListSubheader))
                   color="primary"
                 >
                   2017-09-09
-                </Unknown>
+                </Styled(withStyles(ListSubheader))>
               }
             >
               <withStyles(ListItem)>
@@ -251,11 +251,11 @@ ShallowWrapper {
                   />
                 </withStyles(ListItem)>,
               ],
-              "subheader": <Unknown
+              "subheader": <Styled(withStyles(ListSubheader))
                 color="primary"
               >
                 2017-09-09
-              </Unknown>,
+              </Styled(withStyles(ListSubheader))>,
             },
             "ref": null,
             "rendered": Array [
