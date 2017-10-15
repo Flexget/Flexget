@@ -707,6 +707,7 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
                        sort_by='show_name', descending=None, session=None):
     """
     Return a query with results for all series.
+
     :param configured: 'configured' for shows in config, 'unconfigured' for shows not in config, 'all' for both.
     Default is 'all'
     :param premieres: Return only shows with 1 season and less than 3 episodes
