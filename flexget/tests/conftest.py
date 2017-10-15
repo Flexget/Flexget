@@ -165,6 +165,7 @@ def link_headers(manager):
     """
     Parses link headers and return them in dict form
     """
+
     def headers(response):
         links = {}
         for link in requests.utils.parse_header_links(response.headers.get('link')):
@@ -321,6 +322,10 @@ class MockManager(Manager):
         """
         config = yaml.safe_load(self.config_text) or {}
         self.update_config(config)
+
+    @property
+    def conn(self):
+        return self.engine.connect()
 
     # no lock files with unit testing
     @contextmanager

@@ -6,6 +6,7 @@ from io import StringIO
 
 import pytest
 from jinja2 import Template
+from sqlalchemy.sql import select
 
 from flexget.entry import Entry
 from flexget.logger import capture_output
@@ -2422,11 +2423,12 @@ class TestSeriesFirstSeen(object):
         """No use for different parser tests here"""
         return self._config
 
-    def test_series_first_seen_only_episode(self):
+    def test_series_first_seen_only_episode(self, manager):
+        series_name = 'test series 1'
         first_seen = datetime.now()
         with Session() as session:
             series = Series()
-            series.name = 'test series 1'
+            series.name = series_name
             session.add(series)
 
             task = SeriesTask('test task')
@@ -2450,14 +2452,19 @@ class TestSeriesFirstSeen(object):
             series.episodes.append(episode1)
 
         with Session() as session:
-            series = session.query(Series).filter(Series.name == 'test series 1').one()
+            series = session.query(Series).filter(Series.name == series_name).one()
             assert series.first_seen == first_seen
 
-    def test_series_first_seen_only_season(self):
+        s = select([Series]).where(Series.first_seen == first_seen).where(Series.name == series_name)
+        res = manager.conn.execute(s).fetchone()
+        assert res
+
+    def test_series_first_seen_only_season(self, manager):
+        series_name = 'test series 2'
         first_seen = datetime.now()
         with Session() as session:
             series = Series()
-            series.name = 'test series 2'
+            series.name = series_name
             session.add(series)
 
             task = SeriesTask('test task')
@@ -2480,15 +2487,22 @@ class TestSeriesFirstSeen(object):
             series.seasons.append(season)
 
         with Session() as session:
-            series = session.query(Series).filter(Series.name == 'test series 2').one()
+            series = session.query(Series).filter(Series.name == series_name).one()
             assert series.first_seen == first_seen
 
-    def test_series_first_seen_ep_and_season(self):
+        s = select([Series]).where(Series.first_seen == first_seen).where(Series.name == series_name)
+        res = manager.conn.execute(s).fetchone()
+        assert res
+
+    def test_series_first_seen_ep_and_season(self, manager):
+        series_name = 'test series 3'
         ep_first_seen = datetime.now()
         season_first_seen = ep_first_seen + timedelta(hours=1)
+        series_first_seen = min([ep_first_seen, season_first_seen])
+
         with Session() as session:
             series = Series()
-            series.name = 'test series 3'
+            series.name = series_name
             session.add(series)
 
             task = SeriesTask('test task')
@@ -2524,10 +2538,15 @@ class TestSeriesFirstSeen(object):
             series.seasons.append(season)
 
         with Session() as session:
-            series = session.query(Series).filter(Series.name == 'test series 3').one()
-            assert series.first_seen == min([ep_first_seen, season_first_seen])
+            series = session.query(Series).filter(Series.name == series_name).one()
+            assert series.first_seen == series_first_seen
+
+        s = select([Series]).where(Series.first_seen == series_first_seen).where(Series.name == series_name)
+        res = manager.conn.execute(s).fetchone()
+        assert res
 
     def test_series_first_seen_no_releases(self):
+        series_name = 'test series 4'
         with Session() as session:
             series = Series()
             series.name = 'test series 4'
@@ -2537,5 +2556,5 @@ class TestSeriesFirstSeen(object):
             series.in_tasks = [task]
 
         with Session() as session:
-            series = session.query(Series).filter(Series.name == 'test series 4').one()
+            series = session.query(Series).filter(Series.name == series_name).one()
             assert series.first_seen is None
