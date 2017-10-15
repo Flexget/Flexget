@@ -11,8 +11,8 @@ import { ConnectedRouter } from 'connected-react-router';
 import { MuiThemeProvider } from 'material-ui/styles';
 import { injectGlobal } from 'emotion/react';
 import theme from 'theme';
-import PrivateRoute from 'containers/common/PrivateRoute';
-import Layout from 'components/layout';
+import PrivateRoute from 'common/PrivateRoute';
+import Layout from 'pages/Layout';
 import { createAsyncComponent } from 'utils/loading';
 
 // eslint-disable-next-line no-unused-expressions
@@ -42,11 +42,11 @@ injectGlobal`
   }
 `;
 
-const Home = createAsyncComponent(() => import('components/home'));
-const Log = createAsyncComponent(() => import('components/log'));
-const Login = createAsyncComponent(() => import('containers/login'));
-const Series = createAsyncComponent(() => import('containers/series'));
-const History = createAsyncComponent(() => import('containers/history'));
+const Home = createAsyncComponent(() => import('pages/Home'));
+const Log = createAsyncComponent(() => import('pages/Log'));
+const Login = createAsyncComponent(() => import('pages/Login'));
+const Series = createAsyncComponent(() => import('pages/Series'));
+const History = createAsyncComponent(() => import('pages/History'));
 
 const jss = create(preset());
 jss.options.createGenerateClassName = createGenerateClassName;

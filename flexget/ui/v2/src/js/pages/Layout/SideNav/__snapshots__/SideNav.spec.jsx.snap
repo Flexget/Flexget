@@ -1,0 +1,1299 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pages/Layout/Sidenav adds mini classes without sideBarOpen 1`] = `
+.glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-60 {
+  width: inherit;
+  height: inherit;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+.glamor-49 {
+  width: inherit;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+.glamor-51 {
+  margin: 0px;
+}
+
+.glamor-61 {
+  position: relative;
+  background-color: #263238;
+  height: calc(100vh - 10rem);
+  width: 0;
+  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  border-right: none !important;
+}
+
+.glamor-58 {
+  color: #f44336;
+  display: none;
+}
+
+@media (min-width:600px) {
+  .glamor-61 {
+    height: calc(100vh - 5rem);
+    width: 6rem;
+  }
+}
+
+<div
+  className="MuiDrawer-docked-6"
+>
+  .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-60 {
+  width: inherit;
+  height: inherit;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+.glamor-49 {
+  width: inherit;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+.glamor-51 {
+  margin: 0px;
+}
+
+.glamor-61 {
+  position: relative;
+  background-color: #263238;
+  height: calc(100vh - 10rem);
+  width: 0;
+  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  border-right: none !important;
+}
+
+.glamor-58 {
+  color: #f44336;
+  display: none;
+}
+
+@media (min-width:600px) {
+  .glamor-61 {
+    height: calc(100vh - 5rem);
+    width: 6rem;
+  }
+}
+
+<div
+    className="MuiPaper-root-8 MuiPaper-shadow0-10 MuiDrawer-paper-1 glamor-61 MuiDrawer-anchorLeft-2"
+  >
+    .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-60 {
+  width: inherit;
+  height: inherit;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+.glamor-49 {
+  width: inherit;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+.glamor-51 {
+  margin: 0px;
+}
+
+.glamor-58 {
+  color: #f44336;
+  display: none;
+}
+
+<div
+      className="glamor-59 glamor-60"
+    >
+      .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-49 {
+  width: inherit;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<ul
+        className="MuiList-root-35 MuiList-padding-36 glamor-48 glamor-49"
+      >
+        .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<a
+          href="/config"
+          onClick={[Function]}
+        >
+          .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<li
+            className="MuiListItem-root-39 MuiListItem-gutters-46 MuiListItem-default-42 glamor-4 glamor-5"
+            disabled={false}
+            onClick={[Function]}
+          >
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<span
+              aria-hidden="true"
+              className="material-icons MuiIcon-root-49 glamor-0 MuiListItemIcon-root-48 fa fa-pencil glamor-1"
+            />
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<div
+              className="MuiListItemText-root-56 MuiListItemText-inset-57 glamor-0 glamor-1"
+            >
+              Config
+            </div>
+          </li>
+        </a>
+        .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<a
+          href="/history"
+          onClick={[Function]}
+        >
+          .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<li
+            className="MuiListItem-root-39 MuiListItem-gutters-46 MuiListItem-default-42 glamor-4 glamor-5"
+            disabled={false}
+            onClick={[Function]}
+          >
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<span
+              aria-hidden="true"
+              className="material-icons MuiIcon-root-49 glamor-0 MuiListItemIcon-root-48 fa fa-history glamor-1"
+            />
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<div
+              className="MuiListItemText-root-56 MuiListItemText-inset-57 glamor-0 glamor-1"
+            >
+              History
+            </div>
+          </li>
+        </a>
+        .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<a
+          href="/log"
+          onClick={[Function]}
+        >
+          .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<li
+            className="MuiListItem-root-39 MuiListItem-gutters-46 MuiListItem-default-42 glamor-4 glamor-5"
+            disabled={false}
+            onClick={[Function]}
+          >
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<span
+              aria-hidden="true"
+              className="material-icons MuiIcon-root-49 glamor-0 MuiListItemIcon-root-48 fa fa-book glamor-1"
+            />
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<div
+              className="MuiListItemText-root-56 MuiListItemText-inset-57 glamor-0 glamor-1"
+            >
+              Log
+            </div>
+          </li>
+        </a>
+        .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<a
+          href="/movies"
+          onClick={[Function]}
+        >
+          .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<li
+            className="MuiListItem-root-39 MuiListItem-gutters-46 MuiListItem-default-42 glamor-4 glamor-5"
+            disabled={false}
+            onClick={[Function]}
+          >
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<span
+              aria-hidden="true"
+              className="material-icons MuiIcon-root-49 glamor-0 MuiListItemIcon-root-48 fa fa-film glamor-1"
+            />
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<div
+              className="MuiListItemText-root-56 MuiListItemText-inset-57 glamor-0 glamor-1"
+            >
+              Movies
+            </div>
+          </li>
+        </a>
+        .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<a
+          href="/pending"
+          onClick={[Function]}
+        >
+          .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<li
+            className="MuiListItem-root-39 MuiListItem-gutters-46 MuiListItem-default-42 glamor-4 glamor-5"
+            disabled={false}
+            onClick={[Function]}
+          >
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<span
+              aria-hidden="true"
+              className="material-icons MuiIcon-root-49 glamor-0 MuiListItemIcon-root-48 fa fa-check glamor-1"
+            />
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<div
+              className="MuiListItemText-root-56 MuiListItemText-inset-57 glamor-0 glamor-1"
+            >
+              Pending
+            </div>
+          </li>
+        </a>
+        .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<a
+          href="/seen"
+          onClick={[Function]}
+        >
+          .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<li
+            className="MuiListItem-root-39 MuiListItem-gutters-46 MuiListItem-default-42 glamor-4 glamor-5"
+            disabled={false}
+            onClick={[Function]}
+          >
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<span
+              aria-hidden="true"
+              className="material-icons MuiIcon-root-49 glamor-0 MuiListItemIcon-root-48 fa fa-eye glamor-1"
+            />
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<div
+              className="MuiListItemText-root-56 MuiListItemText-inset-57 glamor-0 glamor-1"
+            >
+              Seen
+            </div>
+          </li>
+        </a>
+        .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<a
+          href="/series"
+          onClick={[Function]}
+        >
+          .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<li
+            className="MuiListItem-root-39 MuiListItem-gutters-46 MuiListItem-default-42 glamor-4 glamor-5"
+            disabled={false}
+            onClick={[Function]}
+          >
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<span
+              aria-hidden="true"
+              className="material-icons MuiIcon-root-49 glamor-0 MuiListItemIcon-root-48 fa fa-tv glamor-1"
+            />
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<div
+              className="MuiListItemText-root-56 MuiListItemText-inset-57 glamor-0 glamor-1"
+            >
+              Series
+            </div>
+          </li>
+        </a>
+        .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<li
+          className="MuiListItem-root-39 MuiListItem-gutters-46 MuiListItem-default-42 glamor-4 glamor-5"
+          disabled={false}
+          onClick={[Function]}
+        >
+          .glamor-1 {
+  color: #b0bec5;
+}
+
+<span
+            aria-hidden="true"
+            className="material-icons MuiIcon-root-49 glamor-0 MuiListItemIcon-root-48 fa fa-tasks glamor-1"
+          />
+          .glamor-1 {
+  color: #b0bec5;
+}
+
+<div
+            className="MuiListItemText-root-56 MuiListItemText-inset-57 glamor-0 glamor-1"
+          >
+            Tasks
+          </div>
+        </li>
+      </ul>
+      .glamor-1 {
+  margin: 0px;
+}
+
+.glamor-8 {
+  color: #f44336;
+  display: none;
+}
+
+<div
+        className="glamor-6 glamor-7 glamor-8"
+      >
+        .glamor-1 {
+  margin: 0px;
+}
+
+<p
+          className="glamor-0 glamor-1"
+        >
+          Version Info
+        </p>
+        .glamor-1 {
+  margin: 0px;
+}
+
+<p
+          className="glamor-0 glamor-1"
+        >
+          Flexget: 
+           
+           
+        </p>
+        .glamor-1 {
+  margin: 0px;
+}
+
+<p
+          className="glamor-0 glamor-1"
+        >
+          API: 
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`pages/Layout/Sidenav renders correctly with sideBarOpen 1`] = `
+.glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-61 {
+  position: relative;
+  background-color: #263238;
+  height: calc(100vh - 10rem);
+  width: 100vw;
+  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  border-right: none !important;
+}
+
+.glamor-60 {
+  width: inherit;
+  height: inherit;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+.glamor-49 {
+  width: inherit;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+.glamor-58 {
+  color: #f44336;
+  display: block;
+}
+
+.glamor-51 {
+  margin: 0px;
+}
+
+@media (min-width:600px) {
+  .glamor-61 {
+    height: calc(100vh - 5rem);
+    width: 19rem;
+  }
+}
+
+<div
+  className="MuiDrawer-docked-6"
+>
+  .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-61 {
+  position: relative;
+  background-color: #263238;
+  height: calc(100vh - 10rem);
+  width: 100vw;
+  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  border-right: none !important;
+}
+
+.glamor-60 {
+  width: inherit;
+  height: inherit;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+.glamor-49 {
+  width: inherit;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+.glamor-58 {
+  color: #f44336;
+  display: block;
+}
+
+.glamor-51 {
+  margin: 0px;
+}
+
+@media (min-width:600px) {
+  .glamor-61 {
+    height: calc(100vh - 5rem);
+    width: 19rem;
+  }
+}
+
+<div
+    className="MuiPaper-root-8 MuiPaper-shadow0-10 MuiDrawer-paper-1 glamor-61 MuiDrawer-anchorLeft-2"
+  >
+    .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-60 {
+  width: inherit;
+  height: inherit;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+.glamor-49 {
+  width: inherit;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+.glamor-58 {
+  color: #f44336;
+  display: block;
+}
+
+.glamor-51 {
+  margin: 0px;
+}
+
+<div
+      className="glamor-59 glamor-60"
+    >
+      .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-49 {
+  width: inherit;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<ul
+        className="MuiList-root-35 MuiList-padding-36 glamor-48 glamor-49"
+      >
+        .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<a
+          href="/config"
+          onClick={[Function]}
+        >
+          .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<li
+            className="MuiListItem-root-39 MuiListItem-gutters-46 MuiListItem-default-42 glamor-4 glamor-5"
+            disabled={false}
+            onClick={[Function]}
+          >
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<span
+              aria-hidden="true"
+              className="material-icons MuiIcon-root-49 glamor-0 MuiListItemIcon-root-48 fa fa-pencil glamor-1"
+            />
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<div
+              className="MuiListItemText-root-56 MuiListItemText-inset-57 glamor-0 glamor-1"
+            >
+              Config
+            </div>
+          </li>
+        </a>
+        .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<a
+          href="/history"
+          onClick={[Function]}
+        >
+          .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<li
+            className="MuiListItem-root-39 MuiListItem-gutters-46 MuiListItem-default-42 glamor-4 glamor-5"
+            disabled={false}
+            onClick={[Function]}
+          >
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<span
+              aria-hidden="true"
+              className="material-icons MuiIcon-root-49 glamor-0 MuiListItemIcon-root-48 fa fa-history glamor-1"
+            />
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<div
+              className="MuiListItemText-root-56 MuiListItemText-inset-57 glamor-0 glamor-1"
+            >
+              History
+            </div>
+          </li>
+        </a>
+        .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<a
+          href="/log"
+          onClick={[Function]}
+        >
+          .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<li
+            className="MuiListItem-root-39 MuiListItem-gutters-46 MuiListItem-default-42 glamor-4 glamor-5"
+            disabled={false}
+            onClick={[Function]}
+          >
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<span
+              aria-hidden="true"
+              className="material-icons MuiIcon-root-49 glamor-0 MuiListItemIcon-root-48 fa fa-book glamor-1"
+            />
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<div
+              className="MuiListItemText-root-56 MuiListItemText-inset-57 glamor-0 glamor-1"
+            >
+              Log
+            </div>
+          </li>
+        </a>
+        .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<a
+          href="/movies"
+          onClick={[Function]}
+        >
+          .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<li
+            className="MuiListItem-root-39 MuiListItem-gutters-46 MuiListItem-default-42 glamor-4 glamor-5"
+            disabled={false}
+            onClick={[Function]}
+          >
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<span
+              aria-hidden="true"
+              className="material-icons MuiIcon-root-49 glamor-0 MuiListItemIcon-root-48 fa fa-film glamor-1"
+            />
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<div
+              className="MuiListItemText-root-56 MuiListItemText-inset-57 glamor-0 glamor-1"
+            >
+              Movies
+            </div>
+          </li>
+        </a>
+        .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<a
+          href="/pending"
+          onClick={[Function]}
+        >
+          .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<li
+            className="MuiListItem-root-39 MuiListItem-gutters-46 MuiListItem-default-42 glamor-4 glamor-5"
+            disabled={false}
+            onClick={[Function]}
+          >
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<span
+              aria-hidden="true"
+              className="material-icons MuiIcon-root-49 glamor-0 MuiListItemIcon-root-48 fa fa-check glamor-1"
+            />
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<div
+              className="MuiListItemText-root-56 MuiListItemText-inset-57 glamor-0 glamor-1"
+            >
+              Pending
+            </div>
+          </li>
+        </a>
+        .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<a
+          href="/seen"
+          onClick={[Function]}
+        >
+          .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<li
+            className="MuiListItem-root-39 MuiListItem-gutters-46 MuiListItem-default-42 glamor-4 glamor-5"
+            disabled={false}
+            onClick={[Function]}
+          >
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<span
+              aria-hidden="true"
+              className="material-icons MuiIcon-root-49 glamor-0 MuiListItemIcon-root-48 fa fa-eye glamor-1"
+            />
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<div
+              className="MuiListItemText-root-56 MuiListItemText-inset-57 glamor-0 glamor-1"
+            >
+              Seen
+            </div>
+          </li>
+        </a>
+        .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<a
+          href="/series"
+          onClick={[Function]}
+        >
+          .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<li
+            className="MuiListItem-root-39 MuiListItem-gutters-46 MuiListItem-default-42 glamor-4 glamor-5"
+            disabled={false}
+            onClick={[Function]}
+          >
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<span
+              aria-hidden="true"
+              className="material-icons MuiIcon-root-49 glamor-0 MuiListItemIcon-root-48 fa fa-tv glamor-1"
+            />
+            .glamor-1 {
+  color: #b0bec5;
+}
+
+<div
+              className="MuiListItemText-root-56 MuiListItemText-inset-57 glamor-0 glamor-1"
+            >
+              Series
+            </div>
+          </li>
+        </a>
+        .glamor-1 {
+  color: #b0bec5;
+}
+
+.glamor-5 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-5:hover {
+  border-left: 3px solid #ff9800;
+}
+
+<li
+          className="MuiListItem-root-39 MuiListItem-gutters-46 MuiListItem-default-42 glamor-4 glamor-5"
+          disabled={false}
+          onClick={[Function]}
+        >
+          .glamor-1 {
+  color: #b0bec5;
+}
+
+<span
+            aria-hidden="true"
+            className="material-icons MuiIcon-root-49 glamor-0 MuiListItemIcon-root-48 fa fa-tasks glamor-1"
+          />
+          .glamor-1 {
+  color: #b0bec5;
+}
+
+<div
+            className="MuiListItemText-root-56 MuiListItemText-inset-57 glamor-0 glamor-1"
+          >
+            Tasks
+          </div>
+        </li>
+      </ul>
+      .glamor-8 {
+  color: #f44336;
+  display: block;
+}
+
+.glamor-1 {
+  margin: 0px;
+}
+
+<div
+        className="glamor-6 glamor-7 glamor-8"
+      >
+        .glamor-1 {
+  margin: 0px;
+}
+
+<p
+          className="glamor-0 glamor-1"
+        >
+          Version Info
+        </p>
+        .glamor-1 {
+  margin: 0px;
+}
+
+<p
+          className="glamor-0 glamor-1"
+        >
+          Flexget: 
+           
+           
+        </p>
+        .glamor-1 {
+  margin: 0px;
+}
+
+<p
+          className="glamor-0 glamor-1"
+        >
+          API: 
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+`;

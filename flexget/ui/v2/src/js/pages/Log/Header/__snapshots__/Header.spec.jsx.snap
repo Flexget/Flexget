@@ -1,0 +1,181 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pages/Log/Header Header renders correctly 1`] = `
+.glamor-1 {
+  color: #757575;
+}
+
+.glamor-14 {
+  display: block;
+}
+
+.glamor-3 {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.glamor-12 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: baseline;
+  -ms-flex-align: baseline;
+  align-items: baseline;
+}
+
+.glamor-7 {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.glamor-10 {
+  color: #757575;
+  cursor: pointer;
+}
+
+@media (min-width:600px) {
+  .glamor-14 {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: baseline;
+    -ms-flex-align: baseline;
+    align-items: baseline;
+  }
+}
+
+<div
+  className="glamor-13 glamor-14"
+>
+  .glamor-1 {
+  color: #757575;
+}
+
+<div>
+    <h2
+      className="MuiTypography-root-1 MuiTypography-title-7"
+    >
+      Server Log
+    </h2>
+    .glamor-1 {
+  color: #757575;
+}
+
+<h3
+      className="MuiTypography-root-1 MuiTypography-subheading-8 glamor-0 glamor-1"
+    >
+      Streaming
+    </h3>
+  </div>
+  .glamor-1 {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+<div
+    className="glamor-0 glamor-1"
+  />
+  .glamor-1 {
+  color: #757575;
+}
+
+.glamor-8 {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: baseline;
+  -ms-flex-align: baseline;
+  align-items: baseline;
+}
+
+.glamor-3 {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.glamor-6 {
+  color: #757575;
+  cursor: pointer;
+}
+
+<div
+    className="glamor-7 glamor-8"
+  >
+    .glamor-1 {
+  color: #757575;
+}
+
+<span
+      aria-hidden="true"
+      className="material-icons MuiIcon-root-23 glamor-0 fa fa-filter glamor-1"
+    />
+    .glamor-1 {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+<div
+      className="MuiFormControl-root-30 glamor-0 glamor-1"
+      onBlur={[Function]}
+      onChange={[Function]}
+      onFocus={[Function]}
+      required={false}
+    >
+      <label
+        className="MuiFormLabel-root-40 MuiInputLabel-root-34 MuiInputLabel-formControl-35 MuiInputLabel-animated-38"
+        htmlFor="filter"
+      >
+        Filter
+      </label>
+      <div
+        className="MuiInput-root-44 MuiInput-formControl-45 MuiInput-inkbar-46 MuiInput-underline-52"
+        onBlur={[Function]}
+        onFocus={[Function]}
+      >
+        <input
+          autoComplete={undefined}
+          autoFocus={undefined}
+          className="MuiInput-input-48 MuiInput-inputSingleline-55"
+          defaultValue={undefined}
+          disabled={false}
+          id="filter"
+          name={undefined}
+          onChange={[Function]}
+          onKeyDown={undefined}
+          onKeyPress={[Function]}
+          onKeyUp={undefined}
+          placeholder={undefined}
+          readOnly={undefined}
+          required={undefined}
+          rows={undefined}
+          type="text"
+          value=""
+        />
+      </div>
+      <p
+        className="MuiFormHelperText-root-58"
+      >
+        Supports operators and, or, (), and "str"
+      </p>
+    </div>
+    .glamor-2 {
+  color: #757575;
+  cursor: pointer;
+}
+
+<span
+      aria-hidden="true"
+      className="material-icons MuiIcon-root-23 glamor-0 glamor-1 fa fa-ellipsis-v glamor-2"
+      onClick={[Function]}
+    />
+  </div>
+</div>
+`;
+
+exports[`pages/Log/Header mapStateToProps should return the right stuff 1`] = `
+Object {
+  "connected": true,
+}
+`;

@@ -1,0 +1,132 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pages/History renders correctly 1`] = `
+ShallowWrapper {
+  "complexSelector": ComplexSelector {
+    "buildPredicate": [Function],
+    "childrenOfNode": [Function],
+    "findWhereUnwrapped": [Function],
+  },
+  "length": 1,
+  "node": <styled(Component)>
+    <FilterNav
+      grouping="time"
+      handleChange={[Function]}
+      order="desc"
+      sort="time"
+      toggleOrder={[Function]}
+    />
+    <Connect(HistoryList)
+      getHistory={[Function]}
+      grouping="time"
+      setScroll={[Function]}
+    />
+  </styled(Component)>,
+  "nodes": Array [
+    <styled(Component)>
+      <FilterNav
+        grouping="time"
+        handleChange={[Function]}
+        order="desc"
+        sort="time"
+        toggleOrder={[Function]}
+      />
+      <Connect(HistoryList)
+        getHistory={[Function]}
+        grouping="time"
+        setScroll={[Function]}
+      />
+    </styled(Component)>,
+  ],
+  "options": Object {},
+  "renderer": ReactShallowRenderer {
+    "_instance": ShallowComponentWrapper {
+      "_calledComponentWillUnmount": false,
+      "_compositeType": 0,
+      "_context": Object {},
+      "_currentElement": <HistoryPage
+        getHistory={[Function]}
+      />,
+      "_debugID": 1,
+      "_hostContainerInfo": null,
+      "_hostParent": null,
+      "_instance": HistoryPage {
+        "_reactInternalInstance": [Circular],
+        "context": Object {},
+        "getHistory": [Function],
+        "handleChange": [Function],
+        "props": Object {
+          "getHistory": [Function],
+        },
+        "refs": Object {},
+        "restartLoader": [Function],
+        "setScroll": [Function],
+        "state": Object {
+          "grouping": "time",
+          "order": "desc",
+          "sort": "time",
+        },
+        "toggleOrder": [Function],
+        "updater": Object {
+          "enqueueCallback": [Function],
+          "enqueueCallbackInternal": [Function],
+          "enqueueElementInternal": [Function],
+          "enqueueForceUpdate": [Function],
+          "enqueueReplaceState": [Function],
+          "enqueueSetState": [Function],
+          "isMounted": [Function],
+          "validateCallback": [Function],
+        },
+      },
+      "_mountOrder": 1,
+      "_pendingCallbacks": null,
+      "_pendingElement": null,
+      "_pendingForceUpdate": false,
+      "_pendingReplaceState": false,
+      "_pendingStateQueue": null,
+      "_renderedComponent": NoopInternalComponent {
+        "_currentElement": <styled(Component)>
+          <FilterNav
+            grouping="time"
+            handleChange={[Function]}
+            order="desc"
+            sort="time"
+            toggleOrder={[Function]}
+          />
+          <Connect(HistoryList)
+            getHistory={[Function]}
+            grouping="time"
+            setScroll={[Function]}
+          />
+        </styled(Component)>,
+        "_debugID": 2,
+        "_renderedOutput": <styled(Component)>
+          <FilterNav
+            grouping="time"
+            handleChange={[Function]}
+            order="desc"
+            sort="time"
+            toggleOrder={[Function]}
+          />
+          <Connect(HistoryList)
+            getHistory={[Function]}
+            grouping="time"
+            setScroll={[Function]}
+          />
+        </styled(Component)>,
+      },
+      "_renderedNodeType": 1,
+      "_rootNodeID": 0,
+      "_topLevelWrapper": null,
+      "_updateBatchNumber": null,
+      "_warnedAboutRefsInRender": false,
+    },
+    "getRenderOutput": [Function],
+    "render": [Function],
+  },
+  "root": [Circular],
+  "unrendered": <HistoryPage
+    getHistory={[Function]}
+  />,
+}
+`;

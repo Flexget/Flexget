@@ -53,7 +53,7 @@
     "html-loader": "^0.4.5",
     "html-webpack-plugin": "^2.30.1",
     "identity-obj-proxy": "^3.0.0",
-    "jest": "^20.0.4",
+    "jest": "^21.0.2",
     "jest-glamor-react": "^3.1.0",
     "jest-styled-components": "^4.4.1",
     "jsdom": "^11.1.0",
