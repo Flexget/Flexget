@@ -9,7 +9,7 @@ const config = require('./webpack.shared');
 config.output = {
   path: path.join(__dirname, 'dist', 'assets'),
   filename: '[name].[chunkhash].js',
-  publicPath: '/assets/',
+  publicPath: '/v2/assets/',
 };
 config.plugins = [
   new FaviconsWebpackPlugin(path.resolve('./src/favicon.png')),
@@ -24,6 +24,7 @@ config.plugins = [
     title: 'FlexGet Manager v2',
     filename: '../index.html',
     template: './src/index.ejs',
+    base: '/v2/',
   }),
   new webpack.optimize.UglifyJsPlugin({
     compress: {

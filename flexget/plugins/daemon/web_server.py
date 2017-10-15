@@ -32,9 +32,7 @@ web_config_schema = {
                 'ssl_private_key': {'type': 'string'},
                 'web_ui': {'type': 'boolean'},
                 'base_url': {'type': 'string'},
-                'version': {'type': 'integer',
-                            'minimum': 1,
-                            'maximum': 2},
+                'run_v2': {'type': 'boolean'}
             },
             'additionalProperties': False,
             'dependencies': {
@@ -59,7 +57,7 @@ def prepare_config(config):
     config.setdefault('ssl_private_key', None)
     config.setdefault('web_ui', True)
     config.setdefault('base_url', '')
-    config.setdefault('version', 1)
+    config.setdefault('run_v2', False)
     if config['base_url']:
         if not config['base_url'].startswith('/'):
             config['base_url'] = '/' + config['base_url']
@@ -106,12 +104,13 @@ def register_web_server(manager):
 
     # Register WebUI
     if web_server_config.get('web_ui'):
-        if web_server_config.get('version') == 1:
-            log.info('Registering WebUI v1')
-            register_web_ui_v1(manager)
-        else:
+        if web_server_config.get('run_v2'):
             log.info('Registering WebUI v2')
             register_web_ui_v2(manager)
+
+        log.info('Registering WebUI v1')
+        register_web_ui_v1(manager)
+
 
     web_server = setup_server(web_server_config)
 

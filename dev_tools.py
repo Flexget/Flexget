@@ -85,7 +85,7 @@ def build_webui():
 
     # Install bower packages
     click.echo('running `bower install`')
-    subprocess.check_call('bower install', cwd=cwd, shell=True)
+    subprocess.check_call('bower install -p', cwd=cwd, shell=True)
 
     # Build the ui
     click.echo('running `gulp buildapp`')

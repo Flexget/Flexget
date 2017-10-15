@@ -28,6 +28,7 @@ config.plugins = [
   new HtmlWebpackPlugin({
     title: 'FlexGet Manager v2',
     template: './src/index.ejs',
+    base: '/',
   }),
 ];
 config.module.rules.push({

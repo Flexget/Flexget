@@ -9,7 +9,6 @@ import {
   NavVersion,
   NavList,
   drawerPaper,
-  drawerDocked,
 } from './styles';
 import sideNavItems from './items';
 
@@ -96,7 +95,6 @@ export default class SideNav extends Component {
         type="permanent"
         classes={{
           paper: drawerPaper(sideBarOpen),
-          docked: drawerDocked,
         }}
       >
         <DrawerInner>

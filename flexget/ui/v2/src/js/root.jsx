@@ -53,9 +53,9 @@ jss.options.createGenerateClassName = createGenerateClassName;
 jss.options.insertionPoint = 'material-ui';
 
 const Root = () => (
-  <Provider store={createStore()}>
-    <ConnectedRouter history={history}>
-      <JssProvider jss={jss}>
+  <JssProvider jss={jss}>
+    <Provider store={createStore()}>
+      <ConnectedRouter history={history}>
         <MuiThemeProvider theme={theme}>
           <div>
             <Switch>
@@ -71,9 +71,9 @@ const Root = () => (
             </Switch>
           </div>
         </MuiThemeProvider>
-      </JssProvider>
-    </ConnectedRouter>
-  </Provider>
+      </ConnectedRouter>
+    </Provider>
+  </JssProvider>
 );
 
 export default Root;
