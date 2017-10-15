@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+from datetime import datetime, timedelta
 from io import StringIO
 
 import pytest
@@ -8,7 +9,8 @@ from jinja2 import Template
 
 from flexget.entry import Entry
 from flexget.logger import capture_output
-from flexget.manager import get_parser
+from flexget.manager import Session, get_parser
+from flexget.plugins.filter.series import Series, SeriesTask, Episode, EpisodeRelease, Season, SeasonRelease
 from flexget.task import TaskAbort
 
 
@@ -2408,3 +2410,132 @@ class TestSeriesDDAudio(object):
         assert task.find_entry(title='Channels.S01E01.1080p.HDTV.DD+7.1-FlexGet'), \
             'Channels.S01E01.1080p.HDTV.DD+7.1-FlexGet should have been accepted'
         assert len(task.accepted) == 1, 'should have accepted only one'
+
+
+class TestSeriesFirstSeen(object):
+    _config = """
+        tasks: {}
+    """
+
+    @pytest.fixture()
+    def config(self):
+        """No use for different parser tests here"""
+        return self._config
+
+    def test_series_first_seen_only_episode(self):
+        first_seen = datetime.now()
+        with Session() as session:
+            series = Series()
+            series.name = 'test series 1'
+            session.add(series)
+
+            task = SeriesTask('test task')
+            series.in_tasks = [task]
+
+            episode1 = Episode()
+            episode1.identifier = 'S01E01'
+            episode1.identified_by = 'ep'
+            episode1.season = 1
+            episode1.number = 1
+            episode1.series_id = series.id
+
+            release = EpisodeRelease()
+
+            release.title = 'test release'
+            release.downloaded = True
+            release.first_seen = first_seen
+
+            episode1.releases = [release]
+
+            series.episodes.append(episode1)
+
+        with Session() as session:
+            series = session.query(Series).filter(Series.name == 'test series 1').one()
+            assert series.first_seen == first_seen
+
+    def test_series_first_seen_only_season(self):
+        first_seen = datetime.now()
+        with Session() as session:
+            series = Series()
+            series.name = 'test series 2'
+            session.add(series)
+
+            task = SeriesTask('test task')
+            series.in_tasks = [task]
+
+            season = Season()
+            season.identifier = 'S01'
+            season.identified_by = 'ep'
+            season.season = 1
+            season.series_id = series.id
+
+            release = SeasonRelease()
+
+            release.title = 'test release'
+            release.downloaded = True
+            release.first_seen = first_seen
+
+            season.releases = [release]
+
+            series.seasons.append(season)
+
+        with Session() as session:
+            series = session.query(Series).filter(Series.name == 'test series 2').one()
+            assert series.first_seen == first_seen
+
+    def test_series_first_seen_ep_and_season(self):
+        ep_first_seen = datetime.now()
+        season_first_seen = ep_first_seen + timedelta(hours=1)
+        with Session() as session:
+            series = Series()
+            series.name = 'test series 3'
+            session.add(series)
+
+            task = SeriesTask('test task')
+            series.in_tasks = [task]
+
+            season = Season()
+            season.identifier = 'S01'
+            season.identified_by = 'ep'
+            season.season = 1
+            season.series_id = series.id
+
+            episode = Episode()
+            episode.identifier = 'S01E01'
+            episode.identified_by = 'ep'
+            episode.season = 1
+            episode.number = 1
+            episode.series_id = series.id
+
+            ep_release = EpisodeRelease()
+            ep_release.title = 'test release'
+            ep_release.downloaded = True
+            ep_release.first_seen = ep_first_seen
+
+            se_release = SeasonRelease()
+            se_release.title = 'test release'
+            se_release.downloaded = True
+            se_release.first_seen = season_first_seen
+
+            season.releases = [se_release]
+            episode.releases = [ep_release]
+
+            series.episodes.append(episode)
+            series.seasons.append(season)
+
+        with Session() as session:
+            series = session.query(Series).filter(Series.name == 'test series 3').one()
+            assert series.first_seen == min([ep_first_seen, season_first_seen])
+
+    def test_series_first_seen_no_releases(self):
+        with Session() as session:
+            series = Series()
+            series.name = 'test series 4'
+            session.add(series)
+
+            task = SeriesTask('test task')
+            series.in_tasks = [task]
+
+        with Session() as session:
+            series = session.query(Series).filter(Series.name == 'test series 4').one()
+            assert series.first_seen is None
