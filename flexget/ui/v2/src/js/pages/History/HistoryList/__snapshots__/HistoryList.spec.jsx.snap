@@ -2,50 +2,37 @@
 
 exports[`pages/History/HistoryList HistoryList renders correctly 1`] = `
 ShallowWrapper {
-  "complexSelector": ComplexSelector {
-    "buildPredicate": [Function],
-    "childrenOfNode": [Function],
-    "findWhereUnwrapped": [Function],
-  },
   "length": 1,
-  "node": <styled(Component)>
-    <InfiniteScroll
-      element="div"
-      hasMore={true}
-      initialLoad={true}
-      isReverse={false}
-      loadMore={[Function]}
-      loader={
-        <LoadingBar
-          loading={true}
-        />
+  Symbol(enzyme.__root__): [Circular],
+  Symbol(enzyme.__unrendered__): <HistoryList
+    getHistory={[Function]}
+    grouping="time"
+    hasMore={true}
+    history={
+      Object {
+        "2017-09-09": Array [
+          Object {
+            "id": 1,
+            "task": "task",
+            "title": "something",
+          },
+        ],
       }
-      pageStart={0}
-      threshold={250}
-      useCapture={false}
-      useWindow={false}
-    >
-      <withStyles(List)
-        subheader={
-          <styled(withStyles(ListSubheader))
-            color="primary"
-          >
-            2017-09-09
-          </styled(withStyles(ListSubheader))>
-        }
-      >
-        <withStyles(ListItem)>
-          <withStyles(ListItemText)
-            primary="something"
-            secondary="task"
-          />
-        </withStyles(ListItem)>
-      </withStyles(List)>
-    </InfiniteScroll>
-  </styled(Component)>,
-  "nodes": Array [
-    <styled(Component)>
-      <InfiniteScroll
+    }
+  />,
+  Symbol(enzyme.__renderer__): Object {
+    "batchedUpdates": [Function],
+    "getNode": [Function],
+    "render": [Function],
+    "simulateEvent": [Function],
+    "unmount": [Function],
+  },
+  Symbol(enzyme.__node__): Object {
+    "instance": null,
+    "key": null,
+    "nodeType": "function",
+    "props": Object {
+      "children": <InfiniteScroll
         element="div"
         hasMore={true}
         initialLoad={true}
@@ -77,169 +64,242 @@ ShallowWrapper {
             />
           </withStyles(ListItem)>
         </withStyles(List)>
-      </InfiniteScroll>
-    </styled(Component)>,
-  ],
-  "options": Object {},
-  "renderer": ReactShallowRenderer {
-    "_instance": ShallowComponentWrapper {
-      "_calledComponentWillUnmount": false,
-      "_compositeType": 0,
-      "_context": Object {},
-      "_currentElement": <HistoryList
-        getHistory={[Function]}
-        grouping="time"
-        hasMore={true}
-        history={
-          Object {
-            "2017-09-09": Array [
-              Object {
-                "id": 1,
-                "task": "task",
-                "title": "something",
-              },
-            ],
-          }
-        }
-      />,
-      "_debugID": 1,
-      "_hostContainerInfo": null,
-      "_hostParent": null,
-      "_instance": HistoryList {
-        "_reactInternalInstance": [Circular],
-        "context": Object {},
-        "props": Object {
-          "getHistory": [Function],
-          "grouping": "time",
-          "hasMore": true,
-          "history": Object {
-            "2017-09-09": Array [
-              Object {
-                "id": 1,
-                "task": "task",
-                "title": "something",
-              },
-            ],
-          },
-        },
-        "refs": Object {},
-        "state": null,
-        "updater": Object {
-          "enqueueCallback": [Function],
-          "enqueueCallbackInternal": [Function],
-          "enqueueElementInternal": [Function],
-          "enqueueForceUpdate": [Function],
-          "enqueueReplaceState": [Function],
-          "enqueueSetState": [Function],
-          "isMounted": [Function],
-          "validateCallback": [Function],
-        },
-      },
-      "_mountOrder": 1,
-      "_pendingCallbacks": null,
-      "_pendingElement": null,
-      "_pendingForceUpdate": false,
-      "_pendingReplaceState": false,
-      "_pendingStateQueue": null,
-      "_renderedComponent": NoopInternalComponent {
-        "_currentElement": <styled(Component)>
-          <InfiniteScroll
-            element="div"
-            hasMore={true}
-            initialLoad={true}
-            isReverse={false}
-            loadMore={[Function]}
-            loader={
-              <LoadingBar
-                loading={true}
-              />
-            }
-            pageStart={0}
-            threshold={250}
-            useCapture={false}
-            useWindow={false}
-          >
-            <withStyles(List)
-              subheader={
-                <styled(withStyles(ListSubheader))
-                  color="primary"
-                >
-                  2017-09-09
-                </styled(withStyles(ListSubheader))>
-              }
-            >
-              <withStyles(ListItem)>
-                <withStyles(ListItemText)
-                  primary="something"
-                  secondary="task"
-                />
-              </withStyles(ListItem)>
-            </withStyles(List)>
-          </InfiniteScroll>
-        </styled(Component)>,
-        "_debugID": 2,
-        "_renderedOutput": <styled(Component)>
-          <InfiniteScroll
-            element="div"
-            hasMore={true}
-            initialLoad={true}
-            isReverse={false}
-            loadMore={[Function]}
-            loader={
-              <LoadingBar
-                loading={true}
-              />
-            }
-            pageStart={0}
-            threshold={250}
-            useCapture={false}
-            useWindow={false}
-          >
-            <withStyles(List)
-              subheader={
-                <styled(withStyles(ListSubheader))
-                  color="primary"
-                >
-                  2017-09-09
-                </styled(withStyles(ListSubheader))>
-              }
-            >
-              <withStyles(ListItem)>
-                <withStyles(ListItemText)
-                  primary="something"
-                  secondary="task"
-                />
-              </withStyles(ListItem)>
-            </withStyles(List)>
-          </InfiniteScroll>
-        </styled(Component)>,
-      },
-      "_renderedNodeType": 1,
-      "_rootNodeID": 0,
-      "_topLevelWrapper": null,
-      "_updateBatchNumber": null,
-      "_warnedAboutRefsInRender": false,
+      </InfiniteScroll>,
     },
-    "getRenderOutput": [Function],
-    "render": [Function],
+    "ref": null,
+    "rendered": Object {
+      "instance": null,
+      "key": null,
+      "nodeType": "class",
+      "props": Object {
+        "children": Array [
+          <withStyles(List)
+            subheader={
+              <styled(withStyles(ListSubheader))
+                color="primary"
+              >
+                2017-09-09
+              </styled(withStyles(ListSubheader))>
+            }
+          >
+            <withStyles(ListItem)>
+              <withStyles(ListItemText)
+                primary="something"
+                secondary="task"
+              />
+            </withStyles(ListItem)>
+          </withStyles(List)>,
+        ],
+        "element": "div",
+        "hasMore": true,
+        "initialLoad": true,
+        "isReverse": false,
+        "loadMore": [Function],
+        "loader": <LoadingBar
+          loading={true}
+        />,
+        "pageStart": 0,
+        "threshold": 250,
+        "useCapture": false,
+        "useWindow": false,
+      },
+      "ref": null,
+      "rendered": Array [
+        Object {
+          "instance": null,
+          "key": "2017-09-09",
+          "nodeType": "class",
+          "props": Object {
+            "children": Array [
+              <withStyles(ListItem)>
+                <withStyles(ListItemText)
+                  primary="something"
+                  secondary="task"
+                />
+              </withStyles(ListItem)>,
+            ],
+            "subheader": <styled(withStyles(ListSubheader))
+              color="primary"
+            >
+              2017-09-09
+            </styled(withStyles(ListSubheader))>,
+          },
+          "ref": null,
+          "rendered": Array [
+            Object {
+              "instance": null,
+              "key": "1",
+              "nodeType": "class",
+              "props": Object {
+                "children": <withStyles(ListItemText)
+                  primary="something"
+                  secondary="task"
+                />,
+              },
+              "ref": null,
+              "rendered": Object {
+                "instance": null,
+                "key": null,
+                "nodeType": "class",
+                "props": Object {
+                  "primary": "something",
+                  "secondary": "task",
+                },
+                "ref": null,
+                "rendered": null,
+                "type": [Function],
+              },
+              "type": [Function],
+            },
+          ],
+          "type": [Function],
+        },
+      ],
+      "type": [Function],
+    },
+    "type": [Function],
   },
-  "root": [Circular],
-  "unrendered": <HistoryList
-    getHistory={[Function]}
-    grouping="time"
-    hasMore={true}
-    history={
-      Object {
-        "2017-09-09": Array [
+  Symbol(enzyme.__nodes__): Array [
+    Object {
+      "instance": null,
+      "key": null,
+      "nodeType": "function",
+      "props": Object {
+        "children": <InfiniteScroll
+          element="div"
+          hasMore={true}
+          initialLoad={true}
+          isReverse={false}
+          loadMore={[Function]}
+          loader={
+            <LoadingBar
+              loading={true}
+            />
+          }
+          pageStart={0}
+          threshold={250}
+          useCapture={false}
+          useWindow={false}
+        >
+          <withStyles(List)
+            subheader={
+              <styled(withStyles(ListSubheader))
+                color="primary"
+              >
+                2017-09-09
+              </styled(withStyles(ListSubheader))>
+            }
+          >
+            <withStyles(ListItem)>
+              <withStyles(ListItemText)
+                primary="something"
+                secondary="task"
+              />
+            </withStyles(ListItem)>
+          </withStyles(List)>
+        </InfiniteScroll>,
+      },
+      "ref": null,
+      "rendered": Object {
+        "instance": null,
+        "key": null,
+        "nodeType": "class",
+        "props": Object {
+          "children": Array [
+            <withStyles(List)
+              subheader={
+                <styled(withStyles(ListSubheader))
+                  color="primary"
+                >
+                  2017-09-09
+                </styled(withStyles(ListSubheader))>
+              }
+            >
+              <withStyles(ListItem)>
+                <withStyles(ListItemText)
+                  primary="something"
+                  secondary="task"
+                />
+              </withStyles(ListItem)>
+            </withStyles(List)>,
+          ],
+          "element": "div",
+          "hasMore": true,
+          "initialLoad": true,
+          "isReverse": false,
+          "loadMore": [Function],
+          "loader": <LoadingBar
+            loading={true}
+          />,
+          "pageStart": 0,
+          "threshold": 250,
+          "useCapture": false,
+          "useWindow": false,
+        },
+        "ref": null,
+        "rendered": Array [
           Object {
-            "id": 1,
-            "task": "task",
-            "title": "something",
+            "instance": null,
+            "key": "2017-09-09",
+            "nodeType": "class",
+            "props": Object {
+              "children": Array [
+                <withStyles(ListItem)>
+                  <withStyles(ListItemText)
+                    primary="something"
+                    secondary="task"
+                  />
+                </withStyles(ListItem)>,
+              ],
+              "subheader": <styled(withStyles(ListSubheader))
+                color="primary"
+              >
+                2017-09-09
+              </styled(withStyles(ListSubheader))>,
+            },
+            "ref": null,
+            "rendered": Array [
+              Object {
+                "instance": null,
+                "key": "1",
+                "nodeType": "class",
+                "props": Object {
+                  "children": <withStyles(ListItemText)
+                    primary="something"
+                    secondary="task"
+                  />,
+                },
+                "ref": null,
+                "rendered": Object {
+                  "instance": null,
+                  "key": null,
+                  "nodeType": "class",
+                  "props": Object {
+                    "primary": "something",
+                    "secondary": "task",
+                  },
+                  "ref": null,
+                  "rendered": null,
+                  "type": [Function],
+                },
+                "type": [Function],
+              },
+            ],
+            "type": [Function],
           },
         ],
-      }
-    }
-  />,
+        "type": [Function],
+      },
+      "type": [Function],
+    },
+  ],
+  Symbol(enzyme.__options__): Object {
+    "adapter": ReactSixteenAdapter {
+      "options": Object {
+        "enableComponentDidUpdateOnSetState": true,
+      },
+    },
+  },
 }
 `;
 

@@ -187,218 +187,33 @@ exports[`components/layout renders correctly 1`] = `
 <div
   className="glamor-90 glamor-91"
 >
-  .glamor-21 {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  min-height: 5rem;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  z-index: 2;
-  position: fixed;
-  width: 100%;
-}
-
-.glamor-3 {
-  height: 5rem;
-}
-
-.glamor-1 {
-  background: #263238 url(test-file-stub) no-repeat center;
-  background-size: 17.5rem;
-  height: 100%;
-  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,background-size 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,background-size 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-}
-
-.glamor-19 {
-  height: 5rem;
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-.glamor-17 {
-  position: static;
-}
-
-.glamor-15 {
-  background-color: #ef6c00;
-  color: rgba(255, 255, 255, 1);
-  min-height: 5rem;
-}
-
-.glamor-5 {
-  color: rgba(255, 255, 255, 1);
-}
-
-.glamor-7 {
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-@media (min-width:600px) {
-  .glamor-21 {
-    -webkit-box-orient: horizontal;
-    -webkit-box-direction: normal;
-    -ms-flex-direction: row;
-    flex-direction: row;
-  }
-}
-
-@media (min-width:600px) {
-  .glamor-1 {
-    width: 6rem;
-    background-size: 25rem;
-  }
-}
-
-<header
+  <header
     className="glamor-20 glamor-21"
   >
-    .glamor-3 {
-  height: 5rem;
-}
-
-.glamor-1 {
-  background: #263238 url(test-file-stub) no-repeat center;
-  background-size: 17.5rem;
-  height: 100%;
-  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,background-size 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,background-size 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-}
-
-@media (min-width:600px) {
-  .glamor-1 {
-    width: 6rem;
-    background-size: 25rem;
-  }
-}
-
-<div
+    <div
       className="glamor-2 glamor-3"
     >
-      .glamor-1 {
-  background: #263238 url(test-file-stub) no-repeat center;
-  background-size: 17.5rem;
-  height: 100%;
-  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,background-size 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,background-size 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-}
-
-@media (min-width:600px) {
-  .glamor-1 {
-    width: 6rem;
-    background-size: 25rem;
-  }
-}
-
-<a
+      <a
         href="/"
         onClick={[Function]}
       >
-        .glamor-1 {
-  background: #263238 url(test-file-stub) no-repeat center;
-  background-size: 17.5rem;
-  height: 100%;
-  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,background-size 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,background-size 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-}
-
-@media (min-width:600px) {
-  .glamor-1 {
-    width: 6rem;
-    background-size: 25rem;
-  }
-}
-
-<div
+        <div
           className="glamor-0 glamor-1"
           open={false}
         />
       </a>
     </div>
-    .glamor-15 {
-  height: 5rem;
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-.glamor-13 {
-  position: static;
-}
-
-.glamor-11 {
-  background-color: #ef6c00;
-  color: rgba(255, 255, 255, 1);
-  min-height: 5rem;
-}
-
-.glamor-1 {
-  color: rgba(255, 255, 255, 1);
-}
-
-.glamor-3 {
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-<nav
-      className="glamor-14 glamor-15"
+    <nav
+      className="glamor-18 glamor-19"
     >
-      .glamor-13 {
-  position: static;
-}
-
-.glamor-11 {
-  background-color: #ef6c00;
-  color: rgba(255, 255, 255, 1);
-  min-height: 5rem;
-}
-
-.glamor-1 {
-  color: rgba(255, 255, 255, 1);
-}
-
-.glamor-3 {
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-<header
-        className="MuiPaper-root-8 MuiPaper-shadow4-14 MuiAppBar-root-1 MuiAppBar-positionFixed-2 MuiAppBar-colorPrimary-6 mui-fixed glamor-12 glamor-13"
+      <header
+        className="MuiPaper-root-8 MuiPaper-shadow4-14 MuiAppBar-root-1 MuiAppBar-positionFixed-2 MuiAppBar-colorPrimary-6 mui-fixed glamor-16 glamor-17"
       >
-        .glamor-11 {
-  background-color: #ef6c00;
-  color: rgba(255, 255, 255, 1);
-  min-height: 5rem;
-}
-
-.glamor-1 {
-  color: rgba(255, 255, 255, 1);
-}
-
-.glamor-3 {
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-<div
-          className="MuiToolbar-root-35 MuiToolbar-gutters-36 glamor-10 glamor-11"
+        <div
+          className="MuiToolbar-root-35 MuiToolbar-gutters-36 glamor-14 glamor-15"
         >
-          .glamor-1 {
-  color: rgba(255, 255, 255, 1);
-}
-
-<button
-            className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-0 glamor-1"
+          <button
+            className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-4 glamor-5"
             disabled={false}
             onBlur={[Function]}
             onClick={[Function]}
@@ -429,30 +244,16 @@ exports[`components/layout renders correctly 1`] = `
           <h2
             className="MuiTypography-root-62 MuiTypography-title-68 MuiTypography-colorInherit-81"
           />
-          .glamor-1 {
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-<div
-            className="glamor-0 glamor-1"
+          <div
+            className="glamor-6 glamor-7"
           />
-          .glamor-1 {
-  color: rgba(255, 255, 255, 1);
-}
-
-<a
+          <a
             href="/config"
             onClick={[Function]}
           >
-            .glamor-1 {
-  color: rgba(255, 255, 255, 1);
-}
-
-<button
+            <button
               aria-label="Config"
-              className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-0 glamor-1"
+              className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-4 glamor-5"
               disabled={false}
               onBlur={[Function]}
               onFocus={[Function]}
@@ -480,21 +281,13 @@ exports[`components/layout renders correctly 1`] = `
               />
             </button>
           </a>
-          .glamor-1 {
-  color: rgba(255, 255, 255, 1);
-}
-
-<a
+          <a
             href="/log"
             onClick={[Function]}
           >
-            .glamor-1 {
-  color: rgba(255, 255, 255, 1);
-}
-
-<button
+            <button
               aria-label="Log"
-              className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-0 glamor-1"
+              className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-4 glamor-5"
               disabled={false}
               onBlur={[Function]}
               onFocus={[Function]}
@@ -522,13 +315,9 @@ exports[`components/layout renders correctly 1`] = `
               />
             </button>
           </a>
-          .glamor-1 {
-  color: rgba(255, 255, 255, 1);
-}
-
-<button
+          <button
             aria-label="Manage"
-            className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-0 glamor-1"
+            className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-4 glamor-5"
             disabled={false}
             onBlur={[Function]}
             onClick={[Function]}
@@ -560,815 +349,197 @@ exports[`components/layout renders correctly 1`] = `
       </header>
     </nav>
   </header>
-  .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-67 {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  padding-top: 10rem;
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-  height: 100vh;
-}
-
-.glamor-63 {
-  overflow-y: auto;
-}
-
-.glamor-61 {
-  position: relative;
-  background-color: #263238;
-  height: calc(100vh - 10rem);
-  width: 0;
-  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  border-right: none !important;
-}
-
-.glamor-60 {
-  width: inherit;
-  height: inherit;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  -webkit-box-pack: justify;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
-}
-
-.glamor-49 {
-  width: inherit;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-.glamor-58 {
-  color: #f44336;
-  display: none;
-}
-
-.glamor-51 {
-  margin: 0px;
-}
-
-.glamor-65 {
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-  opacity: 1;
-  -webkit-transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,margin-left 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,margin-left 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-}
-
-@media (min-width:600px) {
-  .glamor-67 {
-    padding-top: 5rem;
-  }
-}
-
-@media (min-width:600px) {
-  .glamor-61 {
-    height: calc(100vh - 5rem);
-    width: 6rem;
-  }
-}
-
-@media (max-width:599.99px) {
-  .glamor-65 {
-    margin-left: 0px;
-    opacity: 1;
-    display: block;
-  }
-}
-
-<main
-    className="glamor-66 glamor-67"
+  <main
+    className="glamor-88 glamor-89"
   >
-    .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-63 {
-  overflow-y: auto;
-}
-
-.glamor-61 {
-  position: relative;
-  background-color: #263238;
-  height: calc(100vh - 10rem);
-  width: 0;
-  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  border-right: none !important;
-}
-
-.glamor-60 {
-  width: inherit;
-  height: inherit;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  -webkit-box-pack: justify;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
-}
-
-.glamor-49 {
-  width: inherit;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-.glamor-58 {
-  color: #f44336;
-  display: none;
-}
-
-.glamor-51 {
-  margin: 0px;
-}
-
-@media (min-width:600px) {
-  .glamor-61 {
-    height: calc(100vh - 5rem);
-    width: 6rem;
-  }
-}
-
-<aside
-      className="glamor-62 glamor-63"
+    <aside
+      className="glamor-84 glamor-85"
     >
-      .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-61 {
-  position: relative;
-  background-color: #263238;
-  height: calc(100vh - 10rem);
-  width: 0;
-  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  border-right: none !important;
-}
-
-.glamor-60 {
-  width: inherit;
-  height: inherit;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  -webkit-box-pack: justify;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
-}
-
-.glamor-49 {
-  width: inherit;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-.glamor-58 {
-  color: #f44336;
-  display: none;
-}
-
-.glamor-51 {
-  margin: 0px;
-}
-
-@media (min-width:600px) {
-  .glamor-61 {
-    height: calc(100vh - 5rem);
-    width: 6rem;
-  }
-}
-
-<div
+      <div
         className="MuiDrawer-docked-99"
       >
-        .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-61 {
-  position: relative;
-  background-color: #263238;
-  height: calc(100vh - 10rem);
-  width: 0;
-  -webkit-transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  border-right: none !important;
-}
-
-.glamor-60 {
-  width: inherit;
-  height: inherit;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  -webkit-box-pack: justify;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
-}
-
-.glamor-49 {
-  width: inherit;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-.glamor-58 {
-  color: #f44336;
-  display: none;
-}
-
-.glamor-51 {
-  margin: 0px;
-}
-
-@media (min-width:600px) {
-  .glamor-61 {
-    height: calc(100vh - 5rem);
-    width: 6rem;
-  }
-}
-
-<div
-          className="MuiPaper-root-8 MuiPaper-shadow0-10 MuiDrawer-paper-94 glamor-61 MuiDrawer-anchorLeft-95"
+        <div
+          className="MuiPaper-root-8 MuiPaper-shadow0-10 MuiDrawer-paper-94 glamor-83 MuiDrawer-anchorLeft-95"
         >
-          .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-60 {
-  width: inherit;
-  height: inherit;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  -webkit-box-pack: justify;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
-}
-
-.glamor-49 {
-  width: inherit;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-.glamor-58 {
-  color: #f44336;
-  display: none;
-}
-
-.glamor-51 {
-  margin: 0px;
-}
-
-<div
-            className="glamor-59 glamor-60"
+          <div
+            className="glamor-81 glamor-82"
           >
-            .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-49 {
-  width: inherit;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-<ul
-              className="MuiList-root-101 MuiList-padding-102 glamor-48 glamor-49"
+            <ul
+              className="MuiList-root-101 MuiList-padding-102 glamor-70 glamor-71"
             >
-              .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-<a
+              <a
                 href="/config"
                 onClick={[Function]}
               >
-                .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-<li
-                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-4 glamor-5"
+                <li
+                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-26 glamor-27"
                   disabled={false}
                   onClick={[Function]}
                 >
-                  .glamor-1 {
-  color: #b0bec5;
-}
-
-<span
+                  <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 glamor-0 MuiListItemIcon-root-114 fa fa-pencil glamor-1"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-114 fa fa-pencil glamor-23"
                   />
-                  .glamor-1 {
-  color: #b0bec5;
-}
-
-<div
-                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-0 glamor-1"
+                  <div
+                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-24 glamor-23"
                   >
                     Config
                   </div>
                 </li>
               </a>
-              .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-<a
+              <a
                 href="/history"
                 onClick={[Function]}
               >
-                .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-<li
-                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-4 glamor-5"
+                <li
+                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-26 glamor-27"
                   disabled={false}
                   onClick={[Function]}
                 >
-                  .glamor-1 {
-  color: #b0bec5;
-}
-
-<span
+                  <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 glamor-0 MuiListItemIcon-root-114 fa fa-history glamor-1"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-114 fa fa-history glamor-23"
                   />
-                  .glamor-1 {
-  color: #b0bec5;
-}
-
-<div
-                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-0 glamor-1"
+                  <div
+                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-24 glamor-23"
                   >
                     History
                   </div>
                 </li>
               </a>
-              .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-<a
+              <a
                 href="/log"
                 onClick={[Function]}
               >
-                .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-<li
-                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-4 glamor-5"
+                <li
+                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-26 glamor-27"
                   disabled={false}
                   onClick={[Function]}
                 >
-                  .glamor-1 {
-  color: #b0bec5;
-}
-
-<span
+                  <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 glamor-0 MuiListItemIcon-root-114 fa fa-book glamor-1"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-114 fa fa-book glamor-23"
                   />
-                  .glamor-1 {
-  color: #b0bec5;
-}
-
-<div
-                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-0 glamor-1"
+                  <div
+                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-24 glamor-23"
                   >
                     Log
                   </div>
                 </li>
               </a>
-              .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-<a
+              <a
                 href="/movies"
                 onClick={[Function]}
               >
-                .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-<li
-                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-4 glamor-5"
+                <li
+                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-26 glamor-27"
                   disabled={false}
                   onClick={[Function]}
                 >
-                  .glamor-1 {
-  color: #b0bec5;
-}
-
-<span
+                  <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 glamor-0 MuiListItemIcon-root-114 fa fa-film glamor-1"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-114 fa fa-film glamor-23"
                   />
-                  .glamor-1 {
-  color: #b0bec5;
-}
-
-<div
-                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-0 glamor-1"
+                  <div
+                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-24 glamor-23"
                   >
                     Movies
                   </div>
                 </li>
               </a>
-              .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-<a
+              <a
                 href="/pending"
                 onClick={[Function]}
               >
-                .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-<li
-                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-4 glamor-5"
+                <li
+                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-26 glamor-27"
                   disabled={false}
                   onClick={[Function]}
                 >
-                  .glamor-1 {
-  color: #b0bec5;
-}
-
-<span
+                  <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 glamor-0 MuiListItemIcon-root-114 fa fa-check glamor-1"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-114 fa fa-check glamor-23"
                   />
-                  .glamor-1 {
-  color: #b0bec5;
-}
-
-<div
-                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-0 glamor-1"
+                  <div
+                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-24 glamor-23"
                   >
                     Pending
                   </div>
                 </li>
               </a>
-              .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-<a
+              <a
                 href="/seen"
                 onClick={[Function]}
               >
-                .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-<li
-                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-4 glamor-5"
+                <li
+                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-26 glamor-27"
                   disabled={false}
                   onClick={[Function]}
                 >
-                  .glamor-1 {
-  color: #b0bec5;
-}
-
-<span
+                  <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 glamor-0 MuiListItemIcon-root-114 fa fa-eye glamor-1"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-114 fa fa-eye glamor-23"
                   />
-                  .glamor-1 {
-  color: #b0bec5;
-}
-
-<div
-                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-0 glamor-1"
+                  <div
+                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-24 glamor-23"
                   >
                     Seen
                   </div>
                 </li>
               </a>
-              .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-<a
+              <a
                 href="/series"
                 onClick={[Function]}
               >
-                .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-<li
-                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-4 glamor-5"
+                <li
+                  className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-26 glamor-27"
                   disabled={false}
                   onClick={[Function]}
                 >
-                  .glamor-1 {
-  color: #b0bec5;
-}
-
-<span
+                  <span
                     aria-hidden="true"
-                    className="material-icons MuiIcon-root-48 glamor-0 MuiListItemIcon-root-114 fa fa-tv glamor-1"
+                    className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-114 fa fa-tv glamor-23"
                   />
-                  .glamor-1 {
-  color: #b0bec5;
-}
-
-<div
-                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-0 glamor-1"
+                  <div
+                    className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-24 glamor-23"
                   >
                     Series
                   </div>
                 </li>
               </a>
-              .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-<li
-                className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-4 glamor-5"
+              <li
+                className="MuiListItem-root-105 MuiListItem-gutters-112 MuiListItem-default-108 glamor-26 glamor-27"
                 disabled={false}
                 onClick={[Function]}
               >
-                .glamor-1 {
-  color: #b0bec5;
-}
-
-<span
+                <span
                   aria-hidden="true"
-                  className="material-icons MuiIcon-root-48 glamor-0 MuiListItemIcon-root-114 fa fa-tasks glamor-1"
+                  className="material-icons MuiIcon-root-48 glamor-22 MuiListItemIcon-root-114 fa fa-tasks glamor-23"
                 />
-                .glamor-1 {
-  color: #b0bec5;
-}
-
-<div
-                  className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-0 glamor-1"
+                <div
+                  className="MuiListItemText-root-115 MuiListItemText-inset-116 glamor-24 glamor-23"
                 >
                   Tasks
                 </div>
               </li>
             </ul>
-            .glamor-8 {
-  color: #f44336;
-  display: none;
-}
-
-.glamor-1 {
-  margin: 0px;
-}
-
-<div
-              className="glamor-6 glamor-7 glamor-8"
+            <div
+              className="glamor-78 glamor-79 glamor-80"
             >
-              .glamor-1 {
-  margin: 0px;
-}
-
-<p
-                className="glamor-0 glamor-1"
+              <p
+                className="glamor-72 glamor-73"
               >
                 Version Info
               </p>
-              .glamor-1 {
-  margin: 0px;
-}
-
-<p
-                className="glamor-0 glamor-1"
+              <p
+                className="glamor-72 glamor-73"
               >
                 Flexget: 
                  
                  
               </p>
-              .glamor-1 {
-  margin: 0px;
-}
-
-<p
-                className="glamor-0 glamor-1"
+              <p
+                className="glamor-72 glamor-73"
               >
                 API: 
               </p>
@@ -1377,27 +548,8 @@ exports[`components/layout renders correctly 1`] = `
         </div>
       </div>
     </aside>
-    .glamor-1 {
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-  opacity: 1;
-  -webkit-transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,margin-left 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-  transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,margin-left 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-}
-
-@media (max-width:599.99px) {
-  .glamor-1 {
-    margin-left: 0px;
-    opacity: 1;
-    display: block;
-  }
-}
-
-<section
-      className="glamor-0 glamor-1"
+    <section
+      className="glamor-86 glamor-87"
       open={false}
     >
       <div />

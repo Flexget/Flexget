@@ -12,20 +12,12 @@ exports[`pages/Layout/Version Version renders correctly with latest version 1`] 
 <div
   className="glamor-6 glamor-7"
 >
-  .glamor-1 {
-  margin: 0px;
-}
-
-<p
+  <p
     className="glamor-0 glamor-1"
   >
     Version Info
   </p>
-  .glamor-1 {
-  margin: 0px;
-}
-
-<p
+  <p
     className="glamor-0 glamor-1"
   >
     Flexget: 
@@ -33,11 +25,7 @@ exports[`pages/Layout/Version Version renders correctly with latest version 1`] 
      
      
   </p>
-  .glamor-1 {
-  margin: 0px;
-}
-
-<p
+  <p
     className="glamor-0 glamor-1"
   >
     API: 
@@ -58,34 +46,18 @@ exports[`pages/Layout/Version Version renders correctly without latest version 1
 <div
   className="glamor-7 glamor-2"
 >
-  .glamor-1 {
-  margin: 0px;
-}
-
-<p
+  <p
     className="glamor-0 glamor-1"
   >
     Version Info
   </p>
-  .glamor-0 {
-  color: #f44336;
-}
-
-.glamor-2 {
-  margin: 0px;
-}
-
-<p
-    className="glamor-1 glamor-2"
+  <p
+    className="glamor-0 glamor-1"
   >
     Flexget: 
     2.10.11
      
-    .glamor-0 {
-  color: #f44336;
-}
-
-<a
+    <a
       className="MuiButtonBase-root-10 MuiIconButton-root-1"
       href="https://flexget.com/ChangeLog"
       onBlur={[Function]}
@@ -99,20 +71,12 @@ exports[`pages/Layout/Version Version renders correctly without latest version 1
       onTouchStart={[Function]}
       tabIndex={0}
     >
-      .glamor-0 {
-  color: #f44336;
-}
-
-<span
+      <span
         className="MuiIconButton-label-7"
       >
-        .glamor-0 {
-  color: #f44336;
-}
-
-<span
+        <span
           aria-hidden="true"
-          className="material-icons MuiIcon-root-12 MuiIconButton-icon-8 fa fa-question-circle-o glamor-0"
+          className="material-icons MuiIcon-root-12 MuiIconButton-icon-8 fa fa-question-circle-o glamor-2"
         />
       </span>
       <span
@@ -121,11 +85,7 @@ exports[`pages/Layout/Version Version renders correctly without latest version 1
     </a>
      
   </p>
-  .glamor-1 {
-  margin: 0px;
-}
-
-<p
+  <p
     className="glamor-0 glamor-1"
   >
     API: 

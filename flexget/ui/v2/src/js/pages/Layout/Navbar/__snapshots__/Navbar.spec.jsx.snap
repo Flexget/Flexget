@@ -24,30 +24,10 @@ exports[`pages/Layout/Navbar renders correctly 1`] = `
 <header
   className="MuiPaper-root-8 MuiPaper-shadow4-14 MuiAppBar-root-1 MuiAppBar-positionFixed-2 MuiAppBar-colorPrimary-6 mui-fixed glamor-12 glamor-13"
 >
-  .glamor-11 {
-  background-color: #ef6c00;
-  color: rgba(255, 255, 255, 1);
-  min-height: 5rem;
-}
-
-.glamor-1 {
-  color: rgba(255, 255, 255, 1);
-}
-
-.glamor-3 {
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-<div
+  <div
     className="MuiToolbar-root-35 MuiToolbar-gutters-36 glamor-10 glamor-11"
   >
-    .glamor-1 {
-  color: rgba(255, 255, 255, 1);
-}
-
-<button
+    <button
       className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-0 glamor-1"
       disabled={false}
       onBlur={[Function]}
@@ -79,28 +59,14 @@ exports[`pages/Layout/Navbar renders correctly 1`] = `
     <h2
       className="MuiTypography-root-62 MuiTypography-title-68 MuiTypography-colorInherit-81"
     />
-    .glamor-1 {
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-<div
-      className="glamor-0 glamor-1"
+    <div
+      className="glamor-2 glamor-3"
     />
-    .glamor-1 {
-  color: rgba(255, 255, 255, 1);
-}
-
-<a
+    <a
       href="/config"
       onClick={[Function]}
     >
-      .glamor-1 {
-  color: rgba(255, 255, 255, 1);
-}
-
-<button
+      <button
         aria-label="Config"
         className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-0 glamor-1"
         disabled={false}
@@ -130,19 +96,11 @@ exports[`pages/Layout/Navbar renders correctly 1`] = `
         />
       </button>
     </a>
-    .glamor-1 {
-  color: rgba(255, 255, 255, 1);
-}
-
-<a
+    <a
       href="/log"
       onClick={[Function]}
     >
-      .glamor-1 {
-  color: rgba(255, 255, 255, 1);
-}
-
-<button
+      <button
         aria-label="Log"
         className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-0 glamor-1"
         disabled={false}
@@ -172,11 +130,7 @@ exports[`pages/Layout/Navbar renders correctly 1`] = `
         />
       </button>
     </a>
-    .glamor-1 {
-  color: rgba(255, 255, 255, 1);
-}
-
-<button
+    <button
       aria-label="Manage"
       className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-0 glamor-1"
       disabled={false}

@@ -52,125 +52,23 @@ exports[`pages/Login Login renders correctly when logged out 1`] = `
 }
 
 <div>
-  .glamor-1 {
-  background: transparent url(test-file-stub) no-repeat center;
-  min-height: 9rem;
-  background-size: 100% auto;
-  margin: 0 1rem;
-}
-
-@media (min-width:600px) {
-  .glamor-1 {
-    background-size: auto;
-  }
-}
-
-<div
+  <div
     className="glamor-0 glamor-1"
   />
-  .glamor-11 {
-  max-width: 40rem;
-  margin: 0 1rem;
-}
-
-.glamor-7 {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: column;
-  flex-direction: column;
-}
-
-.glamor-1 {
-  color: #f44336;
-  text-align: center;
-  padding: 1rem;
-}
-
-.glamor-3 {
-  padding-bottom: 1rem;
-}
-
-.glamor-9 {
-  width: 100%;
-}
-
-@media (min-width:600px) {
-  .glamor-11 {
-    margin: 0 auto;
-  }
-}
-
-<div
-    className="MuiPaper-root-1 MuiPaper-shadow2-5 MuiPaper-rounded-2 glamor-10 glamor-11"
+  <div
+    className="MuiPaper-root-1 MuiPaper-shadow2-5 MuiPaper-rounded-2 glamor-12 glamor-13"
   >
-    .glamor-7 {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: column;
-  flex-direction: column;
-}
-
-.glamor-1 {
-  color: #f44336;
-  text-align: center;
-  padding: 1rem;
-}
-
-.glamor-3 {
-  padding-bottom: 1rem;
-}
-
-.glamor-9 {
-  width: 100%;
-}
-
-<form
+    <form
       onSubmit={[Function]}
     >
-      .glamor-7 {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: column;
-  flex-direction: column;
-}
-
-.glamor-1 {
-  color: #f44336;
-  text-align: center;
-  padding: 1rem;
-}
-
-.glamor-3 {
-  padding-bottom: 1rem;
-}
-
-<div
-        className="MuiCardContent-root-28 glamor-6 glamor-7"
+      <div
+        className="MuiCardContent-root-28 glamor-8 glamor-9"
       >
-        .glamor-1 {
-  color: #f44336;
-  text-align: center;
-  padding: 1rem;
-}
-
-<div
-          className="glamor-0 glamor-1"
+        <div
+          className="glamor-2 glamor-3"
         />
-        .glamor-1 {
-  padding-bottom: 1rem;
-}
-
-<div
-          className="MuiFormControl-root-29 glamor-0 glamor-1"
+        <div
+          className="MuiFormControl-root-29 glamor-4 glamor-5"
           onBlur={[Function]}
           onChange={[Function]}
           onDragStart={[Function]}
@@ -209,12 +107,8 @@ exports[`pages/Login Login renders correctly when logged out 1`] = `
             />
           </div>
         </div>
-        .glamor-1 {
-  padding-bottom: 1rem;
-}
-
-<div
-          className="MuiFormControl-root-29 glamor-0 glamor-1"
+        <div
+          className="MuiFormControl-root-29 glamor-4 glamor-5"
           onBlur={[Function]}
           onChange={[Function]}
           onDragStart={[Function]}
@@ -254,19 +148,11 @@ exports[`pages/Login Login renders correctly when logged out 1`] = `
           </div>
         </div>
       </div>
-      .glamor-1 {
-  width: 100%;
-}
-
-<div
+      <div
         className="MuiCardActions-root-57"
       >
-        .glamor-1 {
-  width: 100%;
-}
-
-<button
-          className="MuiButtonBase-root-73 MuiButton-root-59 glamor-0 MuiCardActions-actionSpacing-58 glamor-1"
+        <button
+          className="MuiButtonBase-root-73 MuiButton-root-59 glamor-10 MuiCardActions-actionSpacing-58 glamor-11"
           disabled={false}
           onBlur={[Function]}
           onFocus={[Function]}

@@ -31,6 +31,7 @@ module.exports = {
     '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/src/js/__mocks__/fileMock.js',
   },
   setupFiles: [
+    'raf/polyfill',
     '<rootDir>/src/js/utils/tests/setupFiles.js',
   ],
   setupTestFrameworkScriptFile: '<rootDir>/src/js/utils/tests/setupTest.js',

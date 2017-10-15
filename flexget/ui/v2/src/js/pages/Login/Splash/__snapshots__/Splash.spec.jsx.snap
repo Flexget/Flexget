@@ -81,163 +81,26 @@ exports[`pages/splash renders correctly 1`] = `
 }
 
 <div>
-  .glamor-1 {
-  background: transparent url(test-file-stub) no-repeat center;
-  min-height: 9rem;
-  background-size: 100% auto;
-  margin: 0 1rem;
-}
-
-@media (min-width:600px) {
-  .glamor-1 {
-    background-size: auto;
-  }
-}
-
-<div
+  <div
     className="glamor-0 glamor-1"
   />
-  .glamor-15 {
-  margin: 10rem auto;
-  width: 5rem;
-  height: 4rem;
-  text-align: center;
-  font-size: 1rem;
-}
-
-.glamor-1 {
-  background-color: #ff9800;
-  height: 100%;
-  width: 0.6rem;
-  display: inline-block;
-  margin: 0.1rem;
-  -webkit-animation: animation_tzvr9k 1.2s infinite ease-in-out;
-  animation: animation_tzvr9k 1.2s infinite ease-in-out;
-}
-
-.glamor-4 {
-  background-color: #ff9800;
-  height: 100%;
-  width: 0.6rem;
-  display: inline-block;
-  margin: 0.1rem;
-  -webkit-animation: animation_tzvr9k 1.2s infinite ease-in-out;
-  animation: animation_tzvr9k 1.2s infinite ease-in-out;
-  -webkit-animation-delay: -1.1s;
-  animation-delay: -1.1s;
-}
-
-.glamor-7 {
-  background-color: #ff9800;
-  height: 100%;
-  width: 0.6rem;
-  display: inline-block;
-  margin: 0.1rem;
-  -webkit-animation: animation_tzvr9k 1.2s infinite ease-in-out;
-  animation: animation_tzvr9k 1.2s infinite ease-in-out;
-  -webkit-animation-delay: -1.0s;
-  animation-delay: -1.0s;
-}
-
-.glamor-10 {
-  background-color: #ff9800;
-  height: 100%;
-  width: 0.6rem;
-  display: inline-block;
-  margin: 0.1rem;
-  -webkit-animation: animation_tzvr9k 1.2s infinite ease-in-out;
-  animation: animation_tzvr9k 1.2s infinite ease-in-out;
-  -webkit-animation-delay: -0.9s;
-  animation-delay: -0.9s;
-}
-
-.glamor-13 {
-  background-color: #ff9800;
-  height: 100%;
-  width: 0.6rem;
-  display: inline-block;
-  margin: 0.1rem;
-  -webkit-animation: animation_tzvr9k 1.2s infinite ease-in-out;
-  animation: animation_tzvr9k 1.2s infinite ease-in-out;
-  -webkit-animation-delay: -0.8s;
-  animation-delay: -0.8s;
-}
-
-<div
-    className="glamor-14 glamor-15"
+  <div
+    className="glamor-16 glamor-17"
   >
-    .glamor-1 {
-  background-color: #ff9800;
-  height: 100%;
-  width: 0.6rem;
-  display: inline-block;
-  margin: 0.1rem;
-  -webkit-animation: animation_tzvr9k 1.2s infinite ease-in-out;
-  animation: animation_tzvr9k 1.2s infinite ease-in-out;
-}
-
-<div
-      className="glamor-0 glamor-1"
+    <div
+      className="glamor-2 glamor-3"
     />
-    .glamor-2 {
-  background-color: #ff9800;
-  height: 100%;
-  width: 0.6rem;
-  display: inline-block;
-  margin: 0.1rem;
-  -webkit-animation: animation_tzvr9k 1.2s infinite ease-in-out;
-  animation: animation_tzvr9k 1.2s infinite ease-in-out;
-  -webkit-animation-delay: -1.1s;
-  animation-delay: -1.1s;
-}
-
-<div
-      className="glamor-0 glamor-1 glamor-2"
+    <div
+      className="glamor-2 glamor-5 glamor-6"
     />
-    .glamor-2 {
-  background-color: #ff9800;
-  height: 100%;
-  width: 0.6rem;
-  display: inline-block;
-  margin: 0.1rem;
-  -webkit-animation: animation_tzvr9k 1.2s infinite ease-in-out;
-  animation: animation_tzvr9k 1.2s infinite ease-in-out;
-  -webkit-animation-delay: -1.0s;
-  animation-delay: -1.0s;
-}
-
-<div
-      className="glamor-0 glamor-1 glamor-2"
+    <div
+      className="glamor-2 glamor-8 glamor-9"
     />
-    .glamor-2 {
-  background-color: #ff9800;
-  height: 100%;
-  width: 0.6rem;
-  display: inline-block;
-  margin: 0.1rem;
-  -webkit-animation: animation_tzvr9k 1.2s infinite ease-in-out;
-  animation: animation_tzvr9k 1.2s infinite ease-in-out;
-  -webkit-animation-delay: -0.9s;
-  animation-delay: -0.9s;
-}
-
-<div
-      className="glamor-0 glamor-1 glamor-2"
+    <div
+      className="glamor-2 glamor-11 glamor-12"
     />
-    .glamor-2 {
-  background-color: #ff9800;
-  height: 100%;
-  width: 0.6rem;
-  display: inline-block;
-  margin: 0.1rem;
-  -webkit-animation: animation_tzvr9k 1.2s infinite ease-in-out;
-  animation: animation_tzvr9k 1.2s infinite ease-in-out;
-  -webkit-animation-delay: -0.8s;
-  animation-delay: -0.8s;
-}
-
-<div
-      className="glamor-0 glamor-1 glamor-2"
+    <div
+      className="glamor-2 glamor-14 glamor-15"
     />
   </div>
 </div>

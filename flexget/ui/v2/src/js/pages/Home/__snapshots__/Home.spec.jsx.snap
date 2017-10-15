@@ -28,11 +28,7 @@ exports[`pages/Home renders correctly 1`] = `
 <div
   className="MuiPaper-root-1 MuiPaper-shadow2-5 MuiPaper-rounded-2 glamor-6 glamor-7"
 >
-  .glamor-1 {
-  background-color: #ef6c00;
-}
-
-<div
+  <div
     className="MuiCardContent-root-33 MuiCardHeader-root-28 glamor-0 glamor-1"
   >
     <div
@@ -50,19 +46,11 @@ exports[`pages/Home renders correctly 1`] = `
       </span>
     </div>
   </div>
-  .glamor-1 {
-  font-weight: bold;
-}
-
-<div
+  <div
     className="MuiCardContent-root-33"
   >
-    .glamor-1 {
-  font-weight: bold;
-}
-
-<p
-      className="glamor-0 glamor-1"
+    <p
+      className="glamor-2 glamor-3"
     >
       We need your help! If you are a React developer or can help with the layout/design/css then please join in the effort!
     </p>
@@ -101,14 +89,8 @@ exports[`pages/Home renders correctly 1`] = `
       </a>
     </p>
   </div>
-  .glamor-1 {
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-<div
-    className="MuiCardActions-root-56 glamor-0 glamor-1"
+  <div
+    className="MuiCardActions-root-56 glamor-4 glamor-5"
   >
     <a
       aria-label="Github"

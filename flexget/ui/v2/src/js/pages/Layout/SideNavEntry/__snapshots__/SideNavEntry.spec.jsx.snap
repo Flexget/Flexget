@@ -18,38 +18,17 @@ exports[`pages/Layout/SideNavEntry renders correctly with link 1`] = `
   href="/test"
   onClick={[Function]}
 >
-  .glamor-1 {
-  color: #b0bec5;
-}
-
-.glamor-5 {
-  border-left: 3px solid transparent;
-  cursor: pointer;
-}
-
-.glamor-5:hover {
-  border-left: 3px solid #ff9800;
-}
-
-<li
+  <li
     className="MuiListItem-root-1 MuiListItem-gutters-8 MuiListItem-default-4 glamor-4 glamor-5"
     disabled={false}
     onClick={undefined}
   >
-    .glamor-1 {
-  color: #b0bec5;
-}
-
-<span
+    <span
       aria-hidden="true"
       className="material-icons MuiIcon-root-11 glamor-0 MuiListItemIcon-root-10 fa fa-icon glamor-1"
     />
-    .glamor-1 {
-  color: #b0bec5;
-}
-
-<div
-      className="MuiListItemText-root-18 MuiListItemText-inset-19 glamor-0 glamor-1"
+    <div
+      className="MuiListItemText-root-18 MuiListItemText-inset-19 glamor-2 glamor-1"
     >
       Test
     </div>
@@ -76,20 +55,12 @@ exports[`pages/Layout/SideNavEntry renders correctly without link 1`] = `
   disabled={false}
   onClick={undefined}
 >
-  .glamor-1 {
-  color: #b0bec5;
-}
-
-<span
+  <span
     aria-hidden="true"
     className="material-icons MuiIcon-root-11 glamor-0 MuiListItemIcon-root-10 fa fa-icon glamor-1"
   />
-  .glamor-1 {
-  color: #b0bec5;
-}
-
-<div
-    className="MuiListItemText-root-18 MuiListItemText-inset-19 glamor-0 glamor-1"
+  <div
+    className="MuiListItemText-root-18 MuiListItemText-inset-19 glamor-2 glamor-1"
   >
     Test
   </div>
