@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { findDOMNode } from 'react-dom';
 import PropTypes from 'prop-types';
-import HistoryList from 'pages/history/HistoryList';
-import FilterNav from 'pages/history/FilterNav';
+import HistoryList from 'pages/History/HistoryList';
+import FilterNav from 'pages/History/FilterNav';
 import { NoPaddingWrapper } from 'common/styles';
 
 export default class HistoryPage extends Component {
