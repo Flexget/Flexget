@@ -1,10 +1,9 @@
-import styled from 'emotion/react';
+import styled from 'react-emotion';
 import Icon from 'material-ui/Icon';
 import { FormControl } from 'material-ui/Form';
 import theme from 'theme';
 
 export const RotatingIcon = styled(Icon)`
-  composes: ${'fa fa-chevron-up'};
   transition: ${theme.transitions.create()};
   transform: ${({ rotate }) => rotate && 'rotate(180deg)'};
 `;

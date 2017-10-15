@@ -1,4 +1,4 @@
-import styled from 'emotion/react';
+import styled from 'react-emotion';
 import Toolbar from 'material-ui/Toolbar';
 import AppBar from 'material-ui/AppBar';
 import theme from 'theme';

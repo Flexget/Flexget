@@ -14,7 +14,7 @@ describe('common/PrivateRoute', () => {
       expect(tree).toMatchSnapshot();
     });
 
-    it('renders correctly when logged out', () => {
+    xit('renders correctly when logged out', () => {
       const tree = renderer.create(
         router(<PrivateRoute component={Component} loggedIn={false} />)
       ).toJSON();

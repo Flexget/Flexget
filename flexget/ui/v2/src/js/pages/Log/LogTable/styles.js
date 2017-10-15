@@ -1,4 +1,4 @@
-import styled, { css } from 'emotion/react';
+import styled, { css } from 'react-emotion';
 import { Table as RVTable } from 'react-virtualized';
 
 export const Table = styled(RVTable)`

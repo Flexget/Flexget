@@ -1,4 +1,4 @@
-import styled from 'emotion/react';
+import styled from 'react-emotion';
 
 export const TableWrapper = styled.div`
   width: initial;

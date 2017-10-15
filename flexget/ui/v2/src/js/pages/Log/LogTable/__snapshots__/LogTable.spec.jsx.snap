@@ -10,7 +10,6 @@ ShallowWrapper {
         "breakpoints": Object {
           "between": [Function],
           "down": [Function],
-          "getWidth": [Function],
           "keys": Array [
             "xs",
             "sm",
@@ -20,17 +19,27 @@ ShallowWrapper {
           ],
           "only": [Function],
           "up": [Function],
-          "values": Array [
-            360,
-            600,
-            960,
-            1280,
-            1920,
-          ],
+          "values": Object {
+            "lg": 1280,
+            "md": 960,
+            "sm": 600,
+            "xl": 1920,
+            "xs": 360,
+          },
+          "width": [Function],
         },
         "direction": "ltr",
         "mixins": Object {
           "gutters": [Function],
+          "toolbar": Object {
+            "@media (min-width:0px) and (orientation: landscape)": Object {
+              "minHeight": 48,
+            },
+            "@media (min-width:600px)": Object {
+              "minHeight": 64,
+            },
+            "minHeight": 56,
+          },
         },
         "palette": Object {
           "action": Object {

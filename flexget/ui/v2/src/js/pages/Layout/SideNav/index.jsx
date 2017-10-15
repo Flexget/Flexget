@@ -13,7 +13,7 @@ import {
 } from './styles';
 import sideNavItems from './items';
 
-export default class Sidenav extends Component {
+export default class SideNav extends Component {
   static propTypes = {
     sideBarOpen: PropTypes.bool.isRequired,
     toggle: PropTypes.func.isRequired,

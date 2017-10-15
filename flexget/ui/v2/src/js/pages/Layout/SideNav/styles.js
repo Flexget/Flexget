@@ -1,4 +1,4 @@
-import styled, { css } from 'emotion/react';
+import styled, { css } from 'react-emotion';
 import theme from 'theme';
 import List from 'material-ui/List';
 import SideNavEntry from 'pages/Layout/SideNavEntry';

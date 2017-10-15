@@ -127,7 +127,7 @@ class FilterNav extends Component {
           </Select>
         </PaddedFormControl>
         <IconButton color="inherit" onClick={toggleOrder}>
-          <RotatingIcon rotate={order === 'desc'} />
+          <RotatingIcon rotate={order === 'desc'} className="fa fa-chevron-up" />
         </IconButton>
       </SecondaryNav>
     );

@@ -1,4 +1,4 @@
-import styled, { css } from 'emotion/react';
+import styled, { css } from 'react-emotion';
 import Icon from 'material-ui/Icon';
 import Typography from 'material-ui/Typography';
 import TextField from 'material-ui/TextField';
@@ -15,7 +15,7 @@ export const Wrapper = styled.div`
 `;
 
 export const GreyIcon = styled(Icon)`
-  composes: ${grey};
+  ${grey};
 `;
 
 export const GreyClickableIcon = styled(GreyIcon)`
@@ -23,7 +23,7 @@ export const GreyClickableIcon = styled(GreyIcon)`
 `;
 
 export const GreyType = styled(Typography)`
-  composes: ${grey};
+  ${grey};
 `;
 
 export const Spacer = styled.div`

@@ -22,13 +22,13 @@ class Version extends Component {
   };
 
   componentDidMount() {
-    if (process.env.NODE_ENV === 'production' || !(this.props.version && this.props.version.api)) {
+    if (process.env.NODE_ENV === 'production' || !this.props.version.api) {
       this.props.getVersion();
     }
   }
 
   render() {
-    const { version: { api, flexget, latest } = {}, className } = this.props;
+    const { version: { api, flexget, latest }, className } = this.props;
     return (
       <Wrapper className={className}>
         <Line>Version Info</Line>

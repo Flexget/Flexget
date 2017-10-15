@@ -1,4 +1,4 @@
-import styled from 'emotion/react';
+import styled from 'react-emotion';
 import Card, { CardActions, CardHeader } from 'material-ui/Card';
 import theme from 'theme';
 

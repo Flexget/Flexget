@@ -1,4 +1,4 @@
-import styled, { css } from 'emotion/react';
+import styled, { css } from 'react-emotion';
 import theme from 'theme';
 import Icon from 'material-ui/Icon';
 import { ListItem, ListItemText } from 'material-ui/List';
@@ -6,11 +6,11 @@ import { ListItem, ListItemText } from 'material-ui/List';
 const colorClass = css`color: ${theme.palette.secondary[200]};`;
 
 export const SideNavIcon = styled(Icon)`
-  composes: ${colorClass};
+  ${colorClass};
 `;
 
 export const SideNavText = styled(ListItemText)`
-  composes: ${colorClass};
+  ${colorClass};
 `;
 
 export const NavItem = styled(ListItem)`
