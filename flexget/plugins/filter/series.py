@@ -1151,9 +1151,20 @@ def remove_series_entity(name, identifier, forget=False):
             fire_event('forget', downloaded_release)
 
 
-def delete_release_by_id(release_id):
+def delete_episode_release_by_id(release_id):
     with Session() as session:
         release = session.query(EpisodeRelease).filter(EpisodeRelease.id == release_id).first()
+        if release:
+            session.delete(release)
+            session.commit()
+            log.debug('Deleted release ID `%s`', release_id)
+        else:
+            raise ValueError('Unknown identifier `%s` for release' % release_id)
+
+
+def delete_season_release_by_id(release_id):
+    with Session() as session:
+        release = session.query(SeasonRelease).filter(SeasonRelease.id == release_id).first()
         if release:
             session.delete(release)
             session.commit()

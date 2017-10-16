@@ -767,7 +767,7 @@ class SeriesSeasonsReleasesAPI(APIResource):
         for release in release_items:
             if args.get('forget'):
                 fire_event('forget', release.title)
-            series.delete_release_by_id(release.id)
+            series.delete_season_release_by_id(release.id)
         return success_response('successfully deleted all releases for season %s from show %s' % (season_id, show_id))
 
     @api.response(200, 'Successfully reset all downloaded releases for season', model=base_message_schema)
@@ -857,7 +857,7 @@ class SeriesSeasonReleaseAPI(APIResource):
         if args.get('forget'):
             fire_event('forget', release.title)
 
-        series.delete_release_by_id(rel_id)
+        series.delete_season_release_by_id(rel_id)
         return success_response('successfully deleted release %d from season %d' % (rel_id, season_id))
 
     @api.response(200, 'Successfully reset downloaded release status', model=season_release_schema)
@@ -1002,7 +1002,7 @@ class SeriesEpisodeReleasesAPI(APIResource):
         for release in release_items:
             if args.get('forget'):
                 fire_event('forget', release.title)
-            series.delete_release_by_id(release.id)
+            series.delete_episode_release_by_id(release.id)
         return success_response('successfully deleted all releases for episode %s from show %s' % (ep_id, show_id))
 
     @api.response(200, 'Successfully reset all downloaded releases for episode', model=base_message_schema)
@@ -1092,7 +1092,7 @@ class SeriesEpisodeReleaseAPI(APIResource):
         if args.get('forget'):
             fire_event('forget', release.title)
 
-        series.delete_release_by_id(rel_id)
+        series.delete_episode_release_by_id(rel_id)
         return success_response('successfully deleted release %d from episode %d' % (rel_id, ep_id))
 
     @api.response(200, 'Successfully reset downloaded release status', model=episode_release_schema)

@@ -831,72 +831,70 @@ class TestSeriesSeasonReleasesAPI(object):
             series.name = 'test series 1'
             session.add(series)
 
-            episode1 = Episode()
-            episode1.identifier = 'S01E01'
-            episode1.identified_by = 'ep'
-            episode1.season = 1
-            episode1.number = 1
-            episode1.series_id = series.id
+            season1 = Season()
+            season1.identifier = 'S01'
+            season1.identified_by = 'ep'
+            season1.season = 1
+            season1.series_id = series.id
 
-            release1 = EpisodeRelease()
+            release1 = SeasonRelease()
             release1.title = 'downloaded release'
             release1.downloaded = True
 
-            release2 = EpisodeRelease()
+            release2 = SeasonRelease()
             release2.title = 'un-downloaded release'
             release2.downloaded = False
 
-            episode1.releases = [release1, release2]
-            series.episodes.append(episode1)
+            season1.releases = [release1, release2]
+            series.seasons.append(season1)
 
             series2 = Series()
             series2.name = 'test series 2'
             session.add(series2)
 
-            episode2 = Episode()
-            episode2.identifier = 'S01E02'
-            episode2.identified_by = 'ep'
-            episode2.season = 1
-            episode2.number = 2
-            episode2.series_id = series2.id
+            season2 = Season()
+            season2.identifier = 'S02'
+            season2.identified_by = 'ep'
+            season2.season = 2
+            season2.series_id = series2.id
 
-            series2.episodes.append(episode2)
+            series2.seasons.append(season2)
 
-        rsp = api_client.delete('/series/1/episodes/1/releases/?downloaded=true')
+        rsp = api_client.delete('/series/1/seasons/1/releases/?downloaded=true')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
         assert not errors
 
-        rsp = api_client.get('/series/1/episodes/1/releases/')
+        rsp = api_client.get('/series/1/seasons/1/releases/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.release_list_schema, data)
+        errors = schema_match(OC.season_release_list_schema, data)
         assert not errors
 
         assert len(data) == 1
         assert data[0]['title'] == 'un-downloaded release'
 
-        rsp = api_client.delete('/series/1/episodes/1/releases/?downloaded=false')
+        rsp = api_client.delete('/series/1/seasons/1/releases/?downloaded=false')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
         assert not errors
 
-        rsp = api_client.get('/series/1/episodes/1/releases/')
+        rsp = api_client.get('/series/1/seasons/1/releases/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.release_list_schema, data)
+        errors = schema_match(OC.season_release_list_schema, data)
         assert not errors
 
         assert len(data) == 0
 
         # No series
-        rsp = api_client.delete('/series/10/episodes/1/releases/?downloaded=false')
+        rsp = api_client.delete('/series/10/seasons/1/releases/?downloaded=false')
         assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -904,7 +902,7 @@ class TestSeriesSeasonReleasesAPI(object):
         assert not errors
 
         # No episode for series
-        rsp = api_client.delete('/series/1/episodes/10/releases/?downloaded=false')
+        rsp = api_client.delete('/series/1/seasons/10/releases/?downloaded=false')
         assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -912,7 +910,7 @@ class TestSeriesSeasonReleasesAPI(object):
         assert not errors
 
         # Episode does not belong to series
-        rsp = api_client.delete('/series/2/episodes/1/releases/?downloaded=false')
+        rsp = api_client.delete('/series/2/seasons/1/releases/?downloaded=false')
         assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
