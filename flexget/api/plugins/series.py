@@ -57,6 +57,8 @@ class ObjectsContainer(object):
     season_release_object = copy.deepcopy(episode_release_object)
     del season_release_object['properties']['episode_id']
     season_release_object['properties']['season_id'] = {'type': 'integer'}
+    season_release_object['required'].remove('episode_id')
+    season_release_object['required'].append('season_id')
 
     episode_release_list_schema = {'type': 'array', 'items': episode_release_object}
     season_release_list_schema = {'type': 'array', 'items': season_release_object}
@@ -675,7 +677,7 @@ class SeriesSeasonsReleasesAPI(APIResource):
         except NoResultFound:
             raise NotFoundError('show with ID %s not found' % show_id)
         try:
-            episode = series.season_by_id(season_id, session)
+            season = series.season_by_id(season_id, session)
         except NoResultFound:
             raise NotFoundError('season with ID %s not found' % season_id)
         if not series.season_in_show(show_id, season_id):
@@ -706,7 +708,7 @@ class SeriesSeasonsReleasesAPI(APIResource):
             'stop': stop,
             'sort_by': sort_by,
             'descending': descending,
-            'episode': episode,
+            'season': season,
             'session': session
         }
 
