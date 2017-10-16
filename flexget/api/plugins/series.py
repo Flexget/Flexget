@@ -40,7 +40,7 @@ def series_details(show, begin=False, latest=False):
 
 
 class ObjectsContainer(object):
-    release_object = {
+    episode_release_object = {
         'type': 'object',
         'properties': {
             'id': {'type': 'integer'},
@@ -54,7 +54,12 @@ class ObjectsContainer(object):
         'required': ['id', 'title', 'downloaded', 'quality', 'proper_count', 'first_seen', 'episode_id']
     }
 
-    release_list_schema = {'type': 'array', 'items': release_object}
+    season_release_object = copy.deepcopy(episode_release_object)
+    del season_release_object['properties']['episode_id']
+    season_release_object['properties']['season_id'] = {'type': 'integer'}
+
+    episode_release_list_schema = {'type': 'array', 'items': episode_release_object}
+    season_release_list_schema = {'type': 'array', 'items': season_release_object}
 
     episode_object = {
         'type': ['object', 'null'],
@@ -68,7 +73,7 @@ class ObjectsContainer(object):
             "season": {'type': 'integer'},
             "series_id": {'type': 'integer'},
             "number_of_releases": {'type': 'integer'},
-            'latest_release': release_object
+            'latest_release': episode_release_object
         },
         'required': ['first_seen', 'id', 'identified_by', 'identifier', 'premiere', 'number', 'season',
                      'series_id', 'number_of_releases']
@@ -136,8 +141,11 @@ episode_schema = api.schema_model('episode_item', ObjectsContainer.episode_objec
 season_list_schema = api.schema_model('season_list', ObjectsContainer.seasons_list_schema)
 season_schema = api.schema_model('episode_item', ObjectsContainer.season_object)
 
-release_schema = api.schema_model('release_schema', ObjectsContainer.release_object)
-release_list_schema = api.schema_model('release_list_schema', ObjectsContainer.release_list_schema)
+episode_release_schema = api.schema_model('release_schema', ObjectsContainer.episode_release_object)
+episode_release_list_schema = api.schema_model('release_list_schema', ObjectsContainer.episode_release_list_schema)
+
+season_release_schema = api.schema_model('release_schema', ObjectsContainer.season_release_object)
+season_release_list_schema = api.schema_model('release_list_schema', ObjectsContainer.season_release_list_schema)
 
 base_series_parser = api.parser()
 base_series_parser.add_argument('begin', type=inputs.boolean, default=True, help='Show series begin episode')
@@ -657,7 +665,7 @@ release_delete_parser.add_argument('forget', type=inputs.boolean, default=False,
                      'The \'Season-ID\' header will be appended to the result headers.')
 class SeriesSeasonsReleasesAPI(APIResource):
     @etag
-    @api.response(200, 'Releases retrieved successfully for season', release_list_schema)
+    @api.response(200, 'Releases retrieved successfully for season', season_release_list_schema)
     @api.doc(description='Get all matching releases for a specific season of a specific show.',
              parser=release_list_parser)
     def get(self, show_id, season_id, session):
@@ -794,7 +802,7 @@ class SeriesSeasonsReleasesAPI(APIResource):
          )
 class SeriesSeasonReleaseAPI(APIResource):
     @etag
-    @api.response(200, 'Release retrieved successfully for season', release_schema)
+    @api.response(200, 'Release retrieved successfully for season', season_release_schema)
     @api.doc(description='Get a specific downloaded release for a specific season of a specific show')
     def get(self, show_id, season_id, rel_id, session):
         """ Get season release by show ID, season ID and release ID """
@@ -850,7 +858,7 @@ class SeriesSeasonReleaseAPI(APIResource):
         series.delete_release_by_id(rel_id)
         return success_response('successfully deleted release %d from season %d' % (rel_id, season_id))
 
-    @api.response(200, 'Successfully reset downloaded release status', model=release_schema)
+    @api.response(200, 'Successfully reset downloaded release status', model=season_release_schema)
     @api.doc(description='Resets the downloaded release status, clearing the quality to be downloaded again')
     def put(self, show_id, season_id, rel_id, session):
         """ Resets a downloaded release status """
@@ -892,7 +900,7 @@ class SeriesSeasonReleaseAPI(APIResource):
                      'The \'Episode-ID\' header will be appended to the result headers.')
 class SeriesEpisodeReleasesAPI(APIResource):
     @etag
-    @api.response(200, 'Releases retrieved successfully for episode', release_list_schema)
+    @api.response(200, 'Releases retrieved successfully for episode', episode_release_list_schema)
     @api.doc(description='Get all matching releases for a specific episode of a specific show.',
              parser=release_list_parser)
     def get(self, show_id, ep_id, session):
@@ -1029,7 +1037,7 @@ class SeriesEpisodeReleasesAPI(APIResource):
          )
 class SeriesEpisodeReleaseAPI(APIResource):
     @etag
-    @api.response(200, 'Release retrieved successfully for episode', release_schema)
+    @api.response(200, 'Release retrieved successfully for episode', episode_release_schema)
     @api.doc(description='Get a specific downloaded release for a specific episode of a specific show')
     def get(self, show_id, ep_id, rel_id, session):
         """ Get episode release by show ID, episode ID and release ID """
@@ -1085,7 +1093,7 @@ class SeriesEpisodeReleaseAPI(APIResource):
         series.delete_release_by_id(rel_id)
         return success_response('successfully deleted release %d from episode %d' % (rel_id, ep_id))
 
-    @api.response(200, 'Successfully reset downloaded release status', model=release_schema)
+    @api.response(200, 'Successfully reset downloaded release status', model=episode_release_schema)
     @api.doc(description='Resets the downloaded release status, clearing the quality to be downloaded again')
     def put(self, show_id, ep_id, rel_id, session):
         """ Resets a downloaded release status """
