@@ -495,7 +495,7 @@ class SeriesSeasonsAPI(APIResource):
             season = series.season_by_id(season_id, session)
         except NoResultFound:
             raise NotFoundError('season with ID %s not found' % season_id)
-        if not series.episode_in_show(show_id, season_id):
+        if not series.season_in_show(show_id, season_id):
             raise BadRequest('season with id %s does not belong to show %s' % (season_id, show_id))
 
         args = delete_parser.parse_args()
