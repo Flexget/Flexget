@@ -742,7 +742,7 @@ class TestSeriesEpisodeAPI(object):
         assert not errors
 
 
-class TestSeriesReleasesAPI(object):
+class TestSeriesEpisodeReleasesAPI(object):
     config = """
         tasks: {}
     """
@@ -1020,7 +1020,7 @@ class TestSeriesReleasesAPI(object):
         assert not errors
 
 
-class TestSeriesReleaseAPI(object):
+class TestSeriesEpisodeReleaseAPI(object):
     config = """
         tasks: {}
     """
