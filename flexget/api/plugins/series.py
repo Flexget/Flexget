@@ -648,12 +648,148 @@ release_delete_parser.add_argument('forget', type=inputs.boolean, default=False,
 
 @api.response(NotFoundError)
 @api.response(BadRequest)
+@series_api.route('/<int:show_id>/seasons/<int:season_id>/releases/')
+@api.doc(params={'show_id': 'ID of the show', 'season_id': 'Seasons ID'},
+         description='Releases are any seen entries that match the seasons. \n'
+                     'The \'Series-ID\' header will be appended to the result headers.\n'
+                     'The \'Season-ID\' header will be appended to the result headers.')
+class SeriesSeasonsReleasesAPI(APIResource):
+    @etag
+    @api.response(200, 'Releases retrieved successfully for season', release_list_schema)
+    @api.doc(description='Get all matching releases for a specific season of a specific show.',
+             parser=release_list_parser)
+    def get(self, show_id, season_id, session):
+        """ Get all season releases by show ID and season ID """
+        try:
+            series.show_by_id(show_id, session=session)
+        except NoResultFound:
+            raise NotFoundError('show with ID %s not found' % show_id)
+        try:
+            episode = series.season_by_id(season_id, session)
+        except NoResultFound:
+            raise NotFoundError('season with ID %s not found' % season_id)
+        if not series.season_in_show(show_id, season_id):
+            raise BadRequest('seasons with id %s does not belong to show %s' % (season_id, show_id))
+
+        args = release_list_parser.parse_args()
+        # Filter params
+        downloaded = args.get('downloaded')
+
+        # Pagination and sorting params
+        page = args['page']
+        per_page = args['per_page']
+        sort_by = args['sort_by']
+        sort_order = args['order']
+
+        descending = sort_order == 'desc'
+
+        # Handle max size limit
+        if per_page > 100:
+            per_page = 100
+
+        start = per_page * (page - 1)
+        stop = start + per_page
+
+        kwargs = {
+            'downloaded': downloaded,
+            'start': start,
+            'stop': stop,
+            'sort_by': sort_by,
+            'descending': descending,
+            'episode': episode,
+            'session': session
+        }
+
+        # Total number of releases
+        total_items = series.get_season_releases(count=True, **kwargs)
+
+        # Release items
+        release_items = [release.to_dict() for release in series.get_season_releases(**kwargs)]
+
+        # Total number of pages
+        total_pages = int(ceil(total_items / float(per_page)))
+
+        if total_pages < page and total_pages != 0:
+            raise NotFoundError('page %s does not exist' % page)
+
+        # Actual results in page
+        actual_size = min(per_page, len(release_items))
+
+        # Get pagination headers
+        pagination = pagination_headers(total_pages, total_items, actual_size, request)
+
+        # Created response
+        rsp = jsonify(release_items)
+
+        # Add link header to response
+        rsp.headers.extend(pagination)
+
+        # Add Series-ID and Episode-ID headers
+        rsp.headers.extend({'Series-ID': show_id, 'Season-ID': season_id})
+
+        return rsp
+
+    @api.response(200, 'Successfully deleted all releases for season', model=base_message_schema)
+    @api.doc(description='Delete all releases for a specific season of a specific show.',
+             parser=release_delete_parser)
+    def delete(self, show_id, season_id, session):
+        """ Deletes all season releases by show ID and season ID """
+        try:
+            series.show_by_id(show_id, session=session)
+        except NoResultFound:
+            raise NotFoundError('show with ID %s not found' % show_id)
+        try:
+            season = series.season_by_id(season_id, session)
+        except NoResultFound:
+            raise NotFoundError('seasons with ID %s not found' % season_id)
+        if not series.season_in_show(show_id, season_id):
+            raise BadRequest('season with id %s does not belong to show %s' % (season_id, show_id))
+
+        args = release_delete_parser.parse_args()
+        downloaded = args.get('downloaded') is True if args.get('downloaded') is not None else None
+        release_items = []
+        for release in season.releases:
+            if downloaded and release.downloaded or downloaded is False and not release.downloaded or not downloaded:
+                release_items.append(release)
+
+        for release in release_items:
+            if args.get('forget'):
+                fire_event('forget', release.title)
+            series.delete_release_by_id(release.id)
+        return success_response('successfully deleted all releases for season %s from show %s' % (season_id, show_id))
+
+    @api.response(200, 'Successfully reset all downloaded releases for season', model=base_message_schema)
+    @api.doc(description='Resets all of the downloaded releases of an season, clearing the quality to be downloaded '
+                         'again,')
+    def put(self, show_id, season_id, session):
+        """ Marks all downloaded season releases as not downloaded """
+        try:
+            series.show_by_id(show_id, session=session)
+        except NoResultFound:
+            raise NotFoundError('show with ID %s not found' % show_id)
+        try:
+            season = series.season_by_id(season_id, session)
+        except NoResultFound:
+            raise NotFoundError('season with ID %s not found' % season_id)
+        if not series.season_in_show(show_id, season_id):
+            raise BadRequest('season with id %s does not belong to show %s' % (season_id, show_id))
+
+        for release in season.releases:
+            if release.downloaded:
+                release.downloaded = False
+
+        return success_response('successfully reset download status for all releases for season %s from show %s'
+                                % (season_id, show_id))
+
+
+@api.response(NotFoundError)
+@api.response(BadRequest)
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases/')
 @api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'},
          description='Releases are any seen entries that match the episode. \n'
                      'The \'Series-ID\' header will be appended to the result headers.\n'
                      'The \'Episode-ID\' header will be appended to the result headers.')
-class SeriesReleasesAPI(APIResource):
+class SeriesEpisodeReleasesAPI(APIResource):
     @etag
     @api.response(200, 'Releases retrieved successfully for episode', release_list_schema)
     @api.doc(description='Get all matching releases for a specific episode of a specific show.',
@@ -790,7 +926,7 @@ class SeriesReleasesAPI(APIResource):
                      'The \'Series-ID\' header will be appended to the result headers.\n'
                      'The \'Episode-ID\' header will be appended to the result headers.'
          )
-class SeriesReleaseAPI(APIResource):
+class SeriesEpisodeReleaseAPI(APIResource):
     @etag
     @api.response(200, 'Release retrieved successfully for episode', release_schema)
     @api.doc(description='Get a specific downloaded release for a specific episode of a specific show')
