@@ -467,11 +467,11 @@ class SeriesSeasonsAPI(APIResource):
         except NoResultFound:
             raise NotFoundError('show with ID %s not found' % show_id)
         try:
-            episode = series.episode_by_id(season_id, session)
+            episode = series.season_by_id(season_id, session)
         except NoResultFound:
-            raise NotFoundError('episode with ID %s not found' % season_id)
-        if not series.episode_in_show(show_id, season_id):
-            raise BadRequest('episode with id %s does not belong to show %s' % (season_id, show_id))
+            raise NotFoundError('season with ID %s not found' % season_id)
+        if not series.season_in_show(show_id, season_id):
+            raise BadRequest('season with id %s does not belong to show %s' % (season_id, show_id))
 
         rsp = jsonify(episode.to_dict())
 
