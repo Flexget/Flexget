@@ -461,43 +461,43 @@ class SeriesSeasonsAPI(APIResource):
     @api.response(200, 'Season retrieved successfully for show', season_schema)
     @api.doc(description='Get a specific season via its ID and show ID')
     def get(self, show_id, season_id, session):
-        """ Get episode by show ID and episode ID"""
+        """ Get season by show ID and season ID"""
         try:
             series.show_by_id(show_id, session=session)
         except NoResultFound:
             raise NotFoundError('show with ID %s not found' % show_id)
         try:
-            episode = series.season_by_id(season_id, session)
+            season = series.season_by_id(season_id, session)
         except NoResultFound:
             raise NotFoundError('season with ID %s not found' % season_id)
         if not series.season_in_show(show_id, season_id):
             raise BadRequest('season with id %s does not belong to show %s' % (season_id, show_id))
 
-        rsp = jsonify(episode.to_dict())
+        rsp = jsonify(season.to_dict())
 
         # Add Series-ID header
         rsp.headers.extend({'Series-ID': show_id})
         return rsp
 
-    @api.response(200, 'Episode successfully forgotten for show', model=base_message_schema)
-    @api.doc(description='Delete a specific episode via its ID and show ID. Deleting an episode will mark it as '
+    @api.response(200, 'Season successfully forgotten for show', model=base_message_schema)
+    @api.doc(description='Delete a specific season via its ID and show ID. Deleting a season will mark it as '
                          'wanted again',
              parser=delete_parser)
     def delete(self, show_id, season_id, session):
-        """ Forgets episode by show ID and episode ID """
+        """ Forgets season by show ID and season ID """
         try:
             show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             raise NotFoundError('show with ID %s not found' % show_id)
         try:
-            episode = series.season_by_id(season_id, session)
+            season = series.season_by_id(season_id, session)
         except NoResultFound:
             raise NotFoundError('season with ID %s not found' % season_id)
         if not series.episode_in_show(show_id, season_id):
             raise BadRequest('season with id %s does not belong to show %s' % (season_id, show_id))
 
         args = delete_parser.parse_args()
-        series.remove_series_entity(show.name, episode.identifier, args.get('forget'))
+        series.remove_series_entity(show.name, season.identifier, args.get('forget'))
 
         return success_response('successfully removed season %s from show %s' % (season_id, show_id))
 
