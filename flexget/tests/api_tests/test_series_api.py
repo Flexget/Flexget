@@ -11,7 +11,9 @@ from flexget.api.plugins.series import ObjectsContainer as OC
 from flexget.api.plugins.tvdb_lookup import ObjectsContainer as tvdb
 from flexget.api.plugins.tvmaze_lookup import ObjectsContainer as tvmaze
 from flexget.manager import Session
-from flexget.plugins.filter.series import Series, SeriesTask, Episode, EpisodeRelease, AlternateNames
+from flexget.plugins.filter.series import (
+    Series, SeriesTask, Episode, EpisodeRelease, AlternateNames, Season, SeasonRelease
+)
 from flexget.utils import json
 
 
@@ -552,6 +554,76 @@ class TestSeriesSingleAPI(object):
 
         errors = schema_match(base_message, data)
         assert not errors
+
+
+class TestSeriesSeasonsAPI(object):
+    config = """
+        tasks: {}
+    """
+
+    def test_seasons_get(self, api_client, schema_match):
+        with Session() as session:
+            series = Series()
+            series.name = 'test series 1'
+            session.add(series)
+
+            task = SeriesTask('test task')
+            series.in_tasks = [task]
+
+            season1 = Season()
+            season1.identifier = 'S01'
+            season1.identified_by = 'ep'
+            season1.season = 1
+            season1.series_id = series.id
+
+            season2 = Season()
+            season2.identifier = 'S02'
+            season2.identified_by = 'ep'
+            season2.season = 2
+            season2.series_id = series.id
+
+            release = SeasonRelease()
+            release.title = 'test release'
+            release.downloaded = True
+
+            season1.releases = [release]
+
+            series.seasons.append(season1)
+            series.seasons.append(season2)
+
+        # No series
+        rsp = api_client.get('/series/10/seasons/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        rsp = api_client.get('/series/1/seasons/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.seasons_list_schema, data)
+        assert not errors
+
+        assert len(data) == 2
+
+        # Delete all episodes
+        rsp = api_client.delete('/series/1/seasons/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        rsp = api_client.get('/series/1/seasons/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.seasons_list_schema, data)
+        assert not errors
+
+        assert len(data) == 0
 
 
 class TestSeriesEpisodesAPI(object):

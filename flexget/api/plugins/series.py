@@ -76,6 +76,8 @@ class ObjectsContainer(object):
 
     season_object = copy.deepcopy(episode_object)
     del season_object['properties']['number']
+    season_object['required'].remove('number')
+    season_object['required'].remove('premiere')
 
     single_series_object = {
         'type': 'object',
