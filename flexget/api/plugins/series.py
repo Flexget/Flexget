@@ -784,6 +784,105 @@ class SeriesSeasonsReleasesAPI(APIResource):
 
 @api.response(NotFoundError)
 @api.response(BadRequest)
+@series_api.route('/<int:show_id>/seasons/<int:season_id>/releases/<int:rel_id>/')
+@api.doc(params={'show_id': 'ID of the show', 'season_id': 'Season ID', 'rel_id': 'Release ID'},
+         description='Releases are any seen entries that match the season. \n'
+                     'The \'Series-ID\' header will be appended to the result headers.\n'
+                     'The \'Season-ID\' header will be appended to the result headers.'
+         )
+class SeriesSeasonReleaseAPI(APIResource):
+    @etag
+    @api.response(200, 'Release retrieved successfully for season', release_schema)
+    @api.doc(description='Get a specific downloaded release for a specific season of a specific show')
+    def get(self, show_id, season_id, rel_id, session):
+        """ Get season release by show ID, season ID and release ID """
+        try:
+            series.show_by_id(show_id, session=session)
+        except NoResultFound:
+            raise NotFoundError('show with ID %s not found' % show_id)
+        try:
+            series.season_by_id(season_id, session)
+        except NoResultFound:
+            raise NotFoundError('season with ID %s not found' % season_id)
+        try:
+            release = series.season_release_by_id(rel_id, session)
+        except NoResultFound:
+            raise NotFoundError('release with ID %s not found' % rel_id)
+        if not series.season_in_show(show_id, season_id):
+            raise BadRequest('season with id %s does not belong to show %s' % (season_id, show_id))
+        if not series.release_in_season(season_id, rel_id):
+            raise BadRequest('release id %s does not belong to season %s' % (rel_id, season_id))
+
+        rsp = jsonify(release.to_dict())
+        rsp.headers.extend({
+            'Series-ID': show_id,
+            'Season-ID': season_id
+        })
+        return rsp
+
+    @api.response(200, 'Release successfully deleted', model=base_message_schema)
+    @api.doc(description='Delete a specific releases for a specific season of a specific show.',
+             parser=delete_parser)
+    def delete(self, show_id, season_id, rel_id, session):
+        """ Delete episode release by show ID, season ID and release ID """
+        try:
+            series.show_by_id(show_id, session=session)
+        except NoResultFound:
+            raise NotFoundError('show with ID %s not found' % show_id)
+        try:
+            series.season_by_id(season_id, session)
+        except NoResultFound:
+            raise NotFoundError('season with ID %s not found' % season_id)
+        try:
+            release = series.season_release_by_id(rel_id, session)
+        except NoResultFound:
+            raise NotFoundError('release with ID %s not found' % rel_id)
+        if not series.season_in_show(show_id, season_id):
+            raise BadRequest('season with id %s does not belong to show %s' % (season_id, show_id))
+        if not series.release_in_season(season_id, rel_id):
+            raise BadRequest('release id %s does not belong to season %s' % (rel_id, season_id))
+        args = delete_parser.parse_args()
+        if args.get('forget'):
+            fire_event('forget', release.title)
+
+        series.delete_release_by_id(rel_id)
+        return success_response('successfully deleted release %d from season %d' % (rel_id, season_id))
+
+    @api.response(200, 'Successfully reset downloaded release status', model=release_schema)
+    @api.doc(description='Resets the downloaded release status, clearing the quality to be downloaded again')
+    def put(self, show_id, season_id, rel_id, session):
+        """ Resets a downloaded release status """
+        try:
+            series.show_by_id(show_id, session=session)
+        except NoResultFound:
+            raise NotFoundError('show with ID %s not found' % show_id)
+        try:
+            series.season_by_id(season_id, session)
+        except NoResultFound:
+            raise NotFoundError('season with ID %s not found' % season_id)
+        try:
+            release = series.season_release_by_id(rel_id, session)
+        except NoResultFound:
+            raise NotFoundError('release with ID %s not found' % rel_id)
+        if not series.season_in_show(show_id, season_id):
+            raise BadRequest('season with id %s does not belong to show %s' % (season_id, show_id))
+        if not series.release_in_season(season_id, rel_id):
+            raise BadRequest('release id %s does not belong to episode %s' % (rel_id, season_id))
+
+        if not release.downloaded:
+            raise BadRequest('release with id %s is not set as downloaded' % rel_id)
+        release.downloaded = False
+
+        rsp = jsonify(release.to_dict())
+        rsp.headers.extend({
+            'Series-ID': show_id,
+            'Season-ID': season_id
+        })
+        return rsp
+
+
+@api.response(NotFoundError)
+@api.response(BadRequest)
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases/')
 @api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'},
          description='Releases are any seen entries that match the episode. \n'
