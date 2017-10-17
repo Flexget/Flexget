@@ -15,7 +15,7 @@ from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('piratebay')
 
-CUR_TLD = 'se'
+CUR_TLD = 'org'
 TLDS = 'com|org|sx|ac|pe|gy|to|se|gd|vg|%s' % CUR_TLD
 
 URL_MATCH = re.compile('^http://(?:torrents\.)?thepiratebay\.(?:%s)/.*$' % TLDS)
