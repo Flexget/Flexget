@@ -332,12 +332,6 @@ def register_parser_arguments():
                              help='Limit list to series that are currently in the config or not (default: %(default)s)')
     list_parser.add_argument('--premieres', action='store_true',
                              help='limit list to series which only have episode 1 (and maybe also 2) downloaded')
-    list_parser.add_argument('--new', nargs='?', type=int, metavar='DAYS', const=7,
-                             help='Limit list to series with a release seen in last %(const)s days. number of days can '
-                                  'be overridden with %(metavar)s')
-    list_parser.add_argument('--stale', nargs='?', type=int, metavar='DAYS', const=365,
-                             help='Limit list to series which have not seen a release in %(const)s days. number of '
-                                  'days can be overridden with %(metavar)s')
     list_parser.add_argument('--sort-by', choices=('name', 'age'), help='Choose list sort attribute')
     order = list_parser.add_mutually_exclusive_group(required=False)
     order.add_argument('--descending', dest='order', action='store_const', const='desc',
