@@ -160,9 +160,6 @@ series_list_parser.add_argument('in_config', choices=('configured', 'unconfigure
                                 help="Filter list if shows are currently in configuration.")
 series_list_parser.add_argument('premieres', type=inputs.boolean, default=False,
                                 help="Filter by downloaded premieres only.")
-series_list_parser.add_argument('status', choices=('new', 'stale'), help="Filter by status")
-series_list_parser.add_argument('days', type=int,
-                                help="Filter status by number of days.")
 series_list_parser.add_argument('lookup', choices=('tvdb', 'tvmaze'), action='append',
                                 help="Get lookup result for every show by sending another request to lookup API")
 
@@ -182,8 +179,6 @@ class SeriesAPI(APIResource):
         # Filter params
         configured = args['in_config']
         premieres = args['premieres']
-        status = args['status']
-        days = args['days']
 
         # Pagination and sorting params
         page = args['page']
@@ -208,8 +203,6 @@ class SeriesAPI(APIResource):
         kwargs = {
             'configured': configured,
             'premieres': premieres,
-            'status': status,
-            'days': days,
             'start': start,
             'stop': stop,
             'sort_by': sort_by,

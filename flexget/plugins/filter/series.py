@@ -319,28 +319,6 @@ class Series(Base):
     def completed_seasons(self):
         return [season.season for season in self.seasons if season.completed]
 
-    @hybrid_property
-    def first_seen(self):
-        first_ep = first_season = None
-        if self.episodes:
-            first_ep = min(episode.first_seen for episode in self.episodes)
-        if self.seasons:
-            first_season = min(season.first_seen for season in self.seasons)
-        if first_season or first_ep:
-            if not first_season:
-                return first_ep
-            elif not first_ep:
-                return first_season
-            else:
-                return min([first_season, first_ep])
-
-    @first_seen.expression
-    def first_seen(cls):
-        s1 = select([Season.first_seen]).where(Season.series_id == cls.id)
-        s2 = select([Episode.first_seen]).where(Episode.series_id == cls.id)
-        q = s1.union(s2).alias("first_seen_union")
-        return select([func.min(q.c.first_seen)]).as_scalar()
-
 
 class Season(Base):
     __tablename__ = 'series_seasons'
@@ -703,15 +681,14 @@ class SeriesTask(Base):
 
 
 @with_session
-def get_series_summary(configured=None, premieres=None, status=None, days=None, start=None, stop=None, count=False,
-                       sort_by='show_name', descending=None, session=None):
+def get_series_summary(configured=None, premieres=None, start=None, stop=None, count=False, sort_by='show_name',
+                       descending=None, session=None):
     """
     Return a query with results for all series.
 
     :param configured: 'configured' for shows in config, 'unconfigured' for shows not in config, 'all' for both.
     Default is 'all'
     :param premieres: Return only shows with 1 season and less than 3 episodes
-    :param status: Stale or not
     :param days: Value to determine stale
     :param page_size: Number of result per page
     :param page: Page number to return
@@ -732,14 +709,6 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
     if premieres:
         query = (query.having(func.max(Episode.season) <= 1).having(func.max(Episode.number) <= 2)).filter(
             EpisodeRelease.downloaded == True)
-    if status == 'new':
-        if not days:
-            days = 7
-        query = query.having(func.max(Series.first_seen) > datetime.now() - timedelta(days=days))
-    elif status == 'stale':
-        if not days:
-            days = 365
-        query = query.having(func.max(Series.first_seen) < datetime.now() - timedelta(days=days))
     if count:
         return query.group_by(Series).count()
     if sort_by == 'show_name':

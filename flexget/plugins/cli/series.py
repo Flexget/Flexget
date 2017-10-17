@@ -26,8 +26,6 @@ ENV_SHOW_SORTBY_FIELD = 'FLEXGET_SERIES_SHOW_SORTBY_FIELD'
 ENV_SHOW_SORTBY_ORDER = 'FLEXGET_SERIES_SHOW_SORTBY_ORDER'
 ENV_LIST_CONFIGURED = 'FLEXGET_SERIES_LIST_CONFIGURED'
 ENV_LIST_PREMIERES = 'FLEXGET_SERIES_LIST_PREMIERES'
-ENV_LIST_STATUS = 'FLEXGET_SERIES_LIST_STATUS'
-ENV_LIST_NUMDAYS = 'FLEXGET_SERIES_LIST_NUMDAYS'
 ENV_LIST_SORTBY_FIELD = 'FLEXGET_SERIES_LIST_SORTBY_FIELD'
 ENV_LIST_SORTBY_ORDER = 'FLEXGET_SERIES_LIST_SORTBY_ORDER'
 ENV_ADD_QUALITY = 'FLEXGET_SERIES_ADD_QUALITY'
@@ -79,12 +77,6 @@ def display_summary(options):
                   'session': session,
                   'sort_by': sort_by,
                   'descending': descending}
-        if options.new or os.environ.get(ENV_LIST_STATUS) == 'new':
-            kwargs['status'] = 'new'
-            kwargs['days'] = options.new or int(os.environ.get(ENV_LIST_NUMDAYS, 7))
-        elif options.stale or os.environ.get(ENV_LIST_STATUS) == 'stale':
-            kwargs['status'] = 'stale'
-            kwargs['days'] = options.stale or int(os.environ.get(ENV_LIST_NUMDAYS, 365))
         if sort_by == 'name':
             kwargs['sort_by'] = 'show_name'
         else:
