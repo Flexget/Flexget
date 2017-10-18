@@ -317,41 +317,40 @@ class SeriesParser(TitleParser):
                 log.debug('-> no luck with date_regexps')
 
         if self.identified_by in ['ep', 'auto'] and not self.valid:
-            season_pack_match = self.parse_season_packs(data_stripped)
-            # If a title looks like a special, give it precendance over season pack
-            if season_pack_match and not self.special:
+            ep_match = self.parse_episode(data_stripped)
+            if ep_match:
+                # strict_name
                 if self.strict_name:
-                    if season_pack_match['match'].start() > 1:
+                    if ep_match['match'].start() > 1:
                         return
-                self.season = season_pack_match['season']
-                self.season_pack = True
-                self.id = 'S%s' % season_pack_match['season']
+
+                if ep_match['end_episode'] and ep_match['end_episode'] > ep_match['episode'] + 2:
+                    # This is a pack of too many episodes, ignore it.
+                    log.debug('Series pack contains too many episodes (%d). Rejecting',
+                              ep_match['end_episode'] - ep_match['episode'])
+                    return
+
+                self.season = ep_match['season']
+                self.episode = ep_match['episode']
+                if ep_match['end_episode']:
+                    self.episodes = (ep_match['end_episode'] - ep_match['episode']) + 1
+                else:
+                    self.episodes = 1
                 self.id_type = 'ep'
                 self.valid = True
+                if not (self.special and self.prefer_specials):
+                    return
             else:
-                ep_match = self.parse_episode(data_stripped)
-                if ep_match:
-                    # strict_name
-                    if self.strict_name:
-                        if ep_match['match'].start() > 1:
-                            return
-
-                    if ep_match['end_episode'] and ep_match['end_episode'] > ep_match['episode'] + 2:
-                        # This is a pack of too many episodes, ignore it.
-                        log.debug('Series pack contains too many episodes (%d). Rejecting',
-                                  ep_match['end_episode'] - ep_match['episode'])
+                season_pack_match = self.parse_season_packs(data_stripped)
+                # If a title looks like a special, give it precedence over season pack
+                if season_pack_match and not self.special:
+                    if self.strict_name and season_pack_match['match'].start() > 1:
                         return
-
-                    self.season = ep_match['season']
-                    self.episode = ep_match['episode']
-                    if ep_match['end_episode']:
-                        self.episodes = (ep_match['end_episode'] - ep_match['episode']) + 1
-                    else:
-                        self.episodes = 1
+                    self.season = season_pack_match['season']
+                    self.season_pack = True
+                    self.id = 'S%s' % season_pack_match['season']
                     self.id_type = 'ep'
                     self.valid = True
-                    if not (self.special and self.prefer_specials):
-                        return
                 else:
                     log.debug('-> no luck with ep_regexps')
 
@@ -577,13 +576,13 @@ class SeriesParser(TitleParser):
                 if len(matches) == 1:
                     # Single season full pack, no parts etc
                     season = int(matches[0])
+                    return {
+                        'season': season,
+                        'match': match
+                    }
                 elif len(matches) == 2:
                     # TODO support other formats of season packs: 1xall, s01-PART1, etc.
                     pass
-                return {
-                    'season': season,
-                    'match': match
-                }
 
     def roman_to_int(self, roman):
         """Converts roman numerals up to 39 to integers"""

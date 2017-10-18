@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`store/history/reducer should return the initial state 1`] = `
+Object {
+  "items": Array [],
+  "totalCount": 0,
+}
+`;
+
+exports[`store/history/reducer should store history on GET_HISTORY 1`] = `
+Object {
+  "items": Array [
+    Object {
+      "an": "object",
+    },
+  ],
+  "totalCount": 1,
+}
+`;

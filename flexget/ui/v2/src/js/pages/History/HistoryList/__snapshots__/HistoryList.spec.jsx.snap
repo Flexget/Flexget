@@ -1,0 +1,324 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pages/History/HistoryList HistoryList renders correctly 1`] = `
+ShallowWrapper {
+  "length": 1,
+  Symbol(enzyme.__root__): [Circular],
+  Symbol(enzyme.__unrendered__): <HistoryList
+    getHistory={[Function]}
+    grouping="time"
+    hasMore={true}
+    history={
+      Object {
+        "2017-09-09": Array [
+          Object {
+            "id": 1,
+            "task": "task",
+            "title": "something",
+          },
+        ],
+      }
+    }
+  />,
+  Symbol(enzyme.__renderer__): Object {
+    "batchedUpdates": [Function],
+    "getNode": [Function],
+    "render": [Function],
+    "simulateEvent": [Function],
+    "unmount": [Function],
+  },
+  Symbol(enzyme.__node__): Object {
+    "instance": null,
+    "key": null,
+    "nodeType": "class",
+    "props": Object {
+      "children": <InfiniteScroll
+        element="div"
+        hasMore={true}
+        initialLoad={true}
+        isReverse={false}
+        loadMore={[Function]}
+        loader={
+          <LoadingBar
+            loading={true}
+          />
+        }
+        pageStart={0}
+        threshold={250}
+        useCapture={false}
+        useWindow={false}
+      >
+        <withStyles(List)
+          subheader={
+            <Styled(withStyles(ListSubheader))
+              color="primary"
+            >
+              2017-09-09
+            </Styled(withStyles(ListSubheader))>
+          }
+        >
+          <withStyles(ListItem)>
+            <withStyles(ListItemText)
+              primary="something"
+              secondary="task"
+            />
+          </withStyles(ListItem)>
+        </withStyles(List)>
+      </InfiniteScroll>,
+    },
+    "ref": null,
+    "rendered": Object {
+      "instance": null,
+      "key": null,
+      "nodeType": "class",
+      "props": Object {
+        "children": Array [
+          <withStyles(List)
+            subheader={
+              <Styled(withStyles(ListSubheader))
+                color="primary"
+              >
+                2017-09-09
+              </Styled(withStyles(ListSubheader))>
+            }
+          >
+            <withStyles(ListItem)>
+              <withStyles(ListItemText)
+                primary="something"
+                secondary="task"
+              />
+            </withStyles(ListItem)>
+          </withStyles(List)>,
+        ],
+        "element": "div",
+        "hasMore": true,
+        "initialLoad": true,
+        "isReverse": false,
+        "loadMore": [Function],
+        "loader": <LoadingBar
+          loading={true}
+        />,
+        "pageStart": 0,
+        "threshold": 250,
+        "useCapture": false,
+        "useWindow": false,
+      },
+      "ref": null,
+      "rendered": Array [
+        Object {
+          "instance": null,
+          "key": "2017-09-09",
+          "nodeType": "class",
+          "props": Object {
+            "children": Array [
+              <withStyles(ListItem)>
+                <withStyles(ListItemText)
+                  primary="something"
+                  secondary="task"
+                />
+              </withStyles(ListItem)>,
+            ],
+            "subheader": <Styled(withStyles(ListSubheader))
+              color="primary"
+            >
+              2017-09-09
+            </Styled(withStyles(ListSubheader))>,
+          },
+          "ref": null,
+          "rendered": Array [
+            Object {
+              "instance": null,
+              "key": "1",
+              "nodeType": "class",
+              "props": Object {
+                "children": <withStyles(ListItemText)
+                  primary="something"
+                  secondary="task"
+                />,
+              },
+              "ref": null,
+              "rendered": Object {
+                "instance": null,
+                "key": null,
+                "nodeType": "class",
+                "props": Object {
+                  "primary": "something",
+                  "secondary": "task",
+                },
+                "ref": null,
+                "rendered": null,
+                "type": [Function],
+              },
+              "type": [Function],
+            },
+          ],
+          "type": [Function],
+        },
+      ],
+      "type": [Function],
+    },
+    "type": [Function],
+  },
+  Symbol(enzyme.__nodes__): Array [
+    Object {
+      "instance": null,
+      "key": null,
+      "nodeType": "class",
+      "props": Object {
+        "children": <InfiniteScroll
+          element="div"
+          hasMore={true}
+          initialLoad={true}
+          isReverse={false}
+          loadMore={[Function]}
+          loader={
+            <LoadingBar
+              loading={true}
+            />
+          }
+          pageStart={0}
+          threshold={250}
+          useCapture={false}
+          useWindow={false}
+        >
+          <withStyles(List)
+            subheader={
+              <Styled(withStyles(ListSubheader))
+                color="primary"
+              >
+                2017-09-09
+              </Styled(withStyles(ListSubheader))>
+            }
+          >
+            <withStyles(ListItem)>
+              <withStyles(ListItemText)
+                primary="something"
+                secondary="task"
+              />
+            </withStyles(ListItem)>
+          </withStyles(List)>
+        </InfiniteScroll>,
+      },
+      "ref": null,
+      "rendered": Object {
+        "instance": null,
+        "key": null,
+        "nodeType": "class",
+        "props": Object {
+          "children": Array [
+            <withStyles(List)
+              subheader={
+                <Styled(withStyles(ListSubheader))
+                  color="primary"
+                >
+                  2017-09-09
+                </Styled(withStyles(ListSubheader))>
+              }
+            >
+              <withStyles(ListItem)>
+                <withStyles(ListItemText)
+                  primary="something"
+                  secondary="task"
+                />
+              </withStyles(ListItem)>
+            </withStyles(List)>,
+          ],
+          "element": "div",
+          "hasMore": true,
+          "initialLoad": true,
+          "isReverse": false,
+          "loadMore": [Function],
+          "loader": <LoadingBar
+            loading={true}
+          />,
+          "pageStart": 0,
+          "threshold": 250,
+          "useCapture": false,
+          "useWindow": false,
+        },
+        "ref": null,
+        "rendered": Array [
+          Object {
+            "instance": null,
+            "key": "2017-09-09",
+            "nodeType": "class",
+            "props": Object {
+              "children": Array [
+                <withStyles(ListItem)>
+                  <withStyles(ListItemText)
+                    primary="something"
+                    secondary="task"
+                  />
+                </withStyles(ListItem)>,
+              ],
+              "subheader": <Styled(withStyles(ListSubheader))
+                color="primary"
+              >
+                2017-09-09
+              </Styled(withStyles(ListSubheader))>,
+            },
+            "ref": null,
+            "rendered": Array [
+              Object {
+                "instance": null,
+                "key": "1",
+                "nodeType": "class",
+                "props": Object {
+                  "children": <withStyles(ListItemText)
+                    primary="something"
+                    secondary="task"
+                  />,
+                },
+                "ref": null,
+                "rendered": Object {
+                  "instance": null,
+                  "key": null,
+                  "nodeType": "class",
+                  "props": Object {
+                    "primary": "something",
+                    "secondary": "task",
+                  },
+                  "ref": null,
+                  "rendered": null,
+                  "type": [Function],
+                },
+                "type": [Function],
+              },
+            ],
+            "type": [Function],
+          },
+        ],
+        "type": [Function],
+      },
+      "type": [Function],
+    },
+  ],
+  Symbol(enzyme.__options__): Object {
+    "adapter": ReactSixteenAdapter {
+      "options": Object {
+        "enableComponentDidUpdateOnSetState": true,
+      },
+    },
+  },
+}
+`;
+
+exports[`pages/History/HistoryList mapStateToProps should return the right params if there are more 1`] = `
+Object {
+  "task_name": Array [
+    Object {
+      "task": "task_name",
+    },
+  ],
+}
+`;
+
+exports[`pages/History/HistoryList mapStateToProps should return the right params if there are not more 1`] = `
+Object {
+  "task_name": Array [
+    Object {
+      "task": "task_name",
+    },
+  ],
+}
+`;

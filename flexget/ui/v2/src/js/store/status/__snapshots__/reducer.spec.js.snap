@@ -1,0 +1,74 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`store/status/reducer LOADING_STATUS should not change if already loading that action 1`] = `
+Object {
+  "error": null,
+  "info": null,
+  "loading": Object {
+    "TEST": true,
+  },
+}
+`;
+
+exports[`store/status/reducer LOADING_STATUS should set loading status when initially empty 1`] = `
+Object {
+  "error": null,
+  "info": null,
+  "loading": Object {
+    "TEST": true,
+  },
+}
+`;
+
+exports[`store/status/reducer LOADING_STATUS should set loading status when not empty 1`] = `
+Object {
+  "error": null,
+  "info": null,
+  "loading": Object {
+    "OTHER": true,
+    "TEST": true,
+  },
+}
+`;
+
+exports[`store/status/reducer should clear state on CLOSE_STATUS 1`] = `
+Object {
+  "error": null,
+  "info": null,
+  "loading": Object {},
+}
+`;
+
+exports[`store/status/reducer should clear state on LOCATION_CHANGE 1`] = `
+Object {
+  "error": null,
+  "info": null,
+  "loading": Object {},
+}
+`;
+
+exports[`store/status/reducer should handle ERROR_STATUS 1`] = `
+Object {
+  "error": Object {
+    "message": "something",
+  },
+  "info": null,
+  "loading": Object {},
+}
+`;
+
+exports[`store/status/reducer should handle INFO_STATUS 1`] = `
+Object {
+  "error": null,
+  "info": "something",
+  "loading": Object {},
+}
+`;
+
+exports[`store/status/reducer should handle loding done 1`] = `
+Object {
+  "error": null,
+  "info": null,
+  "loading": Object {},
+}
+`;

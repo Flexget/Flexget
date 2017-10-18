@@ -68,11 +68,35 @@ def bump_version(bump_type):
 @cli.command()
 def build_webui():
     """Build webui for release packaging"""
-    cwd = os.path.join('flexget', 'ui')
+    click.echo('Building webui v1...')
+    cwd = os.path.join('flexget', 'ui', 'v1')
 
     # Cleanup previous builds
     click.echo('cleaning previous builds')
-    for folder in ['bower_components' 'node_modules']:
+    for folder in ['bower_components', 'node_modules']:
+        folder = os.path.join(cwd, folder)
+        if os.path.exists(folder):
+            click.echo('Deleting recursively {}'.format(folder))
+            shutil.rmtree(folder)
+
+    # Install npm packages
+    click.echo('running `npm install`')
+    subprocess.check_call('npm install', cwd=cwd, shell=True)
+
+    # Install bower packages
+    click.echo('running `bower install`')
+    subprocess.check_call('bower install -p', cwd=cwd, shell=True)
+
+    # Build the ui
+    click.echo('running `gulp buildapp`')
+    subprocess.check_call('gulp buildapp', cwd=cwd, shell=True)
+
+    click.echo('building webui v2...')
+    cwd = os.path.join('flexget', 'ui', 'v2')
+
+    # Cleanup previous builds
+    click.echo('cleaning previous builds')
+    for folder in ['node_modules']:
         folder = os.path.join(cwd, folder)
         if os.path.exists(folder):
             click.echo('Deleting recursively {}'.format(folder))
@@ -83,13 +107,8 @@ def build_webui():
     subprocess.check_call('npm install', cwd=cwd, shell=True)
 
     # Build the ui
-    click.echo('running `bower install`')
-    subprocess.check_call('bower install -p', cwd=cwd, shell=True)
-
-    # Build the ui
-    click.echo('running `gulp buildapp`')
-    subprocess.check_call('gulp buildapp', cwd=cwd, shell=True)
-
+    click.echo('running `npm run build`')
+    subprocess.check_call('npm run build', cwd=cwd, shell=True)
 
 if __name__ == '__main__':
     cli()

@@ -162,6 +162,7 @@ series_list_parser.add_argument('premieres', type=inputs.boolean, default=False,
                                 help="Filter by downloaded premieres only.")
 series_list_parser.add_argument('lookup', choices=('tvdb', 'tvmaze'), action='append',
                                 help="Get lookup result for every show by sending another request to lookup API")
+series_list_parser.add_argument('query', help="Search by name based on the query")
 
 ep_identifier_doc = "'episode_identifier' should be one of SxxExx, integer or date formatted such as 2012-12-12"
 
@@ -185,6 +186,7 @@ class SeriesAPI(APIResource):
         per_page = args['per_page']
         sort_by = args['sort_by']
         sort_order = args['order']
+        name = series.normalize_series_name(args['query']) if args['query'] else None
 
         # Handle max size limit
         if per_page > 100:
@@ -207,7 +209,8 @@ class SeriesAPI(APIResource):
             'stop': stop,
             'sort_by': sort_by,
             'descending': descending,
-            'session': session
+            'session': session,
+            'name': name
         }
 
         total_items = series.get_series_summary(count=True, **kwargs)

@@ -23,6 +23,18 @@ script: py.test --cov flexget --cov-report xml -n 3
 after_success:
   - python-codacy-coverage -r coverage.xml
 env: VCR_RECORD_MODE=none
+jobs:
+  include:
+    - python: "2.7" # don't want to run this for each python version so picking one
+      before_install:
+        - nvm install 8
+        - cd flexget/ui/v2/
+      install:
+        - npm install
+      script:
+        - npm run lint
+        - npm test -- --coverage
+      after_success: npm run cov
 notifications:
   email: false
   webhooks:
