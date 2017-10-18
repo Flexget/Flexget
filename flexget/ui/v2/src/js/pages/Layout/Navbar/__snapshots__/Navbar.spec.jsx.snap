@@ -1,0 +1,165 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pages/Layout/Navbar renders correctly 1`] = `
+.glamor-6 {
+  position: static;
+}
+
+.glamor-5 {
+  background-color: #ef6c00;
+  color: rgba(255,255,255,1);
+  min-height: 5rem;
+}
+
+.glamor-0 {
+  color: rgba(255,255,255,1);
+}
+
+.glamor-1 {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+<header
+  className="MuiPaper-root-8 MuiPaper-shadow4-14 MuiAppBar-root-1 MuiAppBar-positionFixed-2 MuiAppBar-colorPrimary-6 mui-fixed glamor-6"
+>
+  <div
+    className="MuiToolbar-root-35 MuiToolbar-gutters-36 glamor-5"
+  >
+    <button
+      className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-0"
+      disabled={false}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      onMouseLeave={[Function]}
+      onMouseUp={[Function]}
+      onTouchEnd={[Function]}
+      onTouchStart={[Function]}
+      role="button"
+      tabIndex={0}
+      type="button"
+    >
+      <span
+        className="MuiIconButton-label-43"
+      >
+        <span
+          aria-hidden="true"
+          className="material-icons MuiIcon-root-48 MuiIconButton-icon-44 fa fa-bars"
+        />
+      </span>
+      <span
+        className="MuiTouchRipple-root-55"
+      />
+    </button>
+    <h2
+      className="MuiTypography-root-62 MuiTypography-title-68 MuiTypography-colorInherit-81"
+    />
+    <div
+      className="glamor-1"
+    />
+    <a
+      href="/config"
+      onClick={[Function]}
+    >
+      <button
+        aria-label="Config"
+        className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-0"
+        disabled={false}
+        onBlur={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchStart={[Function]}
+        role="button"
+        tabIndex={0}
+        type="button"
+      >
+        <span
+          className="MuiIconButton-label-43"
+        >
+          <span
+            aria-hidden="true"
+            className="material-icons MuiIcon-root-48 MuiIconButton-icon-44 fa fa-pencil"
+          />
+        </span>
+        <span
+          className="MuiTouchRipple-root-55"
+        />
+      </button>
+    </a>
+    <a
+      href="/log"
+      onClick={[Function]}
+    >
+      <button
+        aria-label="Log"
+        className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-0"
+        disabled={false}
+        onBlur={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchStart={[Function]}
+        role="button"
+        tabIndex={0}
+        type="button"
+      >
+        <span
+          className="MuiIconButton-label-43"
+        >
+          <span
+            aria-hidden="true"
+            className="material-icons MuiIcon-root-48 MuiIconButton-icon-44 fa fa-book"
+          />
+        </span>
+        <span
+          className="MuiTouchRipple-root-55"
+        />
+      </button>
+    </a>
+    <button
+      aria-label="Manage"
+      className="MuiButtonBase-root-46 MuiIconButton-root-37 glamor-0"
+      disabled={false}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      onMouseLeave={[Function]}
+      onMouseUp={[Function]}
+      onTouchEnd={[Function]}
+      onTouchStart={[Function]}
+      role="button"
+      tabIndex={0}
+      type="button"
+    >
+      <span
+        className="MuiIconButton-label-43"
+      >
+        <span
+          aria-hidden="true"
+          className="material-icons MuiIcon-root-48 MuiIconButton-icon-44 fa fa-cog"
+        />
+      </span>
+      <span
+        className="MuiTouchRipple-root-55"
+      />
+    </button>
+  </div>
+</header>
+`;

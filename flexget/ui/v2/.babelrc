@@ -1,0 +1,26 @@
+{
+  "presets": [
+    [ "env", {
+      "loose": true,
+      "modules": false
+    }],
+    "stage-0",
+    "react"
+  ],
+  "plugins": ["emotion", "syntax-dynamic-import"],
+  "env": {
+    "production": {
+      "plugins": [
+        "emotion",
+        "transform-react-remove-prop-types",
+      ]
+    },
+    "test": {
+      "plugins": [
+        "emotion",
+        "transform-es2015-modules-commonjs",
+        "dynamic-import-node",
+      ]
+    }
+  }
+}

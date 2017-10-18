@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`common/PrivateRoute PrivateRoute renders correctly when logged in 1`] = `<div />`;
+
+exports[`common/PrivateRoute PrivateRoute renders correctly when logged out 1`] = `null`;
+
+exports[`common/PrivateRoute mapStateToProps should return logged in if logged in 1`] = `
+Object {
+  "loggedIn": true,
+}
+`;
+
+exports[`common/PrivateRoute mapStateToProps should return not logged in if logged out 1`] = `
+Object {
+  "loggedIn": false,
+}
+`;

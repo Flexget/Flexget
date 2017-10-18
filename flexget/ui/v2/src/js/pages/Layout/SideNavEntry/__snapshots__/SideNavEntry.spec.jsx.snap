@@ -1,0 +1,68 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pages/Layout/SideNavEntry renders correctly with link 1`] = `
+.glamor-2 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-2:hover {
+  border-left: 3px solid #ff9800;
+}
+
+.glamor-0 {
+  color: #b0bec5;
+}
+
+<a
+  href="/test"
+  onClick={[Function]}
+>
+  <li
+    className="MuiListItem-root-1 MuiListItem-gutters-8 MuiListItem-default-4 glamor-2"
+    disabled={false}
+    onClick={undefined}
+  >
+    <span
+      aria-hidden="true"
+      className="material-icons MuiIcon-root-12 MuiListItemIcon-root-11 fa fa-icon glamor-0"
+    />
+    <div
+      className="MuiListItemText-root-19 MuiListItemText-inset-20 glamor-0"
+    >
+      Test
+    </div>
+  </li>
+</a>
+`;
+
+exports[`pages/Layout/SideNavEntry renders correctly without link 1`] = `
+.glamor-2 {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.glamor-2:hover {
+  border-left: 3px solid #ff9800;
+}
+
+.glamor-0 {
+  color: #b0bec5;
+}
+
+<li
+  className="MuiListItem-root-1 MuiListItem-gutters-8 MuiListItem-default-4 glamor-2"
+  disabled={false}
+  onClick={undefined}
+>
+  <span
+    aria-hidden="true"
+    className="material-icons MuiIcon-root-12 MuiListItemIcon-root-11 fa fa-icon glamor-0"
+  />
+  <div
+    className="MuiListItemText-root-19 MuiListItemText-inset-20 glamor-0"
+  >
+    Test
+  </div>
+</li>
+`;

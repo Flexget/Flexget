@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`plugins/common/InfoStatus should be correct if an info status should be displayed 1`] = `
+Object {
+  "message": "Info Status",
+  "open": true,
+}
+`;
+
+exports[`plugins/common/InfoStatus should be correct if an info status should not be displayed 1`] = `
+Object {
+  "message": undefined,
+  "open": false,
+}
+`;

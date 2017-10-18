@@ -657,7 +657,7 @@ class SeriesTask(Base):
 
 @with_session
 def get_series_summary(configured=None, premieres=None, status=None, days=None, start=None, stop=None, count=False,
-                       sort_by='show_name', descending=None, session=None):
+                       sort_by='show_name', descending=None, session=None, name=None):
     """
     Return a query with results for all series.
     :param configured: 'configured' for shows in config, 'unconfigured' for shows not in config, 'all' for both.
@@ -681,6 +681,8 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
         query = query.having(func.count(SeriesTask.id) >= 1)
     elif configured == 'unconfigured':
         query = query.having(func.count(SeriesTask.id) < 1)
+    if name:
+        query = query.filter(Series._name_normalized.contains(name))
     if premieres:
         query = (query.having(func.max(Episode.season) <= 1).having(func.max(Episode.number) <= 2)).filter(
             EpisodeRelease.downloaded == True)

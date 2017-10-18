@@ -1,0 +1,134 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pages/Log/Header Header renders correctly 1`] = `
+.glamor-6 {
+  display: block;
+}
+
+.glamor-0 {
+  color: #757575;
+}
+
+.glamor-1 {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.glamor-5 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: baseline;
+  -webkit-box-align: baseline;
+  -ms-flex-align: baseline;
+  align-items: baseline;
+}
+
+.glamor-3 {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.glamor-4 {
+  color: #757575;
+  cursor: pointer;
+}
+
+@media (min-width:600px) {
+  .glamor-6 {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-align-items: baseline;
+    -webkit-box-align: baseline;
+    -ms-flex-align: baseline;
+    align-items: baseline;
+  }
+}
+
+<div
+  className="glamor-6"
+>
+  <div>
+    <h2
+      className="MuiTypography-root-1 MuiTypography-title-7"
+    >
+      Server Log
+    </h2>
+    <h3
+      className="MuiTypography-root-1 MuiTypography-subheading-8 glamor-0"
+    >
+      Streaming
+    </h3>
+  </div>
+  <div
+    className="glamor-1"
+  />
+  <div
+    className="glamor-5"
+  >
+    <span
+      aria-hidden="true"
+      className="material-icons MuiIcon-root-25 fa fa-filter glamor-0"
+    />
+    <div
+      className="MuiFormControl-root-32 glamor-3"
+      onBlur={[Function]}
+      onFocus={[Function]}
+      required={false}
+    >
+      <label
+        className="MuiFormLabel-root-42 MuiInputLabel-root-36 MuiInputLabel-formControl-37 MuiInputLabel-animated-40"
+        data-shrink={false}
+        htmlFor="filter"
+      >
+        Filter
+      </label>
+      <div
+        className="MuiInput-root-46 MuiInput-formControl-47 MuiInput-inkbar-48 MuiInput-underline-54"
+        onBlur={[Function]}
+        onFocus={[Function]}
+      >
+        <input
+          autoComplete={undefined}
+          autoFocus={undefined}
+          className="MuiInput-input-50 MuiInput-inputSingleline-57"
+          defaultValue={undefined}
+          disabled={false}
+          id="filter"
+          name={undefined}
+          onChange={[Function]}
+          onKeyDown={undefined}
+          onKeyPress={[Function]}
+          onKeyUp={undefined}
+          placeholder={undefined}
+          readOnly={undefined}
+          required={undefined}
+          rows={undefined}
+          type="text"
+          value=""
+        />
+      </div>
+      <p
+        className="MuiFormHelperText-root-61"
+      >
+        Supports operators and, or, (), and "str"
+      </p>
+    </div>
+    <span
+      aria-hidden="true"
+      className="material-icons MuiIcon-root-25 fa fa-ellipsis-v glamor-4"
+      onClick={[Function]}
+    />
+  </div>
+</div>
+`;
+
+exports[`pages/Log/Header mapStateToProps should return the right stuff 1`] = `
+Object {
+  "connected": true,
+}
+`;
