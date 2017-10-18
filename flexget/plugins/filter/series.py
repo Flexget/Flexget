@@ -10,8 +10,10 @@ from copy import copy
 from datetime import datetime, timedelta
 from functools import total_ordering
 
-from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
-                        desc, select, update, delete, ForeignKey, Index, func, and_, not_)
+from sqlalchemy import (
+    Column, Integer, String, Unicode, DateTime, Boolean, desc, select, update, delete, ForeignKey, Index,
+    func, and_, not_
+)
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.orm import relation, backref, object_session
@@ -25,8 +27,9 @@ from flexget.plugins.parsers import SERIES_ID_TYPES
 from flexget.utils import qualities
 from flexget.utils.database import quality_property, with_session
 from flexget.utils.log import log_once
-from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
-                                            create_index)
+from flexget.utils.sqlalchemy_utils import (
+    table_columns, table_exists, drop_tables, table_schema, table_add_column, create_index
+)
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta, parse_episode_identifier
 
 SCHEMA_VER = 14
@@ -407,6 +410,28 @@ class Season(Base):
     def __hash__(self):
         return self.id
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'identifier': self.identifier,
+            'season': self.season,
+            'identified_by': self.identified_by,
+            'series_id': self.series_id,
+            'first_seen': self.first_seen,
+            'number_of_releases': len(self.releases)
+        }
+
+    @property
+    def latest_release(self):
+        """
+        :return: Latest downloaded Release or None
+        """
+        if not self.releases:
+            return None
+        return sorted(self.downloaded_releases,
+                      key=lambda rel: rel.first_seen if rel.downloaded else None,
+                      reverse=True)[0]
+
 
 @total_ordering
 class Episode(Base):
@@ -656,14 +681,14 @@ class SeriesTask(Base):
 
 
 @with_session
-def get_series_summary(configured=None, premieres=None, status=None, days=None, start=None, stop=None, count=False,
-                       sort_by='show_name', descending=None, session=None, name=None):
+def get_series_summary(configured=None, premieres=None, start=None, stop=None, count=False, sort_by='show_name',
+                       descending=None, session=None, name=None):
     """
     Return a query with results for all series.
+
     :param configured: 'configured' for shows in config, 'unconfigured' for shows not in config, 'all' for both.
     Default is 'all'
     :param premieres: Return only shows with 1 season and less than 3 episodes
-    :param status: Stale or not
     :param days: Value to determine stale
     :param page_size: Number of result per page
     :param page: Page number to return
@@ -686,14 +711,6 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
     if premieres:
         query = (query.having(func.max(Episode.season) <= 1).having(func.max(Episode.number) <= 2)).filter(
             EpisodeRelease.downloaded == True)
-    if status == 'new':
-        if not days:
-            days = 7
-        query = query.having(func.max(Episode.first_seen) > datetime.now() - timedelta(days=days))
-    if status == 'stale':
-        if not days:
-            days = 365
-        query = query.having(func.max(Episode.first_seen) < datetime.now() - timedelta(days=days))
     if count:
         return query.group_by(Series).count()
     if sort_by == 'show_name':
@@ -1105,9 +1122,20 @@ def remove_series_entity(name, identifier, forget=False):
             fire_event('forget', downloaded_release)
 
 
-def delete_release_by_id(release_id):
+def delete_episode_release_by_id(release_id):
     with Session() as session:
         release = session.query(EpisodeRelease).filter(EpisodeRelease.id == release_id).first()
+        if release:
+            session.delete(release)
+            session.commit()
+            log.debug('Deleted release ID `%s`', release_id)
+        else:
+            raise ValueError('Unknown identifier `%s` for release' % release_id)
+
+
+def delete_season_release_by_id(release_id):
+    with Session() as session:
+        release = session.query(SeasonRelease).filter(SeasonRelease.id == release_id).first()
         if release:
             session.delete(release)
             session.commit()
@@ -1133,14 +1161,24 @@ def show_by_id(show_id, session=None):
     return session.query(Series).filter(Series.id == show_id).one()
 
 
+def season_by_id(season_id, session=None):
+    """ Return an instance of an season by querying its ID """
+    return session.query(Season).filter(Season.id == season_id).one()
+
+
 def episode_by_id(episode_id, session=None):
     """ Return an instance of an episode by querying its ID """
     return session.query(Episode).filter(Episode.id == episode_id).one()
 
 
-def release_by_id(release_id, session=None):
-    """ Return an instance of a release by querying its ID """
+def episode_release_by_id(release_id, session=None):
+    """ Return an instance of an episode release by querying its ID """
     return session.query(EpisodeRelease).filter(EpisodeRelease.id == release_id).one()
+
+
+def season_release_by_id(release_id, session=None):
+    """ Return an instance of an episode release by querying its ID """
+    return session.query(SeasonRelease).filter(SeasonRelease.id == release_id).one()
 
 
 def show_episodes(series, start=None, stop=None, count=False, descending=False, session=None):
@@ -1178,8 +1216,8 @@ def get_all_entities(series, session, sort_by='age', reverse=False):
     return sorted(episodes + seasons, key=key, reverse=reverse)
 
 
-def get_releases(episode, downloaded=None, start=None, stop=None, count=False, descending=False, sort_by=None,
-                 session=None):
+def get_episode_releases(episode, downloaded=None, start=None, stop=None, count=False, descending=False, sort_by=None,
+                         session=None):
     """ Return all releases for a given episode """
     releases = session.query(EpisodeRelease).filter(EpisodeRelease.episode_id == episode.id)
     if downloaded is not None:
@@ -1194,6 +1232,22 @@ def get_releases(episode, downloaded=None, start=None, stop=None, count=False, d
     return releases.all()
 
 
+def get_season_releases(season, downloaded=None, start=None, stop=None, count=False, descending=False, sort_by=None,
+                        session=None):
+    """ Return all releases for a given season """
+    releases = session.query(SeasonRelease).filter(SeasonRelease.season_id == season.id)
+    if downloaded is not None:
+        releases = releases.filter(SeasonRelease.downloaded == downloaded)
+    if count:
+        return releases.count()
+    releases = releases.slice(start, stop).from_self()
+    if descending:
+        releases = releases.order_by(getattr(SeasonRelease, sort_by).desc())
+    else:
+        releases = releases.order_by(getattr(SeasonRelease, sort_by))
+    return releases.all()
+
+
 def episode_in_show(series_id, episode_id):
     """ Return True if `episode_id` is part of show with `series_id`, else return False """
     with Session() as session:
@@ -1201,11 +1255,25 @@ def episode_in_show(series_id, episode_id):
         return episode.series_id == series_id
 
 
+def season_in_show(series_id, season_id):
+    """ Return True if `episode_id` is part of show with `series_id`, else return False """
+    with Session() as session:
+        season = session.query(Season).filter(Season.id == season_id).one()
+        return season.series_id == series_id
+
+
 def release_in_episode(episode_id, release_id):
     """ Return True if `release_id` is part of episode with `episode_id`, else return False """
     with Session() as session:
         release = session.query(EpisodeRelease).filter(EpisodeRelease.id == release_id).one()
         return release.episode_id == episode_id
+
+
+def release_in_season(season_id, release_id):
+    """ Return True if `release_id` is part of episode with `episode_id`, else return False """
+    with Session() as session:
+        release = session.query(SeasonRelease).filter(SeasonRelease.id == release_id).one()
+        return release.season_id == season_id
 
 
 def populate_entry_fields(entry, parser, config):

@@ -1,14 +1,17 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+from datetime import datetime, timedelta
 from io import StringIO
 
 import pytest
 from jinja2 import Template
+from sqlalchemy.sql import select
 
 from flexget.entry import Entry
 from flexget.logger import capture_output
-from flexget.manager import get_parser
+from flexget.manager import Session, get_parser
+from flexget.plugins.filter.series import Series, SeriesTask, Episode, EpisodeRelease, Season, SeasonRelease
 from flexget.task import TaskAbort
 
 
