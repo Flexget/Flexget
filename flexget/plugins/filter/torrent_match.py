@@ -98,11 +98,11 @@ class TorrentMatch(object):
 
         return entries
 
-    # run first to ensure we have temp files so that torrent plugin can do its magic
-    @plugin.priority(256)
-    def on_task_modify(self, task, config):
+    # Run last in download phase to make sure we have downloaded .torrent to temp before modify phase
+    @plugin.priority(0)
+    def on_task_download(self, task, config):
         for entry in task.accepted:
-            if 'torrent' not in entry and 'download' not in task.config:
+            if 'file' not in entry and 'download' not in task.config:
                 # If the download plugin is not enabled, we need to call it to get
                 # our temp .torrent files
                 download = plugin.get_plugin_by_name('download')
@@ -114,9 +114,8 @@ class TorrentMatch(object):
 
         return config
 
-    # Run last, this is not really a modify plugin though, but we need 'torrent' field, which is set in modify
-    @plugin.priority(0)
-    def on_task_output(self, task, config):
+    # Run after 'torrent' plugin, this is not really a modify plugin though, but we need 'torrent' field
+    def on_task_modify(self, task, config):
         config = self.prepare_config(config)
         max_size_difference = config['max_size_difference']
         local_entries = self.get_local_files(config, task)
