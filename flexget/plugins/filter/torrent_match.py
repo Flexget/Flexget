@@ -26,8 +26,7 @@ class TorrentMatch(object):
             'what': {'type': 'array', 'items': {
                 'allOf': [{'$ref': '/schema/plugins?phase=input'}, {'maxProperties': 1, 'minProperties': 1}]
             }},
-            'max_size_difference': {'type': 'string', 'format': 'percent', 'default': '0%'},
-            'name_in_path': {'type': 'boolean', 'default': True}
+            'max_size_difference': {'type': 'string', 'format': 'percent', 'default': '0%'}
         },
         'required': ['what'],
         'additionalProperties': False
@@ -141,8 +140,7 @@ class TorrentMatch(object):
                 local_files = local_entry['files']
 
                 # skip root dir of the local entry if torrent is single file or if name_in_path is false
-                skip_root_dir = not entry['torrent'].is_multi_file and local_entry['files_root'] or \
-                    not config['name_in_path']
+                skip_root_dir = not entry['torrent'].is_multi_file and local_entry['files_root']
 
                 matches = 0
                 missing_size = 0
@@ -155,7 +153,6 @@ class TorrentMatch(object):
                             local_path = os.path.relpath(local_path, local_entry['files_root'])
                         # if f == local_file, break out of inner loop and increment match counter
                         # we force sizes to be exact
-                        # TODO allow root dir to differ? Requires torrent clients have "do not add name to path"
                         if f.path == local_path and f.size == local_file.size:
                             matches += 1
                             break
