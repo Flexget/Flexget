@@ -115,8 +115,8 @@ class TorrentMatch(object):
 
         return config
 
-    # Run first, this is not really an output plugin though, but we need 'torrent' field, which is set in modify
-    @plugin.priority(255)
+    # Run last, this is not really a modify plugin though, but we need 'torrent' field, which is set in modify
+    @plugin.priority(0)
     def on_task_output(self, task, config):
         config = self.prepare_config(config)
         max_size_difference = config['max_size_difference']
@@ -154,7 +154,7 @@ class TorrentMatch(object):
                         if skip_root_dir:
                             local_path = os.path.relpath(local_path, local_entry['files_root'])
                         # if f == local_file, break out of inner loop and increment match counter
-                        # we force sizes to be exact, TODO is this correct?
+                        # we force sizes to be exact
                         # TODO allow root dir to differ? Requires torrent clients have "do not add name to path"
                         if f.path == local_path and f.size == local_file.size:
                             matches += 1
@@ -164,7 +164,7 @@ class TorrentMatch(object):
                     total_size += f.size
 
                 size_difference = missing_size / total_size * 100
-                # as of now, we require that the number of matches is the same as the number of files in torrent
+                # we allow torrents that either match entirely or if the total size difference is below some threshold
                 if matches == len(torrent_files) or max_size_difference >= size_difference:
                     matched_entries.add(entry)
                     # set the path of the torrent entry
