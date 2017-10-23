@@ -473,7 +473,7 @@ def find_series_id(name, language=None):
 def _update_search_strings(series, session, search=None):
     search_strings = series.search_strings
     add = [series.name.lower()] + ([a.lower() for a in series.aliases] if series.aliases else []) + [
-        search.lower()] if search else []
+        search.lower()] if search and hasattr(search, 'lower') else []
     for name in set(add):
         if name not in search_strings:
             search_result = session.query(TVDBSearchResult).filter(TVDBSearchResult.search == name).first()
