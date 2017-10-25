@@ -44,19 +44,19 @@ class LostFilm(object):
         'type': ['boolean', 'object'],
         'properties': {
             'url': {'type': 'string', 'format': 'url'},
-            'pages': {'type': 'integer'}
+            'pages': {'type': 'integer', 'minimum': 1}
         },
         'additionalProperties': False
     }
 
-    def build_config(self, config):
+    def prepare_config(self, config):
         """Set default url and pages config"""
         if isinstance(config, bool) and config is True:
-            config = {'url': NEW_RELEASES_URL, 'pages': 3}
+            config = {'url': NEW_RELEASES_URL, 'pages': 1}
         return config
 
     def on_task_input(self, task, config):
-        config = self.build_config(config)
+        config = self.prepare_config(config)
         if config is False:
             return
 
@@ -64,7 +64,7 @@ class LostFilm(object):
         for page_num in range(1, config['pages']):
             # Fetch release page
             release_url = '{:s}/page_{:d}'.format(config['url'], page_num)
-            log.debug('Fetching page {:d} of {:d}'.format(page_num, config['pages']))
+            log.debug('Fetching page %d of %d', page_num, config['pages'])
             try:
                 response = task.requests.get(release_url)
             except RequestException as e:
@@ -86,7 +86,7 @@ class LostFilm(object):
                     series_name_eng = details_pane.parent.find('div', 'name-en').text.strip()
                     lostfilm_num, season_num, episode_num = [int(x) for x in seen_btn['data-code'].split('-')]
                 except AttributeError:
-                    log.exception('Could not parse {:s}, probably HTML markup was changed'.format(release_url))
+                    log.exception('Could not parse %s, probably HTML markup was changed', release_url)
                     continue
 
                 params = {'c': lostfilm_num, 's': season_num, 'e': episode_num}
@@ -94,7 +94,7 @@ class LostFilm(object):
                 try:
                     response = task.requests.get(redirect_url, params=params)
                 except RequestException as e:
-                    log.error('Could not connect to redirect url: {:s}'.format(e))
+                    log.error('Could not connect to redirect url: %s', e)
                     continue
 
                 page = get_soup(response.content)
@@ -107,7 +107,7 @@ class LostFilm(object):
                 try:
                     response = task.requests.get(redirect_url)
                 except RequestException as e:
-                    log.error('Could not connect to RETRE redirect url: {:s}'.format(e))
+                    log.error('Could not connect to RETRE redirect url: %s', e)
                     continue
 
                 page = get_soup(response.content)
@@ -129,24 +129,15 @@ class LostFilm(object):
                     else:
                         file_ext = 'avi'
                     if series_name_eng:
-                        new_title = '.'.join(
-                            [
-                                series_name_eng,
-                                episode_id,
-                                quality,
-                                'rus.LostFilm.TV',
-                                file_ext,
-                                'torrent'
-                            ]
-                        ).replace(' ', '.')
+                        title_parts = [series_name_eng, episode_id, quality, 'rus.LostFilm.TV', file_ext, 'torrent']
+                        new_title = '.'.join(title_parts).replace(' ', '.')
                     else:
                         if item.get('title') is not None:
-                            new_title = '{} {}'.format(
-                                item['title'],
-                                quality)
+                            new_title = '{} {}'.format(item['title'], quality)
                         else:
                             log.debug('Item doesn\'t have a title')
                             continue
+
                     new_entry = Entry()
                     new_entry['url'] = torrent_link
                     new_entry['title'] = new_title.strip()
