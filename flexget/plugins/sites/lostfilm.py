@@ -12,7 +12,7 @@ from flexget.plugin import PluginError
 from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 
-__author__ = 'danfocus, duhast'
+__author__ = 'duhast, danfocus'
 
 log = logging.getLogger('lostfilm')
 
@@ -37,14 +37,16 @@ class LostFilm(object):
 
       lostfilm:
         url: <url>
+        favourites_only: <bool>
         pages: <number>
     """
 
     schema = {
         'type': ['boolean', 'object'],
         'properties': {
-            'url': {'type': 'string', 'format': 'url'},
-            'pages': {'type': 'integer', 'minimum': 1}
+            'url': {'type': 'string', 'format': 'url', 'default': NEW_RELEASES_URL},
+            'favourites_only': {'type': 'boolean', 'default': False},
+            'pages': {'type': 'integer', 'minimum': 1, 'default': 1}
         },
         'additionalProperties': False
     }
@@ -52,7 +54,7 @@ class LostFilm(object):
     def prepare_config(self, config):
         """Set default url and pages config"""
         if isinstance(config, bool) and config is True:
-            config = {'url': NEW_RELEASES_URL, 'pages': 1}
+            config = {'url': NEW_RELEASES_URL, 'pages': 1, 'favourites_only': False}
         return config
 
     def on_task_input(self, task, config):
@@ -60,15 +62,17 @@ class LostFilm(object):
         if config is False:
             return
 
+        release_type = 99 if config['favourites_only'] else 0
+
         entries = []
-        for page_num in range(1, config['pages']):
+        for page_num in range(1, config['pages']+1):
             # Fetch release page
-            release_url = '{:s}/page_{:d}'.format(config['url'], page_num)
+            release_url = '{:s}/page_{:d}/type_{:d}'.format(config['url'], page_num, release_type)
             log.debug('Fetching page %d of %d', page_num, config['pages'])
             try:
                 response = task.requests.get(release_url)
             except RequestException as e:
-                raise PluginError('Could not fetch new releases page: {:s}'.format(e))
+                raise PluginError('Could not fetch new releases page: %s'.format(e))
 
             try:
                 index_page = get_soup(response.content)
