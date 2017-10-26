@@ -103,7 +103,6 @@ class LostFilm(object):
                     new_entry['name'] = series_name_eng
                     new_entry['season'] = season_num
                     new_entry['episode'] = episode_num
-                    new_entry['quality'] = quality
                     new_entry['series_name_rus'] = series_name_rus
                     new_entry['episode_name_rus'] = episode_name_rus
                     new_entry['series_name_eng'] = series_name_eng
