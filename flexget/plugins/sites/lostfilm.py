@@ -4,8 +4,8 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
-import urllib
 
+from future.moves.urllib.parse import urlencode
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
@@ -95,7 +95,6 @@ class LostFilm(object):
                     log.exception('Could not parse %s, probably HTML markup was changed', release_url)
                     continue
 
-
                 torrents = self.get_torrents(task, lostfilm_num, season_num, episode_num)
                 for quality, torrent_link in torrents.items():
                     new_entry = Entry()
@@ -113,7 +112,7 @@ class LostFilm(object):
         return entries
 
     def get_torrents(self, task, lostfilm_num, season_num, episode_num):
-        release_url = "{}?{}".format(V_SEARCH_URL, urllib.urlencode({'c': lostfilm_num, 's': season_num, 'e': episode_num}))
+        release_url = "{}?{}".format(V_SEARCH_URL, urlencode({'c': lostfilm_num, 's': season_num, 'e': episode_num}))
         try:
             response = task.requests.get(release_url)
         except RequestException as e:
