@@ -4,6 +4,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
+import urllib
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -57,6 +58,7 @@ class LostFilm(object):
             config = {'url': NEW_RELEASES_URL, 'pages': 1, 'favourites_only': False}
         return config
 
+    # task API
     def on_task_input(self, task, config):
         config = self.prepare_config(config)
         if config is False:
@@ -72,18 +74,18 @@ class LostFilm(object):
             try:
                 response = task.requests.get(release_url)
             except RequestException as e:
-                raise PluginError('Could not fetch new releases page: %s'.format(e))
+                raise PluginError('Could not fetch new releases page: {:s}'.format(e))
 
             try:
                 index_page = get_soup(response.content)
             except:
                 raise PluginError('Cannot parse new releases page')
+
             # Iterate over releases
             seen_buttons = index_page.find_all('div', 'haveseen-btn')
             for seen_btn in seen_buttons:
                 try:
                     details_pane = seen_btn.parent.find('div', 'details-pane')
-
                     episode_name_rus = details_pane.find('div', 'alpha').text.strip()
                     episode_name_eng = details_pane.find('div', 'beta').text.strip()
                     series_name_rus = details_pane.parent.find('div', 'name-ru').text.strip()
@@ -93,71 +95,67 @@ class LostFilm(object):
                     log.exception('Could not parse %s, probably HTML markup was changed', release_url)
                     continue
 
-                params = {'c': lostfilm_num, 's': season_num, 'e': episode_num}
-                redirect_url = V_SEARCH_URL
-                try:
-                    response = task.requests.get(redirect_url, params=params)
-                except RequestException as e:
-                    log.error('Could not connect to redirect url: %s', e)
-                    continue
-
-                page = get_soup(response.content)
-                try:
-                    redirect_url = page.head.meta['content'].split('url=')[1]  # retre.org
-                except:
-                    log.error('Missing redirect')
-                    continue
-
-                try:
-                    response = task.requests.get(redirect_url)
-                except RequestException as e:
-                    log.error('Could not connect to RETRE redirect url: %s', e)
-                    continue
-
-                page = get_soup(response.content)
-
-                episode_id = 'S{:02d}E{:02d}'.format(season_num, episode_num)
-                for item in page.findAll('div', 'inner-box--item'):
-                    torrent_link = quality = None
-                    try:
-                        torrent_link = item.find('div', 'inner-box--link sub').a['href']  # http://tracktor.in/...
-                        quality = item.find('div', 'inner-box--label').text.strip()
-                    except:
-                        log.debug('Item doesn\'t have a link or quality')
-                        continue
-                    if torrent_link is None or quality is None:
-                        log.debug('Item doesn\'t have a link or quality')
-                        continue
-                    if QUALITY_MAP.get(quality):
-                        quality, file_ext = QUALITY_MAP.get(quality)
-                    else:
-                        file_ext = 'avi'
-                    if series_name_eng:
-                        title_parts = [series_name_eng, episode_id, quality, 'rus.LostFilm.TV', file_ext, 'torrent']
-                        new_title = '.'.join(title_parts).replace(' ', '.')
-                    else:
-                        if item.get('title') is not None:
-                            new_title = '{} {}'.format(item['title'], quality)
-                        else:
-                            log.debug('Item doesn\'t have a title')
-                            continue
-
+                # TODO We cannot determine available qualities right now since they are listed on the download page.
+                # So, assume all possible qualities are available and emit entries for them
+                for quality_code, quality_params in QUALITY_MAP.items():
+                    quality, file_ext = quality_params
                     new_entry = Entry()
-                    new_entry['url'] = torrent_link
-                    new_entry['title'] = new_title.strip()
-                    if series_name_rus:
-                        new_entry['series_name_rus'] = series_name_rus
-                    if episode_name_rus:
-                        new_entry['episode_name_rus'] = episode_name_rus
-                    if series_name_eng:
-                        new_entry['series_name_eng'] = series_name_eng
-                    if episode_name_eng:
-                        new_entry['episode_name_eng'] = episode_name_eng
+                    new_entry['url'] = "{}?{}".format(V_SEARCH_URL, urllib.urlencode({'c': lostfilm_num, 's': season_num, 'e': episode_num}))
+                    new_entry['name'] = series_name_eng
+                    new_entry['title'] = '{:s} S{:02d}E{:02d} - {:s} [{:s}, {:s}]'.format(series_name_eng, season_num, episode_num, episode_name_eng, quality, file_ext)
+                    new_entry['season'] = season_num
+                    new_entry['episode'] = episode_num
+                    new_entry['quality'] = quality
+                    new_entry['lf_quality_code'] = quality_code
+                    new_entry['series_name_rus'] = series_name_rus
+                    new_entry['episode_name_rus'] = episode_name_rus
+                    new_entry['series_name_eng'] = series_name_eng
+                    new_entry['episode_name_eng'] = episode_name_eng
                     entries.append(new_entry)
-
         return entries
+
+    # urlrewriter API
+    def url_rewritable(self, task, entry):
+        return entry['url'].startswith(V_SEARCH_URL)
+
+    def url_rewrite(self, task, entry):
+        release_url = entry['url']
+
+        try:
+            response = task.requests.get(release_url)
+        except RequestException as e:
+            log.error('Could not connect to redirect url: %s', e)
+            # TODO raise UrlRewritingError here and below ?
+            return
+
+        page = get_soup(response.content)
+        try:
+            redirect_url = page.head.meta['content'].split('url=')[1]  # retre.org
+        except:
+            log.error('Missing redirect')
+            return
+
+        try:
+            response = task.requests.get(redirect_url)
+        except RequestException as e:
+            log.error('Could not connect to RETRE redirect url: %s', e)
+            return
+
+        page = get_soup(response.content)
+
+        for item in page.findAll('div', 'inner-box--item'):
+            # TODO Cancel/reject entry if the requested quality is not available
+            try:
+                torrent_link = item.find('div', 'inner-box--link sub').a['href']  # http://tracktor.in/...
+                quality_code = item.find('div', 'inner-box--label').text.strip()
+                if entry['lf_quality_code'] == quality_code:
+                    entry['url'] = torrent_link
+                    return
+            except:
+                log.debug('Item doesn\'t have a link or quality')
+                continue
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(LostFilm, 'lostfilm', api_ver=2)
+    plugin.register(LostFilm, 'lostfilm', interfaces=['urlrewriter', 'task'], api_ver=2)
