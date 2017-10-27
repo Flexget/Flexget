@@ -5,7 +5,6 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
-from future.moves.urllib.parse import urlencode
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
@@ -111,9 +110,8 @@ class LostFilm(object):
         return entries
 
     def get_torrents(self, task, lostfilm_num, season_num, episode_num):
-        release_url = "{}?{}".format(V_SEARCH_URL, urlencode({'c': lostfilm_num, 's': season_num, 'e': episode_num}))
         try:
-            response = task.requests.get(release_url)
+            response = task.requests.get(V_SEARCH_URL, params={'c': lostfilm_num, 's': season_num, 'e': episode_num})
         except RequestException as e:
             log.error('Could not connect to redirect url: %s', e)
             return {}
