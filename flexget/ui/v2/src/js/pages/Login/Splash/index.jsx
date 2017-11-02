@@ -1,6 +1,6 @@
 import React from 'react';
-import WaveSpinner from 'common/WaveSpinner';
 import { Logo } from './styles';
+import WaveSpinner from '../../../common/WaveSpinner';
 
 const SplashScreen = () => (
   <div>

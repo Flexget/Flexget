@@ -1,8 +1,8 @@
+import 'react-virtualized/styles.css';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { AutoSizer, Column } from 'react-virtualized';
-import { LogShape } from 'store/log/shapes';
-import 'react-virtualized/styles.css';
+import { LogShape } from '../../../store/log/shapes';
 import { Table, rowClasses } from './styles';
 
 const LogTable = ({ messages }) => (

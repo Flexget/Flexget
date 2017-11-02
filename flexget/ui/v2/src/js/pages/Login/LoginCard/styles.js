@@ -2,7 +2,7 @@ import styled from 'react-emotion';
 import { Field } from 'redux-form';
 import MUICard, { CardContent } from 'material-ui/Card';
 import Button from 'material-ui/Button';
-import theme from 'theme';
+import theme from '../../../theme';
 
 export const Card = styled(MUICard)`
   max-width: 40rem;

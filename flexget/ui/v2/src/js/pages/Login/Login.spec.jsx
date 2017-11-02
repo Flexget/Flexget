@@ -1,7 +1,7 @@
 import React from 'react';
-import { Login, mapStateToProps } from 'pages/Login';
 import renderer from 'react-test-renderer';
-import { provider, router, themed } from 'utils/tests';
+import { Login, mapStateToProps } from './index';
+import { provider, router, themed } from '../../utils/tests';
 
 const Component = () => <div />;
 describe('pages/Login', () => {

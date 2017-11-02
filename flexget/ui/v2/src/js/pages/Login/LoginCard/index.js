@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
-import { LOGIN } from 'store/auth/actions';
-import { request } from 'utils/actions';
+import { LOGIN } from '../../../store/auth/actions';
+import { request } from '../../../utils/actions';
 import LoginCard from './LoginCard';
 
 export function mapStateToProps({ status }) {

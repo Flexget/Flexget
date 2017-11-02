@@ -1,7 +1,7 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import { themed, router } from 'utils/tests';
-import Logo from 'pages/Layout/Logo';
+import { themed, router } from '../../../utils/tests';
+import Logo from '../Logo';
 
 describe('pages/Layout/Logo', () => {
   it('renders correctly with sideBarOpen', () => {

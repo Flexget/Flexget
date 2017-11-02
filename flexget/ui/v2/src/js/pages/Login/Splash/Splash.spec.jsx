@@ -1,7 +1,7 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import SplashScreen from 'pages/Login/Splash';
-import { themed } from 'utils/tests';
+import SplashScreen from '../Splash';
+import { themed } from '../../../utils/tests';
 
 describe('pages/splash', () => {
   it('renders correctly', () => {

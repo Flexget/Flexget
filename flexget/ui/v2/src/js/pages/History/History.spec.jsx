@@ -1,6 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { History } from 'pages/History';
+import { History } from '../History';
 
 describe('pages/History', () => {
   it('renders correctly', () => {

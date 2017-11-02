@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { getGroupedHistory } from 'store/history/selectors';
+import { getGroupedHistory } from '../../../store/history/selectors';
 import HistoryList from './HistoryList';
 
 export function mapStateToProps({ history }, { grouping }) {

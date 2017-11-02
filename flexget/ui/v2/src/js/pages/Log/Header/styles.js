@@ -2,7 +2,7 @@ import styled, { css } from 'react-emotion';
 import Icon from 'material-ui/Icon';
 import Typography from 'material-ui/Typography';
 import TextField from 'material-ui/TextField';
-import theme from 'theme';
+import theme from '../../../theme';
 
 const grey = css`color: ${theme.palette.grey[600]}`;
 

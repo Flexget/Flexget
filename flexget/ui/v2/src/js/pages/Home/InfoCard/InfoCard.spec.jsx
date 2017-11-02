@@ -1,7 +1,7 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import InfoCard from 'pages/Home/InfoCard';
-import { themed } from 'utils/tests';
+import { themed } from '../../../utils/tests';
+import InfoCard from '../InfoCard';
 
 describe('pages/Home/InfoCard', () => {
   it('renders correctly', () => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import LogPage from 'pages/Log';
-import { themed, provider } from 'utils/tests';
+import LogPage from '../Log';
+import { themed, provider } from '../../utils/tests';
 
 describe('pages/Log', () => {
   xit('renders correctly', () => {

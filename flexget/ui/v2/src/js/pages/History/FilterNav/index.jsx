@@ -4,8 +4,8 @@ import IconButton from 'material-ui/IconButton';
 import Select from 'material-ui/Select';
 import Input, { InputLabel } from 'material-ui/Input';
 import { MenuItem } from 'material-ui/Menu';
-import SecondaryNav from 'common/SecondaryNav';
-import { Spacer } from 'common/styles';
+import SecondaryNav from '../../../common/SecondaryNav';
+import { Spacer } from '../../../common/styles';
 import { RotatingIcon, PaddedFormControl } from './styles';
 
 const ENTER_KEY = 13;

@@ -3,8 +3,8 @@ import {
   LOG_CONNECT,
   LOG_DISCONNECT,
   LOG_CLEAR,
-} from 'store/log/actions';
-import { action, request } from 'utils/actions';
+} from '../../../store/log/actions';
+import { action, request } from '../../../utils/actions';
 import Header from './Header';
 
 export function mapStateToProps({ log }) {

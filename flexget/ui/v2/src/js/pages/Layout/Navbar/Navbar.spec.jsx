@@ -1,8 +1,8 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 import { shallow } from 'enzyme';
-import { Navbar } from 'pages/Layout/Navbar';
-import { themed, router } from 'utils/tests';
+import { Navbar } from '../../Layout/Navbar';
+import { themed, router } from '../../../utils/tests';
 import { NavIcon } from './styles';
 
 function renderNavbar(toggle, logout) {

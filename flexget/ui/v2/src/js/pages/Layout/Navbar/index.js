@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
-import { LOGOUT } from 'store/auth/actions';
-import { SERVER_RELOAD, SERVER_SHUTDOWN } from 'store/server/actions';
-import { request } from 'utils/actions';
+import { LOGOUT } from '../../../store/auth/actions';
+import { SERVER_RELOAD, SERVER_SHUTDOWN } from '../../../store/server/actions';
+import { request } from '../../../utils/actions';
 import Navbar from './Navbar';
 
 function mapStateToProps({ router }) {

@@ -1,9 +1,9 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 import { shallow } from 'enzyme';
-import LoginCardFull, { LoginCard } from 'pages/Login/LoginCard/LoginCard';
-import { mapStateToProps } from 'pages/Login/LoginCard';
-import { themed, provider } from 'utils/tests';
+import LoginCardFull, { LoginCard } from '../LoginCard/LoginCard';
+import { mapStateToProps } from '../LoginCard';
+import { themed, provider } from '../../../utils/tests';
 
 describe('pages/Login/LoginCard', () => {
   describe('LoginCard', () => {

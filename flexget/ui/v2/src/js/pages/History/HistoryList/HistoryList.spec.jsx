@@ -1,6 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { mapStateToProps, HistoryList } from 'pages/History/HistoryList';
+import { mapStateToProps, HistoryList } from '../HistoryList';
 
 describe('pages/History/HistoryList', () => {
   describe('HistoryList', () => {

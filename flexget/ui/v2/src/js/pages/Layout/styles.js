@@ -1,5 +1,5 @@
 import styled from 'react-emotion';
-import theme from 'theme';
+import theme from '../../theme';
 
 const HEADER_HEIGHT = 5;
 const MOBILE_HEADER_HEIGHT = (HEADER_HEIGHT * 2);

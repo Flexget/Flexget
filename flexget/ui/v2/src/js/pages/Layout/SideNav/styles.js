@@ -1,8 +1,8 @@
 import styled, { css } from 'react-emotion';
-import theme from 'theme';
 import List from 'material-ui/List';
-import SideNavEntry from 'pages/Layout/SideNavEntry';
-import Version from 'pages/Layout/Version';
+import theme from '../../../theme';
+import SideNavEntry from '../../Layout/SideNavEntry';
+import Version from '../../Layout/Version';
 
 export const NestedSideNavEntry = styled(SideNavEntry)`
   padding-left: ${theme.spacing.unit * 0.4}rem;

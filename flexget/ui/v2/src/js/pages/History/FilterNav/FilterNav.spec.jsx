@@ -1,6 +1,6 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import FilterNav from 'pages/History/FilterNav';
+import FilterNav from '../FilterNav';
 
 describe('pages/History/FilterNav', () => {
   it('renders correctly', () => {

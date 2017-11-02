@@ -1,8 +1,8 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
-import SideNav from 'pages/Layout/SideNav';
-import { provider, themed, router } from 'utils/tests';
 import fetchMock from 'fetch-mock';
+import renderer from 'react-test-renderer';
+import SideNav from '../SideNav';
+import { provider, themed, router } from '../../../utils/tests';
 
 describe('pages/Layout/Sidenav', () => {
   beforeEach(() => {

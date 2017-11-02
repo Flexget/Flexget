@@ -1,6 +1,6 @@
 import styled from 'react-emotion';
 import Card, { CardActions, CardHeader } from 'material-ui/Card';
-import theme from 'theme';
+import theme from '../../../theme';
 
 export const InfoCardWrapper = styled(Card)`
   margin: 0 auto;

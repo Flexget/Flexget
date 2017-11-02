@@ -1,8 +1,8 @@
+import fetchMock from 'fetch-mock';
 import React from 'react';
 import renderer from 'react-test-renderer';
-import Layout from 'pages/Layout';
-import { themed, router, provider } from 'utils/tests';
-import fetchMock from 'fetch-mock';
+import Layout from '../Layout';
+import { themed, router, provider } from '../../utils/tests';
 
 function renderLayout() {
   return provider(router(themed(

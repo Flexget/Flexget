@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { HistoryShape } from 'store/history/shapes';
-import InfiniteScroll from 'react-infinite-scroller';
 import List, { ListItem, ListItemText } from 'material-ui/List';
-import LoadingSpinner from 'common/LoadingSpinner';
+import InfiniteScroll from 'react-infinite-scroller';
+import { HistoryShape } from '../../../store/history/shapes';
+import LoadingSpinner from '../../../common/LoadingSpinner';
 import { Subheader, Wrapper } from './styles';
 
 class HistoryList extends Component {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { themed } from 'utils/tests';
-import { mapStateToProps, LogTable } from 'pages/Log/LogTable';
+import { themed } from '../../../utils/tests';
+import { mapStateToProps, LogTable } from '../LogTable';
 
 
 describe('pages/Log/LogTable', () => {

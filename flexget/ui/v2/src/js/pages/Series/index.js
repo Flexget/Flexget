@@ -1,8 +1,8 @@
 import { connect } from 'react-redux';
 import {
   GET_SHOWS,
-} from 'store/series/shows/actions';
-import { request } from 'utils/actions';
+} from '../../store/series/shows/actions';
+import { request } from '../../utils/actions';
 import Series from './Series';
 
 export function mapStateToProps({ series }) {

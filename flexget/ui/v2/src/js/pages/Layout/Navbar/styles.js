@@ -3,7 +3,7 @@ import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
 import Icon from 'material-ui/Icon';
-import theme from 'theme';
+import theme from '../../../theme';
 
 export const menuIcon = css`padding-right: 3rem`;
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import { mapStateToProps, Header } from 'pages/Log/Header';
-import { themed } from 'utils/tests';
+import { mapStateToProps, Header } from '../Header';
+import { themed } from '../../../utils/tests';
 
 describe('pages/Log/Header', () => {
   describe('Header', () => {

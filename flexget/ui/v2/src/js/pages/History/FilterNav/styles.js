@@ -1,7 +1,7 @@
 import styled from 'react-emotion';
 import Icon from 'material-ui/Icon';
 import { FormControl } from 'material-ui/Form';
-import theme from 'theme';
+import theme from '../../../theme';
 
 export const RotatingIcon = styled(Icon)`
   transition: ${theme.transitions.create()};

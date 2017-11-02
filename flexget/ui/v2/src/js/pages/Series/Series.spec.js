@@ -1,4 +1,4 @@
-import { mapStateToProps } from 'pages/Series';
+import { mapStateToProps } from './index';
 
 describe('containers/series', () => {
   it('should return the right stuff', () => {
