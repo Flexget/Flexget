@@ -82,7 +82,7 @@ class UrlRewriteNewPCT(object):
                 torrent_id_prog = re.compile('function openTorrent.*\n.*\{.*(\n.*)+window\.location\.href =\s*\".*\/(\d+).*\";')
                 torrent_ids = soup.findAll(text=torrent_id_prog)
                 log.debug('torrent ID not found, searching openTorrent script')
-                if len(torrent_ids):
+                if torrent_ids:
                     match = torrent_id_prog.search(torrent_ids[0])
                     if match:
                         torrent_id = match.group(2)
