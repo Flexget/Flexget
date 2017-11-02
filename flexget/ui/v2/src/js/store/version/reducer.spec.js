@@ -1,5 +1,5 @@
-import reducer from 'store/version/reducer';
-import { GET_VERSION } from 'store/version/actions';
+import reducer from '../../store/version/reducer';
+import { GET_VERSION } from '../../store/version/actions';
 
 describe('store/version/reducer', () => {
   it('should return the initial state', () => {

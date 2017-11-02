@@ -1,4 +1,4 @@
-import { GET_HISTORY } from 'store/history/actions';
+import { GET_HISTORY } from '../../store/history/actions';
 
 const initState = {
   totalCount: 0,

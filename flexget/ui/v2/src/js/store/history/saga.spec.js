@@ -1,10 +1,10 @@
 import { stringify } from 'qs';
 import { call, put } from 'redux-saga/effects';
 import sagaHelper from 'redux-saga-testing';
-import { getHistory, defaultOptions } from 'store/history/saga';
-import { get } from 'utils/fetch';
-import { action } from 'utils/actions';
-import { GET_HISTORY } from 'store/history/actions';
+import { getHistory, defaultOptions } from '../../store/history/saga';
+import { get } from '../../utils/fetch';
+import { action } from '../../utils/actions';
+import { GET_HISTORY } from '../../store/history/actions';
 
 describe('store/history/sagas', () => {
   describe('getHistory', () => {

@@ -1,6 +1,6 @@
-import { LOGIN, LOGOUT } from 'store/auth/actions';
-import { ERROR_STATUS } from 'store/status/actions';
-import { GET_VERSION } from 'store/version/actions';
+import { LOGIN, LOGOUT } from '../../store/auth/actions';
+import { ERROR_STATUS } from '../../store/status/actions';
+import { GET_VERSION } from '../../store/version/actions';
 
 export default function reducer(state = {}, action) {
   switch (action.type) {

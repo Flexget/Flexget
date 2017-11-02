@@ -3,7 +3,7 @@ import {
   LOG_MESSAGE,
   LOG_DISCONNECT,
   LOG_CLEAR,
-} from 'store/log/actions';
+} from '../../store/log/actions';
 
 const initState = {
   messages: [],

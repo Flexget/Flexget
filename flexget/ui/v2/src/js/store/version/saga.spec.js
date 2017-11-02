@@ -1,10 +1,10 @@
 import { delay } from 'redux-saga';
 import { call, put } from 'redux-saga/effects';
 import sagaHelper from 'redux-saga-testing';
-import { getVersion } from 'store/version/saga';
-import { get } from 'utils/fetch';
-import { action } from 'utils/actions';
-import { GET_VERSION } from 'store/version/actions';
+import { getVersion } from '../../store/version/saga';
+import { get } from '../../utils/fetch';
+import { action } from '../../utils/actions';
+import { GET_VERSION } from '../../store/version/actions';
 
 describe('store/version/saga', () => {
   describe('getVersion', () => {

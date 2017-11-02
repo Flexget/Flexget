@@ -1,9 +1,9 @@
 import { call, put } from 'redux-saga/effects';
 import sagaHelper from 'redux-saga-testing';
-import { post } from 'utils/fetch';
-import { action, request } from 'utils/actions';
-import { SERVER_RELOAD, SERVER_SHUTDOWN } from 'store/server/actions';
-import { manageServer } from 'store/server/saga';
+import { post } from '../../utils/fetch';
+import { action, request } from '../../utils/actions';
+import { SERVER_RELOAD, SERVER_SHUTDOWN } from '../../store/server/actions';
+import { manageServer } from '../../store/server/saga';
 
 describe('store/server/sage', () => {
   describe('manageServer', () => {

@@ -2,9 +2,9 @@ import { eventChannel } from 'redux-saga';
 import { createMockTask } from 'redux-saga/utils';
 import { take, fork, cancel, cancelled, call, put } from 'redux-saga/effects';
 import sagaHelper from 'redux-saga-testing';
-import { LOG_CONNECT, LOG_DISCONNECT } from 'store/log/actions';
-import saga, { log, logStream } from 'store/log/saga';
-import { action, requesting } from 'utils/actions';
+import { LOG_CONNECT, LOG_DISCONNECT } from '../../store/log/actions';
+import saga, { log, logStream } from '../../store/log/saga';
+import { action, requesting } from '../../utils/actions';
 
 describe('store/log/saga', () => {
   describe('saga', () => {

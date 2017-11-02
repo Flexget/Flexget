@@ -1,4 +1,4 @@
-import { getGroupedHistory } from 'store/history/selectors';
+import { getGroupedHistory } from '../../store/history/selectors';
 
 describe('store/history/selectors', () => {
   describe('getGroupedHistory', () => {

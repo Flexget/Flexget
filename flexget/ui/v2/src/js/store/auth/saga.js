@@ -1,7 +1,7 @@
 import { call, put, takeLatest } from 'redux-saga/effects';
-import { action, requesting } from 'utils/actions';
-import { post } from 'utils/fetch';
-import { LOGIN, LOGOUT } from 'store/auth/actions';
+import { action, requesting } from '../../utils/actions';
+import { post } from '../../utils/fetch';
+import { LOGIN, LOGOUT } from '../../store/auth/actions';
 
 export function* login({ payload }) {
   try {

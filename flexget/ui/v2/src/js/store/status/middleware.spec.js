@@ -1,6 +1,6 @@
 import configureMockStore from 'redux-mock-store';
-import statusMiddleware from 'store/status/middleware';
-import { action, request } from 'utils/actions';
+import statusMiddleware from '../../store/status/middleware';
+import { action, request } from '../../utils/actions';
 
 const ACTION = 'ACTION';
 const mockStore = configureMockStore([statusMiddleware]);

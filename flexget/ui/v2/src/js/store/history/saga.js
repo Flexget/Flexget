@@ -1,8 +1,8 @@
 import { stringify } from 'qs';
 import { call, put, takeLatest } from 'redux-saga/effects';
-import { action, requesting } from 'utils/actions';
-import { get } from 'utils/fetch';
-import { GET_HISTORY } from 'store/history/actions';
+import { action, requesting } from '../../utils/actions';
+import { get } from '../../utils/fetch';
+import { GET_HISTORY } from '../../store/history/actions';
 
 export const defaultOptions = {
   page: 1,

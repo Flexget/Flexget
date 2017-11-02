@@ -1,6 +1,6 @@
-import reducer from 'store/history/reducer';
-import { GET_HISTORY } from 'store/history/actions';
-import { Headers } from 'utils/tests';
+import reducer from '../../store/history/reducer';
+import { GET_HISTORY } from '../../store/history/actions';
+import { Headers } from '../../utils/tests';
 
 
 describe('store/history/reducer', () => {

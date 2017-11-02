@@ -1,9 +1,9 @@
 import { call, put } from 'redux-saga/effects';
 import sagaHelper from 'redux-saga-testing';
-import { post } from 'utils/fetch';
-import { action } from 'utils/actions';
-import { LOGIN, LOGOUT } from 'store/auth/actions';
-import { login, logout } from 'store/auth/saga';
+import { post } from '../../utils/fetch';
+import { action } from '../../utils/actions';
+import { LOGIN, LOGOUT } from '../../store/auth/actions';
+import { login, logout } from '../../store/auth/saga';
 
 describe('store/auth/saga', () => {
   describe('login', () => {

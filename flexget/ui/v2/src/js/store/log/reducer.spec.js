@@ -1,10 +1,10 @@
-import reducer from 'store/log/reducer';
+import reducer from '../../store/log/reducer';
 import {
   LOG_CONNECT,
   LOG_MESSAGE,
   LOG_DISCONNECT,
   LOG_CLEAR,
-} from 'store/log/actions';
+} from '../../store/log/actions';
 
 describe('store/log/reducer', () => {
   it('should return the initial state', () => {

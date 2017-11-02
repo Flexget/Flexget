@@ -1,12 +1,12 @@
 import oboe from 'oboe';
 import { eventChannel } from 'redux-saga';
 import { call, take, put, cancel, cancelled, fork } from 'redux-saga/effects';
-import { action, requesting } from 'utils/actions';
+import { action, requesting } from '../../utils/actions';
 import {
   LOG_CONNECT,
   LOG_MESSAGE,
   LOG_DISCONNECT,
-} from 'store/log/actions';
+} from '../../store/log/actions';
 
 export function logStream({ lines, query }) {
   return eventChannel((emit) => {

@@ -1,11 +1,11 @@
+import { LOCATION_CHANGE } from 'connected-react-router';
+import reducer from '../../store/status/reducer';
 import {
   LOADING_STATUS,
   ERROR_STATUS,
   CLOSE_STATUS,
   INFO_STATUS,
-} from 'store/status/actions';
-import { LOCATION_CHANGE } from 'connected-react-router';
-import reducer from 'store/status/reducer';
+} from '../../store/status/actions';
 
 const TEST = 'TEST';
 

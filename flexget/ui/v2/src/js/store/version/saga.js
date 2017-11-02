@@ -1,8 +1,8 @@
 import { call, put, takeLatest } from 'redux-saga/effects';
 import { delay } from 'redux-saga';
-import { action, requesting } from 'utils/actions';
-import { get } from 'utils/fetch';
-import { GET_VERSION } from 'store/version/actions';
+import { action, requesting } from '../../utils/actions';
+import { get } from '../../utils/fetch';
+import { GET_VERSION } from '../../store/version/actions';
 
 export function* getVersion() {
   try {

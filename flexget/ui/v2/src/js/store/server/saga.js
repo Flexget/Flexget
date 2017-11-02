@@ -1,7 +1,7 @@
 import { call, put, takeEvery } from 'redux-saga/effects';
-import { action, requesting } from 'utils/actions';
-import { post } from 'utils/fetch';
-import { SERVER_RELOAD, SERVER_SHUTDOWN } from 'store/server/actions';
+import { action, requesting } from '../../utils/actions';
+import { post } from '../../utils/fetch';
+import { SERVER_RELOAD, SERVER_SHUTDOWN } from '../../store/server/actions';
 
 export function* manageServer(operation, { meta }) {
   try {

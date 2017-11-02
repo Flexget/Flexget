@@ -1,10 +1,10 @@
+import { LOCATION_CHANGE } from 'connected-react-router';
 import {
   LOADING_STATUS,
   ERROR_STATUS,
   CLOSE_STATUS,
   INFO_STATUS,
-} from 'store/status/actions';
-import { LOCATION_CHANGE } from 'connected-react-router';
+} from '../../store/status/actions';
 
 const initState = {
   loading: {},

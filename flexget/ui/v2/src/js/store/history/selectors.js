@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { groupBy } from 'utils/array';
+import { groupBy } from '../../utils/array';
 
 const getItems = history => history.items;
 const getGrouping = (history, grouping) => grouping;

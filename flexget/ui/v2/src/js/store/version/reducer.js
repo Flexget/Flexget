@@ -1,4 +1,4 @@
-import { GET_VERSION } from 'store/version/actions';
+import { GET_VERSION } from '../../store/version/actions';
 
 export default function reducer(state = {}, action) {
   switch (action.type) {
