@@ -1,8 +1,8 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Icon from 'material-ui/Icon';
-import Menu, {MenuItem} from 'material-ui/Menu';
+import Menu, { MenuItem } from 'material-ui/Menu';
 import Dialog, {
   DialogActions,
   DialogContent,
@@ -12,7 +12,7 @@ import Dialog, {
 import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
 import 'font-awesome/css/font-awesome.css';
-import {Spacer} from '../../../common/styles';
+import { Spacer } from '../../../common/styles';
 import {
   MenuIcon,
   NavAppBar,
@@ -51,7 +51,7 @@ export default class Navbar extends Component {
   }
 
   handleShutdownPromptClick = () => {
-    this.setState({shutdownPrompt: true});
+    this.setState({ shutdownPrompt: true });
     this.handleMenuRequestClose();
   }
 
@@ -65,34 +65,34 @@ export default class Navbar extends Component {
   });
 
   render() {
-    const {toggle, logout, pathname} = this.props;
-    const {anchorEl, menuOpen, shutdownPrompt} = this.state;
+    const { toggle, logout, pathname } = this.props;
+    const { anchorEl, menuOpen, shutdownPrompt } = this.state;
 
     return (
       <NavAppBar>
         <NavToolbar>
           <NavIcon onClick={toggle}>
-            <Icon className="fa fa-bars"/>
+            <Icon className="fa fa-bars" />
           </NavIcon>
           <Typography type="title" color="inherit">
             {titles[pathname]}
           </Typography>
-          <Spacer/>
+          <Spacer />
           <Link to="/config">
             <NavIcon aria-label="Config">
-              <Icon className="fa fa-pencil"/>
+              <Icon className="fa fa-pencil" />
             </NavIcon>
           </Link>
           <Link to="/log">
             <NavIcon aria-label="Log">
-              <Icon className="fa fa-book"/>
+              <Icon className="fa fa-book" />
             </NavIcon>
           </Link>
           <NavIcon
             aria-label="Manage"
             onClick={this.handleMenuClick}
           >
-            <Icon className="fa fa-cog"/>
+            <Icon className="fa fa-cog" />
           </NavIcon>
           <Menu
             id="nav-menu"
@@ -101,19 +101,19 @@ export default class Navbar extends Component {
             onRequestClose={this.handleMenuRequestClose}
           >
             <MenuItem onClick={this.handleReloadClick}>
-              <MenuIcon className="fa fa-refresh"/>
+              <MenuIcon className="fa fa-refresh" />
               Reload
             </MenuItem>
             <MenuItem onClick={this.handleShutdownPromptClick}>
-              <MenuIcon className="fa fa-power-off"/>
+              <MenuIcon className="fa fa-power-off" />
               Shutdown
             </MenuItem>
             <MenuItem>
-              <MenuIcon className="fa fa-database"/>
+              <MenuIcon className="fa fa-database" />
               Database
             </MenuItem>
             <MenuItem onClick={logout}>
-              <MenuIcon className="fa fa-sign-out"/>
+              <MenuIcon className="fa fa-sign-out" />
               Logout
             </MenuItem>
           </Menu>
