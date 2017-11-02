@@ -3,7 +3,7 @@ import { MuiThemeProvider } from 'material-ui/styles';
 import { MemoryRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
-import theme from 'theme';
+import theme from '../../theme';
 
 const mockStore = configureMockStore();
 
