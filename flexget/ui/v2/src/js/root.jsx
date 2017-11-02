@@ -1,19 +1,20 @@
 import React from 'react';
-import createStore from 'store';
-import history from 'history';
-import { JssProvider } from 'react-jss';
-import { create } from 'jss';
-import preset from 'jss-preset-default';
-import createGenerateClassName from 'material-ui/styles/createGenerateClassName';
 import { Provider } from 'react-redux';
 import { Route, Switch } from 'react-router-dom';
+import { create } from 'jss';
+import { JssProvider } from 'react-jss';
+import preset from 'jss-preset-default';
 import { ConnectedRouter } from 'connected-react-router';
 import { MuiThemeProvider } from 'material-ui/styles';
+import createGenerateClassName from 'material-ui/styles/createGenerateClassName';
 import { injectGlobal } from 'react-emotion';
-import theme from 'theme';
-import PrivateRoute from 'common/PrivateRoute';
-import Layout from 'pages/Layout';
-import { createAsyncComponent } from 'utils/loading';
+
+import theme from './theme';
+import PrivateRoute from './common/PrivateRoute';
+import Layout from './pages/Layout';
+import { createAsyncComponent } from './utils/loading';
+import createStore from './store';
+import history from './history';
 
 // eslint-disable-next-line no-unused-expressions
 injectGlobal`
