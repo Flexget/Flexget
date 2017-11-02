@@ -5,7 +5,7 @@ module.exports = {
     main: [
       'babel-polyfill',
       'whatwg-fetch',
-      './src/js/app.jsx',
+      './src/app.jsx',
     ],
     vendor: [
       'redux',
@@ -21,7 +21,6 @@ module.exports = {
     extensions: ['.js', '.jsx'],
     modules: [
       path.resolve('./src'),
-      path.resolve('./src/js'),
       'node_modules',
     ],
   },

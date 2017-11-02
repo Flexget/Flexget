@@ -1,6 +1,6 @@
 import styled from 'react-emotion';
 import theme from '../../../theme';
-import headerImage from '../../../../images/header.png';
+import headerImage from '../../../images/header.png';
 
 export const NavLogo = styled.div`
   background: ${theme.palette.secondary[900]} url(${headerImage}) no-repeat center;

@@ -8,7 +8,7 @@
     "build": "NODE_ENV=production BABEL_ENV=production webpack --config webpack.prod.js",
     "debug": "DEBUG=true npm run build",
     "lint": "eslint --ext .js --ext .jsx src",
-    "lint:css": "stylelint './src/js/**/*.js'",
+    "lint:css": "stylelint './src/**/*.js'",
     "test": "jest",
     "test:watch": "jest --watch",
     "cov": "cat coverage/lcov.info | codacy-coverage"
