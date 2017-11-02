@@ -1,7 +1,7 @@
 import React from 'react';
 import { mapStateToProps, PrivateRoute } from 'common/PrivateRoute';
 import renderer from 'react-test-renderer';
-import { router } from 'utils/tests';
+import { router } from '../../utils/tests';
 
 const Component = () => <div />;
 

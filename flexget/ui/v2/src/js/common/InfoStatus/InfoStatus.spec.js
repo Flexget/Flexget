@@ -1,4 +1,4 @@
-import { mapStateToProps } from 'common/InfoStatus';
+import { mapStateToProps } from '../InfoStatus';
 
 describe('plugins/common/InfoStatus', () => {
   it('should be correct if an info status should be displayed', () => {

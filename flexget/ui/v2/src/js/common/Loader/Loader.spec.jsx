@@ -1,6 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import Loader from 'common/Loader';
+import Loader from '../Loader';
 
 describe('common/Loader', () => {
   it('should render properly when loading', () => {

@@ -1,5 +1,5 @@
 import styled, { keyframes } from 'react-emotion';
-import theme from 'theme';
+import theme from '../../theme';
 
 const stretchDelay = keyframes`
   0%, 40%, 100% {

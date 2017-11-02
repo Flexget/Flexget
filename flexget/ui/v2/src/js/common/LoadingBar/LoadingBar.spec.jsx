@@ -1,7 +1,7 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import { mapStateToProps, LoadingBar } from 'common/LoadingBar';
-import { themed } from 'utils/tests';
+import { mapStateToProps, LoadingBar } from '../LoadingBar';
+import { themed } from '../../utils/tests';
 
 describe('common/LoadingBar', () => {
   describe('Component', () => {
