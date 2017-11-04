@@ -86,6 +86,34 @@ RELEASE_TYPES = {
     'golden popcorn': 2
 }
 
+RESOLUTION_MAP = {
+    '1080p': '1080p',
+    '720p': '720p',
+    '576p': '576p',
+    '480p': '480p',
+}
+
+SOURCE_MAP = {
+    'CAM': 'cam',
+    'TS': 'ts',
+    'R5': 'r5',
+    'DVD-Screener': 'dvdscr',
+    'WEB': 'webdl',
+    'DVD': 'dvdrip',
+    'TV': 'tvrip',
+    'HDTV': 'hdtv',
+    'HD-DVD': 'hdrip',
+    'Blu-ray': 'bluray'
+}
+
+CODEC_MAP = {
+    'H.264': 'h264',
+    'x264': 'h264',
+    'XviD': 'xvid',
+    'DivX': 'divx'
+}
+
+
 class PassThePopcornCookie(Base):
     __tablename__ = 'passthepopcorn_cookie'
 
@@ -210,7 +238,7 @@ class SearchPassThePopcorn(object):
         if 'tags' in config:
             tags = config['tags'] if isinstance(config['tags'], list) else [config['tags']]
             params['taglist'] = ',+'.join(tags)
-        
+
         release_type = config.get('release_type')
         if release_type:
             params['scene'] = RELEASE_TYPES[release_type]
@@ -275,6 +303,15 @@ class SearchPassThePopcorn(object):
                     e['golden_popcorn'] = torrent['GoldenPopcorn']
                     e['checked'] = torrent['Checked']
                     e['uploaded_at'] = dateutil_parse(torrent['UploadTime'])
+                    e['imdb_id'] = 'tt%s' % str(movie['ImdbId']).zfill(7)
+
+                    resolution = self._lookup_quality(torrent, 'Resolution', RESOLUTION_MAP)
+                    source = self._lookup_quality(torrent, 'Source', SOURCE_MAP)
+                    codec = self._lookup_quality(torrent, 'Codec', CODEC_MAP)
+                    quality = ' '.join([resolution, source, codec]).strip()
+
+                    if quality:
+                        e['quality'] = quality
 
                     e['url'] = self.base_url + 'torrents.php?action=download&id={}&authkey={}&torrent_pass={}'.format(
                         e['torrent_id'], authkey, passkey
@@ -283,6 +320,12 @@ class SearchPassThePopcorn(object):
                     entries.add(e)
 
         return entries
+
+    def _lookup_quality(self, torrent, ptp_field_name, lookup_map):
+        if ptp_field_name in torrent and torrent[ptp_field_name] in lookup_map:
+            return lookup_map[torrent[ptp_field_name]]
+        else:
+            return ''
 
 
 @event('plugin.register')
