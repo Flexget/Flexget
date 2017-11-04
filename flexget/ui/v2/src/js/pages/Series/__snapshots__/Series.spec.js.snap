@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`containers/series should return the right stuff 1`] = `
-Object {
-  "shows": Array [],
-}
-`;

@@ -111,7 +111,6 @@ def register_web_server(manager):
         log.info('Registering WebUI v1')
         register_web_ui_v1(manager)
 
-
     web_server = setup_server(web_server_config)
 
 

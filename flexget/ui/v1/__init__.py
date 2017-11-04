@@ -5,7 +5,7 @@ import logging
 import os
 import fnmatch
 
-from flask import send_from_directory, Flask
+from flask import send_from_directory, Flask, abort
 
 from flexget.webserver import register_app, register_home
 from flask_compress import Compress
@@ -34,6 +34,9 @@ def serve_app(path):
 
         if os.path.exists(os.path.join(ui_src, path)):
             return send_from_directory(ui_src, path)
+
+    if not app_base:
+        return send_from_directory(ui_base, 'load.failure.html')
 
     return send_from_directory(app_base, path)
 
@@ -79,7 +82,6 @@ def register_web_ui(mgr):
             log.fatal('Failed to start web ui,'
                       ' this can happen if you are running from GitHub version and forgot to run the web ui build, '
                       'see http://flexget.com/wiki/Web-UI for instructions')
-
             app_base = None
 
     register_app(webui_app.url_path, webui_app)
