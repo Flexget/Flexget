@@ -5,7 +5,7 @@ import logging
 import os
 import fnmatch
 
-from flask import send_from_directory, Flask, abort
+from flask import send_from_directory, Flask
 
 from flexget.webserver import register_app, register_home
 from flask_compress import Compress
