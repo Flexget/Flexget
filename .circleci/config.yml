@@ -131,3 +131,9 @@ workflows:
       - "test-py33"
       - "test-py34"
       - "test-py35"
+
+
+notify:
+  webhooks:
+    # gitter hook
+    - url: https://webhooks.gitter.im/e/c834f258a8dd7abf82de
