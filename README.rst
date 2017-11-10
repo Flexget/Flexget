@@ -1,7 +1,7 @@
 FlexGet
 =======
-.. image:: https://api.travis-ci.org/Flexget/Flexget.png?branch=master
-    :target: https://travis-ci.org/Flexget/Flexget
+.. image:: https://circleci.com/gh/Flexget/Flexget/tree/develop.svg?style=svg
+    :target: https://circleci.com/gh/Flexget/Flexget/tree/develop
 
 .. image:: https://img.shields.io/pypi/v/Flexget.svg
     :target: https://pypi.python.org/pypi/Flexget
