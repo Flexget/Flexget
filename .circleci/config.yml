@@ -12,7 +12,7 @@ jobs:
           - py27-dependencies-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
           - py27-dependencies- # fallback to using the latest cache if no exact match is found
       - run:
-          name: install dependencies
+          name: Install Dependencies
           command: |
             virtualenv venv
             . venv/bin/activate
@@ -24,7 +24,7 @@ jobs:
             - ./venv
           key: py27-dependencies-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
       - run:
-          name: run tests
+          name: Run Tests
           command: |
             . venv/bin/activate
             py.test -n 6
@@ -41,7 +41,7 @@ jobs:
           - py33-dependencies-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
           - py33-dependencies- # fallback to using the latest cache if no exact match is found
       - run:
-          name: install dependencies
+          name: Install Dependencies
           command: |
             virtualenv venv
             . venv/bin/activate
@@ -53,7 +53,7 @@ jobs:
             - ./venv
           key: py33-dependencies-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
       - run:
-          name: run tests
+          name: Run Tests
           command: |
             . venv/bin/activate
             py.test -n 6
@@ -70,7 +70,7 @@ jobs:
           - py34-dependencies-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
           - py34-dependencies- # fallback to using the latest cache if no exact match is found
       - run:
-          name: install dependencies
+          name: Install Dependencies
           command: |
             python3 -m venv venv
             . venv/bin/activate
@@ -82,7 +82,7 @@ jobs:
             - ./venv
           key: py34-dependencies-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
       - run:
-          name: run tests
+          name: Run Tests
           command: |
             . venv/bin/activate
             py.test -n 6
@@ -99,7 +99,7 @@ jobs:
           - py35-dependencies-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
           - py35-dependencies- # fallback to using the latest cache if no exact match is found
       - run:
-          name: install dependencies
+          name: Install Dependencies
           command: |
             python3 -m venv venv
             . venv/bin/activate
@@ -111,12 +111,12 @@ jobs:
             - ./venv
           key: py35-dependencies-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
       - run:
-          name: run tests
+          name: Run Tests
           command: |
             . venv/bin/activate
             py.test --cov flexget --cov-report xml -n 6
       - run:
-          name: coverage
+          name: Coverage to Codacy
           command: |
             python3 -m venv venv
             . venv/bin/activate
