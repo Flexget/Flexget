@@ -2,7 +2,7 @@ version: 2
 jobs:
   test-py27:
     docker:
-      - image: circleci/python:2.7
+      - image: flexget/cci-python:2.7
     steps:
       - checkout
       - restore_cache:
@@ -17,8 +17,6 @@ jobs:
             pip install -r requirements.txt
             pip install -r dev-requirements.txt
             pip install -r dev-requirements-extras.txt
-            sudo apt-get install unrar-free
-            cp `which unrar` venv/bin/unrar
 
       - save_cache:
           paths:
@@ -33,7 +31,7 @@ jobs:
 
   test-py33:
     docker:
-      - image: circleci/python:3.3
+      - image: flexget/cci-python:3.3.6
     steps:
       - checkout
       - restore_cache:
@@ -48,8 +46,6 @@ jobs:
             pip install -r requirements.txt
             pip install -r dev-requirements.txt
             pip install -r dev-requirements-extras.txt
-            sudo apt-get install unrar-free
-            cp `which unrar` venv/bin/unrar
 
       - save_cache:
           paths:
@@ -64,7 +60,7 @@ jobs:
 
   test-py34:
     docker:
-      - image: circleci/python:3.4
+      - image: flexget/cci-python:3.4
     steps:
       - checkout
       - restore_cache:
@@ -79,8 +75,6 @@ jobs:
             pip install -r requirements.txt
             pip install -r dev-requirements.txt
             pip install -r dev-requirements-extras.txt
-            sudo apt-get install unrar-free
-            cp `which unrar` venv/bin/unrar
 
       - save_cache:
           paths:
@@ -95,7 +89,7 @@ jobs:
 
   test-py35:
     docker:
-      - image: circleci/python:3.5
+      - image: flexget/cci-python:3.5
     steps:
       - checkout
       - restore_cache:
@@ -110,8 +104,6 @@ jobs:
             pip install -r requirements.txt
             pip install -r dev-requirements.txt
             pip install -r dev-requirements-extras.txt
-            sudo apt-get install unrar-free
-            cp `which unrar` venv/bin/unrar
 
       - save_cache:
           paths:
