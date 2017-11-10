@@ -123,11 +123,14 @@ jobs:
           command: |
             . venv/bin/activate
             py.test --cov flexget --cov-report xml -n 6
+      - run:
+          name: coverage
+          command: python-codacy-coverage -r coverage.xml
 
 
 workflows:
   version: 2
-  test:
+  tests:
     jobs:
       - "test-py27"
       - "test-py33"
