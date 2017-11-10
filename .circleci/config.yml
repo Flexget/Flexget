@@ -31,7 +31,7 @@ jobs:
 
   test-py33:
     docker:
-      - image: flexget/cci-python:3.3.6
+      - image: flexget/cci-python:3.3
     steps:
       - checkout
       - restore_cache:
