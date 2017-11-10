@@ -19,12 +19,10 @@ jobs:
             pip install -r requirements.txt
             pip install -r dev-requirements.txt
             pip install -r dev-requirements-extras.txt
-
       - save_cache:
           paths:
             - ./venv
           key: py27-dependencies-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
-
       - run:
           name: run tests
           command: |
@@ -50,12 +48,10 @@ jobs:
             pip install -r requirements.txt
             pip install -r dev-requirements.txt
             pip install -r dev-requirements-extras.txt
-
       - save_cache:
           paths:
             - ./venv
           key: py33-dependencies-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
-
       - run:
           name: run tests
           command: |
@@ -81,12 +77,10 @@ jobs:
             pip install -r requirements.txt
             pip install -r dev-requirements.txt
             pip install -r dev-requirements-extras.txt
-
       - save_cache:
           paths:
             - ./venv
           key: py34-dependencies-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
-
       - run:
           name: run tests
           command: |
@@ -112,12 +106,10 @@ jobs:
             pip install -r requirements.txt
             pip install -r dev-requirements.txt
             pip install -r dev-requirements-extras.txt
-
       - save_cache:
           paths:
             - ./venv
           key: py35-dependencies-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
-
       - run:
           name: run tests
           command: |
@@ -125,7 +117,10 @@ jobs:
             py.test --cov flexget --cov-report xml -n 6
       - run:
           name: coverage
-          command: python-codacy-coverage -r coverage.xml
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            python-codacy-coverage -r coverage.xml
 
 
 workflows:
