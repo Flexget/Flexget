@@ -3,6 +3,8 @@ jobs:
   test-py27:
     docker:
       - image: flexget/cci-python:2.7
+    environment:
+      - VCR_RECORD_MODE=none
     steps:
       - checkout
       - restore_cache:
@@ -32,6 +34,8 @@ jobs:
   test-py33:
     docker:
       - image: flexget/cci-python:3.3
+    environment:
+      - VCR_RECORD_MODE=none
     steps:
       - checkout
       - restore_cache:
@@ -61,6 +65,8 @@ jobs:
   test-py34:
     docker:
       - image: flexget/cci-python:3.4
+    environment:
+      - VCR_RECORD_MODE=none
     steps:
       - checkout
       - restore_cache:
@@ -90,6 +96,8 @@ jobs:
   test-py35:
     docker:
       - image: flexget/cci-python:3.5
+    environment:
+      - VCR_RECORD_MODE=none
     steps:
       - checkout
       - restore_cache:
