@@ -17,3 +17,4 @@ pytest-cov==2.2.1
 gitpython==2.1.5
 codacy-coverage>=1.2.18
 pip-tools==1.9.0
+

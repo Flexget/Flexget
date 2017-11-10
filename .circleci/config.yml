@@ -17,6 +17,8 @@ jobs:
             pip install -r requirements.txt
             pip install -r dev-requirements.txt
             pip install -r dev-requirements-extras.txt
+            sudo apt-get install unrar-free
+            cp `which unrar` venv/bin/unrar
 
       - save_cache:
           paths:
@@ -46,6 +48,8 @@ jobs:
             pip install -r requirements.txt
             pip install -r dev-requirements.txt
             pip install -r dev-requirements-extras.txt
+            sudo apt-get install unrar-free
+            cp `which unrar` venv/bin/unrar
 
       - save_cache:
           paths:
@@ -75,6 +79,8 @@ jobs:
             pip install -r requirements.txt
             pip install -r dev-requirements.txt
             pip install -r dev-requirements-extras.txt
+            sudo apt-get install unrar-free
+            cp `which unrar` venv/bin/unrar
 
       - save_cache:
           paths:
@@ -104,6 +110,8 @@ jobs:
             pip install -r requirements.txt
             pip install -r dev-requirements.txt
             pip install -r dev-requirements-extras.txt
+            sudo apt-get install unrar-free
+            cp `which unrar` venv/bin/unrar
 
       - save_cache:
           paths:
@@ -122,5 +130,6 @@ workflows:
   test:
     jobs:
       - "test-py27"
+      - "test-py33"
       - "test-py34"
       - "test-py35"
