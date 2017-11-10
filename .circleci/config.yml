@@ -27,7 +27,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            py.test --cov flexget --cov-report xml -n 3
+            py.test --cov flexget --cov-report xml -n 6
 
   test-py33:
     docker:
@@ -56,7 +56,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            py.test --cov flexget --cov-report xml -n 3
+            py.test --cov flexget --cov-report xml -n 6
 
   test-py34:
     docker:
@@ -85,7 +85,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            py.test --cov flexget --cov-report xml -n 3
+            py.test --cov flexget --cov-report xml -n 6
 
   test-py35:
     docker:
@@ -114,7 +114,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            py.test --cov flexget --cov-report xml -n 3
+            py.test --cov flexget --cov-report xml -n 6
 
 
 workflows:
