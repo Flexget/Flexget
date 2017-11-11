@@ -172,7 +172,7 @@ jobs:
             # If either of the new branches are not fast forwards, the push will be rejected
             git push origin test_release circleci
             # Make sure our branches push before pushing tag
-            git push --tags
+            # git push --tags
 
 
 workflows:
