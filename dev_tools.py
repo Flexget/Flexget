@@ -97,7 +97,7 @@ def bundle_webui():
         if os.path.exists(app_path):
             shutil.rmtree(app_path)
         ui_v2_artifacts = 'https://circleci.com/api/v1.1/project/github/Flexget/webui/latest/artifacts' \
-                          '?circle-token=%s&branch=develop&filter=successful' % os.getenv('CIRCLE_TOKEN')
+                          '?circle-token=%s&branch=develop&filter=successful' % os.getenv('CIRCLE_API_TOKEN')
 
         r = requests.get(ui_v2_artifacts, headers={'Accept': 'application/json', 'User-Agent': 'curl/7.54.0', 'Accept-Encoding': 'test'})
         artifacts = r.json()
