@@ -127,6 +127,12 @@ jobs:
       - image: flexget/cci-python:3.5
     steps:
       - add-ssh-keys
+      - run:
+          name: Setup Git
+          command: |
+            git config --global user.email ${GIT_EMAIL}
+            git config --global user.name ${GIT_USERNAME}
+
       - checkout
       - restore_cache:
           keys:
@@ -155,7 +161,7 @@ jobs:
 
             # Build and upload to pypi.
             python setup.py sdist bdist_wheel --universal
-            twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+            #twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
             # We are working on a detached head, we'll point the branches to the right commits at the end
             # Commit and tag released version
