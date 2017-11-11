@@ -1,7 +1,7 @@
 FlexGet CI/CD
 =============
 
-`FlexGet`_ uses CircleCI for testing, building and deploying FlexGet.
+FlexGet uses CircleCI for testing, building and deploying FlexGet.
 
 Images
 =======
