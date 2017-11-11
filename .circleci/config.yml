@@ -201,18 +201,6 @@ workflows:
             - "test-py34"
             - "test-py35"
 
-  manual-build-test-and-deploy:
-    jobs:
-      - deploy:
-          filters:
-            branches:
-              only: circleci
-          requires:
-            - "test-py27"
-            - "test-py33"
-            - "test-py34"
-            - "test-py35"
-
 notify:
   webhooks:
     # gitter hook
