@@ -190,7 +190,7 @@ workflows:
           filters:
             branches:
               only:
-                - develop
+                - circleci
     jobs:
       - deploy:
           requires:
