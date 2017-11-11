@@ -5,6 +5,14 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 class TestTorrentMatch(object):
     config = """
         tasks:
+          test_multi_torrent_empty_name:
+            mock:
+              - {title: 'torrent1', file: 'torrent_match_test_torrents/torrent1_empty_name.torrent'}
+            accept_all: yes
+            torrent_match:
+              what:
+                - mock:
+                    - {title: 'torrent1', location: 'torrent_match_test_dir/torrent1'}
           test_single_torrent:
             mock:
               - {title: 'torrent1', file: 'torrent_match_test_torrents/torrent1.mkv.torrent'}
@@ -55,6 +63,12 @@ class TestTorrentMatch(object):
               max_size_difference: 5%
 
     """
+
+    def test_multi_torrent_empty_name(self, execute_task):
+        task = execute_task('test_multi_torrent_empty_name')
+
+        assert len(task.accepted) == 1, 'Should have accepted torrent1.mkv'
+        assert task.accepted[0]['path'] == 'torrent_match_test_dir/torrent1'
 
     def test_single_torrent(self, execute_task):
         task = execute_task('test_single_torrent')
