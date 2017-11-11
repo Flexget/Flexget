@@ -122,6 +122,58 @@ jobs:
             . venv/bin/activate
             python-codacy-coverage -r coverage.xml
 
+  deploy:
+    docker:
+      - image: flexget/cci-python:3.5
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - py35-dependencies-{{ checksum "dev-requirements.txt" }}
+          - py35-dependencies- # fallback to using the latest cache if no exact match is found
+      - run:
+          name: Install Dependencies
+          command: |
+            virtualenv venv
+            . venv/bin/activate
+            pip install -r dev-requirements.txt
+      - save_cache:
+          paths:
+            - ./venv
+          key: py35-dependencies-{{ checksum "dev-requirements.txt" }}
+      - run:
+          name: Do Release
+          command: |
+            . venv/bin/activate
+            # Bump to new release version
+            python dev_tools.py bump_version release
+            export VERSION=`python dev_tools.py version`
+
+            # TODO Get latest webui build
+
+            # Build and upload to pypi.
+            python setup.py sdist bdist_wheel --universal
+            twine upload --repository testpypi dist/*
+
+            # We are working on a detached head, we'll point the branches to the right commits at the end
+            # Commit and tag released version
+            git add flexget/_version.py
+            git commit -m "v$VERSION"
+            git tag -a -f "$VERSION" -m "$VERSION release"
+
+            # Bump to new dev version, then commit again
+            python dev_tools.py bump_version dev
+            git add flexget/_version.py
+            git commit -m "Prepare v`python dev_tools.py version`"
+            git branch -f circleci HEAD
+
+            # master branch should be at the release we tagged
+            git branch -f test_release $VERSION
+            # If either of the new branches are not fast forwards, the push will be rejected
+            git push origin test_release circleci
+            # Make sure our branches push before pushing tag
+            git push --tags
+
 
 workflows:
   version: 2
@@ -131,7 +183,21 @@ workflows:
       - "test-py33"
       - "test-py34"
       - "test-py35"
-
+  build-test-and-deploy:
+    triggers:
+      - schedule:
+          cron: "0 2 * * *"
+          filters:
+            branches:
+              only:
+                - develop
+    jobs:
+      - deploy:
+          requires:
+            - "test-py27"
+            - "test-py33"
+            - "test-py34"
+            - "test-py35"
 
 notify:
   webhooks:
