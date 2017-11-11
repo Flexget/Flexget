@@ -177,13 +177,15 @@ jobs:
 
 workflows:
   version: 2
-  tests:
+
+  run-tests:
     jobs:
       - "test-py27"
       - "test-py33"
       - "test-py34"
       - "test-py35"
-  build-test-and-deploy:
+
+  auto-build-test-and-deploy:
     triggers:
       - schedule:
           cron: "0 2 * * *"
@@ -193,6 +195,18 @@ workflows:
                 - circleci
     jobs:
       - deploy:
+          requires:
+            - "test-py27"
+            - "test-py33"
+            - "test-py34"
+            - "test-py35"
+
+  manual-build-test-and-deploy:
+    jobs:
+      - deploy:
+          filters:
+            branches:
+              only: circleci
           requires:
             - "test-py27"
             - "test-py33"
