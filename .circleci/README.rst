@@ -23,7 +23,7 @@ Build the updated image::
     docker build -t flexget/cci-python:<version> <folder>
 
 
-**# Step 3 - Push to dockerhub*
+**# Step 3 - Push to dockerhub**
 You will require access to https://hub.docker.com/u/flexget/dashboard/
 
 Login and push the image to DockerHub::
