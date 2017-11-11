@@ -149,7 +149,8 @@ jobs:
             python dev_tools.py bump_version release
             export VERSION=`python dev_tools.py version`
 
-            # TODO Get latest webui build
+            # Package WebUI
+            python dev_tools.py bundle_webui
 
             # Build and upload to pypi.
             python setup.py sdist bdist_wheel --universal
