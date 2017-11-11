@@ -36,6 +36,7 @@ Manual Deploy
 -------------
 The deploy/release job can be manually triggered if required.
 
-**WARNING: Manually triggering the deploy job WILL NOT ensure tests are passing**
+**WARNING: Manually triggering the deploy job WILL NOT ensure tests are passing**::
 
-    curl -u ${CIRCLE_API_TOKEN} -d build_parameters[CIRCLE_JOB]=deploy https://circleci.com/api/v1.1/project/github/Flexget/Flexget/tree/develop
+    curl -u ${CIRCLE_API_TOKEN} -d "build_parameters[CIRCLE_JOB]=deploy" https://circleci.com/api/v1.1/project/github/Flexget/Flexget/tree/develop
+
