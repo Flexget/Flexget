@@ -86,12 +86,16 @@ class TorrentMatch(object):
                 os.chdir(location)
                 entry['files_root'] = os.path.basename(location)
                 # traverse the file tree
+                if entry['title'] == 'torrent2':
+                    log.info('bleh')
                 for root, _, files in os.walk('.'):
-                    stripped_root = root.lstrip('.')  # remove the dot
+                    # we only need to iterate over files
                     for f in files:
-                        file_path = os.path.join(stripped_root, f)
-                        entry['files'].append(TorrentMatchFile(os.path.join(entry['files_root'], file_path),
-                                                               os.path.getsize(file_path)))
+                        file_path = os.path.join(root, f)
+                        # We need normpath to strip out the dot
+                        abs_file_path = os.path.normpath(os.path.join(entry['files_root'], file_path))
+
+                        entry['files'].append(TorrentMatchFile(abs_file_path, os.path.getsize(file_path)))
 
         # restore the working directory
         os.chdir(cwd)
@@ -136,9 +140,12 @@ class TorrentMatch(object):
                 torrent_files.append(TorrentMatchFile(path, item['size']))
 
             for local_entry in local_entries:
+                log.debug("Checking local entry %s against %s", local_entry['title'], entry['title'])
+                if local_entry['title'] == entry['title']:
+                    log.info('match')
                 local_files = local_entry['files']
 
-                # skip root dir of the local entry if torrent is single file or if name_in_path is false
+                # skip root dir of the local entry if torrent is single file
                 skip_root_dir = not entry['torrent'].is_multi_file and local_entry['files_root']
 
                 matches = 0
@@ -170,6 +177,8 @@ class TorrentMatch(object):
                         entry['path'] = os.path.dirname(local_entry['location'])
 
                     log.debug('Torrent %s matched path %s', entry['title'], entry['path'])
+                    # TODO keep searching for even better matches?
+                    break
 
         for entry in set(task.accepted).difference(matched_entries):
             entry.reject('No local files matched {}% of the torrent size'.format(100 - max_size_difference))
