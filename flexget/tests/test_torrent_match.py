@@ -100,6 +100,6 @@ class TestTorrentMatch(object):
 
     def test_with_filesystem(self, execute_task):
         task = execute_task('test_with_filesystem')
-        assert len(task.all_entries) == 3, 'There should be three torrent files, thus three entries'
-        assert len(task.accepted) == 3, 'Should have accepted multi_file_with_diff and torrent1.mkv and torrent2 ' \
-                                        'because their sizes are within the allowed threshold'
+        assert len(task.all_entries) == 4, 'There should be three torrent files, thus three entries'
+        assert len(task.accepted) == 4, 'Should have accepted multi_file_with_diff, torrent1.mkv, torrent2 and ' \
+                                        'torrent1 because their sizes are within the allowed threshold'
