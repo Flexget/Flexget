@@ -161,7 +161,7 @@ jobs:
 
             # Build and upload to pypi.
             python setup.py sdist bdist_wheel --universal
-            #twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+            twine upload dist/*
 
             # We are working on a detached head, we'll point the branches to the right commits at the end
             # Commit and tag released version
@@ -175,11 +175,11 @@ jobs:
             git commit -m "Prepare v`python dev_tools.py version`"
 
             # master branch should be at the release we tagged
-            git branch -f test_release $VERSION
+            git branch -f master $VERSION
             # If either of the new branches are not fast forwards, the push will be rejected
-            git push origin test_release circleci
+            git push origin master develop
             # Make sure our branches push before pushing tag
-            # git push --tags
+            git push --tags
 
 
 workflows:
