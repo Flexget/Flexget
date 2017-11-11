@@ -128,6 +128,7 @@ class TorrentMatch(object):
                 log.debug('Skipping entry %s as it is not a torrent file', entry['title'])
                 continue
 
+            # Find all files and file sizes in the .torrent.
             torrent_files = []
             for item in entry['torrent'].get_filelist():
                 # if torrent is a multi_file, prepend the name
@@ -137,6 +138,7 @@ class TorrentMatch(object):
 
                 torrent_files.append(TorrentMatchFile(path, item['size']))
 
+            # Iterate over the files/dirs from the  what  plugins
             for local_entry in local_entries:
                 log.debug("Checking local entry %s against %s", local_entry['title'], entry['title'])
 
@@ -148,6 +150,7 @@ class TorrentMatch(object):
                 matches = 0
                 missing_size = 0
                 total_size = 0
+                # Look for matches in the files from the .torrent
                 for f in torrent_files:
                     for local_file in local_files:
                         # remove the root dir from the local path
