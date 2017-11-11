@@ -173,7 +173,6 @@ jobs:
             python dev_tools.py bump_version dev
             git add flexget/_version.py
             git commit -m "Prepare v`python dev_tools.py version`"
-            git branch -f circleci HEAD
 
             # master branch should be at the release we tagged
             git branch -f test_release $VERSION
