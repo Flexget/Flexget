@@ -1,9 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 import logging
+import sys
 
 from flexget.utils.tools import parse_timedelta
 from flexget.utils.qualities import Quality
@@ -134,8 +136,11 @@ class PluginSortByWeight(object):
             min_value = Quality()
         elif isinstance(value, bool):
             min_value = False
-        elif isinstance(value, datetime):
-            min_value = datetime.now()  # assume date comparision vs now()
+        elif isinstance(value, date):
+            if type(value) is datetime:
+                min_value = datetime.now()  # assume date comparision vs now()
+            else:
+                min_value = date.today()
         elif isinstance(value, timedelta):
             min_value = timedelta(0)
         return min_value
@@ -145,46 +150,70 @@ class PluginSortByWeight(object):
         if config[key].get('upper_limit'):
             limit = config[key]['upper_limit']
             # auto handle datetime
-            if isinstance(value, datetime) and isinstance(limit, timedelta):
-                if config[key]['inverse'] is True:
-                    if (datetime.now() - limit) > value:
-                        value = datetime.now() - limit
+            if isinstance(value, date) and isinstance(limit, timedelta):
+                if type(value) is datetime:
+                    now = datetime.now()
                 else:
-                    if (datetime.now() + limit) < value:
-                        value = datetime.now() + limit
+                    now = date.today()
+                if config[key]['inverse'] is True:
+                    if (now - limit) > value:
+                        value = now - limit
+                else:
+                    if (now + limit) < value:
+                        value = now + limit
             elif value > limit:
                 value = limit
         return value
 
     def _calc_stride_delta(self, key, entries, config):
         delta = None
-        stride = None
+        stride = DEFAULT_STRIDE
+        max_entry = None
 
-        lower_default = self._get_lower_limit(entries[0][key])
-        max_entry = max(entries, key=lambda e, k=key, d=lower_default: e.get(k, d))
-        min_entry = min(entries, key=lambda e, k=key, d=lower_default: e.get(k, d))
+        first_valid_entry = next((e for e in entries if key in e), None)
+        lower_default = self._get_lower_limit(first_valid_entry[key])
+        try:
+            max_entry = max(entries, key=lambda e, k=key, d=lower_default: e.get(k, d))
+        except TypeError:
+            # handle mixed datetime and date
+            if isinstance(lower_default, date):
+                fixed_entries = list(entries)
+                for entry in fixed_entries:
+                    if key in entry and type(entry[key]) is date:
+                        entry[key] = datetime.combine(entry[key], datetime.min.time()) # convert to datetime
+                    # update default
+                    first_valid_entry = next((e for e in fixed_entries if key in e), None)
+                    lower_default = self._get_lower_limit(first_valid_entry[key])
+                    max_entry = max(fixed_entries, key=lambda e, k=key, d=lower_default: e.get(k, d))  # try again
+
+        if max_entry is None:
+            return stride, delta
+
         max_value = max_entry[key]
         max_value = self._limit_value(key, max_value, config)
-        min_value = min_entry[key]
-        try:
-            min_value = min(min_value, lower_default)  # try normalize to natural lower bound
-        except Exception as ex:
-            log.debug('Incompatible min_value op: %s' % ex)
+        min_value = self._get_lower_limit(max_value)
+        value_range = max_value - min_value  # exception handled outside (Quality)
 
-        value_range = max_value - min_value
-        if value_range:
-            if 'delta_distance' in config[key]:
-                delta = config[key]['delta_distance']
-                stride = value_range / delta
-                if isinstance(stride, timedelta):
-                    stride = stride.days
-            else:
-                delta = value_range / DEFAULT_STRIDE
+        if not value_range:
+            return stride, delta
+
+        if isinstance(value_range, timedelta):
+            value_range = int(value_range.days)  # convert to int
+
+        if 'delta_distance' in config[key]:
+            delta = config[key]['delta_distance']
+            if isinstance(delta, timedelta):
+                delta = int(delta.days)  # convert to int
+            stride = value_range / delta
+        else:
+            delta = value_range / DEFAULT_STRIDE
+
         return stride, delta
 
     def calc_weights(self, entries, config):
         for key in config:
-            if key not in entries[0]:
+            first_valid_entry = next((e for e in entries if key in e), None)
+            if not first_valid_entry:
                 continue
             # stride = max / delta
             # step = max_weight / stride
@@ -196,9 +225,13 @@ class PluginSortByWeight(object):
             except Exception as ex:
                 delta = None
                 log.warning('Could not calculate stride for key: %s, type: %s, using fallback sort. Error: %s',
-                            key, type(entries[0][key]), ex)
-                lower_default = self._get_lower_limit(entries[0][key])
-                entries.sort(key=lambda e, k=key,d=lower_default: e.get(k, d), reverse=True)
+                            key, type(first_valid_entry[key]), ex)
+                try:
+                    lower_default = self._get_lower_limit(first_valid_entry[key])
+                    entries.sort(key=lambda e, k=key, d=lower_default: e.get(k, d), reverse=True)
+                except TypeError:
+                    log.error('Incompatible fallback sort types detected, skipping key: %s')
+                    continue
             if not stride:
                 stride = DEFAULT_STRIDE
             max_weight = config[key]['weight']
@@ -209,6 +242,8 @@ class PluginSortByWeight(object):
             for entry in entries:
                 if ENTRY_WEIGHT_FIELD_NAME not in entry:
                     entry[ENTRY_WEIGHT_FIELD_NAME] = 0
+                if key not in entry or entry[key] is None:
+                    continue
 
                 value = entry[key]
                 value = self._limit_value(key, value, config)
@@ -220,17 +255,15 @@ class PluginSortByWeight(object):
                     weight = max_weight
 
                 if delta:
+                    if isinstance(value, date):
+                        value = int((value - self._get_lower_limit(value)).days)  # value can get negative!
+                    elif isinstance(value, timedelta):
+                        value = int(value.days)
                     try:
                         weight = (value / delta) * weight_step
-                    except Exception:
-                        try:
-                            # convert value to distance from minimum
-                            value_normalized = abs(value - self._get_lower_limit(value))
-                            weight = (value_normalized / delta) * weight_step
-                        except Exception as ex:
-                            log.warning('Skipping entry: %s, could not calc weight for key: %s, error: %s',
-                                        entry, key, ex)
-                            continue
+                    except Exception as ex:
+                        log.warning('Skipping entry: %s, could not calc weight for key: %s, error: %s', entry, key, ex)
+                        continue
                     current_value = value
                 elif value < current_value:
                     weight = weight - weight_step
@@ -250,8 +283,8 @@ class PluginSortByWeight(object):
             if isinstance(arg, timedelta):
                 short_args.append(arg.days)
             elif isinstance(arg, datetime):
-                date = arg.date()
-                short_args.append('%s-%s-%s' % (date.year, date.month, date.day))
+                thedate = arg.date()
+                short_args.append('%s-%s-%s' % (thedate.year, thedate.month, thedate.day))
             elif isinstance(arg, Quality):
                 quality_string = '[ %s ]-%s-%s, [ %s ]' % (arg.resolution, arg.source, arg.codec, arg.audio)
                 if quality_string not in short_args:
