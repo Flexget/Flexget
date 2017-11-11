@@ -86,8 +86,6 @@ class TorrentMatch(object):
                 os.chdir(location)
                 entry['files_root'] = os.path.basename(location)
                 # traverse the file tree
-                if entry['title'] == 'torrent2':
-                    log.info('bleh')
                 for root, _, files in os.walk('.'):
                     # we only need to iterate over files
                     for f in files:
@@ -141,8 +139,7 @@ class TorrentMatch(object):
 
             for local_entry in local_entries:
                 log.debug("Checking local entry %s against %s", local_entry['title'], entry['title'])
-                if local_entry['title'] == entry['title']:
-                    log.info('match')
+
                 local_files = local_entry['files']
 
                 # skip root dir of the local entry if torrent is single file
