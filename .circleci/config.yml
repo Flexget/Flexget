@@ -154,7 +154,7 @@ jobs:
 
             # Build and upload to pypi.
             python setup.py sdist bdist_wheel --universal
-            twine upload --repository testpypi dist/*
+            twine upload  --repository-url https://test.pypi.org/legacy/ dist/*
 
             # We are working on a detached head, we'll point the branches to the right commits at the end
             # Commit and tag released version
