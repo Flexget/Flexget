@@ -16,6 +16,9 @@ class TorrentMatchFile(object):
         self.path = path
         self.size = size
 
+    def __repr__(self):
+        return "%s(path=%s, size=%s)" % (self.__class__.__name__, str(self.path), self.size)
+
 
 class TorrentMatch(object):
     """TODO"""
