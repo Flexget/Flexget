@@ -188,7 +188,7 @@ def bencode(data):
     if isinstance(data, dict):
         return encode_dictionary(data)
 
-    raise TypeError
+    raise TypeError('Unknown type for bencode: ' + str(type(data)))
 
 
 class Torrent(object):
@@ -305,6 +305,20 @@ class Torrent(object):
     @comment.setter
     def comment(self, comment):
         self.content['comment'] = comment
+        self.modified = True
+
+    @property
+    def piece_size(self):
+        return int(self.content['info']['piece length'])
+
+    @property
+    def libtorrent_resume(self):
+        return self.content.get('libtorrent_resume', {})
+
+    def set_libtorrent_resume(self, chunks, files):
+        self.content['libtorrent_resume'] = {}
+        self.content['libtorrent_resume']['bitfield'] = chunks
+        self.content['libtorrent_resume']['files'] = files
         self.modified = True
 
     def remove_multitracker(self, tracker):
