@@ -426,14 +426,13 @@ def split_title_year(title):
 
 def get_latest_flexget_version_number():
     """
-    Return latest Flexget version from http://download.flexget.com/latestversion
+    Return latest Flexget version from https://pypi.python.org/pypi/FlexGet/json
     """
     try:
-        page = requests.get('http://download.flexget.com/latestversion')
+        data = requests.get('https://pypi.python.org/pypi/FlexGet/json').json()
+        return data.get('info', {}).get('version')
     except requests.RequestException:
         return
-    ver = page.text.strip()
-    return ver
 
 
 def get_current_flexget_version():
