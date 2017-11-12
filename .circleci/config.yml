@@ -201,6 +201,10 @@ workflows:
               only:
                 - circleci
     jobs:
+      - "test-py27"
+      - "test-py33"
+      - "test-py34"
+      - "test-py35"
       - deploy:
           requires:
             - "test-py27"
