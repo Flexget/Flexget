@@ -638,7 +638,10 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                 files = []
 
                 for f in entry['torrent'].get_filelist():
-                    file_path = os.path.join(base, os.path.join(f['path'], f['name']))
+                    relative_file_path = os.path.join(f['path'], f['name'])
+                    if entry['torrent'].is_multi_file:
+                        relative_file_path = os.path.join(entry['torrent'].name, relative_file_path)
+                    file_path = os.path.join(base, relative_file_path)
                     # TODO should it simply add the torrent anyway?
                     if not os.path.exists(file_path) and not os.path.isfile(file_path):
                         entry.fail('Not a local file. Cannot add fast resume data.')
