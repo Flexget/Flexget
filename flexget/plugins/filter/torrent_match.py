@@ -148,7 +148,8 @@ class TorrentMatch(object):
                 local_files = local_entry['files']
 
                 # skip root dir of the local entry if torrent is single file
-                skip_root_dir = not entry['torrent'].is_multi_file and local_entry['files_root']
+                has_root_dir = entry['torrent'].is_multi_file and entry['torrent'].name
+                skip_root_dir = not has_root_dir and local_entry['files_root']
 
                 matches = 0
                 missing_size = 0

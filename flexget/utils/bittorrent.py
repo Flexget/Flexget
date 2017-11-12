@@ -254,10 +254,7 @@ class Torrent(object):
     @property
     def is_multi_file(self):
         """Return True if the torrent is a multi-file torrent"""
-        # A torrent is technically multi-file if it has the 'files' dict, but if the 'name' attribute is empty and
-        # there is only a single file in 'files', then we consider it single-file
-        return 'files' in self.content['info'] and (self.content['info']['name'] or
-                                                    len(self.content['info']['files']) > 1)
+        return 'files' in self.content['info']
 
     @property
     def name(self):
