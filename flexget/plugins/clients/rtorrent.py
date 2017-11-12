@@ -638,12 +638,13 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                 files = []
 
                 for f in entry['torrent'].get_filelist():
+                    file_path = os.path.join(base, os.path.join(f['path'], f['name']))
                     # TODO should it simply add the torrent anyway?
-                    if not os.path.exists(f['path']):
+                    if not os.path.exists(file_path) and not os.path.isfile(file_path):
                         entry.fail('Not a local file. Cannot add fast resume data.')
                         return
                     # cannot bencode floats, so we need to coerce to int
-                    mtime = int(os.path.getmtime(os.path.join(base, f['path'])))
+                    mtime = int(os.path.getmtime(file_path))
                     files.append({'priority': 0, 'mtime': mtime})
 
                 entry['torrent'].set_libtorrent_resume(chunks, files)
