@@ -222,13 +222,17 @@ class NextSeriesEpisodes(object):
             elif db_release:
                 # There are know releases of this episode, but none were accepted
                 return
-            elif latest and identified_by == 'ep' and (
-                            entry['series_season'] == latest.season and entry['series_episode'] == latest.number + 1):
-                # We searched for next predicted episode of this season unsuccessfully, try the next season
-                self.rerun_entries.append(self.search_entry(series, latest.season + 1, 1, task))
-                log.debug('%s %s not found, rerunning to look for next season' %
-                          (entry['series_name'], entry['series_id']))
-                task.rerun(plugin='next_series_episodes', reason='Look for next season')
+            elif latest:
+                if latest.is_season:
+                    # A season pack was picked up in the task, no need to look for more episodes
+                    return
+                elif identified_by == 'ep' and \
+                        (entry['series_season'] == latest.season and entry['series_episode'] == latest.number + 1):
+                    # We searched for next predicted episode of this season unsuccessfully, try the next season
+                    self.rerun_entries.append(self.search_entry(series, latest.season + 1, 1, task))
+                    log.debug('%s %s not found, rerunning to look for next season' %
+                              (entry['series_name'], entry['series_id']))
+                    task.rerun(plugin='next_series_episodes', reason='Look for next season')
 
 
 @event('plugin.register')
