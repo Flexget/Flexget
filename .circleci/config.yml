@@ -204,7 +204,7 @@ workflows:
           filters:
             branches:
               only:
-                - circleci
+                - develop
     jobs:
       - "test-py27"
       - "test-py33"
