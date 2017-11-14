@@ -644,10 +644,11 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                     file_path = os.path.join(base, relative_file_path)
                     # TODO should it simply add the torrent anyway?
                     if not os.path.exists(file_path) and not os.path.isfile(file_path):
-                        entry.fail('Not a local file. Cannot add fast resume data.')
+                        entry.fail('%s does not exist. Cannot add fast resume data.' % file_path)
                         return
                     # cannot bencode floats, so we need to coerce to int
                     mtime = int(os.path.getmtime(file_path))
+                    # priority 0 should be "don't download"
                     files.append({'priority': 0, 'mtime': mtime})
 
                 entry['torrent'].set_libtorrent_resume(chunks, files)
