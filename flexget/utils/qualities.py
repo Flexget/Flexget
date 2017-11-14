@@ -24,7 +24,7 @@ class QualityComponent(object):
         :param defaults: An iterable defining defaults for other quality components if this component matches.
         """
 
-        if type not in ['resolution', 'source', 'codec', 'audio'] + _custom_components.keys():
+        if type not in ['resolution', 'source', 'codec', 'audio'] + list(_custom_components.keys()):
             raise ValueError('%s is not a valid quality component type.' % type)
         self.type = type
         self.value = value
