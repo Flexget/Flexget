@@ -7,7 +7,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils import qualities
 
-log = logging.getLogger('convert_magnet')
+log = logging.getLogger('custom_quality')
 
 
 class CustomQuality(object):
