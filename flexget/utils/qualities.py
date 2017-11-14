@@ -8,6 +8,8 @@ import logging
 
 log = logging.getLogger('utils.qualities')
 
+_custom_components = {}
+
 
 class QualityComponent(object):
     """"""
@@ -22,7 +24,7 @@ class QualityComponent(object):
         :param defaults: An iterable defining defaults for other quality components if this component matches.
         """
 
-        if type not in ['resolution', 'source', 'codec', 'audio']:
+        if type not in ['resolution', 'source', 'codec', 'audio'] + _custom_components.keys():
             raise ValueError('%s is not a valid quality component type.' % type)
         self.type = type
         self.value = value
@@ -189,7 +191,7 @@ _UNKNOWNS = {
 '''
 
 _registry = {}
-for items in (_resolutions, _sources, _codecs, _audios):
+for items in (_resolutions, _sources, _codecs, _audios, _custom_components):
     for item in items:
         _registry[item.name] = item
 
@@ -226,6 +228,11 @@ class Quality(object):
         self.source = self._find_best(_sources, _UNKNOWNS['source'])
         self.codec = self._find_best(_codecs, _UNKNOWNS['codec'])
         self.audio = self._find_best(_audios, _UNKNOWNS['audio'])
+
+        for name, qualities in _custom_components.items():
+            default_quality = QualityComponent(name, 0, 'unknown')
+            setattr(self, name, self._find_best(_custom_components[name], default_quality))
+
         # If any of the matched components have defaults, set them now.
         for component in self.components:
             for default in component.defaults:
@@ -253,17 +260,23 @@ class Quality(object):
 
     @property
     def name(self):
-        name = ' '.join(str(p) for p in (self.resolution, self.source, self.codec, self.audio) if p.value != 0)
+        name = ' '.join(str(p) for p in (self.resolution, self.source, self.codec, self.audio) +
+                        tuple(self.custom_components) if p.value != 0)
         return name or 'unknown'
 
     @property
     def components(self):
-        return [self.resolution, self.source, self.codec, self.audio]
+        # TODO lexicographical ordering maybe doesn't make sense anymore?
+        return self.custom_components + [self.resolution, self.source, self.codec, self.audio]
 
     @property
     def _comparator(self):
         modifier = sum(c.modifier for c in self.components if c.modifier)
         return [modifier] + self.components
+
+    @property
+    def custom_components(self):
+        return [getattr(self, name) for name in _custom_components.keys()]
 
     def __contains__(self, other):
         if isinstance(other, basestring):
