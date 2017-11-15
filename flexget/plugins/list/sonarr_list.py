@@ -245,8 +245,9 @@ class SonarrSet(MutableSet):
     def add(self, entry):
         if not self._find_entry(entry):
             show = self.add_show(entry)
-            self._shows = None
-            log.verbose('Successfully added show %s to Sonarr', show['title'])
+            if show:
+                self._shows = None
+                log.verbose('Successfully added show %s to Sonarr', show['title'])
         else:
             log.debug('entry %s already exists in Sonarr list', entry)
 
