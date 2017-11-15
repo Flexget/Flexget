@@ -339,6 +339,9 @@ class RTorrent(object):
 
         return result
 
+    def get_directory(self):
+        return self._server.get_directory()
+
     def torrent(self, info_hash, fields=None):
         """ Get the details of a torrent """
         info_hash = native_str(info_hash)
@@ -417,8 +420,7 @@ class RTorrentPluginBase(object):
     def _build_options(self, config, entry, entry_first=True):
         options = {}
 
-        for opt_key in ('path', 'message', 'priority',
-                        'custom1', 'custom2', 'custom3', 'custom4', 'custom5'):
+        for opt_key in ('path', 'message', 'priority', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5'):
             # Values do not merge config with task
             # Task takes priority then config is used
             entry_value = entry.get(opt_key)
@@ -485,6 +487,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             'custom3': {'type': 'string'},
             'custom4': {'type': 'string'},
             'custom5': {'type': 'string'},
+            'fast_resume': {'type': 'boolean', 'default': False}
         },
         'required': ['uri'],
         'additionalProperties': False,
@@ -528,7 +531,10 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                     entry.fail("failed to render properties %s" % str(e))
                     continue
 
-                self.add_entry(client, entry, options, start=config['start'], mkdir=config['mkdir'])
+                # fast_resume is not really an rtorrent option so it's not in _build_options
+                fast_resume = entry.get('fast_resume', config['fast_resume'])
+                self.add_entry(client, entry, options, start=config['start'], mkdir=config['mkdir'],
+                               fast_resume=fast_resume)
 
             info_hash = entry.get('torrent_info_hash')
 
@@ -598,7 +604,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             entry.fail('Failed to update: %s' % str(e))
             return
 
-    def add_entry(self, client, entry, options, start=True, mkdir=False):
+    def add_entry(self, client, entry, options, start=True, mkdir=False, fast_resume=False):
 
         if 'torrent_info_hash' not in entry:
             entry.fail('missing torrent_info_hash')
@@ -621,6 +627,34 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                 entry.fail("Downloaded temp file '%s' is not a torrent file" % entry['file'])
                 return
 
+            # Modify the torrent with resume data if needed
+            if fast_resume:
+                base = options.get('directory')
+                if not base:
+                    base = client.get_directory()
+
+                piece_size = entry['torrent'].piece_size
+                chunks = int((entry['torrent'].size + piece_size - 1) / piece_size)
+                files = []
+
+                for f in entry['torrent'].get_filelist():
+                    relative_file_path = os.path.join(f['path'], f['name'])
+                    if entry['torrent'].is_multi_file:
+                        relative_file_path = os.path.join(entry['torrent'].name, relative_file_path)
+                    file_path = os.path.join(base, relative_file_path)
+                    # TODO should it simply add the torrent anyway?
+                    if not os.path.exists(file_path) and not os.path.isfile(file_path):
+                        entry.fail('%s does not exist. Cannot add fast resume data.' % file_path)
+                        return
+                    # cannot bencode floats, so we need to coerce to int
+                    mtime = int(os.path.getmtime(file_path))
+                    # priority 0 should be "don't download"
+                    files.append({'priority': 0, 'mtime': mtime})
+
+                entry['torrent'].set_libtorrent_resume(chunks, files)
+                # Since we modified the torrent, we need to write it to entry['file'] again
+                with open(entry['file'], 'wb+') as f:
+                    f.write(entry['torrent'].encode())
             try:
                 with open(entry['file'], 'rb') as f:
                     torrent_raw = f.read()
