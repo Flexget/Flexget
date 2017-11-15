@@ -1,4 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+
+from functools import partial
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
@@ -50,9 +53,15 @@ class PluginTmdbLookup(object):
         'movie_name': 'name',
         'movie_year': 'year'}
 
-    schema = {'type': 'boolean'}
+    schema = {'oneOf': [
+        {'type': 'boolean'},
+        {'type': 'object',
+         'properties': {
+             'language': {'type': 'string', 'default': 'en'}
+         }}
+    ]}
 
-    def lazy_loader(self, entry):
+    def lazy_loader(self, entry, language):
         """Does the lookup for this entry and populates the entry fields."""
         imdb_id = (entry.get('imdb_id', eval_lazy=False) or
                    imdb.extract_id(entry.get('imdb_url', eval_lazy=False)))
@@ -61,25 +70,29 @@ class PluginTmdbLookup(object):
                 movie = lookup(smart_match=entry['title'],
                                tmdb_id=entry.get('tmdb_id', eval_lazy=False),
                                imdb_id=imdb_id,
+                               language=language,
                                session=session)
                 entry.update_using_map(self.field_map, movie)
         except LookupError:
             log_once('TMDB lookup failed for %s' % entry['title'], log, logging.WARN)
 
-    def lookup(self, entry):
+    def lookup(self, entry, language):
         """
         Populates all lazy fields to an Entry. May be called by other plugins
         requiring tmdb info on an Entry
 
         :param entry: Entry instance
         """
-        entry.register_lazy_func(self.lazy_loader, self.field_map)
+        lazy_func = partial(self.lazy_loader, language=language)
+        entry.register_lazy_func(lazy_func, self.field_map)
 
     def on_task_metainfo(self, task, config):
         if not config:
             return
+        language = config['language'] if not isinstance(config, bool) else 'en'
+
         for entry in task.entries:
-            self.lookup(entry)
+            self.lookup(entry, language)
 
     @property
     def movie_identifier(self):

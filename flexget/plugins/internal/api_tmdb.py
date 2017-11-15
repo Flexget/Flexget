@@ -259,7 +259,8 @@ class ApiTmdb(object):
 
     @staticmethod
     @with_session
-    def lookup(title=None, year=None, tmdb_id=None, imdb_id=None, smart_match=None, only_cached=False, session=None):
+    def lookup(title=None, year=None, tmdb_id=None, imdb_id=None, smart_match=None, only_cached=False, session=None,
+               language=None):
         """
         Do a lookup from TMDb for the movie matching the passed arguments.
 
@@ -272,6 +273,7 @@ class ApiTmdb(object):
         :param unicode smart_match: attempt to clean and parse title and year from a string
         :param bool only_cached: if this is specified, an online lookup will not occur if the movie is not in the cache
         session: optionally specify a session to use, if specified, returned Movie will be live in that session
+        :param language: Specify title lookup language
         :param session: sqlalchemy Session in which to do cache lookups/storage. commit may be called on a passed in
             session. If not supplied, a session will be created automatically.
 
@@ -349,6 +351,8 @@ class ApiTmdb(object):
                 searchparams = {'query': title}
                 if year:
                     searchparams['year'] = year
+                if language:
+                    searchparams['language'] = language
                 try:
                     results = tmdb_request('search/movie', **searchparams)
                 except requests.RequestException as e:
