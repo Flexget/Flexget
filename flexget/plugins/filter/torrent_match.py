@@ -82,20 +82,17 @@ class TorrentMatch(object):
             entry['files'] = []
 
             if os.path.isfile(location):
-                entry['files_root'] = ''
-                entry['files'].append(TorrentMatchFile(os.path.basename(location), os.path.getsize(location)))
+                entry['files'].append(TorrentMatchFile(location, os.path.getsize(location)))
             else:
                 # change working dir to make things simpler
                 os.chdir(location)
-                entry['files_root'] = os.path.basename(location)
                 # traverse the file tree
                 for root, _, files in os.walk('.'):
                     # we only need to iterate over files
                     for f in files:
                         file_path = os.path.join(root, f)
                         # We need normpath to strip out the dot
-                        abs_file_path = os.path.normpath(os.path.join(entry['files_root'], file_path))
-
+                        abs_file_path = os.path.normpath(os.path.join(location, file_path))
                         entry['files'].append(TorrentMatchFile(abs_file_path, os.path.getsize(file_path)))
 
         # restore the working directory
@@ -149,40 +146,59 @@ class TorrentMatch(object):
 
                 # skip root dir of the local entry if torrent is single file
                 has_root_dir = entry['torrent'].is_multi_file and entry['torrent'].name
-                skip_root_dir = not has_root_dir and local_entry['files_root']
 
-                matches = 0
-                missing_size = 0
-                total_size = 0
-                # Look for matches in the files from the .torrent
-                for f in torrent_files:
+                if not has_root_dir:  # single-file
+                    torrent_file = torrent_files[0]
                     for local_file in local_files:
-                        # remove the root dir from the local path
-                        local_path = local_file.path
-                        if skip_root_dir:
-                            local_path = os.path.relpath(local_path, local_entry['files_root'])
-                        # if f == local_file, break out of inner loop and increment match counter
-                        # we force sizes to be exact
-                        if f.path == local_path and f.size == local_file.size:
-                            matches += 1
+                        if torrent_file.path in local_file.path and torrent_file.size == local_file.size:
+                            if os.path.basename(torrent_file.path) in local_entry['location']:
+                                entry['path'] = os.path.dirname(local_entry['location'])
+                            else:
+                                entry['path'] = local_entry['location']
+                            matched_entries.add(entry)
                             break
                     else:
-                        missing_size += f.size
-                    total_size += f.size
+                        log.debug('Single-file: No match found for %s', torrent_files[0].path)
+                    continue
+                else:
+                    matches = 0
+                    missing_size = 0
+                    total_size = 0
+                    path = ''
 
-                size_difference = missing_size / total_size * 100
-                # we allow torrents that either match entirely or if the total size difference is below some threshold
-                if matches == len(torrent_files) or max_size_difference >= size_difference:
-                    matched_entries.add(entry)
-                    # set the path of the torrent entry
-                    if skip_root_dir:
-                        entry['path'] = local_entry['location']
-                    else:
-                        entry['path'] = os.path.dirname(local_entry['location'])
+                    candidate_files = []
+                    # Find candidate files ie. files whose path contains the torrent name
+                    for local_file in local_files:
+                        if entry['torrent'].name in local_file.path:
+                            # we need to find the path that contains the torrent name since it's multi-file
+                            if not path:
+                                # attempt to extract path from the absolute file path
+                                path = local_file.path
 
-                    log.debug('Torrent %s matched path %s', entry['title'], entry['path'])
-                    # TODO keep searching for even better matches?
-                    break
+                                while entry['torrent'].name in path:
+                                    path = os.path.dirname(path)
+
+                            candidate_files.append(local_file)
+
+                    for torrent_file in torrent_files:
+                        for candidate in candidate_files:
+                            if torrent_file.path in candidate.path and torrent_file.size == candidate.size:
+                                matches += 1
+                                break
+                        else:
+                            missing_size += torrent_file.size
+                        total_size += torrent_file.size
+
+                    size_difference = missing_size / total_size * 100
+                    # we allow torrents that either match entirely or if the total size difference is below a threshold
+                    if matches == len(torrent_files) or max_size_difference >= size_difference:
+                        matched_entries.add(entry)
+                        # set the path of the torrent entry
+                        entry['path'] = path
+
+                        log.debug('Torrent %s matched path %s', entry['title'], entry['path'])
+                        # TODO keep searching for even better matches?
+                        break
 
         for entry in set(task.accepted).difference(matched_entries):
             entry.reject('No local files matched {}% of the torrent size'.format(100 - max_size_difference))
