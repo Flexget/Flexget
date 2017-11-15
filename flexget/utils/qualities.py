@@ -229,7 +229,7 @@ class Quality(object):
         self.codec = self._find_best(_codecs, _UNKNOWNS['codec'])
         self.audio = self._find_best(_audios, _UNKNOWNS['audio'])
 
-        for name, qualities in _custom_components.items():
+        for name in _custom_components.keys():
             default_quality = QualityComponent(name, 0, 'unknown')
             setattr(self, name, self._find_best(_custom_components[name], default_quality))
 
