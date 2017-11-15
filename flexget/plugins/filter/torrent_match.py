@@ -157,9 +157,6 @@ class TorrentMatch(object):
                                 entry['path'] = local_entry['location']
                             matched_entries.add(entry)
                             break
-                    else:
-                        log.debug('Single-file: No match found for %s', torrent_files[0].path)
-                    continue
                 else:
                     matches = 0
                     missing_size = 0
