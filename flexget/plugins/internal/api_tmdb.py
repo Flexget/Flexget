@@ -5,7 +5,7 @@ import logging
 from datetime import datetime, timedelta
 
 from flexget.manager import Session
-from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime, Date, func, or_
+from sqlalchemy import Table, Column, Integer, String, Float, Unicode, Boolean, DateTime, Date, func, or_
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
@@ -18,7 +18,7 @@ from flexget.utils import requests
 from flexget.utils.database import year_property, with_session, json_synonym
 
 log = logging.getLogger('api_tmdb')
-Base = db_schema.versioned_base('api_tmdb', 5)
+Base = db_schema.versioned_base('api_tmdb', 6)
 
 # This is a FlexGet API key
 API_KEY = 'bdfc018dbdb7c243dc7cb1454ff74b95'
@@ -71,7 +71,7 @@ def tmdb_request(endpoint, **params):
 
 @db_schema.upgrade('api_tmdb')
 def upgrade(ver, session):
-    if ver is None or ver <= 4:
+    if ver is None or ver <= 5:
         raise db_schema.UpgradeImpossible
     return ver
 
@@ -105,13 +105,14 @@ class TMDBMovie(Base):
     budget = Column(Integer)
     revenue = Column(Integer)
     homepage = Column(Unicode)
+    language = Column(String)
     _posters = relation('TMDBPoster', backref='movie', cascade='all, delete, delete-orphan')
     _backdrops = relation('TMDBBackdrop', backref='movie', cascade='all, delete, delete-orphan')
     _genres = relation('TMDBGenre', secondary=genres_table, backref='movies')
     genres = association_proxy('_genres', 'name')
     updated = Column(DateTime, default=datetime.now, nullable=False)
 
-    def __init__(self, id):
+    def __init__(self, id, language):
         """
         Looks up movie on tmdb and creates a new database model for it.
         These instances should only be added to a session via `session.merge`.
@@ -137,6 +138,7 @@ class TMDBMovie(Base):
         self.budget = movie['budget']
         self.revenue = movie['revenue']
         self.homepage = movie['homepage']
+        self.lookup_language = language
         try:
             self.alternative_name = movie['alternative_titles']['titles'][0]['title']
         except (KeyError, IndexError):
@@ -187,7 +189,8 @@ class TMDBMovie(Base):
             'revenue': self.revenue,
             'homepage': self.homepage,
             'genres': [g for g in self.genres],
-            'updated': self.updated
+            'updated': self.updated,
+            'lookup_language': self.lookup_language
         }
 
 
@@ -260,7 +263,7 @@ class ApiTmdb(object):
     @staticmethod
     @with_session
     def lookup(title=None, year=None, tmdb_id=None, imdb_id=None, smart_match=None, only_cached=False, session=None,
-               language=None):
+               language='en'):
         """
         Do a lookup from TMDb for the movie matching the passed arguments.
 
@@ -348,13 +351,11 @@ class ApiTmdb(object):
                     tmdb_id = result['movie_results'][0]['id']
             if not tmdb_id:
                 search_string = title + ' ({})'.format(year) if year else title
-                searchparams = {'query': title}
+                search_params = {'query': title, 'language': language}
                 if year:
-                    searchparams['year'] = year
-                if language:
-                    searchparams['language'] = language
+                    search_params['year'] = year
                 try:
-                    results = tmdb_request('search/movie', **searchparams)
+                    results = tmdb_request('search/movie', **search_params)
                 except requests.RequestException as e:
                     raise LookupError('Error searching for tmdb item {}: {}'.format(search_string, e))
                 if not results['results']:
@@ -362,7 +363,7 @@ class ApiTmdb(object):
                 tmdb_id = results['results'][0]['id']
                 session.add(TMDBSearchResult(search=search_string, movie_id=tmdb_id))
             if tmdb_id:
-                movie = TMDBMovie(id=tmdb_id)
+                movie = TMDBMovie(id=tmdb_id, language=language)
                 movie = session.merge(movie)
             else:
                 raise LookupError('Unable to find movie on tmdb: {}'.format(id_str))
