@@ -10,14 +10,6 @@ from flexget.manager import Session
 from flexget.utils import imdb
 from flexget.utils.log import log_once
 
-try:
-    # TODO: Fix this after api_tmdb has module level functions
-    from flexget.plugins.internal.api_tmdb import ApiTmdb
-
-    lookup = ApiTmdb.lookup
-except ImportError:
-    raise plugin.DependencyError(issued_by='tmdb_lookup', missing='api_tmdb')
-
 log = logging.getLogger('tmdb_lookup')
 
 
@@ -61,6 +53,8 @@ class PluginTmdbLookup(object):
 
     def lazy_loader(self, entry, language):
         """Does the lookup for this entry and populates the entry fields."""
+        lookup = plugin.get_plugin_by_name('api_tmdb').instance.lookup
+
         imdb_id = (entry.get('imdb_id', eval_lazy=False) or
                    imdb.extract_id(entry.get('imdb_url', eval_lazy=False)))
         try:
