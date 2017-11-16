@@ -105,7 +105,7 @@ class TMDBMovie(Base):
     budget = Column(Integer)
     revenue = Column(Integer)
     homepage = Column(Unicode)
-    language = Column(String)
+    lookup_language = Column(String)
     _posters = relation('TMDBPoster', backref='movie', cascade='all, delete, delete-orphan')
     _backdrops = relation('TMDBBackdrop', backref='movie', cascade='all, delete, delete-orphan')
     _genres = relation('TMDBGenre', secondary=genres_table, backref='movies')

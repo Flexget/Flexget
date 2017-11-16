@@ -53,7 +53,7 @@ class ObjectsContainer(object):
             'backdrops': {'type': 'array', 'items': poster_object},
             'genres': {'type': 'array', 'items': {'type': 'string'}},
             'updated': {'type': 'string', 'format': 'date-time'},
-            'lookup_language': {'type': 'string'}
+            'lookup_language': {'type': ['string', 'null']}
         },
         'required': ['id', 'name', 'year', 'original_name', 'alternative_name', 'runtime', 'language',
                      'overview', 'tagline', 'rating', 'votes', 'popularity', 'adult', 'budget', 'revenue', 'homepage',
