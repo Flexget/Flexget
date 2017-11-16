@@ -7,6 +7,44 @@ interactions:
       Connection: [keep-alive]
       User-Agent: [!!python/unicode FlexGet/2.10.110.dev (www.flexget.com)]
     method: GET
+    uri: https://api.themoviedb.org/3/configuration?api_key=bdfc018dbdb7c243dc7cb1454ff74b95
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA3VS0W7bMAz8Fz0HTdcmW5dfGQaBthhbiCwJFOUgLfrvExmnddbtieT5eKTOfDN+
+        ggGLObyZDgraSsEczMicD9utfnvgyXUPiYYtb/PWbEzBvhLav+jlv/wO+pOjlG3xrzLplzk/Pz62
+        D+cfLxq+PWlM5AcfIZjfGxPSkFb83V54P5+Uvd9peFFsUdprWCvkVBhppfHP7p2C1+5lnTsRSkcf
+        8Msm1/bx+7O0rxsK+xC+Dl3v+kl/35h+hDigPeFF+eBq4MYBT9YBo6ShJHuK6RwtFK3bsyKwn9Gy
+        54ACdj4NBHm8aE48OtC0ugFFr4eiAYn90fetO0Xpa+MJevEpwqRKPWGb62wn/a04t+AatChi9iU5
+        2WvJbKxTh7QCqMa22CScIyHqmXi3riYtB4xIzQbNSIcPFQvbwkBSjWnC3A6qpcuRSuK6q1poxtUF
+        leUlIJ8TnczNY9unGplk75vp+s51rRYKMCPNXp+bgVhUc4AebTpadVSBxPKr2hCnBEqu9uJlm6Sm
+        3CFThuh1vztYVrrChAGbH9d0xlhFotm3uFfaxxQ/kk+nl5pwqAEUyOmE0a4taSZylYRhCD6K3u2p
+        TBBL+LgBnm+W8kyte8kvWbizd5husbST/QP844lDMQQAAA==
+    headers:
+      access-control-allow-origin: ['*']
+      access-control-expose-headers: ['ETag, X-RateLimit-Limit, X-RateLimit-Remaining,
+          X-RateLimit-Reset, Retry-After']
+      cache-control: ['public, max-age=36000']
+      connection: [keep-alive]
+      content-encoding: [gzip]
+      content-length: ['490']
+      content-type: [application/json;charset=utf-8]
+      date: ['Thu, 16 Nov 2017 08:52:03 GMT']
+      etag: [W/"acd3a349fca1f788ac931639278ad061"]
+      server: [openresty]
+      vary: [Accept-Encoding]
+      x-ratelimit-limit: ['40']
+      x-ratelimit-remaining: ['36']
+      x-ratelimit-reset: ['1510822324']
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.10.110.dev (www.flexget.com)]
+    method: GET
     uri: https://api.themoviedb.org/3/search/movie?query=the+matrix+reloaded&api_key=bdfc018dbdb7c243dc7cb1454ff74b95&year=2003
   response:
     body:
@@ -34,12 +72,12 @@ interactions:
       content-encoding: [gzip]
       content-length: ['787']
       content-type: [application/json;charset=utf-8]
-      date: ['Thu, 16 Nov 2017 08:38:19 GMT']
+      date: ['Thu, 16 Nov 2017 08:52:04 GMT']
       server: [openresty]
       vary: [Accept-Encoding]
       x-ratelimit-limit: ['40']
-      x-ratelimit-remaining: ['36']
-      x-ratelimit-reset: ['1510821507']
+      x-ratelimit-remaining: ['35']
+      x-ratelimit-reset: ['1510822324']
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -84,16 +122,16 @@ interactions:
       content-encoding: [gzip]
       content-length: ['1227']
       content-type: [application/json;charset=utf-8]
-      date: ['Thu, 16 Nov 2017 08:38:19 GMT']
+      date: ['Thu, 16 Nov 2017 08:52:04 GMT']
       etag: [W/"c6bef503ee6ec9c4436db769b8e397bd"]
       server: [openresty]
       vary: [Accept-Encoding]
       x-memc: [HIT]
-      x-memc-age: ['12017']
-      x-memc-expires: ['16783']
+      x-memc-age: ['12842']
+      x-memc-expires: ['15958']
       x-memc-key: [6c5eaea2c5d3a505bbca693c69330026]
       x-ratelimit-limit: ['40']
-      x-ratelimit-remaining: ['35']
-      x-ratelimit-reset: ['1510821507']
+      x-ratelimit-remaining: ['39']
+      x-ratelimit-reset: ['1510822334']
     status: {code: 200, message: OK}
 version: 1

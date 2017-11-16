@@ -29,13 +29,13 @@ interactions:
       content-encoding: [gzip]
       content-length: ['490']
       content-type: [application/json;charset=utf-8]
-      date: ['Thu, 16 Nov 2017 08:38:17 GMT']
+      date: ['Thu, 16 Nov 2017 08:51:54 GMT']
       etag: [W/"acd3a349fca1f788ac931639278ad061"]
       server: [openresty]
       vary: [Accept-Encoding]
       x-ratelimit-limit: ['40']
       x-ratelimit-remaining: ['39']
-      x-ratelimit-reset: ['1510821507']
+      x-ratelimit-reset: ['1510822324']
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -158,12 +158,12 @@ interactions:
       content-encoding: [gzip]
       content-length: ['5674']
       content-type: [application/json;charset=utf-8]
-      date: ['Thu, 16 Nov 2017 08:38:17 GMT']
+      date: ['Thu, 16 Nov 2017 08:51:55 GMT']
       server: [openresty]
       vary: [Accept-Encoding]
       x-ratelimit-limit: ['40']
       x-ratelimit-remaining: ['38']
-      x-ratelimit-reset: ['1510821507']
+      x-ratelimit-reset: ['1510822324']
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -201,16 +201,16 @@ interactions:
       content-encoding: [gzip]
       content-length: ['807']
       content-type: [application/json;charset=utf-8]
-      date: ['Thu, 16 Nov 2017 08:38:18 GMT']
+      date: ['Thu, 16 Nov 2017 08:51:56 GMT']
       etag: [W/"115d24baf5383f824cd1eee26684b9a6"]
       server: [openresty]
       vary: [Accept-Encoding]
       x-memc: [HIT]
-      x-memc-age: ['3695']
-      x-memc-expires: ['25105']
+      x-memc-age: ['4513']
+      x-memc-expires: ['24287']
       x-memc-key: [61a5da09f0788273b2abb997d6ca8f93]
       x-ratelimit-limit: ['40']
       x-ratelimit-remaining: ['37']
-      x-ratelimit-reset: ['1510821507']
+      x-ratelimit-reset: ['1510822324']
     status: {code: 200, message: OK}
 version: 1
