@@ -122,6 +122,41 @@ jobs:
             . venv/bin/activate
             python-codacy-coverage -r coverage.xml
 
+  test-py36:
+    docker:
+      - image: flexget/cci-python:3.6
+    environment:
+      - VCR_RECORD_MODE=none
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - py36-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+          - py36-deps- # fallback to using the latest cache if no exact match is found
+      - run:
+          name: Install Dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+            pip install -r dev-requirements.txt
+            pip install -r dev-requirements-extras.txt
+      - save_cache:
+          paths:
+            - ./venv
+          key: py36-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+      - run:
+          name: Run Tests
+          command: |
+            . venv/bin/activate
+            py.test --cov flexget --cov-report xml -n 6
+      - run:
+          name: Coverage to Codacy
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            python-codacy-coverage -r coverage.xml
+
   deploy:
     docker:
       - image: flexget/cci-python:3.5
