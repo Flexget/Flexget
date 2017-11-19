@@ -894,6 +894,8 @@ class Manager(object):
             log.info('Running database cleanup.')
             with Session() as session:
                 fire_event('manager.db_cleanup', self, session)
+            # Try to VACUUM after cleanup
+            fire_event('manager.db_vacuum', self)
             # Just in case some plugin was overzealous in its cleaning, mark the config changed
             self.config_changed()
             self.persist['last_cleanup'] = datetime.now()
