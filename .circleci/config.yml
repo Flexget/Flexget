@@ -231,6 +231,7 @@ workflows:
       - "test-py33"
       - "test-py34"
       - "test-py35"
+      - "test-py36"
 
   auto-build-test-and-deploy:
     triggers:
@@ -245,12 +246,14 @@ workflows:
       - "test-py33"
       - "test-py34"
       - "test-py35"
+      - "test-py36"
       - deploy:
           requires:
             - "test-py27"
             - "test-py33"
             - "test-py34"
             - "test-py35"
+            - "test-py36"
 
 notify:
   webhooks:
