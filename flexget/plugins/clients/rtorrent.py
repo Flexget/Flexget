@@ -513,6 +513,11 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
     @plugin.priority(135)
     def on_task_output(self, task, config):
+
+        if len(task.accepted) == 0:
+            # Nothing to do
+            return
+
         client = self.get_client(task, config)
 
         for entry in task.accepted:
