@@ -548,8 +548,8 @@ class ParsedSerie(ABCMeta(native_str('ParsedSerieABCMeta'), (ParsedVideo,), {}))
     @property
     def pack_identifier(self):
         """Return a combined identifier for the whole pack if this has more than one episode."""
-        # Currently only supports ep mode
-        if self.id_type == 'ep' and isinstance(self.episode, list):
+        # Currently only supports ep mode 
+        if self.id_type == 'ep' and isinstance(self.episode, list): # when guessit returns a list..
             return 'S%02dE%02d-E%02d' % (self.season, self.episode[0], self.episode[-1])
         elif self.id_type == 'ep' and self.episodes > 1:
             return 'S%02dE%02d-E%02d' % (self.season, self.episode, self.episode + self.episodes - 1)
