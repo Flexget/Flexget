@@ -452,7 +452,7 @@ class RTorrentPluginBase(object):
 
         return options
 
-    def on_task_start(self, task, config):
+    def get_client(self, task, config):
         try:
             client = RTorrent(os.path.expanduser(config['uri']),
                               username=config.get('username'),
@@ -513,11 +513,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
     @plugin.priority(135)
     def on_task_output(self, task, config):
-        client = RTorrent(os.path.expanduser(config['uri']),
-                          username=config.get('username'),
-                          password=config.get('password'),
-                          digest_auth=config['digest_auth'],
-                          session=task.requests)
+        client = self.get_client(task, config)
 
         for entry in task.accepted:
 
@@ -721,11 +717,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
     }
 
     def on_task_input(self, task, config):
-        client = RTorrent(os.path.expanduser(config['uri']),
-                          username=config.get('username'),
-                          password=config.get('password'),
-                          digest_auth=config['digest_auth'],
-                          session=task.requests)
+        client = self.get_client(task, config)
 
         fields = config.get('fields')
 
