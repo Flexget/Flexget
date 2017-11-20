@@ -1,0 +1,389 @@
+interactions:
+  - request:
+      body: !!python/unicode '<?xml version=''1.0''?>
+
+        <methodCall>
+
+        <methodName>LogIn</methodName>
+
+        <params>
+
+        <param>
+
+        <value><string></string></value>
+
+        </param>
+
+        <param>
+
+        <value><string></string></value>
+
+        </param>
+
+        <param>
+
+        <value><string>eng</string></value>
+
+        </param>
+
+        <param>
+
+        <value><string>subliminal v2.0</string></value>
+
+        </param>
+
+        </params>
+
+        </methodCall>
+
+        '
+      headers:
+        Accept-Encoding: [gzip]
+        Content-Length: ['317']
+        Content-Type: [text/xml]
+        User-Agent: [xmlrpclib.py/1.0.1 (by www.pythonware.com)]
+      method: POST
+      uri: https://api.opensubtitles.org/xml-rpc
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4yQwQrCMAyGX2Xs7lr1opBVEPHg0IkI7tpt2Zyu7Vjb4eOL0olOD56SkC8f5IfF
+          TdReh62ulAz9cUB9D2Wm8kqWoW9NMZr5CwYCzVnlB9SNkhoZNLzlQrvKoOO1RQbatDYzD1qk2DKQ
+          XCAz6ooSyLN/AytZsuOani5dJJZF1HDaJZsk3m2zYrVP50AcA8TdkN76YdeGG6t/6yeUenH0twkz
+          JfOhKlc2rZHRgNIpEDd9m0j/+mvjkiF9UmQQ4R0AAP//AwDw3HWbeQEAAA==
+      headers:
+        access-control-allow-headers: ['Origin,X-Requested-With,Content-Type,Accept,DNT,Keep-Alive,User-Agent,If-Modified-Since,Cache-Control']
+        access-control-allow-methods: ['GET, POST, OPTIONS']
+        access-control-allow-origin: ['*']
+        age: ['0']
+        cf-ray: [3c0ef915cce697f2-FRA]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [text/xml;charset=UTF-8]
+        date: ['Mon, 20 Nov 2017 22:51:16 GMT']
+        download-quota: ['200']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d4c1f0de72f2a10acfa427f34493f6cac1511218276; expires=Tue,
+            20-Nov-18 22:51:16 GMT; path=/; domain=.opensubtitles.org; HttpOnly',
+          'PHPSESSID=TF0WjvKmBfKpa0vXJXONMcfDPb9; expires=Tue, 21-Nov-2017 04:51:16
+            GMT; Max-Age=21600; path=/; domain=.opensubtitles.org; HttpOnly']
+        vary: [Accept-Encoding]
+        x-cache: [MISS]
+        x-cache-backend: [web2]
+        x-compressed-content-length: ['208']
+        x-content-encoding: [gzip]
+        x-uncompressed-content-length: ['377']
+      status: {code: 200, message: OK}
+  - request:
+      body: !!python/unicode '<?xml version=''1.0''?>
+
+        <methodCall>
+
+        <methodName>SearchSubtitles</methodName>
+
+        <params>
+
+        <param>
+
+        <value><string>TF0WjvKmBfKpa0vXJXONMcfDPb9</string></value>
+
+        </param>
+
+        <param>
+
+        <value><array><data>
+
+        <value><struct>
+
+        <member>
+
+        <name>sublanguageid</name>
+
+        <value><string>eng</string></value>
+
+        </member>
+
+        <member>
+
+        <name>tag</name>
+
+        <value><string>series.mkv</string></value>
+
+        </member>
+
+        </struct></value>
+
+        <value><struct>
+
+        <member>
+
+        <name>query</name>
+
+        <value><string>dev flexget</string></value>
+
+        </member>
+
+        <member>
+
+        <name>sublanguageid</name>
+
+        <value><string>eng</string></value>
+
+        </member>
+
+        </struct></value>
+
+        </data></array></value>
+
+        </param>
+
+        </params>
+
+        </methodCall>
+
+        '
+      headers:
+        Accept-Encoding: [gzip]
+        Content-Length: ['641']
+        Content-Type: [text/xml]
+        User-Agent: [xmlrpclib.py/1.0.1 (by www.pythonware.com)]
+      method: POST
+      uri: https://api.opensubtitles.org/xml-rpc
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA3yQTQrCQAxGr1K6txldKaTpAVwI3iDtRC10Zsr8FL29VKaiFVyFxxceyYfN3QzF
+          JD70ztbltlJlIbZzurfXukzxstmXDaGReHP6LGF0NgjhyJ5NyJNw4iEJYYg+dXHeNq14QstGKESO
+          KSC84GOzt1faKVWcjggZEXIMi+HLpDnyysPe84NwToAQMv7XBOmc1euLtEvtIKQqpQ4ImX5NsPz4
+          TnIFsFQCq66eAAAA//8DACeHz2xiAQAA
+      headers:
+        access-control-allow-headers: ['Origin,X-Requested-With,Content-Type,Accept,DNT,Keep-Alive,User-Agent,If-Modified-Since,Cache-Control']
+        access-control-allow-methods: ['GET, POST, OPTIONS']
+        access-control-allow-origin: ['*']
+        age: ['0']
+        cf-ray: [3c0ef9163d6e97f2-FRA]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [text/xml;charset=UTF-8]
+        date: ['Mon, 20 Nov 2017 22:51:16 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d4c1f0de72f2a10acfa427f34493f6cac1511218276; expires=Tue,
+            20-Nov-18 22:51:16 GMT; path=/; domain=.opensubtitles.org; HttpOnly',
+          'PHPSESSID=TF0WjvKmBfKpa0vXJXONMcfDPb9; expires=Tue, 21-Nov-2017 04:51:16
+            GMT; Max-Age=21600; path=/; domain=.opensubtitles.org; HttpOnly']
+        vary: [Accept-Encoding]
+        x-cache: [MISS]
+        x-cache-backend: [web3]
+        x-compressed-content-length: ['190']
+        x-content-encoding: [gzip]
+        x-uncompressed-content-length: ['354']
+      status: {code: 200, message: OK}
+  - request:
+      body: !!python/unicode '<?xml version=''1.0''?>
+
+        <methodCall>
+
+        <methodName>SearchSubtitles</methodName>
+
+        <params>
+
+        <param>
+
+        <value><string>TF0WjvKmBfKpa0vXJXONMcfDPb9</string></value>
+
+        </param>
+
+        <param>
+
+        <value><array><data>
+
+        <value><struct>
+
+        <member>
+
+        <name>sublanguageid</name>
+
+        <value><string>eng</string></value>
+
+        </member>
+
+        <member>
+
+        <name>tag</name>
+
+        <value><string>movie.mkv</string></value>
+
+        </member>
+
+        </struct></value>
+
+        <value><struct>
+
+        <member>
+
+        <name>query</name>
+
+        <value><string>dev flexget</string></value>
+
+        </member>
+
+        <member>
+
+        <name>sublanguageid</name>
+
+        <value><string>eng</string></value>
+
+        </member>
+
+        </struct></value>
+
+        </data></array></value>
+
+        </param>
+
+        </params>
+
+        </methodCall>
+
+        '
+      headers:
+        Accept-Encoding: [gzip]
+        Content-Length: ['640']
+        Content-Type: [text/xml]
+        User-Agent: [xmlrpclib.py/1.0.1 (by www.pythonware.com)]
+      method: POST
+      uri: https://api.opensubtitles.org/xml-rpc
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA3yQTQrCQAxGr1K6txl14yJND+BC8AZpJ2qhM1Pmp+jtpTIVreAqPL7wSD5s7mYo
+          JvGhd7Yut5UqC7Gd07291mWKl82hbAiNxJvTZwmjs0EIR/ZsQp6EEw9JCEP0qYvztmnFE1o2QiFy
+          TAHhBR+bvb3STqnidETIiJBjWAxfJs2RVx72nh+EcwKEkPG/JkjnrF5fpF1qByFVKbVHyPRrguXH
+          d5IrgKUSWHX1BAAA//8DAAAFJMxiAQAA
+      headers:
+        access-control-allow-headers: ['Origin,X-Requested-With,Content-Type,Accept,DNT,Keep-Alive,User-Agent,If-Modified-Since,Cache-Control']
+        access-control-allow-methods: ['GET, POST, OPTIONS']
+        access-control-allow-origin: ['*']
+        age: ['0']
+        cf-ray: [3c0ef9172e4c97f2-FRA]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [text/xml;charset=UTF-8]
+        date: ['Mon, 20 Nov 2017 22:51:17 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d4c1f0de72f2a10acfa427f34493f6cac1511218276; expires=Tue,
+            20-Nov-18 22:51:16 GMT; path=/; domain=.opensubtitles.org; HttpOnly',
+          'PHPSESSID=TF0WjvKmBfKpa0vXJXONMcfDPb9; expires=Tue, 21-Nov-2017 04:51:17
+            GMT; Max-Age=21600; path=/; domain=.opensubtitles.org; HttpOnly']
+        vary: [Accept-Encoding]
+        x-cache: [MISS]
+        x-cache-backend: [web5]
+        x-compressed-content-length: ['190']
+        x-content-encoding: [gzip]
+        x-uncompressed-content-length: ['354']
+      status: {code: 200, message: OK}
+  - request:
+      body: !!python/unicode '<?xml version=''1.0''?>
+
+        <methodCall>
+
+        <methodName>LogOut</methodName>
+
+        <params>
+
+        <param>
+
+        <value><string>TF0WjvKmBfKpa0vXJXONMcfDPb9</string></value>
+
+        </param>
+
+        </params>
+
+        </methodCall>
+
+        '
+      headers:
+        Accept-Encoding: [gzip]
+        Content-Length: ['177']
+        Content-Type: [text/xml]
+        User-Agent: [xmlrpclib.py/1.0.1 (by www.pythonware.com)]
+      method: POST
+      uri: https://api.opensubtitles.org/xml-rpc
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA2SPwQrCMBBEf6Xkbjf25GG7/QAPgn+QNmstNEnJJsXPFyUVradhmOExg93DzdXK
+          UabgW3WstarYD8FOfmxVTrfDSXWEjtM92CvLErww4WKicVKUcDVzZkJJMQ/p1XY9R0JvHJMkk7Ig
+          vM1Xc/IjNVpXlzNCsQglho3wS+IheLtH2ZD7mUnXWjcIxf2TYBv3Scp22L7A7uQTAAD//wMA+fBq
+          MxsBAAA=
+      headers:
+        access-control-allow-headers: ['Origin,X-Requested-With,Content-Type,Accept,DNT,Keep-Alive,User-Agent,If-Modified-Since,Cache-Control']
+        access-control-allow-methods: ['GET, POST, OPTIONS']
+        access-control-allow-origin: ['*']
+        age: ['0']
+        cf-ray: [3c0ef9179ebd97f2-FRA]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [text/xml;charset=UTF-8]
+        date: ['Mon, 20 Nov 2017 22:51:17 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d07c81d564a64d99bab18a13e3ce9edc21511218277; expires=Tue,
+            20-Nov-18 22:51:17 GMT; path=/; domain=.opensubtitles.org; HttpOnly',
+          'PHPSESSID=TF0WjvKmBfKpa0vXJXONMcfDPb9; expires=Tue, 21-Nov-2017 04:51:17
+            GMT; Max-Age=21600; path=/; domain=.opensubtitles.org; HttpOnly']
+        vary: [Accept-Encoding]
+        x-cache: [MISS]
+        x-cache-backend: [web2]
+        x-compressed-content-length: ['171']
+        x-content-encoding: [gzip]
+        x-uncompressed-content-length: ['283']
+      status: {code: 200, message: OK}
+  - request:
+      body: !!python/unicode '<?xml version=''1.0''?>
+
+        <methodCall>
+
+        <methodName>close</methodName>
+
+        <params>
+
+        </params>
+
+        </methodCall>
+
+        '
+      headers:
+        Accept-Encoding: [gzip]
+        Content-Length: ['99']
+        Content-Type: [text/xml]
+        User-Agent: [xmlrpclib.py/1.0.1 (by www.pythonware.com)]
+      method: POST
+      uri: https://api.opensubtitles.org/xml-rpc
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA2SPTQqDMBCFrxKyr4nQRQvjeIJueoNoRiuYieRHevxSiaW1q+HxPj7mQft0s1gp
+          xMlzI+tKS0Hcezvx2MichtNFtgiO0sPbO8XFcySExQTjYrkIq5kzIcQUcp/etOsoILBxhDGZlCOo
+          LXyRE4941ldx29SCfRKDz2xBlRJUgdXu+/VS79kexdbnbibUldY1qJL+TWp/9dOUJWpfpg6TXwAA
+          AP//AwD3ES06KQEAAA==
+      headers:
+        access-control-allow-headers: ['Origin,X-Requested-With,Content-Type,Accept,DNT,Keep-Alive,User-Agent,If-Modified-Since,Cache-Control']
+        access-control-allow-methods: ['GET, POST, OPTIONS']
+        access-control-allow-origin: ['*']
+        age: ['0']
+        cf-ray: [3c0ef9182f8597f2-FRA]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [text/xml;charset=UTF-8]
+        date: ['Mon, 20 Nov 2017 22:51:17 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d07c81d564a64d99bab18a13e3ce9edc21511218277; expires=Tue,
+            20-Nov-18 22:51:17 GMT; path=/; domain=.opensubtitles.org; HttpOnly']
+        vary: [Accept-Encoding]
+        x-cache: [MISS]
+        x-cache-backend: [web3]
+        x-compressed-content-length: ['178']
+        x-content-encoding: [gzip]
+        x-uncompressed-content-length: ['297']
+      status: {code: 200, message: OK}
+version: 1

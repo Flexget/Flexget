@@ -31,7 +31,11 @@ class GuessitParsedEntry(ParsedEntry):
 
     @property
     def parsed_group(self):
-        return self._guess_result.get('release_group')
+        release_group = self._guess_result.get('release_group')
+        if isinstance(release_group, list):
+            return " ".join(release_group)
+        else:
+            return release_group
 
     @property
     def parsed_type(self):
@@ -245,6 +249,8 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
     @property
     def episode(self):
         episode = self._guess_result.get('episode')
+        if isinstance(episode, list):
+            episode = episode[0]
         if episode is None and 'part' in self._guess_result and not self.date:
             return self._guess_result.get('part')
         if episode is None and self.title:
