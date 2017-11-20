@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import pytest
@@ -143,6 +143,9 @@ class TestSeriesParser(object):
 
         s = parse(name='Something', data='Something - Ep VIII')
         assert (s.season == 1 and s.episode == 8), 'failed to parse %s' % s
+
+        s = parse(name='Something', data='Something - E01')
+        assert (s.season == 1 and s.episode == 1), 'failed to parse %s' % s
 
     def test_season_episode_of_total(self, parse):
         """SeriesParser: season X YofZ"""
@@ -376,7 +379,7 @@ class TestSeriesParser(object):
                 # There's nothing that can be done with those failing cases with the
                 # current
                 # "grab leftmost occurrence of highest quality-like thing" algorithm.
-                if int(mock_ep1) >= int(mock_ep2):
+                if int(mock_ep1) >= int(mock_ep2) or int(mock_ep2) > 999:
                     continue
 
                 s = parse('FooBar - %s %s-FlexGet' % (mock_ep1, quality2.name), name='FooBar')
@@ -604,3 +607,12 @@ class TestSeriesParser(object):
         assert s.episode == 14
         assert s.quality.name == '720p hdtv h264 aac'
         assert not s.proper, 'detected proper'
+
+    def test_episode_with_season_pack_match_is_not_season_pack(self, parse):
+        """SeriesParser: Github issue #1986, s\d{1} parses as invalid season"""
+        s = parse(name='The Show', data='The.Show.S01E01.eps3.0.some.title.720p.x264-NOGRP')
+        assert s.valid
+        assert not s.season_pack
+        assert s.season == 1
+        assert s.episode == 1
+

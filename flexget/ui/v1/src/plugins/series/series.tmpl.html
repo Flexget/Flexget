@@ -1,0 +1,37 @@
+<div layout="column">
+	<md-toolbar class="md-warn">
+    	<span class="md-toolbar-tools" flex>
+    	Please note that performed operations on this page might not be persistent. Depending on your config, settings might get overriden and data might be recreated.
+    </span>
+	</md-toolbar>
+	<md-toolbar class="md-warn md-hue-3">
+        <div class="md-toolbar-tools operation-toolbar">
+           <md-input-container md-no-float>
+                <input ng-model="vm.searchTerm" ng-change="vm.search()" ng-model-options="{ debounce: 1000 }" placeholder="Search for a show">
+            </md-input-container>
+            <span flex></span>
+            <md-input-container>
+                <md-select ng-model="vm.sortOption" ng-change="vm.getSeries()">
+                    <md-option ng-value="option.small" ng-repeat="option in vm.sortOptions | orderBy: 'nice'">{{ option.nice }}</md-option>
+                </md-select>
+            </md-input-container>
+            <md-button class="md-icon-button" aria-label="Order" ng-click="vm.changeOrder()">
+                <md-icon md-font-icon="fa-chevron-down" class="fa fa-lg" ng-if="vm.order === 'desc'"></md-icon>
+                <md-icon md-font-icon="fa-chevron-up" class="fa fa-lg" ng-if="vm.order === 'asc'"></md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+	<md-content layout="column" flex layout-padding>
+		<div layout="row" layout-wrap layout-padding>
+			<series-entry show="show" 
+				forget-show="vm.forgetShow(show)" 
+				toggle-episodes="vm.toggleEpisodes(show)"
+				layout="row" flex="100" flex-gt-md="50" flex-gt-lg="33" ng-repeat-start="show in vm.series">
+				<span class="show-indicator" ng-if="show == vm.selectedShow"></span>
+			</series-entry>
+			<series-episodes-view ng-repeat-end ng-if="vm.areEpisodesOnShowRow($index)" show="vm.selectedShow" class="series-episodes" hide-episodes="vm.toggleEpisodes(show)">
+			</series-episodes-view>
+		</div>
+	</md-content>
+    <fg-pagination load-data="vm.getSeries(page)" link-header="vm.linkHeader" current-page="vm.currentPage"></fg-pagination>
+</div>

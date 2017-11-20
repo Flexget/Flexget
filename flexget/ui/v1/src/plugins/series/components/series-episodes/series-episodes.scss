@@ -1,0 +1,89 @@
+$episodes-list-backdrop-overlay-color: rgba(0, 0, 0, .65);
+
+.show-indicator {
+    content: '';
+    width: 25px;
+    height: 25px;
+    background-color: #000;
+    transform: rotate(45deg);
+    position: absolute;
+    left: 50%;
+    bottom: -37px;
+}
+
+.series-episodes {
+    position: relative;
+
+    width: 100%;
+    height: auto;
+    padding: 0;
+}
+
+.episodes-list-card {
+    flex: 1 1 0;
+}
+
+
+.episodes-list-card md-card-content {
+    position: relative;
+
+    width: 100%;
+    min-height: 100%;
+
+    padding: 0;
+
+
+
+    justify-content: space-between;
+    flex-flow: column nowrap;
+
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-color: #000;
+
+    .episodes-backdrop-image-shadow {
+        position: absolute;
+
+        top: 0;
+        left: 0;
+
+        background-color: $episodes-list-backdrop-overlay-color;
+        box-shadow: inset 0 0 50px 20px #000;
+        height: 100%;
+        width: 100%;
+    }
+
+    .episodes-list {
+        display: flex;
+        flex-direction: column;
+
+        min-height: 100%;
+        margin: 0 30px;
+
+        color: #fff;
+        background-color: transparent;
+
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        align-content: flex-start;
+
+        series-episodes {
+            color: #fff;
+            background-color: transparent;
+        }
+    }
+
+
+    .hide-episodes-button {
+        position: absolute;
+        top: 0;
+        left: 0;
+        color: #FFF;
+
+        transform: translate(-50%, -50%);
+    }
+}
+
+.episodes-pager > .pagination-group {
+    margin-top: 5px;
+}

@@ -1,0 +1,261 @@
+version: 2
+jobs:
+  test-py27:
+    docker:
+      - image: flexget/cci-python:2.7
+    environment:
+      - VCR_RECORD_MODE=none
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - py27-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+          - py27-deps- # fallback to using the latest cache if no exact match is found
+      - run:
+          name: Install Dependencies
+          command: |
+            virtualenv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+            pip install -r dev-requirements.txt
+            pip install -r dev-requirements-extras.txt
+      - save_cache:
+          paths:
+            - ./venv
+          key: py27-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+      - run:
+          name: Run Tests
+          command: |
+            . venv/bin/activate
+            py.test -n 6
+
+  test-py33:
+    docker:
+      - image: flexget/cci-python:3.3
+    environment:
+      - VCR_RECORD_MODE=none
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - py33-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+          - py33-deps- # fallback to using the latest cache if no exact match is found
+      - run:
+          name: Install Dependencies
+          command: |
+            virtualenv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+            pip install -r dev-requirements.txt
+            pip install -r dev-requirements-extras.txt
+      - save_cache:
+          paths:
+            - ./venv
+          key: py33-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+      - run:
+          name: Run Tests
+          command: |
+            . venv/bin/activate
+            py.test -n 6
+
+  test-py34:
+    docker:
+      - image: flexget/cci-python:3.4
+    environment:
+      - VCR_RECORD_MODE=none
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - py34-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+          - py34-deps- # fallback to using the latest cache if no exact match is found
+      - run:
+          name: Install Dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+            pip install -r dev-requirements.txt
+            pip install -r dev-requirements-extras.txt
+      - save_cache:
+          paths:
+            - ./venv
+          key: py34-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+      - run:
+          name: Run Tests
+          command: |
+            . venv/bin/activate
+            py.test -n 6
+
+  test-py35:
+    docker:
+      - image: flexget/cci-python:3.5
+    environment:
+      - VCR_RECORD_MODE=none
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - py35-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+          - py35-deps- # fallback to using the latest cache if no exact match is found
+      - run:
+          name: Install Dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+            pip install -r dev-requirements.txt
+            pip install -r dev-requirements-extras.txt
+      - save_cache:
+          paths:
+            - ./venv
+          key: py35-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+      - run:
+          name: Run Tests
+          command: |
+            . venv/bin/activate
+            py.test --cov flexget --cov-report xml -n 6
+      - run:
+          name: Coverage to Codacy
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            python-codacy-coverage -r coverage.xml
+
+  test-py36:
+    docker:
+      - image: flexget/cci-python:3.6
+    environment:
+      - VCR_RECORD_MODE=none
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - py36-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+          - py36-deps- # fallback to using the latest cache if no exact match is found
+      - run:
+          name: Install Dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+            pip install -r dev-requirements.txt
+            pip install -r dev-requirements-extras.txt
+      - save_cache:
+          paths:
+            - ./venv
+          key: py36-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+      - run:
+          name: Run Tests
+          command: |
+            . venv/bin/activate
+            py.test --cov flexget --cov-report xml -n 6
+      - run:
+          name: Coverage to Codacy
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            python-codacy-coverage -r coverage.xml
+
+  deploy:
+    docker:
+      - image: flexget/cci-python:3.5
+    steps:
+      - add-ssh-keys
+      - run:
+          name: Setup Git
+          command: |
+            git config --global user.email ${GIT_EMAIL}
+            git config --global user.name ${GIT_USERNAME}
+
+      - checkout
+      - restore_cache:
+          keys:
+          - py35-deps-{{ checksum "dev-requirements.txt" }}
+          - py35-deps- # fallback to using the latest cache if no exact match is found
+      - run:
+          name: Install Dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r dev-requirements.txt
+      - save_cache:
+          paths:
+            - ./venv
+          key: py35-deps-{{ checksum "dev-requirements.txt" }}
+      - run:
+          name: Do Release
+          command: |
+            # Only run if there are new commits
+            if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
+              . venv/bin/activate
+              # Bump to new release version
+              python dev_tools.py bump_version release
+              export VERSION=`python dev_tools.py version`
+
+              # Package WebUI
+              python dev_tools.py bundle_webui
+
+              # Build and upload to pypi.
+              python setup.py sdist bdist_wheel --universal
+              twine upload dist/*
+
+              # We are working on a detached head, we'll point the branches to the right commits at the end
+              # Commit and tag released version
+              git add flexget/_version.py
+              git commit -m "v$VERSION"
+              git tag -a -f "$VERSION" -m "$VERSION release"
+
+              # Bump to new dev version, then commit again
+              python dev_tools.py bump_version dev
+              git add flexget/_version.py
+              git commit -m "Prepare v`python dev_tools.py version`"
+
+              # master branch should be at the release we tagged
+              git branch -f master $VERSION
+              # If either of the new branches are not fast forwards, the push will be rejected
+              git push origin master develop
+              # Make sure our branches push before pushing tag
+              git push --tags
+            else
+              echo "No commits, skipping release"
+            fi
+
+
+workflows:
+  version: 2
+
+  run-tests:
+    jobs:
+      - "test-py27"
+      - "test-py33"
+      - "test-py34"
+      - "test-py35"
+      - "test-py36"
+
+  auto-build-test-and-deploy:
+    triggers:
+      - schedule:
+          cron: "0 2 * * *"
+          filters:
+            branches:
+              only:
+                - develop
+    jobs:
+      - "test-py27"
+      - "test-py33"
+      - "test-py34"
+      - "test-py35"
+      - "test-py36"
+      - deploy:
+          requires:
+            - "test-py27"
+            - "test-py33"
+            - "test-py34"
+            - "test-py35"
+            - "test-py36"
+
+notify:
+  webhooks:
+    # gitter hook
+    - url: https://webhooks.gitter.im/e/c834f258a8dd7abf82de

@@ -1,118 +1,73 @@
 interactions:
-  - request:
-      body: null
-      headers:
-        Content-Type: [application/json]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-        trakt-api-version: [2]
-      method: GET
-      uri: https://api-v2launch.trakt.tv/search?id_type=tvrage&id=36939
-    response:
-      body: {string: "[{\"type\":\"show\",\"score\":null,\"show\":{\"title\":\"The\
-          \ Flash\",\"overview\":\"After a particle accelerator causes a freak storm,\
-          \ CSI Investigator Barry Allen is struck by lightning and falls into a coma.\
-          \ Months later he awakens with the power of super speed, granting him the\
-          \ ability to move through Central City like an unseen guardian angel. Though\
-          \ initially excited by his newfound powers, Barry is shocked to discover\
-          \ he is not the only \\\"meta-human\\\" who was created in the wake of the\
-          \ accelerator explosion \u2013 and not everyone is using their new powers\
-          \ for good. Barry partners with S.T.A.R. Labs and dedicates his life to\
-          \ protect the innocent. For now, only a few close friends and associates\
-          \ know that Barry is literally the fastest man alive, but it won't be long\
-          \ before the world learns what Barry Allen has become... The Flash.\",\"\
-          year\":2014,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\"\
-          :\"https://walter.trakt.us/images/shows/000/060/300/posters/original/79bd96a4d3.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/posters/medium/79bd96a4d3.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/posters/thumb/79bd96a4d3.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/original/df36c9a731.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/medium/df36c9a731.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/thumb/df36c9a731.jpg\"\
-          }},\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"\
-          imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939}}}]"}
-      headers:
-        CF-Cache-Status: [HIT]
-        CF-RAY: [2c4c2a4d8d7404c2-SYD]
-        Cache-Control: ['public, max-age=14400']
-        Connection: [keep-alive]
-        Content-Type: [application/json; charset=utf-8]
-        Date: ['Tue, 19 Jul 2016 06:37:31 GMT']
-        ETag: [W/"8fab3b6ca52723f76fff22da83d66ba3"]
-        Expires: ['Tue, 19 Jul 2016 10:37:31 GMT']
-        Server: [cloudflare-nginx]
-        Set-Cookie: ['__cfduid=d4497541b9ed4965c55738b24b7f88f9e1468910251; expires=Wed,
-            19-Jul-17 06:37:31 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        Vary: [Accept-Encoding]
-        X-Content-Type-Options: [nosniff]
-        X-Frame-Options: [SAMEORIGIN]
-        X-Pagination-Item-Count: ['1']
-        X-Pagination-Limit: ['10']
-        X-Pagination-Page: ['1']
-        X-Pagination-Page-Count: ['1']
-        X-Request-Id: [349f42a0-17ba-46d5-a889-4d2799165942]
-        X-Runtime: ['0.087463']
-        X-XSS-Protection: [1; mode=block]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Content-Type: [application/json]
-        Cookie: [__cfduid=d4497541b9ed4965c55738b24b7f88f9e1468910251]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-        trakt-api-version: [2]
-      method: GET
-      uri: https://api-v2launch.trakt.tv/shows/60300?extended=full%2Cimages
-    response:
-      body: {string: "{\"title\":\"The Flash\",\"year\":2014,\"ids\":{\"trakt\":60300,\"\
-          slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\"\
-          :60735,\"tvrage\":36939},\"overview\":\"After a particle accelerator causes\
-          \ a freak storm, CSI Investigator Barry Allen is struck by lightning and\
-          \ falls into a coma. Months later he awakens with the power of super speed,\
-          \ granting him the ability to move through Central City like an unseen guardian\
-          \ angel. Though initially excited by his newfound powers, Barry is shocked\
-          \ to discover he is not the only \\\"meta-human\\\" who was created in the\
-          \ wake of the accelerator explosion \u2013 and not everyone is using their\
-          \ new powers for good. Barry partners with S.T.A.R. Labs and dedicates his\
-          \ life to protect the innocent. For now, only a few close friends and associates\
-          \ know that Barry is literally the fastest man alive, but it won't be long\
-          \ before the world learns what Barry Allen has become... The Flash.\",\"\
-          first_aired\":\"2014-10-08T00:00:00.000Z\",\"airs\":{\"day\":\"Tuesday\"\
-          ,\"time\":\"20:00\",\"timezone\":\"America/New_York\"},\"runtime\":44,\"\
-          certification\":\"TV-14\",\"network\":\"The CW\",\"country\":\"us\",\"trailer\"\
-          :\"http://youtube.com/watch?v=aZxhA_Jihmw\",\"homepage\":\"http://www.cwtv.com/shows/the-flash/\"\
-          ,\"status\":\"returning series\",\"rating\":8.33089,\"votes\":10650,\"updated_at\"\
-          :\"2016-07-18T10:46:12.000Z\",\"language\":\"en\",\"available_translations\"\
-          :[\"pl\",\"sv\",\"fr\",\"en\",\"zh\",\"da\",\"pt\",\"el\",\"de\",\"es\"\
-          ,\"bg\",\"it\",\"tr\",\"ru\",\"nl\",\"hu\",\"ko\",\"lt\",\"cs\",\"hr\",\"\
-          bs\",\"za\",\"he\",\"id\",\"ro\",\"fa\",\"th\",\"ar\",\"te\",\"uk\",\"ms\"\
-          ,\"sk\",\"ml\",\"vi\",\"lb\",\"lb\",\"sr\"],\"genres\":[\"drama\",\"fantasy\"\
-          ,\"science-fiction\"],\"aired_episodes\":46,\"images\":{\"fanart\":{\"full\"\
-          :\"https://walter.trakt.us/images/shows/000/060/300/fanarts/original/df36c9a731.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/medium/df36c9a731.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/thumb/df36c9a731.jpg\"\
-          },\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/posters/original/79bd96a4d3.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/posters/medium/79bd96a4d3.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/posters/thumb/79bd96a4d3.jpg\"\
-          },\"logo\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/logos/original/ab151d1043.png\"\
-          },\"clearart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/cleararts/original/660e6efe67.png\"\
-          },\"banner\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/banners/original/b2c305a2dc.jpg\"\
-          },\"thumb\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/thumbs/original/eab955a39c.jpg\"\
-          }}}"}
-      headers:
-        CF-Cache-Status: [HIT]
-        CF-RAY: [2c4c2a4dcd8704c2-SYD]
-        Cache-Control: ['public, max-age=14400']
-        Connection: [keep-alive]
-        Content-Type: [application/json; charset=utf-8]
-        Date: ['Tue, 19 Jul 2016 06:37:31 GMT']
-        ETag: [W/"9e97c23c019af78c7a2757c7ed495f6e"]
-        Expires: ['Tue, 19 Jul 2016 10:37:31 GMT']
-        Last-Modified: ['Mon, 18 Jul 2016 10:46:12 GMT']
-        Server: [cloudflare-nginx]
-        Vary: [Accept-Encoding]
-        X-Content-Type-Options: [nosniff]
-        X-Frame-Options: [SAMEORIGIN]
-        X-Request-Id: [cc30105a-a919-461d-8bd7-a3433e58a655]
-        X-Runtime: ['0.012986']
-        X-XSS-Protection: [1; mode=block]
-      status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/search?id_type=tvrage&id=36939
+  response:
+    body: {string: '[{"type":"show","score":null,"show":{"title":"The Flash","overview":"Barry
+        Allen wakes up nine months after he was struck by lightning and discovers
+        that the bolt gave him the power of super speed. With his new team and powers,
+        Barry becomes \"The Flash\" and fights crime in Central City.","year":2014,"status":"returning
+        series","images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":60300,"slug":"the-flash-2014","tvdb":279121,"imdb":"tt3107288","tmdb":60735,"tvrage":36939}}}]'}
+    headers:
+      CF-Cache-Status: [MISS]
+      CF-RAY: [312a5a47e8743d4f-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 12:24:34 GMT']
+      ETag: [W/"85140a3806e9bf2f8bb7fb3a06a57e6d"]
+      Expires: ['Sat, 17 Dec 2016 20:24:34 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d8d569812d561f5d2fe11d054d32850141481977473; expires=Sun,
+          17-Dec-17 12:24:33 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Pagination-Item-Count: ['1']
+      X-Pagination-Limit: ['10']
+      X-Pagination-Page: ['1']
+      X-Pagination-Page-Count: ['1']
+      X-Request-Id: [68e5eaf3-6031-4014-bedc-78910e59aab5]
+      X-Runtime: ['0.139957']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      Cookie: [__cfduid=d8d569812d561f5d2fe11d054d32850141481977473]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/60300?extended=full
+  response:
+    body: {string: '{"title":"The Flash","year":2014,"ids":{"trakt":60300,"slug":"the-flash-2014","tvdb":279121,"imdb":"tt3107288","tmdb":60735,"tvrage":36939},"overview":"Barry
+        Allen wakes up nine months after he was struck by lightning and discovers
+        that the bolt gave him the power of super speed. With his new team and powers,
+        Barry becomes \"The Flash\" and fights crime in Central City.","first_aired":"2014-10-08T00:00:00.000Z","airs":{"day":"Tuesday","time":"20:00","timezone":"America/New_York"},"runtime":44,"certification":"TV-PG","network":"The
+        CW","country":"us","trailer":"http://youtube.com/watch?v=aZxhA_Jihmw","homepage":"http://www.cwtv.com/shows/the-flash/","status":"returning
+        series","rating":8.31138,"votes":12114,"updated_at":"2016-12-15T11:24:21.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fa","fr","he","hr","hu","id","it","ko","lb","lb","lt","ml","ms","nl","pl","pt","ro","ru","sk","sr","sv","te","th","tr","uk","vi","za","zh"],"genres":["drama","fantasy","science-fiction"],"aired_episodes":55}'}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [312a5a4de95a3d4f-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 12:24:34 GMT']
+      ETag: [W/"8e835f41af0610ff3561129f65477ae1"]
+      Expires: ['Sat, 17 Dec 2016 20:24:34 GMT']
+      Last-Modified: ['Thu, 15 Dec 2016 11:24:21 GMT']
+      Server: [cloudflare-nginx]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [3ca13e1f-fa04-45e4-a386-42d74de015f6]
+      X-Runtime: ['0.023394']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
 version: 1

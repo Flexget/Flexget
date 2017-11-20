@@ -1,15 +1,15 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
 from flexget import options, plugin
-from flexget.event import event
 from flexget.config_schema import register_config_key
-from flexget.utils.tools import MergeException, merge_dict_from_to
+from flexget.event import event
+from flexget.utils.tools import MergeException
 
-log = logging.getLogger('template')
+plugin_name = 'template'
+log = logging.getLogger(plugin_name)
 
 
 class PluginTemplate(object):
@@ -55,12 +55,12 @@ class PluginTemplate(object):
     def prepare_config(self, config):
         if config is None or isinstance(config, bool):
             config = []
-        elif isinstance(config, basestring):
+        elif isinstance(config, str):
             config = [config]
         return config
 
     @plugin.priority(257)
-    def on_task_start(self, task, config):
+    def on_task_prepare(self, task, config):
         if config is False:  # handles 'template: no' form to turn off template on this task
             return
         # implements --template NAME
@@ -108,12 +108,12 @@ class PluginTemplate(object):
 
             # Merge
             try:
-                merge_dict_from_to(template_config, task.config)
+                task.merge_config(template_config)
             except MergeException as exc:
                 raise plugin.PluginError('Failed to merge template %s to task %s. Error: %s' %
                                          (template, task.name, exc.value))
 
-        log.trace('templates: %s' % config)
+        log.trace('templates: %s', config)
 
 
 @event('plugin.register')
@@ -125,7 +125,7 @@ def register_plugin():
 def register_config():
     root_config_schema = {
         'type': 'object',
-        'additionalProperties': plugin.plugin_schemas(context='task')
+        'additionalProperties': plugin.plugin_schemas(interface='task')
     }
     register_config_key('templates', root_config_schema)
 

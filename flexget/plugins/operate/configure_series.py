@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-import hashlib
 import logging
 
 from sqlalchemy import Column, Integer, Unicode
@@ -12,17 +11,9 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import PluginError
 from flexget.plugins.filter.series import FilterSeriesBase
+from flexget.utils.tools import get_config_hash
 
 log = logging.getLogger('configure_series')
-Base = db_schema.versioned_base('import_series', 0)
-
-
-class LastHash(Base):
-    __tablename__ = 'import_series_last_hash'
-
-    id = Column(Integer, primary_key=True)
-    task = Column(Unicode)
-    hash = Column(Unicode)
 
 
 class ConfigureSeries(FilterSeriesBase):
@@ -54,10 +45,11 @@ class ConfigureSeries(FilterSeriesBase):
                 'settings': self.settings_schema,
                 'from': {'$ref': '/schema/plugins?phase=input'}
             },
+            'required': ['from'],
             'additionalProperties': False
         }
 
-    def on_task_start(self, task, config):
+    def on_task_prepare(self, task, config):
 
         series = {}
         for input_name, input_config in config.get('from', {}).items():
@@ -89,24 +81,13 @@ class ConfigureSeries(FilterSeriesBase):
                         else:
                             s[key] = entry['configure_series_' + key]
 
-        # Set the config_modified flag if the list of shows changed since last time
-        new_hash = str(hashlib.md5(str(sorted(series)).encode('utf-8')).hexdigest())
-        with Session() as session:
-            last_hash = session.query(LastHash).filter(LastHash.task == task.name).first()
-            if not last_hash:
-                last_hash = LastHash(task=task.name)
-                session.add(last_hash)
-            if last_hash.hash != new_hash:
-                task.config_changed()
-            last_hash.hash = new_hash
-
         if not series:
             log.info('Did not get any series to generate series configuration')
             return
 
         # Make a series config with the found series
         # Turn our dict of series with settings into a list of one item dicts
-        series_config = {'generated_series': [dict([s]) for s in series.items()]}
+        series_config = {'generated_series': [dict([x]) for x in series.items()]}
         # If options were specified, add them to the series config
         if 'settings' in config:
             series_config['settings'] = {'generated_series': config['settings']}

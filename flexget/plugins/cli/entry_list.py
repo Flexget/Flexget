@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from argparse import ArgumentParser, ArgumentTypeError
 
@@ -75,8 +75,8 @@ def entry_list_list(options):
         table_data = [header]
         for entry in get_entries_by_list_id(entry_list.id, order_by='added', descending=True, session=session):
             table_data.append([entry.id, entry.title, len(entry.entry)])
-    table = TerminalTable(options.table_type, table_data)
     try:
+        table = TerminalTable(options.table_type, table_data)
         console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))
@@ -107,9 +107,9 @@ def entry_list_show(options):
         table_data = [header]
         for k, v in sorted(entry.entry.items()):
             table_data.append([k, str(v)])
-    table = TerminalTable(options.table_type, table_data, wrap_columns=[1])
-    table.table.justify_columns[0] = 'center'
     try:
+        table = TerminalTable(options.table_type, table_data, wrap_columns=[1])
+        table.table.justify_columns[0] = 'center'
         console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))
@@ -126,7 +126,7 @@ def entry_list_add(options):
         session.merge(entry_list)
         session.commit()
         title = options.entry_title
-        entry = {'title': options.entry_title, 'original_url': options.original_url}
+        entry = {'title': options.entry_title, 'url': options.url}
         db_entry = get_entry_by_title(list_id=entry_list.id, title=title, session=session)
         if db_entry:
             console("Entry with the title `{}` already exist with list `{}`. Will replace identifiers if given".format(
@@ -186,7 +186,7 @@ def register_parser_arguments():
     # Common option to be used in multiple subparsers
     entry_parser = ArgumentParser(add_help=False)
     entry_parser.add_argument('entry_title', help="Title of the entry")
-    entry_parser.add_argument('original_url', help="URL of the entry")
+    entry_parser.add_argument('url', help="URL of the entry")
 
     global_entry_parser = ArgumentParser(add_help=False)
     global_entry_parser.add_argument('entry', help='Can be entry title or ID')

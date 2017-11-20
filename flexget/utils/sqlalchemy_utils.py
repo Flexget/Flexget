@@ -2,7 +2,7 @@
 Miscellaneous SQLAlchemy helpers.
 """
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -80,6 +80,7 @@ def table_add_column(table, name, col_type, session, default=None):
     type_string = session.bind.engine.dialect.type_compiler.process(col_type)
     statement = 'ALTER TABLE %s ADD %s %s' % (table.name, name, type_string)
     session.execute(statement)
+    session.commit()
     # Update the table with the default value if given
     if default is not None:
         # Get the new schema with added column
@@ -89,6 +90,7 @@ def table_add_column(table, name, col_type, session, default=None):
         default._set_parent(getattr(table.c, name))
         statement = table.update().values({name: default.execute(bind=session.bind)})
         session.execute(statement)
+        session.commit()
 
 
 def drop_tables(names, session):

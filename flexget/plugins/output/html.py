@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import os
 import logging
@@ -27,7 +27,7 @@ class OutputHtml(object):
     def on_task_output(self, task, config):
         # Use the default template if none is specified
         if not config.get('template'):
-            config['template'] = 'default.template'
+            config['template'] = 'html.template'
 
         filename = os.path.expanduser(config['template'])
         output = os.path.expanduser(config['file'])
@@ -37,12 +37,12 @@ class OutputHtml(object):
 
         # create the template
         try:
-            template = render_from_task(get_template(filename, PLUGIN_NAME), task)
-            log.verbose('Writing output html to %s' % output)
+            template = render_from_task(get_template(filename), task)
+            log.verbose('Writing output html to %s', output)
             with open(output, 'wb') as f:
                 f.write(template.encode('utf-8'))
         except RenderError as e:
-            log.error('Error while rendering task %s, Error: %s' % (task, e))
+            log.error('Error while rendering task %s, Error: %s', task, e)
             raise plugin.PluginError('There was an error rendering the specified template')
 
 

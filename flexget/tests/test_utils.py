@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from datetime import datetime
 import math
@@ -7,7 +7,7 @@ import math
 import pytest
 
 from flexget.utils import json
-from flexget.utils.tools import parse_filesize
+from flexget.utils.tools import parse_filesize, split_title_year
 
 
 def compare_floats(float1, float2):
@@ -52,17 +52,17 @@ class TestParseFilesize(object):
 
     def test_parse_filesize_space(self):
         size = '200.0 KB'
-        expected = 200 * 1000 / 1024**2
+        expected = 200 * 1000 / 1024 ** 2
         assert compare_floats(parse_filesize(size), expected)
 
     def test_parse_filesize_non_si(self):
         size = '1234 GB'
-        expected = 1234 * 1000**3 / 1024 ** 2
+        expected = 1234 * 1000 ** 3 / 1024 ** 2
         assert compare_floats(parse_filesize(size), expected)
 
     def test_parse_filesize_auto(self):
         size = '1234 GiB'
-        expected = 1234 * 1024**3 / 1024 ** 2
+        expected = 1234 * 1024 ** 3 / 1024 ** 2
         assert compare_floats(parse_filesize(size), expected)
 
     def test_parse_filesize_auto_mib(self):
@@ -76,3 +76,25 @@ class TestParseFilesize(object):
     def test_parse_filesize_single_digit(self):
         size = '1 GiB'
         assert compare_floats(parse_filesize(size), 1024)
+
+    def test_parse_filesize_separators(self):
+        size = '1,234 GiB'
+        assert parse_filesize(size) == 1263616
+
+        size = '1 234 567 MiB'
+        assert parse_filesize(size) == 1234567
+
+
+class TestSplitYearTitle(object):
+    @pytest.mark.parametrize('title, expected_title, expected_year', [
+        ('The Matrix', 'The Matrix', None),
+        ('The Matrix 1999', 'The Matrix', 1999),
+        ('The Matrix (1999)', 'The Matrix', 1999),
+        ('The Matrix - 1999', 'The Matrix -', 1999),
+        ('The.Matrix.1999', 'The.Matrix.', 1999),
+        ('The Human Centipede III (Final Sequence)', 'The Human Centipede III (Final Sequence)', None),
+        ('The Human Centipede III (Final Sequence) (2015)', 'The Human Centipede III (Final Sequence)', 2015),
+        ('2020', '2020', None)
+    ])
+    def test_split_year_title(self, title, expected_title, expected_year):
+        assert split_title_year(title) == (expected_title, expected_year)

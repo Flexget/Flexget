@@ -5,7 +5,7 @@ Provides wrapper archive and exception classes to simplify
 archive extraction
 """
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import zipfile
 import os
@@ -208,8 +208,7 @@ def is_archive(path):
         if archive:
             archive.close()
             return True
-    except ArchiveError as error:
-        error_message = 'Failed to open file as archive: %s (%s)' % (path, error)
-        log.debug(error_message)
+    except (IOError, ArchiveError) as error:
+        log.debug('Failed to open file as archive: %s (%s)', path, error)
 
     return False

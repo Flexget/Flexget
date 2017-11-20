@@ -1,0 +1,21 @@
+<md-card>
+  <md-card-header>
+    <md-card-header-text>
+      <span class="md-title">{{vm.entry.title}}</span>
+      <span class="md-subhead" ng-if='vm.entry.local'>Local to <b>{{vm.entry.task}}</b></span>
+      <span class="md-subhead" ng-if='!vm.entry.local'>Global</span>
+    </md-card-header-text>
+  </md-card-header>
+  <md-card-content>
+    <md-list>
+      <md-list-item ng-repeat="field in ::vm.entry.fields">
+        <div class="md-list-item-text" layout="row">
+          <p><b>{{field.field_name}}:</b> {{field.value}}</p>
+        </div>
+      </md-list-item>
+    </md-list>
+  </md-card-content>
+  <md-card-actions>
+    <md-button class="md-raised md-warn" ng-click="vm.deleteEntry()">Delete</md-button>
+  </md-card-actions>
+</md-card>

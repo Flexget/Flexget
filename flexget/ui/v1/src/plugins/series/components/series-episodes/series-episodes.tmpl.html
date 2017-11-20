@@ -1,0 +1,12 @@
+<md-card layout="column" layout-wrap layout-fill class="episodes-list-card">
+    <md-card-content ng-style="{'background-image':'url({{vm.show.metadata.banner}})'}">
+        <md-button class="md-fab md-mini hide-episodes-button" ng-click="vm.hideEpisodes({ show: vm.show })" aria-label="hide the episodes"><i class="fa fa-times" aria-hidden="true"></i></md-button>
+        <div class="episodes-backdrop-image-shadow"></div>
+        <ng-transclude></ng-transclude>
+        <div class="episodes-list">
+            <series-episode episode="episode" delete-episode="vm.deleteEpisode(episode)" show="vm.show"
+                ng-repeat="episode in vm.episodes"></series-episode>
+        </div>
+        <fg-pagination load-data="vm.getEpisodes(page)" link-header="vm.linkHeader" current-page="vm.currentPage" class="episodes-pager"></fg-pagination>
+    </md-card-content>
+</md-card>

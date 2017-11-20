@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import quote
 
 import logging
@@ -16,10 +16,10 @@ log = logging.getLogger('nyaa')
 # TODO: Other categories
 CATEGORIES = {'all': '0_0',
               'anime': '1_0',
-              'anime eng': '1_37',
-              'anime non-eng': '1_38',
-              'anime raw': '1_11'}
-FILTERS = ['all', 'filter remakes', 'trusted only', 'a+ only']
+              'anime eng': '1_2',
+              'anime non-eng': '1_3',
+              'anime raw': '1_4'}
+FILTERS = ['all', 'filter remakes', 'trusted only']
 
 
 class UrlRewriteNyaa(object):
@@ -47,8 +47,8 @@ class UrlRewriteNyaa(object):
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             name = normalize_unicode(search_string)
-            url = 'http://www.nyaa.eu/?page=rss&cats=%s&filter=%s&term=%s' % (
-                CATEGORIES[config['category']], FILTERS.index(config['filter']), quote(name.encode('utf-8')))
+            url = 'https://www.nyaa.si/?page=rss&q=%s&c=%s&f=%s' % (
+                quote(name.encode('utf-8')), CATEGORIES[config['category']], FILTERS.index(config['filter']))
 
             log.debug('requesting: %s' % url)
             rss = feedparser.parse(url)
@@ -79,12 +79,12 @@ class UrlRewriteNyaa(object):
         return entries
 
     def url_rewritable(self, task, entry):
-        return entry['url'].startswith('http://www.nyaa.eu/?page=torrentinfo&tid=')
+        return entry['url'].startswith('https://www.nyaa.si/view/')
 
     def url_rewrite(self, task, entry):
-        entry['url'] = entry['url'].replace('torrentinfo', 'download')
+        entry['url'] = entry['url'].replace('view', 'download') + ".torrent"
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteNyaa, 'nyaa', groups=['search', 'urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteNyaa, 'nyaa', interfaces=['search', 'urlrewriter'], api_ver=2)

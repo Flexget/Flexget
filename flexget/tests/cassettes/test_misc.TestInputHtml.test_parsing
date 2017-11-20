@@ -5,23 +5,23 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        User-Agent: [FlexGet/1.2.464.dev (www.flexget.com)]
+        User-Agent: [!!python/unicode 'FlexGet/2.10.34.dev (www.flexget.com)']
       method: GET
       uri: http://download.flexget.com/
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA41SS2rDMBDdF3oHob0lj/xJYxRtCimFlp5BjieWQbWCItKkp6/lpCVaNESLYf7v
-          jWakCZ9WPT5Ig7pTMgzBonodOzwStyVc8rNH8jk+5bWuO5G23zjr/Ip+mSEgneshKTOgpPFK7jwq
-          qYnxuF1RxjhVk5Bcx5Jf97PRY49vrqfqT40p5O4nqmyNbSZyqEm+aCaZPKhLgOUV4tri8QVDBkyw
-          YlGyDg8saM/6b6r+j93kJJbZxyZEChXJRVNByqCCUpRPVxSsDrgPB/T7wY1UJeZNoKRvXmTv2l8G
-          Fw2USfRsJKiud2w3Tj9tL9r9WHM3ARPgKQIWcUyRp4AAohYRkM+LjxfA48XEdfPLqf0AoW7AOXMC
-          AAA=
+          H4sIAAAAAAAAA41Sy27DIBC8V+o/IO4GL/GjjghSVSlVpVb9BhxvTCTHWASlSb++xm0qc2iaPSCW
+          3WVmYKTx+07d30mDulHS73yH6qVv8ETslnDJv08kn+pjX22bM6nbje2sW9EPs/NIp3mIxgwoaZyS
+          g0MlNTEOtyvKGKdqXCTXYeRy/GR03+Krban63YYWcnOIPFljnYgUCpKWy3GNAooMoJohrjs8PaNP
+          gAm2KDPW4JF57Vj7SdXftaucRJW8b3ygkJNULHOIGeSQiexhRmEzie5sy/YNVfPsKkx0K4EqeRxc
+          AC1JWiwhi8ukLMtqrrvTHg/+iO6wsz1VUXo77H+ogcRc6ijSsqEfv/eyux1rEiQgedPnIHMR3lak
+          sUwAUYgAyCe3BdvxYNPgMf7j7y/xnxeW6AIAAA==
       headers:
         connection: [keep-alive]
         content-encoding: [gzip]
         content-type: [text/html]
-        date: ['Thu, 03 Mar 2016 09:32:47 GMT']
+        date: ['Wed, 19 Apr 2017 15:40:59 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
       status: {code: 200, message: OK}
 version: 1

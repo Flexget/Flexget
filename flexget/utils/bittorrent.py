@@ -2,7 +2,7 @@
 # Torrent decoding is a short fragment from effbot.org. Site copyright says:
 # Test scripts and other short code fragments can be considered as being in the public domain.
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import binascii
 import functools
@@ -139,7 +139,7 @@ def bdecode(text):
         data = decode_item(functools.partial(next, src), next(src))  # pylint:disable=E1101
         for _ in src:  # look for more tokens
             raise SyntaxError("trailing junk")
-    except (AttributeError, ValueError, StopIteration) as e:
+    except (AttributeError, ValueError, StopIteration, TypeError) as e:
         raise SyntaxError("syntax error: %s" % e)
     return data
 
@@ -188,7 +188,7 @@ def bencode(data):
     if isinstance(data, dict):
         return encode_dictionary(data)
 
-    raise TypeError
+    raise TypeError('Unknown type for bencode: ' + str(type(data)))
 
 
 class Torrent(object):
@@ -252,6 +252,11 @@ class Torrent(object):
         return files
 
     @property
+    def name(self):
+        """Return name of the torrent"""
+        return self.content['info'].get('name', '')
+
+    @property
     def size(self):
         """Return total size of the torrent"""
         size = 0
@@ -300,6 +305,20 @@ class Torrent(object):
     @comment.setter
     def comment(self, comment):
         self.content['comment'] = comment
+        self.modified = True
+
+    @property
+    def piece_size(self):
+        return int(self.content['info']['piece length'])
+
+    @property
+    def libtorrent_resume(self):
+        return self.content.get('libtorrent_resume', {})
+
+    def set_libtorrent_resume(self, chunks, files):
+        self.content['libtorrent_resume'] = {}
+        self.content['libtorrent_resume']['bitfield'] = chunks
+        self.content['libtorrent_resume']['files'] = files
         self.modified = True
 
     def remove_multitracker(self, tracker):

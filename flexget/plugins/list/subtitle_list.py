@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -159,7 +159,7 @@ class SubtitleList(MutableSet):
             path = self._extract_path(entry)
 
             if not path:
-                log.error('Entry %s does not represent a local file/dir.')
+                log.error('Entry %s does not represent a local file/dir.', entry['title'])
                 return
 
             path_exists = os.path.exists(path)
@@ -320,4 +320,4 @@ class PluginSubtitleList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginSubtitleList, 'subtitle_list', api_ver=2, groups=['list'])
+    plugin.register(PluginSubtitleList, 'subtitle_list', api_ver=2, interfaces=['task', 'list'])

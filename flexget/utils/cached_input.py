@@ -1,23 +1,21 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import copy
 import logging
-import hashlib
 import pickle
 from datetime import datetime, timedelta
 
-from sqlalchemy.orm import relation
-from sqlalchemy import Column, Integer, String, DateTime, Unicode, select, ForeignKey
-
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from flexget import db_schema
+from flexget.event import event
 from flexget.manager import Session
+from flexget.plugin import PluginError
 from flexget.utils import json
 from flexget.utils.database import entry_synonym
-from flexget.utils.tools import parse_timedelta, TimedDict
-from flexget.event import event
-from flexget.plugin import PluginError
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
+from flexget.utils.tools import parse_timedelta, TimedDict, get_config_hash
+from sqlalchemy import Column, Integer, String, DateTime, Unicode, select, ForeignKey
+from sqlalchemy.orm import relation
 
 log = logging.getLogger('input_cache')
 Base = db_schema.versioned_base('input_cache', 1)
@@ -70,18 +68,6 @@ def db_cleanup(manager, session):
         log.verbose('Removed %s old input caches.' % result)
 
 
-def config_hash(config):
-    """
-    :param dict config: Configuration
-    :return: MD5 hash for *config*
-    """
-    if isinstance(config, dict):
-        # this does in fact support nested dicts, they're sorted too!
-        return hashlib.md5(str(sorted(config.items())).encode('utf-8')).hexdigest()
-    else:
-        return hashlib.md5(str(config).encode('utf-8')).hexdigest()
-
-
 class cached(object):
     """
     Implements transparent caching decorator @cached for inputs.
@@ -118,9 +104,9 @@ class cached(object):
                 # get name for a cache from tasks configuration
                 if self.name not in task.config:
                     raise Exception('@cache config name %s is not configured in task %s' % (self.name, task.name))
-                hash = config_hash(task.config[self.name])
+                hash = get_config_hash(task.config[self.name])
             else:
-                hash = config_hash(args[2])
+                hash = get_config_hash(args[2])
 
             log.trace('self.name: %s' % self.name)
             log.trace('hash: %s' % hash)
@@ -169,7 +155,7 @@ class cached(object):
                             if db_cache and db_cache.entries:
                                 log.error('There was an error during %s input (%s), using cache instead.' %
                                           (self.name, e))
-                                entries = [e.entry for e in db_cache.entries]
+                                entries = [ent.entry for ent in db_cache.entries]
                                 log.verbose('Restored %s entries from db cache' % len(entries))
                                 # Store to in memory cache
                                 self.cache[cache_name] = copy.deepcopy(entries)
@@ -197,7 +183,7 @@ class cached(object):
                             filter(InputCache.hash == hash).first()
                         if not db_cache:
                             db_cache = InputCache(name=self.name, hash=hash)
-                        db_cache.entries = [InputCacheEntry(entry=e) for e in response]
+                        db_cache.entries = [InputCacheEntry(entry=ent) for ent in response]
                         db_cache.added = datetime.now()
                         session.merge(db_cache)
                 return response

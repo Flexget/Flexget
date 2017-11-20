@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -30,6 +30,9 @@ class FilterRequireField(object):
             for field in config:
                 if field not in entry:
                     entry.reject('Required field %s is not present' % field)
+                    break
+                if entry[field] is None:
+                    entry.reject('Required field %s is `None`' % field)
                     break
 
 

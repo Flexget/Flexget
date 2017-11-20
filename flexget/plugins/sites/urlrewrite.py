@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import re
 import logging
@@ -74,4 +74,4 @@ class UrlRewrite(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewrite, 'urlrewrite', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewrite, 'urlrewrite', interfaces=['task', 'urlrewriter'], api_ver=2)

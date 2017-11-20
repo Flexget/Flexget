@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import base64
 import hashlib
@@ -158,7 +158,7 @@ class OutputRSS(object):
         config.setdefault('encoding', 'iso-8859-1')
         config.setdefault('link', ['imdb_url', 'input_url'])
         config.setdefault('title', '{{title}} (from {{task}})')
-        config.setdefault('template', 'default')
+        config.setdefault('template', 'rss')
         # add url as last resort
         config['link'].append('url')
         return config
@@ -181,7 +181,7 @@ class OutputRSS(object):
             try:
                 rss.title = entry.render(config['title'])
             except RenderError as e:
-                log.error('Error rendering jinja title for `%s` falling back to entry title: %s' % (entry['title'], e))
+                log.error('Error rendering jinja title for `%s` falling back to entry title: %s', entry['title'], e)
                 rss.title = entry['title']
             for field in config['link']:
                 if field in entry:
@@ -189,18 +189,18 @@ class OutputRSS(object):
                     break
 
             try:
-                template = get_template(config['template'], 'rss')
+                template = get_template(config['template'], scope='task')
             except ValueError as e:
                 raise plugin.PluginError('Invalid template specified: %s' % e)
             try:
                 rss.description = render_from_entry(template, entry)
             except RenderError as e:
-                log.error('Error while rendering entry %s, falling back to plain title: %s' % (entry, e))
+                log.error('Error while rendering entry %s, falling back to plain title: %s', entry, e)
                 rss.description = entry['title'] + ' - (Render Error)'
             rss.file = config['file']
 
             # TODO: check if this exists and suggest disabling history if it does since it shouldn't happen normally ...
-            log.debug('Saving %s into rss database' % entry['title'])
+            log.debug('Saving %s into rss database', entry['title'])
             task.session.add(rss)
 
         if not rss2gen:
@@ -236,7 +236,7 @@ class OutputRSS(object):
                        'link': db_item.link,
                        'pubDate': db_item.published,
                        'guid': guid}
-                log.trace('Adding %s into rss %s' % (gen['title'], config['file']))
+                log.trace('Adding %s into rss %s', gen['title'], config['file'])
                 rss_items.append(PyRSS2Gen.RSSItem(**gen))
             else:
                 # no longer needed
@@ -258,14 +258,14 @@ class OutputRSS(object):
         fn = os.path.expanduser(config['file'])
         with io.open(fn, 'wb') as file:
             try:
-                log.verbose('Writing output rss to %s' % fn)
+                log.verbose('Writing output rss to %s', fn)
                 rss.write_xml(file, encoding=config['encoding'])
             except LookupError:
-                log.critical('Unknown encoding %s' % config['encoding'])
+                log.critical('Unknown encoding %s', config['encoding'])
                 return
             except IOError:
                 # TODO: plugins cannot raise PluginWarnings in terminate event ..
-                log.critical('Unable to write %s' % fn)
+                log.critical('Unable to write %s', fn)
                 return
 
 

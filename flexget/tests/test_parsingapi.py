@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget.plugin import get_plugin_by_name, get_plugins
 from flexget.plugins.parsers import plugin_parsing
@@ -14,7 +14,7 @@ class TestParsingAPI(object):
 
     def test_parsing_plugins_have_parse_methods(self):
         for parser_type in plugin_parsing.PARSER_TYPES:
-            for plugin in get_plugins(group='%s_parser' % parser_type):
+            for plugin in get_plugins(interface='%s_parser' % parser_type):
                 assert hasattr(plugin.instance, 'parse_%s' % parser_type), \
                     '{type} parsing plugin {name} has no parse_{type} method'.format(type=parser_type, name=plugin.name)
 

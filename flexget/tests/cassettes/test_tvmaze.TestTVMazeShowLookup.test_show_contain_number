@@ -1,198 +1,211 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=Detroit%201-8-7
-  response:
-    body: {string: !!python/unicode '{"id":998,"url":"http://www.tvmaze.com/shows/998/detroit-1-8-7","name":"Detroit
-        1-8-7","type":"Scripted","language":"English","genres":[],"status":"Ended","runtime":60,"premiered":"2010-09-21","schedule":{"time":"22:00","days":[]},"rating":{"average":9.3},"weight":0,"network":{"id":3,"name":"ABC","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":25043,"thetvdb":164221,"imdb":"tt1578258"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/6/16547.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/6/16547.jpg"},"summary":"<p>Welcome
-        to Detroit Homicide. These are the detectives who dedicate their lives to
-        protecting a city they love. Get an inside<span>rs glimpse at what it means
-        to serve and protect. It''s their city, everything is personal.</span></p>","updated":1426070657,"_links":{"self":{"href":"http://api.tvmaze.com/shows/998"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/98767"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:26 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/998/episodebynumber?season=1&number=16
-  response:
-    body: {string: !!python/unicode '{"id":98765,"url":"http://www.tvmaze.com/episodes/98765/detroit-1-8-7-1x16-stone-cold","name":"Stone
-        Cold","season":1,"number":16,"airdate":"2011-03-08","airtime":"22:00","airstamp":"2011-03-08T22:00:00-05:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/98765"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:26 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=Tosh.0
-  response:
-    body: {string: !!python/unicode '{"id":260,"url":"http://www.tvmaze.com/shows/260/tosh0","name":"Tosh.0","type":"Variety","language":"English","genres":["Comedy"],"status":"Running","runtime":30,"premiered":"2009-06-04","schedule":{"time":"22:00","days":["Tuesday"]},"rating":{"average":6.9},"weight":0,"network":{"id":23,"name":"Comedy
-        Central","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":22690,"thetvdb":97731,"imdb":"tt1430587"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/4676.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/4676.jpg"},"summary":"<p>Tosh.0
-        is a weekly topical series that delves into all aspects of the Internet, featuring
-        razor sharp humor and biting commentary from comedian Daniel Tosh. From the
-        absolutely absurd to the incredibly ingenious, the series features viral clips,
-        sketches, and \"Web Redemptions\" which give subjects of infamous viral videos
-        a second chance to redeem themselves from the embarrassment with which they''ve
-        become synonymous. Now in its third hit season, Tosh.0 continues to be cable
-        TV''s most trusted source for exhibitionist weirdos, injurious idiots and
-        all things Web. </p>","updated":1460569360,"_links":{"self":{"href":"http://api.tvmaze.com/shows/260"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/644512"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:27 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/260/episodebynumber?season=7&number=30
-  response:
-    body: {string: !!python/unicode '{"id":457679,"url":"http://www.tvmaze.com/episodes/457679/tosh0-7x30-best-of-season-7","name":"Best
-        of Season 7","season":7,"number":30,"airdate":"2015-12-01","airtime":"22:00","airstamp":"2015-12-01T22:00:00-05:00","runtime":30,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/33/83190.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/33/83190.jpg"},"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/457679"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:27 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=Unwrapped%202.0
-  response:
-    body: {string: !!python/unicode '{"id":5736,"url":"http://www.tvmaze.com/shows/5736/unwrapped-20","name":"Unwrapped
-        2.0","type":"Reality","language":"English","genres":[],"status":"Running","runtime":30,"premiered":"2015-02-02","schedule":{"time":"22:00","days":["Monday"]},"rating":{"average":null},"weight":0,"network":{"id":174,"name":"Cooking
-        Channel","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":47597,"thetvdb":291603,"imdb":"tt4491916"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/22/57200.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/22/57200.jpg"},"summary":"<p><strong><em>\"Unwrapped
-        2.0\"</em></strong> is a fun and fascinating look at the amazing processes,
-        great stories and interesting people behind the creation of America''s favorite
-        snacks. Hosted by Alfonso Ribeiro, Unwrapped 2.0 features everything from
-        classic childhood treats to the latest candy crazes. Whether you like your
-        snacks sweet or savory, crispy or gooey, Unwrapped 2.0 offers behind-the-scenes
-        access to get you a front row seat to see them made.</p>","updated":1460287286,"_links":{"self":{"href":"http://api.tvmaze.com/shows/5736"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/702485"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:27 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/5736/episodebynumber?season=2&number=6
-  response:
-    body: {string: !!python/unicode '{"id":387214,"url":"http://www.tvmaze.com/episodes/387214/unwrapped-20-2x06-savor-the-flavor","name":"Savor
-        the Flavor","season":2,"number":6,"airdate":"2015-11-07","airtime":"20:00","airstamp":"2015-11-07T20:00:00-05:00","runtime":30,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/387214"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:28 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=Jake%202.0
-  response:
-    body: {string: !!python/unicode '{"id":2381,"url":"http://www.tvmaze.com/shows/2381/jake-20","name":"Jake
-        2.0","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Ended","runtime":60,"premiered":"2003-09-10","schedule":{"time":"21:00","days":["Wednesday"]},"rating":{"average":8.3},"weight":0,"network":{"id":70,"name":"UPN","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":4033,"thetvdb":78898,"imdb":"tt0367344"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/12/32302.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/12/32302.jpg"},"summary":"<p>NSA
-        computer technician Jake Foley is transformed into a secret agent after he
-        is accidentally infected with nanobots, based on nanotechnology that reduce
-        the size of a computer to the molecular level, which give him superhuman powers.
-        With his new abilities, he can hack into anything electronic and control it.
-        His medical and emotional state is carefully watched over by Dr. Diane Hughes,
-        who is far too human for her job with the NSA. Struggling in his early tasks
-        with the NSA, Jake must prove himself and yield results or be locked up for
-        \"research.\"</p>","updated":1452580253,"_links":{"self":{"href":"http://api.tvmaze.com/shows/2381"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/184267"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:28 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/2381/episodebynumber?season=1&number=10
-  response:
-    body: {string: !!python/unicode '{"id":184265,"url":"http://www.tvmaze.com/episodes/184265/jake-20-1x10-the-spy-who-really-liked-me","name":"The
-        Spy Who Really Liked Me","season":1,"number":10,"airdate":"2003-11-19","airtime":"21:00","airstamp":"2003-11-19T21:00:00-05:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/184265"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:28 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
-    status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=Tosh.0
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA92YW4vbOBTHv4rwy74k8T2ZhKGwtLuwL13obVm2ZVBsTayOLRlJTpoO8933f2Rn
+          Grd0N1MyUAYCsaTjo3P5nWPLt4Esg1UyjyZBZ+pgFVTOtasw3O12M7dt+GcxK3QT2krvbAix0Glb
+          RcEkULwREH+D4YzGbt/S+B03Urg9JmquNh3f0ORvalNLW2FyI5QRNlj9EzzXjSj3wYdJYB13HeaC
+          V51SUm0gZjrlJOlPYVdrRCOFEbAzSKJoOY3m0yiDlC0qUXY1xG6DXjxIklVE1pR873d50wmL6+DD
+          HZRyR9ohzLfCeMsWsxQLOyE3lQtWMbwSbqfNDQn5uKT3jvb2sudCOcNrbFFoGGn2JDrE4q2STpTs
+          NfyBjyRRkvdvX+Oa7PusFY1/bYSRBQ9fit3V37TZnbdh/bziSgnkQHV1PQnEJyeM4jX8gHvb3uAk
+          mS8RElcJty3XwWq5WKQwWzY0CJyLszTKLxYBNMrGu3gbIM6ya7A8pJbiLYvj7HZtrXlpQ3+LDfsb
+          rlpt4Kp0YRxm88V89rGl1GgjNxJmPUDf4ZYrBEx3lLRjlTDVdk3DKZTBZfvs0jqj1eZZT9ZlOAyZ
+          tIyznRA39Z453SKCNbOIpLDMVdyxUtRbXEvswXhdM25bUTjL9DXWBftDUTiFm7BrAd4MUGCGf9aG
+          2YqbllVdg2uuSraWxAkD9g2SDbvYtdENjRFIrtgLrqSombeP/U5LpJ+vra47J2AdLjtTwki/IFUB
+          duUaC1ArlNSdnfiVwfreHpi+lSCLFbVsIWBvhEOocEU2vQ/+Emv2SpSiaZ3Uyr4P2K6SRcU2ciuY
+          7dYfD85Kdc0b7DGo28pSaAqdFYWGpgKUFYKMg1VCeOMb28fO+0nOiGbNjeHWUgTYTrpq2A2L+1+w
+          4RrKGuy7V1rtabcZe6l3cJBJhNxVEv5X0mFTbrWa9MGKEEPUtUJN0v5rwQq+rgV78+4XyxptHXOm
+          s1RCVncGRl4jI+JTJSkjWkkIoFRNqREUqT4ih+SmLKXGnhQlSjv2VhvLEK4ZuwzbZ0C2a0tUJNpH
+          nC2j5CKdxyihq1qqG19bcP6aaqwyAv+HKuGtPC6R+wZIpYWOtKW9RSutr/H/uXmQs2EcR3E+vyAd
+          iur7x+5f+o5xhSSJsiS/boM+ztTy+sYVR9Q5/7Oj+8zAJEj2TX3aK5nGCJnqoNz0LbFv9JgczP3T
+          lLTUd6lDc36BCCN4o/4sVHk8HcfTOCHdP0+PPV+PzOZIbp4ly7O2ybHWUadEIB+K8FHGQdDd5B4V
+          PEFORCUeo+LTOaCS3D8qT0UljqYRmEhJ/ggVml5Ok+UTRyWNHgOVQev5UInHqCDLJ6KSjFGhLB+6
+          ype3qpNRiT0q1JpGqAAf/PKnjkr8KKj0Ws+HSjJGBVk+EZV0jAq92x9QyR7eVRJCJf0GlQRPn/7c
+          8JQfQGnyKKj0Ws+HSjpGBVk+EZVsjIqv/OEBlD8clXQagQlSMuoqKaES+1PuE35XSdNHQaXXej5U
+          sjEqyPKJqORjVOZHXWX+cFQyQiW++BqVzHeVp/5am2aPgkqv9Xyo5EeozOPkxBMQSY5RWRyhsng4
+          KrlHhZSMukruUfGnq6fcVfJHQaXXeiZUKONHqCR5ll+c1la86BgWagmHtxVoGb4FUvL70/1wXD7+
+          knl/Ko7xJRMPIDrqjFCZ02vtT3oC6s/9Xz7ZwfYfPIj6YB7lIb9IsxPz4EXHefDnxeFVYPn9PHzn
+          s0W88Jn4pmgxnU4Tn+Ofrmi/ykQ//MFc+IBSLj7c3f0LabLvhxQYAAA=
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 26 Mar 2017 11:10:52 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/shows/260/episodebynumber?season=7&number=30
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4VRzU6EMBB+FdLzlhYQcTn6Cnons7RAldKmP6JueHcHyEbWi6dJ5vuZb2auRAlS
+          P5TVY3U+kehGUpMhBFszNs9zGj40fMu0NZpJq7wR0rOdzILxA6fVZ8HpRfpATUe9BG8mWpETmUBL
+          tHpGJDFd8rIhyYrsJFJXSIr6Ih2pC34ioJyAsGpynpU0yynPkI3toDarPK853zs+gLZ3zNcNRQLl
+          5U5zcdqFq7nS0KP1lWgpVNS/O6JTUO1xzWhHA8KzTeLZLmhGmIRvwUpWFOypyM48fbM9pjFO9WqC
+          w9n+tbxJGkxoYjtIcW+64I2i1uC+MCeOaEY1vfs1vZdjt9bBSay3P4FVxwX+/Iksy/IDj7nxEeUB
+          AAA=
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 26 Mar 2017 11:10:52 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=Unwrapped+2.0
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA+VWbWvjRhD+K8t+6RfLevG7CYHjWuinFhKOcpQQ1tJY2lraFbsru76Q/95nZDmx
+          e+HS+1ZaCGQ1Oy/PzDMz6yepC7meLSbzkexcLdeyCqFdx/HhcBiHfaO+0Di3Tewre/Ax68WdOTjV
+          tlREWSJH0qiGYPbpLBXZmMXh2LL4jlStwxGCWpmyUyULfzJlrX0FYUnGkZfr3x9G0gcVOpzlXWeM
+          NiWuXWeCZveTZCRbR40mR8ArsySdRUmGP2j5vKKiq6H2JE/qMkvXCaMo1JG9y/vO4CgfnuFTBXYO
+          XbUn1wMyXV3j5kC6rIJcI5ahcLBux1pcn3QxfUn0o7U7OBAfK2UM1QiSW8B0R1Z+KYYOVIh7ZITs
+          WKPgvD/d48wIv1jD3x8acjpX8S90ePzM4Z57FJuz6zUDG0n6M5AzqkYmSHB/wjxdzFYLeKso7IuN
+          XGerdJ5MRlI3/CVDmE5XKWQSLnXTp/kkGyp01+B6IJlLrvNLnru2tqrwcW/i45PBY2tdcEqHOMvQ
+          A1mSjP9omR/rdKmB7Ds8nk0eUTPbMXPXTgHXd02juJ7ypr298cFZU95e9ddNPEiF9kKJbWeEMoXY
+          Kp8DDvMratAkVBAokFBoY5a1zubkPfmRKB3h0gfAIbiAsTaoMvneuCXb1iQ2VGncsIuc9bU1wm7F
+          QNsPHgH3cBBIeKPynR+Ln61n4jdH8aHeWuOtuNMb0s6OxFUCYgt3HcIJQhMeA+KUYutsI/Jaea9z
+          kVe6LiprEZ5DexFsD6TmlgoiB+QjUGE+EfY3dEFFThxtJ2q9Iz64AZTwB6IgLL4Z7XEEK+3bI0tK
+          awmCa2h2uyXnh+Qj+I18ToarlHP1GEgJhxwLpQc5QTh7EJ4LijtPxEAb0aiCxjdxe4tG6doCuHmS
+          psvlbL6cz9Cqj7U2u76pPdVbbu7KEf6fu1O1+rI1X1cQ9zS2wV7bzlOrfT9d71gPej5OsTqWyaKf
+          tUdqNlQUDOxJIgEPyrAuzkOfZct3tuLJJE4XUL1ajNHJW5QiedMhikPuLzsEwgHPr67or1CO8377
+          EZVCEa5WHJniSjyNsgV7/jetqWHLnHbW6wwD5vcSfVlV8PQ8eiVk9c8JWb1JCD8YZ0KybxCC9/At
+          QtIkSvlhuSJk3j9Fy/8FIasLQmaTNHvvd8PAZa/6JiGTC0IwBcMLyiU+TfYwIae2+pqSOfiIktXf
+          KVlESRol/31K+royJQ/Pz38BJkJtWMwJAAA=
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 26 Mar 2017 11:10:52 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/shows/5736/episodebynumber?season=2&number=6
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA31Sy27bQAz8FWIvvUiWrDRJIQQB0iA9pGhR1L4XtERZRPaF5cquE/jfS1nNoZdi
+          gX2QQ3KGyzfDvWmvPt0264+FmZI1rRlzjm1VHY/HVT44fKVVF1xFkSX0JNUCriZ/TBgj9WVTl83v
+          +qYUPIRU5pHKwc5XUxiPjjTjZn6CeuDLu0cIJXjTNgqa3I6SaW8Kg5x6zHNIU6+vy/W6rG81jZoz
+          XzI1dVvXi0UyuvgPcnvxKqCsrxdYmvwSeFUXhh3uNbWfrC2MTM5hOmn8Xbx/DuxhDJLhwQ7BS4Cf
+          vCNOAdD3cNF1Yb/ogjCABEeQUfIJciLMUsCQgoMnyx8EpEuTi5nDJPAZD5gYPTzEaAm2mDLkAN+p
+          64JCO4si3MGOM5XCrwTflBY8o6cVbEfyxaWyO0kmtWvpuY0hod9T2QUbEvUF7NDr+tt36uGRU6e1
+          fxD6KQuwUgr2MCNnQQPrFqYMx1Hpj5RIifgAPUfw1JHITGHQL9t4fIGv7PezqMjdCTZohVX46q6K
+          9/oRvyz7FzHtmxGyw3yOifR8nyKM/J8pMufz+Q8/CsjogwIAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 26 Mar 2017 11:10:53 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=Jake+2.0
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA8VUy27jNhT9FYJr2ZIfkzhGECBoOhh0kRYIBoOiEwQ0dS0ypkiBD6tO4H+fQ8mp
+          k02LWXUjiPd57rmPV65rvp4vVrOCJ2/4mqsYu3VZ9n0/jftWvNBUurYMyvWhzHbls9jRZF7xglvR
+          Ejx+g4DNp1kSD12WPEivu0g1JEbYJokmS3+1jdFBQdiQ9RT4+i9+K6N2FqLbek82Jk/4f5CarKTJ
+          Zz1qHwseoogJHghSD3F9slHn9BdVwTtPrSYPxZrPq2oxqa4ms4wnSEV1MjB75aM5n8/WVVbV4jAg
+          +Ea1pYAXfzwW3IuobZPNxZ78gHs1XUDRk25U5GtksxR753fZKJN3mUUjE1//uEdk6YDNH7L+TW41
+          2GAPKAJlZ4s6E/L1Af8Z1ouz+X3bktdSlPfUP/2ZMxyHxJtflLCW0BybjCk4/R3JW2EAH1XtR5TL
+          arFAMEVxX28AarW6WhVct/nBY6wWF5eL5ZIjoG6Hsl55S7VOLdSnlmeOtXzf9dQZJ+pQDi6hHB2e
+          OuejFzqWs3m5mC+q+fS5a1CJ87rRwPUTEd9cnsCYS7lZH4MCbkhtKzKb/Lq7uQ7RO9vcvI3cdXkS
+          sJC8B+91YPcPtwwj2yWwxCJJZbXUwrLB57MzdGC9ckwHhips2DqPupgGACZYIOkpMjBk8d3mEIqy
+          rZBS1xAKYw4w3pLMHe11VMwK6zYuhoJtRIDQ2UE0pHbGNQcWlYgM45kk4Z9Y0C/E3Bb5zkDdoGmB
+          TyYjPDO0J1MAqpaKNXpPTOkWZXbkVWpRT+d68mHKvmUMChAt9UxstNFRE8Agj4SZEnJ3qs4eosJ0
+          M0KOzKOWTNgaGDCuzjAdp+wL4uQ2S2EGHbUuLyheeToGJqTwtMUggkYRc8uYw6qwzYHd+Sm7A9XE
+          vqRGZQwnoreoJzrHRuBgHOA8e3abkcBMCbo2xYL41OBIAKMGcmAh4ZEoirALH2yLsZ1tCpF1HgAy
+          O4EMOEVFB02mBuEhmRgY0m2IGSd3wJo6lvN/59AiuFTT7/y67G4wv6mrUSI2erZcLWeX+CwL/gQ0
+          u2HTcvS8cQrln0dcdPr9xpzvZF413KW9dilQp8Ow8v/hfbIL5aeLy09Xi2H/n6jdUJ2PHnIDcnA2
+          363x9qxml9jyfz3co0eZLd9O92QMM5mhaJsQ3qPmf44YhCccv/s6q8ar83Zj78ARyv9wZsnWZ/Fy
+          Us0n1UWO/T8fytOlG/Gf7wiQ/WxX35GIphwfj8cff4+fkjkHAAA=
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 26 Mar 2017 11:10:53 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/shows/2381/episodebynumber?season=1&number=10
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA32QwU7EMAxEf6XyudkmhV1BvgEusBJHZKghoUkaJSmlrPrvuK04cOE0lv1mNPIF
+          bAda3Vy3p2MNY3KgwZQSddNM03Qonx6/6fA6+IaizUNHudnh5gN7Eq0U6ktJUQyJHGcxmUEkQudm
+          4WxPnfAENQRk0XA2VD3GuXoyQ/WwQdXdClX3K5QJ8xC4C/Ojf6HEo6wBbeqwrPZWyiuhlFC3TPO6
+          2C21VVrKfZML+viHPG9XBoQ87lgaw248cbj1+M7RYXSOC4zeY5rZz2nPzoY+g75wL/e2qknE+vsc
+          jPaf58CyLD/ha/pkWgEAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 26 Mar 2017 11:10:53 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
 version: 1

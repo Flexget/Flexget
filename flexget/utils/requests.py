@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.request import urlopen
 from future.moves.urllib.parse import urlparse
 
@@ -55,7 +55,6 @@ def set_unresponsive(url):
 
 
 class DomainLimiter(object):
-
     def __init__(self, domain):
         self.domain = domain
 
@@ -237,7 +236,7 @@ class Session(requests.Session):
             return _wrap_urlopen(url, timeout=kwargs['timeout'])
 
         try:
-            log.debug('Fetching %s' % url)
+            log.debug('Fetching URL %s with args %s and kwargs %s', url, args, kwargs)
             result = super(Session, self).request(method, url, *args, **kwargs)
         except requests.Timeout:
             # Mark this site in known unresponsive list

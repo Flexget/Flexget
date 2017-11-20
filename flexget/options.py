@@ -1,11 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import sys
 import copy
 import random
 import string
-from argparse import ArgumentParser as ArgParser
+from argparse import ArgumentParser as ArgParser, _UNRECOGNIZED_ARGS_ATTR
 from argparse import (_VersionAction, Action, ArgumentError, Namespace, PARSER, REMAINDER, SUPPRESS,
                       _SubParsersAction)
 
@@ -14,6 +14,7 @@ import flexget
 from flexget.entry import Entry
 from flexget.event import fire_event
 from flexget.utils import requests
+from flexget.utils.tools import get_latest_flexget_version_number, get_current_flexget_version
 
 _UNSET = object()
 
@@ -71,19 +72,19 @@ class VersionAction(_VersionAction):
 
     def __call__(self, parser, namespace, values, option_string=None):
         from flexget.terminal import console
+        current = get_current_flexget_version()
+        latest = get_latest_flexget_version_number()
+
         # Print the version number
-        console('%s' % self.version)
+        console('%s' % get_current_flexget_version())
         # Check for latest version from server
-        try:
-            page = requests.get('http://download.flexget.com/latestversion')
-        except requests.RequestException:
-            console('Error getting latest version number from download.flexget.com')
-        else:
-            ver = page.text.strip()
-            if self.version == ver:
+        if latest:
+            if current == latest:
                 console('You are on the latest release.')
             else:
-                console('Latest release: %s' % ver)
+                console('Latest release: %s' % latest)
+        else:
+            console('Error getting latest version number from https://pypi.python.org/pypi/FlexGet')
         parser.exit()
 
 
@@ -115,7 +116,7 @@ class InjectAction(Action):
         if values:
             kwargs['url'] = values.pop(0)
         else:
-            kwargs['url'] = 'http://localhost/inject/%s' % ''.join(random.sample(string.letters + string.digits, 30))
+            kwargs['url'] = 'http://localhost/inject/%s' % ''.join(random.sample(string.ascii_letters + string.digits, 30))
         if 'force' in [v.lower() for v in values]:
             kwargs['immortal'] = True
         entry = Entry(**kwargs)
@@ -207,6 +208,9 @@ class NestedSubparserAction(_SubParsersAction):
                 setattr(namespace, self.dest, parser_name)
                 delattr(subnamespace, self.dest)
             setattr(namespace, parser_name, subnamespace)
+            # Propagate unrecognized arguments back to parent namespace
+            vars(namespace).setdefault(_UNRECOGNIZED_ARGS_ATTR, [])
+            getattr(namespace, _UNRECOGNIZED_ARGS_ATTR).extend(getattr(subnamespace, _UNRECOGNIZED_ARGS_ATTR))
         else:
             super(NestedSubparserAction, self).__call__(parser, namespace, values, option_string)
 
@@ -444,11 +448,13 @@ class CoreArgumentParser(ArgumentParser):
         daemon_parser.add_subparsers(title='actions', metavar='<action>', dest='action')
         start_parser = daemon_parser.add_subparser('start', help='start the daemon')
         start_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
+        start_parser.add_argument('--autoreload-config', action='store_true',
+                                  help='automatically reload the config from disk if the daemon detects any changes')
         stop_parser = daemon_parser.add_subparser('stop', help='shutdown the running daemon')
         stop_parser.add_argument('--wait', action='store_true',
                                  help='wait for all queued tasks to finish before stopping daemon')
         daemon_parser.add_subparser('status', help='check if a daemon is running')
-        daemon_parser.add_subparser('reload', help='causes a running daemon to reload the config from disk')
+        daemon_parser.add_subparser('reload-config', help='causes a running daemon to reload the config from disk')
 
     def add_subparsers(self, **kwargs):
         # The subparsers should not be CoreArgumentParsers
@@ -466,6 +472,3 @@ class CoreArgumentParser(ArgumentParser):
         # Set the 'allow_manual' flag to True for any usage of the CLI
         setattr(result, 'allow_manual', True)
         return result
-
-
-

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import time
@@ -11,7 +11,10 @@ log = logging.getLogger('sleep')
 
 
 class PluginSleep(object):
-    """Causes a pause to occur during the specified phase of a task"""
+    """
+    Causes a pause in execution to occur at the beginning of the specified phase of a task.
+    The point at which the pause occurs can be adjusted using the `plugin_priority` plugin.
+    """
 
     schema = {
         'oneOf': [

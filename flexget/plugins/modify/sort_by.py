@@ -1,14 +1,16 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
 
 from flexget import plugin
 from flexget.event import event
+import re
 
 log = logging.getLogger('sort_by')
 
+RE_ARTICLES = '^(the|a|an)\s'
 
 class PluginSortBy(object):
     """
@@ -37,27 +39,42 @@ class PluginSortBy(object):
                 'type': 'object',
                 'properties': {
                     'field': {'type': 'string'},
-                    'reverse': {'type': 'boolean'}},
+                    'reverse': {'type': 'boolean'},
+                    'ignore_articles': {
+                        'oneOf': [
+                            {'type': 'boolean'},
+                            {'type': 'string', 'format': 'regex'}
+                        ]
+                    }
+                },
                 'additionalProperties': False
             }
         ]
     }
 
     def on_task_filter(self, task, config):
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             field = config
             reverse = False
+            ignore_articles = False
         else:
             field = config.get('field', None)
             reverse = config.get('reverse', False)
+            ignore_articles = config.get('ignore_articles', False)
 
         log.debug('sorting entries by: %s' % config)
 
         if not field:
             task.all_entries.reverse()
             return
+        
+        re_articles = ignore_articles if not isinstance(ignore_articles, bool) else RE_ARTICLES
 
-        task.all_entries.sort(key=lambda e: e.get(field, 0), reverse=reverse)
+        if ignore_articles:
+            task.all_entries.sort(key=lambda e: re.sub(re_articles, '', e.get(field, 0), flags=re.IGNORECASE),
+                                  reverse=reverse)
+        else:
+            task.all_entries.sort(key=lambda e: e.get(field, 0), reverse=reverse)
 
 
 @event('plugin.register')

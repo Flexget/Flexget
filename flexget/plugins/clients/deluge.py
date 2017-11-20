@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.utils import native
 
 import base64
@@ -152,14 +152,14 @@ class DelugePlugin(object):
     def on_task_start(self, task, config):
         """Raise a DependencyError if our dependencies aren't available"""
         try:
-            from deluge.ui.client import client
+            from deluge.ui.client import client  # noqa
         except ImportError as e:
             log.debug('Error importing deluge: %s' % e)
             raise plugin.DependencyError('deluge', 'deluge',
                                          'Deluge >=1.2 module and it\'s dependencies required. ImportError: %s' % e,
                                          log)
         try:
-            from twisted.internet import reactor
+            from twisted.internet import reactor  # noqa
         except:
             raise plugin.DependencyError('deluge', 'twisted.internet', 'Twisted.internet package required', log)
 
@@ -238,6 +238,46 @@ class InputDeluge(DelugePlugin):
         'total_size': ('content_size', lambda size: size / 1024 / 1024),
         'files': ('content_files', lambda file_dicts: [f['path'] for f in file_dicts])}
 
+    extra_settings_map = {
+        'active_time': ('active_time', lambda time: time / 3600),
+        'compact': 'compact',
+        'distributed_copies': 'distributed_copies',
+        'download_payload_rate': 'download_payload_rate',
+        'file_progress': 'file_progress',
+        'is_auto_managed': 'is_auto_managed',
+        'is_seed': 'is_seed',
+        'max_connections': 'max_connections',
+        'max_download_speed': 'max_download_speed',
+        'max_upload_slots': 'max_upload_slots',
+        'max_upload_speed':  'max_upload_speed',
+        'message': 'message',
+        'move_on_completed': 'move_on_completed',
+        'next_announce': 'next_announce',
+        'num_files': 'num_files',
+        'num_pieces': 'num_pieces',
+        'paused': 'paused',
+        'peers': 'peers',
+        'piece_length': 'piece_length',
+        'prioritize_first_last': 'prioritize_first_last',
+        'queue': 'queue',
+        'remove_at_ratio': 'remove_at_ratio',
+        'seed_rank': 'seed_rank',
+        'stop_at_ratio': 'stop_at_ratio',
+        'stop_ratio': 'stop_ratio',
+        'total_done': 'total_done',
+        'total_payload_download': 'total_payload_download',
+        'total_payload_upload': 'total_payload_upload',
+        'total_peers': 'total_peers',
+        'total_seeds': 'total_seeds', 
+        'total_uploaded': 'total_uploaded',
+        'total_wanted': 'total_wanted', 
+        'tracker': 'tracker',
+        'tracker_host': 'tracker_host',
+        'tracker_status': 'tracker_status',
+        'trackers': 'trackers',
+        'upload_payload_rate': 'upload_payload_rate'
+    }
+
     def __init__(self):
         self.entries = []
 
@@ -262,6 +302,13 @@ class InputDeluge(DelugePlugin):
                             }
                         },
                         'additionalProperties': False
+                    },
+                    'keys': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'string',
+                            'enum': list(extra_settings_map)
+                        }
                     }
                 },
                 'additionalProperties': False
@@ -308,7 +355,10 @@ class InputDeluge(DelugePlugin):
                     else:
                         log.warning('Did not find torrent file at %s' % torrent_path)
                 for key, value in torrent_dict.items():
-                    flexget_key = self.settings_map[key]
+                    if key in self.settings_map:
+                        flexget_key = self.settings_map[key]
+                    else:
+                        flexget_key = self.extra_settings_map[key]
                     if isinstance(flexget_key, tuple):
                         flexget_key, format_func = flexget_key
                         value = format_func(value)
@@ -317,8 +367,9 @@ class InputDeluge(DelugePlugin):
             client.disconnect()
 
         filter = config.get('filter', {})
+
         # deluge client lib chokes on future's newlist, make sure we have a native python list here
-        client.core.get_torrents_status(filter, native(list(self.settings_map.keys()))).addCallback(
+        client.core.get_torrents_status(filter, native(list(self.settings_map.keys()) + config.get('keys', []))).addCallback(
             on_get_torrents_status)
 
 
@@ -354,6 +405,7 @@ class OutputDeluge(DelugePlugin):
                     'keep_subs': {'type': 'boolean'},
                     'hide_sparse_files': {'type': 'boolean'},
                     'enabled': {'type': 'boolean'},
+                    'container_directory': {'type': 'string'},
                 },
                 'additionalProperties': False
             }
@@ -507,6 +559,7 @@ class OutputDeluge(DelugePlugin):
                     log.debug('Moving storage for %s to %s' % (entry['title'], move_now_path))
                     main_file_dlist.append(client.core.move_storage([torrent_id], move_now_path))
 
+                big_file_name = ''
                 if opts.get('content_filename') or opts.get('main_file_only'):
 
                     def file_exists(filename):
@@ -607,6 +660,20 @@ class OutputDeluge(DelugePlugin):
                             entry['title'],
                             opts.get('main_file_ratio') * 100))
 
+                container_directory =  pathscrub(entry.render(entry.get('container_directory', config.get('container_directory', ''))))
+                if container_directory:
+                    if big_file_name:
+                        folder_structure = big_file_name.split(os.sep)
+                    elif len(status['files']) > 0:
+                        folder_structure = status['files'][0]['path'].split(os.sep)
+                    else:
+                        folder_structure = []
+                    if len(folder_structure) > 1:
+                        log.verbose('Renaming Folder %s to %s', folder_structure[0], container_directory)
+                        main_file_dlist.append(client.core.rename_folder(torrent_id, folder_structure[0], container_directory))
+                    else:
+                        log.debug('container_directory specified however the torrent %s does not have a directory structure; skipping folder rename', entry['title'])
+
                 return defer.DeferredList(main_file_dlist)
 
             status_keys = ['files', 'total_size', 'save_path', 'move_on_completed_path',
@@ -623,9 +690,16 @@ class OutputDeluge(DelugePlugin):
         # dlist is a list of deferreds that must complete before we exit
         dlist = []
         # loop through entries to get a list of labels to add
-        labels = set([format_label(entry['label']) for entry in task.accepted if entry.get('label')])
-        if config.get('label'):
-            labels.add(format_label(config['label']))
+        labels = set()
+        for entry in task.accepted:
+            if entry.get('label', config.get('label')):
+                try:
+                    label = format_label(entry.render(entry.get('label', config.get('label'))))
+                    log.debug('Rendered label: %s', label)
+                except RenderError as e:
+                    log.error('Error rendering label `%s`: %s', label, e)
+                    continue
+                labels.add(label)
         label_deferred = defer.succeed(True)
         if labels:
             # Make sure the label plugin is available and enabled, then add appropriate labels
@@ -641,7 +715,7 @@ class OutputDeluge(DelugePlugin):
                         dlist = []
                         for label in labels:
                             if label not in d_labels:
-                                log.debug('Adding the label %s to deluge' % label)
+                                log.debug('Adding the label `%s` to deluge', label)
                                 dlist.append(client.label.add(label))
                         return defer.DeferredList(dlist)
 
@@ -690,7 +764,7 @@ class OutputDeluge(DelugePlugin):
                         except Exception as err:
                             log.error('wait_for_metadata Error: %s' % err)
                             break
-                        if len(status['files']) > 0:
+                        if status.get('files'):
                             log.info('"%s" magnetization successful' % (entry['title']))
                             break
                     else:
@@ -737,13 +811,17 @@ class OutputDeluge(DelugePlugin):
                             add_opts['stop_at_ratio'] = True
                 # Make another set of options, that get set after the torrent has been added
                 modify_opts = {
-                    'label': format_label(entry.get('label', config['label'])),
                     'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
                     'main_file_only': entry.get('main_file_only', config.get('main_file_only', False)),
                     'main_file_ratio': entry.get('main_file_ratio', config.get('main_file_ratio')),
                     'hide_sparse_files': entry.get('hide_sparse_files', config.get('hide_sparse_files', True)),
                     'keep_subs': entry.get('keep_subs', config.get('keep_subs', True))
                 }
+                try:
+                    label = entry.render(entry.get('label', config['label']))
+                    modify_opts['label'] = format_label(label)
+                except RenderError as e:
+                    log.error('Error setting label for `%s`: %s', entry['title'], e)
                 try:
                     movedone = entry.render(entry.get('movedone', config['movedone']))
                     modify_opts['movedone'] = pathscrub(os.path.expanduser(movedone))
@@ -788,8 +866,8 @@ class OutputDeluge(DelugePlugin):
         # Leave the timeout long, to give time for possible lookups to occur
         reactor.callLater(600, lambda: tasks.called or on_timeout(tasks))
 
-    def on_task_exit(self, task, config):
-        """Make sure all temp files are cleaned up when task exits"""
+    def on_task_learn(self, task, config):
+        """ Make sure all temp files are cleaned up when entries are learned """
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
             download = plugin.get_plugin_by_name('download')
@@ -798,7 +876,7 @@ class OutputDeluge(DelugePlugin):
     def on_task_abort(self, task, config):
         """Make sure normal cleanup tasks still happen on abort."""
         DelugePlugin.on_task_abort(self, task, config)
-        self.on_task_exit(task, config)
+        self.on_task_learn(task, config)
 
 
 @event('plugin.register')

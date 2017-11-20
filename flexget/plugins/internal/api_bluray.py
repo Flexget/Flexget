@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 from datetime import datetime, timedelta
@@ -31,7 +31,9 @@ BASE_URL = 'http://m.blu-ray.com/'
 
 def bluray_request(endpoint, **params):
     full_url = BASE_URL + endpoint
-    return requests.get(full_url, params=params).json()
+    response = requests.get(full_url, params=params)
+    if response.content:
+        return response.json(strict=False)
 
 
 def extract_release_date(release_date):
@@ -66,7 +68,7 @@ class BlurayMovie(Base):
             title_year = title
 
         params = {
-            'search': 'bluraymovies',
+            'section': 'bluraymovies',
             'country': 'ALL',
             'keyword': title,
             '_': str(int(time.time() * 1000))
@@ -74,11 +76,13 @@ class BlurayMovie(Base):
 
         country_params = {'_': params['_']}
         try:
-            search_results = bluray_request('quicksearch/search.php', **params)['items']
-            countries = bluray_request('countries.json.php', **country_params) or {}
+            response = bluray_request('quicksearch/search.php', **params)
 
-            if not search_results:
+            if not response or 'items' not in response:
                 raise LookupError('No search results found for {} on blu-ray.com'.format(title_year))
+
+            search_results = response['items']
+            countries = bluray_request('countries.json.php', **country_params) or {}
 
             search_results = sorted(search_results, key=lambda k: extract_release_date(k.get('reldate')))
         except requests.RequestException as e:
@@ -207,9 +211,9 @@ class ApiBluray(object):
                 log.debug('Cache has expired for %s, attempting to refresh from blu-ray.com.', movie.name)
                 try:
                     updated_movie = BlurayMovie(title=title, year=year)
-                except LookupError:
-                    log.error('Error refreshing movie details for %s from blu-ray.com, cached info being used.',
-                              title)
+                except LookupError as e:
+                    log.error('Error refreshing movie details for %s from blu-ray.com, cached info being used. %s',
+                              title, e)
                 else:
                     movie = session.merge(updated_movie)
             else:
@@ -237,4 +241,4 @@ class ApiBluray(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ApiBluray, 'api_bluray', api_ver=2)
+    plugin.register(ApiBluray, 'api_bluray', api_ver=2, interfaces=[])

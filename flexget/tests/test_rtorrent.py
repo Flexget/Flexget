@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.xmlrpc import client as xmlrpc_client
 
 import os
@@ -36,14 +36,6 @@ class Matcher(object):
 
 @mock.patch('flexget.plugins.clients.rtorrent.xmlrpc_client.ServerProxy')
 class TestRTorrentClient(object):
-    def test_version(self, mocked_proxy):
-        mocked_client = mocked_proxy()
-        mocked_client.system.client_version.return_value = '0.9.4'
-        client = RTorrent('http://localhost/RPC2')
-
-        assert client.version == [0, 9, 4]
-        assert mocked_client.system.client_version.called
-
     def test_load(self, mocked_proxy):
         mocked_proxy = mocked_proxy()
         mocked_proxy.execute.throw.return_value = 0

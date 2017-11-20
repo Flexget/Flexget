@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import unquote
 
 import hashlib
@@ -156,7 +156,7 @@ class PluginDownload(object):
         received = os.path.join(task.manager.config_base, 'received', task.name)
         if not os.path.isdir(received):
             os.makedirs(received)
-        filename = os.path.join(received, '%s.error' % entry['title'].encode(sys.getfilesystemencoding(), 'replace'))
+        filename = os.path.join(received, pathscrub('%s.error' % entry['title'], filename=True))
         log.error('Error retrieving %s, the error page has been saved to %s', entry['title'], filename)
         with io.open(filename, 'wb') as outfile:
             outfile.write(page)
@@ -474,12 +474,12 @@ class PluginDownload(object):
 
                 try:
                     shutil.move(entry['file'], destfile)
-                except OSError as err:
+                except (IOError, OSError) as err:
                     # ignore permission errors, see ticket #555
                     import errno
                     if not os.path.exists(destfile):
-                        raise plugin.PluginError('Unable to write %s' % destfile)
-                    if err.errno != errno.EPERM:
+                        raise plugin.PluginError('Unable to write %s: %s' % (destfile, err))
+                    if err.errno != errno.EPERM and err.errno != errno.EACCES:
                         raise
 
             # store final destination as output key
@@ -501,7 +501,8 @@ class PluginDownload(object):
             if os.path.exists(entry['file']):
                 log.debug('removing temp file %s from %s', entry['file'], entry['title'])
                 os.remove(entry['file'])
-            shutil.rmtree(os.path.dirname(entry['file']))
+            if os.path.exists(os.path.dirname(entry['file'])):
+                shutil.rmtree(os.path.dirname(entry['file']))
             del (entry['file'])
 
     def cleanup_temp_files(self, task):

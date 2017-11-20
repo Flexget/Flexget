@@ -1,24 +1,28 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import sys
-import math
 from textwrap import wrap
 
 from colorclass import Windows, Color
-from colorclass.toggles import disable_if_no_tty
 from flexget.logger import local_context
 from flexget.options import ArgumentParser
 from flexget.utils.tools import io_encoding
-from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable
+from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable, PorcelainTable
 from terminaltables.terminal_io import terminal_size
 
-# Enable terminal colors on windows
-if sys.platform == 'win32':
+# Enable terminal colors on windows.
+# pythonw (flexget-headless) does not have a sys.stdout, this command would crash in that case
+if sys.platform == 'win32' and sys.stdout:
     Windows.enable(auto_colors=True)
 
-# Disables colors on no TTY output
-disable_if_no_tty()
+
+def terminal_info():
+    """
+    Returns info we need about the output terminal.
+    When called over IPC, this function is monkeypatched to return the info about the client terminal.
+    """
+    return {'size': terminal_size(), 'isatty': sys.stdout.isatty()}
 
 
 class TerminalTable(object):
@@ -51,49 +55,56 @@ class TerminalTable(object):
     :param table_data: Table data as a list of lists of strings. See `terminaltables` doc.
     :param title: Optional title for table
     :param wrap_columns: A list of column numbers which will can be wrapped.
-        In case of multuple values even split is used.
+        In case of multiple values even split is used.
     :param drop_columns: A list of column numbers which can be dropped if needed.
         List in order of priority.
     """
 
     MIN_WIDTH = 10
+    ASCII_TYPES = ['plain', 'porcelain']
 
     def __init__(self, table_type, table_data, title=None, wrap_columns=None, drop_columns=None):
         self.title = title
-        self.type = table_type
         self.wrap_columns = wrap_columns or []
         self.drop_columns = drop_columns or []
         self.table_data = table_data
-        self.init_table()
 
-    def init_table(self):
+        # Force table type to be ASCII when not TTY and type isn't already ASCII
+        if table_type not in self.ASCII_TYPES and not terminal_info()['isatty']:
+            self.type = 'porcelain'
+        else:
+            self.type = table_type
+
+        self._init_table()
+
+    def _init_table(self):
         """Assigns self.table with the built table based on data."""
-        self.table = self.build_table(self.type, self.table_data)
+        self.table = self._build_table(self.type, self.table_data)
         if self.type == 'porcelain':
+            self.table.padding_left = 0
+            self.table.padding_right = 0
             return
         adjustable = bool(self.wrap_columns + self.drop_columns)
         if not self.valid_table and adjustable:
             self.table = self._resize_table()
 
-    def build_table(self, table_type, table_data):
+    def _build_table(self, table_type, table_data):
         return self.supported_table_types()[table_type](table_data)
 
     @property
     def output(self):
         self.table.title = self.title
         if self.type == 'porcelain':
-            # porcelain is a special case of AsciiTable
-            self.table.inner_footing_row_border = False
-            self.table.inner_heading_row_border = False
-            self.table.outer_border = False
-        return '\n' + self.table.table
+            return '\n'.join(line.rstrip() for line in self.table.table.splitlines())
+        else:
+            return '\n' + self.table.table
 
     @staticmethod
     def supported_table_types():
         """This method hold the dict for supported table type."""
         return {
             'plain': AsciiTable,
-            'porcelain': AsciiTable,
+            'porcelain': PorcelainTable,
             'single': SingleTable,
             'double': DoubleTable,
             'github': GithubFlavoredMarkdownTable
@@ -121,9 +132,7 @@ class TerminalTable(object):
 
     @property
     def valid_table(self):
-        # print('self.table.table_width: %s' % self.table.table_width)
-        # print('terminal_size()[0]: %s' % terminal_size()[0])
-        return self.table.table_width <= terminal_size()[0]
+        return self.table.table_width <= terminal_info()['size'][0]
 
     def _calc_wrap(self):
         """
@@ -135,16 +144,9 @@ class TerminalTable(object):
         longest = self._longest_rows()
         margin = self._columns * 2 + self._columns + 1
         static_columns = sum(longest.values())
-        for wrap in self.wrap_columns:
-            static_columns -= longest[wrap]
-        space_left = terminal_size()[0] - static_columns - margin
-        """
-        print('margin: %s' % margin)
-        print('static_columns: %s' % static_columns)
-        print('space_left: %s' % space_left)
-        print('self.table.table_width: %s' % self.table.table_width)
-        print(longest)
-        """
+        for wrap_c in self.wrap_columns:
+            static_columns -= longest[wrap_c]
+        space_left = terminal_info()['size'][0] - static_columns - margin
         # TODO: This is a bit dumb if wrapped columns have huge disparity
         # for example in flexget plugins the phases and flags
         return int(space_left / len(self.wrap_columns))
@@ -202,11 +204,14 @@ class TerminalTable(object):
             for col_num, value in enumerate(row):
                 output_value = value
                 if col_num in self.wrap_columns:
-                    # print('wrapping val %s col: %s' %  (value, col_num))
-                    output_value = word_wrap(value, wrapped_width)
+                    # This probably shouldn't happen, can be caused by wrong parameters sent to drop_columns and
+                    # wrap_columns
+                    if wrapped_width <= 0:
+                        raise TerminalTableError('Table could not be rendered correctly using it given data')
+                    output_value = word_wrap(str(value), wrapped_width)
                 output_row.append(output_value)
             output_table.append(output_row)
-        return self.build_table(self.type, output_table)
+        return self._build_table(self.type, output_table)
 
 
 class TerminalTableError(Exception):
@@ -235,12 +240,16 @@ def word_wrap(text, max_length):
 def colorize(color, text, auto=True):
     """
     A simple override of Color.colorize which sets the default auto colors value to True, since it's the more common
-    use case.
+    use case. When output isn't TTY just return text
+
     :param color: Color tag to use
     :param text: Text to color
     :param auto: Whether to apply auto colors
-    :return: Colored text
+
+    :return: Colored text or text
     """
+    if not terminal_info()['isatty']:
+        return text
     return Color.colorize(color, text, auto)
 
 

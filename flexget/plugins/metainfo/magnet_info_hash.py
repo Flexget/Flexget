@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
+import base64
 import re
 
 from flexget import plugin
@@ -23,11 +24,18 @@ class MagnetBtih(object):
                 continue
             for url in [entry['url']] + entry.get('urls', []):
                 if url.startswith('magnet:'):
-                    info_hash_search = re.search('btih:([0-9a-f]+)', url, re.IGNORECASE)
+                    # find base16 encoded
+                    info_hash_search = re.search('btih:([0-9a-f]{40})', url, re.IGNORECASE)
                     if info_hash_search:
                         entry['torrent_info_hash'] = info_hash_search.group(1).upper()
                         break
-
+                    # find base32 encoded
+                    info_hash_search = re.search('btih:([2-7a-z]{32})', url, re.IGNORECASE)
+                    if info_hash_search:
+                        b32hash = info_hash_search.group(1).upper()
+                        b16hash = base64.b16encode(base64.b32decode(b32hash))
+                        entry['torrent_info_hash'] = b16hash.decode('ascii').upper()
+                        break
 
 @event('plugin.register')
 def register_plugin():

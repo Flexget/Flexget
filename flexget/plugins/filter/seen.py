@@ -8,7 +8,7 @@ forget (string)
     title will be forgotten. With field value only that particular field is forgotten.
 """
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -125,6 +125,25 @@ class SeenField(Base):
         }
 
 
+@with_session
+def add(title, task_name, fields, reason=None, local=None, session=None):
+    """
+    Adds seen entries to DB
+
+    :param title: name of title to be added
+    :param task_name: name of task to be added
+    :param fields: Dict of fields to be added to seen object
+    :return: Seen Entry object as committed to DB
+    """
+    se = SeenEntry(title, task_name, reason, local)
+    for field, value in list(fields.items()):
+        sf = SeenField(field, value)
+        se.fields.append(sf)
+    session.add(se)
+    session.commit()
+    return se.to_dict()
+
+
 @event('forget')
 def forget(value):
     """
@@ -149,20 +168,6 @@ def forget(value):
             log.debug('forgetting %s', se)
             session.delete(se)
     return count, field_count
-
-
-@with_session
-def forget_by_id(entry_id, session=None):
-    """
-    Delete SeenEntry via its ID
-    :param entry_id: SeenEntry ID
-    :param session: DB Session
-    """
-    entry = session.query(SeenEntry).filter(SeenEntry.id == entry_id).first()
-    if not entry:
-        raise ValueError('Could not find entry with ID {0}'.format(entry_id))
-    log.debug('Deleting seen entry with ID {0}'.format(entry_id))
-    session.delete(entry)
 
 
 @with_session
@@ -321,40 +326,37 @@ def db_cleanup(manager, session):
 
 
 @with_session
-def add(title, task_name, fields, reason=None, local=None, session=None):
-    """
-    Adds seen entries to DB
-    :param title: name of title to be added
-    :param task_name: name of task to be added
-    :param fields: Dict of fields to be added to seen object
-    :return: Seen Entry object as committed to DB
-    """
-    se = SeenEntry(title, task_name, reason, local)
-    for field, value in list(fields.items()):
-        sf = SeenField(field, value)
-        se.fields.append(sf)
-    session.add(se)
-    session.commit()
-    return se.to_dict()
-
-
-@with_session
-def search(value=None, status=None, start=None, stop=None, count=False, order_by='added', descending=False,
+def search(count=None, value=None, status=None, start=None, stop=None, order_by='added', descending=False,
            session=None):
-    query = session.query(SeenEntry)
-    if descending:
-        query = query.order_by(getattr(SeenEntry, order_by).desc())
-    else:
-        query = query.order_by(getattr(SeenEntry, order_by))
-    query = query.join(SeenField)
+    query = session.query(SeenEntry).join(SeenField)
     if value:
         query = query.filter(SeenField.value.like(value))
     if status is not None:
         query = query.filter(SeenEntry.local == status)
     if count:
-        return query.count()
-    query = query.slice(start, stop).from_self()
-    return query
+        return query.group_by(SeenEntry).count()
+    if descending:
+        query = query.order_by(getattr(SeenEntry, order_by).desc())
+    else:
+        query = query.order_by(getattr(SeenEntry, order_by))
+    return query.group_by(SeenEntry).slice(start, stop).from_self()
+
+
+@with_session
+def get_entry_by_id(entry_id, session=None):
+    return session.query(SeenEntry).filter(SeenEntry.id == entry_id).one()
+
+
+@with_session
+def forget_by_id(entry_id, session=None):
+    """
+    Delete SeenEntry via its ID
+    :param entry_id: SeenEntry ID
+    :param session: DB Session
+    """
+    entry = get_entry_by_id(entry_id, session=session)
+    log.debug('Deleting seen entry with ID {0}'.format(entry_id))
+    session.delete(entry)
 
 
 @event('plugin.register')

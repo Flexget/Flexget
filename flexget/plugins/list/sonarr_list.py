@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import urlparse
 
 import json
@@ -26,7 +26,10 @@ class SonarrSet(MutableSet):
             'api_key': {'type': 'string'},
             'include_ended': {'type': 'boolean', 'default': True},
             'only_monitored': {'type': 'boolean', 'default': True},
-            'include_data': {'type': 'boolean', 'default': False}
+            'include_data': {'type': 'boolean', 'default': False},
+            'search_missing_episodes': {'type': 'boolean', 'default': True},
+            'ignore_episodes_without_files': {'type': 'boolean', 'default': False},
+            'ignore_episodes_with_files': {'type': 'boolean', 'default': False}
         },
         'required': ['api_key', 'base_url'],
         'additionalProperties': False
@@ -148,14 +151,15 @@ class SonarrSet(MutableSet):
                           slug=show.get('titleSlug'),
                           sonarr_id=show.get('id'),
                           configure_series_target=fg_cutoff)
-            if len(fg_qualities) > 1:
-                entry['configure_series_qualities'] = fg_qualities
-            elif len(fg_qualities) == 1:
-                entry['configure_series_quality'] = fg_qualities[0]
-            else:
-                entry['configure_series_quality'] = fg_qualities
-            if path:
-                entry['configure_series_path'] = path
+            if self.config.get('include_data'):
+                if len(fg_qualities) > 1:
+                    entry['configure_series_qualities'] = fg_qualities
+                elif len(fg_qualities) == 1:
+                    entry['configure_series_quality'] = fg_qualities[0]
+                else:
+                    entry['configure_series_quality'] = fg_qualities
+                if path:
+                    entry['configure_series_path'] = path
             if entry.isvalid():
                 log.debug('returning entry %s', entry)
                 entries.append(entry)
@@ -192,6 +196,9 @@ class SonarrSet(MutableSet):
         show['profileId'] = 1
         show['qualityProfileId '] = 1
         show['rootFolderPath'] = rootfolder[0]['path']
+        show['addOptions'] = {"ignoreEpisodesWithFiles": self.config.get('ignore_episodes_with_files'),
+                              "ignoreEpisodesWithoutFiles": self.config.get('ignore_episodes_without_files'),
+                              "searchForMissingEpisodes": self.config.get('search_missing_episodes')}
 
         series_url, series_headers = self.request_builder(self.config.get('base_url'), 'series',
                                                           self.config.get('port'), self.config['api_key'])
@@ -238,8 +245,9 @@ class SonarrSet(MutableSet):
     def add(self, entry):
         if not self._find_entry(entry):
             show = self.add_show(entry)
-            self._shows = None
-            log.verbose('Successfully added show %s to Sonarr', show['title'])
+            if show:
+                self._shows = None
+                log.verbose('Successfully added show %s to Sonarr', show['title'])
         else:
             log.debug('entry %s already exists in Sonarr list', entry)
 
@@ -278,4 +286,4 @@ class SonarrList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SonarrList, 'sonarr_list', api_ver=2, groups=['list'])
+    plugin.register(SonarrList, 'sonarr_list', api_ver=2, interfaces=['task', 'list'])

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
 import yaml
@@ -47,6 +47,11 @@ class TestInputRSS(object):
               title: "other:Title"
               other_fields:
               - "Other:field"
+          test_content:
+            rss:
+              <<: *rss
+              other_fields:
+                - content
     """
 
     def test_rss(self, execute_task):
@@ -145,7 +150,15 @@ class TestInputRSS(object):
         assert entry['url'] == 'http://localhost/altlink'
         assert entry['other:field'] == 'otherfield'
 
+    def test_content(self, execute_task):
+        task = execute_task('test_content')
+        assert task.find_entry(title='Content', content='<p>test content:encoded</p>'), \
+            'RSS entry missing: content:encoded'
+        assert task.find_entry(title='Multiple content items', content='<p>test content1</p><p>test content2</p>'), \
+            'RSS entry missing: multiple content tags'
 
+
+@pytest.mark.xfail(reason="silverorange changed some stuff")
 @pytest.mark.online
 class TestRssOnline(object):
     config = """

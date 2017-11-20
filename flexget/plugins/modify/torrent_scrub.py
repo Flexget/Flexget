@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import logging
 
 from flexget import plugin
@@ -105,4 +105,4 @@ class TorrentScrub(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(TorrentScrub, groups=["torrent"], api_ver=2)
+    plugin.register(TorrentScrub, interfaces=['task', 'torrent'], api_ver=2)

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -30,4 +30,4 @@ class UrlRewriteArchetorrent(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteArchetorrent, 'archetorrent', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteArchetorrent, 'archetorrent', interfaces=['urlrewriter'], api_ver=2)

@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+import codecs
 import collections
 import contextlib
 import logging
@@ -9,13 +10,18 @@ import sys
 import threading
 import uuid
 import warnings
+import os
 
 from flexget import __version__
+from flexget.utils.tools import io_encoding
 
 # A level more detailed than DEBUG
 TRACE = 5
 # A level more detailed than INFO
 VERBOSE = 15
+# environment variables to modify rotating log parameters from defaults of 1 MB and 9 files
+ENV_MAXBYTES = 'FLEXGET_LOG_MAXBYTES'
+ENV_MAXCOUNT = 'FLEXGET_LOG_MAXCOUNT'
 
 # Stores `task`, logging `session_id`, and redirected `output` stream in a thread local context
 local_context = threading.local()
@@ -196,14 +202,22 @@ def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
 
     formatter = FlexGetFormatter()
     if to_file:
-        file_handler = logging.handlers.RotatingFileHandler(filename, maxBytes=1000 * 1024, backupCount=9)
+        file_handler = logging.handlers.RotatingFileHandler(filename,
+                                                            maxBytes=int(os.environ.get(ENV_MAXBYTES, 1000 * 1024)),
+                                                            backupCount=int(os.environ.get(ENV_MAXCOUNT, 9)))
         file_handler.setFormatter(formatter)
         file_handler.setLevel(level)
         logger.addHandler(file_handler)
 
     # without --cron we log to console
     if to_console:
-        console_handler = logging.StreamHandler(sys.stdout)
+        # Make sure we don't send any characters that the current terminal doesn't support printing
+        stdout = sys.stdout
+        if hasattr(stdout, 'buffer'):
+            # On python 3, we need to get the buffer directly to support writing bytes
+            stdout = stdout.buffer
+        safe_stdout = codecs.getwriter(io_encoding)(stdout, 'replace')
+        console_handler = logging.StreamHandler(safe_stdout)
         console_handler.setFormatter(formatter)
         console_handler.setLevel(level)
         logger.addHandler(console_handler)

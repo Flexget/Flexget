@@ -1,0 +1,28 @@
+{% if series_name is defined %}
+  {% if tvdb_posters is defined %}<p><img src="{{tvdb_posters[0]}}" /></p>{% endif %}
+  <p>{% if tvdb_series_name is defined %}{{tvdb_series_name}}{% else %}{{series_name}}{% endif %} {{series_id}} {{tvdb_ep_name|d('')}}</p>
+  {% if tvdb_actors is defined %}<p><strong>Cast:</strong> {{tvdb_actors|join(', ')}}</p>{% endif %}
+  {% if tvdb_ep_guest_stars is defined %}<p><strong>Guest Starring:</strong> {{ tvdb_ep_guest_stars|join(', ') }}</p>{% endif %}
+  {% if tvdb_ep_overview is defined %}<p><strong>Overview:</strong> {{tvdb_ep_overview|d('')}}</p>{% endif %}
+
+  {% if trakt_series_banner_url is defined %}<p><img src="{{trakt_series_banner_url}}" /></p>{% endif %}
+  <p>{% if trakt_series_name is defined %}{{trakt_series_name}}{% else %}{{series_name}}{% endif %} {{series_id}} {{trakt_ep_name|d('')}}</p>
+  {% if trakt_series_actors is defined %}<p><strong>Cast:</strong> {{trakt_series_actors|join(', ')}}</p>{% endif %}
+  {% if trakt_ep_overview is defined %}<p><strong>Overview:</strong> {{trakt_ep_overview|d('')}}</p>{% endif %}
+
+{% elif imdb_name is defined %}
+  {% if tmdb_posters is defined %}<p><img src="{{tmdb_posters[0]}}" /></p>{% endif %}
+
+  <p>{{imdb_name}} ({{imdb_year}})</p>
+  <p><strong>Score:</strong> {{imdb_score|d('N/A')}} ({{imdb_votes|d('0')}} votes)</p>
+  {% if imdb_genres is defined %}<p><strong>Genres:</strong> {{ imdb_genres|join(', ') }}</p>{% endif %}
+  {% if imdb_directors is defined %}<p><strong>Directed By:</strong> {% for imdbid, actor in imdb_directors.items() %}<a href="http://www.imdb.com/name/{{ imdbid }}">{{ actor }}</a>, {% endfor %}</p>{% endif %}
+  {% if imdb_actors is defined %}<p><strong>Cast:</strong> {% for imdbid, actor in imdb_actors.items() %}<a href="http://www.imdb.com/name/{{ imdbid }}">{{ actor }}</a>, {% endfor %}</p>{% endif %}
+  <p><strong>Plot:</strong> {{imdb_plot_outline|d('N/A')}}</p>
+{% else %}
+  {{title}}
+  {% if description is defined %}
+
+  {{description}}
+  {% endif %}
+{% endif %}

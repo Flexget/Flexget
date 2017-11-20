@@ -10,7 +10,7 @@ with io.open('README.rst', encoding='utf-8') as readme:
 # Populates __version__ without importing the package
 __version__ = None
 with io.open('flexget/_version.py', encoding='utf-8')as ver_file:
-    exec(ver_file.read())  # pylint: disable=W0122
+    exec (ver_file.read())  # pylint: disable=W0122
 if not __version__:
     print('Could not find __version__ from flexget/_version.py')
     sys.exit(1)
@@ -51,7 +51,10 @@ setup(
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
     ]

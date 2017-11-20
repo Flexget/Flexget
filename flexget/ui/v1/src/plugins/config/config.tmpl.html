@@ -1,0 +1,59 @@
+<div layout="column" layout-fill>
+	<md-toolbar class="md-warn" layout="row">
+		<p class="md-toolbar-tools">
+			<span ng-if="!vm.variables">
+				This page is still pretty much in beta. Please take a backup before trying to save a new config.
+			</span>
+			<span ng-if="vm.variables">
+				Variables get overwritten from file unless you use `variables: yes` in your config file.
+			</span>
+		</p>
+	</md-toolbar>
+	<div layout="column">
+		<div layout="row">
+			<div flex="25" layout-align="center start">
+				<md-button class="md-raised md-primary" ng-click="vm.saveConfiguration()" ng-disabled="vm.configuration == vm.originalValues">
+					Save and apply
+				</md-button>
+			</div>
+			<div flex="25" layout-align="center start">
+				<md-button class="md-raised md-primary" ng-click="vm.changeContent()">
+					{{ vm.variables ? 'Load config' : 'Load variables' }}
+				</md-button>
+			</div>
+			<div flex="30" flex-offset="45">
+				<md-input-container class="md-block">
+					<label>Theme</label>
+					<md-select ng-model="vm.aceOptions.theme" ng-change="vm.updateTheme()">
+						<md-option ng-repeat="theme in ::vm.themes | orderBy: 'caption'" value="{{ theme.name }}">{{ theme.caption }}</md-option>
+					</md-select>
+				</md-input-container>
+			</div>
+		</div>
+	</div>
+	<div layout="row" ng-if="vm.errors">
+		<md-list flex>
+			<md-list-item class="md-2-line" ng-repeat="error in vm.errors">
+				<div class="md-list-item-text">
+					<h3><b>Path:</b> {{ error.config_path }}</h3>
+					<h4><b>Message:</b> {{ error.error }}</h4>
+				</div>
+				<md-divider ng-if="!$last"></md-divider>
+			</md-list-item>
+		</md-list>
+	</div>
+	<div layout="row" ng-if="vm.yamlError">
+		<md-list flex>
+			<md-list-item class="md-3-line">
+				<div class="md-list-item-text">
+					<h3><b>YAML Error</b></h3>
+					<p><b>Line: </b> {{ vm.yamlError.line }}</p>
+					<p><b>Column: </b> {{ vm.yamlError.column }}</p>
+				</div>
+			</md-list-item>
+		</md-list>
+	</div>
+	<div layout="row" flex>
+		<div flex ui-ace='vm.aceOptions' ng-model="vm.configuration"></div>
+	</div>
+</div>

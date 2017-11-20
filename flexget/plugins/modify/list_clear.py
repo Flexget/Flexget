@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -16,7 +16,7 @@ class ListClear(object):
         'properties': {
             'what': {'type': 'array', 'items':
                 {'allOf': [
-                    {'$ref': '/schema/plugins?group=list'},
+                    {'$ref': '/schema/plugins?interface=list'},
                     {'maxProperties': 1,
                      'error_maxProperties': 'Plugin options within list_clear plugin must be indented '
                                             '2 more spaces than the first letter of the plugin name.',

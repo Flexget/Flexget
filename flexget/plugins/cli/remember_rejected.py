@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import options
 from flexget.event import event
@@ -22,9 +22,9 @@ def list_rejected(options):
         table_data = [header]
         for entry in results:
             table_data.append([entry.id, entry.title, entry.task.name, entry.rejected_by, entry.reason or ''])
-    table = TerminalTable(options.table_type, table_data)
-    table.table.justify_columns[0] = 'center'
     try:
+        table = TerminalTable(options.table_type, table_data)
+        table.table.justify_columns[0] = 'center'
         console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))

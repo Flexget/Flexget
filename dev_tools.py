@@ -1,10 +1,11 @@
 from __future__ import print_function
-
-import fileinput
 import os
+import io
 import shutil
-import subprocess
+import zipfile
+import fileinput
 
+import requests
 import click
 
 
@@ -12,7 +13,7 @@ def _get_version():
     with open('flexget/_version.py') as f:
         g = globals()
         l = {}
-        exec(f.read(), g, l)  # pylint: disable=W0122
+        exec (f.read(), g, l)  # pylint: disable=W0122
     if not l['__version__']:
         raise click.ClickException('Could not find __version__ from flexget/_version.py')
     return l['__version__']
@@ -66,29 +67,46 @@ def bump_version(bump_type):
 
 
 @cli.command()
-def build_webui():
-    """Build webui for release packaging"""
-    cwd = os.path.join('flexget', 'ui')
+def bundle_webui():
+    """Bundle webui for release packaging"""
+    ui_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'flexget', 'ui')
 
-    # Cleanup previous builds
-    click.echo('cleaning previous builds')
-    for folder in ['bower_components' 'node_modules']:
-        folder = os.path.join(cwd, folder)
-        if os.path.exists(folder):
-            click.echo('Deleting recursively {}'.format(folder))
-            shutil.rmtree(folder)
+    def download_extract(url, dest_path):
+        print(dest_path)
+        r = requests.get(url)
+        z = zipfile.ZipFile(io.BytesIO(r.content))
+        z.extractall(dest_path)
 
-    # Install npm packages
-    click.echo('running `npm install`')
-    subprocess.check_call('npm install', cwd=cwd, shell=True)
+    # WebUI V1
+    click.echo('Bundle WebUI v1...')
+    try:
+        # Remove existing
+        app_path = os.path.join(ui_path, 'v1', 'app')
+        if os.path.exists(app_path):
+            shutil.rmtree(app_path)
+        download_extract('http://download.flexget.com/webui_v1.zip', os.path.join(ui_path, 'v1'))
+    except IOError as e:
+        click.echo('Unable to download and extract WebUI v1 due to %e' % str(e))
+        raise click.Abort()
 
-    # Build the ui
-    click.echo('running `bower install`')
-    subprocess.check_call('bower install', cwd=cwd, shell=True)
+    # WebUI V2
+    try:
+        click.echo('Bundle WebUI v2...')
+        # Remove existing
+        app_path = os.path.join(ui_path, 'v2', 'dist')
+        if os.path.exists(app_path):
+            shutil.rmtree(app_path)
+        ui_v2_artifacts = 'https://circleci.com/api/v1.1/project/github/Flexget/webui/latest/artifacts' \
+                          '?circle-token=%s&branch=develop&filter=successful' % os.getenv('CIRCLE_API_TOKEN')
 
-    # Build the ui
-    click.echo('running `gulp buildapp`')
-    subprocess.check_call('gulp buildapp', cwd=cwd, shell=True)
+        r = requests.get(ui_v2_artifacts, headers={'Accept': 'application/json', 'User-Agent': 'curl/7.54.0', 'Accept-Encoding': 'test'})
+        artifacts = r.json()
+
+        # Should always be first entry
+        download_extract(artifacts[0]['url'], os.path.join(ui_path, 'v2'))
+    except (IOError, ValueError) as e:
+        click.echo('Unable to download and extract WebUI v2 due to %s' % str(e))
+        raise click.Abort()
 
 
 if __name__ == '__main__':

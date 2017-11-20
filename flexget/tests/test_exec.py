@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+import os
 import sys
 
 import pytest
@@ -8,7 +9,7 @@ import pytest
 
 class TestExec(object):
     __tmp__ = True
-    config = """
+    config = ("""
         templates:
           global:
             set:
@@ -25,7 +26,8 @@ class TestExec(object):
               - {title: entry1, location: '/path/with spaces', quotefield: "with'quote"}
             exec:
               on_output:
-                for_entries: """ + sys.executable + """ exec.py "{{temp_dir}}" "{{title}}" "{{location}}" "/the/final destinaton/" "a {{quotefield}}" "/a hybrid{{location}}"
+                for_entries: """ + sys.executable + """ exec.py "{{temp_dir}}" "{{title}}" "{{location}}" """ +
+          """"/the/final destinaton/" "a {{quotefield}}" "/a hybrid{{location}}"
           test_auto_escape:
             mock:
               - {title: entry2, quotes: single ' double", otherchars: '% a $a! ` *'}
@@ -33,7 +35,7 @@ class TestExec(object):
               auto_escape: yes
               on_output:
                 for_entries: """ + sys.executable + """ exec.py "{{temp_dir}}" "{{title}}" "{{quotes}}" "/start/{{quotes}}" "{{otherchars}}"
-    """
+    """)
 
     def test_replace_from_entry(self, execute_task, tmpdir):
         task = execute_task('replace_from_entry')

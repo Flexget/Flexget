@@ -1,0 +1,37 @@
+.pagination-group {
+    margin-top: -45px;
+
+    > .md-button {
+        font-size: 16px;
+        margin: 0 0 5px 0;
+        padding: 2px 12px 2px 12px;
+        background-color: $flexget-orange;
+        min-width: 50px;
+        max-width: 50px;
+        border-radius: 0;
+        border-right: 1px solid rgba(0, 0, 0, 0.25);
+    }
+
+    > .md-button.left {
+        border-radius: 10px 0 0 10px;
+    }
+
+    > .md-button.right {
+        border-radius: 0 10px 10px 0;
+        border-right: none;
+    }
+
+    .md-button:disabled {
+        opacity: 0.6;
+    }
+
+    .md-button:not([disabled]):not(.active):hover {
+        background-color: $flexget-red;
+        opacity: 0.9;
+        transition: 0.3s;
+    }
+
+    .md-button.active {
+        background-color: $flexget-red;
+    }
+}

@@ -1,21 +1,20 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
-import logging
 import datetime
+import logging
 import re
 
+from requests.exceptions import TooManyRedirects
 from sqlalchemy import Column, Unicode, DateTime
 
 from flexget import plugin, db_schema
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.requests import TimedLimiter, RequestException
 from flexget.manager import Session
 from flexget.utils.database import json_synonym
-from flexget.utils.requests import Session as RequestSession
+from flexget.utils.requests import Session as RequestSession, TimedLimiter, RequestException
 from flexget.utils.soup import get_soup
-from flexget.config_schema import one_or_more
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('alpharatio')
@@ -40,7 +39,7 @@ CATEGORIES = {
     'gamespc': 'filter_cat[12]',
     'gamesxbox': 'filter_cat[13]',
     'gamesps3': 'filter_cat[14]',
-    'gameswii':  'filter_cat[15]',
+    'gameswii': 'filter_cat[15]',
     'appspc': 'filter_cat[16]',
     'appsmac': 'filter_cat[17]',
     'appslinux': 'filter_cat[18]',
@@ -83,7 +82,7 @@ class SearchAlphaRatio(object):
             'order_by': {'type': 'string', 'enum': ['seeders', 'leechers', 'time', 'size', 'year', 'snatched'],
                          'default': 'time'},
             'order_desc': {'type': 'boolean', 'default': True},
-            'scene':  {'type': 'boolean'},
+            'scene': {'type': 'boolean'},
             'leechstatus': {'type': 'string', 'enum': list(LEECHSTATUS.keys()), 'default': 'normal'},
         },
         'required': ['username', 'password'],
@@ -97,18 +96,26 @@ class SearchAlphaRatio(object):
         """
         Wrapper to allow refreshing the cookie if it is invalid for some reason
 
-        :param str url:
-        :param list params:
+        :param unicode url:
+        :param dict params:
         :param str username:
         :param str password:
         :param bool force: flag used to refresh the cookie forcefully ie. forgo DB lookup
         :return:
         """
         cookies = self.get_login_cookie(username, password, force=force)
+        invalid_cookie = False
 
-        response = requests.get(url, params=params, cookies=cookies)
+        try:
+            response = requests.get(url, params=params, cookies=cookies)
+            if self.base_url + 'login.php' in response.url:
+                invalid_cookie = True
+        except TooManyRedirects:
+            # Apparently it endlessly redirects if the cookie is invalid?
+            log.debug('MoreThanTV request failed: Too many redirects. Invalid cookie?')
+            invalid_cookie = True
 
-        if self.base_url + 'login.php' in response.url:
+        if invalid_cookie:
             if self.errors:
                 raise plugin.PluginError('AlphaRatio login cookie is invalid. Login page received?')
             self.errors = True
@@ -141,7 +148,7 @@ class SearchAlphaRatio(object):
             response = requests.post(url, data={'username': username, 'password': password, 'login': 'Log in',
                                                 'keeplogged': '1'}, timeout=30)
         except RequestException as e:
-            raise plugin.PluginError('AlphaRatio login failed: %s', e)
+            raise plugin.PluginError('AlphaRatio login failed: %s' % e)
 
         if 'Your username or password was incorrect.' in response.text:
             raise plugin.PluginError('AlphaRatio login failed: Your username or password was incorrect.')
@@ -157,6 +164,17 @@ class SearchAlphaRatio(object):
             cookie = AlphaRatioCookie(username=username, cookie=dict(requests.cookies), expires=expires)
             session.merge(cookie)
             return cookie.cookie
+
+    def find_index(self, soup, text):
+        """Finds the index of the tag containing the text"""
+        for i in range(0, len(soup)):
+            img = soup[i].find('img')
+            if soup[i].text.strip() == '' and img and text.lower() in img.get('title').lower():
+                return i
+            elif text.lower() in soup[i].text.lower():
+                return i
+
+        raise plugin.PluginError('AlphaRatio layout has changed, unable to parse correctly. Please open a Github issue')
 
     @plugin.internet(log)
     def search(self, task, entry, config):
@@ -191,14 +209,29 @@ class SearchAlphaRatio(object):
                 continue
 
             soup = get_soup(page.content)
+
+            # extract the column indices
+            header_soup = soup.find('tr', attrs={'class': 'colhead'})
+            if not header_soup:
+                log.debug('no search results found for \'%s\'', search_string)
+                continue
+            header_soup = header_soup.findAll('td')
+
+            size_idx = self.find_index(header_soup, 'size')
+            snatches_idx = self.find_index(header_soup, 'snatches')
+            seeds_idx = self.find_index(header_soup, 'seeders')
+            leeches_idx = self.find_index(header_soup, 'leechers')
+
             for result in soup.findAll('tr', attrs={'class': 'torrent'}):
                 group_info = result.find('td', attrs={'class': 'big_info'}).find('div', attrs={'class': 'group_info'})
                 title = group_info.find('a', href=re.compile('torrents.php\?id=\d+')).text
                 url = self.base_url + \
-                    group_info.find('a', href=re.compile('torrents.php\?action=download(?!usetoken)'))['href']
+                      group_info.find('a', href=re.compile('torrents.php\?action=download(?!usetoken)'))['href']
 
                 torrent_info = result.findAll('td')
-                size = re.search('(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', torrent_info[5].text)
+                size_col = torrent_info[size_idx].text
+                log.debug('AlphaRatio size: %s', size_col)
+                size = re.search('(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', size_col)
                 torrent_tags = ', '.join([tag.text for tag in group_info.findAll('div', attrs={'class': 'tags'})])
 
                 e = Entry()
@@ -206,10 +239,13 @@ class SearchAlphaRatio(object):
                 e['title'] = title
                 e['url'] = url
                 e['torrent_tags'] = torrent_tags
-                e['content_size'] = parse_filesize(size.group(0))
-                e['torrent_snatches'] = int(torrent_info[6].text)
-                e['torrent_seeds'] = int(torrent_info[7].text)
-                e['torrent_leeches'] = int(torrent_info[8].text)
+                if not size:
+                    log.error('No size found! Please create a Github issue. Size received: %s', size_col)
+                else:
+                    e['content_size'] = parse_filesize(size.group(0))
+                e['torrent_snatches'] = int(torrent_info[snatches_idx].text)
+                e['torrent_seeds'] = int(torrent_info[seeds_idx].text)
+                e['torrent_leeches'] = int(torrent_info[leeches_idx].text)
 
                 entries.add(e)
 
@@ -218,4 +254,4 @@ class SearchAlphaRatio(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SearchAlphaRatio, 'alpharatio', groups=['search'], api_ver=2)
+    plugin.register(SearchAlphaRatio, 'alpharatio', interfaces=['search'], api_ver=2)

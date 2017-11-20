@@ -1,8 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
+import re
 
 from flexget import options, plugin
 from flexget.event import event
@@ -21,7 +22,6 @@ class PluginTryRegexp(object):
 
     def matches(self, entry, regexp):
         """Return True if any of the entry string fields match given regexp"""
-        import re
         for field, value in entry.items():
             if not isinstance(value, basestring):
                 continue
@@ -66,7 +66,9 @@ class PluginTryRegexp(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTryRegexp, '--try-regexp', builtin=True, api_ver=2)
+    # This plugin runs on task phases, but should not be allowed in the config, so we do not declare the 'task'
+    # interface. This may break if we start checking for the task interface for more than just config schemas.
+    plugin.register(PluginTryRegexp, '--try-regexp', builtin=True, interfaces=[], api_ver=2)
 
 
 @event('options.register')

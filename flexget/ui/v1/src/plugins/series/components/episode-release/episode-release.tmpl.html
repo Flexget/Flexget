@@ -1,0 +1,14 @@
+<md-list-item class="md-2-line episode-release">
+	<div class="md-list-item-text">
+		<h6 class="release-title md-subhead">
+			<i ng-if="vm.release.downloaded" class="fa fa-download"></i> {{ ::vm.release.title }}
+		</h6>
+		<p>{{ ::vm.release.quality }}</p>
+	</div>
+	<md-button ng-click="vm.resetRelease()" ng-if="vm.release.downloaded" class="md-icon-button" aria-label="reset the release">
+		<i class="fa fa-refresh" aria-hidden="true"></i>
+	</md-button>
+		<md-button ng-click="vm.forgetRelease()" class="md-icon-button" aria-label="forget the release">
+		<i class="fa fa-trash" aria-hidden="true"></i>
+	</md-button>
+</md-list-item>

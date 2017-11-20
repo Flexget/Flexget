@@ -1,29 +1,34 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
-import atexit
-import codecs
-import copy
-import fnmatch
-import logging
-import os
-import shutil
-import signal
-import sys
-import threading
-import traceback
-from contextlib import contextmanager
-from datetime import datetime, timedelta
-import io
+# This needs to remain before the builtins import!
+native_int = int
 
-import sqlalchemy
-import yaml
-from sqlalchemy.exc import OperationalError
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from builtins import *  # noqa  pylint: disable=unused-import, redefined-builtin
+
+import atexit  # noqa
+import codecs  # noqa
+import copy  # noqa
+import fnmatch  # noqa
+import logging  # noqa
+import os  # noqa
+import shutil  # noqa
+import signal  # noqa
+import sys  # noqa
+import threading  # noqa
+import traceback  # noqa
+import hashlib  # noqa
+from contextlib import contextmanager  # noqa
+from datetime import datetime, timedelta  # noqa
+import io  # noqa
+
+import sqlalchemy  # noqa
+import yaml  # noqa
+from sqlalchemy.exc import OperationalError  # noqa
+from sqlalchemy.ext.declarative import declarative_base  # noqa
+from sqlalchemy.orm import sessionmaker  # noqa
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
-from flexget.utils.sqlalchemy_utils import ContextSession
+from flexget.utils.sqlalchemy_utils import ContextSession  # noqa
 
 Base = declarative_base()
 Session = sessionmaker(class_=ContextSession)
@@ -34,15 +39,13 @@ from flexget.ipc import IPCClient, IPCServer  # noqa
 from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv  # noqa
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
-from flexget.utils.tools import pid_exists, get_current_flexget_version  # noqa
+from flexget.utils.tools import pid_exists, get_current_flexget_version, io_encoding  # noqa
 from flexget.terminal import console  # noqa
 
 log = logging.getLogger('manager')
 
 manager = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
-
-native_int = int
 
 
 class Manager(object):
@@ -115,6 +118,8 @@ class Manager(object):
             # Decode all arguments to unicode before parsing
             args = unicode_argv()[1:]
         self.args = args
+        self.autoreload_config = False
+        self.config_file_hash = None
         self.config_base = None
         self.config_name = None
         self.config_path = None
@@ -164,8 +169,9 @@ class Manager(object):
 
         manager = self
 
-        log.debug('sys.defaultencoding: %s' % sys.getdefaultencoding())
-        log.debug('sys.getfilesystemencoding: %s' % sys.getfilesystemencoding())
+        log.debug('sys.defaultencoding: %s', sys.getdefaultencoding())
+        log.debug('sys.getfilesystemencoding: %s', sys.getfilesystemencoding())
+        log.debug('flexget detected io encoding: %s', io_encoding)
         log.debug('os.path.supports_unicode_filenames: %s' % os.path.supports_unicode_filenames)
         if codecs.lookup(sys.getfilesystemencoding()).name == 'ascii' and not os.path.supports_unicode_filenames:
             log.warning('Your locale declares ascii as the filesystem encoding. Any plugins reading filenames from '
@@ -241,6 +247,15 @@ class Manager(object):
             options_namespace.__dict__.update(options)
             options = options_namespace
         task_names = self.tasks
+        # Only reload config if daemon
+        config_hash = self.hash_config()
+        if self.is_daemon and self.autoreload_config and self.config_file_hash != config_hash:
+            log.info('Config change detected. Reloading.')
+            try:
+                self.load_config(output_to_console=False, config_file_hash=config_hash)
+                log.info('Config successfully reloaded!')
+            except Exception as e:
+                log.error('Reloading config failed: %s', e)
         # Handle --tasks
         if options.tasks:
             # Consider * the same as not specifying tasks at all (makes sure manual plugin still works)
@@ -353,7 +368,12 @@ class Manager(object):
         :param options: argparse options
         """
         fire_event('manager.execute.started', self, options)
-        if self.task_queue.is_alive():
+        if self.task_queue.is_alive() or self.is_daemon:
+            if not self.task_queue.is_alive():
+                log.error('Task queue has died unexpectedly. Restarting it. Please open an issue on Github and include'
+                          ' any previous error logs.')
+                self.task_queue = TaskQueue()
+                self.task_queue.start()
             if len(self.task_queue):
                 log.verbose('There is a task already running, execution queued.')
             finished_events = self.execute(options, output=logger.get_capture_stream(),
@@ -392,6 +412,8 @@ class Manager(object):
                 return
             if options.daemonize:
                 self.daemonize()
+            if options.autoreload_config:
+                self.autoreload_config = True
             try:
                 signal.signal(signal.SIGTERM, self._handle_sigterm)
             except ValueError as e:
@@ -404,7 +426,7 @@ class Manager(object):
             self.ipc_server.start()
             self.task_queue.wait()
             fire_event('manager.daemon.completed', self)
-        elif options.action in ['stop', 'reload', 'status']:
+        elif options.action in ['stop', 'reload-config', 'status']:
             if not self.is_daemon:
                 log.error('There does not appear to be a daemon running.')
                 return
@@ -414,7 +436,7 @@ class Manager(object):
                 tasks = 'all queued tasks (if any) have' if options.wait else 'currently running task (if any) has'
                 log.info('Daemon shutdown requested. Shutdown will commence when %s finished executing.' % tasks)
                 self.shutdown(options.wait)
-            elif options.action == 'reload':
+            elif options.action == 'reload-config':
                 log.info('Reloading config from disk.')
                 try:
                     self.load_config()
@@ -519,7 +541,19 @@ class Manager(object):
         self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
         self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
 
-    def load_config(self, output_to_console=True):
+    def hash_config(self):
+        if not self.config_path:
+            return
+        sha1_hash = hashlib.sha1()
+        with io.open(self.config_path, 'rb') as f:
+            while True:
+                data = f.read(65536)
+                if not data:
+                    break
+                sha1_hash.update(data)
+        return sha1_hash.hexdigest()
+
+    def load_config(self, output_to_console=True, config_file_hash=None):
         """
         Loads the config file from disk, validates and activates it.
 
@@ -533,6 +567,7 @@ class Manager(object):
                 log.critical('Config file must be UTF-8 encoded.')
                 raise ValueError('Config file is not UTF-8 encoded')
         try:
+            self.config_file_hash = config_file_hash or self.hash_config()
             config = yaml.safe_load(raw_config) or {}
         except Exception as e:
             msg = str(e).replace('\n', ' ')
@@ -680,12 +715,13 @@ class Manager(object):
             self.engine = sqlalchemy.create_engine(self.database_uri,
                                                    echo=self.options.debug_sql,
                                                    connect_args={'check_same_thread': False, 'timeout': 10})
-        except ImportError:
-            print('FATAL: Unable to use SQLite. Are you running Python 2.5 - 2.7 ?\n'
+        except ImportError as e:
+            print('FATAL: Unable to use SQLite. Are you running Python 2.7, 3.3 or newer ?\n'
                   'Python should normally have SQLite support built in.\n'
                   'If you\'re running correct version of Python then it is not equipped with SQLite.\n'
                   'You can try installing `pysqlite`. If you have compiled python yourself, '
-                  'recompile it with SQLite support.', file=sys.stderr)
+                  'recompile it with SQLite support.\n'
+                  'Error: %s' % e, file=sys.stderr)
             sys.exit(1)
         Session.configure(bind=self.engine)
         # create all tables, doesn't do anything to existing tables
@@ -858,6 +894,8 @@ class Manager(object):
             log.info('Running database cleanup.')
             with Session() as session:
                 fire_event('manager.db_cleanup', self, session)
+            # Try to VACUUM after cleanup
+            fire_event('manager.db_vacuum', self)
             # Just in case some plugin was overzealous in its cleaning, mark the config changed
             self.config_changed()
             self.persist['last_cleanup'] = datetime.now()
@@ -909,3 +947,4 @@ class Manager(object):
                          ' at http://flexget.com/wiki/Plugins/version_checker. You are currently using'
                          ' version %s', filename, get_current_flexget_version())
         log.debug('Traceback:', exc_info=True)
+        return traceback.format_exc()
