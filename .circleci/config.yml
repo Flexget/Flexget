@@ -5,8 +5,8 @@ install_deps: &install_deps
   command: |
     if [ ! -f "venv/bin/python" ]; then
       virtualenv venv
-      . venv/bin/activate
     fi
+    . venv/bin/activate
     pip install -r requirements.txt
     pip install -r dev-requirements.txt
     pip install -r dev-requirements-extras.txt
