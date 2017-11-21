@@ -252,6 +252,11 @@ class Torrent(object):
         return files
 
     @property
+    def is_multi_file(self):
+        """Return True if the torrent is a multi-file torrent"""
+        return 'files' in self.content['info']
+
+    @property
     def name(self):
         """Return name of the torrent"""
         return self.content['info'].get('name', '')
