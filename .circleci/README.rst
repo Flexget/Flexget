@@ -29,7 +29,7 @@ You will require access to https://hub.docker.com/u/flexget/dashboard/
 Login and push the image to DockerHub::
 
    docker login
-   docker push flexget/cci-python:<version> <folder>
+   docker push flexget/cci-python:<version>
 
 
 Manual Deploy
