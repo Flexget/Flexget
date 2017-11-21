@@ -1582,18 +1582,31 @@ class FilterSeries(FilterSeriesBase):
 
         # Prefetch data to speed up parsing
         with Session() as session:
-            names_normalized = list(map(lambda s: normalize_series_name(s.keys()[0]), config))
+            names_normalized = [normalize_series_name(series.keys()[0]) for series in config]
             existing_series = session.query(Series).filter(Series._name_normalized.in_(names_normalized))
-            identified_by_cache = dict(map(lambda s: (s._name_normalized, s.identified_by), existing_series))
+            identified_by_cache = dict([(s._name_normalized, s.identified_by) for s in existing_series])
 
-        # TODO: Can we pre-parsed the entries to try guess the series rather then looping over every one?
-        for series_item in config:
-            series_name, series_config = list(series_item.items())[0]
-            log.trace('series_name: `%s`, series_config: `%s`', series_name, series_config)
+        series_name_config = dict([item.items()[0] for item in config])
+
+        # If we have > 100 series and > 20 entries then try do a first parse to reduce compute
+        if len(config) > 100 and len(task.entries) > 20:
             start_time = time.clock()
+            for entry in task.entries:
+                parsed = get_plugin_by_name('parsing').instance.parse_series(entry['title'])
+                if parsed.is_series and parsed.name in series_name_config:
+                    self.parse_series([entry], parsed.name, series_name_config[parsed.name], identified_by_cache)
+                    entry['series_parser_skip'] = True
+                continue
+            log.debug('series on_task_metainfo PRE_PARSE took %s to parse', time.clock() - start_time)
+
+        start_time = time.clock()
+        for series_name, series_config in series_name_config.iteritems():
+            log.trace('series_name: `%s`, series_config: `%s`', series_name, series_config)
+            start_item = time.clock()
             self.parse_series(task.entries, series_name, series_config, identified_by_cache)
-            took = time.clock() - start_time
-            log.trace('parsing `%s` took %s', series_name, took)
+            log.trace('parsing `%s` took %s', series_name, time.clock() - start_item)
+        log.debug('series on_task_metainfo took %s to parse', time.clock() - start_time)
+        sys.exit(1)
 
     def on_task_filter(self, task, config):
         """Filter series"""
@@ -1609,11 +1622,11 @@ class FilterSeries(FilterSeriesBase):
 
         # Prefetch series
         with Session() as session:
-            names_normalized = list(map(lambda s: normalize_series_name(s.keys()[0]), config))
+            names_normalized = [normalize_series_name(series.keys()[0]) for series in config]
             existing_series = session.query(Series) \
                 .filter(Series._name_normalized.in_(names_normalized)) \
                 .options(joinedload('alternate_names')).all()
-            existing_series_map = dict(map(lambda s: (s._name_normalized, s), existing_series))
+            existing_series_map = dict([(s._name_normalized, s.identified_by) for s in existing_series])
             # Detach all series so they can be used (not updated) without extra queries or dblocks
             session.expunge_all()
 
@@ -1717,6 +1730,10 @@ class FilterSeries(FilterSeriesBase):
             params[id_type + '_regexps'] = get_as_array(config, id_type + '_regexp')
 
         for entry in entries:
+            # Skip pre-processed
+            if entry.get('series_parser_skip'):
+                continue
+
             # skip processed entries
             if (entry.get('series_parser') and entry['series_parser'].valid and
                         entry['series_parser'].name.lower() != series_name.lower()):
@@ -2167,11 +2184,11 @@ class SeriesDBManager(FilterSeriesBase):
             config = self.prepare_config(task.config['series'])
 
             # Prefetch series
-            names_normalized = list(map(lambda s: normalize_series_name(s.keys()[0]), config))
+            names_normalized = [normalize_series_name(series.keys()[0]) for series in config]
             existing_series = session.query(Series)\
                 .filter(Series._name_normalized.in_(names_normalized))\
                 .options(joinedload('alternate_names')).all()
-            existing_series_map = dict(map(lambda s: (s._name_normalized, s), existing_series))
+            existing_series_map = dict([(s._name_normalized, s) for s in existing_series])
 
             for series_item in config:
                 series_name, series_config = list(series_item.items())[0]
