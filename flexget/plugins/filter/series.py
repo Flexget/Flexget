@@ -1606,7 +1606,6 @@ class FilterSeries(FilterSeriesBase):
             self.parse_series(task.entries, series_name, series_config, identified_by_cache)
             log.trace('parsing `%s` took %s', series_name, time.clock() - start_item)
         log.debug('series on_task_metainfo took %s to parse', time.clock() - start_time)
-        sys.exit(1)
 
     def on_task_filter(self, task, config):
         """Filter series"""
