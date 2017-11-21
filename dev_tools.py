@@ -96,14 +96,19 @@ def bundle_webui():
         app_path = os.path.join(ui_path, 'v2', 'dist')
         if os.path.exists(app_path):
             shutil.rmtree(app_path)
-        ui_v2_artifacts = 'https://circleci.com/api/v1.1/project/github/Flexget/webui/latest/artifacts' \
-                          '?circle-token=%s&branch=develop&filter=successful' % os.getenv('CIRCLE_API_TOKEN')
 
-        r = requests.get(ui_v2_artifacts, headers={'Accept': 'application/json', 'User-Agent': 'curl/7.54.0', 'Accept-Encoding': 'test'})
-        artifacts = r.json()
+        release = requests.get('https://api.github.com/repos/Flexget/webui/releases/latest').json()
 
-        # Should always be first entry
-        download_extract(artifacts[0]['url'], os.path.join(ui_path, 'v2'))
+        v2_package = None
+        for asset in release['assets']:
+            if asset['name'] == 'dist.zip':
+                v2_package = asset['browser_download_url']
+                break
+
+        if not v2_package:
+            click.echo('Unable to find dist.zip in assets')
+            raise click.Abort()
+        download_extract(v2_package, os.path.join(ui_path, 'v2'))
     except (IOError, ValueError) as e:
         click.echo('Unable to download and extract WebUI v2 due to %s' % str(e))
         raise click.Abort()
