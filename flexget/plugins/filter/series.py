@@ -16,7 +16,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
-from sqlalchemy.orm import relation, backref, object_session
+from sqlalchemy.orm import relation, backref, object_session, joinedload
 
 from flexget import db_schema, options, plugin
 from flexget.config_schema import one_or_more
@@ -678,6 +678,28 @@ class SeriesTask(Base):
 
     def __init__(self, name):
         self.name = name
+
+
+def map_names_to_series(names, session, preload=None):
+    """
+    Return a dict with key=name and value=series_object for all series matching the names.
+
+    :param names: list of series names
+    :param session: db session
+    :return:
+    """
+    # Normalize the names.
+    series_names_normalized = dict(map(lambda n: (n, normalize_series_name(n)), names))
+
+    query = session.query(Series).filter(Series._name_normalized.in_(series_names_normalized.values()))
+    if preload:
+        for j in preload:
+            query = query.options(joinedload(j))
+
+    # Return a dict of key=orig_name and value=series_object
+    found_series = dict(map(lambda s: (s._name_normalized, s), query.all()))
+
+    return dict(map(lambda n: (n, found_series.get(series_names_normalized[n])), names))
 
 
 @with_session
@@ -1599,6 +1621,8 @@ class FilterSeries(FilterSeriesBase):
             if entry.get('series_name') and entry.get('series_id') is not None and entry.get('series_parser'):
                 found_series.setdefault(entry['series_name'], []).append(entry)
 
+        # Prefetch Series
+
         for series_item in config:
             with Session() as session:
                 series_name, series_config = list(series_item.items())[0]
@@ -2139,15 +2163,22 @@ class SeriesDBManager(FilterSeriesBase):
 
         # Clear all series from this task
         with Session() as session:
+            add_series_tasks = []
+
             session.query(SeriesTask).filter(SeriesTask.name == task.name).delete()
             if not task.config.get('series'):
                 return
             config = self.prepare_config(task.config['series'])
+
+            # Prefetch series
+            series_names = list(map(lambda s: s.keys()[0], config))
+            existing_series = map_names_to_series(series_names, session, preload=['alternate_names'])
+
             for series_item in config:
                 series_name, series_config = list(series_item.items())[0]
                 # Make sure number shows (e.g. 24) are turned into strings
                 series_name = str(series_name)
-                db_series = session.query(Series).filter(Series.name == series_name).first()
+                db_series = existing_series.get(series_name)
                 alts = series_config.get('alternate_name', [])
                 if not isinstance(alts, list):
                     alts = [alts]
@@ -2166,8 +2197,13 @@ class SeriesDBManager(FilterSeriesBase):
                     log.debug('-> added `%s`', db_series)
                 for alt in alts:
                     _add_alt_name(alt, db_series, series_name, session)
+
                 log.debug('connecting series `%s` to task `%s`', db_series.name, task.name)
-                db_series.in_tasks.append(SeriesTask(task.name))
+                series_task = SeriesTask(task.name)
+                series_task.series_id = db_series.id
+                add_series_tasks.append(series_task)
+                add_series_tasks.append(series_task)
+
                 if series_config.get('identified_by', 'auto') != 'auto':
                     db_series.identified_by = series_config['identified_by']
                 # Set the begin episode
@@ -2176,6 +2212,9 @@ class SeriesDBManager(FilterSeriesBase):
                         set_series_begin(db_series, series_config['begin'])
                     except ValueError as e:
                         raise plugin.PluginError(e)
+
+            if add_series_tasks:
+                session.bulk_save_objects(add_series_tasks)
 
 
 def _add_alt_name(alt, db_series, series_name, session):
