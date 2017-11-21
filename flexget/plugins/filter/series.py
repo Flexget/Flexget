@@ -680,28 +680,6 @@ class SeriesTask(Base):
         self.name = name
 
 
-def map_names_to_series(names, session, preload=None):
-    """
-    Return a dict with key=name and value=series_object for all series matching the names.
-
-    :param names: list of series names
-    :param session: db session
-    :return:
-    """
-    # Normalize the names.
-    series_names_normalized = dict(map(lambda n: (n, normalize_series_name(n)), names))
-
-    query = session.query(Series).filter(Series._name_normalized.in_(series_names_normalized.values()))
-    if preload:
-        for j in preload:
-            query = query.options(joinedload(j))
-
-    # Return a dict of key=orig_name and value=series_object
-    found_series = dict(map(lambda s: (s._name_normalized, s), query.all()))
-
-    return dict(map(lambda n: (n, found_series.get(series_names_normalized[n])), names))
-
-
 @with_session
 def get_series_summary(configured=None, premieres=None, start=None, stop=None, count=False, sort_by='show_name',
                        descending=None, session=None, name=None):
@@ -1604,11 +1582,9 @@ class FilterSeries(FilterSeriesBase):
 
         # Prefetch data to speed up parsing
         with Session() as session:
-            series_names = list(map(lambda s: s.keys()[0], config))
-            series = map_names_to_series(series_names, session)
-            identified_by_cache = dict(map(lambda s: (s[0], s[1].identified_by), series.iteritems()))
-
-        start = time.clock()
+            names_normalized = list(map(lambda s: normalize_series_name(s.keys()[0]), config))
+            existing_series = session.query(Series).filter(Series._name_normalized.in_(names_normalized))
+            identified_by_cache = dict(map(lambda s: (s._name_normalized, s.identified_by), existing_series))
 
         # TODO: Can we pre-parsed the entries to try guess the series rather then looping over every one?
         for series_item in config:
@@ -1618,8 +1594,6 @@ class FilterSeries(FilterSeriesBase):
             self.parse_series(task.entries, series_name, series_config, identified_by_cache)
             took = time.clock() - start_time
             log.trace('parsing `%s` took %s', series_name, took)
-
-        log.info('took %s to parse', time.clock() - start)
 
     def on_task_filter(self, task, config):
         """Filter series"""
@@ -1633,7 +1607,15 @@ class FilterSeries(FilterSeriesBase):
             if entry.get('series_name') and entry.get('series_id') is not None and entry.get('series_parser'):
                 found_series.setdefault(entry['series_name'], []).append(entry)
 
-        # Prefetch Series
+        # Prefetch series
+        with Session() as session:
+            names_normalized = list(map(lambda s: normalize_series_name(s.keys()[0]), config))
+            existing_series = session.query(Series) \
+                .filter(Series._name_normalized.in_(names_normalized)) \
+                .options(joinedload('alternate_names')).all()
+            existing_series_map = dict(map(lambda s: (s._name_normalized, s), existing_series))
+            # Detach all series so they can be used (not updated) without extra queries or dblocks
+            session.expunge_all()
 
         for series_item in config:
             with Session() as session:
@@ -1643,7 +1625,7 @@ class FilterSeries(FilterSeriesBase):
                     continue
                 # Make sure number shows (e.g. 24) are turned into strings
                 series_name = str(series_name)
-                db_series = session.query(Series).filter(Series.name == series_name).first()
+                db_series = existing_series_map.get(normalize_series_name(series_name))
                 if not db_series:
                     log.debug('adding series `%s` into db', series_name)
                     db_series = Series()
@@ -1657,6 +1639,9 @@ class FilterSeries(FilterSeriesBase):
                         alts = [alts]
                     for alt in alts:
                         _add_alt_name(alt, db_series, series_name, session)
+                    existing_series_map[db_series._name_normalized] = db_series
+                else:
+                    session.add(db_series)
                 if series_name not in found_series:
                     continue
                 series_entries = {}
@@ -1692,6 +1677,7 @@ class FilterSeries(FilterSeriesBase):
 
                 took = time.clock() - start_time
                 log.trace('processing `%s` took %s', series_name, took)
+                session.expunge(db_series)
 
     def parse_series(self, entries, series_name, config, identified_by_cache):
         """
@@ -2173,7 +2159,7 @@ class SeriesDBManager(FilterSeriesBase):
 
         # Clear all series from this task
         with Session() as session:
-            add_series_tasks = []
+            add_series_tasks = {}
 
             session.query(SeriesTask).filter(SeriesTask.name == task.name).delete()
             if not task.config.get('series'):
@@ -2181,14 +2167,18 @@ class SeriesDBManager(FilterSeriesBase):
             config = self.prepare_config(task.config['series'])
 
             # Prefetch series
-            series_names = list(map(lambda s: s.keys()[0], config))
-            existing_series = map_names_to_series(series_names, session, preload=['alternate_names'])
+            names_normalized = list(map(lambda s: normalize_series_name(s.keys()[0]), config))
+            existing_series = session.query(Series)\
+                .filter(Series._name_normalized.in_(names_normalized))\
+                .options(joinedload('alternate_names')).all()
+            existing_series_map = dict(map(lambda s: (s._name_normalized, s), existing_series))
 
             for series_item in config:
                 series_name, series_config = list(series_item.items())[0]
                 # Make sure number shows (e.g. 24) are turned into strings
                 series_name = str(series_name)
-                db_series = existing_series.get(series_name)
+                series_name_normalized = normalize_series_name(series_name)
+                db_series = existing_series_map.get(series_name_normalized)
                 alts = series_config.get('alternate_name', [])
                 if not isinstance(alts, list):
                     alts = [alts]
@@ -2204,15 +2194,18 @@ class SeriesDBManager(FilterSeriesBase):
                     db_series.name = series_name
                     session.add(db_series)
                     session.flush()  # flush to get id on series before creating alternate names
+                    existing_series_map[db_series._name_normalized] = db_series
                     log.debug('-> added `%s`', db_series)
                 for alt in alts:
                     _add_alt_name(alt, db_series, series_name, session)
 
                 log.debug('connecting series `%s` to task `%s`', db_series.name, task.name)
-                series_task = SeriesTask(task.name)
-                series_task.series_id = db_series.id
-                add_series_tasks.append(series_task)
-                add_series_tasks.append(series_task)
+
+                # Add in bulk at the end
+                if db_series.id not in add_series_tasks:
+                    series_task = SeriesTask(task.name)
+                    series_task.series_id = db_series.id
+                    add_series_tasks[db_series.id] = series_task
 
                 if series_config.get('identified_by', 'auto') != 'auto':
                     db_series.identified_by = series_config['identified_by']
@@ -2224,7 +2217,7 @@ class SeriesDBManager(FilterSeriesBase):
                         raise plugin.PluginError(e)
 
             if add_series_tasks:
-                session.bulk_save_objects(add_series_tasks)
+                session.bulk_save_objects(add_series_tasks.values())
 
 
 def _add_alt_name(alt, db_series, series_name, session):
