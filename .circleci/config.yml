@@ -3,8 +3,10 @@ version: 2
 install_deps: &install_deps
   name: Install Dependencies
   command: |
-    virtualenv venv
-    . venv/bin/activate
+    if [ ! -f "venv/bin/python" ]; then
+      virtualenv venv
+      . venv/bin/activate
+    fi
     pip install -r requirements.txt
     pip install -r dev-requirements.txt
     pip install -r dev-requirements-extras.txt
