@@ -6,5 +6,5 @@ RUN sudo sed -i 's/debian jessie main$/debian jessie main contrib non-free/' /et
 # Install unrar used by some flexget tests
 RUN sudo apt-get update; sudo apt-get install -qy unrar
 
-# Required as py3.3 venv does not install pip by default
+# Use virtualenv as we test on py2.7, keeps it consistant
 RUN sudo pip install virtualenv
