@@ -1601,13 +1601,25 @@ class FilterSeries(FilterSeriesBase):
     def on_task_metainfo(self, task, config):
         config = self.prepare_config(config)
         self.auto_exact(config)
+
+        # Prefetch data to speed up parsing
+        with Session() as session:
+            series_names = list(map(lambda s: s.keys()[0], config))
+            series = map_names_to_series(series_names, session)
+            identified_by_cache = dict(map(lambda s: (s[0], s[1].identified_by), series.iteritems()))
+
+        start = time.clock()
+
+        # TODO: Can we pre-parsed the entries to try guess the series rather then looping over every one?
         for series_item in config:
             series_name, series_config = list(series_item.items())[0]
             log.trace('series_name: `%s`, series_config: `%s`', series_name, series_config)
             start_time = time.clock()
-            self.parse_series(task.entries, series_name, series_config)
+            self.parse_series(task.entries, series_name, series_config, identified_by_cache)
             took = time.clock() - start_time
             log.trace('parsing `%s` took %s', series_name, took)
+
+        log.info('took %s to parse', time.clock() - start)
 
     def on_task_filter(self, task, config):
         """Filter series"""
@@ -1681,7 +1693,7 @@ class FilterSeries(FilterSeriesBase):
                 took = time.clock() - start_time
                 log.trace('processing `%s` took %s', series_name, took)
 
-    def parse_series(self, entries, series_name, config):
+    def parse_series(self, entries, series_name, config, identified_by_cache):
         """
         Search for `series_name` and populate all `series_*` fields in entries when successfully parsed
 
@@ -1689,6 +1701,7 @@ class FilterSeries(FilterSeriesBase):
         :param entries: List of entries to process
         :param series_name: Series name which is being processed
         :param config: Series config being processed
+        :param identified_by_cache: Series config being processed
         """
 
         def get_as_array(config, key):
@@ -1701,11 +1714,8 @@ class FilterSeries(FilterSeriesBase):
         # set parser flags flags based on config / database
         identified_by = config.get('identified_by', 'auto')
         if identified_by == 'auto':
-            with Session() as session:
-                series = session.query(Series).filter(Series.name == series_name).first()
-                if series:
-                    # set flag from database
-                    identified_by = series.identified_by or 'auto'
+            # set flag from database
+            identified_by = identified_by_cache.get(series_name) or 'auto'
 
         params = dict(identified_by=identified_by,
                       alternate_names=get_as_array(config, 'alternate_name'),
