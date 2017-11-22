@@ -1606,6 +1606,7 @@ class FilterSeries(FilterSeriesBase):
             self.parse_series(task.entries, series_name, series_config, identified_by_cache)
             log.trace('parsing `%s` took %s', series_name, time.clock() - start_item)
         log.debug('series on_task_metainfo took %s to parse', time.clock() - start_time)
+        sys.exit(1)
 
     def on_task_filter(self, task, config):
         """Filter series"""
@@ -2187,14 +2188,13 @@ class SeriesDBManager(FilterSeriesBase):
             existing_series = session.query(Series)\
                 .filter(Series._name_normalized.in_(names_normalized))\
                 .options(joinedload('alternate_names')).all()
-            existing_series_map = dict([(s._name_normalized, s) for s in existing_series])
+            existing_series_map = dict([(s.name_lower, s) for s in existing_series])
 
             for series_item in config:
                 series_name, series_config = list(series_item.items())[0]
                 # Make sure number shows (e.g. 24) are turned into strings
                 series_name = str(series_name)
-                series_name_normalized = normalize_series_name(series_name)
-                db_series = existing_series_map.get(series_name_normalized)
+                db_series = existing_series_map.get(normalize_series_name(series_name))
                 alts = series_config.get('alternate_name', [])
                 if not isinstance(alts, list):
                     alts = [alts]
@@ -2205,12 +2205,14 @@ class SeriesDBManager(FilterSeriesBase):
                     db_series.alternate_names = [alt for alt in db_series.alternate_names if alt.alt_name in alts]
                     # Add/update the possibly new alternate names
                 else:
+                    # TODO: Remove, added for debugging
+                    log.info('adding series `%s` `%s` into db (on_task_start)', series_name, normalize_series_name(series_name))
                     log.debug('adding series `%s` into db (on_task_start)', series_name)
                     db_series = Series()
                     db_series.name = series_name
                     session.add(db_series)
                     session.flush()  # flush to get id on series before creating alternate names
-                    existing_series_map[db_series._name_normalized] = db_series
+                    existing_series_map[db_series.name_lower] = db_series
                     log.debug('-> added `%s`', db_series)
                 for alt in alts:
                     _add_alt_name(alt, db_series, series_name, session)
