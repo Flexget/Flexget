@@ -6,6 +6,7 @@ import logging
 import re
 import time
 import sys
+from collections import defaultdict
 from copy import copy
 from datetime import datetime, timedelta
 from functools import total_ordering
@@ -1597,11 +1598,11 @@ class FilterSeries(FilterSeriesBase):
 
         # Sort Entries into data model similar to https://en.wikipedia.org/wiki/Trie
         # Only process series if both the entry title and series title first letter match
-        entries_map = {}
+        entries_map = defaultdict(list)
         for entry in task.entries:
             parsed = parser.parse_series(entry['title'])
             if parsed.name:
-                entries_map.setdefault(parsed.name[:1].lower(), []).append(entry)
+                entries_map[parsed.name[:1].lower()].append(entry)
 
         with Session() as session:
             # Preload series
@@ -1616,8 +1617,8 @@ class FilterSeries(FilterSeriesBase):
                 alt_names = get_config_as_array(series_config, 'alternate_name')
                 db_series = existing_db_series.get(normalize_series_name(series_name))
                 db_identified_by = db_series.identified_by if db_series else None
-                trie_letters = set([series_name[:1].lower()] + [alt[:1].lower() for alt in alt_names])
-                entries = [entry for letter in trie_letters for entry in entries_map.get(letter, [])]
+                letters = set([series_name[:1].lower()] + [alt[:1].lower() for alt in alt_names])
+                entries = [entry for letter in letters for entry in entries_map.get(letter, [])]
                 if entries:
                     self.parse_series(entries, series_name, series_config, db_identified_by)
 
