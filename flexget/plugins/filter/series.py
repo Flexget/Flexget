@@ -1602,7 +1602,11 @@ class FilterSeries(FilterSeriesBase):
         for entry in task.entries:
             parsed = parser.parse_series(entry['title'])
             if parsed.name:
-                entries_map[parsed.name[:1].lower()].append(entry)
+                char = parsed.name[:1].lower()
+            else:
+                # Use first char of entry title if parsing failed
+                char = entry['title'][:1].lower()
+            entries_map[char].append(entry)
 
         with Session() as session:
             # Preload series
