@@ -235,7 +235,12 @@ def normalize_series_name(name):
 
 class NormalizedComparator(Comparator):
     def operate(self, op, other):
-        return op(self.__clause_element__(), normalize_series_name(other))
+        if isinstance(other, list):
+            other = [normalize_series_name(o) for o in other]
+        else:
+            other = normalize_series_name(other)
+
+        return op(self.__clause_element__(), other)
 
 
 class AlternateNames(Base):
@@ -301,6 +306,10 @@ class Series(Base):
 
     def name_comparator(self):
         return NormalizedComparator(self._name_normalized)
+
+    @property
+    def name_normalized(self):
+        return self._name_normalized
 
     name = hybrid_property(name_getter, name_setter)
     name.comparator(name_comparator)
@@ -1580,11 +1589,11 @@ class FilterSeries(FilterSeriesBase):
         config = self.prepare_config(config)
         self.auto_exact(config)
 
-        # Prefetch data to speed up parsing
+        # Prefetch series data to speed up parsing
         with Session() as session:
-            names_normalized = [normalize_series_name(series.keys()[0]) for series in config]
-            existing_series = session.query(Series).filter(Series._name_normalized.in_(names_normalized))
-            identified_by_cache = dict([(s._name_normalized, s.identified_by) for s in existing_series])
+            series_names = [s.keys()[0] for s in config]
+            existing_series = session.query(Series).filter(Series.name.in_(series_names))
+            identified_by_cache = dict([(s.name_normalized, s.identified_by) for s in existing_series])
 
         series_name_config = dict([item.items()[0] for item in config])
 
@@ -2171,8 +2180,8 @@ class SeriesDBManager(FilterSeriesBase):
     @plugin.priority(0)
     def on_task_start(self, task, config):
         # Only operate if task changed
-        if not task.config_modified:
-            return
+        #if not task.config_modified:
+        #    return
 
         # Clear all series from this task
         with Session() as session:
@@ -2184,11 +2193,11 @@ class SeriesDBManager(FilterSeriesBase):
             config = self.prepare_config(task.config['series'])
 
             # Prefetch series
-            names_normalized = [normalize_series_name(series.keys()[0]) for series in config]
+            names = [series.keys()[0] for series in config]
             existing_series = session.query(Series)\
-                .filter(Series._name_normalized.in_(names_normalized))\
+                .filter(Series.name.in_(names))\
                 .options(joinedload('alternate_names')).all()
-            existing_series_map = dict([(s.name_lower, s) for s in existing_series])
+            existing_series_map = dict([(s.name_normalized, s) for s in existing_series])
 
             for series_item in config:
                 series_name, series_config = list(series_item.items())[0]
@@ -2212,7 +2221,7 @@ class SeriesDBManager(FilterSeriesBase):
                     db_series.name = series_name
                     session.add(db_series)
                     session.flush()  # flush to get id on series before creating alternate names
-                    existing_series_map[db_series.name_lower] = db_series
+                    existing_series_map[db_series.name_normalized] = db_series
                     log.debug('-> added `%s`', db_series)
                 for alt in alts:
                     _add_alt_name(alt, db_series, series_name, session)
