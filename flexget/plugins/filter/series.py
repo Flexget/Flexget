@@ -1606,7 +1606,7 @@ class FilterSeries(FilterSeriesBase):
         with Session() as session:
             # Preload series
             # str() added to make sure number shows (e.g. 24) are turned into strings
-            series_names = [str(s.keys()[0]) for s in config]
+            series_names = [str(list(s.keys())[0]) for s in config]
             existing_db_series = session.query(Series).filter(Series.name.in_(series_names))
             existing_db_series = dict([(s.name_normalized, s) for s in existing_db_series])
 
@@ -1638,7 +1638,7 @@ class FilterSeries(FilterSeriesBase):
         # Prefetch series
         with Session() as session:
             # str() added to make sure number shows (e.g. 24) are turned into strings
-            series_names = [str(s.keys()[0]) for s in config]
+            series_names = [str(list(s.keys())[0]) for s in config]
             existing_series = session.query(Series) \
                 .filter(Series.name.in_(series_names)) \
                 .options(joinedload('alternate_names')).all()
@@ -2193,7 +2193,7 @@ class SeriesDBManager(FilterSeriesBase):
             config = self.prepare_config(task.config['series'])
 
             # Prefetch series
-            names = [series.keys()[0] for series in config]
+            names = [str(list(series.keys())[0]) for series in config]
             existing_series = session.query(Series)\
                 .filter(Series.name.in_(names))\
                 .options(joinedload('alternate_names')).all()
