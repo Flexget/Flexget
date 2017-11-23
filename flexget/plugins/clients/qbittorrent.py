@@ -52,8 +52,8 @@ class OutputQBitTorrent(object):
             else:
                 return response
         except RequestException as e:
-            msg = e.message
-        raise plugin.PluginError('Error when trying to send request to qBittorent: {}'.format(msg))
+            msg = str(e)
+        raise plugin.PluginError('Error when trying to send request to qBittorrent: {}'.format(msg))
 
     def connect(self, config):
         """
@@ -76,16 +76,16 @@ class OutputQBitTorrent(object):
         multipart_data = {k: (None, v) for k, v in data.items()}
         with open(file_path, 'rb') as f:
             multipart_data['torrents'] = f
-            self._request('post', self.url + '/command/upload', msg_on_fail='Failed to add file to qBittorent',
+            self._request('post', self.url + '/command/upload', msg_on_fail='Failed to add file to qBittorrent',
                           files=multipart_data)
-        log.debug('Added torrent file %s to qBittorent', file_path)
+        log.debug('Added torrent file %s to qBittorrent', file_path)
 
     def add_torrent_url(self, url, data):
         if not self.connected:
             raise plugin.PluginError('Not connected.')
         data['urls'] = url
         multipart_data = {k: (None, v) for k, v in data.items()}
-        self._request('post', self.url + '/command/download', msg_on_fail='Failed to add file to qBittorent',
+        self._request('post', self.url + '/command/download', msg_on_fail='Failed to add file to qBittorrent',
                       files=multipart_data)
         log.debug('Added url %s to qBittorrent', url)
 
