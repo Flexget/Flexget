@@ -1596,17 +1596,19 @@ class FilterSeries(FilterSeriesBase):
 
         parser = get_plugin_by_name('parsing').instance
 
+        start_time = time.clock()
+
         # Sort Entries into data model similar to https://en.wikipedia.org/wiki/Trie
         # Only process series if both the entry title and series title first letter match
         entries_map = defaultdict(list)
         for entry in task.entries:
             parsed = parser.parse_series(entry['title'])
             if parsed.name:
-                first_char = parsed.name[:1].lower()
+                entries_map[parsed.name[:1].lower()].append(entry)
             else:
-                # Use first char of entry title if parsing failed
-                first_char = entry['title'][:1].lower()
-            entries_map[first_char].append(entry)
+                # If parsing failed, use first char of each word in the entry title
+                for word in entry['title'].replace(' ', '.').split('.'):
+                    entries_map[word[:1].lower()].append(entry)
 
         with Session() as session:
             # Preload series
@@ -1615,18 +1617,17 @@ class FilterSeries(FilterSeriesBase):
             existing_db_series = session.query(Series).filter(Series.name.in_(series_names))
             existing_db_series = {s.name_normalized: s for s in existing_db_series}
 
-            start_time = time.clock()
             for series_item in config:
                 series_name, series_config = list(series_item.items())[0]
                 alt_names = get_config_as_array(series_config, 'alternate_name')
                 db_series = existing_db_series.get(normalize_series_name(series_name))
                 db_identified_by = db_series.identified_by if db_series else None
                 letters = set([series_name[:1].lower()] + [alt[:1].lower() for alt in alt_names])
-                entries = [entry for letter in letters for entry in entries_map.get(letter, [])]
+                entries = set([entry for letter in letters for entry in entries_map.get(letter, [])])
                 if entries:
                     self.parse_series(entries, series_name, series_config, db_identified_by)
 
-            log.debug('series on_task_metainfo took %s to parse', time.clock() - start_time)
+        log.debug('series on_task_metainfo took %s to parse', time.clock() - start_time)
 
     def on_task_filter(self, task, config):
         """Filter series"""
