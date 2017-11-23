@@ -1609,7 +1609,7 @@ class FilterSeries(FilterSeriesBase):
             # str() added to make sure number shows (e.g. 24) are turned into strings
             series_names = [str(list(s.keys())[0]) for s in config]
             existing_db_series = session.query(Series).filter(Series.name.in_(series_names))
-            existing_db_series = dict([(s.name_normalized, s) for s in existing_db_series])
+            existing_db_series = {s.name_normalized: s for s in existing_db_series}
 
             start_time = time.clock()
             for series_item in config:
