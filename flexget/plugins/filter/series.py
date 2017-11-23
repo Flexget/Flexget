@@ -1707,8 +1707,6 @@ class FilterSeries(FilterSeriesBase):
                     log.debug('identified_by set to `%s` based on series history', db_series.identified_by)
 
                 self.process_series(task, series_entries, series_config)
-                # Detach series from session
-                session.expunge(db_series)
 
         log.debug('processing series took %s', time.clock() - start_time)
 
@@ -2195,8 +2193,8 @@ class SeriesDBManager(FilterSeriesBase):
 
             # Prefetch series
             names = [str(list(series.keys())[0]) for series in config]
-            existing_series = session.query(Series)\
-                .filter(Series.name.in_(names))\
+            existing_series = session.query(Series) \
+                .filter(Series.name.in_(names)) \
                 .options(joinedload('alternate_names')).all()
             existing_series_map = dict([(s.name_normalized, s) for s in existing_series])
 
@@ -2216,7 +2214,8 @@ class SeriesDBManager(FilterSeriesBase):
                     # Add/update the possibly new alternate names
                 else:
                     # TODO: Remove, added for debugging
-                    log.info('adding series `%s` `%s` into db (on_task_start)', series_name, normalize_series_name(series_name))
+                    log.info('adding series `%s` `%s` into db (on_task_start)', series_name,
+                             normalize_series_name(series_name))
                     log.debug('adding series `%s` into db (on_task_start)', series_name)
                     db_series = Series()
                     db_series.name = series_name
