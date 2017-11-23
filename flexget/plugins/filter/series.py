@@ -1595,17 +1595,18 @@ class FilterSeries(FilterSeriesBase):
 
         parser = get_plugin_by_name('parsing').instance
 
-        # Sort Entries into a https://en.wikipedia.org/wiki/Trie
+        # Sort Entries into data model similar to https://en.wikipedia.org/wiki/Trie
         # Only process series if both the entry title and series title first letter match
-        entry_trie = {}
+        entries_map = {}
         for entry in task.entries:
             parsed = parser.parse_series(entry['title'])
             if parsed.name:
-                entry_trie.setdefault(parsed.name[:1].lower(), []).append(entry)
+                entries_map.setdefault(parsed.name[:1].lower(), []).append(entry)
 
         with Session() as session:
             # Preload series
-            series_names = [s.keys()[0] for s in config]
+            # str() added to make sure number shows (e.g. 24) are turned into strings
+            series_names = [str(s.keys()[0]) for s in config]
             existing_db_series = session.query(Series).filter(Series.name.in_(series_names))
             existing_db_series = dict([(s.name_normalized, s) for s in existing_db_series])
 
@@ -1616,11 +1617,11 @@ class FilterSeries(FilterSeriesBase):
                 db_series = existing_db_series.get(normalize_series_name(series_name))
                 db_identified_by = db_series.identified_by if db_series else None
                 trie_letters = set([series_name[:1].lower()] + [alt[:1].lower() for alt in alt_names])
-                entries = [entry for letter in trie_letters for entry in entry_trie.get(letter, [])]
+                entries = [entry for letter in trie_letters for entry in entries_map.get(letter, [])]
                 if entries:
                     self.parse_series(entries, series_name, series_config, db_identified_by)
 
-            log.info('series on_task_metainfo PRE_PARSE took %s to parse', time.clock() - start_time)
+            log.debug('series on_task_metainfo took %s to parse', time.clock() - start_time)
 
     def on_task_filter(self, task, config):
         """Filter series"""
@@ -1636,20 +1637,24 @@ class FilterSeries(FilterSeriesBase):
 
         # Prefetch series
         with Session() as session:
-            names_normalized = [normalize_series_name(series.keys()[0]) for series in config]
+            # str() added to make sure number shows (e.g. 24) are turned into strings
+            series_names = [str(s.keys()[0]) for s in config]
             existing_series = session.query(Series) \
-                .filter(Series._name_normalized.in_(names_normalized)) \
+                .filter(Series.name.in_(series_names)) \
                 .options(joinedload('alternate_names')).all()
-            existing_series_map = dict([(s._name_normalized, s.identified_by) for s in existing_series])
-            # Detach all series so they can be used (not updated) without extra queries or dblocks
+            existing_series_map = dict([(s.name_normalized, s) for s in existing_series])
+            # Expunge so we can work on de-attached while processing the series to minimize db locks
             session.expunge_all()
 
+        start_time = time.clock()
         for series_item in config:
             with Session() as session:
                 series_name, series_config = list(series_item.items())[0]
+
                 if series_config.get('parse_only'):
                     log.debug('Skipping filtering of series `%s` because of parse_only', series_name)
                     continue
+
                 # Make sure number shows (e.g. 24) are turned into strings
                 series_name = str(series_name)
                 db_series = existing_series_map.get(normalize_series_name(series_name))
@@ -1666,11 +1671,15 @@ class FilterSeries(FilterSeriesBase):
                         alts = [alts]
                     for alt in alts:
                         _add_alt_name(alt, db_series, series_name, session)
-                    existing_series_map[db_series._name_normalized] = db_series
+                    existing_series_map[db_series.name_normalized] = db_series
                 else:
+                    # Add existing series back to session
                     session.add(db_series)
+
+                # Skip if series not within entries
                 if series_name not in found_series:
                     continue
+
                 series_entries = {}
                 for entry in found_series[series_name]:
                     # store found episodes into database and save reference for later use
@@ -1696,15 +1705,11 @@ class FilterSeries(FilterSeriesBase):
                     db_series.identified_by = auto_identified_by(db_series)
                     log.debug('identified_by set to `%s` based on series history', db_series.identified_by)
 
-                log.trace('series_name: `%s`, series_config: `%s`', series_name, series_config)
-
-                start_time = time.clock()
-
                 self.process_series(task, series_entries, series_config)
-
-                took = time.clock() - start_time
-                log.trace('processing `%s` took %s', series_name, took)
+                # Detach series from session
                 session.expunge(db_series)
+
+        log.debug('processing series took %s', time.clock() - start_time)
 
     def parse_series(self, entries, series_name, config, db_identified_by=None):
         """
