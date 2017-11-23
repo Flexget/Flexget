@@ -482,6 +482,19 @@ def get_config_hash(config):
         return hashlib.md5(str(config).encode('utf-8')).hexdigest()
 
 
+def get_config_as_array(config, key):
+    """
+    Return configuration key as array, even if given as a single string
+    :param dict config: Configuration
+    :param string key: Configuration
+    :return: Array
+    """
+    v = config.get(key, [])
+    if isinstance(v, str):
+        return [v]
+    return v
+
+
 def parse_episode_identifier(ep_id, identify_season=False):
     """
     Parses series episode identifier, raises ValueError if it fails

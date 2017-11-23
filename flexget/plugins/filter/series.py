@@ -30,7 +30,7 @@ from flexget.utils.log import log_once
 from flexget.utils.sqlalchemy_utils import (
     table_columns, table_exists, drop_tables, table_schema, table_add_column, create_index
 )
-from flexget.utils.tools import merge_dict_from_to, parse_timedelta, parse_episode_identifier
+from flexget.utils.tools import merge_dict_from_to, parse_timedelta, parse_episode_identifier, get_config_as_array
 
 SCHEMA_VER = 14
 
@@ -262,6 +262,10 @@ class AlternateNames(Base):
 
     def name_comparator(self):
         return NormalizedComparator(self._alt_name_normalized)
+
+    @property
+    def name_normalized(self):
+        return self._alt_name_normalized
 
     alt_name = hybrid_property(name_getter, name_setter)
     alt_name.comparator(name_comparator)
@@ -1589,33 +1593,34 @@ class FilterSeries(FilterSeriesBase):
         config = self.prepare_config(config)
         self.auto_exact(config)
 
-        # Prefetch series data to speed up parsing
+        parser = get_plugin_by_name('parsing').instance
+
+        # Sort Entries into a https://en.wikipedia.org/wiki/Trie
+        # Only process series if both the entry title and series title first letter match
+        entry_trie = {}
+        for entry in task.entries:
+            parsed = parser.parse_series(entry['title'])
+            if parsed.name:
+                entry_trie.setdefault(parsed.name[:1].lower(), []).append(entry)
+
         with Session() as session:
+            # Preload series
             series_names = [s.keys()[0] for s in config]
-            existing_series = session.query(Series).filter(Series.name.in_(series_names))
-            identified_by_cache = dict([(s.name_normalized, s.identified_by) for s in existing_series])
+            existing_db_series = session.query(Series).filter(Series.name.in_(series_names))
+            existing_db_series = dict([(s.name_normalized, s) for s in existing_db_series])
 
-        series_name_config = dict([item.items()[0] for item in config])
-
-        # If we have > 100 series and > 20 entries then try do a first parse to reduce compute
-        if len(config) > 100 and len(task.entries) > 20:
             start_time = time.clock()
-            for entry in task.entries:
-                parsed = get_plugin_by_name('parsing').instance.parse_series(entry['title'])
-                if parsed.is_series and parsed.name in series_name_config:
-                    self.parse_series([entry], parsed.name, series_name_config[parsed.name], identified_by_cache)
-                    entry['series_parser_skip'] = True
-                continue
-            log.debug('series on_task_metainfo PRE_PARSE took %s to parse', time.clock() - start_time)
+            for series_item in config:
+                series_name, series_config = list(series_item.items())[0]
+                alt_names = get_config_as_array(series_config, 'alternate_name')
+                db_series = existing_db_series.get(normalize_series_name(series_name))
+                db_identified_by = db_series.identified_by if db_series else None
+                trie_letters = set([series_name[:1].lower()] + [alt[:1].lower() for alt in alt_names])
+                entries = [entry for letter in trie_letters for entry in entry_trie.get(letter, [])]
+                if entries:
+                    self.parse_series(entries, series_name, series_config, db_identified_by)
 
-        start_time = time.clock()
-        for series_name, series_config in series_name_config.iteritems():
-            log.trace('series_name: `%s`, series_config: `%s`', series_name, series_config)
-            start_item = time.clock()
-            self.parse_series(task.entries, series_name, series_config, identified_by_cache)
-            log.trace('parsing `%s` took %s', series_name, time.clock() - start_item)
-        log.debug('series on_task_metainfo took %s to parse', time.clock() - start_time)
-        sys.exit(1)
+            log.info('series on_task_metainfo PRE_PARSE took %s to parse', time.clock() - start_time)
 
     def on_task_filter(self, task, config):
         """Filter series"""
@@ -1701,7 +1706,7 @@ class FilterSeries(FilterSeriesBase):
                 log.trace('processing `%s` took %s', series_name, took)
                 session.expunge(db_series)
 
-    def parse_series(self, entries, series_name, config, identified_by_cache):
+    def parse_series(self, entries, series_name, config, db_identified_by=None):
         """
         Search for `series_name` and populate all `series_*` fields in entries when successfully parsed
 
@@ -1712,44 +1717,34 @@ class FilterSeries(FilterSeriesBase):
         :param identified_by_cache: Series config being processed
         """
 
-        def get_as_array(config, key):
-            """Return configuration key as array, even if given as a single string"""
-            v = config.get(key, [])
-            if isinstance(v, str):
-                return [v]
-            return v
-
         # set parser flags flags based on config / database
         identified_by = config.get('identified_by', 'auto')
         if identified_by == 'auto':
             # set flag from database
-            identified_by = identified_by_cache.get(series_name) or 'auto'
+            identified_by = db_identified_by or 'auto'
 
         params = dict(identified_by=identified_by,
-                      alternate_names=get_as_array(config, 'alternate_name'),
-                      name_regexps=get_as_array(config, 'name_regexp'),
+                      alternate_names=get_config_as_array(config, 'alternate_name'),
+                      name_regexps=get_config_as_array(config, 'name_regexp'),
                       strict_name=config.get('exact', False),
-                      allow_groups=get_as_array(config, 'from_group'),
+                      allow_groups=get_config_as_array(config, 'from_group'),
                       date_yearfirst=config.get('date_yearfirst'),
                       date_dayfirst=config.get('date_dayfirst'),
-                      special_ids=get_as_array(config, 'special_ids'),
+                      special_ids=get_config_as_array(config, 'special_ids'),
                       prefer_specials=config.get('prefer_specials'),
                       assume_special=config.get('assume_special'))
         for id_type in SERIES_ID_TYPES:
-            params[id_type + '_regexps'] = get_as_array(config, id_type + '_regexp')
+            params[id_type + '_regexps'] = get_config_as_array(config, id_type + '_regexp')
 
+        parser = get_plugin_by_name('parsing').instance
         for entry in entries:
-            # Skip pre-processed
-            if entry.get('series_parser_skip'):
-                continue
-
             # skip processed entries
             if (entry.get('series_parser') and entry['series_parser'].valid and
                         entry['series_parser'].name.lower() != series_name.lower()):
                 continue
 
             # Quality field may have been manipulated by e.g. assume_quality. Use quality field from entry if available.
-            parsed = get_plugin_by_name('parsing').instance.parse_series(entry['title'], name=series_name, **params)
+            parsed = parser.parse_series(entry['title'], name=series_name, **params)
             if not parsed.valid:
                 continue
             parsed.field = 'title'
@@ -2180,8 +2175,8 @@ class SeriesDBManager(FilterSeriesBase):
     @plugin.priority(0)
     def on_task_start(self, task, config):
         # Only operate if task changed
-        #if not task.config_modified:
-        #    return
+        if not task.config_modified:
+            return
 
         # Clear all series from this task
         with Session() as session:
