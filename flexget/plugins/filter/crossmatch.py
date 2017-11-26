@@ -84,10 +84,14 @@ class CrossMatch(object):
             v1 = e1[field]
             v2 = e2[field]
 
-            if (not exact and v2 in v1) or v1 == v2:
-                common_fields.append(field)
-            else:
-                log.trace('not matching')
+            try:
+                if v1 == v2 or not exact and (v2 in v1 or v1 in v2):
+                    common_fields.append(field)
+                else:
+                    log.trace('not matching')
+            except TypeError:
+                # argument of type <type> is not iterable
+                pass
 
         return common_fields
 
