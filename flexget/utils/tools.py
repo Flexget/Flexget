@@ -529,3 +529,50 @@ def parse_episode_identifier(ep_id, identify_season=False):
     if error:
         raise ValueError(error)
     return (identified_by, entity_type)
+
+
+def aggregate_inputs(task, inputs):
+    from flexget import plugin
+
+    entries = []
+    entry_titles = set()
+    entry_urls = set()
+    entry_locations = set()
+    for item in inputs:
+        for input_name, input_config in item.items():
+            input = plugin.get_plugin_by_name(input_name)
+            if input.api_ver == 1:
+                raise plugin.PluginError('Plugin %s does not support API v2' % input_name)
+            method = input.phase_handlers['input']
+            try:
+                result = method(task, input_config)
+            except plugin.PluginError as e:
+                log.warning('Error during input plugin %s: %s', input_name, e)
+                continue
+
+            if not result:
+                log.warning('Input %s did not return anything', input_name)
+                continue
+
+            for entry in result:
+                urls = ([entry['url']] if entry.get('url') else []) + entry.get('urls', [])
+
+                if any(url in entry_urls for url in urls):
+                    log.debug('URL for `%s` already in entry list, skipping.', entry['title'])
+                    continue
+
+                if entry['title'] in entry_titles:
+                    log.debug('Ignored duplicate title `%s`', entry['title'])  # TODO: should combine?
+                    continue
+
+                if entry.get('location') and entry['location'] in entry_locations:
+                    log.debug('Ignored duplicate location `%s`', entry['location'])  # TODO: should combine?
+                    continue
+
+                entries.append(entry)
+                entry_titles.add(entry['title'])
+                entry_urls.update(urls)
+                if entry.get('location'):
+                    entry_locations.add(entry['location'])
+
+    return entries

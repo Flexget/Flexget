@@ -12,7 +12,7 @@ from flexget import db_schema
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name, PluginError, PluginWarning
-from flexget.utils.tools import parse_timedelta, multiply_timedelta
+from flexget.utils.tools import parse_timedelta, multiply_timedelta, aggregate_inputs
 
 log = logging.getLogger('discover')
 Base = db_schema.versioned_base('discover', 0)
@@ -88,46 +88,6 @@ class Discover(object):
         'required': ['what', 'from'],
         'additionalProperties': False
     }
-
-    def execute_inputs(self, config, task):
-        """
-        :param config: Discover config
-        :param task: Current task
-        :return: List of pseudo entries created by inputs under `what` configuration
-        """
-        entries = []
-        entry_titles = set()
-        entry_urls = set()
-        # run inputs
-        for item in config['what']:
-            for input_name, input_config in item.items():
-                input = get_plugin_by_name(input_name)
-                if input.api_ver == 1:
-                    raise PluginError('Plugin %s does not support API v2' % input_name)
-                method = input.phase_handlers['input']
-                try:
-                    result = method(task, input_config)
-                except PluginError as e:
-                    log.warning('Error during input plugin %s: %s', input_name, e)
-                    continue
-                if not result:
-                    log.warning('Input %s did not return anything', input_name)
-                    continue
-
-                for entry in result:
-                    urls = ([entry['url']] if entry.get('url') else []) + entry.get('urls', [])
-                    if any(url in entry_urls for url in urls):
-                        log.debug('URL for `%s` already in entry list, skipping.', entry['title'])
-                        continue
-
-                    if entry['title'] in entry_titles:
-                        log.verbose('Ignored duplicate title `%s`', entry['title'])  # TODO: should combine?
-                        continue
-
-                    entries.append(entry)
-                    entry_titles.add(entry['title'])
-                    entry_urls.update(urls)
-        return entries
 
     def execute_searches(self, config, entries, task):
         """
@@ -277,7 +237,7 @@ class Discover(object):
         config['release_estimations'].setdefault('optimistic', '0 days')
 
         task.no_entries_ok = True
-        entries = self.execute_inputs(config, task)
+        entries = aggregate_inputs(task, config['what'])
         log.verbose('Discovering %i titles ...', len(entries))
         if len(entries) > 500:
             log.critical('Looks like your inputs in discover configuration produced '
