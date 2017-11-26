@@ -89,9 +89,9 @@ class CrossMatch(object):
                     common_fields.append(field)
                 else:
                     log.trace('not matching')
-            except TypeError:
+            except TypeError as e:
                 # argument of type <type> is not iterable
-                pass
+                log.trace('error matching fields: %s', str(e))
 
         return common_fields
 
