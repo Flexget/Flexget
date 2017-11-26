@@ -562,7 +562,7 @@ def aggregate_inputs(task, inputs):
                     continue
 
                 if entry['title'] in entry_titles:
-                    log.verbose('Ignored duplicate title `%s`', entry['title'])  # TODO: should combine?
+                    log.debug('Ignored duplicate title `%s`', entry['title'])  # TODO: should combine?
                     continue
 
                 if entry.get('location') and entry['location'] in entry_locations:

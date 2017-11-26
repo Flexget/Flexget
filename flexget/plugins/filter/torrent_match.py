@@ -6,7 +6,6 @@ import os
 
 from flexget import plugin
 from flexget.event import event
-from flexget.plugin import get_plugin_by_name, PluginError
 from flexget.utils.tools import aggregate_inputs
 
 log = logging.getLogger('torrent_match')
