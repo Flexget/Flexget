@@ -2218,8 +2218,7 @@ class SeriesDBManager(FilterSeriesBase):
                     db_series.alternate_names = [alt for alt in db_series.alternate_names if alt.alt_name in alts]
                     # Add/update the possibly new alternate names
                 else:
-                    # TODO: Remove, added for debugging
-                    log.info('adding series `%s` `%s` into db (on_task_start)', series_name,
+                    log.debug('adding series `%s` `%s` into db (on_task_start)', series_name,
                              normalize_series_name(series_name))
                     log.debug('adding series `%s` into db (on_task_start)', series_name)
                     db_series = Series()
