@@ -177,7 +177,7 @@ class Decompress(object):
                 to = render_from_entry(to, entry)
             except RenderError as error:
                 log.error('Could not render path: %s', to)
-                entry.fail(error)
+                entry.fail(str(error))
                 return
         else:
             to = archive_dir
