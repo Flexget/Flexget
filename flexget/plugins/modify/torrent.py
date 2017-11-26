@@ -57,6 +57,7 @@ class TorrentFilename(object):
                     self.purge(entry)
                     continue
 
+                log.trace('working on torrent %s', torrent)
                 entry['torrent'] = torrent
                 entry['torrent_info_hash'] = torrent.info_hash
                 # if we do not have good filename (by download plugin)
