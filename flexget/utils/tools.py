@@ -20,6 +20,7 @@ from pprint import pformat
 import flexget
 import queue
 import requests
+from flexget import plugin
 
 from html.entities import name2codepoint
 
@@ -529,3 +530,25 @@ def parse_episode_identifier(ep_id, identify_season=False):
     if error:
         raise ValueError(error)
     return (identified_by, entity_type)
+
+
+def aggregate_inputs(task, inputs):
+    entries = []
+    for item in inputs:
+        for input_name, input_config in item.items():
+            input = plugin.get_plugin_by_name(input_name)
+            if input.api_ver == 1:
+                raise plugin.PluginError('Plugin %s does not support API v2' % input_name)
+            method = input.phase_handlers['input']
+            try:
+                result = method(task, input_config)
+            except plugin.PluginError as e:
+                log.warning('Error during input plugin %s: %s', input_name, e)
+                continue
+            if result:
+                entries.extend(result)
+            else:
+                log.warning('Input %s did not return anything', input_name)
+                continue
+
+    return entries

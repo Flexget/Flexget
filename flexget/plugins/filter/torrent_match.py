@@ -7,6 +7,7 @@ import os
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import get_plugin_by_name, PluginError
+from flexget.utils.tools import aggregate_inputs
 
 log = logging.getLogger('torrent_match')
 
@@ -35,43 +36,9 @@ class TorrentMatch(object):
         'additionalProperties': False
     }
 
-    def execute_inputs(self, config, task):
-        """
-        :param config: TorrentMatch config
-        :param task: Current task
-        :return: List of pseudo entries created by inputs under `what` configuration
-        """
-        entries = set()
-        entry_urls = set()
-        # run inputs
-        for item in config['what']:
-            for input_name, input_config in item.items():
-                input = get_plugin_by_name(input_name)
-                if input.api_ver == 1:
-                    raise PluginError('Plugin %s does not support API v2' % input_name)
-                method = input.phase_handlers['input']
-                try:
-                    result = method(task, input_config)
-                except PluginError as e:
-                    log.warning('Error during input plugin %s: %s', input_name, e)
-                    continue
-                if not result:
-                    log.warning('Input %s did not return anything', input_name)
-                    continue
-
-                for entry in result:
-                    urls = ([entry['url']] if entry.get('url') else []) + entry.get('urls', [])
-                    if any(url in entry_urls for url in urls):
-                        log.debug('URL for `%s` already in entry list, skipping.', entry['title'])
-                        continue
-
-                    entries.add(entry)
-                    entry_urls.update(urls)
-        return entries
-
     def get_local_files(self, config, task):
         cwd = os.getcwd()  # save the current working directory
-        entries = self.execute_inputs(config, task)
+        entries = aggregate_inputs(task, config['what'])
         for entry in entries:
             location = entry.get('location')
             if not location or not os.path.exists(location):
