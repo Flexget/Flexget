@@ -20,7 +20,6 @@ from pprint import pformat
 import flexget
 import queue
 import requests
-from flexget import plugin
 
 from html.entities import name2codepoint
 
@@ -533,6 +532,8 @@ def parse_episode_identifier(ep_id, identify_season=False):
 
 
 def aggregate_inputs(task, inputs):
+    from flexget import plugin
+
     entries = []
     for item in inputs:
         for input_name, input_config in item.items():
