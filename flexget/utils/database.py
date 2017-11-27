@@ -112,6 +112,8 @@ def entry_synonym(name):
                 return tuple(result)
             else:
                 return set(result)
+        elif isinstance(item, qualities.Quality):
+            return item.name
         else:
             for s_type in supported_types:
                 if isinstance(item, s_type):
