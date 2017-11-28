@@ -291,7 +291,7 @@ def setup_loglevel(pytestconfig, caplog):
     elif pytestconfig.getoption('quiet') == 1:
         level = logging.INFO
     logging.getLogger().setLevel(level)
-    caplog.setLevel(level)
+    caplog.set_level(level)
 
 
 class CrashReport(Exception):
