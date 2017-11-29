@@ -27,13 +27,13 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-          - py27-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
-          - py27-deps- # fallback to using the latest cache if no exact match is found
+          - py2.7-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+          - py2.7-deps- # fallback to using the latest cache if no exact match is found
       - run: *install_deps
       - save_cache:
           paths:
             - ./venv
-          key: py27-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+          key: py2.7-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
       - run: *run_tests
 
   test-py33:
@@ -45,13 +45,13 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-          - py33-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
-          - py33-deps- # fallback to using the latest cache if no exact match is found
+          - py3.3-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+          - py3.3-deps- # fallback to using the latest cache if no exact match is found
       - run: *install_deps
       - save_cache:
           paths:
             - ./venv
-          key: py33-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+          key: py3.3-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
       - run: *run_tests
 
   test-py34:
@@ -63,13 +63,13 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-          - py34-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
-          - py34-deps- # fallback to using the latest cache if no exact match is found
+          - py3.4-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+          - py3.4-deps- # fallback to using the latest cache if no exact match is found
       - run: *install_deps
       - save_cache:
           paths:
             - ./venv
-          key: py34-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+          key: py3.4-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
       - run: *run_tests
 
   test-py35:
@@ -81,13 +81,13 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-          - py35-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
-          - py35-deps- # fallback to using the latest cache if no exact match is found
+          - py3.5-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+          - py3.5-deps- # fallback to using the latest cache if no exact match is found
       - run: *install_deps
       - save_cache:
           paths:
             - ./venv
-          key: py35-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+          key: py3.5-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
       - run:
           name: Run Tests
           command: |
@@ -104,13 +104,13 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-          - py36-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
-          - py36-deps- # fallback to using the latest cache if no exact match is found
+          - py3.6-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+          - py3.6-deps- # fallback to using the latest cache if no exact match is found
       - run: *install_deps
       - save_cache:
           paths:
             - ./venv
-          key: py36-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+          key: py3.6-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
       - run:
           name: Run Tests
           command: |
@@ -136,13 +136,13 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-          - py35-deps-{{ checksum "dev-requirements.txt" }}
-          - py35-deps- # fallback to using the latest cache if no exact match is found
+          - py3.5-deps-{{ checksum "dev-requirements.txt" }}
+          - py3.5-deps- # fallback to using the latest cache if no exact match is found
       - run: *install_deps
       - save_cache:
           paths:
             - ./venv
-          key: py35-deps-{{ checksum "dev-requirements.txt" }}
+          key: py3.5-deps-{{ checksum "dev-requirements.txt" }}
       - run:
           name: Do Release
           command: |
