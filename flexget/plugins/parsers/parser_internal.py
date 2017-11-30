@@ -19,18 +19,25 @@ from .parser_common import ParseWarning
 log = logging.getLogger('parser_internal')
 
 series_parser_cache = lru_cache()(SeriesParser)
+movie_parser_cache = lru_cache()(MovieParser)
 
 
 def series_parser_factory(**kwargs):
     """Returns a series parser from the cache, or creates one."""
-    if not kwargs.get('name'):
-        # Don't cache parsing calls that aren't for a specific series (e.g. from metainfo_series or series_premiere)
-        return SeriesParser(**kwargs)
     # Turn our list arguments to tuples so that they are hashable by lru_cache
     for key, val in kwargs.items():
         if isinstance(val, list):
             kwargs[key] = tuple(val)
     return series_parser_cache(**kwargs)
+
+
+def movie_parser_factory(**kwargs):
+    """Returns a series parser from the cache, or creates one."""
+    # Turn our list arguments to tuples so that they are hashable by lru_cache
+    for key, val in kwargs.items():
+        if isinstance(val, list):
+            kwargs[key] = tuple(val)
+    return movie_parser_cache(**kwargs)
 
 
 class ParserInternal(object):
@@ -40,7 +47,7 @@ class ParserInternal(object):
     def parse_movie(self, data, **kwargs):
         log.debug('Parsing movie: `%s` kwargs: %s', data, kwargs)
         start = time.clock()
-        parser = MovieParser()
+        parser = movie_parser_factory(**kwargs)
         try:
             parser.parse(data)
         except ParseWarning as pw:
