@@ -51,3 +51,4 @@ urllib3==1.22           # via requests
 webencodings==0.5.1       # via html5lib
 werkzeug==0.12.2          # via flask
 zxcvbn-python==4.4.15
+backports.functools_lru_cache==1.4; python_version <= '2.7'
