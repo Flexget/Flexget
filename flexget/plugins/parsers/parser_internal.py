@@ -18,8 +18,8 @@ from .parser_common import ParseWarning
 
 log = logging.getLogger('parser_internal')
 
-series_parser_cache = lru_cache()(SeriesParser)
-movie_parser_cache = lru_cache()(MovieParser)
+series_parser_cache = lru_cache(maxsize=256)(SeriesParser)
+movie_parser_cache = lru_cache(maxsize=256)(MovieParser)
 
 
 def series_parser_factory(**kwargs):
