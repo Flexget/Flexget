@@ -36,24 +36,6 @@ jobs:
           key: py2.7-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
       - run: *run_tests
 
-  test-py33:
-    docker:
-      - image: flexget/cci-python:3.3
-    environment:
-      - VCR_RECORD_MODE=none
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-          - py3.3-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
-          - py3.3-deps- # fallback to using the latest cache if no exact match is found
-      - run: *install_deps
-      - save_cache:
-          paths:
-            - ./venv
-          key: py3.3-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
-      - run: *run_tests
-
   test-py34:
     docker:
       - image: flexget/cci-python:3.4
@@ -155,7 +137,6 @@ workflows:
   run-tests:
     jobs:
       - "test-py27"
-      - "test-py33"
       - "test-py34"
       - "test-py35"
       - "test-py36"
@@ -170,14 +151,12 @@ workflows:
                 - develop
     jobs:
       - "test-py27"
-      - "test-py33"
       - "test-py34"
       - "test-py35"
       - "test-py36"
       - deploy:
           requires:
             - "test-py27"
-            - "test-py33"
             - "test-py34"
             - "test-py35"
             - "test-py36"

@@ -119,7 +119,7 @@ class TMDBMovie(Base):
         """
         self.id = id
         try:
-            movie = tmdb_request('movie/{}'.format(self.id), append_to_response='alternative_titles')
+            movie = tmdb_request('movie/{}'.format(self.id), append_to_response='alternative_titles', language=language)
         except requests.RequestException as e:
             raise LookupError('Error updating data from tmdb: %s' % e)
         self.imdb_id = movie['imdb_id']
@@ -330,7 +330,7 @@ class ApiTmdb(object):
             if movie.updated < datetime.now() - refresh_time and not only_cached:
                 log.debug('Cache has expired for %s, attempting to refresh from TMDb.', movie.name)
                 try:
-                    updated_movie = TMDBMovie(id=movie.id)
+                    updated_movie = TMDBMovie(id=movie.id, language=language)
                 except LookupError:
                     log.error('Error refreshing movie details from TMDb, cached info being used.')
                 else:
