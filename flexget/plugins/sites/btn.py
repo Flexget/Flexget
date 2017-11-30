@@ -39,8 +39,7 @@ class SearchBTN(object):
                 'api_key': config
             }
 
-        config.setdefault('append_quality', False)
-
+        config.setdefault('append_quality', True)
         return config
 
     def search(self, task, entry, config):
