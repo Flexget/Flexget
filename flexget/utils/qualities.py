@@ -472,7 +472,9 @@ class Requirements(object):
         if isinstance(qual, basestring):
             qual = Quality(qual)
             if not qual:
-                raise TypeError('`%s` does not appear to be a valid quality string.' % qual.text)
+                # If the quality isn't valid, it is not allowed
+                log.debug('`%s` does not appear to be a valid quality string.', qual.text)
+                return False
         for r_component, q_component in zip(self.components, qual.components):
             if not r_component.allows(q_component, loose=loose):
                 return False
