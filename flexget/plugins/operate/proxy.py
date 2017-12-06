@@ -9,7 +9,7 @@ from flexget.event import event
 
 log = logging.getLogger('proxy')
 
-PROTOCOLS = ['http', 'https', 'ftp', 'socks5']
+PROTOCOLS = ['http', 'https', 'ftp', 'socks5', 'socks5h']
 
 
 class Proxy(object):
