@@ -620,6 +620,7 @@ class IRCConnection(SimpleIRCBot):
         # If we have announcers defined, ignore any messages not from them
         if self.announcer_list and nickname not in self.announcer_list:
             log.debug('Ignoring message: from non-announcer %s', nickname)
+            self.processing_message = False
             return
 
         # Clean up the messages
@@ -641,6 +642,7 @@ class IRCConnection(SimpleIRCBot):
                 entry.update(self.process_tracker_config_rules(entry))
             elif self.tracker_config is not None:
                 log.error('Failed to parse message(s).')
+                self.processing_message = False
                 return
 
             entry['title'] = entry.get('irc_torrentname')
