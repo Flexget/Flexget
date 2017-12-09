@@ -16,6 +16,12 @@ log = logging.getLogger('upgrade')
 
 Base = db_schema.versioned_base('upgrade', 0)
 
+entry_actions = {
+    'accept': Entry.accept,
+    'reject': Entry.reject,
+    'fail': Entry.fail
+}
+
 
 class EntryUpgrade(Base):
     __tablename__ = 'upgrade'
@@ -107,12 +113,6 @@ class LazyUpgrade(object):
 
                 # Action lower qualities
                 if config['on_lower'] != 'skip':
-                    entry_actions = {
-                        'accept': Entry.accept,
-                        'reject': Entry.reject,
-                        'fail': Entry.fail
-                    }
-
                     for entry in entries:
                         if entry['quality'] < existing.quality:
                             msg = 'on_lower %s because lower then existing quality' % config['on_lower']
