@@ -35,12 +35,6 @@ class EntryUpgrade(Base):
                (self.id, self.added, self.quality)
 
 
-def reject_lower(self, quality, entries):
-    for entry in entries:
-        if quality > entry['quality']:
-            entry.reject('Higher quality already downloaded')
-
-
 def group_entries(entries, identified_by):
     grouped_entries = defaultdict(list)
 
@@ -56,15 +50,16 @@ def group_entries(entries, identified_by):
 
 
 class LazyUpgrade(object):
+
     schema = {
         'oneOf': [
             {'type': 'boolean'},
             {
                 'type': 'object',
                 'properties': {
-                    'identified_by': {'type': 'string', 'default': 'auto'},
-                    'tracking': {'type': 'boolean', 'default': True},
-                    'on_lower': {'type': 'string', 'enum': ['accept', 'reject', 'fail', 'skip'], 'default': 'skip'}
+                    'identified_by': {'type': 'string'},
+                    'tracking': {'type': 'boolean'},
+                    'on_lower': {'type': 'string', 'enum': ['accept', 'reject', 'fail', 'skip']}
                 },
                 'additionalProperties': False
             }
@@ -73,7 +68,10 @@ class LazyUpgrade(object):
 
     def prepare_config(self, config):
         if not config or isinstance(config, bool):
-            return {'identified_by': 'auto', 'on_lower': 'skip', 'tracking': True}
+            config = {}
+        config.setdefault('identified_by', 'auto')
+        config.setdefault('tracking', True)
+        config.setdefault('on_lower', 'skip')
         return config
 
     def on_task_filter(self, task, config):
