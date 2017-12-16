@@ -33,7 +33,8 @@ class SonarrSet(MutableSet):
             'profile_id': {'type': 'number', 'default': 1},
             'season_folder': {'type': 'boolean', 'default': False},
             'monitored': {'type': 'boolean', 'default': True},
-            'root_folder_path': {'type': 'number', 'default': 1}
+            'root_folder_path': {'type': 'number', 'default': 1},
+            'series_type': {'type': 'string', 'default': 'standard'}
         },
         'required': ['api_key', 'base_url'],
         'additionalProperties': False
@@ -201,6 +202,7 @@ class SonarrSet(MutableSet):
         show['qualityProfileId'] = self.config.get('profile_id')
         show['seasonFolder'] = self.config.get('season_folder')
         show['monitored'] = self.config.get('monitored')
+        show['seriesType'] = self.config.get('series_type')
         show['rootFolderPath'] = rootfolder[self.config.get('root_folder_path') - 1]['path']
         show['addOptions'] = {"ignoreEpisodesWithFiles": self.config.get('ignore_episodes_with_files'),
                               "ignoreEpisodesWithoutFiles": self.config.get('ignore_episodes_without_files'),
