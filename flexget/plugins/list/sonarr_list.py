@@ -30,11 +30,11 @@ class SonarrSet(MutableSet):
             'search_missing_episodes': {'type': 'boolean', 'default': True},
             'ignore_episodes_without_files': {'type': 'boolean', 'default': False},
             'ignore_episodes_with_files': {'type': 'boolean', 'default': False},
-            'profile_id': {'type': 'number', 'default': 1},
+            'profile_id': {'type': 'integer', 'default': 1},
             'season_folder': {'type': 'boolean', 'default': False},
             'monitored': {'type': 'boolean', 'default': True},
-            'root_folder_path': {'type': 'number', 'default': 1},
-            'series_type': {'type': 'string', 'default': 'standard'}
+            'root_folder_path': {'type': 'integer', 'default': 1},
+            'series_type': {'type': 'string', 'enum': ['standard', 'daily', 'anime'], 'default': 'standard'}
         },
         'required': ['api_key', 'base_url'],
         'additionalProperties': False
