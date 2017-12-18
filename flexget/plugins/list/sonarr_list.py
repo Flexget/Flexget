@@ -208,7 +208,7 @@ class SonarrSet(MutableSet):
         show['monitored'] = self.config.get('monitored')
         show['seriesType'] = self.config.get('series_type')
         show['tags'] = self.config.get('tags')
-        # Requires both rootFolderPath and path otherwise it fails.
+        # Requires both rootFolder and path otherwise it fails.
         # takes root_folder_path ID from config and subtracts 1 from it due to how script is setup
         # since users are passing actual ID it won't be confusing to users
         show['rootFolderPath'] = rootfolder[self.config.get('root_folder_path') - 1]['path'] 
