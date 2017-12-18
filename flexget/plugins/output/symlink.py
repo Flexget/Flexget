@@ -67,6 +67,9 @@ class Symlink(object):
                     if os.path.isdir(lnkfrom):
                         self.hard_link_dir(lnkfrom, lnkto, existing)
                     else:
+                        dirname = os.path.dirname(lnkto)
+                        if not os.path.exists(dirname):
+                            os.makedirs(dirname)
                         os.link(lnkfrom, lnkto)
             except OSError as e:
                 entry.fail('Failed to create %slink, %s' % (config['link_type'], e))
