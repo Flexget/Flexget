@@ -33,7 +33,7 @@ class SonarrSet(MutableSet):
             'profile_id': {'type': 'integer', 'default': 1},
             'season_folder': {'type': 'boolean', 'default': False},
             'monitored': {'type': 'boolean', 'default': True},
-            # Users are passing actual RootFolderPath ID instead of starting from 0 and counting up. 
+            # Users are passing actual RootFolderPath ID instead of starting from 0 and counting up.
             # Passing root_folder_path as a String seems to make the script fail, so had to use int instead.
             # Read comment on show['rootFolderPath'] for more information.
             'root_folder_path': {'type': 'integer', 'default': 1},
@@ -211,7 +211,7 @@ class SonarrSet(MutableSet):
         # Requires both rootFolder and path otherwise it fails.
         # takes root_folder_path ID from config and subtracts 1 from it due to how script is setup
         # since users are passing actual ID it won't be confusing to users
-        show['rootFolderPath'] = rootfolder[self.config.get('root_folder_path') - 1]['path'] 
+        show['rootFolderPath'] = rootfolder[self.config.get('root_folder_path') - 1]['path']
         show['addOptions'] = {"ignoreEpisodesWithFiles": self.config.get('ignore_episodes_with_files'),
                               "ignoreEpisodesWithoutFiles": self.config.get('ignore_episodes_without_files'),
                               "searchForMissingEpisodes": self.config.get('search_missing_episodes')}
