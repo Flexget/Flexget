@@ -33,7 +33,7 @@ class SonarrSet(MutableSet):
             'profile_id': {'type': 'integer', 'default': 1},
             'season_folder': {'type': 'boolean', 'default': False},
             'monitored': {'type': 'boolean', 'default': True},
-            'root_folder_path': {'type': 'integer', 'default': 1}, # Users are passing actual rootFolderPath ID (number (integer) starting from 1 and going up) as apposed to an number (integer) system starting from 0. Read comment on show['rootFolderPath'] for more information.
+            'root_folder_path': {'type': 'integer', 'default': 1}, # Users are passing actual rootFolderPath ID (number (integer) starting from 1 and going up) as apposed to an number (integer) system starting from 0. Passing root_folder_path as a string seems to make the script fail, so that's why it's coded as an integerinstead. Read comment on show['rootFolderPath'] for more information.
             'series_type': {'type': 'string', 'enum': ['standard', 'daily', 'anime'], 'default': 'standard'},
             'tags': {'type': 'array', 'items': {'type': 'integer'}, 'default': [0]}
         },
