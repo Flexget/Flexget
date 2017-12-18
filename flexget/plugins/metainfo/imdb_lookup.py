@@ -325,7 +325,7 @@ class ImdbLookup(object):
                 entry['imdb_url'] = make_url(imdb_id)
             else:
                 log.debug('imdb url %s is invalid, removing it' % entry['imdb_url'])
-                del (entry['imdb_url'])
+                entry['imdb_url'] = ''
 
         # no imdb_url, check if there is cached result for it or if the
         # search is known to fail
