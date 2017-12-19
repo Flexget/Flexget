@@ -77,7 +77,7 @@ class Symlink(object):
     def hard_link_dir(self, path, destination, existing):
         if not os.path.exists(destination):
             try:
-                os.mkdir(destination)
+                os.makedirs(destination)
             except OSError as e:
                 # Raised when it already exists, but are there other cases?
                 log.debug('Failed to create destination dir %s: %s', destination, e)
