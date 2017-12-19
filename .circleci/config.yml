@@ -101,7 +101,7 @@ jobs:
       - run:
           name: Coverage to Codacy
           command: |
-            .circleci/release.sh
+            .circleci/coverage.sh
 
   deploy:
     docker:
