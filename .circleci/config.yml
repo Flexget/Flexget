@@ -70,11 +70,6 @@ jobs:
           paths:
             - ./venv
           key: py3.5-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
-      - run:
-          name: Run Tests
-          command: |
-            . venv/bin/activate
-            py.test --cov flexget --cov-report xml -n 6
       - run: *run_tests
 
   test-py36:
