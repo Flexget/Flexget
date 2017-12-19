@@ -29,7 +29,16 @@ class SonarrSet(MutableSet):
             'include_data': {'type': 'boolean', 'default': False},
             'search_missing_episodes': {'type': 'boolean', 'default': True},
             'ignore_episodes_without_files': {'type': 'boolean', 'default': False},
-            'ignore_episodes_with_files': {'type': 'boolean', 'default': False}
+            'ignore_episodes_with_files': {'type': 'boolean', 'default': False},
+            'profile_id': {'type': 'integer', 'default': 1},
+            'season_folder': {'type': 'boolean', 'default': False},
+            'monitored': {'type': 'boolean', 'default': True},
+            # Users are passing actual RootFolderPath ID instead of starting from 0 and counting up.
+            # Passing root_folder_path as a String seems to make the script fail, so had to use int instead.
+            # Read comment on show['rootFolderPath'] for more information.
+            'root_folder_path': {'type': 'integer', 'default': 1},
+            'series_type': {'type': 'string', 'enum': ['standard', 'daily', 'anime'], 'default': 'standard'},
+            'tags': {'type': 'array', 'items': {'type': 'integer'}, 'default': [0]}
         },
         'required': ['api_key', 'base_url'],
         'additionalProperties': False
@@ -193,9 +202,16 @@ class SonarrSet(MutableSet):
         rootfolder = self.get_json(rootfolder_series_url, headers=rootfolder_series_headers)
 
         # Setting defaults for Sonarr
-        show['profileId'] = 1
-        show['qualityProfileId '] = 1
-        show['rootFolderPath'] = rootfolder[0]['path']
+        show['profileId'] = self.config.get('profile_id')
+        show['qualityProfileId'] = self.config.get('profile_id')
+        show['seasonFolder'] = self.config.get('season_folder')
+        show['monitored'] = self.config.get('monitored')
+        show['seriesType'] = self.config.get('series_type')
+        show['tags'] = self.config.get('tags')
+        # Requires both rootFolder and path otherwise it fails.
+        # takes root_folder_path ID from config and subtracts 1 from it due to how script is setup
+        # since users are passing actual ID it won't be confusing to users
+        show['rootFolderPath'] = rootfolder[self.config.get('root_folder_path') - 1]['path']
         show['addOptions'] = {"ignoreEpisodesWithFiles": self.config.get('ignore_episodes_with_files'),
                               "ignoreEpisodesWithoutFiles": self.config.get('ignore_episodes_without_files'),
                               "searchForMissingEpisodes": self.config.get('search_missing_episodes')}
