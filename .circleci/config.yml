@@ -101,9 +101,7 @@ jobs:
       - run:
           name: Coverage to Codacy
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            python-codacy-coverage -r coverage.xml
+            .circleci/release.sh
 
   deploy:
     docker:
