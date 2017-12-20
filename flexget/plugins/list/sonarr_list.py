@@ -1,8 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urlparse
 
-import json
 import logging
 from collections import MutableSet
 
@@ -15,13 +13,19 @@ from flexget.event import event
 
 log = logging.getLogger('sonarr_list')
 
+SERIES_ENDPOINT = 'series'
+LOOKUP_ENDPOINT = 'series/lookup'
+PROFILE_ENDPOINT = 'profile'
+ROOTFOLDER_ENDPOINT = 'Rootfolder'
+DELETE_ENDPOINT = 'series/{}'
+
 
 class SonarrSet(MutableSet):
     supported_ids = ['tvdb_id', 'tvrage_id', 'tvmaze_id', 'imdb_id', 'slug', 'sonarr_id']
     schema = {
         'type': 'object',
         'properties': {
-            'base_url': {'type': 'string'},
+            'base_url': {'type': 'string', 'default': 'http://localhost'},
             'port': {'type': 'number', 'default': 80},
             'api_key': {'type': 'string'},
             'include_ended': {'type': 'boolean', 'default': True},
@@ -37,69 +41,23 @@ class SonarrSet(MutableSet):
             'series_type': {'type': 'string', 'enum': ['standard', 'daily', 'anime'], 'default': 'standard'},
             'tags': {'type': 'array', 'items': {'type': 'integer'}, 'default': [0]}
         },
-        'required': ['api_key', 'base_url'],
+        'required': ['api_key'],
         'additionalProperties': False
     }
 
-    def series_request_builder(self, base_url, port, api_key):
-        parsedurl = urlparse(base_url)
-        log.debug('Received series list request')
-        url = '%s://%s:%s%s/api/series' % (parsedurl.scheme, parsedurl.netloc, port, parsedurl.path)
-        headers = {'X-Api-Key': api_key}
-        return url, headers
-
-    def lookup_request(self, base_url, port, api_key):
-        parsedurl = urlparse(base_url)
-        log.debug('Received series lookup request')
-        url = '%s://%s:%s%s/api/series/lookup?term=' % (parsedurl.scheme, parsedurl.netloc, port, parsedurl.path)
-        headers = {'X-Api-Key': api_key}
-        return url, headers
-
-    def profile_list_request(self, base_url, port, api_key):
-        parsedurl = urlparse(base_url)
-        log.debug('Received profile list request')
-        url = '%s://%s:%s%s/api/profile' % (parsedurl.scheme, parsedurl.netloc, port, parsedurl.path)
-        headers = {'X-Api-Key': api_key}
-        return url, headers
-
-    def rootfolder_request(self, base_url, port, api_key):
-        parsedurl = urlparse(base_url)
-        log.debug('Received rootfolder list request')
-        url = '%s://%s:%s%s/api/Rootfolder' % (parsedurl.scheme, parsedurl.netloc, port, parsedurl.path)
-        headers = {'X-Api-Key': api_key}
-        return url, headers
-
-    def get_json(self, url, headers):
+    def _sonarr_request(self, endpoint, term=None, method='get', data=None):
+        base_url = self.config['base_url']
+        port = self.config['port']
+        url = '{}:{}/api/{}'.format(base_url, port, endpoint)
+        headers = {'X-Api-Key': self.config['api_key']}
+        if term:
+            url += '?term={}'.format(term)
         try:
-            response = requests.get(url, headers=headers)
-            if response.status_code == 200:
-                return response.json()
-            else:
-                raise plugin.PluginError('Invalid response received from Sonarr: %s' % response.content)
+            rsp = requests.request(method, url, headers=headers, json=data)
+            rsp.raise_for_status()
+            return rsp.json()
         except RequestException as e:
-            raise plugin.PluginError('Unable to connect to Sonarr at %s. Error: %s' % (url, e))
-
-    def post_json(self, url, headers, data):
-        try:
-            response = requests.post(url, headers=headers, data=data)
-            if response.status_code == 201:
-                return response.json()
-            else:
-                raise plugin.PluginError('Invalid response received from Sonarr: %s' % response.content)
-        except RequestException as e:
-            raise plugin.PluginError('Unable to connect to Sonarr at %s. Error: %s' % (url, e))
-
-    def request_builder(self, base_url, request_type, port, api_key):
-        if request_type == 'series':
-            return self.series_request_builder(base_url, port, api_key)
-        elif request_type == 'profile':
-            return self.profile_list_request(base_url, port, api_key)
-        elif request_type == 'lookup':
-            return self.lookup_request(base_url, port, api_key)
-        elif request_type == 'rootfolder':
-            return self.rootfolder_request(base_url, port, api_key)
-        else:
-            raise plugin.PluginError('Received unknown API request, aborting.')
+            raise plugin.PluginError('Error when trying to communicate with sonarr: {}'.format(str(e)))
 
     def translate_quality(self, quality_name):
         """
@@ -120,28 +78,25 @@ class SonarrSet(MutableSet):
 
         return allowed_qualities, cutoff
 
-    def list_entries(self):
-        series_url, series_headers = self.request_builder(self.config.get('base_url'), 'series',
-                                                          self.config.get('port'), self.config['api_key'])
-        json = self.get_json(series_url, series_headers)
+    def list_entries(self, filters=True):
+        shows = self._sonarr_request(SERIES_ENDPOINT)
 
         # Retrieves Sonarr's profile list if include_data is set to true
         if self.config.get('include_data'):
-            profile_url, profile_headers = self.request_builder(self.config.get('base_url'), 'profile',
-                                                                self.config.get('port'),
-                                                                self.config['api_key'])
-            profiles_json = self.get_json(profile_url, profile_headers)
+            profiles_json = self._sonarr_request(PROFILE_ENDPOINT)
 
         entries = []
-        for show in json:
-            fg_qualities = ''  # Initializes the quality parameter
-            fg_cutoff = ''
+        for show in shows:
+            fg_qualities = []  # Initializes the quality parameter
+            fg_cutoff = None
             path = None
-            if not show['monitored'] and self.config.get(
-                    'only_monitored'):  # Checks if to retrieve just monitored shows
-                continue
-            if show['status'] == 'ended' and not self.config.get('include_ended'):  # Checks if to retrieve ended shows
-                continue
+            if filters:
+                # Checks if to retrieve just monitored shows
+                if not show['monitored'] and self.config.get('only_monitored'):
+                    continue
+                # Checks if to retrieve ended shows
+                if show['status'] == 'ended' and not self.config.get('include_ended'):
+                    continue
             if self.config.get('include_data') and profiles_json:  # Check if to retrieve quality & path
                 path = show.get('path')
                 for profile in profiles_json:
@@ -155,17 +110,16 @@ class SonarrSet(MutableSet):
                           tvmaze_id=show.get('tvMazeId'),
                           imdb_id=show.get('imdbid'),
                           slug=show.get('titleSlug'),
-                          sonarr_id=show.get('id'),
-                          configure_series_target=fg_cutoff)
+                          sonarr_id=show.get('id'))
             if self.config.get('include_data'):
                 if len(fg_qualities) > 1:
                     entry['configure_series_qualities'] = fg_qualities
                 elif len(fg_qualities) == 1:
                     entry['configure_series_quality'] = fg_qualities[0]
-                else:
-                    entry['configure_series_quality'] = fg_qualities
                 if path:
                     entry['configure_series_path'] = path
+                if fg_cutoff:
+                    entry['configure_series_target'] = fg_cutoff
             if entry.isvalid():
                 log.debug('returning entry %s', entry)
                 entries.append(entry)
@@ -177,13 +131,8 @@ class SonarrSet(MutableSet):
 
     def add_show(self, entry):
         log.debug('searching for show match for %s using Sonarr', entry)
-        lookup_series_url, lookup_series_headers = self.request_builder(self.config.get('base_url'), 'lookup',
-                                                                        self.config.get('port'), self.config['api_key'])
-        if entry.get('tvdb_id'):
-            lookup_series_url += 'tvdb:%s' % entry.get('tvdb_id')
-        else:
-            lookup_series_url += entry.get('title')
-        lookup_results = self.get_json(lookup_series_url, headers=lookup_series_headers)
+        term = 'tvdb:{}'.format(entry['tvdb_id']) if entry.get('tvdb_id') else entry['title']
+        lookup_results = self._sonarr_request(LOOKUP_ENDPOINT, term=term)
         if not lookup_results:
             log.debug('could not find series match to %s', entry)
             return
@@ -192,11 +141,13 @@ class SonarrSet(MutableSet):
                 log.debug('got multiple results for Sonarr, using first one')
         show = lookup_results[0]
         log.debug('using show %s', show)
-        # Getting rootfolder
-        rootfolder_series_url, rootfolder_series_headers = self.request_builder(self.config.get('base_url'),
-                                                                                'rootfolder', self.config.get('port'),
-                                                                                self.config['api_key'])
-        rootfolder = self.get_json(rootfolder_series_url, headers=rootfolder_series_headers)
+
+        # Getting root folder
+        if self.config.get('root_folder_path'):
+            root_path = self.config['root_folder_path']
+        else:
+            root_folder = self._sonarr_request(ROOTFOLDER_ENDPOINT)
+            root_path = root_folder[0]['path']
 
         # Setting defaults for Sonarr
         show['profileId'] = self.config.get('profile_id')
@@ -205,31 +156,28 @@ class SonarrSet(MutableSet):
         show['monitored'] = self.config.get('monitored')
         show['seriesType'] = self.config.get('series_type')
         show['tags'] = self.config.get('tags')
-        show['rootFolderPath'] = self.config.get('root_folder_path', rootfolder[0]['path'])
-        show['addOptions'] = {"ignoreEpisodesWithFiles": self.config.get('ignore_episodes_with_files'),
-                              "ignoreEpisodesWithoutFiles": self.config.get('ignore_episodes_without_files'),
-                              "searchForMissingEpisodes": self.config.get('search_missing_episodes')}
+        show['rootFolderPath'] = root_path
+        show['addOptions'] = {
+            "ignoreEpisodesWithFiles": self.config.get('ignore_episodes_with_files'),
+            "ignoreEpisodesWithoutFiles": self.config.get('ignore_episodes_without_files'),
+            "searchForMissingEpisodes": self.config.get('search_missing_episodes')
+        }
 
-        series_url, series_headers = self.request_builder(self.config.get('base_url'), 'series',
-                                                          self.config.get('port'), self.config['api_key'])
         log.debug('adding show %s to sonarr', show)
-        returned_show = self.post_json(series_url, headers=series_headers, data=json.dumps(show))
+        returned_show = self._sonarr_request(SERIES_ENDPOINT, method='post', data=show)
         return returned_show
 
     def remove_show(self, show):
-        delete_series_url, delete_series_headers = self.request_builder(self.config.get('base_url'), 'series',
-                                                                        self.config.get('port'), self.config['api_key'])
-        delete_series_url += '/%s' % show.get('sonarr_id')
-        requests.delete(delete_series_url, headers=delete_series_headers)
+        log.debug('sending sonarr delete show request')
+        self._sonarr_request(DELETE_ENDPOINT.format(show['sonarr_id']), method='delete')
 
-    @property
-    def shows(self):
+    def shows(self, filters=True):
         if self._shows is None:
-            self._shows = self.list_entries()
+            self._shows = self.list_entries(filters=filters)
         return self._shows
 
-    def _find_entry(self, entry):
-        for sb_entry in self.shows:
+    def _find_entry(self, entry, filters=True):
+        for sb_entry in self.shows(filters=filters):
             if any(entry.get(id) is not None and entry[id] == sb_entry[id] for id in self.supported_ids):
                 return sb_entry
             if entry.get('title').lower() == sb_entry.get('title').lower():
@@ -244,16 +192,16 @@ class SonarrSet(MutableSet):
         self._shows = None
 
     def __iter__(self):
-        return (entry for entry in self.shows)
+        return (entry for entry in self.shows())
 
     def __len__(self):
-        return len(self.shows)
+        return len(self.shows())
 
     def __contains__(self, entry):
         return self._find_entry(entry) is not None
 
     def add(self, entry):
-        if not self._find_entry(entry):
+        if not self._find_entry(entry, filters=False):
             show = self.add_show(entry)
             if show:
                 self._shows = None
@@ -262,7 +210,7 @@ class SonarrSet(MutableSet):
             log.debug('entry %s already exists in Sonarr list', entry)
 
     def discard(self, entry):
-        show = self._find_entry(entry)
+        show = self._find_entry(entry, filters=False)
         if not show:
             log.debug('Did not find matching show in Sonarr for %s, skipping', entry)
             return
