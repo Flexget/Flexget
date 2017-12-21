@@ -19,6 +19,12 @@ PROFILE_ENDPOINT = 'profile'
 ROOTFOLDER_ENDPOINT = 'Rootfolder'
 DELETE_ENDPOINT = 'series/{}'
 
+# Sonarr qualities that do no exist in Flexget
+QUALITY_MAP = {
+    'Raw-HD': 'remux',
+    'DVD': 'dvdrip'
+}
+
 
 class SonarrSet(MutableSet):
     supported_ids = ['tvdb_id', 'tvrage_id', 'tvmaze_id', 'imdb_id', 'slug', 'sonarr_id']
@@ -54,7 +60,9 @@ class SonarrSet(MutableSet):
             url += '?term={}'.format(term)
         try:
             rsp = requests.request(method, url, headers=headers, json=data)
-            return rsp.json()
+            data = rsp.json()
+            log.trace('sonarr response: %s', data)
+            return data
         except RequestException as e:
             base_msg = 'Sonarr returned an error. {}'
             if e.response is not None:
@@ -66,17 +74,13 @@ class SonarrSet(MutableSet):
 
     def translate_quality(self, quality_name):
         """
-        Translate Sonnar's qualities to ones recognize by Flexget
+        Translate Sonarr's qualities to ones recognize by Flexget
         """
-        if quality_name == 'Raw-HD':  # No better match yet in Flexget
-            return 'remux'
-        elif quality_name == 'DVD':  # No better match yet in Flexget
-            return 'dvdrip'
-        else:
-            return quality_name.replace('-', ' ').lower()
+        if quality_name in QUALITY_MAP:
+            return QUALITY_MAP[quality_name]
+        return quality_name.replace('-', ' ').lower()
 
     def quality_requirement_builder(self, quality_profile):
-
         allowed_qualities = [self.translate_quality(quality['quality']['name']) for quality in quality_profile['items']
                              if quality['allowed']]
         cutoff = self.translate_quality(quality_profile['cutoff']['name'])
@@ -85,10 +89,10 @@ class SonarrSet(MutableSet):
 
     def list_entries(self, filters=True):
         shows = self._sonarr_request(SERIES_ENDPOINT)
-
+        profiles = None
         # Retrieves Sonarr's profile list if include_data is set to true
         if self.config.get('include_data'):
-            profiles_json = self._sonarr_request(PROFILE_ENDPOINT)
+            profiles = self._sonarr_request(PROFILE_ENDPOINT)
 
         entries = []
         for show in shows:
@@ -102,11 +106,12 @@ class SonarrSet(MutableSet):
                 # Checks if to retrieve ended shows
                 if show['status'] == 'ended' and not self.config.get('include_ended'):
                     continue
-            if self.config.get('include_data') and profiles_json:  # Check if to retrieve quality & path
+            if profiles:  # Check if to retrieve quality & path
                 path = show.get('path')
-                for profile in profiles_json:
+                for profile in profiles:
                     if profile['id'] == show['profileId']:  # Get show's profile data from all possible profiles
                         fg_qualities, fg_cutoff = self.quality_requirement_builder(profile)
+                        break
             entry = Entry(title=show['title'],
                           url='',
                           series_name=show['title'],
