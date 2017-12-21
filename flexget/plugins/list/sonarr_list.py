@@ -89,16 +89,18 @@ class SonarrSet(MutableSet):
 
     def list_entries(self, filters=True):
         shows = self._sonarr_request(SERIES_ENDPOINT)
-        profiles = None
+        profiles_dict = {}
         # Retrieves Sonarr's profile list if include_data is set to true
-        if self.config.get('include_data'):
+        include_data = self.config.get('include_data')
+        if include_data:
             profiles = self._sonarr_request(PROFILE_ENDPOINT)
+            profiles_dict = {profile['id']: profile for profile in profiles}
 
         entries = []
         for show in shows:
             fg_qualities = []  # Initializes the quality parameter
             fg_cutoff = None
-            path = None
+            path = show.get('path') if include_data else None
             if filters:
                 # Checks if to retrieve just monitored shows
                 if not show['monitored'] and self.config.get('only_monitored'):
@@ -106,12 +108,10 @@ class SonarrSet(MutableSet):
                 # Checks if to retrieve ended shows
                 if show['status'] == 'ended' and not self.config.get('include_ended'):
                     continue
-            if profiles:  # Check if to retrieve quality & path
-                path = show.get('path')
-                for profile in profiles:
-                    if profile['id'] == show['profileId']:  # Get show's profile data from all possible profiles
-                        fg_qualities, fg_cutoff = self.quality_requirement_builder(profile)
-                        break
+            profile = profiles_dict.get(show['profileId'])
+            if profile:
+                fg_qualities, fg_cutoff = self.quality_requirement_builder(profile)
+
             entry = Entry(title=show['title'],
                           url='',
                           series_name=show['title'],
@@ -121,15 +121,15 @@ class SonarrSet(MutableSet):
                           imdb_id=show.get('imdbid'),
                           slug=show.get('titleSlug'),
                           sonarr_id=show.get('id'))
-            if self.config.get('include_data'):
-                if len(fg_qualities) > 1:
-                    entry['configure_series_qualities'] = fg_qualities
-                elif len(fg_qualities) == 1:
-                    entry['configure_series_quality'] = fg_qualities[0]
-                if path:
-                    entry['configure_series_path'] = path
-                if fg_cutoff:
-                    entry['configure_series_target'] = fg_cutoff
+            if len(fg_qualities) > 1:
+                entry['configure_series_qualities'] = fg_qualities
+            elif len(fg_qualities) == 1:
+                entry['configure_series_quality'] = fg_qualities[0]
+            if path:
+                entry['configure_series_path'] = path
+            if fg_cutoff:
+                entry['configure_series_target'] = fg_cutoff
+
             if entry.isvalid():
                 log.debug('returning entry %s', entry)
                 entries.append(entry)
@@ -146,9 +146,8 @@ class SonarrSet(MutableSet):
         if not lookup_results:
             log.debug('could not find series match to %s', entry)
             return
-        else:
-            if len(lookup_results) > 1:
-                log.debug('got multiple results for Sonarr, using first one')
+        elif len(lookup_results) > 1:
+            log.debug('got multiple results for Sonarr, using first one')
         show = lookup_results[0]
         log.debug('using show %s', show)
 
