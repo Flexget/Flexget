@@ -4,12 +4,12 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import logging
 from collections import MutableSet
 
-import requests
 from requests import RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils import requests
 
 log = logging.getLogger('sonarr_list')
 
@@ -54,10 +54,15 @@ class SonarrSet(MutableSet):
             url += '?term={}'.format(term)
         try:
             rsp = requests.request(method, url, headers=headers, json=data)
-            rsp.raise_for_status()
             return rsp.json()
         except RequestException as e:
-            raise plugin.PluginError('Error when trying to communicate with sonarr: {}'.format(str(e)))
+            base_msg = 'Sonarr returned an error. {}'
+            if e.response is not None:
+                error = e.response.json()[0]
+                error = '{}: {} \'{}\''.format(error['errorMessage'], error['propertyName'], error['attemptedValue'])
+            else:
+                error = str(e)
+            raise plugin.PluginError(base_msg.format(error))
 
     def translate_quality(self, quality_name):
         """
