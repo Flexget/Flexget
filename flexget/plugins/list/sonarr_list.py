@@ -187,11 +187,11 @@ class SonarrSet(MutableSet):
         return self._shows
 
     def _find_entry(self, entry, filters=True):
-        for sb_entry in self.shows(filters=filters):
-            if any(entry.get(id) is not None and entry[id] == sb_entry[id] for id in self.supported_ids):
-                return sb_entry
-            if entry.get('title').lower() == sb_entry.get('title').lower():
-                return sb_entry
+        for show in self.shows(filters=filters):
+            if any(entry.get(id) is not None and entry[id] == show[id] for id in self.supported_ids):
+                return show
+            if entry.get('title').lower() == show.get('title').lower():
+                return show
 
     def _from_iterable(self, it):
         # TODO: is this the right answer? the returned object won't have our custom __contains__ logic
