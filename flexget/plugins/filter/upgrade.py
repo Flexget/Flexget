@@ -47,10 +47,10 @@ def group_entries(entries, identified_by):
     # Group by Identifier
     for entry in entries:
         identifier = entry.get('id') if identified_by == 'auto' else entry.render(identified_by)
-        if identifier:
-            grouped_entries[identifier.lower()].append(entry)
-        else:
+        if not identifier:
             log.debug('No identifier found for', entry['title'])
+            continue
+        grouped_entries[identifier.lower()].append(entry)
 
     return grouped_entries
 
