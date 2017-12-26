@@ -13,6 +13,7 @@ from flexget.utils.soup import get_soup
 from flexget.entry import Entry
 from flexget.utils.search import normalize_unicode
 
+import unicodedata
 
 log = logging.getLogger('newpct')
 
@@ -22,8 +23,7 @@ requests.add_domain_limiter(TimedLimiter('newpct1.com', '2 seconds'))
 requests.add_domain_limiter(TimedLimiter('newpct.com', '2 seconds'))
 
 NEWPCT_TORRENT_FORMAT = 'http://www.newpct.com/torrents/{:0>6}.torrent'
-NEWPCT1_TORRENT_FORMAT = 'http://www.newpct1.com/download/{:0>6}.torrent'
-
+NEWPCT1_TORRENT_FORMAT = 'http://www.newpct1.com/download/{}.torrent'
 
 class UrlRewriteNewPCT(object):
     """NewPCT urlrewriter and search."""
@@ -47,7 +47,6 @@ class UrlRewriteNewPCT(object):
     def parse_download_page(self, url):
         if 'newpct1.com' in url:
             log.verbose('Newpct1 URL: %s', url)
-            url = url.replace('newpct1.com/', 'newpct1.com/descarga-torrent/')
         else:
             log.verbose('Newpct URL: %s', url)
 
@@ -63,11 +62,13 @@ class UrlRewriteNewPCT(object):
         torrent_id = None
         if 'newpct1.com' in url:
             url_format = NEWPCT1_TORRENT_FORMAT
-
-            torrent_id_prog = re.compile(r'descargar-torrent/(.+)/')
-            match = torrent_id_prog.search(soup.text)
-            if match:
-                torrent_id = match.group(1)
+            torrent_id_prog = re.compile('function openTorrent.*\n.*\{.*(\n.*)+window\.location\.href =\s*\".*\/(\d+.+)\";')
+            torrent_ids = soup.findAll(text=torrent_id_prog)
+            log.debug('searching openTorrent script')
+            if torrent_ids:
+                match = torrent_id_prog.search(torrent_ids[0])
+                if match:
+                    torrent_id = match.group(2)
         else:
             url_format = NEWPCT_TORRENT_FORMAT
 
@@ -97,13 +98,14 @@ class UrlRewriteNewPCT(object):
             log.debug('NewPCT disabled')
             return set()
         log.debug('Search NewPCT')
-        url_search = 'http://www.newpct1.com/buscar'
+        url_search = 'http://newpct1.com/buscar'
         results = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
             query = re.sub(' \(\d\d\d\d\)$', '', query)
             log.debug('Searching NewPCT %s', query)
-            query = query.encode('utf8', 'ignore')
+            query = unicodedata.normalize('NFD', query).encode('ascii', 'ignore')
+            #query = query.encode('latin1', 'ignore')
             data = {'q': query}
             try:
                 response = task.requests.post(url_search, data=data)
