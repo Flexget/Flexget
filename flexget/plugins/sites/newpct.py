@@ -105,7 +105,6 @@ class UrlRewriteNewPCT(object):
             query = re.sub(' \(\d\d\d\d\)$', '', query)
             log.debug('Searching NewPCT %s', query)
             query = unicodedata.normalize('NFD', query).encode('ascii', 'ignore')
-            #query = query.encode('latin1', 'ignore')
             data = {'q': query}
             try:
                 response = task.requests.post(url_search, data=data)
