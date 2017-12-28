@@ -58,14 +58,6 @@ def group_entries(entries, identified_by):
     return grouped_entries
 
 
-def is_better_quality_proper(entry, existing):
-    if entry['quality'] > existing.quality:
-        return True
-    if entry['quality'] >= existing.quality and entry.get('proper_count', 0) > existing.proper_count:
-        return True
-    return False
-
-
 class LazyUpgrade(object):
     schema = {
         'oneOf': [
@@ -96,17 +88,35 @@ class LazyUpgrade(object):
         config.setdefault('propers', True)
         return config
 
-    def filter_entries(self, entries, existing, target):
+    def filter_entries(self, entries, existing, target, action_on_lower):
 
-        # Filter out entries within target
-        if target:
-            target_requirement = qualities.Requirements(target)
-            entries = [e for e in entries if target_requirement.allows(e['quality'])]
+        target_requirement = qualities.Requirements(target) if target else None
+        filtered = []
 
-        # Filter out entries of lower quality or lower proper count
-        entries = [e for e in entries if is_better_quality_proper(e, existing)]
+        for entry in entries:
+            # Filter out entries within target
+            if target:
+                if not target_requirement.allows(entry['quality']):
+                    log.debug('Skipping %s as does not meet upgrade quality requirements %s', entry['title'])
+                    if action_on_lower:
+                        entry.reject('does not meet upgrade quality requirements')
+                    continue
 
-        return entries
+            if entry['quality'] < existing.quality:
+                log.debug('Skipping %s as lower quality then existing', entry['title'])
+                if action_on_lower:
+                    entry.reject('lower quality then existing')
+                continue
+
+            if entry['quality'] == existing.quality and entry.get('proper_count', 0) <= existing.proper_count:
+                log.debug('Skipping %s as same quality but lower proper', entry['title'])
+                if action_on_lower:
+                    entry.reject('lower proper then existing')
+                continue
+
+            filtered.append(entry)
+
+        return filtered
 
     def on_task_filter(self, task, config):
         if not config:
@@ -130,11 +140,14 @@ class LazyUpgrade(object):
                     # No existing, skip
                     continue
 
+                log.debug('Looking for upgrades for identifier %s (within %s entries)', identifier, len(entries))
+
                 # Check if passed allowed timeframe
                 if config['timeframe']:
                     expires = existing.first_seen + parse_timedelta(config['timeframe'])
                     if expires <= datetime.now():
                         # Timeframe reached, skip
+                        log.debug('Skipping upgrade with identifier %s as timeframe reached')
                         continue
 
                 # Check target already met
@@ -142,10 +155,12 @@ class LazyUpgrade(object):
                     target_quality = qualities.Quality(config['target'])
                     target_requirement = qualities.Requirements(config['target'])
                     if existing.quality > target_quality or target_requirement.allows(existing.quality):
+                        log.debug('Skipping upgrade with identifier %s as target quality %s reached', config['target'])
                         continue
 
-                # Filter our lower quality and propers
-                upgradeable = self.filter_entries(entries, existing, config['target'])
+                # Filter out lower quality and propers
+                action_on_lower = entry_actions[config['on_lower']] if config['on_lower'] != 'skip' else None
+                upgradeable = self.filter_entries(entries, existing, config['target'], action_on_lower)
 
                 # Skip if we have no entries after filtering
                 if not upgradeable:
@@ -157,23 +172,7 @@ class LazyUpgrade(object):
                 # First entry will be the best quality
                 best = upgradeable.pop(0)
                 best.accept('upgraded quality')
-
-                # Action lower qualities
-                if config['on_lower'] != 'skip':
-                    for entry in entries:
-                        if entry == best:
-                            continue
-
-                        action = entry_actions[config['on_lower']]
-                        if entry['quality'] > existing.quality:
-                            msg = 'on_lower %s because already at target quality' % config['on_lower']
-                            action(entry, msg)
-                        elif entry['quality'] < existing.quality:
-                            msg = 'on_lower %s because lower then existing quality' % config['on_lower']
-                            action(entry, msg)
-                        elif entries[0].accepted and entries[0]['quality'] > entry['quality']:
-                            msg = 'on_lower %s because lower quality compared to entries' % config['on_lower']
-                            action(entry, msg)
+                log.debug('Found %s as upgraded quality for identifier %s', best['title'], identifier)
 
     def on_task_learn(self, task, config):
         config = self.prepare_config(config)
