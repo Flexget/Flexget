@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from collections import defaultdict
 from datetime import datetime
 from sqlalchemy import Column, String, Unicode, DateTime, Integer
