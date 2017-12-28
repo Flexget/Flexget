@@ -23,7 +23,7 @@ class TestUpgrade(object):
           upgrade_quality:
             upgrade: yes
             mock:
-              - {title: 'Movie.1080p.720p WEB-DL X264 AC3', 'id': 'Movie'}
+              - {title: 'Movie.1080p WEB-DL X264 AC3', 'id': 'Movie'}
               - {title: 'Movie.720p.WEB-DL.X264.AC3', 'id': 'Movie'}
               - {title: 'Movie.BRRip.x264.720p', 'id': 'Movie'}
           reject_lower:
@@ -31,7 +31,7 @@ class TestUpgrade(object):
               on_lower: reject
             mock:
               - {title: 'Movie.1080p.BRRip.X264.AC3', 'id': 'Movie'}
-              - {title: 'Movie.1080p.720p WEB-DL X264-EVO', 'id': 'Movie'}
+              - {title: 'Movie.1080p WEB-DL X264-EVO', 'id': 'Movie'}
               - {title: 'Movie.BRRip.x264.720p', 'id': 'Movie'}
     """
 
@@ -50,16 +50,16 @@ class TestUpgrade(object):
     def test_upgrade_quality(self, execute_task):
         execute_task('first_download')
         task = execute_task('upgrade_quality')
-        entry = task.find_entry('accepted', title='Movie.1080p.720p WEB-DL X264 AC3')
-        assert entry, 'Movie.1080p.720p WEB-DL X264 AC3 should have been accepted'
+        entry = task.find_entry('accepted', title='Movie.1080p WEB-DL X264 AC3')
+        assert entry, 'Movie.1080p WEB-DL X264 AC3 should have been accepted'
 
     def test_reject_lower(self, execute_task):
         execute_task('first_download')
         task = execute_task('reject_lower')
         entry = task.find_entry('accepted', title='Movie.1080p.BRRip.X264.AC3')
         assert entry, 'Movie.1080p.BRRip.X264.AC3 should have been accepted'
-        entry = task.find_entry('rejected', title='Movie.1080p.720p WEB-DL X264-EVO')
-        assert entry, 'Movie.1080p.720p WEB-DL X264-EVO should have been rejected'
+        entry = task.find_entry('rejected', title='Movie.1080p WEB-DL X264-EVO')
+        assert entry, 'Movie.1080p WEB-DL X264-EVO should have been rejected'
         entry = task.find_entry('rejected', title='Movie.BRRip.x264.720p')
         assert entry, 'Movie.BRRip.x264.720p should have been rejected'
 

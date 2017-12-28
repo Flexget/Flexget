@@ -51,7 +51,7 @@ def group_entries(entries, identified_by):
     for entry in entries:
         identifier = entry.get('id') if identified_by == 'auto' else entry.render(identified_by)
         if not identifier:
-            log.debug('No identifier found for', entry['title'])
+            log.debug('No identifier found for %s', entry['title'])
             continue
         grouped_entries[identifier.lower()].append(entry)
 
@@ -97,21 +97,21 @@ class LazyUpgrade(object):
             # Filter out entries within target
             if target:
                 if not target_requirement.allows(entry['quality']):
-                    log.debug('Skipping %s as does not meet upgrade quality requirements %s', entry['title'])
+                    log.debug('Skipping %s as does not meet upgrade quality requirements', entry['title'])
                     if action_on_lower:
-                        entry.reject('does not meet upgrade quality requirements')
+                        action_on_lower(entry, 'does not meet upgrade quality requirements')
                     continue
 
             if entry['quality'] < existing.quality:
                 log.debug('Skipping %s as lower quality then existing', entry['title'])
                 if action_on_lower:
-                    entry.reject('lower quality then existing')
+                    action_on_lower(entry, 'lower quality then existing')
                 continue
 
             if entry['quality'] == existing.quality and entry.get('proper_count', 0) <= existing.proper_count:
                 log.debug('Skipping %s as same quality but lower proper', entry['title'])
                 if action_on_lower:
-                    entry.reject('lower proper then existing')
+                    action_on_lower(entry, 'lower proper then existing')
                 continue
 
             filtered.append(entry)
@@ -147,7 +147,7 @@ class LazyUpgrade(object):
                     expires = existing.first_seen + parse_timedelta(config['timeframe'])
                     if expires <= datetime.now():
                         # Timeframe reached, skip
-                        log.debug('Skipping upgrade with identifier %s as timeframe reached')
+                        log.debug('Skipping upgrade with identifier %s as timeframe reached', identifier)
                         continue
 
                 # Check target already met
@@ -155,7 +155,7 @@ class LazyUpgrade(object):
                     target_quality = qualities.Quality(config['target'])
                     target_requirement = qualities.Requirements(config['target'])
                     if existing.quality > target_quality or target_requirement.allows(existing.quality):
-                        log.debug('Skipping upgrade with identifier %s as target quality %s reached', config['target'])
+                        log.debug('Skipping upgrade with identifier %s as target quality %s reached', identifier, config['target'])
                         continue
 
                 # Filter out lower quality and propers
@@ -173,6 +173,12 @@ class LazyUpgrade(object):
                 best = upgradeable.pop(0)
                 best.accept('upgraded quality')
                 log.debug('Found %s as upgraded quality for identifier %s', best['title'], identifier)
+
+                # Process rest
+                for entry in upgradeable:
+                    log.debug('Skipping %s as lower quality then best %s', entry['title'], best['title'])
+                    if action_on_lower:
+                        action_on_lower(entry, 'lower quality then best match')
 
     def on_task_learn(self, task, config):
         config = self.prepare_config(config)
