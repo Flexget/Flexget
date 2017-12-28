@@ -32,8 +32,8 @@ class EntryUpgrade(Base):
     _quality = Column('quality', String)
     quality = quality_property('_quality')
     proper_count = Column(Integer, default=0)
-    first_seen = Column(DateTime)
-    updated = Column(DateTime, index=True)
+    first_seen = Column(DateTime, default=datetime.now)
+    updated = Column(DateTime, index=True, default=datetime.now)
 
     def __init__(self):
         self.first_seen = datetime.now()
@@ -58,8 +58,14 @@ def group_entries(entries, identified_by):
     return grouped_entries
 
 
-class LazyUpgrade(object):
+def filter_quality_propers(entries, existing):
+    def valid(entry):
+        return True
 
+    return list(filter(valid, entries))
+
+
+class LazyUpgrade(object):
     schema = {
         'oneOf': [
             {'type': 'boolean'},
@@ -71,7 +77,7 @@ class LazyUpgrade(object):
                     'target': {'type': 'string', 'format': 'quality_requirements'},
                     'on_lower': {'type': 'string', 'enum': ['accept', 'reject', 'fail', 'skip']},
                     'timeframe': {'type': 'string', 'format': 'interval'},
-                    'propers': {'type': ['boolean', 'string'], 'format': 'interval'}
+                    'propers': {'type': 'boolean'}
                 },
                 'additionalProperties': False
             }
@@ -106,6 +112,8 @@ class LazyUpgrade(object):
                 if not entries:
                     continue
 
+                filtered_entries = entries
+
                 existing = existing_ids.get(identifier)
                 if not existing:
                     # No existing, skip
@@ -116,7 +124,7 @@ class LazyUpgrade(object):
                     expires = existing.first_seen + parse_timedelta(config['timeframe'])
                     if expires <= datetime.now():
                         # Timeframe reached, skip
-                        return False
+                        continue
 
                 # Check and filter on target qualities
                 target_downloaded = False
@@ -124,23 +132,26 @@ class LazyUpgrade(object):
                     target_quality = qualities.Quality(config['target'])
                     target_requirement = qualities.Requirements(config['target'])
                     # Filter out entries within target
-                    entries = list(filter(lambda e: target_requirement.allows(e['quality']), entries))
+                    filtered_entries = list(filter(lambda e: target_requirement.allows(e['quality']), filtered_entries))
 
                     # Have we already downloaded target
                     if existing.quality > target_quality or target_requirement.allows(existing.quality):
                         continue
 
-                # We may have no entries within target
-                if len(entries) == 0:
+                # Filter lower qualities and propers
+                filtered_entries = filter_quality_propers(filtered_entries, existing)
+
+                # Skip if we have no entries after filtering
+                if not filtered_entries:
                     continue
 
                 # Sort entities in order of quality
-                entries.sort(key=lambda e: e['quality'], reverse=True)
+                filtered_entries.sort(key=lambda e: e['quality'], reverse=True)
 
                 # First entry will be the best quality
-                if entries[0]['quality'] > existing.quality:
+                if filtered_entries[0]['quality'] > existing.quality:
                     # Accept if we have a better quality
-                    entries[0].accept('upgraded quality')
+                    filtered_entries[0].accept('upgraded quality')
 
                 # Action lower qualities
                 if config['on_lower'] != 'skip':
@@ -183,8 +194,7 @@ class LazyUpgrade(object):
                     existing = EntryUpgrade()
                     existing.id = identifier
                     session.add(existing)
-                else:
-                    if existing.quality > best_entry['quality']:
+                elif existing.quality > best_entry['quality']:
                         continue
 
                 existing.quality = best_entry['quality']
