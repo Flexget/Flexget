@@ -61,7 +61,7 @@ def group_entries(entries, identified_by):
 def is_better_quality_proper(entry, existing):
     if entry['quality'] > existing.quality:
         return True
-    if existing.proper_count and entry.get('proper_count', 0) > existing.proper_count:
+    if entry['quality'] >= existing.quality and entry.get('proper_count', 0) > existing.proper_count:
         return True
     return False
 
@@ -137,15 +137,15 @@ class LazyUpgrade(object):
                         # Timeframe reached, skip
                         continue
 
-                # Filter our lower quality and propers
-                upgradeable = self.filter_entries(entries, existing, config['target'])
-
                 # Check target already met
                 if config['target']:
                     target_quality = qualities.Quality(config['target'])
                     target_requirement = qualities.Requirements(config['target'])
                     if existing.quality > target_quality or target_requirement.allows(existing.quality):
                         continue
+
+                # Filter our lower quality and propers
+                upgradeable = self.filter_entries(entries, existing, config['target'])
 
                 # Skip if we have no entries after filtering
                 if not upgradeable:
@@ -207,6 +207,7 @@ class LazyUpgrade(object):
 
                 existing.quality = best_entry['quality']
                 existing.title = best_entry['title']
+                existing.proper_count = best_entry.get('proper_count', 0)
                 existing.updated = datetime.now()
 
                 log.debug('Tracking upgrade on identifier `%s` current quality `%s`', identifier, best_entry['quality'])
