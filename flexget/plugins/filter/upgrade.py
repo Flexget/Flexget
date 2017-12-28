@@ -58,11 +58,12 @@ def group_entries(entries, identified_by):
     return grouped_entries
 
 
-def filter_quality_propers(entries, existing):
-    def valid(entry):
+def is_better_quality_proper(entry, existing):
+    if entry['quality'] > existing.quality:
         return True
-
-    return list(filter(valid, entries))
+    if existing.proper_count and entry.get('proper_count', 0) > existing.proper_count:
+        return True
+    return False
 
 
 class LazyUpgrade(object):
@@ -95,6 +96,18 @@ class LazyUpgrade(object):
         config.setdefault('propers', True)
         return config
 
+    def filter_entries(self, entries, existing, target):
+
+        # Filter out entries within target
+        if target:
+            target_requirement = qualities.Requirements(target)
+            entries = [e for e in entries if target_requirement.allows(e['quality'])]
+
+        # Filter out entries of lower quality or lower proper count
+        entries = [e for e in entries if is_better_quality_proper(e, existing)]
+
+        return entries
+
     def on_task_filter(self, task, config):
         if not config:
             return
@@ -112,8 +125,6 @@ class LazyUpgrade(object):
                 if not entries:
                     continue
 
-                filtered_entries = entries
-
                 existing = existing_ids.get(identifier)
                 if not existing:
                     # No existing, skip
@@ -126,44 +137,41 @@ class LazyUpgrade(object):
                         # Timeframe reached, skip
                         continue
 
-                # Check and filter on target qualities
-                target_downloaded = False
+                # Filter our lower quality and propers
+                upgradeable = self.filter_entries(entries, existing, config['target'])
+
+                # Check target already met
                 if config['target']:
                     target_quality = qualities.Quality(config['target'])
                     target_requirement = qualities.Requirements(config['target'])
-                    # Filter out entries within target
-                    filtered_entries = list(filter(lambda e: target_requirement.allows(e['quality']), filtered_entries))
-
-                    # Have we already downloaded target
                     if existing.quality > target_quality or target_requirement.allows(existing.quality):
                         continue
 
-                # Filter lower qualities and propers
-                filtered_entries = filter_quality_propers(filtered_entries, existing)
-
                 # Skip if we have no entries after filtering
-                if not filtered_entries:
+                if not upgradeable:
                     continue
 
-                # Sort entities in order of quality
-                filtered_entries.sort(key=lambda e: e['quality'], reverse=True)
+                # Sort entities in order of quality and best proper
+                upgradeable.sort(key=lambda e: (e['quality'], e.get('proper_count', 0)), reverse=True)
 
                 # First entry will be the best quality
-                if filtered_entries[0]['quality'] > existing.quality:
-                    # Accept if we have a better quality
-                    filtered_entries[0].accept('upgraded quality')
+                best = upgradeable.pop(0)
+                best.accept('upgraded quality')
 
                 # Action lower qualities
                 if config['on_lower'] != 'skip':
                     for entry in entries:
+                        if entry == best:
+                            continue
+
                         action = entry_actions[config['on_lower']]
-                        if entry['quality'] > existing.quality and target_downloaded:
+                        if entry['quality'] > existing.quality:
                             msg = 'on_lower %s because already at target quality' % config['on_lower']
                             action(entry, msg)
-                        if entry['quality'] < existing.quality:
+                        elif entry['quality'] < existing.quality:
                             msg = 'on_lower %s because lower then existing quality' % config['on_lower']
                             action(entry, msg)
-                        if entries[0].accepted and entries[0]['quality'] > entry['quality']:
+                        elif entries[0].accepted and entries[0]['quality'] > entry['quality']:
                             msg = 'on_lower %s because lower quality compared to entries' % config['on_lower']
                             action(entry, msg)
 
@@ -195,7 +203,7 @@ class LazyUpgrade(object):
                     existing.id = identifier
                     session.add(existing)
                 elif existing.quality > best_entry['quality']:
-                        continue
+                    continue
 
                 existing.quality = best_entry['quality']
                 existing.title = best_entry['title']
