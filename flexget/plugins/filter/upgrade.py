@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *
 from collections import defaultdict
 from datetime import datetime
-from sqlalchemy import Column, String, Unicode, DateTime, Boolean
+from sqlalchemy import Column, String, Unicode, DateTime, Integer
 import logging
 
 from flexget import db_schema, plugin
@@ -11,6 +11,7 @@ from flexget.utils.database import quality_property
 from flexget.db_schema import Session
 from flexget.event import event
 from flexget.utils import qualities
+from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('upgrade')
 
@@ -30,11 +31,13 @@ class EntryUpgrade(Base):
     title = Column(Unicode)
     _quality = Column('quality', String)
     quality = quality_property('_quality')
-    proper = Column(Boolean)
-    added = Column(DateTime, index=True)
+    proper_count = Column(Integer, default=0)
+    first_seen = Column(DateTime)
+    updated = Column(DateTime, index=True)
 
     def __init__(self):
-        self.added = datetime.now()
+        self.first_seen = datetime.now()
+        self.updated = datetime.now()
 
     def __str__(self):
         return '<Upgrade(id=%s,added=%s,quality=%s)>' % \
@@ -66,7 +69,9 @@ class LazyUpgrade(object):
                     'identified_by': {'type': 'string'},
                     'tracking': {'type': 'boolean'},
                     'target': {'type': 'string', 'format': 'quality_requirements'},
-                    'on_lower': {'type': 'string', 'enum': ['accept', 'reject', 'fail', 'skip']}
+                    'on_lower': {'type': 'string', 'enum': ['accept', 'reject', 'fail', 'skip']},
+                    'timeframe': {'type': 'string', 'format': 'interval'},
+                    'propers': {'type': ['boolean', 'string'], 'format': 'interval'}
                 },
                 'additionalProperties': False
             }
@@ -80,6 +85,8 @@ class LazyUpgrade(object):
         config.setdefault('tracking', True)
         config.setdefault('on_lower', 'skip')
         config.setdefault('target', None)
+        config.setdefault('timeframe', None)
+        config.setdefault('propers', True)
         return config
 
     def on_task_filter(self, task, config):
@@ -104,8 +111,15 @@ class LazyUpgrade(object):
                     # No existing, skip
                     continue
 
-                target_downloaded = False
+                # Check if passed allowed timeframe
+                if config['timeframe']:
+                    expires = existing.first_seen + parse_timedelta(config['timeframe'])
+                    if expires <= datetime.now():
+                        # Timeframe reached, skip
+                        return False
 
+                # Check and filter on target qualities
+                target_downloaded = False
                 if config['target']:
                     target_quality = qualities.Quality(config['target'])
                     target_requirement = qualities.Requirements(config['target'])
@@ -175,7 +189,7 @@ class LazyUpgrade(object):
 
                 existing.quality = best_entry['quality']
                 existing.title = best_entry['title']
-                existing.added = datetime.now()
+                existing.updated = datetime.now()
 
                 log.debug('Tracking upgrade on identifier `%s` current quality `%s`', identifier, best_entry['quality'])
 

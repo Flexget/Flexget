@@ -128,6 +128,40 @@ class TestUpgradeTarget(object):
         assert entry, 'Movie.720p.WEB-DL.X264.AC3 should have been undecided'
 
 
+class TestUpgradeTimeFrame(object):
+    config = """
+        tasks:
+          existing_download_480p:
+            accept_all: yes
+            mock:
+              - {title: 'Movie.480p.WEB-DL.X264.AC3', 'id': 'Movie'}
+          outside_timeframe:
+            upgrade:
+              timeframe: 0 seconds
+              target: 1080p
+            mock:
+              - {title: 'Movie.1080p WEB-DL X264 AC3', 'id': 'Movie'}
+          within_timeframe:
+            upgrade:
+              timeframe: 1 day
+              target: 1080p
+            mock:
+              - {title: 'Movie.1080p WEB-DL X264 AC3', 'id': 'Movie'}
+    """
+
+    def test_outside_timeframe(self, execute_task):
+        execute_task('existing_download_480p')
+        task = execute_task('outside_timeframe')
+        entry = task.find_entry('undecided', title='Movie.1080p WEB-DL X264 AC3')
+        assert entry, 'Movie.HDRip.XviD.AC3 should have been undecided'
+
+    def test_within_timeframe(self, execute_task):
+        execute_task('existing_download_480p')
+        task = execute_task('within_timeframe')
+        entry = task.find_entry('accepted', title='Movie.1080p WEB-DL X264 AC3')
+        assert entry, 'Movie.HDRip.XviD.AC3 should have been accepted'
+
+
 class TestUpgradeIdentifiers(object):
     config = """
         tasks:
