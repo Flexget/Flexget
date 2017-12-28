@@ -4,13 +4,13 @@ from collections import defaultdict
 from datetime import datetime
 from sqlalchemy import Column, String, Unicode, DateTime, Boolean
 import logging
-from os.path import expanduser
 
 from flexget import db_schema, plugin
 from flexget.entry import Entry
 from flexget.utils.database import quality_property
 from flexget.db_schema import Session
 from flexget.event import event
+from flexget.utils import qualities
 
 log = logging.getLogger('upgrade')
 
@@ -65,6 +65,7 @@ class LazyUpgrade(object):
                 'properties': {
                     'identified_by': {'type': 'string'},
                     'tracking': {'type': 'boolean'},
+                    'target': {'type': 'string', 'format': 'quality_requirements'},
                     'on_lower': {'type': 'string', 'enum': ['accept', 'reject', 'fail', 'skip']}
                 },
                 'additionalProperties': False
@@ -78,6 +79,7 @@ class LazyUpgrade(object):
         config.setdefault('identified_by', 'auto')
         config.setdefault('tracking', True)
         config.setdefault('on_lower', 'skip')
+        config.setdefault('target', None)
         return config
 
     def on_task_filter(self, task, config):
@@ -98,9 +100,24 @@ class LazyUpgrade(object):
                     continue
 
                 existing = existing_ids.get(identifier)
-
                 if not existing:
                     # No existing, skip
+                    continue
+
+                target_downloaded = False
+
+                if config['target']:
+                    target_quality = qualities.Quality(config['target'])
+                    target_requirement = qualities.Requirements(config['target'])
+                    # Filter out entries within target
+                    entries = list(filter(lambda e: target_requirement.allows(e['quality']), entries))
+
+                    # Have we already downloaded target
+                    if existing.quality > target_quality or target_requirement.allows(existing.quality):
+                        continue
+
+                # We may have no entries within target
+                if len(entries) == 0:
                     continue
 
                 # Sort entities in order of quality
@@ -114,12 +131,16 @@ class LazyUpgrade(object):
                 # Action lower qualities
                 if config['on_lower'] != 'skip':
                     for entry in entries:
+                        action = entry_actions[config['on_lower']]
+                        if entry['quality'] > existing.quality and target_downloaded:
+                            msg = 'on_lower %s because already at target quality' % config['on_lower']
+                            action(entry, msg)
                         if entry['quality'] < existing.quality:
                             msg = 'on_lower %s because lower then existing quality' % config['on_lower']
-                            entry_actions[config['on_lower']](entry, msg)
+                            action(entry, msg)
                         if entries[0].accepted and entries[0]['quality'] > entry['quality']:
                             msg = 'on_lower %s because lower quality compared to entries' % config['on_lower']
-                            entry_actions[config['on_lower']](entry, msg)
+                            action(entry, msg)
 
     def on_task_learn(self, task, config):
         config = self.prepare_config(config)
@@ -157,10 +178,6 @@ class LazyUpgrade(object):
                 existing.added = datetime.now()
 
                 log.debug('Tracking upgrade on identifier `%s` current quality `%s`', identifier, best_entry['quality'])
-
-        with Session() as session:
-            a = session.query(EntryUpgrade).all()
-            pass
 
 
 @event('plugin.register')
