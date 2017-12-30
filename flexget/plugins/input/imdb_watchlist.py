@@ -225,8 +225,6 @@ class ImdbWatchlist(object):
                 entry['imdb_name'] = entry['title']
                 entries.append(entry)
 
-            log.debug(items_processed)
-
         return entries
 
 
