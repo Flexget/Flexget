@@ -122,6 +122,7 @@ class TorrentMatch(object):
                                 entry['path'] = os.path.dirname(local_entry['location'])
                             else:
                                 entry['path'] = local_entry['location']
+                            log.debug('Path for %s set to %s', entry['title'], entry['path'])
                             matched_entries.add(entry)
                             break
                 else:
@@ -143,13 +144,17 @@ class TorrentMatch(object):
                                     path = os.path.dirname(path)
 
                             candidate_files.append(local_file)
-
+                    
+                    log.debug('Path for %s set to %s', entry['title'], entry['path'])
+                    
                     for torrent_file in torrent_files:
                         for candidate in candidate_files:
                             if torrent_file.path in candidate.path and torrent_file.size == candidate.size:
+                                log.debug('Path %s matched local file path %s', torrent_file.path, candidate.path)
                                 matches += 1
                                 break
                         else:
+                            log.debug('No local paths matched %s', torrent_file.path)
                             missing_size += torrent_file.size
                         total_size += torrent_file.size
 
