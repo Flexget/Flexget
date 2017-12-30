@@ -3,7 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
 
-from requests.exceptions import HTTPError
+from flexget.utils.requests import RequestException
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -110,10 +110,12 @@ class ImdbWatchlist(object):
         log.debug('Requesting: %s %s', url, headers)
         try:
             page = task.requests.get(url, params=params, headers=headers)
-        except HTTPError as e:
+        except RequestException as e:
             raise plugin.PluginError(e.args[0])
         if page.status_code != 200:
-            raise plugin.PluginError('Unable to get imdb list. Either list is private or does not exist.')
+            raise plugin.PluginError(
+                'Unable to get imdb list. Either list is private or does not exist.' +
+                ' Html status code was: %d.' % page.status_code)
         return page
 
     def parse_react_widget(self, task, config, url, params, headers):
@@ -125,7 +127,7 @@ class ImdbWatchlist(object):
         except (TypeError, AttributeError, ValueError) as e:
             raise plugin.PluginError(
                 'Unable to get imdb list from imdb react widget.' +
-                ' Either the list is empty or the imdb parser plugin is broken.' +
+                ' Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken.' +
                 ' Original error: %s.' % e.args[0])
         total_item_count = 0
         if 'list' in json_vars and 'items' in json_vars['list']:
@@ -139,15 +141,15 @@ class ImdbWatchlist(object):
                 imdb_ids.append(item['const'])
         params = {'ids': ','.join(imdb_ids)}
         url = 'http://www.imdb.com/title/data'
+        page = self.fetch_page(task, url, params, headers)
         try:
-            page = task.requests.get(url, params=params)
-        except HTTPError as e:
-            raise plugin.PluginError(e.args[0])
-        if page.status_code != 200:
-            raise plugin.PluginError('Unable to get imdb title data. Html status code was: %d.' % page.status_code)
-        json_data = json.loads(page.text)
-        log.verbose('imdb list contains %d items' % len(json_data))
-        log.debug('First entry (imdb id: %s) looks like this: %s' % (imdb_ids[0], json_data[imdb_ids[0]]))
+            json_data = json.loads(page.text)
+        except (ValueError, TypeError) as e:
+            raise plugin.PluginError('Unable to get imdb list from imdb JSON API.' +
+                ' Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken.' +
+                ' Original error: %s.' % e.args[0])
+        log.verbose('imdb list contains %d items', len(json_data))
+        log.debug('First entry (imdb id: %s) looks like this: %s', imdb_ids[0], json_data[imdb_ids[0]])
         entries = []
         for imdb_id in imdb_ids:
             imdb_type = ''
@@ -156,7 +158,7 @@ class ImdbWatchlist(object):
                     'primary' in json_data[imdb_id]['title'] and
                     'href' in json_data[imdb_id]['title']['primary'] and
                     'title' in json_data[imdb_id]['title']['primary']):
-                log.debug('no title or link found for item %s, skipping' % imdb_id)
+                log.debug('no title or link found for item %s, skipping', imdb_id)
                 continue
             if 'type' in json_data[imdb_id]['title']:
                 imdb_type = json_data[imdb_id]['title']['type']
@@ -187,7 +189,7 @@ class ImdbWatchlist(object):
             raise plugin.PluginError('Received invalid movie count: %s ; %s' %
                                      (soup.find('div', class_='lister-total-num-results').string, e))
 
-        if total_item_count == 0:
+        if not total_item_count:
             log.verbose('No movies were found in imdb list: %s', config['list'])
             return
 
@@ -203,10 +205,10 @@ class ImdbWatchlist(object):
                 soup = get_soup(page.text)
 
             items = soup.find_all('div', class_='lister-item')
-            if len(items) == 0:
-                log.debug('no items found on page: %s, aborting.' % url)
+            if not items:
+                log.debug('no items found on page: %s, aborting.', url)
                 break
-            log.debug('%d items found on page %d' % (len(items), page_no))
+            log.debug('%d items found on page %d', len(items), page_no)
 
             for item in items:
                 items_processed += 1
