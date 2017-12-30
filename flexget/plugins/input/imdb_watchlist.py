@@ -108,7 +108,6 @@ class ImdbWatchlist(object):
 
     def fetch_page(self, task, url, params, headers):
         log.debug('Requesting: %s %s', url, headers)
-
         try:
             page = task.requests.get(url, params=params, headers=headers)
         except HTTPError as e:
@@ -119,15 +118,19 @@ class ImdbWatchlist(object):
 
     def parse_react_widget(self, task, config, url, params, headers):
         page = self.fetch_page(task, url, params, headers)
-#         log.debug(page.text)
-        re_result = re.search('IMDbReactInitialState.push\((.+?)\);\n', page.text)
-        json_text = re_result.group(1)
-        json_vars = json.loads(json_text)
+        try:
+            re_result = re.search('IMDbReactInitialState.push\((.+?)\);\n', page.text)
+            json_text = re_result.group(1)
+            json_vars = json.loads(json_text)
+        except (TypeError, AttributeError, ValueError) as e:
+            raise plugin.PluginError(
+                'Unable to get imdb list from imdb react widget.' +
+                ' Either the list is empty or the imdb parser plugin is broken.' +
+                ' Original error: %s.' % e.args[0])
+        total_item_count = 0
         if 'list' in json_vars and 'items' in json_vars['list']:
             total_item_count = len(json_vars['list']['items'])
-        else:
-            total_item_count = 0
-        if total_item_count == 0:
+        if not total_item_count:
             log.verbose('No movies were found in imdb list: %s', config['list'])
             return
         imdb_ids = []
@@ -147,14 +150,16 @@ class ImdbWatchlist(object):
         log.debug('First entry (imdb id: %s) looks like this: %s' % (imdb_ids[0], json_data[imdb_ids[0]]))
         entries = []
         for imdb_id in imdb_ids:
+            imdb_type = ''
             entry = Entry()
-            if not 'title' in json_data[imdb_id] or not 'primary' in json_data[imdb_id]['title'] or not 'href' in json_data[imdb_id]['title']['primary'] or not 'title' in json_data[imdb_id]['title']['primary']:
+            if not ('title' in json_data[imdb_id] and
+                    'primary' in json_data[imdb_id]['title'] and
+                    'href' in json_data[imdb_id]['title']['primary'] and
+                    'title' in json_data[imdb_id]['title']['primary']):
                 log.debug('no title or link found for item %s, skipping' % imdb_id)
                 continue
             if 'type' in json_data[imdb_id]['title']:
                 imdb_type = json_data[imdb_id]['title']['type']
-            else:
-                imdb_type = ''
             title = json_data[imdb_id]['title']['primary']['title']
             entry['title'] = title
             if 'year' in json_data[imdb_id]['title']['primary']:
