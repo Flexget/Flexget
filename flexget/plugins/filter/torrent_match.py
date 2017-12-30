@@ -145,7 +145,7 @@ class TorrentMatch(object):
 
                             candidate_files.append(local_file)
                     
-                    log.debug('Path for %s set to %s', entry['title'], entry['path'])
+                    log.debug('Path for %s will be set to %s', entry['title'], path)
                     
                     for torrent_file in torrent_files:
                         for candidate in candidate_files:
