@@ -1,10 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import * # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
 
 from flexget.utils.requests import RequestException
-
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
@@ -111,7 +111,7 @@ class ImdbWatchlist(object):
         try:
             page = task.requests.get(url, params=params, headers=headers)
         except RequestException as e:
-            raise plugin.PluginError(e.args[0])
+            raise plugin.PluginError(str(e))
         if page.status_code != 200:
             raise plugin.PluginError(
                 'Unable to get imdb list. Either list is private or does not exist.' +
@@ -122,13 +122,12 @@ class ImdbWatchlist(object):
         page = self.fetch_page(task, url, params, headers)
         try:
             re_result = re.search('IMDbReactInitialState.push\((.+?)\);\n', page.text)
-            json_text = re_result.group(1)
-            json_vars = json.loads(json_text)
+            json_vars = json.loads(re_result.group(1))
         except (TypeError, AttributeError, ValueError) as e:
             raise plugin.PluginError(
                 'Unable to get imdb list from imdb react widget.' +
                 ' Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken.' +
-                ' Original error: %s.' % e.args[0])
+                ' Original error: %s.' % str(e))
         total_item_count = 0
         if 'list' in json_vars and 'items' in json_vars['list']:
             total_item_count = len(json_vars['list']['items'])
@@ -137,7 +136,7 @@ class ImdbWatchlist(object):
             return
         imdb_ids = []
         for item in json_vars['list']['items']:
-            if is_valid_imdb_title_id(item['const']):
+            if is_valid_imdb_title_id(item.get('const')):
                 imdb_ids.append(item['const'])
         params = {'ids': ','.join(imdb_ids)}
         url = 'http://www.imdb.com/title/data'
@@ -147,7 +146,7 @@ class ImdbWatchlist(object):
         except (ValueError, TypeError) as e:
             raise plugin.PluginError('Unable to get imdb list from imdb JSON API.' +
                 ' Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken.' +
-                ' Original error: %s.' % e.args[0])
+                ' Original error: %s.' % str(e))
         log.verbose('imdb list contains %d items', len(json_data))
         log.debug('First entry (imdb id: %s) looks like this: %s', imdb_ids[0], json_data[imdb_ids[0]])
         entries = []
