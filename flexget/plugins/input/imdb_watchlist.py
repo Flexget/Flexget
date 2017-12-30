@@ -144,8 +144,8 @@ class ImdbWatchlist(object):
         if page.status_code != 200:
             raise plugin.PluginError('Unable to get imdb title data. Html status code was: %d.' % page.status_code)
         json_data = json.loads(page.text)
-        log.debug('Received %d entries from imdb. Example entry %s looks like this: %s' %
-                  (len(json_data), imdb_ids[0], json_data[imdb_ids[0]]))
+        log.verbose('imdb list contains %d items' % len(json_data))
+        log.debug('First entry (imdb id: %s) looks like this: %s' % (imdb_ids[0], json_data[imdb_ids[0]]))
         entries = []
         for imdb_id in imdb_ids:
             entry = Entry()
