@@ -94,9 +94,7 @@ class ImdbWatchlist(object):
         else:
             url = 'http://www.imdb.com/list/%s' % config['list']
         if 'all' not in config['type']:
-            title_types = []
-            for title_type in config['type']:
-                title_types.append(TITLE_TYPE_MAP[title_type])
+            title_types = [TITLE_TYPE_MAP[title_type] for title_type in config['type']]
             params['title_type'] = ','.join(title_types)
             params['sort'] = 'list_order%2Casc'
 
@@ -121,8 +119,7 @@ class ImdbWatchlist(object):
     def parse_react_widget(self, task, config, url, params, headers):
         page = self.fetch_page(task, url, params, headers)
         try:
-            re_result = re.search('IMDbReactInitialState.push\((.+?)\);\n', page.text)
-            json_vars = json.loads(re_result.group(1))
+            json_vars = json.loads(re.search('IMDbReactInitialState.push\((.+?)\);\n', page.text).group(1))
         except (TypeError, AttributeError, ValueError) as e:
             raise plugin.PluginError(
                 'Unable to get imdb list from imdb react widget.' +
@@ -140,9 +137,8 @@ class ImdbWatchlist(object):
                 imdb_ids.append(item['const'])
         params = {'ids': ','.join(imdb_ids)}
         url = 'http://www.imdb.com/title/data'
-        page = self.fetch_page(task, url, params, headers)
         try:
-            json_data = json.loads(page.text)
+            json_data = self.fetch_page(task, url, params, headers).json()
         except (ValueError, TypeError) as e:
             raise plugin.PluginError('Unable to get imdb list from imdb JSON API.' +
                 ' Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken.' +
@@ -151,7 +147,6 @@ class ImdbWatchlist(object):
         log.debug('First entry (imdb id: %s) looks like this: %s', imdb_ids[0], json_data[imdb_ids[0]])
         entries = []
         for imdb_id in imdb_ids:
-            imdb_type = ''
             entry = Entry()
             if not ('title' in json_data[imdb_id] and
                     'primary' in json_data[imdb_id]['title'] and
@@ -160,14 +155,13 @@ class ImdbWatchlist(object):
                 log.debug('no title or link found for item %s, skipping', imdb_id)
                 continue
             if 'type' in json_data[imdb_id]['title']:
-                imdb_type = json_data[imdb_id]['title']['type']
+                entry['imdb_type'] = json_data[imdb_id]['title']['type']
             title = json_data[imdb_id]['title']['primary']['title']
             entry['title'] = title
             if 'year' in json_data[imdb_id]['title']['primary']:
                 year = json_data[imdb_id]['title']['primary']['year'][0]
                 entry['title'] += ' (%s)' % year
                 entry['imdb_year'] = year
-            entry['imdb_type'] = imdb_type
             entry['url'] = json_data[imdb_id]['title']['primary']['href']
             entry['imdb_id'] = imdb_id
             entry['imdb_name'] = entry['title']
