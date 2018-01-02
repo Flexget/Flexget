@@ -1,0 +1,86 @@
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from future.utils import text_to_native_str
+
+import logging
+
+from flexget import plugin
+from flexget.config_schema import one_or_more
+from flexget.event import event
+from flexget.utils.requests import Session
+from requests.exceptions import HTTPError
+
+plugin_name = 'ifttt'
+log = logging.getLogger(plugin_name)
+
+
+class IFTTTNotifier(object):
+    """
+    Push the notification to an IFTTT webhook.
+
+    Configuration options
+
+    ===============  ===================================================================
+    Option           Description
+    ===============  ===================================================================
+    event            The event endpoint to trigger (required)
+    keys             List of auth  keys to send the notification to. (required)
+    ===============  ===================================================================
+
+    Config basic example::
+
+      notify:
+        task:
+          via:
+            - ifttt:
+                event: download_added
+                keys:
+                    - deadebeef123
+    """
+
+    def __init__(self):
+        self.session = Session()
+        self.url_template = 'https://maker.ifttt.com/trigger/{}/with/key/{}'
+
+    schema = {
+        'type': 'object',
+        'properties': {
+            'event': {'type': 'string'},
+            'keys': one_or_more({'type': 'string'}),
+        },
+        'required': ['event', 'keys'],
+        'additionalProperties': False,
+    }
+
+    def notify(self, title, message, config):
+        """
+        Send notification to ifttt webhook.
+
+        The notification will be sent to https://maker.ifttt.com/trigger/{event}/with/key/{key}'
+        with the values for the config, with a json body setting 'value1' to the message title,
+        and 'value2' to the message body.
+
+        If multiple keys are provided the event will be triggered for all of them.
+
+        :param str message: message body
+        :param str title: message subject
+        :param dict config: plugin config
+        """
+        notification_body = dict()
+        notification_body['value1'] = title
+        notification_body['value2'] = message
+        for key in config['keys']:
+            url = self.url_template.format(config['event'], key)
+            try:
+                res = self.session.post(url, json = notification_body)
+                if res.ok:
+                    log.info("Sent notification to key: {}".format(key))
+                else:
+                    log.error("Error sending to: {}: {} {} -- {}".format(url, res.status_code, res.reason, res.text))
+            except HTTPError as e:
+                log.error("Error sending to {}: {}".format(url, e))
+
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(IFTTTNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])
