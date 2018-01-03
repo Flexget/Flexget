@@ -74,10 +74,10 @@ class IFTTTNotifier(object):
             url = self.url_template.format(config['event'], key)
             try:
                 self.session.post(url, json=notification_body)
-                log.info("Sent notification to key: {}".format(key))
+                log.info("Sent notification to key: %s", key)
             except RequestException as e:
-                log.error("Error sending notification to key {}: {} ".format(key, e))
-                errors += 1
+                log.error("Error sending notification to key %s: %s", key, e)
+                errors = True
         if errors:
             raise PluginWarning("Failed to send notifications")
 
