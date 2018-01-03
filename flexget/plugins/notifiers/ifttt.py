@@ -10,7 +10,6 @@ from flexget.utils.requests import Session
 from flexget.plugin import PluginWarning
 
 from requests.exceptions import RequestException
-from types import StringTypes
 
 plugin_name = 'ifttt'
 log = logging.getLogger(plugin_name)
@@ -83,7 +82,7 @@ class IFTTTNotifier(object):
             raise PluginWarning("Failed to send notifications")
 
     def prepare_config(self, config):
-        if isinstance(config['keys'], StringTypes):
+        if not isinstance(config['keys'], list):
             config['keys'] = [config['keys']]
         return config
 
