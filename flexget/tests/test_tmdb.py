@@ -21,8 +21,8 @@ class TestTmdbLookup(object):
     def test_tmdb_lookup(self, execute_task):
         task = execute_task('test')
         # check that these were created
-        assert task.find_entry(tmdb_name='Taken', tmdb_year=2008, id='8681'), 'Didn\'t populate tmdb info for Taken'
-        assert task.find_entry(tmdb_name='The Matrix', tmdb_year=1999, id='603'), 'Didn\'t populate tmdb info for The Matrix'
+        assert task.find_entry(tmdb_name='Taken', tmdb_year=2008), 'Didn\'t populate tmdb info for Taken'
+        assert task.find_entry(tmdb_name='The Matrix', tmdb_year=1999), 'Didn\'t populate tmdb info for The Matrix'
 
 
 @pytest.mark.online
