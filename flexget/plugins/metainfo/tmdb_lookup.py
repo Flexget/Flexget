@@ -21,6 +21,7 @@ class PluginTmdbLookup(object):
     """
 
     field_map = {
+        'id': lambda movie: str(movie.id),
         'tmdb_name': 'name',
         'tmdb_id': 'id',
         'imdb_id': 'imdb_id',

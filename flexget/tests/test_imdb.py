@@ -127,6 +127,12 @@ class TestImdb(object):
             imdb:
               reject_mpaa_ratings:
               - R
+
+          imdb_identifier:
+            imdb_lookup: yes
+            mock:
+              - {title: 'The.Matrix.720p.WEB-DL.X264.AC3'}
+
     """
 
     def test_lookup(self, execute_task):
@@ -285,6 +291,11 @@ class TestImdb(object):
         saw = task.find_entry(imdb_name='Saw')
         assert saw['imdb_mpaa_rating'] == 'R', 'Didn\'t get right rating for Saw'
         assert not saw.accepted, 'R rated movie should not have been accepted'
+
+    def test_identifier(self, execute_task):
+        task = execute_task('imdb_identifier')
+        entry = task.find_entry(title='The.Matrix.720p.WEB-DL.X264.AC3')
+        assert entry['id'] == 'tt0133093', 'id should have been tt0133093'
 
 
 @pytest.mark.online

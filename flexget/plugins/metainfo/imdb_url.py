@@ -40,6 +40,7 @@ class MetainfoImdbUrl(object):
                 log.debug('Found multiple imdb ids; not using any of: %s' % ' '.join(imdb_ids))
                 continue
 
+            entry['id'] = imdb_ids[0]
             entry['imdb_id'] = imdb_ids[0]
             entry['imdb_url'] = make_url(entry['imdb_id'])
             log.debug('Found imdb url in description %s' % entry['imdb_url'])

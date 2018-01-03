@@ -214,7 +214,7 @@ class ImdbLookup(object):
     """
 
     field_map = {
-        'id': 'url',
+        'id': 'imdb_id',
         'imdb_url': 'url',
         'imdb_id': lambda movie: extract_id(movie.url),
         'imdb_name': 'title',
