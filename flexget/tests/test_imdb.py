@@ -292,11 +292,6 @@ class TestImdb(object):
         assert saw['imdb_mpaa_rating'] == 'R', 'Didn\'t get right rating for Saw'
         assert not saw.accepted, 'R rated movie should not have been accepted'
 
-    def test_identifier(self, execute_task):
-        task = execute_task('imdb_identifier')
-        entry = task.find_entry(title='The.Matrix.720p.WEB-DL.X264.AC3')
-        assert entry['id'] == 'tt0133093', 'id should have been tt0133093'
-
 
 @pytest.mark.online
 class TestImdbLookup(object):
