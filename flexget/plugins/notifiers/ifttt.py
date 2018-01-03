@@ -7,7 +7,7 @@ from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils.requests import Session
-from requests.exceptions import HTTPError
+from requests.exceptions import RequestError
 
 plugin_name = 'ifttt'
 log = logging.getLogger(plugin_name)
@@ -65,18 +65,13 @@ class IFTTTNotifier(object):
         :param str title: message subject
         :param dict config: plugin config
         """
-        notification_body = dict()
-        notification_body['value1'] = title
-        notification_body['value2'] = message
+        notification_body = {'value1': title, 'value2': message}
         for key in config['keys']:
             url = self.url_template.format(config['event'], key)
             try:
-                res = self.session.post(url, json = notification_body)
-                if res.ok:
-                    log.info("Sent notification to key: {}".format(key))
-                else:
-                    log.error("Error sending to: {}: {} {} -- {}".format(url, res.status_code, res.reason, res.text))
-            except HTTPError as e:
+                res = self.session.post(url, json=notification_body)
+                log.info("Sent notification to key: {}".format(key))
+            except RequestError as e:
                 log.error("Error sending to {}: {}".format(url, e))
 
 
