@@ -12,14 +12,15 @@ class TestUpgrade(object):
         tasks:
           first_download:
             accept_all: yes
+            upgrade:
+              only_tracking: yes
             mock:
               - {title: 'Movie.720p.WEB-DL.X264.AC3', 'id': 'Movie'}
-          no_tracking:
-            accept_all: yes
+          tracking_only:
             upgrade:
-              tracking: no
+              only_tracking: yes
             mock:
-              - {title: 'Movie.BRRip.x264.720p', 'id': 'Movie'} 
+              - {title: 'Movie.1080p WEB-DL X264 AC3', 'id': 'Movie'} 
           upgrade_quality:
             upgrade: yes
             mock:
@@ -42,10 +43,11 @@ class TestUpgrade(object):
             assert len(query) == 1, 'There should be one tracked entity present.'
             assert query[0].id == 'movie', 'Should of tracked name `Movie`.'
 
-    def test_no_tracking(self, execute_task):
-        execute_task('no_tracking')
-        with Session() as session:
-            assert len(session.query(EntryUpgrade).all()) == 0, 'There should be one tracked entity present.'
+    def test_only_tracking(self, execute_task):
+        execute_task('first_download')
+        task = execute_task('tracking_only')
+        entry = task.find_entry('undecided', title='Movie.1080p WEB-DL X264 AC3')
+        assert entry, 'Movie.1080p WEB-DL X264 AC3 should be undecided'
 
     def test_upgrade_quality(self, execute_task):
         execute_task('first_download')
@@ -68,10 +70,14 @@ class TestUpgradeTarget(object):
     config = """
         tasks:
           existing_download_480p:
+            upgrade:
+              only_tracking: yes
             accept_all: yes
             mock:
               - {title: 'Movie.480p.WEB-DL.X264.AC3', 'id': 'Movie'}
           existing_download_1080p:
+            upgrade:
+              only_tracking: yes
             accept_all: yes
             mock:
               - {title: 'Movie.1080p.WEB-DL.X264.AC3', 'id': 'Movie'}
@@ -132,6 +138,8 @@ class TestUpgradeTimeFrame(object):
     config = """
         tasks:
           existing_download_480p:
+            upgrade:
+              only_tracking: yes
             accept_all: yes
             mock:
               - {title: 'Movie.480p.WEB-DL.X264.AC3', 'id': 'Movie'}
@@ -221,41 +229,3 @@ class TestUpgradePropers(object):
         task = execute_task('existing_lower_quality_proper')
         entry = task.find_entry('undecided', title='Movie.720p PROPER WEB-DL X264 AC3')
         assert entry, 'Movie.720p PROPER WEB-DL X264 AC3 should have been undecided'
-
-
-class TestUpgradeIdentifiers(object):
-    config = """
-        tasks:
-          first_download:
-            accept_all: yes
-            mock:
-              - {title: 'Smoke.720p.WEB-DL.X264.AC3', 'id': 'Smoke'}
-          identified_by:
-            upgrade:
-              identified_by: "{{ movie_name }}"
-            mock:
-              - {title: 'Smoke.1080p.BRRip.X264.AC3', 'id': 'Smoke', 'movie_name': 'Smoke'}
-          imdb_download:
-            accept_all: yes
-            imdb_lookup: yes
-            mock:
-              - {title: 'Smoke.720p.WEB-DL.X264.AC3'}
-          imdb_upgrade:
-            accept_all: yes
-            imdb_lookup: yes
-            mock:
-              - {title: 'Smoke.1080p.BRRip.X264.AC3'}
-    """
-
-    @pytest.mark.online
-    def test_imdb(self, execute_task):
-        execute_task('imdb_download')
-        task = execute_task('imdb_upgrade')
-        entry = task.find_entry('accepted', title='Smoke.1080p.BRRip.X264.AC3')
-        assert entry, 'Smoke.1080p.BRRip.X264.AC3 should have been accepted'
-
-    def test_identified_by(self, execute_task):
-        execute_task('first_download')
-        task = execute_task('identified_by')
-        entry = task.find_entry('accepted', title='Smoke.1080p.BRRip.X264.AC3')
-        assert entry, 'Smoke.1080p.BRRip.X264.AC3 should have been accepted'

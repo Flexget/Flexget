@@ -66,7 +66,7 @@ class LazyUpgrade(object):
                 'type': 'object',
                 'properties': {
                     'identified_by': {'type': 'string'},
-                    'tracking': {'type': 'boolean'},
+                    'only_tracking': {'type': 'boolean'},
                     'target': {'type': 'string', 'format': 'quality_requirements'},
                     'on_lower': {'type': 'string', 'enum': ['accept', 'reject', 'fail', 'skip']},
                     'timeframe': {'type': 'string', 'format': 'interval'},
@@ -78,10 +78,14 @@ class LazyUpgrade(object):
     }
 
     def prepare_config(self, config):
-        if not config or isinstance(config, bool):
+        if config is None or config is False:
+            return
+
+        if config is True:
             config = {}
+
         config.setdefault('identified_by', 'auto')
-        config.setdefault('tracking', True)
+        config.setdefault('only_tracking', False)
         config.setdefault('on_lower', 'skip')
         config.setdefault('target', None)
         config.setdefault('timeframe', None)
@@ -119,10 +123,10 @@ class LazyUpgrade(object):
         return filtered
 
     def on_task_filter(self, task, config):
-        if not config:
-            return
-
         config = self.prepare_config(config)
+
+        if not config or config['only_tracking']:
+            return
 
         grouped_entries = group_entries(task.entries, config['identified_by'])
 
@@ -182,7 +186,7 @@ class LazyUpgrade(object):
 
     def on_task_learn(self, task, config):
         config = self.prepare_config(config)
-        if not config['tracking']:
+        if not config:
             return
 
         grouped_entries = group_entries(task.accepted, config['identified_by'])
@@ -220,4 +224,4 @@ class LazyUpgrade(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(LazyUpgrade, 'upgrade', builtin=True, api_ver=2)
+    plugin.register(LazyUpgrade, 'upgrade', api_ver=2)
