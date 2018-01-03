@@ -22,7 +22,7 @@ requests.headers.update({'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windo
 requests.add_domain_limiter(TimedLimiter('newpct1.com', '2 seconds'))
 requests.add_domain_limiter(TimedLimiter('newpct.com', '2 seconds'))
 
-NEWPCT_TORRENT_FORMAT   = 'http://www.newpct.com/torrents/{:0>6}.torrent'
+NEWPCT_TORRENT_FORMAT = 'http://www.newpct.com/torrents/{:0>6}.torrent'
 NEWPCT1_TORRENT_FORMAT = 'http://www.newpct1.com/torrents/{:0>6}.torrent'
 
 class UrlRewriteNewPCT(object):
@@ -68,7 +68,7 @@ class UrlRewriteNewPCT(object):
         torrent_id_prog = re.compile("(?:parametros\s*=\s*\n?)\s*{\s*\n(?:\s*'\w+'\s*:.*\n)+\s*'(?:torrentID|id)"
                                          "'\s*:\s*'(\d+)'")
         torrent_ids = soup.findAll(text=torrent_id_prog)
-        if len(torrent_ids):
+        if torrent_ids:
             match = torrent_id_prog.search(torrent_ids[0])
             if match:
                 torrent_id = match.group(1)
