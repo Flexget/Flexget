@@ -7,7 +7,10 @@ from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils.requests import Session
-from requests.exceptions import RequestError
+from flexget.plugin import PluginWarning
+
+from requests.exceptions import RequestException
+from types import StringTypes
 
 plugin_name = 'ifttt'
 log = logging.getLogger(plugin_name)
@@ -65,14 +68,24 @@ class IFTTTNotifier(object):
         :param str title: message subject
         :param dict config: plugin config
         """
+        config = self.prepare_config(config)
         notification_body = {'value1': title, 'value2': message}
+        errors = False
         for key in config['keys']:
             url = self.url_template.format(config['event'], key)
             try:
-                res = self.session.post(url, json=notification_body)
+                self.session.post(url, json=notification_body)
                 log.info("Sent notification to key: {}".format(key))
-            except RequestError as e:
-                log.error("Error sending to {}: {}".format(url, e))
+            except RequestException as e:
+                log.error("Error sending notification to key {}: {} ".format(key, e))
+                errors += 1
+        if errors:
+            raise PluginWarning("Failed to send notifications")
+
+    def prepare_config(self, config):
+        if isinstance(config['keys'], StringTypes):
+            config['keys'] = [config['keys']]
+        return config
 
 
 @event('plugin.register')
