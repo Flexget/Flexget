@@ -23,7 +23,7 @@ requests.add_domain_limiter(TimedLimiter('newpct1.com', '2 seconds'))
 requests.add_domain_limiter(TimedLimiter('newpct.com', '2 seconds'))
 
 NEWPCT_TORRENT_FORMAT = 'http://www.newpct.com/torrents/{:0>6}.torrent'
-NEWPCT1_TORRENT_FORMAT = 'http://www.newpct1.com/download/{}.torrent'
+NEWPCT1_TORRENT_FORMAT = 'http://www.newpct1.com/torrents/{:0>6}.torrent'
 
 class UrlRewriteNewPCT(object):
     """NewPCT urlrewriter and search."""
@@ -62,31 +62,24 @@ class UrlRewriteNewPCT(object):
         torrent_id = None
         if 'newpct1.com' in url:
             url_format = NEWPCT1_TORRENT_FORMAT
-            torrent_id_prog = re.compile('function openTorrent.*\n.*\{.*(\n.*)+window\.location\.href =\s*\".*\/(\d+.+)\";')
+        else:
+            url_format = NEWPCT_TORRENT_FORMAT
+
+        torrent_id_prog = re.compile("(?:parametros\s*=\s*\n?)\s*{\s*\n(?:\s*'\w+'\s*:.*\n)+\s*'(?:torrentID|id)"
+                                         "'\s*:\s*'(\d+)'")
+        torrent_ids = soup.findAll(text=torrent_id_prog)
+        if torrent_ids:
+            match = torrent_id_prog.search(torrent_ids[0])
+            if match:
+                torrent_id = match.group(1)
+        if not torrent_id:
+            torrent_id_prog = re.compile('function openTorrent.*\n.*\{.*(\n.*)+window\.location\.href =\s*\".*\/(\d+).*\";')
             torrent_ids = soup.findAll(text=torrent_id_prog)
-            log.debug('searching openTorrent script')
+            log.debug('torrent ID not found, searching openTorrent script')
             if torrent_ids:
                 match = torrent_id_prog.search(torrent_ids[0])
                 if match:
                     torrent_id = match.group(2)
-        else:
-            url_format = NEWPCT_TORRENT_FORMAT
-
-            torrent_id_prog = re.compile("(?:parametros\s*=\s*\n?)\s*{\s*\n(?:\s*'\w+'\s*:.*\n)+\s*'(?:torrentID|id)"
-                                         "'\s*:\s*'(\d+)'")
-            torrent_ids = soup.findAll(text=torrent_id_prog)
-            if len(torrent_ids):
-                match = torrent_id_prog.search(torrent_ids[0])
-                if match:
-                    torrent_id = match.group(1)
-            if not torrent_id:
-                torrent_id_prog = re.compile('function openTorrent.*\n.*\{.*(\n.*)+window\.location\.href =\s*\".*\/(\d+).*\";')
-                torrent_ids = soup.findAll(text=torrent_id_prog)
-                log.debug('torrent ID not found, searching openTorrent script')
-                if torrent_ids:
-                    match = torrent_id_prog.search(torrent_ids[0])
-                    if match:
-                        torrent_id = match.group(2)
 
         if not torrent_id:
             raise UrlRewritingError('Unable to locate torrent ID from url %s' % url)
