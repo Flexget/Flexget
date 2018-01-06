@@ -1,0 +1,80 @@
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+import datetime
+
+from flexget.manager import Session
+from flexget.plugins.filter.timeframe import EntryTimeFrame
+
+
+def age_timeframe(**kwargs):
+    with Session() as session:
+        session.query(EntryTimeFrame).update({'first_seen': datetime.datetime.now() - datetime.timedelta(**kwargs)})
+
+
+class TestTimeFrame(object):
+    config = """
+        tasks:
+          wait:
+            timeframe:
+              wait: 1 day
+              target: 1080p
+            mock:
+              - {title: 'Movie.BRRip.x264.720p', 'id': 'Movie'}
+              - {title: 'Movie.720p WEB-DL X264 AC3', 'id': 'Movie'} 
+          reached_and_backlog:
+            timeframe:
+              wait: 1 hour
+              target: 1080p
+            mock:
+              - {title: 'Movie.720p WEB-DL X264 AC3', 'id': 'Movie'} 
+              - {title: 'Movie.BRRip.x264.720p', 'id': 'Movie'}
+          target1:
+            timeframe:
+              wait: 1 hour
+              target: 1080p
+            mock:
+              - {title: 'Movie.720p WEB-DL X264 AC3', 'id': 'Movie'} 
+              - {title: 'Movie.BRRip.x264.720p', 'id': 'Movie'}
+          target2:
+            timeframe:
+              wait: 1 hour
+              target: 1080p
+            mock:
+              - {title: 'Movie.1080p WEB-DL X264 AC3', 'id': 'Movie'} 
+    """
+
+    def test_wait(self, execute_task):
+        task = execute_task('wait')
+        with Session() as session:
+            query = session.query(EntryTimeFrame).all()
+            assert len(query) == 1, 'There should be one tracked entity present.'
+            assert query[0].id == 'movie', 'Should of tracked name `Movie`.'
+
+        entry = task.find_entry('undecided', title='Movie.BRRip.x264.720p')
+        assert entry, 'Movie.BRRip.x264.720p should be undecided'
+        entry = task.find_entry('undecided', title='Movie.720p WEB-DL X264 AC3')
+        assert entry, 'Movie.720p WEB-DL X264 AC3 should be undecided'
+
+    def test_reached_and_backlog(self, manager, execute_task):
+        execute_task('reached_and_backlog')
+        age_timeframe(hours=1)
+
+        # simulate movie going away from the task/feed
+        del (manager.config['tasks']['reached_and_backlog']['mock'])
+
+        task = execute_task('reached_and_backlog')
+        entry = task.find_entry('accepted', title='Movie.BRRip.x264.720p')
+        assert entry, 'Movie.BRRip.x264.720p should be undecided, backlog not injecting'
+
+    def test_target(self, execute_task):
+        execute_task('target1')
+        task = execute_task('target2')
+        entry = task.find_entry('accepted', title='Movie.1080p WEB-DL X264 AC3')
+        assert entry, 'Movie.1080p WEB-DL X264 AC3 should be undecided'
+
+    def test_learn(self, execute_task):
+        execute_task('target2')
+        with Session() as session:
+            query = session.query(EntryTimeFrame).all()
+            assert len(query) == 1, 'There should be one tracked entity present.'
+            assert query[0].status == 'accepted', 'Should be accepted.'
