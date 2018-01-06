@@ -58,7 +58,7 @@ def group_entries(entries, identified_by):
     return grouped_entries
 
 
-class LazyUpgrade(object):
+class FilterUpgrade(object):
     schema = {
         'oneOf': [
             {'type': 'boolean'},
@@ -224,4 +224,4 @@ class LazyUpgrade(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(LazyUpgrade, 'upgrade', api_ver=2)
+    plugin.register(FilterUpgrade, 'upgrade', api_ver=2)
