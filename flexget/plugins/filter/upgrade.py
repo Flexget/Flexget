@@ -124,6 +124,8 @@ class FilterUpgrade(object):
             return
 
         grouped_entries = group_entries(task.entries, config['identified_by'])
+        if len(grouped_entries) == 0:
+            return
 
         with Session() as session:
             # Prefetch Data
@@ -177,6 +179,8 @@ class FilterUpgrade(object):
             return
 
         grouped_entries = group_entries(task.accepted, config['identified_by'])
+        if len(grouped_entries) == 0:
+            return
 
         with Session() as session:
             # Prefetch Data
