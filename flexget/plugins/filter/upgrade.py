@@ -60,21 +60,16 @@ def group_entries(entries, identified_by):
 
 class FilterUpgrade(object):
     schema = {
-        'oneOf': [
-            {'type': 'boolean'},
-            {
-                'type': 'object',
-                'properties': {
-                    'identified_by': {'type': 'string'},
-                    'only_tracking': {'type': 'boolean'},
-                    'target': {'type': 'string', 'format': 'quality_requirements'},
-                    'on_lower': {'type': 'string', 'enum': ['accept', 'reject', 'fail', 'skip']},
-                    'timeframe': {'type': 'string', 'format': 'interval'},
-                    'propers': {'type': 'boolean'}
-                },
-                'additionalProperties': False
-            }
-        ]
+        'type': 'object',
+        'properties': {
+            'identified_by': {'type': 'string'},
+            'tracking': {'type': 'boolean'},
+            'target': {'type': 'string', 'format': 'quality_requirements'},
+            'on_lower': {'type': 'string', 'enum': ['accept', 'reject', 'fail', 'skip']},
+            'timeframe': {'type': 'string', 'format': 'interval'},
+            'propers': {'type': 'boolean'}
+        },
+        'additionalProperties': False
     }
 
     def prepare_config(self, config):
@@ -85,7 +80,7 @@ class FilterUpgrade(object):
             config = {}
 
         config.setdefault('identified_by', 'auto')
-        config.setdefault('only_tracking', False)
+        config.setdefault('tracking', True)
         config.setdefault('on_lower', 'skip')
         config.setdefault('target', None)
         config.setdefault('timeframe', None)
@@ -125,7 +120,7 @@ class FilterUpgrade(object):
     def on_task_filter(self, task, config):
         config = self.prepare_config(config)
 
-        if not config or config['only_tracking']:
+        if not config or not config['target']:
             return
 
         grouped_entries = group_entries(task.entries, config['identified_by'])
@@ -154,14 +149,6 @@ class FilterUpgrade(object):
                         log.debug('Skipping upgrade with identifier %s as timeframe reached', identifier)
                         continue
 
-                # Check target already met
-                if config['target']:
-                    target_quality = qualities.Quality(config['target'])
-                    target_requirement = qualities.Requirements(config['target'])
-                    if existing.quality > target_quality or target_requirement.allows(existing.quality):
-                        log.debug('Skipping upgrade with identifier %s as target quality %s reached', identifier, config['target'])
-                        continue
-
                 # Filter out lower quality and propers
                 action_on_lower = entry_actions[config['on_lower']] if config['on_lower'] != 'skip' else None
                 upgradeable = self.filter_entries(entries, existing, config['target'], action_on_lower)
@@ -186,7 +173,7 @@ class FilterUpgrade(object):
 
     def on_task_learn(self, task, config):
         config = self.prepare_config(config)
-        if not config:
+        if not config or not config['tracking']:
             return
 
         grouped_entries = group_entries(task.accepted, config['identified_by'])
