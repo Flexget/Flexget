@@ -7,6 +7,7 @@ import logging
 
 from flexget import db_schema, plugin
 from flexget.event import event
+from flexget.entry import Entry
 from flexget.utils.database import quality_property
 from flexget.db_schema import Session
 from flexget.utils import qualities
@@ -15,6 +16,12 @@ from flexget.utils.tools import parse_timedelta
 log = logging.getLogger('timeframe')
 
 Base = db_schema.versioned_base('upgrade', 0)
+
+entry_actions = {
+    'accept': Entry.accept,
+    'reject': Entry.reject,
+    'fail': Entry.fail
+}
 
 
 class EntryTimeFrame(Base):
@@ -27,7 +34,6 @@ class EntryTimeFrame(Base):
     quality = quality_property('_quality')
     first_seen = Column(DateTime, default=datetime.now)
     proper_count = Column(Integer, default=0)
-    accepted = Column(DateTime)
 
     def __init__(self):
         self.first_seen = datetime.now()
@@ -61,7 +67,9 @@ class FilterTimeFrame(object):
         'properties': {
             'identified_by': {'type': 'string', 'default': 'auto'},
             'target': {'type': 'string', 'format': 'quality_requirements'},
-            'wait': {'type': 'string', 'format': 'interval'}
+            'wait': {'type': 'string', 'format': 'interval'},
+            'on_waiting': {'type': 'string', 'enum': ['accept', 'reject', 'fail', 'skip'], 'default': 'reject'},
+            'on_reached': {'type': 'string', 'enum': ['accept', 'reject', 'fail', 'skip'], 'default': 'skip'},
         },
         'required': ['target', 'wait'],
         'additionalProperties': False
@@ -73,20 +81,6 @@ class FilterTimeFrame(object):
         except plugin.DependencyError:
             log.warning('Unable to utilize backlog plugin, so episodes may slip through timeframe.')
 
-    def filter_entries(self, entries, target):
-
-        target_requirement = qualities.Requirements(target)
-        filtered = []
-
-        for entry in entries:
-            # Filter out entries within target
-            if not target_requirement.allows(entry['quality']):
-                log.debug('Skipping %s as does not meet timeframe quality requirements', entry['title'])
-                continue
-            filtered.append(entry)
-
-        return filtered
-
     def on_task_filter(self, task, config):
         if not config:
             return
@@ -94,6 +88,9 @@ class FilterTimeFrame(object):
         grouped_entries = group_entries(task.entries, config['identified_by'])
         if len(grouped_entries) == 0:
             return
+
+        action_on_waiting = entry_actions[config['on_waiting']] if config['on_waiting'] != 'skip' else None
+        action_on_reached = entry_actions[config['on_reached']] if config['on_reached'] != 'skip' else None
 
         with Session() as session:
             # Prefetch Data
@@ -130,17 +127,22 @@ class FilterTimeFrame(object):
                 target_quality = qualities.Quality(config['target'])
                 if target_requirement.allows(best_entry['quality']) or best_entry['quality'] >= target_quality:
                     log.debug('timeframe reach target quality %s or higher for %s' % (target_quality, identifier))
-                    best_entry.accept('timeframe reached target quality or higher')
+                    if action_on_reached:
+                        action_on_reached(best_entry, 'timeframe reached target quality or higher')
                     continue
 
                 # Check if passed wait time
                 expires = id_timeframe.first_seen + parse_timedelta(config['wait'])
                 if expires <= datetime.now():
                     log.debug('timeframe expired, releasing quality restriction for %s' % identifier)
-                    best_entry.accept('timeframe wait expired')
+                    if action_on_reached:
+                        action_on_reached(best_entry, 'timeframe wait expired')
                     continue
 
                 # Verbose waiting, add to backlog
+                if action_on_waiting:
+                    for entry in entries:
+                        action_on_waiting(entry, 'timeframe waiting')
                 diff = expires - datetime.now()
                 hours, remainder = divmod(diff.seconds, 3600)
                 hours += diff.days * 24

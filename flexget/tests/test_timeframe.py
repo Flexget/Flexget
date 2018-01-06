@@ -78,3 +78,39 @@ class TestTimeFrame(object):
             query = session.query(EntryTimeFrame).all()
             assert len(query) == 1, 'There should be one tracked entity present.'
             assert query[0].status == 'accepted', 'Should be accepted.'
+
+
+class TestTimeFrameActions(object):
+    config = """
+        tasks:
+          wait_reject:
+            timeframe:
+              wait: 1 day
+              target: 1080p
+              on_waiting: reject
+            mock:
+              - {title: 'Movie.BRRip.x264.720p', 'id': 'Movie'}
+              - {title: 'Movie.720p WEB-DL X264 AC3', 'id': 'Movie'} 
+          reached_accept:
+            timeframe:
+              wait: 1 hour
+              target: 1080p
+              on_reached: accept
+            mock:
+              - {title: 'Movie.720p WEB-DL X264 AC3', 'id': 'Movie'} 
+              - {title: 'Movie.BRRip.x264.720p', 'id': 'Movie'}
+    """
+
+    def test_on_reject(self, execute_task):
+        task = execute_task('wait_reject')
+        entry = task.find_entry('rejected', title='Movie.BRRip.x264.720p')
+        assert entry, 'Movie.BRRip.x264.720p should be rejected'
+        entry = task.find_entry('rejected', title='Movie.720p WEB-DL X264 AC3')
+        assert entry, 'Movie.720p WEB-DL X264 AC3 should be rejected'
+
+    def test_on_reached(self, manager, execute_task):
+        execute_task('reached_accept')
+        age_timeframe(hours=1)
+        task = execute_task('reached_accept')
+        entry = task.find_entry('accepted', title='Movie.BRRip.x264.720p')
+        assert entry, 'Movie.BRRip.x264.720p should be undecided, backlog not injecting'
