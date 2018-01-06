@@ -49,6 +49,9 @@ def group_entries(entries, identified_by):
 
     # Group by Identifier
     for entry in entries:
+        # We don't want to work on rejected entries
+        if entry.rejected:
+            continue
         identifier = entry.get('id') if identified_by == 'auto' else entry.render(identified_by)
         if not identifier:
             log.debug('No identifier found for %s', entry['title'])
