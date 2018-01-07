@@ -13,7 +13,7 @@ import operator
 import os
 import re
 import sys
-from collections import MutableMapping
+from collections import MutableMapping, defaultdict
 from datetime import timedelta, datetime
 from pprint import pformat
 
@@ -529,6 +529,19 @@ def parse_episode_identifier(ep_id, identify_season=False):
     if error:
         raise ValueError(error)
     return (identified_by, entity_type)
+
+
+def group_entries_by_field(entries, field):
+    grouped_entries = defaultdict(list)
+
+    # Group by Identifier
+    for entry in entries:
+        field = entry.render(field)
+        if not field:
+            continue
+        grouped_entries[field.lower().strip()].append(entry)
+
+    return grouped_entries
 
 
 def aggregate_inputs(task, inputs):

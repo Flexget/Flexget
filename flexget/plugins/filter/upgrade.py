@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from collections import defaultdict
 from datetime import datetime
 from sqlalchemy import Column, String, Unicode, DateTime, Integer
 import logging
@@ -11,7 +10,7 @@ from flexget.utils.database import quality_property
 from flexget.db_schema import Session
 from flexget.event import event
 from flexget.utils import qualities
-from flexget.utils.tools import parse_timedelta
+from flexget.utils.tools import parse_timedelta, group_entries_by_field
 
 log = logging.getLogger('upgrade')
 
@@ -44,23 +43,6 @@ class EntryUpgrade(Base):
                (self.id, self.added, self.quality)
 
 
-def group_entries(entries, identified_by):
-    grouped_entries = defaultdict(list)
-
-    # Group by Identifier
-    for entry in entries:
-        # We don't want to work on rejected entries
-        if entry.rejected:
-            continue
-        identifier = entry.get('id') if identified_by == 'auto' else entry.render(identified_by)
-        if not identifier:
-            log.debug('No identifier found for %s', entry['title'])
-            continue
-        grouped_entries[identifier.lower()].append(entry)
-
-    return grouped_entries
-
-
 class FilterUpgrade(object):
     schema = {
         'type': 'object',
@@ -68,7 +50,7 @@ class FilterUpgrade(object):
             'identified_by': {'type': 'string'},
             'tracking': {'type': 'boolean'},
             'target': {'type': 'string', 'format': 'quality_requirements'},
-            'on_lower': {'type': 'string', 'enum': ['accept', 'reject', 'fail', 'skip']},
+            'on_lower': {'type': 'string', 'enum': ['accept', 'reject', 'skip']},
             'timeframe': {'type': 'string', 'format': 'interval'},
             'propers': {'type': 'boolean'}
         },
@@ -126,7 +108,9 @@ class FilterUpgrade(object):
         if not config or not config['target']:
             return
 
-        grouped_entries = group_entries(task.entries, config['identified_by'])
+        identified_by = '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
+
+        grouped_entries = group_entries_by_field(task.accepted + task.undecided, identified_by)
         if len(grouped_entries) == 0:
             return
 
@@ -181,7 +165,9 @@ class FilterUpgrade(object):
         if not config or not config['tracking']:
             return
 
-        grouped_entries = group_entries(task.accepted, config['identified_by'])
+        identified_by = '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
+
+        grouped_entries = group_entries_by_field(task.accepted, identified_by)
         if len(grouped_entries) == 0:
             return
 
