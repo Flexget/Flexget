@@ -10,7 +10,7 @@ from flexget.entry import Entry
 from flexget.utils.database import quality_property
 from flexget.db_schema import Session
 from flexget.utils import qualities
-from flexget.utils.tools import parse_timedelta, group_entries_by_field
+from flexget.utils.tools import parse_timedelta, group_entries
 
 log = logging.getLogger('timeframe')
 
@@ -68,7 +68,7 @@ class FilterTimeFrame(object):
 
         identified_by = '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
 
-        grouped_entries = group_entries_by_field(task.accepted + task.undecided, identified_by)
+        grouped_entries = group_entries(task.accepted + task.undecided, identified_by)
         if len(grouped_entries) == 0:
             return
 
@@ -144,7 +144,7 @@ class FilterTimeFrame(object):
 
         identified_by = '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
 
-        grouped_entries = group_entries_by_field(task.accepted, identified_by)
+        grouped_entries = group_entries(task.accepted, identified_by)
         if len(grouped_entries) == 0:
             return
 

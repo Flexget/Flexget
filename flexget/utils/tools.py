@@ -531,15 +531,15 @@ def parse_episode_identifier(ep_id, identify_season=False):
     return (identified_by, entity_type)
 
 
-def group_entries_by_field(entries, field):
+def group_entries(entries, identifier):
     grouped_entries = defaultdict(list)
 
     # Group by Identifier
     for entry in entries:
-        field = entry.render(field)
-        if not field:
+        rendered_id = entry.render(identifier)
+        if not rendered_id:
             continue
-        grouped_entries[field.lower().strip()].append(entry)
+        grouped_entries[rendered_id.lower().strip()].append(entry)
 
     return grouped_entries
 

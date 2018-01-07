@@ -4,7 +4,7 @@ import logging
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
-from flexget.utils.tools import group_entries_by_field
+from flexget.utils.tools import group_entries
 
 log = logging.getLogger('best_quality')
 
@@ -34,7 +34,7 @@ class FilterBestQuality(object):
         action_on_best = entry_actions[config['on_best']] if config['on_best'] != 'skip' else None
         action_on_lower = entry_actions[config['on_lower']] if config['on_lower'] != 'skip' else None
 
-        grouped_entries = group_entries_by_field(task.accepted + task.undecided, identified_by)
+        grouped_entries = group_entries(task.accepted + task.undecided, identified_by)
 
         for identifier, entries in grouped_entries.items():
             if not entries:
