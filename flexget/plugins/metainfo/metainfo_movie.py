@@ -42,7 +42,7 @@ class MetainfoMovie(object):
         if parser and parser.valid:
             parser.name = normalize_name(remove_dirt(parser.name))
             for field, value in parser.fields.items():
-                if not entry.store.get(field):
+                if not entry.is_lazy(field):
                     entry.update(parser.fields)
             return True
         return False
