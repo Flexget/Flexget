@@ -25,6 +25,7 @@ class TestTimeFrame(object):
             timeframe:
               wait: 1 hour
               target: 1080p
+              on_reached: accept
             mock:
               - {title: 'Movie.720p WEB-DL X264 AC3', 'id': 'Movie'} 
               - {title: 'Movie.BRRip.x264.720p', 'id': 'Movie'}
@@ -32,6 +33,7 @@ class TestTimeFrame(object):
             timeframe:
               wait: 1 hour
               target: 1080p
+              on_reached: accept
             mock:
               - {title: 'Movie.720p WEB-DL X264 AC3', 'id': 'Movie'} 
               - {title: 'Movie.BRRip.x264.720p', 'id': 'Movie'}
@@ -39,6 +41,7 @@ class TestTimeFrame(object):
             timeframe:
               wait: 1 hour
               target: 1080p
+              on_reached: accept
             mock:
               - {title: 'Movie.1080p WEB-DL X264 AC3', 'id': 'Movie'} 
     """
@@ -50,10 +53,10 @@ class TestTimeFrame(object):
             assert len(query) == 1, 'There should be one tracked entity present.'
             assert query[0].id == 'movie', 'Should of tracked name `Movie`.'
 
-        entry = task.find_entry('undecided', title='Movie.BRRip.x264.720p')
-        assert entry, 'Movie.BRRip.x264.720p should be undecided'
-        entry = task.find_entry('undecided', title='Movie.720p WEB-DL X264 AC3')
-        assert entry, 'Movie.720p WEB-DL X264 AC3 should be undecided'
+        entry = task.find_entry('rejected', title='Movie.BRRip.x264.720p')
+        assert entry, 'Movie.BRRip.x264.720p should be rejected'
+        entry = task.find_entry('rejected', title='Movie.720p WEB-DL X264 AC3')
+        assert entry, 'Movie.720p WEB-DL X264 AC3 should be rejected'
 
     def test_reached_and_backlog(self, manager, execute_task):
         execute_task('reached_and_backlog')
@@ -64,7 +67,7 @@ class TestTimeFrame(object):
 
         task = execute_task('reached_and_backlog')
         entry = task.find_entry('accepted', title='Movie.BRRip.x264.720p')
-        assert entry, 'Movie.BRRip.x264.720p should be undecided, backlog not injecting'
+        assert entry, 'Movie.BRRip.x264.720p should be accepted, backlog not injecting'
 
     def test_target(self, execute_task):
         execute_task('target1')
