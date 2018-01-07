@@ -18,7 +18,7 @@ class FilterBestQuality(object):
     schema = {
         'type': 'object',
         'properties': {
-            'identified_by': {'type': 'string', 'default': 'id'},
+            'identified_by': {'type': 'string', 'default': 'auto'},
             'on_best': {'type': 'string', 'enum': ['accept', 'reject', 'skip'], 'default': 'skip'},
             'on_lower': {'type': 'string', 'enum': ['accept', 'reject', 'skip'], 'default': 'reject'},
         },
