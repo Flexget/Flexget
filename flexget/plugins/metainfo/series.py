@@ -27,7 +27,7 @@ class MetainfoSeries(object):
             return
         for entry in task.entries:
             # If series plugin already parsed this, don't touch it.
-            if entry.get('series_name'):
+            if entry.get('id'):
                 continue
             self.guess_entry(entry)
 
