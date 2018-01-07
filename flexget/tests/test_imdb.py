@@ -314,10 +314,6 @@ class TestImdbLookup(object):
 
     """
 
-    def test_identifier(self, execute_task):
-        task = execute_task('identifier')
-        assert task.entries[0]['id'] == 'taken 2008', 'id was not set correctly'
-
     def test_invalid_url(self, execute_task):
         task = execute_task('invalid url')
         # check that these were created

@@ -183,29 +183,29 @@ class TestUpgradePropers(object):
           existing_download:
             accept_all: yes
             mock:
-              - {title: 'Movie.1080p.WEB-DL.X264.AC3-GRP1', 'id': 'Movie'}
+              - {title: 'Movie.1080p.WEB-DL.X264.AC3-GRP1'}
           existing_download_proper:
             accept_all: yes
             mock:
-              - {title: 'Movie.1080p PROPER WEB-DL X264 AC3 GRP1', 'id': 'Movie'}
+              - {title: 'Movie.1080p PROPER WEB-DL X264 AC3 GRP1'}
           existing_download_proper_repack:
             accept_all: yes
             mock:
-              - {title: 'Movie.1080p PROPER REPACK WEB-DL X264 AC3 GRP1', 'id': 'Movie'}
+              - {title: 'Movie.1080p PROPER REPACK WEB-DL X264 AC3 GRP1'}
           upgrade_proper:
             mock:
-              - {title: 'Movie.1080p REPACK PROPER WEB-DL X264 AC3', 'id': 'Movie'}
-              - {title: 'Movie.1080p PROPER WEB-DL X264 AC3', 'id': 'Movie'}
+              - {title: 'Movie.1080p REPACK PROPER WEB-DL X264 AC3'}
+              - {title: 'Movie.1080p PROPER WEB-DL X264 AC3'}
           existing_upgrade_proper:
             mock:
-              - {title: 'Movie.1080p REPACK PROPER WEB-DL X264 AC3', 'id': 'Movie'}
-              - {title: 'Movie.1080p PROPER WEB-DL X264 AC3', 'id': 'Movie'}
+              - {title: 'Movie.1080p REPACK PROPER WEB-DL X264 AC3'}
+              - {title: 'Movie.1080p PROPER WEB-DL X264 AC3'}
           existing_higher_proper:
             mock:
-              - {title: 'Movie.1080p PROPER WEB-DL X264 AC3', 'id': 'Movie'}
+              - {title: 'Movie.1080p PROPER WEB-DL X264 AC3'}
           existing_lower_quality_proper:
             mock:
-              - {title: 'Movie.720p PROPER WEB-DL X264 AC3', 'id': 'Movie'}
+              - {title: 'Movie.720p PROPER WEB-DL X264 AC3'}
     """
 
     def test_upgrade_proper(self, execute_task):
