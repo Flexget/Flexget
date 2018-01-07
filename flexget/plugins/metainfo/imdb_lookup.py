@@ -73,6 +73,13 @@ class Movie(Base):
     updated = Column(DateTime)
 
     @property
+    def identifier(self):
+        if self.title and self.year:
+            return ('%s %s' % (self.title, self.year)).strip().lower()
+        elif self.name:
+            return self.title.lower()
+
+    @property
     def imdb_id(self):
         return extract_id(self.url)
 
@@ -214,6 +221,7 @@ class ImdbLookup(object):
     """
 
     field_map = {
+        'id': 'identifier',
         'imdb_url': 'url',
         'imdb_id': lambda movie: extract_id(movie.url),
         'imdb_name': 'title',

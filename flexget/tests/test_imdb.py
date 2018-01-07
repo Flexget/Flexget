@@ -297,6 +297,10 @@ class TestImdb(object):
 class TestImdbLookup(object):
     config = """
         tasks:
+          identifier:
+            mock:
+              - {title: 'Taken 720p'}
+            imdb_lookup: yes
           invalid url:
             mock:
               - {title: 'Taken', imdb_url: 'imdb.com/title/tt0936501/'}
@@ -309,6 +313,10 @@ class TestImdbLookup(object):
             imdb_lookup: yes
 
     """
+
+    def test_identifier(self, execute_task):
+        task = execute_task('identifier')
+        assert task.entries[0]['id'] == 'taken 2008', 'id was not set correctly'
 
     def test_invalid_url(self, execute_task):
         task = execute_task('invalid url')
