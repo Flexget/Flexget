@@ -18,7 +18,6 @@ from datetime import timedelta, datetime
 from pprint import pformat
 
 import flexget
-from flexget.utils.template import RenderError
 import queue
 import requests
 from html.entities import name2codepoint
@@ -532,6 +531,8 @@ def parse_episode_identifier(ep_id, identify_season=False):
 
 
 def group_entries(entries, identifier):
+    from flexget.utils.template import RenderError
+
     grouped_entries = defaultdict(list)
 
     # Group by Identifier
