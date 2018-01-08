@@ -34,10 +34,6 @@ class EntryUpgrade(Base):
     first_seen = Column(DateTime, default=datetime.now)
     updated = Column(DateTime, index=True, default=datetime.now)
 
-    def __init__(self):
-        self.first_seen = datetime.now()
-        self.updated = datetime.now()
-
     def __str__(self):
         return '<Upgrade(id=%s,added=%s,quality=%s)>' % \
                (self.id, self.added, self.quality)
@@ -58,7 +54,7 @@ class FilterUpgrade(object):
     }
 
     def prepare_config(self, config):
-        if config is None or config is False:
+        if not config or config is False:
             return
 
         if config is True:
@@ -111,7 +107,7 @@ class FilterUpgrade(object):
         identified_by = '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
 
         grouped_entries = group_entries(task.accepted + task.undecided, identified_by)
-        if len(grouped_entries) == 0:
+        if not grouped_entries:
             return
 
         with Session() as session:
@@ -168,7 +164,7 @@ class FilterUpgrade(object):
         identified_by = '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
 
         grouped_entries = group_entries(task.accepted, identified_by)
-        if len(grouped_entries) == 0:
+        if not grouped_entries:
             return
 
         with Session() as session:

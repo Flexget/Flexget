@@ -33,10 +33,6 @@ class EntryTimeFrame(Base):
     first_seen = Column(DateTime, default=datetime.now)
     proper_count = Column(Integer, default=0)
 
-    def __init__(self):
-        self.first_seen = datetime.now()
-        self.updated = datetime.now()
-
     def __str__(self):
         return '<Timeframe(id=%s,added=%s,quality=%s)>' % \
                (self.id, self.added, self.quality)
@@ -60,6 +56,7 @@ class FilterTimeFrame(object):
         try:
             self.backlog = plugin.get_plugin_by_name('backlog')
         except plugin.DependencyError:
+            self.backlog = None
             log.warning('Unable to utilize backlog plugin, so episodes may slip through timeframe.')
 
     def on_task_filter(self, task, config):
@@ -69,7 +66,7 @@ class FilterTimeFrame(object):
         identified_by = '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
 
         grouped_entries = group_entries(task.accepted + task.undecided, identified_by)
-        if len(grouped_entries) == 0:
+        if not grouped_entries:
             return
 
         action_on_waiting = entry_actions[config['on_waiting']] if config['on_waiting'] != 'do_nothing' else None
@@ -103,7 +100,7 @@ class FilterTimeFrame(object):
 
                 id_timeframe.title = best_entry['title']
                 id_timeframe.quality = best_entry['quality']
-                id_timeframe.title = best_entry.get('proper_count', 0)
+                id_timeframe.proper_count = best_entry.get('proper_count', 0)
 
                 # Check we hit target or better
                 target_requirement = qualities.Requirements(config['target'])
@@ -145,7 +142,7 @@ class FilterTimeFrame(object):
         identified_by = '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
 
         grouped_entries = group_entries(task.accepted, identified_by)
-        if len(grouped_entries) == 0:
+        if not grouped_entries:
             return
 
         with Session() as session:
@@ -171,7 +168,6 @@ class FilterTimeFrame(object):
                 id_timeframe.quality = best_entry['quality']
                 id_timeframe.title = best_entry['title']
                 id_timeframe.proper_count = best_entry.get('proper_count', 0)
-                id_timeframe.updated = datetime.now()
                 id_timeframe.status = 'accepted'
 
 
