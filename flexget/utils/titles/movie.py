@@ -34,6 +34,7 @@ class MovieParser(TitleParser):
         Return a dict of all parser fields
         """
         return {
+            'id': self.identifier,
             'movie_parser': self,
             'movie_name': self.name,
             'movie_year': self.year,
@@ -44,6 +45,13 @@ class MovieParser(TitleParser):
     @property
     def valid(self):
         return True
+
+    @property
+    def identifier(self):
+        if self.name and self.year:
+            return ('%s %s' % (self.name, self.year)).strip().lower()
+        elif self.name:
+            return self.name.lower()
 
     @property
     def proper(self):

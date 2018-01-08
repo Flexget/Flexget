@@ -13,14 +13,13 @@ import operator
 import os
 import re
 import sys
-from collections import MutableMapping
+from collections import MutableMapping, defaultdict
 from datetime import timedelta, datetime
 from pprint import pformat
 
 import flexget
 import queue
 import requests
-
 from html.entities import name2codepoint
 
 log = logging.getLogger('utils')
@@ -529,6 +528,24 @@ def parse_episode_identifier(ep_id, identify_season=False):
     if error:
         raise ValueError(error)
     return (identified_by, entity_type)
+
+
+def group_entries(entries, identifier):
+    from flexget.utils.template import RenderError
+
+    grouped_entries = defaultdict(list)
+
+    # Group by Identifier
+    for entry in entries:
+        try:
+            rendered_id = entry.render(identifier)
+        except RenderError:
+            continue
+        if not rendered_id:
+            continue
+        grouped_entries[rendered_id.lower().strip()].append(entry)
+
+    return grouped_entries
 
 
 def aggregate_inputs(task, inputs):

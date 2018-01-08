@@ -24,7 +24,7 @@ class MetainfoMovie(object):
             return
         for entry in task.entries:
             # If movie parser already parsed this, don't touch it.
-            if entry.get('movie_name'):
+            if entry.get('id'):
                 continue
             self.guess_entry(entry)
 
@@ -41,7 +41,9 @@ class MetainfoMovie(object):
         parser = get_plugin_by_name('parsing').instance.parse_movie(data=entry['title'])
         if parser and parser.valid:
             parser.name = normalize_name(remove_dirt(parser.name))
-            entry.update(parser.fields)
+            for field, value in parser.fields.items():
+                if not entry.is_lazy(field) and not entry.get(field):
+                    entry[field] = value
             return True
         return False
 

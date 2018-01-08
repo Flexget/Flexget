@@ -173,6 +173,13 @@ class GuessitParsedMovie(GuessitParsedVideo, ParsedMovie):
         GuessitParsedVideo.__init__(self, data, name, guess_result, **kwargs)
 
     @property
+    def identifier(self):
+        if self.name and self.year:
+            return ('%s %s' % (self.name, self.year)).strip().lower()
+        elif self.name:
+            return self.name.lower()
+
+    @property
     def title(self):
         return self._guess_result.get('title')
 
@@ -183,6 +190,7 @@ class GuessitParsedMovie(GuessitParsedVideo, ParsedMovie):
         """
         return {
             'movie_parser': self,
+            'id': self.identifier,
             'movie_name': self.name,
             'movie_year': self.year,
             'proper': self.proper,

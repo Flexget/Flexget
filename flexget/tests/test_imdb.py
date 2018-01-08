@@ -127,6 +127,12 @@ class TestImdb(object):
             imdb:
               reject_mpaa_ratings:
               - R
+
+          imdb_identifier:
+            imdb_lookup: yes
+            mock:
+              - {title: 'The.Matrix.720p.WEB-DL.X264.AC3'}
+
     """
 
     def test_lookup(self, execute_task):
@@ -291,6 +297,10 @@ class TestImdb(object):
 class TestImdbLookup(object):
     config = """
         tasks:
+          identifier:
+            mock:
+              - {title: 'Taken 720p'}
+            imdb_lookup: yes
           invalid url:
             mock:
               - {title: 'Taken', imdb_url: 'imdb.com/title/tt0936501/'}
