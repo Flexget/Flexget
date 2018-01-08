@@ -16,9 +16,9 @@ import sys
 from collections import MutableMapping, defaultdict
 from datetime import timedelta, datetime
 from pprint import pformat
-from jinja2 import UndefinedError
 
 import flexget
+from flexget.utils.template import RenderError
 import queue
 import requests
 from html.entities import name2codepoint
@@ -538,7 +538,7 @@ def group_entries(entries, identifier):
     for entry in entries:
         try:
             rendered_id = entry.render(identifier)
-        except UndefinedError:
+        except RenderError:
             continue
         if not rendered_id:
             continue
