@@ -50,7 +50,7 @@ class FilterUpgrade(object):
             'identified_by': {'type': 'string'},
             'tracking': {'type': 'boolean'},
             'target': {'type': 'string', 'format': 'quality_requirements'},
-            'on_lower': {'type': 'string', 'enum': ['accept', 'reject', 'skip']},
+            'on_lower': {'type': 'string', 'enum': ['accept', 'reject', 'allow']},
             'timeframe': {'type': 'string', 'format': 'interval'},
             'propers': {'type': 'boolean'}
         },
@@ -66,7 +66,7 @@ class FilterUpgrade(object):
 
         config.setdefault('identified_by', 'auto')
         config.setdefault('tracking', True)
-        config.setdefault('on_lower', 'skip')
+        config.setdefault('on_lower', 'allow')
         config.setdefault('target', None)
         config.setdefault('timeframe', None)
         config.setdefault('propers', True)
@@ -125,7 +125,7 @@ class FilterUpgrade(object):
 
                 existing = existing_ids.get(identifier)
                 if not existing:
-                    # No existing, skip
+                    # No existing, allow
                     continue
 
                 log.debug('Looking for upgrades for identifier %s (within %s entries)', identifier, len(entries))
@@ -134,12 +134,12 @@ class FilterUpgrade(object):
                 if config['timeframe']:
                     expires = existing.first_seen + parse_timedelta(config['timeframe'])
                     if expires <= datetime.now():
-                        # Timeframe reached, skip
+                        # Timeframe reached, allow
                         log.debug('Skipping upgrade with identifier %s as timeframe reached', identifier)
                         continue
 
                 # Filter out lower quality and propers
-                action_on_lower = entry_actions[config['on_lower']] if config['on_lower'] != 'skip' else None
+                action_on_lower = entry_actions[config['on_lower']] if config['on_lower'] != 'allow' else None
                 upgradeable = self.filter_entries(entries, existing, config['target'], action_on_lower)
 
                 # Skip if we have no entries after filtering

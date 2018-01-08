@@ -19,8 +19,8 @@ class FilterBestQuality(object):
         'type': 'object',
         'properties': {
             'identified_by': {'type': 'string', 'default': 'auto'},
-            'on_best': {'type': 'string', 'enum': ['accept', 'reject', 'skip'], 'default': 'skip'},
-            'on_lower': {'type': 'string', 'enum': ['accept', 'reject', 'skip'], 'default': 'reject'},
+            'on_best': {'type': 'string', 'enum': ['accept', 'reject', 'allow'], 'default': 'allow'},
+            'on_lower': {'type': 'string', 'enum': ['accept', 'reject', 'allow'], 'default': 'reject'},
         },
         'additionalProperties': False
     }
@@ -31,8 +31,8 @@ class FilterBestQuality(object):
 
         identified_by = '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
 
-        action_on_best = entry_actions[config['on_best']] if config['on_best'] != 'skip' else None
-        action_on_lower = entry_actions[config['on_lower']] if config['on_lower'] != 'skip' else None
+        action_on_best = entry_actions[config['on_best']] if config['on_best'] != 'allow' else None
+        action_on_lower = entry_actions[config['on_lower']] if config['on_lower'] != 'allow' else None
 
         grouped_entries = group_entries(task.accepted + task.undecided, identified_by)
 

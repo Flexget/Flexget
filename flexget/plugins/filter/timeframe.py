@@ -49,8 +49,8 @@ class FilterTimeFrame(object):
             'identified_by': {'type': 'string', 'default': 'auto'},
             'target': {'type': 'string', 'format': 'quality_requirements'},
             'wait': {'type': 'string', 'format': 'interval'},
-            'on_waiting': {'type': 'string', 'enum': ['accept', 'reject', 'skip'], 'default': 'reject'},
-            'on_reached': {'type': 'string', 'enum': ['accept', 'reject', 'skip'], 'default': 'skip'},
+            'on_waiting': {'type': 'string', 'enum': ['accept', 'reject', 'allow'], 'default': 'reject'},
+            'on_reached': {'type': 'string', 'enum': ['accept', 'reject', 'allow'], 'default': 'allow'},
         },
         'required': ['target', 'wait'],
         'additionalProperties': False
@@ -72,8 +72,8 @@ class FilterTimeFrame(object):
         if len(grouped_entries) == 0:
             return
 
-        action_on_waiting = entry_actions[config['on_waiting']] if config['on_waiting'] != 'skip' else None
-        action_on_reached = entry_actions[config['on_reached']] if config['on_reached'] != 'skip' else None
+        action_on_waiting = entry_actions[config['on_waiting']] if config['on_waiting'] != 'allow' else None
+        action_on_reached = entry_actions[config['on_reached']] if config['on_reached'] != 'allow' else None
 
         with Session() as session:
             # Prefetch Data

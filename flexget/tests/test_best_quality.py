@@ -11,15 +11,15 @@ class TestBestQuality(object):
             mock:
               - {title: 'Movie.720p.WEB-DL.X264.AC3-GRP1', 'id': 'Movie'}
               - {title: 'Movie.1080p.WEB-DL.X264.AC3-GRP1', 'id': 'Movie'}
-          best_skip:
+          best_allow:
             best_quality:
-              on_best: skip
+              on_best: allow
             mock:
               - {title: 'Movie.720p.WEB-DL.X264.AC3-GRP1', 'id': 'Movie'}
               - {title: 'Movie.1080p.WEB-DL.X264.AC3-GRP1', 'id': 'Movie'}
-          lower_skip:
+          lower_allow:
             best_quality:
-              on_lower: skip
+              on_lower: allow
             mock:
               - {title: 'Movie.720p.WEB-DL.X264.AC3-GRP1', 'id': 'Movie'}
               - {title: 'Movie.1080p.WEB-DL.X264.AC3-GRP1', 'id': 'Movie'}
@@ -32,15 +32,15 @@ class TestBestQuality(object):
         entry = task.find_entry('rejected', title='Movie.720p.WEB-DL.X264.AC3-GRP1')
         assert entry, 'Movie.720p.WEB-DL.X264.AC3-GRP1 should be rejected'
 
-    def test_best_skip(self, execute_task):
-        task = execute_task('best_skip')
+    def test_best_allow(self, execute_task):
+        task = execute_task('best_allow')
         entry = task.find_entry('undecided', title='Movie.1080p.WEB-DL.X264.AC3-GRP1')
         assert entry, 'Movie.1080p.WEB-DL.X264.AC3-GRP1 should be undecided'
         entry = task.find_entry('rejected', title='Movie.720p.WEB-DL.X264.AC3-GRP1')
         assert entry, 'Movie.720p.WEB-DL.X264.AC3-GRP1 should be rejected'
 
-    def test_lower_skip(self, execute_task):
-        task = execute_task('lower_skip')
+    def test_lower_allow(self, execute_task):
+        task = execute_task('lower_allow')
         entry = task.find_entry('undecided', title='Movie.1080p.WEB-DL.X264.AC3-GRP1')
         assert entry, 'Movie.1080p.WEB-DL.X264.AC3-GRP1 should be undecided'
         entry = task.find_entry('undecided', title='Movie.720p.WEB-DL.X264.AC3-GRP1')
