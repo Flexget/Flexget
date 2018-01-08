@@ -30,7 +30,7 @@ class EntryTimeFrame(Base):
     title = Column(Unicode)
     _quality = Column('quality', String)
     quality = quality_property('_quality')
-    first_seen = Column(DateTime, default=datetime.now)
+    first_seen = Column(DateTime, default=datetime.now())
     proper_count = Column(Integer, default=0)
 
     def __str__(self):
@@ -86,6 +86,7 @@ class FilterTimeFrame(object):
                     id_timeframe = EntryTimeFrame()
                     id_timeframe.id = identifier
                     id_timeframe.status = 'waiting'
+                    id_timeframe.first_seen = datetime.now()
                     session.add(id_timeframe)
 
                 if id_timeframe.status == 'accepted':
