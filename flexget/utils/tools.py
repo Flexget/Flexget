@@ -16,11 +16,11 @@ import sys
 from collections import MutableMapping, defaultdict
 from datetime import timedelta, datetime
 from pprint import pformat
+from jinja2 import UndefinedError
 
 import flexget
 import queue
 import requests
-
 from html.entities import name2codepoint
 
 log = logging.getLogger('utils')
@@ -536,7 +536,10 @@ def group_entries(entries, identifier):
 
     # Group by Identifier
     for entry in entries:
-        rendered_id = entry.render(identifier)
+        try:
+            rendered_id = entry.render(identifier)
+        except UndefinedError:
+            continue
         if not rendered_id:
             continue
         grouped_entries[rendered_id.lower().strip()].append(entry)
