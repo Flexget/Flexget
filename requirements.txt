@@ -5,7 +5,7 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 aniso8601==1.2.1          # via flask-restful, flask-restplus
-apscheduler==3.3.1
+apscheduler==3.5.0
 babelfish==0.5.5          # via guessit
 beautifulsoup4==4.6.0
 certifi==2017.4.17        # via requests
@@ -40,14 +40,14 @@ python-dateutil==2.6.1
 pytz==2017.2              # via apscheduler, flask-restful, flask-restplus, tempora, tzlocal
 pyyaml==3.12
 rebulk==0.8.2
-requests==2.18.4
+requests==2.16.5
 rpyc==3.3.0
 six==1.10.0               # via apscheduler, cheroot, cherrypy, flask-cors, flask-restful, flask-restplus, html5lib, python-dateutil, rebulk, tempora
 sqlalchemy==1.1.10
 tempora==1.8              # via portend
 terminaltables==3.1.0
 tzlocal==1.4              # via apscheduler
-urllib3==1.22           # via requests
+urllib3==1.21.1           # via requests
 webencodings==0.5.1       # via html5lib
 werkzeug==0.12.2          # via flask
 zxcvbn-python==4.4.15
