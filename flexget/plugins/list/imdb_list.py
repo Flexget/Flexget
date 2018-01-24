@@ -107,9 +107,9 @@ class ImdbEntrySet(MutableSet):
 
     def get_user_id(self, cookies=None):
         try:
-            # We need to allow for redirects here as it performs 1-2 redirects before reaching the real profile url
             if cookies:
                 self._session.cookies = cookiejar_from_dict(cookies)
+            # We need to allow for redirects here as it performs 1-2 redirects before reaching the real profile url
             response = self._session.head('https://www.imdb.com/profile', allow_redirects=True)
         except RequestException as e:
             raise PluginError(str(e))
