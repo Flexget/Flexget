@@ -282,8 +282,6 @@ class Quality(object):
     def __eq__(self, other):
         if isinstance(other, basestring):
             other = Quality(other)
-            if not other:
-                raise TypeError('`%s` does not appear to be a valid quality string.' % other.text)
         if not isinstance(other, Quality):
             if other is None:
                 return False
@@ -296,8 +294,6 @@ class Quality(object):
     def __lt__(self, other):
         if isinstance(other, basestring):
             other = Quality(other)
-            if not other:
-                raise TypeError('`%s` does not appear to be a valid quality string.' % other.text)
         if not isinstance(other, Quality):
             raise TypeError('Cannot compare %r and %r' % (self, other))
         return self._comparator < other._comparator
@@ -471,8 +467,6 @@ class Requirements(object):
         """
         if isinstance(qual, basestring):
             qual = Quality(qual)
-            if not qual:
-                raise TypeError('`%s` does not appear to be a valid quality string.' % qual.text)
         for r_component, q_component in zip(self.components, qual.components):
             if not r_component.allows(q_component, loose=loose):
                 return False
