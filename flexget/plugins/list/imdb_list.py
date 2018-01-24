@@ -120,7 +120,6 @@ class ImdbEntrySet(MutableSet):
     def authenticate(self):
         """Authenticates a session with IMDB, and grabs any IDs needed for getting/modifying list."""
         cached_credentials = False
-        user_id_re = re.compile('ur\d+(?!\d)')
         with Session() as session:
             user = session.query(IMDBListUser).filter(IMDBListUser.user_name == self.config.get('login')).one_or_none()
             if user and user.cookies and user.user_id:
