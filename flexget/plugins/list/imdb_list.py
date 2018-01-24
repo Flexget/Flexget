@@ -9,7 +9,7 @@ from collections import MutableSet
 from datetime import datetime
 
 from requests.exceptions import RequestException
-
+from requests.utils import cookiejar_from_dict
 from sqlalchemy import Column, Unicode, String
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
@@ -105,19 +105,31 @@ class ImdbEntrySet(MutableSet):
             self.authenticate()
         return self._session
 
+    def get_user_id(self, cookies=None):
+        try:
+            # We need to allow for redirects here as it performs 1-2 redirects before reaching the real profile url
+            if cookies:
+                self._session.cookies = cookiejar_from_dict(cookies)
+            response = self._session.head('https://www.imdb.com/profile', allow_redirects=True)
+        except RequestException as e:
+            raise PluginError(str(e))
+
+        match = re.search('ur\d+(?!\d)', response.url)
+        return match.group() if match else None
+
     def authenticate(self):
         """Authenticates a session with IMDB, and grabs any IDs needed for getting/modifying list."""
         cached_credentials = False
+        user_id_re = re.compile('ur\d+(?!\d)')
         with Session() as session:
             user = session.query(IMDBListUser).filter(IMDBListUser.user_name == self.config.get('login')).one_or_none()
             if user and user.cookies and user.user_id:
                 log.debug('login credentials found in cache, testing')
-                self.cookies = user.cookies
                 self.user_id = user.user_id
-                r = self._session.head('https://www.imdb.com/profile', allow_redirects=True, cookies=self.cookies)
-                if 'login' in r.url:
+                if not self.get_user_id(cookies=user.cookies):
                     log.debug('cache credentials expired')
                 else:
+                    self.cookies = user.cookies
                     cached_credentials = True
             if not cached_credentials:
                 log.debug('user credentials not found in cache or outdated, fetching from IMDB')
@@ -143,14 +155,13 @@ class ImdbEntrySet(MutableSet):
                 action = form.get('action')
                 log.debug('email=%s, password=%s', data['email'], data['password'])
                 self._session.headers.update({'Referer': url_credentials})
-                d = self._session.post(action, data=data)
+                self._session.post(action, data=data)
                 self._session.headers.update({'Referer': 'http://www.imdb.com/'})
-                # Get user id by extracting from redirect url.
-                r = self._session.head('https://www.imdb.com/profile', allow_redirects=True)
-                if 'login' in r.url:
+
+                self.user_id = self.get_user_id()
+                if not self.user_id:
                     raise plugin.PluginError('Login to IMDB failed. Check your credentials.')
-                self.user_id = re.search('ur\d+(?!\d)', r.url).group()
-                self.cookies = dict(d.cookies)
+                self.cookies = self._session.cookies.get_dict(domain='.imdb.com')
                 # Get list ID
             if user:
                 for list in user.lists:
