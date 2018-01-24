@@ -227,7 +227,7 @@ class TraktSet(MutableSet):
                 raise plugin.PluginError('`type` cannot be `auto` for ratings lists.')
             endpoint += ('ratings', self.config['type'], self.config['list']['rating'])
         elif self.config['list'] in ['collection', 'watchlist', 'watched', 'ratings']:
-            if self.config['type'] == 'auto' or (self.config['list'] == 'collection' and
+            if self.config['type'] == 'auto' or (self.config['list'] in ['collection', 'watched'] and
                                                  self.config['type'] == 'episodes'):
                 raise plugin.PluginError('`type` cannot be `%s` for %s list.' % (self.config['type'],
                                                                                  self.config['list']))
