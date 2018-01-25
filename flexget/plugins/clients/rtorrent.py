@@ -17,6 +17,7 @@ from flexget.event import event
 from flexget.entry import Entry
 from flexget.config_schema import one_or_more
 from flexget.utils.bittorrent import Torrent, is_torrent_file
+from flexget.utils.tools import native_str_to_text
 
 from requests.auth import HTTPDigestAuth, HTTPBasicAuth
 
@@ -145,14 +146,14 @@ class SCGITransport(xmlrpc_client.Transport):
             data = response.read(1024)
             if not data:
                 break
-            response_body += data
+            response_body += native_str_to_text(data, encoding='utf-8')
 
         if self.verbose:
             log.info('body: %s', repr(response_body))
 
         # Remove SCGI headers from the response.
         _, response_body = re.split(r'\n\s*?\n', response_body, maxsplit=1)
-        p.feed(response_body)
+        p.feed(response_body.encode('utf-8'))
         p.close()
 
         return u.close()
