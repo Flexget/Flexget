@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.request import urlopen
 from future.moves.urllib.parse import urlparse
-from future.utils import PY2
+from future.utils import text_to_native_str
 
 import time
 import logging
@@ -140,11 +140,7 @@ def _wrap_urlopen(url, timeout=None):
 
     """
     try:
-        if PY2:
-            encoded_url = url.encode('utf-8')
-        else:
-            encoded_url = url
-        raw = urlopen(encoded_url, timeout=timeout)
+        raw = urlopen(text_to_native_str(url), timeout=timeout)
     except IOError as e:
         msg = 'Error getting %s: %s' % (url, e)
         log.error(msg)
