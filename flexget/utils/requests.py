@@ -140,7 +140,7 @@ def _wrap_urlopen(url, timeout=None):
 
     """
     try:
-        raw = urlopen(text_to_native_str(url), timeout=timeout)
+        raw = urlopen(text_to_native_str(url, encoding='utf-8'), timeout=timeout)
     except IOError as e:
         msg = 'Error getting %s: %s' % (url, e)
         log.error(msg)
