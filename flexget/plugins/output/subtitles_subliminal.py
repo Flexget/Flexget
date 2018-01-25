@@ -206,16 +206,16 @@ class PluginSubliminal(object):
 
                             if subtitles:
                                 downloaded_subtitles[video].extend(subtitles)
-                                entry.fail('subtitles found for a second-choice language.')
+                                entry.reject('subtitles found for a second-choice language.')
                             else:
-                                entry.fail('cannot find any subtitles for now.')
+                                entry.reject('cannot find any subtitles for now.')
 
                         downloaded_languages = set([Language.fromietf(str(l.language))
                                                     for l in subtitles])
                         if entry_languages:
                             entry['subtitles_missing'] = entry_languages - downloaded_languages
                             if len(entry['subtitles_missing']) > 0:
-                                entry.fail('Subtitles for all primary languages not found')
+                                entry.reject('Subtitles for all primary languages not found')
                 except ValueError as e:
                     log.error('subliminal error: %s', e)
                     entry.fail()
