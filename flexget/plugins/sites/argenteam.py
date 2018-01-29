@@ -66,7 +66,7 @@ class SearchArgenteam(object):
 
             for release in response['releases']:
                 for torrent in release['torrents']:
-                    if config.get('subtitles') and release['subtitles'] or not config.get('subtitles'):
+                    if config.get('force_subtitles') and release['subtitles'] or not config.get('force_subtitles'):
                         e = Entry()
 
                         e['title'] = ' '.join((search_string, release['source'], release['codec'], release['team'], release['tags']))
