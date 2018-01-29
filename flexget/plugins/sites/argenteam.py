@@ -6,10 +6,7 @@ import logging
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.config_schema import one_or_more
-from flexget.utils.requests import Session, TimedLimiter, RequestException
 from flexget.utils.search import normalize_scene
-from flexget.plugin import PluginError
 
 log = logging.getLogger('argenteam')
 
@@ -51,34 +48,35 @@ class SearchArgenteam(object):
 
             if not response.get('total'):
                 log.debug('No results found for %s', search_string)
-            else:
-                results = response.get('results')
-                if results[0]['type'] == 'tvshow':
-                  log.error('Argenteam type tvshow not supported yet.')
-                  continue
-                url = '{}{}?id={}'.format(self.base_url, results[0]['type'], results[0]['id'])
-                try:
-                    resp = task.requests.get(url)
-                    log.debug('Requesting releases for: %s', url)
-                    response = resp.json()
-                except RequestException as e:
-                    log.error('Argenteam request failed: %s', e)
-                    return
+                continue
 
-                for release in response['releases']:
-                    for torrent in release['torrents']:
-                        if config.get('subtitles') and release['subtitles'] or not config.get('subtitles'):
-                            e = Entry()
+            results = response.get('results')
+            if results[0]['type'] == 'tvshow':
+              log.error('Argenteam type tvshow not supported yet.')
+              continue
 
-                            e['title'] = ' '.join((search_string, release['source'], release['codec'], release['team'], release['tags']))
-                            e['url'] = torrent['uri']
-                            if 'tvdb' in response:
-                              e['tvdb_id'] = response['tvdb']
-                            if 'info' in response:
-                              if 'imdb' in response['info']:
-                                e['imdb_id'] = response['info']['imdb']
+            url = '{}{}?id={}'.format(self.base_url, results[0]['type'], results[0]['id'])
+            try:
+                resp = task.requests.get(url)
+                log.debug('Requesting releases for: %s', url)
+                response = resp.json()
+            except RequestException as e:
+                log.error('Argenteam request failed: %s', e)
+                return
 
-                            entries.add(e)
+            for release in response['releases']:
+                for torrent in release['torrents']:
+                    if config.get('subtitles') and release['subtitles'] or not config.get('subtitles'):
+                        e = Entry()
+
+                        e['title'] = ' '.join((search_string, release['source'], release['codec'], release['team'], release['tags']))
+                        e['url'] = torrent['uri']
+                        if 'tvdb' in response:
+                            e['tvdb_id'] = response['tvdb']
+                        if 'info' in response and 'imdb' in response['info']:
+                            e['imdb_id'] = response['info']['imdb']
+
+                        entries.add(e)
 
         return entries
 
