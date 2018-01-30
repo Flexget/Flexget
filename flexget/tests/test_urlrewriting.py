@@ -14,11 +14,11 @@ class TestURLRewriters(object):
           test:
             # make test data
             mock:
-              - {title: 'tpb page', url: 'http://thepiratebay.org/tor/8492471/Test.avi'}
-              - {title: 'tbp search', url: 'http://thepiratebay.com/search/something'}
-              - {title: 'tbp torrent', url: 'http://torrents.thepiratebay.se/8492471/Test.torrent'}
-              - {title: 'tbp torrent subdomain', url: 'http://torrents.thepiratebay.se/8492471/Test.avi'}
-              - {title: 'tbp torrent bad subdomain', url: 'http://torrent.thepiratebay.se/8492471/Test.avi'}
+              - {title: 'tpb page', url: 'https://thepiratebay.org/tor/8492471/Test.avi'}
+              - {title: 'tbp search', url: 'https://thepiratebay.com/search/something'}
+              - {title: 'tbp torrent', url: 'https://torrents.thepiratebay.se/8492471/Test.torrent'}
+              - {title: 'tbp torrent subdomain', url: 'https://torrents.thepiratebay.se/8492471/Test.avi'}
+              - {title: 'tbp torrent bad subdomain', url: 'https://torrent.thepiratebay.se/8492471/Test.avi'}
               - {title: 'nyaa', url: 'https://www.nyaa.si/view/15'}
               - {title: 'cinemageddon download', url: 'http://cinemageddon.net/details.php?id=1234'}
     """

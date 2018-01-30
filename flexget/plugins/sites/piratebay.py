@@ -15,11 +15,8 @@ from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('piratebay')
 
-CUR_TLD = 'org'
-TLDS = 'com|org|sx|ac|pe|gy|to|se|gd|vg|%s' % CUR_TLD
-
-URL_MATCH = re.compile('^http://(?:torrents\.)?thepiratebay\.(?:%s)/.*$' % TLDS)
-URL_SEARCH = re.compile('^http://thepiratebay\.(?:%s)/search/.*$' % TLDS)
+PROTOCOL = 'https'
+DOMAIN = 'thepiratebay.org'
 
 CATEGORIES = {
     'all': 0,
@@ -51,6 +48,8 @@ class UrlRewritePirateBay(object):
             {
                 'type': 'object',
                 'properties': {
+                    'domain': {'type': 'string', 'default': DOMAIN},
+                    'protocol:': {'type': 'string', 'default': PROTOCOL},
                     'category': {
                         'oneOf': [
                             {'type': 'string', 'enum': list(CATEGORIES)},
@@ -65,12 +64,15 @@ class UrlRewritePirateBay(object):
         ]
     }
 
+    url_match = re.compile('^%s://(?:torrents\.)?(%s)/.*$' % (re.escape(PROTOCOL), re.escape(DOMAIN)))
+    url_search = re.compile('^%s://(%s)/search/.*$' % (re.escape(PROTOCOL), re.escape(DOMAIN)))
+
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
         if url.endswith('.torrent'):
             return False
-        return bool(URL_MATCH.match(url))
+        return bool(self.url_match.match(url))
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
@@ -78,7 +80,7 @@ class UrlRewritePirateBay(object):
             log.error("Didn't actually get a URL...")
         else:
             log.debug("Got the URL: %s" % entry['url'])
-        if URL_SEARCH.match(entry['url']):
+        if self.url_search.match(entry['url']):
             # use search
             results = self.search(task, entry)
             if not results:
@@ -113,6 +115,12 @@ class UrlRewritePirateBay(object):
         """
         if not isinstance(config, dict):
             config = {}
+
+        protocol = config.get('protocol', PROTOCOL)
+        domain = config.get('domain', DOMAIN)
+        self.url_match = re.compile('^%s://(?:torrents\.)?(%s)/.*$' % (re.escape(protocol), re.escape(domain)))
+        self.url_search = re.compile('^%s://(%s)/search/.*$' % (re.escape(protocol), re.escape(domain)))
+
         sort = SORT.get(config.get('sort_by', 'seeds'))
         if config.get('sort_reverse'):
             sort += 1
@@ -130,7 +138,7 @@ class UrlRewritePirateBay(object):
             query = query.replace('-', ' ').replace("'", " ")
 
             # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-            url = 'http://thepiratebay.%s/search/%s%s' % (CUR_TLD, quote(query.encode('utf-8')), filter_url)
+            url = '%s://%s/search/%s%s' % (protocol, domain, quote(query.encode('utf-8')), filter_url)
             log.debug('Using %s as piratebay search url' % url)
             page = task.requests.get(url).content
             soup = get_soup(page)
@@ -140,7 +148,7 @@ class UrlRewritePirateBay(object):
                 if not entry['title']:
                     log.error('Malformed search result. No title or url found. Skipping.')
                     continue
-                entry['url'] = 'http://thepiratebay.%s%s' % (CUR_TLD, link.get('href'))
+                entry['url'] = '%s://%s%s' % (protocol, domain, link.get('href'))
                 tds = link.parent.parent.parent.find_all('td')
                 entry['torrent_seeds'] = int(tds[-2].contents[0])
                 entry['torrent_leeches'] = int(tds[-1].contents[0])
