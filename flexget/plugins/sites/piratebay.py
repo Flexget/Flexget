@@ -1,10 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import quote
+from future.moves.urllib.parse import quote, urlparse
 
 import re
 import logging
-import urlparse
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -63,7 +62,8 @@ class UrlRewritePirateBay(object):
         ]
     }
 
-    url = URL
+    def __init__(self):
+        self.url = URL
 
     def on_task_start(self, task, config=None):
         if not isinstance(config, dict):
