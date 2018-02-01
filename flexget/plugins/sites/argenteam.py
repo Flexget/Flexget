@@ -11,7 +11,16 @@ from flexget.utils.search import normalize_scene
 log = logging.getLogger('argenteam')
 
 class SearchArgenteam(object):
-    """ Argenteam """
+    """ Argenteam 
+    Search plugin which gives results from www.argenteam.net, latin american (Argentina) web.
+
+    Configuration:
+      - force_subtitles: [yes/no] #Force download release with subtitles made by aRGENTeaM. Default is yes
+
+    Example
+      argenteam:
+        force_subtitles: yes
+    """
 
     schema = {
         'type': 'object',
@@ -71,6 +80,11 @@ class SearchArgenteam(object):
 
                         e['title'] = ' '.join((search_string, release['source'], release['codec'], release['team'], release['tags']))
                         e['url'] = torrent['uri']
+
+                        # Save aRGENTeaM subtitle URL for this release
+                        if 'subtitles' in release:
+                            e['argenteam_subtitle'] = release['subtitles'][0]['uri']
+                            log.debug('Argenteam subtitle found: %s', e['argenteam_subtitle'])
                         if 'tvdb' in response:
                             e['tvdb_id'] = response['tvdb']
                         if 'info' in response and 'imdb' in response['info']:
