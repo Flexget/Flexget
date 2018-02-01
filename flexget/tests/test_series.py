@@ -238,8 +238,10 @@ class TestFilterSeries(object):
             parsing:
               series: {{parser}}
         tasks:
+        
           test:
             mock:
+              - {title: 'Some.Series.S01E20.720p.XViD-FlexGet'}
               - {title: 'Another.Series.S01E20.720p.XViD-FlexGet'}
               - {title: 'Another.Series.S01E21.1080p.H264-FlexGet'}
               - {title: 'Date.Series.10-11-2008.XViD'}
@@ -260,6 +262,7 @@ class TestFilterSeries(object):
               - date series
               - filename series
               - empty description
+              - (some) series
 
           metainfo_series_override:
             metainfo_series: yes
@@ -295,6 +298,7 @@ class TestFilterSeries(object):
                 - name 2
             - paren title (US):
                 alternate_name: paren title 2013
+
     """
 
     def test_smoke(self, execute_task):
@@ -304,6 +308,10 @@ class TestFilterSeries(object):
         # normal passing
         assert task.find_entry(title='Another.Series.S01E20.720p.XViD-FlexGet'), \
             'Another.Series.S01E20.720p.XViD-FlexGet should have passed'
+
+        # series with brackets
+        assert task.find_entry('accepted', title='Some.Series.S01E20.720p.XViD-FlexGet'), \
+            'Some.Series.S01E20.720p.XViD-FlexGet should have been accepted'
 
         # date formats
         df = ['Date.Series.10-11-2008.XViD', 'Date.Series.10.12.2008.XViD', 'Date Series 2010 11 17 XViD',
