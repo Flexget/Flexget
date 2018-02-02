@@ -22,6 +22,8 @@ class OutputQBitTorrent(object):
         password: <PASSWORD> (default: (none))
         host: <HOSTNAME> (default: localhost)
         port: <PORT> (default: 8080)
+        use_ssl: <SSL> (default: False)
+        verify_cert: <VERIFY> (default: True)
         path: <OUTPUT_DIR> (default: (none))
         label: <LABEL> (default: (none))
     """
@@ -35,6 +37,8 @@ class OutputQBitTorrent(object):
                     'password': {'type': 'string'},
                     'host': {'type': 'string'},
                     'port': {'type': 'integer'},
+                    'use_ssl': {'type': 'boolean'},
+                    'verify_cert': {'type': 'boolean'},
                     'path': {'type': 'string'},
                     'label': {'type': 'string'},
                     'fail_html': {'type': 'boolean'}
@@ -62,15 +66,15 @@ class OutputQBitTorrent(object):
         'localhost'.
         """
         self.session = Session()
-        self.url = 'http://{}:{}'.format(config['host'], config['port'])
+        self.url = '{}://{}:{}'.format('http' if config['use_ssl']==False else 'https', config['host'], config['port'])
         if config.get('username') and config.get('password'):
             data = {'username': config['username'],
                     'password': config['password']}
-            self._request('post', self.url + '/login', data=data, msg_on_fail='Authentication failed.')
+            self._request('post', self.url + '/login', data=data, msg_on_fail='Authentication failed.', verify=config['verify_cert'])
         log.debug('Successfully connected to qBittorrent')
         self.connected = True
 
-    def add_torrent_file(self, file_path, data):
+    def add_torrent_file(self, file_path, data, config):
         if not self.connected:
             raise plugin.PluginError('Not connected.')
         multipart_data = {k: (None, v) for k, v in data.items()}
@@ -78,15 +82,15 @@ class OutputQBitTorrent(object):
             multipart_data['torrents'] = f
             self._request('post', self.url + '/command/upload', msg_on_fail='Failed to add file to qBittorrent',
                           files=multipart_data)
-        log.debug('Added torrent file %s to qBittorrent', file_path)
+        log.debug('Added torrent file %s to qBittorrent', file_path, verify=config['verify_cert'])
 
-    def add_torrent_url(self, url, data):
+    def add_torrent_url(self, url, data, config):
         if not self.connected:
             raise plugin.PluginError('Not connected.')
         data['urls'] = url
         multipart_data = {k: (None, v) for k, v in data.items()}
         self._request('post', self.url + '/command/download', msg_on_fail='Failed to add file to qBittorrent',
-                      files=multipart_data)
+                      files=multipart_data, verify=config['verify_cert'])
         log.debug('Added url %s to qBittorrent', url)
 
     def prepare_config(self, config):
@@ -95,6 +99,8 @@ class OutputQBitTorrent(object):
         config.setdefault('enabled', True)
         config.setdefault('host', 'localhost')
         config.setdefault('port', 8080)
+        config.setdefault('use_ssl', False)
+        config.setdefault('verify_cert', True)
         config.setdefault('label', '')
         config.setdefault('fail_html', True)
         return config
@@ -134,9 +140,9 @@ class OutputQBitTorrent(object):
                     log.debug('temp: %s', ', '.join(os.listdir(tmp_path)))
                     entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
                     continue
-                self.add_torrent_file(entry['file'], form_data)
+                self.add_torrent_file(entry['file'], form_data, config)
             else:
-                self.add_torrent_url(entry['url'], form_data)
+                self.add_torrent_url(entry['url'], form_data, config)
 
     @plugin.priority(120)
     def on_task_download(self, task, config):
