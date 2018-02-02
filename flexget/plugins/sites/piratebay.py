@@ -62,9 +62,6 @@ class UrlRewritePirateBay(object):
         ]
     }
 
-    def __init__(self):
-        self.url = URL
-
     def on_task_start(self, task, config=None):
         if not isinstance(config, dict):
             config = {}
@@ -121,6 +118,7 @@ class UrlRewritePirateBay(object):
         """
         if not isinstance(config, dict):
             config = {}
+        self.url = config.get('url', URL)
         sort = SORT.get(config.get('sort_by', 'seeds'))
         if config.get('sort_reverse'):
             sort += 1
@@ -177,4 +175,4 @@ class UrlRewritePirateBay(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewritePirateBay, 'piratebay', interfaces=['urlrewriter', 'search'], api_ver=2)
+    plugin.register(UrlRewritePirateBay, 'piratebay', interfaces=['urlrewriter', 'search', 'task'], api_ver=2)
