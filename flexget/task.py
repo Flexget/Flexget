@@ -598,7 +598,7 @@ class Task(object):
                     # log keywords not executed
                     for plugin in self.plugins(phase):
                         if plugin.name in self.config:
-                            log.info('Plugin %s is not executed in %s phase because the phase is disabled' \
+                            log.info('Plugin %s is not executed in %s phase because the phase is disabled ' \
                                      '(e.g. --test, --inject)', plugin.name, phase)
                     continue
                 if phase in ('start', 'prepare') and self.is_rerun:
