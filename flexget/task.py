@@ -596,10 +596,11 @@ class Task(object):
             for phase in task_phases:
                 if phase in self.disabled_phases:
                     # log keywords not executed
-                    for plugin in self.plugins(phase):
-                        if plugin.name in self.config:
-                            log.info('Plugin %s is not executed in %s phase because the phase is disabled ' \
-                                     '(e.g. --test, --inject)', plugin.name, phase)
+                    if phase not in self.suppress_warnings:
+                        for plugin in self.plugins(phase):
+                            if plugin.name in self.config:
+                                log.info('Plugin %s is not executed in %s phase because the phase is disabled ' \
+                                         '(e.g. --test, --inject)', plugin.name, phase)
                     continue
                 if phase in ('start', 'prepare') and self.is_rerun:
                     log.debug('skipping phase %s during rerun', phase)
