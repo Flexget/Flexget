@@ -62,13 +62,19 @@ class UrlRewritePirateBay(object):
         ]
     }
 
+    def __init__(self):
+        self.set_urls(URL)
+
     def on_task_start(self, task, config=None):
         if not isinstance(config, dict):
             config = {}
-        self.url = config.get('url', URL)
-        parsed_url = urlparse(self.url)
+        self.set_urls(config.get('url', URL))
+
+    def set_urls(self, url):
+        self.url = url
+        parsed_url = urlparse(url)
         self.url_match = re.compile('^%s://(?:torrents\.)?(%s)/.*$' % (re.escape(parsed_url.scheme), re.escape(parsed_url.netloc)))
-        self.url_search = re.compile('^%s/search/.*$' % (re.escape(self.url)))
+        self.url_search = re.compile('^%s/search/.*$' % (re.escape(url)))
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
@@ -118,7 +124,7 @@ class UrlRewritePirateBay(object):
         """
         if not isinstance(config, dict):
             config = {}
-        self.url = config.get('url', URL)
+        self.set_urls(config.get('url', URL))
         sort = SORT.get(config.get('sort_by', 'seeds'))
         if config.get('sort_reverse'):
             sort += 1
