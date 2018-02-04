@@ -394,7 +394,7 @@ class IRCConnection(SimpleIRCBot):
                     'cron': True,
                     'inject': entries,
                     'allow_manual': True,
-                    'suppress_warnings': True
+                    'suppress_warnings': ['input']
                 }
                 manager.execute(options, priority=5)
 
