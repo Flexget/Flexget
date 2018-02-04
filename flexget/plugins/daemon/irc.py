@@ -389,8 +389,14 @@ class IRCConnection(SimpleIRCBot):
 
             for task, entries in tasks_entry_map.items():
                 log.debug('Injecting %d entries into task "%s"', len(entries), task)
-                manager.execute(options={'tasks': [task], 'cron': True, 'inject': entries, 'allow_manual': True},
-                                priority=5)
+                options = {
+                    'tasks': [task],
+                    'cron': True,
+                    'inject': entries,
+                    'allow_manual': True,
+                    'suppress_warnings': True
+                }
+                manager.execute(options, priority=5)
 
         self.entry_queue = []
 
