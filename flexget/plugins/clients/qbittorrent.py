@@ -70,7 +70,8 @@ class OutputQBitTorrent(object):
         if config.get('username') and config.get('password'):
             data = {'username': config['username'],
                     'password': config['password']}
-            self._request('post', self.url + '/login', data=data, msg_on_fail='Authentication failed.', verify=config['verify_cert'])
+            self._request('post', self.url + '/login', data=data, msg_on_fail='Authentication failed.',
+                          verify=config['verify_cert'])
         log.debug('Successfully connected to qBittorrent')
         self.connected = True
 
