@@ -71,7 +71,7 @@ class OutputQBitTorrent(object):
             data = {'username': config['username'],
                     'password': config['password']}
             self._request('post', self.url + '/login', data=data, msg_on_fail='Authentication failed.',
-                          verify=config['verify_cert'])
+                                  verify=config['verify_cert'])
         log.debug('Successfully connected to qBittorrent')
         self.connected = True
 
@@ -82,7 +82,7 @@ class OutputQBitTorrent(object):
         with open(file_path, 'rb') as f:
             multipart_data['torrents'] = f
             self._request('post', self.url + '/command/upload', msg_on_fail='Failed to add file to qBittorrent',
-                          files=multipart_data, verify=verify_cert)
+                                  files=multipart_data, verify=verify_cert)
         log.debug('Added torrent file %s to qBittorrent', file_path)
 
     def add_torrent_url(self, url, data, verify_cert):
@@ -91,7 +91,7 @@ class OutputQBitTorrent(object):
         data['urls'] = url
         multipart_data = {k: (None, v) for k, v in data.items()}
         self._request('post', self.url + '/command/download', msg_on_fail='Failed to add file to qBittorrent',
-                      files=multipart_data, verify=verify_cert)
+                              files=multipart_data, verify=verify_cert)
         log.debug('Added url %s to qBittorrent', url)
 
     def prepare_config(self, config):
