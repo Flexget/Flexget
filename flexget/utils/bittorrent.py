@@ -223,15 +223,23 @@ class Torrent(object):
         files = []
         if 'length' in self.content['info']:
             # single file torrent
-            t = {'name': self.content['info']['name'],
+            if 'name.utf-8' in self.content['info']:
+                name = self.content['info']['name.utf-8']
+            else:
+                name = self.content['info']['name']
+            t = {'name': name,
                  'size': self.content['info']['length'],
                  'path': ''}
             files.append(t)
         else:
             # multifile torrent
             for item in self.content['info']['files']:
-                t = {'path': '/'.join(item['path'][:-1]),
-                     'name': item['path'][-1],
+                if 'path.utf-8' in item:
+                    path = item['path.utf-8']
+                else:
+                    path = item['path']
+                t = {'path': '/'.join(path[:-1]),
+                     'name': path[-1],
                      'size': item['length']}
                 files.append(t)
 

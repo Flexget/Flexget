@@ -368,8 +368,8 @@ class IRCConnection(SimpleIRCBot):
             if isinstance(tasks, basestring):
                 tasks = [tasks]
             log.debug('Injecting %d entries into tasks %s', len(self.entry_queue), ', '.join(tasks))
-            manager.execute(options={'tasks': tasks, 'cron': True, 'inject': self.entry_queue, 'allow_manual': True},
-                            priority=5)
+            options = {'tasks': tasks, 'cron': True, 'inject': self.entry_queue, 'allow_manual': True}
+            manager.execute(options=options, priority=5, suppress_warnings=['input'])
 
         if tasks_re:
             tasks_entry_map = {}
@@ -389,8 +389,8 @@ class IRCConnection(SimpleIRCBot):
 
             for task, entries in tasks_entry_map.items():
                 log.debug('Injecting %d entries into task "%s"', len(entries), task)
-                manager.execute(options={'tasks': [task], 'cron': True, 'inject': entries, 'allow_manual': True},
-                                priority=5)
+                options = {'tasks': [task], 'cron': True, 'inject': entries, 'allow_manual': True}
+                manager.execute(options=options, priority=5, suppress_warnings=['input'])
 
         self.entry_queue = []
 

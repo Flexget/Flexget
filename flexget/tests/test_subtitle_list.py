@@ -264,7 +264,7 @@ class TestSubtitleList(object):
         assert len(task.entries) == 2, 'Task should have two entries.'
 
         task = execute_task('subtitle_fail')
-        assert len(task.failed) == 2, 'Entries should fail since the files are not valid.'
+        assert len(task.rejected) == 2, 'Entries should be rejected since the files are not valid.'
 
     # Skip if subliminal is not installed or if python version <2.7
     @pytest.mark.skip
@@ -307,7 +307,7 @@ class TestSubtitleList(object):
             os.utime('subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.en.srt', None)
 
         task = execute_task('subtitle_simulate_success')
-        assert len(task.failed) == 1, 'Should have found both languages for walking dead but not for jessica jones'
+        assert len(task.rejected) == 1, 'Should have found both languages for walking dead but not for jessica jones'
 
         task = execute_task('subtitle_emit')
         assert len(task.entries) == 1, 'Walking Dead should have been removed from the list'

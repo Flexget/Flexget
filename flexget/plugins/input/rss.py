@@ -474,10 +474,15 @@ class InputRSS(object):
         # Save last spot in rss
         if rss.entries:
             log.debug('Saving location in rss feed.')
+
             try:
-                task.simple_persistence['%s_last_entry' % url_hash] = (rss.entries[0].title +
-                                                                       rss.entries[0].get('guid', ''))
+                entry_id = rss.entries[0].title + rss.entries[0].get('guid', '')
             except AttributeError:
+                entry_id = ''
+
+            if entry_id.strip():
+                task.simple_persistence['%s_last_entry' % url_hash] = entry_id
+            else:
                 log.debug('rss feed location saving skipped: no title information in first entry')
 
         if ignored:

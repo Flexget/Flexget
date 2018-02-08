@@ -9,7 +9,7 @@ from collections import MutableSet
 from datetime import datetime
 
 from requests.exceptions import RequestException
-
+from requests.utils import cookiejar_from_dict
 from sqlalchemy import Column, Unicode, String
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
@@ -28,9 +28,9 @@ IMMUTABLE_LISTS = ['ratings', 'checkins']
 
 Base = db_schema.versioned_base('imdb_list', 0)
 
-MOVIE_TYPES = ['feature film', 'documentary', 'tv movie', 'video', 'short film']
-SERIES_TYPES = ['tv series', 'mini-series']
-OTHER_TYPES = ['video game']
+MOVIE_TYPES = ['documentary', 'tvmovie', 'video', 'short', 'movie']
+SERIES_TYPES = ['tvseries', 'tvepisode', 'tvminiseries']
+OTHER_TYPES = ['videogame']
 
 
 class IMDBListUser(Base):
@@ -105,6 +105,18 @@ class ImdbEntrySet(MutableSet):
             self.authenticate()
         return self._session
 
+    def get_user_id(self, cookies=None):
+        try:
+            if cookies:
+                self._session.cookies = cookiejar_from_dict(cookies)
+            # We need to allow for redirects here as it performs 1-2 redirects before reaching the real profile url
+            response = self._session.head('https://www.imdb.com/profile', allow_redirects=True)
+        except RequestException as e:
+            raise PluginError(str(e))
+
+        match = re.search('ur\d+(?!\d)', response.url)
+        return match.group() if match else None
+
     def authenticate(self):
         """Authenticates a session with IMDB, and grabs any IDs needed for getting/modifying list."""
         cached_credentials = False
@@ -112,12 +124,11 @@ class ImdbEntrySet(MutableSet):
             user = session.query(IMDBListUser).filter(IMDBListUser.user_name == self.config.get('login')).one_or_none()
             if user and user.cookies and user.user_id:
                 log.debug('login credentials found in cache, testing')
-                self.cookies = user.cookies
                 self.user_id = user.user_id
-                r = self._session.head('http://www.imdb.com/profile', allow_redirects=False, cookies=self.cookies)
-                if not r.headers.get('location') or 'login' in r.headers['location']:
+                if not self.get_user_id(cookies=user.cookies):
                     log.debug('cache credentials expired')
                 else:
+                    self.cookies = user.cookies
                     cached_credentials = True
             if not cached_credentials:
                 log.debug('user credentials not found in cache or outdated, fetching from IMDB')
@@ -129,25 +140,27 @@ class ImdbEntrySet(MutableSet):
                     'nid.net%2Fauth%2F2.0'
                 )
                 try:
+                    # we need to get some cookies first
+                    self._session.get('https://www.imdb.com')
                     r = self._session.get(url_credentials)
                 except RequestException as e:
                     raise PluginError(e.args[0])
                 soup = get_soup(r.content)
-                inputs = soup.select('form#ap_signin_form input')
+                form = soup.find('form', attrs={'name': 'signIn'})
+                inputs = form.select('input')
                 data = dict((i['name'], i.get('value')) for i in inputs if i.get('name'))
                 data['email'] = self.config['login']
                 data['password'] = self.config['password']
-                action = soup.find('form', id='ap_signin_form').get('action')
+                action = form.get('action')
                 log.debug('email=%s, password=%s', data['email'], data['password'])
                 self._session.headers.update({'Referer': url_credentials})
-                d = self._session.post(action, data=data)
+                self._session.post(action, data=data)
                 self._session.headers.update({'Referer': 'http://www.imdb.com/'})
-                # Get user id by extracting from redirect url
-                r = self._session.head('http://www.imdb.com/profile', allow_redirects=False)
-                if not r.headers.get('location') or 'login' in r.headers['location']:
+
+                self.user_id = self.get_user_id()
+                if not self.user_id:
                     raise plugin.PluginError('Login to IMDB failed. Check your credentials.')
-                self.user_id = re.search('ur\d+(?!\d)', r.headers['location']).group()
-                self.cookies = dict(d.cookies)
+                self.cookies = self._session.cookies.get_dict(domain='.imdb.com')
                 # Get list ID
             if user:
                 for list in user.lists:
@@ -204,28 +217,27 @@ class ImdbEntrySet(MutableSet):
             self._items = []
             for row in csv_reader(lines):
                 log.debug('parsing line from csv: %s', ', '.join(row))
-                if not len(row) == 16:
+                if not len(row) == 15:
                     log.debug('no movie row detected, skipping. %s', ', '.join(row))
                     continue
                 entry = Entry({
-                    'title': '%s (%s)' % (row[5], row[11]) if row[11] != '????' else '%s' % row[5],
-                    'url': row[15],
+                    'title': '%s (%s)' % (row[5], row[10]) if row[10] != '????' else '%s' % row[5],
+                    'url': row[6],
                     'imdb_id': row[1],
-                    'imdb_url': row[15],
+                    'imdb_url': row[6],
                     'imdb_list_position': int(row[0]),
-                    'imdb_list_created': datetime.strptime(row[2], '%a %b %d %H:%M:%S %Y') if row[2] else None,
-                    'imdb_list_modified': datetime.strptime(row[3], '%a %b %d %H:%M:%S %Y') if row[3] else None,
+                    'imdb_list_created': datetime.strptime(row[2], '%Y-%m-%d') if row[2] else None,
+                    'imdb_list_modified': datetime.strptime(row[3], '%Y-%m-%d') if row[3] else None,
                     'imdb_list_description': row[4],
                     'imdb_name': row[5],
-                    'imdb_year': int(row[11]) if row[11] != '????' else None,
-                    'imdb_score': float(row[9]) if row[9] else None,
+                    'imdb_year': int(row[10]) if row[10] != '????' else None,
                     'imdb_user_score': float(row[8]) if row[8] else None,
-                    'imdb_votes': int(row[13]) if row[13] else None,
-                    'imdb_genres': [genre.strip() for genre in row[12].split(',')]
+                    'imdb_votes': int(row[12]) if row[12] else None,
+                    'imdb_genres': [genre.strip() for genre in row[11].split(',')]
                 })
-                item_type = row[6].lower()
+                item_type = row[7].lower()
                 name = row[5]
-                year = int(row[11]) if row[11] != '????' else None
+                year = int(row[10]) if row[10] != '????' else None
                 if item_type in MOVIE_TYPES:
                     entry['movie_name'] = name
                     entry['movie_year'] = year
