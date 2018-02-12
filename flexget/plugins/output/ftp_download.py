@@ -5,6 +5,7 @@ from future.moves.urllib.parse import urlparse, unquote
 import logging
 import os
 import ftplib
+import time
 
 from flexget import plugin
 from flexget.event import event
@@ -170,7 +171,7 @@ class OutputFtp(object):
         max_attempts = 5
 
         log.info("Starting download of %s into %s" % (file_name, tmp_path))
-
+        size_at_last_err = 0
         while file_size > local_file.tell():
             try:
                 if local_file.tell() != 0:
@@ -181,7 +182,17 @@ class OutputFtp(object):
                     ftp.retrbinary('RETR %s' % file_name, local_file.write)
             except Exception as error:
                 if max_attempts != 0:
-                    log.debug("Retrying download after error %s" % error)
+                    # Nothing new was downloaded so the error is most likely connected to the resume functionality.
+                    # Delete the downloaded file and try again from the beginning.
+                    if size_at_last_err == local_file.tell():
+                        local_file.close()
+                        os.remove(os.path.join(tmp_path, file_name))
+                        local_file = open(os.path.join(tmp_path, file_name), 'a+b')
+                        max_attempts -= 1
+                    size_at_last_err = local_file.tell()
+                    log.debug("Retrying download after error [%s] - %s" % (type(error), error))
+                    # Short timeout before retry.
+                    time.sleep(1)
                 else:
                     log.error("Too many errors downloading %s. Aborting." % file_name)
                     break
