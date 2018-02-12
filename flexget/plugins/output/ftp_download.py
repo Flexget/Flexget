@@ -90,10 +90,22 @@ class OutputFtp(object):
             except ftplib.all_errors as e:
                 entry.fail("Unable to connect to server : %s" % (e))
                 break
-            to_path = pathscrub(entry.render(config['ftp_tmp_path']))
-            if not os.path.isdir(to_path):
-                log.debug('creating base path: %s' % to_path)
+
+            to_path = config['ftp_tmp_path']
+
+            try:
+                to_path = entry.render(to_path)
+            except RenderError as err:
+                raise plugin.PluginError("Path value replacement `%s` failed: %s" % (to_path, err.args[0]))
+
+            # Clean invalid characters with pathscrub plugin
+            to_path = pathscrub(to_path)
+
+            if not os.path.exists(to_path):
+                log.debug("Creating base path: %s" % to_path)
                 os.makedirs(to_path)
+            if not os.path.isdir(to_path):
+                raise plugin.PluginWarning("Destination `%s` is not a directory." % to_path)
 
             file_name = os.path.basename(ftp_url.path)
 
@@ -169,9 +181,8 @@ class OutputFtp(object):
             file_size = 1
 
         max_attempts = 5
-
-        log.info("Starting download of %s into %s" % (file_name, tmp_path))
         size_at_last_err = 0
+        log.info("Starting download of %s into %s" % (file_name, tmp_path))
         while file_size > local_file.tell():
             try:
                 if local_file.tell() != 0:
@@ -182,15 +193,16 @@ class OutputFtp(object):
                     ftp.retrbinary('RETR %s' % file_name, local_file.write)
             except Exception as error:
                 if max_attempts != 0:
-                    # Nothing new was downloaded so the error is most likely connected to the resume functionality.
-                    # Delete the downloaded file and try again from the beginning.
                     if size_at_last_err == local_file.tell():
+                        # Nothing new was downloaded so the error is most likely connected to the resume functionality.
+                        # Delete the downloaded file and try again from the beginning.
                         local_file.close()
                         os.remove(os.path.join(tmp_path, file_name))
                         local_file = open(os.path.join(tmp_path, file_name), 'a+b')
                         max_attempts -= 1
+
                     size_at_last_err = local_file.tell()
-                    log.debug("Retrying download after error [%s] - %s" % (type(error), error))
+                    log.debug("Retrying download after error %s" %  error.args[0])
                     # Short timeout before retry.
                     time.sleep(1)
                 else:
