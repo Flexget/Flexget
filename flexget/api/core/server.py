@@ -99,16 +99,12 @@ class ObjectsContainer(object):
     }
 
     crash_logs = {
-        'type': 'object',
-        'properties': {
-            'name': {'type': 'string'},
-            'data': {'type': 'array', 'items': {
-                'type': 'object',
-                'properties': {
-                    'name': {'type': 'string'},
-                    'content': {'type': 'string'}
-                }
-            }}
+        'type': 'array', 'items': {
+            'type': 'object',
+            'properties': {
+                'name': {'type': 'string'},
+                'content': {'type': 'array', 'items': {'type': 'string'}}
+            }
         }
     }
 

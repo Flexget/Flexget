@@ -1,0 +1,61 @@
+2017-12-06 16:31 DEBUG    series        t_e             adding episode `S01E01` into series `My Show`
+2017-12-06 16:31 DEBUG    series        t_e             -> added `<Episode(id=None,identifier=S01E01,season=1,number=1)>`
+2017-12-06 16:31 DEBUG    series        t_e             adding release `<SeriesParser(data=My Show S01E01,name=My Show,id=None,season=1,season_pack=None,episode=1,quality=unknown,proper=0,status=OK)>`
+2017-12-06 16:31 DEBUG    series        t_e             -> added `<Release(id=None,quality=unknown,downloaded=None,proper_count=0,title=My Show S01E01)>`
+2017-12-06 16:31 DEBUG    series        t_e             My Show episode type totals: {'ep': 1}
+2017-12-06 16:31 VERBOSE  series        t_e             identified by is currently on `auto` for My Show. Multiple id types may be accepted until it locks in on the appropriate type.
+2017-12-06 16:31 DEBUG    series        t_e             identified_by set to `auto` based on series history
+2017-12-06 16:31 DEBUG    series        t_e             start with entities: ['My Show S01E01']
+2017-12-06 16:31 DEBUG    series        t_e             current entities: ['My Show S01E01']
+2017-12-06 16:31 DEBUG    series        t_e             -------------------- process_propers -->
+2017-12-06 16:31 DEBUG    series        t_e             propers - downloaded qualities: {}
+2017-12-06 16:31 DEBUG    series        t_e             continuing w. entities: ['My Show S01E01']
+2017-12-06 16:31 DEBUG    series        t_e             best entity is: `My Show S01E01`
+2017-12-06 16:31 DEBUG    series        t_e             -------------------- tracking -->
+2017-12-06 16:31 DEBUG    series        t_e             no episodes found for series `My Show` with parameters season: None, downloaded: True
+2017-12-06 16:31 DEBUG    series        t_e             no season packs found for series `My Show` with parameters season: None, downloaded: True
+2017-12-06 16:31 DEBUG    series        t_e             latest download: None
+2017-12-06 16:31 DEBUG    series        t_e             current: <Episode(id=1,identifier=S01E01,season=1,number=1)>
+2017-12-06 16:31 VERBOSE  task          t_e             ACCEPTED: `My Show S01E01` by series plugin because choosing best available quality
+2017-12-06 16:31 DEBUG    series        t_e             processing series took 0.02118600000000015
+2017-12-06 16:31 DEBUG    urlrewriter   t_e             Checking 1 entries
+2017-12-06 16:31 VERBOSE  details       t_e             Summary - Accepted: 1 (Rejected: 0 Undecided: 0 Failed: 0)
+2017-12-06 16:31 VERBOSE  list_add      t_e             adding accepted entries into entry_list - test
+2017-12-06 16:31 DEBUG    entry_list    t_e             adding entry <Entry(title=My Show S01E01,state=accepted)> to list test
+2017-12-06 16:31 CRITICAL task          t_e             BUG: Unhandled error in plugin list_add: 
+Traceback (most recent call last):
+  File "/Users/orcarmi/PycharmProjects/Flexget/flexget/task.py", line 486, in __run_plugin
+    return method(*args, **kwargs)
+  File "/Users/orcarmi/PycharmProjects/Flexget/flexget/event.py", line 23, in __call__
+    return self.func(*args, **kwargs)
+  File "/Users/orcarmi/PycharmProjects/Flexget/flexget/plugins/output/list_add.py", line 54, in on_task_output
+    thelist |= task.accepted
+  File "/Users/orcarmi/PycharmProjects/Flexget/flexget/plugins/list/entry_list.py", line 157, in __ior__
+    self.add(value)
+  File "/Users/orcarmi/PycharmProjects/Flexget/flexget/plugins/list/entry_list.py", line 148, in add
+    stored_entry = EntryListEntry(entry=entry, entry_list_id=self._db_list(session).id)
+  File "<string>", line 4, in __init__
+  File "/Users/orcarmi/PycharmProjects/Flexget/venv/lib/python3.6/site-packages/sqlalchemy/orm/state.py", line 414, in _initialize_instance
+    manager.dispatch.init_failure(self, args, kwargs)
+  File "/Users/orcarmi/PycharmProjects/Flexget/venv/lib/python3.6/site-packages/sqlalchemy/util/langhelpers.py", line 66, in __exit__
+    compat.reraise(exc_type, exc_value, exc_tb)
+  File "/Users/orcarmi/PycharmProjects/Flexget/venv/lib/python3.6/site-packages/sqlalchemy/util/compat.py", line 187, in reraise
+    raise value
+  File "/Users/orcarmi/PycharmProjects/Flexget/venv/lib/python3.6/site-packages/sqlalchemy/orm/state.py", line 411, in _initialize_instance
+    return manager.original_init(*mixed[1:], **kwargs)
+  File "/Users/orcarmi/PycharmProjects/Flexget/flexget/plugins/list/entry_list.py", line 77, in __init__
+    self.entry = entry
+  File "<string>", line 1, in __set__
+  File "/Users/orcarmi/PycharmProjects/Flexget/flexget/utils/database.py", line 130, in setter
+    setattr(self, name, unicode(json.dumps(only_builtins(dict(entry)), encode_datetime=True)))
+  File "/Users/orcarmi/PycharmProjects/Flexget/flexget/utils/json.py", line 93, in dumps
+    return json.dumps(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/json/__init__.py", line 238, in dumps
+    **kw).encode(obj)
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/json/encoder.py", line 199, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/json/encoder.py", line 257, in iterencode
+    return _iterencode(o, 0)
+  File "/Users/orcarmi/PycharmProjects/Flexget/flexget/utils/json.py", line 56, in _datetime_encoder
+    raise TypeError
+TypeError
