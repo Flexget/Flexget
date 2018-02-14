@@ -98,6 +98,20 @@ class ObjectsContainer(object):
         'additionalProperties': False
     }
 
+    crash_logs = {
+        'type': 'object',
+        'properties': {
+            'name': {'type': 'string'},
+            'data': {'type': 'array', 'items': {
+                'type': 'object',
+                'properties': {
+                    'name': {'type': 'string'},
+                    'content': {'type': 'string'}
+                }
+            }}
+        }
+    }
+
 
 yaml_error_schema = api.schema_model('yaml_error_schema', ObjectsContainer.yaml_error_response)
 config_validation_schema = api.schema_model('config_validation_schema', ObjectsContainer.config_validation_error)
@@ -106,6 +120,7 @@ raw_config_schema = api.schema_model('raw_config', ObjectsContainer.raw_config_o
 version_schema = api.schema_model('server.version', ObjectsContainer.version_object)
 dump_threads_schema = api.schema_model('server.dump_threads', ObjectsContainer.dump_threads_object)
 server_manage_schema = api.schema_model('server.manage', ObjectsContainer.server_manage)
+crash_logs_schema = api.schema_model('server.crash_logs', ObjectsContainer.crash_logs)
 
 
 @server_api.route('/manage/')
@@ -508,7 +523,10 @@ class LogParser(object):
 
 @server_api.route('/crash_logs/')
 class ServerCrashLogAPI(APIResource):
+    @api.response(200, 'Succesfully retreived crash logs', model=crash_logs_schema)
     def get(self, session):
+        """Get Crash logs"""
         path = Path(self.manager.config_base)
-        crashes = [{file.name: file.open().readlines()} for file in path.listdir(pattern='crash_report*.log')]
-        return jsonify(crashes=crashes)
+        crashes = [{'name': file.name, 'content': file.open().readlines()} for file in
+                   path.listdir(pattern='crash_report*.log')]
+        return jsonify(crashes)
