@@ -1,0 +1,50 @@
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=Marvel's Agents of S.H.I.E.L.D.,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=Episodes,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=Game of Thrones,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=iZombie,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=Marvel's Jessica Jones,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=Rick and Morty,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=Silicon Valley,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=Supernatural,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=Mr. Robot,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=Suits,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=The Big Bang Theory,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=Sherlock,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=Criminal Minds,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=The Blacklist,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=The Flash (2014),state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=Grimm,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=The Walking Dead,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=Marvel's Daredevil,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=Elementary,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=The Good Place,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test returning entry <Entry(title=Attack on Titan,state=undecided)>
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test searching for show match for <Entry(title=Doctor Who,state=accepted)> using Sonarr
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test using show {'title': 'Doctor Who (2005)', 'sortTitle': 'doctor who 2005', 'seasonCount': 10, 'status': 'continuing', 'overview': 'The Doctor is an alien Time Lord from the planet Gallifrey who travels through all of time and space in his TARDIS. Having no gender, the Doctor has a long list of friends and companions who have shared journeys along the way. Instead of dying, the Doctor is able to "regenerate" into a new body, taking on a new personality with each regeneration.', 'network': 'BBC One', 'airTime': '18:45', 'images': [{'coverType': 'fanart', 'url': 'http://thetvdb.com/banners/fanart/original/78804-68.jpg'}, {'coverType': 'banner', 'url': 'http://thetvdb.com/banners/graphical/78804-g44.jpg'}, {'coverType': 'poster', 'url': 'http://thetvdb.com/banners/posters/78804-52.jpg'}], 'remotePoster': 'http://thetvdb.com/banners/posters/78804-52.jpg', 'seasons': [{'seasonNumber': 0, 'monitored': False}, {'seasonNumber': 1, 'monitored': True}, {'seasonNumber': 2, 'monitored': True}, {'seasonNumber': 3, 'monitored': True}, {'seasonNumber': 4, 'monitored': True}, {'seasonNumber': 5, 'monitored': True}, {'seasonNumber': 6, 'monitored': True}, {'seasonNumber': 7, 'monitored': True}, {'seasonNumber': 8, 'monitored': True}, {'seasonNumber': 9, 'monitored': True}, {'seasonNumber': 10, 'monitored': True}], 'year': 2005, 'profileId': 0, 'seasonFolder': False, 'monitored': True, 'useSceneNumbering': False, 'runtime': 45, 'tvdbId': 78804, 'tvRageId': 3332, 'tvMazeId': 210, 'firstAired': '2005-03-25T22:00:00Z', 'seriesType': 'standard', 'cleanTitle': 'doctorwho2005', 'imdbId': 'tt0436992', 'titleSlug': 'doctor-who-2005', 'certification': 'TV-PG', 'genres': ['Adventure', 'Drama', 'Science-Fiction'], 'tags': [], 'added': '0001-01-01T00:00:00Z', 'ratings': {'votes': 878, 'value': 9.4}, 'qualityProfileId': 0}
+2017-12-21 09:55 DEBUG    sonarr_list   sonarr_list_test adding show {'title': 'Doctor Who (2005)', 'sortTitle': 'doctor who 2005', 'seasonCount': 10, 'status': 'continuing', 'overview': 'The Doctor is an alien Time Lord from the planet Gallifrey who travels through all of time and space in his TARDIS. Having no gender, the Doctor has a long list of friends and companions who have shared journeys along the way. Instead of dying, the Doctor is able to "regenerate" into a new body, taking on a new personality with each regeneration.', 'network': 'BBC One', 'airTime': '18:45', 'images': [{'coverType': 'fanart', 'url': 'http://thetvdb.com/banners/fanart/original/78804-68.jpg'}, {'coverType': 'banner', 'url': 'http://thetvdb.com/banners/graphical/78804-g44.jpg'}, {'coverType': 'poster', 'url': 'http://thetvdb.com/banners/posters/78804-52.jpg'}], 'remotePoster': 'http://thetvdb.com/banners/posters/78804-52.jpg', 'seasons': [{'seasonNumber': 0, 'monitored': False}, {'seasonNumber': 1, 'monitored': True}, {'seasonNumber': 2, 'monitored': True}, {'seasonNumber': 3, 'monitored': True}, {'seasonNumber': 4, 'monitored': True}, {'seasonNumber': 5, 'monitored': True}, {'seasonNumber': 6, 'monitored': True}, {'seasonNumber': 7, 'monitored': True}, {'seasonNumber': 8, 'monitored': True}, {'seasonNumber': 9, 'monitored': True}, {'seasonNumber': 10, 'monitored': True}], 'year': 2005, 'profileId': 1, 'seasonFolder': False, 'monitored': True, 'useSceneNumbering': False, 'runtime': 45, 'tvdbId': 78804, 'tvRageId': 3332, 'tvMazeId': 210, 'firstAired': '2005-03-25T22:00:00Z', 'seriesType': 'standard', 'cleanTitle': 'doctorwho2005', 'imdbId': 'tt0436992', 'titleSlug': 'doctor-who-2005', 'certification': 'TV-PG', 'genres': ['Adventure', 'Drama', 'Science-Fiction'], 'tags': [0], 'added': '0001-01-01T00:00:00Z', 'ratings': {'votes': 878, 'value': 9.4}, 'qualityProfileId': 1, 'rootFolderPath': 'fgsdfgssd', 'addOptions': {'ignoreEpisodesWithFiles': False, 'ignoreEpisodesWithoutFiles': False, 'searchForMissingEpisodes': True}} to sonarr
+2017-12-21 09:55 CRITICAL task          sonarr_list_test BUG: Unhandled error in plugin list_add: list indices must be integers or slices, not str
+Traceback (most recent call last):
+  File "/Users/orcarmi/PycharmProjects/Flexget/flexget/plugins/list/sonarr_list.py", line 57, in _sonarr_request
+    rsp.raise_for_status()
+  File "/Users/orcarmi/PycharmProjects/Flexget/venv/lib/python3.6/site-packages/requests/models.py", line 935, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: http://f.dlinkddns.com:8989/api/series
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/orcarmi/PycharmProjects/Flexget/flexget/task.py", line 486, in __run_plugin
+    return method(*args, **kwargs)
+  File "/Users/orcarmi/PycharmProjects/Flexget/flexget/event.py", line 23, in __call__
+    return self.func(*args, **kwargs)
+  File "/Users/orcarmi/PycharmProjects/Flexget/flexget/plugins/output/list_add.py", line 54, in on_task_output
+    thelist |= task.accepted
+  File "/Users/orcarmi/PycharmProjects/Flexget/venv/bin/../lib/python3.6/_collections_abc.py", line 606, in __ior__
+    self.add(value)
+  File "/Users/orcarmi/PycharmProjects/Flexget/flexget/plugins/list/sonarr_list.py", line 211, in add
+    show = self.add_show(entry)
+  File "/Users/orcarmi/PycharmProjects/Flexget/flexget/plugins/list/sonarr_list.py", line 173, in add_show
+    returned_show = self._sonarr_request(SERIES_ENDPOINT, method='post', data=show)
+  File "/Users/orcarmi/PycharmProjects/Flexget/flexget/plugins/list/sonarr_list.py", line 63, in _sonarr_request
+    error = '{}: {} \'{}\''.format(error['errorMessage'], error['propertyName'], error['attemptedValue'])
+TypeError: list indices must be integers or slices, not str

@@ -21,7 +21,7 @@ from flexget.utils.database import with_session
 from flexget.webserver import User
 from . import __path__
 
-__version__ = '1.4.1'
+__version__ = '1.4.2'
 
 log = logging.getLogger('api')
 
