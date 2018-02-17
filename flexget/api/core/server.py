@@ -11,23 +11,24 @@ import logging
 import threading
 import traceback
 from time import sleep
-
+from path import Path
 import binascii
 import cherrypy
 import yaml
 from flask import Response, jsonify, request
-from flask_restplus import inputs
 from flexget.utils.tools import get_latest_flexget_version_number
-from pyparsing import Word, Keyword, Group, Forward, Suppress, OneOrMore, oneOf, White, restOfLine, ParseException, \
-    Combine
+from pyparsing import (
+    Word, Keyword, Group, Forward, Suppress, OneOrMore, oneOf, White, restOfLine, ParseException, Combine
+)
 from pyparsing import nums, alphanums, printables
 from yaml.error import YAMLError
 
 from flexget._version import __version__
 from flexget.api import api, APIResource
-from flexget.api.app import __version__ as __api_version__, APIError, BadRequest, base_message, success_response, \
-    base_message_schema, \
+from flexget.api.app import (
+    __version__ as __api_version__, APIError, BadRequest, base_message, success_response, base_message_schema,
     empty_response, etag
+)
 
 log = logging.getLogger('api.server')
 
@@ -97,6 +98,16 @@ class ObjectsContainer(object):
         'additionalProperties': False
     }
 
+    crash_logs = {
+        'type': 'array', 'items': {
+            'type': 'object',
+            'properties': {
+                'name': {'type': 'string'},
+                'content': {'type': 'array', 'items': {'type': 'string'}}
+            }
+        }
+    }
+
 
 yaml_error_schema = api.schema_model('yaml_error_schema', ObjectsContainer.yaml_error_response)
 config_validation_schema = api.schema_model('config_validation_schema', ObjectsContainer.config_validation_error)
@@ -105,6 +116,7 @@ raw_config_schema = api.schema_model('raw_config', ObjectsContainer.raw_config_o
 version_schema = api.schema_model('server.version', ObjectsContainer.version_object)
 dump_threads_schema = api.schema_model('server.dump_threads', ObjectsContainer.dump_threads_object)
 server_manage_schema = api.schema_model('server.manage', ObjectsContainer.server_manage)
+crash_logs_schema = api.schema_model('server.crash_logs', ObjectsContainer.crash_logs)
 
 
 @server_api.route('/manage/')
@@ -419,7 +431,7 @@ class LogParser(object):
 
             operator_quotes_content = Forward()
             operator_quotes_content << (
-                (operator_word + operator_quotes_content) | operator_word
+                    (operator_word + operator_quotes_content) | operator_word
             )
 
             operator_quotes = Group(
@@ -455,14 +467,14 @@ class LogParser(object):
         word = Word(printables)
 
         self._log_parser = (
-            date.setResultsName('timestamp') +
-            word.setResultsName('log_level') +
-            word.setResultsName('plugin') +
-            (
-                White(min=16).setParseAction(lambda s, l, t: [t[0].strip()]).setResultsName('task') |
-                (White(min=1).suppress() & word.setResultsName('task'))
-            ) +
-            restOfLine.setResultsName('message')
+                date.setResultsName('timestamp') +
+                word.setResultsName('log_level') +
+                word.setResultsName('plugin') +
+                (
+                        White(min=16).setParseAction(lambda s, l, t: [t[0].strip()]).setResultsName('task') |
+                        (White(min=1).suppress() & word.setResultsName('task'))
+                ) +
+                restOfLine.setResultsName('message')
         )
 
     def evaluate_and(self, argument):
@@ -503,3 +515,14 @@ class LogParser(object):
             return json.dumps(self._log_parser().parseString(line).asDict())
         except ParseException:
             return '{}'
+
+
+@server_api.route('/crash_logs/')
+class ServerCrashLogAPI(APIResource):
+    @api.response(200, 'Succesfully retreived crash logs', model=crash_logs_schema)
+    def get(self, session):
+        """Get Crash logs"""
+        path = Path(self.manager.config_base)
+        crashes = [{'name': file.name, 'content': file.open().readlines()} for file in
+                   path.listdir(pattern='crash_report*.log')]
+        return jsonify(crashes)

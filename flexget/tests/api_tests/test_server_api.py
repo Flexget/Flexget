@@ -5,6 +5,7 @@ import json
 import os
 
 import pytest
+from mock import patch
 
 from flexget import __version__
 from flexget.api.app import __version__ as __api_version__, base_message
@@ -12,7 +13,6 @@ from flexget.api.core.server import ObjectsContainer as OC
 from flexget.manager import Manager
 from flexget.tests.conftest import MockManager
 from flexget.utils.tools import get_latest_flexget_version_number
-from mock import patch
 
 
 class TestServerAPI(object):
@@ -104,3 +104,24 @@ class TestServerAPI(object):
         assert data == {'flexget_version': __version__,
                         'api_version': __api_version__,
                         'latest_version': latest}
+
+    def test_crash_logs_without_crash_log(self, api_client, schema_match):
+        rsp = api_client.get('/server/crash_logs')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.crash_logs, data)
+        assert not errors
+
+        assert not data
+
+    def test_crash_logs_with_crashes(self, api_client, schema_match, manager):
+        manager.config_base = os.path.join(os.path.dirname(__file__))
+        rsp = api_client.get('/server/crash_logs')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.crash_logs, data)
+        assert not errors
+
+        assert len(data) == 2
