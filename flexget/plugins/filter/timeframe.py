@@ -59,13 +59,15 @@ class FilterTimeFrame(object):
             self.backlog = None
             log.warning('Unable to utilize backlog plugin, so episodes may slip through timeframe.')
 
+    # Run last so we work on only accepted entries
+    @plugin.priority(-255)
     def on_task_filter(self, task, config):
         if not config:
             return
 
         identified_by = '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
 
-        grouped_entries = group_entries(task.accepted + task.undecided, identified_by)
+        grouped_entries = group_entries(task.accepted, identified_by)
         if not grouped_entries:
             return
 

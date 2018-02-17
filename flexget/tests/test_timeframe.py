@@ -13,6 +13,9 @@ def age_timeframe(**kwargs):
 
 class TestTimeFrame(object):
     config = """
+        templates:
+          global:
+            accept_all: yes
         tasks:
           wait:
             timeframe:
@@ -85,6 +88,9 @@ class TestTimeFrame(object):
 
 class TestTimeFrameActions(object):
     config = """
+        templates:
+          global:
+            accept_all: yes
         tasks:
           wait_reject:
             timeframe:
