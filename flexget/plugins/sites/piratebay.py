@@ -47,7 +47,7 @@ class UrlRewritePirateBay(object):
             {
                 'type': 'object',
                 'properties': {
-                    'url': {'type': 'string', 'default': URL},
+                    'url': {'type': 'string', 'default': URL, 'format': 'url'},
                     'category': {
                         'oneOf': [
                             {'type': 'string', 'enum': list(CATEGORIES)},
@@ -73,10 +73,12 @@ class UrlRewritePirateBay(object):
         self.set_urls(config.get('url', URL))
 
     def set_urls(self, url):
+        url = url.rstrip('/')
         if self.url != url:
             self.url = url
             parsed_url = urlparse(url)
-            self.url_match = re.compile('^%s://(?:torrents\.)?(%s)/.*$' % (re.escape(parsed_url.scheme), re.escape(parsed_url.netloc)))
+            self.url_match = re.compile('^%s://(?:torrents\.)?(%s)/.*$' % (re.escape(parsed_url.scheme),
+                                                                           re.escape(parsed_url.netloc)))
             self.url_search = re.compile('^%s/search/.*$' % (re.escape(url)))
 
     # urlrewriter API
