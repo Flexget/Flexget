@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import quote
+from future.moves.urllib.parse import quote, urlparse
 
 import re
 import logging
@@ -15,11 +15,7 @@ from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('piratebay')
 
-CUR_TLD = 'org'
-TLDS = 'com|org|sx|ac|pe|gy|to|se|gd|vg|%s' % CUR_TLD
-
-URL_MATCH = re.compile('^http://(?:torrents\.)?thepiratebay\.(?:%s)/.*$' % TLDS)
-URL_SEARCH = re.compile('^http://thepiratebay\.(?:%s)/search/.*$' % TLDS)
+URL = 'https://thepiratebay.org'
 
 CATEGORIES = {
     'all': 0,
@@ -51,6 +47,7 @@ class UrlRewritePirateBay(object):
             {
                 'type': 'object',
                 'properties': {
+                    'url': {'type': 'string', 'default': URL, 'format': 'url'},
                     'category': {
                         'oneOf': [
                             {'type': 'string', 'enum': list(CATEGORIES)},
@@ -65,12 +62,31 @@ class UrlRewritePirateBay(object):
         ]
     }
 
+    url = None
+
+    def __init__(self):
+        self.set_urls(URL)
+
+    def on_task_start(self, task, config=None):
+        if not isinstance(config, dict):
+            config = {}
+        self.set_urls(config.get('url', URL))
+
+    def set_urls(self, url):
+        url = url.rstrip('/')
+        if self.url != url:
+            self.url = url
+            parsed_url = urlparse(url)
+            self.url_match = re.compile('^%s://(?:torrents\.)?(%s)/.*$' % (re.escape(parsed_url.scheme),
+                                                                           re.escape(parsed_url.netloc)))
+            self.url_search = re.compile('^%s/search/.*$' % (re.escape(url)))
+
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
         if url.endswith('.torrent'):
             return False
-        return bool(URL_MATCH.match(url))
+        return bool(self.url_match.match(url))
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
@@ -78,7 +94,7 @@ class UrlRewritePirateBay(object):
             log.error("Didn't actually get a URL...")
         else:
             log.debug("Got the URL: %s" % entry['url'])
-        if URL_SEARCH.match(entry['url']):
+        if self.url_search.match(entry['url']):
             # use search
             results = self.search(task, entry)
             if not results:
@@ -113,6 +129,7 @@ class UrlRewritePirateBay(object):
         """
         if not isinstance(config, dict):
             config = {}
+        self.set_urls(config.get('url', URL))
         sort = SORT.get(config.get('sort_by', 'seeds'))
         if config.get('sort_reverse'):
             sort += 1
@@ -130,7 +147,7 @@ class UrlRewritePirateBay(object):
             query = query.replace('-', ' ').replace("'", " ")
 
             # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-            url = 'http://thepiratebay.%s/search/%s%s' % (CUR_TLD, quote(query.encode('utf-8')), filter_url)
+            url = '%s/search/%s%s' % (self.url, quote(query.encode('utf-8')), filter_url)
             log.debug('Using %s as piratebay search url' % url)
             page = task.requests.get(url).content
             soup = get_soup(page)
@@ -140,7 +157,7 @@ class UrlRewritePirateBay(object):
                 if not entry['title']:
                     log.error('Malformed search result. No title or url found. Skipping.')
                     continue
-                entry['url'] = 'http://thepiratebay.%s%s' % (CUR_TLD, link.get('href'))
+                entry['url'] = self.url + link.get('href')
                 tds = link.parent.parent.parent.find_all('td')
                 entry['torrent_seeds'] = int(tds[-2].contents[0])
                 entry['torrent_leeches'] = int(tds[-1].contents[0])
@@ -169,4 +186,4 @@ class UrlRewritePirateBay(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewritePirateBay, 'piratebay', interfaces=['urlrewriter', 'search'], api_ver=2)
+    plugin.register(UrlRewritePirateBay, 'piratebay', interfaces=['urlrewriter', 'search', 'task'], api_ver=2)
