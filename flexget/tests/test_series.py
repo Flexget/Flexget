@@ -1469,7 +1469,7 @@ class TestFromGroup(object):
               - test: {from_group: [Name, FlexGet]}
     """
 
-    def testFromGroup(self, execute_task):
+    def test_from_group(self, execute_task):
         """Series plugin: test from_group"""
         task = execute_task('test')
         assert task.find_entry('accepted', title='[FlexGet] Test 12')

@@ -3,6 +3,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.utils import native
 
 import logging
+import re
 import sys
 import time
 
@@ -14,6 +15,7 @@ from rebulk.pattern import RePattern
 from flexget import plugin
 from flexget.event import event
 from flexget.utils import qualities
+from flexget.utils.tools import ReList
 from .parser_common import MovieParseResult, SeriesParseResult
 
 log = logging.getLogger('parser_guessit')
@@ -28,6 +30,42 @@ def _id_regexps_function(input_string, context):
         for match in RePattern(regexp, children=True).matches(input_string, context):
             ret.append(match.span)
     return ret
+
+
+default_ignore_prefixes = [
+    '(?:\[[^\[\]]*\])',  # ignores group names before the name, eg [foobar] name
+    '(?:HD.720p?:)',
+    '(?:HD.1080p?:)',
+    '(?:HD.2160p?:)'
+]
+
+
+def name_to_re(name, ignore_prefixes=None, parser=None):
+    """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
+    if not ignore_prefixes:
+        ignore_prefixes = default_ignore_prefixes
+    parenthetical = None
+    if name.endswith(')'):
+        p_start = name.rfind('(')
+        if p_start != -1:
+            parenthetical = re.escape(name[p_start + 1:-1])
+            name = name[:p_start - 1]
+    # Blanks are any non word characters except & and _
+    blank = r'(?:[^\w&]|_)'
+    ignore = '(?:' + '|'.join(ignore_prefixes) + ')?'
+    res = re.sub(re.compile(blank + '+', re.UNICODE), ' ', name)
+    res = res.strip()
+    # accept either '&' or 'and'
+    res = re.sub(' (&|and) ', ' (?:and|&) ', res, re.UNICODE)
+    res = re.sub(' +', blank + '*', res, re.UNICODE)
+    if parenthetical:
+        res += '(?:' + blank + '+' + parenthetical + ')?'
+        # Turn on exact mode for series ending with a parenthetical,
+        # so that 'Show (US)' is not accepted as 'Show (UK)'
+        if parser:
+            parser.strict_name = True
+    res = '^' + ignore + blank + '*' + '(' + res + ')(?:\\b|_)' + blank + '*'
+    return res
 
 
 _id_regexps = Rebulk().functional(_id_regexps_function, name='regexpId',
@@ -164,7 +202,8 @@ class ParserGuessit(object):
                     else:
                         break
             # Check the name doesn't end mid-word (guessit might put the border before or after the space after title)
-            if data[title_end - 1].isalnum() and len(data) <= title_end or data[title_end].isalnum():
+            if data[title_end - 1].isalnum() and len(data) <= title_end or \
+                    not self._is_valid_name(data, guessit_options=guessit_options):
                 return SeriesParseResult(data=data, valid=False)
             # If we are in exact mode, make sure there is nothing after the title
             if kwargs.get('strict_name'):
@@ -187,6 +226,9 @@ class ParserGuessit(object):
         quality = self._quality(guess_result)
         proper_count = self._proper_count(guess_result)
         group = guess_result.get('release_group')
+        # Validate group with from_group
+        if not self._is_valid_groups(group, guessit_options.get('allow_groups', [])):
+            return SeriesParseResult(data=data, valid=False)
         special = guess_result.get('episode_details', '').lower() == 'special'
         if 'episode' not in guess_result.values_list:
             episodes = len(guess_result.values_list.get('part', []))
@@ -243,6 +285,44 @@ class ParserGuessit(object):
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
         return parsed
+
+    # TODO: The following functions are sort of legacy. No idea if they should be changed.
+    def _is_valid_name(self, data, guessit_options):
+        # name end position
+        name_start = 0
+        name_end = 0
+
+        # regexp name matching
+        re_from_name = False
+        name_regexps = ReList(guessit_options.get('name_regexps', []))
+        if not name_regexps:
+            # if we don't have name_regexps, generate one from the name
+            name_regexps = ReList(name_to_re(name, default_ignore_prefixes, None)
+                                  for name in [guessit_options['name']] + guessit_options.get('alternate_names', []))
+            # With auto regex generation, the first regex group captures the name
+            re_from_name = True
+        # try all specified regexps on this data
+        for name_re in name_regexps:
+            match = re.search(name_re, data)
+            if match:
+                match_start, match_end = match.span(1 if re_from_name else 0)
+                # Always pick the longest matching regex
+                if match_end > name_end:
+                    name_start, name_end = match_start, match_end
+                log.debug('NAME SUCCESS: %s matched to %s', name_re.pattern, data)
+        if not name_end:
+            # leave this invalid
+            log.debug('FAIL: name regexps %s do not match %s',
+                      [regexp.pattern for regexp in name_regexps], data)
+            return
+        return True
+
+    def _is_valid_groups(self, group, allow_groups):
+        if not allow_groups:
+            return True
+        if not group:
+            return False
+        return group.lower() in [x.lower() for x in allow_groups]
 
 
 @event('plugin.register')
