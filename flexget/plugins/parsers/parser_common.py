@@ -8,6 +8,7 @@ import re
 from abc import abstractproperty, abstractmethod, ABCMeta
 from string import capwords
 
+from flexget.utils.qualities import Quality
 from flexget.utils.tools import ReList
 
 log = logging.getLogger('parser')
@@ -111,6 +112,55 @@ def remove_dirt(name):
 def normalize_name(name):
     name = capwords(name)
     return name
+
+
+class MovieParseResult(object):
+    def __init__(self, data=None, name=None, year=None, quality=None, proper_count=0, valid=True):
+        self.name = name
+        self.data = data
+        self.year = year
+        self.quality = quality if quality is not None else Quality()
+        self.proper_count = proper_count
+        self.valid = valid
+
+
+class SeriesParseResult(object):
+    def __init__(self,
+                 data=None,
+                 name=None,
+                 season=None,
+                 episode=None,
+                 episodes=None,
+                 id=None,
+                 id_type=None,
+                 identifier=None,
+                 identifiers=None,
+                 pack_identifier=None,
+                 quality=None,
+                 proper_count=0,
+                 special=False,
+                 group=None,
+                 valid=True
+                 ):
+        self.name = name
+        self.data = data
+        self.season = season
+        self.episode = episode
+        self.episodes = episodes
+        self.id = id
+        self.id_type = id_type
+        self.identifier = identifier
+        self.identifiers = identifiers
+        self.pack_identifier = pack_identifier
+        self.quality = quality if quality is not None else Quality()
+        self.proper_count = proper_count
+        self.special = special
+        self.group = group
+        self.valid = valid
+
+    @property
+    def proper(self):
+        return self.proper_count > 0
 
 
 class ParsedEntry(ABCMeta(native_str('ParsedEntryABCMeta'), (object,), {})):

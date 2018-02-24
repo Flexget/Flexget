@@ -16,7 +16,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils import qualities
 from .parser_common import old_assume_quality
-from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie
+from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie, MovieParseResult, SeriesParseResult
 
 log = logging.getLogger('parser_guessit')
 
@@ -314,6 +314,7 @@ guessit_api = GuessItApi(rebulk_builder().rebulk(_id_regexps))
 
 
 class ParserGuessit(object):
+    @staticmethod
     def _guessit_options(self, options):
         settings = {'name_only': True, 'allowed_languages': ['en', 'fr'], 'allowed_countries': ['us', 'uk', 'gb']}
         # 'clean_function': clean_value
@@ -327,6 +328,50 @@ class ParserGuessit(object):
         settings.update(options)
         return settings
 
+    @staticmethod
+    def _proper_count(guessit_result):
+        """Calculate a FlexGet style proper_count from a guessit result."""
+        version = guessit_result.get('version')
+        if version is None:
+            version = 0
+        elif version <= 0:
+            version = -1
+        else:
+            version -= 1
+        proper_count = guessit_result.get('proper_count', 0)
+        fastsub = 'Fastsub' in guessit_result.get('other', [])
+        return version + proper_count - (5 if fastsub else 0)
+
+    @staticmethod
+    def _quality(guessit_result):
+        """Generate a FlexGet Quality from a guessit result."""
+        resolution = guessit_result.get('screen_size', '')
+        if not resolution and 'HR' in guessit_result.get('other', []):
+            resolution = 'hr'
+
+        source = guessit_result.get('format', '').replace('-', '')
+        if 'Preair' in guessit_result.get('other', {}):
+            source = 'preair'
+        if 'Screener' in guessit_result.get('other', {}):
+            if source == 'BluRay':
+                source = 'bdscr'
+            else:
+                source = 'dvdscr'
+        if 'R5' in guessit_result.get('other', {}):
+            source = 'r5'
+
+        codec = guessit_result.get('video_codec', '')
+        if guessit_result.get('video_profile') == '10bit':
+            codec = '10bit'
+
+        audio = guessit_result.get('audio_codec', '')
+        if audio == 'DTS' and guessit_result.get('audio_profile') in ['HD', 'HDMA']:
+            audio = 'dtshd'
+        elif guessit_result.get('audio_channels') == '5.1' and not audio or audio == 'DolbyDigital':
+            audio = 'dd5.1'
+
+        return qualities.Quality(' '.join([resolution, source, codec, audio]))
+
     # movie_parser API
     def parse_movie(self, data, **kwargs):
         log.debug('Parsing movie: `%s` [options: %s]', data, kwargs)
@@ -335,7 +380,13 @@ class ParserGuessit(object):
         guessit_options['type'] = 'movie'
         guess_result = guessit_api.guessit(data, options=guessit_options)
         # NOTE: Guessit expects str on PY3 and unicode on PY2 hence the use of future.utils.native
-        parsed = GuessitParsedMovie(native(data), kwargs.pop('name', None), guess_result, **kwargs)
+        parsed = MovieParseResult(
+            data=data,
+            name=guess_result.get('title'),
+            year=guess_result.get('year'),
+            proper_count=self._proper_count(guess_result),
+            quality=self._quality(guess_result)
+        )
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
         return parsed
@@ -363,7 +414,65 @@ class ParserGuessit(object):
         except GuessitException:
             log.warning('Parsing %s with guessit failed. Most likely a unicode error.', data)
             guess_result = {}
-        parsed = GuessitParsedSerie(data, kwargs.pop('name', None), guess_result, **kwargs)
+
+        if guess_result.get('type') != 'episode':
+            return SeriesParseResult(data=data, valid=False)
+
+        name = kwargs.get('name')
+        if not name:
+            name = guess_result.get('title')
+            if guess_result.get('country') and hasattr(guess_result.get('country'), 'alpha2'):
+                name += ' (%s)' % guess_result.get('country').alpha2
+
+        season = guess_result.get('season')
+        episode = guess_result.get('episode')
+        date = guess_result.get('date')
+        quality = self._quality(guess_result)
+        proper_count = self._proper_count(guess_result)
+        if 'episode' not in guess_result.values_list:
+            episodes = len(guess_result.values_list.get('part', []))
+        else:
+            episodes = len(guess_result.values_list['episode'])
+        if guess_result.matches['regexpId']:
+            id_type = 'id'
+            id = '-'.join(match.value for match in guess_result.matches['regexpId'])
+            identifier = id
+            identifiers = [id]
+        elif season is not None and episode is not None:
+            id_type = 'ep'
+            id = None
+            identifier = 'S%02dE%02d' % (season, episode)
+            # TODO: support multiple properly
+            identifiers = [identifier]
+        elif episode is not None:
+            id_type = 'sequence'
+            id = episode
+            identifier = episode
+            identifiers = [identifier]
+        elif date:
+            id_type = 'date'
+            id = date
+            identifier = date.strftime('%Y-%m-%d')
+            identifiers = [identifier]
+        else:
+            return SeriesParseResult(data=data, valid=False)
+
+        parsed = SeriesParseResult(
+            data=data,
+            name=name,
+            season=season,
+            episode=episode,
+            episodes=episodes,
+            id=id,
+            id_type=id_type,
+            identifiers=identifiers,
+            # pack_identifier=pack_identifier,
+            quality=quality,
+            proper_count=proper_count,
+            # special=special,
+            # group=group
+        )
+
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
         return parsed
