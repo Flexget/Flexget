@@ -53,18 +53,16 @@ class ParserInternal(object):
         result = SeriesParseResult(
             data=data,
             name=parser.name,
-            season=parser.season,
-            episode=parser.episode,
             episodes=parser.episodes,
             id=parser.id,
             id_type=parser.id_type,
-            identifier=parser.identifier,
-            identifiers=parser.identifiers,
-            pack_identifier=parser.pack_identifier,
             quality=parser.quality,
             proper_count=parser.proper_count,
             special=parser.special,
-            group=parser.group
+            group=parser.group,
+            season_pack=parser.season_pack,
+            strict_name=parser.strict_name,
+            identified_by=parser.identified_by
         )
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parser, (end - start) * 1000)
