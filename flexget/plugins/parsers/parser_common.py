@@ -120,6 +120,10 @@ class MovieParseResult(object):
         self.proper_count = proper_count
         self.valid = valid
 
+    @property
+    def fields(self):
+        return {}
+
 
 class SeriesParseResult(object):
     def __init__(self,
