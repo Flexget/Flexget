@@ -112,17 +112,40 @@ def normalize_name(name):
 
 
 class MovieParseResult(object):
-    def __init__(self, data=None, name=None, year=None, quality=None, proper_count=0, valid=True):
+    def __init__(self, data=None, name=None, year=None, quality=None, proper_count=0, release_group=None, valid=True):
         self.name = name
         self.data = data
         self.year = year
         self.quality = quality if quality is not None else Quality()
         self.proper_count = proper_count
+        self.release_group = release_group
         self.valid = valid
 
     @property
+    def identifier(self):
+        if self.name and self.year:
+            return ('%s %s' % (self.name, self.year)).strip().lower()
+        elif self.name:
+            return self.name.lower()
+
+    @property
+    def proper(self):
+        return self.proper_count > 0
+
+    @property
     def fields(self):
-        return {}
+        """
+        Return a dict of all parser fields
+        """
+        return {
+            'id': self.identifier,
+            'movie_parser': self,
+            'movie_name': self.name,
+            'movie_year': self.year,
+            'proper': self.proper,
+            'proper_count': self.proper_count,
+            'release_group': self.release_group
+        }
 
 
 class SeriesParseResult(object):

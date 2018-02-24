@@ -146,7 +146,8 @@ class ParserGuessit(object):
             name=guess_result.get('title'),
             year=guess_result.get('year'),
             proper_count=self._proper_count(guess_result),
-            quality=self._quality(guess_result)
+            quality=self._quality(guess_result),
+            release_group=guess_result.get('release_group')
         )
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
@@ -156,6 +157,7 @@ class ParserGuessit(object):
     def parse_series(self, data, **kwargs):
         log.debug('Parsing series: `%s` [options: %s]', data, kwargs)
         guessit_options = self._guessit_options(kwargs)
+        valid = True
         if kwargs.get('name'):
             expected_titles = [kwargs['name']]
             if kwargs.get('alternate_names'):
@@ -180,7 +182,7 @@ class ParserGuessit(object):
             guess_result = {}
 
         if guess_result.get('type') != 'episode':
-            return SeriesParseResult(data=data, valid=False)
+            valid = False
 
         name = kwargs.get('name')
         country = guess_result.get('country')
@@ -205,7 +207,7 @@ class ParserGuessit(object):
             # Check the name doesn't end mid-word (guessit might put the border before or after the space after title)
             if data[title_end - 1].isalnum() and len(data) <= title_end or \
                     not self._is_valid_name(data, guessit_options=guessit_options):
-                return SeriesParseResult(data=data, valid=False)
+                valid = False
             # If we are in exact mode, make sure there is nothing after the title
             if kwargs.get('strict_name'):
                 post_title = sys.maxsize
@@ -218,7 +220,7 @@ class ParserGuessit(object):
                             post_title = min(post_title, matches[0].parent.start)
                 for char in data[title_end:post_title]:
                     if char.isalnum() or char.isdigit():
-                        return SeriesParseResult(data=data, valid=False)
+                        valid = False
         season = guess_result.get('season')
         episode = guess_result.get('episode')
         if episode is None and 'part' in guess_result:
@@ -276,7 +278,10 @@ class ParserGuessit(object):
             id_type = 'special'
             id = guess_result.get('episode_title', 'special')
         if not id_type:
-            return SeriesParseResult(data=data, valid=False)
+            valid = False
+        # TODO: Legacy - Complete == invalid
+        if 'complete' in guess_result.get('other', '').lower():
+            valid = False
 
         parsed = SeriesParseResult(
             data=data,
@@ -288,7 +293,8 @@ class ParserGuessit(object):
             quality=quality,
             proper_count=proper_count,
             special=special,
-            group=group
+            group=group,
+            valid=valid
         )
 
         end = time.clock()
@@ -297,6 +303,8 @@ class ParserGuessit(object):
 
     # TODO: The following functions are sort of legacy. No idea if they should be changed.
     def _is_valid_name(self, data, guessit_options):
+        if not guessit_options.get('name'):
+            return True
         # name end position
         name_start = 0
         name_end = 0
