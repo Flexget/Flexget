@@ -325,7 +325,7 @@ class ParserGuessit(object):
         for name_re in name_regexps:
             match = re.search(name_re, data)
             if match:
-                match_start, match_end = match.span(1 if re_from_name else 0)
+                match_end = match.end(1 if re_from_name else 0)
                 # Always pick the longest matching regex
                 if match_end > name_end:
                     name_end = match_end
