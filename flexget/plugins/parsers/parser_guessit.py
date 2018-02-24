@@ -196,7 +196,11 @@ class ParserGuessit(object):
             title_start = guess_result.matches['title'][0].start
             title_end = guess_result.matches['title'][0].end
             if title_start != 0:
-                pre_title = max((match[0].end for match in guess_result.matches.values() if match[0].end <= title_start), default=0)
+                try:
+                    pre_title = max((match[0].end for match in guess_result.matches.values() if
+                                     match[0].end <= title_start))
+                except ValueError:
+                    pre_title = 0
                 for char in reversed(data[pre_title:title_start]):
                     if char.isalnum() or char.isdigit():
                         return SeriesParseResult(data=data, valid=False)
