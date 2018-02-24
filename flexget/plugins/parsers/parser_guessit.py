@@ -183,10 +183,11 @@ class ParserGuessit(object):
             return SeriesParseResult(data=data, valid=False)
 
         name = kwargs.get('name')
+        country = guess_result.get('country')
         if not name:
             name = guess_result.get('title')
-            if guess_result.get('country') and hasattr(guess_result.get('country'), 'alpha2'):
-                name += ' (%s)' % guess_result.get('country').alpha2
+            if country and hasattr(country, 'alpha2'):
+                name += ' (%s)' % country.alpha2
         else:
             # Make sure the name match is up to FlexGet standards
             # Check there is no unmatched cruft before the matched name
@@ -229,6 +230,13 @@ class ParserGuessit(object):
         # Validate group with from_group
         if not self._is_valid_groups(group, guessit_options.get('allow_groups', [])):
             return SeriesParseResult(data=data, valid=False)
+        # Validate country, TODO: LEGACY
+        if country and name.endswith(')'):
+            p_start = name.rfind('(')
+            if p_start != -1:
+                parenthetical = re.escape(name[p_start + 1:-1])
+                if parenthetical and parenthetical.lower() != str(country).lower():
+                    return SeriesParseResult(data=data, valid=False)
         special = guess_result.get('episode_details', '').lower() == 'special'
         if 'episode' not in guess_result.values_list:
             episodes = len(guess_result.values_list.get('part', []))
@@ -263,9 +271,10 @@ class ParserGuessit(object):
             if episode is not None:
                 id_type = 'sequence'
                 id = episode
-        if not id_type and special:
+        if (not id_type or guessit_options.get('prefer_specials')) and (special or
+                                                                        guessit_options.get('assume_special')):
             id_type = 'special'
-            id = guess_result.get('title', 'special')
+            id = guess_result.get('episode_title', 'special')
         if not id_type:
             return SeriesParseResult(data=data, valid=False)
 
