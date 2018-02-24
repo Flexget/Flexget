@@ -310,7 +310,6 @@ class ParserGuessit(object):
         if not guessit_options.get('name'):
             return True
         # name end position
-        name_start = 0
         name_end = 0
 
         # regexp name matching
@@ -329,13 +328,13 @@ class ParserGuessit(object):
                 match_start, match_end = match.span(1 if re_from_name else 0)
                 # Always pick the longest matching regex
                 if match_end > name_end:
-                    name_start, name_end = match_start, match_end
+                    name_end = match_end
                 log.debug('NAME SUCCESS: %s matched to %s', name_re.pattern, data)
         if not name_end:
             # leave this invalid
             log.debug('FAIL: name regexps %s do not match %s',
                       [regexp.pattern for regexp in name_regexps], data)
-            return
+            return False
         return True
 
     def _is_valid_groups(self, group, allow_groups):
