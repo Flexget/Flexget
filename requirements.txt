@@ -22,7 +22,7 @@ flask-restful==0.3.6
 flask-restplus==0.10.1
 flask==0.12.2
 future==0.16.0
-guessit==2.0.4
+guessit==2.1.4
 html5lib==0.999999999
 idna==2.5                 # via requests
 itsdangerous==0.24        # via flask
@@ -39,7 +39,7 @@ pyrss2gen==1.1
 python-dateutil==2.6.1
 pytz==2017.2              # via apscheduler, flask-restful, flask-restplus, tempora, tzlocal
 pyyaml==3.12
-rebulk==0.8.2
+rebulk==0.9.0
 requests==2.16.5
 rpyc==3.3.0
 six==1.10.0               # via apscheduler, cheroot, cherrypy, flask-cors, flask-restful, flask-restplus, html5lib, python-dateutil, rebulk, tempora

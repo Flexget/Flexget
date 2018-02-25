@@ -38,6 +38,15 @@ _id_regexps = Rebulk().functional(_id_regexps_function, name='regexpId',
 guessit_api = GuessItApi(rebulk_builder().rebulk(_id_regexps))
 
 
+def lower_to_list(data):
+    if data is None:
+        return []
+    if isinstance(data, list):
+        return [d.lower() for d in data]
+
+    return [data.lower()]
+
+
 class ParserGuessit(object):
     @staticmethod
     def _guessit_options(options):
@@ -50,6 +59,12 @@ class ParserGuessit(object):
             options['date_year_first'] = options['date_yearfirst']
         if 'date_dayfirst' in options:
             options['date_day_first'] = options['date_dayfirst']
+        else:
+            # See https://github.com/guessit-io/guessit/issues/329
+            # https://github.com/guessit-io/guessit/pull/333
+            # They made changes that break backward compatibility, so we have to make do this hackery
+            if options.get('date_year_first'):
+                options['date_day_first'] = True
         settings.update(options)
         return settings
 
@@ -64,25 +79,26 @@ class ParserGuessit(object):
         else:
             version -= 1
         proper_count = guessit_result.get('proper_count', 0)
-        fastsub = 'Fastsub' in guessit_result.get('other', [])
+        fastsub = 'fastsub' in lower_to_list(guessit_result.get('other'))
         return version + proper_count - (5 if fastsub else 0)
 
     @staticmethod
     def _quality(guessit_result):
         """Generate a FlexGet Quality from a guessit result."""
         resolution = guessit_result.get('screen_size', '')
-        if not resolution and 'HR' in guessit_result.get('other', []):
+        other = lower_to_list(guessit_result.get('other'))
+        if not resolution and 'hr' in other:
             resolution = 'hr'
 
         source = guessit_result.get('format', '').replace('-', '')
-        if 'Preair' in guessit_result.get('other', {}):
+        if 'preair' in other:
             source = 'preair'
-        if 'Screener' in guessit_result.get('other', {}):
+        if 'screener' in other:
             if source == 'BluRay':
                 source = 'bdscr'
             else:
                 source = 'dvdscr'
-        if 'R5' in guessit_result.get('other', {}):
+        if 'r5' in other:
             source = 'r5'
 
         codec = guessit_result.get('video_codec', '')
@@ -92,9 +108,18 @@ class ParserGuessit(object):
         audio = guessit_result.get('audio_codec', '')
         if audio == 'DTS' and guessit_result.get('audio_profile') in ['HD', 'HDMA']:
             audio = 'dtshd'
-        elif guessit_result.get('audio_channels') == '5.1' and not audio or audio == 'DolbyDigital':
+        elif guessit_result.get('audio_channels') == '5.1' and audio == 'AC3' or audio == 'DolbyDigital':
             audio = 'dd5.1'
 
+        # Make sure everything are strings (guessit will return lists when there are multiples)
+        if isinstance(resolution, list):
+            resolution = ' '.join(resolution)
+        if isinstance(source, list):
+            source = ' '.join(source)
+        if isinstance(codec, list):
+            codec = ' '.join(codec)
+        if isinstance(audio, list):
+            audio = ' '.join(audio)
         return qualities.Quality(' '.join([resolution, source, codec, audio]))
 
     # movie_parser API
@@ -193,6 +218,9 @@ class ParserGuessit(object):
         episode = guess_result.get('episode')
         if episode is None and 'part' in guess_result:
             episode = guess_result['part']
+        if isinstance(episode, list):
+            # guessit >=2.1.4 returns a list for multi-packs, but we just want the first one and the number of eps
+            episode = episode[0]
         date = guess_result.get('date')
         quality = self._quality(guess_result)
         proper_count = self._proper_count(guess_result)
@@ -248,7 +276,7 @@ class ParserGuessit(object):
         if not id_type:
             valid = False
         # TODO: Legacy - Complete == invalid
-        if 'complete' in guess_result.get('other', '').lower():
+        if 'complete' in lower_to_list(guess_result.get('other')):
             valid = False
 
         parsed = SeriesParseResult(
@@ -306,7 +334,12 @@ class ParserGuessit(object):
             return True
         if not group:
             return False
-        return group.lower() in [x.lower() for x in allow_groups]
+        normalized_allow_groups = [x.lower() for x in allow_groups]
+        # TODO: special case for guessit with expected_group parameter
+        if isinstance(group, list):
+            return any(g.lower() in normalized_allow_groups for g in group)
+
+        return group.lower() in normalized_allow_groups
 
 
 @event('plugin.register')
