@@ -343,7 +343,7 @@ inject_api = api.namespace('inject', description='Entry injection API')
 @tasks_api.route('/execute/params/')
 @api.doc(description='Available payload parameters for task execute')
 class TaskExecutionParams(APIResource):
-    @etag
+    @etag(cache_age=3600)
     @api.response(200, model=task_execution_params)
     def get(self, session=None):
         """ Execute payload parameters """

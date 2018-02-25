@@ -81,7 +81,7 @@ tmdb_parser.add_argument('include_backdrops', type=inputs.boolean, default=False
 @tmdb_api.route('/movies/')
 @api.doc(description=description)
 class TMDBMoviesAPI(APIResource):
-    @etag
+    @etag(cache_age=3600)
     @api.response(200, model=return_schema)
     @api.response(NotFoundError)
     @api.response(BadRequest)

@@ -97,7 +97,7 @@ series_parser.add_argument('include_actors', type=inputs.boolean, help='Include 
 @tvdb_api.route('/series/<string:title>/')
 @api.doc(params={'title': 'TV Show name or TVDB ID'}, parser=series_parser)
 class TVDBSeriesLookupAPI(APIResource):
-    @etag
+    @etag(cache_age=3600)
     @api.response(200, 'Successfully found show', tvdb_series_schema)
     @api.response(NotFoundError)
     def get(self, title, session=None):
@@ -139,7 +139,7 @@ episode_parser.add_argument('air_date', type=inputs.date, help='Episode airdate 
 @tvdb_api.route('/episode/<int:tvdb_id>/')
 @api.doc(params={'tvdb_id': 'TVDB ID of show'}, parser=episode_parser)
 class TVDBEpisodeSearchAPI(APIResource):
-    @etag
+    @etag(cache_age=3600)
     @api.response(200, 'Successfully found episode', tvdb_episode_schema)
     @api.response(NotFoundError)
     @api.response(BadRequest)
@@ -186,7 +186,7 @@ search_parser.add_argument('force_search', type=inputs.boolean,
 @tvdb_api.route('/search/')
 @api.doc(parser=search_parser)
 class TVDBSeriesSearchAPI(APIResource):
-    @etag
+    @etag(cache_age=3600)
     @api.response(200, 'Successfully got results', search_results_schema)
     @api.response(BadRequest)
     @api.response(NotFoundError)
