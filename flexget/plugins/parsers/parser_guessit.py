@@ -16,7 +16,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils import qualities
 from flexget.utils.tools import ReList
-from .parser_common import MovieParseResult, SeriesParseResult
+from .parser_common import MovieParseResult, SeriesParseResult, default_ignore_prefixes, name_to_re
 
 log = logging.getLogger('parser_guessit')
 
@@ -30,42 +30,6 @@ def _id_regexps_function(input_string, context):
         for match in RePattern(regexp, children=True).matches(input_string, context):
             ret.append(match.span)
     return ret
-
-
-default_ignore_prefixes = [
-    '(?:\[[^\[\]]*\])',  # ignores group names before the name, eg [foobar] name
-    '(?:HD.720p?:)',
-    '(?:HD.1080p?:)',
-    '(?:HD.2160p?:)'
-]
-
-
-def name_to_re(name, ignore_prefixes=None, parser=None):
-    """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
-    if not ignore_prefixes:
-        ignore_prefixes = default_ignore_prefixes
-    parenthetical = None
-    if name.endswith(')'):
-        p_start = name.rfind('(')
-        if p_start != -1:
-            parenthetical = re.escape(name[p_start + 1:-1])
-            name = name[:p_start - 1]
-    # Blanks are any non word characters except & and _
-    blank = r'(?:[^\w&]|_)'
-    ignore = '(?:' + '|'.join(ignore_prefixes) + ')?'
-    res = re.sub(re.compile(blank + '+', re.UNICODE), ' ', name)
-    res = res.strip()
-    # accept either '&' or 'and'
-    res = re.sub(' (&|and) ', ' (?:and|&) ', res, re.UNICODE)
-    res = re.sub(' +', blank + '*', res, re.UNICODE)
-    if parenthetical:
-        res += '(?:' + blank + '+' + parenthetical + ')?'
-        # Turn on exact mode for series ending with a parenthetical,
-        # so that 'Show (US)' is not accepted as 'Show (UK)'
-        if parser:
-            parser.strict_name = True
-    res = '^' + ignore + blank + '*' + '(' + res + ')(?:\\b|_)' + blank + '*'
-    return res
 
 
 _id_regexps = Rebulk().functional(_id_regexps_function, name='regexpId',

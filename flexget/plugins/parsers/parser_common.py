@@ -6,7 +6,6 @@ import re
 from string import capwords
 
 from flexget.utils.qualities import Quality
-from flexget.utils.tools import ReList
 
 log = logging.getLogger('parser')
 
@@ -14,18 +13,12 @@ SERIES_ID_TYPES = ['ep', 'date', 'sequence', 'id']
 
 
 def clean_value(name):
-    # Move anything in leading brackets to the end
-    # name = re.sub(r'^\[(.*?)\](.*)', r'\2 \1', name)
-
     for char in '[]()_,.':
         name = name.replace(char, ' ')
 
     # if there are no spaces
     if name.find(' ') == -1:
         name = name.replace('-', ' ')
-
-    # remove unwanted words (imax, ..)
-    # self.remove_words(data, self.remove)
 
     # MovieParser.strip_spaces
     name = ' '.join(name.split())
@@ -146,6 +139,16 @@ class MovieParseResult(object):
             'proper_count': self.proper_count,
             'release_group': self.release_group
         }
+
+    def __str__(self):
+        # for some fucking reason it's impossible to print self.field here, if someone figures out why please
+        # tell me!
+        valid = 'INVALID'
+        if self.valid:
+            valid = 'OK'
+        return '<MovieParseResult(data=%s,name=%s,year=%s,id=%s,quality=%s,proper=%s,release_group=%s,status=%s)>' % \
+               (self.data, self.name, self.year, self.identifier, self.quality, self.proper_count, self.release_group,
+                valid)
 
 
 class SeriesParseResult(object):
