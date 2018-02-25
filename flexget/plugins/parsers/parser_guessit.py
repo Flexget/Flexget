@@ -199,21 +199,21 @@ class ParserGuessit(object):
         group = guess_result.get('release_group')
         # Validate group with from_group
         if not self._is_valid_groups(group, guessit_options.get('allow_groups', [])):
-            return SeriesParseResult(data=data, valid=False)
+            valid = False
         # Validate country, TODO: LEGACY
         if country and name.endswith(')'):
             p_start = name.rfind('(')
             if p_start != -1:
                 parenthetical = re.escape(name[p_start + 1:-1])
                 if parenthetical and parenthetical.lower() != str(country).lower():
-                    return SeriesParseResult(data=data, valid=False)
+                    valid = False
         special = guess_result.get('episode_details', '').lower() == 'special'
         if 'episode' not in guess_result.values_list:
             episodes = len(guess_result.values_list.get('part', []))
         else:
             episodes = len(guess_result.values_list['episode'])
         if episodes > 3:
-            return SeriesParseResult(data=data, valid=False)
+            valid = False
         identified_by = kwargs.get('identified_by', 'auto')
         id_type, id = None, None
         if identified_by in ['date', 'auto']:
