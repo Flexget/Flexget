@@ -28,43 +28,6 @@ class MovieParser(TitleParser):
         self.reset()
         TitleParser.__init__(self)
 
-    @property
-    def fields(self):
-        """
-        Return a dict of all parser fields
-        """
-        return {
-            'id': self.identifier,
-            'movie_parser': self,
-            'movie_name': self.name,
-            'movie_year': self.year,
-            'proper': self.proper,
-            'proper_count': self.proper_count
-        }
-
-    @property
-    def valid(self):
-        return True
-
-    @property
-    def identifier(self):
-        if self.name and self.year:
-            return ('%s %s' % (self.name, self.year)).strip().lower()
-        elif self.name:
-            return self.name.lower()
-
-    @property
-    def proper(self):
-        return self.proper_count > 0
-
-    @property
-    def is_series(self):
-        return False
-
-    @property
-    def is_movie(self):
-        return True
-
     def reset(self):
         # parsing results
         self.name = None

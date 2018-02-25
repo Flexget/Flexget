@@ -132,14 +132,6 @@ class SeriesParser(TitleParser):
         self.field = None
         self._reset()
 
-    @property
-    def is_series(self):
-        return True
-
-    @property
-    def is_movie(self):
-        return False
-
     def _reset(self):
         # parse produces these
         self.season = None
@@ -611,9 +603,9 @@ class SeriesParser(TitleParser):
         valid = 'INVALID'
         if self.valid:
             valid = 'OK'
-        return '<SeriesParser(data=%s,name=%s,id=%s,season=%s,season_pack=%s,episode=%s,quality=%s,proper=%s,status=%s)>' % \
-               (self.data, self.name, str(self.id), self.season, self.season_pack, self.episode, self.quality,
-                self.proper_count, valid)
+        return '<SeriesParser(data=%s,name=%s,id=%s,season=%s,season_pack=%s,episode=%s,quality=%s,proper=%s,' \
+               'status=%s)>' % (self.data, self.name, str(self.id), self.season, self.season_pack, self.episode,
+                                self.quality, self.proper_count, valid)
 
     def __cmp__(self, other):
         """Compares quality of parsers, if quality is equal, compares proper_count."""
