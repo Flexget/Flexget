@@ -3,10 +3,11 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import json
 
+from mock import patch
+
 from flexget.api.app import base_message
 from flexget.api.core.tasks import ObjectsContainer as OC
 from flexget.manager import Manager
-from mock import patch
 
 
 class TestTaskAPI(object):
@@ -266,3 +267,22 @@ class TestTaskQueue(object):
         assert not errors
 
         assert data == []
+
+
+class TestDisabledTasks(object):
+    config = """
+        tasks:
+          live_task:
+            mock:
+            - title: foo
+          _disabled_task:
+            mock:
+            - title: bar
+    """
+
+    def test_only_active_tasks_return(self, api_client):
+        rsp = api_client.get('/tasks/')
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert len(data) == 1
+        assert not data[0].get('name') == '_disabled_task'
