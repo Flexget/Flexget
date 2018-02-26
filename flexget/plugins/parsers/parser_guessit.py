@@ -16,7 +16,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils import qualities
 from flexget.utils.tools import ReList
-from .parser_common import MovieParseResult, SeriesParseResult, default_ignore_prefixes, name_to_re
+from .parser_common import MovieParseResult, SeriesParseResult, default_ignore_prefixes, name_to_re, ParseWarning
 
 log = logging.getLogger('parser_guessit')
 
@@ -82,8 +82,7 @@ class ParserGuessit(object):
         fastsub = 'fastsub' in lower_to_list(guessit_result.get('other'))
         return version + proper_count - (5 if fastsub else 0)
 
-    @staticmethod
-    def _quality(guessit_result):
+    def _quality(self, guessit_result):
         """Generate a FlexGet Quality from a guessit result."""
         resolution = guessit_result.get('screen_size', '')
         other = lower_to_list(guessit_result.get('other'))
@@ -112,15 +111,17 @@ class ParserGuessit(object):
             audio = 'dd5.1'
 
         # Make sure everything are strings (guessit will return lists when there are multiples)
-        if isinstance(resolution, list):
-            resolution = ' '.join(resolution)
-        if isinstance(source, list):
-            source = ' '.join(source)
-        if isinstance(codec, list):
-            codec = ' '.join(codec)
-        if isinstance(audio, list):
-            audio = ' '.join(audio)
-        return qualities.Quality(' '.join([resolution, source, codec, audio]))
+        flattened_qualities = []
+        for component in (resolution, source, codec, audio):
+            if isinstance(component, list):
+                flattened_qualities.append(' '.join(component))
+            elif isinstance(component, str):
+                flattened_qualities.append(component)
+            else:
+                raise ParseWarning(self, 'Guessit quality returned type %s: %s. Expected str or list.'.format(
+                    type(component), component))
+
+        return qualities.Quality(' '.join(flattened_qualities))
 
     # movie_parser API
     def parse_movie(self, data, **kwargs):
@@ -243,12 +244,12 @@ class ParserGuessit(object):
         if episodes > 3:
             valid = False
         identified_by = kwargs.get('identified_by', 'auto')
-        id_type, id = None, None
+        identifier_type, identifier = None, None
         if identified_by in ['date', 'auto']:
             if date:
-                id_type = 'date'
-                id = date
-        if not id_type and identified_by in ['ep', 'auto']:
+                identifier_type = 'date'
+                identifier = date
+        if not identifier_type and identified_by in ['ep', 'auto']:
             if episode is not None:
                 if season is None and kwargs.get('allow_seasonless', True):
                     if 'part' in guess_result:
@@ -258,22 +259,22 @@ class ParserGuessit(object):
                         if episode_raw and any(c.isalpha() and c.lower() != 'v' for c in episode_raw):
                             season = 1
                 if season is not None:
-                    id_type = 'ep'
-                    id = (season, episode)
+                    identifier_type = 'ep'
+                    identifier = (season, episode)
 
-        if not id_type and identified_by in ['id', 'auto']:
+        if not identifier_type and identified_by in ['id', 'auto']:
             if guess_result.matches['regexpId']:
-                id_type = 'id'
-                id = '-'.join(match.value for match in guess_result.matches['regexpId'])
-        if not id_type and identified_by in ['sequence', 'auto']:
+                identifier_type = 'id'
+                identifier = '-'.join(match.value for match in guess_result.matches['regexpId'])
+        if not identifier_type and identified_by in ['sequence', 'auto']:
             if episode is not None:
-                id_type = 'sequence'
-                id = episode
-        if (not id_type or guessit_options.get('prefer_specials')) and (special or
+                identifier_type = 'sequence'
+                identifier = episode
+        if (not identifier_type or guessit_options.get('prefer_specials')) and (special or
                                                                         guessit_options.get('assume_special')):
-            id_type = 'special'
-            id = guess_result.get('episode_title', 'special')
-        if not id_type:
+            identifier_type = 'special'
+            identifier = guess_result.get('episode_title', 'special')
+        if not identifier_type:
             valid = False
         # TODO: Legacy - Complete == invalid
         if 'complete' in lower_to_list(guess_result.get('other')):
@@ -284,8 +285,8 @@ class ParserGuessit(object):
             name=name,
             episodes=episodes,
             identified_by=identified_by,
-            id=id,
-            id_type=id_type,
+            id=identifier,
+            id_type=identifier_type,
             quality=quality,
             proper_count=proper_count,
             special=special,
