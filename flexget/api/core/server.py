@@ -164,7 +164,7 @@ class ServerPIDAPI(APIResource):
 
 @server_api.route('/config/')
 class ServerConfigAPI(APIResource):
-    @etag(cache_age=0)
+    @etag
     @api.response(200, description='Flexget config', model=empty_response)
     def get(self, session=None):
         """ Get Flexget Config in JSON form"""
@@ -173,7 +173,7 @@ class ServerConfigAPI(APIResource):
 
 @server_api.route('/raw_config/')
 class ServerRawConfigAPI(APIResource):
-    @etag(cache_age=0)
+    @etag
     @api.doc(description='Return config file encoded in Base64')
     @api.response(200, model=raw_config_schema, description='Flexget raw YAML config file encoded in Base64')
     def get(self, session=None):
