@@ -118,7 +118,7 @@ class ParserGuessit(object):
             elif isinstance(component, str):
                 flattened_qualities.append(component)
             else:
-                raise ParseWarning(self, 'Guessit quality returned type %s: %s. Expected str or list.'.format(
+                raise ParseWarning(self, 'Guessit quality returned type {}: {}. Expected str or list.'.format(
                     type(component), component))
 
         return qualities.Quality(' '.join(flattened_qualities))
