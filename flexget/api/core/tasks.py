@@ -175,13 +175,14 @@ class TasksAPI(APIResource):
     def get(self, session=None):
         """ List all tasks """
 
+        active_tasks = {task: task_data for task, task_data in self.manager.user_config.get('tasks', {}).items()
+                        if not task.startswith('_')}
+
         args = tasks_parser.parse_args()
         if not args.get('include_config'):
-            return jsonify(list(self.manager.user_config.get('tasks', {})))
+            return jsonify(list(active_tasks))
 
-        tasks = []
-        for name, config in self.manager.user_config.get('tasks', {}).items():
-            tasks.append({'name': name, 'config': config})
+        tasks = [{'name': name, 'config': config} for name, config in active_tasks.items()]
         return jsonify(tasks)
 
     @api.validate(task_input_schema, description='New task object')
