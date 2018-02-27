@@ -89,7 +89,7 @@ class OutputAria2(object):
             try:
                 self.add_entry(aria2, entry, config)
             except socket_error as se:
-                entry.fail('Unable to reach Aria2: %s', se)
+                entry.fail('Unable to reach Aria2: %s' % se)
             except xmlrpc.client.Fault as err:
                 log.critical('Fault code %s message %s', err.faultCode, err.faultString)
                 entry.fail('Aria2 communication Fault')
