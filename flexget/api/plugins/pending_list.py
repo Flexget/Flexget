@@ -154,6 +154,7 @@ pending_lists_entries_return_schema = api.schema_model('pending_list.entry_retur
 
 sort_choices = ('id', 'added', 'title', 'original_url', 'list_id', 'approved')
 entries_parser = api.pagination_parser(sort_choices=sort_choices, default='title')
+entries_parser.add_argument('filter', help='Filter by title name')
 
 
 @pending_list_api.route('/<int:list_id>/entries/')
@@ -177,6 +178,8 @@ class PendingListEntriesAPI(APIResource):
         sort_by = args['sort_by']
         sort_order = args['order']
 
+        filter_ = args['filter']
+
         # Handle max size limit
         if per_page > 100:
             per_page = 100
@@ -191,6 +194,7 @@ class PendingListEntriesAPI(APIResource):
             'list_id': list_id,
             'order_by': sort_by,
             'descending': descending,
+            'filter': filter_,
             'session': session
         }
 
