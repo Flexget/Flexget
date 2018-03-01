@@ -106,6 +106,7 @@ class SeriesParser(TitleParser):
             identifier as a special.
         """
 
+        self.episodes = 1
         self.name = name
         self.alternate_names = alternate_names or []
         self.data = ''
@@ -130,14 +131,6 @@ class SeriesParser(TitleParser):
 
         self.field = None
         self._reset()
-
-    @property
-    def is_series(self):
-        return True
-
-    @property
-    def is_movie(self):
-        return False
 
     def _reset(self):
         # parse produces these
@@ -334,8 +327,8 @@ class SeriesParser(TitleParser):
                 self.episode = ep_match['episode']
                 if ep_match['end_episode']:
                     self.episodes = (ep_match['end_episode'] - ep_match['episode']) + 1
-                else:
-                    self.episodes = 1
+
+                self.id = (self.season, self.episode)
                 self.id_type = 'ep'
                 self.valid = True
                 if not (self.special and self.prefer_specials):
@@ -348,7 +341,7 @@ class SeriesParser(TitleParser):
                         return
                     self.season = season_pack_match['season']
                     self.season_pack = True
-                    self.id = 'S%s' % season_pack_match['season']
+                    self.id = (season_pack_match['season'], 0)
                     self.id_type = 'ep'
                     self.valid = True
                 else:
@@ -369,6 +362,7 @@ class SeriesParser(TitleParser):
 
                     self.season = int(match.group(1))
                     self.episode = int(match.group(2))
+                    self.id = (self.season, self.episode)
                     log.debug(self)
                     self.id_type = 'ep'
                     self.valid = True
@@ -603,55 +597,15 @@ class SeriesParser(TitleParser):
                 i += len(numeral)
         return result
 
-    @property
-    def identifiers(self):
-        """Return all identifiers this parser represents. (for packs)"""
-        # Currently 'ep' is the only id type that supports packs
-        if not self.valid:
-            raise Exception('Series flagged invalid')
-        if self.id_type == 'ep':
-            if self.season_pack:
-                return ['S%02d' % self.season]
-            return ['S%02dE%02d' % (self.season, self.episode + x) for x in range(self.episodes)]
-        elif self.id_type == 'date':
-            return [self.id.strftime('%Y-%m-%d')]
-        if self.id is None:
-            raise Exception('Series is missing identifier')
-        else:
-            return [self.id]
-
-    @property
-    def identifier(self):
-        """Return String identifier for parsed episode, eg. S01E02
-        (will be the first identifier if this is a pack)
-        """
-        return self.identifiers[0]
-
-    @property
-    def pack_identifier(self):
-        """Return a combined identifier for the whole pack if this has more than one episode."""
-        # Currently only supports ep mode
-        if self.id_type == 'ep':
-            if self.episodes > 1:
-                return 'S%02dE%02d-E%02d' % (self.season, self.episode, self.episode + self.episodes - 1)
-            else:
-                return self.identifier
-        else:
-            return self.identifier
-
-    @property
-    def proper(self):
-        return self.proper_count > 0
-
     def __str__(self):
         # for some fucking reason it's impossible to print self.field here, if someone figures out why please
         # tell me!
         valid = 'INVALID'
         if self.valid:
             valid = 'OK'
-        return '<SeriesParser(data=%s,name=%s,id=%s,season=%s,season_pack=%s,episode=%s,quality=%s,proper=%s,status=%s)>' % \
-               (self.data, self.name, str(self.id), self.season, self.season_pack, self.episode, self.quality,
-                self.proper_count, valid)
+        return '<SeriesParser(data=%s,name=%s,id=%s,season=%s,season_pack=%s,episode=%s,quality=%s,proper=%s,' \
+               'status=%s)>' % (self.data, self.name, str(self.id), self.season, self.season_pack, self.episode,
+                                self.quality, self.proper_count, valid)
 
     def __cmp__(self, other):
         """Compares quality of parsers, if quality is equal, compares proper_count."""

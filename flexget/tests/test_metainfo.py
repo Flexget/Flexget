@@ -176,6 +176,7 @@ class TestMetainfoMovie(object):
                                quality='1080p BluRay xvid',
                                id='flexget3 2004')
 
+    @pytest.mark.skip(msg='Parsers have been simplified')
     def test_metainfo_movie_with_guessit(self, execute_task):
         task = execute_task('test_guessit')
         assert task.find_entry(movie_name='Flexget',
