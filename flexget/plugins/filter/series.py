@@ -1624,7 +1624,15 @@ class FilterSeries(FilterSeriesBase):
             #  that use slightly different series names. See https://github.com/Flexget/Flexget/issues/2057
             series_names.extend(str(list(s.keys())[0]) for s in config if str(list(s.keys())[0]) not in series_names)
 
-            existing_db_series = session.query(Series).filter(Series.name.in_(series_names))
+            # Too Many Variables error if we use too many series at a time in the in_ clause.
+            # SQLite supports up to 999 by default. Ubuntu, Arch and macOS set this limit to 250,000 though.
+            existing_db_series = []
+            upper_limit = 999
+            for i in range(0, len(series_names), upper_limit):
+                existing_db_series.extend(
+                    session.query(Series).filter(Series.name.in_(series_names[i:i + upper_limit]))
+                )
+
             existing_db_series = {s.name_normalized: s for s in existing_db_series}
 
             for series_item in config:
@@ -1632,7 +1640,8 @@ class FilterSeries(FilterSeriesBase):
                 alt_names = get_config_as_array(series_config, 'alternate_name')
                 db_series = existing_db_series.get(normalize_series_name(series_name))
                 db_identified_by = db_series.identified_by if db_series else None
-                letters = set([series_name[:1].lower()] + [normalize_series_name(series_name)[:1].lower()] + [alt[:1].lower() for alt in alt_names])
+                letters = set([series_name[:1].lower()] + [normalize_series_name(series_name)[:1].lower()] +
+                              [alt[:1].lower() for alt in alt_names])
                 entries = set([entry for letter in letters for entry in entries_map.get(letter, [])])
                 if entries:
                     self.parse_series(entries, series_name, series_config, db_identified_by)
