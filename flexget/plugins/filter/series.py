@@ -31,7 +31,9 @@ from flexget.utils.log import log_once
 from flexget.utils.sqlalchemy_utils import (
     table_columns, table_exists, drop_tables, table_schema, table_add_column, create_index
 )
-from flexget.utils.tools import merge_dict_from_to, parse_timedelta, parse_episode_identifier, get_config_as_array
+from flexget.utils.tools import (
+    merge_dict_from_to, parse_timedelta, parse_episode_identifier, get_config_as_array, chunked
+)
 
 SCHEMA_VER = 14
 
@@ -1624,14 +1626,10 @@ class FilterSeries(FilterSeriesBase):
             #  that use slightly different series names. See https://github.com/Flexget/Flexget/issues/2057
             series_names.extend(str(list(s.keys())[0]) for s in config if str(list(s.keys())[0]) not in series_names)
 
-            # Too Many Variables error if we use too many series at a time in the in_ clause.
-            # SQLite supports up to 999 by default. Ubuntu, Arch and macOS set this limit to 250,000 though.
             existing_db_series = []
-            upper_limit = 999
-            for i in range(0, len(series_names), upper_limit):
-                existing_db_series.extend(
-                    session.query(Series).filter(Series.name.in_(series_names[i:i + upper_limit]))
-                )
+
+            for chunk in chunked(series_names):
+                existing_db_series.extend(session.query(Series).filter(Series.name.in_(chunk)))
 
             existing_db_series = {s.name_normalized: s for s in existing_db_series}
 

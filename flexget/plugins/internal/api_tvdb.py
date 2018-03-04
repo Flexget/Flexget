@@ -11,7 +11,7 @@ from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
 from flexget.utils import requests
-from flexget.utils.tools import split_title_year
+from flexget.utils.tools import split_title_year, chunked
 from flexget.utils.database import with_session, text_date_synonym, json_synonym, Session
 from flexget.utils.simple_persistence import SimplePersistence
 
@@ -709,11 +709,6 @@ def mark_expired(session):
     except requests.RequestException as e:
         log.error('Could not get update information from tvdb: %s', e)
         return
-
-    def chunked(seq):
-        """Helper to divide our expired lists into sizes sqlite can handle in a query. (<1000)"""
-        for i in range(0, len(seq), 900):
-            yield seq[i:i + 900]
 
     expired_series = [series['id'] for series in updates] if updates else []
 

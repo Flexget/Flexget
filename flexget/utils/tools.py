@@ -593,3 +593,11 @@ def aggregate_inputs(task, inputs):
                     entry_locations.add(entry['location'])
 
     return entries
+
+
+# Mainly used due to Too Many Variables error if we use too many variables at a time in the in_ clause.
+# SQLite supports up to 999 by default. Ubuntu, Arch and macOS set this limit to 250,000 though, so it's a rare issue.
+def chunked(seq, limit=900):
+    """Helper to divide our expired lists into sizes sqlite can handle in a query. (<1000)"""
+    for i in range(0, len(seq), limit):
+        yield seq[i:i + limit]
