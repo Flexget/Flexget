@@ -9,24 +9,23 @@ from flexget.event import event
 from flexget.plugins.internal.urlrewriting import UrlRewritingError
 from flexget.utils.requests import Session, TimedLimiter
 from flexget.utils.soup import get_soup
+from flexget.utils import requests
 
 from flexget.entry import Entry
 from flexget.utils.search import normalize_unicode
 
 import unicodedata
 
-log = logging.getLogger('newpct')
+log = logging.getLogger('descargas2020')
 
 requests = Session()
 requests.headers.update({'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'})
-requests.add_domain_limiter(TimedLimiter('newpct1.com', '2 seconds'))
-requests.add_domain_limiter(TimedLimiter('newpct.com', '2 seconds'))
+requests.add_domain_limiter(TimedLimiter('descargas2020.com', '2 seconds'))
 
-NEWPCT_TORRENT_FORMAT = 'http://www.newpct.com/torrents/{:0>6}.torrent'
-NEWPCT1_TORRENT_FORMAT = 'http://www.newpct1.com/torrents/{:0>6}.torrent'
+DESCARGAS2020_TORRENT_FORMAT = 'http://descargas2020.com/torrents/{:0>6}.torrent'
 
-class UrlRewriteNewPCT(object):
-    """NewPCT urlrewriter and search."""
+class UrlRewriteDescargas2020(object):
+    """Descargas2020 urlrewriter and search."""
 
     schema = {
         'type': 'boolean',
@@ -36,19 +35,16 @@ class UrlRewriteNewPCT(object):
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        rewritable_regex = '^http:\/\/(www.)?newpct1?.com\/.*'
+        rewritable_regex = '^http:\/\/(www.)?(descargas2020|tvsinpagar).com\/.*'
         return re.match(rewritable_regex, url) and not url.endswith('.torrent')
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
-        entry['url'] = self.parse_download_page(entry['url'])
+        entry['url'] = self.parse_download_page(entry['url'], task)
 
     @plugin.internet(log)
-    def parse_download_page(self, url):
-        if 'newpct1.com' in url:
-            log.verbose('Newpct1 URL: %s', url)
-        else:
-            log.verbose('Newpct URL: %s', url)
+    def parse_download_page(self, url, task):
+        log.verbose('Descargas2020 URL: %s', url)
 
         try:
             page = requests.get(url)
@@ -60,10 +56,7 @@ class UrlRewriteNewPCT(object):
             raise UrlRewritingError(e)
 
         torrent_id = None
-        if 'newpct1.com' in url:
-            url_format = NEWPCT1_TORRENT_FORMAT
-        else:
-            url_format = NEWPCT_TORRENT_FORMAT
+        url_format = DESCARGAS2020_TORRENT_FORMAT
 
         torrent_id_prog = re.compile("(?:parametros\s*=\s*\n?)\s*{\s*\n(?:\s*'\w+'\s*:.*\n)+\s*'(?:torrentID|id)"
                                          "'\s*:\s*'(\d+)'")
@@ -73,13 +66,24 @@ class UrlRewriteNewPCT(object):
             if match:
                 torrent_id = match.group(1)
         if not torrent_id:
-            torrent_id_prog = re.compile('function openTorrent.*\n.*\{.*(\n.*)+window\.location\.href =\s*\".*\/(\d+).*\";')
-            torrent_ids = soup.findAll(text=torrent_id_prog)
             log.debug('torrent ID not found, searching openTorrent script')
+            if 'descargas2020.com' in url:
+                torrent_id_prog = re.compile('function openTorrent.*\n.*\{.*(\n.*)+window\.location\.href =\s*\"(.*\/\d+_-.*[^\/])\/?\";')
+            else:
+                torrent_id_prog = re.compile('function openTorrent.*\n.*\{.*(\n.*)+window\.location\.href =\s*\"(.*\/\d+_.*)\";')
+            torrent_ids = soup.findAll(text=torrent_id_prog)
             if torrent_ids:
                 match = torrent_id_prog.search(torrent_ids[0])
                 if match:
                     torrent_id = match.group(2)
+                    if 'descargas2020.com' in url:
+                        return (torrent_id.replace('descargar-torrent','download') + '.torrent')
+                    else:
+                        response = task.requests.get(torrent_id)
+#                        log.info(requests.head(response.url).headers)
+                        response = task.requests.get(response.url)
+#                        log.info(response.url)
+                        return response.url.replace('.html','.torrent').replace('//tvsinpagar.com','//www.tvsinpagar.com')
 
         if not torrent_id:
             raise UrlRewritingError('Unable to locate torrent ID from url %s' % url)
@@ -88,21 +92,21 @@ class UrlRewriteNewPCT(object):
 
     def search(self, task, entry, config=None):
         if not config:
-            log.debug('NewPCT disabled')
+            log.debug('Descargas2020 disabled')
             return set()
-        log.debug('Search NewPCT')
-        url_search = 'http://newpct1.com/buscar'
+        log.debug('Search Descargas2020')
+        url_search = 'http://descargas2020.com/buscar'
         results = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
             query = re.sub(' \(\d\d\d\d\)$', '', query)
-            log.debug('Searching NewPCT %s', query)
+            log.debug('Searching Descargas2020 %s', query)
             query = unicodedata.normalize('NFD', query).encode('ascii', 'ignore')
             data = {'q': query}
             try:
                 response = task.requests.post(url_search, data=data)
             except requests.RequestException as e:
-                log.error('Error searching NewPCT: %s', e)
+                log.error('Error searching Descargas2020: %s', e)
                 return results
             content = response.content
             soup = get_soup(content)
@@ -126,9 +130,9 @@ class UrlRewriteNewPCT(object):
                 entry_title = re.sub(' \[.+]$', '', entry_title)
                 entry['title'] = entry_title + ' ' + entry_quality_lan
                 results.add(entry)
-        log.debug('Finish search NewPCT with %d entries', len(results))
+        log.debug('Finish search Descargas2020 with %d entries', len(results))
         return results
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteNewPCT, 'newpct', interfaces=['urlrewriter', 'search'], api_ver=2)
+    plugin.register(UrlRewriteDescargas2020, 'descargas2020', interfaces=['urlrewriter', 'search'], api_ver=2)
