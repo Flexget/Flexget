@@ -80,9 +80,7 @@ class UrlRewriteDescargas2020(object):
                         return (torrent_id.replace('descargar-torrent','download') + '.torrent')
                     else:
                         response = task.requests.get(torrent_id)
-#                        log.info(requests.head(response.url).headers)
                         response = task.requests.get(response.url)
-#                        log.info(response.url)
                         return response.url.replace('.html','.torrent').replace('//tvsinpagar.com','//www.tvsinpagar.com')
 
         if not torrent_id:
