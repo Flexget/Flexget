@@ -35,7 +35,7 @@ class UrlRewriteDescargas2020(object):
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        rewritable_regex = '^http:\/\/(www.)?(descargas2020|tvsinpagar).com\/.*'
+        rewritable_regex = '^http:\/\/(www.)?(descargas2020|tvsinpagar|tumejortorrent|torrentlocura|torrentrapid).com\/.*'
         return re.match(rewritable_regex, url) and not url.endswith('.torrent')
 
     # urlrewriter API
@@ -67,21 +67,13 @@ class UrlRewriteDescargas2020(object):
                 torrent_id = match.group(1)
         if not torrent_id:
             log.debug('torrent ID not found, searching openTorrent script')
-            if 'descargas2020.com' in url:
-                torrent_id_prog = re.compile('function openTorrent.*\n.*\{.*(\n.*)+window\.location\.href =\s*\"(.*\/\d+_-.*[^\/])\/?\";')
-            else:
-                torrent_id_prog = re.compile('function openTorrent.*\n.*\{.*(\n.*)+window\.location\.href =\s*\"(.*\/\d+_.*)\";')
+            torrent_id_prog = re.compile('function openTorrent.*\n.*\{.*(\n.*)+window\.location\.href =\s*\"(.*\/\d+_-.*[^\/])\/?\";')
             torrent_ids = soup.findAll(text=torrent_id_prog)
             if torrent_ids:
                 match = torrent_id_prog.search(torrent_ids[0])
                 if match:
                     torrent_id = match.group(2)
-                    if 'descargas2020.com' in url:
-                        return (torrent_id.replace('descargar-torrent','download') + '.torrent')
-                    else:
-                        response = task.requests.get(torrent_id)
-                        response = task.requests.get(response.url)
-                        return response.url.replace('.html','.torrent').replace('//tvsinpagar.com','//www.tvsinpagar.com')
+                    return torrent_id.replace('descargar-torrent', 'download') + '.torrent'
 
         if not torrent_id:
             raise UrlRewritingError('Unable to locate torrent ID from url %s' % url)
