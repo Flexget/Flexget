@@ -7,6 +7,7 @@ import logging
 import re
 from collections import MutableSet
 from datetime import datetime
+from itertools import chain
 
 from requests.exceptions import RequestException
 from requests.utils import cookiejar_from_dict
@@ -63,16 +64,16 @@ class IMDBListList(Base):
 
 
 if PY3:
-    csv_reader = csv.reader
+    csv_dictreader = csv.DictReader
 else:
-    def csv_reader(iterable, dialect='excel', *args, **kwargs):
+    def csv_dictreader(iterable, dialect='excel', *args, **kwargs):
         """
         Compatibilty function to make python 2 act like python 3
         Always takes and returns text (no bytes).
         """
         iterable = (l.encode('utf-8') for l in iterable)
-        for row in csv.reader(iterable):
-            yield [cell.decode('utf-8') for cell in row]
+        for row in csv.DictReader(iterable):
+            yield {header.decode('utf-8'): value.decode('utf-8') for header, value in row.items()}
 
 
 class ImdbEntrySet(MutableSet):
@@ -212,32 +213,40 @@ class ImdbEntrySet(MutableSet):
             except RequestException as e:
                 raise PluginError(e.args[0])
             lines = r.iter_lines(decode_unicode=True)
-            # Throw away first line with headers
-            next(lines)
+            # Normalize headers to lowercase
+            headers = next(lines).lower()
+            # Chain them back together
+            lines = chain([headers], lines)
             self._items = []
-            for row in csv_reader(lines):
-                log.debug('parsing line from csv: %s', ', '.join(row))
-                if not len(row) == 15:
-                    log.debug('no movie row detected, skipping. %s', ', '.join(row))
+            for row in csv_dictreader(lines):
+                log.debug('parsing line from csv: %s', row)
+
+                try:
+                    item_type = row['title type'].lower()
+                    name = row['title']
+                    year = int(row['year']) if row['year'] != '????' else None
+                    created = datetime.strptime(row['created'], '%Y-%m-%d') if row['created'] else None
+                    modified = datetime.strptime(row['modified'], '%Y-%m-%d') if row['modified'] else None
+                    entry = Entry({
+                        'title': '%s (%s)' % (name, year) if year != '????' else name,
+                        'url': row['url'],
+                        'imdb_id': row['const'],
+                        'imdb_url': row['url'],
+                        'imdb_list_position': int(row['position']),
+                        'imdb_list_created': created,
+                        'imdb_list_modified': modified,
+                        'imdb_list_description': row['description'],
+                        'imdb_name': name,
+                        'imdb_year': year,
+                        'imdb_user_score': float(row['imdb rating']) if row['imdb rating'] else None,
+                        'imdb_votes': int(row['num votes']) if row['num votes'] else None,
+                        'imdb_genres': [genre.strip() for genre in row['genres'].split(',')]
+                    })
+
+                except ValueError as e:
+                    log.debug('no movie row detected, skipping. %s. Exception: %s', row, e)
                     continue
-                entry = Entry({
-                    'title': '%s (%s)' % (row[5], row[10]) if row[10] != '????' else '%s' % row[5],
-                    'url': row[6],
-                    'imdb_id': row[1],
-                    'imdb_url': row[6],
-                    'imdb_list_position': int(row[0]),
-                    'imdb_list_created': datetime.strptime(row[2], '%Y-%m-%d') if row[2] else None,
-                    'imdb_list_modified': datetime.strptime(row[3], '%Y-%m-%d') if row[3] else None,
-                    'imdb_list_description': row[4],
-                    'imdb_name': row[5],
-                    'imdb_year': int(row[10]) if row[10] != '????' else None,
-                    'imdb_user_score': float(row[8]) if row[8] else None,
-                    'imdb_votes': int(row[12]) if row[12] else None,
-                    'imdb_genres': [genre.strip() for genre in row[11].split(',')]
-                })
-                item_type = row[7].lower()
-                name = row[5]
-                year = int(row[10]) if row[10] != '????' else None
+
                 if item_type in MOVIE_TYPES:
                     entry['movie_name'] = name
                     entry['movie_year'] = year
