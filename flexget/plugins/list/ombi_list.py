@@ -22,7 +22,7 @@ class OmbiBase(object):
         tempid = 'S' + str(season.get('seasonNumber')).zfill(2)
         if episode:
             tempid = tempid + 'E' + str(episode.get('episodeNumber')).zfill(2)
-            
+
         return tempid
             
 
@@ -39,7 +39,7 @@ class OmbiBase(object):
                 if episode.get('title') and config.get('include_episode_title'):
                     temptitle = temptitle + ' ' + episode.get('title')
             
-        return temptitle       
+        return temptitle
 
     @staticmethod
     def construct_url(config):
@@ -100,7 +100,7 @@ class OmbiBase(object):
                           ombi_season_id=season.get('id'),
                           ombi_status=parent_request.get('status'),
                           ombi_request_id=parent_request.get('id'))
-        elif config.get('type') == 'episodes':            
+        elif config.get('type') == 'episodes':
             entry = Entry(title=OmbiBase.generate_title(config, parent_request, season, episode),
                           url=episode.get('url'),
                           series_name=OmbiBase.generate_title(config, parent_request),
@@ -129,7 +129,7 @@ class OmbiBase(object):
             log.verbose('Request already available skipping: %s', entry.get('title'))
             return False
         else:
-            return entry    
+            return entry
         
             
     @staticmethod
@@ -140,7 +140,7 @@ class OmbiBase(object):
         log.debug('URL %s', connection_url)
         json = OmbiBase.get_json(connection_url)
 		
-        entries = []        
+        entries = []
 
         for parent_request in json:
             if config.get('type') in ['movies','shows']:
