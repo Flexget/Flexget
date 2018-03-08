@@ -23,7 +23,7 @@ requests.add_domain_limiter(TimedLimiter('newpct1.com', '2 seconds'))
 requests.add_domain_limiter(TimedLimiter('newpct.com', '2 seconds'))
 
 NEWPCT_TORRENT_FORMAT = 'http://www.newpct.com/torrents/{:0>6}.torrent'
-NEWPCT1_TORRENT_FORMAT = 'http://www.newpct1.com/torrents/{:0>6}.torrent'
+NEWPCT1_TORRENT_FORMAT = 'http://www.newpct1.com/download/{:0>6}.torrent'
 
 class UrlRewriteNewPCT(object):
     """NewPCT urlrewriter and search."""
@@ -73,7 +73,7 @@ class UrlRewriteNewPCT(object):
             if match:
                 torrent_id = match.group(1)
         if not torrent_id:
-            torrent_id_prog = re.compile('function openTorrent.*\n.*\{.*(\n.*)+window\.location\.href =\s*\".*\/(\d+).*\";')
+            torrent_id_prog = re.compile('function openTorrent.*\n.*\{.*(\n.*)+window\.location\.href =\s*\".*\/(\d+.*)\";')
             torrent_ids = soup.findAll(text=torrent_id_prog)
             log.debug('torrent ID not found, searching openTorrent script')
             if torrent_ids:
