@@ -22,7 +22,7 @@ class OmbiBase(object):
             return '%s (%s)' % (item.get('title'), item.get('releaseDate')[0:4] )
         else:
             return item.get('title')
-        
+
     @staticmethod
     def construct_url(config):
         parsedurl = urlparse(config.get('base_url'))
@@ -105,7 +105,7 @@ class OmbiBase(object):
             
         if config.get('type') in ['shows','seasons']:
             # shows/seasons do not have approval or available status so return
-            return entry 
+            return entry
         elif config.get('only_approved') and not entry.get('ombi_approved'):
             log.verbose('Request not approved skipping: %s', entry.get('title'))
             return False
