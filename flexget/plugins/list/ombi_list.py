@@ -16,12 +16,30 @@ log = logging.getLogger('ombi_list')
 
 class OmbiBase(object):
 
+
     @staticmethod
-    def generate_title(item, strip):
-        if item.get('releaseDate') and not strip:
-            return '%s (%s)' % (item.get('title'), item.get('releaseDate')[0:4] )
-        else:
-            return item.get('title')
+    def generate_series_id(season, episode=False):
+        tempid = 'S' + str(season.get('seasonNumber')).zfill(2)
+        if episode:
+            tempid = tempid + 'E' + str(episode.get('episodeNumber')).zfill(2)
+            
+        return tempid
+            
+
+    @staticmethod
+    def generate_title(config, item, season=False, episode=False):
+        temptitle = item.get('title')
+
+        if item.get('releaseDate') and not config.get('strip_year'):
+            temptitle = temptitle + ' (' + str(item.get('releaseDate')[0:4]) +')'
+            
+        if season or episode:
+            temptitle = temptitle + ' ' + OmbiBase.generate_series_id(season, episode)
+            if episode:
+                if episode.get('title') and config.get('include_episode_title'):
+                    temptitle = temptitle + ' ' + episode.get('title')
+            
+        return temptitle       
 
     @staticmethod
     def construct_url(config):
@@ -48,7 +66,7 @@ class OmbiBase(object):
         entry = Entry()
         if config.get('type') == 'movies':
             log.debug('Found movie: %s', parent_request.get('title'))
-            entry = Entry(title=OmbiBase.generate_title(parent_request, config.get('type')),
+            entry = Entry(title=OmbiBase.generate_title(config, parent_request),
                           url='http://www.imdb.com/title/' + parent_request.get('imdbId') +'/',
                           imdb_id=parent_request.get('imdbId'),
                           tmdb_id=parent_request.get('theMovieDbId'),
@@ -62,35 +80,33 @@ class OmbiBase(object):
                           ombi_denied=parent_request.get('denied'))
         elif config.get('type') == 'shows':
             log.debug('Found Series: %s', parent_request.get('title'))
-            entry = Entry(title=OmbiBase.generate_title(parent_request, config.get('strip_year')),
+            entry = Entry(title=OmbiBase.generate_title(config, parent_request),
                           url='http://www.imdb.com/title/' + parent_request.get('imdbId') +'/',
-                          series_name=OmbiBase.generate_title(parent_request, config.get('strip_year')),
+                          series_name=OmbiBase.generate_title(config, parent_request),
                           tvdb_id=parent_request.get('tvDbId'),
                           imdb_id=parent_request.get('imdbId'),
                           ombi_status=parent_request.get('status'),
                           ombi_request_id=parent_request.get('id'))
         elif config.get('type') == 'seasons':
             log.debug('Season Number: %s', season.get('seasonNumber'))
-            tempSeries_id = 'S' + str(season.get('seasonNumber')).zfill(2)
-            entry = Entry(title=OmbiBase.generate_title(parent_request, config.get('strip_year')) + ' ' + tempSeries_id,
+            entry = Entry(title=OmbiBase.generate_title(config, parent_request, season),
                           url='http://www.imdb.com/title/' + parent_request.get('imdbId') +'/',
-                          series_name=OmbiBase.generate_title(parent_request, config.get('strip_year')),
+                          series_name=OmbiBase.generate_title(config, parent_request),
                           series_season=season.get('seasonNumber'),
-                          series_id=tempSeries_id,
+                          series_id=OmbiBase.generate_series_id(season),
                           tvdb_id=parent_request.get('tvDbId'),
                           imdb_id=parent_request.get('imdbId'),
                           ombi_childrequest_id=child_request.get('id'),
                           ombi_season_id=season.get('id'),
                           ombi_status=parent_request.get('status'),
                           ombi_request_id=parent_request.get('id'))
-        elif config.get('type') == 'episodes':
-            tempSeries_id = 'S' + str(season.get('seasonNumber')).zfill(2) + 'E' + str(episode.get('episodeNumber')).zfill(2)
-            entry = Entry(title=OmbiBase.generate_title(parent_request, config.get('strip_year')) + ' ' + tempSeries_id + ' ' + episode['title'],
+        elif config.get('type') == 'episodes':            
+            entry = Entry(title=OmbiBase.generate_title(config, parent_request, season, episode),
                           url=episode.get('url'),
-                          series_name=OmbiBase.generate_title(parent_request, config.get('strip_year')),
+                          series_name=OmbiBase.generate_title(config, parent_request),
                           series_season=season.get('seasonNumber'),
                           series_episode=episode.get('episodeNumber'),
-                          series_id=tempSeries_id,
+                          series_id=OmbiBase.generate_series_id(season, episode),
                           tvdb_id=parent_request.get('tvDbId'),
                           imdb_id=parent_request.get('imdbId'),
                           ombi_request_id=parent_request.get('id'),
@@ -159,7 +175,8 @@ class OmbiSet(MutableSet):
             'type': {'type': 'string', 'enum': ['shows', 'seasons', 'episodes', 'movies']},
             'only_approved': {'type': 'boolean', 'default': True},
             'include_available': {'type': 'boolean', 'default': False},
-            'strip_year': {'type': 'boolean', 'default': False}
+            'strip_year': {'type': 'boolean', 'default': False},
+            'include_episode_title': {'type': 'boolean', 'default': False}
         },
         'required': ['api_key', 'base_url', 'type'],
         'additionalProperties': False
