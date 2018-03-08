@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import urlparse
 
 import logging
@@ -14,24 +14,26 @@ from flexget.event import event
 
 log = logging.getLogger('ombi_list')
 
-def generate_title(item, strip):
-    if item.get('releaseDate') and not strip:
-        return '%s (%s)' % (item.get('title'), item.get('releaseDate')[0:4] )
-    else:
-        return item.get('title')
-
 class OmbiBase(object):
+
     @staticmethod
-    def movie_list_request(base_url, port, api_key):
-        parsedurl = urlparse(base_url)
-        log.debug('Received movie list request')
-        return '%s://%s:%s%s/api/v1/Request/movie?apikey=%s' % (parsedurl.scheme, parsedurl.netloc, port, parsedurl.path, api_key)
-    
-    @staticmethod    
-    def tv_list_request(base_url, port, api_key):
-        parsedurl = urlparse(base_url)
-        log.debug('Received TV list request')
-        return '%s://%s:%s%s/api/v1/Request/tv?apikey=%s' % (parsedurl.scheme, parsedurl.netloc, port, parsedurl.path, api_key)
+    def generate_title(item, strip):
+        if item.get('releaseDate') and not strip:
+            return '%s (%s)' % (item.get('title'), item.get('releaseDate')[0:4] )
+        else:
+            return item.get('title')
+        
+    @staticmethod
+    def construct_url(config):
+        parsedurl = urlparse(config.get('base_url'))
+        if config.get('type') in ['movies']:
+            log.debug('Received movie list request')
+            return '%s://%s:%s%s/api/v1/Request/movie?apikey=%s' % (parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path, config.get('api_key'))
+        elif config.get('type') in ['shows', 'seasons', 'episodes']:
+            log.debug('Received TV list request')
+            return '%s://%s:%s%s/api/v1/Request/tv?apikey=%s' % (parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path, config.get('api_key'))
+        else:
+            raise plugin.PluginError('Error: Unknown list type %s.' % (config.get('type')))
 
     @staticmethod
     def get_json(url):
@@ -41,118 +43,110 @@ class OmbiBase(object):
             raise plugin.PluginError('Unable to connect to Ombi at %s. Error: %s' % (url, e))
 
     @staticmethod
+    def generate_entry(config, parent_request, child_request=False, season=False, episode=False):
+        log.debug('Generating Entry')
+        entry = Entry()
+        if config.get('type') == 'movies':
+            log.debug('Found movie: %s', parent_request.get('title'))
+            entry = Entry(title=OmbiBase.generate_title(parent_request, config.get('type')),
+                          url='http://www.imdb.com/title/' + parent_request.get('imdbId') +'/',
+                          imdb_id=parent_request.get('imdbId'),
+                          tmdb_id=parent_request.get('theMovieDbId'),
+                          movie_name=parent_request.get('title'),
+                          movie_year=int(parent_request.get('releaseDate')[0:4]),
+                          ombi_request_id=parent_request.get('id'),
+                          ombi_released=parent_request.get('released'),
+                          ombi_status=parent_request.get('status'),
+                          ombi_approved=parent_request.get('approved'),
+                          ombi_available=parent_request.get('available'),
+                          ombi_denied=parent_request.get('denied'))
+        elif config.get('type') == 'shows':
+            log.debug('Found Series: %s', parent_request.get('title'))
+            entry = Entry(title=OmbiBase.generate_title(parent_request, config.get('strip_year')),
+                          url='http://www.imdb.com/title/' + parent_request.get('imdbId') +'/',
+                          series_name=OmbiBase.generate_title(parent_request, config.get('strip_year')),
+                          tvdb_id=parent_request.get('tvDbId'),
+                          imdb_id=parent_request.get('imdbId'),
+                          ombi_status=parent_request.get('status'),
+                          ombi_request_id=parent_request.get('id'))
+        elif config.get('type') == 'seasons':
+            log.debug('Season Number: %s', season.get('seasonNumber'))
+            tempSeries_id = 'S' + str(season.get('seasonNumber')).zfill(2)
+            entry = Entry(title=OmbiBase.generate_title(parent_request, config.get('strip_year')) + ' ' + tempSeries_id,
+                          url='http://www.imdb.com/title/' + parent_request.get('imdbId') +'/',
+                          series_name=OmbiBase.generate_title(parent_request, config.get('strip_year')),
+                          series_season=season.get('seasonNumber'),
+                          series_id=tempSeries_id,
+                          tvdb_id=parent_request.get('tvDbId'),
+                          imdb_id=parent_request.get('imdbId'),
+                          ombi_childrequest_id=child_request.get('id'),
+                          ombi_season_id=season.get('id'),
+                          ombi_status=parent_request.get('status'),
+                          ombi_request_id=parent_request.get('id'))
+        elif config.get('type') == 'episodes':
+            tempSeries_id = 'S' + str(season.get('seasonNumber')).zfill(2) + 'E' + str(episode.get('episodeNumber')).zfill(2)
+            entry = Entry(title=OmbiBase.generate_title(parent_request, config.get('strip_year')) + ' ' + tempSeries_id + ' ' + episode['title'],
+                          url=episode.get('url'),
+                          series_name=OmbiBase.generate_title(parent_request, config.get('strip_year')),
+                          series_season=season.get('seasonNumber'),
+                          series_episode=episode.get('episodeNumber'),
+                          series_id=tempSeries_id,
+                          tvdb_id=parent_request.get('tvDbId'),
+                          imdb_id=parent_request.get('imdbId'),
+                          ombi_request_id=parent_request.get('id'),
+                          ombi_childrequest_id=child_request.get('id'),
+                          ombi_season_id=season.get('id'),
+                          ombi_episode_id=episode.get('id'),
+                          ombi_approved=episode.get('approved'),
+                          ombi_available=episode.get('available'),
+                          ombi_requested=episode.get('requested'))
+        else:
+            raise plugin.PluginError('Error: Unknown list type %s.' % (config.get('type')))
+            
+        if config.get('type') in ['shows','seasons']:
+            # shows/seasons do not have approval or available status so return
+            return entry 
+        elif config.get('only_approved') and not entry.get('ombi_approved'):
+            log.verbose('Request not approved skipping: %s', entry.get('title'))
+            return False
+        elif not config.get('include_available') and entry.get('ombi_available'):
+            log.verbose('Request already available skipping: %s', entry.get('title'))
+            return False
+        else:
+            return entry    
+        
+            
+    @staticmethod
     def list_requests(config):
         log.debug('Connecting to Ombi to retrieve request list.')
-        if config.get('type')  in ['movies']:
-            request_url = OmbiBase.movie_list_request(config.get('base_url'), config.get('port'), config.get('api_key'))
-        if config.get('type') in ['shows', 'seasons', 'episodes']:
-            request_url = OmbiBase.tv_list_request(config.get('base_url'), config.get('port'), config.get('api_key'))
-        log.debug('URL %s', request_url)
-        json = OmbiBase.get_json(request_url)        
-		
-        entries = []
+        connection_url = OmbiBase.construct_url(config)
         
-        if config.get('type') == 'movies':
-            for request in json:
-                entry = Entry(title=generate_title(request, config.get('type')),
-                              url='http://www.imdb.com/title/' + request.get('imdbId') +'/',
-                              imdb_id=request.get('imdbId'),
-                              tmdb_id=request.get('theMovieDbId'),
-                              movie_name=request.get('title'),
-                              movie_year=int(request.get('releaseDate')[0:4]),
-                              ombi_request_id=request.get('id'),
-                              ombi_released=request.get('released'),
-                              ombi_status=request.get('status'),
-                              ombi_approved=request.get('approved'),
-                              ombi_available=request.get('available'),
-                              ombi_denied=request.get('denied'))
-                if entry.isvalid():
+        log.debug('URL %s', connection_url)
+        json = OmbiBase.get_json(connection_url)
+		
+        entries = []        
+
+        for parent_request in json:
+            if config.get('type') in ['movies','shows']:
+                entry = OmbiBase.generate_entry(config, parent_request)
+                if entry:
                     log.debug('Valid entry %s', entry)
-                    if config.get('only_approved') and not entry.get('ombi_approved'):
-                        log.verbose('Request not approved skipping: %s', entry.get('title'))
-                    else:
-                        if not config.get('include_available') and entry.get('ombi_available'):
-                            log.verbose('Request already available skipping: %s', entry.get('title'))
+                    entries.append(entry)
+            else:
+                for child_request in parent_request["childRequests"]:
+                    for season in child_request["seasonRequests"]:
+                        if config.get('type') == 'seasons':
+                            entry = OmbiBase.generate_entry(config, parent_request, child_request, season)
+                            if entry:
+                                log.debug('Valid entry %s', entry)
+                                entries.append(entry)
                         else:
-                            entries.append(entry)
-                else:
-                    log.error('Invalid entry created? %s', entry)
-                    continue
-            return entries
-           
-        if config.get('type') in ['shows', 'seasons', 'episodes']:
-            log.debug('Looking for series')
-            for request in json:
-                log.debug('Found series: %s', request["title"])
-                if config.get('type') == 'shows':
-                    entry = Entry(title=generate_title(request, config.get('strip_year')),
-                                  url='http://www.imdb.com/title/' + request.get('imdbId') +'/',
-                                  series_name=generate_title(request, config.get('strip_year')),
-                                  tvdb_id=request.get('tvDbId'),
-                                  imdb_id=request.get('imdbId'),
-                                  ombi_status=request.get('status'),
-                                  ombi_request_id=request.get('id'))
-                    if entry.isvalid():
-                        log.debug('Valid entry %s', entry)
-                        entries.append(entry)
-                    else:
-                        log.error('Invalid entry created? %s', entry)
-                    continue                
-                else:
-                    for childRequest in request["childRequests"]:
-                        log.debug('Child Request ID: %s', childRequest["id"])
-                        for season in childRequest["seasonRequests"]:
-                            log.debug('Season Number: %s', season["seasonNumber"])
-                            if config.get('type') == 'seasons':
-                                tempSeries_id = 'S' + str(season["seasonNumber"]).zfill(2)
-                                entry = Entry(title=generate_title(request, config.get('strip_year')) + ' ' + tempSeries_id,
-                                              url='http://www.imdb.com/title/' + request.get('imdbId') +'/',
-                                              series_name=generate_title(request, config.get('strip_year')),
-                                              series_season=season["seasonNumber"],
-                                              series_id=tempSeries_id,
-                                              tvdb_id=request.get('tvDbId'),
-                                              imdb_id=request.get('imdbId'),
-                                              ombi_childrequest_id=childRequest["id"],
-                                              ombi_season_id=season["id"],
-                                              ombi_status=request.get('status'),
-                                              ombi_request_id=request.get('id'))
-                                if entry.isvalid():
+                            for episode in season['episodes']:
+                                entry = OmbiBase.generate_entry(config, parent_request, child_request, season, episode)
+                                if entry:
                                     log.debug('Valid entry %s', entry)
                                     entries.append(entry)
-                                else:
-                                    log.error('Invalid entry created? %s', entry)
-                                continue
-                            else:
-                                for episode in season['episodes']:
-                                    tempSeries_id = 'S' + str(season["seasonNumber"]).zfill(2) + 'E' + str(episode["episodeNumber"]).zfill(2)
-                                    entry = Entry(title=generate_title(request, config.get('strip_year')) + ' ' + tempSeries_id + ' ' + episode['title'],
-                                                  url=episode.get('url'),
-                                                  series_name=generate_title(request, config.get('strip_year')),
-                                                  series_season=season["seasonNumber"],
-                                                  series_episode=episode["episodeNumber"],
-                                                  series_id=tempSeries_id,
-                                                  tvdb_id=request.get('tvDbId'),
-                                                  imdb_id=request.get('imdbId'),
-                                                  ombi_request_id=request.get('id'),
-                                                  ombi_childrequest_id=childRequest["id"],
-                                                  ombi_season_id=season["id"],
-                                                  ombi_episode_id=episode["id"],
-                                                  ombi_approved=episode.get('approved'),
-                                                  ombi_available=episode.get('available'),
-                                                  ombi_requested=episode.get('requested'))
-                                    if entry.isvalid():
-                                        log.debug('Valid entry %s', entry)
-                                        if config.get('only_approved') and not entry.get('ombi_approved'):
-                                            log.verbose('Request not approved skipping: %s', entry.get('title'))
-                                        else:
-                                            if not config.get('include_available') and entry.get('ombi_available'):
-                                                log.verbose('Request already available skipping: %s', entry.get('title'))
-                                            else:
-                                                entries.append(entry)
-                                    else:
-                                        log.error('Invalid entry created? %s', entry)
-                                        continue
-            return entries
+        return entries
  
 class OmbiSet(MutableSet):
     supported_ids = ['imdb_id', 'tmdb_id', 'ombi_id']
@@ -162,7 +156,7 @@ class OmbiSet(MutableSet):
             'base_url': {'type': 'string'},
             'port': {'type': 'number', 'default': 3579},
             'api_key': {'type': 'string'},
-            'type': {'type': 'string', 'enum': ['shows', 'seasons', 'episodes', 'movies']},            
+            'type': {'type': 'string', 'enum': ['shows', 'seasons', 'episodes', 'movies']},
             'only_approved': {'type': 'boolean', 'default': True},
             'include_available': {'type': 'boolean', 'default': False},
             'strip_year': {'type': 'boolean', 'default': False}
@@ -239,7 +233,6 @@ class OmbiSet(MutableSet):
     def get(self, entry):
         return self._find_entry(entry)
 
-
 class OmbiList(object):
     schema = OmbiSet.schema
     
@@ -249,7 +242,6 @@ class OmbiList(object):
 
     def on_task_input(self, task, config):
         return list(OmbiSet(config))
-
 
 @event('plugin.register')
 def register_plugin():
