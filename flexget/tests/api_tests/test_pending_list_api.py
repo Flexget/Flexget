@@ -260,6 +260,43 @@ class TestPendingListAPI(object):
         errors = schema_match(base_message, data)
         assert not errors
 
+    def test_pending_list_filter_entries(self, api_client, schema_match):
+        payload = {'name': 'test_list'}
+
+        rsp = api_client.json_post('/pending_list/', data=json.dumps(payload))
+        assert rsp.status_code == 201
+
+        entry_1_data = {'title': 'Foobaz', 'original_url': 'http://test1.com'}
+        entry_2_data = {'title': 'fooBar', 'original_url': 'http://test2.com'}
+
+        rsp = api_client.json_post('/pending_list/1/entries/', data=json.dumps(entry_1_data))
+        assert rsp.status_code == 201
+
+        rsp = api_client.json_post('/pending_list/1/entries/', data=json.dumps(entry_2_data))
+        assert rsp.status_code == 201
+
+        rsp = api_client.get('/pending_list/1/entries?filter=bar')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.pending_lists_entries_return_object, data)
+        assert not errors
+
+        assert len(data) == 1
+        assert data[0]['title'] == 'fooBar'
+
+        rsp = api_client.get('/pending_list/1/entries?filter=foo')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert len(data) == 2
+
+        rsp = api_client.get('/pending_list/1/entries?filter=bla')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert not data
+
 
 class TestPendingListPagination(object):
     config = 'tasks: {}'
