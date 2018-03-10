@@ -316,7 +316,6 @@ class PluginTraktLookup(object):
                                                                             entry['title'])
             except LookupError as e:
                 log.debug(e)
-
         return entry
 
     def lazy_season_collected_lookup(self, entry):
@@ -335,18 +334,15 @@ class PluginTraktLookup(object):
                                                                                entry['title'])
             except LookupError as e:
                 log.debug(e)
-
         return entry
 
     def lazy_movie_collected_lookup(self, entry):
         with Session() as session:
-
             try:
                 entry['trakt_collected'] = self.trakt.is_movie_in_collection(self.__get_movie(entry, session),
                                                                              entry['title'])
             except LookupError as e:
                 log.debug(e)
-
         return entry
 
     def lazy_show_watched_lookup(self, entry):
