@@ -929,11 +929,13 @@ def get_trakt_id_from_id(trakt_ids, media_type):
     for id_type, identifier in trakt_ids.to_dict().items():
         if not identifier:
             continue
+        stripped_id_type = id_type.rstrip('_id')  # need to remove _id for the api call
         try:
-            log.debug('Searching with params: %s=%s', id_type, identifier)
-            results = requests_session.get(get_api_url('search'), params={'id_type': id_type, 'id': identifier}).json()
+            log.debug('Searching with params: %s=%s', stripped_id_type, identifier)
+            results = requests_session.get(get_api_url('search'), params={'id_type': stripped_id_type,
+                                                                          'id': identifier}).json()
         except requests.RequestException as e:
-            raise LookupError('Searching trakt for %s=%s failed with error: %s' % (id_type, identifier, e))
+            raise LookupError('Searching trakt for %s=%s failed with error: %s' % (stripped_id_type, identifier, e))
         for result in results:
             if result['type'] != media_type:
                 continue
