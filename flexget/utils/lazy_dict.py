@@ -38,7 +38,7 @@ class LazyLookup(object):
             except PluginError as e:
                 e.log.info(e)
             except Exception as e:
-                log.error('Unhandled error in lazy lookup plugin')
+                log.error('Unhandled error in lazy lookup plugin: %s', e)
                 from flexget.manager import manager
                 if manager:
                     manager.crash_report()
