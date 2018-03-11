@@ -352,8 +352,8 @@ class PluginTraktLookup(object):
                                          self.movie_translate_map)
 
             if config.get('username') or config.get('account'):
-                self.__register_lazy_user_data_lookup(entry=entry, field_name='trakt_collected', data_type='collected')
-                self.__register_lazy_user_data_lookup(entry=entry, field_name='trakt_watched', data_type='watched')
+                self.__register_lazy_user_data_lookup(entry, 'collected')
+                self.__register_lazy_user_data_lookup(entry, 'watched')
                 self.__register_lazy_user_ratings_lookup(entry)
 
     def __get_media_type_from_entry(self, entry):
@@ -370,22 +370,22 @@ class PluginTraktLookup(object):
 
         return media_type
 
-    def __register_lazy_user_data_lookup(self, entry, field_name, data_type):
-        entry.register_lazy_func(TraktUserDataLookup(field_name, data_type, self.__get_media_type_from_entry(entry),
-                                                     self.lazy_user_data_lookup), [field_name])
+    def __register_lazy_user_data_lookup(self, entry, data_type, media_type=None):
+        if not media_type:
+            media_type = self.__get_media_type_from_entry(entry)
+        field_name = self.__get_user_data_field_name(data_type=data_type, media_type=media_type)
+        entry.register_lazy_func(TraktUserDataLookup(field_name, data_type, media_type, self.lazy_user_data_lookup),
+                                 [field_name])
 
     def __register_lazy_user_ratings_lookup(self, entry):
-        def register(self, media_type, entry):
-            field_name = self.__get_user_data_field_name('ratings', media_type)
-            entry.register_lazy_func(TraktUserDataLookup(field_name, 'ratings', media_type, self.lazy_user_data_lookup),
-                                     [field_name])
+        data_type = 'ratings'
 
         if self.__entry_is_show(entry):
-            register(self, 'show', entry)
-            register(self, 'season', entry)
-            register(self, 'episode', entry)
+            self.__register_lazy_user_data_lookup(entry=entry, data_type=data_type, media_type='show')
+            self.__register_lazy_user_data_lookup(entry=entry, data_type=data_type, media_type='season')
+            self.__register_lazy_user_data_lookup(entry=entry, data_type=data_type, media_type='episode')
         else:
-            register(self, 'movie', entry)
+            self.__register_lazy_user_data_lookup(entry=entry, data_type=data_type, media_type='movie')
 
     @property
     def series_identifier(self):
