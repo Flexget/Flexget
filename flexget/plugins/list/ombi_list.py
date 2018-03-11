@@ -13,7 +13,7 @@ from flexget.entry import Entry
 from flexget.event import event
 
 log = logging.getLogger('ombi_list')
- 
+
 class OmbiSet(MutableSet):
     supported_ids = ['imdb_id', 'tmdb_id', 'ombi_id']
     schema = {
@@ -35,11 +35,11 @@ class OmbiSet(MutableSet):
     @property
     def immutable(self):
         return False
-        
+
     def __init__(self, config):
         self.config = config
         self._items = None
-        
+
     def __iter__(self):
         return (item for item in self.items)
 
@@ -48,10 +48,10 @@ class OmbiSet(MutableSet):
 
     def __contains__(self, entry):
         return self._find_entry(entry) is not None
-        
+
     def get(self, entry):
-        return self._find_entry(entry)    
-    
+        return self._find_entry(entry)
+
     def generate_series_id(self, season, episode=None):
         tempid = 'S' + str(season.get('seasonNumber')).zfill(2)
         if episode:
@@ -64,13 +64,13 @@ class OmbiSet(MutableSet):
 
         if item.get('releaseDate') and self.config.get('include_year'):
             temptitle = temptitle + ' (' + str(item.get('releaseDate')[0:4]) +')'
-            
+
         if season or episode:
             temptitle = temptitle + ' ' + self.generate_series_id(season, episode)
             if episode:
                 if episode.get('title') and self.config.get('include_ep_title'):
                     temptitle = temptitle + ' ' + episode.get('title')
-            
+
         return temptitle
 
     def construct_request_list_url(self):
@@ -89,7 +89,7 @@ class OmbiSet(MutableSet):
             return requests.get(url).json()
         except RequestException as e:
             raise plugin.PluginError('Unable to connect to Ombi at %s. Error: %s' % (url, e))
-            
+
     def generate_movie_entry(self, parent_request):
         entry = Entry()
         log.debug('Found movie: %s', parent_request.get('title'))
@@ -150,21 +150,21 @@ class OmbiSet(MutableSet):
                           ombi_requested=episode.get('requested'))
         else:
             raise plugin.PluginError('Error: Unknown list type %s.' % (self.config.get('type')))
-            
+
         return entry
-        
+
     @property
     def items(self):
         if not self._items:
             log.debug('Connecting to Ombi to retrieve request list.')
             connection_url = self.construct_request_list_url()
-            
+
             log.debug('URL %s', connection_url)
             json = self.get_json(connection_url)
-            
+
             self._items = []
 
-            for parent_request in json:            
+            for parent_request in json:
                 if self.config.get('type') == 'movies':
                     # check that the request is approved unless user has selected to include everything
                     if (self.config.get('only_approved') and not parent_request.get('approved')) or parent_request.get('approved'):
@@ -196,7 +196,7 @@ class OmbiSet(MutableSet):
                                             entry = self.generate_tv_entry(parent_request, child_request, season, episode)
                                             log.debug('Valid entry %s', entry)
                                             self._items.append(entry)
-        return self._items 
+        return self._items
 
     def add(self, entry):
         log.verbose('List adding not yet implemented')
@@ -208,17 +208,17 @@ class OmbiSet(MutableSet):
 
     def _find_entry(self, entry):
         log.verbose('Find entry not yet implemented')
-        return   
+        return
 
     @property
     def online(self):
         """ Set the online status of the plugin, online plugin should be treated differently in certain situations,
         like test mode"""
-        return True    
+        return True
 
 class OmbiList(object):
     schema = OmbiSet.schema
-    
+
     def get_list(self, config):
         return OmbiSet(config)
 
