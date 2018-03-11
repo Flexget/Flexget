@@ -1189,6 +1189,29 @@ class ApiTrakt(object):
         self.account = account
         self.username = get_username(username, account)
 
+    @property
+    def lookup_map(self):
+        return {
+            'watched': {
+                'show': self.is_show_watched,
+                'season': self.is_season_watched,
+                'episode': self.is_episode_watched,
+                'movie': self.is_movie_watched
+            },
+            'collected': {
+                'show': self.is_show_in_collection,
+                'season': self.is_season_in_collection,
+                'episode': self.is_episode_in_collection,
+                'movie': self.is_movie_in_collection
+            },
+            'ratings': {
+                'show': self.show_user_ratings,
+                'season': self.season_user_ratings,
+                'episode': self.episode_user_ratings,
+                'movie': self.movie_user_ratings
+            }
+        }
+
     @staticmethod
     @with_session
     def lookup_series(title=None, year=None, session=None, only_cached=None, **lookup_params):

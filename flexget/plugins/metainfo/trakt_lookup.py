@@ -20,6 +20,41 @@ except ImportError:
 log = logging.getLogger('trakt_lookup')
 
 
+class TraktLookup(object):
+    def __init__(self, field_map, lookup_function):
+        self.field_map = field_map
+        self.lookup_function = lookup_function
+
+    def __call__(self, entry):
+        with Session() as session:
+            try:
+                result = self.lookup_function(entry, session)
+            except LookupError as e:
+                log.debug(e)
+            else:
+                entry.update_using_map(self.field_map, result)
+
+        return entry
+
+
+class TraktUserDataLookup(object):
+    def __init__(self, field_name, data_type, media_type, lookup_function):
+        self.field_name = field_name
+        self.lookup_function = lookup_function
+        self.data_type = data_type
+        self.media_type = media_type
+
+    def __call__(self, entry):
+        try:
+            result = self.lookup_function(data_type=self.data_type, media_type=self.media_type, entry=entry)
+        except LookupError as e:
+            log.debug(e)
+        else:
+            entry[self.field_name] = result
+
+        return entry
+
+
 class PluginTraktLookup(object):
     """Retrieves trakt information for entries. Uses series_name,
     series_season, series_episode from series plugin.
@@ -163,6 +198,17 @@ class PluginTraktLookup(object):
         'trakt_actors': lambda movie: list_actors(movie.actors),
     }
 
+    user_data_map = {
+        'collected': 'trakt_collected',
+        'watched': 'trakt_watched',
+        'ratings': {
+            'show': 'trakt_series_user_rating',
+            'season': 'trakt_season_user_rating',
+            'episode': 'trakt_ep_user_rating',
+            'movie': 'trakt_movie_user_rating'
+        }
+    }
+
     schema = {'oneOf': [
         {
             'type': 'object',
@@ -180,11 +226,28 @@ class PluginTraktLookup(object):
         }
     ]}
 
+    def __init__(self):
+        self.getter_map = {
+            'show': self.__get_series,
+            'season': self.__get_season,
+            'episode': self.__get_episode,
+            'movie': self.__get_movie,
+        }
+
     def on_task_start(self, task, config):
         if isinstance(config, dict):
             self.trakt = ApiTrakt(username=config.get('username'), account=config.get('account'))
         else:
             self.trakt = ApiTrakt()
+
+    def __get_user_data_field_name(self, data_type, media_type):
+        if data_type not in self.user_data_map:
+            raise plugin.PluginError('Unknown user data type "%s"' % data_type)
+
+        if isinstance(self.user_data_map[data_type], dict):
+            return self.user_data_map[data_type][media_type]
+
+        return self.user_data_map[data_type]
 
     def __get_series_lookup_args(self, entry):
         return {
@@ -223,196 +286,29 @@ class PluginTraktLookup(object):
         movie_lookup_args = self.__get_movie_lookup_args(entry)
         return lookup_movie(session=session, **movie_lookup_args)
 
-    def lazy_series_lookup(self, entry):
+    def lazy_lookup(self, entry, media_type, mapping):
         """Does the lookup for this entry and populates the entry fields."""
         with Session() as session:
             try:
-                series = self.__get_series(entry, session)
+                trakt_media = self.getter_map[media_type](entry, session)
             except LookupError as e:
                 log.debug(e)
             else:
-                entry.update_using_map(self.series_map, series)
+                entry.update_using_map(mapping, trakt_media)
         return entry
 
-    def lazy_series_actor_lookup(self, entry):
-        """Does the lookup for this entry and populates the entry fields."""
+    def lazy_user_data_lookup(self, data_type, media_type, entry):
+        try:
+            lookup = self.getter_map[media_type]
+            user_data_lookup = self.trakt.lookup_map[data_type][media_type]
+        except KeyError:
+            raise plugin.PluginError('Unknown data type="%s" or media type="%s"' % (data_type, media_type))
+
         with Session() as session:
             try:
-                series = self.__get_series(entry, session)
+                return user_data_lookup(lookup(entry, session), entry['title'])
             except LookupError as e:
                 log.debug(e)
-            else:
-                entry.update_using_map(self.series_actor_map, series)
-        return entry
-
-    def lazy_series_translate_lookup(self, entry):
-        """Does the lookup for this entry and populates the entry fields."""
-        with Session() as session:
-            try:
-                series = self.__get_series(entry, session)
-            except LookupError as e:
-                log.debug(e)
-            else:
-                entry.update_using_map(self.show_translate_map, series)
-        return entry
-
-    def lazy_episode_lookup(self, entry):
-        with Session() as session:
-            try:
-                episode = self.__get_episode(entry, session)
-            except LookupError as e:
-                log.debug('Error looking up trakt episode information for %s: %s', entry['title'], e)
-            else:
-                entry.update_using_map(self.episode_map, episode)
-        return entry
-
-    def lazy_season_lookup(self, entry):
-        with Session() as session:
-            try:
-                season = self.__get_season(entry, session)
-            except LookupError as e:
-                log.debug('Error looking up trakt season information for %s: %s', entry['title'], e)
-            else:
-                entry.update_using_map(self.season_map, season)
-        return entry
-
-    def lazy_movie_lookup(self, entry):
-        """Does the lookup for this entry and populates the entry fields."""
-        with Session() as session:
-            try:
-                movie = self.__get_movie(entry, session)
-            except LookupError as e:
-                log.debug(e)
-            else:
-                entry.update_using_map(self.movie_map, movie)
-        return entry
-
-    def lazy_movie_actor_lookup(self, entry):
-        """Does the lookup for this entry and populates the entry fields."""
-        with Session() as session:
-            try:
-                movie = self.__get_movie(entry, session)
-            except LookupError as e:
-                log.debug(e)
-            else:
-                entry.update_using_map(self.movie_actor_map, movie)
-        return entry
-
-    def lazy_movie_translate_lookup(self, entry):
-        """Does the lookup for this entry and populates the entry fields."""
-        with Session() as session:
-            try:
-                movie = self.__get_movie(entry, session)
-            except LookupError as e:
-                log.debug(e)
-            else:
-                entry.update_using_map(self.movie_translate_map, movie)
-        return entry
-
-    def lazy_show_collected_lookup(self, entry):
-        with Session() as session:
-            try:
-                entry['trakt_collected'] = self.trakt.is_show_in_collection(self.__get_series(entry, session),
-                                                                            entry['title'])
-            except LookupError as e:
-                log.debug(e)
-        return entry
-
-    def lazy_season_collected_lookup(self, entry):
-        with Session() as session:
-            try:
-                entry['trakt_collected'] = self.trakt.is_season_in_collection(self.__get_season(entry, session),
-                                                                              entry['title'])
-            except LookupError as e:
-                log.debug(e)
-        return entry
-
-    def lazy_episode_collected_lookup(self, entry):
-        with Session() as session:
-            try:
-                entry['trakt_collected'] = self.trakt.is_episode_in_collection(self.__get_episode(entry, session),
-                                                                               entry['title'])
-            except LookupError as e:
-                log.debug(e)
-        return entry
-
-    def lazy_movie_collected_lookup(self, entry):
-        with Session() as session:
-            try:
-                entry['trakt_collected'] = self.trakt.is_movie_in_collection(self.__get_movie(entry, session),
-                                                                             entry['title'])
-            except LookupError as e:
-                log.debug(e)
-        return entry
-
-    def lazy_show_watched_lookup(self, entry):
-        with Session() as session:
-            try:
-                entry['trakt_watched'] = self.trakt.is_show_watched(self.__get_series(entry, session), entry['title'])
-            except LookupError as e:
-                log.debug(e)
-        return entry
-
-    def lazy_season_watched_lookup(self, entry):
-        with Session() as session:
-            try:
-                entry['trakt_watched'] = self.trakt.is_season_watched(self.__get_season(entry, session), entry['title'])
-            except LookupError as e:
-                log.debug(e)
-        return entry
-
-    def lazy_episode_watched_lookup(self, entry):
-        with Session() as session:
-            try:
-                entry['trakt_watched'] = self.trakt.is_episode_watched(self.__get_episode(entry, session),
-                                                                       entry['title'])
-            except LookupError as e:
-                log.debug(e)
-        return entry
-
-    def lazy_movie_watched_lookup(self, entry):
-        with Session() as session:
-            try:
-                entry['trakt_watched'] = self.trakt.is_movie_watched(self.__get_movie(entry, session), entry['title'])
-            except LookupError as e:
-                log.debug(e)
-        return entry
-
-    def lazy_show_user_ratings_lookup(self, entry):
-        with Session() as session:
-            try:
-                entry['trakt_series_user_rating'] = self.trakt.show_user_ratings(self.__get_series(entry, session),
-                                                                                 entry['title'])
-            except LookupError as e:
-                log.debug(e)
-        return entry
-
-    def lazy_season_user_ratings_lookup(self, entry):
-        with Session() as session:
-            try:
-                entry['trakt_season_user_rating'] = self.trakt.season_user_ratings(self.__get_season(entry, session),
-                                                                                   entry['title'])
-            except LookupError as e:
-                log.debug(e)
-        return entry
-
-    def lazy_episode_user_ratings_lookup(self, entry):
-        with Session() as session:
-            try:
-                entry['trakt_ep_user_rating'] = self.trakt.episode_user_ratings(self.__get_episode(entry, session),
-                                                                                entry['title'])
-            except LookupError as e:
-                log.debug(e)
-        return entry
-
-    def lazy_movie_user_ratings_lookup(self, entry):
-        with Session() as session:
-            try:
-                entry['trakt_movie_user_rating'] = self.trakt.movie_user_ratings(self.__get_movie(entry, session),
-                                                                                 entry['title'])
-            except LookupError as e:
-                log.debug(e)
-        return entry
 
     # TODO: these shouldn't be here?
     def __entry_is_show(self, entry):
@@ -423,6 +319,9 @@ class PluginTraktLookup(object):
 
     def __entry_is_season(self, entry):
         return 'series_season' in entry and not self.__entry_is_episode(entry)
+
+    def __entry_is_movie(self, entry):
+        return entry.get('movie_name')
 
     # Run after series and metainfo series
     @plugin.priority(110)
@@ -435,52 +334,58 @@ class PluginTraktLookup(object):
 
         for entry in task.entries:
             if self.__entry_is_show(entry):
-                entry.register_lazy_func(self.lazy_series_lookup, self.series_map)
+                entry.register_lazy_func(TraktLookup(self.series_map, self.__get_series), self.series_map)
                 # TODO cleaner way to do this?
-                entry.register_lazy_func(self.lazy_series_actor_lookup, self.series_actor_map)
-                entry.register_lazy_func(self.lazy_series_translate_lookup, self.show_translate_map)
+                entry.register_lazy_func(TraktLookup(self.series_actor_map, self.__get_series),
+                                         self.series_actor_map)
+                entry.register_lazy_func(TraktLookup(self.show_translate_map, self.__get_series),
+                                         self.show_translate_map)
                 if self.__entry_is_episode(entry):
-                    entry.register_lazy_func(self.lazy_episode_lookup, self.episode_map)
+                    entry.register_lazy_func(TraktLookup(self.episode_map, self.__get_episode), self.episode_map)
                 elif self.__entry_is_season(entry):
-                    entry.register_lazy_func(self.lazy_season_lookup, self.season_map)
+                    entry.register_lazy_func(TraktLookup(self.season_map, self.__get_season), self.season_map)
             else:
-                entry.register_lazy_func(self.lazy_movie_lookup, self.movie_map)
+                entry.register_lazy_func(TraktLookup(self.movie_map, self.__get_movie), self.movie_map)
                 # TODO cleaner way to do this?
-                entry.register_lazy_func(self.lazy_movie_actor_lookup, self.movie_actor_map)
-                entry.register_lazy_func(self.lazy_movie_translate_lookup, self.movie_translate_map)
+                entry.register_lazy_func(TraktLookup(self.movie_actor_map, self.__get_movie), self.movie_actor_map)
+                entry.register_lazy_func(TraktLookup(self.movie_translate_map, self.__get_movie),
+                                         self.movie_translate_map)
 
             if config.get('username') or config.get('account'):
-                self.__register_lazy_collected_lookup(entry)
-                self.__register_lazy_watched_lookup(entry)
+                self.__register_lazy_user_data_lookup(entry=entry, field_name='trakt_collected', data_type='collected')
+                self.__register_lazy_user_data_lookup(entry=entry, field_name='trakt_watched', data_type='watched')
                 self.__register_lazy_user_ratings_lookup(entry)
 
-    def __register_lazy_collected_lookup(self, entry):
+    def __get_media_type_from_entry(self, entry):
         if self.__entry_is_episode(entry):
-            entry.register_lazy_func(self.lazy_episode_collected_lookup, ['trakt_collected'])
+            media_type = 'episode'
         elif self.__entry_is_season(entry):
-            entry.register_lazy_func(self.lazy_season_collected_lookup, ['trakt_collected'])
+            media_type = 'season'
         elif self.__entry_is_show(entry):
-            entry.register_lazy_func(self.lazy_show_collected_lookup, ['trakt_collected'])
+            media_type = 'show'
+        elif self.__entry_is_movie(entry):
+            media_type = 'movie'
         else:
-            entry.register_lazy_func(self.lazy_movie_collected_lookup, ['trakt_collected'])
+            raise plugin.PluginError('Unknown media type in entry %s', entry['title'])
 
-    def __register_lazy_watched_lookup(self, entry):
-        if self.__entry_is_episode(entry):
-            entry.register_lazy_func(self.lazy_episode_watched_lookup, ['trakt_watched'])
-        elif self.__entry_is_season(entry):
-            entry.register_lazy_func(self.lazy_season_watched_lookup, ['trakt_watched'])
-        elif self.__entry_is_show(entry):
-            entry.register_lazy_func(self.lazy_show_watched_lookup, ['trakt_watched'])
-        else:
-            entry.register_lazy_func(self.lazy_movie_watched_lookup, ['trakt_watched'])
+        return media_type
+
+    def __register_lazy_user_data_lookup(self, entry, field_name, data_type):
+        entry.register_lazy_func(TraktUserDataLookup(field_name, data_type, self.__get_media_type_from_entry(entry),
+                                                     self.lazy_user_data_lookup), [field_name])
 
     def __register_lazy_user_ratings_lookup(self, entry):
+        def register(self, media_type, entry):
+            field_name = self.__get_user_data_field_name('ratings', media_type)
+            entry.register_lazy_func(TraktUserDataLookup(field_name, 'ratings', media_type, self.lazy_user_data_lookup),
+                                     [field_name])
+
         if self.__entry_is_show(entry):
-            entry.register_lazy_func(self.lazy_show_user_ratings_lookup, ['trakt_series_user_rating'])
-            entry.register_lazy_func(self.lazy_season_user_ratings_lookup, ['trakt_season_user_rating'])
-            entry.register_lazy_func(self.lazy_episode_user_ratings_lookup, ['trakt_ep_user_rating'])
+            register(self, 'show', entry)
+            register(self, 'season', entry)
+            register(self, 'episode', entry)
         else:
-            entry.register_lazy_func(self.lazy_movie_user_ratings_lookup, ['trakt_movie_user_rating'])
+            register(self, 'movie', entry)
 
     @property
     def series_identifier(self):
