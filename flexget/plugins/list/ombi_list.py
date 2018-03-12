@@ -22,13 +22,15 @@ class OmbiSet(MutableSet):
             'base_url': {'type': 'string'},
             'port': {'type': 'number', 'default': 3579},
             'api_key': {'type': 'string'},
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
             'type': {'type': 'string', 'enum': ['shows', 'seasons', 'episodes', 'movies']},
             'only_approved': {'type': 'boolean', 'default': True},
             'include_available': {'type': 'boolean', 'default': False},
             'include_year': {'type': 'boolean', 'default': False},
             'include_ep_title': {'type': 'boolean', 'default': False}
         },
-        'required': ['api_key', 'base_url', 'type'],
+        'required': ['base_url', 'type'],
         'additionalProperties': False
     }
 
@@ -73,20 +75,54 @@ class OmbiSet(MutableSet):
 
         return temptitle
 
-    def construct_request_list_url(self):
+    def get_access_token(self):
         parsedurl = urlparse(self.config.get('base_url'))
+        url = '%s://%s:%s%s/api/v1/Token' % (parsedurl.scheme, parsedurl.netloc, self.config.get('port'), parsedurl.path)
+        data = {'username': self.config.get('username'),
+                'password': self.config.get('password')
+        }
+        headers = { 'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+        }
+        try:
+            log.debug('Logging in with username and password to get access token')
+            log.debug('URL %s', url)
+            access_token = requests.post(url, json=data, headers=headers).json().get('access_token')
+            log.debug('Access Token: %s', access_token)
+            return access_token
+        except RequestException as e:
+            raise plugin.PluginError('Ombi username and password login failed: %s' % e)
+
+    def ombi_auth(self):
+        if self.config.get('api_key'):
+            log.debug('api_key auth selected')
+            api_key = self.config.get('api_key')
+            header = {'apikey': api_key}
+            return header
+        elif self.config.get('username') and self.config.get('password'):
+            log.debug('username and password auth selected')
+            access_token = self.get_access_token()
+            return {"Authorization": "Bearer %s" %access_token}
+        else:
+            raise plugin.PluginError('Error: an api_key or username and password must be configured')
+
+    def get_request_list(self):
+        auth_header = self.ombi_auth()
+
+        parsedurl = urlparse(self.config.get('base_url'))
+        url=''
         if self.config.get('type') in ['movies']:
             log.debug('Received movie list request')
-            return '%s://%s:%s%s/api/v1/Request/movie?apikey=%s' % (parsedurl.scheme, parsedurl.netloc, self.config.get('port'), parsedurl.path, self.config.get('api_key'))
+            url = '%s://%s:%s%s/api/v1/Request/movie' % (parsedurl.scheme, parsedurl.netloc, self.config.get('port'), parsedurl.path)
         elif self.config.get('type') in ['shows', 'seasons', 'episodes']:
             log.debug('Received TV list request')
-            return '%s://%s:%s%s/api/v1/Request/tv?apikey=%s' % (parsedurl.scheme, parsedurl.netloc, self.config.get('port'), parsedurl.path, self.config.get('api_key'))
+            url= '%s://%s:%s%s/api/v1/Request/tv' % (parsedurl.scheme, parsedurl.netloc, self.config.get('port'), parsedurl.path)
         else:
             raise plugin.PluginError('Error: Unknown list type %s.' % (self.config.get('type')))
-
-    def get_json(self, url):
+        log.debug('Request URL: %s', url)
+        log.debug('Connecting to Ombi to retrieve request list.')
         try:
-            return requests.get(url).json()
+            return requests.get(url, headers=auth_header).json()
         except RequestException as e:
             raise plugin.PluginError('Unable to connect to Ombi at %s. Error: %s' % (url, e))
 
@@ -156,18 +192,15 @@ class OmbiSet(MutableSet):
     @property
     def items(self):
         if not self._items:
-            log.debug('Connecting to Ombi to retrieve request list.')
-            connection_url = self.construct_request_list_url()
 
-            log.debug('URL %s', connection_url)
-            json = self.get_json(connection_url)
+            json = self.get_request_list()
 
             self._items = []
 
             for parent_request in json:
                 if self.config.get('type') == 'movies':
                     # check that the request is approved unless user has selected to include everything
-                    if (self.config.get('only_approved') and not parent_request.get('approved')) or parent_request.get('approved'):
+                    if self.config.get('only_approved') and not parent_request.get('approved') or parent_request.get('approved'):
                         # Always include items that are not available and only include available items if user has selected to do so
                         if (self.config.get('include_available') and parent_request.get('available') or not parent_request.get('available')):
                             entry = self.generate_movie_entry(parent_request)
@@ -190,7 +223,7 @@ class OmbiSet(MutableSet):
                             else:
                                 for episode in season['episodes']:
                                     # check that the request is approved unless user has selected to include everything
-                                    if (self.config.get('only_approved') and not episode.get('approved') or episode.get('approved')):
+                                    if self.config.get('only_approved') and not episode.get('approved') or episode.get('approved'):
                                         # Always include items that are not available and only include available items if user has selected to do so
                                         if (self.config.get('include_available') and episode.get('available')) or not episode.get('available'):
                                             entry = self.generate_tv_entry(parent_request, child_request, season, episode)
