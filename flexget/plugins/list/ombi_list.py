@@ -88,7 +88,6 @@ class OmbiSet(MutableSet):
             log.debug('Logging in with username and password to get access token')
             log.debug('URL %s', url)
             access_token = requests.post(url, json=data, headers=headers).json().get('access_token')
-            log.debug('Access Token: %s', access_token)
             return access_token
         except RequestException as e:
             raise plugin.PluginError('Ombi username and password login failed: %s' % e)
@@ -231,17 +230,36 @@ class OmbiSet(MutableSet):
                                             self._items.append(entry)
         return self._items
 
+    def add_movie(self, entry):
+        log.verbose('Adding entry %s', entry.get('title'))
+        auth_header = self.ombi_auth()
+
+        parsedurl = urlparse(self.config.get('base_url'))
+        url = '%s://%s:%s%s/api/v1/Request/movie' % (parsedurl.scheme, parsedurl.netloc, self.config.get('port'), parsedurl.path)
+        data = {'theMovieDbId': entry.get('tmdb_id')}
+        try:
+            return requests.post(url, json=data, headers=auth_header).json()
+        except RequestException as e:
+            raise plugin.PluginError('Unable to connect to Ombi at %s. Error: %s' % (url, e))
+
     def add(self, entry):
-        log.verbose('List adding not yet implemented')
-        return
+        if self.config.get('type') == 'movies':
+            if entry.get('tmdb_id'):
+                result = self.add_movie(entry)
+                if result.get('message'):
+                    log.verbose('%s', result.get('message'))
+                elif result.get('errorMessage'):
+                    log.verbose('%s', result.get('errorMessage'))
+                else:
+                    log.verbose('Unknown result')
+            else:
+                log.verbose('Skipping %s ombi requires an tmdb_id to add movies, try using the tmdb_lookup plugin', entry.get('title'))
+        else:
+            log.verbose('%s list adding not implemented', self.config.get('type'))
+
 
     def discard(self, entry):
         log.verbose('List item removal not yet implemented')
-        return
-
-    def _find_entry(self, entry):
-        log.verbose('Find entry not yet implemented')
-        return
 
     @property
     def online(self):
