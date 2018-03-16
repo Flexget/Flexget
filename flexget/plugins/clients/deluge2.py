@@ -30,15 +30,17 @@ class DelugePlugin(object):
             raise plugin.DependencyError('deluge', 'deluge-client',
                                          'deluge-client >=1.2 module and it\'s dependencies required. ImportError: %s' %
                                          e, log)
+        config = self.prepare_config(config)
         self.client = DelugeRPCClient(config['host'], config['port'], config['username'], config['password'],
-                                      decode_utf8=True)
+                                      decode_utf8=True, deluge_version=2)
 
     def on_task_abort(self, task, config):
         pass
 
-    def prepare_connection_info(self, config):
+    def prepare_config(self, config):
         config.setdefault('host', 'localhost')
         config.setdefault('port', 58846)
+        return config
 
     def connect(self):
         """Connects to the deluge daemon and runs on_connect_success """
@@ -169,7 +171,7 @@ class InputDeluge(DelugePlugin):
                 filter['label'] = filter['label'].lower()
             if 'state' in filter:
                 filter['state'] = filter['state'].capitalize()
-        self.prepare_connection_info(config)
+        super(InputDeluge, self).prepare_config(config)
         return config
 
     def on_task_input(self, task, config):
@@ -255,7 +257,7 @@ class OutputDeluge(DelugePlugin):
     def prepare_config(self, config):
         if isinstance(config, bool):
             config = {'enabled': config}
-        self.prepare_connection_info(config)
+        super(OutputDeluge, self).prepare_config(config)
         config.setdefault('enabled', True)
         config.setdefault('path', '')
         config.setdefault('movedone', '')
@@ -362,11 +364,11 @@ class OutputDeluge(DelugePlugin):
                 'main_file_ratio': entry.get('main_file_ratio', config.get('main_file_ratio')),
                 'hide_sparse_files': entry.get('hide_sparse_files', config.get('hide_sparse_files', True)),
                 'keep_subs': entry.get('keep_subs', config.get('keep_subs', True)),
-                'container_directory': config.get('container_directory')
+                'container_directory': config.get('container_directory', '')
             }
             try:
                 label = entry.render(entry.get('label', config['label']))
-                modify_opts['label'] = self.format_label(label)
+                modify_opts['label'] = self._format_label(label)
             except RenderError as e:
                 log.error('Error setting label for `%s`: %s', entry['title'], e)
             try:
@@ -451,8 +453,8 @@ class OutputDeluge(DelugePlugin):
         entry['deluge_id'] = torrent_id
 
         if opts.get('movedone'):
-            self.client.call('core.set_move_completed', torrent_id, True)
-            self.client.call('core.set_move_completed_path', torrent_id, opts['movedone'])
+            self.client.call('core.set_torrent_move_completed', torrent_id, True)
+            self.client.call('core.set_torrent_move_completed_path', torrent_id, opts['movedone'])
             log.debug('%s move on complete set to %s' % (entry['title'], opts['movedone']))
         if opts.get('label'):
             self.client.call('label.set_torrent', torrent_id, opts['label'])
@@ -599,3 +601,4 @@ class OutputDeluge(DelugePlugin):
 @event('plugin.register')
 def register_plugin():
     plugin.register(InputDeluge, 'from_deluge3', api_ver=2)
+    plugin.register(OutputDeluge, 'deluge3', api_ver=2)
