@@ -18,7 +18,7 @@ from flexget.terminal import console
 from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
-from flexget.utils.database import with_session, json_synonym
+from flexget.utils.database import json_synonym
 from flexget.utils.simple_persistence import SimplePersistence
 from flexget.utils.tools import TimedDict, split_title_year
 
@@ -897,8 +897,7 @@ class TraktShowIds(object):
         return any([self.trakt_id, self.trakt_slug, self.tmdb_id, self.imdb_id, self.tvdb_id, self.tvrage_id])
 
 
-@with_session
-def get_cached(table, title=None, year=None, trakt_ids=None, session=None):
+def get_cached(table, session, title=None, year=None, trakt_ids=None):
     """
     Get the cached info for a given show/movie from the database.
     :param table: Either TraktMovie or TraktShow
@@ -1213,8 +1212,7 @@ class ApiTrakt(object):
         }
 
     @staticmethod
-    @with_session
-    def lookup_series(title=None, year=None, session=None, only_cached=None, **lookup_params):
+    def lookup_series(session, title=None, year=None, only_cached=None, **lookup_params):
         trakt_show_ids = TraktShowIds(**lookup_params)
         series = get_cached(TraktShow, title=title, year=year, trakt_ids=trakt_show_ids, session=session)
         found = None
@@ -1236,24 +1234,25 @@ class ApiTrakt(object):
                 log.debug('Error refreshing show data from trakt, using cached. %s', e)
                 return series
             raise
-        series = session.merge(TraktShow(trakt_show, session))
-        if series and title.lower() == series.title.lower():
+        try:
+            series = session.merge(TraktShow(trakt_show, session))
+            if series and title.lower() == series.title.lower():
+                return series
+            elif series and title and not found:
+                if not session.query(TraktShowSearchResult).filter(TraktShowSearchResult.search == title.lower()).first():
+                    log.debug('Adding search result to db')
+                    session.merge(TraktShowSearchResult(search=title, series=series))
+            elif series and found:
+                log.debug('Updating search result in db')
+                found.series = series
             return series
-        elif series and title and not found:
-            if not session.query(TraktShowSearchResult).filter(TraktShowSearchResult.search == title.lower()).first():
-                log.debug('Adding search result to db')
-                session.merge(TraktShowSearchResult(search=title, series=series))
-        elif series and found:
-            log.debug('Updating search result in db')
-            found.series = series
-        return series
+        finally:
+            session.commit()
 
     @staticmethod
-    @with_session
-    def lookup_movie(title=None, year=None, session=None, only_cached=None, **lookup_params):
+    def lookup_movie(session, title=None, year=None, only_cached=None, **lookup_params):
         trakt_movie_ids = TraktMovieIds(**lookup_params)
-        movie = get_cached(TraktMovie, title=title, year=year, trakt_ids=trakt_movie_ids,
-                           session=session)
+        movie = get_cached(TraktMovie, title=title, year=year, trakt_ids=trakt_movie_ids, session=session)
         found = None
         if not movie and title:
             found = session.query(TraktMovieSearchResult).filter(TraktMovieSearchResult.search == title.lower()).first()
@@ -1277,17 +1276,20 @@ class ApiTrakt(object):
                 log.debug('Error refreshing movie data from trakt, using cached. %s', e)
                 return movie
             raise
-        movie = session.merge(TraktMovie(trakt_movie, session))
-        if movie and title.lower() == movie.title.lower():
+        try:
+            movie = session.merge(TraktMovie(trakt_movie, session))
+            if movie and title.lower() == movie.title.lower():
+                return movie
+            if movie and title and not found:
+                if not session.query(TraktMovieSearchResult).filter(TraktMovieSearchResult.search == title.lower()).first():
+                    log.debug('Adding search result to db')
+                    session.merge(TraktMovieSearchResult(search=title, movie=movie))
+            elif movie and found:
+                log.debug('Updating search result in db')
+                found.movie = movie
             return movie
-        if movie and title and not found:
-            if not session.query(TraktMovieSearchResult).filter(TraktMovieSearchResult.search == title.lower()).first():
-                log.debug('Adding search result to db')
-                session.merge(TraktMovieSearchResult(search=title, movie=movie))
-        elif movie and found:
-            log.debug('Updating search result in db')
-            found.movie = movie
-        return movie
+        finally:
+            session.commit()
 
     def is_show_in_collection(self, trakt_data, title):
         cache = user_cache.get_shows_collection(self.username, account=self.account)
