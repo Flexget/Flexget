@@ -227,7 +227,7 @@ class ArchiveInfo(object):
             if os.path.exists(destination):
                 log.debug('Cleaning up partially extracted file: %s', destination)
                 os.remove(destination)
-            
+
             raise error
 
 

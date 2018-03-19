@@ -30,7 +30,7 @@ def open_archive_entry(entry):
     try:
         archive_path = entry['location']
         if not archive_path:
-            raise ValueError()
+            raise ValueError('Entry does not appear to represent a local file.')
 
         archive = archiveutil.open_archive(archive_path)
     except (KeyError, ValueError):
@@ -63,11 +63,11 @@ def extract_info(info, archive, to, keep_dirs):
         info.extract(archive, destination)
     except archiveutil.FSError as error:
         log.error('OS error while creating file: %s (%s)' % (destination, error))
+    except archiveutil.FileAlreadyExists as error:
+        log.warn('File already exists: %s' % destination)
     except archiveutil.ArchiveError as error:
         log.error('Failed to extract file: %s in %s (%s)' % (info.filename,
                                                                    entry['location'], error))
-    except archiveutil.FileAlreadyExists as error:
-        log.warn('File already exists: %s' % destination)
 
 
 def get_destination_path(info, to, keep_dirs):
