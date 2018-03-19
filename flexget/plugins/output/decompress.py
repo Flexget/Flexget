@@ -73,10 +73,7 @@ def extract_info(info, archive, to, keep_dirs):
 def get_destination_path(info, to, keep_dirs):
     """Generate the destination path for a given file"""
 
-    if keep_dirs:
-        path_suffix = info.path
-    else:
-        path_suffix = os.path.basename(info.path)
+    path_suffix = info.path if keep_dirs else os.path.basename(info.path)
 
     return os.path.join(to, path_suffix)
 
