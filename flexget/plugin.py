@@ -523,6 +523,7 @@ def get_plugin_keywords():
 
 
 def get_plugin_by_name(name, issued_by='???'):
+    # type: (object, object) -> object
     """Get plugin by name, preferred way since this structure may be changed at some point."""
     if name not in plugins:
         raise DependencyError(issued_by=issued_by, missing=name, message='Unknown plugin %s' % name)
