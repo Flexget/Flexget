@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import urlparse
 
+
 import logging
 from collections import MutableSet
 
@@ -31,6 +32,10 @@ class OmbiSet(MutableSet):
             'include_ep_title': {'type': 'boolean', 'default': False}
         },
         'required': ['base_url', 'type'],
+        'oneOf': [
+            {'required': ['username', 'password']},
+            {'required': ['api_key']}
+        ],
         'additionalProperties': False
     }
 
@@ -76,8 +81,9 @@ class OmbiSet(MutableSet):
         return temptitle
 
     def get_access_token(self):
-        parsedurl = urlparse(self.config.get('base_url'))
-        url = '%s://%s:%s%s/api/v1/Token' % (parsedurl.scheme, parsedurl.netloc, self.config.get('port'), parsedurl.path)
+        url = self.get_ombi_api_path('Token')
+        #parsedurl = urlparse(self.config.get('base_url'))
+        #url = '%s://%s:%s%s/api/v1/Token' % (parsedurl.scheme, parsedurl.netloc, self.config.get('port'), parsedurl.path)
         data = {'username': self.config.get('username'),
                 'password': self.config.get('password')
         }
@@ -94,12 +100,8 @@ class OmbiSet(MutableSet):
 
     def ombi_auth(self):
         if self.config.get('api_key'):
-            log.debug('api_key auth selected')
-            api_key = self.config.get('api_key')
-            header = {'apikey': api_key}
-            return header
+            return {'apikey': self.config.get('api_key')}
         elif self.config.get('username') and self.config.get('password'):
-            log.debug('username and password auth selected')
             access_token = self.get_access_token()
             return {"Authorization": "Bearer %s" %access_token}
         else:
@@ -108,14 +110,10 @@ class OmbiSet(MutableSet):
     def get_request_list(self):
         auth_header = self.ombi_auth()
 
-        parsedurl = urlparse(self.config.get('base_url'))
-        url=''
         if self.config.get('type') in ['movies']:
-            log.debug('Received movie list request')
-            url = '%s://%s:%s%s/api/v1/Request/movie' % (parsedurl.scheme, parsedurl.netloc, self.config.get('port'), parsedurl.path)
+            url = self.get_ombi_api_path('Request/movie')
         elif self.config.get('type') in ['shows', 'seasons', 'episodes']:
-            log.debug('Received TV list request')
-            url= '%s://%s:%s%s/api/v1/Request/tv' % (parsedurl.scheme, parsedurl.netloc, self.config.get('port'), parsedurl.path)
+            url = self.get_ombi_api_path('Request/tv')
         else:
             raise plugin.PluginError('Error: Unknown list type %s.' % (self.config.get('type')))
         log.debug('Request URL: %s', url)
@@ -188,6 +186,17 @@ class OmbiSet(MutableSet):
 
         return entry
 
+    def accept_entry(self, entry):
+        # check that the request is approved unless user has selected to include everything
+        if (self.config.get('only_approved') and not entry.get('approved')) or entry.get('approved'):
+            # Always include items that are not available and only include available items if user has selected to do so
+            if (self.config.get('include_available') and entry.get('available') or not entry.get('available')):
+                return True
+            else:
+                return False
+        else:
+            return False
+
     @property
     def items(self):
         if not self._items:
@@ -197,14 +206,13 @@ class OmbiSet(MutableSet):
             self._items = []
 
             for parent_request in json:
+                log.debug('Parent: %s', parent_request)
                 if self.config.get('type') == 'movies':
                     # check that the request is approved unless user has selected to include everything
-                    if self.config.get('only_approved') and not parent_request.get('approved') or parent_request.get('approved'):
-                        # Always include items that are not available and only include available items if user has selected to do so
-                        if (self.config.get('include_available') and parent_request.get('available') or not parent_request.get('available')):
-                            entry = self.generate_movie_entry(parent_request)
-                            log.debug('Entry %s', entry)
-                            self._items.append(entry)
+                    if self.accept_entry(parent_request):
+                        entry = self.generate_movie_entry(parent_request)
+                        log.debug('Entry %s', entry)
+                        self._items.append(entry)
                 elif self.config.get('type') == 'shows':
                     # Shows do not have approvals or available flags so include them all
                     entry = self.generate_tv_entry(parent_request)
@@ -221,21 +229,22 @@ class OmbiSet(MutableSet):
                                     self._items.append(entry)
                             else:
                                 for episode in season['episodes']:
-                                    # check that the request is approved unless user has selected to include everything
-                                    if self.config.get('only_approved') and not episode.get('approved') or episode.get('approved'):
-                                        # Always include items that are not available and only include available items if user has selected to do so
-                                        if (self.config.get('include_available') and episode.get('available')) or not episode.get('available'):
-                                            entry = self.generate_tv_entry(parent_request, child_request, season, episode)
-                                            log.debug('Valid entry %s', entry)
-                                            self._items.append(entry)
+                                    if self.accept_entry(parent_request):
+                                        entry = self.generate_tv_entry(parent_request, child_request, season, episode)
+                                        log.debug('Valid entry %s', entry)
+                                        self._items.append(entry)
         return self._items
+
+    def get_ombi_api_path(self, endpoint):
+        parsedurl = urlparse(self.config.get('base_url'))
+        url = '%s://%s:%s%s/api/v1/%s' % (parsedurl.scheme, parsedurl.netloc, self.config.get('port'), parsedurl.path, endpoint)
+        return url
 
     def add_movie(self, entry):
         log.verbose('Adding entry %s', entry.get('title'))
         auth_header = self.ombi_auth()
 
-        parsedurl = urlparse(self.config.get('base_url'))
-        url = '%s://%s:%s%s/api/v1/Request/movie' % (parsedurl.scheme, parsedurl.netloc, self.config.get('port'), parsedurl.path)
+        url = self.get_ombi_api_path('Request/movie')
         data = {'theMovieDbId': entry.get('tmdb_id')}
         try:
             return requests.post(url, json=data, headers=auth_header).json()
@@ -257,9 +266,36 @@ class OmbiSet(MutableSet):
         else:
             log.verbose('%s list adding not implemented', self.config.get('type'))
 
+    def find_movie_request_id(self,entry):
+        auth_header = self.ombi_auth()
+        url = self.get_ombi_api_path('Request/movie/search/') + str(entry.get('movie_name'))
+        log.debug('searching for movie request: %s', url)
+
+        try:
+            return requests.get(url, headers=auth_header).json()
+        except RequestException as e:
+            raise plugin.PluginError('Unable to connect to Ombi at %s. Error: %s' % (url, e))
+
+    def delete_movie_request_id(self,request_id):
+        auth_header = self.ombi_auth()
+        url = self.get_ombi_api_path('Request/movie/') + str(request_id)
+        log.debug('deleting movie request: %s', url)
+
+        try:
+            return requests.delete(url, headers=auth_header)
+        except RequestException as e:
+            raise plugin.PluginError('Unable to connect to Ombi at %s. Error: %s' % (url, e))
 
     def discard(self, entry):
-        log.verbose('List item removal not yet implemented')
+        search_results = self.find_movie_request_id(entry)
+        if search_results:
+            for requests in search_results:
+                log.debug('Title: %s ID: %s', requests.get('title'), requests.get('id'))
+                results = self.delete_movie_request_id(requests.get('id'))
+                log.debug('Result: %s', results)
+        else:
+            log.verbose('Search returned no matching requests')
+
 
     @property
     def online(self):
