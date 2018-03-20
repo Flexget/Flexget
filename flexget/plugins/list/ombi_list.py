@@ -294,7 +294,7 @@ class OmbiSet(MutableSet):
                 results = self.delete_movie_request_id(requests.get('id'))
                 log.debug('Result: %s', results)
         else:
-            log.verbose('Search returned no matching requests')
+            log.verbose('Search returned no matching requests.')
 
 
     @property
