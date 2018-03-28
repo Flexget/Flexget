@@ -314,4 +314,4 @@ class OmbiList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(OmbiList, 'ombi_list', api_ver=2, interfaces=['task', 'list'])
+    plugin.register(OmbiList, 'ombi_list', api_ver=2, interfaces=['task'])
