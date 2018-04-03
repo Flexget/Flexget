@@ -122,7 +122,8 @@ class ImdbEntrySet(MutableSet):
             soup = get_soup(response.text)
             self.hidden_value = soup.find('input', attrs={'id': '49e6c'})['value']
         except Exception as e:
-            log.error('Unable to locate the hidden form value ''49e6c''. Without it, you can''t add/remove. %s', e)
+            log.warning('Unable to locate the hidden form value ''49e6c''. Without it, you might not be able to '
+                        'add or remove items. %s', e)
         return user_id_match.group() if user_id_match else None
 
     def authenticate(self):
