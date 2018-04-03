@@ -97,6 +97,7 @@ class ImdbEntrySet(MutableSet):
         self.user_id = None
         self.list_id = None
         self.cookies = None
+        self.hidden_value = None
         self._items = None
         self._authenticated = False
 
@@ -106,17 +107,23 @@ class ImdbEntrySet(MutableSet):
             self.authenticate()
         return self._session
 
-    def get_user_id(self, cookies=None):
+    def get_user_id_and_hidden_value(self, cookies=None):
         try:
             if cookies:
                 self._session.cookies = cookiejar_from_dict(cookies)
             # We need to allow for redirects here as it performs 1-2 redirects before reaching the real profile url
-            response = self._session.head('https://www.imdb.com/profile', allow_redirects=True)
+            response = self._session.get('https://www.imdb.com/profile', allow_redirects=True)
         except RequestException as e:
             raise PluginError(str(e))
 
-        match = re.search('ur\d+(?!\d)', response.url)
-        return match.group() if match else None
+        user_id_match = re.search('ur\d+(?!\d)', response.url)
+        # extract the hidden form value that we need to do post requests later on
+        try:
+            soup = get_soup(response.text)
+            self.hidden_value = soup.find('input', attrs={'id': '49e6c'})['value']
+        except Exception as e:
+            log.error('Unable to locate the hidden form value ''49e6c''. Without it, you can''t add/remove. %s', e)
+        return user_id_match.group() if user_id_match else None
 
     def authenticate(self):
         """Authenticates a session with IMDB, and grabs any IDs needed for getting/modifying list."""
@@ -126,7 +133,7 @@ class ImdbEntrySet(MutableSet):
             if user and user.cookies and user.user_id:
                 log.debug('login credentials found in cache, testing')
                 self.user_id = user.user_id
-                if not self.get_user_id(cookies=user.cookies):
+                if not self.get_user_id_and_hidden_value(cookies=user.cookies):
                     log.debug('cache credentials expired')
                 else:
                     self.cookies = user.cookies
@@ -158,7 +165,7 @@ class ImdbEntrySet(MutableSet):
                 self._session.post(action, data=data)
                 self._session.headers.update({'Referer': 'http://www.imdb.com/'})
 
-                self.user_id = self.get_user_id()
+                self.user_id = self.get_user_id_and_hidden_value()
                 if not self.user_id:
                     raise plugin.PluginError('Login to IMDB failed. Check your credentials.')
                 self.cookies = self._session.cookies.get_dict(domain='.imdb.com')
@@ -284,12 +291,16 @@ class ImdbEntrySet(MutableSet):
             return
         # Get the list item id
         item_ids = None
+        urls = []
         if self.config['list'] == 'watchlist':
+            method = 'delete'
             data = {'consts[]': entry['imdb_id'], 'tracking_tag': 'watchlistRibbon'}
             status = self.session.post('http://www.imdb.com/list/_ajax/watchlist_has', data=data,
                                        cookies=self.cookies).json()
             item_ids = status.get('has', {}).get(entry['imdb_id'])
+            urls = ['http://www.imdb.com/watchlist/%s' % entry['imdb_id']]
         else:
+            method = 'post'
             data = {'tconst': entry['imdb_id']}
             status = self.session.post('http://www.imdb.com/list/_ajax/wlb_dropdown', data=data,
                                        cookies=self.cookies).json()
@@ -297,18 +308,16 @@ class ImdbEntrySet(MutableSet):
                 if a_list['data_list_id'] == self.list_id:
                     item_ids = a_list['data_list_item_ids']
                     break
+
+            for item_id in item_ids:
+                urls.append('http://www.imdb.com/list/%s/li%s/delete' % (self.list_id, item_id))
         if not item_ids:
             log.warning('%s is not in list %s, cannot be removed', entry['imdb_id'], self.list_id)
             return
-        data = {
-            'action': 'delete',
-            'list_id': self.list_id,
-            'ref_tag': 'title'
-        }
-        for item_id in item_ids:
+
+        for url in urls:
             log.debug('found movie %s with ID %s in list %s, removing', entry['title'], entry['imdb_id'], self.list_id)
-            self.session.post('http://www.imdb.com/list/_ajax/edit', data=dict(data, list_item_id=item_id),
-                              cookies=self.cookies)
+            self.session.request(method, url, data={'49e6c': self.hidden_value}, cookies=self.cookies)
             # We don't need to invalidate our cache if we remove the item
             self._items = [i for i in self._items if i['imdb_id'] != entry['imdb_id']] if self._items else None
 
@@ -319,15 +328,17 @@ class ImdbEntrySet(MutableSet):
         if 'imdb_id' not in entry:
             log.warning('Cannot add %s to imdb_list because it does not have an imdb_id', entry['title'])
             return
-        # Manually calling authenticate to fetch list_id and cookies
+        # Manually calling authenticate to fetch list_id and cookies and hidden form value
         self.authenticate()
-        data = {
-            'const': entry['imdb_id'],
-            'list_id': self.list_id,
-            'ref_tag': 'title'
-        }
+        if self.config['list'] == 'watchlist':
+            method = 'put'
+            url = 'http://www.imdb.com/watchlist/%s' % entry['imdb_id']
+        else:
+            method = 'post'
+            url = 'http://www.imdb.com/list/%s/%s/add' % (self.list_id, entry['imdb_id'])
+
         log.debug('adding title %s with ID %s to imdb %s', entry['title'], entry['imdb_id'], self.list_id)
-        self.session.post('http://www.imdb.com/list/_ajax/edit', data=data, cookies=self.cookies)
+        self.session.request(method, url, cookies=self.cookies, data={'49e6c': self.hidden_value})
 
     def add(self, entry):
         self._add(entry)
