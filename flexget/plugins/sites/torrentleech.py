@@ -13,7 +13,6 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.plugins.internal.urlrewriting import UrlRewritingError
-from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
 from flexget.utils.tools import parse_filesize
@@ -107,7 +106,7 @@ class UrlRewriteTorrentleech(object):
         data = {'username': config['username'], 'password': config['password']}
         # POST the login form:
         try:
-            login = requests.post('https://www.torrentleech.org/user/account/login/', data=data)
+            login = task.requests.post('https://www.torrentleech.org/user/account/login/', data=data)
         except RequestException as e:
             raise PluginError('Could not connect to torrentleech: %s', str(e))
 
@@ -131,7 +130,7 @@ class UrlRewriteTorrentleech(object):
                    quote(query.encode('utf-8')) + filter_url)
             log.debug('Using %s as torrentleech search url' % url)
 
-            page = requests.get(url, cookies=login.cookies).content
+            page = task.requests.get(url, cookies=login.cookies).content
             soup = get_soup(page)
 
             for tr in soup.find_all("tr", ["even", "odd"]):
