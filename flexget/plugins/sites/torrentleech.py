@@ -77,7 +77,7 @@ class UrlRewriteTorrentleech(object):
         url = entry['url']
         if url.endswith('.torrent'):
             return False
-        if url.startswith('https://www.torrentleech.org/'):
+        if url.startswith('https://v4.torrentleech.org/'):
             return True
         return False
 
@@ -87,7 +87,7 @@ class UrlRewriteTorrentleech(object):
             log.error("Didn't actually get a URL...")
         else:
             log.debug("Got the URL: %s" % entry['url'])
-        if entry['url'].startswith('https://www.torrentleech.org/torrents/browse/index/query/'):
+        if entry['url'].startswith('https://v4.torrentleech.org/torrents/browse/index/query/'):
             # use search
             results = self.search(task, entry)
             if not results:
@@ -106,7 +106,7 @@ class UrlRewriteTorrentleech(object):
         data = {'username': config['username'], 'password': config['password']}
         # POST the login form:
         try:
-            login = task.requests.post('https://www.torrentleech.org/user/account/login/', data=data)
+            login = task.requests.post('https://v4.torrentleech.org/user/account/login/', data=data)
         except RequestException as e:
             raise PluginError('Could not connect to torrentleech: %s', str(e))
 
@@ -126,7 +126,7 @@ class UrlRewriteTorrentleech(object):
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string).replace(":", "")
             # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-            url = ('https://www.torrentleech.org/torrents/browse/index/query/' +
+            url = ('https://v4.torrentleech.org/torrents/browse/index/query/' +
                    quote(query.encode('utf-8')) + filter_url)
             log.debug('Using %s as torrentleech search url' % url)
 
@@ -146,7 +146,7 @@ class UrlRewriteTorrentleech(object):
                 # parse link and split along /download/12345 and /name.torrent
                 download_url = re.search('(/download/\d+)/(.+\.torrent)', torrent_url)
                 # change link to rss and splice in rss_key
-                torrent_url = 'https://www.torrentleech.org/rss' + download_url.group(1) + '/' \
+                torrent_url = 'https://v4.torrentleech.org/rss' + download_url.group(1) + '/' \
                               + rss_key + '/' + download_url.group(2)
                 log.debug('RSS-ified download link: %s' % torrent_url)
                 entry['url'] = torrent_url
