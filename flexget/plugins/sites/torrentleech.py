@@ -126,7 +126,7 @@ class UrlRewriteTorrentleech(object):
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string).replace(":", "")
             # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-            url = ('https://v4.torrentleech.org//torrents/browse/index/query/' +
+            url = ('https://v4.torrentleech.org/torrents/browse/index/query/' +
                    quote(query.encode('utf-8')) + filter_url)
             log.debug('Using %s as torrentleech search url' % url)
 
