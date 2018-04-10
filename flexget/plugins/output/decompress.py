@@ -53,7 +53,7 @@ def get_output_path(to, entry):
             return render_from_entry(to, entry)
         else:
             return os.path.dirname(entry.get('location'))
-    except RenderError as error:
+    except RenderError:
         raise PluginError('Could not render path: %s', to)
 
 
