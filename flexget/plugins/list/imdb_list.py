@@ -225,8 +225,8 @@ class ImdbEntrySet(MutableSet):
                     item_type = row['title type'].lower()
                     name = row['title']
                     year = int(row['year']) if row['year'] != '????' else None
-                    created = datetime.strptime(row['created'], '%Y-%m-%d') if row.get('created', '') else None
-                    modified = datetime.strptime(row['modified'], '%Y-%m-%d') if row.get('modified', '') else None
+                    created = datetime.strptime(row['created'], '%Y-%m-%d') if row.get('created') else None
+                    modified = datetime.strptime(row['modified'], '%Y-%m-%d') if row.get('modified') else None
                     entry = Entry({
                         'title': '%s (%s)' % (name, year) if year != '????' else name,
                         'url': row['url'],
@@ -235,7 +235,7 @@ class ImdbEntrySet(MutableSet):
                         'imdb_list_position': int(row['position']) if 'position' in row else None,
                         'imdb_list_created': created,
                         'imdb_list_modified': modified,
-                        'imdb_list_description': row.get('description', None),
+                        'imdb_list_description': row.get('description'),
                         'imdb_name': name,
                         'imdb_year': year,
                         'imdb_user_score': float(row['imdb rating']) if row['imdb rating'] else None,
