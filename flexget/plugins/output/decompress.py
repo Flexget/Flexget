@@ -28,7 +28,7 @@ def open_archive_entry(entry):
     archive = None
 
     try:
-        archive_path = entry.get('location')
+        archive_path = entry.get('location', '')
 
         if not os.path.exists(archive_path):
             log.error('File no longer exists: %s', entry['location'])
