@@ -28,13 +28,14 @@ def open_archive_entry(entry):
     archive = None
 
     try:
-        archive_path = entry['location']
-        if not archive_path:
-            raise ValueError('Entry does not appear to represent a local file.')
+        archive_path = entry.get('location')
 
-        archive = archiveutil.open_archive(archive_path)
-    except (KeyError, ValueError):
-        log.error('Entry does not appear to represent a local file.')
+        if not os.path.exists(archive_path):
+            log.error('File no longer exists: %s', entry['location'])
+        elif not archive_path:
+            log.error('Entry does not appear to represent a local file.')
+        else:
+            archive = archiveutil.open_archive(archive_path)
     except archiveutil.BadArchive as error:
         fail_entry_with_error(entry, 'Bad archive: %s (%s)' % (archive_path, error))
     except archiveutil.NeedFirstVolume:
@@ -47,10 +48,13 @@ def open_archive_entry(entry):
 
 def get_output_path(to, entry):
     """Determine which path to output to"""
-    if to:
-        return render_from_entry(to, entry)
-    else:
-        return os.path.dirname(entry.get('location'))
+    try:
+        if to:
+            return render_from_entry(to, entry)
+        else:
+            return os.path.dirname(entry.get('location'))
+    except RenderError as error:
+        raise PluginError('Could not render path: %s', to)
 
 
 def extract_info(info, archive, to, keep_dirs):
@@ -76,6 +80,12 @@ def get_destination_path(info, to, keep_dirs):
     path_suffix = info.path if keep_dirs else os.path.basename(info.path)
 
     return os.path.join(to, path_suffix)
+
+
+def is_match(info, pattern):
+    """Returns whether an info record matches the supplied regex"""
+    match = re.compile(pattern, re.IGNORECASE).match
+    return bool(match(info.filename))
 
 
 class Decompress(object):
@@ -157,26 +167,15 @@ class Decompress(object):
         Optionally delete the original archive if config.delete_archive is True
         """
 
-        match = re.compile(config['regexp'], re.IGNORECASE).match
-
-        if not os.path.exists(entry['location']):
-            log.warning('File no longer exists: %s', entry['location'])
-            return
-
         archive = open_archive_entry(entry)
 
         if not archive:
             return
 
-        try:
-            to = get_output_path(config['to'], entry)
-        except RenderError as error:
-            log.error('Could not render path: %s', to)
-            entry.fail(str(error))
-            return
+        to = get_output_path(config['to'], entry)
 
         for info in archive.infolist():
-            if match(info.filename):
+            if is_match(info, config['regexp']):
                 log.debug('Found matching file: %s', info.filename)
                 extract_info(info, archive, to, config['keep_dirs'])
             else:
