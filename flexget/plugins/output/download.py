@@ -232,7 +232,7 @@ class PluginDownload(object):
             auth = entry['download_auth']
             log.debug('Custom auth enabled for %s download: %s', entry['title'], entry['download_auth'])
 
-        headers = task.config.get('headers', {})
+        headers = task.requests.headers
         if 'download_headers' in entry:
             headers.update(entry['download_headers'])
             log.debug('Custom headers enabled for %s download: %s', entry['title'], entry['download_headers'])
