@@ -130,7 +130,7 @@ class UrlRewriteTorrentleech(object):
 
             url = ('https://www.torrentleech.org/torrents/browse/list/query/' +
                    quote(query.encode('utf-8')) + filter_url)
-            log.debug('Using %s as torrentleech search url' % url)
+            log.debug('Using %s as torrentleech search url', url)
 
             results = task.requests.get(url, cookies=login.cookies).json()
 
