@@ -3,6 +3,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.utils import tobytes
 from future.moves.urllib.parse import urlparse, urlsplit
 
+import hashlib
 import os
 import logging
 import xml.sax
@@ -210,7 +211,7 @@ class InputRSS(object):
         log.debug('Requesting task `%s` url `%s`', task.name, config['url'])
 
         # Used to identify which etag/modified to use
-        url_hash = str(hash(config['url']))
+        url_hash = hashlib.md5(config['url'].encode('utf-8')).hexdigest()
 
         # set etag and last modified headers if config has not changed since
         # last run and if caching wasn't disabled with --no-cache argument.
