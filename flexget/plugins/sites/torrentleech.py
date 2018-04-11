@@ -98,15 +98,15 @@ class UrlRewriteTorrentleech(object):
         """
         Search for name from torrentleech.
         """
-        task.requests.headers.update({'User-Agent': 'curl/7.54.0'})
+        request_headers = {'User-Agent': 'curl/7.54.0'}
         rss_key = config['rss_key']
 
         # build the form request:
         data = {'username': config['username'], 'password': config['password']}
         # POST the login form:
         try:
-            login = task.requests.post('https://www.torrentleech.org/user/account/login/',
-                                       data=data, allow_redirects=True)
+            login = task.requests.post('https://www.torrentleech.org/user/account/login/', data=data,
+                                       headers=request_headers, allow_redirects=True)
         except RequestException as e:
             raise PluginError('Could not connect to torrentleech: %s', str(e))
 
@@ -132,23 +132,23 @@ class UrlRewriteTorrentleech(object):
                    quote(query.encode('utf-8')) + filter_url)
             log.debug('Using %s as torrentleech search url', url)
 
-            results = task.requests.get(url, cookies=login.cookies).json()
+            results = task.requests.get(url, headers=request_headers, cookies=login.cookies).json()
 
             for torrent in results['torrentList']:
                 entry = Entry()
+                entry['download_headers'] = request_headers
                 entry['title'] = torrent['name']
 
                 # construct download URL
-                torrent_url = 'https://www.torrentleech.org/rss/download/{}/{}/{}'.format(
-                    torrent['fid'], rss_key, torrent['filename'])
+                torrent_url = 'https://www.torrentleech.org/rss/download/{}/{}/{}'.format(torrent['fid'], rss_key,
+                                                                                          torrent['filename'])
                 log.debug('RSS-ified download link: %s', torrent_url)
                 entry['url'] = torrent_url
 
                 # seeders/leechers
                 entry['torrent_seeds'] = torrent['seeders']
                 entry['torrent_leeches'] = torrent['leechers']
-                entry['search_sort'] = torrent_availability(entry['torrent_seeds'],
-                                                            entry['torrent_leeches'])
+                entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
                 entry['content_size'] = parse_filesize(str(torrent['size']) + ' b')
                 entries.add(entry)
 
