@@ -198,7 +198,7 @@ def quality_property(text_attr):
         return QualComparator(getattr(self, text_attr))
 
     prop = hybrid_property(getter, setter)
-    prop.comparator(comparator)
+    prop = prop.comparator(comparator)
     return prop
 
 
