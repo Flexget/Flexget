@@ -304,22 +304,22 @@ class Series(Base):
     seasons = relation('Season', backref='series', cascade='all, delete, delete-orphan')
 
     # Make a special property that does indexed case insensitive lookups on name, but stores/returns specified case
-    def name_getter(self):
+    @hybrid_property
+    def name(self):
         return self._name
 
-    def name_setter(self, value):
+    @name.setter
+    def name(self, value):
         self._name = value
         self._name_normalized = normalize_series_name(value)
 
-    def name_comparator(self):
+    @name.comparator
+    def name(self):
         return NormalizedComparator(self._name_normalized)
 
     @property
     def name_normalized(self):
         return self._name_normalized
-
-    name = hybrid_property(name_getter, name_setter)
-    name.comparator(name_comparator)
 
     def __str__(self):
         return '<Series(id=%s,name=%s)>' % (self.id, self.name)
