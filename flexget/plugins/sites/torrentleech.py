@@ -13,6 +13,7 @@ from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.plugins.internal.urlrewriting import UrlRewritingError
 from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('torrentleech')
 
@@ -129,7 +130,7 @@ class UrlRewriteTorrentleech(object):
 
             url = ('https://www.torrentleech.org/torrents/browse/list/query/' +
                    quote(query.encode('utf-8')) + filter_url)
-            log.debug('Using {} as torrentleech search url'.format(url))
+            log.debug('Using %s as torrentleech search url' % url)
 
             results = task.requests.get(url, cookies=login.cookies).json()
 
@@ -140,7 +141,7 @@ class UrlRewriteTorrentleech(object):
                 # construct download URL
                 torrent_url = 'https://www.torrentleech.org/rss/download/{}/{}/{}'.format(
                     torrent['fid'], rss_key, torrent['filename'])
-                log.debug('RSS-ified download link: {}'.format(torrent_url))
+                log.debug('RSS-ified download link: %s', torrent_url)
                 entry['url'] = torrent_url
 
                 # seeders/leechers
