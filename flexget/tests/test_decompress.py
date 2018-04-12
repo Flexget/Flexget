@@ -10,7 +10,7 @@ except ImportError:
     rarfile = None
 
 
-@pytest.mark.usefixtures('tmpdir', 'caplog')
+@pytest.mark.usefixtures('tmpdir')
 class TestExtract(object):
     config = """
         templates:
