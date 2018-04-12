@@ -85,7 +85,14 @@ def get_destination_path(info, to, keep_dirs):
 def is_match(info, pattern):
     """Returns whether an info record matches the supplied regex"""
     match = re.compile(pattern, re.IGNORECASE).match
-    return bool(match(info.filename))
+    is_match = bool(match(info.filename))
+
+    if is_match:
+        log.debug('Found matching file: %s', info.filename)
+    else:
+        log.debug('File did not match regexp: %s', info.filename)
+
+    return is_match
 
 
 class Decompress(object):
@@ -176,10 +183,7 @@ class Decompress(object):
 
         for info in archive.infolist():
             if is_match(info, config['regexp']):
-                log.debug('Found matching file: %s', info.filename)
                 extract_info(info, archive, to, config['keep_dirs'])
-            else:
-                log.debug('File did not match regexp: %s', info.filename)
 
         if config['delete_archive']:
             archive.delete()
