@@ -23,17 +23,17 @@ def fail_entry_with_error(entry, error):
 
 def open_archive_entry(entry):
     """
-    Convenience method for opening archives from entries. Returns an archive.Archive object
+    Convenience function for opening archives from entries. Returns an archive.Archive object
     """
     archive = None
 
     try:
         archive_path = entry.get('location', '')
 
-        if not os.path.exists(archive_path):
-            log.error('File no longer exists: %s', entry['location'])
-        elif not archive_path:
+        if not archive_path:
             log.error('Entry does not appear to represent a local file.')
+        elif not os.path.exists(archive_path):
+            log.error('File no longer exists: %s', entry['location'])
         else:
             archive = archiveutil.open_archive(archive_path)
     except archiveutil.BadArchive as error:
