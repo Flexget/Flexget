@@ -23,6 +23,9 @@ from flexget.utils.tools import parse_timedelta
 from flexget.config_schema import one_or_more
 from fnmatch import fnmatch
 
+def remove_non_ascii(text):
+        return re.sub(r'[^\x00-\x7F]',' ', text)
+
 try:
     import transmissionrpc
     from transmissionrpc import TransmissionError
@@ -525,7 +528,7 @@ class PluginTransmission(TransmissionBase):
 
                         # Get new filename without ext
                         file_ext = os.path.splitext(fl[r.id][main_id]['name'])[1]
-                        file_path = os.path.dirname(os.path.join(download_dir, fl[r.id][main_id]['name']))
+                        file_path = os.path.dirname(os.path.join(remove_non_ascii(download_dir), remove_non_ascii(fl[r.id][main_id]['name'])))
                         filename = options['post']['content_filename']
                         if config['host'] == 'localhost' or config['host'] == '127.0.0.1':
                             counter = 1
