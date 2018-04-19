@@ -7,7 +7,7 @@ mock==2.0.0
 vcrpy~=1.11.1  # requests 2.16.3 doesn't work with vcrpy <1.11.1
 virtualenv==15.1.0
 boto3
-wheel==0.29.0
+wheel==0.31.0
 pytest>=3.3.0
 pytest-xdist==1.20.0
 pytest-runner
@@ -15,4 +15,4 @@ pytest-cov==2.5.1
 gitpython==2.1.5
 codacy-coverage>=1.2.18
 pip-tools==1.9.0
-twine==1.9.1
+twine==1.11.0
