@@ -3,7 +3,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import urlparse
 
 import logging
-from flexget.utils import requests, json
+from flexget.utils import requests
 from flexget.utils.requests import RequestException
 from flexget import plugin
 from flexget.event import event
