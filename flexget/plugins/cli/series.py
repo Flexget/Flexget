@@ -93,7 +93,7 @@ def display_summary(options):
             name_column = series.name
 
             behind = (0,)
-            begin = series.begin.identifier if series.begin else None
+            begin = series.begin.identifier if series.begin else '-'
             latest_release = '-'
             age_col = '-'
             episode_id = '-'
