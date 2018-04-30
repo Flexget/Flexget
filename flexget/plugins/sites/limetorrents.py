@@ -1,5 +1,4 @@
 from __future__ import unicode_literals, division, absolute_import
-from future.moves.urllib.parse import quote
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
@@ -13,7 +12,6 @@ from flexget.utils.search import torrent_availability, clean_symbols
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('limetorrents')
-
 
 class Limetorrents(object):
     """
