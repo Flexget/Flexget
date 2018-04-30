@@ -63,7 +63,7 @@ class Limetorrents(object):
             cleaned_search_string = clean_symbols(search_string).replace(' ', '-')
 
             query = 'search/{0}/{1}/{2}'.format(category, cleaned_search_string.encode('utf8'), order_by)
-            log.info('Using search: %s; category: %s; ordering: %s', cleaned_search_string, category, order_by or 'default')
+            log.debug('Using search: %s; category: %s; ordering: %s', cleaned_search_string, category, order_by or 'default')
             try:
                 page = task.requests.get(self.base_url + query)
                 log.debug('requesting: %s', page.url)
