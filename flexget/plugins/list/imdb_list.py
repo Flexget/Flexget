@@ -164,7 +164,7 @@ class ImdbEntrySet(MutableSet):
                 log.debug('email=%s, password=%s', data['email'], data['password'])
                 self._session.headers.update({'Referer': url_credentials})
                 self._session.post(action, data=data)
-                self._session.headers.update({'Referer': 'http://www.imdb.com/'})
+                self._session.headers.update({'Referer': 'https://www.imdb.com/'})
 
                 self.user_id = self.get_user_id_and_hidden_value()
                 if not self.user_id:
@@ -180,7 +180,7 @@ class ImdbEntrySet(MutableSet):
                 log.debug('could not find list ID in cache, fetching from IMDB')
                 if self.config['list'] == 'watchlist':
                     data = {'consts[]': 'tt0133093', 'tracking_tag': 'watchlistRibbon'}
-                    wl_data = self._session.post('http://www.imdb.com/list/_ajax/watchlist_has', data=data,
+                    wl_data = self._session.post('https://www.imdb.com/list/_ajax/watchlist_has', data=data,
                                                  cookies=self.cookies).json()
                     try:
                         self.list_id = wl_data['list_id']
@@ -191,7 +191,7 @@ class ImdbEntrySet(MutableSet):
                     self.list_id = self.config['list']
                 else:
                     data = {'tconst': 'tt0133093'}
-                    list_data = self._session.post('http://www.imdb.com/list/_ajax/wlb_dropdown', data=data,
+                    list_data = self._session.post('https://www.imdb.com/list/_ajax/wlb_dropdown', data=data,
                                                    cookies=self.cookies).json()
                     for li in list_data['items']:
                         if li['wlb_text'] == self.config['list']:
@@ -215,7 +215,7 @@ class ImdbEntrySet(MutableSet):
         if self._items is None:
             log.debug('fetching items from IMDB')
             try:
-                r = self.session.get('http://www.imdb.com/list/export?list_id=%s&author_id=%s' %
+                r = self.session.get('https://www.imdb.com/list/export?list_id=%s&author_id=%s' %
                                      (self.list_id, self.user_id), cookies=self.cookies)
 
             except RequestException as e:
@@ -296,14 +296,14 @@ class ImdbEntrySet(MutableSet):
         if self.config['list'] == 'watchlist':
             method = 'delete'
             data = {'consts[]': entry['imdb_id'], 'tracking_tag': 'watchlistRibbon'}
-            status = self.session.post('http://www.imdb.com/list/_ajax/watchlist_has', data=data,
+            status = self.session.post('https://www.imdb.com/list/_ajax/watchlist_has', data=data,
                                        cookies=self.cookies).json()
             item_ids = status.get('has', {}).get(entry['imdb_id'])
-            urls = ['http://www.imdb.com/watchlist/%s' % entry['imdb_id']]
+            urls = ['https://www.imdb.com/watchlist/%s' % entry['imdb_id']]
         else:
             method = 'post'
             data = {'tconst': entry['imdb_id']}
-            status = self.session.post('http://www.imdb.com/list/_ajax/wlb_dropdown', data=data,
+            status = self.session.post('https://www.imdb.com/list/_ajax/wlb_dropdown', data=data,
                                        cookies=self.cookies).json()
             for a_list in status['items']:
                 if a_list['data_list_id'] == self.list_id:
@@ -311,7 +311,7 @@ class ImdbEntrySet(MutableSet):
                     break
 
             for item_id in item_ids:
-                urls.append('http://www.imdb.com/list/%s/li%s/delete' % (self.list_id, item_id))
+                urls.append('https://www.imdb.com/list/%s/li%s/delete' % (self.list_id, item_id))
         if not item_ids:
             log.warning('%s is not in list %s, cannot be removed', entry['imdb_id'], self.list_id)
             return
@@ -333,10 +333,10 @@ class ImdbEntrySet(MutableSet):
         self.authenticate()
         if self.config['list'] == 'watchlist':
             method = 'put'
-            url = 'http://www.imdb.com/watchlist/%s' % entry['imdb_id']
+            url = 'https://www.imdb.com/watchlist/%s' % entry['imdb_id']
         else:
             method = 'post'
-            url = 'http://www.imdb.com/list/%s/%s/add' % (self.list_id, entry['imdb_id'])
+            url = 'https://www.imdb.com/list/%s/%s/add' % (self.list_id, entry['imdb_id'])
 
         log.debug('adding title %s with ID %s to imdb %s', entry['title'], entry['imdb_id'], self.list_id)
         self.session.request(method, url, cookies=self.cookies, data={'49e6c': self.hidden_value})
