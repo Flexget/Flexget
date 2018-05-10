@@ -32,6 +32,7 @@ class SonarrSet(MutableSet):
         'type': 'object',
         'properties': {
             'base_url': {'type': 'string', 'default': 'http://localhost'},
+            'base_path': {'type': 'string', 'default': ''},
             'port': {'type': 'number', 'default': 80},
             'api_key': {'type': 'string'},
             'include_ended': {'type': 'boolean', 'default': True},
@@ -54,7 +55,8 @@ class SonarrSet(MutableSet):
     def _sonarr_request(self, endpoint, term=None, method='get', data=None):
         base_url = self.config['base_url']
         port = self.config['port']
-        url = '{}:{}/api/{}'.format(base_url, port, endpoint)
+        base_path = self.config['base_path']
+        url = '{}:{}{}/api/{}'.format(base_url, port, base_path, endpoint)
         headers = {'X-Api-Key': self.config['api_key']}
         if term:
             url += '?term={}'.format(term)
