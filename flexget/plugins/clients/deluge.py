@@ -15,7 +15,7 @@ from flexget.event import event
 from flexget.utils.pathscrub import pathscrub
 from flexget.utils.template import RenderError
 
-log = logging.getLogger('deluge3')
+log = logging.getLogger('deluge')
 
 
 class DelugePlugin(object):
