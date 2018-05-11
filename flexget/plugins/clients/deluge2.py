@@ -12,8 +12,8 @@ import time
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from utils.pathscrub import pathscrub
-from utils.template import RenderError
+from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError
 
 log = logging.getLogger('deluge3')
 
@@ -32,7 +32,7 @@ class DelugePlugin(object):
                                          e, log)
         config = self.prepare_config(config)
         self.client = DelugeRPCClient(config['host'], config['port'], config['username'], config['password'],
-                                      decode_utf8=True, deluge_version=2)
+                                      decode_utf8=True) #, deluge_version=2)
 
     def on_task_abort(self, task, config):
         pass
