@@ -70,6 +70,7 @@ class TestQualityParser(object):
         ('Test.File.br-rip', 'bluray'),
         ('Test.File.720px', '720p'),
         ('Test.File.720p50', '720p'),
+        ('Test.File.720p60', '720p'),
 
         ('Test.File.dvd.rip', 'dvdrip'),
         ('Test.File.dvd.rip.r5', 'r5'),
