@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 
 import base64
 import re
+import sys
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
@@ -31,6 +32,16 @@ class DelugePlugin(object):
                                          'deluge-client >=1.2 module and it\'s dependencies required. ImportError: %s' %
                                          e, log)
         config = self.prepare_config(config)
+
+        if config['host'] in ['localhost', '127.0.0.1'] and not config.get('username'):
+            # If an username is not specified, we have to do a lookup for the localclient username/password
+            auth = self.get_localhost_auth()
+            if auth and auth[0]:
+                config['username'], config['password'] = auth
+            else:
+                raise plugin.PluginError('Unable to get local authentication info for Deluge. You may need to '
+                                         'specify an username and password from your Deluge auth file.')
+
         self.client = DelugeRPCClient(config['host'], config['port'], config['username'], config['password'],
                                       decode_utf8=True)
 
@@ -58,6 +69,31 @@ class DelugePlugin(object):
         if filters is None:
             filters = {}
         return self.client.call('core.get_torrents_status', filters, fields)
+
+    def get_localhost_auth(self):
+        if sys.platform.startswith('win'):
+            auth_file = os.path.join(os.getenv('APPDATA'), 'deluge', 'auth')
+        else:
+            auth_file = os.path.expanduser('~/.config/deluge/auth')
+
+        with open(auth_file) as auth:
+            for line in auth:
+                line = line.strip()
+                if line.startswith('#') or not line:
+                    # This is a comment or blank line
+                    continue
+
+                lsplit = line.split(':')
+
+                if len(lsplit) == 2:
+                    username, password = lsplit
+                elif len(lsplit) == 3:
+                    username, password, level = lsplit
+                else:
+                    continue
+
+                if username == 'localclient':
+                    return username, password
 
 
 class InputDeluge(DelugePlugin):
