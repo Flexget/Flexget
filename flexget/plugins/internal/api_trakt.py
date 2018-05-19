@@ -1037,20 +1037,9 @@ class TraktUserCache(TimedDict):
     def __init__(self, cache_time):
         super(TraktUserCache, self).__init__(cache_time=cache_time)
         self.updaters = {
-            'collection': {
-                'shows': self.__update_collection_cache,
-                'movies': self.__update_collection_cache
-            },
-            'watched': {
-                'shows': self.__update_watched_cache,
-                'movies': self.__update_watched_cache
-            },
-            'ratings': {
-                'shows': self.__update_ratings_cache,
-                'seasons': self.__update_ratings_cache,
-                'episodes': self.__update_ratings_cache,
-                'movies': self.__update_ratings_cache
-            }
+            'collection': self.__update_collection_cache,
+            'watched': self.__update_watched_cache,
+            'ratings': self.__update_ratings_cache,
         }
 
     def __get_user_cache(self, username=None, account=None):
@@ -1100,7 +1089,7 @@ class TraktUserCache(TimedDict):
 
         if not cache:
             log.debug('No %s found in cache. Refreshing.', data_type)
-            self.updaters[data_type][media_type](cache, media_type, username=username, account=account)
+            self.updaters[data_type](cache, media_type, username=username, account=account)
             cache = self.__get_user_cache(username=username, account=account)[data_type][media_type]
 
         if not cache:
