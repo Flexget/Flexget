@@ -84,15 +84,8 @@ class DelugePlugin(object):
                     continue
 
                 lsplit = line.split(':')
-
-                if len(lsplit) == 2:
-                    username, password = lsplit
-                elif len(lsplit) == 3:
-                    username, password, level = lsplit
-                else:
-                    continue
-
-                if username == 'localclient':
+                if lsplit[0] == 'localclient':
+                    username, password = lsplit[:2]
                     return username, password
 
 
