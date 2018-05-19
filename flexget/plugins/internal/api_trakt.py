@@ -1001,7 +1001,7 @@ def get_user_data(data_type, media_type, session, username):
     try:
         data = session.get(get_api_url('users', username, data_type, media_type)).json()
         if not data:
-            log.warning('No %s data returned from trakt endpoint %s.', endpoint)
+            log.warning('No %s data returned from trakt endpoint %s.', data_type, endpoint)
             return
         log.verbose('Received %d records from trakt.tv for user %s from endpoint %s', len(data), username, endpoint)
 
