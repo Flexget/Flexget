@@ -184,6 +184,22 @@ class Entry(LazyDict):
     def undecided(self):
         return self._state == 'undecided'
 
+    @property
+    def is_show(self):
+        return self.get('series_name') or self.get('tvdb_id', eval_lazy=False)
+
+    @property
+    def is_episode(self):
+        return self.get('series_season') and self.get('series_episode')
+
+    @property
+    def is_season(self):
+        return self.get('series_season') and not self.is_episode
+
+    @property
+    def is_movie(self):
+        return bool(self.get('movie_name'))
+
     def __setitem__(self, key, value):
         # Enforce unicode compatibility.
         if PY2 and isinstance(value, native_str):
