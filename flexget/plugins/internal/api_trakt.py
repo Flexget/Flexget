@@ -632,8 +632,7 @@ class TraktShow(Base):
                 raise LookupError('Episode %s %s not found in cache' % (season, number))
             log.debug('Episode %s %s not found in cache, looking up from trakt.', season, number)
             try:
-                ses = get_session()
-                data = ses.get(url).json()
+                data = get_session().get(url).json()
             except requests.RequestException:
                 raise LookupError('Error Retrieving Trakt url: %s' % url)
             if not data:
@@ -987,7 +986,7 @@ def get_trakt_data(media_type, title=None, year=None, trakt_ids=None):
         raise LookupError('Error getting trakt data for id %s: %s' % (trakt_id, e))
 
 
-def get_user_data(data_type, media_type, session, username, log_context):
+def get_user_data(data_type, media_type, session, username):
     """
     Fetches user data from Trakt.tv on the /users/<username>/<data_type>/<media_type> end point. Eg. a user's
     movie collection is fetched from /users/<username>/collection/movies.
@@ -995,18 +994,35 @@ def get_user_data(data_type, media_type, session, username, log_context):
     :param media_type: Type of media we want <data_type> for eg. shows, episodes, movies.
     :param session: A trakt requests session with a valid token
     :param username: Username of the user to fetch data
-    :param log_context: A string to interpolate in the logs for context eg. "shows watched history"
     :return:
     """
+
+    endpoint = '{}/{}'.format(data_type, media_type)
     try:
         data = session.get(get_api_url('users', username, data_type, media_type)).json()
         if not data:
-            log.warning('No %s data returned from trakt.', log_context)
+            log.warning('No %s data returned from trakt endpoint %s.', endpoint)
             return
-        log.verbose('Received %d records from trakt.tv %s\'s %s', len(data), username, log_context)
+        log.verbose('Received %d records from trakt.tv for user %s from endpoint %s', len(data), username, endpoint)
+
+        # extract show, episode and movie information
+        for item in data:
+            episode = item.pop('episode', {})
+            season = item.pop('season', {})
+            show = item.pop('show', {})
+            movie = item.pop('movie', {})
+            item.update(episode)
+            item.update(season)
+            item.update(movie)
+            # show is irrelevant if either episode or season is present
+            if not episode and not season:
+                item.update(show)
+
         return data
+
     except requests.RequestException as e:
-        raise plugin.PluginError('Unable to get %s data from trakt.tv: %s' % (log_context, e))
+        raise plugin.PluginError('Error fetching data from trakt.tv endpoint %s for user %s: %s' %
+                                 (endpoint, username, e))
 
 
 def get_username(username=None, account=None):
@@ -1022,18 +1038,18 @@ class TraktUserCache(TimedDict):
         super(TraktUserCache, self).__init__(cache_time=cache_time)
         self.updaters = {
             'collection': {
-                'shows': self.__update_shows_collection,
-                'movies': self.__update_movie_collection
+                'shows': self.__update_collection_cache,
+                'movies': self.__update_collection_cache
             },
             'watched': {
-                'shows': self.__update_shows_watched,
-                'movies': self.__update_movie_watched
+                'shows': self.__update_watched_cache,
+                'movies': self.__update_watched_cache
             },
             'ratings': {
-                'shows': self.__update_user_show_ratings,
-                'seasons': self.__update_user_season_ratings,
-                'episodes': self.__update_user_episode_ratings,
-                'movies': self.__update_user_movie_ratings
+                'shows': self.__update_ratings_cache,
+                'seasons': self.__update_ratings_cache,
+                'episodes': self.__update_ratings_cache,
+                'movies': self.__update_ratings_cache
             }
         }
 
@@ -1050,101 +1066,41 @@ class TraktUserCache(TimedDict):
 
         return self[identifier]
 
-    def __update_shows_collection(self, cache, username=None, account=None):
-        collection = get_user_data(data_type='collection', media_type='shows', session=get_session(account),
-                                   log_context='shows collection', username=username)
+    def __update_collection_cache(self, cache, media_type, username=None, account=None):
+        collection = get_user_data(data_type='collection', media_type=media_type, session=get_session(account),
+                                   username=username)
 
-        for series in collection:
-            series_id = series['show']['ids']['trakt']
-            cache[series_id] = series['show']
-            cache[series_id]['seasons'] = series['seasons']
-            cache[series_id]['collected_at'] = dateutil_parse(series['last_collected_at'], ignoretz=True)
+        for media in collection:
+            media_id = media['ids']['trakt']
+            cache[media_id] = media
+            collected_at = media.get('collected_at') or media.get('last_collected_at')
+            cache[media_id]['collected_at'] = dateutil_parse(collected_at, ignoretz=True)
 
-    def __update_movie_collection(self, cache, username=None, account=None):
-        collection = get_user_data(data_type='collection', media_type='movies', session=get_session(account),
-                                   log_context='movie collection', username=username)
+    def __update_watched_cache(self, cache, media_type, username=None, account=None):
+        watched = get_user_data(data_type='watched', media_type=media_type, session=get_session(account),
+                                username=username)
+        for media in watched:
+            media_id = media['ids']['trakt']
+            cache[media_id] = media
+            cache[media_id]['watched_at'] = dateutil_parse(media['last_watched_at'], ignoretz=True)
+            cache[media_id]['plays'] = media['plays']
 
-        for movie in collection:
-            movie_id = movie['movie']['ids']['trakt']
-            cache[movie_id] = movie['movie']
-            cache[movie_id]['collected_at'] = dateutil_parse(movie['collected_at'], ignoretz=True)
-
-    def __update_shows_watched(self, cache, username=None, account=None):
-        watched = get_user_data(data_type='watched', media_type='shows', session=get_session(account),
-                                log_context='show watched history', username=username)
-        for series in watched:
-            series_id = series['show']['ids']['trakt']
-            cache[series_id] = series['show']
-            cache[series_id]['seasons'] = series['seasons']
-            cache[series_id]['watched_at'] = dateutil_parse(series['last_watched_at'], ignoretz=True)
-            cache[series_id]['plays'] = series['plays']
-
-    def __update_movie_watched(self, cache, username=None, account=None):
-        watched = get_user_data(data_type='watched', media_type='movies', session=get_session(account),
-                                log_context='movie watched history', username=username)
-        for movie in watched:
-            movie_id = movie['movie']['ids']['trakt']
-            cache[movie_id] = movie['movie']
-            cache[movie_id]['watched_at'] = dateutil_parse(movie['last_watched_at'], ignoretz=True)
-            cache[movie_id]['plays'] = movie['plays']
-
-    def __update_user_show_ratings(self, cache, username=None, account=None):
-        show_ratings = get_user_data(data_type='ratings', media_type='shows', session=get_session(account=account),
-                                     log_context='user show ratings', username=username)
-        for item in show_ratings:
+    def __update_ratings_cache(self, cache, media_type, username=None, account=None):
+        ratings = get_user_data(data_type='ratings', media_type=media_type, session=get_session(account=account),
+                                username=username)
+        for media in ratings:
             # get the proper cache from the type returned by trakt
-            show_trakt_id = item['show']['ids']['trakt']
-            cache[show_trakt_id] = item['show']
-            cache[show_trakt_id]['rated_at'] = dateutil_parse(item['rated_at'], ignoretz=True)
-            cache[show_trakt_id]['rating'] = item['rating']
-
-    def __update_user_season_ratings(self, cache, username=None, account=None):
-        season_ratings = get_user_data(data_type='ratings', media_type='seasons', session=get_session(account=account),
-                                       log_context='user season ratings', username=username)
-
-        for item in season_ratings:
-            # season cannot be put into shows because the code would turn to spaghetti later when retrieving from cache
-            # instead we put some season info inside the season cache key'd to series id
-            # eg. cache['seasons'][<show_id>][<season_number>] = ratings and stuff
-            show_id = item['show']['ids']['trakt']
-            season = item['season']['number']
-            cache.setdefault(show_id, {})
-            cache[show_id].setdefault(season, {})
-            show_cache = cache[show_id]
-            season_id = season
-            show_cache[season_id] = item['show']
-            show_cache[season_id]['rated_at'] = dateutil_parse(item['rated_at'], ignoretz=True)
-            show_cache[season_id]['rating'] = item['rating']
-
-    def __update_user_episode_ratings(self, cache, username=None, account=None):
-        episode_ratings = get_user_data(data_type='ratings', media_type='episodes',
-                                        session=get_session(account=account), log_context='user episode ratings',
-                                        username=username)
-
-        for item in episode_ratings:
-            # get the proper cache from the type returned by trakt
-            episode_trakt_id = item['episode']['ids']['trakt']
-            cache[episode_trakt_id] = item['episode']
-            cache[episode_trakt_id]['rated_at'] = dateutil_parse(item['rated_at'], ignoretz=True)
-            cache[episode_trakt_id]['rating'] = item['rating']
-
-    def __update_user_movie_ratings(self, cache, username=None, account=None):
-        movie_ratings = get_user_data(data_type='ratings', media_type='movies', session=get_session(account=account),
-                                      log_context='user movie ratings', username=username)
-
-        for item in movie_ratings:
-            # get the proper cache from the type returned by trakt
-            movie_trakt_id = item['movie']['ids']['trakt']
-            cache[movie_trakt_id] = item['movie']
-            cache[movie_trakt_id]['rated_at'] = dateutil_parse(item['rated_at'], ignoretz=True)
-            cache[movie_trakt_id]['rating'] = item['rating']
+            media_id = media['ids']['trakt']
+            cache[media_id] = media
+            cache[media_id]['rated_at'] = dateutil_parse(media['rated_at'], ignoretz=True)
+            cache[media_id]['rating'] = media['rating']
 
     def __get_data(self, data_type, media_type, username=None, account=None):
         cache = self.__get_user_cache(username=username, account=account)[data_type][media_type]
 
         if not cache:
             log.debug('No %s found in cache. Refreshing.', data_type)
-            self.updaters[data_type][media_type](cache, username=username, account=account)
+            self.updaters[data_type][media_type](cache, media_type, username=username, account=account)
             cache = self.__get_user_cache(username=username, account=account)[data_type][media_type]
 
         if not cache:
@@ -1397,8 +1353,8 @@ class ApiTrakt(object):
     def season_user_ratings(self, trakt_data, title):
         cache = user_cache.get_season_user_ratings(username=self.username, account=self.account)
         user_rating = None
-        if trakt_data.series_id in cache and trakt_data.number in cache[trakt_data.series_id]:
-            user_rating = cache[trakt_data.series_id][trakt_data.number]['rating']
+        if trakt_data.id in cache and trakt_data.number == cache[trakt_data.id]['number']:
+            user_rating = cache[trakt_data.id]['rating']
         log.debug('User rating for season entry "%s" is: %s', title, user_rating)
         return user_rating
 
