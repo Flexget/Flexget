@@ -20,7 +20,7 @@ except ImportError:
 log = logging.getLogger('trakt_lookup')
 
 
-class TraktLookup(object):
+class TraktLazyLookup(object):
     def __init__(self, field_map, lookup_function):
         self.field_map = field_map
         self.lookup_function = lookup_function
@@ -321,21 +321,21 @@ class PluginTraktLookup(object):
 
         for entry in task.entries:
             if entry.is_show:
-                entry.register_lazy_func(TraktLookup(self.series_map, self.__get_series), self.series_map)
+                entry.register_lazy_func(TraktLazyLookup(self.series_map, self.__get_series), self.series_map)
                 # TODO cleaner way to do this?
-                entry.register_lazy_func(TraktLookup(self.series_actor_map, self.__get_series),
+                entry.register_lazy_func(TraktLazyLookup(self.series_actor_map, self.__get_series),
                                          self.series_actor_map)
-                entry.register_lazy_func(TraktLookup(self.show_translate_map, self.__get_series),
+                entry.register_lazy_func(TraktLazyLookup(self.show_translate_map, self.__get_series),
                                          self.show_translate_map)
                 if entry.is_episode:
-                    entry.register_lazy_func(TraktLookup(self.episode_map, self.__get_episode), self.episode_map)
+                    entry.register_lazy_func(TraktLazyLookup(self.episode_map, self.__get_episode), self.episode_map)
                 elif entry.is_season:
-                    entry.register_lazy_func(TraktLookup(self.season_map, self.__get_season), self.season_map)
+                    entry.register_lazy_func(TraktLazyLookup(self.season_map, self.__get_season), self.season_map)
             else:
-                entry.register_lazy_func(TraktLookup(self.movie_map, self.__get_movie), self.movie_map)
+                entry.register_lazy_func(TraktLazyLookup(self.movie_map, self.__get_movie), self.movie_map)
                 # TODO cleaner way to do this?
-                entry.register_lazy_func(TraktLookup(self.movie_actor_map, self.__get_movie), self.movie_actor_map)
-                entry.register_lazy_func(TraktLookup(self.movie_translate_map, self.__get_movie),
+                entry.register_lazy_func(TraktLazyLookup(self.movie_actor_map, self.__get_movie), self.movie_actor_map)
+                entry.register_lazy_func(TraktLazyLookup(self.movie_translate_map, self.__get_movie),
                                          self.movie_translate_map)
 
             if config.get('username') or config.get('account'):

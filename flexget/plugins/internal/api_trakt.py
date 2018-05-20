@@ -643,6 +643,7 @@ class TraktShow(Base):
             else:
                 episode = TraktEpisode(data, session)
                 self.episodes.append(episode)
+            session.commit()
         return episode
 
     def get_season(self, number, session, only_cached=False):
@@ -672,6 +673,7 @@ class TraktShow(Base):
                     season = db_season
             if not season:
                 raise LookupError('Season %s not found for show %s' % (number, self.title))
+            session.commit()
         return season
 
     @property
