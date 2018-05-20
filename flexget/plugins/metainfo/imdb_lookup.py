@@ -63,6 +63,7 @@ class Movie(Base):
 
     score = Column(Float)
     votes = Column(Integer)
+    meta_score = Column(Integer)
     year = Column(Integer)
     plot_outline = Column(Unicode)
     mpaa_rating = Column(String, default='')
@@ -222,6 +223,7 @@ class ImdbLookup(object):
         'imdb_plot_outline': 'plot_outline',
         'imdb_score': 'score',
         'imdb_votes': 'votes',
+        'imdb_meta_score': 'meta_score'
         'imdb_year': 'year',
         'imdb_genres': lambda movie: [genre.name for genre in movie.genres],
         'imdb_languages': lambda movie: [lang.language.name for lang in movie.languages],
@@ -404,7 +406,7 @@ class ImdbLookup(object):
                 log.exception(e)
             raise plugin.PluginError('Invalid parameter: %s' % entry['imdb_url'], log)
 
-        for att in ['title', 'score', 'votes', 'year', 'genres', 'languages', 'actors', 'directors', 'writers',
+        for att in ['title', 'score', 'votes', 'meta_score', 'year', 'genres', 'languages', 'actors', 'directors', 'writers',
                     'mpaa_rating']:
             log.trace('movie.%s: %s' % (att, getattr(movie, att)))
 
@@ -428,6 +430,7 @@ class ImdbLookup(object):
         movie.original_title = parser.original_name
         movie.score = parser.score
         movie.votes = parser.votes
+        movie.meta_score = parser.meta_score
         movie.year = parser.year
         movie.mpaa_rating = parser.mpaa_rating
         movie.plot_outline = parser.plot_outline
