@@ -7,6 +7,7 @@ import logging
 from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
+from flexget.utils.entry import is_episode, is_season, is_show, is_movie
 
 try:
     from flexget.plugins.internal.api_trakt import ApiTrakt, list_actors, get_translations_dict
@@ -320,16 +321,16 @@ class PluginTraktLookup(object):
             config = dict()
 
         for entry in task.entries:
-            if entry.is_show:
+            if is_show(entry):
                 entry.register_lazy_func(TraktLazyLookup(self.series_map, self.__get_series), self.series_map)
                 # TODO cleaner way to do this?
                 entry.register_lazy_func(TraktLazyLookup(self.series_actor_map, self.__get_series),
                                          self.series_actor_map)
                 entry.register_lazy_func(TraktLazyLookup(self.show_translate_map, self.__get_series),
                                          self.show_translate_map)
-                if entry.is_episode:
+                if is_episode(entry):
                     entry.register_lazy_func(TraktLazyLookup(self.episode_map, self.__get_episode), self.episode_map)
-                elif entry.is_season:
+                elif is_season(entry):
                     entry.register_lazy_func(TraktLazyLookup(self.season_map, self.__get_season), self.season_map)
             else:
                 entry.register_lazy_func(TraktLazyLookup(self.movie_map, self.__get_movie), self.movie_map)
@@ -344,13 +345,13 @@ class PluginTraktLookup(object):
                 self.__register_lazy_user_ratings_lookup(entry)
 
     def __get_media_type_from_entry(self, entry):
-        if entry.is_episode:
+        if is_episode(entry):
             media_type = 'episode'
-        elif entry.is_season:
+        elif is_season(entry):
             media_type = 'season'
-        elif entry.is_show:
+        elif is_show(entry):
             media_type = 'show'
-        elif entry.is_movie:
+        elif is_movie(entry):
             media_type = 'movie'
         else:
             raise plugin.PluginError('Unknown media type in entry %s', entry['title'])
@@ -367,7 +368,7 @@ class PluginTraktLookup(object):
     def __register_lazy_user_ratings_lookup(self, entry):
         data_type = 'ratings'
 
-        if entry.is_show:
+        if is_show(entry):
             self.__register_lazy_user_data_lookup(entry=entry, data_type=data_type, media_type='show')
             self.__register_lazy_user_data_lookup(entry=entry, data_type=data_type, media_type='season')
             self.__register_lazy_user_data_lookup(entry=entry, data_type=data_type, media_type='episode')

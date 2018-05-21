@@ -898,7 +898,7 @@ class TraktShowIds(object):
         return any([self.trakt_id, self.trakt_slug, self.tmdb_id, self.imdb_id, self.tvdb_id, self.tvrage_id])
 
 
-def get_cached(table, session, title=None, year=None, trakt_ids=None):
+def get_item_from_cache(table, session, title=None, year=None, trakt_ids=None):
     """
     Get the cached info for a given show/movie from the database.
     :param table: Either TraktMovie or TraktShow
@@ -1161,7 +1161,7 @@ class ApiTrakt(object):
     @staticmethod
     def lookup_series(session, title=None, year=None, only_cached=None, **lookup_params):
         trakt_show_ids = TraktShowIds(**lookup_params)
-        series = get_cached(TraktShow, title=title, year=year, trakt_ids=trakt_show_ids, session=session)
+        series = get_item_from_cache(TraktShow, title=title, year=year, trakt_ids=trakt_show_ids, session=session)
         found = None
         if not series and title:
             found = session.query(TraktShowSearchResult).filter(TraktShowSearchResult.search == title.lower()).first()
@@ -1199,7 +1199,7 @@ class ApiTrakt(object):
     @staticmethod
     def lookup_movie(session, title=None, year=None, only_cached=None, **lookup_params):
         trakt_movie_ids = TraktMovieIds(**lookup_params)
-        movie = get_cached(TraktMovie, title=title, year=year, trakt_ids=trakt_movie_ids, session=session)
+        movie = get_item_from_cache(TraktMovie, title=title, year=year, trakt_ids=trakt_movie_ids, session=session)
         found = None
         if not movie and title:
             found = session.query(TraktMovieSearchResult).filter(TraktMovieSearchResult.search == title.lower()).first()
