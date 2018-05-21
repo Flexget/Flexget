@@ -160,6 +160,9 @@ class TraktSet(MutableSet):
     @property
     def items(self):
         if self._items is None:
+            if self.config['list'] in ['collection', 'watched'] and self.config['type'] == 'auto':
+                raise plugin.PluginError('`type` cannot be `auto` for %s list.' % self.config['list'])
+
             endpoint = self.get_list_endpoint()
 
             log.verbose('Retrieving `%s` list `%s`', self.config['type'], self.config['list'])
@@ -220,20 +223,21 @@ class TraktSet(MutableSet):
     def invalidate_cache(self):
         self._items = None
 
-    def get_list_endpoint(self):
-        endpoint = ['users', self.config['username']]
-        if isinstance(self.config['list'], dict):
-            if self.config['type'] == 'auto':
-                raise plugin.PluginError('`type` cannot be `auto` for ratings lists.')
-            endpoint += ('ratings', self.config['type'], self.config['list']['rating'])
-        elif self.config['list'] in ['collection', 'watchlist', 'watched', 'ratings']:
-            if self.config['type'] == 'auto' or (self.config['list'] in ['collection', 'watched'] and
-                                                 self.config['type'] == 'episodes'):
-                raise plugin.PluginError('`type` cannot be `%s` for %s list.' % (self.config['type'],
-                                                                                 self.config['list']))
-            endpoint += (self.config['list'], self.config['type'])
+    def get_list_endpoint(self, remove=False):
+        # Api restriction, but we could easily extract season and episode info from the 'shows' type
+        if self.config['list'] in ['collection', 'watched'] and self.config['type'] == 'episodes':
+            raise plugin.PluginError('`type` cannot be `%s` for %s list.' % (self.config['type'], self.config['list']))
+
+        if self.config['list'] in ['collection', 'watchlist', 'watched', 'ratings']:
+            if self.config.get('account'):
+                endpoint = ('sync', 'history' if self.config['list'] == 'watched' else self.config['list'])
+            else:
+                endpoint = ('users', self.config['username'], self.config['list'], self.config['type'])
         else:
-            endpoint += ('lists', make_list_slug(self.config['list']), 'items')
+            endpoint = ('users', self.config['username'], 'lists', make_list_slug(self.config['list']), 'items')
+
+        if remove:
+            endpoint += ('remove', )
         return endpoint
 
     def show_match(self, entry1, entry2):
@@ -293,13 +297,7 @@ class TraktSet(MutableSet):
             log.debug('Nothing to submit to trakt.')
             return
 
-        if self.config['list'] in ['collection', 'watchlist', 'watched']:
-            args = ('sync', 'history' if self.config['list'] == 'watched' else self.config['list'])
-        else:
-            args = ('users', self.config['username'], 'lists', make_list_slug(self.config['list']), 'items')
-        if remove:
-            args += ('remove',)
-        url = get_api_url(args)
+        url = get_api_url(self.get_list_endpoint(remove))
 
         log.debug('Submitting data to trakt.tv (%s): %s', url, found)
         try:
