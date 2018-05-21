@@ -212,7 +212,7 @@ class TraktSet(MutableSet):
                 if entry.isvalid():
                     if self.config.get('strip_dates'):
                         # Remove year from end of name if present
-                        entry['title'] = re.sub(r'\s+\(\d{4}\)$', '', entry['title'])
+                        entry['title'] = split_title_year(entry['title'])[0]
                     entries.append(entry)
                 else:
                     log.debug('Invalid entry created? %s', entry)
@@ -313,9 +313,9 @@ class TraktSet(MutableSet):
                 res[action].setdefault(cat, 0)
             log.info('Successfully {0} to/from list {1}: {movies} movie(s), {shows} show(s), {episodes} episode(s), '
                      '{seasons} season(s).'.format(action, self.config['list'], **res[action]))
-            for k, r in res['not_found'].items():
-                if r:
-                    log.debug('not found %s: %s', k, r)
+            for media_type, request in res['not_found'].items():
+                if request:
+                    log.debug('not found %s: %s', media_type, request)
             # TODO: Improve messages about existing and unknown results
             # Mark the results expired if we added or removed anything
             if sum(res[action].values()):
