@@ -637,7 +637,6 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
                 if not episode or (episode and episode.expired is not False):
                     updated_episode = TVDBEpisode(series.id, results[0]['id'], language=language)
                     episode = session.merge(updated_episode)
-                    session.commit()
         except requests.RequestException as e:
             raise LookupError('Error looking up episode from TVDb (%s)' % e)
     if episode:
