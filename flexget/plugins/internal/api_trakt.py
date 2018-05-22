@@ -1039,12 +1039,12 @@ class TraktUserCache(TimedDict):
     def __init__(self, cache_time):
         super(TraktUserCache, self).__init__(cache_time=cache_time)
         self.updaters = {
-            'collection': self.__update_collection_cache,
-            'watched': self.__update_watched_cache,
-            'ratings': self.__update_ratings_cache,
+            'collection': self._update_collection_cache,
+            'watched': self._update_watched_cache,
+            'ratings': self._update_ratings_cache,
         }
 
-    def __get_user_cache(self, username=None, account=None):
+    def _get_user_cache(self, username=None, account=None):
         identifier = '{}|{}'.format(account, username or 'me')
         self.setdefault(identifier, {}).setdefault('watched', {}).setdefault('shows', {})
         self.setdefault(identifier, {}).setdefault('watched', {}).setdefault('movies', {})
@@ -1057,7 +1057,7 @@ class TraktUserCache(TimedDict):
 
         return self[identifier]
 
-    def __update_collection_cache(self, cache, media_type, username=None, account=None):
+    def _update_collection_cache(self, cache, media_type, username=None, account=None):
         collection = get_user_data(data_type='collection', media_type=media_type, session=get_session(account),
                                    username=username)
 
@@ -1067,7 +1067,7 @@ class TraktUserCache(TimedDict):
             collected_at = media.get('collected_at') or media.get('last_collected_at')
             cache[media_id]['collected_at'] = dateutil_parse(collected_at, ignoretz=True)
 
-    def __update_watched_cache(self, cache, media_type, username=None, account=None):
+    def _update_watched_cache(self, cache, media_type, username=None, account=None):
         watched = get_user_data(data_type='watched', media_type=media_type, session=get_session(account),
                                 username=username)
         for media in watched:
@@ -1076,7 +1076,7 @@ class TraktUserCache(TimedDict):
             cache[media_id]['watched_at'] = dateutil_parse(media['last_watched_at'], ignoretz=True)
             cache[media_id]['plays'] = media['plays']
 
-    def __update_ratings_cache(self, cache, media_type, username=None, account=None):
+    def _update_ratings_cache(self, cache, media_type, username=None, account=None):
         ratings = get_user_data(data_type='ratings', media_type=media_type, session=get_session(account=account),
                                 username=username)
         for media in ratings:
@@ -1086,13 +1086,13 @@ class TraktUserCache(TimedDict):
             cache[media_id]['rated_at'] = dateutil_parse(media['rated_at'], ignoretz=True)
             cache[media_id]['rating'] = media['rating']
 
-    def __get_data(self, data_type, media_type, username=None, account=None):
-        cache = self.__get_user_cache(username=username, account=account)[data_type][media_type]
+    def _get_data(self, data_type, media_type, username=None, account=None):
+        cache = self._get_user_cache(username=username, account=account)[data_type][media_type]
 
         if not cache:
             log.debug('No %s found in cache. Refreshing.', data_type)
             self.updaters[data_type](cache, media_type, username=username, account=account)
-            cache = self.__get_user_cache(username=username, account=account)[data_type][media_type]
+            cache = self._get_user_cache(username=username, account=account)[data_type][media_type]
 
         if not cache:
             log.warning('No %s data returned from trakt.', data_type)
@@ -1100,28 +1100,28 @@ class TraktUserCache(TimedDict):
         return cache
 
     def get_shows_collection(self, username=None, account=None):
-        return self.__get_data('collection', 'shows', username=username, account=account)
+        return self._get_data('collection', 'shows', username=username, account=account)
 
     def get_movie_collection(self, username=None, account=None):
-        return self.__get_data('collection', 'movies', username=username, account=account)
+        return self._get_data('collection', 'movies', username=username, account=account)
 
     def get_watched_shows(self, username=None, account=None):
-        return self.__get_data('watched', 'shows', username=username, account=account)
+        return self._get_data('watched', 'shows', username=username, account=account)
 
     def get_watched_movies(self, username=None, account=None):
-        return self.__get_data('watched', 'movies', username=username, account=account)
+        return self._get_data('watched', 'movies', username=username, account=account)
 
     def get_show_user_ratings(self, username=None, account=None):
-        return self.__get_data('ratings', 'shows', username=username, account=account)
+        return self._get_data('ratings', 'shows', username=username, account=account)
 
     def get_season_user_ratings(self, username=None, account=None):
-        return self.__get_data('ratings', 'seasons', username=username, account=account)
+        return self._get_data('ratings', 'seasons', username=username, account=account)
 
     def get_episode_user_ratings(self, username=None, account=None):
-        return self.__get_data('ratings', 'episodes', username=username, account=account)
+        return self._get_data('ratings', 'episodes', username=username, account=account)
 
     def get_movie_user_ratings(self, username=None, account=None):
-        return self.__get_data('ratings', 'movies', username=username, account=account)
+        return self._get_data('ratings', 'movies', username=username, account=account)
 
 
 # Global user cache
