@@ -280,12 +280,12 @@ class PluginTraktLookup(object):
     def _get_season(self, entry, session):
         series_lookup_args = self._get_lookup_args(entry)
         show = lookup_series(session=session, **series_lookup_args)
-        return show._get_season(entry['series_season'], session)
+        return show.get_season(entry['series_season'], session)
 
     def _get_episode(self, entry, session):
         series_lookup_args = self._get_lookup_args(entry)
         show = lookup_series(session=session, **series_lookup_args)
-        return show._get_episode(entry['series_season'], entry['series_episode'], session)
+        return show.get_episode(entry['series_season'], entry['series_episode'], session)
 
     def _get_movie(self, entry, session):
         movie_lookup_args = self._get_lookup_args(entry)
