@@ -553,6 +553,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None, lang
     if not series.name:
         raise LookupError('Tvdb result for series does not have a title.')
 
+    session.commit()
     return series
 
 
@@ -636,10 +637,11 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
                 if not episode or (episode and episode.expired is not False):
                     updated_episode = TVDBEpisode(series.id, results[0]['id'], language=language)
                     episode = session.merge(updated_episode)
-
+                    session.commit()
         except requests.RequestException as e:
             raise LookupError('Error looking up episode from TVDb (%s)' % e)
     if episode:
+        session.commit()
         return episode
     else:
         raise LookupError('No results found for %s' % ep_description)
@@ -682,6 +684,7 @@ def search_for_series(search_name=None, imdb_id=None, zap2it_id=None, force_sear
             raise LookupError('Error searching series from TVDb (%s)' % e)
         series_search_results = [session.merge(TVDBSeriesSearchResult(series, lookup_term)) for series in
                                  fetched_results]
+        session.commit()  # don't want no long running transactions for data like this
     if series_search_results:
         return series_search_results
     raise LookupError('No results found for series lookup')
@@ -720,3 +723,4 @@ def mark_expired(session):
         log.debug('%s series and %s episodes marked as expired', series_updated, episodes_updated)
 
     persist['last_check'] = new_last_check
+    session.commit()

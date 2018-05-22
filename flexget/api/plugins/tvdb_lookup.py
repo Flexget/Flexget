@@ -153,7 +153,7 @@ class TVDBEpisodeSearchAPI(APIResource):
         ep_number = args.get('ep_number')
         air_date = args.get('air_date')
 
-        if not ((season_number and ep_number) or absolute_number or air_date):
+        if not (season_number and ep_number or absolute_number or air_date):
             raise BadRequest('not enough parameters for lookup. Either season and episode number or absolute number '
                              'are required.')
         kwargs = {'tvdb_id': tvdb_id,

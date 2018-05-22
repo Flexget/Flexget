@@ -1,9 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-
-from functools import partial
-
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+
+from functools import partial
 import logging
 
 from flexget import plugin
@@ -118,7 +117,7 @@ class PluginThetvdbLookup(object):
             )
             entry.update_using_map(field_map, series)
         except LookupError as e:
-            log.debug('Error looking up tvdb series information for %s: %s', entry['title'], e.args[0])
+            log.debug('Error looking up tvdb series information for %s: %s', entry['title'], e)
         return entry
 
     def lazy_series_lookup(self, entry, language):
