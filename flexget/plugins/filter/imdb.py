@@ -23,7 +23,7 @@ class FilterImdb(object):
       min_meta_score: <num>
       min_year: <num>
       max_year: <num>
-      
+
       # accept movies with any of these genres
       accept_genres:
         - genre1
