@@ -72,7 +72,7 @@ class PluginSchema(Base):
 def get_version(plugin, session=None):
     schema = session.query(PluginSchema).filter(PluginSchema.plugin == plugin).first()
     if not schema:
-        log.debug('No schema version stored for %s' % plugin)
+        log.debug('No schema version stored for %s', plugin)
         return None
     else:
         return schema.version
