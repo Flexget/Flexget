@@ -251,6 +251,7 @@ class ImdbParser(object):
         self.writers = {}
         self.score = 0.0
         self.votes = 0
+        self.meta_score = 0
         self.year = 0
         self.plot_outline = None
         self.name = None
@@ -321,7 +322,13 @@ class ImdbParser(object):
         else:
             log.debug('No score found for %s' % self.imdb_id)
 
-        # get director(s)
+        meta_score_elem = title_overview.find(attrs={'class': 'metacriticScore'})
+        if meta_score_elem:
+            self.meta_score = str_to_int(meta_score_elem.text)
+        else:
+            log.debug('No Metacritic score found for %s' % self.imdb_id)
+
+            # get director(s)
         for director in title_overview.select('[itemprop="director"] > a'):
             director_id = extract_id(director['href'])
             director_name = director.text
