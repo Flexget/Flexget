@@ -20,6 +20,7 @@ class FilterImdb(object):
 
       min_score: <num>
       min_votes: <num>
+      min_meta_score: <num>
       min_year: <num>
       max_year: <num>
 
@@ -86,6 +87,7 @@ class FilterImdb(object):
             'min_year': {'type': 'integer'},
             'max_year': {'type': 'integer'},
             'min_votes': {'type': 'integer'},
+            'min_votes': {'type': 'integer'},
             'min_score': {'type': 'number'},
             'accept_genres': {'type': 'array', 'items': {'type': 'string'}},
             'reject_genres': {'type': 'array', 'items': {'type': 'string'}},
@@ -134,6 +136,9 @@ class FilterImdb(object):
             if 'min_votes' in config:
                 if entry.get('imdb_votes', 0) < config['min_votes']:
                     reasons.append('min_votes (%s < %s)' % (entry.get('imdb_votes'), config['min_votes']))
+            if 'min_meta_score' in config:
+                if entry.get('imdb_meta_score', 0) < config['min_meta_score']:
+                    reasons.append('min_meta_score (%s < %s)' % (entry.get('imdb_meta_score'), config['min_meta_score']))
             if 'min_year' in config:
                 if entry.get('imdb_year', 0) < config['min_year']:
                     reasons.append('min_year (%s < %s)' % (entry.get('imdb_year'), config['min_year']))
