@@ -223,7 +223,7 @@ class ImdbLookup(object):
         'imdb_plot_outline': 'plot_outline',
         'imdb_score': 'score',
         'imdb_votes': 'votes',
-        'imdb_meta_score': 'meta_score'
+        'imdb_meta_score': 'meta_score',
         'imdb_year': 'year',
         'imdb_genres': lambda movie: [genre.name for genre in movie.genres],
         'imdb_languages': lambda movie: [lang.language.name for lang in movie.languages],
