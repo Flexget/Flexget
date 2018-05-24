@@ -1,5 +1,4 @@
 #!/usr/bin/python
-from __future__ import unicode_literals, division, absolute_import, print_function
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from ._version import __version__  # noqa
@@ -27,7 +26,7 @@ def main(args=None):
                 import traceback
                 traceback.print_exc()
             else:
-                print('Could not instantiate manager: %s' % e, file=sys.stderr)
+                print(f'Could not instantiate manager: {e}', file=sys.stderr)
             sys.exit(1)
 
         try:
@@ -45,7 +44,7 @@ def main(args=None):
                 import traceback
                 traceback.print_exc()
             else:
-                print('Could not start manager: %s' % e, file=sys.stderr)
+                print(f'Could not start manager: {e}', file=sys.stderr)
 
             sys.exit(1)
     except KeyboardInterrupt:

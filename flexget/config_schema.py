@@ -1,4 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from flexget.utils.template import get_template
 
@@ -9,7 +8,7 @@ import re
 import logging
 from collections import defaultdict
 from datetime import datetime
-
+from pathlib import Path
 import jsonschema
 from jsonschema.compat import str_types, int_types
 
@@ -89,7 +88,7 @@ def resolve_ref(uri):
         if callable(schema):
             return schema(**dict(parse_qsl(parsed.query)))
         return schema
-    raise jsonschema.RefResolutionError("%s could not be resolved" % uri)
+    raise jsonschema.RefResolutionError(f"{uri} could not be resolved")
 
 
 def process_config(config, schema=None, set_defaults=True):
@@ -125,7 +124,7 @@ def parse_time(time_string):
             return datetime.strptime(time_string, f).time()
         except ValueError:
             continue
-    raise ValueError('invalid time `%s`' % time_string)
+    raise ValueError(f'invalid time `{time_string}`')
 
 
 def parse_interval(interval_string):
@@ -156,7 +155,7 @@ def parse_size(size_input):
         value, unit = float(size_input[:-1]), size_input[-1:]
         if unit not in prefixes:
             raise ValueError("should be in format '0-x (KiB, MiB, GiB, TiB, PiB)'")
-        return int(1024 ** prefixes.index(unit) * value)
+        return int(1_024 ** prefixes.index(unit) * value)
 
 
 # Public API end here, the rest should not be used outside this module
@@ -165,7 +164,7 @@ def parse_size(size_input):
 class RefResolver(jsonschema.RefResolver):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('handlers', {'': resolve_ref})
-        super(RefResolver, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 format_checker = jsonschema.FormatChecker(('email',))
@@ -220,16 +219,16 @@ def is_regex(instance):
     try:
         return re.compile(instance)
     except re.error as e:
-        raise ValueError('Error parsing regex: %s' % e)
+        raise ValueError(f'Error parsing regex: {e}')
 
 
 @format_checker.checks('file', raises=ValueError)
 def is_file(instance):
     if not isinstance(instance, str_types):
         return True
-    if os.path.isfile(os.path.expanduser(instance)):
+    if Path(instance).expanduser().is_file():
         return True
-    raise ValueError('`%s` does not exist' % instance)
+    raise ValueError(f'`{instance}` does not exist')
 
 
 @format_checker.checks('path', raises=ValueError)
@@ -237,13 +236,14 @@ def is_path(instance):
     if not isinstance(instance, str_types):
         return True
     # Only validate the part of the path before the first identifier to be replaced
+    # todo use pathlib here
     pat = re.compile(r'{[{%].*[}%]}')
     result = pat.search(instance)
     if result:
         instance = os.path.dirname(instance[0:result.start()])
     if os.path.isdir(os.path.expanduser(instance)):
         return True
-    raise ValueError('`%s` does not exist' % instance)
+    raise ValueError(f'`{instance}` does not exist')
 
 
 # TODO: jsonschema has a format checker for uri if rfc3987 is installed, perhaps we should use that
@@ -294,22 +294,22 @@ def set_error_message(error):
         # Make valid_types into an english list, with commas and 'or'
         valid_types = ', '.join(valid_types[:-2] + ['']) + ' or '.join(valid_types[-2:])
         if isinstance(error.instance, dict):
-            error.message = 'Got a dict, expected: %s' % valid_types
+            error.message = f'Got a dict, expected: {valid_types}'
         if isinstance(error.instance, list):
-            error.message = 'Got a list, expected: %s' % valid_types
-        error.message = 'Got `%s`, expected: %s' % (error.instance, valid_types)
+            error.message = f'Got a list, expected: {valid_types}'
+        error.message = f'Got `{error.instance}`, expected: {valid_types}'
     elif error.validator == 'format':
         if error.cause:
             error.message = str(error.cause)
     elif error.validator == 'enum':
-        error.message = 'Must be one of the following: %s' % ', '.join(map(str, error.validator_value))
+        error.message = f'Must be one of the following: {", ".join([str(value) for value in error.validator_value])}'
     elif error.validator == 'additionalProperties':
         if error.validator_value is False:
             extras = set(jsonschema._utils.find_additional_properties(error.instance, error.schema))
             if len(extras) == 1:
-                error.message = 'The key `%s` is not valid here.' % extras.pop()
+                error.message = f'The key `{extras.pop()}` is not valid here.'
             else:
-                error.message = 'The keys %s are not valid here.' % ', '.join('`%s`' % e for e in extras)
+                error.message = f'The keys {", ".join(extras)} are not valid here.'
     else:
         # Remove u'' string representation from jsonschema error messages
         error.message = re.sub('u\'(.*?)\'', '`\\1`', error.message)
