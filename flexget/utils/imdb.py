@@ -321,7 +321,7 @@ class ImdbParser(object):
             self.score = float(score_elem.text)
         else:
             log.debug('No score found for %s' % self.imdb_id)
-            
+
         meta_score_elem = title_overview.find(attrs={'class': 'metacriticScore'})
         if meta_score_elem:
             self.meta_score = str_to_int(meta_score_elem.text)
