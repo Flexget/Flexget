@@ -16,7 +16,7 @@ from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id, make_url
 from flexget.utils.database import with_session
 
-SCHEMA_VER = 8
+SCHEMA_VER = 9
 
 Base = db_schema.versioned_base('imdb_lookup', SCHEMA_VER)
 
@@ -198,7 +198,8 @@ def upgrade(ver, session):
     # v6 The association tables were not cleared on the last upgrade, clear again. GitHub #714
     # v7 Another layout change cached bad data. GitHub #729
     # v8 Added writers to the DB Schema
-    if ver is None or ver <= 7:
+    # v9 Added Metacritic score exftraction/filtering
+    if ver is None or ver <= 8:
         raise UpgradeImpossible('Resetting imdb_lookup caches because bad data may have been cached.')
     return ver
 
