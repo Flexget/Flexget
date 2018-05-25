@@ -1,5 +1,4 @@
 from __future__ import unicode_literals, division, absolute_import
-from future.moves.urllib.parse import quote
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
@@ -9,11 +8,10 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
-from flexget.utils.search import torrent_availability
+from flexget.utils.search import torrent_availability, clean_symbols
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('limetorrents')
-
 
 class Limetorrents(object):
     """
@@ -59,9 +57,11 @@ class Limetorrents(object):
         entries = set()
 
         for search_string in entry.get('search_strings', [entry['title']]):
+            # No special characters - use dashes instead of %20
+            cleaned_search_string = clean_symbols(search_string).replace(' ', '-')
 
-            query = 'search/{0}/{1}/{2}'.format(category, quote(search_string.encode('utf8')), order_by)
-            log.debug('Using search: %s; category: %s; ordering: %s', search_string, category, order_by or 'default')
+            query = 'search/{0}/{1}/{2}'.format(category, cleaned_search_string.encode('utf8'), order_by)
+            log.debug('Using search: %s; category: %s; ordering: %s', cleaned_search_string, category, order_by or 'default')
             try:
                 page = task.requests.get(self.base_url + query)
                 log.debug('requesting: %s', page.url)

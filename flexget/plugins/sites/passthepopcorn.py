@@ -86,6 +86,7 @@ RELEASE_TYPES = {
     'golden popcorn': 2
 }
 
+
 class PassThePopcornCookie(Base):
     __tablename__ = 'passthepopcorn_cookie'
 
@@ -189,13 +190,8 @@ class SearchPassThePopcorn(object):
             raise plugin.PluginError('PassThePopcorn login failed: %s' % e)
 
         with Session() as session:
-            expires = None
-            for c in requests.cookies:
-                if c.name == 'session':
-                    expires = c.expires
-            if expires:
-                expires = datetime.datetime.fromtimestamp(expires)
-            log.debug('Saving or updating PassThePopcorn cookie in db')
+            expires = datetime.datetime.now() + datetime.timedelta(days=30)
+            log.debug('Saving or updating PassThePopcorn cookie in db. Expires 30 days from now: %s', expires)
             cookie = PassThePopcornCookie(username=username, cookie=dict(requests.cookies), expires=expires)
             session.merge(cookie)
             return cookie.cookie

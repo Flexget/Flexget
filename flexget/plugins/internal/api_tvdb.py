@@ -29,9 +29,10 @@ class TVDBRequest(object):
     BASE_URL = 'https://api.thetvdb.com/'
     BANNER_URL = 'http://thetvdb.com/banners/'
 
-    def __init__(self, username=None, account_id=None):
+    def __init__(self, username=None, account_id=None, api_key=None):
         self.username = username
         self.account_id = account_id
+        self.api_key = api_key
         self.auth_key = self.username.lower() if self.username else 'default'
 
     def get_auth_token(self, refresh=False):
@@ -47,6 +48,8 @@ class TVDBRequest(object):
                     data['username'] = self.username
                 if self.account_id:
                     data['userkey'] = self.account_id
+                if self.api_key:
+                    data['apikey'] = self.api_key
 
                 log.debug('Authenticating to TheTVDB with %s', self.username if self.username else 'api_key')
 

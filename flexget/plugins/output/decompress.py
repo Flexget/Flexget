@@ -8,7 +8,7 @@ import re
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.template import render_from_entry, RenderError
-from flexget.utils import archive
+from flexget.utils import archive as archiveutil
 
 log = logging.getLogger('decompress')
 
@@ -23,55 +23,76 @@ def fail_entry_with_error(entry, error):
 
 def open_archive_entry(entry):
     """
-    Convenience method for opening archives from entries. Returns an archive.Archive object
+    Convenience function for opening archives from entries. Returns an archive.Archive object
     """
-    arch = None
+    archive = None
 
     try:
-        archive_path = entry['location']
-        arch = archive.open_archive(archive_path)
-    except KeyError:
-        log.error('Entry does not appear to represent a local file.')
-    except archive.BadArchive as error:
+        archive_path = entry.get('location', '')
+
+        if not archive_path:
+            log.error('Entry does not appear to represent a local file.')
+        elif not os.path.exists(archive_path):
+            log.error('File no longer exists: %s', entry['location'])
+        else:
+            archive = archiveutil.open_archive(archive_path)
+    except archiveutil.BadArchive as error:
         fail_entry_with_error(entry, 'Bad archive: %s (%s)' % (archive_path, error))
-    except archive.NeedFirstVolume:
+    except archiveutil.NeedFirstVolume:
         log.error('Not the first volume: %s', archive_path)
-    except archive.ArchiveError as error:
+    except archiveutil.ArchiveError as error:
         fail_entry_with_error(entry, 'Failed to open Archive: %s (%s)' % (archive_path, error))
 
-    return arch
+    return archive
 
 
-def get_destination_path(path, to, keep_dirs):
-    """
-    Generate the destination path for a given file
-    """
-    filename = os.path.basename(path)
+def get_output_path(to, entry):
+    """Determine which path to output to"""
+    try:
+        if to:
+            return render_from_entry(to, entry)
+        else:
+            return os.path.dirname(entry.get('location'))
+    except RenderError:
+        raise PluginError('Could not render path: %s', to)
 
-    if keep_dirs:
-        path_suffix = path
-    else:
-        path_suffix = filename
+
+def extract_info(info, archive, to, keep_dirs):
+    """Extract ArchiveInfo object"""
+
+    destination = get_destination_path(info, to, keep_dirs)
+
+    log.debug('Attempting to extract: %s to %s', info.filename, destination)
+    try:
+        info.extract(archive, destination)
+    except archiveutil.FSError as error:
+        log.error('OS error while creating file: %s (%s)' % (destination, error))
+    except archiveutil.FileAlreadyExists as error:
+        log.warn('File already exists: %s' % destination)
+    except archiveutil.ArchiveError as error:
+        log.error('Failed to extract file: %s in %s (%s)' % (info.filename,
+                                                                   entry['location'], error))
+
+
+def get_destination_path(info, to, keep_dirs):
+    """Generate the destination path for a given file"""
+
+    path_suffix = info.path if keep_dirs else os.path.basename(info.path)
 
     return os.path.join(to, path_suffix)
 
 
-def is_dir(info):
-    """
-    Tests whether the file descibed in info is a directory
-    """
+def is_match(info, pattern):
+    """Returns whether an info record matches the supplied regex"""
+    match = re.compile(pattern, re.IGNORECASE).match
+    is_match = bool(match(info.filename))
 
-    if hasattr(info, 'isdir'):
-        return info.isdir()
+    if is_match:
+        log.debug('Found matching file: %s', info.filename)
     else:
-        base = os.path.basename(info.filename)
-        return not base
+        log.debug('File did not match regexp: %s', info.filename)
 
-
-def makepath(path):
-    if not os.path.exists(path):
-        log.debug('Creating path: %s', path)
-        os.makedirs(path)
+    return is_match
 
 
 class Decompress(object):
@@ -126,9 +147,7 @@ class Decompress(object):
     }
 
     def prepare_config(self, config):
-        """
-        Prepare config for processing
-        """
+        """Prepare config for processing"""
         from fnmatch import translate
 
         if not isinstance(config, dict):
@@ -155,80 +174,21 @@ class Decompress(object):
         Optionally delete the original archive if config.delete_archive is True
         """
 
-        match = re.compile(config['regexp'], re.IGNORECASE).match
-        archive_path = entry.get('location')
-        if not archive_path:
-            log.warning('Entry does not appear to represent a local file.')
-            return
-        archive_dir = os.path.dirname(archive_path)
+        archive = open_archive_entry(entry)
 
-        if not os.path.exists(archive_path):
-            log.warning('File no longer exists: %s', archive_path)
+        if not archive:
             return
 
-        arch = open_archive_entry(entry)
+        to = get_output_path(config['to'], entry)
 
-        if not arch:
-            return
-
-        to = config['to']
-        if to:
-            try:
-                to = render_from_entry(to, entry)
-            except RenderError as error:
-                log.error('Could not render path: %s', to)
-                entry.fail(str(error))
-                return
-        else:
-            to = archive_dir
-
-        for info in arch.infolist():
-            destination = get_destination_path(info.filename, to, config['keep_dirs'])
-            dest_dir = os.path.dirname(destination)
-            arch_file = os.path.basename(info.filename)
-
-            if is_dir(info):
-                log.debug('Appears to be a directory: %s', info.filename)
-                continue
-
-            if not match(arch_file):
-                log.debug('File did not match regexp: %s', arch_file)
-                continue
-
-            log.debug('Found matching file: %s', info.filename)
-
-            log.debug('Creating path: %s', dest_dir)
-            makepath(dest_dir)
-
-            if os.path.exists(destination):
-                log.verbose('File already exists: %s', destination)
-                continue
-
-            error_message = ''
-
-            log.debug('Attempting to extract: %s to %s', arch_file, destination)
-            try:
-                arch.extract_file(info, destination)
-            except archive.FSError as error:
-                error_message = 'OS error while creating file: %s (%s)' % (destination, error)
-            except archive.ArchiveError as error:
-                error_message = 'Failed to extract file: %s in %s (%s)' % (info.filename,
-                                                                           archive_path, error)
-
-            if error_message:
-                log.error(error_message)
-                entry.fail(entry)
-
-                if os.path.exists(destination):
-                    log.debug('Cleaning up partially extracted file: %s', destination)
-                    os.remove(destination)
-
-                return
+        for info in archive.infolist():
+            if is_match(info, config['regexp']):
+                extract_info(info, archive, to, config['keep_dirs'])
 
         if config['delete_archive']:
-            arch.delete()
+            archive.delete()
         else:
-            arch.close()
+            archive.close()
 
     @plugin.priority(255)
     def on_task_output(self, task, config):
@@ -237,9 +197,9 @@ class Decompress(object):
             return
 
         config = self.prepare_config(config)
-        archive.rarfile_set_tool_path(config)
+        archiveutil.rarfile_set_tool_path(config)
 
-        archive.rarfile_set_path_sep(os.path.sep)
+        archiveutil.rarfile_set_path_sep(os.path.sep)
 
         for entry in task.accepted:
             self.handle_entry(entry, config)

@@ -38,13 +38,13 @@ _id_regexps = Rebulk().functional(_id_regexps_function, name='regexpId',
 guessit_api = GuessItApi(rebulk_builder().rebulk(_id_regexps))
 
 
-def lower_to_list(data):
+def normalize_component(data):
     if data is None:
         return []
     if isinstance(data, list):
-        return [d.lower() for d in data]
+        return [d.lower().replace('-', '') for d in data]
 
-    return [data.lower()]
+    return [data.lower().replace('-', '')]
 
 
 class ParserGuessit(object):
@@ -79,36 +79,39 @@ class ParserGuessit(object):
         else:
             version -= 1
         proper_count = guessit_result.get('proper_count', 0)
-        fastsub = 'fastsub' in lower_to_list(guessit_result.get('other'))
+        fastsub = 'fastsub' in normalize_component(guessit_result.get('other'))
         return version + proper_count - (5 if fastsub else 0)
 
     def _quality(self, guessit_result):
         """Generate a FlexGet Quality from a guessit result."""
-        resolution = guessit_result.get('screen_size', '')
-        other = lower_to_list(guessit_result.get('other'))
+        resolution = normalize_component(guessit_result.get('screen_size'))
+        other = normalize_component(guessit_result.get('other'))
         if not resolution and 'hr' in other:
-            resolution = 'hr'
+            resolution.append('hr')
 
-        source = guessit_result.get('format', '').replace('-', '')
+        source = normalize_component(guessit_result.get('format'))
         if 'preair' in other:
-            source = 'preair'
+            source.append('preair')
         if 'screener' in other:
-            if source == 'BluRay':
-                source = 'bdscr'
+            if 'bluray' in source:
+                source.append('bdscr')
             else:
-                source = 'dvdscr'
+                source.append('dvdscr')
         if 'r5' in other:
-            source = 'r5'
+            source.append('r5')
 
-        codec = guessit_result.get('video_codec', '')
-        if guessit_result.get('video_profile') == '10bit':
-            codec = '10bit'
+        codec = normalize_component(guessit_result.get('video_codec'))
+        if '10bit' in normalize_component(guessit_result.get('video_profile')):
+            codec.append('10bit')
 
-        audio = guessit_result.get('audio_codec', '')
-        if audio == 'DTS' and guessit_result.get('audio_profile') in ['HD', 'HDMA']:
-            audio = 'dtshd'
-        elif guessit_result.get('audio_channels') == '5.1' and audio == 'AC3' or audio == 'DolbyDigital':
-            audio = 'dd5.1'
+        audio = normalize_component(guessit_result.get('audio_codec'))
+        audio_profile = normalize_component(guessit_result.get('audio_profile'))
+        audio_channels = normalize_component(guessit_result.get('audio_channels'))
+        # unlike the other components, audio can be a bit iffy with multiple codecs, so we limit it to one
+        if 'dts' in audio and any(hd in audio_profile for hd in ['HD', 'HDMA']):
+            audio = ['dtshd']
+        elif '5.1' in audio_channels and any(dd in audio for dd in ['ac3', 'dolbydigital']):
+            audio = ['dd5.1']
 
         # Make sure everything are strings (guessit will return lists when there are multiples)
         flattened_qualities = []
@@ -277,7 +280,7 @@ class ParserGuessit(object):
         if not identifier_type:
             valid = False
         # TODO: Legacy - Complete == invalid
-        if 'complete' in lower_to_list(guess_result.get('other')):
+        if 'complete' in normalize_component(guess_result.get('other')):
             valid = False
 
         parsed = SeriesParseResult(

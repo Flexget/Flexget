@@ -208,9 +208,11 @@ def delete_list_by_id(list_id, session=None):
 
 @with_session
 def get_entries_by_list_id(list_id, start=None, stop=None, order_by='title', descending=False, approved=False,
-                           session=None):
+                           filter=None, session=None):
     log.debug('querying entries from pending list with id %d', list_id)
     query = session.query(PendingListEntry).filter(PendingListEntry.list_id == list_id)
+    if filter:
+        query = query.filter(func.lower(PendingListEntry.title).contains(filter.lower()))
     if approved:
         query = query.filter(PendingListEntry.approved is approved)
     if descending:

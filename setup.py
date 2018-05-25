@@ -27,10 +27,16 @@ setup(
     description='FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) '
                 'from different sources like RSS-feeds, html-pages, various sites and more.',
     long_description=long_description,
+    long_description_content_type='text/x-rst',
     author='Marko Koivusalo',
     author_email='marko.koivusalo@gmail.com',
     license='MIT',
-    url='http://flexget.com',
+    url='https://flexget.com',
+    project_urls={
+        'Repository': 'https://github.com/Flexget/Flexget',
+        'Issue Tracker': 'https://github.com/Flexget/Flexget/issues',
+        'Forum': 'https://discuss.flexget.com'
+    },
     packages=find_packages(exclude=['flexget.tests']),
     include_package_data=True,
     zip_safe=False,

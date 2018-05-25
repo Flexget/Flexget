@@ -2,7 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import quote
 
-import re
 import logging
 
 from requests.exceptions import RequestException
@@ -13,8 +12,6 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.plugins.internal.urlrewriting import UrlRewritingError
-from flexget.utils import requests
-from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
 from flexget.utils.tools import parse_filesize
 
@@ -88,7 +85,7 @@ class UrlRewriteTorrentleech(object):
             log.error("Didn't actually get a URL...")
         else:
             log.debug("Got the URL: %s" % entry['url'])
-        if entry['url'].startswith('https://www.torrentleech.org/torrents/browse/index/query/'):
+        if entry['url'].startswith('https://www.torrentleech.org/torrents/browse/list/query/'):
             # use search
             results = self.search(task, entry)
             if not results:
@@ -101,13 +98,15 @@ class UrlRewriteTorrentleech(object):
         """
         Search for name from torrentleech.
         """
+        request_headers = {'User-Agent': 'curl/7.54.0'}
         rss_key = config['rss_key']
 
         # build the form request:
         data = {'username': config['username'], 'password': config['password']}
         # POST the login form:
         try:
-            login = requests.post('https://www.torrentleech.org/user/account/login/', data=data)
+            login = task.requests.post('https://www.torrentleech.org/user/account/login/', data=data,
+                                       headers=request_headers, allow_redirects=True)
         except RequestException as e:
             raise PluginError('Could not connect to torrentleech: %s', str(e))
 
@@ -122,48 +121,35 @@ class UrlRewriteTorrentleech(object):
             categories = [categories]
         # If there are any text categories, turn them into their id number
         categories = [c if isinstance(c, int) else CATEGORIES[c] for c in categories]
-        filter_url = '/categories/%s' % ','.join(str(c) for c in categories)
+        filter_url = '/categories/{}'.format(','.join(str(c) for c in categories))
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string).replace(":", "")
-            # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-            url = ('https://www.torrentleech.org/torrents/browse/index/query/' +
+            # urllib.quote will crash if the unicode string has non ascii characters,
+            # so encode in utf-8 beforehand
+
+            url = ('https://www.torrentleech.org/torrents/browse/list/query/' +
                    quote(query.encode('utf-8')) + filter_url)
-            log.debug('Using %s as torrentleech search url' % url)
+            log.debug('Using %s as torrentleech search url', url)
 
-            page = requests.get(url, cookies=login.cookies).content
-            soup = get_soup(page)
+            results = task.requests.get(url, headers=request_headers, cookies=login.cookies).json()
 
-            for tr in soup.find_all("tr", ["even", "odd"]):
-                # within each even or odd row, find the torrent names
-                link = tr.find("a", attrs={'href': re.compile('/torrent/\d+')})
-                log.debug('link phase: %s' % link.contents[0])
+            for torrent in results['torrentList']:
                 entry = Entry()
-                # extracts the contents of the <a>titlename/<a> tag
-                entry['title'] = link.contents[0]
+                entry['download_headers'] = request_headers
+                entry['title'] = torrent['name']
 
-                # find download link
-                torrent_url = tr.find("a", attrs={'href': re.compile('/download/\d+/.*')}).get('href')
-                # parse link and split along /download/12345 and /name.torrent
-                download_url = re.search('(/download/\d+)/(.+\.torrent)', torrent_url)
-                # change link to rss and splice in rss_key
-                torrent_url = 'https://www.torrentleech.org/rss' + download_url.group(1) + '/' \
-                              + rss_key + '/' + download_url.group(2)
-                log.debug('RSS-ified download link: %s' % torrent_url)
+                # construct download URL
+                torrent_url = 'https://www.torrentleech.org/rss/download/{}/{}/{}'.format(torrent['fid'], rss_key,
+                                                                                          torrent['filename'])
+                log.debug('RSS-ified download link: %s', torrent_url)
                 entry['url'] = torrent_url
 
-                # us tr object for seeders/leechers
-                seeders, leechers = tr.find_all('td', ["seeders", "leechers"])
-                entry['torrent_seeds'] = int(seeders.contents[0])
-                entry['torrent_leeches'] = int(leechers.contents[0])
+                # seeders/leechers
+                entry['torrent_seeds'] = torrent['seeders']
+                entry['torrent_leeches'] = torrent['leechers']
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
-
-                # use tr object for size
-                size = tr.find("td", text=re.compile('([\.\d]+) ([TGMK]?)B')).contents[0]
-                size = re.search('([\.\d]+) ([TGMK]?)B', size)
-
-                entry['content_size'] = parse_filesize(size.group(0))
-
+                entry['content_size'] = parse_filesize(str(torrent['size']) + ' b')
                 entries.add(entry)
 
         return sorted(entries, reverse=True, key=lambda x: x.get('search_sort'))
