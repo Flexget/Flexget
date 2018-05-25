@@ -29,8 +29,8 @@ class DelugePlugin(object):
         except ImportError as e:
             log.debug('Error importing deluge-client: %s' % e)
             raise plugin.DependencyError('deluge', 'deluge-client',
-                                         'deluge-client >=1.2 module and it\'s dependencies required. ImportError: %s' %
-                                         e, log)
+                                         'deluge-client >=1.5 is required. `pip install deluge-client` to install.',
+                                         log)
         config = self.prepare_config(config)
 
         if config['host'] in ['localhost', '127.0.0.1'] and not config.get('username'):
@@ -70,7 +70,8 @@ class DelugePlugin(object):
             filters = {}
         return self.client.call('core.get_torrents_status', filters, fields)
 
-    def get_localhost_auth(self):
+    @staticmethod
+    def get_localhost_auth():
         if sys.platform.startswith('win'):
             auth_file = os.path.join(os.getenv('APPDATA'), 'deluge', 'auth')
         else:
