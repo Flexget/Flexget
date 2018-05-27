@@ -1,4 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
@@ -66,14 +65,14 @@ class DaemonService(rpyc.Service):
 
     def exposed_handle_cli(self, args):
         args = rpyc.utils.classic.obtain(args)
-        log.verbose('Running command `%s` for client.' % ' '.join(args))
+        log.verbose('Running command `%s` for client.', ' '.join(args))
         parser = get_parser()
         try:
             options = parser.parse_args(args, file=self.client_out_stream)
         except SystemExit as e:
             if e.code:
                 # TODO: Not sure how to properly propagate the exit code back to client
-                log.debug('Parsing cli args caused system exit with status %s.' % e.code)
+                log.debug('Parsing cli args caused system exit with status %s.', e.code)
             return
         # Saving original terminal size to restore after monkeypatch
         original_terminal_info = terminal.terminal_info
@@ -122,7 +121,7 @@ class IPCServer(threading.Thread):
         self.manager = manager
         self.host = '127.0.0.1'
         self.port = port or 0
-        self.password = ''.join(random.choice(string.ascii_letters + string.digits) for x in range(15))
+        self.password = ''.join(random.choices(string.ascii_letters + string.digits, k=15))
         self.server = None
 
     def authenticator(self, sock):
