@@ -219,7 +219,7 @@ class ImdbSearch(object):
                     log.debug('aka `%s` is invalid' % aka)
                     continue
                 aka = match.group(0).replace('"', '')
-                log.trace('processing aka %s', aka)
+                log.trace('processing aka %s' % aka)
                 seq = difflib.SequenceMatcher(lambda x: x == ' ', aka.title(), name.title())
                 aka_ratio = seq.ratio()
                 if aka_ratio > ratio:
