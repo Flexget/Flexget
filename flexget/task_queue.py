@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import queue
 import sys
@@ -14,7 +11,7 @@ from flexget.task import TaskAbort
 log = logging.getLogger('task_queue')
 
 
-class TaskQueue(object):
+class TaskQueue:
     """
     Task processing thread.
     Only executes one task at a time, if more are requested they are queued up and run in turn.
@@ -47,7 +44,7 @@ class TaskQueue(object):
             try:
                 self.current_task.execute()
             except TaskAbort as e:
-                log.debug('task %s aborted: %r' % (self.current_task.name, e))
+                log.debug('task %s aborted: %r', self.current_task.name, e)
             except (ProgrammingError, OperationalError):
                 log.critical('Database error while running a task. Attempting to recover.')
                 self.current_task.manager.crash_report()
@@ -60,7 +57,7 @@ class TaskQueue(object):
 
         remaining_jobs = self.run_queue.qsize()
         if remaining_jobs:
-            log.warning('task queue shut down with %s tasks remaining in the queue to run.' % remaining_jobs)
+            log.warning('task queue shut down with %s tasks remaining in the queue to run.', remaining_jobs)
         else:
             log.debug('task queue shut down')
 
@@ -84,7 +81,7 @@ class TaskQueue(object):
         if finish_queue:
             self._shutdown_when_finished = True
             if self.run_queue.qsize():
-                log.verbose('There are %s tasks to execute. Shutdown will commence when they have completed.' %
+                log.verbose('There are %s tasks to execute. Shutdown will commence when they have completed.',
                             self.run_queue.qsize())
         else:
             self._shutdown_now = True

@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
 import itertools
 import logging
@@ -39,7 +36,7 @@ class TaskConfigHash(Base):
     hash = Column('hash', String)
 
     def __repr__(self):
-        return '<TaskConfigHash(task=%s,hash=%s)>' % (self.task, self.hash)
+        return f'<TaskConfigHash(task={self.task},hash={self.hash})>'
 
 
 @with_session
@@ -52,7 +49,7 @@ def config_changed(task=None, session=None):
 
     :param task: Name of the task. If `None`, will be set for all tasks.
     """
-    log.debug('Marking config for %s as changed.' % (task or 'all tasks'))
+    log.debug('Marking config for %s as changed.', task or 'all tasks')
     task_hash = session.query(TaskConfigHash)
     if task:
         task_hash = task_hash.filter(TaskConfigHash.task == task)
@@ -74,7 +71,7 @@ def use_task_logging(func):
     return wrapper
 
 
-class EntryIterator(object):
+class EntryIterator:
     """An iterator over a subset of entries to emulate old task.accepted/rejected/failed/entries properties."""
 
     def __init__(self, entries, states):
@@ -107,7 +104,7 @@ class EntryIterator(object):
             if index == item:
                 return entry
         else:
-            raise IndexError('%d is out of bounds' % item)
+            raise IndexError(f'{item} is out of bounds')
 
     def reverse(self):
         self.all_entries.sort(reverse=True)
@@ -136,7 +133,7 @@ class EntryContainer(list):
     undecided = property(lambda self: self._undecided)
 
     def __repr__(self):
-        return '<EntryContainer(%s)>' % list.__repr__(self)
+        return f'<EntryContainer({list.__repr__(self)})>'
 
 
 class TaskAbort(Exception):
@@ -145,11 +142,11 @@ class TaskAbort(Exception):
         self.silent = silent
 
     def __repr__(self):
-        return 'TaskAbort(reason=%s, silent=%s)' % (self.reason, self.silent)
+        return f'TaskAbort(reason={self.reason}, silent={self.silent})'
 
 
 @total_ordering
-class Task(object):
+class Task:
     """
     Represents one task in the configuration.
 
@@ -201,7 +198,7 @@ class Task(object):
 
         """
         self.name = str(name)
-        self.id = ''.join(random.choice(string.digits) for _ in range(6))
+        self.id = ''.join(random.choices(string.digits, k=6))
         self.manager = manager
         if config is None:
             config = manager.config['tasks'].get(name, {})
@@ -343,7 +340,7 @@ class Task(object):
         return (self.priority, self._count) == (other.priority, other._count)
 
     def __str__(self):
-        return '<Task(name=%s,aborted=%s)>' % (self.name, self.aborted)
+        return f'<Task(name={self.name},aborted={self.name})>'
 
     def disable_phase(self, phase):
         """Disable ``phase`` from execution.
@@ -352,9 +349,9 @@ class Task(object):
         :raises ValueError: *phase* could not be found.
         """
         if phase not in task_phases:
-            raise ValueError('%s is not a valid phase' % phase)
+            raise ValueError(f'{phase} is not a valid phase')
         if phase not in self.disabled_phases:
-            log.debug('Disabling %s phase' % phase)
+            log.debug('Disabling %s phase', phase)
             self.disabled_phases.append(phase)
 
     def abort(self, reason='Unknown', silent=False, traceback=None):
@@ -364,9 +361,9 @@ class Task(object):
         self.silent_abort = silent
         self.traceback = traceback
         if not self.silent_abort:
-            log.warning('Aborting task (plugin: %s)' % self.current_plugin)
+            log.warning('Aborting task (plugin: %s)', self.current_plugin)
         else:
-            log.debug('Aborting task (plugin: %s)' % self.current_plugin)
+            log.debug('Aborting task (plugin: %s)', self.current_plugin)
         raise TaskAbort(reason, silent=silent)
 
     def find_entry(self, category='entries', **values):
@@ -427,7 +424,7 @@ class Task(object):
                             log.warning('Task does not have any filter plugins to accept entries. '
                                         'You need at least one to accept the entries you  want.')
                         else:
-                            log.warning('Task doesn\'t have any %s plugins, you should add (at least) one!' % phase)
+                            log.warning("Task doesn't have any %s plugins, you should add (at least) one!", phase)
 
         for plugin in self.plugins(phase):
             # Abort this phase if one of the plugins disables it
@@ -494,26 +491,24 @@ class Task(object):
             else:
                 warn.log.warning(warn)
         except EntryUnicodeError as eue:
-            msg = ('Plugin %s tried to create non-unicode compatible entry (key: %s, value: %r)' %
-                   (keyword, eue.key, eue.value))
+            msg = f'Plugin {keyword} tried to create non-unicode compatible entry (key: {eue.key}, value: {eue.value})'
             log.critical(msg)
             self.abort(msg)
         except PluginError as err:
             err.log.critical(err.value)
             self.abort(err.value)
         except DependencyError as e:
-            msg = ('Plugin `%s` cannot be used because dependency `%s` is missing.' %
-                   (keyword, e.missing))
+            msg = f'Plugin `{keyword}` cannot be used because dependency `{e.missing}` is missing.'
             log.critical(msg)
             log.debug(e.message)
             self.abort(msg)
         except Warning as e:
             # If warnings have been elevated to errors
-            msg = 'Warning during plugin %s: %s' % (keyword, e)
+            msg = f'Warning during plugin {keyword}: {e}'
             log.exception(msg)
             self.abort(msg)
         except Exception as e:
-            msg = 'BUG: Unhandled error in plugin %s: %s' % (keyword, e)
+            msg = f'BUG: Unhandled error in plugin {keyword}: {e}'
             log.critical(msg)
             traceback = self.manager.crash_report()
             self.abort(msg, traceback=traceback)
@@ -526,10 +521,10 @@ class Task(object):
         :param str plugin: Plugin name
         :param str reason: Why the rerun is done
         """
-        msg = 'Plugin {0} has requested task to be ran again after execution has completed.'.format(
-            self.current_plugin if plugin is None else plugin)
+        msg = f'Plugin {self.current_plugin if plugin is None else plugin} has requested task to be ran again ' \
+              f'after execution has completed.'
         if reason:
-            msg += ' Reason: {0}'.format(reason)
+            msg += f' Reason: {reason}'
         # Only print the first request for a rerun to the info log
         if self._rerun:
             log.debug(msg)
@@ -548,7 +543,7 @@ class Task(object):
         try:
             merge_dict_from_to(new_config, self.config)
         except MergeException as e:
-            raise PluginError('Failed to merge configs for task %s: %s' % (self.name, e))
+            raise PluginError(f'Failed to merge configs for task {self.name}: {e}')
 
     def check_config_hash(self):
         """
@@ -574,10 +569,10 @@ class Task(object):
     def _execute(self):
         """Executes the task without rerunning."""
         if not self.enabled:
-            log.debug('Not running disabled task %s' % self.name)
+            log.debug('Not running disabled task %s', self.name)
             return
 
-        log.debug('executing %s' % self.name)
+        log.debug('executing %s', self.name)
 
         # Handle keyword args
         if self.options.learn:
@@ -599,7 +594,7 @@ class Task(object):
                     if phase not in self.suppress_warnings:
                         for plugin in self.plugins(phase):
                             if plugin.name in self.config:
-                                log.info('Plugin %s is not executed in %s phase because the phase is disabled ' \
+                                log.info('Plugin %s is not executed in %s phase because the phase is disabled '
                                          '(e.g. --test, --inject)', plugin.name, phase)
                     continue
                 if phase in ('start', 'prepare') and self.is_rerun:
@@ -616,7 +611,7 @@ class Task(object):
             try:
                 self.__run_task_phase('abort')
             except TaskAbort as e:
-                log.exception('abort handlers aborted: %s' % e)
+                log.exception('abort handlers aborted: %s', e)
             raise
         else:
             for entry in self.all_entries:
@@ -653,7 +648,7 @@ class Task(object):
                     self._rerun = False
                     continue
                 elif self._rerun:
-                    log.info('Task has been re-run %s times already, stopping for now' % self._rerun_count)
+                    log.info('Task has been re-run %s times already, stopping for now', self._rerun_count)
                 break
             fire_event('task.execute.completed', self)
         finally:
@@ -687,8 +682,7 @@ class Task(object):
         :raises RenderError: If there is a problem.
         """
         if not isinstance(template, (str, FlexGetTemplate)):
-            raise ValueError(
-                'Trying to render non string template or unrecognized template format, got %s' % repr(template))
+            raise ValueError(f'Trying to render non string template or unrecognized template format, got {template!r}')
         log.trace('rendering: %s', template)
         return render_from_task(template, self)
 

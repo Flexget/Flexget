@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.utils import with_metaclass
 
 import re
@@ -10,7 +8,7 @@ from flexget.config_schema import process_config
 # TODO: rename all validator.valid -> validator.accepts / accepted / accept ?
 
 
-class Errors(object):
+class Errors:
     """Create and hold validator error messages."""
 
     def __init__(self):
@@ -25,7 +23,7 @@ class Errors(object):
     def add(self, msg):
         """Add new error message to current path."""
         path = [str(p) for p in self.path]
-        msg = '[/%s] %s' % ('/'.join(path), msg)
+        msg = f"[/{'/'.join(path)}] {msg}"
         self.messages.append(msg)
 
     def back_out_errors(self, num=1):
@@ -59,7 +57,7 @@ registry = {}
 def factory(name='root', **kwargs):
     """Factory method, returns validator instance."""
     if name not in registry:
-        raise Exception('Asked unknown validator \'%s\'' % name)
+        raise Exception(f"Asked unknown validator '{name}'")
     return registry[name](**kwargs)
 
 
@@ -82,7 +80,7 @@ class ValidatorType(type):
     def __init__(cls, name, bases, dict):
         type.__init__(cls, name, bases, dict)
         if 'name' not in dict:
-            raise Exception('Validator %s is missing class-attribute name' % name)
+            raise Exception(f'Validator {name} is missing class-attribute name')
         registry[dict['name']] = cls
 
 
@@ -136,7 +134,7 @@ class Validator(with_metaclass(ValidatorType)):
         return factory(value, **kwargs)
 
     def accept(self, value, **kwargs):
-        raise NotImplementedError('Validator %s should override accept method' % self.__class__.__name__)
+        raise NotImplementedError(f'Validator {self.__class__.__name__} should override accept method')
 
     def schema(self):
         schema = self._schema()
@@ -155,7 +153,7 @@ class Validator(with_metaclass(ValidatorType)):
         return not errors
 
     def __str__(self):
-        return '<validator:name=%s>' % self.name
+        return f'<validator:name={self.name}>'
 
     __repr__ = __str__
 
@@ -333,7 +331,7 @@ class FileValidator(TextValidator):
         import os
 
         if not os.path.isfile(os.path.expanduser(data)):
-            self.errors.add('File %s does not exist' % data)
+            self.errors.add(f'File {data} does not exist')
             return False
         return True
 
@@ -401,7 +399,7 @@ class DictValidator(Validator):
         :raises ValueError: `key` was not specified
         """
         if not key:
-            raise ValueError('%s.accept() must specify key' % self.name)
+            raise ValueError(f'{self.name}.accept() must specify key')
 
         if required:
             self.require_key(key)
@@ -453,7 +451,7 @@ class DictValidator(Validator):
             for key_type in key_type:
                 key_validator.accept(key_type)
         else:
-            raise ValueError('%s.accept_valid_keys() must specify key_type or key_validator' % self.name)
+            raise ValueError(f'{self.name}.accept_valid_keys() must specify key_type or key_validator')
         v = self.get_validator(value, **kwargs)
         self.key_validators.append((key_validator, v))
         return v

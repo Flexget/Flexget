@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.error import HTTPError, URLError
 from future.utils import python_2_unicode_compatible
 
@@ -36,7 +34,7 @@ class DependencyError(Exception):
     """
 
     def __init__(self, issued_by=None, missing=None, message=None, silent=False):
-        super(DependencyError, self).__init__()
+        super().__init__()
         self.issued_by = issued_by
         self.missing = missing
         self._message = message
@@ -46,7 +44,7 @@ class DependencyError(Exception):
         if self._message:
             return self._message
         else:
-            return 'Plugin `%s` requires dependency `%s`' % (self.issued_by, self.missing)
+            return f'Plugin `{self.issued_by}` requires dependency `{self.missing}`'
 
     def _set_message(self, message):
         self._message = message
@@ -57,13 +55,15 @@ class DependencyError(Exception):
     message = property(_get_message, _set_message)
 
     def __str__(self):
-        return '<DependencyError(issued_by=%r,missing=%r,message=%r,silent=%r)>' % \
-               (self.issued_by, self.missing, self.message, self.silent)
+        return f'<DependencyError(issued_by={self.issued_by!r},' \
+               f'missing={self.missing!r}' \
+               f',message={self.message!r},' \
+               f'silent={self.silent!r})>'
 
 
 class RegisterException(Exception):
     def __init__(self, value):
-        super(RegisterException, self).__init__()
+        super().__init__()
         self.value = value
 
     def __str__(self):
@@ -73,7 +73,7 @@ class RegisterException(Exception):
 @python_2_unicode_compatible
 class PluginWarning(Warning):
     def __init__(self, value, logger=log, **kwargs):
-        super(PluginWarning, self).__init__()
+        super().__init__()
         self.value = value
         self.log = logger
         self.kwargs = kwargs
@@ -85,7 +85,7 @@ class PluginWarning(Warning):
 @python_2_unicode_compatible
 class PluginError(Exception):
     def __init__(self, value, logger=log, **kwargs):
-        super(PluginError, self).__init__()
+        super().__init__()
         # Value is expected to be a string
         if not isinstance(value, str):
             value = str(value)
@@ -98,7 +98,7 @@ class PluginError(Exception):
 
 
 # TODO: move to utils or somewhere more appropriate
-class internet(object):
+class internet:
     """@internet decorator for plugin phase methods.
 
     Catches all internet related exceptions and raises PluginError with relevant message.
@@ -118,12 +118,12 @@ class internet(object):
                 return func(*args, **kwargs)
             except RequestException as e:
                 log.debug('decorator caught RequestException. handled traceback:', exc_info=True)
-                raise PluginError('RequestException: %s' % e)
+                raise PluginError(f'RequestException: {e}')
             except HTTPError as e:
-                raise PluginError('HTTPError %s' % e.code, self.log)
+                raise PluginError(f'HTTPError {e.code}', self.log)
             except URLError as e:
                 log.debug('decorator caught urlerror. handled traceback:', exc_info=True)
-                raise PluginError('URLError %s' % e.reason, self.log)
+                raise PluginError(f'URLError{e.reason}', self.log)
             except BadStatusLine:
                 log.debug('decorator caught badstatusline. handled traceback:', exc_info=True)
                 raise PluginError('Got BadStatusLine', self.log)
@@ -133,10 +133,10 @@ class internet(object):
             except IOError as e:
                 log.debug('decorator caught ioerror. handled traceback:', exc_info=True)
                 if hasattr(e, 'reason'):
-                    raise PluginError('Failed to reach server. Reason: %s' % e.reason, self.log)
+                    raise PluginError(f'Failed to reach server. Reason: {e.reason}', self.log)
                 elif hasattr(e, 'code'):
-                    raise PluginError('The server couldn\'t fulfill the request. Error code: %s' % e.code, self.log)
-                raise PluginError('IOError when connecting to server: %s' % e, self.log)
+                    raise PluginError(f"The server couldn't fulfill the request. Error code: {e.code}", self.log)
+                raise PluginError(f'IOError when connecting to server: {e}', self.log)
 
         return wrapped_func
 
@@ -186,7 +186,7 @@ def register_task_phase(name, before=None, after=None):
     if not before and not after:
         raise RegisterException('You must specify either a before or after phase.')
     if name in task_phases or name in _new_phase_queue:
-        raise RegisterException('Phase %s already exists.' % name)
+        raise RegisterException(f'Phase {name} already exists.')
 
     def add_phase(phase_name, before, after):
         if before is not None and before not in task_phases:
@@ -241,7 +241,7 @@ class PluginInfo(dict):
             interfaces = ['task']
         if groups is not None:
             warnings.warn('The `groups` argument for plugin registration is deprecated. `interfaces` should be used '
-                          'instead. Plugin %s' % name, DeprecationWarning, stacklevel=2)
+                          f'instead. Plugin {name}', DeprecationWarning, stacklevel=2)
             interfaces.extend(groups)
         if name is None:
             # Convention is to take camel-case class name and rewrite it to an underscore form,
@@ -253,7 +253,7 @@ class PluginInfo(dict):
 
         # Check for unsupported api versions
         if api_ver < 2:
-            warnings.warn('Api versions <2 are no longer supported. Plugin %s' % name, DeprecationWarning, stacklevel=2)
+            warnings.warn(f'Api versions <2 are no longer supported. Plugin {name}', DeprecationWarning, stacklevel=2)
 
         # Set basic info attributes
         self.api_ver = api_ver
@@ -484,7 +484,7 @@ def get_plugins(phase=None, interface=None, category=None, name=None, min_api=No
 
     def matches(plugin):
         if phase is not None and phase not in phase_methods:
-            raise ValueError('Unknown phase %s' % phase)
+            raise ValueError(f'Unknown phase {phase}')
         if phase and phase not in plugin.phase_handlers:
             return False
         if interface and interface not in plugin.interfaces:
@@ -525,5 +525,5 @@ def get_plugin_keywords():
 def get_plugin_by_name(name, issued_by='???'):
     """Get plugin by name, preferred way since this structure may be changed at some point."""
     if name not in plugins:
-        raise DependencyError(issued_by=issued_by, missing=name, message='Unknown plugin %s' % name)
+        raise DependencyError(issued_by=issued_by, missing=name, message=f'Unknown plugin {name}')
     return plugins[name]

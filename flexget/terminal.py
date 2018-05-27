@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import sys
 from textwrap import wrap
 
@@ -25,7 +22,7 @@ def terminal_info():
     return {'size': terminal_size(), 'isatty': sys.stdout.isatty()}
 
 
-class TerminalTable(object):
+class TerminalTable:
     """
     A data table suited for CLI output, created via its sent parameters. For example::
 
@@ -153,7 +150,7 @@ class TerminalTable(object):
 
     def _drop_column(self, col):
         name = self.table_data[0][col]
-        console('Least important column `%s` removed due terminal size' % name)
+        console(f'Least important column `{name}` removed due terminal size')
 
         for row in self.table_data:
             del row[col]

@@ -1,12 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import hashlib
 import logging
 import random
 import socket
 import threading
-
+import string
 import cherrypy
 import zxcvbn
 from flask import Flask, abort, redirect
@@ -31,7 +28,7 @@ def generate_key():
     return str(hashlib.sha224(str(random.getrandbits(128)).encode('utf-8')).hexdigest())
 
 
-def get_random_string(length=12, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):
+def get_random_string(length=12, allowed_chars=None):
     """
     Returns a securely generated random string.
 
@@ -40,7 +37,9 @@ def get_random_string(length=12, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEF
 
     Taken from the django.utils.crypto module.
     """
-    return ''.join(random.choice(allowed_chars) for __ in range(length))
+    if not allowed_chars:
+        allowed_chars = string.digits + string.ascii_letters
+    return ''.join(random.choices(allowed_chars, k=length))
 
 
 @with_session
@@ -57,7 +56,7 @@ def get_secret(session=None):
 
 class WeakPassword(Exception):
     def __init__(self, value, logger=log, **kwargs):
-        super(WeakPassword, self).__init__()
+        super().__init__()
         # Value is expected to be a string
         if not isinstance(value, str):
             value = str(value)
@@ -98,7 +97,7 @@ class WebSecret(Base):
 
 def register_app(path, application):
     if path in _app_register:
-        raise ValueError('path %s already registered' % path)
+        raise ValueError(f'path {path} already registered')
     _app_register[path] = application
 
 
@@ -224,11 +223,11 @@ def change_password(username='flexget', password='', session=None):
     if check['score'] < 3:
         warning = check['feedback']['warning']
         suggestions = ' '.join(check['feedback']['suggestions'])
-        message = 'Password \'{}\' is not strong enough. '.format(password)
+        message = f"Password '{password}' is not strong enough. "
         if warning:
             message += warning + ' '
         if suggestions:
-            message += 'Suggestions: {}'.format(suggestions)
+            message += f'Suggestions: {suggestions}'
         raise WeakPassword(message)
 
     user = get_user(username=username, session=session)
