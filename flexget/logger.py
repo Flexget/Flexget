@@ -1,5 +1,3 @@
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import codecs
 import collections
 import contextlib

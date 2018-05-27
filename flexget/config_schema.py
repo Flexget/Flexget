@@ -1,19 +1,18 @@
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from flexget.utils.template import get_template
-
 from future.moves.urllib.parse import urlparse, parse_qsl
 
+import logging
 import os
 import re
-import logging
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
+
 import jsonschema
 from jsonschema.compat import str_types, int_types
 
 from flexget.event import fire_event
 from flexget.utils import qualities, template
+from flexget.utils.template import get_template
 from flexget.utils.tools import parse_timedelta, parse_episode_identifier
 
 schema_paths = {}

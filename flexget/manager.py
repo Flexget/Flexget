@@ -1,10 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import, print_function
-
-# This needs to remain before the builtins import!
-native_int = int
-
-from builtins import *  # noqa  pylint: disable=unused-import, redefined-builtin
-
 import atexit  # noqa
 import codecs  # noqa
 import copy  # noqa

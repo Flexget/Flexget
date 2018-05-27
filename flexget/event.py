@@ -1,8 +1,6 @@
 """
 Provides small event framework
 """
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 log = logging.getLogger('event')

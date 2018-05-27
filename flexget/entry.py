@@ -1,4 +1,3 @@
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.utils import PY2, native_str, text_type
 
 import copy

@@ -1,6 +1,4 @@
 #!/usr/bin/python
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from ._version import __version__  # noqa
 
 import logging
