@@ -1,4 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.utils import PY2, native_str, text_type
 
@@ -21,7 +20,7 @@ class EntryUnicodeError(Exception):
         self.value = value
 
     def __str__(self):
-        return 'Entry strings must be unicode: %s (%r)' % (self.key, self.value)
+        return f"Entry strings must be unicode: {self.key} ({self.value!r})"
 
 
 class Entry(LazyDict):
@@ -39,7 +38,7 @@ class Entry(LazyDict):
     """
 
     def __init__(self, *args, **kwargs):
-        super(Entry, self).__init__()
+        super().__init__()
         self.traces = []
         self.snapshots = {}
         self._state = 'undecided'
@@ -64,7 +63,7 @@ class Entry(LazyDict):
         :param plugin: Uses task.current_plugin by default, pass value to override
         """
         if operation not in (None, 'accept', 'reject', 'fail'):
-            raise ValueError('Unknown operation %s' % operation)
+            raise ValueError(f'Unknown operation {operation}')
         item = (plugin, operation, message)
         if item not in self.traces:
             self.traces.append(item)
@@ -91,7 +90,7 @@ class Entry(LazyDict):
         try:
             self._hooks[action].append(functools.partial(func, **kwargs))
         except KeyError:
-            raise ValueError('`%s` is not a valid entry action' % action)
+            raise ValueError(f'`{action}` is not a valid entry action')
 
     def on_accept(self, func, **kwargs):
         """
@@ -131,7 +130,7 @@ class Entry(LazyDict):
 
     def accept(self, reason=None, **kwargs):
         if self.rejected:
-            log.debug('tried to accept rejected %r' % self)
+            log.debug('tried to accept rejected %r', self)
         elif not self.accepted:
             self._state = 'accepted'
             self.trace(reason, operation='accept')
@@ -142,8 +141,8 @@ class Entry(LazyDict):
         # ignore rejections on immortal entries
         if self.get('immortal'):
             reason_str = '(%s)' % reason if reason else ''
-            log.info('Tried to reject immortal %s %s' % (self['title'], reason_str))
-            self.trace('Tried to reject immortal %s' % reason_str)
+            log.info('Tried to reject immortal %s %s', self['title'], reason_str)
+            self.trace('Tried to reject immortal %s', reason_str)
             return
         if not self.rejected:
             self._state = 'rejected'
@@ -152,11 +151,11 @@ class Entry(LazyDict):
             self.run_hooks('reject', reason=reason, **kwargs)
 
     def fail(self, reason=None, **kwargs):
-        log.debug('Marking entry \'%s\' as failed' % self['title'])
+        log.debug("Marking entry '%s' as failed", self['title'])
         if not self.failed:
             self._state = 'failed'
             self.trace(reason, operation='fail')
-            log.error('Failed %s (%s)' % (self['title'], reason))
+            log.error('Failed %s (%s)', self['title'], reason)
             # Run entry on_fail hooks
             self.run_hooks('fail', reason=reason, **kwargs)
 
@@ -203,7 +202,7 @@ class Entry(LazyDict):
         # url and original_url handling
         if key == 'url':
             if not isinstance(value, (str, LazyLookup)):
-                raise PluginError('Tried to set %r url to %r' % (self.get('title'), value))
+                raise PluginError(f"Tried to set {self.get('title')} url to {value}")
             self.setdefault('original_url', value)
 
         # title handling
@@ -212,14 +211,14 @@ class Entry(LazyDict):
                 raise PluginError('Tried to set title to %r' % value)
 
         try:
-            log.trace('ENTRY SET: %s = %r' % (key, value))
+            log.trace('ENTRY SET: %s = %r', key, value)
         except Exception as e:
-            log.debug('trying to debug key `%s` value threw exception: %s' % (key, e))
+            log.debug('trying to debug key `%s` value threw exception: %s', key, e)
 
         super(Entry, self).__setitem__(key, value)
 
     def safe_str(self):
-        return '%s | %s' % (self['title'], self['url'])
+        return f"{self['title']} | {self['url']}"
 
     # TODO: this is too manual, maybe we should somehow check this internally and throw some exception if
     # application is trying to operate on invalid entry
@@ -248,10 +247,10 @@ class Entry(LazyDict):
             try:
                 snapshot[field] = copy.deepcopy(value)
             except TypeError:
-                log.warning('Unable to take `%s` snapshot for field `%s` in `%s`' % (name, field, self['title']))
+                log.warning('Unable to take `%s` snapshot for field `%s` in `%s`', name, field, self['title'])
         if snapshot:
             if name in self.snapshots:
-                log.warning('Snapshot `%s` is being overwritten for `%s`' % (name, self['title']))
+                log.warning('Snapshot `%s` is being overwritten for `%s`', name, self['title'])
             self.snapshots[name] = snapshot
 
     def update_using_map(self, field_map, source_item, ignore_none=False):
@@ -288,8 +287,8 @@ class Entry(LazyDict):
         :raises RenderError: If there is a problem.
         """
         if not isinstance(template, (str, FlexGetTemplate)):
-            raise ValueError(
-                'Trying to render non string template or unrecognized template format, got %s' % repr(template))
+            raise ValueError(f'Trying to render non string template or unrecognized template format, '
+                             f'got {repr(template)}')
         log.trace('rendering: %s', template)
         return render_from_entry(template, self)
 
@@ -300,4 +299,4 @@ class Entry(LazyDict):
         return hash(self.get('title', '') + self.get('original_url', ''))
 
     def __repr__(self):
-        return '<Entry(title=%s,state=%s)>' % (self['title'], self._state)
+        return f"<Entry(title={self['title']},state={self._state})>"
