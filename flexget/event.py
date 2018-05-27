@@ -1,7 +1,6 @@
 """
 Provides small event framework
 """
-from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
@@ -32,7 +31,7 @@ class Event(object):
         return self.priority > other.priority
 
     def __str__(self):
-        return '<Event(name=%s,func=%s,priority=%s)>' % (self.name, self.func.__name__, self.priority)
+        return f'<Event(name={self.name},func={self.func.__name__},priority={self.priority})>'
 
     __repr__ = __str__
 
@@ -56,7 +55,7 @@ def get_events(name):
     :return: List of :class:`Event` for *name* ordered by priority
     """
     if name not in _events:
-        raise KeyError('No such event %s' % name)
+        raise KeyError(f'No such event {name}')
     _events[name].sort(reverse=True)
     return _events[name]
 
@@ -73,8 +72,8 @@ def add_event_handler(name, func, priority=128):
     events = _events.setdefault(name, [])
     for event in events:
         if event.func == func:
-            raise ValueError('%s has already been registered as event listener under name %s' % (func.__name__, name))
-    log.trace('registered function %s to event %s' % (func.__name__, name))
+            raise ValueError(f'{func.__name__} has already been registered as event listener under name {name}')
+    log.trace('registered function %s to event %s', func.__name__, name)
     event = Event(name, func, priority)
     events.append(event)
     return event
