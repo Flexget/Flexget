@@ -139,9 +139,9 @@ class Entry(LazyDict):
     def reject(self, reason=None, **kwargs):
         # ignore rejections on immortal entries
         if self.get('immortal'):
-            reason_str = '(%s)' % reason if reason else ''
+            reason_str = f'({reason})' if reason else ''
             log.info('Tried to reject immortal %s %s', self['title'], reason_str)
-            self.trace('Tried to reject immortal %s', reason_str)
+            self.trace(f'Tried to reject immortal {reason_str}')
             return
         if not self.rejected:
             self._state = 'rejected'
