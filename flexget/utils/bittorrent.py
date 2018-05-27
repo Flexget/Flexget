@@ -1,9 +1,6 @@
 """Torrenting utils, mostly for handling bencoding and torrent files."""
 # Torrent decoding is a short fragment from effbot.org. Site copyright says:
 # Test scripts and other short code fragments can be considered as being in the public domain.
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import binascii
 import functools
 import re
