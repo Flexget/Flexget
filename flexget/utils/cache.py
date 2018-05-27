@@ -39,7 +39,7 @@ def cached_resource(url, base_dir, force=False, max_size=250, directory='cached_
                 size = dir_size(directory) / (1_024 * 1_024.0)
         file_path.write_bytes(content)
 
-    return file_path, mime_type
+    return str(file_path), mime_type
 
 
 def dir_size(directory: Path):
