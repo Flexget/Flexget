@@ -1,4 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import, print_function
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import codecs
@@ -175,7 +174,7 @@ def initialize(unit_test=False):
 
     # Store any log messages in a buffer until we `start` function is run
     logger = logging.getLogger()
-    _buff_handler = logging.handlers.BufferingHandler(1000 * 1000)
+    _buff_handler = logging.handlers.BufferingHandler(1_000 * 1_000)
     logger.addHandler(_buff_handler)
     logger.setLevel(logging.NOTSET)
 
@@ -203,7 +202,7 @@ def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
     formatter = FlexGetFormatter()
     if to_file:
         file_handler = logging.handlers.RotatingFileHandler(filename,
-                                                            maxBytes=int(os.environ.get(ENV_MAXBYTES, 1000 * 1024)),
+                                                            maxBytes=int(os.environ.get(ENV_MAXBYTES, 1_000 * 1_024)),
                                                             backupCount=int(os.environ.get(ENV_MAXCOUNT, 9)))
         file_handler.setFormatter(formatter)
         file_handler.setLevel(level)
