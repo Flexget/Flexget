@@ -1,5 +1,3 @@
-from future.utils import PY2, native_str, text_type
-
 import copy
 import functools
 import logging
@@ -183,20 +181,13 @@ class Entry(LazyDict):
         return self._state == 'undecided'
 
     def __setitem__(self, key, value):
-        # Enforce unicode compatibility.
-        if PY2 and isinstance(value, native_str):
-            # Allow Python 2's implicit string decoding, but fail now instead of when entry fields are used.
-            # If encoding is anything but ascii, it should be decoded it to text before setting an entry field
-            try:
-                value = value.decode('ascii')
-            except UnicodeDecodeError:
-                raise EntryUnicodeError(key, value)
-        elif isinstance(value, bytes):
+
+        if isinstance(value, bytes):
             raise EntryUnicodeError(key, value)
         # Coerce any enriched strings (such as those returned by BeautifulSoup) to plain strings to avoid serialization
         # troubles.
-        elif isinstance(value, text_type) and type(value) != text_type:  # pylint: disable=unidiomatic-typecheck
-            value = text_type(value)
+        elif isinstance(value, str) and type(value) != str:  # pylint: disable=unidiomatic-typecheck
+            value = str(value)
 
         # url and original_url handling
         if key == 'url':

@@ -1,11 +1,10 @@
-from future.moves.urllib.parse import urlparse, parse_qsl
-
 import logging
 import os
 import re
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import urlparse, parse_qsl
 
 import jsonschema
 from jsonschema.compat import str_types, int_types
