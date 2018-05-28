@@ -1,18 +1,15 @@
 """Logging utilities"""
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import hashlib
+import logging
 from datetime import datetime, timedelta
 
 from sqlalchemy import Column, Integer, String, DateTime, Index
 
-from flexget.utils.database import with_session
 from flexget import db_schema
 from flexget import logger as f_logger
-from flexget.utils.sqlalchemy_utils import table_schema
 from flexget.event import event
+from flexget.utils.database import with_session
+from flexget.utils.sqlalchemy_utils import table_schema
 
 log = logging.getLogger('util.log')
 Base = db_schema.versioned_base('log_once', 0)
@@ -41,7 +38,7 @@ class LogMessage(Base):
         self.md5sum = md5sum
 
     def __repr__(self):
-        return "<LogMessage('%s')>" % self.md5sum
+        return f"<LogMessage({self.md5sum})>"
 
 
 @event('manager.db_cleanup')
@@ -51,7 +48,7 @@ def purge(manager, session):
 
     result = session.query(LogMessage).filter(LogMessage.added < old).delete()
     if result:
-        log.verbose('Purged %s entries from log_once table.' % result)
+        log.verbose('Purged %s entries from log_once table.', result)
 
 
 @with_session

@@ -1,9 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import ntpath
-import sys
 import re
+import sys
 
 os_mode = None  # Can be 'windows', 'mac', 'linux' or None. None will auto-detect os.
 # Replacement order is important, don't use dicts to store
@@ -55,5 +52,5 @@ def pathscrub(dirty_path, os=None, filename=False):
     path = path.strip()
     # If we stripped everything from a filename, complain
     if filename and dirty_path and not path:
-        raise ValueError('Nothing was left after stripping invalid characters from path `%s`!' % dirty_path)
+        raise ValueError(f'Nothing was left after stripping invalid characters from path `{dirty_path}`!')
     return drive + path

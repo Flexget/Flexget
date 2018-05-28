@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring, long, unicode
 
 import functools
@@ -120,7 +118,7 @@ def entry_synonym(name):
                     return s_type(item)
 
         # If item isn't a subclass of a builtin python type, raise ValueError.
-        raise TypeError('%r is not of type Entry.' % type(item))
+        raise TypeError(f'{type(item)!r} is not of type Entry.')
 
     def getter(self):
         return Entry(json.loads(getattr(self, name), decode_datetime=True))
@@ -129,7 +127,7 @@ def entry_synonym(name):
         if isinstance(entry, Entry) or isinstance(entry, dict):
             setattr(self, name, unicode(json.dumps(only_builtins(dict(entry)), encode_datetime=True)))
         else:
-            raise TypeError('%r is not of type Entry or dict.' % type(entry))
+            raise TypeError(f'{type(entry)!r} is not of type Entry or dict.')
 
     return synonym(name, descriptor=property(getter, setter))
 
