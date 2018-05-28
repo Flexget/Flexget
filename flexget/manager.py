@@ -41,7 +41,7 @@ manager = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
 
 
-class Manager(object):
+class Manager:
     """Manager class for FlexGet
 
     Fires events:
@@ -145,7 +145,7 @@ class Manager(object):
                     self.options, _ = manager_parser.parse_known_args(args)
                 except ParserError as e:
                     manager_parser.print_help()
-                    print('\nError: %s' % e.message)
+                    print(f'\nError: {e.message}')
                     sys.exit(1)
         try:
             self.find_config(create=False)
@@ -165,7 +165,7 @@ class Manager(object):
         log.debug('sys.defaultencoding: %s', sys.getdefaultencoding())
         log.debug('sys.getfilesystemencoding: %s', sys.getfilesystemencoding())
         log.debug('flexget detected io encoding: %s', io_encoding)
-        log.debug('os.path.supports_unicode_filenames: %s' % os.path.supports_unicode_filenames)
+        log.debug('os.path.supports_unicode_filenames: %s', os.path.supports_unicode_filenames)
         if codecs.lookup(sys.getfilesystemencoding()).name == 'ascii' and not os.path.supports_unicode_filenames:
             log.warning('Your locale declares ascii as the filesystem encoding. Any plugins reading filenames from '
                         'disk will not work properly for filenames containing non-ascii characters. Make sure your '
@@ -195,7 +195,7 @@ class Manager(object):
         try:
             self.load_config()
         except ValueError as e:
-            log.critical('Failed to load config file: %s' % e.args[0])
+            log.critical('Failed to load config file: %s', e.args[0])
             raise
 
         # cannot be imported at module level because of circular references
@@ -261,7 +261,7 @@ class Manager(object):
                 for arg in options.tasks:
                     matches = [t for t in self.tasks if fnmatch.fnmatchcase(str(t).lower(), arg.lower())]
                     if not matches:
-                        msg = '`%s` does not match any tasks' % arg
+                        msg = f'`{arg}` does not match any tasks'
                         log.error(msg)
                         if output:
                             output.write(msg)
@@ -297,7 +297,7 @@ class Manager(object):
         ipc_info = self.check_ipc_info()
         if ipc_info:
             console('There is a FlexGet process already running for this config, sending execution there.')
-            log.debug('Sending command to running FlexGet process: %s' % self.args)
+            log.debug('Sending command to running FlexGet process: %s', self.args)
             try:
                 client = IPCClient(ipc_info['port'], ipc_info['password'])
             except ValueError as e:
@@ -416,7 +416,7 @@ class Manager(object):
             except ValueError as e:
                 # If flexget is being called from another script, e.g. windows service helper, and we are not the
                 # main thread, this error will occur.
-                log.debug('Error registering sigterm handler: %s' % e)
+                log.debug('Error registering sigterm handler: %s', e)
             self.is_daemon = True
             fire_event('manager.daemon.started', self)
             self.task_queue.start()
@@ -431,14 +431,14 @@ class Manager(object):
                 log.info('Daemon running. (PID: %s)' % os.getpid())
             elif options.action == 'stop':
                 tasks = 'all queued tasks (if any) have' if options.wait else 'currently running task (if any) has'
-                log.info('Daemon shutdown requested. Shutdown will commence when %s finished executing.' % tasks)
+                log.info('Daemon shutdown requested. Shutdown will commence when %s finished executing.', tasks)
                 self.shutdown(options.wait)
             elif options.action == 'reload-config':
                 log.info('Reloading config from disk.')
                 try:
                     self.load_config()
                 except ValueError as e:
-                    log.error('Error loading config: %s' % e.args[0])
+                    log.error('Error loading config: %s', e.args[0])
                 else:
                     log.info('Config successfully reloaded from disk.')
 
@@ -520,29 +520,29 @@ class Manager(object):
 
         if create and not (config and os.path.exists(config)):
             config = os.path.join(home_path, options_config)
-            log.info('Config file %s not found. Creating new config %s' % (options_config, config))
+            log.info('Config file %s not found. Creating new config %s', options_config, config)
             with open(config, 'w') as newconfig:
                 # Write empty tasks to the config
                 newconfig.write(yaml.dump({'tasks': {}}))
         elif not config:
-            log.critical('Failed to find configuration file %s' % options_config)
-            log.info('Tried to read from: %s' % ', '.join(possible))
+            log.critical('Failed to find configuration file %s', options_config)
+            log.info('Tried to read from: %s', ', '.join(possible))
             raise IOError('No configuration file found.')
         if not os.path.isfile(config):
-            raise IOError('Config `%s` does not appear to be a file.' % config)
+            raise IOError(f'Config `{config}` does not appear to be a file.')
 
-        log.debug('Config file %s selected' % config)
+        log.debug('Config file %s selected', config)
         self.config_path = config
         self.config_name = os.path.splitext(os.path.basename(config))[0]
         self.config_base = os.path.normpath(os.path.dirname(config))
-        self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
-        self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
+        self.lockfile = os.path.join(self.config_base, f'.{self.config_name}-lock')
+        self.db_filename = os.path.join(self.config_base, f'db-{self.config_name}.sqlite')
 
     def hash_config(self):
         if not self.config_path:
             return
         sha1_hash = hashlib.sha1()
-        with io.open(self.config_path, 'rb') as f:
+        with open(self.config_path, 'rb') as f:
             while True:
                 data = f.read(65536)
                 if not data:
@@ -557,7 +557,7 @@ class Manager(object):
         :raises: `ValueError` if there is a problem loading the config file
         """
         fire_event('manager.before_config_load', self)
-        with io.open(self.config_path, 'r', encoding='utf-8') as f:
+        with open(self.config_path, 'r', encoding='utf-8') as f:
             try:
                 raw_config = f.read()
             except UnicodeDecodeError:
@@ -612,8 +612,8 @@ class Manager(object):
             raise ValueError('Config file is not valid YAML')
 
         # config loaded successfully
-        log.debug('config_name: %s' % self.config_name)
-        log.debug('config_base: %s' % self.config_base)
+        log.debug('config_name: %s', self.config_name)
+        log.debug('config_base: %s', self.config_base)
         # Install the newly loaded config
         self.update_config(config)
 
@@ -639,8 +639,7 @@ class Manager(object):
 
     def backup_config(self):
         backup_path = os.path.join(self.config_base,
-                                   '%s-%s.bak' % (self.config_name, datetime.now().strftime('%y%m%d%H%M%S')))
-
+                                   f'{self.config_name}-{datetime.now().strftime("%y%m%d%H%M%S")}.bak')
         log.debug('backing up old config to %s before new save' % backup_path)
         try:
             shutil.copy(self.config_path, backup_path)
@@ -701,13 +700,13 @@ class Manager(object):
         if self.database_uri is None:
             # in case running on windows, needs double \\
             filename = self.db_filename.replace('\\', '\\\\')
-            self.database_uri = 'sqlite:///%s' % filename
+            self.database_uri = f'sqlite:///{filename}'
 
         if self.db_filename and not os.path.exists(self.db_filename):
-            log.verbose('Creating new database %s - DO NOT INTERUPT ...' % self.db_filename)
+            log.verbose('Creating new database %s - DO NOT INTERUPT ...', self.db_filename)
 
         # fire up the engine
-        log.debug('Connecting to: %s' % self.database_uri)
+        log.debug('Connecting to: %s', self.database_uri)
         try:
             self.engine = sqlalchemy.create_engine(self.database_uri,
                                                    echo=self.options.debug_sql,
@@ -718,7 +717,7 @@ class Manager(object):
                   'If you\'re running correct version of Python then it is not equipped with SQLite.\n'
                   'You can try installing `pysqlite`. If you have compiled python yourself, '
                   'recompile it with SQLite support.\n'
-                  'Error: %s' % e, file=sys.stderr)
+                  f'Error: {e}', file=sys.stderr)
             sys.exit(1)
         Session.configure(bind=self.engine)
         # create all tables, doesn't do anything to existing tables
