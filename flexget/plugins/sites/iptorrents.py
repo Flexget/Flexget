@@ -72,13 +72,13 @@ class UrlRewriteIPTorrents(object):
           password: xxxxxxxx  (required)
           category: HD
 
-          Category is any combination of: Movie-all, Movie-3D, Movie-480p, 
-				Movie-4K, Movie-BD-R, Movie-BD-Rip, Movie-Cam, Movie-DVD-R, 
-				Movie-HD-Bluray, Movie-Kids, Movie-MP4, Movie-Non-English, 
+          Category is any combination of: Movie-all, Movie-3D, Movie-480p,
+				Movie-4K, Movie-BD-R, Movie-BD-Rip, Movie-Cam, Movie-DVD-R,
+				Movie-HD-Bluray, Movie-Kids, Movie-MP4, Movie-Non-English,
 				Movie-Packs, Movie-Web-DL, Movie-x265, Movie-XviD,
 
-                TV-all, TV-Documentaries, TV-Sports, TV-480p, TV-BD, TV-DVD-R, 
-				TV-DVD-Rip, TV-MP4, TV-Mobile, TV-Non-English, TV-Packs, 
+                TV-all, TV-Documentaries, TV-Sports, TV-480p, TV-BD, TV-DVD-R,
+				TV-DVD-Rip, TV-MP4, TV-Mobile, TV-Non-English, TV-Packs,
 				TV-Packs-Non-English, TV-SD-x264, TV-x264, TV-x265, TV-XVID, TV-Web-DL
     """
 
