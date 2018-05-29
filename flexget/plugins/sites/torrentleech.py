@@ -24,21 +24,14 @@ CATEGORIES = {
     'Cam': 8,
     'TS': 9,
     'TS/TC': 9,
-#    R5 is deprecated
-    'R5': 10,
-    'DVDRip': 11,
     'DVDRip/DVDScreener': 11,
     'WEBRip': 37,
     'HDRip': 43,
-    'BDRip': 14,
     'BlurayRip': 14,
-    'DVDR': 12,
     'DVD-R': 12,
-    'HD': 13,
     'Bluray': 13,
     '4KUpscaled': 41,
     'Real4K': 47,
-    'Movie Boxsets': 15,
     'Boxsets': 15,
     'Documentaries': 29,
 
@@ -60,9 +53,9 @@ class UrlRewriteTorrentleech(object):
           category: HD
 
           Category is any combination of: all, Cam, TS, TS/TC, DVDRip,
-				DVDRip/DVDScreener, WEBRip': 37, HDRip': 43, BDRip, DVDR,
-				DVD-R, HD, Bluray, 4KUpscaled, Real4K, Movie Boxsets,
-				Boxsets': 15, Documentaries, Episodes, TV Boxsets, Episodes HD
+          DVDRip/DVDScreener, WEBRip': 37, HDRip': 43, BDRip, DVDR,
+          DVD-R, HD, Bluray, 4KUpscaled, Real4K, Movie Boxsets,
+          Boxsets': 15, Documentaries, Episodes, TV Boxsets, Episodes HD
     """
 
     schema = {
