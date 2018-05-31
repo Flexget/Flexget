@@ -1,6 +1,8 @@
+import importlib.util
 import logging
 import os
 import re
+import sys
 import time
 import warnings
 from functools import total_ordering
@@ -351,7 +353,7 @@ register = PluginInfo
 
 
 def _strip_trailing_sep(path):
-    return path.rstrip("\\/")
+    return str(path).rstrip("\\/")
 
 
 def _get_standard_plugins_path():
@@ -384,15 +386,13 @@ def _load_plugins_from_dirs(dirs: List[Path]):
     log.debug('Trying to load plugins from: %s', dirs)
     dirs = [d for d in dirs if d.is_dir()]
     # add all dirs to plugins_pkg load path so that imports work properly from any of the plugin dirs
-    # plugins_pkg.__path__ = list(map(_strip_trailing_sep, dirs))
+    plugins_pkg.__path__ = list(map(_strip_trailing_sep, dirs))
     for plugins_dir in dirs:
         for plugin_path in plugins_dir.rglob('*.py'):
             if plugin_path.name == '__init__.py':
                 continue
-            module_name = plugin_path.name
-            # Split the relative path from the plugins dir to current file's parent dir to find subpackage names
-            # plugin_subpackages = [_f for _f in plugin_path.relative_to(plugins_dir).parent.splitall() if _f]
-            # module_name = '.'.join([plugins_pkg.__name__] + plugin_subpackages + [plugin_path.namebase])
+            module_name = str(plugin_path.relative_to(plugins_dir)).strip(".py").replace("/", ".")
+            module_name = f'{plugins_pkg.__name__}.{module_name}'
             try:
                 __import__(module_name)
             except DependencyError as e:

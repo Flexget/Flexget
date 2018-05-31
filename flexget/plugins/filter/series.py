@@ -977,7 +977,7 @@ def store_parser(session, parser, series=None, quality=None):
         #
         # NOTE:
         #
-        # filter(Release.episode_id != None) fixes weird bug where release had/has been added
+        # filter(Release.episode_id != None) fixes weird bug whpere release had/has been added
         # to database but doesn't have episode_id, this causes all kinds of havoc with the plugin.
         # perhaps a bug in sqlalchemy?
         release = session.query(table).filter(filter_by == filter_id). \
