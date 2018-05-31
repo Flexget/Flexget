@@ -362,7 +362,7 @@ def _get_standard_plugins_path():
     """
     # Get basic path from environment
     paths = []
-    env_path = os.environ.get('FLEXGET_PLUGIN_PATH')
+    env_path = os.getenv('FLEXGET_PLUGIN_PATH')
     if env_path:
         paths = env_path.split(os.pathsep)
 
