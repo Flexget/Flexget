@@ -292,7 +292,7 @@ class Manager:
         """
         # When we are in test mode, we use a different lock file and db
         if self.options.test:
-            self.lockfile = os.path.join(self.config_base, '.test-%s-lock' % self.config_name)
+            self.lockfile = Path(self.config_base).joinpath(f'.test-{self.config_name}-lock')
         # If another process is started, send the execution to the running process
         ipc_info = self.check_ipc_info()
         if ipc_info:
@@ -313,8 +313,8 @@ class Manager:
             return
         if self.options.test:
             log.info('Test mode, creating a copy from database ...')
-            db_test_filename = os.path.join(self.config_base, 'test-%s.sqlite' % self.config_name)
-            if os.path.exists(self.db_filename):
+            db_test_filename = Path(self.config_base).joinpath(f'test-{self.config_name}.sqlite')
+            if Path(self.db_filename).exists():
                 shutil.copy(self.db_filename, db_test_filename)
                 log.info('Test database created')
             self.db_filename = db_test_filename
@@ -481,7 +481,7 @@ class Manager:
         :param bool create: If a config file is not found, and create is True, one will be created in the home folder
         :raises: `IOError` when no config file could be found, and `create` is False.
         """
-        home_path = os.path.join(os.path.expanduser('~'), '.flexget')
+        home_path = Path('~').joinpath('.flexget').expanduser()
         options_config = os.path.expanduser(self.options.config)
 
         possible = []

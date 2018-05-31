@@ -391,7 +391,8 @@ def _load_plugins_from_dirs(dirs: List[Path]):
         for plugin_path in plugins_dir.rglob('*.py'):
             if plugin_path.name == '__init__.py':
                 continue
-            module_name = str(plugin_path.relative_to(plugins_dir)).strip(".py").replace("/", ".")
+            # todo this kinda sucks, should probably use importlib
+            module_name = str(plugin_path.relative_to(plugins_dir)).replace(".py", '').replace("/", ".")
             module_name = f'{plugins_pkg.__name__}.{module_name}'
             try:
                 __import__(module_name)

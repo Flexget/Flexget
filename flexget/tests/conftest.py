@@ -63,7 +63,7 @@ def manager(request, config, caplog, monkeypatch, filecopy):  # enforce filecopy
     Create a :class:`MockManager` for this test based on `config` argument.
     """
     if 'tmpdir' in request.fixturenames:
-        config = config.replace('__tmp__', request.getfuncargvalue('tmpdir').strpath)
+        config = config.replace('__tmp__', request.getfixturevalue('tmpdir').strpath)
     try:
         mockmanager = MockManager(config, request.cls.__name__)
     except Exception:
