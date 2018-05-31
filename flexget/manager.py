@@ -2,6 +2,7 @@ import atexit  # noqa
 import codecs  # noqa
 import copy  # noqa
 import fnmatch  # noqa
+import hashlib  # noqa
 import logging  # noqa
 import os  # noqa
 import shutil  # noqa
@@ -9,10 +10,9 @@ import signal  # noqa
 import sys  # noqa
 import threading  # noqa
 import traceback  # noqa
-import hashlib  # noqa
 from contextlib import contextmanager  # noqa
 from datetime import datetime, timedelta  # noqa
-import io  # noqa
+from pathlib import Path
 
 import sqlalchemy  # noqa
 import yaml  # noqa
@@ -153,10 +153,10 @@ class Manager:
             logger.start(level=self.options.loglevel.upper(), to_file=False)
             raise
         else:
-            log_file = os.path.expanduser(self.options.logfile)
+            log_file = Path(self.options.logfile).expanduser()
             # If an absolute path is not specified, use the config directory.
-            if not os.path.isabs(log_file):
-                log_file = os.path.join(self.config_base, log_file)
+            if not log_file.is_absolute():
+                log_file = Path(self.config_base) / log_file
 
             logger.start(log_file, self.options.loglevel.upper(), to_console=not self.options.cron)
 
@@ -179,7 +179,7 @@ class Manager:
         if self.initialized:
             raise RuntimeError('Cannot call initialize on an already initialized manager.')
 
-        plugin.load_plugins(extra_dirs=[os.path.join(self.config_base, 'plugins')])
+        plugin.load_plugins(extra_dirs=[Path(self.config_base) / 'plugins'])
 
         # Reparse CLI options now that plugins are loaded
         if not self.args:
@@ -738,7 +738,7 @@ class Manager:
         """
         if self.lockfile and os.path.exists(self.lockfile):
             result = {}
-            with io.open(self.lockfile, encoding='utf-8') as f:
+            with open(self.lockfile, encoding='utf-8') as f:
                 lines = [l for l in f.readlines() if l]
             for line in lines:
                 try:
@@ -749,7 +749,7 @@ class Manager:
                 result[key.strip().lower()] = value.strip()
             for key in result:
                 if result[key].isdigit():
-                    result[key] = native_int(result[key])
+                    result[key] = int(result[key])
             result.setdefault('pid', None)
             if not result['pid']:
                 log.error('Invalid lock file. Make sure FlexGet is not running, then delete it.')
@@ -786,7 +786,7 @@ class Manager:
             if not self._has_lock:
                 # Exit if there is an existing lock.
                 if self.check_lock():
-                    with io.open(self.lockfile, encoding='utf-8') as f:
+                    with open(self.lockfile, encoding='utf-8') as f:
                         pid = f.read()
                     print('Another process (%s) is running, will exit.' % pid.split('\n')[0], file=sys.stderr)
                     print('If you\'re sure there is no other instance running, delete %s' % self.lockfile,
@@ -806,7 +806,7 @@ class Manager:
 
     def write_lock(self, ipc_info=None):
         assert self._has_lock
-        with io.open(self.lockfile, 'w', encoding='utf-8') as f:
+        with open(self.lockfile, 'w', encoding='utf-8') as f:
             f.write('PID: %s\n' % os.getpid())
             if ipc_info:
                 for key in sorted(ipc_info):

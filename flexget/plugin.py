@@ -1,20 +1,20 @@
-from future.moves.urllib.error import HTTPError, URLError
-from future.utils import python_2_unicode_compatible
-
 import logging
 import os
 import re
 import time
 import warnings
-import pkg_resources
 from functools import total_ordering
 from http.client import BadStatusLine
+from pathlib import Path
+from typing import List
 
-from path import Path
+import pkg_resources
+from future.moves.urllib.error import HTTPError, URLError
+from future.utils import python_2_unicode_compatible
 from requests import RequestException
 
-from flexget import plugins as plugins_pkg
 from flexget import config_schema
+from flexget import plugins as plugins_pkg
 from flexget.event import add_event_handler as add_phase_handler
 from flexget.event import fire_event, remove_event_handlers
 
@@ -365,7 +365,7 @@ def _get_standard_plugins_path():
         paths = env_path.split(os.pathsep)
 
     # Add flexget.plugins directory (core plugins)
-    paths.append(os.path.abspath(os.path.dirname(plugins_pkg.__file__)))
+    paths.append(Path(plugins_pkg.__file__).parent.absolute())
     return paths
 
 
@@ -376,22 +376,23 @@ def _check_phase_queue():
                       'point (before, after). Plugin is not working properly.', args[0], phase)
 
 
-def _load_plugins_from_dirs(dirs):
+def _load_plugins_from_dirs(dirs: List[Path]):
     """
     :param list dirs: Directories from where plugins are loaded from
     """
 
     log.debug('Trying to load plugins from: %s', dirs)
-    dirs = [Path(d) for d in dirs if os.path.isdir(d)]
+    dirs = [d for d in dirs if d.is_dir()]
     # add all dirs to plugins_pkg load path so that imports work properly from any of the plugin dirs
-    plugins_pkg.__path__ = list(map(_strip_trailing_sep, dirs))
+    # plugins_pkg.__path__ = list(map(_strip_trailing_sep, dirs))
     for plugins_dir in dirs:
-        for plugin_path in plugins_dir.walkfiles('*.py'):
+        for plugin_path in plugins_dir.rglob('*.py'):
             if plugin_path.name == '__init__.py':
                 continue
+            module_name = plugin_path.name
             # Split the relative path from the plugins dir to current file's parent dir to find subpackage names
-            plugin_subpackages = [_f for _f in plugin_path.relpath(plugins_dir).parent.splitall() if _f]
-            module_name = '.'.join([plugins_pkg.__name__] + plugin_subpackages + [plugin_path.namebase])
+            # plugin_subpackages = [_f for _f in plugin_path.relative_to(plugins_dir).parent.splitall() if _f]
+            # module_name = '.'.join([plugins_pkg.__name__] + plugin_subpackages + [plugin_path.namebase])
             try:
                 __import__(module_name)
             except DependencyError as e:
