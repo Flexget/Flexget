@@ -358,7 +358,7 @@ class PluginTraktLookup(object):
         elif is_movie(entry):
             media_type = 'movie'
         else:
-            raise plugin.PluginError('Unknown media type in entry %s', entry['title'])
+            raise plugin.PluginError('Unknown media type in entry %s' % entry['title'])
 
         return media_type
 
