@@ -1,11 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flask import jsonify, request
 
-from flexget.db_schema import reset_schema, plugin_schemas
 from flexget.api import api, APIResource
 from flexget.api.app import base_message_schema, success_response, BadRequest
+from flexget.db_schema import reset_schema, plugin_schemas
 
 db_api = api.namespace('database', description='Manage Flexget DB')
 
@@ -46,12 +43,12 @@ class DBOperation(APIResource):
         elif operation == 'plugin_reset':
             plugin_name = data.get('plugin_name')
             if not plugin_name:
-                raise BadRequest('\'plugin_name\' attribute must be used when trying to reset plugin')
+                raise BadRequest("'plugin_name' attribute must be used when trying to reset plugin")
             try:
                 reset_schema(plugin_name)
-                msg = 'Plugin {} DB reset was successful'.format(plugin_name)
+                msg = f'Plugin {plugin_name} DB reset was successful'
             except ValueError:
-                raise BadRequest('The plugin {} has no stored schema to reset'.format(plugin_name))
+                raise BadRequest(f'The plugin {plugin_name} has no stored schema to reset')
         return success_response(msg)
 
 

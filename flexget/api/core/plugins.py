@@ -1,15 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 from math import ceil
 
 from flask import jsonify, request
 from flask_restplus import inputs
 
-from flexget.plugin import get_plugins, get_plugin_by_name, DependencyError
 from flexget.api import api, APIResource
 from flexget.api.app import BadRequest, NotFoundError, etag, pagination_headers
+from flexget.plugin import get_plugins, get_plugin_by_name, DependencyError
 
 log = logging.getLogger('plugins')
 
@@ -108,7 +105,7 @@ class PluginsAPI(APIResource):
         total_pages = int(ceil(total_items / float(per_page)))
 
         if page > total_pages and total_pages != 0:
-            raise NotFoundError('page %s does not exist' % page)
+            raise NotFoundError(f'page {page} does not exist')
 
         # Actual results in page
         actual_size = min(per_page, len(sliced_list))

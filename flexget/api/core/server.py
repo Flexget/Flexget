@@ -1,22 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-import copy
-
 import base64
-
-import os
+import binascii
+import copy
 import json
-import sys
 import logging
+import os
+import sys
 import threading
 import traceback
 from time import sleep
-from path import Path
-import binascii
+
 import cherrypy
 import yaml
 from flask import Response, jsonify, request
-from flexget.utils.tools import get_latest_flexget_version_number
+from path import Path
 from pyparsing import (
     Word, Keyword, Group, Forward, Suppress, OneOrMore, oneOf, White, restOfLine, ParseException, Combine
 )
@@ -29,6 +25,7 @@ from flexget.api.app import (
     __version__ as __api_version__, APIError, BadRequest, base_message, success_response, base_message_schema,
     empty_response, etag
 )
+from flexget.utils.tools import get_latest_flexget_version_number
 
 log = logging.getLogger('api.server')
 
@@ -146,7 +143,7 @@ class ServerReloadAPI(APIResource):
                 for er in e.errors:
                     errors.append({'error': er.message,
                                    'config_path': er.json_pointer})
-                raise APIError('Error loading config: %s' % e.args[0], payload={'errors': errors})
+                raise APIError(f'Error loading config: {e}', payload={'errors': errors})
             response = 'Config successfully reloaded from disk'
         else:
             self.manager.shutdown(data.get('force'))
@@ -240,9 +237,11 @@ class ServerVersionAPI(APIResource):
     def get(self, session=None):
         """ Flexget Version """
         latest = get_latest_flexget_version_number()
-        return jsonify({'flexget_version': __version__,
-                        'api_version': __api_version__,
-                        'latest_version': latest})
+        return jsonify({
+            'flexget_version': __version__,
+            'api_version': __api_version__,
+            'latest_version': latest}
+        )
 
 
 @server_api.route('/dump_threads/', doc=False)
