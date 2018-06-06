@@ -1,16 +1,14 @@
-from past.builtins import basestring, long, unicode
-
 import functools
 from collections import Mapping
 from datetime import datetime
 
 from sqlalchemy import extract, func
-from sqlalchemy.orm import synonym
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
+from sqlalchemy.orm import synonym
 
+from flexget.entry import Entry
 from flexget.manager import Session
 from flexget.utils import qualities, json
-from flexget.entry import Entry
 
 
 def with_session(*args, **kwargs):
@@ -68,7 +66,7 @@ def text_date_synonym(name):
         return getattr(self, name)
 
     def setter(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             try:
                 setattr(self, name, datetime.strptime(value, '%Y-%m-%d'))
             except ValueError:
@@ -84,7 +82,7 @@ def entry_synonym(name):
     """Use json to serialize python objects for db storage."""
 
     def only_builtins(item):
-        supported_types = (str, unicode, int, float, long, bool, datetime)
+        supported_types = (str, int, float, bool, datetime)
         # dict, list, tuple and set are also supported, but handled separately
 
         if isinstance(item, supported_types):
@@ -125,7 +123,7 @@ def entry_synonym(name):
 
     def setter(self, entry):
         if isinstance(entry, Entry) or isinstance(entry, dict):
-            setattr(self, name, unicode(json.dumps(only_builtins(dict(entry)), encode_datetime=True)))
+            setattr(self, name, json.dumps(only_builtins(dict(entry)), encode_datetime=True))
         else:
             raise TypeError(f'{type(entry)!r} is not of type Entry or dict.')
 
@@ -139,7 +137,7 @@ def json_synonym(name):
         return json.loads(getattr(self, name), decode_datetime=True)
 
     def setter(self, entry):
-        setattr(self, name, unicode(json.dumps(entry, encode_datetime=True)))
+        setattr(self, name, json.dumps(entry, encode_datetime=True))
 
     return synonym(name, descriptor=property(getter, setter))
 
