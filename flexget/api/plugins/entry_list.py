@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
 import logging
 from math import ceil
@@ -60,8 +57,10 @@ class ObjectsContainer(object):
 
 
 entry_list_object_schema = api.schema_model('entry_list_object_schema', ObjectsContainer.entry_list_base_object)
-entry_list_input_object_schema = api.schema_model('entry_list_input_object_schema', ObjectsContainer.entry_list_input_object)
-entry_list_return_lists_schema = api.schema_model('entry_list_return_lists_schema', ObjectsContainer.entry_list_return_lists)
+entry_list_input_object_schema = api.schema_model('entry_list_input_object_schema',
+                                                  ObjectsContainer.entry_list_input_object)
+entry_list_return_lists_schema = api.schema_model('entry_list_return_lists_schema',
+                                                  ObjectsContainer.entry_list_return_lists)
 
 entry_list_parser = api.parser()
 entry_list_parser.add_argument('name', help='Filter results by list name')
@@ -93,7 +92,7 @@ class EntryListListsAPI(APIResource):
         except NoResultFound:
             new_list = True
         if not new_list:
-            raise Conflict('list with name \'%s\' already exists' % name)
+            raise Conflict(f"list with name '{name}' already exists")
         entry_list = el.EntryListList(name=name)
         session.add(entry_list)
         session.commit()
@@ -113,7 +112,7 @@ class EntryListListAPI(APIResource):
         try:
             list = el.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            raise NotFoundError('list_id %d does not exist' % list_id)
+            raise NotFoundError(f'list_id {list_id} does not exist')
         return jsonify(list.to_dict())
 
     @api.response(200, description='list successfully deleted', model=base_message_schema)
@@ -128,9 +127,10 @@ class EntryListListAPI(APIResource):
 
 
 base_entry_schema = api.schema_model('base_entry_schema', ObjectsContainer.base_entry_object)
-entry_list_entry_base_schema = api.schema_model('entry_list_entry_base_schema', ObjectsContainer.entry_list_entry_base_object)
+entry_list_entry_base_schema = api.schema_model('entry_list_entry_base_schema',
+                                                ObjectsContainer.entry_list_entry_base_object)
 entry_lists_entries_return_schema = api.schema_model('entry_lists_entries_return_schema',
-                                               ObjectsContainer.entry_lists_entries_return_object)
+                                                     ObjectsContainer.entry_lists_entries_return_object)
 
 sort_choices = ('id', 'added', 'title', 'original_url', 'list_id')
 entries_parser = api.pagination_parser(sort_choices=sort_choices, default='title')
@@ -147,7 +147,7 @@ class EntryListEntriesAPI(APIResource):
         try:
             list = el.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            raise NotFoundError('list_id %d does not exist' % list_id)
+            raise NotFoundError(f'list_id {list_id} does not exist')
 
         args = entries_parser.parse_args()
 
@@ -186,7 +186,7 @@ class EntryListEntriesAPI(APIResource):
         total_pages = int(ceil(total_items / float(per_page)))
 
         if page > total_pages:
-            raise NotFoundError('page %s does not exist' % page)
+            raise NotFoundError(f'page {page} does not exist')
 
         # Actual results in page
         actual_size = min(len(entries), per_page)
@@ -209,12 +209,12 @@ class EntryListEntriesAPI(APIResource):
         try:
             el.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            raise NotFoundError('list_id %d does not exist' % list_id)
+            raise NotFoundError(f'list_id {list_id} does not exist')
         data = request.json
         title = data.get('title')
         entry_object = el.get_entry_by_title(list_id=list_id, title=title, session=session)
         if entry_object:
-            raise Conflict('entry with title \'%s\' already exists' % title)
+            raise Conflict(f"entry with title '{title}' already exists")
         entry_object = el.EntryListEntry(entry=data, entry_list_id=list_id)
         session.add(entry_object)
         session.commit()
@@ -234,7 +234,7 @@ class EntryListEntryAPI(APIResource):
         try:
             entry = el.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
-            raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
+            raise NotFoundError(f'could not find entry with id {entry_id} in list {list_id}')
 
         return jsonify(entry.to_dict())
 
@@ -244,10 +244,10 @@ class EntryListEntryAPI(APIResource):
         try:
             entry = el.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
-            raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
+            raise NotFoundError(f'could not find entry with id {entry_id} in list {list_id}')
         log.debug('deleting movie %d', entry.id)
         session.delete(entry)
-        return success_response('successfully deleted entry %d' % entry.id)
+        return success_response(f'successfully deleted entry {entry.id}')
 
     @api.validate(model=base_entry_schema)
     @api.response(201, model=entry_list_entry_base_schema)
@@ -257,7 +257,7 @@ class EntryListEntryAPI(APIResource):
         try:
             entry = el.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
-            raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
+            raise NotFoundError(f'could not find entry with id {entry_id} in list {list_id}')
         data = request.json
         entry.entry = data
         if data.get('title'):

@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 from math import ceil
 
@@ -91,7 +88,7 @@ class RetryFailed(APIResource):
         total_pages = int(ceil(total_items / float(per_page)))
 
         if page > total_pages:
-            raise NotFoundError('page %s does not exist' % page)
+            raise NotFoundError(f'page {page} does not exist')
 
         # Actual results in page
         actual_size = min(per_page, len(failed_entries))
@@ -112,7 +109,7 @@ class RetryFailed(APIResource):
         """ Clear all failed entries """
         log.debug('deleting all failed entries')
         deleted = session.query(FailedEntry).delete()
-        return success_response('successfully deleted %d failed entries' % deleted)
+        return success_response(f'successfully deleted {deleted} failed entries')
 
 
 @retry_failed_api.route('/<int:failed_entry_id>/')
@@ -126,7 +123,7 @@ class RetryFailedID(APIResource):
         try:
             failed_entry = session.query(FailedEntry).filter(FailedEntry.id == failed_entry_id).one()
         except NoResultFound:
-            raise NotFoundError('could not find entry with ID %i' % failed_entry_id)
+            raise NotFoundError(f'could not find entry with ID {failed_entry_id}')
         return jsonify(failed_entry.to_dict())
 
     @api.response(200, 'successfully delete failed entry', model=base_message_schema)
@@ -135,7 +132,7 @@ class RetryFailedID(APIResource):
         try:
             failed_entry = session.query(FailedEntry).filter(FailedEntry.id == failed_entry_id).one()
         except NoResultFound:
-            raise NotFoundError('could not find entry with ID %i' % failed_entry_id)
-        log.debug('deleting failed entry: "%s"' % failed_entry.title)
+            raise NotFoundError(f'could not find entry with ID {failed_entry_id}')
+        log.debug('deleting failed entry: "%s"', failed_entry.title)
         session.delete(failed_entry)
-        return success_response('successfully delete failed entry %d' % failed_entry_id)
+        return success_response(f'successfully delete failed entry {failed_entry_id}')
