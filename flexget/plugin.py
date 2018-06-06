@@ -362,9 +362,9 @@ def _get_standard_plugins_path():
     """
     # Get basic path from environment
     paths = []
-    env_path = os.getenv('FLEXGET_PLUGIN_PATH')
-    if env_path:
-        paths = env_path.split(os.pathsep)
+    env_paths = os.getenv('FLEXGET_PLUGIN_PATH')
+    if env_paths:
+        paths = [Path(env_path) for env_path in env_paths.split(os.pathsep)]
 
     # Add flexget.plugins directory (core plugins)
     paths.append(Path(plugins_pkg.__file__).parent.absolute())

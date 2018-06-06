@@ -70,8 +70,8 @@ class TestExternalPluginLoading(object):
             external_plugin: yes
     """
 
-    @pytest.yield_fixture()
-    def config(self, request):
+    @pytest.fixture
+    def config(self, request, monkeypatch):
         os.environ['FLEXGET_PLUGIN_PATH'] = request.fspath.dirpath().join('external_plugins').strpath
         plugin.load_plugins()
         # fire the config register event again so that task schema is rebuilt with new plugin
