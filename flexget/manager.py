@@ -270,7 +270,7 @@ class Manager:
                 # Set the option as a list of matching task names so plugins can use it easily
                 options.tasks = task_names
         # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
-        task_names = sorted(task_names, key=lambda t: self.config['tasks'][t].get('priority', 65535))
+        task_names = sorted(task_names, key=lambda t: self.config['tasks'][t].get('priority', 65_535))
 
         finished_events = []
         for task_name in task_names:
@@ -428,7 +428,7 @@ class Manager:
                 log.error('There does not appear to be a daemon running.')
                 return
             if options.action == 'status':
-                log.info('Daemon running. (PID: %s)' % os.getpid())
+                log.info('Daemon running. (PID: %s)', os.getpid())
             elif options.action == 'stop':
                 tasks = 'all queued tasks (if any) have' if options.wait else 'currently running task (if any) has'
                 log.info('Daemon shutdown requested. Shutdown will commence when %s finished executing.', tasks)
@@ -482,17 +482,17 @@ class Manager:
         :raises: `IOError` when no config file could be found, and `create` is False.
         """
         home_path = Path('~').joinpath('.flexget').expanduser()
-        options_config = os.path.expanduser(self.options.config)
+        options_config = Path(self.options.config).expanduser()
 
         possible = []
-        if os.path.isabs(options_config):
+        if options_config.is_absolute():
             # explicit path given, don't try anything
             config = options_config
             possible = [config]
         else:
             log.debug('Figuring out config load paths')
             try:
-                possible.append(os.getcwd())
+                possible.append(Path.cwd())
             except OSError:
                 log.debug('current directory invalid, not searching for config there')
             # for virtualenv / dev sandbox
@@ -503,46 +503,44 @@ class Manager:
             possible.append(home_path)
             if sys.platform.startswith('win'):
                 # On windows look in ~/flexget as well, as explorer does not let you create a folder starting with a dot
-                home_path = os.path.join(os.path.expanduser('~'), 'flexget')
+                home_path = Path('~').joinpath('flexget').expanduser()
                 possible.append(home_path)
             else:
                 # The freedesktop.org standard config location
-                xdg_config = os.environ.get('XDG_CONFIG_HOME', os.path.join(os.path.expanduser('~'), '.config'))
-                possible.append(os.path.join(xdg_config, 'flexget'))
+                xdg_config = os.environ.get('XDG_CONFIG_HOME', Path('~').joinpath('flexget').expanduser())
+                possible.append(Path(xdg_config).joinpath('flexget'))
 
             for path in possible:
-                config = os.path.join(path, options_config)
+                config = path / options_config
                 if os.path.exists(config):
-                    log.debug('Found config: %s' % config)
+                    log.debug('Found config: %s', config)
                     break
             else:
                 config = None
 
-        if create and not (config and os.path.exists(config)):
-            config = os.path.join(home_path, options_config)
+        if create and not (config and Path(config).exists()):
+            config = Path(home_path).joinpath(options_config)
             log.info('Config file %s not found. Creating new config %s', options_config, config)
-            with open(config, 'w') as newconfig:
-                # Write empty tasks to the config
-                newconfig.write(yaml.dump({'tasks': {}}))
+            config.write_text(yaml.dump({'tasks': {}}))
         elif not config:
             log.critical('Failed to find configuration file %s', options_config)
             log.info('Tried to read from: %s', ', '.join(possible))
             raise IOError('No configuration file found.')
-        if not os.path.isfile(config):
+        if not Path(config).is_file():
             raise IOError(f'Config `{config}` does not appear to be a file.')
 
         log.debug('Config file %s selected', config)
-        self.config_path = config
-        self.config_name = os.path.splitext(os.path.basename(config))[0]
-        self.config_base = os.path.normpath(os.path.dirname(config))
-        self.lockfile = os.path.join(self.config_base, f'.{self.config_name}-lock')
-        self.db_filename = os.path.join(self.config_base, f'db-{self.config_name}.sqlite')
+        self.config_path = Path(config)
+        self.config_name = self.config_path.name
+        self.config_base = self.config_path.parent.name
+        self.lockfile = Path(self.config_base) / f'.{self.config_name}-lock'
+        self.db_filename = Path(self.config_base) / f'db-{self.config_name}.sqlite'
 
     def hash_config(self):
         if not self.config_path:
             return
         sha1_hash = hashlib.sha1()
-        with open(self.config_path, 'rb') as f:
+        with self.config_path.open('rb') as f:
             while True:
                 data = f.read(65536)
                 if not data:
@@ -640,7 +638,7 @@ class Manager:
     def backup_config(self):
         backup_path = os.path.join(self.config_base,
                                    f'{self.config_name}-{datetime.now().strftime("%y%m%d%H%M%S")}.bak')
-        log.debug('backing up old config to %s before new save' % backup_path)
+        log.debug('backing up old config to %s before new save', backup_path)
         try:
             shutil.copy(self.config_path, backup_path)
         except (OSError, IOError) as e:
@@ -725,11 +723,10 @@ class Manager:
             Base.metadata.create_all(bind=self.engine)
         except OperationalError as e:
             if os.path.exists(self.db_filename):
-                print('%s - make sure you have write permissions to file %s' %
-                      (e.message, self.db_filename), file=sys.stderr)
+                print(f'{e.message} - make sure you have write permissions to file {self.db_filename}', file=sys.stderr)
             else:
-                print('%s - make sure you have write permissions to directory %s' %
-                      (e.message, self.config_base), file=sys.stderr)
+                print(f'{e.message} - make sure you have write permissions to directory {self.config_base}'
+                      , file=sys.stderr)
             raise
 
     def _read_lock(self):
