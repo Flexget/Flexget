@@ -1,16 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.request import urlopen
-from future.moves.urllib.parse import urlparse
-from future.utils import text_to_native_str
-
-import time
 import logging
-from datetime import timedelta, datetime
-
-import requests
+import time
 # Allow some request objects to be imported from here instead of requests
 import warnings
+from datetime import timedelta, datetime
+from urllib.parse import urlparse
+from urllib.request import urlopen
+
+import requests
 from requests import RequestException
 
 from flexget import __version__ as version
@@ -80,7 +76,7 @@ class TokenBucketLimiter(DomainLimiter):
         :param rate: Amount of time to accrue 1 token. Either `timedelta` or interval string.
         :param bool wait: If true, will wait for a token to be available. If false, errors when token is not available.
         """
-        super(TokenBucketLimiter, self).__init__(domain)
+        super().__init__(domain)
         self.max_tokens = tokens
         self.rate = parse_timedelta(rate)
         self.wait = wait
@@ -111,7 +107,7 @@ class TokenBucketLimiter(DomainLimiter):
         self.last_update = datetime.now()
         if self.tokens < 1:
             if not self.wait:
-                raise RequestException('Requests to %s have exceeded their limit.' % self.domain)
+                raise RequestException(f'Requests to {self.domain} have exceeded their limit.')
             wait = timedelta_total_seconds(self.rate) * (1 - self.tokens)
             # Don't spam console if wait is low
             if wait < 4:
@@ -128,7 +124,7 @@ class TimedLimiter(TokenBucketLimiter):
     """Enforces a minimum interval between requests to a given domain."""
 
     def __init__(self, domain, interval):
-        super(TimedLimiter, self).__init__(domain, 1, interval)
+        super().__init__(domain, 1, interval)
 
 
 def _wrap_urlopen(url, timeout=None):
@@ -140,9 +136,9 @@ def _wrap_urlopen(url, timeout=None):
 
     """
     try:
-        raw = urlopen(text_to_native_str(url, encoding='utf-8'), timeout=timeout)
+        raw = urlopen(url, timeout=timeout)
     except IOError as e:
-        msg = 'Error getting %s: %s' % (url, e)
+        msg = f'Error getting {url}: {e}'
         log.error(msg)
         raise RequestException(msg)
     resp = requests.Response()
@@ -176,13 +172,13 @@ class Session(requests.Session):
 
     def __init__(self, timeout=30, max_retries=1, *args, **kwargs):
         """Set some defaults for our session if not explicitly defined."""
-        super(Session, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.timeout = timeout
         self.stream = True
         self.adapters['http://'].max_retries = max_retries
         # Stores min intervals between requests for certain sites
         self.domain_limiters = {}
-        self.headers.update({'User-Agent': 'FlexGet/%s (www.flexget.com)' % version})
+        self.headers.update({'User-Agent': f'FlexGet/{version} (www.flexget.com)'})
 
     def add_cookiejar(self, cookiejar):
         """
@@ -222,8 +218,8 @@ class Session(requests.Session):
 
         # Raise Timeout right away if site is known to timeout
         if is_unresponsive(url):
-            raise requests.Timeout('Requests to this site (%s) have timed out recently. Waiting before trying again.' %
-                                   urlparse(url).hostname)
+            raise requests.Timeout(f'Requests to this site ({urlparse(url).hostname}) have timed out recently. '
+                                   f'Waiting before trying again.')
 
         # Run domain limiters for this url
         limit_domains(url, self.domain_limiters)
@@ -238,7 +234,7 @@ class Session(requests.Session):
 
         try:
             log.debug('%sing URL %s with args %s and kwargs %s', method.upper(), url, args, kwargs)
-            result = super(Session, self).request(method, url, *args, **kwargs)
+            result = super().request(method, url, *args, **kwargs)
         except requests.Timeout:
             # Mark this site in known unresponsive list
             set_unresponsive(url)

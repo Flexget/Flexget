@@ -6,10 +6,6 @@ Avoid using this module on your own or in plugins, this was originally made for 
 You can safely use task.simple_persistence and manager.persist, if we implement something better we
 can replace underlying mechanism in single point (and provide transparent switch).
 """
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.types.newstr import newstr
-
 import logging
 import pickle
 from collections import MutableMapping, defaultdict
@@ -43,7 +39,7 @@ def upgrade(ver, session):
             try:
                 pickle.loads(row['value'])
             except Exception as e:
-                log.warning('Couldn\'t load %s:%s removing from db: %s' % (row['plugin'], row['key'], e))
+                log.warning('Couldn\'t load %s:%s removing from db: %s', row['plugin'], row['key'], e)
                 session.execute(table.delete().where(table.c.id == row['id']))
         ver = 1
     if ver == 1:
@@ -95,7 +91,7 @@ class SimpleKeyValue(Base):
         self.value = value
 
     def __repr__(self):
-        return "<SimpleKeyValue('%s','%s','%s')>" % (self.task, self.key, self.value)
+        return f"<SimpleKeyValue('{self.task}','{self.key}','{self.value}')>"
 
 
 Index('ix_simple_persistence_feed_plugin_key', SimpleKeyValue.task, SimpleKeyValue.plugin, SimpleKeyValue.key)
@@ -120,12 +116,12 @@ class SimplePersistence(MutableMapping):
         return self.class_store[self.taskname][self.plugin]
 
     def __setitem__(self, key, value):
-        log.debug('setting key %s value %s' % (key, repr(value)))
+        log.debug('setting key %s value %s' ,key, repr(value))
         self.store[key] = value
 
     def __getitem__(self, key):
         if key not in self.store or self.store[key] == DELETE:
-            raise KeyError('%s is not contained in the simple_persistence table.' % key)
+            raise KeyError(f'{key} is not contained in the simple_persistence table.')
         return self.store[key]
 
     def __delitem__(self, key):
@@ -147,7 +143,7 @@ class SimplePersistence(MutableMapping):
     @classmethod
     def flush(cls, task=None):
         """Flush all in memory key/values to database."""
-        log.debug('Flushing simple persistence for task %s to db.' % task)
+        log.debug('Flushing simple persistence for task %s to db.', task)
         with Session() as session:
             for pluginname in cls.class_store[task]:
                 for key, value in cls.class_store[task][pluginname].items():
@@ -159,7 +155,7 @@ class SimplePersistence(MutableMapping):
                         query.delete()
                     else:
                         updated = query.update(
-                            {'value': newstr(json.dumps(value, encode_datetime=True))},
+                            {'value': json.dumps(value, encode_datetime=True)},
                             synchronize_session=False
                         )
                         if not updated:

@@ -1,20 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from future.utils import text_to_native_str
-from flexget.utils.tools import native_str_to_text
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-
+import locale
 import logging
 import os
 import re
-import locale
 from copy import copy
 from datetime import datetime, date, time
 
 import jinja2.filters
-from jinja2 import (Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader, Template,
-                    TemplateNotFound, TemplateSyntaxError)
 from dateutil import parser as dateutil_parse
+from jinja2 import (
+    Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader, Template, TemplateNotFound,
+    TemplateSyntaxError
+)
 
 from flexget.event import event
 from flexget.utils.lazy_dict import LazyDict
@@ -63,7 +59,7 @@ def filter_re_replace(val, pattern, repl):
 
 def filter_re_search(val, pattern):
     """Perform a search for given regexp pattern, return the matching portion of the text."""
-    if not isinstance(val, basestring):
+    if not isinstance(val, str):
         return val
     result = re.search(pattern, val, re.IGNORECASE)
     if result:
@@ -73,10 +69,9 @@ def filter_re_search(val, pattern):
 
 def filter_formatdate(val, format):
     """Returns a string representation of a datetime object according to format string."""
-    encoding = locale.getpreferredencoding()
     if not isinstance(val, (datetime, date, time)):
         return val
-    return native_str_to_text(val.strftime(text_to_native_str(format, encoding=encoding)), encoding=encoding)
+    return val.strftime(format)
 
 
 def filter_parsedate(val):
@@ -99,7 +94,7 @@ def filter_format_number(val, places=None, grouping=True):
     if not isinstance(val, (int, float, int)):
         return val
     if places is not None:
-        format = '%.' + str(places) + 'f'
+        format = f'{places}.f'
     elif isinstance(val, (int, int)):
         format = '%d'
     else:
@@ -201,7 +196,7 @@ def render(template, context):
     :param context: Context to render the template from.
     :return: The rendered template text.
     """
-    if isinstance(template, basestring):
+    if isinstance(template, str):
         try:
             template = environment.from_string(template)
         except TemplateSyntaxError as e:
@@ -209,7 +204,7 @@ def render(template, context):
     try:
         result = template.render(context)
     except Exception as e:
-        error = RenderError('(%s) %s' % (type(e).__name__, e))
+        error = RenderError(f'({type(e)} {type(e).__name__, e}')
         log.debug('Error during rendering: %s', error)
         raise error
 
