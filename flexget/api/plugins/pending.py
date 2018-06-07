@@ -1,14 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from math import ceil
 
 from flask import jsonify, request
 from flask_restplus import inputs
-from flexget.plugins.filter.pending_approval import list_pending_entries, PendingEntry, get_entry_by_id
+from sqlalchemy.orm.exc import NoResultFound
+
 from flexget.api import api, APIResource
 from flexget.api.app import base_message_schema, success_response, NotFoundError, etag, pagination_headers, BadRequest
-from sqlalchemy.orm.exc import NoResultFound
+from flexget.plugins.filter.pending_approval import list_pending_entries, PendingEntry, get_entry_by_id
 
 pending_api = api.namespace('pending', description='View and manage pending entries')
 
@@ -108,7 +106,7 @@ class PendingEntriesAPI(APIResource):
         total_pages = int(ceil(total_items / float(per_page)))
 
         if page > total_pages:
-            raise NotFoundError('page %s does not exist' % page)
+            raise NotFoundError(f'page {page} does not exist')
 
         # Actual results in page
         actual_size = min(per_page, len(pending_entries))
@@ -163,7 +161,7 @@ class PendingEntriesAPI(APIResource):
             deleted = deleted.filter(PendingEntry.approved == approved)
         deleted = deleted.delete()
 
-        return success_response('deleted %s pending entries'.format(deleted))
+        return success_response(f'deleted {deleted} pending entries')
 
 
 @pending_api.route('/<int:entry_id>/')
@@ -177,7 +175,7 @@ class PendingEntryAPI(APIResource):
         try:
             entry = get_entry_by_id(session, entry_id)
         except NoResultFound:
-            raise NotFoundError('No pending entry with ID %s' % entry_id)
+            raise NotFoundError(f'No pending entry with ID {entry_id}')
         return jsonify(entry.to_dict())
 
     @api.response(201, model=pending_entry_schema)
@@ -188,13 +186,13 @@ class PendingEntryAPI(APIResource):
         try:
             entry = get_entry_by_id(session, entry_id)
         except NoResultFound:
-            raise NotFoundError('No pending entry with ID %s' % entry_id)
+            raise NotFoundError(f'No pending entry with ID {entry_id}')
 
         data = request.json
         approved = data['operation'] == 'approve'
         operation_text = 'approved' if approved else 'pending'
         if entry.approved is approved:
-            raise BadRequest('Entry with id {} is already {}'.format(entry_id, operation_text))
+            raise BadRequest(f'Entry with id {entry_id} is already {operation_text}')
 
         entry.approved = approved
         session.commit()
@@ -208,6 +206,6 @@ class PendingEntryAPI(APIResource):
         try:
             entry = get_entry_by_id(session, entry_id)
         except NoResultFound:
-            raise NotFoundError('No pending entry with ID %s' % entry_id)
+            raise NotFoundError(f'No pending entry with ID {entry_id}')
         session.delete(entry)
-        return success_response('successfully deleted entry with ID %s' % entry_id)
+        return success_response(f'successfully deleted entry with ID {entry_id}')

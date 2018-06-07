@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
 import logging
 from math import ceil
@@ -10,8 +7,9 @@ from flask import request
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource
-from flexget.api.app import Conflict, NotFoundError, base_message_schema, success_response, BadRequest, etag, \
-    pagination_headers
+from flexget.api.app import (
+    Conflict, NotFoundError, base_message_schema, success_response, BadRequest, etag, pagination_headers
+)
 from flexget.plugins.list import movie_list as ml
 from flexget.plugins.list.movie_list import MovieListBase
 
@@ -123,7 +121,7 @@ class MovieListAPI(APIResource):
         except NoResultFound:
             movie_list = None
         if movie_list:
-            raise Conflict('list with name \'%s\' already exists' % name)
+            raise Conflict(f"list with name '{name}' already exists")
         movie_list = ml.MovieListList(name=name)
         session.add(movie_list)
         session.commit()
@@ -143,7 +141,7 @@ class MovieListListAPI(APIResource):
         try:
             movie_list = ml.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            raise NotFoundError('list_id %d does not exist' % list_id)
+            raise NotFoundError(f"list_id {list_id} does not exist")
         return jsonify(movie_list.to_dict())
 
     @api.response(200, model=base_message_schema)
@@ -153,7 +151,7 @@ class MovieListListAPI(APIResource):
         try:
             movie_list = ml.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            raise NotFoundError('list_id %d does not exist' % list_id)
+            raise NotFoundError(f"list_id {list_id} does not exist")
         session.delete(movie_list)
         return success_response('successfully deleted list')
 
@@ -195,7 +193,7 @@ class MovieListMoviesAPI(APIResource):
         try:
             list = ml.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            raise NotFoundError('list_id %d does not exist' % list_id)
+            raise NotFoundError(f"list_id {list_id} does not exist")
 
         total_items = list.movies.count()
 
@@ -207,7 +205,7 @@ class MovieListMoviesAPI(APIResource):
         total_pages = int(ceil(total_items / float(per_page)))
 
         if page > total_pages:
-            raise NotFoundError('page %s does not exist' % page)
+            raise NotFoundError(f'page {page} does not exist')
 
         # Actual results in page
         actual_size = min(len(movies), per_page)
@@ -238,11 +236,11 @@ class MovieListMoviesAPI(APIResource):
         # Validates ID type based on allowed ID
         for id_name in movie_identifiers:
             if list(id_name)[0] not in MovieListBase().supported_ids:
-                raise BadRequest('movie identifier %s is not allowed' % id_name)
+                raise BadRequest(f'movie identifier {id_name} is not allowed')
         title, year = data['movie_name'], data.get('movie_year')
         movie = ml.get_movie_by_title_and_year(list_id=list_id, title=title, year=year, session=session)
         if movie:
-            raise Conflict('movie with name "%s" already exist in list %d' % (title, list_id))
+            raise Conflict(f'movie with name "{title}" already exist in list {list_id}')
         movie = ml.MovieListMovie()
         movie.title = title
         movie.year = year
@@ -275,7 +273,7 @@ class MovieListMovieAPI(APIResource):
         try:
             movie = ml.get_movie_by_id(list_id=list_id, movie_id=movie_id, session=session)
         except NoResultFound:
-            raise NotFoundError('could not find movie with id %d in list %d' % (movie_id, list_id))
+            raise NotFoundError(f'could not find movie with id {movie_id} in list {list_id}')
         log.debug('deleting movie %d', movie.id)
         session.delete(movie)
         return success_response('successfully deleted movie %d' % movie_id)
@@ -289,13 +287,13 @@ class MovieListMovieAPI(APIResource):
         try:
             movie = ml.get_movie_by_id(list_id=list_id, movie_id=movie_id, session=session)
         except NoResultFound:
-            raise NotFoundError('could not find movie with id %d in list %d' % (movie_id, list_id))
+            raise NotFoundError(f'could not find movie with id {movie_id} in list {list_id}')
         data = request.json
 
         # Validates ID type based on allowed ID
         for id_name in data:
             if list(id_name)[0] not in MovieListBase().supported_ids:
-                raise BadRequest('movie identifier %s is not allowed' % id_name)
+                raise BadRequest(f'movie identifier {id_name} is not allowed')
         movie.ids[:] = ml.get_db_movie_identifiers(identifier_list=data, movie_id=movie_id, session=session)
         session.commit()
         return jsonify(movie.to_dict())

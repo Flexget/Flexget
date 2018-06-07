@@ -1,8 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flask import jsonify
 from flask_restplus import inputs
+
 from flexget.api import api, APIResource
 from flexget.api.app import BadRequest, NotFoundError, success_response, base_message_schema, empty_response
 
@@ -94,7 +92,7 @@ class IRCRestart(APIResource):
         try:
             irc_manager.restart_connections(connection)
         except KeyError:
-            raise NotFoundError('Connection {} is not a valid IRC connection'.format(connection))
+            raise NotFoundError(f'Connection {connection} is not a valid IRC connection')
         return success_response('Successfully restarted connection(s)')
 
 
@@ -120,5 +118,5 @@ class IRCStop(APIResource):
         try:
             irc_manager.stop_connections(wait=wait, name=name)
         except KeyError:
-            raise NotFoundError('Connection {} is not a valid IRC connection'.format(name))
+            raise NotFoundError(f'Connection {name} is not a valid IRC connection')
         return success_response('Successfully stopped connection(s)')
