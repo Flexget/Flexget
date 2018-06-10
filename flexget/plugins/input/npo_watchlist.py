@@ -74,8 +74,8 @@ class NPOWatchlist(object):
             log.debug('Already logged in')
             return
 
-        login_url = 'https://www.npo.nl/login'
-        login_api_url = 'https://www.npo.nl/api/login'
+        login_url = 'https://www.npostart.nl/login'
+        login_api_url = 'https://www.npostart.nl/api/login'
 
         try:
             login_response = requests.get(login_url)
@@ -256,7 +256,7 @@ class NPOWatchlist(object):
         email = config.get('email')
         log.info('Retrieving npo.nl watchlist for %s', email)
 
-        response = self._get_page(task, config, 'https://www.npo.nl/mijn_npo')
+        response = self._get_page(task, config, 'https://www.npostart.nl/mijn_npo')
         page = get_soup(response.content)
 
         entries = self._get_watchlist_entries(task, config, page)
@@ -275,8 +275,8 @@ class NPOWatchlist(object):
             log.info('Removing from watchlist: %s', e['title'])
 
             headers = {
-                'Origin': 'https://www.npo.nl',
-                'Referer': 'https://www.npo.nl/mijn_npo',
+                'Origin': 'https://www.npostart.nl',
+                'Referer': 'https://www.npostart.nl/mijn_npo',
                 'X-XSRF-TOKEN': requests.cookies['XSRF-TOKEN'],
                 'X-Requested-With': 'XMLHttpRequest'
             }
