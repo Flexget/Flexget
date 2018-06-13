@@ -72,6 +72,7 @@ class NPOWatchlist(object):
     def _get_page(self, task, config, url):
         self._login(task, config)
         try:
+            log.info('Fetching NPO profile page: %s', url)
             page_response = requests.get(url)
             if page_response.url != url:
                 raise plugin.PluginError('Unexpected page: {} (expected {})'.format(page_response.url, url))
@@ -105,7 +106,7 @@ class NPOWatchlist(object):
 
             if 'isAuthenticatedUser' not in profile_response.cookies:
                 raise plugin.PluginError('Failed to login. Check username and password.')
-
+            log.debug('Succesfully logged in: %s', email)
         except RequestException as e:
             raise plugin.PluginError('Request error: %s' % e.args[0])
 
@@ -152,6 +153,7 @@ class NPOWatchlist(object):
             entries += self._parse_tiles(task, config, episodes['tiles'], series_info)
 
             if episodes['nextLink']:
+                log.debug('NextLink for more episodes: %s', episodes['nextLink'])
                 entries += self._get_series_episodes(task, config, mediaId, series_info,
                                                      page=int(episodes['nextLink'].rsplit('page=')[1]))
         except RequestException as e:
@@ -166,6 +168,7 @@ class NPOWatchlist(object):
         log.info('Retrieving series info for %s', mediaId)
         try:
             response = requests.get(series_info_url.format(mediaId))
+            log.debug('Series info found at: %s', response.url)
             page = get_soup(response.content)
             series = page.find('section', class_='npo-header-episode-meta')
             # create a stub to store the common values for all episodes of this series
@@ -173,6 +176,7 @@ class NPOWatchlist(object):
                            'npo_name': series.find('h1').text,
                            'npo_description': series.find('div', id='metaContent').find('p').text,
                            'npo_language': 'nl'}  # hard-code the language as if in NL, for lookup plugins
+            log.debug('Parsed series info for: %s', series_info['npo_name'])
         except RequestException as e:
             raise plugin.PluginError('Request error: %s' % e.args[0])
         return series_info
@@ -185,13 +189,13 @@ class NPOWatchlist(object):
             for tile in tiles:
                 # there is only one list_item per tile
                 for list_item in get_soup(tile).findAll('div', class_='npo-asset-tile-container'):
-                    id = list_item['id']
+                    episode_id = list_item['id']
+                    log.debug('Parsing episode: %s', episode_id)
                     url = list_item.find('a')['href']
                     episode_name = next(list_item.find('h2').stripped_strings)
                     timer = next(list_item.find('div', class_='npo-asset-tile-timer').stripped_strings)
                     remove_url = list_item.find('div', class_='npo-asset-tile-delete')
 
-                    episode_id = url.split('/')[-1]
                     title = '{} ({})'.format(episode_name, episode_id)
 
                     not_available = list_item.find('div', class_='npo-asset-tile-availability')['data-to']
@@ -213,7 +217,7 @@ class NPOWatchlist(object):
                     e['series_name_plain'] = self._convert_plain(series_info['npo_name'])
                     e['series_date'] = entry_date
                     e['series_id_type'] = 'date'
-                    e['npo_id'] = id
+                    e['npo_id'] = episode_id
                     e['npo_runtime'] = timer.strip('min').strip()
                     e['language'] = series_info['npo_language']
 
