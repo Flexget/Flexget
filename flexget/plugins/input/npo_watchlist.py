@@ -203,7 +203,12 @@ class NPOWatchlist(object):
                         log.debug('Skipping %s, no longer available', title)
                         continue
 
-                    entry_date = url.split('/')[4]
+                    # Check if the URL found to the episode matches the URL for the series
+                    if url.split('/')[-3] != series_info['npo_url'].split('/')[3]:
+                        log.info('Skipping %s, the URL has an unexpected pattern: %s', title, url)
+                        continue  # something is wrong; skip this episode
+
+                    entry_date = url.split('/')[-2]
                     entry_date = self._parse_date(entry_date)
 
                     if max_age >= 0 and (date.today() - entry_date) > timedelta(days=max_age):

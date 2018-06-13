@@ -32,6 +32,12 @@ class TestNpoWatchlistInfo(object):
         assert entry['npo_description'] == 'Zeven dagen nieuws in dertig minuten, satirisch geremixt door Arjen Lubach. Met irrelevante verhalen van relevante gasten. Of andersom. Vanuit theater Bellevue in Amsterdam: platte inhoud en diepgravende grappen.'
         assert entry['npo_runtime'] == '32'
 
+        entry = task.find_entry(url='https://www.npostart.nl/14-01-2014/VARA_101348553') is None  # episode with weird (and broken) URL and should be skipped
+        entry = task.find_entry(url='https://www.npostart.nl/zembla/12-12-2013/VARA_101320582')  # check that the next episode it there though
+        assert entry['npo_id'] == 'VARA_101320582'
+        assert entry['npo_url'] == 'https://www.npostart.nl/zembla/VARA_101377863'
+        assert entry['npo_name'] == 'ZEMBLA'
+
         assert task.find_entry(url='https://www.npostart.nl/zondag-met-lubach-westeros-the-series/04-09-2017/WO_VPRO_10651334') is None  # a trailer for the series, that should not be listed
 
 
