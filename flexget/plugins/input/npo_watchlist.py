@@ -117,7 +117,7 @@ class NPOWatchlist(object):
         # https://www.npostart.nl/ums/accounts/@me/favourites/episodes?dateFrom=2018-06-04&dateTo=2018-06-05
         profile_details_url = 'https://www.npostart.nl/api/account/@me/profile/'
 
-        entries = list()
+        entries = []
         try:
             profile = requests.get(profile_details_url + profileId).json()
             log.info('Retrieving favorites for profile %s', profile['name'])
@@ -142,7 +142,7 @@ class NPOWatchlist(object):
             headers['Referer'] = episode_tiles_url.format(mediaId, page-1)  # referer from prev page
 
         log.info('Retrieving episodes page %s for %s (%s)', page, series_info['npo_name'], mediaId)
-        entries = list()
+        entries = []
         try:
             episodes = requests.get(episode_tiles_url.format(mediaId, page) + episode_tiles_parameters,
                                     headers=headers).json()
@@ -165,18 +165,18 @@ class NPOWatchlist(object):
             response = requests.get(series_info_url.format(mediaId))
             page = get_soup(response.content)
             series = page.find('section', class_='npo-header-episode-meta')
-            series_info = Entry()  # create a stub to store the common values for all episodes of this series
-            series_info['npo_url'] = response.url  # we were redirected to the true URL
-            series_info['npo_name'] = series.find('h1').text
-            series_info['npo_description'] = series.find('div', id='metaContent').find('p').text
-            series_info['npo_language'] = 'nl'  # hard-code the language as if in NL, for lookup plugins
+            # create a stub to store the common values for all episodes of this series
+            series_info = {'npo_url': response.url,  # we were redirected to the true URL
+                           'npo_name': series.find('h1').text,
+                           'npo_description': series.find('div', id='metaContent').find('p').text,
+                           'npo_language': 'nl'}  # hard-code the language as if in NL, for lookup plugins
         except RequestException as e:
             raise plugin.PluginError('Request error: %s' % e.args[0])
         return series_info
 
     def _parse_tiles(self, task, config, tiles, series_info):
         max_age = config.get('max_episode_age_days')
-        entries = list()
+        entries = []
 
         if tiles is not None:
             for tile in tiles:
@@ -203,7 +203,7 @@ class NPOWatchlist(object):
                         log.debug('Skipping %s, aired on %s', title, entry_date)
                         continue
 
-                    e = Entry()
+                    e = Entry(series_info)
                     e['url'] = url
                     e['title'] = title
                     e['series_name'] = series_info['npo_name']
@@ -211,10 +211,6 @@ class NPOWatchlist(object):
                     e['series_date'] = entry_date
                     e['series_id_type'] = 'date'
                     e['npo_id'] = id
-                    e['npo_url'] = series_info['npo_url']
-                    e['npo_name'] = series_info['npo_name']
-                    e['npo_description'] = series_info['npo_description']
-                    e['npo_language'] = series_info['npo_language']
                     e['npo_runtime'] = timer.strip('min').strip()
                     e['language'] = series_info['npo_language']
 
