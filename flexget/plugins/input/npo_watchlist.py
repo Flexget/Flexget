@@ -159,8 +159,8 @@ class NPOWatchlist(object):
         except RequestException as e:
             raise plugin.PluginError('Request error: %s' % e.args[0])
 
-        if not entries:
-            log.warning('No episodes found for %s (%s)', series_info['npo_name'], mediaId)
+        if not entries and page == 1:
+            log.info('No new episodes found for %s (%s)', series_info['npo_name'], mediaId)
         return entries
 
     def _get_series_info(self, task, config, mediaId):
