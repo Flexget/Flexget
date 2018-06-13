@@ -129,8 +129,10 @@ class NPOWatchlist(object):
         return entries
 
     def _get_series_episodes(self, task, config, mediaId, series_info=None, page=1):
-        episode_tiles_url = 'https://www.npostart.nl/media/series/{0}/episodes?page={1}'
-        episode_tiles_parameters = '&tilemapping=dedicated&tiletype=asset'
+        episode_tiles_url = 'https://www.npostart.nl/media/series/{0}/episodes'
+        episode_tiles_parameters = {'page': str(page),
+                                    'tilemapping': 'dedicated',
+                                    'tiletype': 'asset'}
 
         if not series_info:
             series_info = self._get_series_info(task, config, mediaId)
@@ -139,12 +141,13 @@ class NPOWatchlist(object):
                    'X-XSRF-TOKEN': requests.cookies['XSRF-TOKEN'],
                    'X-Requested-With': 'XMLHttpRequest'}
         if page > 1:
-            headers['Referer'] = episode_tiles_url.format(mediaId, page-1)  # referer from prev page
+            headers['Referer'] = episode_tiles_url+'?page={1}'.format(mediaId, page-1)  # referer from prev page
 
         log.info('Retrieving episodes page %s for %s (%s)', page, series_info['npo_name'], mediaId)
         entries = []
         try:
-            episodes = requests.get(episode_tiles_url.format(mediaId, page) + episode_tiles_parameters,
+            episodes = requests.get(episode_tiles_url.format(mediaId),
+                                    params=episode_tiles_parameters,
                                     headers=headers).json()
             entries += self._parse_tiles(task, config, episodes['tiles'], series_info)
 
