@@ -203,8 +203,8 @@ class NPOWatchlist(object):
                         log.debug('Skipping %s, no longer available', title)
                         continue
 
-                    # Check if the URL found to the episode matches the URL for the series
-                    if url.split('/')[-3] != series_info['npo_url'].split('/')[3]:
+                    # Check if the URL found to the episode matches the expected pattern
+                    if len(url.split('/')) != 6:
                         log.info('Skipping %s, the URL has an unexpected pattern: %s', title, url)
                         continue  # something is wrong; skip this episode
 

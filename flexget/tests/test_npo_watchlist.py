@@ -38,6 +38,11 @@ class TestNpoWatchlistInfo(object):
         assert entry['npo_url'] == 'https://www.npostart.nl/zembla/VARA_101377863'
         assert entry['npo_name'] == 'ZEMBLA'
 
+        entry = task.find_entry(url='https://www.npostart.nl/typisch-overvecht/24-05-2018/BV_101388144')
+        assert entry['npo_id'] == 'BV_101388144'
+        assert entry['npo_url'] == 'https://www.npostart.nl/typisch/BV_101386658'
+        assert entry['npo_name'] == 'Typisch'
+
         assert task.find_entry(url='https://www.npostart.nl/zondag-met-lubach-westeros-the-series/04-09-2017/WO_VPRO_10651334') is None  # a trailer for the series, that should not be listed
 
 
