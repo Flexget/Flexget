@@ -43,6 +43,8 @@ class TestNpoWatchlistInfo(object):
         assert entry['npo_url'] == 'https://www.npostart.nl/typisch/BV_101386658'
         assert entry['npo_name'] == 'Typisch'
 
+        assert task.find_entry(url='https://www.npostart.nl/11-04-2014/KN_1656572') is None  # episode without a name (and broken URL) that should be skipped
+
         assert task.find_entry(url='https://www.npostart.nl/zondag-met-lubach-westeros-the-series/04-09-2017/WO_VPRO_10651334') is None  # a trailer for the series, that should not be listed
 
 

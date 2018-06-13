@@ -191,22 +191,25 @@ class NPOWatchlist(object):
                 for list_item in get_soup(tile).findAll('div', class_='npo-asset-tile-container'):
                     episode_id = list_item['id']
                     log.debug('Parsing episode: %s', episode_id)
+
                     url = list_item.find('a')['href']
-                    episode_name = next(list_item.find('h2').stripped_strings)
+                    # Check if the URL found to the episode matches the expected pattern
+                    if len(url.split('/')) != 6:
+                        log.info('Skipping %s, the URL has an unexpected pattern: %s', episode_id, url)
+                        continue  # something is wrong; skip this episode
+
+                    episode_name = list_item.find('h2')
+                    if episode_name:
+                        title = '{} ({})'.format(next(episode_name.stripped_strings), episode_id)
+                    else:
+                        title = '{}'.format(episode_id)
                     timer = next(list_item.find('div', class_='npo-asset-tile-timer').stripped_strings)
                     remove_url = list_item.find('div', class_='npo-asset-tile-delete')
-
-                    title = '{} ({})'.format(episode_name, episode_id)
 
                     not_available = list_item.find('div', class_='npo-asset-tile-availability')['data-to']
                     if not_available:
                         log.debug('Skipping %s, no longer available', title)
                         continue
-
-                    # Check if the URL found to the episode matches the expected pattern
-                    if len(url.split('/')) != 6:
-                        log.info('Skipping %s, the URL has an unexpected pattern: %s', title, url)
-                        continue  # something is wrong; skip this episode
 
                     entry_date = url.split('/')[-2]
                     entry_date = self._parse_date(entry_date)
