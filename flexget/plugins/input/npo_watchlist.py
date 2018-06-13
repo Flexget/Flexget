@@ -150,9 +150,10 @@ class NPOWatchlist(object):
             episodes = requests.get(episode_tiles_url.format(mediaId),
                                     params=episode_tiles_parameters,
                                     headers=headers).json()
-            entries += self._parse_tiles(task, config, episodes['tiles'], series_info)
+            new_entries = self._parse_tiles(task, config, episodes['tiles'], series_info)
+            entries += new_entries
 
-            if episodes['nextLink']:
+            if new_entries and episodes['nextLink']:  # only fetch next page if we accepted any from current page
                 log.debug('NextLink for more episodes: %s', episodes['nextLink'])
                 entries += self._get_series_episodes(task, config, mediaId, series_info,
                                                      page=int(episodes['nextLink'].rsplit('page=')[1]))
