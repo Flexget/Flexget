@@ -142,7 +142,7 @@ class NPOWatchlist(object):
                    'X-XSRF-TOKEN': requests.cookies['XSRF-TOKEN'],
                    'X-Requested-With': 'XMLHttpRequest'}
         if page > 1:
-            headers['Referer'] = episode_tiles_url+'?page={1}'.format(mediaId, page-1)  # referer from prev page
+            headers['Referer'] = episode_tiles_url.format(mediaId) + '?page={0}'.format(page-1)  # referer from prev page
 
         log.info('Retrieving episodes page %s for %s (%s)', page, series_info['npo_name'], mediaId)
         entries = []
@@ -176,7 +176,7 @@ class NPOWatchlist(object):
                            'npo_name': series.find('h1').text,
                            'npo_description': series.find('div', id='metaContent').find('p').text,
                            'npo_language': 'nl'}  # hard-code the language as if in NL, for lookup plugins
-            log.debug('Parsed series info for: %s', series_info['npo_name'])
+            log.debug('Parsed series info for: %s (%s)', series_info['npo_name'], mediaId)
         except RequestException as e:
             raise plugin.PluginError('Request error: %s' % e.args[0])
         return series_info
