@@ -72,13 +72,13 @@ class NPOWatchlist(object):
     def _get_page(self, task, config, url):
         self._login(task, config)
         try:
-            log.info('Fetching NPO profile page: %s', url)
+            log.debug('Fetching NPO profile page: %s', url)
             page_response = requests.get(url)
             if page_response.url != url:
                 raise plugin.PluginError('Unexpected page: {} (expected {})'.format(page_response.url, url))
             return page_response
         except RequestException as e:
-            raise plugin.PluginError('Request error: %s' % e.args[0])
+            raise plugin.PluginError('Request error: %s' % str(e))
 
     def _login(self, task, config):
         if 'isAuthenticatedUser' in requests.cookies:
@@ -108,7 +108,7 @@ class NPOWatchlist(object):
                 raise plugin.PluginError('Failed to login. Check username and password.')
             log.debug('Succesfully logged in: %s', email)
         except RequestException as e:
-            raise plugin.PluginError('Request error: %s' % e.args[0])
+            raise plugin.PluginError('Request error: %s' % str(e))
 
     def _get_favourites_entries(self, task, config, profileId):
         # Details of profile using the $profileId:
@@ -126,7 +126,7 @@ class NPOWatchlist(object):
                 if favourite['mediaType'] == 'series':
                     entries += self._get_series_episodes(task, config, favourite['mediaId'])
         except RequestException as e:
-            raise plugin.PluginError('Request error: %s' % e.args[0])
+            raise plugin.PluginError('Request error: %s' % str(e))
         return entries
 
     def _get_series_episodes(self, task, config, mediaId, series_info=None, page=1):
@@ -144,7 +144,7 @@ class NPOWatchlist(object):
         if page > 1:
             headers['Referer'] = episode_tiles_url.format(mediaId) + '?page={0}'.format(page-1)  # referer from prev page
 
-        log.info('Retrieving episodes page %s for %s (%s)', page, series_info['npo_name'], mediaId)
+        log.debug('Retrieving episodes page %s for %s (%s)', page, series_info['npo_name'], mediaId)
         entries = []
         try:
             episodes = requests.get(episode_tiles_url.format(mediaId),
@@ -158,15 +158,15 @@ class NPOWatchlist(object):
                 entries += self._get_series_episodes(task, config, mediaId, series_info,
                                                      page=int(episodes['nextLink'].rsplit('page=')[1]))
         except RequestException as e:
-            raise plugin.PluginError('Request error: %s' % e.args[0])
+            raise plugin.PluginError('Request error: %s' % str(e))
 
         if not entries and page == 1:
-            log.info('No new episodes found for %s (%s)', series_info['npo_name'], mediaId)
+            log.verbose('No new episodes found for %s (%s)', series_info['npo_name'], mediaId)
         return entries
 
     def _get_series_info(self, task, config, mediaId):
         series_info_url = 'https://www.npostart.nl/{0}'
-        log.info('Retrieving series info for %s', mediaId)
+        log.verbose('Retrieving series info for %s', mediaId)
         try:
             response = requests.get(series_info_url.format(mediaId))
             log.debug('Series info found at: %s', response.url)
@@ -179,7 +179,7 @@ class NPOWatchlist(object):
                            'npo_language': 'nl'}  # hard-code the language as if in NL, for lookup plugins
             log.debug('Parsed series info for: %s (%s)', series_info['npo_name'], mediaId)
         except RequestException as e:
-            raise plugin.PluginError('Request error: %s' % e.args[0])
+            raise plugin.PluginError('Request error: %s' % str(e))
         return series_info
 
     def _parse_tiles(self, task, config, tiles, series_info):
@@ -196,7 +196,7 @@ class NPOWatchlist(object):
                     url = list_item.find('a')['href']
                     # Check if the URL found to the episode matches the expected pattern
                     if len(url.split('/')) != 6:
-                        log.info('Skipping %s, the URL has an unexpected pattern: %s', episode_id, url)
+                        log.verbose('Skipping %s, the URL has an unexpected pattern: %s', episode_id, url)
                         continue  # something is wrong; skip this episode
 
                     episode_name = list_item.find('h2')
@@ -215,7 +215,7 @@ class NPOWatchlist(object):
                     entry_date = url.split('/')[-2]
                     entry_date = self._parse_date(entry_date)
 
-                    if max_age >= 0 and (date.today() - entry_date) > timedelta(days=max_age):
+                    if max_age >= 0 and date.today() - entry_date > timedelta(days=max_age):
                         log.debug('Skipping %s, aired on %s', title, entry_date)
                         continue
 
@@ -244,7 +244,7 @@ class NPOWatchlist(object):
         account_profile_url = 'https://www.npostart.nl/account-profile'
 
         email = config.get('email')
-        log.info('Retrieving NPOStart profiles for account %s', email)
+        log.verbose('Retrieving NPOStart profiles for account %s', email)
 
         profilejson = self._get_page(task, config, account_profile_url).json()
         if 'profileId' not in profilejson:
