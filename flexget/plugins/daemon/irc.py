@@ -55,18 +55,23 @@ schema = {
                     'task': one_or_more({
                         'type': 'string'
                     }),
-                    'task_re': {
+                    'task_re': one_or_more({
                         'type': 'object',
-                        'additionalProperties': one_or_more({
-                            'type': 'object',
-                            'properties': {
-                                'regexp': {'type': 'string'},
-                                'field': {'type': 'string'}
+                        'properties': {
+                            'task': {
+                                'type': 'string'
                             },
-                            'required': ['regexp', 'field'],
-                            'additionalProperties': False
-                        })
-                    },
+                            'patterns': one_or_more({
+                                'type': 'object',
+                                'properties': {
+                                    'regexp': {'type': 'string'},
+                                    'field': {'type': 'string'}
+                                },
+                                'required': ['regexp', 'field'],
+                                'additionalProperties': False
+                            })
+                        },
+                    }, unique_items=True),
                     'queue_size': {'type': 'integer', 'default': 1},
                     'use_ssl': {'type': 'boolean', 'default': False},
                     'task_delay': {'type': 'integer'},
@@ -375,15 +380,19 @@ class IRCConnection(SimpleIRCBot):
             tasks_entry_map = {}
             for entry in self.entry_queue:
                 matched = False
-                for task, config in tasks_re.items():
-                    if isinstance(config, dict):
-                        config = [config]
-                    for c in config:
-                        if re.search(c['regexp'], entry.get(c['field'], ''), re.IGNORECASE):
-                            matched = True
-                            if not tasks_entry_map.get(task):
-                                tasks_entry_map[task] = []
-                            tasks_entry_map[task].append(entry)
+                for task_config in tasks_re:
+                    pattern_match = 0
+                    for pattern in task_config.get('patterns'):
+                        if re.search(pattern['regexp'], entry.get(pattern['field'], ''), re.IGNORECASE):
+                            pattern_match += 1
+
+                    # the entry is added to the task map if all of the defined regex matched
+                    if len(task_config.get('patterns')) == pattern_match:
+                        matched = True
+                        if not tasks_entry_map.get(task_config.get('task')):
+                            tasks_entry_map[task_config.get('task')] = []
+                        tasks_entry_map[task_config.get('task')].append(entry)
+
                 if not matched:
                     log.debug('Entry "%s" did not match any task regexp.', entry['title'])
 
