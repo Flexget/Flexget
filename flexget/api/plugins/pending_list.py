@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-
 import copy
 import logging
 from math import ceil
@@ -8,13 +5,13 @@ from math import ceil
 from flask import jsonify, request
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.plugins.list.pending_list import (
-    get_pending_lists, get_list_by_exact_name, PendingListList, get_list_by_id, delete_list_by_id,
-    get_entries_by_list_id, get_entry_by_title, PendingListEntry, get_entry_by_id
-)
 from flexget.api import api, APIResource
 from flexget.api.app import (
     NotFoundError, base_message_schema, success_response, etag, pagination_headers, Conflict, BadRequest
+)
+from flexget.plugins.list.pending_list import (
+    get_pending_lists, get_list_by_exact_name, PendingListList, get_list_by_id, delete_list_by_id,
+    get_entries_by_list_id, get_entry_by_title, PendingListEntry, get_entry_by_id
 )
 
 log = logging.getLogger('pending_list')
@@ -288,7 +285,7 @@ class PendingListEntryAPI(APIResource):
         approved = data['operation'] == 'approve'
         operation_text = 'approved' if approved else 'pending'
         if entry.approved is approved:
-            raise BadRequest('Entry with id {} is already {}'.format(entry_id, operation_text))
+            raise BadRequest(f'Entry with id {entry_id} is already {operation_text}')
 
         entry.approved = approved
         session.commit()
