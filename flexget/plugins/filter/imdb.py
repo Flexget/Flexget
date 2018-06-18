@@ -87,7 +87,7 @@ class FilterImdb(object):
             'min_year': {'type': 'integer'},
             'max_year': {'type': 'integer'},
             'min_votes': {'type': 'integer'},
-            'min_votes': {'type': 'integer'},
+            'min_meta_score': {'type': 'integer'},
             'min_score': {'type': 'number'},
             'accept_genres': {'type': 'array', 'items': {'type': 'string'}},
             'reject_genres': {'type': 'array', 'items': {'type': 'string'}},
