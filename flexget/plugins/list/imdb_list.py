@@ -117,13 +117,14 @@ class ImdbEntrySet(MutableSet):
             raise PluginError(str(e))
 
         user_id_match = re.search('ur\d+(?!\d)', response.url)
-        # extract the hidden form value that we need to do post requests later on
-        try:
-            soup = get_soup(response.text)
-            self.hidden_value = soup.find('input', attrs={'id': '49e6c'})['value']
-        except Exception as e:
-            log.warning('Unable to locate the hidden form value ''49e6c''. Without it, you might not be able to '
-                        'add or remove items. %s', e)
+        if user_id_match:
+            # extract the hidden form value that we need to do post requests later on
+            try:
+                soup = get_soup(response.text)
+                self.hidden_value = soup.find('input', attrs={'id': '49e6c'})['value']
+            except Exception as e:
+                log.warning('Unable to locate the hidden form value ''49e6c''. Without it, you might not be able to '
+                            'add or remove items. %s', e)
         return user_id_match.group() if user_id_match else None
 
     def authenticate(self):
