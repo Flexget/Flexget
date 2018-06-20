@@ -136,6 +136,8 @@ class ImdbEntrySet(MutableSet):
                 self.user_id = user.user_id
                 if not self.get_user_id_and_hidden_value(cookies=user.cookies):
                     log.debug('cache credentials expired')
+                    user.cookies = None
+                    self._session.cookies.clear()
                 else:
                     self.cookies = user.cookies
                     cached_credentials = True
