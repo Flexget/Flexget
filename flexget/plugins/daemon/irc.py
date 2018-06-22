@@ -55,23 +55,32 @@ schema = {
                     'task': one_or_more({
                         'type': 'string'
                     }),
-                    'task_re': one_or_more({
-                        'type': 'object',
-                        'properties': {
-                            'task': {
-                                'type': 'string'
-                            },
-                            'patterns': one_or_more({
-                                'type': 'object',
-                                'properties': {
-                                    'regexp': {'type': 'string'},
-                                    'field': {'type': 'string'}
+                    'task_re': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'object',
+                            'properties': {
+                                'task': {
+                                    'type': 'string'
                                 },
-                                'required': ['regexp', 'field'],
-                                'additionalProperties': False
-                            })
-                        },
-                    }, unique_items=True),
+                                'patterns': {
+                                    'type': 'array',
+                                    'items': {
+                                        'type': 'object',
+                                        'properties': {
+                                            'regexp': {'type': 'string'},
+                                            'field': {'type': 'string'}
+                                        },
+                                        'required': ['regexp', 'field'],
+                                        'additionalProperties': False
+                                    }
+                                }
+                            },
+                            'required': ['task', 'patterns'],
+                            'additionalProperties': False
+
+                        }
+                    },
                     'queue_size': {'type': 'integer', 'default': 1},
                     'use_ssl': {'type': 'boolean', 'default': False},
                     'task_delay': {'type': 'integer'},
