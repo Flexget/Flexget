@@ -5,7 +5,7 @@ from future.moves.urllib.parse import quote_plus
 
 import logging
 import re
-
+from requests.exceptions import RequestException
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
@@ -64,10 +64,20 @@ class UrlRewriteFuzer(object):
     }
 
     def get_fuzer_soup(self, search_term, categories_list):
-        params = {'matchquery': 'any'}
-        page = requests.get(
-            'https://www.fuzer.me/browse.php?ref_=advanced&query={}&{}'.format(search_term, '&'.join(categories_list)),
-            params=params, cookies=self.cookies)
+        params = {
+            'matchquery': 'any',
+            'ref_': 'advanced'
+        }
+        query = '{}&{}'.format(search_term, '&'.join(categories_list))
+        try:
+            page = requests.get('https://www.fuzer.me/browse.php?query={}'.format(query),
+                                params=params, cookies=self.cookies)
+        except RequestException as e:
+            raise PluginError('Could not connect to Fuzer: %s', e)
+
+        if 'login' in page.url:
+            raise PluginError('Could not fetch results from Fuzer. Check config')
+
         log.debug('Using %s as fuzer search url', page.url)
         return get_soup(page.content)
 
@@ -76,6 +86,7 @@ class UrlRewriteFuzer(object):
         if table is None:
             raise PluginError('Could not fetch results table from Fuzer, aborting')
 
+        log.trace('fuzer results table: %s', table)
         table = table.find('table', {'class': 'table_info'})
         if len(table.find_all('tr')) == 1:
             log.debug('No search results were returned, continuing')
