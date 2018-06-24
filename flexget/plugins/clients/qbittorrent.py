@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import os
 import logging
+from pathlib import Path
 
 from requests import Session
 from requests.exceptions import RequestException
@@ -71,7 +68,7 @@ class OutputQBitTorrent(object):
             data = {'username': config['username'],
                     'password': config['password']}
             self._request('post', self.url + '/login', data=data, msg_on_fail='Authentication failed.',
-                                  verify=config['verify_cert'])
+                          verify=config['verify_cert'])
         log.debug('Successfully connected to qBittorrent')
         self.connected = True
 
@@ -82,7 +79,7 @@ class OutputQBitTorrent(object):
         with open(file_path, 'rb') as f:
             multipart_data['torrents'] = f
             self._request('post', self.url + '/command/upload', msg_on_fail='Failed to add file to qBittorrent',
-                                  files=multipart_data, verify=verify_cert)
+                          files=multipart_data, verify=verify_cert)
         log.debug('Added torrent file %s to qBittorrent', file_path)
 
     def add_torrent_url(self, url, data, verify_cert):
@@ -91,7 +88,7 @@ class OutputQBitTorrent(object):
         data['urls'] = url
         multipart_data = {k: (None, v) for k, v in data.items()}
         self._request('post', self.url + '/command/download', msg_on_fail='Failed to add file to qBittorrent',
-                              files=multipart_data, verify=verify_cert)
+                      files=multipart_data, verify=verify_cert)
         log.debug('Added url %s to qBittorrent', url)
 
     def prepare_config(self, config):
@@ -135,10 +132,10 @@ class OutputQBitTorrent(object):
                 if 'file' not in entry:
                     entry.fail('File missing?')
                     continue
-                if not os.path.exists(entry['file']):
-                    tmp_path = os.path.join(task.manager.config_base, 'temp')
+                if not Path(entry['file']).exists():
+                    tmp_path = task.manager.config_base / 'temp'
                     log.debug('entry: %s', entry)
-                    log.debug('temp: %s', ', '.join(os.listdir(tmp_path)))
+                    log.debug('temp: %s', ', '.join(str(p) for p in tmp_path.iterdir()))
                     entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
                     continue
                 self.add_torrent_file(entry['file'], form_data, config['verify_cert'])

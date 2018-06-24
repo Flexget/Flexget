@@ -1,24 +1,20 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.xmlrpc import client as xmlrpc_client
-from future.moves.urllib.parse import urlparse, urljoin
-from future.utils import native_str
-
 import logging
 import os
-import socket
 import re
+import socket
 from time import sleep
-
-from flexget.utils.template import RenderError
-from flexget.utils.pathscrub import pathscrub
-from flexget import plugin
-from flexget.event import event
-from flexget.entry import Entry
-from flexget.config_schema import one_or_more
-from flexget.utils.bittorrent import Torrent, is_torrent_file
+from urllib.parse import urlparse, urljoin
+from xmlrpc import client as xmlrpc_client
 
 from requests.auth import HTTPDigestAuth, HTTPBasicAuth
+
+from flexget import plugin
+from flexget.config_schema import one_or_more
+from flexget.entry import Entry
+from flexget.event import event
+from flexget.utils.bittorrent import Torrent, is_torrent_file
+from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError
 
 log = logging.getLogger('rtorrent')
 
@@ -79,7 +75,7 @@ class HTTPDigestTransport(xmlrpc_client.Transport):
         if self.__digest_auth:
             return HTTPDigestAuth(self.__username, self.__password)
         return HTTPBasicAuth(self.__username, self.__password)
-    
+
     def send_request(self, url, auth, data):
         return self.__session.post(url, auth=auth, data=data, raise_status=False)
 
@@ -107,7 +103,7 @@ class SCGITransport(xmlrpc_client.Transport):
 
     def single_request(self, host, handler, request_body, verbose=0):
         # Add SCGI headers to the request.
-        headers = [('CONTENT_LENGTH', native_str(len(request_body))), ('SCGI', '1')]
+        headers = [('CONTENT_LENGTH', str(len(request_body))), ('SCGI', '1')]
         header = '\x00'.join(['%s\x00%s' % (key, value) for key, value in headers]) + '\x00'
         header = '%d:%s' % (len(header), header)
         request_body = '%s,%s' % (header, request_body)
@@ -199,8 +195,8 @@ class SCGIServerProxy(object):
 
     def __repr__(self):
         return (
-            "<ServerProxy for %s%s>" %
-            (self.__host, self.__handler)
+                "<ServerProxy for %s%s>" %
+                (self.__host, self.__handler)
         )
 
     __str__ = __repr__
@@ -288,7 +284,7 @@ class RTorrent(object):
         if reverse:
             for field in ['up.total', 'down.total', 'down.rate']:
                 if field in fields:
-                    fields[fields.index(field)] = native_str(field.replace('.', '_'))
+                    fields[fields.index(field)] = field.replace('.', '_')
             return fields
 
         for required_field in self.required_fields:
@@ -297,7 +293,7 @@ class RTorrent(object):
 
         for field in ['up_total', 'down_total', 'down_rate']:
             if field in fields:
-                fields[fields.index(field)] = native_str(field.replace('_', '.'))
+                fields[fields.index(field)] = field.replace('_', '.')
 
         return fields
 
@@ -311,7 +307,7 @@ class RTorrent(object):
         # Additional fields to set
         for key, val in fields.items():
             # Values must be escaped if within params
-            params.append('d.%s.set=%s' % (key, re.escape(native_str(val))))
+            params.append('d.%s.set=%s' % (key, re.escape(val)))
 
         if mkdir and 'directory' in fields:
             result = self._server.execute.throw('', 'mkdir', '-p', fields['directory'])
@@ -340,7 +336,6 @@ class RTorrent(object):
 
     def torrent(self, info_hash, fields=None):
         """ Get the details of a torrent """
-        info_hash = native_str(info_hash)
         if not fields:
             fields = list(self.default_fields)
 
@@ -374,22 +369,21 @@ class RTorrent(object):
 
         for key, val in fields.items():
             method_name = 'd.%s.set' % key
-            getattr(multi_call, method_name)(native_str(info_hash), native_str(val))
+            getattr(multi_call, method_name)(info_hash, val)
 
         return multi_call()[0]
 
     def delete(self, info_hash):
-        return self._server.d.erase(native_str(info_hash))
+        return self._server.d.erase(info_hash)
 
     def stop(self, info_hash):
         self._server.d.stop(info_hash)
-        return self._server.d.close(native_str(info_hash))
+        return self._server.d.close(info_hash)
 
     def start(self, info_hash):
-        return self._server.d.start(native_str(info_hash))
+        return self._server.d.start(info_hash)
 
     def move(self, info_hash, dst_path):
-        info_hash = native_str(info_hash)
         self.stop(info_hash)
 
         torrent = self.torrent(info_hash, fields=['base_path'])

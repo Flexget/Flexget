@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import os
 import xmlrpc.client
@@ -30,7 +27,7 @@ class OutputAria2(object):
             'server': {'type': 'string', 'default': 'localhost'},
             'port': {'type': 'integer', 'default': 6800},
             'secret': {'type': 'string', 'default': ''},
-            'username': {'type': 'string', 'default': ''}, # NOTE: To be deprecated by aria2
+            'username': {'type': 'string', 'default': ''},  # NOTE: To be deprecated by aria2
             'password': {'type': 'string', 'default': ''},
             'path': {'type': 'string'},
             'filename': {'type': 'string'},
@@ -56,10 +53,10 @@ class OutputAria2(object):
             return xmlrpc.client.ServerProxy(url).aria2
         except xmlrpc.client.ProtocolError as err:
             raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s'
-                              % (url, err.errcode, err.errmsg), log)
+                                     % (url, err.errcode, err.errmsg), log)
         except xmlrpc.client.Fault as err:
             raise plugin.PluginError('XML-RPC fault: Unable to connect to aria2 daemon at %s: %s'
-                              % (url, err.faultString), log)
+                                     % (url, err.faultString), log)
         except socket_error as e:
             raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s' % (url, e), log)
         except:
@@ -108,11 +105,11 @@ class OutputAria2(object):
             entry.fail('failed to render \'path\': %s' % e)
             return
         if 'filename' in config:
-             try:
-                 options['out'] = os.path.expanduser(entry.render(config['filename']))
-             except RenderError as e:
-                 entry.fail('failed to render \'filename\': %s' % e)
-                 return
+            try:
+                options['out'] = os.path.expanduser(entry.render(config['filename']))
+            except RenderError as e:
+                entry.fail('failed to render \'filename\': %s' % e)
+                return
         secret = None
         if config['secret']:
             secret = 'token:%s' % config['secret']

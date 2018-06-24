@@ -532,7 +532,7 @@ class Manager:
         log.debug('Config file %s selected', config)
         self.config_path = Path(config)
         self.config_name = self.config_path.name
-        self.config_base = self.config_path.parent.name
+        self.config_base = self.config_path.parent
         self.lockfile = Path(self.config_base) / f'.{self.config_name}-lock'
         self.db_filename = Path(self.config_base) / f'db-{self.config_name}.sqlite'
 

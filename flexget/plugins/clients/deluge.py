@@ -1,22 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import native
-
 import base64
 import glob
 import logging
-import pkg_resources
 import os
 import re
 import sys
 import time
 import warnings
 
+import pkg_resources
+
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError
 
 log = logging.getLogger('deluge')
 
@@ -36,7 +33,7 @@ def add_deluge_windows_install_dir_to_sys_path():
     if minor_version != sys.version_info[1]:
         log.verbose('Cannot use deluge from install directory because its python version doesn\'t match.')
         return
-    log.debug('Found deluge install in %s adding to sys.path' % deluge_dir)
+    log.debug('Found deluge install in %s adding to sys.path', deluge_dir)
     sys.path.append(deluge_dir)
     for item in os.listdir(deluge_dir):
         if item.endswith(('.egg', '.zip')):
@@ -249,7 +246,7 @@ class InputDeluge(DelugePlugin):
         'max_connections': 'max_connections',
         'max_download_speed': 'max_download_speed',
         'max_upload_slots': 'max_upload_slots',
-        'max_upload_speed':  'max_upload_speed',
+        'max_upload_speed': 'max_upload_speed',
         'message': 'message',
         'move_on_completed': 'move_on_completed',
         'next_announce': 'next_announce',
@@ -268,9 +265,9 @@ class InputDeluge(DelugePlugin):
         'total_payload_download': 'total_payload_download',
         'total_payload_upload': 'total_payload_upload',
         'total_peers': 'total_peers',
-        'total_seeds': 'total_seeds', 
+        'total_seeds': 'total_seeds',
         'total_uploaded': 'total_uploaded',
-        'total_wanted': 'total_wanted', 
+        'total_wanted': 'total_wanted',
         'tracker': 'tracker',
         'tracker_host': 'tracker_host',
         'tracker_status': 'tracker_status',
@@ -369,7 +366,8 @@ class InputDeluge(DelugePlugin):
         filter = config.get('filter', {})
 
         # deluge client lib chokes on future's newlist, make sure we have a native python list here
-        client.core.get_torrents_status(filter, native(list(self.settings_map.keys()) + config.get('keys', []))).addCallback(
+        client.core.get_torrents_status(filter,
+                                        native(list(self.settings_map.keys()) + config.get('keys', []))).addCallback(
             on_get_torrents_status)
 
 
@@ -660,7 +658,8 @@ class OutputDeluge(DelugePlugin):
                             entry['title'],
                             opts.get('main_file_ratio') * 100))
 
-                container_directory =  pathscrub(entry.render(entry.get('container_directory', config.get('container_directory', ''))))
+                container_directory = pathscrub(
+                    entry.render(entry.get('container_directory', config.get('container_directory', ''))))
                 if container_directory:
                     if big_file_name:
                         folder_structure = big_file_name.split(os.sep)
@@ -670,9 +669,12 @@ class OutputDeluge(DelugePlugin):
                         folder_structure = []
                     if len(folder_structure) > 1:
                         log.verbose('Renaming Folder %s to %s', folder_structure[0], container_directory)
-                        main_file_dlist.append(client.core.rename_folder(torrent_id, folder_structure[0], container_directory))
+                        main_file_dlist.append(
+                            client.core.rename_folder(torrent_id, folder_structure[0], container_directory))
                     else:
-                        log.debug('container_directory specified however the torrent %s does not have a directory structure; skipping folder rename', entry['title'])
+                        log.debug(
+                            'container_directory specified however the torrent %s does not have a directory structure; skipping folder rename',
+                            entry['title'])
 
                 return defer.DeferredList(main_file_dlist)
 

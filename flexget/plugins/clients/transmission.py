@@ -1,27 +1,21 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-from future.moves.urllib.parse import urlparse
-from future.utils import text_to_native_str
-
-import os
-import logging
 import base64
+import logging
+import os
 import re
 import time
 from datetime import datetime
 from datetime import timedelta
+from fnmatch import fnmatch
 from netrc import netrc, NetrcParseError
+from urllib.parse import urlparse
 
 from flexget import plugin, validator
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError
 from flexget.utils.tools import parse_timedelta
-
-from flexget.config_schema import one_or_more
-from fnmatch import fnmatch
 
 try:
     import transmissionrpc
@@ -182,9 +176,9 @@ class PluginTransmissionInput(TransmissionBase):
             seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
             if not config['onlycomplete'] or (downloaded and
                                               ((
-                                                  torrent.status == 'stopped' and
-                                                  seed_ratio_ok is None and
-                                                  idle_limit_ok is None) or
+                                                       torrent.status == 'stopped' and
+                                                       seed_ratio_ok is None and
+                                                       idle_limit_ok is None) or
                                                (seed_ratio_ok is True or idle_limit_ok is True))):
                 entry = Entry(title=torrent.name,
                               url='file://%s' % torrent.torrentFile,
@@ -323,7 +317,7 @@ class PluginTransmission(TransmissionBase):
         if opt_dic.get('path'):
             try:
                 path = os.path.expanduser(entry.render(opt_dic['path']))
-                add['download_dir'] = text_to_native_str(pathscrub(path), 'utf-8')
+                add['download_dir'] = pathscrub(path)
             except RenderError as e:
                 log.error('Error setting path for %s: %s' % (entry['title'], e))
         if 'bandwidthpriority' in opt_dic:
@@ -421,7 +415,7 @@ class PluginTransmission(TransmissionBase):
 
                 def _filter_list(list):
                     for item in list:
-                        if not isinstance(item, basestring):
+                        if not isinstance(item, str):
                             list.remove(item)
                     return list
 
@@ -456,7 +450,7 @@ class PluginTransmission(TransmissionBase):
                     fl = cli.get_files(r.id)
 
                     if ('magnetization_timeout' in options['post'] and
-                        options['post']['magnetization_timeout'] > 0 and
+                            options['post']['magnetization_timeout'] > 0 and
                             not downloaded and
                             len(fl[r.id]) == 0):
                         log.debug('Waiting %d seconds for "%s" to magnetize', options['post']['magnetization_timeout'],
@@ -514,7 +508,7 @@ class PluginTransmission(TransmissionBase):
                             dl_list.append(main_id)
                     elif find_main_file:
                         log.warning('No files in "%s" are > %d%% of content size, no files renamed.',
-                            entry['title'], main_ratio * 100)
+                                    entry['title'], main_ratio * 100)
 
                     # If we have a main file and want to rename it and associated files
                     if 'content_filename' in options['post'] and main_id is not None:
@@ -654,7 +648,8 @@ class PluginTransmissionClean(TransmissionBase):
         delete_files = bool(config['delete_files']) if 'delete_files' in config else False
         trans_checks = bool(config['transmission_seed_limits']) if 'transmission_seed_limits' in config else False
         tracker_re = re.compile(config['tracker'], re.IGNORECASE) if 'tracker' in config else None
-        preserve_tracker_re = re.compile(config['preserve_tracker'], re.IGNORECASE) if 'preserve_tracker' in config else None
+        preserve_tracker_re = re.compile(config['preserve_tracker'],
+                                         re.IGNORECASE) if 'preserve_tracker' in config else None
         directories_re = config.get('directories')
 
         session = self.client.get_session()
