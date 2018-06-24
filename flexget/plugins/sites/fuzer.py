@@ -89,7 +89,7 @@ class UrlRewriteFuzer(object):
         log.trace('fuzer results table: %s', table)
         table = table.find('table', {'class': 'table_info'})
         if len(table.find_all('tr')) == 1:
-            log.debug('No search results were returned, continuing')
+            log.debug('No search results were returned from Fuzer, continuing')
             return []
 
         entries = []
@@ -146,14 +146,11 @@ class UrlRewriteFuzer(object):
 
         # If there are any text categories, turn them into their id number
         categories = [c if isinstance(c, int) else CATEGORIES[c] for c in category]
-
-        c_list = []
-        for c in categories:
-            c_list.append('c{}={}'.format(quote_plus('[]'), c))
+        c_list = ['c{}={}'.format(quote_plus('[]'), c) for c in categories]
 
         entries = []
         if entry.get('imdb_id'):
-            log.debug('imdb_id {} detected, using in search.'.format(entry['imdb_id']))
+            log.debug("imdb_id '%s' detected, using in search.", entry['imdb_id'])
             soup = self.get_fuzer_soup(entry['imdb_id'], c_list)
             entries = self.extract_entry_from_soup(soup)
             if entries:
