@@ -2,7 +2,7 @@ interactions:
 - request:
     body: null
     headers:
-      Authorization: [Bearer 336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22]
+      Authorization: [Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a]
       Content-Type: [application/json]
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: ['2']
@@ -13,146 +13,26 @@ interactions:
         Walking Dead","year":2010,"ids":{"trakt":1393,"slug":"the-walking-dead","tvdb":153021,"imdb":"tt1520211","tmdb":1402,"tvrage":25056}}},{"rank":2,"listed_at":"2016-04-06T01:08:56.000Z","type":"movie","movie":{"title":"Deadpool","year":2016,"ids":{"trakt":190430,"slug":"deadpool-2016","imdb":"tt1431045","tmdb":293660}}},{"rank":3,"listed_at":"2016-04-06T01:09:11.000Z","type":"episode","episode":{"season":8,"number":15,"title":"Fidelis
         Ad Mortem","ids":{"trakt":2125119,"tvdb":5483434,"imdb":"tt5318930","tmdb":1165957,"tvrage":1065902569}},"show":{"title":"Castle","year":2009,"ids":{"trakt":1410,"slug":"castle","tvdb":83462,"imdb":"tt1219024","tmdb":1419,"tvrage":19267}}}]'}
     headers:
-      CF-RAY: [312a3baef9c33cb3-CPH]
+      CF-RAY: [41e72ae1dd3f3cf5-CPH]
       Cache-Control: ['max-age=0, private, must-revalidate']
-      Cf-Railgun: [069e2b840c 99.99 0.026796 0030 e6be]
+      Cf-Railgun: [9d1890bb0c 2.91 0.022321 0030 57da]
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 12:03:40 GMT']
-      Etag: [W/"d7723e2119c665a0bcf95798ae399e20"]
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d177d9eb16207c2ad848e85e625f658351481976219; expires=Sun,
-          17-Dec-17 12:03:39 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Private-User: ['false']
-      X-Request-Id: [641c20cc-b9ac-4507-b90b-72fe1f2ddccf]
-      X-Runtime: ['0.024014']
-      X-Sort-By: [rank]
-      X-Sort-How: [asc]
-      X-Xss-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Authorization: [Bearer 336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22]
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
-    method: GET
-    uri: https://api.trakt.tv/users/me/lists/testlist/items
-  response:
-    body: {string: ''}
-    headers:
-      CF-RAY: [366b1485b9663ca7-CPH]
-      Cache-Control: ['max-age=0, private, no-cache, no-store, must-revalidate']
-      Cf-Railgun: [ce7c470811 stream 0.000000 0200 e6be]
-      Connection: [close]
-      Content-Type: [text/html]
-      Date: ['Mon, 29 May 2017 17:12:43 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d9ad19de05ac038190afb00ee06d0dc411496077963; expires=Tue,
-          29-May-18 17:12:43 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      Www-Authenticate: ['Bearer realm="Doorkeeper", error="invalid_token", error_description="The
-          access token expired"']
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [e938b506-a3f1-40d2-a391-9a61c7609068]
-      X-Runtime: ['0.010961']
-      X-Xss-Protection: [1; mode=block]
-    status: {code: 401, message: Unauthorized}
-- request:
-    body: null
-    headers:
-      Authorization: [Bearer 336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22]
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
-    method: GET
-    uri: https://api.trakt.tv/users/me/lists/testlist/items
-  response:
-    body: {string: ''}
-    headers:
-      CF-RAY: [366b26b60ede3d0d-CPH]
-      Cache-Control: ['max-age=0, private, no-cache, no-store, must-revalidate']
-      Cf-Railgun: [df3415de26 99.99 0.046826 0030 e6be]
-      Connection: [close]
-      Content-Type: [text/html]
-      Date: ['Mon, 29 May 2017 17:25:08 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d51e6102f361e66f354776b9b3ffa44e61496078708; expires=Tue,
-          29-May-18 17:25:08 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      Www-Authenticate: ['Bearer realm="Doorkeeper", error="invalid_token", error_description="The
-          access token expired"']
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [8094980d-ddd2-47a5-b6d1-3d15e6b38b8a]
-      X-Runtime: ['0.009273']
-      X-Xss-Protection: [1; mode=block]
-    status: {code: 401, message: Unauthorized}
-- request:
-    body: null
-    headers:
-      Authorization: [Bearer 336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22]
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
-    method: GET
-    uri: https://api.trakt.tv/users/me/lists/testlist/items
-  response:
-    body: {string: ''}
-    headers:
-      CF-RAY: [366b90e409623d19-CPH]
-      Cache-Control: ['max-age=0, private, no-cache, no-store, must-revalidate']
-      Cf-Railgun: [336629a023 99.99 0.012405 0030 e6be]
-      Connection: [close]
-      Content-Type: [text/html]
-      Date: ['Mon, 29 May 2017 18:37:37 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=dde8dd9d52734e64b21619f69c4c35c6a1496083057; expires=Tue,
-          29-May-18 18:37:37 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      Www-Authenticate: ['Bearer realm="Doorkeeper", error="invalid_token", error_description="The
-          access token expired"']
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [04e6c184-b1f3-485f-9207-8a474d69cc80]
-      X-Runtime: ['0.008450']
-      X-Xss-Protection: [1; mode=block]
-    status: {code: 401, message: Unauthorized}
-- request:
-    body: null
-    headers:
-      Authorization: [Bearer 690dd940c75b133b56c58cd05d5de45c94224874c81e6777efbf7e6762ce016b]
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
-    method: GET
-    uri: https://api.trakt.tv/users/me/lists/testlist/items
-  response:
-    body: {string: '[{"rank":1,"listed_at":"2016-04-06T01:08:39.000Z","type":"show","show":{"title":"The
-        Walking Dead","year":2010,"ids":{"trakt":1393,"slug":"the-walking-dead","tvdb":153021,"imdb":"tt1520211","tmdb":1402,"tvrage":25056}}},{"rank":2,"listed_at":"2016-04-06T01:08:56.000Z","type":"movie","movie":{"title":"Deadpool","year":2016,"ids":{"trakt":190430,"slug":"deadpool-2016","imdb":"tt1431045","tmdb":293660}}},{"rank":3,"listed_at":"2016-04-06T01:09:11.000Z","type":"episode","episode":{"season":8,"number":15,"title":"Fidelis
-        Ad Mortem","ids":{"trakt":2125119,"tvdb":5483434,"imdb":"tt5318930","tmdb":1165957,"tvrage":1065902569}},"show":{"title":"Castle","year":2009,"ids":{"trakt":1410,"slug":"castle","tvdb":83462,"imdb":"tt1219024","tmdb":1419,"tvrage":19267}}}]'}
-    headers:
-      CF-RAY: [366badceee193d5b-CPH]
-      Cache-Control: ['max-age=0, private, must-revalidate']
-      Cf-Railgun: [a0195d0ca7 2.64 0.046296 0030 e6be]
-      Connection: [close]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Mon, 29 May 2017 18:57:21 GMT']
+      Date: ['Mon, 21 May 2018 12:50:13 GMT']
       Etag: [W/"7b6e0d2f1f65bce494c5691609a18856"]
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d34b2f112c0b2b81a23c6d3086ed8eeea1496084241; expires=Tue,
-          29-May-18 18:57:21 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+      Server: [cloudflare]
+      Set-Cookie: ['__cfduid=d611c9d51eb0a60eeaf1d232d8d37dbf61526907013; expires=Tue,
+          21-May-19 12:50:13 GMT; path=/; domain=.trakt.tv; HttpOnly']
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
       X-Frame-Options: [SAMEORIGIN]
+      X-Pagination-Item-Count: ['3']
+      X-Pagination-Page: ['1']
+      X-Pagination-Page-Count: ['1']
       X-Private-User: ['false']
-      X-Request-Id: [8dc78d34-fd33-4ef1-839d-5a565f1301d3]
-      X-Runtime: ['0.031558']
+      X-Request-Id: [e319ddac-b939-421a-bca1-f05229444883]
+      X-Runtime: ['0.017527']
       X-Sort-By: [rank]
       X-Sort-How: [asc]
       X-Xss-Protection: [1; mode=block]

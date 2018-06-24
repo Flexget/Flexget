@@ -119,7 +119,7 @@ class TestTraktShowLookup(object):
             session.commit()
 
             lookupargs = {'title': "Shameless.S01E03.HDTV-FlexGet"}
-            series = ApiTrakt.lookup_series(**lookupargs)
+            series = ApiTrakt.lookup_series(session=session, **lookupargs)
 
             assert series.tvdb_id == entry['tvdb_id'], 'tvdb id should be the same as the first entry'
             assert series.id == entry['trakt_show_id'], 'trakt id should be the same as the first entry'
@@ -399,7 +399,7 @@ class TestTraktMovieLookup(object):
             session.commit()
 
             lookupargs = {'title': "harry.potter.and.the.philosopher's"}
-            movie = ApiTrakt.lookup_movie(**lookupargs)
+            movie = ApiTrakt.lookup_movie(session=session, **lookupargs)
 
             assert movie.imdb_id == entry['imdb_id']
             assert movie.title.lower() == entry['movie_name'].lower()
