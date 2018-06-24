@@ -1,10 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
+from math import ceil
 
 from flask import jsonify, request
-from math import ceil
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource
@@ -48,7 +45,8 @@ class ObjectsContainer(object):
 
 
 rejected_entry_schema = api.schema_model('rejected_failed_entry_schema', ObjectsContainer.rejected_entry_object)
-rejected_entries_list_schema = api.schema_model('rejected_entries_list_schema', ObjectsContainer.rejected_entries_list_object)
+rejected_entries_list_schema = api.schema_model('rejected_entries_list_schema',
+                                                ObjectsContainer.rejected_entries_list_object)
 
 sort_choices = ('added', 'id', 'title', 'url', 'expires', 'rejected_by', 'reason')
 rejected_parser = api.pagination_parser(sort_choices=sort_choices)
@@ -101,7 +99,7 @@ class Rejected(APIResource):
         total_pages = int(ceil(total_items / float(per_page)))
 
         if page > total_pages:
-            raise NotFoundError('page %s does not exist' % page)
+            raise NotFoundError(f'page {page} does not exist')
 
         # Actual results in page
         actual_size = min(per_page, len(failed_entries))
@@ -124,7 +122,7 @@ class Rejected(APIResource):
         if entries:
             session.commit()
             self.manager.config_changed()
-        return success_response('successfully deleted %i rejected entries' % entries)
+        return success_response(f'successfully deleted {len(entries)} rejected entries')
 
 
 @rejected_api.route('/<int:rejected_entry_id>/')
@@ -137,7 +135,7 @@ class RejectedEntry(APIResource):
         try:
             entry = session.query(RememberEntry).filter(RememberEntry.id == rejected_entry_id).one()
         except NoResultFound:
-            raise NotFoundError('rejected entry ID %d not found' % rejected_entry_id)
+            raise NotFoundError(f'rejected entry ID {rejected_entry_id} not found')
         return jsonify(rejected_entry_to_dict(entry))
 
     @api.response(200, model=base_message_schema)
@@ -146,6 +144,6 @@ class RejectedEntry(APIResource):
         try:
             entry = session.query(RememberEntry).filter(RememberEntry.id == rejected_entry_id).one()
         except NoResultFound:
-            raise NotFoundError('rejected entry ID %d not found' % rejected_entry_id)
+            raise NotFoundError(f'rejected entry ID {rejected_entry_id} not found')
         session.delete(entry)
-        return success_response('successfully deleted rejected entry %i' % rejected_entry_id)
+        return success_response('successfully deleted rejected entry {rejected_entry_id}')

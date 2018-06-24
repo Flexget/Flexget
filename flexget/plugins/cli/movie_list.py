@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from argparse import ArgumentParser, ArgumentTypeError
 
 from sqlalchemy.orm.exc import NoResultFound
@@ -10,8 +7,10 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import PluginError, DependencyError
-from flexget.plugins.list.movie_list import get_list_by_exact_name, get_movie_lists, get_movies_by_list_id, \
-    get_movie_by_title_and_year, MovieListMovie, get_db_movie_identifiers, MovieListList, MovieListBase, get_movie_by_id
+from flexget.plugins.list.movie_list import (
+    get_list_by_exact_name, get_movie_lists, get_movies_by_list_id, get_movie_by_title_and_year, MovieListMovie,
+    get_db_movie_identifiers, MovieListList, MovieListBase, get_movie_by_id
+)
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 from flexget.utils.tools import split_title_year
 

@@ -1,10 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flexget import options
 from flexget.event import event
-from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 from flexget.plugins.filter import seen
+from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 from flexget.utils.database import with_session
 from flexget.utils.imdb import is_imdb_url, extract_id
 

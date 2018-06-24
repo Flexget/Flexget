@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import codecs
 import logging
+
 import yaml
 
 from flexget import options
@@ -20,7 +17,7 @@ def before_config_load(manager):
 
 def pre_check_config(config_path):
     """Checks configuration file for common mistakes that are easily detectable"""
-    with codecs.open(config_path, 'r', 'utf-8') as config_file:
+    with open(config_path) as config_file:
         try:
             config = config_file.read()
         except UnicodeDecodeError:
@@ -85,26 +82,26 @@ def pre_check_config(config_path):
 
         if ':\t' in line:
             log.critical('Line %s has TAB character after : character. '
-                         'DO NOT use tab key when editing config!' % line_num)
+                         'DO NOT use tab key when editing config!', line_num)
         elif '\t' in line:
-            log.warning('Line %s has tabs, use only spaces!' % line_num)
+            log.warning('Line %s has tabs, use only spaces!', line_num)
         if isodd(indentation):
-            log.warning('Config line %s has odd (uneven) indentation' % line_num)
+            log.warning('Config line %s has odd (uneven) indentation', line_num)
         if indentation > prev_indentation and not prev_mapping:
             # line increases indentation, but previous didn't start mapping
-            log.warning('Config line %s is likely missing \':\' at the end' % (line_num - 1))
+            log.warning('Config line %s is likely missing \':\' at the end', (line_num - 1))
         if indentation > prev_indentation + 2 and prev_mapping and not prev_list:
             # mapping value after non list indented more than 2
-            log.warning('Config line %s is indented too much' % line_num)
+            log.warning('Config line %s is indented too much', line_num)
         if indentation <= prev_indentation + (2 * (not cur_list)) and prev_mapping and prev_list:
-            log.warning('Config line %s is not indented enough' % line_num)
+            log.warning('Config line %s is not indented enough', line_num)
         if prev_mapping and cur_list:
             # list after opening mapping
             if indentation < prev_indentation or indentation > prev_indentation + 2 + (2 * prev_list):
-                log.warning('Config line %s containing list element is indented incorrectly' % line_num)
+                log.warning('Config line %s containing list element is indented incorrectly', line_num)
         elif prev_mapping and indentation <= prev_indentation:
             # after opening a map, indentation doesn't increase
-            log.warning('Config line %s is indented incorrectly (previous line ends with \':\')' % line_num)
+            log.warning('Config line %s is indented incorrectly (previous line ends with \':\')', line_num)
 
         # notify if user is trying to set same key multiple times in a task (a common mistake)
         for level in duplicates.keys():
@@ -130,15 +127,15 @@ def pre_check_config(config_path):
             # as duplicates are not always wrong in a list. see #697
             duplicates[indentation] = {}
 
-    log.verbose('Pre-checked %s configuration lines' % line_num)
+    log.verbose('Pre-checked %s configuration lines', line_num)
 
 
 def check(manager, options):
-    log.verbose('Checking config file `%s`' % manager.config_path)
+    log.verbose('Checking config file `%s`', manager.config_path)
     if manager.is_daemon:
         # If we are running in a daemon, check disk config
         pre_check_config(manager.config_path)
-        with codecs.open(manager.config_path, 'r', encoding='utf-8') as config_file:
+        with open(manager.config_path) as config_file:
             try:
                 config = yaml.load(config_file)
             except yaml.error.YAMLError as e:

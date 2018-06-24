@@ -1,12 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
-from time import time
 from argparse import SUPPRESS
+from time import time
 
-from sqlalchemy.orm.query import Query
 from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.orm.query import Query
 from sqlalchemy.sql.expression import Executable, ClauseElement, _literal_as_text
 
 from flexget import manager, options
@@ -30,12 +27,12 @@ def explain(element, compiler, **kw):
 class ExplainQuery(Query):
 
     def __iter__(self):
-        log.info('Query:\n\t%s' % str(self).replace('\n', '\n\t'))
+        log.info('Query:\n\t%s', str(self).replace('\n', '\n\t'))
         explain = self.session.execute(Explain(self)).fetchall()
         text = '\n\t'.join('|'.join(str(x) for x in line) for line in explain)
         before = time()
         result = Query.__iter__(self)
-        log.info('Query Time: %0.3f Explain Query Plan:\n\t%s' % (time() - before, text))
+        log.info('Query Time: %0.3f Explain Query Plan:\n\t%s', (time() - before, text))
         return result
 
 

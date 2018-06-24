@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
 from math import ceil
 
@@ -10,14 +7,14 @@ from flask_restplus import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIClient, APIResource
-from flexget.api.app import NotFoundError, Conflict, BadRequest, base_message_schema, success_response, etag, \
-    pagination_headers
+from flexget.api.app import (
+    NotFoundError, Conflict, BadRequest, base_message_schema, success_response, etag, pagination_headers
+)
+from flexget.api.plugins.tvdb_lookup import ObjectsContainer as tvdb
+from flexget.api.plugins.tvmaze_lookup import ObjectsContainer as tvmaze
 from flexget.event import fire_event
 from flexget.plugin import PluginError
 from flexget.plugins.filter import series
-
-from flexget.api.plugins.tvmaze_lookup import ObjectsContainer as tvmaze
-from flexget.api.plugins.tvdb_lookup import ObjectsContainer as tvdb
 
 series_api = api.namespace('series', description='Flexget Series operations')
 

@@ -1,16 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import sys
 from argparse import ArgumentTypeError, ArgumentParser
 
 from colorclass.toggles import disable_all_colors
+from sqlalchemy.orm.exc import NoResultFound
+
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugins.filter.pending_approval import list_pending_entries, get_entry_by_id, PendingEntry
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console, colorize
-from sqlalchemy.orm.exc import NoResultFound
 
 
 def valid_entry(value):

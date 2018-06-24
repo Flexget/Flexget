@@ -1,12 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from argparse import ArgumentParser
 
 from colorclass.toggles import disable_all_colors
+
 from flexget import options
 from flexget.event import event
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console, colorize
+
 try:
     from irc_bot.simple_irc_bot import IRCChannelStatus, SimpleIRCBot
 except ImportError:

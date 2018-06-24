@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import argparse
 import logging
 import os
@@ -19,6 +16,7 @@ try:
     import win32event
     import win32service
     import win32serviceutil
+
 
     class AppServerSvc(win32serviceutil.ServiceFramework):
         _svc_name_ = 'FlexGet'

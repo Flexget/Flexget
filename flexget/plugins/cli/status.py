@@ -1,17 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa
-
 import datetime
 from datetime import timedelta
 
 from colorclass.toggles import disable_all_colors
+from sqlalchemy import desc
+from sqlalchemy.orm.exc import NoResultFound
+
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugins.operate.status import StatusTask, TaskExecution
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, colorize, console
-from sqlalchemy import desc
-from sqlalchemy.orm.exc import NoResultFound
 
 
 def do_cli(manager, options):
@@ -88,7 +86,7 @@ def do_cli_summary(manager, options):
                 elif age < timedelta(minutes=10):
                     last_success = colorize('green', last_success)
             # Fix weird issue that a task registers StatusTask but without an execution. GH #2022
-            last_exec = task.last_execution_time.strftime('%Y-%m-%d %H:%M') if  task.last_execution_time else '-'
+            last_exec = task.last_execution_time.strftime('%Y-%m-%d %H:%M') if task.last_execution_time else '-'
 
             table_data.append([
                 task.name,

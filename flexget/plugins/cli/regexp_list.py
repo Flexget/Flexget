@@ -1,15 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-from argparse import ArgumentParser, ArgumentTypeError
 import re
+from argparse import ArgumentParser, ArgumentTypeError
 
 from flexget import options
 from flexget.event import event
+from flexget.plugins.list.regexp_list import (
+    get_regexp_lists, get_list_by_exact_name, get_regexps_by_list_id, get_regexp, create_list, add_to_list_by_name
+)
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 from flexget.utils.database import Session
-from flexget.plugins.list.regexp_list import get_regexp_lists, get_list_by_exact_name, get_regexps_by_list_id, \
-    get_regexp, create_list, add_to_list_by_name
 
 
 def do_cli(manager, options):

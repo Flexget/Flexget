@@ -1,10 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import argparse
 import cgi
-import string
 import random
+import string
+
 import yaml
 
 from flexget import options

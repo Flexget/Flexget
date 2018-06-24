@@ -1,11 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import argparse
 import os
 from datetime import timedelta
 
 from colorclass.toggles import disable_all_colors
+
 from flexget import options, plugin
 from flexget.event import event
 from flexget.manager import Session

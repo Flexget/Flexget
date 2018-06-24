@@ -1,13 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from sqlalchemy import desc
 
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 from flexget.plugins.output.history import History
+from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 
 
 def do_cli(manager, options):

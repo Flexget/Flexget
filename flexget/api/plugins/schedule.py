@@ -1,13 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
 
 from flask import request, jsonify
 
-from flexget.plugins.daemon.scheduler import schedule_schema, scheduler, scheduler_job_map, DEFAULT_SCHEDULES
 from flexget.api import api, APIResource
 from flexget.api.app import NotFoundError, APIError, base_message_schema, success_response, etag, Conflict
+from flexget.plugins.daemon.scheduler import schedule_schema, scheduler, scheduler_job_map, DEFAULT_SCHEDULES
 
 schedule_api = api.namespace('schedules', description='Task Scheduler')
 

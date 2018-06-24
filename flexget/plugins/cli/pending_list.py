@@ -1,18 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-
 from argparse import ArgumentParser, ArgumentTypeError
 from functools import partial
 
 from colorclass.toggles import disable_all_colors
+from sqlalchemy.orm.exc import NoResultFound
+
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.plugins.list.pending_list import get_entry_by_id, get_entry_by_title, PendingListList, \
-    PendingListEntry
-from flexget.plugins.list.pending_list import get_pending_lists, get_list_by_exact_name, get_entries_by_list_id
+from flexget.plugins.list.pending_list import (
+    get_entry_by_id, get_entry_by_title, PendingListList, PendingListEntry, get_pending_lists, get_list_by_exact_name,
+    get_entries_by_list_id
+)
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console, colorize
-from sqlalchemy.orm.exc import NoResultFound
 
 
 def attribute_type(attribute):
