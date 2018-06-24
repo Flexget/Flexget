@@ -1,23 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import, with_statement
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-from future.moves.urllib.parse import quote
-
+import logging
 import os
 import re
 import threading
-import logging
-from xml.etree.ElementTree import parse
-import io
-from uuid import uuid4
 import time
 from datetime import datetime, timedelta
+from pathlib import Path
+from urllib.parse import quote
+from uuid import uuid4
+from xml.etree.ElementTree import parse
 
-from flexget.entry import Entry
+from flexget.config_schema import one_or_more
 from flexget.config_schema import register_config_key
+from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import manager
-from flexget.config_schema import one_or_more
 from flexget.utils import requests
 from flexget.utils.tools import get_config_hash
 
@@ -114,7 +110,7 @@ def irc_prefix(var):
     :param var: Variable to prefix
     :return: Prefixed variable
     """
-    if isinstance(var, basestring):
+    if isinstance(var, str):
         return 'irc_%s' % var.lower()
 
 
@@ -124,7 +120,7 @@ def strip_whitespace(value):
     :param value:
     :return: stripped string or value
     """
-    if isinstance(value, basestring):
+    if isinstance(value, str):
         return value.strip()
     return value
 
@@ -248,7 +244,7 @@ class IRCConnection(SimpleIRCBot):
         :return: the parsed XML
         """
         try:
-            with io.open(path, 'rb') as xml_file:
+            with open(path, 'rb') as xml_file:
                 return parse(xml_file).getroot()
         except Exception as e:
             raise TrackerFileParseError('Unable to parse tracker config file %s: %s' % (path, e))
@@ -261,18 +257,18 @@ class IRCConnection(SimpleIRCBot):
         :return: parsed XML
         """
         base_url = 'https://raw.githubusercontent.com/autodl-community/autodl-trackers/master/'
-        tracker_config_file = os.path.expanduser(tracker_config_file)
+        tracker_config_file = Path(tracker_config_file).expanduser()
 
         # First we attempt to find the file locally as-is
-        if os.path.exists(tracker_config_file):
+        if tracker_config_file.exists():
             log.debug('Found tracker file: %s', tracker_config_file)
             return cls.read_tracker_config(tracker_config_file)
 
-        if not tracker_config_file.endswith('.tracker'):
-            tracker_config_file += '.tracker'
+        if not tracker_config_file.suffix == '.tracker':
+            tracker_config_file = tracker_config_file.with_suffix('.tracker')
 
             # Maybe the file is missing extension?
-            if os.path.exists(tracker_config_file):
+            if tracker_config_file.exists():
                 log.debug('Found tracker file: %s', tracker_config_file)
                 return cls.read_tracker_config(tracker_config_file.rsplit('.tracker')[0])
 
@@ -326,7 +322,7 @@ class IRCConnection(SimpleIRCBot):
 
         # If we got this far, let's save our work :)
         save_path = os.path.join(base_dir, tracker_name)
-        with io.open(save_path, 'wb') as tracker_file:
+        with open(save_path, 'wb') as tracker_file:
             for chunk in tracker.iter_content(8192):
                 tracker_file.write(chunk)
         return cls.read_tracker_config(save_path)
@@ -365,7 +361,7 @@ class IRCConnection(SimpleIRCBot):
         tasks = self.config.get('task')
         tasks_re = self.config.get('task_re')
         if tasks:
-            if isinstance(tasks, basestring):
+            if isinstance(tasks, str):
                 tasks = [tasks]
             log.debug('Injecting %d entries into tasks %s', len(self.entry_queue), ', '.join(tasks))
             options = {'tasks': tasks, 'cron': True, 'inject': self.entry_queue, 'allow_manual': True}

@@ -1,13 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-
 import logging
 from fnmatch import fnmatch
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 
 log = logging.getLogger('content_filter')
 
@@ -40,7 +36,7 @@ class FilterContentFilter(object):
     def prepare_config(self, config):
         for key in ['require', 'require_all', 'reject']:
             if key in config:
-                if isinstance(config[key], basestring):
+                if isinstance(config[key], str):
                     config[key] = [config[key]]
         return config
 

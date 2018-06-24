@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import pickle
 from datetime import datetime
@@ -11,8 +8,8 @@ from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.utils import json
 from flexget.utils.database import entry_synonym
-from flexget.utils.tools import parse_timedelta
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
+from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('delay')
 Base = db_schema.versioned_base('delay', 2)

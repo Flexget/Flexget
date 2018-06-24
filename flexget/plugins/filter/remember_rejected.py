@@ -1,8 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-from past.builtins import basestring
-
 import logging
 from datetime import datetime, timedelta
 
@@ -129,7 +124,7 @@ class FilterRememberRejected(object):
             log.debug('Can\'t remember rejection for entry without title or url.')
             return
         if remember_time:
-            if isinstance(remember_time, basestring):
+            if isinstance(remember_time, str):
                 remember_time = parse_timedelta(remember_time)
         message = 'Remembering rejection of `%s`' % entry['title']
         if remember_time:

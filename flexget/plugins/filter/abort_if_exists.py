@@ -1,4 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
 
@@ -7,12 +6,13 @@ from flexget.event import event
 
 log = logging.getLogger('abort_if_exists')
 
+
 class PluginAbortIfExists(object):
     """Aborts a task if an entry field matches the regexp"""
 
     schema = {
         'type': 'object',
-        'properties' : {
+        'properties': {
             'regexp': {'type': 'string', 'format': 'regex'},
             'field': {'type': 'string'}
         },
@@ -32,6 +32,7 @@ class PluginAbortIfExists(object):
                 continue
             if abort_re.search(entry[field]):
                 task.abort('An entry contained %s in field %s. Abort!' % (config['regexp'], field))
+
 
 @event('plugin.register')
 def register_plugin():

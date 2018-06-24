@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flexget import plugin
 from flexget.event import event
 from flexget.plugins.filter.series import FilterSeriesBase, normalize_series_name

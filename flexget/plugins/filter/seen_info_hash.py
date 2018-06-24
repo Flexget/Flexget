@@ -1,7 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-
 from flexget import plugin
 from flexget.event import event
 from flexget.plugins.filter.seen import FilterSeen
@@ -28,7 +24,7 @@ class FilterSeenInfoHash(FilterSeen):
             return
         # First make sure all the torrent_info_hash fields are in upper case
         for entry in task.entries:
-            if isinstance(entry.get('torrent_info_hash'), basestring):
+            if isinstance(entry.get('torrent_info_hash'), str):
                 entry['torrent_info_hash'] = entry['torrent_info_hash'].upper()
         FilterSeen.on_task_filter(self, task, config, remember_rejected=True)
 

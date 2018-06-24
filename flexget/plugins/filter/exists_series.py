@@ -1,18 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-
 import logging
 
 from path import Path
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
+from flexget.plugin import get_plugin_by_name
+from flexget.plugins.parsers import ParseWarning
 from flexget.utils.log import log_once
 from flexget.utils.template import RenderError
-from flexget.plugins.parsers import ParseWarning
-from flexget.plugin import get_plugin_by_name
 
 log = logging.getLogger('exists_series')
 
@@ -46,7 +42,7 @@ class FilterExistsSeries(object):
         if not isinstance(config, dict):
             config = {'path': config}
         # if only a single path is passed turn it into a 1 element list
-        if isinstance(config['path'], basestring):
+        if isinstance(config['path'], str):
             config['path'] = [config['path']]
         return config
 

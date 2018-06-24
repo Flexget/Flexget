@@ -1,14 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 from datetime import datetime, timedelta
+
+from sqlalchemy import Column, String, Unicode, Boolean, Integer, DateTime
 
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.database import entry_synonym
-from sqlalchemy import Column, String, Unicode, Boolean, Integer, DateTime
 
 log = logging.getLogger('pending_approval')
 Base = db_schema.versioned_base('pending_approval', 0)

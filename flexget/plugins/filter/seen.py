@@ -7,10 +7,6 @@ forget (string)
     task name then everything in that task will be forgotten. With title all learned fields from it and the
     title will be forgotten. With field value only that particular field is forgotten.
 """
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-
 import logging
 from datetime import datetime
 
@@ -226,7 +222,7 @@ class FilterSeen(object):
                 return config
             else:
                 config = {'local': False}
-        elif isinstance(config, basestring):
+        elif isinstance(config, str):
             config = {'local': config == 'local'}
 
         config.setdefault('local', False)
