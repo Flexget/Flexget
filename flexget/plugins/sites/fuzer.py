@@ -73,7 +73,7 @@ class UrlRewriteFuzer(object):
             page = requests.get('https://www.fuzer.me/browse.php?query={}'.format(query),
                                 params=params, cookies=self.cookies)
         except RequestException as e:
-            raise PluginError('Could not connect to Fuzer: %s', e)
+            raise PluginError('Could not connect to Fuzer: {}'.format(e))
 
         if 'login' in page.url:
             raise PluginError('Could not fetch results from Fuzer. Check config')
