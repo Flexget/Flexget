@@ -349,6 +349,7 @@ class PluginTraktLookup(object):
                 self._register_lazy_user_ratings_lookup(entry)
 
     def _get_media_type_from_entry(self, entry):
+        media_type = None
         if is_episode(entry):
             media_type = 'episode'
         elif is_season(entry):
@@ -357,14 +358,13 @@ class PluginTraktLookup(object):
             media_type = 'show'
         elif is_movie(entry):
             media_type = 'movie'
-        else:
-            raise plugin.PluginError('Unknown media type in entry %s' % entry['title'])
 
         return media_type
 
     def _register_lazy_user_data_lookup(self, entry, data_type, media_type=None):
+        media_type = media_type or self._get_media_type_from_entry(entry)
         if not media_type:
-            media_type = self._get_media_type_from_entry(entry)
+            return
         field_name = self._get_user_data_field_name(data_type=data_type, media_type=media_type)
         entry.register_lazy_func(TraktUserDataLookup(field_name, data_type, media_type, self._lazy_user_data_lookup),
                                  [field_name])
