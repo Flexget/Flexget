@@ -82,7 +82,10 @@ def name_to_re(name, ignore_prefixes=None, parser=None):
     res = res.strip()
     # accept either '&' or 'and'
     res = re.sub(' (&|and) ', ' (?:and|&) ', res, re.UNICODE)
-    res = re.sub(' +', blank + '*', res, re.UNICODE)
+    # https://docs.python.org/3.7/library/re.html#re.sub
+    # In Python 3.6 onwards, the replacement text can't contain \w or any
+    # similar regex sequences.  Use split and join instead.
+    res = (blank + '*').join(re.split(' +', res, re.UNICODE))
     if parenthetical:
         res += '(?:' + blank + '+' + parenthetical + ')?'
         # Turn on exact mode for series ending with a parenthetical,
