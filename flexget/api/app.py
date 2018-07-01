@@ -6,7 +6,7 @@ import logging
 import os
 import re
 from collections import deque
-from functools import wraps
+from functools import wraps, partial
 
 from flask import Flask, request, jsonify, make_response
 from flask_compress import Compress
@@ -21,7 +21,7 @@ from flexget.utils.database import with_session
 from flexget.webserver import User
 from . import __path__
 
-__version__ = '1.3.0'
+__version__ = '1.4.3'
 
 log = logging.getLogger('api')
 
@@ -317,27 +317,34 @@ def api_key(session=None):
     return session.query(User).first().token
 
 
-def etag(f):
+def etag(method=None, cache_age=0):
     """
     A decorator that add an ETag header to the response and checks for the "If-Match" and "If-Not-Match" headers to
      return an appropriate response.
 
-    :param f: A GET or HEAD flask method to wrap
+    :param method: A GET or HEAD flask method to wrap
+    :param cache_age: max-age cache age for the content
     :return: The method's response with the ETag and Cache-Control headers, raises a 412 error or returns a 304 response
     """
 
-    @wraps(f)
+    # If called without method, we've been called with optional arguments.
+    # We return a decorator with the optional arguments filled in.
+    # Next time round we'll be decorating method.
+    if method is None:
+        return partial(etag, cache_age=cache_age)
+
+    @wraps(method)
     def wrapped(*args, **kwargs):
         # Identify if this is a GET or HEAD in order to proceed
         assert request.method in ['HEAD', 'GET'], '@etag is only supported for GET requests'
-        rv = f(*args, **kwargs)
+        rv = method(*args, **kwargs)
         rv = make_response(rv)
 
         # Some headers can change without data change for specific page
         content_headers = rv.headers.get('link', '') + rv.headers.get('count', '') + rv.headers.get('total-count', '')
         data = (rv.get_data().decode() + content_headers).encode()
         etag = generate_etag(data)
-        rv.headers['Cache-Control'] = 'max-age=86400'
+        rv.headers['Cache-Control'] = 'max-age=%s' % cache_age
         rv.headers['ETag'] = etag
         if_match = request.headers.get('If-Match')
         if_none_match = request.headers.get('If-None-Match')

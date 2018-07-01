@@ -65,3 +65,29 @@ class TestEntryListSearch(object):
 
         task = execute_task('entry_list_with_series')
         assert task.find_entry('accepted', title='foo.s01e01.720p.hdtv-flexget')
+
+
+class TestEntryListQuality(object):
+    config = """
+        templates:
+          global:
+            disable: seen
+        tasks:
+          verify_quality_1:
+            mock:
+            - title: foo.bar.720p.hdtv-Flexget
+            accept_all: yes
+            list_add:
+            - entry_list: qual
+          verify_quality_2:
+            disable: builtins
+            entry_list: qual
+    """
+
+    def test_quality_in_entry_list(self, execute_task):
+        execute_task('verify_quality_1')
+        task = execute_task('verify_quality_2')
+        entry = task.find_entry(title='foo.bar.720p.hdtv-Flexget')
+        assert entry['quality'] == '720p hdtv'
+
+

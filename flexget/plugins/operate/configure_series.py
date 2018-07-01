@@ -3,15 +3,11 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
-from sqlalchemy import Column, Integer, Unicode
-
-from flexget import db_schema, plugin
+from flexget import plugin
 from flexget.config_schema import process_config
 from flexget.event import event
-from flexget.manager import Session
 from flexget.plugin import PluginError
 from flexget.plugins.filter.series import FilterSeriesBase
-from flexget.utils.tools import get_config_hash
 
 log = logging.getLogger('configure_series')
 

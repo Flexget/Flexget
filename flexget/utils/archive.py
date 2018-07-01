@@ -50,6 +50,11 @@ class FSError(ArchiveError):
     pass
 
 
+class FileAlreadyExists(ArchiveError):
+    """Exception to be raised when destination file already exists"""
+    pass
+
+
 def rarfile_set_tool_path(config):
     """
     Manually set the path of unrar executable if it can't be resolved from the
@@ -72,6 +77,12 @@ def rarfile_set_path_sep(separator):
     if rarfile:
         rarfile.PATH_SEP = separator
 
+
+def makepath(path):
+    """Make directories as needed"""
+    if not os.path.exists(path):
+        log.debug('Creating path: %s', path)
+        os.makedirs(path)
 
 class Archive(object):
     """
@@ -106,7 +117,16 @@ class Archive(object):
 
     def infolist(self):
         """Returns a list of info objects describing the contents of this archive"""
-        return self.archive.infolist()
+        infolist = []
+
+        for info in self.archive.infolist():
+            try:
+                archive_info =  ArchiveInfo(info)
+                infolist.append(archive_info)
+            except ValueError as e:
+                log.debug(e)
+
+        return infolist
 
     def open(self, member):
         """Returns file-like object from where the data of a member file can be read."""
@@ -171,6 +191,44 @@ class ZipArchive(Archive):
             return super(ZipArchive, self).open(member)
         except zipfile.BadZipfile as error:
             raise ArchiveError(error)
+
+class ArchiveInfo(object):
+    """Wrapper class for  archive info objects"""
+
+    def __init__(self, info):
+        self.info = info
+        self.path = info.filename
+        self.filename = os.path.basename(self.path)
+
+        if self._is_dir():
+            raise ValueError('Appears to be a directory: %s' % self.path)
+
+    def _is_dir(self):
+        """Indicates if info object looks to be a directory"""
+
+        if hasattr(self.info, 'isdir'):
+            return self.info.isdir()
+        else:
+            return not self.filename
+
+    def extract(self, archive, destination):
+        """Extract ArchiveInfo object to the specified destination"""
+        dest_dir = os.path.dirname(destination)
+
+        if os.path.exists(destination):
+            raise FileAlreadyExists('File already exists: %s' % destination)
+
+        log.debug('Creating path: %s', dest_dir)
+        makepath(dest_dir)
+
+        try:
+            archive.extract_file(self.info, destination)
+        except Exception as error:
+            if os.path.exists(destination):
+                log.debug('Cleaning up partially extracted file: %s', destination)
+                os.remove(destination)
+
+            raise error
 
 
 def open_archive(archive_path):

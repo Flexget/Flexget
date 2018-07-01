@@ -12,21 +12,20 @@ from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, colorize, console
 
 try:
-    from flexget.plugins.filter.series import (Series, remove_series, remove_series_entity, set_series_begin,
-                                               normalize_series_name, new_entities_after, get_latest_release,
-                                               get_series_summary, shows_by_name, show_episodes, shows_by_exact_name,
-                                               get_all_entities, add_series_entity)
+    from flexget.plugins.filter.series import (
+        Series, remove_series, remove_series_entity, set_series_begin, normalize_series_name, new_entities_after,
+        get_latest_release, get_series_summary, shows_by_name, show_episodes, shows_by_exact_name, get_all_entities,
+        add_series_entity
+    )
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
 
-# Enviroment variables to set defaults for `series list` and `series show`
+# Environment variables to set defaults for `series list` and `series show`
 ENV_SHOW_SORTBY_FIELD = 'FLEXGET_SERIES_SHOW_SORTBY_FIELD'
 ENV_SHOW_SORTBY_ORDER = 'FLEXGET_SERIES_SHOW_SORTBY_ORDER'
 ENV_LIST_CONFIGURED = 'FLEXGET_SERIES_LIST_CONFIGURED'
 ENV_LIST_PREMIERES = 'FLEXGET_SERIES_LIST_PREMIERES'
-ENV_LIST_STATUS = 'FLEXGET_SERIES_LIST_STATUS'
-ENV_LIST_NUMDAYS = 'FLEXGET_SERIES_LIST_NUMDAYS'
 ENV_LIST_SORTBY_FIELD = 'FLEXGET_SERIES_LIST_SORTBY_FIELD'
 ENV_LIST_SORTBY_ORDER = 'FLEXGET_SERIES_LIST_SORTBY_ORDER'
 ENV_ADD_QUALITY = 'FLEXGET_SERIES_ADD_QUALITY'
@@ -78,19 +77,13 @@ def display_summary(options):
                   'session': session,
                   'sort_by': sort_by,
                   'descending': descending}
-        if options.new or os.environ.get(ENV_LIST_STATUS) == 'new':
-            kwargs['status'] = 'new'
-            kwargs['days'] = options.new or int(os.environ.get(ENV_LIST_NUMDAYS, 7))
-        elif options.stale or os.environ.get(ENV_LIST_STATUS) == 'stale':
-            kwargs['status'] = 'stale'
-            kwargs['days'] = options.stale or int(os.environ.get(ENV_LIST_NUMDAYS, 365))
         if sort_by == 'name':
             kwargs['sort_by'] = 'show_name'
         else:
             kwargs['sort_by'] = 'last_download_date'
 
         query = get_series_summary(**kwargs)
-        header = ['Name', 'Latest', 'Age', 'Downloaded', 'Identified By']
+        header = ['Name', 'Begin', 'Last Encountered', 'Age', 'Downloaded', 'Identified By']
         for index, value in enumerate(header):
             if value.lower() == options.sort_by:
                 header[index] = colorize(SORT_COLUMN_COLOR, value)
@@ -100,6 +93,7 @@ def display_summary(options):
             name_column = series.name
 
             behind = (0,)
+            begin = series.begin.identifier if series.begin else '-'
             latest_release = '-'
             age_col = '-'
             episode_id = '-'
@@ -124,7 +118,7 @@ def display_summary(options):
                 if behind[0] > 0:
                     name_column += colorize(BEHIND_EP_COLOR, ' {} {} behind'.format(behind[0], behind[1]))
 
-            table_data.append([name_column, episode_id, age_col, latest_release, identifier_type])
+            table_data.append([name_column, begin, episode_id, age_col, latest_release, identifier_type])
     try:
         table = TerminalTable(options.table_type, table_data, wrap_columns=[3], drop_columns=[4, 3, 2])
         console(table.output)
@@ -339,19 +333,14 @@ def register_parser_arguments():
                              help='Limit list to series that are currently in the config or not (default: %(default)s)')
     list_parser.add_argument('--premieres', action='store_true',
                              help='limit list to series which only have episode 1 (and maybe also 2) downloaded')
-    list_parser.add_argument('--new', nargs='?', type=int, metavar='DAYS', const=7,
-                             help='Limit list to series with a release seen in last %(const)s days. number of days can '
-                                  'be overridden with %(metavar)s')
-    list_parser.add_argument('--stale', nargs='?', type=int, metavar='DAYS', const=365,
-                             help='Limit list to series which have not seen a release in %(const)s days. number of '
-                                  'days can be overridden with %(metavar)s')
     list_parser.add_argument('--sort-by', choices=('name', 'age'), help='Choose list sort attribute')
     order = list_parser.add_mutually_exclusive_group(required=False)
-    order.add_argument('--descending', dest='order', action='store_const', const='desc', help='Sort in descending order')
+    order.add_argument('--descending', dest='order', action='store_const', const='desc',
+                       help='Sort in descending order')
     order.add_argument('--ascending', dest='order', action='store_const', const='asc', help='Sort in ascending order')
 
     show_parser = subparsers.add_parser('show', parents=[series_parser, table_parser],
-                          help='Show the releases FlexGet has seen for a given series')
+                                        help='Show the releases FlexGet has seen for a given series')
     show_parser.add_argument('--sort-by', choices=('age', 'identifier'),
                              help='Choose releases list sort: age (default) or identifier')
     show_order = show_parser.add_mutually_exclusive_group(required=False)
@@ -365,9 +354,9 @@ def register_parser_arguments():
     begin_opts = begin_parser.add_mutually_exclusive_group(required=True)
     begin_opts.add_argument('--forget', dest='forget', action='store_true', help='Forget begin episode', required=False)
     begin_opts.add_argument('episode_id', metavar='<episode ID>',
-                              help='Episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, '
-                                   'depending on how the series is numbered). You can also enter a season ID such as '
-                                   ' S02.', nargs='?', default='')
+                            help='Episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, '
+                                 'depending on how the series is numbered). You can also enter a season ID such as '
+                                 ' S02.', nargs='?', default='')
 
     addshow_parser = subparsers.add_parser('add', parents=[series_parser],
                                            help='Add episode(s) and season(s) to series history')

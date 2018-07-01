@@ -1,14 +1,17 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+from datetime import datetime, timedelta
 from io import StringIO
 
 import pytest
 from jinja2 import Template
+from sqlalchemy.sql import select
 
 from flexget.entry import Entry
 from flexget.logger import capture_output
-from flexget.manager import get_parser
+from flexget.manager import Session, get_parser
+from flexget.plugins.filter.series import Series, SeriesTask, Episode, EpisodeRelease, Season, SeasonRelease
 from flexget.task import TaskAbort
 
 
@@ -235,8 +238,10 @@ class TestFilterSeries(object):
             parsing:
               series: {{parser}}
         tasks:
+        
           test:
             mock:
+              - {title: 'Some.Series.S01E20.720p.XViD-FlexGet'}
               - {title: 'Another.Series.S01E20.720p.XViD-FlexGet'}
               - {title: 'Another.Series.S01E21.1080p.H264-FlexGet'}
               - {title: 'Date.Series.10-11-2008.XViD'}
@@ -257,6 +262,7 @@ class TestFilterSeries(object):
               - date series
               - filename series
               - empty description
+              - (some) series
 
           metainfo_series_override:
             metainfo_series: yes
@@ -292,6 +298,7 @@ class TestFilterSeries(object):
                 - name 2
             - paren title (US):
                 alternate_name: paren title 2013
+
     """
 
     def test_smoke(self, execute_task):
@@ -301,6 +308,10 @@ class TestFilterSeries(object):
         # normal passing
         assert task.find_entry(title='Another.Series.S01E20.720p.XViD-FlexGet'), \
             'Another.Series.S01E20.720p.XViD-FlexGet should have passed'
+
+        # series with brackets
+        assert task.find_entry('accepted', title='Some.Series.S01E20.720p.XViD-FlexGet'), \
+            'Some.Series.S01E20.720p.XViD-FlexGet should have been accepted'
 
         # date formats
         df = ['Date.Series.10-11-2008.XViD', 'Date.Series.10.12.2008.XViD', 'Date Series 2010 11 17 XViD',
@@ -1458,7 +1469,7 @@ class TestFromGroup(object):
               - test: {from_group: [Name, FlexGet]}
     """
 
-    def testFromGroup(self, execute_task):
+    def test_from_group(self, execute_task):
         """Series plugin: test from_group"""
         task = execute_task('test')
         assert task.find_entry('accepted', title='[FlexGet] Test 12')

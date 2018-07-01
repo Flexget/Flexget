@@ -6,15 +6,18 @@ import logging
 import re
 import time
 import sys
+from collections import defaultdict
 from copy import copy
 from datetime import datetime, timedelta
 from functools import total_ordering
 
-from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
-                        desc, select, update, delete, ForeignKey, Index, func, and_, not_)
+from sqlalchemy import (
+    Column, Integer, String, Unicode, DateTime, Boolean, desc, select, update, delete, ForeignKey, Index,
+    func, and_, not_
+)
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
-from sqlalchemy.orm import relation, backref, object_session
+from sqlalchemy.orm import relation, backref, object_session, joinedload
 
 from flexget import db_schema, options, plugin
 from flexget.config_schema import one_or_more
@@ -25,9 +28,12 @@ from flexget.plugins.parsers import SERIES_ID_TYPES
 from flexget.utils import qualities
 from flexget.utils.database import quality_property, with_session
 from flexget.utils.log import log_once
-from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
-                                            create_index)
-from flexget.utils.tools import merge_dict_from_to, parse_timedelta, parse_episode_identifier
+from flexget.utils.sqlalchemy_utils import (
+    table_columns, table_exists, drop_tables, table_schema, table_add_column, create_index
+)
+from flexget.utils.tools import (
+    merge_dict_from_to, parse_timedelta, parse_episode_identifier, get_config_as_array, chunked
+)
 
 SCHEMA_VER = 14
 
@@ -232,7 +238,12 @@ def normalize_series_name(name):
 
 class NormalizedComparator(Comparator):
     def operate(self, op, other):
-        return op(self.__clause_element__(), normalize_series_name(other))
+        if isinstance(other, list):
+            other = [normalize_series_name(o) for o in other]
+        else:
+            other = normalize_series_name(other)
+
+        return op(self.__clause_element__(), other)
 
 
 class AlternateNames(Base):
@@ -245,18 +256,22 @@ class AlternateNames(Base):
     _alt_name_normalized = Column('alt_name_normalized', Unicode, index=True, unique=True)
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
 
-    def name_setter(self, value):
+    @hybrid_property
+    def alt_name(self):
+        return self._alt_name
+
+    @alt_name.setter
+    def alt_name(self, value):
         self._alt_name = value
         self._alt_name_normalized = normalize_series_name(value)
 
-    def name_getter(self):
-        return self._alt_name
-
-    def name_comparator(self):
+    @alt_name.comparator
+    def alt_name(self):
         return NormalizedComparator(self._alt_name_normalized)
 
-    alt_name = hybrid_property(name_getter, name_setter)
-    alt_name.comparator(name_comparator)
+    @property
+    def name_normalized(self):
+        return self._alt_name_normalized
 
     def __init__(self, name):
         self.alt_name = name
@@ -289,18 +304,22 @@ class Series(Base):
     seasons = relation('Season', backref='series', cascade='all, delete, delete-orphan')
 
     # Make a special property that does indexed case insensitive lookups on name, but stores/returns specified case
-    def name_getter(self):
+    @hybrid_property
+    def name(self):
         return self._name
 
-    def name_setter(self, value):
+    @name.setter
+    def name(self, value):
         self._name = value
         self._name_normalized = normalize_series_name(value)
 
-    def name_comparator(self):
+    @name.comparator
+    def name(self):
         return NormalizedComparator(self._name_normalized)
 
-    name = hybrid_property(name_getter, name_setter)
-    name.comparator(name_comparator)
+    @property
+    def name_normalized(self):
+        return self._name_normalized
 
     def __str__(self):
         return '<Series(id=%s,name=%s)>' % (self.id, self.name)
@@ -406,6 +425,28 @@ class Season(Base):
 
     def __hash__(self):
         return self.id
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'identifier': self.identifier,
+            'season': self.season,
+            'identified_by': self.identified_by,
+            'series_id': self.series_id,
+            'first_seen': self.first_seen,
+            'number_of_releases': len(self.releases)
+        }
+
+    @property
+    def latest_release(self):
+        """
+        :return: Latest downloaded Release or None
+        """
+        if not self.releases:
+            return None
+        return sorted(self.downloaded_releases,
+                      key=lambda rel: rel.first_seen if rel.downloaded else None,
+                      reverse=True)[0]
 
 
 @total_ordering
@@ -656,14 +697,14 @@ class SeriesTask(Base):
 
 
 @with_session
-def get_series_summary(configured=None, premieres=None, status=None, days=None, start=None, stop=None, count=False,
-                       sort_by='show_name', descending=None, session=None):
+def get_series_summary(configured=None, premieres=None, start=None, stop=None, count=False, sort_by='show_name',
+                       descending=None, session=None, name=None):
     """
     Return a query with results for all series.
+
     :param configured: 'configured' for shows in config, 'unconfigured' for shows not in config, 'all' for both.
     Default is 'all'
     :param premieres: Return only shows with 1 season and less than 3 episodes
-    :param status: Stale or not
     :param days: Value to determine stale
     :param page_size: Number of result per page
     :param page: Page number to return
@@ -681,17 +722,11 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
         query = query.having(func.count(SeriesTask.id) >= 1)
     elif configured == 'unconfigured':
         query = query.having(func.count(SeriesTask.id) < 1)
+    if name:
+        query = query.filter(Series._name_normalized.contains(name))
     if premieres:
         query = (query.having(func.max(Episode.season) <= 1).having(func.max(Episode.number) <= 2)).filter(
             EpisodeRelease.downloaded == True)
-    if status == 'new':
-        if not days:
-            days = 7
-        query = query.having(func.max(Episode.first_seen) > datetime.now() - timedelta(days=days))
-    if status == 'stale':
-        if not days:
-            days = 365
-        query = query.having(func.max(Episode.first_seen) < datetime.now() - timedelta(days=days))
     if count:
         return query.group_by(Series).count()
     if sort_by == 'show_name':
@@ -1103,9 +1138,20 @@ def remove_series_entity(name, identifier, forget=False):
             fire_event('forget', downloaded_release)
 
 
-def delete_release_by_id(release_id):
+def delete_episode_release_by_id(release_id):
     with Session() as session:
         release = session.query(EpisodeRelease).filter(EpisodeRelease.id == release_id).first()
+        if release:
+            session.delete(release)
+            session.commit()
+            log.debug('Deleted release ID `%s`', release_id)
+        else:
+            raise ValueError('Unknown identifier `%s` for release' % release_id)
+
+
+def delete_season_release_by_id(release_id):
+    with Session() as session:
+        release = session.query(SeasonRelease).filter(SeasonRelease.id == release_id).first()
         if release:
             session.delete(release)
             session.commit()
@@ -1131,14 +1177,24 @@ def show_by_id(show_id, session=None):
     return session.query(Series).filter(Series.id == show_id).one()
 
 
+def season_by_id(season_id, session=None):
+    """ Return an instance of an season by querying its ID """
+    return session.query(Season).filter(Season.id == season_id).one()
+
+
 def episode_by_id(episode_id, session=None):
     """ Return an instance of an episode by querying its ID """
     return session.query(Episode).filter(Episode.id == episode_id).one()
 
 
-def release_by_id(release_id, session=None):
-    """ Return an instance of a release by querying its ID """
+def episode_release_by_id(release_id, session=None):
+    """ Return an instance of an episode release by querying its ID """
     return session.query(EpisodeRelease).filter(EpisodeRelease.id == release_id).one()
+
+
+def season_release_by_id(release_id, session=None):
+    """ Return an instance of an episode release by querying its ID """
+    return session.query(SeasonRelease).filter(SeasonRelease.id == release_id).one()
 
 
 def show_episodes(series, start=None, stop=None, count=False, descending=False, session=None):
@@ -1176,8 +1232,8 @@ def get_all_entities(series, session, sort_by='age', reverse=False):
     return sorted(episodes + seasons, key=key, reverse=reverse)
 
 
-def get_releases(episode, downloaded=None, start=None, stop=None, count=False, descending=False, sort_by=None,
-                 session=None):
+def get_episode_releases(episode, downloaded=None, start=None, stop=None, count=False, descending=False, sort_by=None,
+                         session=None):
     """ Return all releases for a given episode """
     releases = session.query(EpisodeRelease).filter(EpisodeRelease.episode_id == episode.id)
     if downloaded is not None:
@@ -1192,6 +1248,22 @@ def get_releases(episode, downloaded=None, start=None, stop=None, count=False, d
     return releases.all()
 
 
+def get_season_releases(season, downloaded=None, start=None, stop=None, count=False, descending=False, sort_by=None,
+                        session=None):
+    """ Return all releases for a given season """
+    releases = session.query(SeasonRelease).filter(SeasonRelease.season_id == season.id)
+    if downloaded is not None:
+        releases = releases.filter(SeasonRelease.downloaded == downloaded)
+    if count:
+        return releases.count()
+    releases = releases.slice(start, stop).from_self()
+    if descending:
+        releases = releases.order_by(getattr(SeasonRelease, sort_by).desc())
+    else:
+        releases = releases.order_by(getattr(SeasonRelease, sort_by))
+    return releases.all()
+
+
 def episode_in_show(series_id, episode_id):
     """ Return True if `episode_id` is part of show with `series_id`, else return False """
     with Session() as session:
@@ -1199,11 +1271,25 @@ def episode_in_show(series_id, episode_id):
         return episode.series_id == series_id
 
 
+def season_in_show(series_id, season_id):
+    """ Return True if `episode_id` is part of show with `series_id`, else return False """
+    with Session() as session:
+        season = session.query(Season).filter(Season.id == season_id).one()
+        return season.series_id == series_id
+
+
 def release_in_episode(episode_id, release_id):
     """ Return True if `release_id` is part of episode with `episode_id`, else return False """
     with Session() as session:
         release = session.query(EpisodeRelease).filter(EpisodeRelease.id == release_id).one()
         return release.episode_id == episode_id
+
+
+def release_in_season(season_id, release_id):
+    """ Return True if `release_id` is part of episode with `episode_id`, else return False """
+    with Session() as session:
+        release = session.query(SeasonRelease).filter(SeasonRelease.id == release_id).one()
+        return release.season_id == season_id
 
 
 def populate_entry_fields(entry, parser, config):
@@ -1214,6 +1300,10 @@ def populate_entry_fields(entry, parser, config):
     :config dict: If supplied, will use 'path' and 'set' options to populate specified fields.
     """
     entry['series_parser'] = copy(parser)
+
+    if parser.identifier:
+        entry['id'] = ('%s %s' % (parser.name, parser.identifier)).lower().strip()
+
     # add series, season and episode to entry
     entry['series_name'] = parser.name
     if 'quality' in entry and entry['quality'] != parser.quality:
@@ -1509,13 +1599,52 @@ class FilterSeries(FilterSeriesBase):
     def on_task_metainfo(self, task, config):
         config = self.prepare_config(config)
         self.auto_exact(config)
-        for series_item in config:
-            series_name, series_config = list(series_item.items())[0]
-            log.trace('series_name: `%s`, series_config: `%s`', series_name, series_config)
-            start_time = time.clock()
-            self.parse_series(task.entries, series_name, series_config)
-            took = time.clock() - start_time
-            log.trace('parsing `%s` took %s', series_name, took)
+
+        parser = get_plugin_by_name('parsing').instance
+
+        start_time = time.clock()
+
+        # Sort Entries into data model similar to https://en.wikipedia.org/wiki/Trie
+        # Only process series if both the entry title and series title first letter match
+        entries_map = defaultdict(list)
+        for entry in task.entries:
+            parsed = parser.parse_series(entry['title'])
+            if parsed.name:
+                entries_map[parsed.name[:1].lower()].append(entry)
+            else:
+                # If parsing failed, use first char of each word in the entry title
+                for word in entry['title'].replace(' ', '.').split('.'):
+                    entries_map[word[:1].lower()].append(entry)
+
+        with Session() as session:
+            # Preload series
+            # str() added to make sure number shows (e.g. 24) are turned into strings
+
+            # First add all series config names (normalized)
+            series_names = [str(normalize_series_name(list(s.keys())[0])) for s in config]
+            # Add series names from the config without normalization to capture configs
+            #  that use slightly different series names. See https://github.com/Flexget/Flexget/issues/2057
+            series_names.extend(str(list(s.keys())[0]) for s in config if str(list(s.keys())[0]) not in series_names)
+
+            existing_db_series = []
+
+            for chunk in chunked(series_names):
+                existing_db_series.extend(session.query(Series).filter(Series.name.in_(chunk)))
+
+            existing_db_series = {s.name_normalized: s for s in existing_db_series}
+
+            for series_item in config:
+                series_name, series_config = list(series_item.items())[0]
+                alt_names = get_config_as_array(series_config, 'alternate_name')
+                db_series = existing_db_series.get(normalize_series_name(series_name))
+                db_identified_by = db_series.identified_by if db_series else None
+                letters = set([series_name[:1].lower()] + [normalize_series_name(series_name)[:1].lower()] +
+                              [alt[:1].lower() for alt in alt_names])
+                entries = set([entry for letter in letters for entry in entries_map.get(letter, [])])
+                if entries:
+                    self.parse_series(entries, series_name, series_config, db_identified_by)
+
+        log.debug('series on_task_metainfo took %s to parse', time.clock() - start_time)
 
     def on_task_filter(self, task, config):
         """Filter series"""
@@ -1529,15 +1658,29 @@ class FilterSeries(FilterSeriesBase):
             if entry.get('series_name') and entry.get('series_id') is not None and entry.get('series_parser'):
                 found_series.setdefault(entry['series_name'], []).append(entry)
 
+        # Prefetch series
+        with Session() as session:
+            # str() added to make sure number shows (e.g. 24) are turned into strings
+            series_names = [str(list(s.keys())[0]) for s in config]
+            existing_series = session.query(Series) \
+                .filter(Series.name.in_(series_names)) \
+                .options(joinedload('alternate_names')).all()
+            existing_series_map = dict([(s.name_normalized, s) for s in existing_series])
+            # Expunge so we can work on de-attached while processing the series to minimize db locks
+            session.expunge_all()
+
+        start_time = time.clock()
         for series_item in config:
             with Session() as session:
                 series_name, series_config = list(series_item.items())[0]
+
                 if series_config.get('parse_only'):
                     log.debug('Skipping filtering of series `%s` because of parse_only', series_name)
                     continue
+
                 # Make sure number shows (e.g. 24) are turned into strings
                 series_name = str(series_name)
-                db_series = session.query(Series).filter(Series.name == series_name).first()
+                db_series = existing_series_map.get(normalize_series_name(series_name))
                 if not db_series:
                     log.debug('adding series `%s` into db', series_name)
                     db_series = Series()
@@ -1551,8 +1694,15 @@ class FilterSeries(FilterSeriesBase):
                         alts = [alts]
                     for alt in alts:
                         _add_alt_name(alt, db_series, series_name, session)
+                    existing_series_map[db_series.name_normalized] = db_series
+                else:
+                    # Add existing series back to session
+                    session.add(db_series)
+
+                # Skip if series not within entries
                 if series_name not in found_series:
                     continue
+
                 series_entries = {}
                 for entry in found_series[series_name]:
                     # store found episodes into database and save reference for later use
@@ -1578,16 +1728,11 @@ class FilterSeries(FilterSeriesBase):
                     db_series.identified_by = auto_identified_by(db_series)
                     log.debug('identified_by set to `%s` based on series history', db_series.identified_by)
 
-                log.trace('series_name: `%s`, series_config: `%s`', series_name, series_config)
-
-                start_time = time.clock()
-
                 self.process_series(task, series_entries, series_config)
 
-                took = time.clock() - start_time
-                log.trace('processing `%s` took %s', series_name, took)
+        log.debug('processing series took %s', time.clock() - start_time)
 
-    def parse_series(self, entries, series_name, config):
+    def parse_series(self, entries, series_name, config, db_identified_by=None):
         """
         Search for `series_name` and populate all `series_*` fields in entries when successfully parsed
 
@@ -1595,45 +1740,37 @@ class FilterSeries(FilterSeriesBase):
         :param entries: List of entries to process
         :param series_name: Series name which is being processed
         :param config: Series config being processed
+        :param identified_by_cache: Series config being processed
         """
-
-        def get_as_array(config, key):
-            """Return configuration key as array, even if given as a single string"""
-            v = config.get(key, [])
-            if isinstance(v, str):
-                return [v]
-            return v
 
         # set parser flags flags based on config / database
         identified_by = config.get('identified_by', 'auto')
         if identified_by == 'auto':
-            with Session() as session:
-                series = session.query(Series).filter(Series.name == series_name).first()
-                if series:
-                    # set flag from database
-                    identified_by = series.identified_by or 'auto'
+            # set flag from database
+            identified_by = db_identified_by or 'auto'
 
         params = dict(identified_by=identified_by,
-                      alternate_names=get_as_array(config, 'alternate_name'),
-                      name_regexps=get_as_array(config, 'name_regexp'),
+                      alternate_names=get_config_as_array(config, 'alternate_name'),
+                      name_regexps=get_config_as_array(config, 'name_regexp'),
                       strict_name=config.get('exact', False),
-                      allow_groups=get_as_array(config, 'from_group'),
+                      allow_groups=get_config_as_array(config, 'from_group'),
                       date_yearfirst=config.get('date_yearfirst'),
                       date_dayfirst=config.get('date_dayfirst'),
-                      special_ids=get_as_array(config, 'special_ids'),
+                      special_ids=get_config_as_array(config, 'special_ids'),
                       prefer_specials=config.get('prefer_specials'),
                       assume_special=config.get('assume_special'))
         for id_type in SERIES_ID_TYPES:
-            params[id_type + '_regexps'] = get_as_array(config, id_type + '_regexp')
+            params[id_type + '_regexps'] = get_config_as_array(config, id_type + '_regexp')
 
+        parser = get_plugin_by_name('parsing').instance
         for entry in entries:
             # skip processed entries
             if (entry.get('series_parser') and entry['series_parser'].valid and
-                        entry['series_parser'].name.lower() != series_name.lower()):
+                    entry['series_parser'].name.lower() != series_name.lower()):
                 continue
 
             # Quality field may have been manipulated by e.g. assume_quality. Use quality field from entry if available.
-            parsed = get_plugin_by_name('parsing').instance.parse_series(entry['title'], name=series_name, **params)
+            parsed = parser.parse_series(entry['title'], name=series_name, **params)
             if not parsed.valid:
                 continue
             parsed.field = 'title'
@@ -2069,15 +2206,25 @@ class SeriesDBManager(FilterSeriesBase):
 
         # Clear all series from this task
         with Session() as session:
+            add_series_tasks = {}
+
             session.query(SeriesTask).filter(SeriesTask.name == task.name).delete()
             if not task.config.get('series'):
                 return
             config = self.prepare_config(task.config['series'])
+
+            # Prefetch series
+            names = [str(list(series.keys())[0]) for series in config]
+            existing_series = session.query(Series) \
+                .filter(Series.name.in_(names)) \
+                .options(joinedload('alternate_names')).all()
+            existing_series_map = dict([(s.name_normalized, s) for s in existing_series])
+
             for series_item in config:
                 series_name, series_config = list(series_item.items())[0]
                 # Make sure number shows (e.g. 24) are turned into strings
                 series_name = str(series_name)
-                db_series = session.query(Series).filter(Series.name == series_name).first()
+                db_series = existing_series_map.get(normalize_series_name(series_name))
                 alts = series_config.get('alternate_name', [])
                 if not isinstance(alts, list):
                     alts = [alts]
@@ -2088,16 +2235,26 @@ class SeriesDBManager(FilterSeriesBase):
                     db_series.alternate_names = [alt for alt in db_series.alternate_names if alt.alt_name in alts]
                     # Add/update the possibly new alternate names
                 else:
+                    log.debug('adding series `%s` `%s` into db (on_task_start)', series_name,
+                             normalize_series_name(series_name))
                     log.debug('adding series `%s` into db (on_task_start)', series_name)
                     db_series = Series()
                     db_series.name = series_name
                     session.add(db_series)
                     session.flush()  # flush to get id on series before creating alternate names
+                    existing_series_map[db_series.name_normalized] = db_series
                     log.debug('-> added `%s`', db_series)
                 for alt in alts:
                     _add_alt_name(alt, db_series, series_name, session)
+
                 log.debug('connecting series `%s` to task `%s`', db_series.name, task.name)
-                db_series.in_tasks.append(SeriesTask(task.name))
+
+                # Add in bulk at the end
+                if db_series.id not in add_series_tasks:
+                    series_task = SeriesTask(task.name)
+                    series_task.series_id = db_series.id
+                    add_series_tasks[db_series.id] = series_task
+
                 if series_config.get('identified_by', 'auto') != 'auto':
                     db_series.identified_by = series_config['identified_by']
                 # Set the begin episode
@@ -2106,6 +2263,9 @@ class SeriesDBManager(FilterSeriesBase):
                         set_series_begin(db_series, series_config['begin'])
                     except ValueError as e:
                         raise plugin.PluginError(e)
+
+            if add_series_tasks:
+                session.bulk_save_objects(add_series_tasks.values())
 
 
 def _add_alt_name(alt, db_series, series_name, session):

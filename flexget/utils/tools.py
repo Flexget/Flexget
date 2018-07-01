@@ -13,14 +13,13 @@ import operator
 import os
 import re
 import sys
-from collections import MutableMapping
+from collections import MutableMapping, defaultdict
 from datetime import timedelta, datetime
 from pprint import pformat
 
 import flexget
 import queue
 import requests
-
 from html.entities import name2codepoint
 
 log = logging.getLogger('utils')
@@ -408,7 +407,8 @@ def split_title_year(title):
         return
     if not re.search(r'\d{4}', title):
         return title, None
-    match = re.search(r'(.*?)\(?(\d{4})?\)?$', title)
+    # We only recognize years from the 2nd and 3rd millennium, FlexGetters from the year 3000 be damned!
+    match = re.search(r'(.*?)\(?([12]\d{3})?\)?$', title)
 
     title = match.group(1).strip()
     year_match = match.group(2)
@@ -426,14 +426,13 @@ def split_title_year(title):
 
 def get_latest_flexget_version_number():
     """
-    Return latest Flexget version from http://download.flexget.com/latestversion
+    Return latest Flexget version from https://pypi.python.org/pypi/FlexGet/json
     """
     try:
-        page = requests.get('http://download.flexget.com/latestversion')
+        data = requests.get('https://pypi.python.org/pypi/FlexGet/json').json()
+        return data.get('info', {}).get('version')
     except requests.RequestException:
         return
-    ver = page.text.strip()
-    return ver
 
 
 def get_current_flexget_version():
@@ -483,6 +482,19 @@ def get_config_hash(config):
         return hashlib.md5(str(config).encode('utf-8')).hexdigest()
 
 
+def get_config_as_array(config, key):
+    """
+    Return configuration key as array, even if given as a single string
+    :param dict config: Configuration
+    :param string key: Configuration
+    :return: Array
+    """
+    v = config.get(key, [])
+    if isinstance(v, str):
+        return [v]
+    return v
+
+
 def parse_episode_identifier(ep_id, identify_season=False):
     """
     Parses series episode identifier, raises ValueError if it fails
@@ -517,3 +529,76 @@ def parse_episode_identifier(ep_id, identify_season=False):
     if error:
         raise ValueError(error)
     return (identified_by, entity_type)
+
+
+def group_entries(entries, identifier):
+    from flexget.utils.template import RenderError
+
+    grouped_entries = defaultdict(list)
+
+    # Group by Identifier
+    for entry in entries:
+        try:
+            rendered_id = entry.render(identifier)
+        except RenderError:
+            continue
+        if not rendered_id:
+            continue
+        grouped_entries[rendered_id.lower().strip()].append(entry)
+
+    return grouped_entries
+
+
+def aggregate_inputs(task, inputs):
+    from flexget import plugin
+
+    entries = []
+    entry_titles = set()
+    entry_urls = set()
+    entry_locations = set()
+    for item in inputs:
+        for input_name, input_config in item.items():
+            input = plugin.get_plugin_by_name(input_name)
+            if input.api_ver == 1:
+                raise plugin.PluginError('Plugin %s does not support API v2' % input_name)
+            method = input.phase_handlers['input']
+            try:
+                result = method(task, input_config)
+            except plugin.PluginError as e:
+                log.warning('Error during input plugin %s: %s', input_name, e)
+                continue
+
+            if not result:
+                log.warning('Input %s did not return anything', input_name)
+                continue
+
+            for entry in result:
+                urls = ([entry['url']] if entry.get('url') else []) + entry.get('urls', [])
+
+                if any(url in entry_urls for url in urls):
+                    log.debug('URL for `%s` already in entry list, skipping.', entry['title'])
+                    continue
+
+                if entry['title'] in entry_titles:
+                    log.debug('Ignored duplicate title `%s`', entry['title'])  # TODO: should combine?
+                    continue
+
+                if entry.get('location') and entry['location'] in entry_locations:
+                    log.debug('Ignored duplicate location `%s`', entry['location'])  # TODO: should combine?
+                    continue
+
+                entries.append(entry)
+                entry_titles.add(entry['title'])
+                entry_urls.update(urls)
+                if entry.get('location'):
+                    entry_locations.add(entry['location'])
+
+    return entries
+
+
+# Mainly used due to Too Many Variables error if we use too many variables at a time in the in_ clause.
+# SQLite supports up to 999 by default. Ubuntu, Arch and macOS set this limit to 250,000 though, so it's a rare issue.
+def chunked(seq, limit=900):
+    """Helper to divide our expired lists into sizes sqlite can handle in a query. (<1000)"""
+    for i in range(0, len(seq), limit):
+        yield seq[i:i + limit]

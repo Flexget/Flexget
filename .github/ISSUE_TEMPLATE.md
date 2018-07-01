@@ -22,13 +22,13 @@ Please don't just say "it doesn't crash" or "it works". Explain what the expecte
 #### Config:
 ```
 paste FULL config and remove any personal info
-use paste service like http://dpaste.de or http://pastebin.com if config is too long
+if config is too long, attach the file to the ticket
 ```
   
 #### Log:
 ```
 paste log output
-use paste service like http://dpaste.de or http://pastebin.com if log is too long
+if log output is too long, attach the file to the ticket
 ```
 
 ### Additional information:

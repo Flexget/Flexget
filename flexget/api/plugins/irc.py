@@ -71,10 +71,10 @@ class IRCEnums(APIResource):
     def get(self, session=None):
         """Get channel status enumeration meaning"""
         try:
-            from irc_bot import irc_bot
+            from irc_bot import simple_irc_bot
         except ImportError:
             raise BadRequest('irc_bot dep is not installed')
-        return jsonify(irc_bot.IRCChannelStatus().enum_dict)
+        return jsonify(simple_irc_bot.IRCChannelStatus().enum_dict)
 
 
 @irc_api.route('/restart/')

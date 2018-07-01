@@ -228,7 +228,7 @@ class Manager(object):
     def has_lock(self):
         return self._has_lock
 
-    def execute(self, options=None, output=None, loglevel=None, priority=1):
+    def execute(self, options=None, output=None, loglevel=None, priority=1, suppress_warnings=None):
         """
         Run all (can be limited with options) tasks from the config.
 
@@ -237,7 +237,8 @@ class Manager(object):
             written to it.
         :param priority: If there are other executions waiting to be run, they will be run in priority order,
             lowest first.
-         :returns: a list of :class:`threading.Event` instances which will be
+        :param suppress_warnings: Allows suppressing log warning about missing plugin in key phases
+        :returns: a list of :class:`threading.Event` instances which will be
             set when each respective task has finished running
         """
         if options is None:
@@ -280,7 +281,10 @@ class Manager(object):
 
         finished_events = []
         for task_name in task_names:
-            task = Task(self, task_name, options=options, output=output, loglevel=loglevel, priority=priority)
+            task = Task(
+                self, task_name, options=options, output=output,
+                loglevel=loglevel, priority=priority, suppress_warnings=suppress_warnings
+            )
             self.task_queue.put(task)
             finished_events.append((task.id, task.name, task.finished_event))
         return finished_events
@@ -894,6 +898,8 @@ class Manager(object):
             log.info('Running database cleanup.')
             with Session() as session:
                 fire_event('manager.db_cleanup', self, session)
+            # Try to VACUUM after cleanup
+            fire_event('manager.db_vacuum', self)
             # Just in case some plugin was overzealous in its cleaning, mark the config changed
             self.config_changed()
             self.persist['last_cleanup'] = datetime.now()

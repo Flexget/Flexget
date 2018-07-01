@@ -1,23 +1,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import
-
-import hashlib
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import quote_plus
 
-import re
 import logging
-
+import re
 from requests.exceptions import RequestException
-
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.utils.requests import Session as RequestSession
-from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('fuzer')
@@ -54,8 +50,8 @@ class UrlRewriteFuzer(object):
     schema = {
         'type': 'object',
         'properties': {
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
+            'cookie_password': {'type': 'string'},
+            'user_id': {'type': 'integer'},
             'rss_key': {'type': 'string'},
             'category': one_or_more(
                 {'oneOf': [
@@ -63,27 +59,39 @@ class UrlRewriteFuzer(object):
                     {'type': 'integer'}
                 ]}),
         },
-        'required': ['username', 'password', 'rss_key'],
+        'required': ['user_id', 'cookie_password', 'rss_key'],
         'additionalProperties': False
     }
 
-    @staticmethod
-    def get_fuzer_soup(search_term, categories_list):
-        params = {'matchquery': 'any'}
-        page = requests.get(
-            'https://www.fuzer.me/browse.php?ref_=advanced&query={}&{}'.format(search_term, '&'.join(categories_list)),
-            params=params)
-        log.debug('Using %s as fuzer search url' % page.url)
+    def get_fuzer_soup(self, search_term, categories_list):
+        params = {
+            'matchquery': 'any',
+            'ref_': 'advanced'
+        }
+        query = '{}&{}'.format(search_term, '&'.join(categories_list))
+        try:
+            page = requests.get('https://www.fuzer.me/browse.php?query={}'.format(query),
+                                params=params, cookies=self.cookies)
+        except RequestException as e:
+            raise PluginError('Could not connect to Fuzer: {}'.format(e))
+
+        if 'login' in page.url:
+            raise PluginError('Could not fetch results from Fuzer. Check config')
+
+        log.debug('Using %s as fuzer search url', page.url)
         return get_soup(page.content)
 
     def extract_entry_from_soup(self, soup):
         table = soup.find('div', {'id': 'main_table'})
         if table is None:
-            raise PluginError('Could fetch results table from Fuzer, aborting')
+            raise PluginError('Could not fetch results table from Fuzer, aborting')
+
+        log.trace('fuzer results table: %s', table)
         table = table.find('table', {'class': 'table_info'})
         if len(table.find_all('tr')) == 1:
-            log.debug('No search results were returned, continuing')
+            log.debug('No search results were returned from Fuzer, continuing')
             return []
+
         entries = []
         for tr in table.find_all("tr"):
             if not tr.get('class') or 'colhead_dark' in tr.get('class'):
@@ -102,7 +110,7 @@ class UrlRewriteFuzer(object):
             final_url = 'https://www.fuzer.me/rss/torrent.php/{}/{}/{}/{}'.format(attachment_id, self.user_id,
                                                                                   self.rss_key, torrent_name)
 
-            log.debug('RSS-ified download link: %s' % final_url)
+            log.debug('RSS-ified download link: %s', final_url)
             e['url'] = final_url
 
             e['torrent_seeds'] = seeders
@@ -121,30 +129,16 @@ class UrlRewriteFuzer(object):
         Search for name from fuzer.
         """
         self.rss_key = config['rss_key']
-        username = config['username']
-        password = hashlib.md5(config['password'].encode('utf-8')).hexdigest()
+        self.user_id = config['user_id']
 
-        # build the form request:
-        data = {'cookieuser': '1',
-                'do': 'login',
-                's': '',
-                'securitytoken': 'guest',
-                'vb_login_username': username,
-                'vb_login_password': '',
-                'vb_login_md5password': password,
-                'vb_login_md5password_utf': password
-                }
-        # POST the login form:
-        try:
-            login = requests.post('https://www.fuzer.me/login.php?do=login', data=data)
-        except RequestException as e:
-            raise PluginError('Could not connect to fuzer: %s' % str(e))
+        self.cookies = {
+            'fzr2lastactivity': '0',
+            'fzr2lastvisit': '',
+            'fzr2password': config['cookie_password'],
+            'fzr2sessionhash': '',
+            'fzr2userid': str(self.user_id)
+        }
 
-        login_check_phrases = ['ההתחברות נכשלה', 'banned']
-        if any(phrase in login.text for phrase in login_check_phrases):
-            raise PluginError('Login to Fuzer failed, check credentials')
-
-        self.user_id = requests.cookies.get('fzr2userid')
         category = config.get('category', [0])
         # Make sure categories is a list
         if not isinstance(category, list):
@@ -152,14 +146,11 @@ class UrlRewriteFuzer(object):
 
         # If there are any text categories, turn them into their id number
         categories = [c if isinstance(c, int) else CATEGORIES[c] for c in category]
-
-        c_list = []
-        for c in categories:
-            c_list.append('c{}={}'.format(quote_plus('[]'), c))
+        c_list = ['c{}={}'.format(quote_plus('[]'), c) for c in categories]
 
         entries = []
         if entry.get('imdb_id'):
-            log.debug('imdb_id {} detected, using in search.'.format(entry['imdb_id']))
+            log.debug("imdb_id '%s' detected, using in search.", entry['imdb_id'])
             soup = self.get_fuzer_soup(entry['imdb_id'], c_list)
             entries = self.extract_entry_from_soup(soup)
             if entries:

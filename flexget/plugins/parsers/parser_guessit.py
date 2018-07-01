@@ -2,9 +2,9 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.utils import native
 
-import datetime
 import logging
 import re
+import sys
 import time
 
 from guessit.rules import rebulk_builder
@@ -15,280 +15,13 @@ from rebulk.pattern import RePattern
 from flexget import plugin
 from flexget.event import event
 from flexget.utils import qualities
-from .parser_common import old_assume_quality
-from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie
+from flexget.utils.tools import ReList
+from .parser_common import MovieParseResult, SeriesParseResult, default_ignore_prefixes, name_to_re, ParseWarning
 
 log = logging.getLogger('parser_guessit')
 
 logging.getLogger('rebulk').setLevel(logging.WARNING)
 logging.getLogger('guessit').setLevel(logging.WARNING)
-
-
-class GuessitParsedEntry(ParsedEntry):
-    def __init__(self, data, name, guess_result, **kwargs):
-        ParsedEntry.__init__(self, data, name, **kwargs)
-        self._guess_result = guess_result
-
-    @property
-    def parsed_group(self):
-        return self._guess_result.get('release_group')
-
-    @property
-    def parsed_type(self):
-        parsed_type = self._guess_result.get('type', self.type)
-        if parsed_type == 'episode':
-            return 'series'
-        return parsed_type
-
-    @property
-    def proper_count(self):
-        # todo: deprecated. We should remove this field from the rest of code.
-        version = self._guess_result.get('version')
-        if version is None:
-            version = 0
-        elif version <= 0:
-            version = -1
-        else:
-            version = version - 1
-        proper_count = self._guess_result.get('proper_count', 0)
-        fastsub = 'Fastsub' in self._guess_result.get('other', [])
-        return version + proper_count - (5 if fastsub else 0)
-
-    @property
-    def properties(self):
-        return self._guess_result
-
-
-class GuessitParsedVideoQuality(ParsedVideoQuality):
-    def __init__(self, guess_result):
-        self._guess_result = guess_result
-
-    @property
-    def video_codec(self):
-        return self._guess_result.get('video_codec')
-
-    @property
-    def source(self):
-        return self._guess_result.get('source')
-
-    @property
-    def format(self):
-        return self._guess_result.get('format')
-
-    @property
-    def audio_codec(self):
-        return self._guess_result.get('audio_codec')
-
-    @property
-    def video_profile(self):
-        return self._guess_result.get('video_profile')
-
-    @property
-    def screen_size(self):
-        return self._guess_result.get('screen_size')
-
-    @property
-    def audio_channels(self):
-        return self._guess_result.get('audio_channels')
-
-    @property
-    def audio_profile(self):
-        return self._guess_result.get('audio_profile')
-
-    @property
-    def old_resolution(self):
-        return self.screen_size if self.screen_size else 'HR' if 'HR' in self._guess_result.get('other', []) else None
-
-    @property
-    def old_source(self):
-        """
-        Those properties should really be extracted to another category of quality ...
-        """
-        if 'Screener' in self._guess_result.get('other', {}):
-            if self.format == 'BluRay':
-                return 'bdscr'
-            return 'dvdscr'
-        if 'Preair' in self._guess_result.get('other', {}):
-            return 'preair'
-        if 'R5' in self._guess_result.get('other', {}):
-            return 'r5'
-        return self.format.replace('-', '') if self.format else None
-
-    @property
-    def old_codec(self):
-        if self.video_profile == '10bit':
-            return '10bit'
-        return self.video_codec
-
-    @property
-    def old_audio(self):
-        if self.audio_codec == 'DTS' and (self.audio_profile in ['HD', 'HDMA']):
-            return 'dtshd'
-        elif self.audio_channels == '5.1' and self.audio_codec is None or self.audio_codec == 'DolbyDigital':
-            return 'dd5.1'
-        return self.audio_codec
-
-    def to_old_quality(self, assumed_quality=None):
-        resolution = self.old_resolution
-        source = self.old_source
-        codec = self.old_codec
-        audio = self.old_audio
-
-        old_quality = qualities.Quality(' '.join([_f for _f in [resolution, source, codec, audio] if _f]))
-        old_quality = old_assume_quality(old_quality, assumed_quality)
-
-        return old_quality
-
-
-class GuessitParsedVideo(GuessitParsedEntry, ParsedVideo):
-    def __init__(self, data, name, guess_result, **kwargs):
-        GuessitParsedEntry.__init__(self, data, name, guess_result, **kwargs)
-        self._quality = None
-
-    @property
-    def is_3d(self):
-        return '3D' in self._guess_result.get('other', {})
-
-    @property
-    def quality2(self):
-        if self._quality is None:
-            self._quality = GuessitParsedVideoQuality(self._guess_result)
-        return self._quality
-
-    @property
-    def subtitle_languages(self):
-        return self._guess_result.get('subtitle_language')
-
-    @property
-    def languages(self):
-        return self._guess_result.get('language')
-
-    @property
-    def year(self):
-        return self._guess_result.get('year')
-
-
-class GuessitParsedMovie(GuessitParsedVideo, ParsedMovie):
-    def __init__(self, data, name, guess_result, **kwargs):
-        GuessitParsedVideo.__init__(self, data, name, guess_result, **kwargs)
-
-    @property
-    def title(self):
-        return self._guess_result.get('title')
-
-    @property
-    def fields(self):
-        """
-        Return a dict of all parser fields
-        """
-        return {
-            'movie_parser': self,
-            'movie_name': self.name,
-            'movie_year': self.year,
-            'proper': self.proper,
-            'proper_count': self.proper_count,
-            'release_group': self.parsed_group,
-            'is_3d': self.is_3d,
-            'subtitle_languages': self.subtitle_languages,
-            'languages': self.languages,
-            'video_codec': self.quality2.video_codec,
-            'format': self.quality2.format,
-            'audio_codec': self.quality2.audio_codec,
-            'video_profile': self.quality2.video_profile,
-            'screen_size': self.quality2.screen_size,
-            'audio_channels': self.quality2.audio_channels,
-            'audio_profile': self.quality2.audio_profile
-        }
-
-
-class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
-    part_re = re.compile('part\\s?(\\d+)', re.IGNORECASE)
-
-    def __init__(self, data, name, guess_result, **kwargs):
-        GuessitParsedVideo.__init__(self, data, name, guess_result, **kwargs)
-
-    @property
-    def series(self):
-        if self._guess_result.get('country') and hasattr(self._guess_result.get('country'), 'alpha2'):
-            return "%s (%s)" % (self._guess_result.get('title'), self._guess_result.get('country').alpha2)
-        return self._guess_result.get('title')
-
-    @property
-    def country(self):
-        return str(self._guess_result.get('country')) if 'country' in self._guess_result else None
-
-    @property
-    def complete(self):
-        return 'Complete' in self._guess_result.get('other', [])
-
-    @property
-    def regexp_id(self):
-        regexp_id = [match.value for match in self._guess_result.matches['regexpId']]
-        if isinstance(regexp_id, list):
-            return '-'.join(regexp_id)
-        else:
-            return regexp_id
-
-    @property
-    def title(self):
-        return self._guess_result.get('episode_title')
-
-    @property
-    def special(self):
-        return (self.episode_details and len(self.episode_details) > 0 or
-                (self.title and self.title.lower().strip() == 'special'))
-
-    @property
-    def episode_details(self):
-        return self._guess_result.get('episode_details')
-
-    @property
-    def episode(self):
-        episode = self._guess_result.get('episode')
-        if episode is None and 'part' in self._guess_result and not self.date:
-            return self._guess_result.get('part')
-        if episode is None and self.title:
-            matched = self.part_re.search(self.title)
-            if matched:
-                return int(matched.group(1))
-        return episode
-
-    @property
-    def episodes(self):
-        if 'episode' not in self._guess_result.values_list:
-            return len(self._guess_result.values_list.get('part', []))
-        return len(self._guess_result.values_list['episode'])
-
-    @property
-    def date(self):
-        d = self._guess_result.get('date')
-        if d:
-            if d > datetime.date.today() + datetime.timedelta(days=1):
-                return None
-            # Don't accept dates that are too old
-            if d < datetime.date(1970, 1, 1):
-                return None
-            return d
-
-    @property
-    def parsed_season(self):
-        season = self._guess_result.get('season')
-        if season is None and self.episode and not self.allow_seasonless:
-            if 'part' in self._guess_result:
-                return 1
-            episode_raw = self._guess_result.matches['episode'][0].initiator.raw
-            if episode_raw and any(c.isalpha() and c.lower() != 'v' for c in episode_raw):
-                return 1
-        return season
-
-    @property
-    def valid_strict(self):
-        return True
-
-    @property
-    def season_pack(self):
-        # Guessit does not support season pack
-        return False
 
 
 def _id_regexps_function(input_string, context):
@@ -305,8 +38,18 @@ _id_regexps = Rebulk().functional(_id_regexps_function, name='regexpId',
 guessit_api = GuessItApi(rebulk_builder().rebulk(_id_regexps))
 
 
+def normalize_component(data):
+    if data is None:
+        return []
+    if isinstance(data, list):
+        return [d.lower().replace('-', '') for d in data]
+
+    return [data.lower().replace('-', '')]
+
+
 class ParserGuessit(object):
-    def _guessit_options(self, options):
+    @staticmethod
+    def _guessit_options(options):
         settings = {'name_only': True, 'allowed_languages': ['en', 'fr'], 'allowed_countries': ['us', 'uk', 'gb']}
         # 'clean_function': clean_value
         options['episode_prefer_number'] = not options.get('identified_by') == 'ep'
@@ -316,8 +59,72 @@ class ParserGuessit(object):
             options['date_year_first'] = options['date_yearfirst']
         if 'date_dayfirst' in options:
             options['date_day_first'] = options['date_dayfirst']
+        else:
+            # See https://github.com/guessit-io/guessit/issues/329
+            # https://github.com/guessit-io/guessit/pull/333
+            # They made changes that break backward compatibility, so we have to make do this hackery
+            if options.get('date_year_first'):
+                options['date_day_first'] = True
         settings.update(options)
         return settings
+
+    @staticmethod
+    def _proper_count(guessit_result):
+        """Calculate a FlexGet style proper_count from a guessit result."""
+        version = guessit_result.get('version')
+        if version is None:
+            version = 0
+        elif version <= 0:
+            version = -1
+        else:
+            version -= 1
+        proper_count = guessit_result.get('proper_count', 0)
+        fastsub = 'fastsub' in normalize_component(guessit_result.get('other'))
+        return version + proper_count - (5 if fastsub else 0)
+
+    def _quality(self, guessit_result):
+        """Generate a FlexGet Quality from a guessit result."""
+        resolution = normalize_component(guessit_result.get('screen_size'))
+        other = normalize_component(guessit_result.get('other'))
+        if not resolution and 'hr' in other:
+            resolution.append('hr')
+
+        source = normalize_component(guessit_result.get('format'))
+        if 'preair' in other:
+            source.append('preair')
+        if 'screener' in other:
+            if 'bluray' in source:
+                source.append('bdscr')
+            else:
+                source.append('dvdscr')
+        if 'r5' in other:
+            source.append('r5')
+
+        codec = normalize_component(guessit_result.get('video_codec'))
+        if '10bit' in normalize_component(guessit_result.get('video_profile')):
+            codec.append('10bit')
+
+        audio = normalize_component(guessit_result.get('audio_codec'))
+        audio_profile = normalize_component(guessit_result.get('audio_profile'))
+        audio_channels = normalize_component(guessit_result.get('audio_channels'))
+        # unlike the other components, audio can be a bit iffy with multiple codecs, so we limit it to one
+        if 'dts' in audio and any(hd in audio_profile for hd in ['HD', 'HDMA']):
+            audio = ['dtshd']
+        elif '5.1' in audio_channels and any(dd in audio for dd in ['ac3', 'dolbydigital']):
+            audio = ['dd5.1']
+
+        # Make sure everything are strings (guessit will return lists when there are multiples)
+        flattened_qualities = []
+        for component in (resolution, source, codec, audio):
+            if isinstance(component, list):
+                flattened_qualities.append(' '.join(component))
+            elif isinstance(component, str):
+                flattened_qualities.append(component)
+            else:
+                raise ParseWarning(self, 'Guessit quality returned type {}: {}. Expected str or list.'.format(
+                    type(component), component))
+
+        return qualities.Quality(' '.join(flattened_qualities))
 
     # movie_parser API
     def parse_movie(self, data, **kwargs):
@@ -327,7 +134,14 @@ class ParserGuessit(object):
         guessit_options['type'] = 'movie'
         guess_result = guessit_api.guessit(data, options=guessit_options)
         # NOTE: Guessit expects str on PY3 and unicode on PY2 hence the use of future.utils.native
-        parsed = GuessitParsedMovie(native(data), kwargs.pop('name', None), guess_result, **kwargs)
+        parsed = MovieParseResult(
+            data=data,
+            name=guess_result.get('title'),
+            year=guess_result.get('year'),
+            proper_count=self._proper_count(guess_result),
+            quality=self._quality(guess_result),
+            release_group=guess_result.get('release_group')
+        )
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
         return parsed
@@ -336,10 +150,14 @@ class ParserGuessit(object):
     def parse_series(self, data, **kwargs):
         log.debug('Parsing series: `%s` [options: %s]', data, kwargs)
         guessit_options = self._guessit_options(kwargs)
-        if kwargs.get('name') and not guessit_options.get('strict_name'):
-            expected_title = kwargs['name']
-            expected_title = expected_title.replace('\'', '(?:\'|\\\'|\\\\\'|-|)?')  # apostrophe support
-            guessit_options['expected_title'] = ['re:' + expected_title]
+        valid = True
+        if kwargs.get('name'):
+            expected_titles = [kwargs['name']]
+            if kwargs.get('alternate_names'):
+                expected_titles.extend(kwargs['alternate_names'])
+            # apostrophe support
+            expected_titles = [title.replace('\'', '(?:\'|\\\'|\\\\\'|-|)?') for title in expected_titles]
+            guessit_options['expected_title'] = ['re:' + title for title in expected_titles]
         if kwargs.get('id_regexps'):
             guessit_options['id_regexps'] = kwargs.get('id_regexps')
         start = time.clock()
@@ -355,10 +173,177 @@ class ParserGuessit(object):
         except GuessitException:
             log.warning('Parsing %s with guessit failed. Most likely a unicode error.', data)
             guess_result = {}
-        parsed = GuessitParsedSerie(data, kwargs.pop('name', None), guess_result, **kwargs)
+
+        if guess_result.get('type') != 'episode':
+            valid = False
+
+        name = kwargs.get('name')
+        country = guess_result.get('country')
+        if not name:
+            name = guess_result.get('title')
+            if country and hasattr(country, 'alpha2'):
+                name += ' (%s)' % country.alpha2
+        else:
+            # Make sure the name match is up to FlexGet standards
+            # Check there is no unmatched cruft before the matched name
+            title_start = guess_result.matches['title'][0].start
+            title_end = guess_result.matches['title'][0].end
+            if title_start != 0:
+                try:
+                    pre_title = max((match[0].end for match in guess_result.matches.values() if
+                                     match[0].end <= title_start))
+                except ValueError:
+                    pre_title = 0
+                for char in reversed(data[pre_title:title_start]):
+                    if char.isalnum() or char.isdigit():
+                        return SeriesParseResult(data=data, valid=False)
+                    if char.isspace() or char in '._':
+                        continue
+                    else:
+                        break
+            # Check the name doesn't end mid-word (guessit might put the border before or after the space after title)
+            if data[title_end - 1].isalnum() and len(data) <= title_end or \
+                    not self._is_valid_name(data, guessit_options=guessit_options):
+                valid = False
+            # If we are in exact mode, make sure there is nothing after the title
+            if kwargs.get('strict_name'):
+                post_title = sys.maxsize
+                for match_type, matches in guess_result.matches.items():
+                    if match_type in ['season', 'episode', 'date', 'regexpId']:
+                        if matches[0].start < title_end:
+                            continue
+                        post_title = min(post_title, matches[0].start)
+                        if matches[0].parent:
+                            post_title = min(post_title, matches[0].parent.start)
+                for char in data[title_end:post_title]:
+                    if char.isalnum() or char.isdigit():
+                        valid = False
+        season = guess_result.get('season')
+        episode = guess_result.get('episode')
+        if episode is None and 'part' in guess_result:
+            episode = guess_result['part']
+        if isinstance(episode, list):
+            # guessit >=2.1.4 returns a list for multi-packs, but we just want the first one and the number of eps
+            episode = episode[0]
+        date = guess_result.get('date')
+        quality = self._quality(guess_result)
+        proper_count = self._proper_count(guess_result)
+        group = guess_result.get('release_group')
+        # Validate group with from_group
+        if not self._is_valid_groups(group, guessit_options.get('allow_groups', [])):
+            valid = False
+        # Validate country, TODO: LEGACY
+        if country and name.endswith(')'):
+            p_start = name.rfind('(')
+            if p_start != -1:
+                parenthetical = re.escape(name[p_start + 1:-1])
+                if parenthetical and parenthetical.lower() != str(country).lower():
+                    valid = False
+        special = guess_result.get('episode_details', '').lower() == 'special'
+        if 'episode' not in guess_result.values_list:
+            episodes = len(guess_result.values_list.get('part', []))
+        else:
+            episodes = len(guess_result.values_list['episode'])
+        if episodes > 3:
+            valid = False
+        identified_by = kwargs.get('identified_by', 'auto')
+        identifier_type, identifier = None, None
+        if identified_by in ['date', 'auto']:
+            if date:
+                identifier_type = 'date'
+                identifier = date
+        if not identifier_type and identified_by in ['ep', 'auto']:
+            if episode is not None:
+                if season is None and kwargs.get('allow_seasonless', True):
+                    if 'part' in guess_result:
+                        season = 1
+                    else:
+                        episode_raw = guess_result.matches['episode'][0].initiator.raw
+                        if episode_raw and any(c.isalpha() and c.lower() != 'v' for c in episode_raw):
+                            season = 1
+                if season is not None:
+                    identifier_type = 'ep'
+                    identifier = (season, episode)
+
+        if not identifier_type and identified_by in ['id', 'auto']:
+            if guess_result.matches['regexpId']:
+                identifier_type = 'id'
+                identifier = '-'.join(match.value for match in guess_result.matches['regexpId'])
+        if not identifier_type and identified_by in ['sequence', 'auto']:
+            if episode is not None:
+                identifier_type = 'sequence'
+                identifier = episode
+        if (not identifier_type or guessit_options.get('prefer_specials')) and (special or
+                                                                        guessit_options.get('assume_special')):
+            identifier_type = 'special'
+            identifier = guess_result.get('episode_title', 'special')
+        if not identifier_type:
+            valid = False
+        # TODO: Legacy - Complete == invalid
+        if 'complete' in normalize_component(guess_result.get('other')):
+            valid = False
+
+        parsed = SeriesParseResult(
+            data=data,
+            name=name,
+            episodes=episodes,
+            identified_by=identified_by,
+            id=identifier,
+            id_type=identifier_type,
+            quality=quality,
+            proper_count=proper_count,
+            special=special,
+            group=group,
+            valid=valid
+        )
+
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
         return parsed
+
+    # TODO: The following functions are sort of legacy. No idea if they should be changed.
+    def _is_valid_name(self, data, guessit_options):
+        if not guessit_options.get('name'):
+            return True
+        # name end position
+        name_end = 0
+
+        # regexp name matching
+        re_from_name = False
+        name_regexps = ReList(guessit_options.get('name_regexps', []))
+        if not name_regexps:
+            # if we don't have name_regexps, generate one from the name
+            name_regexps = ReList(name_to_re(name, default_ignore_prefixes, None)
+                                  for name in [guessit_options['name']] + guessit_options.get('alternate_names', []))
+            # With auto regex generation, the first regex group captures the name
+            re_from_name = True
+        # try all specified regexps on this data
+        for name_re in name_regexps:
+            match = re.search(name_re, data)
+            if match:
+                match_end = match.end(1 if re_from_name else 0)
+                # Always pick the longest matching regex
+                if match_end > name_end:
+                    name_end = match_end
+                log.debug('NAME SUCCESS: %s matched to %s', name_re.pattern, data)
+        if not name_end:
+            # leave this invalid
+            log.debug('FAIL: name regexps %s do not match %s',
+                      [regexp.pattern for regexp in name_regexps], data)
+            return False
+        return True
+
+    def _is_valid_groups(self, group, allow_groups):
+        if not allow_groups:
+            return True
+        if not group:
+            return False
+        normalized_allow_groups = [x.lower() for x in allow_groups]
+        # TODO: special case for guessit with expected_group parameter
+        if isinstance(group, list):
+            return any(g.lower() in normalized_allow_groups for g in group)
+
+        return group.lower() in normalized_allow_groups
 
 
 @event('plugin.register')

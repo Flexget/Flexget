@@ -183,7 +183,7 @@ class PluginSubliminal(object):
                         hash_scores = movie_scores['hash']
                     log.info('Name computed for %s was %s', entry['location'], title)
                     msc = hash_scores if config['exact_match'] else 0
-                    if entry_languages.issubset(video.subtitle_languages) or (single_mode and video.subtitle_languages):
+                    if entry_languages.issubset(video.subtitle_languages):
                         log.debug('All preferred languages already exist for "%s"', entry['title'])
                         entry['subtitles_missing'] = set()
                         continue  # subs for preferred lang(s) already exists
@@ -206,16 +206,16 @@ class PluginSubliminal(object):
 
                             if subtitles:
                                 downloaded_subtitles[video].extend(subtitles)
-                                entry.fail('subtitles found for a second-choice language.')
+                                entry.reject('subtitles found for a second-choice language.')
                             else:
-                                entry.fail('cannot find any subtitles for now.')
+                                entry.reject('cannot find any subtitles for now.')
 
                         downloaded_languages = set([Language.fromietf(str(l.language))
                                                     for l in subtitles])
                         if entry_languages:
                             entry['subtitles_missing'] = entry_languages - downloaded_languages
                             if len(entry['subtitles_missing']) > 0:
-                                entry.fail('Subtitles for all primary languages not found')
+                                entry.reject('Subtitles for all primary languages not found')
                 except ValueError as e:
                     log.error('subliminal error: %s', e)
                     entry.fail()

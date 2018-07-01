@@ -5,6 +5,7 @@ from future.utils import text_to_native_str
 import logging
 import smtplib
 import socket
+import getpass
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
@@ -133,6 +134,7 @@ class EmailNotifier(object):
         'properties': {
             'to': one_or_more({'type': 'string', 'format': 'email'}),
             'from': {'type': 'string', 'default': 'flexget_notifer@flexget.com', 'format': 'email'},
+            'autofrom': {'type': 'boolean', 'default': False},
             'smtp_host': {'type': 'string', 'default': 'localhost'},
             'smtp_port': {'type': 'integer', 'default': 25},
             'smtp_username': {'type': 'string'},
@@ -164,7 +166,7 @@ class EmailNotifier(object):
 
         email = MIMEMultipart('alternative')
         email['To'] = ','.join(config['to'])
-        email['From'] = config['from']
+        email['From'] = getpass.getuser() + '@' + socket.getfqdn() if config['autofrom'] else config['from']
         email['Subject'] = title
         email['Date'] = formatdate(localtime=True)
         content_type = 'html' if config['html'] else 'plain'

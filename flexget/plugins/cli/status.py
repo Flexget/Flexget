@@ -87,10 +87,12 @@ def do_cli_summary(manager, options):
                     last_success = colorize('red', last_success)
                 elif age < timedelta(minutes=10):
                     last_success = colorize('green', last_success)
+            # Fix weird issue that a task registers StatusTask but without an execution. GH #2022
+            last_exec = task.last_execution_time.strftime('%Y-%m-%d %H:%M') if  task.last_execution_time else '-'
 
             table_data.append([
                 task.name,
-                task.last_execution_time.strftime('%Y-%m-%d %H:%M'),
+                last_exec,
                 last_success,
                 ok.produced if ok is not None else '-',
                 ok.accepted if ok is not None else '-',

@@ -175,13 +175,14 @@ class TasksAPI(APIResource):
     def get(self, session=None):
         """ List all tasks """
 
+        active_tasks = {task: task_data for task, task_data in self.manager.user_config.get('tasks', {}).items()
+                        if not task.startswith('_')}
+
         args = tasks_parser.parse_args()
         if not args.get('include_config'):
-            return jsonify(list(self.manager.user_config.get('tasks', {})))
+            return jsonify(list(active_tasks))
 
-        tasks = []
-        for name, config in self.manager.user_config.get('tasks', {}).items():
-            tasks.append({'name': name, 'config': config})
+        tasks = [{'name': name, 'config': config} for name, config in active_tasks.items()]
         return jsonify(tasks)
 
     @api.validate(task_input_schema, description='New task object')
@@ -343,7 +344,7 @@ inject_api = api.namespace('inject', description='Entry injection API')
 @tasks_api.route('/execute/params/')
 @api.doc(description='Available payload parameters for task execute')
 class TaskExecutionParams(APIResource):
-    @etag
+    @etag(cache_age=3600)
     @api.response(200, model=task_execution_params)
     def get(self, session=None):
         """ Execute payload parameters """

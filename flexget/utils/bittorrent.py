@@ -188,7 +188,7 @@ def bencode(data):
     if isinstance(data, dict):
         return encode_dictionary(data)
 
-    raise TypeError
+    raise TypeError('Unknown type for bencode: ' + str(type(data)))
 
 
 class Torrent(object):
@@ -223,15 +223,23 @@ class Torrent(object):
         files = []
         if 'length' in self.content['info']:
             # single file torrent
-            t = {'name': self.content['info']['name'],
+            if 'name.utf-8' in self.content['info']:
+                name = self.content['info']['name.utf-8']
+            else:
+                name = self.content['info']['name']
+            t = {'name': name,
                  'size': self.content['info']['length'],
                  'path': ''}
             files.append(t)
         else:
             # multifile torrent
             for item in self.content['info']['files']:
-                t = {'path': '/'.join(item['path'][:-1]),
-                     'name': item['path'][-1],
+                if 'path.utf-8' in item:
+                    path = item['path.utf-8']
+                else:
+                    path = item['path']
+                t = {'path': '/'.join(path[:-1]),
+                     'name': path[-1],
                      'size': item['length']}
                 files.append(t)
 
@@ -250,6 +258,11 @@ class Torrent(object):
                         item[field] = fallback
 
         return files
+
+    @property
+    def is_multi_file(self):
+        """Return True if the torrent is a multi-file torrent"""
+        return 'files' in self.content['info']
 
     @property
     def name(self):
@@ -305,6 +318,20 @@ class Torrent(object):
     @comment.setter
     def comment(self, comment):
         self.content['comment'] = comment
+        self.modified = True
+
+    @property
+    def piece_size(self):
+        return int(self.content['info']['piece length'])
+
+    @property
+    def libtorrent_resume(self):
+        return self.content.get('libtorrent_resume', {})
+
+    def set_libtorrent_resume(self, chunks, files):
+        self.content['libtorrent_resume'] = {}
+        self.content['libtorrent_resume']['bitfield'] = chunks
+        self.content['libtorrent_resume']['files'] = files
         self.modified = True
 
     def remove_multitracker(self, tracker):

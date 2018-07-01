@@ -16,13 +16,36 @@ log = logging.getLogger('search_btn')
 
 
 class SearchBTN(object):
-    schema = {'type': 'string'}
+    schema = {
+        'oneOf': [
+            {'type': 'string'},
+            {
+                'type': 'object',
+                'properties': {
+                    'api_key': {'type': 'string'},
+                    'append_quality': {'type': 'boolean'}
+                },
+                'required': ['api_key'],
+                'additionalProperties': False
+            }
+        ]
+    }
     # Advertised limit is 150/hour (24s/request average). This may need some tweaking.
     request_limiter = TokenBucketLimiter('api.broadcasthe.net/', 100, '25 seconds')
 
+    def prepare_config(self, config):
+        if not isinstance(config, dict):
+            config = {
+                'api_key': config
+            }
+
+        config.setdefault('append_quality', True)
+        return config
+
     def search(self, task, entry, config):
         task.requests.add_domain_limiter(self.request_limiter)
-        api_key = config
+        config = self.prepare_config(config)
+        api_key = config['api_key']
 
         searches = entry.get('search_strings', [entry['title']])
 
@@ -78,7 +101,8 @@ class SearchBTN(object):
                 for item in content['result']['torrents'].values():
                     entry = Entry()
                     entry['title'] = item['ReleaseName']
-                    entry['title'] += ' '.join(['', item['Resolution'], item['Source'], item['Codec']])
+                    if config['append_quality']:
+                        entry['title'] += ' '.join(['', item['Resolution'], item['Source'], item['Codec']])
                     entry['url'] = item['DownloadURL']
                     entry['torrent_seeds'] = int(item['Seeders'])
                     entry['torrent_leeches'] = int(item['Leechers'])

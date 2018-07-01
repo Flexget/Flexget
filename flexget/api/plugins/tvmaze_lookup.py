@@ -94,7 +94,7 @@ tvmaze_episode_schema = api.schema_model('tvmaze_episode_schema', ObjectsContain
 @tvmaze_api.route('/series/<string:title>/')
 @api.doc(params={'title': 'TV Show name or TVMaze ID'})
 class TVDBSeriesSearchApi(APIResource):
-    @etag
+    @etag(cache_age=3600)
     @api.response(200, 'Successfully found show', model=tvmaze_series_schema)
     @api.response(NotFoundError)
     def get(self, title, session=None):
@@ -123,7 +123,7 @@ episode_parser.add_argument('air_date', type=inputs.date_from_iso8601, help="Air
 @api.doc(params={'tvmaze_id': 'TVMaze ID of show'})
 @api.doc(parser=episode_parser)
 class TVDBEpisodeSearchAPI(APIResource):
-    @etag
+    @etag(cache_age=3600)
     @api.response(200, 'Successfully found episode', tvmaze_episode_schema)
     @api.response(NotFoundError)
     @api.response(BadRequest)

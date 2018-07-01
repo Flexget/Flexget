@@ -27,20 +27,23 @@ class MetainfoSeries(object):
             return
         for entry in task.entries:
             # If series plugin already parsed this, don't touch it.
-            if entry.get('series_name'):
+            if entry.get('id'):
                 continue
             self.guess_entry(entry)
 
-    def guess_entry(self, entry, allow_seasonless=False, config=None, force=False):
+    def guess_entry(self, entry, allow_seasonless=False, config=None):
         """
         Populates series_* fields for entries that are successfully parsed.
 
         :param dict config: A series config to be used. This will also cause 'path' and 'set' fields to be populated.
         """
-        if not force and entry.get('series_parser') and entry['series_parser'].valid:
+        if entry.get('series_parser') and entry['series_parser'].valid:
             # Return true if we already parsed this, false if series plugin parsed it
-            return entry.get('series_guessed')
-        parsed = get_plugin_by_name('parsing').instance.parse_series(data=entry['title'], identified_by='auto',
+            return True
+        identified_by = 'auto'
+        if config and 'identified_by' in config:
+            identified_by = config['identified_by']
+        parsed = get_plugin_by_name('parsing').instance.parse_series(data=entry['title'], identified_by=identified_by,
                                                                      allow_seasonless=allow_seasonless)
         if parsed and parsed.valid:
             parsed.name = normalize_name(remove_dirt(parsed.name))

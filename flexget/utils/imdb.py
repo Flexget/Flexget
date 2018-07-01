@@ -94,7 +94,7 @@ class ImdbSearch(object):
         name = parser.name
         year = parser.year
         if name == '':
-            log.critical('Failed to parse name from %s' % raw_name)
+            log.critical('Failed to parse name from %s', raw_name)
             return None
         log.debug('smart_match name=%s year=%s' % (name, str(year)))
         return self.best_match(name, year, single_match)
@@ -144,12 +144,12 @@ class ImdbSearch(object):
 
     def search(self, name):
         """Return array of movie details (dict)"""
-        log.debug('Searching: %s' % name)
+        log.debug('Searching: %s', name)
         url = u'http://www.imdb.com/find'
         # This may include Shorts and TV series in the results
         params = {'q': name, 's': 'tt'}
 
-        log.debug('Search query: %s' % repr(url))
+        log.debug('Search query: %s', repr(url))
         page = requests.get(url, params=params)
         actual_url = page.url
 
@@ -164,7 +164,7 @@ class ImdbSearch(object):
             title = title.strip()
             year = div.find('a').text
             actual_url = re_m.group(0)
-            log.debug('Perfect hit. Search got redirected to %s' % actual_url)
+            log.debug('Perfect hit. Search got redirected to %s', actual_url)
             movie = {}
             movie['match'] = 1.0
             movie['name'] = title
@@ -251,6 +251,7 @@ class ImdbParser(object):
         self.writers = {}
         self.score = 0.0
         self.votes = 0
+        self.meta_score = 0
         self.year = 0
         self.plot_outline = None
         self.name = None
@@ -289,39 +290,45 @@ class ImdbParser(object):
                 self.year = int(m.group(1))
 
         if not self.year:
-            log.debug('No year found for %s' % self.imdb_id)
+            log.debug('No year found for %s', self.imdb_id)
 
         mpaa_rating_elem = title_overview.find(itemprop='contentRating')
         if mpaa_rating_elem:
             self.mpaa_rating = mpaa_rating_elem['content']
         else:
-            log.debug('No rating found for %s' % self.imdb_id)
+            log.debug('No rating found for %s', self.imdb_id)
 
         photo_elem = title_overview.find(itemprop='image')
         if photo_elem:
             self.photo = photo_elem['src']
         else:
-            log.debug('No photo found for %s' % self.imdb_id)
+            log.debug('No photo found for %s', self.imdb_id)
 
         original_name_elem = title_overview.find(attrs={'class': 'originalTitle'})
         if original_name_elem:
             self.original_name = original_name_elem.contents[0].strip().strip('"')
         else:
-            log.debug('No original title found for %s' % self.imdb_id)
+            log.debug('No original title found for %s', self.imdb_id)
 
         votes_elem = title_overview.find(itemprop='ratingCount')
         if votes_elem:
             self.votes = str_to_int(votes_elem.text)
         else:
-            log.debug('No votes found for %s' % self.imdb_id)
+            log.debug('No votes found for %s', self.imdb_id)
 
         score_elem = title_overview.find(itemprop='ratingValue')
         if score_elem:
             self.score = float(score_elem.text)
         else:
-            log.debug('No score found for %s' % self.imdb_id)
+            log.debug('No score found for %s', self.imdb_id)
 
-        # get director(s)
+        meta_score_elem = title_overview.find(attrs={'class': 'metacriticScore'})
+        if meta_score_elem:
+            self.meta_score = str_to_int(meta_score_elem.text)
+        else:
+            log.debug('No Metacritic score found for %s', self.imdb_id)
+
+            # get director(s)
         for director in title_overview.select('[itemprop="director"] > a'):
             director_id = extract_id(director['href'])
             director_name = director.text
@@ -359,7 +366,7 @@ class ImdbParser(object):
                     plot_elem.em.replace_with('')
                 self.plot_outline = plot_elem.text.strip()
             else:
-                log.debug('No storyline found for %s' % self.imdb_id)
+                log.debug('No storyline found for %s', self.imdb_id)
             self.genres = [i.text.strip().lower() for i in storyline.select('[itemprop="genre"] > a')]
 
         # Cast section

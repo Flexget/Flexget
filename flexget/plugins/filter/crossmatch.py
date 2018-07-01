@@ -5,6 +5,7 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
+from flexget.utils.tools import aggregate_inputs
 
 log = logging.getLogger('crossmatch')
 
@@ -44,28 +45,7 @@ class CrossMatch(object):
         action = config['action']
         all_fields = config['all_fields']
 
-        match_entries = []
-
-        # TODO: xxx
-        # we probably want to have common "run and combine inputs" function sometime soon .. this code is in
-        # few places already (discover, inputs, ...)
-        # code written so that this can be done easily ...
-        for item in config['from']:
-            for input_name, input_config in item.items():
-                input = plugin.get_plugin_by_name(input_name)
-                if input.api_ver == 1:
-                    raise plugin.PluginError('Plugin %s does not support API v2' % input_name)
-                method = input.phase_handlers['input']
-                try:
-                    result = method(task, input_config)
-                except plugin.PluginError as e:
-                    log.warning('Error during input plugin %s: %s', input_name, e)
-                    continue
-                if result:
-                    match_entries.extend(result)
-                else:
-                    log.warning('Input %s did not return anything', input_name)
-                    continue
+        match_entries = aggregate_inputs(task, config['from'])
 
         # perform action on intersecting entries
         for entry in task.entries:
@@ -104,10 +84,14 @@ class CrossMatch(object):
             v1 = e1[field]
             v2 = e2[field]
 
-            if (not exact and v2 in v1) or v1 == v2:
-                common_fields.append(field)
-            else:
-                log.trace('not matching')
+            try:
+                if v1 == v2 or not exact and (v2 in v1 or v1 in v2):
+                    common_fields.append(field)
+                else:
+                    log.trace('not matching')
+            except TypeError as e:
+                # argument of type <type> is not iterable
+                log.trace('error matching fields: %s', str(e))
 
         return common_fields
 

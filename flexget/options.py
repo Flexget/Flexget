@@ -14,6 +14,7 @@ import flexget
 from flexget.entry import Entry
 from flexget.event import fire_event
 from flexget.utils import requests
+from flexget.utils.tools import get_latest_flexget_version_number, get_current_flexget_version
 
 _UNSET = object()
 
@@ -71,19 +72,19 @@ class VersionAction(_VersionAction):
 
     def __call__(self, parser, namespace, values, option_string=None):
         from flexget.terminal import console
+        current = get_current_flexget_version()
+        latest = get_latest_flexget_version_number()
+
         # Print the version number
-        console('%s' % self.version)
+        console('%s' % get_current_flexget_version())
         # Check for latest version from server
-        try:
-            page = requests.get('http://download.flexget.com/latestversion')
-        except requests.RequestException:
-            console('Error getting latest version number from download.flexget.com')
-        else:
-            ver = page.text.strip()
-            if self.version == ver:
+        if latest:
+            if current == latest:
                 console('You are on the latest release.')
             else:
-                console('Latest release: %s' % ver)
+                console('Latest release: %s' % latest)
+        else:
+            console('Error getting latest version number from https://pypi.python.org/pypi/FlexGet')
         parser.exit()
 
 

@@ -65,6 +65,14 @@ class TestSeriesPremiere(object):
               - title: theshow s01e02
             series_premiere: yes
             rerun: 1
+          test_no_rerun_with_series:
+            mock:
+              - title: theshow s01e01
+              - title: theshow s01e02
+            series_premiere: yes
+            series:
+              - theshow
+            rerun: 0
           test_no_rerun:
             mock:
               - title: theshow s01e01
@@ -113,6 +121,10 @@ class TestSeriesPremiere(object):
     def test_rerun(self, execute_task):
         task = execute_task('test_rerun')
         assert not task.find_entry('accepted', title='theshow s01e02'), 'accepted non-premiere'
+
+    def test_no_rerun_with_series(self, execute_task):
+        task = execute_task('test_no_rerun_with_series')
+        assert task.find_entry('accepted', title='theshow s01e02'), 'should be accepted by series'
 
     def test_no_rerun(self, execute_task):
         task = execute_task('test_no_rerun')

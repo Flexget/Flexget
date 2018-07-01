@@ -11,7 +11,7 @@ from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
 from flexget.utils import requests
-from flexget.utils.tools import split_title_year
+from flexget.utils.tools import split_title_year, chunked
 from flexget.utils.database import with_session, text_date_synonym, json_synonym, Session
 from flexget.utils.simple_persistence import SimplePersistence
 
@@ -29,9 +29,10 @@ class TVDBRequest(object):
     BASE_URL = 'https://api.thetvdb.com/'
     BANNER_URL = 'http://thetvdb.com/banners/'
 
-    def __init__(self, username=None, account_id=None):
+    def __init__(self, username=None, account_id=None, api_key=None):
         self.username = username
         self.account_id = account_id
+        self.api_key = api_key
         self.auth_key = self.username.lower() if self.username else 'default'
 
     def get_auth_token(self, refresh=False):
@@ -47,6 +48,8 @@ class TVDBRequest(object):
                     data['username'] = self.username
                 if self.account_id:
                     data['userkey'] = self.account_id
+                if self.api_key:
+                    data['apikey'] = self.api_key
 
                 log.debug('Authenticating to TheTVDB with %s', self.username if self.username else 'api_key')
 
@@ -472,8 +475,9 @@ def find_series_id(name, language=None):
 
 def _update_search_strings(series, session, search=None):
     search_strings = series.search_strings
-    add = [series.name.lower()] + ([a.lower() for a in series.aliases] if series.aliases else []) + [
-        search.lower()] if search else []
+    aliases = [a.lower() for a in series.aliases] if series.aliases else []
+    searches = [search.lower()] if search else []
+    add = [series.name.lower()] + aliases + searches
     for name in set(add):
         if name not in search_strings:
             search_result = session.query(TVDBSearchResult).filter(TVDBSearchResult.search == name).first()
@@ -708,11 +712,6 @@ def mark_expired(session):
     except requests.RequestException as e:
         log.error('Could not get update information from tvdb: %s', e)
         return
-
-    def chunked(seq):
-        """Helper to divide our expired lists into sizes sqlite can handle in a query. (<1000)"""
-        for i in range(0, len(seq), 900):
-            yield seq[i:i + 900]
 
     expired_series = [series['id'] for series in updates] if updates else []
 

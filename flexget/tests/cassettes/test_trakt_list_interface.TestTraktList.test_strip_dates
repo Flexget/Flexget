@@ -2,7 +2,7 @@ interactions:
 - request:
     body: null
     headers:
-      Authorization: [Bearer 336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22]
+      Authorization: [Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a]
       Content-Type: [application/json]
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: ['2']
@@ -13,114 +13,28 @@ interactions:
         Walking Dead","year":2010,"ids":{"trakt":1393,"slug":"the-walking-dead","tvdb":153021,"imdb":"tt1520211","tmdb":1402,"tvrage":25056}}},{"rank":2,"listed_at":"2016-04-06T01:08:56.000Z","type":"movie","movie":{"title":"Deadpool","year":2016,"ids":{"trakt":190430,"slug":"deadpool-2016","imdb":"tt1431045","tmdb":293660}}},{"rank":3,"listed_at":"2016-04-06T01:09:11.000Z","type":"episode","episode":{"season":8,"number":15,"title":"Fidelis
         Ad Mortem","ids":{"trakt":2125119,"tvdb":5483434,"imdb":"tt5318930","tmdb":1165957,"tvrage":1065902569}},"show":{"title":"Castle","year":2009,"ids":{"trakt":1410,"slug":"castle","tvdb":83462,"imdb":"tt1219024","tmdb":1419,"tvrage":19267}}}]'}
     headers:
-      CF-RAY: [312a3bb4c98d3cd7-CPH]
+      CF-RAY: [41e72aee5da93d37-CPH]
       Cache-Control: ['max-age=0, private, must-revalidate']
-      Cf-Railgun: [a07f794581 2.64 0.084329 0030 e6be]
+      Cf-Railgun: [a37363ac48 2.91 0.028770 0030 57da]
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 12:03:41 GMT']
-      Etag: [W/"d7723e2119c665a0bcf95798ae399e20"]
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d632a099fb68d532d208202f56e222e031481976220; expires=Sun,
-          17-Dec-17 12:03:40 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Date: ['Mon, 21 May 2018 12:50:15 GMT']
+      Etag: [W/"7b6e0d2f1f65bce494c5691609a18856"]
+      Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+      Server: [cloudflare]
+      Set-Cookie: ['__cfduid=d9b14b10a1ade733435468acb72ecd61d1526907015; expires=Tue,
+          21-May-19 12:50:15 GMT; path=/; domain=.trakt.tv; HttpOnly']
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
       X-Frame-Options: [SAMEORIGIN]
+      X-Pagination-Item-Count: ['3']
+      X-Pagination-Page: ['1']
+      X-Pagination-Page-Count: ['1']
       X-Private-User: ['false']
-      X-Request-Id: [9bb71eac-79a9-4aac-96ad-b0e3d8aab97e]
-      X-Runtime: ['0.012037']
+      X-Request-Id: [b929fe39-c31a-4737-8e42-cdf5201f3141]
+      X-Runtime: ['0.024282']
       X-Sort-By: [rank]
       X-Sort-How: [asc]
       X-Xss-Protection: [1; mode=block]
     status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Authorization: [Bearer 336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22]
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
-    method: GET
-    uri: https://api.trakt.tv/users/me/lists/testlist/items
-  response:
-    body: {string: ''}
-    headers:
-      CF-RAY: [366b14927d163d0d-CPH]
-      Cache-Control: ['max-age=0, private, no-cache, no-store, must-revalidate']
-      Cf-Railgun: [940e69d55b 99.99 0.014256 0030 e6be]
-      Connection: [close]
-      Content-Type: [text/html]
-      Date: ['Mon, 29 May 2017 17:12:45 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=df0f304f791d64f631008f5587bbba2df1496077965; expires=Tue,
-          29-May-18 17:12:45 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      Www-Authenticate: ['Bearer realm="Doorkeeper", error="invalid_token", error_description="The
-          access token expired"']
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [6ebc699b-4749-4db8-ab32-9e501f911916]
-      X-Runtime: ['0.008317']
-      X-Xss-Protection: [1; mode=block]
-    status: {code: 401, message: Unauthorized}
-- request:
-    body: null
-    headers:
-      Authorization: [Bearer 336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22]
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
-    method: GET
-    uri: https://api.trakt.tv/users/me/lists/testlist/items
-  response:
-    body: {string: ''}
-    headers:
-      CF-RAY: [366b26c28b823d01-CPH]
-      Cache-Control: ['max-age=0, private, no-cache, no-store, must-revalidate']
-      Cf-Railgun: [5dc64461d2 99.99 0.033371 0030 e6be]
-      Connection: [close]
-      Content-Type: [text/html]
-      Date: ['Mon, 29 May 2017 17:25:10 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d738c4e610211a8bd7c6e8472d4d0f27d1496078710; expires=Tue,
-          29-May-18 17:25:10 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      Www-Authenticate: ['Bearer realm="Doorkeeper", error="invalid_token", error_description="The
-          access token expired"']
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [c34d9fee-95ab-40e9-83e0-02aeacb213f3]
-      X-Runtime: ['0.014866']
-      X-Xss-Protection: [1; mode=block]
-    status: {code: 401, message: Unauthorized}
-- request:
-    body: null
-    headers:
-      Authorization: [Bearer 336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22]
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
-    method: GET
-    uri: https://api.trakt.tv/users/me/lists/testlist/items
-  response:
-    body: {string: ''}
-    headers:
-      CF-RAY: [366b90f06a2d3d19-CPH]
-      Cache-Control: ['max-age=0, private, no-cache, no-store, must-revalidate']
-      Cf-Railgun: [37c41af44e 99.99 0.013456 0030 e6be]
-      Connection: [close]
-      Content-Type: [text/html]
-      Date: ['Mon, 29 May 2017 18:37:39 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d4c91301679a6b5ad7c717bebd70481631496083059; expires=Tue,
-          29-May-18 18:37:39 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      Www-Authenticate: ['Bearer realm="Doorkeeper", error="invalid_token", error_description="The
-          access token expired"']
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [2d767c28-3974-41f2-ad1e-52a5b23fd6a2]
-      X-Runtime: ['0.010163']
-      X-Xss-Protection: [1; mode=block]
-    status: {code: 401, message: Unauthorized}
 version: 1

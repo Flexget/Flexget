@@ -232,8 +232,13 @@ class PluginDownload(object):
             auth = entry['download_auth']
             log.debug('Custom auth enabled for %s download: %s', entry['title'], entry['download_auth'])
 
+        headers = task.requests.headers
+        if 'download_headers' in entry:
+            headers.update(entry['download_headers'])
+            log.debug('Custom headers enabled for %s download: %s', entry['title'], entry['download_headers'])
+
         try:
-            response = task.requests.get(url, auth=auth, raise_status=False)
+            response = task.requests.get(url, auth=auth, raise_status=False, headers=headers)
         except UnicodeError:
             log.error('Unicode error while encoding url %s', url)
             return

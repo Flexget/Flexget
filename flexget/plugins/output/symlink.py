@@ -6,6 +6,7 @@ import os
 
 from flexget import plugin
 from flexget.event import event
+from flexget.utils.template import render_from_entry, RenderError
 
 log = logging.getLogger('symlink')
 
@@ -51,6 +52,12 @@ class Symlink(object):
             lnkfrom = entry['location']
             name = os.path.basename(lnkfrom)
             lnkto = os.path.join(config['to'], name)
+            try:
+                lnkto = render_from_entry(lnkto, entry)
+            except RenderError as error:
+                log.error('Could not render path: %s', lnkto)
+                entry.fail(str(error))
+                return
             # Hardlinks for dirs will not be failed here
             if os.path.exists(lnkto) and (config['link_type'] == 'soft' or os.path.isfile(lnkfrom)):
                 msg = 'Symlink destination %s already exists' % lnkto
@@ -67,6 +74,9 @@ class Symlink(object):
                     if os.path.isdir(lnkfrom):
                         self.hard_link_dir(lnkfrom, lnkto, existing)
                     else:
+                        dirname = os.path.dirname(lnkto)
+                        if not os.path.exists(dirname):
+                            os.makedirs(dirname)
                         os.link(lnkfrom, lnkto)
             except OSError as e:
                 entry.fail('Failed to create %slink, %s' % (config['link_type'], e))
@@ -74,7 +84,7 @@ class Symlink(object):
     def hard_link_dir(self, path, destination, existing):
         if not os.path.exists(destination):
             try:
-                os.mkdir(destination)
+                os.makedirs(destination)
             except OSError as e:
                 # Raised when it already exists, but are there other cases?
                 log.debug('Failed to create destination dir %s: %s', destination, e)
