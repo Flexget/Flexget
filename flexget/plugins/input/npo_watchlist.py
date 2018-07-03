@@ -19,7 +19,7 @@ import re
 log = logging.getLogger('search_npo')
 
 requests = RequestSession(max_retries=3)
-requests.add_domain_limiter(TimedLimiter('npostart.nl', '5 seconds'))
+requests.add_domain_limiter(TimedLimiter('npostart.nl', '8 seconds'))
 
 
 class NPOWatchlist(object):
@@ -135,7 +135,7 @@ class NPOWatchlist(object):
                                     'tilemapping': 'dedicated',
                                     'tiletype': 'asset'}
 
-        if not series_info:
+        while not series_info:  # loop, so that if it fails it will retry
             series_info = self._get_series_info(task, config, mediaId)
 
         headers = {'Origin': 'https://www.npostart.nl',
@@ -158,7 +158,7 @@ class NPOWatchlist(object):
                 entries += self._get_series_episodes(task, config, mediaId, series_info,
                                                      page=int(episodes['nextLink'].rsplit('page=')[1]))
         except RequestException as e:
-            raise plugin.PluginError('Request error: %s' % str(e))
+            log.error('Request error: %s' % str(e))  # if it fails, just go to next favourite
 
         if not entries and page == 1:
             log.verbose('No new episodes found for %s (%s)', series_info['npo_name'], mediaId)
@@ -179,7 +179,7 @@ class NPOWatchlist(object):
                            'npo_language': 'nl'}  # hard-code the language as if in NL, for lookup plugins
             log.debug('Parsed series info for: %s (%s)', series_info['npo_name'], mediaId)
         except RequestException as e:
-            raise plugin.PluginError('Request error: %s' % str(e))
+            log.error('Request error: %s' % str(e))
         return series_info
 
     def _parse_tiles(self, task, config, tiles, series_info):
