@@ -139,7 +139,7 @@ class NPOWatchlist(object):
         if not series_info:
             series_info = self._get_series_info(task, config, mediaId)
             if not series_info:  # if fetching series_info failed, return empty entries
-                log.warning('Failed to fetch series information for %s, skipping series', mediaId)
+                log.error('Failed to fetch series information for %s, skipping series', mediaId)
                 return entries
 
         headers = {'Origin': 'https://www.npostart.nl',
@@ -161,7 +161,7 @@ class NPOWatchlist(object):
                 entries += self._get_series_episodes(task, config, mediaId, series_info,
                                                      page=int(episodes['nextLink'].rsplit('page=')[1]))
         except RequestException as e:
-            log.warning('Request error: %s' % str(e))  # if it fails, just go to next favourite
+            log.error('Request error: %s' % str(e))  # if it fails, just go to next favourite
 
         if not entries and page == 1:
             log.verbose('No new episodes found for %s (%s)', series_info['npo_name'], mediaId)
