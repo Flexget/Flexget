@@ -229,7 +229,10 @@ class TraktSet(MutableSet):
 
         if self.config['list'] in ['collection', 'watchlist', 'watched', 'ratings']:
             if self.config.get('account'):
-                endpoint = ('sync', 'history' if self.config['list'] == 'watched' else self.config['list'])
+                if self.config['list'] == 'watched':
+                    endpoint = ('sync', 'history')
+                else:
+                    endpoint = ('sync', self.config['list'], self.config['type'])
             else:
                 endpoint = ('users', self.config['username'], self.config['list'], self.config['type'])
         else:
