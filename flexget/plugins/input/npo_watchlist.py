@@ -19,7 +19,7 @@ import re
 log = logging.getLogger('search_npo')
 
 requests = RequestSession(max_retries=3)
-requests.add_domain_limiter(TimedLimiter('npostart.nl', '5 seconds'))
+requests.add_domain_limiter(TimedLimiter('npostart.nl', '8 seconds'))
 
 
 class NPOWatchlist(object):
@@ -134,9 +134,13 @@ class NPOWatchlist(object):
         episode_tiles_parameters = {'page': str(page),
                                     'tilemapping': 'dedicated',
                                     'tiletype': 'asset'}
+        entries = []
 
         if not series_info:
             series_info = self._get_series_info(task, config, mediaId)
+            if not series_info:  # if fetching series_info failed, return empty entries
+                log.error('Failed to fetch series information for %s, skipping series', mediaId)
+                return entries
 
         headers = {'Origin': 'https://www.npostart.nl',
                    'X-XSRF-TOKEN': requests.cookies['XSRF-TOKEN'],
@@ -145,7 +149,6 @@ class NPOWatchlist(object):
             headers['Referer'] = episode_tiles_url.format(mediaId) + '?page={0}'.format(page-1)  # referer from prev page
 
         log.debug('Retrieving episodes page %s for %s (%s)', page, series_info['npo_name'], mediaId)
-        entries = []
         try:
             episodes = requests.get(episode_tiles_url.format(mediaId),
                                     params=episode_tiles_parameters,
@@ -158,7 +161,7 @@ class NPOWatchlist(object):
                 entries += self._get_series_episodes(task, config, mediaId, series_info,
                                                      page=int(episodes['nextLink'].rsplit('page=')[1]))
         except RequestException as e:
-            raise plugin.PluginError('Request error: %s' % str(e))
+            log.error('Request error: %s' % str(e))  # if it fails, just go to next favourite
 
         if not entries and page == 1:
             log.verbose('No new episodes found for %s (%s)', series_info['npo_name'], mediaId)
@@ -179,7 +182,7 @@ class NPOWatchlist(object):
                            'npo_language': 'nl'}  # hard-code the language as if in NL, for lookup plugins
             log.debug('Parsed series info for: %s (%s)', series_info['npo_name'], mediaId)
         except RequestException as e:
-            raise plugin.PluginError('Request error: %s' % str(e))
+            log.error('Request error: %s' % str(e))
         return series_info
 
     def _parse_tiles(self, task, config, tiles, series_info):
