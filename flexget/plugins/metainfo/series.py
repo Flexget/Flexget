@@ -46,9 +46,9 @@ class MetainfoSeries(object):
         if entry.get('series_name'):
             title = entry['series_name']
             if entry.get('series_year'):
-                title += ' (%s)'.format(entry['series_year'])
+                title += ' ({})'.format(entry['series_year'])
             if entry.get('series_id'):
-                title += ' %s'.format(entry['series_id'])
+                title += ' {}'.format(entry['series_id'])
         else:
             title = entry['title']
         parsed = get_plugin_by_name('parsing').instance.parse_series(data=title, identified_by=identified_by,
