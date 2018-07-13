@@ -132,8 +132,8 @@ class NPOWatchlist(object):
     def _get_series_episodes(self, task, config, mediaId, series_info=None, page=1):
         episode_tiles_url = 'https://www.npostart.nl/media/series/{0}/episodes'
         episode_tiles_parameters = {'page': str(page),
-                                    'tilemapping': 'dedicated',
-                                    'tiletype': 'asset'}
+                                    'tileMapping': 'dedicated',
+                                    'tileType': 'asset'}
         entries = []
 
         if not series_info:
