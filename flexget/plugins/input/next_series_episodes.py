@@ -227,7 +227,7 @@ class NextSeriesEpisodes(object):
                 if latest.is_season:
                     # A season pack was picked up in the task, no need to look for more episodes
                     return
-                elif not self.config['only_same_season'] and identified_by == 'ep' and (
+                elif not self.config.get('only_same_season') and identified_by == 'ep' and (
                             entry['series_season'] == latest.season and entry['series_episode'] == latest.number + 1):
                     # We searched for next predicted episode of this season unsuccessfully, try the next season
                     self.rerun_entries.append(self.search_entry(series, latest.season + 1, 1, task))
