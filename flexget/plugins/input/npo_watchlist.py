@@ -169,6 +169,7 @@ class NPOWatchlist(object):
 
     def _get_series_info(self, task, config, mediaId):
         series_info_url = 'https://www.npostart.nl/{0}'
+        series_info = None
         log.verbose('Retrieving series info for %s', mediaId)
         try:
             response = requests.get(series_info_url.format(mediaId))
@@ -181,10 +182,9 @@ class NPOWatchlist(object):
                            'npo_description': series.find('div', id='metaContent').find('p').text,
                            'npo_language': 'nl'}  # hard-code the language as if in NL, for lookup plugins
             log.debug('Parsed series info for: %s (%s)', series_info['npo_name'], mediaId)
-            return series_info
         except RequestException as e:
             log.error('Request error: %s' % str(e))
-        return  # if it failed, return empty
+        return series_info
 
     def _parse_tiles(self, task, config, tiles, series_info):
         max_age = config.get('max_episode_age_days')
