@@ -43,7 +43,8 @@ class MetainfoSeries(object):
         identified_by = 'auto'
         if config and 'identified_by' in config:
             identified_by = config['identified_by']
-        parsed = get_plugin_by_name('parsing').instance.parse_series(data=entry['title'], identified_by=identified_by,
+        title = entry.get('series_name') or entry['title']
+        parsed = get_plugin_by_name('parsing').instance.parse_series(data=title, identified_by=identified_by,
                                                                      allow_seasonless=allow_seasonless)
         if parsed and parsed.valid:
             parsed.name = normalize_name(remove_dirt(parsed.name))
