@@ -181,9 +181,10 @@ class NPOWatchlist(object):
                            'npo_description': series.find('div', id='metaContent').find('p').text,
                            'npo_language': 'nl'}  # hard-code the language as if in NL, for lookup plugins
             log.debug('Parsed series info for: %s (%s)', series_info['npo_name'], mediaId)
+            return series_info
         except RequestException as e:
             log.error('Request error: %s' % str(e))
-        return series_info
+        return  # if it failed, return empty
 
     def _parse_tiles(self, task, config, tiles, series_info):
         max_age = config.get('max_episode_age_days')
