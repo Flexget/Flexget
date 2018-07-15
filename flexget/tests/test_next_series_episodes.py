@@ -117,6 +117,15 @@ class TestNextSeriesEpisodes(object):
                  - Testing SerieS 8
             max_reruns: 0
             mock_output: yes
+          test_next_series_episodes_only_same_season:
+            next_series_episodes:
+              only_same_season: yes
+            series:
+            - Test Series 8:
+                identified_by: ep
+            regexp:
+              reject:
+              - .
     """
 
     @pytest.fixture(scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'])
@@ -220,6 +229,14 @@ class TestNextSeriesEpisodes(object):
         task = execute_task('test_next_series_episodes_alternate_name')
         s2 = len(task.mock_output[0].get('search_strings'))
         assert s2 > s1, 'Alternate names did not create sufficient search strings.'
+
+    def test_next_series_episodes_only_same_season(self, execute_task):
+        self.inject_series(execute_task, 'Test Series 8 S01E01')
+        task = execute_task('test_next_series_episodes_only_same_season')
+        assert task._rerun_count == 0
+        assert len(task.all_entries) == 1
+        assert not task.find_entry(title='Test Series 8 S02E01')
+
 
 class TestNextSeriesEpisodesSeasonPack(object):
     _config = """
