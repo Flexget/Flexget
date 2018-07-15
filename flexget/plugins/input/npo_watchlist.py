@@ -180,7 +180,8 @@ class NPOWatchlist(object):
             series_info = {'npo_url': response.url,  # we were redirected to the true URL
                            'npo_name': series.find('h1').text,
                            'npo_description': series.find('div', id='metaContent').find('p').text,
-                           'npo_language': 'nl'}  # hard-code the language as if in NL, for lookup plugins
+                           'npo_language': 'nl',  # hard-code the language as if in NL, for lookup plugins
+                           'npo_version': page.find('meta', attrs={'name': 'generator'})['content']}  # include NPO website version
             log.debug('Parsed series info for: %s (%s)', series_info['npo_name'], mediaId)
         except RequestException as e:
             log.error('Request error: %s' % str(e))
