@@ -17,7 +17,7 @@ from flexget.utils.requests import Session as RequestSession, TimedLimiter, Requ
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('passthepopcorn')
-Base = db_schema.versioned_base('passthepopcorn', 0)
+Base = db_schema.versioned_base('passthepopcorn', 1)
 
 requests = RequestSession()
 requests.add_domain_limiter(TimedLimiter('passthepopcorn.me', '5 seconds'))
@@ -85,6 +85,15 @@ RELEASE_TYPES = {
     'scene': 1,
     'golden popcorn': 2
 }
+
+
+@db_schema.upgrade('passthepopcorn')
+def upgrade(ver, session):
+    if ver is None:
+        ver = 0
+    if ver == 0:
+        raise db_schema.UpgradeImpossible
+    return ver
 
 
 class PassThePopcornCookie(Base):
