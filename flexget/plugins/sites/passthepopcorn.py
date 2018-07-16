@@ -153,6 +153,15 @@ class SearchPassThePopcorn(object):
             # TODO Apparently it endlessly redirects if the cookie is invalid? I assume it's a gazelle bug.
             log.debug('PassThePopcorn request failed: Too many redirects. Invalid cookie?')
             invalid_cookie = True
+        except RequestException as e:
+            if e.response and e.response.status_code == 429:
+                log.error('Saved cookie is invalid and will be deleted. Error: %s', str(e))
+                # cookie is invalid and must be deleted
+                with Session() as session:
+                    session.query(PassThePopcornCookie).filter(PassThePopcornCookie.username == username).delete()
+                invalid_cookie = True
+            else:
+                log.error('PassThePopcorn request failed: %s', str(e))
 
         if invalid_cookie:
             if self.errors:
