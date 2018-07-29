@@ -97,10 +97,10 @@ class UrlRewriteFuzer(object):
             if not tr.get('class') or 'colhead_dark' in tr.get('class'):
                 continue
             name = tr.find('div', {'class': 'main_title'}).find('a').text
-            torrent_name = re.search('\\r\\n(.*)',
+            torrent_name = re.search('\\n(.*)',
                                      tr.find('div', {'style': 'float: right;'}).find('a')['title']).group(1)
             attachment_link = tr.find('div', {'style': 'float: right;'}).find('a')['href']
-            attachment_id = re.search('attachmentid\=(\d+)', attachment_link).group(1)
+            attachment_id = re.search('attachmentid=(\d+)', attachment_link).group(1)
             raw_size = tr.find_all('td', {'class': 'inline_info'})[0].text.strip()
             seeders = int(tr.find_all('td', {'class': 'inline_info'})[2].text)
             leechers = int(tr.find_all('td', {'class': 'inline_info'})[3].text)
