@@ -1125,8 +1125,12 @@ def remove_series_entity(name, identifier, forget=False):
                 removed = True
                 downloaded_releases = remove_entity(season)
         else:
-            episode = session.query(Episode).filter(Episode.season == parsed.season).filter(
-                Episode.number == parsed.episode).filter(Episode.series_id == series.id).first()
+            episode = session.query(Episode).filter(Episode.series_id == series.id)
+            if parsed.episode:
+                episode = episode.filter(Episode.number == parsed.episode).filter(Episode.season == parsed.season)
+            else:
+                episode = episode.filter(Episode.identifier == parsed.identifier)
+            episode = episode.first()
             if episode:
                 removed = True
                 downloaded_releases = remove_entity(episode)
