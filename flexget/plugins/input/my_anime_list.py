@@ -82,8 +82,11 @@ class MyAnimeList(object):
             raise plugin.PluginError('Error reading JSON')
 
         for anime in js:
-            if (anime["status"] in selected_status or config['status'] == 'all')
-                    and (anime["anime_media_type_string"].lower() in selected_types or config['type'] == 'all'):
+            if (anime["status"] in selected_status
+                    or config['status'] == 'all'
+                    ) and (
+                    anime["anime_media_type_string"].lower() in selected_types
+                    or config['type'] == 'all'):
                 entry = Entry(
                     title = anime["anime_title"],
                     url = "https://myanimelist.net" + anime["anime_url"],
