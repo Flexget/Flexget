@@ -2,7 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
-import json
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -69,26 +68,22 @@ class MyAnimeList(object):
         if not isinstance(selected_types, list):
             selected_types = [selected_types]
 
-        for i in range(len(selected_status)):
-            selected_status[i] = STATUS[selected_status[i]]
+        for i,j in enumerate(selected_status):
+            selected_status[i] = STATUS[j]
 
         try:
-            list.response = task.requests.get('https://myanimelist.net/animelist/' + config['username'] + '/load.json')
+            list_response = task.requests.get('https://myanimelist.net/animelist/' + config['username'] + '/load.json')
         except RequestException as e:
             raise plugin.PluginError('Error finding list on url: {url}'.format(url=e.request.url))
 
         try:
-            js = json.loads(list.response.text.encode('utf-8'))
+            js = (list_response.text.encode('utf-8')).json()
         except:
             raise plugin.PluginError('Error reading JSON')
 
         for anime in js:
-            if (anime["status"] in selected_status
-                or config['status'] == 'all'
-                ) and (
-                anime["anime_media_type_string"].lower() in selected_types
-                or config['type'] == 'all'
-            ):
+            if (anime["status"] in selected_status or config['status'] == 'all')
+                    and (anime["anime_media_type_string"].lower() in selected_types or config['type'] == 'all'):
                 entry = Entry(
                     title = anime["anime_title"],
                     url = "https://myanimelist.net" + anime["anime_url"],
