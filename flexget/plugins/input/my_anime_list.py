@@ -77,7 +77,7 @@ class MyAnimeList(object):
             raise plugin.PluginError('Error finding list on url: {url}'.format(url=e.request.url))
 
         try:
-            js = (list_response.text.encode('utf-8')).json()
+            js = list_response.json()
         except:
             raise plugin.PluginError('Error reading JSON')
 
