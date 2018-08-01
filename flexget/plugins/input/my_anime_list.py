@@ -68,8 +68,7 @@ class MyAnimeList(object):
         if not isinstance(selected_types, list):
             selected_types = [selected_types]
 
-        for index, value in enumerate(selected_status):
-            selected_status[index] = STATUS[value]
+        selected_status = [STATUS[s] for s in selected_status]
 
         try:
             list_response = task.requests.get('https://myanimelist.net/animelist/' + config['username'] + '/load.json')
