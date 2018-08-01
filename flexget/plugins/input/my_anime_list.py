@@ -13,12 +13,12 @@ from flexget.utils.requests import RequestException
 log = logging.getLogger('my_anime_list')
 
 STATUS = {
-    'watching' : 1,
-    'completed' : 2,
-    'on_hold' : 3,
-    'dropped' : 4,
-    'plan_to_watch' : 6,
-    'all' : 7
+    'watching': 1,
+    'completed': 2,
+    'on_hold': 3,
+    'dropped': 4,
+    'plan_to_watch': 6,
+    'all': 7
 }
 
 ANIME_TYPE = [
@@ -59,8 +59,8 @@ class MyAnimeList(object):
     @cached('my_anime_list', persist='2 hours')
     def on_task_input(self, task, config):
         entries = []
-        selected_status = config.get('status', list(STATUS.keys()))
-        selected_types = config.get('type', list(ANIME_TYPE))
+        selected_status = config['status']
+        selected_types = config['type']
 
         if not isinstance(selected_status, list):
             selected_status = [selected_status]
@@ -68,8 +68,8 @@ class MyAnimeList(object):
         if not isinstance(selected_types, list):
             selected_types = [selected_types]
 
-        for i,j in enumerate(selected_status):
-            selected_status[i] = STATUS[j]
+        for index, value in enumerate(selected_status):
+            selected_status[index] = STATUS[value]
 
         try:
             list_response = task.requests.get('https://myanimelist.net/animelist/' + config['username'] + '/load.json')
@@ -77,24 +77,23 @@ class MyAnimeList(object):
             raise plugin.PluginError('Error finding list on url: {url}'.format(url=e.request.url))
 
         try:
-            js = list_response.json()
-        except:
-            raise plugin.PluginError('Error reading JSON')
+            list_json = list_response.json()
+        except ValueError:
+            raise plugin.PluginError('Invalid JSON response')
 
-        for anime in js:
-            if (anime["status"] in selected_status
-                    or config['status'] == 'all'
-                    ) and (
-                    anime["anime_media_type_string"].lower() in selected_types
-                    or config['type'] == 'all'):
-                entry = Entry(
-                    title = anime["anime_title"],
-                    url = "https://myanimelist.net" + anime["anime_url"],
-                    mal_name = anime["anime_title"],
-                    mal_poster = anime["anime_image_path"],
-                    mal_type = anime["anime_media_type_string"]
+        for anime in list_json:
+            has_selected_status = anime["status"] in selected_status or config['status'] == 'all'
+            has_selected_type = anime["anime_media_type_string"].lower() in selected_types or config['type'] == 'all'
+            if has_selected_status and has_selected_type:
+                entries.append(
+                    Entry(
+                        title=anime["anime_title"],
+                        url="https://myanimelist.net" + anime["anime_url"],
+                        mal_name=anime["anime_title"],
+                        mal_poster=anime["anime_image_path"],
+                        mal_type=anime["anime_media_type_string"]
+                    )
                 )
-                entries.append(entry)
         return entries
 
 
