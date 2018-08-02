@@ -112,7 +112,7 @@ class OutputQBitTorrent(object):
         for entry in task.accepted:
             form_data = {}
             try:
-                save_path = entry.render(entry.get('path', config.get('path')))
+                save_path = entry.render(entry.get('path', config.get('path', '')))
                 if save_path:
                     form_data['savepath'] = save_path
             except RenderError as e:
