@@ -224,7 +224,7 @@ class TraktSet(MutableSet):
 
     def get_list_endpoint(self, remove=False, submit=False):
         # Api restriction, but we could easily extract season and episode info from the 'shows' type
-        if self.config['list'] in ['collection', 'watched'] and self.config['type'] == 'episodes':
+        if not submit and self.config['list'] in ['collection', 'watched'] and self.config['type'] == 'episodes':
             raise plugin.PluginError('`type` cannot be `%s` for %s list.' % (self.config['type'], self.config['list']))
 
         if self.config['list'] in ['collection', 'watchlist', 'watched', 'ratings']:
