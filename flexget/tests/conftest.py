@@ -67,7 +67,7 @@ def manager(request, config, caplog, monkeypatch, filecopy):  # enforce filecopy
         mockmanager = MockManager(config, request.cls.__name__)
     except Exception:
         # Since we haven't entered the test function yet, pytest won't print the logs on failure. Print them manually.
-        print(caplog.text())
+        print(caplog.text)
         raise
     yield mockmanager
     mockmanager.shutdown()
@@ -197,27 +197,27 @@ def pytest_runtest_setup(item):
         item.fixturenames.append('no_requests')
 
 
-@pytest.yield_fixture()
+@pytest.fixture
 def filecopy(request):
     out_files = []
-    marker = request.node.get_marker('filecopy')
-    if marker is not None:
+    marker = request.node.get_closest_marker('filecopy')
+    if marker:
         copy_list = marker.args[0] if len(marker.args) == 1 else [marker.args]
 
         for sources, dst in copy_list:
             if isinstance(sources, str):
                 sources = [sources]
             if 'tmpdir' in request.fixturenames:
-                dst = dst.replace('__tmp__', request.getfuncargvalue('tmpdir').strpath)
+                dst = dst.replace('__tmp__', request.getfixturevalue('tmpdir').strpath)
             dst = Path(dst)
-            for f in itertools.chain(*(Path().glob(src) for src in sources)):
+            sources = [Path(src) for src in sources]
+            for f in sources:
                 dest_path = dst
-                if dest_path.isdir():
+                if dest_path.is_dir():
                     dest_path = dest_path / f.basename()
                 log.debug('copying %s to %s', f, dest_path)
-                if not os.path.isdir(os.path.dirname(dest_path)):
-                    os.makedirs(os.path.dirname(dest_path))
-                if os.path.isdir(f):
+                dest_path.mkdir(parents=True, exist_ok=True)
+                if f.is_dir():
                     shutil.copytree(f, dest_path)
                 else:
                     shutil.copy(f, dest_path)
@@ -226,10 +226,10 @@ def filecopy(request):
     if out_files:
         for f in out_files:
             try:
-                if os.path.isdir(f):
+                if f.is_dir():
                     shutil.rmtree(f)
                 else:
-                    f.remove()
+                    f.unlink()
             except OSError as e:
                 print("couldn't remove %s: %s" % (f, e))
 
