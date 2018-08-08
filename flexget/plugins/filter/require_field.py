@@ -20,7 +20,7 @@ class FilterRequireField(object):
 
     @plugin.priority(32)
     def on_task_filter(self, task, config):
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = [config]
         for entry in task.entries:
             for field in config:

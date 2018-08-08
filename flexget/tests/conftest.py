@@ -1,10 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
+from pathlib import Path
 import jsonschema
-from future.utils import PY2
-from future.backports.http import client as backport_client
 
+from http import client
 import re
 import os
 import sys
@@ -19,7 +18,7 @@ from contextlib import contextmanager
 
 import mock
 import pytest
-from path import Path
+
 from vcr import VCR
 from vcr.stubs import VCRHTTPSConnection, VCRHTTPConnection
 
@@ -40,8 +39,8 @@ vcr = VCR(
     cassette_library_dir=VCR_CASSETTE_DIR,
     record_mode=VCR_RECORD_MODE,
     custom_patches=(
-        (backport_client, 'HTTPSConnection', VCRHTTPSConnection),
-        (backport_client, 'HTTPConnection', VCRHTTPConnection),
+        (client, 'HTTPSConnection', VCRHTTPSConnection),
+        (client, 'HTTPConnection', VCRHTTPConnection),
     )
 )
 
@@ -246,16 +245,12 @@ def no_requests(monkeypatch):
     try:
         import ssl  # noqa
         from ssl import SSLContext  # noqa
-        online_funcs.append('future.backports.http.client.HTTPSConnection.request')
+        online_funcs.append('http.client.HTTPSConnection.request')
     except ImportError:
         pass
 
-    if PY2:
-        online_funcs.extend(['httplib.HTTPConnection.request',
-                             'httplib.HTTPSConnection.request'])
-    else:
-        online_funcs.extend(['http.client.HTTPConnection.request',
-                             'http.client.HTTPSConnection.request'])
+    online_funcs.extend(['http.client.HTTPConnection.request',
+                         'http.client.HTTPSConnection.request'])
 
     for func in online_funcs:
         monkeypatch.setattr(func, mock.Mock(side_effect=Exception('Online tests should use @pytest.mark.online')))
@@ -288,8 +283,8 @@ def setup_loglevel(pytestconfig, caplog):
     level = logging.DEBUG
     if pytestconfig.getoption('verbose') == 1:
         level = flexget.logger.TRACE
-    elif pytestconfig.getoption('quiet') == 1:
-        level = logging.INFO
+    # elif pytestconfig.getoption('quiet') == 1:
+    #     level = logging.INFO
     logging.getLogger().setLevel(level)
     caplog.set_level(level)
 

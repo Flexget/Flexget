@@ -122,7 +122,7 @@ class Rejected(APIResource):
         if entries:
             session.commit()
             self.manager.config_changed()
-        return success_response(f'successfully deleted {len(entries)} rejected entries')
+        return success_response(f'successfully deleted {entries} rejected entries')
 
 
 @rejected_api.route('/<int:rejected_entry_id>/')

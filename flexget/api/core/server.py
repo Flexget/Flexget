@@ -7,16 +7,16 @@ import os
 import sys
 import threading
 import traceback
+from pathlib import Path
 from time import sleep
 
 import cherrypy
 import yaml
 from flask import Response, jsonify, request
-from path import Path
 from pyparsing import (
-    Word, Keyword, Group, Forward, Suppress, OneOrMore, oneOf, White, restOfLine, ParseException, Combine
+    Word, Keyword, Group, Forward, Suppress, OneOrMore, oneOf, White, restOfLine, ParseException, Combine, nums,
+    alphanums, printables
 )
-from pyparsing import nums, alphanums, printables
 from yaml.error import YAMLError
 
 from flexget._version import __version__

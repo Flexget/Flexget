@@ -1,11 +1,7 @@
 """Plugin for text file or URL feeds via regex."""
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import re
 import logging
-
-import path
+import re
+from pathlib import Path
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -78,7 +74,7 @@ class Text(object):
         if '://' in url:
             lines = task.requests.get(url).text.split('\n')
         else:
-            lines = path.Path(url).lines(encoding=config.get('encoding', 'utf-8'))
+            lines = Path(url).lines(encoding=config.get('encoding', 'utf-8'))
 
         entry_config = config.get('entry')
         format_config = config.get('format', {})

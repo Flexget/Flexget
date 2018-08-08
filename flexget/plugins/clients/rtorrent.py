@@ -307,7 +307,7 @@ class RTorrent(object):
         # Additional fields to set
         for key, val in fields.items():
             # Values must be escaped if within params
-            params.append('d.%s.set=%s' % (key, re.escape(val)))
+            params.append('d.%s.set=%s' % (key, re.escape(str(val))))
 
         if mkdir and 'directory' in fields:
             result = self._server.execute.throw('', 'mkdir', '-p', fields['directory'])

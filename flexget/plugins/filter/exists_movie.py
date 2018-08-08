@@ -1,7 +1,6 @@
 import logging
 import re
-
-from path import Path
+from pathlib import Path
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
