@@ -14,8 +14,6 @@ requests~=2.16.3
 #Guessit requires python-dateutil<=2.5.2
 python-dateutil>=2.5.3
 jsonschema>=2.0
-path.py>=8.1.1
-pathlib>=1.0; python_version<'3.4'
 guessit<=2.1.4
 # Rebulk changes how guessit works higher than 0.8.2
 rebulk==0.9.0
