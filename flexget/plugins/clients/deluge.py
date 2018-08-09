@@ -1,9 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from future.utils import native
 
 import base64
 import re
 import sys
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import os
@@ -217,7 +218,8 @@ class InputDeluge(DelugePlugin):
 
     def generate_entries(self, config):
         entries = []
-        torrents = self.get_torrents_status(list(self.settings_map.keys()) + config.get('keys', []))
+        # deluge client lib chokes on future's newlist, make sure we have a native python list here
+        torrents = self.get_torrents_status(native(list(self.settings_map.keys())) + config.get('keys', []))
         for hash, torrent_dict in torrents.items():
             # Make sure it has a url so no plugins crash
             entry = Entry(deluge_id=hash, url='')
