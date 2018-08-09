@@ -218,8 +218,9 @@ class InputDeluge(DelugePlugin):
 
     def generate_entries(self, config):
         entries = []
+        filter = config.get('filter', {})
         # deluge client lib chokes on future's newlist, make sure we have a native python list here
-        torrents = self.get_torrents_status(native(list(self.settings_map.keys())) + config.get('keys', []))
+        torrents = self.get_torrents_status(native(list(self.settings_map.keys())) + config.get('keys', []), filter)
         for hash, torrent_dict in torrents.items():
             # Make sure it has a url so no plugins crash
             entry = Entry(deluge_id=hash, url='')
