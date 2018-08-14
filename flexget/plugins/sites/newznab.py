@@ -62,11 +62,11 @@ class Newznab(object):
         try:
             response = task.requests.get(url)
         except RequestException as e:
-            log.error("Failed fetching '%s': %s" % (url, e))
+            log.error("Failed fetching '%s': %s", url, e)
             return entries
 
         rss = feedparser.parse(response.content)
-        log.debug("Raw RSS: %s" % rss)
+        log.debug("Raw RSS: %s", rss)
 
         if not len(rss.entries):
             log.info('No results returned')
@@ -83,7 +83,7 @@ class Newznab(object):
         return entries
 
     def search(self, task, entry, config=None):
-        log.info('Searching for %s' % entry['title'])
+        log.info('Searching for %s', entry['title'])
         config = self.build_config(config)
         category = config['category']
         url = ''
