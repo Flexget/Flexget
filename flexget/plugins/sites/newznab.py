@@ -30,13 +30,13 @@ class Newznab(object):
           apikey: xxxxxxxxxxxxxxxxxxxxxxxxxx
           category: movie
 
-    Category is any of: movie, tvsearch, music, book
+    Category is one of: movie, tv
     """
 
     schema = {
         'type': 'object',
         'properties': {
-            'category': {'type': 'string', 'enum': ['movie', 'tvsearch', 'tv', 'music', 'book']},
+            'category': {'type': 'string', 'enum': ['movie', 'tv']},
             'url': {'type': 'string', 'format': 'url'},
             'website': {'type': 'string', 'format': 'url'},
             'apikey': {'type': 'string'}
@@ -46,32 +46,27 @@ class Newznab(object):
     }
 
     def build_config(self, config):
-        log.debug(type(config))
-
-        if config['category'] == 'tv':
-            config['category'] = 'tvsearch'
-
         if 'url' not in config:
             if 'apikey' in config and 'website' in config:
+                category = config['category']
                 params = {
-                    't': config['category'],
+                    't': 'tvsearch' if category == 'tv' else category,
                     'apikey': config['apikey'],
                     'extended': 1
                 }
                 config['url'] = config['website'] + '/api?' + urlencode(params)
-
         return config
 
     def fill_entries_for_url(self, url, task):
         entries = []
-        log.verbose('Fetching %s' % url)
-
         try:
-            r = task.requests.get(url)
+            log.verbose('Fetching %s' % url)
+            response = task.requests.get(url)
         except RequestException as e:
             log.error("Failed fetching '%s': %s" % (url, e))
+            return entries
 
-        rss = feedparser.parse(r.content)
+        rss = feedparser.parse(response.content)
         log.debug("Raw RSS: %s" % rss)
 
         if not len(rss.entries):
@@ -79,8 +74,7 @@ class Newznab(object):
 
         for rss_entry in rss.entries:
             new_entry = Entry()
-
-            for key in list(rss_entry.keys()):
+            for key in rss_entry.keys():
                 new_entry[key] = rss_entry[key]
             new_entry['url'] = new_entry['link']
             if rss_entry.enclosures:
@@ -90,37 +84,33 @@ class Newznab(object):
         return entries
 
     def search(self, task, entry, config=None):
+        log.info('Searching for %s' % entry['title'])
         config = self.build_config(config)
-        if config['category'] == 'movie':
-            return self.do_search_movie(entry, task, config)
-        elif config['category'] == 'tvsearch':
-            return self.do_search_tvsearch(entry, task, config)
-        else:
-            entries = []
-            log.warning("Not done yet...")
-            return entries
+        category = config['category']
+        url = ''
 
-    def do_search_tvsearch(self, arg_entry, task, config=None):
-        log.info('Searching for %s' % (arg_entry['title']))
-        # normally this should be used with next_series_episodes who has provided season and episodenumber
-        if 'series_name' not in arg_entry or 'series_season' not in arg_entry or 'series_episode' not in arg_entry:
-            return []
-        if arg_entry.get('tvrage_id'):
-            lookup = '&rid=%s' % arg_entry.get('tvrage_id')
-        else:
-            lookup = '&q=%s' % quote(arg_entry['series_name'])
-        url = config['url'] + lookup + '&season=%s&ep=%s' % (arg_entry['series_season'], arg_entry['series_episode'])
-        return self.fill_entries_for_url(url, task)
+        if category == 'movie':
+            if 'imdb_id' not in entry:
+                log.error('Missing `imdb_id`')
+                return
+            url = config['url'] + '&imdbid=' + entry['imdb_id'].replace('tt', '')
 
-    def do_search_movie(self, arg_entry, task, config=None):
-        entries = []
-        log.info('Searching for %s (imdbid:%s)' % (arg_entry['title'], arg_entry['imdb_id']))
-        # normally this should be used with emit_movie_queue who has imdbid (i guess)
-        if 'imdb_id' not in arg_entry:
-            return entries
+        elif category == 'tv':
+            if 'series_name' not in entry:
+                log.error('Missing `series_name`')
+                return
 
-        imdb_id = arg_entry['imdb_id'].replace('tt', '')
-        url = config['url'] + '&imdbid=' + imdb_id
+            lookup = ''
+            if 'tvdb_id' in entry:
+                lookup += '&tvdbid=%s' % entry['tvdb_id']
+            else:
+                lookup += '&q=%s' % quote(entry['series_name'])
+                if 'series_season' in entry:
+                    lookup += '&season=%s' % entry['series_season']
+                if 'series_episode' in entry:
+                    lookup += '&ep=%s' % entry['series_episode']
+            url = config['url'] + lookup
+
         return self.fill_entries_for_url(url, task)
 
 
