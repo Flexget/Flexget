@@ -60,7 +60,6 @@ class Newznab(object):
     def fill_entries_for_url(self, url, task):
         entries = []
         try:
-            log.verbose('Fetching %s' % url)
             response = task.requests.get(url)
         except RequestException as e:
             log.error("Failed fetching '%s': %s" % (url, e))
