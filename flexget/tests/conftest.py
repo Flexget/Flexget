@@ -288,7 +288,7 @@ def setup_loglevel(pytestconfig, caplog):
     level = logging.DEBUG
     if pytestconfig.getoption('verbose') == 1:
         level = flexget.logger.TRACE
-    elif pytestconfig.getoption('quiet') == 1:
+    elif pytestconfig.getoption('quiet', None) == 1:
         level = logging.INFO
     logging.getLogger().setLevel(level)
     caplog.set_level(level)
