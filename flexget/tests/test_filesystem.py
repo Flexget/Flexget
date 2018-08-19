@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from path import Path
+from pathlib import Path
 
 
 class TestFilesystem(object):
@@ -73,6 +73,7 @@ class TestFilesystem(object):
               path: """ + test1 + """
               recursive: yes
               retrieve: dirs
+
           non_ascii:
             filesystem:
               path: """ + test3 + """
@@ -84,14 +85,14 @@ class TestFilesystem(object):
                  'dir2', 'dir4', 'dir6', 'dir7', 'dir8']
 
     def assert_check(self, task, task_name, test_type, filenames):
-        for file in filenames:
-            file = Path(file)
+        for fn in filenames:
+            f = Path(fn)
             if test_type == 'positive':
-                assertion_error = 'Failed %s %s test, did not find %s' % (test_type, task_name, file)
-                assert task.find_entry(title=file.namebase), assertion_error
+                assertion_error = 'Failed %s %s test, did not find %s' % (test_type, task_name, f)
+                assert task.find_entry(title=f.name), assertion_error
             else:
-                assertion_error = 'Failed %s %s test, found %s' % (test_type, task_name, file)
-                assert not task.find_entry(title=file.namebase), assertion_error
+                assertion_error = 'Failed %s %s test, found %s' % (test_type, task_name, f)
+                assert not task.find_entry(title=f.name), assertion_error
 
     def test_string(self, execute_task):
         task_name = 'string'

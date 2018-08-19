@@ -1,5 +1,6 @@
 import logging
 import re
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -101,29 +102,21 @@ class Filesystem(object):
         """
         Creates a single entry using a filepath and a type (file/dir)
         """
-        filepath = filepath.abspath()
+        filepath = filepath.resolve()
         entry = Entry()
-        entry['location'] = filepath
-        if PY2:
-            import urllib
-            import urlparse
-            entry['url'] = urlparse.urljoin('file:', urllib.pathname2url(filepath.encode('utf8')))
-        else:
-            import pathlib
-            entry['url'] = pathlib.Path(filepath).absolute().as_uri()
+        entry['location'] = str(filepath)
+        entry['url'] = Path(filepath).as_uri()
         entry['filename'] = filepath.name
-        if filepath.isfile():
-            entry['title'] = filepath.namebase
-        else:
-            entry['title'] = filepath.name
+        entry['title'] = filepath.name
         try:
             entry['timestamp'] = datetime.fromtimestamp(filepath.getmtime())
         except Exception as e:
             log.warning('Error setting timestamp for %s: %s' % (filepath, e))
             entry['timestamp'] = None
-        entry['accessed'] = datetime.fromtimestamp(filepath.getatime())
-        entry['modified'] = datetime.fromtimestamp(filepath.getmtime())
-        entry['created'] = datetime.fromtimestamp(filepath.getctime())
+        stat = filepath.stat()
+        entry['accessed'] = datetime.fromtimestamp(stat.st_atime)
+        entry['modified'] = datetime.fromtimestamp(stat.st_mtime)
+        entry['created'] = datetime.fromtimestamp(stat.st_ctime)
         if entry.isvalid():
             if test_mode:
                 log.info("Test mode. Entry includes:")
@@ -147,9 +140,11 @@ class Filesystem(object):
 
     def get_folder_objects(self, folder, recursion):
         if recursion is False:
-            return folder.listdir()
+            yield from folder.iterdir()
         else:
-            return folder.walk(errors='ignore')
+            for root, dirs, files in os.walk(folder):
+                yield from (Path(d) for d in dirs)
+                yield from (Path(f) for f in files)
 
     def get_entries_from_path(self, path_list, match, recursion, test_mode, get_files, get_dirs, get_symlinks):
         entries = []
@@ -158,7 +153,7 @@ class Filesystem(object):
             log.verbose('Scanning folder %s. Recursion is set to %s.' % (folder, recursion))
             folder = Path(folder).expanduser()
             log.debug('Scanning %s' % folder)
-            base_depth = len(folder.splitall())
+            base_depth = len(folder.parts)
             max_depth = self.get_max_depth(recursion, base_depth)
             folder_objects = self.get_folder_objects(folder, recursion)
             for path_object in folder_objects:
@@ -170,15 +165,15 @@ class Filesystem(object):
                         path_object, sys.getfilesystemencoding()))
                     continue
                 entry = None
-                object_depth = len(path_object.splitall())
+                object_depth = len(path_object.parts)
                 if object_depth <= max_depth:
-                    if match(path_object):
-                        if (path_object.isdir() and get_dirs) or (
-                                path_object.islink() and get_symlinks) or (
-                                path_object.isfile() and not path_object.islink() and get_files):
+                    if match(str(path_object)):
+                        if (path_object.is_dir() and get_dirs) or (
+                                path_object.is_symlink() and get_symlinks) or (
+                                path_object.is_file() and not path_object.is_symlink() and get_files):
                             entry = self.create_entry(path_object, test_mode)
                         else:
-                            log.debug("Path object's %s type doesn't match requested object types." % path_object)
+                            log.debug("Path object's %s type doesn't match requested object types.", path_object)
                         if entry and entry not in entries:
                             entries.append(entry)
 
