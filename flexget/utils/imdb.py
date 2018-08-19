@@ -8,6 +8,8 @@ import logging
 import re
 import random
 
+from bs4.element import Tag
+
 from flexget.utils.soup import get_soup
 from flexget.utils.requests import Session, TimedLimiter
 from flexget.utils.tools import str_to_int
@@ -293,13 +295,13 @@ class ImdbParser(object):
         if not self.year:
             log.debug('No year found for %s', self.imdb_id)
 
-        mpaa_rating_elem = data['contentRating']
+        mpaa_rating_elem = data.get('contentRating')
         if mpaa_rating_elem:
             self.mpaa_rating = mpaa_rating_elem
         else:
             log.debug('No rating found for %s', self.imdb_id)
 
-        photo_elem = data['image']
+        photo_elem = data.get('image')
         if photo_elem:
             self.photo = photo_elem
         else:
@@ -307,7 +309,7 @@ class ImdbParser(object):
 
         original_name_elem = title_wrapper.find('div', {'class': 'originalTitle'})
         if original_name_elem:
-            self.name = title_wrapper.find('h1', {'class': ''}).contents[0].strip
+            self.name = title_wrapper.find('h1', {'class': ''}).contents[0].strip()
             self.original_name = original_name_elem.contents[0].strip().strip('"')
         else:
             log.debug('No original title found for %s', self.imdb_id)
@@ -331,7 +333,7 @@ class ImdbParser(object):
             log.debug('No Metacritic score found for %s', self.imdb_id)
 
         # get director(s)
-        directors = data['director']
+        directors = data.get('director', [])
         if not isinstance(directors, list):
             directors = [directors]
 
@@ -343,7 +345,7 @@ class ImdbParser(object):
             self.directors[director_id] = director_name
 
         # get writer(s)
-        writers = data['creator']
+        writers = data.get('creator', [])
         if not isinstance(writers, list):
             writers = [writers]
 
@@ -376,20 +378,19 @@ class ImdbParser(object):
             else:
                 log.debug('No storyline found for %s', self.imdb_id)
 
-        genres = data['genre']
+        genres = data.get('genre', [])
         if not isinstance(genres, list):
             genres = [genres]
 
         self.genres = [g.strip().lower() for g in genres]
 
         # Cast section
-        actors = data['actor']
-        if not isinstance(actors, list):
-            actors = [actors]
-
-        for actor in actors:
-            if actor['@type'] != 'Person':
-                continue
-            actor_id = extract_id(actor['url'])
-            actor_name = actor['name'].strip()
-            self.actors[actor_id] = actor_name
+        cast = soup.find('table', attrs={'class': 'cast_list'})
+        if cast:
+            for actor in cast.select('tr > td:nth-of-type(2) > a'):
+                actor_id = extract_id(actor['href'])
+                actor_name = actor.text.strip()
+                # tag instead of name
+                if isinstance(actor_name, Tag):
+                    actor_name = None
+                self.actors[actor_id] = actor_name
