@@ -3,11 +3,10 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import difflib
+import json
 import logging
 import re
 import random
-
-from bs4.element import Tag
 
 from flexget.utils.soup import get_soup
 from flexget.utils.requests import Session, TimedLimiter
@@ -270,20 +269,22 @@ class ImdbParser(object):
         self.url = url
         page = requests.get(url)
         soup = get_soup(page.text)
+        title_wrapper = soup.find('div', attrs={'class': 'title_wrapper'})
 
-        title_overview = soup.find('div', attrs={'class': 'title-overview'})
-        if not title_overview:
+        data = json.loads(soup.find('script', {'type': 'application/ld+json'}).text)
+
+        if not data:
             raise PluginError('IMDB parser needs updating, imdb format changed. Please report on Github.')
 
         # Parse stuff from the title-overview section
-        name_elem = title_overview.find('h1', attrs={'itemprop': 'name'})
+        name_elem = data['name']
         if name_elem:
-            self.name = name_elem.contents[0].strip()
+            self.name = name_elem.strip()
         else:
             log.error('Possible IMDB parser needs updating, Please report on Github.')
             raise PluginError('Unable to set imdb_name for %s from %s' % (self.imdb_id, self.url))
 
-        year = title_overview.find('span', attrs={'id': 'titleYear'})
+        year = soup.find('span', attrs={'id': 'titleYear'})
         if year:
             m = re.search(r'([0-9]{4})', year.text)
             if m:
@@ -292,58 +293,65 @@ class ImdbParser(object):
         if not self.year:
             log.debug('No year found for %s', self.imdb_id)
 
-        mpaa_rating_elem = title_overview.find(itemprop='contentRating')
+        mpaa_rating_elem = data['contentRating']
         if mpaa_rating_elem:
-            self.mpaa_rating = mpaa_rating_elem['content']
+            self.mpaa_rating = mpaa_rating_elem
         else:
             log.debug('No rating found for %s', self.imdb_id)
 
-        photo_elem = title_overview.find(itemprop='image')
+        photo_elem = data['image']
         if photo_elem:
-            self.photo = photo_elem['src']
+            self.photo = photo_elem
         else:
             log.debug('No photo found for %s', self.imdb_id)
 
-        original_name_elem = title_overview.find(attrs={'class': 'originalTitle'})
+        original_name_elem = title_wrapper.find('div', {'class': 'originalTitle'})
         if original_name_elem:
+            self.name = title_wrapper.find('h1', {'class': ''}).contents[0].strip
             self.original_name = original_name_elem.contents[0].strip().strip('"')
         else:
             log.debug('No original title found for %s', self.imdb_id)
 
-        votes_elem = title_overview.find(itemprop='ratingCount')
+        votes_elem = data.get('aggregateRating', {}).get('ratingCount')
         if votes_elem:
-            self.votes = str_to_int(votes_elem.text)
+            self.votes = str_to_int(votes_elem) if not isinstance(votes_elem, int) else votes_elem
         else:
             log.debug('No votes found for %s', self.imdb_id)
 
-        score_elem = title_overview.find(itemprop='ratingValue')
+        score_elem = data.get('aggregateRating', {}).get('ratingValue')
         if score_elem:
-            self.score = float(score_elem.text)
+            self.score = float(score_elem)
         else:
             log.debug('No score found for %s', self.imdb_id)
 
-        meta_score_elem = title_overview.find(attrs={'class': 'metacriticScore'})
+        meta_score_elem = soup.find(attrs={'class': 'metacriticScore'})
         if meta_score_elem:
             self.meta_score = str_to_int(meta_score_elem.text)
         else:
             log.debug('No Metacritic score found for %s', self.imdb_id)
 
-            # get director(s)
-        for director in title_overview.select('[itemprop="director"] > a'):
-            director_id = extract_id(director['href'])
-            director_name = director.text
-            # tag instead of name
-            if isinstance(director_name, Tag):
-                director_name = None
+        # get director(s)
+        directors = data['director']
+        if not isinstance(directors, list):
+            directors = [directors]
+
+        for director in directors:
+            if director['@type'] != 'Person':
+                continue
+            director_id = extract_id(director['url'])
+            director_name = director['name']
             self.directors[director_id] = director_name
 
         # get writer(s)
-        for writer in title_overview.select('[itemprop="creator"] > a'):
-            writer_id = extract_id(writer['href'])
-            writer_name = writer.text
-            # tag instead of name
-            if isinstance(writer_name, Tag):
-                writer_name = None
+        writers = data['creator']
+        if not isinstance(writers, list):
+            writers = [writers]
+
+        for writer in writers:
+            if writer['@type'] != 'Person':
+                continue
+            writer_id = extract_id(writer['url'])
+            writer_name = writer['name']
             self.writers[writer_id] = writer_name
 
         # Details section
@@ -367,15 +375,21 @@ class ImdbParser(object):
                 self.plot_outline = plot_elem.text.strip()
             else:
                 log.debug('No storyline found for %s', self.imdb_id)
-            self.genres = [i.text.strip().lower() for i in storyline.select('[itemprop="genre"] > a')]
+
+        genres = data['genre']
+        if not isinstance(genres, list):
+            genres = [genres]
+
+        self.genres = [g.strip().lower() for g in genres]
 
         # Cast section
-        cast = soup.find('div', attrs={'id': 'titleCast'})
-        if cast:
-            for actor in cast.select('[itemprop="actor"] > a'):
-                actor_id = extract_id(actor['href'])
-                actor_name = actor.text.strip()
-                # tag instead of name
-                if isinstance(actor_name, Tag):
-                    actor_name = None
-                self.actors[actor_id] = actor_name
+        actors = data['actor']
+        if not isinstance(actors, list):
+            actors = [actors]
+
+        for actor in actors:
+            if actor['@type'] != 'Person':
+                continue
+            actor_id = extract_id(actor['url'])
+            actor_name = actor['name'].strip()
+            self.actors[actor_id] = actor_name
