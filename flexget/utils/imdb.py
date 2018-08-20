@@ -111,7 +111,7 @@ class ImdbSearch(object):
         # remove all movies below min_match, and different year
         for movie in movies[:]:
             if year and movie.get('year'):
-                if movie['year'] != str(year):
+                if movie['year'] != year:
                     log.debug('best_match removing %s - %s (wrong year: %s)' % (
                         movie['name'],
                         movie['url'],
@@ -159,19 +159,18 @@ class ImdbSearch(object):
         # in case we got redirected to movie page (perfect match)
         re_m = re.match(r'.*\.imdb\.com/title/tt\d+/', actual_url)
         if re_m:
-            div = soup.find('div', {'class': 'title_wrapper'})
-            title_wrapper = div.find('h1', {'itemprop': 'name'})
-            title = ''.join(text for text in title_wrapper.find_all(text=True) if text.parent.name not in ['span', 'a'])
-            title = title.strip()
-            year = div.find('a').text
             actual_url = re_m.group(0)
+            imdb_id = extract_id(actual_url)
+            movie_parse = ImdbParser()
+            movie_parse.parse(imdb_id, soup=soup)
             log.debug('Perfect hit. Search got redirected to %s', actual_url)
-            movie = {}
-            movie['match'] = 1.0
-            movie['name'] = title
-            movie['imdb_id'] = extract_id(actual_url)
-            movie['url'] = make_url(movie['imdb_id'])
-            movie['year'] = year
+            movie = {
+                'match': 1.0,
+                'name': movie_parse.name,
+                'imdb_id': imdb_id,
+                'url': make_url(imdb_id),
+                'year': movie_parse.year
+            }
             movies.append(movie)
             return movies
 
@@ -193,9 +192,9 @@ class ImdbSearch(object):
             additional = re.findall(r'\((.*?)\)', result_text.text)
             if len(additional) > 0:
                 if re.match('^\d{4}$', additional[-1]):
-                    movie['year'] = additional[-1]
+                    movie['year'] = str_to_int(additional[-1])
                 elif len(additional) > 1:
-                    movie['year'] = additional[-2]
+                    movie['year'] = str_to_int(additional[-2])
                     if additional[-1] not in ['TV Movie', 'Video']:
                         log.debug('skipping %s', result_text.text)
                         continue
@@ -265,12 +264,15 @@ class ImdbParser(object):
     def __str__(self):
         return '<ImdbParser(name=%s,imdb_id=%s)>' % (self.name, self.imdb_id)
 
-    def parse(self, imdb_id):
+    def parse(self, imdb_id, soup=None):
         self.imdb_id = extract_id(imdb_id)
         url = make_url(self.imdb_id)
         self.url = url
-        page = requests.get(url)
-        soup = get_soup(page.text)
+
+        if not soup:
+            page = requests.get(url)
+            soup = get_soup(page.text)
+
         title_wrapper = soup.find('div', attrs={'class': 'title_wrapper'})
 
         data = json.loads(soup.find('script', {'type': 'application/ld+json'}).text)

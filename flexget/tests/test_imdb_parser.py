@@ -46,7 +46,7 @@ class TestImdbParser(object):
             'leaves 27 men dead in a boat explosion, but the real question arises now: Who actually is Keyser S\xf6ze?'
         ), 'Plot outline not parsed correctly'
         assert 8.0 < parser.score < 9.0, 'Score not parsed correctly'
-        assert parser.url == 'http://www.imdb.com/title/tt0114814/', 'URL not parsed correctly'
+        assert parser.url == 'https://www.imdb.com/title/tt0114814/', 'URL not parsed correctly'
         assert 400000 < parser.votes < 1000000, 'Votes not parsed correctly'
         assert parser.year == 1995, 'Year not parsed correctly'
 
