@@ -29,8 +29,9 @@ class TestImdbParser(object):
             'nm0000860': 'Paul Bartel'
         }, 'Actors not parsed correctly'
         assert parser.directors == {'nm0001741': 'Bryan Singer'}, 'Directors not parsed correctly'
-        assert len(set(parser.genres).intersection([u'crime', u'drama', u'mystery', u'thriller'])) == \
-            len([u'crime', u'drama', u'mystery', u'thriller']), 'Genres not parsed correctly'
+        print(parser.genres)
+        assert len(set(parser.genres).intersection([u'crime', u'mystery', u'thriller'])) == \
+            len([u'crime', u'mystery', u'thriller']), 'Genres not parsed correctly'
         assert parser.imdb_id == 'tt0114814', 'ID not parsed correctly'
         assert len(set(parser.languages).intersection(
             ['english', 'hungarian', 'spanish', 'french'])) == 4, 'Languages not parsed correctly'
@@ -45,7 +46,7 @@ class TestImdbParser(object):
             'leaves 27 men dead in a boat explosion, but the real question arises now: Who actually is Keyser S\xf6ze?'
         ), 'Plot outline not parsed correctly'
         assert 8.0 < parser.score < 9.0, 'Score not parsed correctly'
-        assert parser.url == 'http://www.imdb.com/title/tt0114814/', 'URL not parsed correctly'
+        assert parser.url == 'https://www.imdb.com/title/tt0114814/', 'URL not parsed correctly'
         assert 400000 < parser.votes < 1000000, 'Votes not parsed correctly'
         assert parser.year == 1995, 'Year not parsed correctly'
 
