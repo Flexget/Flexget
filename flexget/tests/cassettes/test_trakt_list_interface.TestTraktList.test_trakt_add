@@ -1,174 +1,135 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Authorization: [Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a]
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
-    method: GET
-    uri: https://api.trakt.tv/sync/watchlist
-  response:
-    body: {string: '[{"rank":1,"listed_at":"2017-08-27T03:25:45.000Z","type":"episode","episode":{"season":1,"number":5,"title":"Chapter
-        Five: The Flea and the Acrobat","ids":{"trakt":2124182,"tvdb":5621929,"imdb":"tt4593128","tmdb":1205904,"tvrage":1065933149}},"show":{"title":"Stranger
-        Things","year":2016,"ids":{"trakt":104439,"slug":"stranger-things","tvdb":305288,"imdb":"tt4574334","tmdb":66732,"tvrage":48493}}},{"rank":2,"listed_at":"2017-08-27T03:25:45.000Z","type":"episode","episode":{"season":1,"number":6,"title":"Chapter
-        Six: The Monster","ids":{"trakt":2124184,"tvdb":5621930,"imdb":"tt4593132","tmdb":1205905,"tvrage":1065933150}},"show":{"title":"Stranger
-        Things","year":2016,"ids":{"trakt":104439,"slug":"stranger-things","tvdb":305288,"imdb":"tt4574334","tmdb":66732,"tvrage":48493}}},{"rank":3,"listed_at":"2018-05-21T12:41:31.000Z","type":"show","show":{"title":"White
-        Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}}}]'}
-    headers:
-      CF-RAY: [41e72afafb7a3cd7-CPH]
-      Cache-Control: ['max-age=0, private, must-revalidate']
-      Cf-Railgun: [b5b01a159a 99.99 0.315764 0030 57da]
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Mon, 21 May 2018 12:50:17 GMT']
-      Etag: [W/"378fb23693a812fb972bb94d0ad4932e"]
-      Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-      Last-Modified: ['Mon, 21 May 2018 12:41:31 GMT']
-      Server: [cloudflare]
-      Set-Cookie: ['__cfduid=d016d6d015d588a458227137587db75611526907017; expires=Tue,
-          21-May-19 12:50:17 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [b82cc551-a656-438d-b18d-852e0c196659]
-      X-Runtime: ['0.277465']
-      X-Sort-By: [rank]
-      X-Sort-How: [asc]
-      X-Xss-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
-- request:
-    body: '{"shows": [{"title": "White Collar", "ids": {"trakt": 21410, "tmdb": 21510,
-      "tvdb": 108611, "imdb": "tt1358522", "tvrage": 20720}, "year": 2009}]}'
-    headers:
-      Authorization: [Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a]
-      Content-Length: ['146']
-      Content-Type: [application/json]
-      Cookie: [__cfduid=d016d6d015d588a458227137587db75611526907017]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
-    method: POST
-    uri: https://api.trakt.tv/sync/watchlist/remove
-  response:
-    body: {string: '{"deleted":{"movies":0,"shows":1,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
-    headers:
-      CF-RAY: [41e72b06eb6b3cd7-CPH]
-      Cache-Control: ['max-age=0, private, must-revalidate']
-      Cf-Railgun: [f05494f39c stream 0.000000 0210 57da]
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Mon, 21 May 2018 12:50:19 GMT']
-      Etag: [W/"eec60e1e660181ec72f2ae88f251e4a0"]
-      Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-      Server: [cloudflare]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [f27254e8-315b-4e35-930d-a9d3d7297cd0]
-      X-Runtime: ['0.039698']
-      X-Xss-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Authorization: [Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a]
-      Content-Type: [application/json]
-      Cookie: [__cfduid=d016d6d015d588a458227137587db75611526907017]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
-    method: GET
-    uri: https://api.trakt.tv/sync/watchlist
-  response:
-    body: {string: '[{"rank":1,"listed_at":"2017-08-27T03:25:45.000Z","type":"episode","episode":{"season":1,"number":5,"title":"Chapter
-        Five: The Flea and the Acrobat","ids":{"trakt":2124182,"tvdb":5621929,"imdb":"tt4593128","tmdb":1205904,"tvrage":1065933149}},"show":{"title":"Stranger
-        Things","year":2016,"ids":{"trakt":104439,"slug":"stranger-things","tvdb":305288,"imdb":"tt4574334","tmdb":66732,"tvrage":48493}}},{"rank":2,"listed_at":"2017-08-27T03:25:45.000Z","type":"episode","episode":{"season":1,"number":6,"title":"Chapter
-        Six: The Monster","ids":{"trakt":2124184,"tvdb":5621930,"imdb":"tt4593132","tmdb":1205905,"tvrage":1065933150}},"show":{"title":"Stranger
-        Things","year":2016,"ids":{"trakt":104439,"slug":"stranger-things","tvdb":305288,"imdb":"tt4574334","tmdb":66732,"tvrage":48493}}}]'}
-    headers:
-      CF-RAY: [41e72b136bf13cd7-CPH]
-      Cache-Control: ['max-age=0, private, must-revalidate']
-      Cf-Railgun: [1863e99587 99.99 0.090806 0030 57da]
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Mon, 21 May 2018 12:50:21 GMT']
-      Etag: [W/"4822fa8a4bd4f7e50141020691f12485"]
-      Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-      Last-Modified: ['Mon, 21 May 2018 12:50:04 GMT']
-      Server: [cloudflare]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [9503a2a5-c8ff-412b-8fa5-98f9f98124be]
-      X-Runtime: ['0.055744']
-      X-Sort-By: [rank]
-      X-Sort-How: [asc]
-      X-Xss-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
-- request:
-    body: '{"shows": [{"title": "White Collar", "ids": {}, "year": 2009}]}'
-    headers:
-      Authorization: [Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a]
-      Content-Length: ['63']
-      Content-Type: [application/json]
-      Cookie: [__cfduid=d016d6d015d588a458227137587db75611526907017]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
-    method: POST
-    uri: https://api.trakt.tv/sync/watchlist
-  response:
-    body: {string: '{"added":{"movies":0,"shows":1,"seasons":0,"episodes":0},"existing":{"movies":0,"shows":0,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
-    headers:
-      CF-RAY: [41e72b1fdcdf3cd7-CPH]
-      Cache-Control: ['max-age=0, private, must-revalidate']
-      Cf-Railgun: [3d3c4e3ba6 99.99 0.030192 0030 57da]
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Mon, 21 May 2018 12:50:23 GMT']
-      Etag: [W/"69ce3532345f080933eb76bc178cdc75"]
-      Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-      Server: [cloudflare]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [d7b18064-80b9-4d19-9524-881bdfcf3d3a]
-      X-Runtime: ['0.027114']
-      X-Xss-Protection: [1; mode=block]
-    status: {code: 201, message: Created}
-- request:
-    body: null
-    headers:
-      Authorization: [Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a]
-      Content-Type: [application/json]
-      Cookie: [__cfduid=d016d6d015d588a458227137587db75611526907017]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
-    method: GET
-    uri: https://api.trakt.tv/sync/watchlist
-  response:
-    body: {string: '[{"rank":1,"listed_at":"2017-08-27T03:25:45.000Z","type":"episode","episode":{"season":1,"number":5,"title":"Chapter
-        Five: The Flea and the Acrobat","ids":{"trakt":2124182,"tvdb":5621929,"imdb":"tt4593128","tmdb":1205904,"tvrage":1065933149}},"show":{"title":"Stranger
-        Things","year":2016,"ids":{"trakt":104439,"slug":"stranger-things","tvdb":305288,"imdb":"tt4574334","tmdb":66732,"tvrage":48493}}},{"rank":2,"listed_at":"2017-08-27T03:25:45.000Z","type":"episode","episode":{"season":1,"number":6,"title":"Chapter
-        Six: The Monster","ids":{"trakt":2124184,"tvdb":5621930,"imdb":"tt4593132","tmdb":1205905,"tvrage":1065933150}},"show":{"title":"Stranger
-        Things","year":2016,"ids":{"trakt":104439,"slug":"stranger-things","tvdb":305288,"imdb":"tt4574334","tmdb":66732,"tvrage":48493}}},{"rank":3,"listed_at":"2018-05-21T12:49:59.000Z","type":"show","show":{"title":"White
-        Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}}}]'}
-    headers:
-      CF-RAY: [41e72b403af73cd7-CPH]
-      Cache-Control: ['max-age=0, private, must-revalidate']
-      Cf-Railgun: [01bd901cf6 99.99 0.115988 0030 57da]
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Mon, 21 May 2018 12:50:28 GMT']
-      Etag: [W/"18cc2a25b1536f2c74cd7ac11c47d14b"]
-      Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-      Last-Modified: ['Mon, 21 May 2018 12:49:59 GMT']
-      Server: [cloudflare]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [1155995f-bc4c-45b3-a8ed-6fdbfcb4ec4c]
-      X-Runtime: ['0.033164']
-      X-Sort-By: [rank]
-      X-Sort-How: [asc]
-      X-Xss-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Authorization: [!!python/unicode 'Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a']
+        Content-Type: [!!python/unicode 'application/json']
+        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
+        trakt-api-version: [!!python/unicode '2']
+      method: GET
+      uri: https://api.trakt.tv/sync/watchlist/shows
+    response:
+      body: {string: !!python/unicode '[]'}
+      headers:
+        cache-control: ['max-age=0, private, must-revalidate']
+        cf-railgun: [direct (starting new WAN connection)]
+        cf-ray: [439a5fc06c7a3d25-CPH]
+        connection: [keep-alive]
+        content-length: ['2']
+        content-type: [application/json; charset=utf-8]
+        date: ['Fri, 13 Jul 2018 08:28:05 GMT']
+        etag: [W/"96c03990b70f3bd751465b2e643d2bb4"]
+        expect-ct: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        last-modified: ['Fri, 13 Jul 2018 08:27:20 GMT']
+        server: [cloudflare]
+        set-cookie: ['__cfduid=d14081071f9f7400f47024d4d009cd86e1531470484; expires=Sat,
+            13-Jul-19 08:28:04 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-request-id: [f514bfb8-a697-4a55-9291-bfbd0a4d9646]
+        x-runtime: ['0.042495']
+        x-sort-by: [rank]
+        x-sort-how: [asc]
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Authorization: [!!python/unicode 'Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a']
+        Content-Type: [!!python/unicode 'application/json']
+        Cookie: [__cfduid=d14081071f9f7400f47024d4d009cd86e1531470484]
+        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
+        trakt-api-version: [!!python/unicode '2']
+      method: GET
+      uri: https://api.trakt.tv/sync/watchlist/shows
+    response:
+      body: {string: !!python/unicode '[]'}
+      headers:
+        cache-control: ['max-age=0, private, must-revalidate']
+        cf-railgun: [direct (starting new WAN connection)]
+        cf-ray: [439a5fc948a53d25-CPH]
+        connection: [keep-alive]
+        content-length: ['2']
+        content-type: [application/json; charset=utf-8]
+        date: ['Fri, 13 Jul 2018 08:28:06 GMT']
+        etag: [W/"96c03990b70f3bd751465b2e643d2bb4"]
+        expect-ct: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        last-modified: ['Fri, 13 Jul 2018 08:27:20 GMT']
+        server: [cloudflare]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-request-id: [c369653d-2efc-4499-ad2f-43a2e8c07fbc]
+        x-runtime: ['0.112148']
+        x-sort-by: [rank]
+        x-sort-how: [asc]
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: !!python/unicode '{"shows": [{"year": 2009, "ids": {}, "title": "White
+        Collar"}]}'
+      headers:
+        Authorization: [!!python/unicode 'Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a']
+        Content-Length: ['63']
+        Content-Type: [!!python/unicode 'application/json']
+        Cookie: [__cfduid=d14081071f9f7400f47024d4d009cd86e1531470484]
+        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
+        trakt-api-version: [!!python/unicode '2']
+      method: POST
+      uri: https://api.trakt.tv/sync/watchlist
+    response:
+      body: {string: !!python/unicode '{"added":{"movies":0,"shows":1,"seasons":0,"episodes":0},"existing":{"movies":0,"shows":0,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
+      headers:
+        cache-control: ['max-age=0, private, must-revalidate']
+        cf-railgun: [direct (starting new WAN connection)]
+        cf-ray: [439a5fd5ce133d25-CPH]
+        connection: [keep-alive]
+        content-length: ['192']
+        content-type: [application/json; charset=utf-8]
+        date: ['Fri, 13 Jul 2018 08:28:08 GMT']
+        etag: [W/"a985f9b80abdce02453ffa525df76638"]
+        expect-ct: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        server: [cloudflare]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-request-id: [94a77360-2be5-401d-949f-416fa33a3048]
+        x-runtime: ['0.027188']
+        x-xss-protection: [1; mode=block]
+      status: {code: 201, message: Created}
+  - request:
+      body: null
+      headers:
+        Authorization: [!!python/unicode 'Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a']
+        Content-Type: [!!python/unicode 'application/json']
+        Cookie: [__cfduid=d14081071f9f7400f47024d4d009cd86e1531470484]
+        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
+        trakt-api-version: [!!python/unicode '2']
+      method: GET
+      uri: https://api.trakt.tv/sync/watchlist/shows
+    response:
+      body: {string: !!python/unicode '[{"rank":1,"listed_at":"2018-07-13T08:28:16.000Z","type":"show","show":{"title":"White
+          Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}}}]'}
+      headers:
+        cache-control: ['max-age=0, private, must-revalidate']
+        cf-railgun: [direct (starting new WAN connection)]
+        cf-ray: [439a5ffa484e3d25-CPH]
+        connection: [keep-alive]
+        content-length: ['214']
+        content-type: [application/json; charset=utf-8]
+        date: ['Fri, 13 Jul 2018 08:28:14 GMT']
+        etag: [W/"0557d4b6f4f50f0058e5eebe13d045a5"]
+        expect-ct: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        last-modified: ['Fri, 13 Jul 2018 08:28:16 GMT']
+        server: [cloudflare]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-request-id: [3484b60f-af35-4d56-83ab-fda530160824]
+        x-runtime: ['0.304691']
+        x-sort-by: [rank]
+        x-sort-how: [asc]
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
 version: 1

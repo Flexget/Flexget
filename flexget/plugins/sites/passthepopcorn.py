@@ -17,7 +17,7 @@ from flexget.utils.requests import Session as RequestSession, TimedLimiter, Requ
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('passthepopcorn')
-Base = db_schema.versioned_base('passthepopcorn', 0)
+Base = db_schema.versioned_base('passthepopcorn', 1)
 
 requests = RequestSession()
 requests.add_domain_limiter(TimedLimiter('passthepopcorn.me', '5 seconds'))
@@ -87,6 +87,15 @@ RELEASE_TYPES = {
 }
 
 
+@db_schema.upgrade('passthepopcorn')
+def upgrade(ver, session):
+    if ver is None:
+        ver = 0
+    if ver == 0:
+        raise db_schema.UpgradeImpossible
+    return ver
+
+
 class PassThePopcornCookie(Base):
     __tablename__ = 'passthepopcorn_cookie'
 
@@ -144,6 +153,15 @@ class SearchPassThePopcorn(object):
             # TODO Apparently it endlessly redirects if the cookie is invalid? I assume it's a gazelle bug.
             log.debug('PassThePopcorn request failed: Too many redirects. Invalid cookie?')
             invalid_cookie = True
+        except RequestException as e:
+            if e.response and e.response.status_code == 429:
+                log.error('Saved cookie is invalid and will be deleted. Error: %s', str(e))
+                # cookie is invalid and must be deleted
+                with Session() as session:
+                    session.query(PassThePopcornCookie).filter(PassThePopcornCookie.username == username).delete()
+                invalid_cookie = True
+            else:
+                log.error('PassThePopcorn request failed: %s', str(e))
 
         if invalid_cookie:
             if self.errors:

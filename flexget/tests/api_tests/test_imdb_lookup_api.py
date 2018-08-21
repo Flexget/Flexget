@@ -17,7 +17,7 @@ class TestIMDBLookupAPI(object):
         assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
 
         # Lookup by title
-        rsp = api_client.get('/imdb/search/matrix/')
+        rsp = api_client.get('/imdb/search/saw/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))

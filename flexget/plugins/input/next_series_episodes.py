@@ -29,7 +29,8 @@ class NextSeriesEpisodes(object):
                 'type': 'object',
                 'properties': {
                     'from_start': {'type': 'boolean', 'default': False},
-                    'backfill': {'type': 'boolean', 'default': False}
+                    'backfill': {'type': 'boolean', 'default': False},
+                    'only_same_season': {'type': 'boolean', 'default': False}
                 },
                 'additionalProperties': False
             }
@@ -82,7 +83,7 @@ class NextSeriesEpisodes(object):
             return
         if isinstance(config, bool):
             config = {}
-
+        self.config = config
         if task.is_rerun:
             # Just return calculated next eps on reruns
             entries = self.rerun_entries
@@ -226,8 +227,8 @@ class NextSeriesEpisodes(object):
                 if latest.is_season:
                     # A season pack was picked up in the task, no need to look for more episodes
                     return
-                elif identified_by == 'ep' and \
-                        (entry['series_season'] == latest.season and entry['series_episode'] == latest.number + 1):
+                elif not self.config.get('only_same_season') and identified_by == 'ep' and (
+                            entry['series_season'] == latest.season and entry['series_episode'] == latest.number + 1):
                     # We searched for next predicted episode of this season unsuccessfully, try the next season
                     self.rerun_entries.append(self.search_entry(series, latest.season + 1, 1, task))
                     log.debug('%s %s not found, rerunning to look for next season' %

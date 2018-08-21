@@ -6,6 +6,7 @@ import logging
 import re
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests, json
@@ -13,6 +14,16 @@ from flexget.utils.requests import TokenBucketLimiter
 from flexget.utils.search import torrent_availability
 
 log = logging.getLogger('search_btn')
+
+
+ORIGINS = [
+    'None',
+    'Scene',
+    'P2P',
+    'User',
+    'Mixed',
+    'Internal'
+]
 
 
 class SearchBTN(object):
@@ -23,7 +34,8 @@ class SearchBTN(object):
                 'type': 'object',
                 'properties': {
                     'api_key': {'type': 'string'},
-                    'append_quality': {'type': 'boolean'}
+                    'append_quality': {'type': 'boolean'},
+                    'origin': one_or_more({'type': 'string', 'enum': ORIGINS})
                 },
                 'required': ['api_key'],
                 'additionalProperties': False
@@ -40,6 +52,9 @@ class SearchBTN(object):
             }
 
         config.setdefault('append_quality', True)
+        config.setdefault('origin', [])
+        if not isinstance(config['origin'], list):
+            config['origin'] = [config['origin']]
         return config
 
     def search(self, task, entry, config):
@@ -54,6 +69,8 @@ class SearchBTN(object):
                 search = {'category': 'Season'}
             else:
                 search = {'category': 'Episode'}
+            if config.get('origin'):
+                search['origin'] = config['origin']
             if 'tvdb_id' in entry:
                 search['tvdb'] = entry['tvdb_id']
             elif 'tvrage_id' in entry:
@@ -108,6 +125,7 @@ class SearchBTN(object):
                     entry['torrent_leeches'] = int(item['Leechers'])
                     entry['torrent_info_hash'] = item['InfoHash']
                     entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+                    entry['btn_origin'] = item['Origin']
                     if item['TvdbID'] and int(item['TvdbID']):
                         entry['tvdb_id'] = int(item['TvdbID'])
                     if item['TvrageID'] and int(item['TvrageID']):
