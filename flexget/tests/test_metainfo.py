@@ -37,13 +37,13 @@ class TestMetainfoImdb(object):
     def test_imdb(self, execute_task):
         """Metainfo: imdb url"""
         task = execute_task('test')
-        assert task.find_entry(imdb_url='http://www.imdb.com/title/tt0330793/'), \
+        assert task.find_entry(imdb_url='https://www.imdb.com/title/tt0330793/'), \
             'Failed to pick url from test 1'
-        assert task.find_entry(imdb_url='http://www.imdb.com/title/tt0472198/'), \
+        assert task.find_entry(imdb_url='https://www.imdb.com/title/tt0472198/'), \
             'Failed to pick url from test 2'
-        assert not task.find_entry(imdb_url='http://www.imdb.com/title/tt66666/'), \
+        assert not task.find_entry(imdb_url='https://www.imdb.com/title/tt66666/'), \
             'Failed to ignore multiple imdb urls in test 4'
-        assert not task.find_entry(imdb_url='http://www.imdb.com/title/tt99999/'), \
+        assert not task.find_entry(imdb_url='https://www.imdb.com/title/tt99999/'), \
             'Failed to ignore multiple imdb urls in test 4'
 
 

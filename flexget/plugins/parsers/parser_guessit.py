@@ -183,7 +183,7 @@ class ParserGuessit(object):
             name = guess_result.get('title')
             if country and hasattr(country, 'alpha2'):
                 name += ' (%s)' % country.alpha2
-        else:
+        elif guess_result.matches['title']:
             # Make sure the name match is up to FlexGet standards
             # Check there is no unmatched cruft before the matched name
             title_start = guess_result.matches['title'][0].start
@@ -218,6 +218,8 @@ class ParserGuessit(object):
                 for char in data[title_end:post_title]:
                     if char.isalnum() or char.isdigit():
                         valid = False
+        else:
+            valid = False
         season = guess_result.get('season')
         episode = guess_result.get('episode')
         if episode is None and 'part' in guess_result:

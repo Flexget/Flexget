@@ -12,7 +12,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.utils.requests import Session as RequestSession
-from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.utils.search import torrent_availability, normalize_scene
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
@@ -97,10 +97,10 @@ class UrlRewriteFuzer(object):
             if not tr.get('class') or 'colhead_dark' in tr.get('class'):
                 continue
             name = tr.find('div', {'class': 'main_title'}).find('a').text
-            torrent_name = re.search('\\r\\n(.*)',
+            torrent_name = re.search('\\n(.*)',
                                      tr.find('div', {'style': 'float: right;'}).find('a')['title']).group(1)
             attachment_link = tr.find('div', {'style': 'float: right;'}).find('a')['href']
-            attachment_id = re.search('attachmentid\=(\d+)', attachment_link).group(1)
+            attachment_id = re.search('attachmentid=(\d+)', attachment_link).group(1)
             raw_size = tr.find_all('td', {'class': 'inline_info'})[0].text.strip()
             seeders = int(tr.find_all('td', {'class': 'inline_info'})[2].text)
             leechers = int(tr.find_all('td', {'class': 'inline_info'})[3].text)
@@ -158,7 +158,7 @@ class UrlRewriteFuzer(object):
                     e['imdb_id'] = entry.get('imdb_id')
         else:
             for search_string in entry.get('search_strings', [entry['title']]):
-                query = normalize_unicode(search_string).replace(":", "")
+                query = normalize_scene(search_string)
                 text = quote_plus(query.encode('windows-1255'))
                 soup = self.get_fuzer_soup(text, c_list)
                 entries += self.extract_entry_from_soup(soup)

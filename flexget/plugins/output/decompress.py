@@ -54,7 +54,7 @@ def get_output_path(to, entry):
         else:
             return os.path.dirname(entry.get('location'))
     except RenderError:
-        raise PluginError('Could not render path: %s', to)
+        raise plugin.PluginError('Could not render path: %s' % to)
 
 
 def extract_info(info, archive, to, keep_dirs):

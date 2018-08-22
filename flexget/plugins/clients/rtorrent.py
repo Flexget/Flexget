@@ -676,7 +676,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             self._verify_load(client, entry['torrent_info_hash'])
             log.info('%s added to rtorrent' % entry['title'])
         except xmlrpc_client.Error as e:
-            entry.fail('Failed to verify torrent loaded: %s' % str(e))
+            log.warning('Failed to verify torrent %s loaded: %s', entry['title'], str(e))
 
     def on_task_learn(self, task, config):
         """ Make sure all temp files are cleaned up when entries are learned """

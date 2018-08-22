@@ -222,14 +222,19 @@ class TraktSet(MutableSet):
     def invalidate_cache(self):
         self._items = None
 
-    def get_list_endpoint(self, remove=False):
+    def get_list_endpoint(self, remove=False, submit=False):
         # Api restriction, but we could easily extract season and episode info from the 'shows' type
-        if self.config['list'] in ['collection', 'watched'] and self.config['type'] == 'episodes':
+        if not submit and self.config['list'] in ['collection', 'watched'] and self.config['type'] == 'episodes':
             raise plugin.PluginError('`type` cannot be `%s` for %s list.' % (self.config['type'], self.config['list']))
 
         if self.config['list'] in ['collection', 'watchlist', 'watched', 'ratings']:
             if self.config.get('account'):
-                endpoint = ('sync', 'history' if self.config['list'] == 'watched' else self.config['list'])
+                if self.config['list'] == 'watched':
+                    endpoint = ('sync', 'history')
+                else:
+                    endpoint = ('sync', self.config['list'])
+                    if not submit:
+                        endpoint += (self.config['type'], )
             else:
                 endpoint = ('users', self.config['username'], self.config['list'], self.config['type'])
         else:
@@ -296,7 +301,7 @@ class TraktSet(MutableSet):
             log.debug('Nothing to submit to trakt.')
             return
 
-        url = get_api_url(self.get_list_endpoint(remove))
+        url = get_api_url(self.get_list_endpoint(remove, submit=True))
 
         log.debug('Submitting data to trakt.tv (%s): %s', url, found)
         try:
@@ -323,7 +328,7 @@ class TraktSet(MutableSet):
             log.error('List does not appear to exist on trakt: %s', self.config['list'])
         elif result.status_code == 401:
             log.error('Authentication error: have you authorized Flexget on Trakt.tv?')
-            log.debug('trakt response: ' + result.text)
+            log.debug('trakt response: %s', result.text)
         else:
             log.error('Unknown error submitting data to trakt.tv: %s', result.text)
 
