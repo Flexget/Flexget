@@ -30,7 +30,6 @@ jinja2==2.9.6
 jsonschema==2.6.0
 markupsafe==1.0           # via jinja2
 path.py==10.3.1
-pathlib==1.0.1 ; python_version < "3.4"
 plumbum==1.6.3            # via rpyc
 portend==1.8              # via cherrypy
 pynzb==0.1.0
@@ -41,7 +40,7 @@ pytz==2017.2              # via apscheduler, flask-restful, flask-restplus, temp
 pyyaml==3.12
 rebulk==0.9.0
 requests==2.16.5
-rpyc==3.3.0
+rpyc==4.0.2
 six==1.10.0               # via apscheduler, cheroot, cherrypy, flask-cors, flask-restful, flask-restplus, html5lib, python-dateutil, rebulk, tempora
 sqlalchemy==1.2.6
 tempora==1.8              # via portend
