@@ -44,6 +44,7 @@ class InputHtml(object):
         advanced.accept('text', key='password')
         advanced.accept('text', key='dump')
         advanced.accept('text', key='title_from')
+        advanced.accept('boolean', key='allow_empty_links')
         regexps = advanced.accept('list', key='links_re')
         regexps.accept('regexp')
         advanced.accept('boolean', key='increment')
@@ -180,7 +181,7 @@ class InputHtml(object):
             if not link.has_attr('href'):
                 continue
             # no content in the link
-            if not link.contents:
+            if not link.contents and not config.get('allow_empty_links', False):
                 continue
 
             url = link['href']
