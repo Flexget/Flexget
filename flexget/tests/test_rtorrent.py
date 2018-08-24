@@ -67,7 +67,9 @@ class TestRTorrentClient(object):
 
         fields = [p for p in called_args[2:]]
         assert len(fields) == 3
-        assert 'd.directory.set=\\/data\\/downloads' in fields
+        assert ('d.directory.set=\\/data\\/downloads' in fields
+                # Python 3.7+.
+                or 'd.directory.set=/data/downloads' in fields)
         assert 'd.custom1.set=testing' in fields
         assert 'd.priority.set=3' in fields
 
