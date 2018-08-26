@@ -311,7 +311,7 @@ class ImdbParser(object):
 
         original_name_elem = title_wrapper.find('div', {'class': 'originalTitle'})
         if original_name_elem:
-            self.name = title_wrapper.find('h1', {'class': ''}).contents[0].strip()
+            self.name = title_wrapper.find('h1').contents[0].strip()
             self.original_name = original_name_elem.contents[0].strip().strip('"')
         else:
             log.debug('No original title found for %s', self.imdb_id)
