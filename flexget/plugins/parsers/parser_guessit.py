@@ -51,18 +51,29 @@ guessit_api.configure(
 def normalize_component(data):
     if data is None:
         return []
+    if isinstance(data, list):
+        return [d.lower().replace('-', '') for d in data]
 
-    if not isinstance(data, list):
-        data = [data]
-
-    return [d.lower().replace('-', '') for d in data]
+    return [data.lower().replace('-', '')]
 
 
 class ParserGuessit(object):
+    SOURCE_MAP = {
+        'Camera': 'cam',
+        'HD Camera': 'cam',
+        'HD Telesync': 'telesync',
+        'Pay-per-view': 'ppv',
+        'Digital TV': 'dvb',
+        'Video on Demand': 'vod',
+        'Analog HDTV': 'ahdtv',
+        'Ultra HDTV': 'uhdtv',
+        'HD Telecine': 'hdtc',
+        'Web': 'web-dl'
+    }
+
     @staticmethod
     def _guessit_options(options):
         settings = {'name_only': True, 'allowed_languages': ['en', 'fr'], 'allowed_countries': ['us', 'uk', 'gb']}
-        # 'clean_function': clean_value
         options['episode_prefer_number'] = not options.get('identified_by') == 'ep'
         if options.get('allow_groups'):
             options['expected_group'] = options['allow_groups']
@@ -93,41 +104,14 @@ class ParserGuessit(object):
         fastsub = 'fast subtitled' in normalize_component(guessit_result.get('other'))
         return version + proper_count - (5 if fastsub else 0)
 
-    def _quality(self, guessit_result):
-        """Generate a FlexGet Quality from a guessit result."""
-        resolution = normalize_component(guessit_result.get('screen_size'))
+    def _source(self, guessit_result):
         other = normalize_component(guessit_result.get('other'))
-        if not resolution and 'high resolution' in other:
-            resolution.append('hr')
+        source = self.SOURCE_MAP.get(guessit_result.get('source'), guessit_result.get('source'))
+        # special case
+        if source == 'web-dl' and 'Rip' in other:
+            source = 'webrip'
 
-        source = normalize_component(guessit_result.get('source'))
-
-        # some renaming happened in guessit 3.0. This is here so quality lookups keeps working
-        # see https://github.com/guessit-io/guessit/blob/3.0.0/docs/migration2to3.rst
-        if 'digital tv' in source:
-            source[0] = 'dvb'
-        elif any(s in source for s in ['camera', 'hd camera']):
-            source[0] = 'cam'
-        elif 'hd telesync' in source:
-            source[0] = 'telesync'
-        elif 'payperview' in source:
-            source[0] = 'ppv'
-        elif 'digital tv' in source:
-            source[0] = 'dvb'
-        elif 'video on demand' in source:
-            source[0] = 'vod'
-        elif 'web' in source:
-            if 'rip' in other:
-                source[0] = 'webrip'
-            else:
-                source[0] = 'webdl'
-        elif 'analog hdtv' in source:
-            source[0] = 'ahdtv'
-        elif 'ultra hdtv' in source:
-            source[0] = 'uhdtv'
-        elif 'hd telecine' in source:
-            source[0] = 'hdtc'
-        # end renaming
+        source = normalize_component(source)
 
         if 'preair' in other:
             source.append('preair')
@@ -138,6 +122,17 @@ class ParserGuessit(object):
                 source.append('dvdscr')
         if 'r5' in other:
             source.append('r5')
+
+        return source
+
+    def _quality(self, guessit_result):
+        """Generate a FlexGet Quality from a guessit result."""
+        resolution = normalize_component(guessit_result.get('screen_size'))
+        other = normalize_component(guessit_result.get('other'))
+        if not resolution and 'high resolution' in other:
+            resolution.append('hr')
+
+        source = self._source(guessit_result)
 
         codec = normalize_component(guessit_result.get('video_codec'))
         if '10bit' in normalize_component(guessit_result.get('video_profile')):
