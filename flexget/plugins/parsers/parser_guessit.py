@@ -42,16 +42,20 @@ def rules_builder(config):
 
 
 guessit_api = GuessItApi()
-guessit_api.configure({}, rules_builder=rules_builder)
+guessit_api.configure(
+    options={},
+    rules_builder=rules_builder,
+    force=True)
 
 
 def normalize_component(data):
     if data is None:
         return []
-    if isinstance(data, list):
-        return [d.lower().replace('-', '') for d in data]
 
-    return [data.lower().replace('-', '')]
+    if not isinstance(data, list):
+        data = [data]
+
+    return [d.lower().replace('-', '') for d in data]
 
 
 class ParserGuessit(object):
@@ -93,10 +97,38 @@ class ParserGuessit(object):
         """Generate a FlexGet Quality from a guessit result."""
         resolution = normalize_component(guessit_result.get('screen_size'))
         other = normalize_component(guessit_result.get('other'))
-        if not resolution and 'hr' in other:
+        if not resolution and 'high resolution' in other:
             resolution.append('hr')
 
         source = normalize_component(guessit_result.get('source'))
+
+        # some source renaming happened in guessit 3.0. This is here so quality lookups keeps working
+        # see https://github.com/guessit-io/guessit/blob/3.0.0/docs/migration2to3.rst
+        if 'digital tv' in source:
+            source[0] = 'dvb'
+        elif any(s in source for s in ['camera', 'hd camera']):
+            source[0] = 'cam'
+        elif 'hd telesync' in source:
+            source[0] = 'telesync'
+        elif 'payperview' in source:
+            source[0] = 'ppv'
+        elif 'digital tv' in source:
+            source[0] = 'dvb'
+        elif 'video on demand' in source:
+            source[0] = 'vod'
+        elif 'web' in source:
+            if 'rip' in other:
+                source[0] = 'webrip'
+            else:
+                source[0] = 'webdl'
+        elif 'analog hdtv' in source:
+            source[0] = 'ahdtv'
+        elif 'ultra hdtv' in source:
+            source[0] = 'uhdtv'
+        elif 'hd telecine' in source:
+            source[0] = 'hdtc'
+        # end renaming
+
         if 'preair' in other:
             source.append('preair')
         if 'screener' in other:
@@ -115,9 +147,9 @@ class ParserGuessit(object):
         audio_profile = normalize_component(guessit_result.get('audio_profile'))
         audio_channels = normalize_component(guessit_result.get('audio_channels'))
         # unlike the other components, audio can be a bit iffy with multiple codecs, so we limit it to one
-        if 'dts' in audio and any(hd in audio_profile for hd in ['HD', 'HDMA']):
+        if 'dts' in audio and any(hd in audio_profile for hd in ['hd', 'master audio']):
             audio = ['dtshd']
-        elif '5.1' in audio_channels and any(dd in audio for dd in ['ac3', 'dolbydigital']):
+        elif '5.1' in audio_channels and any(dd in audio for dd in ['dolby digital']):
             audio = ['dd5.1']
 
         # Make sure everything are strings (guessit will return lists when there are multiples)
