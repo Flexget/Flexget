@@ -35,7 +35,14 @@ def _id_regexps_function(input_string, context):
 _id_regexps = Rebulk().functional(_id_regexps_function, name='regexpId',
                                   disabled=lambda context: not context.get('id_regexps'))
 
-guessit_api = GuessItApi(rebulk_builder().rebulk(_id_regexps))
+def rules_builder(config):
+    rebulk = rebulk_builder(config)
+    rebulk.rebulk(_id_regexps)
+    return rebulk
+
+
+guessit_api = GuessItApi()
+guessit_api.configure({}, rules_builder=rules_builder)
 
 
 def normalize_component(data):
@@ -89,7 +96,7 @@ class ParserGuessit(object):
         if not resolution and 'hr' in other:
             resolution.append('hr')
 
-        source = normalize_component(guessit_result.get('format'))
+        source = normalize_component(guessit_result.get('source'))
         if 'preair' in other:
             source.append('preair')
         if 'screener' in other:
