@@ -90,7 +90,7 @@ class ParserGuessit(object):
         else:
             version -= 1
         proper_count = guessit_result.get('proper_count', 0)
-        fastsub = 'fastsub' in normalize_component(guessit_result.get('other'))
+        fastsub = 'fast subtitled' in normalize_component(guessit_result.get('other'))
         return version + proper_count - (5 if fastsub else 0)
 
     def _quality(self, guessit_result):
@@ -102,7 +102,7 @@ class ParserGuessit(object):
 
         source = normalize_component(guessit_result.get('source'))
 
-        # some source renaming happened in guessit 3.0. This is here so quality lookups keeps working
+        # some renaming happened in guessit 3.0. This is here so quality lookups keeps working
         # see https://github.com/guessit-io/guessit/blob/3.0.0/docs/migration2to3.rst
         if 'digital tv' in source:
             source[0] = 'dvb'
@@ -268,7 +268,7 @@ class ParserGuessit(object):
             episode = episode[0]
         date = guess_result.get('date')
         quality = self._quality(guess_result)
-        proper_count = self._proper_count(guess_result)
+        proper_count = self._proper_count(guess_result, )
         group = guess_result.get('release_group')
         # Validate group with from_group
         if not self._is_valid_groups(group, guessit_options.get('allow_groups', [])):
