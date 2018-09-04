@@ -113,7 +113,7 @@ class UrlRewriteTorrentleech(object):
             login = task.requests.post('https://www.torrentleech.org/user/account/login/', data=data,
                                        headers=request_headers, allow_redirects=True)
         except RequestException as e:
-            raise PluginError('Could not connect to torrentleech: %s', str(e))
+            raise PluginError('Could not connect to torrentleech: %s' % str(e))
 
         if not isinstance(config, dict):
             config = {}
