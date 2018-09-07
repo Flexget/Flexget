@@ -41,7 +41,7 @@ class UrlRewriteYTS(object):
                 raise plugin.PluginError('failed to query YTS')
 
             try:
-                if data['data']['movie_count'] > 0:  
+                if data['data']['movie_count'] > 0:
                     for item in data['data']['movies']:
                         for torrent in item['torrents']:
                             entry = Entry()
@@ -57,7 +57,7 @@ class UrlRewriteYTS(object):
                             entry['imdb_id'] = item['imdb_code']
                             if entry.isvalid():
                                 entries.add(entry)
-            except:
+            except Exception:
                 log.debug('invalid return structure from YTS')
 
         log.debug('Search got %d results' % len(entries))
