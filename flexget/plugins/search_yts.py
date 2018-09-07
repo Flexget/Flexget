@@ -7,6 +7,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('yts')
 
@@ -39,24 +40,25 @@ class UrlRewriteYTS(object):
             if not data['status'] == 'ok':
                 raise plugin.PluginError('failed to query YTS')
 
-            for item in data['data']['movies']:
-                try:
-                    for torrent in item['torrents']:
-                        entry = Entry()
-                        entry['title'] = item['title']
-                        entry['year'] = item['year']
-                        entry['url'] = torrent['url']
-                        entry['content_size'] = torrent['size']
-                        entry['torrent_seeds'] = torrent['seeds']
-                        entry['torrent_leeches'] = torrent['peers']
-                        entry['torrent_info_hash'] = torrent['hash']
-                        entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
-                        entry['quality'] = torrent['quality']
-                        entry['imdb_id'] = item['imdb_code']
-                        if entry.isvalid():
-                            entries.add(entry)
-                except:
-                    log.debug('invalid return structure from YTS')
+            try:
+                if data['data']['movie_count'] > 0:  
+                    for item in data['data']['movies']:
+                        for torrent in item['torrents']:
+                            entry = Entry()
+                            entry['title'] = item['title']
+                            entry['year'] = item['year']
+                            entry['url'] = torrent['url']
+                            entry['content_size'] = parse_filesize(str(torrent['size_bytes']) + "b")
+                            entry['torrent_seeds'] = torrent['seeds']
+                            entry['torrent_leeches'] = torrent['peers']
+                            entry['torrent_info_hash'] = torrent['hash']
+                            entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+                            entry['quality'] = torrent['quality']
+                            entry['imdb_id'] = item['imdb_code']
+                            if entry.isvalid():
+                                entries.add(entry)
+            except:
+                log.debug('invalid return structure from YTS')
 
         log.debug('Search got %d results' % len(entries))
         return entries
@@ -64,4 +66,4 @@ class UrlRewriteYTS(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteYTS, 'yts', groups=['search'], api_ver=2)
+    plugin.register(UrlRewriteYTS, 'yts', interfaces=['search'], api_ver=2)
