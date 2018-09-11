@@ -66,8 +66,8 @@ class Site1337x(object):
 
         soup = get_soup(page.content)
 
-        magnet_url = str(soup.find("a", href=re.compile(r"^magnet:\?")).get('href')).lower()
-        torrent_url = str(soup.find("a", href=re.compile(r"\.torrent$")).get('href')).lower()
+        magnet_url = str(soup.find('a', href=re.compile(r'^magnet:\?')).get('href')).lower()
+        torrent_url = str(soup.find('a', href=re.compile(r'\.torrent$')).get('href')).lower()
 
         entry['url'] = torrent_url
         entry.setdefault('urls', []).append(torrent_url)
