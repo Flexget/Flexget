@@ -66,8 +66,8 @@ class Site1337x(object):
 
         soup = get_soup(page.content)
 
-        magnet_url = str(soup.find('a', id='magnetdl').get('href')).lower()
-        torrent_url = str(soup.find('a', id='torrentdl').get('href')).lower()
+        magnet_url = str(soup.find('a', href=re.compile(r'^magnet:\?')).get('href')).lower()
+        torrent_url = str(soup.find('a', href=re.compile(r'\.torrent$')).get('href')).lower()
 
         entry['url'] = torrent_url
         entry.setdefault('urls', []).append(torrent_url)
@@ -103,16 +103,16 @@ class Site1337x(object):
                 continue
 
             soup = get_soup(page.content)
-            if soup.find('div', attrs={'class': 'tab-detail'}) is not None:
-                for link in soup.find('div', attrs={'class': 'tab-detail'}).findAll('a', href=re.compile('^/torrent/')):
+            if soup.find('div', attrs={'class': 'table-list-wrap'}) is not None:
+                for link in soup.find('div', attrs={'class': 'table-list-wrap'}).findAll('a', href=re.compile('^/torrent/')):
 
-                    li = link.parent.parent.parent
+                    li = link.parent.parent
 
                     title = str(link.text).replace('...', '')
                     info_url = self.base_url + str(link.get('href'))[1:]
-                    seeds = int(li.find('span', class_='green').string)
-                    leeches = int(li.find('span', class_='red').string)
-                    size = str(li.find('div', class_='coll-4').string)
+                    seeds = int(li.find('td', class_='seeds').string)
+                    leeches = int(li.find('td', class_='leeches').string)
+                    size = str(li.find('td', class_='coll-4').contents[0])
 
                     size = parse_filesize(size)
 
