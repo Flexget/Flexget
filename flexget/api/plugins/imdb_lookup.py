@@ -17,7 +17,7 @@ class ObjectsContainer(object):
             'match': {'type': 'number'},
             'name': {'type': 'string'},
             'url': {'type': 'string'},
-            'year': {'type': 'string'},
+            'year': {'type': 'number'},
             'thumbnail': {'type': 'string'}
         },
         'required': ['imdb_id', 'match', 'name', 'url', 'year'],
