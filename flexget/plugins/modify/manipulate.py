@@ -126,7 +126,7 @@ class Manipulate(object):
                         continue
                     replace_config = config['replace']
                     regexp = re.compile(replace_config['regexp'], flags=re.I | re.U)
-                    field_value = regexp.sub(replace_config['format'].replace('\\', r'\\'), field_value).strip()
+                    field_value = regexp.sub(replace_config['format'], field_value).strip()
                     log.debug('field `%s` after replace: `%s`' % (field, field_value))
 
                 if from_field != field or entry[field] != field_value:

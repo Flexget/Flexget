@@ -3,7 +3,6 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.xmlrpc import client as xmlrpc_client
 
 import os
-import re
 
 import mock
 
@@ -68,7 +67,7 @@ class TestRTorrentClient(object):
 
         fields = [p for p in called_args[2:]]
         assert len(fields) == 3
-        assert ('d.directory.set=' + re.escape('/data/downloads')) in fields
+        assert 'd.directory.set=\\/data\\/downloads' in fields
         assert 'd.custom1.set=testing' in fields
         assert 'd.priority.set=3' in fields
 
