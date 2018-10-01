@@ -191,15 +191,19 @@ class PluginSubliminal(object):
                         # Gather the subtitles for the alternative languages too, to avoid needing to search the sites
                         # again. They'll just be ignored if the main languages are found.
                         all_subtitles = provider_pool.list_subtitles(video, entry_languages | alternative_languages)
-
-                        subtitles = provider_pool.download_best_subtitles(all_subtitles, video, entry_languages,
-                                                                          min_score=msc,
-                                                                          hearing_impaired=hearing_impaired)
+                        try:
+                            subtitles = provider_pool.download_best_subtitles(all_subtitles, video, entry_languages,
+                                                                              min_score=msc,
+                                                                              hearing_impaired=hearing_impaired)
+                        except TypeError as e:
+                            log.error('Downloading subtitles failed due to a bug in subliminal. Please see'
+                                      'https://github.com/Diaoul/subliminal/issues/921. Error: %s', e)
+                            subtitles = []
                         if subtitles:
                             downloaded_subtitles[video].extend(subtitles)
                             log.info('Subtitles found for %s', entry['location'])
                         else:
-                            # only try to download for alternatives that aren't alread downloaded
+                            # only try to download for alternatives that aren't already downloaded
                             subtitles = provider_pool.download_best_subtitles(all_subtitles, video,
                                                                               alternative_languages, min_score=msc,
                                                                               hearing_impaired=hearing_impaired)
