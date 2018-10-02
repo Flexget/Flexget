@@ -44,7 +44,7 @@ class AnidbList(object):
         url = 'http://anidb.net/perl-bin/animedb.pl?show=mywishlist&uid=%s' % config['user_id']
         log.debug('Requesting: %s' % url)
 
-        page = task.requests.get(url)
+        page = task.requests.get(url, headers={'user-agent': 'Mozilla/5.0'})
         if page.status_code != 200:
             raise plugin.PluginError('Unable to get AniDB list. Either the list is private or does not exist.')
 
