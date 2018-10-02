@@ -28,6 +28,13 @@ class AnidbList(object):
                 'type': 'string',
                 'enum': ['shows', 'movies'],
                 'default': 'movies'},
+            'mode': {
+                'type': 'string',
+                'enum': ['all', 'get', 'watch', 'buddy', 'undefined', 'blacklist'],
+                'value': [0, 3, 2, 11, 1, 4],
+                'default': 'all'},
+            'pass': {
+                'type': 'string'},
             'strip_dates': {
                 'type': 'boolean',
                 'default': False}
@@ -37,11 +44,16 @@ class AnidbList(object):
         'error_required': 'user_id is required'
     }
 
+    def __mode_string_to_int(self, mode_string):
+        mode_string_index = self.schema['properties']['mode']['enum'].index(mode_string)
+        return self.schema['properties']['mode']['value'][mode_string_index]
+
     @cached('anidb_list', persist='2 hours')
     def on_task_input(self, task, config):
         # Create entries by parsing AniDB wishlist page html using beautifulsoup
         log.verbose('Retrieving AniDB list: mywishlist')
-        url = 'http://anidb.net/perl-bin/animedb.pl?show=mywishlist&uid=%s' % config['user_id']
+        url = 'https://anidb.net/perl-bin/animedb.pl?show=mywishlist&uid=%s&pass=%s&mode=%s' %\
+              (config['user_id'], config['pass'], self.__mode_string_to_int(config['mode']))
         log.debug('Requesting: %s' % url)
 
         page = task.requests.get(url, headers={'user-agent': 'Mozilla/5.0'})
