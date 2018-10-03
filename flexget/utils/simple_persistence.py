@@ -47,7 +47,7 @@ def upgrade(ver, session):
                     log.warning('Couldn\'t load %s:%s removing from db: %s' % (row['plugin'], row['key'], e))
                     session.execute(table.delete().where(table.c.id == row['id']))
         except Exception as e:
-            log.warning('Couldn\'t upgrade the table. Commencing nuke. Error: %s', e)
+            log.warning('Couldn\'t upgrade the simple_persistence table. Commencing nuke. Error: %s', e)
             raise db_schema.UpgradeImpossible
         ver = 1
     if ver == 1:
