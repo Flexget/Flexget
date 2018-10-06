@@ -19,7 +19,6 @@ from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
 from flexget.utils.database import json_synonym
-from flexget.utils.simple_persistence import SimplePersistence
 from flexget.utils.tools import TimedDict, split_title_year
 
 Base = db_schema.versioned_base('api_trakt', 7)
@@ -31,8 +30,6 @@ CLIENT_SECRET = 'db4af7531e8df678b134dbc22445a2c04ebdbdd7213be7f5b6d17dfdfabfcdc
 API_URL = 'https://api.trakt.tv/'
 PIN_URL = 'https://trakt.tv/pin/346'
 USER_CACHE_DURATION = '15 minutes'  # cache duration for sync data eg. history, collection
-# Stores the last time we checked for updates for shows/movies
-updated = SimplePersistence('api_trakt')
 
 
 # Oauth account authentication
