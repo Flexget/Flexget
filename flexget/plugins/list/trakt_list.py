@@ -94,7 +94,8 @@ class TraktSet(MutableSet):
             'account': {'type': 'string'},
             'list': {'type': 'string'},
             'type': {'type': 'string', 'enum': ['shows', 'seasons', 'episodes', 'movies', 'auto'], 'default': 'auto'},
-            'strip_dates': {'type': 'boolean', 'default': False}
+            'strip_dates': {'type': 'boolean', 'default': False},
+            'language': {'type': 'string', 'minLength': 2, 'maxLength': 2}
         },
         'required': ['list'],
         'anyOf': [{'required': ['username']}, {'required': ['account']}],
@@ -199,6 +200,27 @@ class TraktSet(MutableSet):
                         item['show']['ids']['slug'], item['episode']['season'], item['episode']['number'])
                 else:
                     entry['url'] = 'https://trakt.tv/%ss/%s' % (list_type, item[list_type]['ids'].get('slug'))
+
+                # get movie name translation
+                language = self.config.get('language')
+                if list_type == 'movie' and language:
+                    endpoint = ['movies', entry['trakt_movie_id'], 'translations', language]
+                    try:
+                        result = self.session.get(get_api_url(endpoint))
+                        try:
+                            translation = result.json()
+                        except ValueError:
+                            raise plugin.PluginError('Error decoding movie translation from trakt: %s.' % result.text)
+                    except RequestException as e:
+                        raise plugin.PluginError('Could not retrieve movie translation from trakt: %s' % str(e))
+                    if not translation:
+                        log.warning('No translation data returned from trakt for movie %s.', entry['title'])
+                    else:
+                        log.verbose('Found `%s` translation for movie `%s`: %s',
+                                    language, entry['movie_name'], translation[0]['title'])
+                        entry['title'] = translation[0]['title'] + ' (' + entry['movie_year'] + ')'
+                        entry['movie_name'] = translation[0]['title']
+
                 entry.update_using_map(field_maps[list_type], item)
                 # Override the title if strip_dates is on. TODO: a better way?
                 if self.config.get('strip_dates'):
