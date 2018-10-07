@@ -140,7 +140,8 @@ class ParserGuessit(object):
             year=guess_result.get('year'),
             proper_count=self._proper_count(guess_result),
             quality=self._quality(guess_result),
-            release_group=guess_result.get('release_group')
+            release_group=guess_result.get('release_group'),
+            valid=bool(guess_result.get('title'))  # It's not valid if it didn't find a name, which sometimes happens
         )
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
