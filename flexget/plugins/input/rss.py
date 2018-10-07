@@ -111,6 +111,7 @@ class InputRSS(object):
             'link': one_or_more({'type': 'string'}),
             'silent': {'type': 'boolean', 'default': False},
             'ascii': {'type': 'boolean', 'default': False},
+            'escape': {'type': 'boolean', 'default': False},
             'filename': {'type': 'boolean'},
             'group_links': {'type': 'boolean', 'default': False},
             'all_entries': {'type': 'boolean', 'default': True},
@@ -184,6 +185,25 @@ class InputRSS(object):
             f.write(data)
         log.critical('I have saved the invalid content to %s for you to view', filepath)
 
+    def escape_content(self, content):
+        future_result = []
+        should_change = True
+        for idx, char in enumerate(content):
+            if should_change and chr(char) == '&':
+                if content[idx:idx + 4] != '&amp;':
+                    future_result.append('&amp;')
+            elif should_change and chr(char) == '<':
+                if content[idx:idx+9] == '<![CDATA[':
+                    should_change = False
+                future_result.append(chr(char))
+            elif not should_change and chr(char) == ']':
+                if content[idx:idx+3] == ']]>':
+                    should_change = True
+                future_result.append(chr(char))
+            else:
+                future_result.append(chr(char))
+        return "".join(future_result)
+
     def add_enclosure_info(self, entry, enclosure, filename=True, multiple=False):
         """Stores information from an rss enclosure into an Entry."""
         entry['url'] = enclosure['href']
@@ -247,6 +267,9 @@ class InputRSS(object):
             if config.get('ascii'):
                 # convert content to ascii (cleanup), can also help with parsing problems on malformed feeds
                 content = response.text.encode('ascii', 'ignore')
+
+            if config.get('escape'):
+                content = self.escape_content(content)
 
             # status checks
             status = response.status_code
