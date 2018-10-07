@@ -13,13 +13,13 @@ from flexget.utils.cached_input import cached
 
 log = logging.getLogger('betaseries_list')
 
-API_URL_PREFIX = 'http://api.betaseries.com/'
+API_URL_PREFIX = 'https://api.betaseries.com/'
 
 
 class BetaSeriesList(object):
     """
         Emits an entry for each serie followed by one or more BetaSeries account.
-        See http://www.betaseries.com/
+        See https://www.betaseries.com/
 
         Configuration examples:
 
@@ -47,7 +47,7 @@ class BetaSeriesList(object):
             - guy2
 
 
-        Api key can be requested at http://www.betaseries.com/api.
+        Api key can be requested at https://www.betaseries.com/api.
 
         This plugin is meant to work with the import_series plugin as follow:
 
@@ -105,9 +105,9 @@ class BetaSeriesList(object):
 def create_token(api_key, login, password):
     """
     login in and request an new API token.
-    http://www.betaseries.com/wiki/Documentation#cat-members
+    https://www.betaseries.com/wiki/Documentation#cat-members
 
-    :param string api_key: Api key requested at http://www.betaseries.com/api
+    :param string api_key: Api key requested at https://www.betaseries.com/api
     :param string login: Login name
     :param string password: Password
     :return: User token
@@ -133,7 +133,7 @@ def query_member_id(api_key, user_token, login_name):
     """
     Get the member id of a member identified by its login name.
 
-    :param string api_key: Api key requested at http://www.betaseries.com/api
+    :param string api_key: Api key requested at https://www.betaseries.com/api
     :param string user_token: obtained with a call to create_token()
     :param string login_name: The login name of the member
     :return: Id of the member identified by its login name or `None` if not found
@@ -164,7 +164,7 @@ def query_series(api_key, user_token, member_name=None):
     """
     Get the list of series followed by the authenticated user
 
-    :param string api_key: Api key requested at http://www.betaseries.com/api
+    :param string api_key: Api key requested at https://www.betaseries.com/api
     :param string user_token: Obtained with a call to create_token()
     :param string member_name: [optional] A member name to get the list of series from. If None, will query the member
         for whom the user_token was for
