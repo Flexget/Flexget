@@ -125,7 +125,10 @@ class InputBacklog(object):
     @plugin.priority(255)
     def on_task_metainfo(self, task, config):
         # Take a snapshot of any new entries' states before metainfo event in case we have to store them to backlog
-        # This is really a hack to avoid unnecessary lazy lookups causing db locks
+        # This is really a hack to avoid unnecessary lazy lookups causing db locks. Ideally, saving a snapshot
+        # should not cause lazy lookups, but we currently have no other way of saving a lazy field than performing its
+        # action.
+        # https://github.com/Flexget/Flexget/issues/1000
         for entry in task.entries:
             snapshot = entry.snapshots.get('after_input')
             if snapshot:
