@@ -186,22 +186,19 @@ class InputRSS(object):
         log.critical('I have saved the invalid content to %s for you to view', filepath)
 
     def escape_content(self, content):
-        valid_escapes = ['&quot;', '&apos;', '&lt;', '&gt;', '&amp;']
+        valid_escapes = ('&quot;', '&apos;', '&lt;', '&gt;', '&amp;')
         future_result = []
         in_cdata_block = False
         
         for idx, char in enumerate(content):
             char = chr(char)
             if not in_cdata_block and char == '&':
-                for escape in valid_escapes:
-                    if content[idx:idx+len(escape)] == escape:
-                        break
-                else:
+                if not str(content[idx:idx+8]).startswith(valid_escapes):
                     char = '&amp;'
             elif not in_cdata_block and char == '<' and content[idx:idx+9] == '<![CDATA[':
                 in_cdata_block = True
-            elif in_cdata_block and char == ']' and content[idx:idx+3] == ']]>':
-                should_change = False
+            elif in_cdata_block and char == ']' and content[idx-2:idx+1] == ']]>':
+                in_cdata_block = False
             future_result.append(char)
         return ''.join(future_result)
 
