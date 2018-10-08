@@ -158,6 +158,31 @@ class TestInputRSS(object):
             'RSS entry missing: multiple content tags'
 
 
+class TestEscapeInputRSS(object):
+    config = """
+        tasks:
+          test:
+            rss:
+              url: rss_escape.xml
+              escape: yes
+    """
+
+    def test_rss(self, execute_task):
+        task = execute_task('test')
+
+        assert task.find_entry(title='Snatch', url='http://wrong&url2'), \
+            'RSS entry: broken url'
+
+        assert task.find_entry(title='Snatch &2', url='http://some/url'), \
+            'RSS entry: broken name'
+
+        assert task.find_entry(title='Snatch &amp;4', url='http://correct&url3'), \
+            'RSS entry: normal'
+
+        assert task.find_entry(title='Snatch &amp;5', url='http://correct&url4'), \
+            'RSS entry: CDATA in title'
+
+
 @pytest.mark.xfail(reason="silverorange changed some stuff")
 @pytest.mark.online
 class TestRssOnline(object):

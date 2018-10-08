@@ -267,6 +267,7 @@ class InputRSS(object):
                 content = response.text.encode('ascii', 'ignore')
 
             if config.get('escape'):
+                log.debug("Trying to escape unescaped ampersands in RSS")
                 content = self.escape_content(content)
 
             # status checks
@@ -303,6 +304,10 @@ class InputRSS(object):
             if config.get('ascii'):
                 # Just assuming utf-8 file in this case
                 content = content.decode('utf-8', 'ignore').encode('ascii', 'ignore')
+
+            if config.get('escape'):
+                log.debug("Trying to escape unescaped in RSS")
+                content = self.escape_content(content)
 
         if not content:
             log.error('No data recieved for rss feed.')
