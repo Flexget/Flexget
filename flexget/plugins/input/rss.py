@@ -191,7 +191,9 @@ class InputRSS(object):
         in_cdata_block = False
 
         for idx, char in enumerate(content):
-            char = chr(char)
+
+            if type(char) is int:
+                char = chr(char)
             if not in_cdata_block and char == '&':
                 if not str(content[idx:idx+7]).startswith(valid_escapes):
                     char = '&amp;'
