@@ -193,7 +193,7 @@ class InputRSS(object):
         for idx, char in enumerate(content):
             char = chr(char)
             if not in_cdata_block and char == '&':
-                if not str(content[idx:idx+8]).startswith(valid_escapes):
+                if not str(content[idx:idx+7]).startswith(valid_escapes):
                     char = '&amp;'
             elif not in_cdata_block and char == '<' and content[idx:idx+9] == '<![CDATA[':
                 in_cdata_block = True
