@@ -39,5 +39,13 @@
             <description>Snatch s02e07</description>
             <enclosure url="http://correct&amp;url4" length="0" type="application/x-bittorrent" />
         </item>
+        <item>
+            <title><![CDATA[Cyrillic &тест]]></title>
+            <guid isPermaLink="true">http://newstudio.tv/viewtopic.php?t=5</guid>
+            <pubDate>Sun, 07 Oct 2018 22:10:55 +0300</pubDate>
+            <link>http://newstudio.tv/viewtopic.php?t=4</link>
+            <description>Snatch s02e07</description>
+            <enclosure url="http://correct&amp;url5" length="0" type="application/x-bittorrent" />
+        </item>
     </channel>
 </rss>
