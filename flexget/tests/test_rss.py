@@ -176,10 +176,10 @@ class TestEscapeInputRSS(object):
         assert task.find_entry(title='Snatch &2', url='http://some/url'), \
             'RSS entry: broken name'
 
-        assert task.find_entry(title='Snatch &amp;4', url='http://correct&url3'), \
+        assert task.find_entry(title='Snatch &4', url='http://correct&url3'), \
             'RSS entry: normal'
 
-        assert task.find_entry(title='Snatch &amp;5', url='http://correct&url4'), \
+        assert task.find_entry(title='Snatch &5', url='http://correct&url4'), \
             'RSS entry: CDATA in title'
 
 

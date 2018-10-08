@@ -186,23 +186,23 @@ class InputRSS(object):
         log.critical('I have saved the invalid content to %s for you to view', filepath)
 
     def escape_content(self, content):
-        valid_escapes = ('&quot;', '&apos;', '&lt;', '&gt;', '&amp;')
+        valid_escapes = (b'&quot;', b'&apos;', b'&lt;', b'&gt;', b'&amp;')
         future_result = []
         in_cdata_block = False
 
         for idx, char in enumerate(content):
 
             if type(char) is int:
-                char = chr(char)
-            if not in_cdata_block and char == '&':
-                if not str(content[idx:idx+7]).startswith(valid_escapes):
-                    char = '&amp;'
-            elif not in_cdata_block and char == '<' and content[idx:idx+9] == '<![CDATA[':
+                char = tobytes(chr(char))
+            if not in_cdata_block and char == b'&':
+                if not content[idx:idx + 7].startswith(valid_escapes):
+                    char = b'&amp;'
+            elif not in_cdata_block and char == b'<' and content[idx:idx + 9] == b'<![CDATA[':
                 in_cdata_block = True
-            elif in_cdata_block and char == ']' and content[idx-1:idx+2] == ']]>':
+            elif in_cdata_block and char == b']' and content[idx - 1:idx + 2] == b']]>':
                 in_cdata_block = False
             future_result.append(char)
-        return ''.join(future_result)
+        return b''.join(future_result)
 
     def add_enclosure_info(self, entry, enclosure, filename=True, multiple=False):
         """Stores information from an rss enclosure into an Entry."""
