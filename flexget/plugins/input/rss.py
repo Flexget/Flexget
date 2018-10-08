@@ -189,7 +189,7 @@ class InputRSS(object):
         valid_escapes = ('&quot;', '&apos;', '&lt;', '&gt;', '&amp;')
         future_result = []
         in_cdata_block = False
-        
+
         for idx, char in enumerate(content):
             char = chr(char)
             if not in_cdata_block and char == '&':
@@ -197,7 +197,7 @@ class InputRSS(object):
                     char = '&amp;'
             elif not in_cdata_block and char == '<' and content[idx:idx+9] == '<![CDATA[':
                 in_cdata_block = True
-            elif in_cdata_block and char == ']' and content[idx-2:idx+1] == ']]>':
+            elif in_cdata_block and char == ']' and content[idx-1:idx+2] == ']]>':
                 in_cdata_block = False
             future_result.append(char)
         return ''.join(future_result)
