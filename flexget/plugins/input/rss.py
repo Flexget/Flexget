@@ -190,23 +190,19 @@ class InputRSS(object):
         future_result = []
         in_cdata_block = False
         
-        for idx, char in enumerate(letter for letter in content):
-            if not in_cdata_block and chr(char) == '&':
+        for idx, char in enumerate(content):
+            char = chr(char)
+            if not in_cdata_block and char == '&':
                 for escape in valid_escapes:
                     if content[idx:idx+len(escape)] == escape:
                         break
                 else:
-                    future_result.append('&amp;')
-            elif not in_cdata_block and chr(char) == '<':
-                if content[idx:idx+9] == '<![CDATA[':
-                    should_change = False
-                future_result.append(chr(char))
-            elif in_cdata_block and chr(char) == ']':
-                if content[idx:idx+3] == ']]>':
-                    should_change = True
-                future_result.append(chr(char))
-            else:
-                future_result.append(chr(char))
+                    char = '&amp;'
+            elif not in_cdata_block and char == '<' and content[idx:idx+9] == '<![CDATA[':
+                in_cdata_block = True
+            elif in_cdata_block and char == ']' and content[idx:idx+3] == ']]>':
+                should_change = False
+            future_result.append(char)
         return ''.join(future_result)
 
     def add_enclosure_info(self, entry, enclosure, filename=True, multiple=False):
