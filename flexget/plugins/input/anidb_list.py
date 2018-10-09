@@ -17,6 +17,8 @@ USER_ID_RE = r'^\d{1,6}$'
 class AnidbList(object):
     """"Creates an entry for each movie or series in your AniDB wishlist."""
 
+    anidb_url = 'http://anidb.net/perl-bin/'
+
     schema = {
         'type': 'object',
         'properties': {
@@ -26,18 +28,21 @@ class AnidbList(object):
                 'error_pattern': 'user_id must be in the form XXXXXXX'},
             'type': {
                 'type': 'string',
-                'enum': ['shows', 'movies'],
+                'enum': ['shows', 'movies', 'ovas'],
                 'default': 'movies'},
             'mode': {
                 'type': 'string',
-                'enum': ['all', 'get', 'watch', 'buddy', 'undefined', 'blacklist'],
-                'value': [0, 3, 2, 11, 1, 4],
+                'enum': ['all', 'undefined', 'watch', 'get', 'blacklist', 'buddy'],
                 'default': 'all'},
             'pass': {
                 'type': 'string'},
             'strip_dates': {
                 'type': 'boolean',
-                'default': False}
+                'default': False},
+            'user_agent': {
+                'type': 'string',
+                'default': ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                            'AppleWebkit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36')}
         },
         'additionalProperties': False,
         'required': ['user_id'],
@@ -45,28 +50,29 @@ class AnidbList(object):
     }
 
     def __mode_string_to_int(self, mode_string):
-        mode_string_index = self.schema['properties']['mode']['enum'].index(mode_string)
-        return self.schema['properties']['mode']['value'][mode_string_index]
+        if mode_string == 'buddy':
+            return 11
+        return self.schema['properties']['mode']['enum'].index(mode_string)
+
+    def __build_url(self, config):
+        base_url = self.anidb_url + 'animedb.pl?show=mywishlist&uid=%s' % config['user_id']
+        base_url = base_url + ('' if config['mode'] == 'all' else '&mode=%s' % self.__mode_string_to_int(config['mode']))
+        base_url = base_url + ('' if config['pass'] is None else '&pass=%s' % config['pass'])
+        return base_url
 
     @cached('anidb_list', persist='2 hours')
     def on_task_input(self, task, config):
         # Create entries by parsing AniDB wishlist page html using beautifulsoup
-        log.verbose('Retrieving AniDB list: mywishlist')
-        url = 'https://anidb.net/perl-bin/animedb.pl?show=mywishlist&uid=%s&pass=%s&mode=%s' %\
-              (config['user_id'], config['pass'], self.__mode_string_to_int(config['mode']))
-        log.debug('Requesting: %s' % url)
+        log.verbose('Retrieving AniDB list: mywishlist:%s' % config['mode'])
+        comp_link = self.__build_url(config)
+        log.debug('Requesting: %s', comp_link)
+        task_header = {
+            'User-Agent': config['user_agent']
+        }
 
-        page = task.requests.get(url, headers={'user-agent': 'Mozilla/5.0'})
+        page = task.requests.get(comp_link, headers=task_header)
         if page.status_code != 200:
             raise plugin.PluginError('Unable to get AniDB list. Either the list is private or does not exist.')
-
-        soup = get_soup(page.text)
-        soup = soup.find('table', class_='wishlist')
-
-        trs = soup.find_all('tr')
-        if not trs:
-            log.verbose('No movies were found in AniDB list: mywishlist')
-            return
 
         entries = []
         entry_type = ''
@@ -74,33 +80,47 @@ class AnidbList(object):
             entry_type = 'Type: Movie'
         elif config['type'] == 'shows':
             entry_type = 'Type: TV Series'
-        for tr in trs:
-            if tr.find('span', title=entry_type):
-                a = tr.find('td', class_='name').find('a')
-                if not a:
-                    log.debug('No title link found for the row, skipping')
-                    continue
+        elif config['type'] == 'ovas':
+            entry_type = 'Type: OVA'
+        while True:
+            soup = get_soup(page.text)
+            soup_table = soup.find('table', class_='wishlist').find('tbody')
 
-                anime_title = a.string
-                if config.get('strip_dates'):
-                    # Remove year from end of series name if present
-                    anime_title = re.sub(r'\s+\(\d{4}\)$', '', anime_title)
+            trs = soup_table.find_all('tr')
+            if not trs:
+                log.verbose('No movies were found in AniDB list: mywishlist')
+                return entries
+            for tr in trs:
+                if tr.find('span', title=entry_type):
+                    a = tr.find('td', class_='name').find('a')
+                    if not a:
+                        log.debug('No title link found for the row, skipping')
+                        continue
 
-                link = ('http://anidb.net/perl-bin/' + a.get('href'))
+                    anime_title = a.string
+                    if config.get('strip_dates'):
+                        # Remove year from end of series name if present
+                        anime_title = re.sub(r'\s+\(\d{4}\)$', '', anime_title)
 
-                anime_id = ""
-                match = re.search(r'aid=([\d]{1,5})', a.get('href'))
-                if match:
-                    anime_id = match.group(1)
-
-                entry = Entry()
-                entry['title'] = anime_title
-                entry['url'] = link
-                entry['anidb_id'] = anime_id
-                entry['anidb_name'] = entry['title']
-                entries.append(entry)
-            else:
-                log.verbose('Entry does not match the requested type')
+                    entry = Entry()
+                    entry['title'] = anime_title
+                    entry['url'] = (self.anidb_url + a.get('href'))
+                    entry['anidb_id'] = tr['id'][1:]  # The <tr> tag's id is "aN..." where "N..." is the anime id
+                    log.debug('%s id is %s', entry['title'], entry['anidb_id'])
+                    entry['anidb_name'] = entry['title']
+                    entries.append(entry)
+                else:
+                    log.verbose('Entry does not match the requested type')
+            try:
+                # Try to get the link to the next page.
+                next_link = soup.find('li', class_='next').find('a')['href']
+            except TypeError:
+                # If it isn't there, there are no more pages to be crawled.
+                log.verbose('No more pages on the wishlist.')
+                break
+            comp_link = self.anidb_url + next_link
+            log.debug('Requesting: %s', comp_link)
+            page = task.requests.get(comp_link, headers=task_header)
         return entries
 
 
