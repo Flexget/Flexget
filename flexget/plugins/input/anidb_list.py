@@ -56,7 +56,8 @@ class AnidbList(object):
 
     def __build_url(self, config):
         base_url = self.anidb_url + 'animedb.pl?show=mywishlist&uid=%s' % config['user_id']
-        base_url = base_url + ('' if config['mode'] == 'all' else '&mode=%s' % self.__mode_string_to_int(config['mode']))
+        base_url = base_url +\
+            ('' if config['mode'] == 'all' else '&mode=%s' % self.__mode_string_to_int(config['mode']))
         base_url = base_url + ('' if config['pass'] is None else '&pass=%s' % config['pass'])
         return base_url
 
