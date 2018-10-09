@@ -192,7 +192,7 @@ class InputRSS(object):
 
         for idx, char in enumerate(content):
 
-            if type(char) is int:
+            if isinstance(char, int):
                 char = tobytes(chr(char))
             if not in_cdata_block and char == b'&':
                 if not content[idx:idx + 7].startswith(valid_escapes):
