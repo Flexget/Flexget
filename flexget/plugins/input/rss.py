@@ -190,10 +190,9 @@ class InputRSS(object):
         future_result = []
         in_cdata_block = False
 
-        for idx, char in enumerate(content):
+        for idx, char in enumerate(bytes(content)):
 
-            if isinstance(char, int):
-                char = tobytes(chr(char))
+            char = bytes([char])
             if not in_cdata_block and char == b'&':
                 if not content[idx:idx + 7].startswith(valid_escapes):
                     char = b'&amp;'
