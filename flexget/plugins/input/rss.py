@@ -302,13 +302,12 @@ class InputRSS(object):
                 # Just assuming utf-8 file in this case
                 content = content.decode('utf-8', 'ignore').encode('ascii', 'ignore')
 
-        if config.get('escape'):
-            log.debug("Trying to escape unescaped in RSS")
-            content = self.escape_content(content)
-
         if not content:
             log.error('No data recieved for rss feed.')
             return []
+        if config.get('escape'):
+            log.debug("Trying to escape unescaped in RSS")
+            content = self.escape_content(content)
         try:
             rss = feedparser.parse(content)
         except LookupError as e:
