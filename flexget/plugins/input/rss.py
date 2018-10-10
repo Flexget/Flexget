@@ -111,6 +111,7 @@ class InputRSS(object):
             'link': one_or_more({'type': 'string'}),
             'silent': {'type': 'boolean', 'default': False},
             'ascii': {'type': 'boolean', 'default': False},
+            'escape': {'type': 'boolean', 'default': False},
             'filename': {'type': 'boolean'},
             'group_links': {'type': 'boolean', 'default': False},
             'all_entries': {'type': 'boolean', 'default': True},
@@ -183,6 +184,24 @@ class InputRSS(object):
         with open(filepath, 'wb') as f:
             f.write(data)
         log.critical('I have saved the invalid content to %s for you to view', filepath)
+
+    def escape_content(self, content):
+        valid_escapes = (b'&quot;', b'&apos;', b'&lt;', b'&gt;', b'&amp;')
+        future_result = []
+        in_cdata_block = False
+
+        for idx, char in enumerate(bytes(content)):
+
+            char = bytes([char])
+            if not in_cdata_block and char == b'&':
+                if not content[idx:idx + 7].startswith(valid_escapes):
+                    char = b'&amp;'
+            elif not in_cdata_block and char == b'<' and content[idx:idx + 9] == b'<![CDATA[':
+                in_cdata_block = True
+            elif in_cdata_block and char == b']' and content[idx - 1:idx + 2] == b']]>':
+                in_cdata_block = False
+            future_result.append(char)
+        return b''.join(future_result)
 
     def add_enclosure_info(self, entry, enclosure, filename=True, multiple=False):
         """Stores information from an rss enclosure into an Entry."""
@@ -286,6 +305,9 @@ class InputRSS(object):
         if not content:
             log.error('No data recieved for rss feed.')
             return []
+        if config.get('escape'):
+            log.debug("Trying to escape unescaped in RSS")
+            content = self.escape_content(content)
         try:
             rss = feedparser.parse(content)
         except LookupError as e:

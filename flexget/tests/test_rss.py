@@ -1,3 +1,4 @@
+# coding=utf-8
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
@@ -156,6 +157,46 @@ class TestInputRSS(object):
             'RSS entry missing: content:encoded'
         assert task.find_entry(title='Multiple content items', content='<p>test content1</p><p>test content2</p>'), \
             'RSS entry missing: multiple content tags'
+
+
+class TestEscapeInputRSS(object):
+    config = """
+        tasks:
+          test:
+            rss:
+              url: rss_escape.xml
+              escape: yes
+    """
+
+    def test_rss_broken_url(self, execute_task):
+        task = execute_task('test')
+
+        assert task.find_entry(title='Snatch', url='http://wrong&url2'), \
+            'RSS entry: broken url'
+
+    def test_rss_broken_title(self, execute_task):
+        task = execute_task('test')
+
+        assert task.find_entry(title='Snatch &2', url='http://some/url'), \
+            'RSS entry: broken name'
+
+    def test_rss_normal_after_escaping(self, execute_task):
+        task = execute_task('test')
+
+        assert task.find_entry(title='Snatch &4', url='http://correct&url3'), \
+            'RSS entry: normal'
+
+    def test_rss_with_cdata(self, execute_task):
+        task = execute_task('test')
+
+        assert task.find_entry(title='Snatch &5', url='http://correct&url4'), \
+            'RSS entry: CDATA in title'
+
+    def test_rss_with_cyrillic(self, execute_task):
+        task = execute_task('test')
+
+        assert task.find_entry(title='Cyrillic &тест', url='http://correct&url5'), \
+            'RSS entry: Cyrillic'
 
 
 @pytest.mark.xfail(reason="silverorange changed some stuff")

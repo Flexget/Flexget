@@ -71,6 +71,7 @@ class TestServerAPI(object):
                         'url': u'http://test/rss',
                         'group_links': False,
                         'ascii': False,
+                        'escape': False,
                         'silent': False,
                         'all_entries': True
                     }
