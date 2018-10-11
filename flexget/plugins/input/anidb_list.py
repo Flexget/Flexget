@@ -19,6 +19,15 @@ class AnidbList(object):
 
     anidb_url = 'http://anidb.net/perl-bin/'
 
+    MODE_MAP = {
+        'all': 0,
+        'undefined': 1,
+        'watch': 2,
+        'get': 3,
+        'blacklist': 4,
+        'buddy': 11
+    }
+
     schema = {
         'type': 'object',
         'properties': {
@@ -32,7 +41,7 @@ class AnidbList(object):
                 'default': 'movies'},
             'mode': {
                 'type': 'string',
-                'enum': ['all', 'undefined', 'watch', 'get', 'blacklist', 'buddy'],
+                'enum': list(MODE_MAP.keys()),
                 'default': 'all'},
             'pass': {
                 'type': 'string'},
@@ -49,15 +58,10 @@ class AnidbList(object):
         'error_required': 'user_id is required'
     }
 
-    def __mode_string_to_int(self, mode_string):
-        if mode_string == 'buddy':
-            return 11
-        return self.schema['properties']['mode']['enum'].index(mode_string)
-
     def __build_url(self, config):
         base_url = self.anidb_url + 'animedb.pl?show=mywishlist&uid=%s' % config['user_id']
         base_url = base_url +\
-            ('' if config['mode'] == 'all' else '&mode=%s' % self.__mode_string_to_int(config['mode']))
+            ('' if config['mode'] == 'all' else '&mode=%s' % config['mode'])
         base_url = base_url + ('' if config['pass'] is None else '&pass=%s' % config['pass'])
         return base_url
 
