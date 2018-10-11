@@ -64,7 +64,7 @@ class AnidbList(object):
     @cached('anidb_list', persist='2 hours')
     def on_task_input(self, task, config):
         # Create entries by parsing AniDB wishlist page html using beautifulsoup
-        log.verbose('Retrieving AniDB list: mywishlist:%s' % config['mode'])
+        log.verbose('Retrieving AniDB list: mywishlist:%s', config['mode'])
         comp_link = self.__build_url(config)
         log.debug('Requesting: %s', comp_link)
         task_header = {
