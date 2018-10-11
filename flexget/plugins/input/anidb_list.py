@@ -19,6 +19,9 @@ class AnidbList(object):
 
     anidb_url = 'http://anidb.net/perl-bin/'
 
+    default_user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebkit/537.36 (KHTML, like Gecko) ' \
+                         'Chrome/69.0.3497.100 Safari/537.36'
+
     MODE_MAP = {
         'all': 0,
         'undefined': 1,
@@ -47,11 +50,7 @@ class AnidbList(object):
                 'type': 'string'},
             'strip_dates': {
                 'type': 'boolean',
-                'default': False},
-            'user_agent': {
-                'type': 'string',
-                'default': ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
-                            'AppleWebkit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36')}
+                'default': False}
         },
         'additionalProperties': False,
         'required': ['user_id'],
@@ -71,9 +70,15 @@ class AnidbList(object):
         log.verbose('Retrieving AniDB list: mywishlist:%s', config['mode'])
         comp_link = self.__build_url(config)
         log.debug('Requesting: %s', comp_link)
-        task_header = {
-            'User-Agent': config['user_agent']
-        }
+
+        if 'headers' in task.config:
+            task_header = task.config['headers']
+            if 'user-agent' not in (header.lower() for header in task.config['headers']) :
+                task_header['User-Agent'] = self.default_user_agent
+        else:
+            task_header = {
+                'User-Agent': self.default_user_agent
+            }
 
         page = task.requests.get(comp_link, headers=task_header)
         if page.status_code != 200:
