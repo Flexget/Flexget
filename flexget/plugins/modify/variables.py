@@ -8,7 +8,8 @@ from datetime import datetime
 
 import yaml
 
-from jinja2 import Environment, TemplateError
+from jinja2 import TemplateError
+from jinja2.nativetypes import NativeEnvironment
 
 from sqlalchemy import Column
 from sqlalchemy.sql.sqltypes import Unicode, DateTime, Integer
@@ -76,10 +77,13 @@ def process_variables(config, manager):
     }
     if 'variables' not in config or config.get('variables') is False:
         return
-    env = Environment(**env_params)
+    env = NativeEnvironment(**env_params)
     if isinstance(config['variables'], bool):
         log.debug('trying to load variables from DB')
         variables = variables_from_db()
+    elif isinstance(config['variables'], dict):
+        log.debug('loading variables from config')
+        variables = config['variables']
     else:
         log.debug('trying to load variables from file')
         variables = variables_from_file(manager.config_base, config['variables'])
@@ -113,7 +117,7 @@ def _process(element, environment):
             return None
 
 
-variables_config_schema = {'type': ['string', 'boolean']}
+variables_config_schema = {'type': ['string', 'boolean', 'object']}
 
 
 @event('config.register')

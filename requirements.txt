@@ -26,7 +26,7 @@ guessit==2.1.4
 html5lib==0.999999999
 idna==2.5                 # via requests
 itsdangerous==0.24        # via flask
-jinja2==2.9.6
+jinja2==2.10
 jsonschema==2.6.0
 markupsafe==1.0           # via jinja2
 path.py==10.3.1

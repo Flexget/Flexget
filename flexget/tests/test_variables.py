@@ -40,6 +40,36 @@ class TestVariablesFromFile(object):
         assert task.accepted[0]['a_field'] == 'first bar then foo end'
 
 
+class TestVariablesFromConfig():
+    config = """
+      variables:
+        mock_entry_list:
+        - title: a
+        - title: b
+        integer: 2
+      tasks:
+        test_int_var:
+          mock:
+          - title: a
+          - title: b
+          - title: c
+          accept_all: yes
+          limit_new: "{? integer ?}"
+        test_var_mock:
+          mock: "{? mock_entry_list ?}"
+    """
+
+    def test_complex_var(self, execute_task):
+        task = execute_task('test_var_mock')
+        assert len(task.all_entries) == 2
+        assert task.all_entries[1]['title'] == 'b'
+
+    def test_int_var(self, execute_task):
+        task = execute_task('test_int_var')
+        assert len(task.all_entries) == 3
+        assert len(task.accepted) == 2
+
+
 class TestVariablesFromDB(object):
     config = """
         variables: yes

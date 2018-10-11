@@ -8,7 +8,7 @@ PyRSS2Gen
 pynzb
 #PY3 progressbar
 rpyc==3.3.0
-jinja2
+jinja2~=2.10
 # There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
 requests~=2.16.3
 #Guessit requires python-dateutil<=2.5.2
