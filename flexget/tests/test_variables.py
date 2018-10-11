@@ -47,7 +47,6 @@ class TestVariablesFromConfig():
         - title: a
         - title: b
         integer: 2
-        nested: "{? integer ?}"
       tasks:
         test_int_var:
           mock:
