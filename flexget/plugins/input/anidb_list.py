@@ -4,6 +4,8 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import logging
 import re
 
+from requests import RequestException
+
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.cached_input import cached
@@ -73,14 +75,17 @@ class AnidbList(object):
 
         if 'headers' in task.config:
             task_header = task.config['headers']
-            if 'user-agent' not in (header.lower() for header in task.config['headers']) :
+            if 'user-agent' not in (header.lower() for header in task.config['headers']):
                 task_header['User-Agent'] = self.default_user_agent
         else:
             task_header = {
                 'User-Agent': self.default_user_agent
             }
 
-        page = task.requests.get(comp_link, headers=task_header)
+        try:
+            page = task.requests.get(comp_link, headers=task_header)
+        except RequestException as e:
+            raise plugin.PluginError(str(e))
         if page.status_code != 200:
             raise plugin.PluginError('Unable to get AniDB list. Either the list is private or does not exist.')
 
@@ -130,7 +135,14 @@ class AnidbList(object):
                 break
             comp_link = self.anidb_url + next_link
             log.debug('Requesting: %s', comp_link)
-            page = task.requests.get(comp_link, headers=task_header)
+            try:
+                page = task.requests.get(comp_link, headers=task_header)
+            except RequestException as e:
+                log.warning('There was an exception in fetching the next wishlist page.')
+                log.error(str(e))
+            if page.status_code != 200:
+                log.warning('Unable to retrieve next page of wishlist.')
+                break
         return entries
 
 
