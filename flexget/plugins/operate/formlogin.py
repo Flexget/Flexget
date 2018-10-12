@@ -7,27 +7,15 @@ import os
 import socket
 
 try:
-    import mechanize
+    import mechanicalsoup
 except ImportError:
-    mechanize = None
+    mechanicalsoup = None
+import requests
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.soup import get_soup
 
 log = logging.getLogger('formlogin')
-
-
-if mechanize:
-    class SanitizeHandler(mechanize.BaseHandler):
-        def http_response(self, request, response):
-            if not hasattr(response, "seek"):
-                response = mechanize.response_seek_wrapper(response)
-            # Run HTML through BeautifulSoup for sanitizing
-            if 'html' in response.info().get('content-type', ''):
-                soup = get_soup(response.get_data())
-                response.set_data(soup.prettify(encoding=soup.original_encoding))
-            return response
 
 
 class FormLogin(object):
@@ -49,8 +37,8 @@ class FormLogin(object):
     }
 
     def on_task_start(self, task, config):
-        if not mechanize:
-            raise plugin.PluginError('mechanize required (python module), please install it.', log)
+        if not mechanicalsoup:
+            raise plugin.PluginError('mechanicalsoup required (python module), please install it.', log)
 
         userfield = config.get('userfield', 'username')
         passfield = config.get('passfield', 'password')
@@ -59,29 +47,28 @@ class FormLogin(object):
         username = config['username']
         password = config['password']
 
-        br = mechanize.Browser()
-        br.add_handler(SanitizeHandler())
-        br.set_handle_robots(False)
+        br = mechanicalsoup.StatefulBrowser(session=task.requests)
+
         try:
-            br.open(url)
-        except Exception:
+            response = br.open(url)
+        except requests.RequestException:
             # TODO: improve error handling
-            log.debug('Exception posting login form.', exc_info=True)
-            raise plugin.PluginError('Unable to post login form', log)
+            log.debug('Exception getting login page.', exc_info=True)
+            raise plugin.PluginError('Unable to get login page', log)
 
-        # br.set_debug_redirects(True)
-        # br.set_debug_responses(True)
-        # br.set_debug_http(True)
+        # br.set_debug(True)
 
+        num_forms = len(br.get_current_page().find_all('form'))
+        if not num_forms:
+            raise plugin.PluginError('Unable to find any forms on {}'.format(url), log)
         try:
-            for form in br.forms():
-                loginform = form
-
+            for form_num in range(num_forms):
+                br.select_form(nr=form_num)
                 try:
-                    loginform[userfield] = username
-                    loginform[passfield] = password
+                    br[userfield] = username
+                    br[passfield] = password
                     break
-                except Exception:
+                except mechanicalsoup.LinkNotFoundError:
                     pass
             else:
                 received = os.path.join(task.manager.config_base, 'received')
@@ -89,20 +76,17 @@ class FormLogin(object):
                     os.mkdir(received)
                 filename = os.path.join(received, '%s.formlogin.html' % task.name)
                 with io.open(filename, 'wb') as f:
-                    f.write(br.response().get_data())
+                    f.write(response.content)
                 log.critical('I have saved the login page content to %s for you to view', filename)
                 raise plugin.PluginError('Unable to find login fields', log)
         except socket.timeout:
             raise plugin.PluginError('Timed out on url %s' % url)
 
-        br.form = loginform
-
-        br.submit()
-
-        cookiejar = br._ua_handlers["_cookies"].cookiejar
-
-        # Add cookiejar to our requests session
-        task.requests.add_cookiejar(cookiejar)
+        try:
+            br.submit_selected()
+        except requests.RequestException:
+            log.debug('Exception submitting login form.', exc_info=True)
+            raise plugin.PluginError('Unable to post login form', log)
 
 
 @event('plugin.register')
