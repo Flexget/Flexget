@@ -98,6 +98,24 @@ jobs:
           command: |
             .circleci/coverage.sh
 
+  test-py37:
+    docker:
+      - image: flexget/cci-python:3.7
+    environment:
+      - VCR_RECORD_MODE=none
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - py3.7-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+          - py3.7-deps- # fallback to using the latest cache if no exact match is found
+      - run: *install_deps
+      - save_cache:
+          paths:
+            - ./venv
+          key: py3.7-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+      - run: *run_tests
+
   deploy:
     docker:
       - image: flexget/cci-python:3.5
@@ -133,6 +151,7 @@ workflows:
       - "test-py34"
       - "test-py35"
       - "test-py36"
+      - "test-py37"
 
   auto-build-test-and-deploy:
     triggers:
@@ -147,12 +166,14 @@ workflows:
       - "test-py34"
       - "test-py35"
       - "test-py36"
+      - "test-py37"
       - deploy:
           requires:
             - "test-py27"
             - "test-py34"
             - "test-py35"
             - "test-py36"
+            - "test-py37"
 
 notify:
   webhooks:

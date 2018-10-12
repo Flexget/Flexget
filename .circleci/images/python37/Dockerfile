@@ -1,4 +1,4 @@
-FROM circleci/python:3.5
+FROM circleci/python:3.7
 
 # Install extra repos
 RUN sudo sed -i 's/debian stretch main$/debian stretch main contrib non-free/' /etc/apt/sources.list
