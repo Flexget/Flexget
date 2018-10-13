@@ -249,7 +249,10 @@ class TraktSet(MutableSet):
             # API restriction as they don't have an endpoint for collected episodes yet
             if self.config['list'] == 'collection':
                 raise plugin.PluginError('`type` cannot be `episodes` for collection list.')
-            return ('sync', 'history', 'episodes')
+            if self.config.get('account'):
+                return ('sync', 'history', 'episodes')
+            else:
+                raise plugin.PluginError('A trakt `account` needs to be configured to get the episode history.')
 
         if self.config['list'] in ['collection', 'watchlist', 'watched', 'ratings']:
             if self.config.get('account'):
