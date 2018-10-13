@@ -245,7 +245,7 @@ class TraktSet(MutableSet):
         self._items = None
 
     def get_list_endpoint(self, remove=False, submit=False):
-        if not submit and self.config['list'] in ['collection', 'watched'] and self.config['type'] == 'episodes':
+        if not submit and self.config['list'] == 'collection' and self.config['type'] == 'episodes':
             # API restriction as they don't have an endpoint for collected episodes yet
             if self.config['list'] == 'collection':
                 raise plugin.PluginError('`type` cannot be `episodes` for collection list.')
@@ -256,12 +256,9 @@ class TraktSet(MutableSet):
 
         if self.config['list'] in ['collection', 'watchlist', 'watched', 'ratings']:
             if self.config.get('account'):
-                if self.config['list'] == 'watched':
-                    endpoint = ('sync', 'history')
-                else:
-                    endpoint = ('sync', self.config['list'])
-                    if not submit:
-                        endpoint += (self.config['type'], )
+                endpoint = ('sync', 'history' if self.config['list'] == 'watched' else self.config['list'])
+                if not submit:
+                    endpoint += (self.config['type'], )
             else:
                 endpoint = ('users', self.config['username'], self.config['list'], self.config['type'])
         else:
