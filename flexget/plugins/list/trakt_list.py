@@ -248,8 +248,7 @@ class TraktSet(MutableSet):
         if not submit and self.config['list'] in ['collection', 'watched'] and self.config['type'] == 'episodes':
             # API restriction as they don't have an endpoint for collected episodes yet
             if self.config['list'] == 'collection':
-                raise plugin.PluginError('`type` cannot be `%s` for %s list.' % (self.config['type'], self.config['list']))
-            else:
+                raise plugin.PluginError('`type` cannot be `episodes` for collection list.')
                 return ('sync', 'history', 'episodes')
 
         if self.config['list'] in ['collection', 'watchlist', 'watched', 'ratings']:
