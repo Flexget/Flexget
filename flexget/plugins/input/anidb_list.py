@@ -91,12 +91,14 @@ class AnidbList(object):
 
         entries = []
         entry_type = ''
+
         if config['type'] == 'movies':
             entry_type = 'Type: Movie'
         elif config['type'] == 'shows':
             entry_type = 'Type: TV Series'
         elif config['type'] == 'ovas':
             entry_type = 'Type: OVA'
+
         while True:
             soup = get_soup(page.text)
             soup_table = soup.find('table', class_='wishlist').find('tbody')
@@ -138,7 +140,6 @@ class AnidbList(object):
             try:
                 page = task.requests.get(comp_link, headers=task_header)
             except RequestException as e:
-                log.warning('There was an exception in fetching the next wishlist page.')
                 log.error(str(e))
             if page.status_code != 200:
                 log.warning('Unable to retrieve next page of wishlist.')
