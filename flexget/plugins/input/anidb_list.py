@@ -73,17 +73,11 @@ class AnidbList(object):
         comp_link = self.__build_url(config)
         log.debug('Requesting: %s', comp_link)
 
-        if 'headers' in task.config:
-            task_header = task.config['headers']
-            if 'user-agent' not in (header.lower() for header in task.config['headers']):
-                task_header['User-Agent'] = self.default_user_agent
-        else:
-            task_header = {
-                'User-Agent': self.default_user_agent
-            }
+        task_headers = task.requests.headers
+        task_headers['User-Agent'] = self.default_user_agent
 
         try:
-            page = task.requests.get(comp_link, headers=task_header)
+            page = task.requests.get(comp_link, headers=task_headers)
         except RequestException as e:
             raise plugin.PluginError(str(e))
         if page.status_code != 200:
@@ -138,7 +132,7 @@ class AnidbList(object):
             comp_link = self.anidb_url + next_link
             log.debug('Requesting: %s', comp_link)
             try:
-                page = task.requests.get(comp_link, headers=task_header)
+                page = task.requests.get(comp_link, headers=task_headers)
             except RequestException as e:
                 log.error(str(e))
             if page.status_code != 200:
