@@ -224,7 +224,7 @@ class SearchPassThePopcorn(object):
         if 'tags' in config:
             tags = config['tags'] if isinstance(config['tags'], list) else [config['tags']]
             params['taglist'] = ',+'.join(tags)
-        
+
         release_type = config.get('release_type')
         if release_type:
             params['scene'] = RELEASE_TYPES[release_type]
@@ -279,6 +279,9 @@ class SearchPassThePopcorn(object):
                     e = Entry()
 
                     e['title'] = torrent['ReleaseName']
+
+                    if entry.get('imdb_id'):
+                        e['imdb_id'] = entry.get('imdb_id')
 
                     e['torrent_tags'] = movie['Tags']
                     e['content_size'] = parse_filesize(torrent['Size'] + ' b')
