@@ -24,7 +24,7 @@ _PLUGIN_NAME = 'telegram'
 
 _PARSERS = ['markdown', 'html']
 
-_DSBL_PRE_ATTR = 'disable_previews'
+_DISABLE_PREVIEWS_ATTR = 'disable_previews'
 _TOKEN_ATTR = 'bot_token'
 _PARSE_ATTR = 'parse_mode'
 _RCPTS_ATTR = 'recipients'
@@ -130,7 +130,7 @@ class TelegramNotifier(object):
         'properties': {
             _TOKEN_ATTR: {'type': 'string'},
             _PARSE_ATTR: {'type': 'string', 'enum': _PARSERS},
-            _DSBL_PRE_ATTR: {'type': 'boolean', 'default': False},
+            _DISABLE_PREVIEWS_ATTR: {'type': 'boolean', 'default': False},
             _RCPTS_ATTR: {
                 'type': 'array',
                 'minItems': 1,
@@ -190,7 +190,7 @@ class TelegramNotifier(object):
         """
         self._token = config[_TOKEN_ATTR]
         self._parse_mode = config.get(_PARSE_ATTR)
-        self._disable_previews = config[_DSBL_PRE_ATTR]
+        self._disable_previews = config[_DISABLE_PREVIEWS_ATTR]
         self._usernames = []
         self._fullnames = []
         self._groups = []
