@@ -73,7 +73,7 @@ class AnidbList(object):
         comp_link = self.__build_url(config)
         log.debug('Requesting: %s', comp_link)
 
-        task_headers = task.requests.headers
+        task_headers = task.requests.headers.copy()
         task_headers['User-Agent'] = self.default_user_agent
 
         try:
