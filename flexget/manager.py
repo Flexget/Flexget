@@ -180,12 +180,20 @@ class Manager(object):
                     manager_parser.print_help()
                     print('\nError: %s' % e.message)
                     sys.exit(1)
-        if options.cli_command is None:
-            # TODO: another hack ...
-            # simply running "flexget -c config.yml" fails, let's fix that
-            manager_parser.print_help()
-            print('\nCommand missing, eg. execute or daemon ...')
-            sys.exit(1)
+        try:
+            if options.cli_command is None:
+                # TODO: another hack ...
+                # simply running "flexget -c config.yml" fails, let's fix that
+                manager_parser.print_help()
+                print('\nCommand missing, eg. execute or daemon ...')
+                # TODO: oh dear ...
+                if '--help' in args or '-h' in args:
+                    print('NOTE: The help may be incomplete due issues with argparse. Try without --help.')
+                else:
+                    print('NOTE: The help may be incomplete due issues with argparse. Try with --help.')
+                sys.exit(1)
+        except AttributeError:
+            pass  # TODO: hack .. this is getting out of hand
         return options
 
 
