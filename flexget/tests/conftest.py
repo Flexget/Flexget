@@ -310,7 +310,7 @@ class MockManager(Manager):
         log.debug('database_uri: %s' % self.database_uri)
         self.initialize()
 
-    def find_config(self, *args, **kwargs):
+    def _init_config(self, *args, **kwargs):
         """
         Override configuration loading
         """
