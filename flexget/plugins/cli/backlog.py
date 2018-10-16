@@ -7,7 +7,13 @@ from flexget.manager import Session
 from flexget.plugins.input.backlog import get_entries, clear_entries
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 
+import click
 
+
+@click.command('backlog', help='View or clear entries from backlog plugin')
+@click.argument('action', type=click.Choice(['list', 'clear']),
+                        help='Choose to show items in backlog, or clear all of them')
+@click.option('--task', nargs=1, help='Limit to specific task (if supplied)')
 def do_cli(manager, options):
     if options.action == 'clear':
         num = clear_entries(options.task, all=True)
@@ -30,6 +36,6 @@ def do_cli(manager, options):
 def register_options():
     parser = options.register_command('backlog', do_cli, help='View or clear entries from backlog plugin',
                                       parents=[table_parser])
-    parser.add_argument('action', choices=['list', 'clear'],
-                        help='Choose to show items in backlog, or clear all of them')
-    parser.add_argument('task', nargs='?', help='Limit to specific task (if supplied)')
+    # parser.add_argument('action', choices=['list', 'clear'],
+    #                     help='Choose to show items in backlog, or clear all of them')
+    # parser.add_argument('task', nargs='?', help='Limit to specific task (if supplied)')

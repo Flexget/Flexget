@@ -1,5 +1,5 @@
 sphinx==1.6.3
-click==6.7
+click==7.0
 pylint
 coverage==4.4.1
 flake8
