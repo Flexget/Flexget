@@ -140,7 +140,8 @@ class ParserGuessit(object):
             year=guess_result.get('year'),
             proper_count=self._proper_count(guess_result),
             quality=self._quality(guess_result),
-            release_group=guess_result.get('release_group')
+            release_group=guess_result.get('release_group'),
+            valid=bool(guess_result.get('title'))  # It's not valid if it didn't find a name, which sometimes happens
         )
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
@@ -183,7 +184,7 @@ class ParserGuessit(object):
             name = guess_result.get('title')
             if country and hasattr(country, 'alpha2'):
                 name += ' (%s)' % country.alpha2
-        else:
+        elif guess_result.matches['title']:
             # Make sure the name match is up to FlexGet standards
             # Check there is no unmatched cruft before the matched name
             title_start = guess_result.matches['title'][0].start
@@ -218,6 +219,8 @@ class ParserGuessit(object):
                 for char in data[title_end:post_title]:
                     if char.isalnum() or char.isdigit():
                         valid = False
+        else:
+            valid = False
         season = guess_result.get('season')
         episode = guess_result.get('episode')
         if episode is None and 'part' in guess_result:

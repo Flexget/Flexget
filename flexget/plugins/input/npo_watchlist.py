@@ -19,12 +19,12 @@ import re
 log = logging.getLogger('search_npo')
 
 requests = RequestSession(max_retries=3)
-requests.add_domain_limiter(TimedLimiter('npo.nl', '5 seconds'))
+requests.add_domain_limiter(TimedLimiter('npostart.nl', '8 seconds'))
 
 
 class NPOWatchlist(object):
     """
-        Produces entries for every episode on the user's npo.nl watchlist (Dutch public television).
+        Produces entries for every episode on the user's npostart.nl watchlist (Dutch public television).
         Entries can be downloaded using http://arp242.net/code/download-npo
 
         If 'remove_accepted' is set to 'yes', the plugin will delete accepted entries from the watchlist after download
@@ -69,13 +69,24 @@ class NPOWatchlist(object):
     def _parse_date(self, date_text):
         return datetime.strptime(date_text, '%d-%m-%Y').date()
 
+    def _get_page(self, task, config, url):
+        self._login(task, config)
+        try:
+            log.debug('Fetching NPO profile page: %s', url)
+            page_response = requests.get(url)
+            if page_response.url != url:
+                raise plugin.PluginError('Unexpected page: {} (expected {})'.format(page_response.url, url))
+            return page_response
+        except RequestException as e:
+            raise plugin.PluginError('Request error: %s' % str(e))
+
     def _login(self, task, config):
         if 'isAuthenticatedUser' in requests.cookies:
             log.debug('Already logged in')
             return
 
-        login_url = 'https://www.npo.nl/login'
-        login_api_url = 'https://www.npo.nl/api/login'
+        login_url = 'https://www.npostart.nl/login'
+        login_api_url = 'https://www.npostart.nl/api/login'
 
         try:
             login_response = requests.get(login_url)
@@ -95,173 +106,156 @@ class NPOWatchlist(object):
 
             if 'isAuthenticatedUser' not in profile_response.cookies:
                 raise plugin.PluginError('Failed to login. Check username and password.')
+            log.debug('Succesfully logged in: %s', email)
         except RequestException as e:
-            raise plugin.PluginError('Request error: %s' % e.args[0])
+            raise plugin.PluginError('Request error: %s' % str(e))
 
-    def _get_page(self, task, config, url):
-        self._login(task, config)
+    def _get_favourites_entries(self, task, config, profileId):
+        # Details of profile using the $profileId:
+        # https://www.npostart.nl/api/account/@me/profile/$profileId  (?refresh=1)
+        # XMLHttpRequest could also be done on, but is not reliable, because if a series is
+        # bookmarked after episode is already broadcasted, it does not appear in this list.
+        # https://www.npostart.nl/ums/accounts/@me/favourites/episodes?dateFrom=2018-06-04&dateTo=2018-06-05
+        profile_details_url = 'https://www.npostart.nl/api/account/@me/profile/'
 
+        entries = []
         try:
-            page_response = requests.get(url)
-            if page_response.url != url:
-                raise plugin.PluginError('Unexpected page: {} (expected {})'.format(page_response.url, url))
-
-            return page_response
+            profile = requests.get(profile_details_url + profileId).json()
+            log.info('Retrieving favorites for profile %s', profile['name'])
+            for favourite in profile['favourites']:
+                if favourite['mediaType'] == 'series':
+                    entries += self._get_series_episodes(task, config, favourite['mediaId'])
         except RequestException as e:
-            raise plugin.PluginError('Request error: %s' % e.args[0])
+            raise plugin.PluginError('Request error: %s' % str(e))
+        return entries
 
-    def _get_watchlist_entries(self, task, config, page):
-        watchlist = page.find('div', attrs={'id': 'component-grid-watchlist'})
-        return self._parse_tiles(task, config, watchlist)
+    def _get_series_episodes(self, task, config, mediaId, series_info=None, page=1):
+        episode_tiles_url = 'https://www.npostart.nl/media/series/{0}/episodes'
+        episode_tiles_parameters = {'page': str(page),
+                                    'tileMapping': 'dedicated',
+                                    'tileType': 'asset'}
+        entries = []
 
-    _series_info = dict()
+        if not series_info:
+            series_info = self._get_series_info(task, config, mediaId)
+            if not series_info:  # if fetching series_info failed, return empty entries
+                log.error('Failed to fetch series information for %s, skipping series', mediaId)
+                return entries
 
-    def _get_series_info(self, task, config, episode_name, episode_url):
-        log.info('Retrieving series info for %s', episode_name)
+        headers = {'Origin': 'https://www.npostart.nl',
+                   'X-XSRF-TOKEN': requests.cookies['XSRF-TOKEN'],
+                   'X-Requested-With': 'XMLHttpRequest'}
+        if page > 1:
+            headers['Referer'] = episode_tiles_url.format(mediaId) + '?page={0}'.format(page-1)  # referer from prev page
+
+        log.debug('Retrieving episodes page %s for %s (%s)', page, series_info['npo_name'], mediaId)
         try:
-            response = requests.get(episode_url)
+            episodes = requests.get(episode_tiles_url.format(mediaId),
+                                    params=episode_tiles_parameters,
+                                    headers=headers).json()
+            new_entries = self._parse_tiles(task, config, episodes['tiles'], series_info)
+            entries += new_entries
+
+            if new_entries and episodes['nextLink']:  # only fetch next page if we accepted any from current page
+                log.debug('NextLink for more episodes: %s', episodes['nextLink'])
+                entries += self._get_series_episodes(task, config, mediaId, series_info,
+                                                     page=int(episodes['nextLink'].rsplit('page=')[1]))
+        except RequestException as e:
+            log.error('Request error: %s' % str(e))  # if it fails, just go to next favourite
+
+        if not entries and page == 1:
+            log.verbose('No new episodes found for %s (%s)', series_info['npo_name'], mediaId)
+        return entries
+
+    def _get_series_info(self, task, config, mediaId):
+        series_info_url = 'https://www.npostart.nl/{0}'
+        series_info = None
+        log.verbose('Retrieving series info for %s', mediaId)
+        try:
+            response = requests.get(series_info_url.format(mediaId))
+            log.debug('Series info found at: %s', response.url)
             page = get_soup(response.content)
-
-            series_url = page.find('a', class_='npo-episode-header-program-info')['href']
-
-            if series_url not in self._series_info:
-                response = requests.get(series_url)
-                page = get_soup(response.content)
-
-                series_info = self._parse_series_info(task, config, page, series_url)
-                self._series_info[series_url] = series_info
-
-            return self._series_info[series_url]
+            series = page.find('section', class_='npo-header-episode-meta')
+            # create a stub to store the common values for all episodes of this series
+            series_info = {'npo_url': response.url,  # we were redirected to the true URL
+                           'npo_name': series.find('h1').text,
+                           'npo_description': series.find('div', id='metaContent').find('p').text,
+                           'npo_language': 'nl',  # hard-code the language as if in NL, for lookup plugins
+                           'npo_version': page.find('meta', attrs={'name': 'generator'})['content']}  # include NPO website version
+            log.debug('Parsed series info for: %s (%s)', series_info['npo_name'], mediaId)
         except RequestException as e:
-            raise plugin.PluginError('Request error: %s' % e.args[0])
-
-    def _parse_series_info(self, task, config, page, series_url):
-        tvseries = page.find('section', class_='npo-header-episode-meta')
-        series_info = Entry()  # create a stub to store the common values for all episodes of this series
-        series_info['npo_url'] = series_url
-        series_info['npo_name'] = tvseries.find('h1').text
-        series_info['npo_description'] = tvseries.find('div', id='metaContent').find('p').text
-        series_info['npo_language'] = 'nl'  # hard-code the language as if in NL, for loookup plugins
+            log.error('Request error: %s' % str(e))
         return series_info
 
-    def _get_series_episodes(self, task, config, series_name, series_url):
-        log.info('Retrieving new episodes for %s', series_name)
-        try:
-            response = requests.get(series_url)
-            page = get_soup(response.content)
-
-            series_info = self._parse_series_info(task, config, page, series_url)
-            episodes = page.find('div', id='component-grid-episodes')
-            entries = self._parse_tiles(task, config, episodes, series_info)
-
-            if not entries:
-                log.warning('No episodes found for %s', series_name)
-
-            return entries
-        except RequestException as e:
-            raise plugin.PluginError('Request error: %s' % e.args[0])
-
-    def _parse_tiles(self, task, config, tiles, series_info=None):
+    def _parse_tiles(self, task, config, tiles, series_info):
         max_age = config.get('max_episode_age_days')
-        entries = list()
+        entries = []
 
         if tiles is not None:
-            for list_item in tiles.findAll('div', class_='npo-asset-tile-container'):
-                url = list_item.find('a')['href']
-                episode_name = next(list_item.find('h2').stripped_strings)
-                timer = next(list_item.find('div', class_='npo-asset-tile-timer').stripped_strings)
-                remove_url = list_item.find('div', class_='npo-asset-tile-delete')
+            for tile in tiles:
+                # there is only one list_item per tile
+                for list_item in get_soup(tile).findAll('div', class_='npo-asset-tile-container'):
+                    episode_id = list_item['id']
+                    log.debug('Parsing episode: %s', episode_id)
 
-                episode_id = url.split('/')[-1]
-                title = '{} ({})'.format(episode_name, episode_id)
+                    url = list_item.find('a')['href']
+                    # Check if the URL found to the episode matches the expected pattern
+                    if len(url.split('/')) != 6:
+                        log.verbose('Skipping %s, the URL has an unexpected pattern: %s', episode_id, url)
+                        continue  # something is wrong; skip this episode
 
-                not_available = list_item.find('div', class_='npo-asset-tile-availability')['data-to']
-                if not_available:
-                    log.debug('Skipping %s, no longer available', title)
-                    continue
+                    episode_name = list_item.find('h2')
+                    if episode_name:
+                        title = '{} ({})'.format(next(episode_name.stripped_strings), episode_id)
+                    else:
+                        title = '{}'.format(episode_id)
+                    timer = next(list_item.find('div', class_='npo-asset-tile-timer').stripped_strings)
+                    remove_url = list_item.find('div', class_='npo-asset-tile-delete')
 
-                entry_date = url.split('/')[4]
-                entry_date = self._parse_date(entry_date)
+                    not_available = list_item.find('div', class_='npo-asset-tile-availability')['data-to']
+                    if not_available:
+                        log.debug('Skipping %s, no longer available', title)
+                        continue
 
-                if max_age >= 0 and (date.today() - entry_date) > timedelta(days=max_age):
-                    log.debug('Skipping %s, aired on %s', title, entry_date)
-                    continue
+                    entry_date = url.split('/')[-2]
+                    entry_date = self._parse_date(entry_date)
 
-                if not series_info:
-                    tile_series_info = self._get_series_info(task, config, episode_name, url)
-                else:
-                    tile_series_info = series_info
+                    if max_age >= 0 and date.today() - entry_date > timedelta(days=max_age):
+                        log.debug('Skipping %s, aired on %s', title, entry_date)
+                        continue
 
-                series_name = tile_series_info['npo_name']
+                    e = Entry(series_info)
+                    e['url'] = url
+                    e['title'] = title
+                    e['series_name'] = series_info['npo_name']
+                    e['series_name_plain'] = self._convert_plain(series_info['npo_name'])
+                    e['series_date'] = entry_date
+                    e['series_id_type'] = 'date'
+                    e['npo_id'] = episode_id
+                    e['npo_runtime'] = timer.strip('min').strip()
+                    e['language'] = series_info['npo_language']
 
-                e = Entry()
-                e['url'] = url
-                e['title'] = title
-                e['series_name'] = series_name
-                e['series_name_plain'] = self._convert_plain(series_name)
-                e['series_date'] = entry_date
-                e['series_id_type'] = 'date'
-                e['npo_url'] = tile_series_info['npo_url']
-                e['npo_name'] = tile_series_info['npo_name']
-                e['npo_description'] = tile_series_info['npo_description']
-                e['npo_language'] = tile_series_info['npo_language']
-                e['npo_runtime'] = timer.strip('min').strip()
-                e['language'] = tile_series_info['npo_language']
-
-                if remove_url and remove_url['data-link']:
-                    e['remove_url'] = remove_url['data-link']
-
-                    if config.get('remove_accepted'):
-                        e.on_complete(self.entry_complete, task=task)
-
-                entries.append(e)
-
-        return entries
-
-    def _get_favorites_entries(self, task, config, page):
-        max_age = config.get('max_episode_age_days')
-        if max_age >= 3:
-            log.warning('If max_episode_age_days is 3 days or more, the plugin will still check all series')
-        elif max_age > -1:
-            return self._get_recent_entries(task, config, page)
-
-        series = page.find('div', attrs={'id': 'component-grid-favourite-series'})
-
-        entries = list()
-        for list_item in series.findAll('div', class_='npo-ankeiler-tile-container'):
-            url = list_item.find('a')['href']
-            series_name = next(list_item.find('h2').stripped_strings)
-
-            entries += self._get_series_episodes(task, config, series_name, url)
-
-        return entries
-
-    def _get_recent_entries(self, task, config, page):
-        max_age = config.get('max_episode_age_days')
-
-        episodes = page.find('div', id='grid-favourite-episodes-today')
-        entries = self._parse_tiles(task, config, episodes)
-
-        if max_age >= 1:
-            episodes = page.find('div', id='grid-favourite-episodes-yesterday')
-            entries += self._parse_tiles(task, config, episodes)
-
-        if max_age >= 2:
-            episodes = page.find('div', id='grid-favourite-episodes-day-before-yesterday')
-            entries += self._parse_tiles(task, config, episodes)
+                    if remove_url and remove_url['data-link']:
+                        e['remove_url'] = remove_url['data-link']
+                        if config.get('remove_accepted'):
+                            e.on_complete(self.entry_complete, task=task)
+                    entries.append(e)
 
         return entries
 
     def on_task_input(self, task, config):
+        # On https://www.npostart.nl/account-profile get the value for the profileId that is in use
+        # Details of this account you can get at: https://www.npostart.nl/api/account/@me
+        account_profile_url = 'https://www.npostart.nl/account-profile'
+
         email = config.get('email')
-        log.info('Retrieving npo.nl watchlist for %s', email)
+        log.verbose('Retrieving NPOStart profiles for account %s', email)
 
-        response = self._get_page(task, config, 'https://www.npo.nl/mijn_npo')
-        page = get_soup(response.content)
-
-        entries = self._get_watchlist_entries(task, config, page)
-        entries += self._get_favorites_entries(task, config, page)
-
+        profilejson = self._get_page(task, config, account_profile_url).json()
+        if 'profileId' not in profilejson:
+            raise plugin.PluginError('Failed to fetch profile for NPO account')
+        profileId = profilejson['profileId']
+        entries = self._get_favourites_entries(task, config, profileId)
         return entries
 
     def entry_complete(self, e, task=None):
@@ -275,8 +269,8 @@ class NPOWatchlist(object):
             log.info('Removing from watchlist: %s', e['title'])
 
             headers = {
-                'Origin': 'https://www.npo.nl',
-                'Referer': 'https://www.npo.nl/mijn_npo',
+                'Origin': 'https://www.npostart.nl',
+                'Referer': 'https://www.npostart.nl/mijn_npo',
                 'X-XSRF-TOKEN': requests.cookies['XSRF-TOKEN'],
                 'X-Requested-With': 'XMLHttpRequest'
             }

@@ -21,9 +21,10 @@ class TheTVDBSet(MutableSet):
         'properties': {
             'username': {'type': 'string'},
             'account_id': {'type': 'string'},
+            'api_key': {'type': 'string'},
             'strip_dates': {'type': 'boolean'}
         },
-        'required': ['username', 'account_id'],
+        'required': ['username', 'account_id', 'api_key'],
         'additionalProperties': False
     }
 
@@ -54,7 +55,7 @@ class TheTVDBSet(MutableSet):
     def items(self):
         if self._items is None:
             try:
-                req = TVDBRequest(username=self.config['username'], account_id=self.config['account_id']).get(
+                req = TVDBRequest(username=self.config['username'], account_id=self.config['account_id'], api_key=self.config['api_key']).get(
                     'user/favorites')
                 series_ids = [int(f_id) for f_id in req['favorites'] if f_id != '']
             except RequestException as e:
@@ -86,7 +87,7 @@ class TheTVDBSet(MutableSet):
             log.verbose('entry does not have `tvdb_id`, cannot add to list. Consider using a lookup plugin`')
             return
         try:
-            TVDBRequest(username=self.config['username'], account_id=self.config['account_id']).put(
+            TVDBRequest(username=self.config['username'], account_id=self.config['account_id'], api_key=self.config['api_key']).put(
                 'user/favorites/{}'.format(entry['tvdb_id']))
         except RequestException as e:
             log.error('Could not add tvdb_id {} to favourites list: {}'.format(entry['tvdb_id'], e))
@@ -97,7 +98,7 @@ class TheTVDBSet(MutableSet):
             log.verbose('entry does not have `tvdb_id`, cannot remove from list. Consider using a lookup plugin`')
             return
         try:
-            TVDBRequest(username=self.config['username'], account_id=self.config['account_id']).delete(
+            TVDBRequest(username=self.config['username'], account_id=self.config['account_id'], api_key=self.config['api_key']).delete(
                 'user/favorites/{}'.format(entry['tvdb_id']))
         except RequestException as e:
             log.error('Could not add tvdb_id {} to favourites list: {}'.format(entry['tvdb_id'], e))

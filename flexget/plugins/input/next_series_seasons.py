@@ -17,6 +17,7 @@ log = logging.getLogger(plugin_name)
 MAX_SEASON_DIFF_WITHOUT_BEGIN = 15
 MAX_SEASON_DIFF_WITH_BEGIN = 30
 
+
 class NextSeriesSeasons(object):
     """
     Emit next season number from all series configured in this task.
@@ -120,16 +121,18 @@ class NextSeriesSeasons(object):
                 else:
                     latest_season = low_season + 1
 
-                if (latest_season - low_season > MAX_SEASON_DIFF_WITHOUT_BEGIN and not series.begin) or (series.begin and
-                    latest_season - series.begin.season > MAX_SEASON_DIFF_WITH_BEGIN):
+                if (latest_season - low_season > MAX_SEASON_DIFF_WITHOUT_BEGIN and not series.begin) or (
+                        series.begin and latest_season - series.begin.season > MAX_SEASON_DIFF_WITH_BEGIN):
                     if series.begin:
-                        log.error('Series `%s` has a begin episode set (`%s`), but the season currently being processed '
-                                  '(%s) is %s seasons later than it. To prevent emitting incorrect seasons, this '
+                        log.error('Series `%s` has a begin episode set (`%s`), but the season currently being processed'
+                                  ' (%s) is %s seasons later than it. To prevent emitting incorrect seasons, this '
                                   'series will not emit unless the begin episode is adjusted to a season that is less '
-                                  'than %s seasons from season %s.', series.name, series.begin.identifier, latest_season,
-                                  (latest_season - series.begin.season), MAX_SEASON_DIFF_WITH_BEGIN, latest_season)
+                                  'than %s seasons from season %s.', series.name, series.begin.identifier,
+                                  latest_season, (latest_season - series.begin.season), MAX_SEASON_DIFF_WITH_BEGIN,
+                                  latest_season)
                     else:
-                        log.error('Series `%s` does not have a begin episode set and continuing this task would result '                                   'in more than %s seasons being emitted. To prevent emitting incorrect seasons, this '
+                        log.error('Series `%s` does not have a begin episode set and continuing this task would result '
+                                  'in more than %s seasons being emitted. To prevent emitting incorrect seasons, this '
                                   'series will not emit unless the begin episode is set in your series config or by '
                                   'using the CLI subcommand `series begin "%s" <SxxExx>`.', series.name,
                                   MAX_SEASON_DIFF_WITHOUT_BEGIN, series.name)

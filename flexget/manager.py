@@ -137,35 +137,14 @@ class Manager(object):
 
         self.config = {}
 
-        if '--help' in args or '-h' in args:
-            # TODO: This is a bit hacky, but we can't call parse on real arguments when --help is used because it will
-            # cause a system exit before plugins are loaded and print incomplete help. This will get us a default
-            # options object and we'll parse the real args later, or send them to daemon. #2807
-            self.options, _ = CoreArgumentParser().parse_known_args(['execute'])
-        else:
-            try:
-                self.options, _ = CoreArgumentParser().parse_known_args(args)
-            except ParserError:
-                try:
-                    # If a non-built-in command was used, we need to parse with a parser that
-                    # doesn't define the subparsers
-                    self.options, _ = manager_parser.parse_known_args(args)
-                except ParserError as e:
-                    manager_parser.print_help()
-                    print('\nError: %s' % e.message)
-                    sys.exit(1)
+        self.options = self._init_options(args)
         try:
-            self.find_config(create=False)
+            self._init_config(create=False)
         except:
             logger.start(level=self.options.loglevel.upper(), to_file=False)
             raise
         else:
-            log_file = os.path.expanduser(self.options.logfile)
-            # If an absolute path is not specified, use the config directory.
-            if not os.path.isabs(log_file):
-                log_file = os.path.join(self.config_base, log_file)
-
-            logger.start(log_file, self.options.loglevel.upper(), to_console=not self.options.cron)
+            self._init_logging()
 
         manager = self
 
@@ -177,6 +156,56 @@ class Manager(object):
             log.warning('Your locale declares ascii as the filesystem encoding. Any plugins reading filenames from '
                         'disk will not work properly for filenames containing non-ascii characters. Make sure your '
                         'locale env variables are set up correctly for the environment which is launching FlexGet.')
+
+    def _init_options(self, args):
+        """
+        Initialize argument parsing
+        """
+        if '--help' in args or '-h' in args:
+            # TODO: This is a bit hacky, but we can't call parse on real arguments when --help is used because it will
+            # cause a system exit before plugins are loaded and print incomplete help. This will get us a default
+            # options object and we'll parse the real args later, or send them to daemon. #2807
+            # TODO: this will cause command failure in case of config.yml does not
+            # exists and user runs "flexget -c some.yml --help"
+            options = CoreArgumentParser().parse_known_args(['execute'])[0]
+        else:
+            try:
+                options = CoreArgumentParser().parse_known_args(args)[0]
+            except ParserError:
+                try:
+                    # If a non-built-in command was used, we need to parse with a parser that
+                    # doesn't define the subparsers
+                    options = manager_parser.parse_known_args(args)[0]
+                except ParserError as e:
+                    manager_parser.print_help()
+                    print('\nError: %s' % e.message)
+                    sys.exit(1)
+        try:
+            if options.cli_command is None:
+                # TODO: another hack ...
+                # simply running "flexget -c config.yml" fails, let's fix that
+                manager_parser.print_help()
+                print('\nCommand missing, eg. execute or daemon ...')
+                # TODO: oh dear ...
+                if '--help' in args or '-h' in args:
+                    print('NOTE: The help may be incomplete due issues with argparse. Try without --help.')
+                else:
+                    print('NOTE: The help may be incomplete due issues with argparse. Try with --help.')
+                sys.exit(1)
+        except AttributeError:
+            pass  # TODO: hack .. this is getting out of hand
+        return options
+
+
+    def _init_logging(self):
+        """
+        Initialize logging facilities
+        """
+        log_file = os.path.expanduser(self.options.logfile)
+        # If an absolute path is not specified, use the config directory.
+        if not os.path.isabs(log_file):
+            log_file = os.path.join(self.config_base, log_file)
+        logger.start(log_file, self.options.loglevel.upper(), to_console=not self.options.cron)
 
     def initialize(self):
         """
@@ -346,6 +375,8 @@ class Manager(object):
         if not options:
             options = self.options
         command = options.cli_command
+        if command is None:
+            raise Exception('Command missing')
         command_options = getattr(options, command)
         # First check for built-in commands
         if command in ['execute', 'daemon']:
@@ -481,9 +512,9 @@ class Manager(object):
         yaml.Dumper.increase_indent = increase_indent_wrapper(yaml.Dumper.increase_indent)
         yaml.SafeDumper.increase_indent = increase_indent_wrapper(yaml.SafeDumper.increase_indent)
 
-    def find_config(self, create=False):
+    def _init_config(self, create=False):
         """
-        Find the configuration file.
+        Find and load the configuration file.
 
         :param bool create: If a config file is not found, and create is True, one will be created in the home folder
         :raises: `IOError` when no config file could be found, and `create` is False.

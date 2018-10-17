@@ -17,7 +17,7 @@ from flexget.utils.requests import Session as RequestSession, TimedLimiter, Requ
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('passthepopcorn')
-Base = db_schema.versioned_base('passthepopcorn', 0)
+Base = db_schema.versioned_base('passthepopcorn', 1)
 
 requests = RequestSession()
 requests.add_domain_limiter(TimedLimiter('passthepopcorn.me', '5 seconds'))
@@ -86,6 +86,16 @@ RELEASE_TYPES = {
     'golden popcorn': 2
 }
 
+
+@db_schema.upgrade('passthepopcorn')
+def upgrade(ver, session):
+    if ver is None:
+        ver = 0
+    if ver == 0:
+        raise db_schema.UpgradeImpossible
+    return ver
+
+
 class PassThePopcornCookie(Base):
     __tablename__ = 'passthepopcorn_cookie'
 
@@ -143,6 +153,15 @@ class SearchPassThePopcorn(object):
             # TODO Apparently it endlessly redirects if the cookie is invalid? I assume it's a gazelle bug.
             log.debug('PassThePopcorn request failed: Too many redirects. Invalid cookie?')
             invalid_cookie = True
+        except RequestException as e:
+            if e.response and e.response.status_code == 429:
+                log.error('Saved cookie is invalid and will be deleted. Error: %s', str(e))
+                # cookie is invalid and must be deleted
+                with Session() as session:
+                    session.query(PassThePopcornCookie).filter(PassThePopcornCookie.username == username).delete()
+                invalid_cookie = True
+            else:
+                log.error('PassThePopcorn request failed: %s', str(e))
 
         if invalid_cookie:
             if self.errors:
@@ -189,13 +208,8 @@ class SearchPassThePopcorn(object):
             raise plugin.PluginError('PassThePopcorn login failed: %s' % e)
 
         with Session() as session:
-            expires = None
-            for c in requests.cookies:
-                if c.name == 'session':
-                    expires = c.expires
-            if expires:
-                expires = datetime.datetime.fromtimestamp(expires)
-            log.debug('Saving or updating PassThePopcorn cookie in db')
+            expires = datetime.datetime.now() + datetime.timedelta(days=30)
+            log.debug('Saving or updating PassThePopcorn cookie in db. Expires 30 days from now: %s', expires)
             cookie = PassThePopcornCookie(username=username, cookie=dict(requests.cookies), expires=expires)
             session.merge(cookie)
             return cookie.cookie
@@ -210,7 +224,7 @@ class SearchPassThePopcorn(object):
         if 'tags' in config:
             tags = config['tags'] if isinstance(config['tags'], list) else [config['tags']]
             params['taglist'] = ',+'.join(tags)
-        
+
         release_type = config.get('release_type')
         if release_type:
             params['scene'] = RELEASE_TYPES[release_type]
@@ -265,6 +279,9 @@ class SearchPassThePopcorn(object):
                     e = Entry()
 
                     e['title'] = torrent['ReleaseName']
+
+                    if entry.get('imdb_id'):
+                        e['imdb_id'] = entry.get('imdb_id')
 
                     e['torrent_tags'] = movie['Tags']
                     e['content_size'] = parse_filesize(torrent['Size'] + ' b')

@@ -38,6 +38,7 @@ class TorrentMatch(object):
     def get_local_files(self, config, task):
         cwd = os.getcwd()  # save the current working directory
         entries = aggregate_inputs(task, config['what'])
+        result = []
         for entry in entries:
             location = entry.get('location')
             if not location or not os.path.exists(location):
@@ -45,6 +46,7 @@ class TorrentMatch(object):
                 entry.reject('not a local file')
                 continue
 
+            result.append(entry)
             entry['files'] = []
 
             if os.path.isfile(location):
@@ -64,7 +66,7 @@ class TorrentMatch(object):
         # restore the working directory
         os.chdir(cwd)
 
-        return entries
+        return result
 
     # Run last in download phase to make sure we have downloaded .torrent to temp before modify phase
     @plugin.priority(0)

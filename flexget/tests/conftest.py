@@ -288,7 +288,7 @@ def setup_loglevel(pytestconfig, caplog):
     level = logging.DEBUG
     if pytestconfig.getoption('verbose') == 1:
         level = flexget.logger.TRACE
-    elif pytestconfig.getoption('quiet') == 1:
+    elif pytestconfig.getoption('quiet', None) == 1:
         level = logging.INFO
     logging.getLogger().setLevel(level)
     caplog.set_level(level)
@@ -310,7 +310,7 @@ class MockManager(Manager):
         log.debug('database_uri: %s' % self.database_uri)
         self.initialize()
 
-    def find_config(self, *args, **kwargs):
+    def _init_config(self, *args, **kwargs):
         """
         Override configuration loading
         """

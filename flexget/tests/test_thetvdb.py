@@ -296,10 +296,12 @@ class TestTVDBList(object):
                 thetvdb_list:
                   username: flexget
                   account_id: 80FB8BD0720CA5EC
+                  api_key: 4D297D8CFDE0E105
           test_strip_dates:
             thetvdb_list:
               username: flexget
               account_id: 80FB8BD0720CA5EC
+              api_key: 4D297D8CFDE0E105
               strip_dates: yes
     """
 
@@ -350,10 +352,12 @@ class TestTVDBFavorites(object):
                 thetvdb_list:
                   username: flexget
                   account_id: 80FB8BD0720CA5EC
+                  api_key: 4D297D8CFDE0E105
           test_strip_dates:
             thetvdb_list:
               username: flexget
               account_id: 80FB8BD0720CA5EC
+              api_key: 4D297D8CFDE0E105
               strip_dates: yes
     """
 

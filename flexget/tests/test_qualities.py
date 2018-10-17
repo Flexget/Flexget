@@ -70,6 +70,7 @@ class TestQualityParser(object):
         ('Test.File.br-rip', 'bluray'),
         ('Test.File.720px', '720p'),
         ('Test.File.720p50', '720p'),
+        ('Test.File.720p60', '720p'),
 
         ('Test.File.dvd.rip', 'dvdrip'),
         ('Test.File.dvd.rip.r5', 'r5'),
@@ -101,7 +102,10 @@ class TestQualityParser(object):
         ('Test.File.DTSHD', 'dtshd'),
         ('Test.File.DTS', 'dts'),
         ('Test.File.truehd', 'truehd'),
+        ('Test.File.truehd7.1', 'truehd'),
+        ('Test.File.truehd.7.1', 'truehd'),
         ('Test.File.DTSHDMA', 'dtshd'),
+        ('Test.File.DTSHDMA5.1', 'dtshd'),
         ('Test.File.DD2.0', 'dd5.1'),
         ('Test.File.AC35.1', 'ac3')
     ])

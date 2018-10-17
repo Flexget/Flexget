@@ -46,11 +46,25 @@ class TestManipulate(object):
               - {title: 'abc', description: 'def'}
             manipulate:
               - description: { remove: yes }
+              
+          test_replace_with_group:
+            mock:
+              - {title: '1234-7890'}
+            manipulate:
+              - title:
+                  replace:
+                    regexp: (1234)\-(7890)
+                    format: 'e\\2'
     """
 
     def test_replace(self, execute_task):
         task = execute_task('test_1')
         assert task.find_entry('entries', title='abc BAR'), 'replace failed'
+
+    def test_replace_with_group(self, execute_task):
+        task = execute_task('test_replace_with_group')
+        entry = task.all_entries[0]
+        assert entry['title'] == 'e7890', 'Title should have been %s but was %s' % ('e7890', entry['title'])
 
     def test_extract(self, execute_task):
         task = execute_task('test_2')

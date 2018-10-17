@@ -31,7 +31,8 @@ class ParserInternal(object):
             name=parser.name,
             year=parser.year,
             quality=parser.quality,
-            proper_count=parser.proper_count
+            proper_count=parser.proper_count,
+            valid=bool(parser.name)
         )
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parser, (end - start) * 1000)

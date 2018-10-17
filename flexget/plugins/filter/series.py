@@ -256,22 +256,22 @@ class AlternateNames(Base):
     _alt_name_normalized = Column('alt_name_normalized', Unicode, index=True, unique=True)
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
 
-    def name_setter(self, value):
+    @hybrid_property
+    def alt_name(self):
+        return self._alt_name
+
+    @alt_name.setter
+    def alt_name(self, value):
         self._alt_name = value
         self._alt_name_normalized = normalize_series_name(value)
 
-    def name_getter(self):
-        return self._alt_name
-
-    def name_comparator(self):
+    @alt_name.comparator
+    def alt_name(self):
         return NormalizedComparator(self._alt_name_normalized)
 
     @property
     def name_normalized(self):
         return self._alt_name_normalized
-
-    alt_name = hybrid_property(name_getter, name_setter)
-    alt_name.comparator(name_comparator)
 
     def __init__(self, name):
         self.alt_name = name
@@ -304,22 +304,22 @@ class Series(Base):
     seasons = relation('Season', backref='series', cascade='all, delete, delete-orphan')
 
     # Make a special property that does indexed case insensitive lookups on name, but stores/returns specified case
-    def name_getter(self):
+    @hybrid_property
+    def name(self):
         return self._name
 
-    def name_setter(self, value):
+    @name.setter
+    def name(self, value):
         self._name = value
         self._name_normalized = normalize_series_name(value)
 
-    def name_comparator(self):
+    @name.comparator
+    def name(self):
         return NormalizedComparator(self._name_normalized)
 
     @property
     def name_normalized(self):
         return self._name_normalized
-
-    name = hybrid_property(name_getter, name_setter)
-    name.comparator(name_comparator)
 
     def __str__(self):
         return '<Series(id=%s,name=%s)>' % (self.id, self.name)
@@ -1125,8 +1125,12 @@ def remove_series_entity(name, identifier, forget=False):
                 removed = True
                 downloaded_releases = remove_entity(season)
         else:
-            episode = session.query(Episode).filter(Episode.season == parsed.season).filter(
-                Episode.number == parsed.episode).filter(Episode.series_id == series.id).first()
+            episode = session.query(Episode).filter(Episode.series_id == series.id)
+            if parsed.episode:
+                episode = episode.filter(Episode.number == parsed.episode).filter(Episode.season == parsed.season)
+            else:
+                episode = episode.filter(Episode.identifier == parsed.identifier)
+            episode = episode.first()
             if episode:
                 removed = True
                 downloaded_releases = remove_entity(episode)

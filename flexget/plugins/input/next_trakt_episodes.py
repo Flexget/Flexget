@@ -64,7 +64,7 @@ class NextTraktEpisodes(object):
         except RequestException as e:
             raise plugin.PluginError('Unable to get trakt list `%s`: %s' % (config['list'], e))
         if not data:
-            log.warning('The list "%s" is empty.' % config['list'])
+            log.warning('The list "%s" is empty.', config['list'])
             return
         for item in data:
             if item.get('show'):
@@ -72,26 +72,19 @@ class NextTraktEpisodes(object):
                     # Seems we can get entries with a blank show title sometimes
                     log.warning('Found trakt list show with no series name.')
                     continue
-                trakt_id = item['show']['ids']['trakt']
+                ids = item['show']['ids']
+                trakt_id = ids['trakt']
                 listed_series[trakt_id] = {
                     'series_name': '%s (%s)' % (item['show']['title'], item['show']['year']),
                     'trakt_id': trakt_id,
                     'trakt_series_name': item['show']['title'],
                     'trakt_series_year': item['show']['year'],
-                    'trakt_list': config.get('list')}
-                if item['show']['ids'].get('tvdb'):
-                    listed_series[trakt_id]['tvdb_id'] = item['show']['ids']['tvdb']
-                if item['show']['ids'].get('tvrage'):
-                    listed_series[trakt_id]['tvrage_id'] = item['show']['ids']['tvrage']
-                if item['show']['ids'].get('imdb'):
-                    listed_series[trakt_id]['imdb_id'] = item['show']['ids']['imdb']
-                if item['show']['ids'].get('tmdb'):
-                    listed_series[trakt_id]['tmdb_id'] = item['show']['ids']['tmdb']
-                if item['show']['ids'].get('slug'):
-                    listed_series[trakt_id]['trakt_slug'] = item['show']['ids']['slug']
-        context = config['context']
-        if context == 'collected':
-            context = 'collection'
+                    'trakt_list': config.get('list')
+                }
+                for id_name, id_value in ids.items():
+                    entry_field_name = 'trakt_slug' if id_name == 'slug' else id_name  # rename slug to trakt_slug
+                    listed_series[trakt_id][entry_field_name] = id_value
+        context = 'collection' if config['context'] == 'collected' else config['context']
         entries = []
         for trakt_id, fields in listed_series.items():
             url = get_api_url('shows', trakt_id, 'progress', context)
@@ -101,37 +94,36 @@ class NextTraktEpisodes(object):
                 raise plugin.PluginError('An error has occurred looking up: Trakt_id: %s Error: %s' % (trakt_id, e))
             if config['position'] == 'next' and data.get('next_episode'):
                 # If the next episode is already in the trakt database, we'll get it here
-                eps = data['next_episode']['season']
-                epn = data['next_episode']['number']
+                season_number = data['next_episode']['season']
+                episode_number = data['next_episode']['number']
             else:
                 # If we need last ep, or next_episode was not provided, search for last ep
-                for seas in reversed(data['seasons']):
+                for season in reversed(data['seasons']):
                     # Find the first season with collected/watched episodes
-                    if seas['completed'] > 0:
-                        eps = seas['number']
-                        # Pick the highest collected/watched episode
-                        epn = max(item['number'] for item in seas['episodes'] if item['completed'])
-                        # If we are in next episode mode, we have to increment this number
-                        if config['position'] == 'next':
-                            if seas['completed'] >= seas['aired']:
-                                # TODO: next_episode doesn't count unaired episodes right now, this will skip to next
-                                # season too early when there are episodes left to air this season.
-                                eps += 1
-                                epn = 1
-                            else:
-                                epn += 1
-                        break
-                else:
+                    if not season['completed']:
+                        continue
+                    season_number = season['number']
+                    # Pick the highest collected/watched episode
+                    episode_number = max(item['number'] for item in season['episodes'] if item['completed'])
+                    # If we are in next episode mode, we have to increment this number
                     if config['position'] == 'next':
-                        eps = epn = 1
-                    else:
+                        if season['completed'] >= season['aired']:
+                            # TODO: next_episode doesn't count unaired episodes right now, this will skip to next
+                            # season too early when there are episodes left to air this season.
+                            season_number += 1
+                        episode_number = 1
+                    break
+                else:
+                    if config['position'] != 'next':
                         # There were no watched/collected episodes, nothing to emit in 'last' mode
                         continue
-            if eps and epn:
+                    season_number = episode_number = 1
+
+            if season_number and episode_number:
                 if config.get('strip_dates'):
                     # remove year from end of series_name if present
                     fields['series_name'] = re.sub(r'\s+\(\d{4}\)$', '', fields['series_name'])
-                entry = self.make_entry(fields, eps, epn)
+                entry = self.make_entry(fields, season_number, episode_number)
                 entries.append(entry)
         return entries
 

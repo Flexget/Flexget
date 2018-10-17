@@ -25,26 +25,35 @@ CATEGORIES = {
     'Movie-all': 72,
     'Movie-3D': 87,
     'Movie-480p': 77,
+    'Movie-4K': 101,
     'Movie-BD-R': 89,
     'Movie-BD-Rip': 90,
+    'Movie-Cam': 96,
     'Movie-DVD-R': 6,
     'Movie-HD-Bluray': 48,
     'Movie-Kids': 54,
     'Movie-MP4': 62,
     'Movie-Non-English': 38,
     'Movie-Packs': 68,
-    'Movie-XviD': 17,
+    'Movie-Web-DL': 20,
+    'Movie-x265': 100,
+    'Movie-XviD': 7,
 
     # TV
     'TV-all': 73,
+    'TV-Documentaries': 26,
     'TV-Sports': 55,
     'TV-480p': 78,
-    'TV-MP4': 66,
+    'TV-BD': 23,
+    'TV-DVD-R': 24,
+    'TV-DVD-Rip': 25,
+    'TV-Mobile': 66,
     'TV-Non-English': 82,
     'TV-Packs': 65,
     'TV-Packs-Non-English': 83,
     'TV-SD-x264': 79,
     'TV-x264': 5,
+    'TV-x265': 99,
     'TV-XVID': 4,
     'TV-Web-DL': 22
 }
@@ -62,13 +71,14 @@ class UrlRewriteIPTorrents(object):
           password: xxxxxxxx  (required)
           category: HD
 
-          Category is any combination of: all, Movie-3D, Movie-480p, Movie-3D,
-                Movie-480p, Movie-BD-R, Movie-BD-Rip, Movie-DVD-R,
-                Movie-HD-Bluray, Movie-Kids, Movie-MP4,
-                Movie-Non-English, Movie-Packs, Movie-XviD,
+          Category is any combination of: Movie-all, Movie-3D, Movie-480p,
+          Movie-4K, Movie-BD-R, Movie-BD-Rip, Movie-Cam, Movie-DVD-R,
+          Movie-HD-Bluray, Movie-Kids, Movie-MP4, Movie-Non-English,
+          Movie-Packs, Movie-Web-DL, Movie-x265, Movie-XviD,
 
-                TV-all, TV-Sports, TV-480p, TV-MP4, TV-Non-English, TV-Packs,
-                TV-Packs-Non-English, TV-SD-x264, TV-x264, TV-XVID, TV-Web-DL
+          TV-all, TV-Documentaries, TV-Sports, TV-480p, TV-BD, TV-DVD-R,
+          TV-DVD-Rip, TV-MP4, TV-Mobile, TV-Non-English, TV-Packs,
+          TV-Packs-Non-English, TV-SD-x264, TV-x264, TV-x265, TV-XVID, TV-Web-DL
     """
 
     schema = {

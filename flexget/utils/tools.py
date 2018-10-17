@@ -407,7 +407,8 @@ def split_title_year(title):
         return
     if not re.search(r'\d{4}', title):
         return title, None
-    match = re.search(r'(.*?)\(?(\d{4})?\)?$', title)
+    # We only recognize years from the 2nd and 3rd millennium, FlexGetters from the year 3000 be damned!
+    match = re.search(r'(.*?)\(?([12]\d{3})?\)?$', title)
 
     title = match.group(1).strip()
     year_match = match.group(2)

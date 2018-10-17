@@ -3,6 +3,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import hashlib
 import logging
+import os
 
 import pytz
 import tzlocal
@@ -121,7 +122,13 @@ def setup_scheduler(manager):
     global scheduler
     if logging.getLogger().getEffectiveLevel() > logging.DEBUG:
         logging.getLogger('apscheduler').setLevel(logging.WARNING)
-    jobstores = {'default': SQLAlchemyJobStore(engine=manager.engine, metadata=Base.metadata)}
+    # Since APScheduler runs in a separate thread, slower devices can sometimes get a DB lock, so use a separate db
+    # for the jobs to avoid this
+    db_filename = os.path.join(manager.config_base, 'db-%s-jobs.sqlite' % manager.config_name)
+    # in case running on windows, needs double \\
+    db_filename = db_filename.replace('\\', '\\\\')
+    database_uri = 'sqlite:///%s' % db_filename
+    jobstores = {'default': SQLAlchemyJobStore(url=database_uri)}
     # If job was meant to run within last day while daemon was shutdown, run it once when continuing
     job_defaults = {'coalesce': True, 'misfire_grace_time': 60 * 60 * 24}
     try:

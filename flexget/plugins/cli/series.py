@@ -83,7 +83,7 @@ def display_summary(options):
             kwargs['sort_by'] = 'last_download_date'
 
         query = get_series_summary(**kwargs)
-        header = ['Name', 'Latest', 'Age', 'Downloaded', 'Identified By']
+        header = ['Name', 'Begin', 'Last Encountered', 'Age', 'Downloaded', 'Identified By']
         for index, value in enumerate(header):
             if value.lower() == options.sort_by:
                 header[index] = colorize(SORT_COLUMN_COLOR, value)
@@ -93,6 +93,7 @@ def display_summary(options):
             name_column = series.name
 
             behind = (0,)
+            begin = series.begin.identifier if series.begin else '-'
             latest_release = '-'
             age_col = '-'
             episode_id = '-'
@@ -117,7 +118,7 @@ def display_summary(options):
                 if behind[0] > 0:
                     name_column += colorize(BEHIND_EP_COLOR, ' {} {} behind'.format(behind[0], behind[1]))
 
-            table_data.append([name_column, episode_id, age_col, latest_release, identifier_type])
+            table_data.append([name_column, begin, episode_id, age_col, latest_release, identifier_type])
     try:
         table = TerminalTable(options.table_type, table_data, wrap_columns=[3], drop_columns=[4, 3, 2])
         console(table.output)

@@ -37,14 +37,18 @@ def upgrade(ver, session):
         # Upgrade to version 0 was a failed attempt at cleaning bad entries from our table, better attempt in ver 1
         ver = 0
     if ver == 0:
-        # Remove any values that are not loadable.
-        table = table_schema('simple_persistence', session)
-        for row in session.execute(select([table.c.id, table.c.plugin, table.c.key, table.c.value])):
-            try:
-                pickle.loads(row['value'])
-            except Exception as e:
-                log.warning('Couldn\'t load %s:%s removing from db: %s' % (row['plugin'], row['key'], e))
-                session.execute(table.delete().where(table.c.id == row['id']))
+        try:
+            # Remove any values that are not loadable.
+            table = table_schema('simple_persistence', session)
+            for row in session.execute(select([table.c.id, table.c.plugin, table.c.key, table.c.value])):
+                try:
+                    pickle.loads(row['value'])
+                except Exception as e:
+                    log.warning('Couldn\'t load %s:%s removing from db: %s' % (row['plugin'], row['key'], e))
+                    session.execute(table.delete().where(table.c.id == row['id']))
+        except Exception as e:
+            log.warning('Couldn\'t upgrade the simple_persistence table. Commencing nuke. Error: %s', e)
+            raise db_schema.UpgradeImpossible
         ver = 1
     if ver == 1:
         log.info('Creating index on simple_persistence table.')
@@ -120,7 +124,7 @@ class SimplePersistence(MutableMapping):
         return self.class_store[self.taskname][self.plugin]
 
     def __setitem__(self, key, value):
-        log.debug('setting key %s value %s' % (key, repr(value)))
+        log.debug('setting key %s value %s', key, repr(value))
         self.store[key] = value
 
     def __getitem__(self, key):
@@ -142,7 +146,12 @@ class SimplePersistence(MutableMapping):
         """Load all key/values from `task` into memory from database."""
         with Session() as session:
             for skv in session.query(SimpleKeyValue).filter(SimpleKeyValue.task == task).all():
-                cls.class_store[task][skv.plugin][skv.key] = skv.value
+                try:
+                    cls.class_store[task][skv.plugin][skv.key] = skv.value
+                except TypeError as e:
+                    log.warning('Value stored in simple_persistence cannot be decoded. It will be removed. Error: %s',
+                                str(e))
+                    cls.class_store[task][skv.plugin][skv.key] = DELETE
 
     @classmethod
     def flush(cls, task=None):

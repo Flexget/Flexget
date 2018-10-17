@@ -22,6 +22,15 @@ class TestExtract(object):
             zip_file:
                 mock:
                     - {title: 'test', location: '__tmp__/test_zip.zip'}
+            empty_path:
+                mock:
+                    - {title: 'test', location: ''}
+            file_not_exists:
+                mock:
+                    - {title: 'test', location: '__tmp__/nothing_here.zip'}
+            no_path:
+                mock:
+                    - {title: 'test'}
         tasks:
             test_rar:
                 template: rar_file
@@ -50,7 +59,23 @@ class TestExtract(object):
                     to: '__tmp__'
                     keep_dirs: no
                     delete_archive: yes
-                    
+            test_empty_path:
+                template: empty_path
+                decompress:
+                    to: '__tmp__'
+                    keep_dirs: no
+            test_no_path:
+                template: no_path
+                decompress:
+                    to: '__tmp__'
+                    keep_dirs: no
+                    delete_archive: yes
+            test_file_not_exists:
+                template: file_not_exists
+                decompress:
+                    to: '__tmp__'
+                    keep_dirs: no
+                    delete_archive: yes
         """
 
     # Files
@@ -65,6 +90,10 @@ class TestExtract(object):
     # Paths
     rar_path = os.path.join(source_dir, rar_name)
     zip_path = os.path.join(source_dir, zip_name)
+
+    # Error messages
+    error_not_local = 'Entry does not appear to represent a local file.'
+    error_not_exists = 'File no longer exists:'
 
     @pytest.mark.skipif(rarfile is None, reason='rarfile module required')
     @pytest.mark.filecopy(rar_path, '__tmp__')
@@ -100,3 +129,18 @@ class TestExtract(object):
         """Test Zip deletion after extraction"""
         execute_task('test_delete_zip')
         assert not tmpdir.join(self.zip_name).exists(), 'Zip archive was not deleted.'
+
+    def test_empty_path(self, execute_task, caplog):
+        """Test when an empty location is provided"""
+        execute_task('test_empty_path')
+        assert self.error_not_local in caplog.text, 'Plugin logs an error when entry has an empty path.'
+
+    def test_no_path(self, execute_task, caplog):
+        """Test when no location is provided"""
+        execute_task('test_no_path')
+        assert self.error_not_local in caplog.text, 'Plugin logs an error when entry has no path.'
+
+    def test_not_a_file(self, execute_task, caplog):
+        """Test when a non-existent path is provided"""
+        execute_task('test_file_not_exists')
+        assert self.error_not_exists in caplog.text, 'Plugin logs an error when file does not exist.'

@@ -124,10 +124,10 @@ _resolutions = [
     QualityComponent('resolution', 40, '576p', '576p?'),
     QualityComponent('resolution', 45, 'hr'),
     QualityComponent('resolution', 50, '720i'),
-    QualityComponent('resolution', 60, '720p', '(1280x)?720(p|hd)?x?(50)?'),
+    QualityComponent('resolution', 60, '720p', '(1280x)?720(p|hd)?x?([56]0)?'),
     QualityComponent('resolution', 70, '1080i'),
-    QualityComponent('resolution', 80, '1080p', '(1920x)?1080p?x?(50)?'),
-    QualityComponent('resolution', 90, '2160p', '((3840x)?2160p?x?(50)?)|4k')
+    QualityComponent('resolution', 80, '1080p', '(1920x)?1080p?x?([56]0)?'),
+    QualityComponent('resolution', 90, '2160p', '((3840x)?2160p?x?([56]0)?)|4k')
 ]
 _sources = [
     QualityComponent('source', 10, 'workprint', modifier=-8),
@@ -168,9 +168,9 @@ _audios = [
     QualityComponent('audio', 45, 'dd+5.1', 'dd[p+]%s' % channels),
     QualityComponent('audio', 50, 'flac', 'flac%s?' % channels),
     # The DTSs are a bit backwards, but the more specific one needs to be parsed first
-    QualityComponent('audio', 60, 'dtshd', 'dts[\W_]?hd(?:[\W_]?ma)?'),
+    QualityComponent('audio', 60, 'dtshd', 'dts[\W_]?hd(?:[\W_]?ma)?%s?' % channels),
     QualityComponent('audio', 70, 'dts'),
-    QualityComponent('audio', 80, 'truehd')
+    QualityComponent('audio', 80, 'truehd', 'truehd%s?' % channels)
 ]
 
 _UNKNOWNS = {
