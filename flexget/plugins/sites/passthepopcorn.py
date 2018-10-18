@@ -291,6 +291,7 @@ class SearchPassThePopcorn(object):
                     e['torrent_id'] = int(torrent['Id'])
                     e['golden_popcorn'] = torrent['GoldenPopcorn']
                     e['checked'] = torrent['Checked']
+                    e['scene'] = torrent['Scene']
                     e['uploaded_at'] = dateutil_parse(torrent['UploadTime'])
 
                     e['url'] = self.base_url + 'torrents.php?action=download&id={}&authkey={}&torrent_pass={}'.format(
