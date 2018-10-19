@@ -540,7 +540,7 @@ class OutputDeluge(DelugePlugin):
 
             def unused_name(name):
                 # If on local computer, tries appending a (#) suffix until a unique filename is found
-                if self.client.call('is_localhost'):
+                if self.client.host in ['127.0.0.1', 'localhost']:
                     counter = 2
                     while file_exists(name):
                         name = ''.join([os.path.splitext(name)[0],
