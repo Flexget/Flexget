@@ -77,6 +77,8 @@ class DelugePlugin(object):
             auth_file = os.path.join(os.getenv('APPDATA'), 'deluge', 'auth')
         else:
             auth_file = os.path.expanduser('~/.config/deluge/auth')
+        if not os.path.isfile(auth_file):
+            return None
 
         with open(auth_file) as auth:
             for line in auth:
