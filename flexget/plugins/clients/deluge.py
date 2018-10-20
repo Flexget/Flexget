@@ -347,7 +347,7 @@ class OutputDeluge(DelugePlugin):
         labels = set()
         for entry in task.accepted:
             label = entry.get('label', config.get('label'))
-            if label:
+            if label and label.lower() != 'no label':
                 try:
                     label = self._format_label(entry.render(entry.get('label', config.get('label'))))
                     log.debug('Rendered label: %s', label)
@@ -483,6 +483,9 @@ class OutputDeluge(DelugePlugin):
 
     def _format_label(self, label):
         """Makes a string compliant with deluge label naming rules"""
+        # "No Label" is a special identifier to unset a label
+        if label.lower() == 'no label':
+            return 'No Label'
         return re.sub('[^\w-]+', '_', label.lower())
 
     def _set_torrent_options(self, torrent_id, entry, opts):
