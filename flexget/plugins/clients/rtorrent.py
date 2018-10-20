@@ -1,14 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.xmlrpc import client as xmlrpc_client
-from future.moves.urllib.parse import urlparse, urljoin
+from future.moves.urllib.parse import urlparse, urljoin, urlsplit
 from future.utils import native_str
 
 import logging
 import os
 import socket
 import re
-import urllib.parse
 from io import BytesIO
 from time import sleep
 
@@ -151,7 +150,7 @@ if not hasattr(xmlrpc_client.Transport, 'single_request'):
 
 
 def create_proxy(url):
-    parsed = urllib.parse.urlsplit(url)
+    parsed = urlsplit(url)
     proto = url.split(':')[0].lower()
     if proto == 'scgi':
         if parsed.netloc:
