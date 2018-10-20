@@ -464,7 +464,10 @@ class OutputDeluge(DelugePlugin):
                     except Exception as e:
                         log.info('%s was not added to deluge! %s', entry['title'], e)
                         entry.fail('Could not be added to deluge')
-                self._set_torrent_options(added_torrent, entry, modify_opts)
+                if not added_torrent:
+                    log.error('There was an error adding %s to deluge.' % entry['title'])
+                else:
+                    self._set_torrent_options(added_torrent, entry, modify_opts)
 
     def on_task_learn(self, task, config):
         """ Make sure all temp files are cleaned up when entries are learned """
