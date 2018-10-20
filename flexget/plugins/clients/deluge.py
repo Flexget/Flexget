@@ -77,6 +77,8 @@ class DelugePlugin(object):
             auth_file = os.path.join(os.getenv('APPDATA'), 'deluge', 'auth')
         else:
             auth_file = os.path.expanduser('~/.config/deluge/auth')
+        if not os.path.isfile(auth_file):
+            return None
 
         with open(auth_file) as auth:
             for line in auth:
@@ -462,7 +464,10 @@ class OutputDeluge(DelugePlugin):
                     except Exception as e:
                         log.info('%s was not added to deluge! %s', entry['title'], e)
                         entry.fail('Could not be added to deluge')
-                self._set_torrent_options(added_torrent, entry, modify_opts)
+                if not added_torrent:
+                    log.error('There was an error adding %s to deluge.' % entry['title'])
+                else:
+                    self._set_torrent_options(added_torrent, entry, modify_opts)
 
     def on_task_learn(self, task, config):
         """ Make sure all temp files are cleaned up when entries are learned """
@@ -538,7 +543,7 @@ class OutputDeluge(DelugePlugin):
 
             def unused_name(name):
                 # If on local computer, tries appending a (#) suffix until a unique filename is found
-                if self.client.call('is_localhost'):
+                if self.client.host in ['127.0.0.1', 'localhost']:
                     counter = 2
                     while file_exists(name):
                         name = ''.join([os.path.splitext(name)[0],
