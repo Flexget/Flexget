@@ -291,7 +291,15 @@ class SearchPassThePopcorn(object):
                     e['torrent_id'] = int(torrent['Id'])
                     e['golden_popcorn'] = torrent['GoldenPopcorn']
                     e['checked'] = torrent['Checked']
+                    e['scene'] = torrent['Scene']
                     e['uploaded_at'] = dateutil_parse(torrent['UploadTime'])
+
+                    e['ptp_remaster_title'] = torrent.get('RemasterTitle') # tags such as remux, 4k remaster, etc.
+                    e['ptp_quality'] = torrent.get('Quality') # high, ultra high, or standard definition
+                    e['ptp_resolution'] = torrent.get('Resolution') # 1080p, 720p, etc.
+                    e['ptp_source'] = torrent.get('Source') # blu-ray, dvd, etc.
+                    e['ptp_container'] = torrent.get('Container') # mkv, vob ifo, etc.
+                    e['ptp_codec'] = torrent.get('Codec') # x264, XviD, etc.
 
                     e['url'] = self.base_url + 'torrents.php?action=download&id={}&authkey={}&torrent_pass={}'.format(
                         e['torrent_id'], authkey, passkey
