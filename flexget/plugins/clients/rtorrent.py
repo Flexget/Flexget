@@ -151,16 +151,13 @@ if not hasattr(xmlrpc_client.Transport, 'single_request'):
 
 def create_proxy(url):
     parsed = urlsplit(url)
-    proto = url.split(':')[0].lower()
-    if proto == 'scgi':
-        if parsed.netloc:
-            url = 'http://%s' % parsed.netloc
-            return xmlrpc_client.ServerProxy(url, transport=SCGITransport())
-        else:
-            path = parsed.path
-            return xmlrpc_client.ServerProxy('http://1', transport=SCGITransport(socket_path=path))
-    else:
-        log.debug('Creating Normal XMLRPC Proxy with url %r' % url)
+    if not parsed.scheme:
+        path = parsed.path
+        return xmlrpc_client.ServerProxy('http://1', transport=SCGITransport(socket_path=path))
+    if parsed.scheme == 'scgi':
+        url = 'http://%s' % parsed.netloc
+        return xmlrpc_client.ServerProxy(url, transport=SCGITransport())
+    log.debug('Creating Normal XMLRPC Proxy with url %r' % url)
     return xmlrpc_client.ServerProxy(url)
 
 
