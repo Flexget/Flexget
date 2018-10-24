@@ -266,10 +266,14 @@ class SearchPassThePopcorn(object):
             passkey = result['PassKey']
 
             for movie in result['Movies']:
-                # skip movies that are irrelevant
-                if entry.get('movie_year') and int(movie['Year']) != int(entry['movie_year']):
-                    log.debug('Movie year %s does not match %s', movie['Year'], entry['movie_year'])
+                # skip movies with wrong year
+                # don't consider if we have imdb_id (account for year discrepancies if we know we have
+                # the right movie)
+                if (not entry.get('imdb_id') and entry.get('movie_year') and
+                        int(movie['Year']) != int(entry['movie_year'])):
+                    log.debug('Movie year %s does not match default %s', movie['Year'], entry['movie_year'])
                     continue
+
                 # imdb id in the json result is without 'tt'
                 if entry.get('imdb_id') and movie['ImdbId'] not in entry['imdb_id']:
                     log.debug('imdb id %s does not match %s', movie['ImdbId'], entry['imdb_id'])
