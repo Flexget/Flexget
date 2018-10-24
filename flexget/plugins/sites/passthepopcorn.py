@@ -269,13 +269,13 @@ class SearchPassThePopcorn(object):
                 # skip movies with wrong year
                 # don't consider if we have imdb_id (account for year discrepancies if we know we have
                 # the right movie)
-                if (not entry.get('imdb_id') and entry.get('movie_year') and
+                if ('imdb_id' not in movie and 'movie_year' in movie and
                         int(movie['Year']) != int(entry['movie_year'])):
                     log.debug('Movie year %s does not match default %s', movie['Year'], entry['movie_year'])
                     continue
 
                 # imdb id in the json result is without 'tt'
-                if entry.get('imdb_id') and movie['ImdbId'] not in entry['imdb_id']:
+                if 'imdb_id' in movie and movie['ImdbId'] not in entry['imdb_id']:
                     log.debug('imdb id %s does not match %s', movie['ImdbId'], entry['imdb_id'])
                     continue
 
@@ -284,8 +284,7 @@ class SearchPassThePopcorn(object):
 
                     e['title'] = torrent['ReleaseName']
 
-                    if entry.get('imdb_id'):
-                        e['imdb_id'] = entry.get('imdb_id')
+                    e['imdb_id'] = entry.get('imdb_id')
 
                     e['torrent_tags'] = movie['Tags']
                     e['content_size'] = parse_filesize(torrent['Size'] + ' b')
