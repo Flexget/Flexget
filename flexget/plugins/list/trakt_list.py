@@ -201,6 +201,8 @@ class TraktSet(MutableSet):
                 else:
                     entry['url'] = 'https://trakt.tv/%ss/%s' % (list_type, item[list_type]['ids'].get('slug'))
 
+                entry.update_using_map(field_maps[list_type], item)
+
                 # get movie name translation
                 language = self.config.get('language')
                 if list_type == 'movie' and language:
@@ -221,7 +223,6 @@ class TraktSet(MutableSet):
                         entry['title'] = translation[0]['title'] + ' (' + entry['movie_year'] + ')'
                         entry['movie_name'] = translation[0]['title']
 
-                entry.update_using_map(field_maps[list_type], item)
                 # Override the title if strip_dates is on. TODO: a better way?
                 if self.config.get('strip_dates'):
                     if list_type in ['show', 'movie']:
