@@ -15,6 +15,12 @@ from flexget.manager import Manager
 from flexget.utils.tools import get_latest_flexget_version_number, get_current_flexget_version
 
 
+class AttrDict(dict):
+    def __init__(self, *args, **kwargs):
+        super(AttrDict, self).__init__(*args, **kwargs)
+        self.__dict__ = self
+
+
 class AliasedGroup(click.Group):
     def resolve_command(self, ctx, args):
         """Click's 'ignore_unknown_options' doesn't really work  with Groups. This fixes that."""
@@ -39,6 +45,16 @@ class AliasedGroup(click.Group):
         elif len(matches) == 1:
             return click.Group.get_command(self, ctx, matches[0])
         ctx.fail('Too many matches: %s' % ', '.join(sorted(matches)))
+
+    def parse_core_options(self, args=None):
+        """
+        Returns known core options without validating anything. Works before plugins are loaded.
+        """
+        if args is None:
+            args = click.get_os_args()
+        with self.make_context('flexget', args, ignore_unknown_options=True) as ctx:
+            return ctx.params
+
 
 
 def inject_callback(ctx, param, value):
@@ -139,12 +155,11 @@ def cron_callback(ctx, param, value):
                                  'maintenance to run, disables stdout and stderr output, reduces logging level')
 @click.pass_context
 def run_flexget(ctx, config, logfile, loglevel, cron, do_profile, **params):
-    return
+    ctx.ensure_object(dict)
     try:
         logger.initialize()
-
         try:
-            manager = Manager(None, ctx.params)
+            manager = Manager(None, AttrDict(ctx.params))
         except (IOError, ValueError) as e:
             if params['debug']:
                 import traceback
@@ -154,7 +169,7 @@ def run_flexget(ctx, config, logfile, loglevel, cron, do_profile, **params):
             sys.exit(1)
 
         # Store instantiated manager instance on context for subcommands to use
-        ctx.obj.manager = manager
+        ctx.obj['manager'] = manager
 
         ipc_info = manager.check_ipc_info()
         if ipc_info:
@@ -223,7 +238,7 @@ def execute(ctx, **params):
 def main():
     # with run_flexget.make_context("flexget", click.get_os_args(), ignore_unknown_options=True, allow_extra_args=True) as ctx:
     #     print(ctx)
-    rv = run_flexget(standalone_mode=False, ignore_unknown_options=True)
+    rv = run_flexget()
     #rv = run_flexget(standalone_mode=False)
 
 
