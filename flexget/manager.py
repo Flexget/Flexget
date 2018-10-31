@@ -104,7 +104,7 @@ class Manager(object):
     unit_test = False
     options = None
 
-    def __init__(self, args, options):
+    def __init__(self, options):
         """
         :param args: CLI args
         """
@@ -114,10 +114,6 @@ class Manager(object):
         elif manager:
             log.info('last manager was not torn down correctly')
 
-        if args is None:
-            # Decode all arguments to unicode before parsing
-            args = unicode_argv()[1:]
-        self.args = args
         self.options = options
         self.autoreload_config = False
         self.config_file_hash = None
@@ -141,17 +137,17 @@ class Manager(object):
         try:
             self.find_config(create=False)
         except:
-            logger.start(level=self.options.loglevel.upper(), to_file=False)
+            logger.start(level=self.options['loglevel'].upper(), to_file=False)
             raise
         else:
-            log_file = os.path.expanduser(self.options.logfile)
+            log_file = os.path.expanduser(self.options['logfile'])
             # If an absolute path is not specified, use the config directory.
             if not os.path.isabs(log_file):
                 log_file = os.path.join(self.config_base, log_file)
 
-            logger.start(log_file, self.options.loglevel.upper(), to_console=not self.options.cron)
+            logger.start(log_file, self.options['loglevel'].upper(), to_console=not self.options['cron'])
 
-        if self.options.test:
+        if self.options['test']:
             # When we are in test mode, we use a different lock file and db
             self.lockfile = os.path.join(self.config_base, '.test-%s-lock' % self.config_name)
             log.info('Test mode, creating a copy from database ...')
@@ -182,13 +178,8 @@ class Manager(object):
 
         plugin.load_plugins(extra_dirs=[os.path.join(self.config_base, 'plugins')])
 
-        # Reparse CLI options now that plugins are loaded
-        if not self.args:
-            self.args = ['--help']
-        self.options = get_parser().parse_args(self.args)
-
         self.task_queue = TaskQueue()
-        self.ipc_server = IPCServer(self, self.options.ipc_port)
+        self.ipc_server = IPCServer(self, self.options['ipc_port'])
 
         self.setup_yaml()
         self.init_sqlalchemy()
@@ -235,12 +226,12 @@ class Manager(object):
         :returns: a list of :class:`threading.Event` instances which will be
             set when each respective task has finished running
         """
-        if options is None:
-            options = copy.copy(self.options.execute)
-        elif isinstance(options, dict):
-            options_namespace = copy.copy(self.options.execute)
-            options_namespace.__dict__.update(options)
-            options = options_namespace
+        # if options is None:
+        #     options = copy.copy(self.options['execute'])
+        # elif isinstance(options, dict):
+        #     options_namespace = copy.copy(self.options['execute'])
+        #     options_namespace.__dict__.update(options)
+        #     options = options_namespace
         task_names = self.tasks
         # Only reload config if daemon
         config_hash = self.hash_config()
@@ -252,14 +243,14 @@ class Manager(object):
             except Exception as e:
                 log.error('Reloading config failed: %s', e)
         # Handle --tasks
-        if options.tasks:
+        if options['task']:
             # Consider * the same as not specifying tasks at all (makes sure manual plugin still works)
-            if options.tasks == ['*']:
-                options.tasks = None
+            if options['task'] == ['*']:
+                options['task'] = None
             else:
                 # Create list of tasks to run, preserving order
                 task_names = []
-                for arg in options.tasks:
+                for arg in options['task']:
                     matches = [t for t in self.tasks if fnmatch.fnmatchcase(str(t).lower(), arg.lower())]
                     if not matches:
                         msg = '`%s` does not match any tasks' % arg
@@ -269,7 +260,7 @@ class Manager(object):
                         continue
                     task_names.extend(m for m in matches if m not in task_names)
                 # Set the option as a list of matching task names so plugins can use it easily
-                options.tasks = task_names
+                options['task'] = task_names
         # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
         task_names = sorted(task_names, key=lambda t: self.config['tasks'][t].get('priority', 65535))
 
@@ -292,54 +283,32 @@ class Manager(object):
         If not, this will attempt to obtain a lock, initialize the manager, and run the command here.
         """
         # If another process is started, send the execution to the running process
+    def run_ipc_command(self, args):
         ipc_info = self.check_ipc_info()
-        if ipc_info:
-            console('There is a FlexGet process already running for this config, sending execution there.')
-            log.debug('Sending command to running FlexGet process: %s' % self.args)
+        if not ipc_info:
+            raise Exception('there is no daemon running')
+        console('There is a FlexGet process already running for this config, sending execution there.')
+        log.debug('Sending command to running FlexGet process: %s' % self.args)
+        try:
+            client = IPCClient(ipc_info['port'], ipc_info['password'])
+        except ValueError as e:
+            log.error(e)
+        else:
             try:
-                client = IPCClient(ipc_info['port'], ipc_info['password'])
-            except ValueError as e:
-                log.error(e)
-            else:
-                try:
-                    client.handle_cli(self.args)
-                except KeyboardInterrupt:
-                    log.error('Disconnecting from daemon due to ctrl-c. Executions will still continue in the '
-                              'background.')
-                except EOFError:
-                    log.error('Connection from daemon was severed.')
-            return
+                client.run_local_command(args)
+            except KeyboardInterrupt:
+                log.error('Disconnecting from daemon due to ctrl-c. Executions will still continue in the '
+                          'background.')
+            except EOFError:
+                log.error('Connection from daemon was severed.')
+
+    def run_local_command(self, args):
         # No running process, we start our own to handle command
+        from flexget import click_entry
         with self.acquire_lock():
             self.initialize()
-            self.handle_cli()
+            click_entry.run_flexget(args=args, obj={'manager': self})
             self._shutdown()
-
-    def handle_cli(self, options=None):
-        """
-        Dispatch a cli command to the appropriate function.
-
-        * :meth:`.execute_command`
-        * :meth:`.daemon_command`
-        * CLI plugin callback function
-
-        The manager should have a lock and be initialized before calling this method.
-
-        :param options: argparse options for command. Defaults to options that manager was instantiated with.
-        """
-        if not options:
-            options = self.options
-        command = options.cli_command
-        command_options = getattr(options, command)
-        # First check for built-in commands
-        if command in ['execute', 'daemon']:
-            if command == 'execute':
-                self.execute_command(command_options)
-            elif command == 'daemon':
-                self.daemon_command(command_options)
-        else:
-            # Otherwise dispatch the command to the callback function
-            options.cli_command_callback(self, command_options)
 
     def execute_command(self, options):
         """
@@ -366,7 +335,7 @@ class Manager(object):
                 log.verbose('There is a task already running, execution queued.')
             finished_events = self.execute(options, output=logger.get_capture_stream(),
                                            loglevel=logger.get_capture_loglevel())
-            if not options.cron:
+            if not options['cron']:
                 # Wait until execution of all tasks has finished
                 for _, _, event in finished_events:
                     event.wait()
@@ -391,16 +360,16 @@ class Manager(object):
         """
 
         # Import API so it can register to daemon.started event
-        if options.action == 'start':
+        if options['action'] == 'start':
             if self.is_daemon:
                 log.error('Daemon already running for this config.')
                 return
             elif self.task_queue.is_alive():
                 log.error('Non-daemon execution of FlexGet is running. Cannot start daemon until it is finished.')
                 return
-            if options.daemonize:
+            if options['daemonize']:
                 self.daemonize()
-            if options.autoreload_config:
+            if options['autoreload_config']:
                 self.autoreload_config = True
             try:
                 signal.signal(signal.SIGTERM, self._handle_sigterm)
@@ -414,17 +383,17 @@ class Manager(object):
             self.ipc_server.start()
             self.task_queue.wait()
             fire_event('manager.daemon.completed', self)
-        elif options.action in ['stop', 'reload-config', 'status']:
+        elif options['action'] in ['stop', 'reload-config', 'status']:
             if not self.is_daemon:
                 log.error('There does not appear to be a daemon running.')
                 return
-            if options.action == 'status':
+            if options['action'] == 'status':
                 log.info('Daemon running. (PID: %s)' % os.getpid())
-            elif options.action == 'stop':
-                tasks = 'all queued tasks (if any) have' if options.wait else 'currently running task (if any) has'
+            elif options['action'] == 'stop':
+                tasks = 'all queued tasks (if any) have' if options['wait'] else 'currently running task (if any) has'
                 log.info('Daemon shutdown requested. Shutdown will commence when %s finished executing.' % tasks)
-                self.shutdown(options.wait)
-            elif options.action == 'reload-config':
+                self.shutdown(options['wait'])
+            elif options['action'] == 'reload-config':
                 log.info('Reloading config from disk.')
                 try:
                     self.load_config()
@@ -473,7 +442,7 @@ class Manager(object):
         :raises: `IOError` when no config file could be found, and `create` is False.
         """
         home_path = os.path.join(os.path.expanduser('~'), '.flexget')
-        options_config = os.path.expanduser(self.options.config)
+        options_config = os.path.expanduser(self.options['config'])
 
         possible = []
         if os.path.isabs(options_config):
@@ -598,7 +567,7 @@ class Manager(object):
                         print(' Fault is almost always in one of these lines or previous ones\n')
 
             # When --debug escalate to full stacktrace
-            if self.options.debug or not output_to_console:
+            if self.options['debug'] or not output_to_console:
                 raise
             raise ValueError('Config file is not valid YAML')
 
@@ -701,7 +670,7 @@ class Manager(object):
         log.debug('Connecting to: %s' % self.database_uri)
         try:
             self.engine = sqlalchemy.create_engine(self.database_uri,
-                                                   echo=self.options.debug_sql,
+                                                   echo=self.options['debug_sql'],
                                                    connect_args={'check_same_thread': False, 'timeout': 10})
         except ImportError as e:
             print('FATAL: Unable to use SQLite. Are you running Python 2.7, 3.3 or newer ?\n'
@@ -910,7 +879,7 @@ class Manager(object):
             log.debug('Shutting down')
         self.engine.dispose()
         # remove temporary database used in test mode
-        if self.options.test:
+        if self.options['test']:
             if 'test' not in self.db_filename:
                 raise Exception('trying to delete non test database?')
             if self._has_lock:

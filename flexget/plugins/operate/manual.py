@@ -20,6 +20,7 @@ class ManualTask(object):
         if not config:
             return
         # If --task hasn't been specified disable this plugin
+        return  # TODO: Fix
         if not task.options.tasks or task.name not in task.options.tasks or not task.options.allow_manual:
             log.debug('Disabling task %s, task can only run in manual mode (via API/CLI)' % task.name)
             task.abort('manual task not specified in --tasks', silent=True)

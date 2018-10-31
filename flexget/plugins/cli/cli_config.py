@@ -51,6 +51,7 @@ def replace_in_item(replaces, item):
 
 @event('manager.before_config_validate')
 def substitute_cli_variables(config, manager):
+    return  #TODO: Fix
     if not manager.options.execute.cli_config:
         return
     return replace_in_item(dict(manager.options.execute.cli_config), config)

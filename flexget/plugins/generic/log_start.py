@@ -13,6 +13,7 @@ log = logging.getLogger('log_start')
 
 @event('manager.startup')
 def log_on_start(manager):
+    return  # TODO: Fix
     if manager.options.log_start:
         log.info('FlexGet started (PID: %s)' % os.getpid())
 

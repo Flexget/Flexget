@@ -64,6 +64,10 @@ class DaemonService(rpyc.Service):
     def exposed_version(self):
         return IPC_VERSION
 
+    def exposed_run_local_command(self, args):
+        # TODO: Fix
+        raise Exception('no ipc yet')
+
     def exposed_handle_cli(self, args):
         args = rpyc.utils.classic.obtain(args)
         log.verbose('Running command `%s` for client.' % ' '.join(args))

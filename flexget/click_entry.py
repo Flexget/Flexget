@@ -22,7 +22,7 @@ class AttrDict(dict):
 
 
 class AliasedGroup(click.Group):
-    def resolve_command(self, ctx, args):
+    def _resolve_command(self, ctx, args):
         """Click's 'ignore_unknown_options' doesn't really work  with Groups. This fixes that."""
         if args and ctx.ignore_unknown_options:
             for i in range(len(args)):
@@ -155,64 +155,65 @@ def cron_callback(ctx, param, value):
                                  'maintenance to run, disables stdout and stderr output, reduces logging level')
 @click.pass_context
 def run_flexget(ctx, config, logfile, loglevel, cron, do_profile, **params):
-    ctx.ensure_object(dict)
-    try:
-        logger.initialize()
-        try:
-            manager = Manager(None, AttrDict(ctx.params))
-        except (IOError, ValueError) as e:
-            if params['debug']:
-                import traceback
-                traceback.print_exc()
-            else:
-                print('Could not instantiate manager: %s' % e, file=sys.stderr)
-            sys.exit(1)
-
-        # Store instantiated manager instance on context for subcommands to use
-        ctx.obj['manager'] = manager
-
-        ipc_info = manager.check_ipc_info()
-        if ipc_info:
-            args = click.get_os_args()
-            click.echo('There is a FlexGet process already running for this config, sending execution there.')
-            click.echo('Sending command to running FlexGet process: %s' % args)
-            try:
-                client = IPCClient(ipc_info['port'], ipc_info['password'])
-            except ValueError as e:
-                click.echo(e, err=True)
-                sys.exit(1)
-            else:
-                try:
-                    client.handle_cli(args)
-                except KeyboardInterrupt:
-                    click.echo('Disconnecting from daemon due to ctrl-c. Executions will still continue in the '
-                              'background.')
-                except EOFError:
-                    click.echo('Connection from daemon was severed.', err=True)
-                    sys.exit(1)
-                sys.exit(0)
-
-        try:
-            if do_profile:
-                try:
-                    import cProfile as profile
-                except ImportError:
-                    import profile
-                profile.runctx('manager.start()', globals(), locals(),
-                               os.path.join(manager.config_base, 'flexget.profile'))
-            else:
-                manager.start()
-        except (IOError, ValueError) as e:
-            if params['debug']:
-                import traceback
-                traceback.print_exc()
-            else:
-                print('Could not start manager: %s' % e, file=sys.stderr)
-
-            sys.exit(1)
-    except KeyboardInterrupt:
-        print('Killed with keyboard interrupt.', file=sys.stderr)
-        sys.exit(1)
+    pass
+    # ctx.ensure_object(dict)
+    # try:
+    #     logger.initialize()
+    #     try:
+    #         manager = Manager(None, AttrDict(ctx.params))
+    #     except (IOError, ValueError) as e:
+    #         if params['debug']:
+    #             import traceback
+    #             traceback.print_exc()
+    #         else:
+    #             print('Could not instantiate manager: %s' % e, file=sys.stderr)
+    #         sys.exit(1)
+    #
+    #     # Store instantiated manager instance on context for subcommands to use
+    #     ctx.obj['manager'] = manager
+    #
+    #     ipc_info = manager.check_ipc_info()
+    #     if ipc_info:
+    #         args = click.get_os_args()
+    #         click.echo('There is a FlexGet process already running for this config, sending execution there.')
+    #         click.echo('Sending command to running FlexGet process: %s' % args)
+    #         try:
+    #             client = IPCClient(ipc_info['port'], ipc_info['password'])
+    #         except ValueError as e:
+    #             click.echo(e, err=True)
+    #             sys.exit(1)
+    #         else:
+    #             try:
+    #                 client.handle_cli(args)
+    #             except KeyboardInterrupt:
+    #                 click.echo('Disconnecting from daemon due to ctrl-c. Executions will still continue in the '
+    #                           'background.')
+    #             except EOFError:
+    #                 click.echo('Connection from daemon was severed.', err=True)
+    #                 sys.exit(1)
+    #             sys.exit(0)
+    #
+    #     try:
+    #         if do_profile:
+    #             try:
+    #                 import cProfile as profile
+    #             except ImportError:
+    #                 import profile
+    #             profile.runctx('manager.start()', globals(), locals(),
+    #                            os.path.join(manager.config_base, 'flexget.profile'))
+    #         else:
+    #             manager.start()
+    #     except (IOError, ValueError) as e:
+    #         if params['debug']:
+    #             import traceback
+    #             traceback.print_exc()
+    #         else:
+    #             print('Could not start manager: %s' % e, file=sys.stderr)
+    #
+    #         sys.exit(1)
+    # except KeyboardInterrupt:
+    #     print('Killed with keyboard interrupt.', file=sys.stderr)
+    #     sys.exit(1)
 
 
 @run_flexget.command()
@@ -221,7 +222,7 @@ def run_flexget(ctx, config, logfile, loglevel, cron, do_profile, **params):
                               'matching is case-insensitive')
 @click.option('--learn', is_flag=True,
                          help='matches are not downloaded but will be skipped in the future')
-@click.option('--profile', is_flag=True, hidden=True)
+#@click.option('--profile', is_flag=True, hidden=True)  # TODO: make this a plugin
 @click.option('--disable-phase', '--disable-phases', multiple=True, hidden=True)
 @click.option('--inject', multiple=True, callback=inject_callback, hidden=True)
 # Plugins should respect these flags where appropriate
@@ -230,15 +231,23 @@ def run_flexget(ctx, config, logfile, loglevel, cron, do_profile, **params):
                          help='disable caches. works only in plugins that have explicit support')
 @click.pass_context
 def execute(ctx, **params):
-    print("ran execute")
-    print(params)
-    print(ctx.args)
+    print("running execute")
+    ctx.obj['manager'].execute_command(options=ctx.params)
 
 
 def main():
     # with run_flexget.make_context("flexget", click.get_os_args(), ignore_unknown_options=True, allow_extra_args=True) as ctx:
     #     print(ctx)
-    rv = run_flexget()
+    logger.initialize()
+    params = run_flexget.parse_core_options()
+    manager = Manager(params)
+    args = click.get_os_args()
+    try:
+        manager.run_ipc_command(args)
+        return
+    except Exception:  # TODO: Fix this
+        pass
+    manager.run_local_command(args)
     #rv = run_flexget(standalone_mode=False)
 
 

@@ -12,6 +12,7 @@ log = logging.getLogger('debug_warnings')
 
 @event('manager.startup')
 def debug_warnings(manager):
+    return  # TODO: Fix
     if manager.options.debug_warnings:
         log.info('All warnings will be raised as errors for debugging purposes.')
         warnings.simplefilter('error')

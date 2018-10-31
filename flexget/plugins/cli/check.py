@@ -3,6 +3,8 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import codecs
 import logging
+
+import click
 import yaml
 
 from flexget import options
@@ -14,7 +16,8 @@ log = logging.getLogger('check')
 
 @event('manager.before_config_load')
 def before_config_load(manager):
-    if manager.options.cli_command == 'check':
+    return  #TODO: Fix
+    if manager.options['cli_command'] == 'check':
         pre_check_config(manager.config_path)
 
 
@@ -133,6 +136,7 @@ def pre_check_config(config_path):
     log.verbose('Pre-checked %s configuration lines' % line_num)
 
 
+@click.command('check')
 def check(manager, options):
     log.verbose('Checking config file `%s`' % manager.config_path)
     if manager.is_daemon:

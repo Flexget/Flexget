@@ -80,6 +80,7 @@ def after_end(session, transaction):
 
 @event('manager.startup')
 def debug_warnings(manager):
+    return  # TODO: Fix
     if manager.options.debug_db_sessions:
         sqlalchemy.event.listen(Session, 'after_begin', after_begin)
         sqlalchemy.event.listen(Session, 'after_flush', after_flush)

@@ -11,8 +11,8 @@ import click
 
 
 @click.command('backlog', help='View or clear entries from backlog plugin')
-@click.argument('action', type=click.Choice(['list', 'clear']),
-                        help='Choose to show items in backlog, or clear all of them')
+@click.argument('action', type=click.Choice(['list', 'clear']),)
+                        #help='Choose to show items in backlog, or clear all of them')
 @click.option('--task', nargs=1, help='Limit to specific task (if supplied)')
 def do_cli(manager, options):
     if options.action == 'clear':

@@ -43,6 +43,7 @@ def after_plugin(task, keyword):
 
 @event('manager.execute.started')
 def startup(manager, options):
+    return  # TODO: Fix
     if not options.debug_perf:
         return
 
@@ -69,6 +70,7 @@ def startup(manager, options):
 
 @event('manager.execute.completed')
 def cleanup(manager, options):
+    return  # TODO: Fix
     if not options.debug_perf:
         return
 

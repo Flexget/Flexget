@@ -207,21 +207,12 @@ class Task(object):
             config = manager.config['tasks'].get(name, {})
         self.config = copy.deepcopy(config)
         self.prepared_config = None
-        if options is None:
-            options = copy.copy(self.manager.options.execute)
-        elif isinstance(options, dict):
-            options_namespace = copy.copy(self.manager.options.execute)
-            options_namespace.__dict__.update(options)
-            options = options_namespace
-        # If execution hasn't specifically set the `allow_manual` flag, set it to False by default
-        if not hasattr(options, 'allow_manual'):
-            setattr(options, 'allow_manual', False)
         self.options = options
         self.output = output
         self.loglevel = loglevel
         self.suppress_warnings = suppress_warnings or []
         if priority is None:
-            self.priority = 10 if self.options.cron else 0
+            self.priority = 10 if self.options['cron'] else 0
         else:
             self.priority = priority
         self.priority = priority
@@ -580,16 +571,16 @@ class Task(object):
         log.debug('executing %s' % self.name)
 
         # Handle keyword args
-        if self.options.learn:
+        if self.options['learn']:
             log.info('Disabling download and output phases because of --learn')
             self.disable_phase('download')
             self.disable_phase('output')
-        if self.options.disable_phases:
-            list(map(self.disable_phase, self.options.disable_phases))
-        if self.options.inject:
+        if self.options['disable_phases']:
+            list(map(self.disable_phase, self.options['disable_phases']))
+        if self.options['inject']:
             # If entries are passed for this execution (eg. rerun), disable the input phase
             self.disable_phase('input')
-            self.all_entries.extend(copy.deepcopy(self.options.inject))
+            self.all_entries.extend(copy.deepcopy(self.options['inject']))
 
         # run phases
         try:
@@ -638,7 +629,7 @@ class Task(object):
 
         try:
             self.finished_event.clear()
-            if self.options.cron:
+            if self.manager.options['cron']:
                 self.manager.db_cleanup()
             fire_event('task.execute.started', self)
             while True:
