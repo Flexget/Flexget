@@ -263,7 +263,7 @@ class ParserGuessit(object):
             episode = episode[0]
         date = guess_result.get('date')
         quality = self._quality(guess_result)
-        proper_count = self._proper_count(guess_result, )
+        proper_count = self._proper_count(guess_result)
         group = guess_result.get('release_group')
         # Validate group with from_group
         if not self._is_valid_groups(group, guessit_options.get('allow_groups', [])):
