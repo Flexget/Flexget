@@ -3,6 +3,8 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
+import click
+
 from flexget import options, plugin
 from flexget.config_schema import register_config_key
 from flexget.event import event
@@ -64,9 +66,9 @@ class PluginTemplate(object):
         if config is False:  # handles 'template: no' form to turn off template on this task
             return
         # implements --template NAME
-        if task.options.template:
-            if not config or task.options.template not in config:
-                task.abort('does not use `%s` template' % task.options.template, silent=True)
+        if task.options['template']:
+            if not config or task.options['template'] not in config:
+                task.abort('does not use `%s` template' % task.options['template'], silent=True)
 
         config = self.prepare_config(config)
 
@@ -132,5 +134,6 @@ def register_config():
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('-T', '--template', metavar='NAME',
-                                               help='execute tasks using given template')
+    # TODO: fix this up
+    from flexget import click_entry
+    click_entry.execute.params.append(click.Option(['-T', '--template'], metavar='NAME', help='execute tasks using given template'))

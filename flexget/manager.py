@@ -307,7 +307,9 @@ class Manager(object):
         from flexget import click_entry
         with self.acquire_lock():
             self.initialize()
-            click_entry.run_flexget(args=args, obj={'manager': self})
+            # TODO: this shouldn't go here
+            fire_event('options.register')
+            click_entry.run_flexget(args=args, obj=self)
             self._shutdown()
 
     def execute_command(self, options):

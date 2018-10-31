@@ -30,6 +30,7 @@ class PluginTryRegexp(object):
         return (False, None)
 
     def on_task_filter(self, task, config):
+        return  # TODO: Fix
         if not task.options.try_regexp:
             return
         if self.abort:

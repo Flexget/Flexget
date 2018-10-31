@@ -52,7 +52,7 @@ class AliasedGroup(click.Group):
         """
         if args is None:
             args = click.get_os_args()
-        with self.make_context('flexget', args, ignore_unknown_options=True) as ctx:
+        with self.make_context('flexget', args, ignore_unknown_options=True, help_option_names=[]) as ctx:
             return ctx.params
 
 
@@ -102,6 +102,9 @@ def cron_callback(ctx, param, value):
     return value
 
 
+pass_manager = click.make_pass_decorator(Manager)
+
+
 @click.group("flexget", cls=AliasedGroup, context_settings={'default_map': {}})
 @click.option(
     "-V",
@@ -143,7 +146,7 @@ def cron_callback(ctx, param, value):
 @click.option('--bugreport', 'debug_tb', is_flag=True,
               help='Use this option to create a detailed bug report, '
                                  'note that the output might contain PRIVATE data, so edit that out')
-@click.option('--profile', 'do_profile', is_flag=True,
+@click.option('--profile', 'do_profile', is_flag=True,   # TODO: make this a plugin?
                              help='Use the python profiler for this run to debug performance issues.')
 @click.option('--debug', is_flag=True, callback=debug_callback, hidden=True)
 @click.option('--debug-trace', is_flag=True, callback=debug_trace_callback, hidden=True)
@@ -153,93 +156,73 @@ def cron_callback(ctx, param, value):
 @click.option('--cron', is_flag=True, callback=cron_callback,
                             help='use when executing FlexGet non-interactively: allows background '
                                  'maintenance to run, disables stdout and stderr output, reduces logging level')
-@click.pass_context
-def run_flexget(ctx, config, logfile, loglevel, cron, do_profile, **params):
-    pass
-    # ctx.ensure_object(dict)
-    # try:
-    #     logger.initialize()
-    #     try:
-    #         manager = Manager(None, AttrDict(ctx.params))
-    #     except (IOError, ValueError) as e:
-    #         if params['debug']:
-    #             import traceback
-    #             traceback.print_exc()
-    #         else:
-    #             print('Could not instantiate manager: %s' % e, file=sys.stderr)
-    #         sys.exit(1)
-    #
-    #     # Store instantiated manager instance on context for subcommands to use
-    #     ctx.obj['manager'] = manager
-    #
-    #     ipc_info = manager.check_ipc_info()
-    #     if ipc_info:
-    #         args = click.get_os_args()
-    #         click.echo('There is a FlexGet process already running for this config, sending execution there.')
-    #         click.echo('Sending command to running FlexGet process: %s' % args)
-    #         try:
-    #             client = IPCClient(ipc_info['port'], ipc_info['password'])
-    #         except ValueError as e:
-    #             click.echo(e, err=True)
-    #             sys.exit(1)
-    #         else:
-    #             try:
-    #                 client.handle_cli(args)
-    #             except KeyboardInterrupt:
-    #                 click.echo('Disconnecting from daemon due to ctrl-c. Executions will still continue in the '
-    #                           'background.')
-    #             except EOFError:
-    #                 click.echo('Connection from daemon was severed.', err=True)
-    #                 sys.exit(1)
-    #             sys.exit(0)
-    #
-    #     try:
-    #         if do_profile:
-    #             try:
-    #                 import cProfile as profile
-    #             except ImportError:
-    #                 import profile
-    #             profile.runctx('manager.start()', globals(), locals(),
-    #                            os.path.join(manager.config_base, 'flexget.profile'))
-    #         else:
-    #             manager.start()
-    #     except (IOError, ValueError) as e:
-    #         if params['debug']:
-    #             import traceback
-    #             traceback.print_exc()
-    #         else:
-    #             print('Could not start manager: %s' % e, file=sys.stderr)
-    #
-    #         sys.exit(1)
-    # except KeyboardInterrupt:
-    #     print('Killed with keyboard interrupt.', file=sys.stderr)
-    #     sys.exit(1)
+@pass_manager
+def run_flexget(manager, **params):
+    # manager gets initialized with options before plugins are loaded. Update options with fully parsed versions now
+    # TODO: is this the right answer? What about when it's an IPC run and manager already has inited options?
+    manager.options = params
 
 
-@run_flexget.command()
+@run_flexget.command('execute', help='execute tasks now')
 @click.option('--task', '--tasks', metavar='TASK', multiple=True,
                          help='run only specified task(s), optionally using glob patterns ("tv-*"). '
                               'matching is case-insensitive')
 @click.option('--learn', is_flag=True,
                          help='matches are not downloaded but will be skipped in the future')
-#@click.option('--profile', is_flag=True, hidden=True)  # TODO: make this a plugin
-@click.option('--disable-phase', '--disable-phases', multiple=True, hidden=True)
+@click.option('--disable-phase', '--disable-phases', 'disable_phases', multiple=True, hidden=True)
 @click.option('--inject', multiple=True, callback=inject_callback, hidden=True)
 # Plugins should respect these flags where appropriate
 @click.option('--retry', is_flag=True, hidden=True)
 @click.option('--no-cache', 'nocache', is_flag=True,
                          help='disable caches. works only in plugins that have explicit support')
-@click.pass_context
-def execute(ctx, **params):
+@pass_manager
+def execute(manager, **params):
     print("running execute")
-    ctx.obj['manager'].execute_command(options=ctx.params)
+    manager.execute_command(options=params)
+
+
+@run_flexget.group('daemon', help='run continuously, executing tasks according to schedules defined in config')
+@click.pass_context
+def daemon(ctx, **params):
+    # TODO: set loglevel to info?
+    pass
+
+
+@daemon.command('start', help='start the daemon')
+# TODO: no daemonize on windows
+@click.option('-d', '--daemonize', is_flag=True, help='causes process to daemonize after starting')
+@click.option('--autoreload-config', is_flag=True,
+                          help='automatically reload the config from disk if the daemon detects any changes')
+def daemon_start(**params):
+    click.echo('daemon_start')
+
+
+@daemon.command('stop', help='shutdown the running daemon')
+@click.option('--wait', is_flag=True,
+              help='wait for all queued tasks to finish before stopping daemon')
+def daemon_stop(**params):
+    click.echo('daemon_stop')
+
+
+@daemon.command('status', help='check if a daemon is running')
+def daemon_status(**params):
+    click.echo('daemon_status')
+
+
+@daemon.command('reload-config', help='causes a running daemon to reload the config from disk')
+def daemon_reload(**params):
+    click.echo('daemon_reload')
 
 
 def main():
     # with run_flexget.make_context("flexget", click.get_os_args(), ignore_unknown_options=True, allow_extra_args=True) as ctx:
     #     print(ctx)
     logger.initialize()
-    params = run_flexget.parse_core_options()
+    try:
+        params = run_flexget.parse_core_options()
+    except click.exceptions.Exit as e:
+        # -V can end us up here
+        return
     manager = Manager(params)
     args = click.get_os_args()
     try:

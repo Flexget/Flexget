@@ -19,6 +19,7 @@ class Verbose(object):
     # Run first thing after input phase
     @plugin.priority(255)
     def on_task_metainfo(self, task, config):
+        return  # TODO: Fix
         if task.options.silent:
             return
         for entry in task.all_entries:
@@ -34,6 +35,7 @@ class Verbose(object):
         task_log.verbose(msg)
 
     def on_task_exit(self, task, config):
+        return  # TODO: Fix
         if task.options.silent:
             return
         # verbose undecided entries

@@ -19,6 +19,7 @@ class OutputDumpConfig(object):
 
     @plugin.priority(-255)
     def on_task_start(self, task, config):
+        return  # TODO: Fix
         if task.options.dump_config:
             import yaml
             console('--- config from task: %s' % task.name)

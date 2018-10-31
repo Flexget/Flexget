@@ -78,6 +78,7 @@ class OutputDump(object):
 
     @plugin.priority(0)
     def on_task_output(self, task, config):
+        return  # TODO: Fix
         if not config and task.options.dump_entries is None:
             return
 

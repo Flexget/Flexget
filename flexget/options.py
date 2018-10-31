@@ -36,7 +36,7 @@ def get_parser(command=None):
     if not core_parser:
         core_parser = CoreArgumentParser()
         # Add all plugin options to the parser
-        fire_event('options.register')
+        #fire_event('options.register')
     if command:
         return core_parser.get_subparser(command)
     return core_parser

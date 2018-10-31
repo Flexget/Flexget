@@ -17,6 +17,7 @@ log = logging.getLogger('cron_env')
 def check_env(manager, options):
     persistence = SimplePersistence(plugin='cron_env')
     encoding = sys.getfilesystemencoding()
+    return  # TODO: fix
     if options.cron:
         if 'terminal_encoding' in persistence:
             terminal_encoding = persistence['terminal_encoding']
