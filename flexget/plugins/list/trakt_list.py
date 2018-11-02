@@ -220,7 +220,9 @@ class TraktSet(MutableSet):
                     else:
                         log.verbose('Found `%s` translation for movie `%s`: %s',
                                     language, entry['movie_name'], translation[0]['title'])
-                        entry['title'] = translation[0]['title'] + ' (' + entry['movie_year'] + ')'
+                        entry['title'] = translation[0]['title']
+                        if entry.get('movie_year'):
+                            entry['title'] += ' (' + str(entry['movie_year']) + ')'
                         entry['movie_name'] = translation[0]['title']
 
                 # Override the title if strip_dates is on. TODO: a better way?
