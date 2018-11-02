@@ -36,7 +36,6 @@ Session = sessionmaker(class_=ContextSession)
 from flexget import config_schema, db_schema, logger, plugin  # noqa
 from flexget.event import fire_event  # noqa
 from flexget.ipc import IPCClient, IPCServer  # noqa
-from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv  # noqa
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
 from flexget.utils.tools import pid_exists, get_current_flexget_version, io_encoding  # noqa
@@ -286,31 +285,23 @@ class Manager(object):
     def run_ipc_command(self, args):
         ipc_info = self.check_ipc_info()
         if not ipc_info:
-            raise Exception('there is no daemon running')
+            return False
         console('There is a FlexGet process already running for this config, sending execution there.')
-        log.debug('Sending command to running FlexGet process: %s' % self.args)
+        log.debug('Sending command to running FlexGet process: %s' % args)
         try:
             client = IPCClient(ipc_info['port'], ipc_info['password'])
         except ValueError as e:
             log.error(e)
         else:
             try:
-                client.run_local_command(args)
+                client.handle_cli(args)
             except KeyboardInterrupt:
                 log.error('Disconnecting from daemon due to ctrl-c. Executions will still continue in the '
                           'background.')
             except EOFError:
                 log.error('Connection from daemon was severed.')
-
-    def run_local_command(self, args):
-        # No running process, we start our own to handle command
-        from flexget import click_entry
-        with self.acquire_lock():
-            self.initialize()
-            # TODO: this shouldn't go here
-            fire_event('options.register')
-            click_entry.run_flexget(args=args, obj=self)
-            self._shutdown()
+        finally:
+            return True
 
     def execute_command(self, options):
         """
@@ -348,6 +339,30 @@ class Manager(object):
             self.shutdown(finish_queue=True)
             self.task_queue.wait()
         fire_event('manager.execute.completed', self, options)
+
+    def run_daemon(self, daemonize=False, autoreload_config=False):
+        if self.is_daemon:
+            log.error('Daemon already running for this config.')
+            return
+        elif self.task_queue.is_alive():
+            log.error('Non-daemon execution of FlexGet is running. Cannot start daemon until it is finished.')
+            return
+        if daemonize:
+            self.daemonize()
+        if autoreload_config:
+            self.autoreload_config = True
+        try:
+            signal.signal(signal.SIGTERM, self._handle_sigterm)
+        except ValueError as e:
+            # If flexget is being called from another script, e.g. windows service helper, and we are not the
+            # main thread, this error will occur.
+            log.debug('Error registering sigterm handler: %s' % e)
+        self.is_daemon = True
+        fire_event('manager.daemon.started', self)
+        self.task_queue.start()
+        self.ipc_server.start()
+        self.task_queue.wait()
+        fire_event('manager.daemon.completed', self)
 
     def daemon_command(self, options):
         """

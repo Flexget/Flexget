@@ -1,17 +1,14 @@
+import os
 import random
 import string
 
 import click
 
-
-import logging
-import os
-import sys
-
 from flexget import logger
 from flexget.entry import Entry
-from flexget.ipc import IPCClient
+from flexget.event import fire_event
 from flexget.manager import Manager
+from flexget.terminal import console
 from flexget.utils.tools import get_latest_flexget_version_number, get_current_flexget_version
 
 
@@ -22,19 +19,13 @@ class AttrDict(dict):
 
 
 class AliasedGroup(click.Group):
-    def _resolve_command(self, ctx, args):
-        """Click's 'ignore_unknown_options' doesn't really work  with Groups. This fixes that."""
-        if args and ctx.ignore_unknown_options:
-            for i in range(len(args)):
-                # Look for an argument that appears to be a command name
-                if not click.parser.split_opt(args[i])[0]:
-                    unknown_opts, args = args[:i], args[i:]
-                    ctx.args.extend(unknown_opts)
-                    break
-            cmd_name, cmd, args = click.Group.resolve_command(self, ctx, args)
-            return cmd.name, cmd, args
+    def resolve_command(self, ctx, args):
+        """Returns the full command name, even when user has used a shortened version."""
+        cmd_name, cmd, args = click.Group.resolve_command(self, ctx, args)
+        return cmd.name, cmd, args
 
     def get_command(self, ctx, cmd_name):
+        """Allows unambigouous partial matches."""
         rv = click.Group.get_command(self, ctx, cmd_name)
         if rv is not None:
             return rv
@@ -56,7 +47,6 @@ class AliasedGroup(click.Group):
             return ctx.params
 
 
-
 def inject_callback(ctx, param, value):
     return [Entry(**{
         'title': title,
@@ -71,15 +61,15 @@ def version_callback(ctx, param, value):
     latest = get_latest_flexget_version_number()
 
     # Print the version number
-    click.echo('%s' % get_current_flexget_version())
+    console('%s' % get_current_flexget_version())
     # Check for latest version from server
     if latest:
         if current == latest:
-            click.echo('You are on the latest release.')
+            console('You are on the latest release.')
         else:
-            click.echo('Latest release: %s' % latest)
+            console('Latest release: %s' % latest)
     else:
-        click.echo('Error getting latest version number from https://pypi.python.org/pypi/FlexGet')
+        console('Error getting latest version number from https://pypi.python.org/pypi/FlexGet')
     ctx.exit()
 
 
@@ -189,34 +179,53 @@ def daemon(ctx, **params):
 
 
 @daemon.command('start', help='start the daemon')
-# TODO: no daemonize on windows
-@click.option('-d', '--daemonize', is_flag=True, help='causes process to daemonize after starting')
+@click.option('-d', '--daemonize', is_flag=True, help='causes process to daemonize after starting '
+                                                      '(not available on Windows)')
 @click.option('--autoreload-config', is_flag=True,
                           help='automatically reload the config from disk if the daemon detects any changes')
-def daemon_start(**params):
-    click.echo('daemon_start')
+@pass_manager
+def daemon_start(manager, daemonize, autoreload_config):
+    console('daemon_start')
+    manager.run_daemon(daemonize=daemonize, autoreload_config=autoreload_config)
 
 
 @daemon.command('stop', help='shutdown the running daemon')
 @click.option('--wait', is_flag=True,
               help='wait for all queued tasks to finish before stopping daemon')
-def daemon_stop(**params):
-    click.echo('daemon_stop')
+@pass_manager
+def daemon_stop(manager, wait):
+    if not manager.is_daemon:
+        console('There does not appear to be a daemon running.', err=True)
+        return
+    tasks = 'all queued tasks (if any) have' if wait else 'currently running task (if any) has'
+    console('Daemon shutdown requested. Shutdown will commence when %s finished executing.' % tasks)
+    manager.shutdown(wait)
 
 
 @daemon.command('status', help='check if a daemon is running')
-def daemon_status(**params):
-    click.echo('daemon_status')
+@pass_manager
+def daemon_status(manager, **params):
+    if manager.is_daemon:
+        console('Daemon running. (PID: %s)' % os.getpid())
 
 
 @daemon.command('reload-config', help='causes a running daemon to reload the config from disk')
-def daemon_reload(**params):
-    click.echo('daemon_reload')
+@pass_manager
+def daemon_reload(manager, **params):
+    if not manager.is_daemon:
+        console('There does not appear to be a daemon running.', err=True)
+        return
+    console('Reloading config from disk.')
+    try:
+        manager.load_config()
+    except ValueError as e:
+        console('Error loading config: %s' % e.args[0])
+    else:
+        console('Config successfully reloaded from disk.')
 
 
 def main():
-    # with run_flexget.make_context("flexget", click.get_os_args(), ignore_unknown_options=True, allow_extra_args=True) as ctx:
-    #     print(ctx)
+    from flexget.manager import Manager
     logger.initialize()
     try:
         params = run_flexget.parse_core_options()
@@ -225,13 +234,12 @@ def main():
         return
     manager = Manager(params)
     args = click.get_os_args()
-    try:
-        manager.run_ipc_command(args)
+    if manager.run_ipc_command(args):
         return
-    except Exception:  # TODO: Fix this
-        pass
-    manager.run_local_command(args)
-    #rv = run_flexget(standalone_mode=False)
+    with manager.acquire_lock():
+        manager.initialize()
+        fire_event('options.register')
+        run_flexget(args, obj=manager)
 
 
 if __name__ == "__main__":

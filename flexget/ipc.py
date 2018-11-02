@@ -14,7 +14,6 @@ from terminaltables.terminal_io import terminal_size
 from flexget import terminal
 from flexget.logger import capture_output
 from flexget.terminal import console
-from flexget.options import get_parser
 
 log = logging.getLogger('ipc')
 
@@ -69,26 +68,23 @@ class DaemonService(rpyc.Service):
         raise Exception('no ipc yet')
 
     def exposed_handle_cli(self, args):
+        from cli import run_flexget
         args = rpyc.utils.classic.obtain(args)
         log.verbose('Running command `%s` for client.' % ' '.join(args))
-        parser = get_parser()
-        try:
-            options = parser.parse_args(args, file=self.client_out_stream)
-        except SystemExit as e:
-            if e.code:
-                # TODO: Not sure how to properly propagate the exit code back to client
-                log.debug('Parsing cli args caused system exit with status %s.' % e.code)
-            return
         # Saving original terminal size to restore after monkeypatch
         original_terminal_info = terminal.terminal_info
         # Monkeypatching terminal_size so it'll work using IPC
         terminal.terminal_info = self._conn.root.terminal_info
         try:
-            if not options.cron:
-                with capture_output(self.client_out_stream, loglevel=options.loglevel):
-                    self.manager.handle_cli(options)
+            options = run_flexget.parse_core_options(args) or {}
+        except Exception as e:
+            options = {}
+        try:
+            if not options.get('cron'):
+                with capture_output(self.client_out_stream, loglevel=options.get('loglevel', 'verbose')):
+                    run_flexget(args, obj=self.manager)
             else:
-                self.manager.handle_cli(options)
+                run_flexget(args, obj=self.manager)
         finally:
             # Restoring original terminal_size value
             terminal.terminal_info = original_terminal_info

@@ -135,5 +135,5 @@ def register_config():
 @event('options.register')
 def register_parser_arguments():
     # TODO: fix this up
-    from flexget import click_entry
-    click_entry.execute.params.append(click.Option(['-T', '--template'], metavar='NAME', help='execute tasks using given template'))
+    from flexget import cli
+    cli.execute.params.append(click.Option(['-T', '--template'], metavar='NAME', help='execute tasks using given template'))
