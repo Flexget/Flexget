@@ -7,7 +7,7 @@ import logging
 import click
 import yaml
 
-from flexget import options
+from flexget import cli
 from flexget.event import event
 from flexget.terminal import console
 
@@ -136,8 +136,9 @@ def pre_check_config(config_path):
     log.verbose('Pre-checked %s configuration lines' % line_num)
 
 
-@click.command('check')
-def check(manager, options):
+@click.command('check', help='validate configuration file and print errors')
+@cli.pass_manager
+def check(manager):
     log.verbose('Checking config file `%s`' % manager.config_path)
     if manager.is_daemon:
         # If we are running in a daemon, check disk config
@@ -164,4 +165,5 @@ def check(manager, options):
 
 @event('options.register')
 def register_options():
-    options.register_command('check', check, help='validate configuration file and print errors')
+    cli.run_flexget.add_command(check)
+    #options.register_command('check', check, help='validate configuration file and print errors')

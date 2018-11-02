@@ -46,6 +46,21 @@ log = logging.getLogger('manager')
 manager = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
 
+DEFAULT_OPTIONS = {
+    'test': False,
+    'config': 'config.yml',
+    'logfile': 'flexget.log',
+    'loglevel': 'verbose',
+    'debug_tb': False,
+    'debug': False,
+    'do_profile': False,
+    'debug_trace': False,
+    'debug_sql': False,
+    'experimental': False,
+    'ipc_port': None,
+    'cron': False,
+}
+
 
 class Manager(object):
     """Manager class for FlexGet
@@ -113,7 +128,9 @@ class Manager(object):
         elif manager:
             log.info('last manager was not torn down correctly')
 
-        self.options = options
+        self.options = copy.copy(DEFAULT_OPTIONS)
+        if options:
+            self.options.update(options)
         self.autoreload_config = False
         self.config_file_hash = None
         self.config_base = None
@@ -242,14 +259,14 @@ class Manager(object):
             except Exception as e:
                 log.error('Reloading config failed: %s', e)
         # Handle --tasks
-        if options['task']:
+        if options['tasks']:
             # Consider * the same as not specifying tasks at all (makes sure manual plugin still works)
-            if options['task'] == ['*']:
-                options['task'] = None
+            if options['tasks'] == ['*']:
+                options['tasks'] = None
             else:
                 # Create list of tasks to run, preserving order
                 task_names = []
-                for arg in options['task']:
+                for arg in options['tasks']:
                     matches = [t for t in self.tasks if fnmatch.fnmatchcase(str(t).lower(), arg.lower())]
                     if not matches:
                         msg = '`%s` does not match any tasks' % arg
@@ -259,7 +276,7 @@ class Manager(object):
                         continue
                     task_names.extend(m for m in matches if m not in task_names)
                 # Set the option as a list of matching task names so plugins can use it easily
-                options['task'] = task_names
+                options['tasks'] = task_names
         # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
         task_names = sorted(task_names, key=lambda t: self.config['tasks'][t].get('priority', 65535))
 
@@ -273,15 +290,6 @@ class Manager(object):
             finished_events.append((task.id, task.name, task.finished_event))
         return finished_events
 
-    def start(self):
-        """
-        Starting point when executing from commandline, dispatch execution to correct destination.
-
-        If there is a FlexGet process with an ipc server already running, the command will be sent there for execution
-        and results will be streamed back.
-        If not, this will attempt to obtain a lock, initialize the manager, and run the command here.
-        """
-        # If another process is started, send the execution to the running process
     def run_ipc_command(self, args):
         ipc_info = self.check_ipc_info()
         if not ipc_info:
@@ -363,61 +371,6 @@ class Manager(object):
         self.ipc_server.start()
         self.task_queue.wait()
         fire_event('manager.daemon.completed', self)
-
-    def daemon_command(self, options):
-        """
-        Handles the 'daemon' CLI command.
-
-        Fires events:
-
-        * manager.daemon.started
-        * manager.daemon.completed
-
-        :param options: argparse options
-        """
-
-        # Import API so it can register to daemon.started event
-        if options['action'] == 'start':
-            if self.is_daemon:
-                log.error('Daemon already running for this config.')
-                return
-            elif self.task_queue.is_alive():
-                log.error('Non-daemon execution of FlexGet is running. Cannot start daemon until it is finished.')
-                return
-            if options['daemonize']:
-                self.daemonize()
-            if options['autoreload_config']:
-                self.autoreload_config = True
-            try:
-                signal.signal(signal.SIGTERM, self._handle_sigterm)
-            except ValueError as e:
-                # If flexget is being called from another script, e.g. windows service helper, and we are not the
-                # main thread, this error will occur.
-                log.debug('Error registering sigterm handler: %s' % e)
-            self.is_daemon = True
-            fire_event('manager.daemon.started', self)
-            self.task_queue.start()
-            self.ipc_server.start()
-            self.task_queue.wait()
-            fire_event('manager.daemon.completed', self)
-        elif options['action'] in ['stop', 'reload-config', 'status']:
-            if not self.is_daemon:
-                log.error('There does not appear to be a daemon running.')
-                return
-            if options['action'] == 'status':
-                log.info('Daemon running. (PID: %s)' % os.getpid())
-            elif options['action'] == 'stop':
-                tasks = 'all queued tasks (if any) have' if options['wait'] else 'currently running task (if any) has'
-                log.info('Daemon shutdown requested. Shutdown will commence when %s finished executing.' % tasks)
-                self.shutdown(options['wait'])
-            elif options['action'] == 'reload-config':
-                log.info('Reloading config from disk.')
-                try:
-                    self.load_config()
-                except ValueError as e:
-                    log.error('Error loading config: %s' % e.args[0])
-                else:
-                    log.info('Config successfully reloaded from disk.')
 
     def _handle_sigterm(self, signum, frame):
         log.info('Got SIGTERM. Shutting down.')

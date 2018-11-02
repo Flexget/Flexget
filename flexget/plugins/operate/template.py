@@ -136,4 +136,4 @@ def register_config():
 def register_parser_arguments():
     # TODO: fix this up
     from flexget import cli
-    cli.execute.params.append(click.Option(['-T', '--template'], metavar='NAME', help='execute tasks using given template'))
+    cli.execute.params.append(click.Option(['--template', '-T'], metavar='NAME', help='execute tasks using given template'))
