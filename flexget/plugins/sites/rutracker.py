@@ -91,8 +91,8 @@ class RutrackerAuth(AuthBase):
                 sleep(3)
         raise PluginError('unable to obtain cookies from rutracker')
 
-    def __init__(self, task, login, password, cookies=None, db_session=None):
-        self.requests = task.requests
+    def __init__(self, requests, login, password, cookies=None, db_session=None):
+        self.requests = requests
         self.base_url = self.update_base_url()
         if cookies is None:
             log.debug('rutracker cookie not found. Requesting new one')
@@ -153,7 +153,7 @@ class RutrackerUrlrewrite(object):
         cookies = self.try_find_cookie(db_session, username)
         if username not in self.auth_cache:
             auth_handler = RutrackerAuth(
-                task, username, config['password'], cookies, db_session)
+                task.requests, username, config['password'], cookies, db_session)
             self.auth_cache[username] = auth_handler
         else:
             auth_handler = self.auth_cache[username]
