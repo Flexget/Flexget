@@ -1,13 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.xmlrpc import client as xmlrpc_client
-from future.moves.urllib.parse import urlparse, urljoin
+from future.moves.urllib.parse import urlparse, urljoin, urlsplit
 from future.utils import native_str
 
 import logging
 import os
 import socket
 import re
+from io import BytesIO
 from time import sleep
 
 from flexget.utils.template import RenderError
@@ -17,7 +18,6 @@ from flexget.event import event
 from flexget.entry import Entry
 from flexget.config_schema import one_or_more
 from flexget.utils.bittorrent import Torrent, is_torrent_file
-from flexget.utils.tools import native_str_to_text
 
 from requests.auth import HTTPDigestAuth, HTTPBasicAuth
 
@@ -96,132 +96,69 @@ class HTTPDigestTransport(xmlrpc_client.Transport):
         return u.close()
 
 
-class SCGITransport(xmlrpc_client.Transport):
-    """ Used to override the default xmlrpclib transport to support SCGI """
+def encode_netstring(input):
+    return str(len(input)).encode() + b':' + input + b','
 
+
+def encode_header(key, value):
+    return key + b'\x00' + value + b'\x00'
+
+
+class SCGITransport(xmlrpc_client.Transport):
+    """
+    Public domain SCGITrannsport implementation from:
+    https://github.com/JohnDoee/autotorrent/blob/develop/autotorrent/scgitransport.py
+    """
     def __init__(self, *args, **kwargs):
-        self.verbose = 0
+        self.socket_path = kwargs.pop('socket_path', '')
         xmlrpc_client.Transport.__init__(self, *args, **kwargs)
 
-    def request(self, host, handler, request_body, verbose=False):
-        return self.single_request(host, handler, request_body, verbose)
+    def single_request(self, host, handler, request_body, verbose=False):
+        self.verbose = verbose
+        if self.socket_path:
+            s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            s.connect(self.socket_path)
+        else:
+            host, port = host.split(':')
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((host, int(port)))
 
-    def single_request(self, host, handler, request_body, verbose=0):
-        # Add SCGI headers to the request.
-        headers = [('CONTENT_LENGTH', native_str(len(request_body))), ('SCGI', '1')]
-        header = '\x00'.join(['%s\x00%s' % (key, value) for key, value in headers]) + '\x00'
-        header = '%d:%s' % (len(header), header)
-        request_body = '%s,%s' % (header, request_body)
+        request = encode_header(b'CONTENT_LENGTH', str(len(request_body)).encode())
+        request += encode_header(b'SCGI', b'1')
+        request += encode_header(b'REQUEST_METHOD', b'POST')
+        request += encode_header(b'REQUEST_URI', handler.encode())
 
-        sock = None
+        request = encode_netstring(request)
+        request += request_body
 
-        try:
-            if host:
-                parsed_host = urlparse(host)
-                host = parsed_host.hostname
-                port = parsed_host.port
+        s.send(request)
 
-                addr_info = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
-                sock = socket.socket(*addr_info[0][:3])
-                sock.connect(addr_info[0][4])
-            else:
-                sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-                sock.connect(handler)
-
-            self.verbose = verbose
-
-            sock.sendall(request_body.encode())
-
-            return self.parse_response(sock.makefile())
-        finally:
-            if sock:
-                sock.close()
-
-    def parse_response(self, response):
-        p, u = self.getparser()
-
-        response_body = ''
-
+        response = b''
         while True:
-            data = response.read(1024)
-            if not data:
+            r = s.recv(1024)
+            if not r:
                 break
-            response_body += native_str_to_text(data, encoding='utf-8')
+            response += r
 
-        if self.verbose:
-            log.info('body: %s', repr(response_body))
+        response_body = BytesIO(b'\r\n\r\n'.join(response.split(b'\r\n\r\n')[1:]))
 
-        # Remove SCGI headers from the response.
-        _, response_body = re.split(r'\n\s*?\n', response_body, maxsplit=1)
-        p.feed(response_body.encode('utf-8'))
-        p.close()
-
-        return u.close()
+        return self.parse_response(response_body)
 
 
-class SCGIServerProxy(object):
-    """ Enable connection to SCGI proxy """
+if not hasattr(xmlrpc_client.Transport, 'single_request'):
+    SCGITransport.request = SCGITransport.single_request
 
-    def __init__(self, uri, transport=None, encoding=None,
-                 verbose=False, allow_none=False, use_datetime=False):
-        parsed_url = urlparse(uri)
-        self.__host = uri if parsed_url.scheme else None
-        self.__handler = parsed_url.path
-        if not self.__handler:
-            self.__handler = '/'
 
-        if not transport:
-            transport = SCGITransport(use_datetime=use_datetime)
-        self.__transport = transport
-        self.__encoding = encoding or 'utf-8'
-        self.__verbose = verbose
-        self.__allow_none = allow_none
-
-    def __close(self):
-        self.__transport.close()
-
-    def __request(self, method_name, params):
-        # call a method on the remote server
-
-        request = xmlrpc_client.dumps(params, method_name, encoding=self.__encoding,
-                                      allow_none=self.__allow_none).encode(self.__encoding)
-
-        response = self.__transport.request(
-            self.__host,
-            self.__handler,
-            request.decode('utf-8'),
-            verbose=self.__verbose
-        )
-
-        if len(response) == 1:
-            response = response[0]
-
-        return response
-
-    def __repr__(self):
-        return (
-            "<ServerProxy for %s%s>" %
-            (self.__host, self.__handler)
-        )
-
-    __str__ = __repr__
-
-    def __getattr__(self, name):
-        # magic method dispatcher
-        return _Method(self.__request, name)
-
-    # note: to call a remote object with an non-standard name, use
-    # result getattr(server, "strange-python-name")(args)
-
-    def __call__(self, attr):
-        """A workaround to get special attributes on the ServerProxy
-           without interfering with the magic __getattr__
-        """
-        if attr == "close":
-            return self.__close
-        elif attr == "transport":
-            return self.__transport
-        raise AttributeError("Attribute %r not found" % (attr,))
+def create_proxy(url):
+    parsed = urlsplit(url)
+    if not parsed.scheme:
+        path = parsed.path
+        return xmlrpc_client.ServerProxy('http://1', transport=SCGITransport(socket_path=path))
+    if parsed.scheme == 'scgi':
+        url = 'http://%s' % parsed.netloc
+        return xmlrpc_client.ServerProxy(url, transport=SCGITransport())
+    log.debug('Creating Normal XMLRPC Proxy with url %r' % url)
+    return xmlrpc_client.ServerProxy(url)
 
 
 class RTorrent(object):
@@ -268,10 +205,10 @@ class RTorrent(object):
         if parsed_uri.scheme in ['http', 'https']:
             sp = xmlrpc_client.ServerProxy
         elif parsed_uri.scheme == 'scgi':
-            sp = SCGIServerProxy
+            sp = create_proxy
         elif parsed_uri.scheme == '' and parsed_uri.path:
             self.uri = parsed_uri.path
-            sp = SCGIServerProxy
+            sp = create_proxy
         else:
             raise IOError('Unsupported scheme %s for uri %s' % (parsed_uri.scheme, self.uri))
 
