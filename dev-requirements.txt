@@ -14,5 +14,5 @@ pytest-runner
 pytest-cov==2.5.1
 gitpython==2.1.5
 codacy-coverage>=1.2.18
-pip-tools==1.9.0
+pip-tools==2.0.2
 twine==1.11.0

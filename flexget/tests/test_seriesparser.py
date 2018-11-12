@@ -110,6 +110,7 @@ class TestSeriesParser(object):
         s = parse(name='Something', data='Something - Season2 Episode2')
         assert (s.season == 2 and s.episode == 2), 'failed to parse %s' % s
 
+    @pytest.mark.xfail(reason='Not supported in guessit, works for internal parser')
     def test_series_episode(self, parse):
         """SeriesParser: series X, episode Y"""
         s = parse(name='Something', data='Something - Series 2, Episode 2')

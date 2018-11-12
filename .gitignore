@@ -43,3 +43,4 @@ pip-selfcheck.json
 !variables.yml
 cached_resources/
 pyvenv.cfg
+.pytest_cache
