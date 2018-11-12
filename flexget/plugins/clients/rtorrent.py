@@ -302,7 +302,13 @@ class RTorrent(object):
         params = ['d.%s=' % field for field in fields]
         params.insert(0, view)
 
-        resp = self._server.d.multicall(params)
+        try:
+            resp = self._server.d.multicall(params)
+        except xmlrpc_client.Fault as err:
+            if err.faultCode == -506:
+                resp = self._server.d.multicall2('', params)
+            else:
+                raise err
 
         # Response is formatted as a list of lists, with just the values
         return [dict(list(zip(self._clean_fields(fields, reverse=True), val))) for val in resp]
