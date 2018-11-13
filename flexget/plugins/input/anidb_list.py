@@ -132,29 +132,34 @@ class AnidbList(object):
                 'pattern': USER_ID_RE,
                 'error_pattern': 'user_id must be in the form XXXXXXX'},
             'type': {
-                'oneOf': {
+                'oneOf': [
                     {'type': 'string', 'enum': MEDIA_TYPES},
-                    {'type': 'array', 'items': MEDIA_TYPES}}},
+                    {'type': 'array', 'items': MEDIA_TYPES}
+                ]
+            },
             'is_airing': {'type': 'boolean'},
             'adult_only': {'type': 'string', 'enum': list(ADULT_MODES.keys())},
             'buddy_lists': {'type': 'string', 'enum': list(BUDDY_MODES.keys())},
             'mylist': {
-                'oneOf': {
+                'oneOf': [
                     {'type': 'string', 'enum': list(MYLIST_MODES.keys())},
                     {'type': 'object',
                      'properties': {
                          'status': {'type': 'string', 'enum': list(MYLIST_MODES.keys())},
                          'state': {
-                             'oneOf': {
+                             'oneOf': [
                                  {'type': 'string', 'enum': MYLIST_STATE},
-                                 {'type': 'array', 'items': MYLIST_STATE}}}}}
-                }
+                                 {'type': 'array', 'items': MYLIST_STATE}
+                             ]
+                         }
+                     }}
+                ]
             },
             'watched': {
-                'oneOf': {
+                'oneOf': [
                     {'type': 'string', 'enum': WATCHED_STATE},
                     {'type': 'array', 'items': WATCHED_STATE}
-                }
+                ]
             },
             'mode': {
                 'type': 'string',
