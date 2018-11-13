@@ -73,7 +73,12 @@ class ParserGuessit(object):
 
     @staticmethod
     def _guessit_options(options):
-        settings = {'name_only': True, 'allowed_languages': ['en', 'fr'], 'allowed_countries': ['us', 'uk', 'gb']}
+        settings = {
+            'name_only': True,
+            'allowed_languages': ['en', 'fr'],
+            'allowed_countries': ['us', 'uk', 'gb'],
+            'single_value': True
+        }
         options['episode_prefer_number'] = not options.get('identified_by') == 'ep'
         if options.get('allow_groups'):
             options['expected_group'] = options['allow_groups']
