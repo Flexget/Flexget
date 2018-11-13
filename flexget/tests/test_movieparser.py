@@ -55,3 +55,10 @@ class TestParser(object):
         assert movie.name == 'A Movie Title', 'failed to parse %s (got %s)' % (movie.data, movie.name)
         assert movie.year == 2013, 'failed to parse year from %s' % movie.data
         assert movie.quality.name == '720p h264'
+
+    def test_multiple_property_values(self, parse):
+        """ Test correct parsing for title's with multiple propertie definitions """
+        movie = parse(name='FlexGet', data='FlexGet (premiere 2018)(2016/MHD/1080P/AC3 5.1/DUAL/SUB/bluray/Webrip)')
+        assert movie.valid
+        assert movie.year == 2018
+        assert movie.quality.source == 'bluray'
