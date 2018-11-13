@@ -17,16 +17,112 @@ USER_ID_RE = r'^\d{1,6}$'
 
 
 class AnidbList(object):
-    """"Creates an entry for each movie or series in your AniDB wishlist."""
+    """"Creates an entry for each item in your AniDB wishlist.
+
+        anidb_list:
+          user_id: <required>
+          type: # zero or more
+            - tvseries
+            - tvspecial
+            - ova
+            - movie
+            - web
+            - musicvideo
+          is_airing: (ignore)/airing/finished/unknown
+          adult_only: boolean  # if adult_only is not present, it will be ignored
+          buddy_lists: (ignore)/show_in/hide_in/show_watched/hide_watched
+          mylist: # this option can also just be the value of "status"
+            status: (ignore)/complete/incomplete/in_mylist/not_in_mylist/related_not_in_mylist
+            state: watching/unknown/collecting/stalled/dropped
+          watched: # zero or more
+            - unwatched
+            - partial
+            - complete
+            - allihave
+          mode: (all)/undefined/watch/get/blacklist/buddy
+          pass: <guest pass set on anidb settings>
+          voted: (ignore)/permanent/temporary/none/either
+          strip_dates: (no)/yes
+
+    """
 
     anidb_url = 'http://anidb.net/perl-bin/'
+    anidb_url_pl = anidb_url + 'animedb.pl'
 
-    default_user_agent = (
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebkit/537.36 (KHTML, like Gecko) '
-        'Chrome/69.0.3497.100 Safari/537.36'
-    )
+    default_user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebkit/537.36 (KHTML, like Gecko) ' \
+                         'Chrome/69.0.3497.100 Safari/537.36'
 
-    MODE_MAP = {'all': 0, 'undefined': 1, 'watch': 2, 'get': 3, 'blacklist': 4, 'buddy': 11}
+    ADULT_MODES = {
+        'ignore': 0,
+        'hide': 1,
+        'only': 2
+    }
+
+    AIRING_MODES = {
+        'ignore': 0,
+        'airing': 1,
+        'finished': 2,
+        'unknown': 3
+    }
+
+    MEDIA_TYPES = {
+        'tvseries',
+        'tvspecial',
+        'ova',
+        'movie',
+        'web',
+        'musicvideo',
+        'unknown'
+    }
+
+    BUDDY_MODES = {
+        'ignore': 0,
+        'show_in': 1,
+        'hide_in': 2,
+        'show_watched': 3,
+        'hide_watched': 4
+    }
+
+    MYLIST_MODES = {
+        'ignore': 0,
+        'complete': 1,
+        'incomplete': 2,
+        'in_mylist': 3,
+        'not_in_mylist': 4,
+        'related_not_in_mylist': 5
+    }
+
+    MYLIST_STATE = {
+        'watching',
+        'unknown',
+        'collecting',
+        'stalled',
+        'dropped'
+    }
+
+    WATCHED_STATE = {
+        'unwatched',
+        'partial',
+        'complete',
+        'allihave'
+    }
+
+    VOTE_MODES = {
+        'ignore': 0,
+        'permanent': 1,
+        'temporary': 2,
+        'none': 3,
+        'either': 4
+    }
+    
+    WISHLIST_MODES = {
+        'all': 0,
+        'undefined': 1,
+        'watch': 2,
+        'get': 3,
+        'blacklist': 4,
+        'buddy': 11
+    }
 
     schema = {
         'type': 'object',
@@ -34,12 +130,39 @@ class AnidbList(object):
             'user_id': {
                 'type': 'integer',
                 'pattern': USER_ID_RE,
-                'error_pattern': 'user_id must be in the form XXXXXXX',
+                'error_pattern': 'user_id must be in the form XXXXXXX'},
+            'type': {
+                'oneOf': {
+                    {'type': 'string', 'enum': MEDIA_TYPES},
+                    {'type': 'array', 'items': MEDIA_TYPES}}},
+            'is_airing': {'type': 'boolean'},
+            'adult_only': {'type': 'string', 'enum': list(ADULT_MODES.keys())},
+            'buddy_lists': {'type': 'string', 'enum': list(BUDDY_MODES.keys())},
+            'mylist': {
+                'oneOf': {
+                    {'type': 'string', 'enum': list(MYLIST_MODES.keys())},
+                    {'type': 'object',
+                     'properties': {
+                         'status': {'type': 'string', 'enum': list(MYLIST_MODES.keys())},
+                         'state': {
+                             'oneOf': {
+                                 {'type': 'string', 'enum': MYLIST_STATE},
+                                 {'type': 'array', 'items': MYLIST_STATE}}}}}
+                }
             },
-            'type': {'type': 'string', 'enum': ['shows', 'movies', 'ovas'], 'default': 'movies'},
-            'mode': {'type': 'string', 'enum': list(MODE_MAP.keys()), 'default': 'all'},
+            'watched': {
+                'oneOf': {
+                    {'type': 'string', 'enum': WATCHED_STATE},
+                    {'type': 'array', 'items': WATCHED_STATE}
+                }
+            },
+            'mode': {
+                'type': 'string',
+                'enum': list(WISHLIST_MODES.keys())},
             'pass': {'type': 'string'},
-            'strip_dates': {'type': 'boolean', 'default': False},
+            'strip_dates': {
+                'type': 'boolean',
+                'default': False}
         },
         'additionalProperties': False,
         'required': ['user_id'],
@@ -47,10 +170,31 @@ class AnidbList(object):
     }
 
     def __build_url(self, config):
-        base_url = self.anidb_url + 'animedb.pl?show=mywishlist&uid=%s' % config['user_id']
-        base_url = base_url + ('' if config['mode'] == 'all' else '&mode=%s' % config['mode'])
-        base_url = base_url + ('' if config['pass'] is None else '&pass=%s' % config['pass'])
-        return base_url
+        params = {
+            'show': 'mywishlist',
+            'uid': config['user_id']
+        }
+        if config['mode']:
+            params['mode'] = self.WISHLIST_MODES[config['mode']]
+        if isinstance(config['type'], str):
+            params['type.%s' % config['type']] = 1
+        elif isinstance(config['type'], list):
+            for media_type in config['type']:
+                params['type.%s' % media_type] = 1
+        if config['is_airing']:
+            params['airing'] = self.AIRING_MODES[config['is_airing']]
+        if config['adult_only']:
+            params['h'] = self.ADULT_MODES[config['adult_only']]
+        if config['pass']:
+            params['pass'] = config['pass']
+        if config['voted']:
+            params['vote'] = self.VOTE_MODES[config['voted']]
+        if isinstance(config['watched'], str):
+            params['watched.%s' % config['watched']] = 1
+        elif isinstance(config['watched'], list):
+            for watched_type in config['watched']:
+                params['watched.%s' % watched_type] = 1
+        return params
 
     @cached('anidb_list', persist='2 hours')
     def on_task_input(self, task, config):
@@ -63,7 +207,7 @@ class AnidbList(object):
         task_headers['User-Agent'] = self.default_user_agent
 
         try:
-            page = task.requests.get(comp_link, headers=task_headers)
+            page = task.requests.get(self.anidb_url_pl, headers=task_headers, params=comp_link)
         except RequestException as e:
             raise plugin.PluginError(str(e))
         if page.status_code != 200:
