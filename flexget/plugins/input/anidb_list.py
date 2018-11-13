@@ -65,7 +65,7 @@ class AnidbList(object):
         'unknown': 3
     }
 
-    MEDIA_TYPES = {
+    MEDIA_TYPES = [
         'tvseries',
         'tvspecial',
         'ova',
@@ -73,7 +73,7 @@ class AnidbList(object):
         'web',
         'musicvideo',
         'unknown'
-    }
+    ]
 
     BUDDY_MODES = {
         'ignore': 0,
@@ -92,20 +92,20 @@ class AnidbList(object):
         'related_not_in_mylist': 5
     }
 
-    MYLIST_STATE = {
+    MYLIST_STATE = [
         'watching',
         'unknown',
         'collecting',
         'stalled',
         'dropped'
-    }
+    ]
 
-    WATCHED_STATE = {
+    WATCHED_STATE = [
         'unwatched',
         'partial',
         'complete',
         'allihave'
-    }
+    ]
 
     VOTE_MODES = {
         'ignore': 0,
