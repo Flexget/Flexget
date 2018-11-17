@@ -144,6 +144,7 @@ class SearchPassThePopcorn(object):
         """
         cookies = self.get_login_cookie(username, password, passkey, force=force)
         invalid_cookie = False
+        response = None
 
         try:
             response = requests.get(url, params=params, cookies=cookies)
@@ -154,7 +155,7 @@ class SearchPassThePopcorn(object):
             log.debug('PassThePopcorn request failed: Too many redirects. Invalid cookie?')
             invalid_cookie = True
         except RequestException as e:
-            if e.response and e.response.status_code == 429:
+            if e.response is not None and e.response.status_code == 429:
                 log.error('Saved cookie is invalid and will be deleted. Error: %s', str(e))
                 # cookie is invalid and must be deleted
                 with Session() as session:
