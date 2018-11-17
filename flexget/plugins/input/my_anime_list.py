@@ -32,6 +32,7 @@ ANIME_TYPE = [
     'unknown'
 ]
 
+
 class MyAnimeList(object):
     """" Creates entries for series and movies from MyAnimeList list
     Syntax:
@@ -90,7 +91,8 @@ class MyAnimeList(object):
                         url="https://myanimelist.net" + anime["anime_url"],
                         mal_name=anime["anime_title"],
                         mal_poster=anime["anime_image_path"],
-                        mal_type=anime["anime_media_type_string"]
+                        mal_type=anime["anime_media_type_string"],
+                        mal_tags=anime["tags"]
                     )
                 )
         return entries
