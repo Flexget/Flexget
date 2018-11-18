@@ -179,32 +179,34 @@ class AnidbList(object):
             'show': 'mywishlist',
             'uid': config['user_id']
         }
-        if config['mode']:
+        if 'mode' in config:
             params['mode'] = self.WISHLIST_MODES[config['mode']]
-        if isinstance(config['type'], str):
-            params['type.%s' % config['type']] = 1
-        elif isinstance(config['type'], list):
-            for media_type in config['type']:
-                params['type.%s' % media_type] = 1
-        if config['is_airing']:
+        if 'type' in config:
+            if isinstance(config['type'], str):
+                params['type.%s' % config['type']] = 1
+            elif isinstance(config['type'], list):
+                for media_type in config['type']:
+                    params['type.%s' % media_type] = 1
+        if 'is_airing' in config:
             params['airing'] = self.AIRING_MODES[config['is_airing']]
-        if config['adult_only']:
+        if 'adult_only' in config:
             params['h'] = self.ADULT_MODES[config['adult_only']]
-        if config['pass']:
+        if 'pass' in config:
             params['pass'] = config['pass']
-        if config['voted']:
+        if 'voted' in config:
             params['vote'] = self.VOTE_MODES[config['voted']]
-        if isinstance(config['watched'], str):
-            params['watched.%s' % config['watched']] = 1
-        elif isinstance(config['watched'], list):
-            for watched_type in config['watched']:
-                params['watched.%s' % watched_type] = 1
+        if 'watched' in config:
+            if isinstance(config['watched'], str):
+                params['watched.%s' % config['watched']] = 1
+            elif isinstance(config['watched'], list):
+                for watched_type in config['watched']:
+                    params['watched.%s' % watched_type] = 1
         return params
 
     @cached('anidb_list', persist='2 hours')
     def on_task_input(self, task, config):
         # Create entries by parsing AniDB wishlist page html using beautifulsoup
-        log.verbose('Retrieving AniDB list: mywishlist:%s', config['mode'])
+        log.verbose('Retrieving AniDB list: mywishlist:%s')
         comp_link = self.__build_url(config)
         log.debug('Requesting: %s', comp_link)
 
