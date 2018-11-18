@@ -10,6 +10,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.search import normalize_unicode, torrent_availability
+from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('nyaa')
 
@@ -97,17 +98,8 @@ class UrlRewriteNyaa(object):
                 entry['torrent_leeches'] = int(item.nyaa_leechers)
                 entry['torrent_info_hash'] = item.nyaa_infohash
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
-                nyaa_size_split = item.nyaa_size.split(' ')
-                if len(nyaa_size_split):
-                    size_multiplier = float(1.0 / 1024.0**2)  # Assume it is in bytes
-                    if len(nyaa_size_split) == 2:
-                        if nyaa_size_split[1] == 'GiB':
-                            size_multiplier = 1024
-                        elif nyaa_size_split[1] == 'MiB':
-                            size_multiplier = 1
-                        elif nyaa_size_split[1] == 'KiB':
-                            size_multiplier = float(1.0 / 1024.0)
-                    entry['content_size'] = int(float(item.nyaa_size.split(' ')[0]) * size_multiplier)
+                if item.nyaa_size:
+                    entry['content_size'] = parse_filesize(item.nyaa_size)
 
                 entries.add(entry)
 
