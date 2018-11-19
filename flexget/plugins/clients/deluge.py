@@ -46,24 +46,10 @@ class DelugePlugin(object):
         self.client = DelugeRPCClient(config['host'], config['port'], config['username'], config['password'],
                                       decode_utf8=True)
 
-    def on_task_abort(self, task, config):
-        pass
-
     def prepare_config(self, config):
         config.setdefault('host', 'localhost')
         config.setdefault('port', 58846)
         return config
-
-    def connect(self):
-        """Connects to the deluge daemon and runs on_connect_success """
-
-        self.client.connect()
-
-        if not self.client.connected:
-            raise plugin.PluginError('Deluge failed to connect.')
-
-    def disconnect(self):
-        self.client.disconnect()
 
     def get_torrents_status(self, fields, filters=None):
         """Fetches all torrents and their requested fields optionally filtered"""
@@ -212,10 +198,10 @@ class InputDeluge(DelugePlugin):
         # Reset the entries list
         self.entries = []
         # Call connect, entries get generated if everything is successful
-        self.connect()
+        self.client.connect()
 
         self.entries = self.generate_entries(config)
-        self.disconnect()
+        self.client.disconnect()
         return self.entries
 
     def generate_entries(self, config):
@@ -336,7 +322,7 @@ class OutputDeluge(DelugePlugin):
         if not config['enabled'] or not (task.accepted or task.options.test):
             return
 
-        self.connect()
+        self.client.connect()
 
         if task.options.test:
             log.debug('Test connection to deluge daemon successful.')
@@ -469,6 +455,8 @@ class OutputDeluge(DelugePlugin):
                 else:
                     self._set_torrent_options(added_torrent, entry, modify_opts)
 
+        self.client.disconnect()
+
     def on_task_learn(self, task, config):
         """ Make sure all temp files are cleaned up when entries are learned """
         # If download plugin is enabled, it will handle cleanup.
@@ -478,7 +466,6 @@ class OutputDeluge(DelugePlugin):
 
     def on_task_abort(self, task, config):
         """Make sure normal cleanup tasks still happen on abort."""
-        DelugePlugin.on_task_abort(self, task, config)
         self.on_task_learn(task, config)
 
     def _format_label(self, label):
