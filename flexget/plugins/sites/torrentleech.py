@@ -115,7 +115,7 @@ class UrlRewriteTorrentleech(object):
         except RequestException as e:
             raise PluginError('Could not connect to torrentleech: %s' % str(e))
 
-        if login.url.endswith(u'/user/account/login/'):
+        if login.url.endswith('/user/account/login/'):
             raise PluginError('Could not login to torrentleech, faulty credentials?')
 
         if not isinstance(config, dict):
