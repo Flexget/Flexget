@@ -8,6 +8,7 @@ from builtins import *  # noqa  pylint: disable=unused-import, redefined-builtin
 import atexit  # noqa
 import codecs  # noqa
 import copy  # noqa
+import errno  # noqa
 import fnmatch  # noqa
 import logging  # noqa
 import os  # noqa
@@ -852,11 +853,14 @@ class Manager(object):
                     f.write('%s: %s\n' % (key, ipc_info[key]))
 
     def release_lock(self):
-        if os.path.exists(self.lockfile):
+        try:
             os.remove(self.lockfile)
-            log.debug('Removed %s' % self.lockfile)
-        else:
+        except OSError as e:
+            if e.errno != errno.ENOENT:
+                raise
             log.debug('Lockfile %s not found' % self.lockfile)
+        else:
+            log.debug('Removed %s' % self.lockfile)
 
     def daemonize(self):
         """Daemonizes the current process. Returns the new pid"""
