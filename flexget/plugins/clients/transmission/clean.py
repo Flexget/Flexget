@@ -1,12 +1,14 @@
-from .transmission import TransmissionBase, log
-from flexget import plugin, validator
-from flexget.event import event
-from future.moves.urllib.parse import urlparse
-from flexget.utils.tools import parse_timedelta
-from datetime import datetime
 import re
-from .client import create_rpc_client
-from .utils import torrent_info, check_seed_limits
+from datetime import datetime
+from future.moves.urllib.parse import urlparse
+
+from flexget.event import event
+from flexget import plugin, validator
+from flexget.utils.tools import parse_timedelta
+
+from flexget.plugins.clients.transmission.client import create_rpc_client
+from flexget.plugins.clients.transmission.transmission import TransmissionBase, log
+from flexget.plugins.clients.transmission.utils import torrent_info, check_seed_limits
 
 
 class PluginTransmissionClean(TransmissionBase):

@@ -10,7 +10,7 @@ from flexget.event import event
 
 from flexget.config_schema import one_or_more
 
-from .client import create_rpc_client, add_to_transmission
+from flexget.plugins.clients.transmission.client import create_rpc_client, add_to_transmission
 
 try:
     import transmissionrpc

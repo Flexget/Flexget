@@ -1,14 +1,14 @@
 import os
 import time
 import base64
+import logging
 from fnmatch import fnmatch
 from past.builtins import basestring
 
 from flexget import plugin
 from flexget.utils.pathscrub import pathscrub
 
-from .transmission import log
-from .utils import create_torrent_options
+from flexget.plugins.clients.transmission.utils import create_torrent_options
 
 try:
     import transmissionrpc
@@ -18,6 +18,7 @@ except ImportError:
     # If transmissionrpc is not found, errors will be shown later
     pass
 
+log = logging.getLogger('transmission')
 
 def create_rpc_client(config):
     user, password = config.get('username'), config.get('password')

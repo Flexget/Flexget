@@ -1,4 +1,5 @@
 import os
+import logging
 from datetime import datetime
 from datetime import timedelta
 from future.utils import text_to_native_str
@@ -6,7 +7,7 @@ from future.utils import text_to_native_str
 from flexget.utils.pathscrub import pathscrub
 from flexget.utils.template import RenderError
 
-from .transmission import log
+log = logging.getLogger('transmission')
 
 
 def torrent_info(torrent, config):
