@@ -11,14 +11,6 @@ from flexget.config_schema import one_or_more
 from flexget.plugins.clients.transmission.utils import prepare_config, check_requirements
 from flexget.plugins.clients.transmission.client import create_rpc_client, add_to_transmission
 
-try:
-    import transmissionrpc
-    from transmissionrpc import TransmissionError
-    from transmissionrpc import HTTPHandlerError
-except ImportError:
-    # If transmissionrpc is not found, errors will be shown later
-    pass
-
 log = logging.getLogger('transmission')
 
 

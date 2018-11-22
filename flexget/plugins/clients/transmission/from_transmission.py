@@ -7,7 +7,7 @@ from flexget.plugins.clients.transmission.utils import torrent_info, check_seed_
     check_requirements
 
 
-class TransmissionInputPlugin:
+class FromTransmissionPlugin:
     schema = {
         'type': 'object',
         'properties': {
@@ -68,4 +68,4 @@ class TransmissionInputPlugin:
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(TransmissionInputPlugin, 'from_transmission', api_ver=2, category='input')
+    plugin.register(FromTransmissionPlugin, 'from_transmission', api_ver=2, category='input')

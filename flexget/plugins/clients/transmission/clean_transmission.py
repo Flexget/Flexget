@@ -13,7 +13,7 @@ from flexget.plugins.clients.transmission.utils import torrent_info, check_seed_
     check_requirements
 
 
-class PluginTransmissionClean:
+class CleanTransmissionPlugin:
     """
     Remove completed torrents from Transmission.
 
@@ -126,4 +126,4 @@ class PluginTransmissionClean:
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTransmissionClean, 'clean_transmission', api_ver=2, category='clients')
+    plugin.register(CleanTransmissionPlugin, 'clean_transmission', api_ver=2, category='clients')
