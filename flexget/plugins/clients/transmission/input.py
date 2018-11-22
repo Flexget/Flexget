@@ -13,7 +13,7 @@ class TransmissionInputPlugin:
         'properties': {
             'host': {'type': 'string', 'default': 'localhost'},
             'port': {'type': 'integer', 'default': 9091},
-            'netrc': {'type': 'string', 'default': None},
+            'netrc': {'type': 'string'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
             'enabled': {'type': 'boolean', 'default': True},

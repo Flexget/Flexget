@@ -47,17 +47,17 @@ class PluginTransmissionClean:
         'properties': {
             'host': {'type': 'string', 'default': 'localhost'},
             'port': {'type': 'integer', 'default': 9091},
-            'netrc': {'type': 'string', 'default': None},
+            'netrc': {'type': 'string'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
             'enabled': {'type': 'boolean', 'default': True},
 
             'min_ratio': {'type': 'number', 'default': None},
-            'finished_for': {'type': 'string', 'format': 'interval', 'default': None},
+            'finished_for': {'type': 'string', 'format': 'interval'},
             'transmission_seed_limits': {'type': 'boolean', 'default': False},
             'delete_files': {'type': 'boolean', 'default': False},
-            'tracker': {'type': 'string', 'format': 'regex', 'default': None},
-            'preserve_tracker': {'type': 'string', 'format': 'regex', 'default': None},
+            'tracker': {'type': 'string', 'format': 'regex'},
+            'preserve_tracker': {'type': 'string', 'format': 'regex'},
             'directories': one_or_more({'type': 'string', 'format': 'regex'}),
         },
         'additionalProperties': False
