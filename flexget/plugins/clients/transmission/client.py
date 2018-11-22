@@ -21,11 +21,14 @@ except ImportError:
 log = logging.getLogger('transmission')
 
 
+# TODO: maybe cache client
 def create_rpc_client(config):
     user, password = config.get('username'), config.get('password')
 
     try:
-        return transmissionrpc.Client(config['host'], config['port'], user, password)
+        client = transmissionrpc.Client(config['host'], config['port'], user, password)
+        log.info('Successfully connected to transmission.')
+        return client
     except TransmissionError as e:
         if isinstance(e.original, HTTPHandlerError):
             if e.original.code == 111:

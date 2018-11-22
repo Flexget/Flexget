@@ -23,25 +23,14 @@ log = logging.getLogger('transmission')
 
 
 class TransmissionBase(object):
-    def __init__(self):
-        self.client = None
-        self.opener = None
-
     def on_task_start(self, task, config):
         check_requirements()
 
-        # Mark rpc client for garbage collector so every task can start
-        # a fresh new according its own config - fix to bug #2804
-        self.client = None
         config = prepare_config(config)
         if config['enabled']:
             if task.options.test:
                 log.info('Trying to connect to transmission...')
-                self.client = create_rpc_client(config)
-                if self.client:
-                    log.info('Successfully connected to transmission.')
-                else:
-                    log.error('It looks like there was a problem connecting to transmission.')
+                create_rpc_client(config)
 
 
 class PluginTransmission(TransmissionBase):
@@ -127,14 +116,9 @@ class PluginTransmission(TransmissionBase):
         # Do not run if there is nothing to do
         if not task.accepted:
             return
-        if self.client is None:
-            self.client = create_rpc_client(config)
-            if self.client:
-                log.debug('Successfully connected to transmission.')
-            else:
-                raise plugin.PluginError("Couldn't connect to transmission.")
+        client = create_rpc_client(config)
         if task.accepted:
-            add_to_transmission(self.client, task, config)
+            add_to_transmission(client, task, config)
 
     def on_task_learn(self, task, config):
         """ Make sure all temp files are cleaned up when entries are learned """

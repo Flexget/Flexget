@@ -66,8 +66,8 @@ class PluginTransmissionClean(TransmissionBase):
         config = prepare_config(config)
         if not config['enabled'] or task.options.learn:
             return
-        if not self.client:
-            self.client = create_rpc_client(config)
+
+        client = create_rpc_client(config)
         nrat = float(config['min_ratio']) if 'min_ratio' in config else None
         nfor = parse_timedelta(config['finished_for']) if 'finished_for' in config else None
         delete_files = bool(config['delete_files']) if 'delete_files' in config else False
@@ -77,10 +77,10 @@ class PluginTransmissionClean(TransmissionBase):
                                          re.IGNORECASE) if 'preserve_tracker' in config else None
         directories_re = config.get('directories')
 
-        session = self.client.get_session()
+        session = client.get_session()
 
         remove_ids = []
-        for torrent in self.client.get_torrents():
+        for torrent in client.get_torrents():
             log.verbose('Torrent "%s": status: "%s" - ratio: %s -  date added: %s - date done: %s' %
                         (torrent.name, torrent.status, torrent.ratio, torrent.date_added, torrent.date_done))
             downloaded, dummy = torrent_info(torrent, config)
@@ -114,7 +114,7 @@ class PluginTransmissionClean(TransmissionBase):
                 log.info('Removing finished torrent `%s` from transmission', torrent.name)
                 remove_ids.append(torrent.id)
         if remove_ids:
-            self.client.remove_torrent(remove_ids, delete_files)
+            client.remove_torrent(remove_ids, delete_files)
 
 
 @event('plugin.register')

@@ -27,18 +27,17 @@ class TransmissionInputPlugin(TransmissionBase):
         if not config['enabled']:
             return
 
-        if not self.client:
-            self.client = create_rpc_client(config)
+        client = create_rpc_client(config)
         entries = []
 
         # Hack/Workaround for http://flexget.com/ticket/2002
         # TODO: Proper fix
         if 'username' in config and 'password' in config:
-            self.client.http_handler.set_authentication(self.client.url, config['username'], config['password'])
+            client.http_handler.set_authentication(client.url, config['username'], config['password'])
 
-        session = self.client.get_session()
+        session = client.get_session()
 
-        for torrent in self.client.get_torrents():
+        for torrent in client.get_torrents():
             downloaded, bigfella = torrent_info(torrent, config)
             seed_ratio_ok, idle_limit_ok = check_seed_limits(torrent, session)
             if not config['onlycomplete'] or (downloaded and
