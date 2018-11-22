@@ -5,7 +5,8 @@ from future.moves.urllib.parse import urlparse
 from flexget.utils.tools import parse_timedelta
 from datetime import datetime
 import re
-from .client import create_rpc_client, torrent_info, check_seed_limits
+from .client import create_rpc_client
+from .utils import torrent_info, check_seed_limits
 
 
 class PluginTransmissionClean(TransmissionBase):

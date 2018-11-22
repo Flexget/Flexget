@@ -3,7 +3,8 @@ from flexget import plugin, validator
 from flexget.entry import Entry
 from flexget.event import event
 
-from .client import create_rpc_client, torrent_info, check_seed_limits
+from .client import create_rpc_client
+from .utils import torrent_info, check_seed_limits
 
 
 class TransmissionInputPlugin(TransmissionBase):

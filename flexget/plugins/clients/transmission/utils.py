@@ -1,9 +1,49 @@
 import os
+from datetime import datetime
+from datetime import timedelta
 from future.utils import text_to_native_str
+
 from flexget.utils.pathscrub import pathscrub
 from flexget.utils.template import RenderError
 
 from .transmission import log
+
+
+def torrent_info(torrent, config):
+    done = torrent.totalSize > 0
+    vloc = None
+    best = None
+    for t in torrent.files().items():
+        tf = t[1]
+        if tf['selected']:
+            if tf['size'] <= 0 or tf['completed'] < tf['size']:
+                done = False
+                break
+            if not best or tf['size'] > best[1]:
+                best = (tf['name'], tf['size'])
+    if done and best and (100 * float(best[1]) / float(torrent.totalSize)) >= (config['main_file_ratio'] * 100):
+        vloc = ('%s/%s' % (torrent.downloadDir, best[0])).replace('/', os.sep)
+    return done, vloc
+
+
+def check_seed_limits(torrent, session):
+    seed_limit_ok = None  # will remain if no seed ratio defined
+    idle_limit_ok = None  # will remain if no idle limit defined
+
+    if torrent.seedRatioMode == 1:  # use torrent's own seed ratio limit
+        seed_limit_ok = torrent.uploadRatio >= torrent.seedRatioLimit
+    elif torrent.seedRatioMode == 0:  # use global rules
+        if session.seedRatioLimited:
+            seed_limit_ok = torrent.uploadRatio >= session.seedRatioLimit
+
+    if torrent.seedIdleMode == 1:  # use torrent's own idle limit
+        idle_limit_ok = torrent.date_active + timedelta(minutes=torrent.seedIdleLimit) < datetime.now()
+    elif torrent.seedIdleMode == 0:  # use global rules
+        if session.idle_seeding_limit_enabled:
+            idle_limit_ok = torrent.date_active + timedelta(minutes=session.idle_seeding_limit) < datetime.now()
+
+    return seed_limit_ok, idle_limit_ok
+
 
 OVERRIDABLE_KEYS = ('path', 'addpaused', 'honourlimits', 'bandwidthpriority', 'maxconnections', 'maxupspeed',
                     'maxdownspeed', 'ratio', 'main_file_only', 'main_file_ratio', 'magnetization_timeout',
