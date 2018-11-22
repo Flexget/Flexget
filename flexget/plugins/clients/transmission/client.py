@@ -59,7 +59,7 @@ def add_to_transmission(cli, task, config):
                 self.config = config
 
                 # Compile user options into appropriate dict
-                self.options = create_torrent_options(data.config, data.entry)
+                self.options = create_torrent_options(config, entry)
                 self.downloaded = not entry['url'].startswith('magnet:')
 
             @staticmethod
