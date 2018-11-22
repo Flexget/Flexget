@@ -45,38 +45,33 @@ class TransmissionPlugin:
     """
 
     schema = {
-        'anyOf': [
-            {'type': 'boolean'},
-            {
-                'type': 'object',
-                'properties': {
-                    'host': {'type': 'string', 'default': 'localhost'},
-                    'port': {'type': 'integer', 'default': 9091},
-                    'netrc': {'type': 'string', 'default': None},
-                    'username': {'type': 'string'},
-                    'password': {'type': 'string'},
-                    'enabled': {'type': 'boolean', 'default': True},
-                    'path': {'type': 'string', 'default': ''},
-                    'maxupspeed': {'type': 'number'},
-                    'maxdownspeed': {'type': 'number'},
-                    'maxconnections': {'type': 'integer'},
-                    'ratio': {'type': 'number'},
-                    'addpaused': {'type': 'boolean'},
-                    'content_filename': {'type': 'string'},
-                    'main_file_only': {'type': 'boolean', 'default': False},
-                    'main_file_ratio': {'type': 'number', 'default': 0.9},
-                    'magnetization_timeout': {'type': 'integer', 'default': 0},
-                    'include_subs': {'type': 'boolean', 'default': False},
-                    'bandwidthpriority': {'type': 'number'},
-                    'honourlimits': {'type': 'boolean'},
-                    'include_files': one_or_more({'type': 'string'}),
-                    'skip_files': one_or_more({'type': 'string'}),
-                    'rename_like_files': {'type': 'boolean', 'default': False},
-                    'queue_position': {'type': 'integer'}
-                },
-                'additionalProperties': False
-            }
-        ]
+        'type': 'object',
+        'properties': {
+            'host': {'type': 'string', 'default': 'localhost'},
+            'port': {'type': 'integer', 'default': 9091},
+            'netrc': {'type': 'string'},
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
+            'enabled': {'type': 'boolean', 'default': True},
+            'path': {'type': 'string', 'default': ''},
+            'maxupspeed': {'type': 'number'},
+            'maxdownspeed': {'type': 'number'},
+            'maxconnections': {'type': 'integer'},
+            'ratio': {'type': 'number'},
+            'addpaused': {'type': 'boolean'},
+            'content_filename': {'type': 'string'},
+            'main_file_only': {'type': 'boolean', 'default': False},
+            'main_file_ratio': {'type': 'number', 'default': 0.9},
+            'magnetization_timeout': {'type': 'integer', 'default': 0},
+            'include_subs': {'type': 'boolean', 'default': False},
+            'bandwidthpriority': {'type': 'number'},
+            'honourlimits': {'type': 'boolean'},
+            'include_files': one_or_more({'type': 'string'}),
+            'skip_files': one_or_more({'type': 'string'}),
+            'rename_like_files': {'type': 'boolean', 'default': False},
+            'queue_position': {'type': 'integer'}
+        },
+        'additionalProperties': False
     }
 
     def __init__(self):

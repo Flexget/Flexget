@@ -13,8 +13,6 @@ log = logging.getLogger('transmission')
 
 
 def prepare_config(config):
-    if isinstance(config, bool):
-        config = {'enabled': config}
     if 'netrc' in config:
         netrc_path = os.path.expanduser(config['netrc'])
         try:
