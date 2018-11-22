@@ -22,7 +22,7 @@ except ImportError:
 log = logging.getLogger('transmission')
 
 
-class PluginTransmission:
+class TransmissionPlugin:
     """
     Add url from entry url to transmission
 
@@ -127,4 +127,4 @@ class PluginTransmission:
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTransmission, 'transmission', api_ver=2)
+    plugin.register(TransmissionPlugin, 'transmission', api_ver=2)
