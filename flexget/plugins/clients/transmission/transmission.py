@@ -122,4 +122,4 @@ class TransmissionPlugin:
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(TransmissionPlugin, 'transmission', api_ver=2)
+    plugin.register(TransmissionPlugin, 'transmission', api_ver=2, category='clients')

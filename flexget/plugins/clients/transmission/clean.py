@@ -126,4 +126,4 @@ class PluginTransmissionClean:
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTransmissionClean, 'clean_transmission', api_ver=2, category='input')
+    plugin.register(PluginTransmissionClean, 'clean_transmission', api_ver=2, category='clients')
