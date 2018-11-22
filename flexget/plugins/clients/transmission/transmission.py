@@ -65,22 +65,6 @@ class TransmissionBase(object):
                 log.error('netrc: %s, file: %s, line: %s' % (e.msg, e.filename, e.lineno))
         return config
 
-    def torrent_info(self, torrent, config):
-        done = torrent.totalSize > 0
-        vloc = None
-        best = None
-        for t in torrent.files().items():
-            tf = t[1]
-            if tf['selected']:
-                if tf['size'] <= 0 or tf['completed'] < tf['size']:
-                    done = False
-                    break
-                if not best or tf['size'] > best[1]:
-                    best = (tf['name'], tf['size'])
-        if done and best and (100 * float(best[1]) / float(torrent.totalSize)) >= (config['main_file_ratio'] * 100):
-            vloc = ('%s/%s' % (torrent.downloadDir, best[0])).replace('/', os.sep)
-        return done, vloc
-
     def check_seed_limits(self, torrent, session):
         seed_limit_ok = None  # will remain if no seed ratio defined
         idle_limit_ok = None  # will remain if no idle limit defined
