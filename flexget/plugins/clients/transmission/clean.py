@@ -8,11 +8,12 @@ from flexget.config_schema import one_or_more
 from flexget.utils.tools import parse_timedelta
 
 from flexget.plugins.clients.transmission.client import create_rpc_client
-from flexget.plugins.clients.transmission.transmission import TransmissionBase, log
-from flexget.plugins.clients.transmission.utils import torrent_info, check_seed_limits, prepare_config
+from flexget.plugins.clients.transmission.transmission import log
+from flexget.plugins.clients.transmission.utils import torrent_info, check_seed_limits, prepare_config, \
+    check_requirements
 
 
-class PluginTransmissionClean(TransmissionBase):
+class PluginTransmissionClean:
     """
     Remove completed torrents from Transmission.
 
@@ -61,6 +62,12 @@ class PluginTransmissionClean(TransmissionBase):
         },
         'additionalProperties': False
     }
+
+    def __init__(self):
+        pass
+
+    def on_task_start(self, task, config):
+        check_requirements()
 
     def on_task_exit(self, task, config):
         config = prepare_config(config)

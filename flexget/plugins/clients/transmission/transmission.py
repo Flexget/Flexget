@@ -22,12 +22,7 @@ except ImportError:
 log = logging.getLogger('transmission')
 
 
-class TransmissionBase(object):
-    def on_task_start(self, task, config):
-        check_requirements()
-
-
-class PluginTransmission(TransmissionBase):
+class PluginTransmission:
     """
     Add url from entry url to transmission
 
@@ -83,6 +78,12 @@ class PluginTransmission(TransmissionBase):
             }
         ]
     }
+
+    def __init__(self):
+        pass
+
+    def on_task_start(self, task, config):
+        check_requirements()
 
     @plugin.priority(120)
     def on_task_download(self, task, config):

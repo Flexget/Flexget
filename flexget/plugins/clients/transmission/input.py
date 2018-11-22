@@ -1,13 +1,13 @@
-from .transmission import TransmissionBase
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 
 from flexget.plugins.clients.transmission.client import create_rpc_client
-from flexget.plugins.clients.transmission.utils import torrent_info, check_seed_limits, prepare_config
+from flexget.plugins.clients.transmission.utils import torrent_info, check_seed_limits, prepare_config, \
+    check_requirements
 
 
-class TransmissionInputPlugin(TransmissionBase):
+class TransmissionInputPlugin:
     schema = {
         'type': 'object',
         'properties': {
@@ -21,6 +21,12 @@ class TransmissionInputPlugin(TransmissionBase):
         },
         'additionalProperties': False
     }
+
+    def __init__(self):
+        pass
+
+    def on_task_start(self, task, config):
+        check_requirements()
 
     def on_task_input(self, task, config):
         config = prepare_config(config)
