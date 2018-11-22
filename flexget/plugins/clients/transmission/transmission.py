@@ -1,15 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-import os
 import logging
-from netrc import netrc, NetrcParseError
 
 from flexget import plugin
 from flexget.event import event
 
 from flexget.config_schema import one_or_more
 
+from flexget.plugins.clients.transmission.utils import prepare_config
 from flexget.plugins.clients.transmission.client import create_rpc_client, add_to_transmission
 
 try:
@@ -28,19 +27,6 @@ class TransmissionBase(object):
         self.client = None
         self.opener = None
 
-    def prepare_config(self, config):
-        if isinstance(config, bool):
-            config = {'enabled': config}
-        if 'netrc' in config:
-            netrc_path = os.path.expanduser(config['netrc'])
-            try:
-                config['username'], _, config['password'] = netrc(netrc_path).authenticators(config['host'])
-            except IOError as e:
-                log.error('netrc: unable to open: %s' % e.filename)
-            except NetrcParseError as e:
-                log.error('netrc: %s, file: %s, line: %s' % (e.msg, e.filename, e.lineno))
-        return config
-
     def on_task_start(self, task, config):
         try:
             import transmissionrpc
@@ -54,7 +40,7 @@ class TransmissionBase(object):
         # Mark rpc client for garbage collector so every task can start
         # a fresh new according its own config - fix to bug #2804
         self.client = None
-        config = self.prepare_config(config)
+        config = prepare_config(config)
         if config['enabled']:
             if task.options.test:
                 log.info('Trying to connect to transmission...')
@@ -128,7 +114,7 @@ class PluginTransmission(TransmissionBase):
             Call download plugin to generate the temp files we will load
             into deluge then verify they are valid torrents
         """
-        config = self.prepare_config(config)
+        config = prepare_config(config)
         if not config['enabled']:
             return
         # If the download plugin is not enabled, we need to call it to get
@@ -139,7 +125,7 @@ class PluginTransmission(TransmissionBase):
 
     @plugin.priority(135)
     def on_task_output(self, task, config):
-        config = self.prepare_config(config)
+        config = prepare_config(config)
         # don't add when learning
         if task.options.learn:
             return

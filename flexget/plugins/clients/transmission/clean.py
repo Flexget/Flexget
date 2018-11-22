@@ -9,7 +9,7 @@ from flexget.utils.tools import parse_timedelta
 
 from flexget.plugins.clients.transmission.client import create_rpc_client
 from flexget.plugins.clients.transmission.transmission import TransmissionBase, log
-from flexget.plugins.clients.transmission.utils import torrent_info, check_seed_limits
+from flexget.plugins.clients.transmission.utils import torrent_info, check_seed_limits, prepare_config
 
 
 class PluginTransmissionClean(TransmissionBase):
@@ -63,7 +63,7 @@ class PluginTransmissionClean(TransmissionBase):
     }
 
     def on_task_exit(self, task, config):
-        config = self.prepare_config(config)
+        config = prepare_config(config)
         if not config['enabled'] or task.options.learn:
             return
         if not self.client:

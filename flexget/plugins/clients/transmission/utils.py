@@ -2,12 +2,27 @@ import os
 import logging
 from datetime import datetime
 from datetime import timedelta
+from netrc import netrc, NetrcParseError
 from future.utils import text_to_native_str
 
 from flexget.utils.pathscrub import pathscrub
 from flexget.utils.template import RenderError
 
 log = logging.getLogger('transmission')
+
+
+def prepare_config(config):
+    if isinstance(config, bool):
+        config = {'enabled': config}
+    if 'netrc' in config:
+        netrc_path = os.path.expanduser(config['netrc'])
+        try:
+            config['username'], _, config['password'] = netrc(netrc_path).authenticators(config['host'])
+        except IOError as e:
+            log.error('netrc: unable to open: %s' % e.filename)
+        except NetrcParseError as e:
+            log.error('netrc: %s, file: %s, line: %s' % (e.msg, e.filename, e.lineno))
+    return config
 
 
 def torrent_info(torrent, config):

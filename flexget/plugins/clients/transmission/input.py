@@ -4,7 +4,7 @@ from flexget.entry import Entry
 from flexget.event import event
 
 from flexget.plugins.clients.transmission.client import create_rpc_client
-from flexget.plugins.clients.transmission.utils import torrent_info, check_seed_limits
+from flexget.plugins.clients.transmission.utils import torrent_info, check_seed_limits, prepare_config
 
 
 class TransmissionInputPlugin(TransmissionBase):
@@ -23,7 +23,7 @@ class TransmissionInputPlugin(TransmissionBase):
     }
 
     def on_task_input(self, task, config):
-        config = self.prepare_config(config)
+        config = prepare_config(config)
         if not config['enabled']:
             return
 
