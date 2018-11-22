@@ -26,12 +26,6 @@ class TransmissionBase(object):
     def on_task_start(self, task, config):
         check_requirements()
 
-        config = prepare_config(config)
-        if config['enabled']:
-            if task.options.test:
-                log.info('Trying to connect to transmission...')
-                create_rpc_client(config)
-
 
 class PluginTransmission(TransmissionBase):
     """
