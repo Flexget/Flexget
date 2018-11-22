@@ -28,24 +28,9 @@ class TransmissionBase(object):
         self.client = None
         self.opener = None
 
-    def _validator(self, advanced):
-        """Return config validator"""
-        advanced.accept('text', key='host')
-        advanced.accept('integer', key='port')
-        # note that password is optional in transmission
-        advanced.accept('file', key='netrc')
-        advanced.accept('text', key='username')
-        advanced.accept('text', key='password')
-        advanced.accept('boolean', key='enabled')
-        return advanced
-
     def prepare_config(self, config):
         if isinstance(config, bool):
             config = {'enabled': config}
-        config.setdefault('enabled', True)
-        config.setdefault('host', 'localhost')
-        config.setdefault('port', 9091)
-        config.setdefault('main_file_ratio', 0.9)
         if 'netrc' in config:
             netrc_path = os.path.expanduser(config['netrc'])
             try:
@@ -108,44 +93,34 @@ class PluginTransmission(TransmissionBase):
             {
                 'type': 'object',
                 'properties': {
-                    'host': {'type': 'string'},
-                    'port': {'type': 'integer'},
-                    'netrc': {'type': 'string'},
+                    'host': {'type': 'string', 'default': 'localhost'},
+                    'port': {'type': 'integer', 'default': 9091},
+                    'netrc': {'type': 'string', 'default': None},
                     'username': {'type': 'string'},
                     'password': {'type': 'string'},
-                    'path': {'type': 'string'},
+                    'enabled': {'type': 'boolean', 'default': True},
+                    'path': {'type': 'string', 'default': ''},
                     'maxupspeed': {'type': 'number'},
                     'maxdownspeed': {'type': 'number'},
                     'maxconnections': {'type': 'integer'},
                     'ratio': {'type': 'number'},
                     'addpaused': {'type': 'boolean'},
                     'content_filename': {'type': 'string'},
-                    'main_file_only': {'type': 'boolean'},
-                    'main_file_ratio': {'type': 'number'},
-                    'magnetization_timeout': {'type': 'integer'},
-                    'enabled': {'type': 'boolean'},
-                    'include_subs': {'type': 'boolean'},
+                    'main_file_only': {'type': 'boolean', 'default': False},
+                    'main_file_ratio': {'type': 'number', 'default': 0.9},
+                    'magnetization_timeout': {'type': 'integer', 'default': 0},
+                    'include_subs': {'type': 'boolean', 'default': False},
                     'bandwidthpriority': {'type': 'number'},
                     'honourlimits': {'type': 'boolean'},
                     'include_files': one_or_more({'type': 'string'}),
                     'skip_files': one_or_more({'type': 'string'}),
-                    'rename_like_files': {'type': 'boolean'},
+                    'rename_like_files': {'type': 'boolean', 'default': False},
                     'queue_position': {'type': 'integer'}
                 },
                 'additionalProperties': False
             }
         ]
     }
-
-    def prepare_config(self, config):
-        config = TransmissionBase.prepare_config(self, config)
-        config.setdefault('path', '')
-        config.setdefault('main_file_only', False)
-        config.setdefault('magnetization_timeout', 0)
-        config.setdefault('include_subs', False)
-        config.setdefault('rename_like_files', False)
-        config.setdefault('include_files', [])
-        return config
 
     @plugin.priority(120)
     def on_task_download(self, task, config):

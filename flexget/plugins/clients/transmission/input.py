@@ -1,5 +1,5 @@
 from .transmission import TransmissionBase
-from flexget import plugin, validator
+from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 
@@ -8,19 +8,19 @@ from flexget.plugins.clients.transmission.utils import torrent_info, check_seed_
 
 
 class TransmissionInputPlugin(TransmissionBase):
-    def validator(self):
-        """Return config validator"""
-        root = validator.factory()
-        root.accept('boolean')
-        advanced = root.accept('dict')
-        self._validator(advanced)
-        advanced.accept('boolean', key='onlycomplete')
-        return root
-
-    def prepare_config(self, config):
-        config = TransmissionBase.prepare_config(self, config)
-        config.setdefault('onlycomplete', True)
-        return config
+    schema = {
+        'type': 'object',
+        'properties': {
+            'host': {'type': 'string', 'default': 'localhost'},
+            'port': {'type': 'integer', 'default': 9091},
+            'netrc': {'type': 'string', 'default': None},
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
+            'enabled': {'type': 'boolean', 'default': True},
+            'onlycomplete': {'type': 'boolean', 'default': True}
+        },
+        'additionalProperties': False
+    }
 
     def on_task_input(self, task, config):
         config = self.prepare_config(config)

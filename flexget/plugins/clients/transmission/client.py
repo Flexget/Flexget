@@ -20,6 +20,7 @@ except ImportError:
 
 log = logging.getLogger('transmission')
 
+
 def create_rpc_client(config):
     user, password = config.get('username'), config.get('password')
 

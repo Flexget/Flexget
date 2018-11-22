@@ -2,8 +2,9 @@ import re
 from datetime import datetime
 from future.moves.urllib.parse import urlparse
 
+from flexget import plugin
 from flexget.event import event
-from flexget import plugin, validator
+from flexget.config_schema import one_or_more
 from flexget.utils.tools import parse_timedelta
 
 from flexget.plugins.clients.transmission.client import create_rpc_client
@@ -40,21 +41,26 @@ class PluginTransmissionClean(TransmissionBase):
         enabled: yes
     """
 
-    def validator(self):
-        """Return config validator"""
-        root = validator.factory()
-        root.accept('boolean')
-        advanced = root.accept('dict')
-        self._validator(advanced)
-        advanced.accept('number', key='min_ratio')
-        advanced.accept('interval', key='finished_for')
-        advanced.accept('boolean', key='transmission_seed_limits')
-        advanced.accept('boolean', key='delete_files')
-        advanced.accept('regexp', key='tracker')
-        advanced.accept('regexp', key='preserve_tracker')
-        directories_re = advanced.accept('list', key='directories')
-        directories_re.accept('regexp')
-        return root
+    schema = {
+        'type': 'object',
+        'properties': {
+            'host': {'type': 'string', 'default': 'localhost'},
+            'port': {'type': 'integer', 'default': 9091},
+            'netrc': {'type': 'string', 'default': None},
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
+            'enabled': {'type': 'boolean', 'default': True},
+
+            'min_ratio': {'type': 'number', 'default': None},
+            'finished_for': {'type': 'string', 'format': 'interval', 'default': None},
+            'transmission_seed_limits': {'type': 'boolean', 'default': False},
+            'delete_files': {'type': 'boolean', 'default': False},
+            'tracker': {'type': 'string', 'format': 'regex', 'default': None},
+            'preserve_tracker': {'type': 'string', 'format': 'regex', 'default': None},
+            'directories': one_or_more({'type': 'string', 'format': 'regex'}),
+        },
+        'additionalProperties': False
+    }
 
     def on_task_exit(self, task, config):
         config = self.prepare_config(config)
