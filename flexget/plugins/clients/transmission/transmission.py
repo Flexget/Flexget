@@ -8,7 +8,7 @@ from flexget.event import event
 
 from flexget.config_schema import one_or_more
 
-from flexget.plugins.clients.transmission.utils import prepare_config
+from flexget.plugins.clients.transmission.utils import prepare_config, check_requirements
 from flexget.plugins.clients.transmission.client import create_rpc_client, add_to_transmission
 
 try:
@@ -28,14 +28,7 @@ class TransmissionBase(object):
         self.opener = None
 
     def on_task_start(self, task, config):
-        try:
-            import transmissionrpc
-            from transmissionrpc import TransmissionError  # noqa
-            from transmissionrpc import HTTPHandlerError  # noqa
-        except:
-            raise plugin.PluginError('Transmissionrpc module version 0.11 or higher required.', log)
-        if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 11]:
-            raise plugin.PluginError('Transmissionrpc module version 0.11 or higher required, please upgrade', log)
+        check_requirements()
 
         # Mark rpc client for garbage collector so every task can start
         # a fresh new according its own config - fix to bug #2804
@@ -112,7 +105,7 @@ class PluginTransmission(TransmissionBase):
     def on_task_download(self, task, config):
         """
             Call download plugin to generate the temp files we will load
-            into deluge then verify they are valid torrents
+            into transmission then verify they are valid torrents
         """
         config = prepare_config(config)
         if not config['enabled']:

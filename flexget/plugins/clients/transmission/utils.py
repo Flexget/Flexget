@@ -5,6 +5,7 @@ from datetime import timedelta
 from netrc import netrc, NetrcParseError
 from future.utils import text_to_native_str
 
+from flexget import plugin
 from flexget.utils.pathscrub import pathscrub
 from flexget.utils.template import RenderError
 
@@ -40,6 +41,17 @@ def torrent_info(torrent, config):
     if done and best and (100 * float(best[1]) / float(torrent.totalSize)) >= (config['main_file_ratio'] * 100):
         vloc = ('%s/%s' % (torrent.downloadDir, best[0])).replace('/', os.sep)
     return done, vloc
+
+
+def check_requirements():
+    try:
+        import transmissionrpc
+        from transmissionrpc import TransmissionError  # noqa
+        from transmissionrpc import HTTPHandlerError  # noqa
+    except:
+        raise plugin.PluginError('Transmissionrpc module version 0.11 or higher required.', log)
+    if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 11]:
+        raise plugin.PluginError('Transmissionrpc module version 0.11 or higher required, please upgrade', log)
 
 
 def check_seed_limits(torrent, session):
