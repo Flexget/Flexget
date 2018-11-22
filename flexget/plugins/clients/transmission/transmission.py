@@ -19,6 +19,8 @@ from flexget.utils.pathscrub import pathscrub
 from flexget.config_schema import one_or_more
 from fnmatch import fnmatch
 
+from .client import create_rpc_client
+
 try:
     import transmissionrpc
     from transmissionrpc import TransmissionError
@@ -62,25 +64,6 @@ class TransmissionBase(object):
             except NetrcParseError as e:
                 log.error('netrc: %s, file: %s, line: %s' % (e.msg, e.filename, e.lineno))
         return config
-
-    def create_rpc_client(self, config):
-        user, password = config.get('username'), config.get('password')
-
-        try:
-            cli = transmissionrpc.Client(config['host'], config['port'], user, password)
-        except TransmissionError as e:
-            if isinstance(e.original, HTTPHandlerError):
-                if e.original.code == 111:
-                    raise plugin.PluginError("Cannot connect to transmission. Is it running?")
-                elif e.original.code == 401:
-                    raise plugin.PluginError("Username/password for transmission is incorrect. Cannot connect.")
-                elif e.original.code == 110:
-                    raise plugin.PluginError("Cannot connect to transmission: Connection timed out.")
-                else:
-                    raise plugin.PluginError("Error connecting to transmission: %s" % e.original.message)
-            else:
-                raise plugin.PluginError("Error connecting to transmission: %s" % e.message)
-        return cli
 
     def torrent_info(self, torrent, config):
         done = torrent.totalSize > 0
@@ -133,7 +116,7 @@ class TransmissionBase(object):
         if config['enabled']:
             if task.options.test:
                 log.info('Trying to connect to transmission...')
-                self.client = self.create_rpc_client(config)
+                self.client = create_rpc_client(config)
                 if self.client:
                     log.info('Successfully connected to transmission.')
                 else:
@@ -234,7 +217,7 @@ class PluginTransmission(TransmissionBase):
         if not task.accepted:
             return
         if self.client is None:
-            self.client = self.create_rpc_client(config)
+            self.client = create_rpc_client(config)
             if self.client:
                 log.debug('Successfully connected to transmission.')
             else:

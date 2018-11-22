@@ -5,7 +5,7 @@ from future.moves.urllib.parse import urlparse
 from flexget.utils.tools import parse_timedelta
 from datetime import datetime
 import re
-
+from .client import create_rpc_client
 
 class PluginTransmissionClean(TransmissionBase):
     """
@@ -57,7 +57,7 @@ class PluginTransmissionClean(TransmissionBase):
         if not config['enabled'] or task.options.learn:
             return
         if not self.client:
-            self.client = self.create_rpc_client(config)
+            self.client = create_rpc_client(config)
         nrat = float(config['min_ratio']) if 'min_ratio' in config else None
         nfor = parse_timedelta(config['finished_for']) if 'finished_for' in config else None
         delete_files = bool(config['delete_files']) if 'delete_files' in config else False

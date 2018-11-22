@@ -3,6 +3,8 @@ from flexget import plugin, validator
 from flexget.entry import Entry
 from flexget.event import event
 
+from .client import create_rpc_client
+
 
 class TransmissionInputPlugin(TransmissionBase):
     def validator(self):
@@ -25,7 +27,7 @@ class TransmissionInputPlugin(TransmissionBase):
             return
 
         if not self.client:
-            self.client = self.create_rpc_client(config)
+            self.client = create_rpc_client(config)
         entries = []
 
         # Hack/Workaround for http://flexget.com/ticket/2002
