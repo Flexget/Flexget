@@ -3,7 +3,7 @@ from flexget import plugin, validator
 from flexget.entry import Entry
 from flexget.event import event
 
-from .client import create_rpc_client, torrent_info
+from .client import create_rpc_client, torrent_info, check_seed_limits
 
 
 class TransmissionInputPlugin(TransmissionBase):
@@ -39,7 +39,7 @@ class TransmissionInputPlugin(TransmissionBase):
 
         for torrent in self.client.get_torrents():
             downloaded, bigfella = torrent_info(torrent, config)
-            seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
+            seed_ratio_ok, idle_limit_ok = check_seed_limits(torrent, session)
             if not config['onlycomplete'] or (downloaded and
                                                   ((
                                                                        torrent.status == 'stopped' and

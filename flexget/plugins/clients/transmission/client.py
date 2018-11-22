@@ -1,5 +1,9 @@
 from flexget import plugin
 
+import os
+from datetime import datetime
+from datetime import timedelta
+
 try:
     import transmissionrpc
     from transmissionrpc import TransmissionError
@@ -43,3 +47,22 @@ def torrent_info(torrent, config):
     if done and best and (100 * float(best[1]) / float(torrent.totalSize)) >= (config['main_file_ratio'] * 100):
         vloc = ('%s/%s' % (torrent.downloadDir, best[0])).replace('/', os.sep)
     return done, vloc
+
+
+def check_seed_limits(torrent, session):
+    seed_limit_ok = None  # will remain if no seed ratio defined
+    idle_limit_ok = None  # will remain if no idle limit defined
+
+    if torrent.seedRatioMode == 1:  # use torrent's own seed ratio limit
+        seed_limit_ok = torrent.uploadRatio >= torrent.seedRatioLimit
+    elif torrent.seedRatioMode == 0:  # use global rules
+        if session.seedRatioLimited:
+            seed_limit_ok = torrent.uploadRatio >= session.seedRatioLimit
+
+    if torrent.seedIdleMode == 1:  # use torrent's own idle limit
+        idle_limit_ok = torrent.date_active + timedelta(minutes=torrent.seedIdleLimit) < datetime.now()
+    elif torrent.seedIdleMode == 0:  # use global rules
+        if session.idle_seeding_limit_enabled:
+            idle_limit_ok = torrent.date_active + timedelta(minutes=session.idle_seeding_limit) < datetime.now()
+
+    return seed_limit_ok, idle_limit_ok

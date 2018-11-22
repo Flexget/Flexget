@@ -7,8 +7,6 @@ import os
 import logging
 import base64
 import time
-from datetime import datetime
-from datetime import timedelta
 from netrc import netrc, NetrcParseError
 
 from flexget import plugin
@@ -64,24 +62,6 @@ class TransmissionBase(object):
             except NetrcParseError as e:
                 log.error('netrc: %s, file: %s, line: %s' % (e.msg, e.filename, e.lineno))
         return config
-
-    def check_seed_limits(self, torrent, session):
-        seed_limit_ok = None  # will remain if no seed ratio defined
-        idle_limit_ok = None  # will remain if no idle limit defined
-
-        if torrent.seedRatioMode == 1:  # use torrent's own seed ratio limit
-            seed_limit_ok = torrent.uploadRatio >= torrent.seedRatioLimit
-        elif torrent.seedRatioMode == 0:  # use global rules
-            if session.seedRatioLimited:
-                seed_limit_ok = torrent.uploadRatio >= session.seedRatioLimit
-
-        if torrent.seedIdleMode == 1:  # use torrent's own idle limit
-            idle_limit_ok = torrent.date_active + timedelta(minutes=torrent.seedIdleLimit) < datetime.now()
-        elif torrent.seedIdleMode == 0:  # use global rules
-            if session.idle_seeding_limit_enabled:
-                idle_limit_ok = torrent.date_active + timedelta(minutes=session.idle_seeding_limit) < datetime.now()
-
-        return seed_limit_ok, idle_limit_ok
 
     def on_task_start(self, task, config):
         try:

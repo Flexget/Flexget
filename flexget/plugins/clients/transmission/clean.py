@@ -5,7 +5,7 @@ from future.moves.urllib.parse import urlparse
 from flexget.utils.tools import parse_timedelta
 from datetime import datetime
 import re
-from .client import create_rpc_client, torrent_info
+from .client import create_rpc_client, torrent_info, check_seed_limits
 
 
 class PluginTransmissionClean(TransmissionBase):
@@ -75,7 +75,7 @@ class PluginTransmissionClean(TransmissionBase):
             log.verbose('Torrent "%s": status: "%s" - ratio: %s -  date added: %s - date done: %s' %
                         (torrent.name, torrent.status, torrent.ratio, torrent.date_added, torrent.date_done))
             downloaded, dummy = torrent_info(torrent, config)
-            seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
+            seed_ratio_ok, idle_limit_ok = check_seed_limits(torrent, session)
             tracker_hosts = (urlparse(tracker['announce']).hostname for tracker in torrent.trackers)
             is_clean_all = nrat is None and nfor is None and trans_checks is False
             is_minratio_reached = nrat and (nrat <= torrent.ratio)
