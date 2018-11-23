@@ -103,18 +103,25 @@ class CleanTransmissionPlugin:
             is_torrent_idlelimit_since_finished_reached = nfor and (torrent.date_done + nfor) <= datetime.now()
             is_tracker_matching = not tracker_re or any(tracker_re.search(host) for host in tracker_hosts)
             is_preserve_tracker_matching = False
+
             if preserve_tracker_re is not None:
                 is_preserve_tracker_matching = any(preserve_tracker_re.search(host) for host in tracker_hosts)
             is_directories_matching = not directories_re or any(
                 re.compile(directory, re.IGNORECASE).search(torrent.downloadDir) for directory in directories_re)
-            if (downloaded and (is_clean_all or
-                is_transmission_seedlimit_unset or
-                is_transmission_seedlimit_reached or
-                is_transmission_idlelimit_reached or
-                is_minratio_reached or
-                (is_torrent_seed_only and is_torrent_idlelimit_since_added_reached) or
-                (not is_torrent_seed_only and is_torrent_idlelimit_since_finished_reached)) and
-                    is_directories_matching and (not is_preserve_tracker_matching and is_tracker_matching)):
+
+            if self._should_remove(
+                    downloaded=downloaded,
+                    is_directories_matching=is_directories_matching,
+                    is_preserve_tracker_matching=is_preserve_tracker_matching,
+                    is_tracker_matching=is_tracker_matching,
+                    is_clean_all=is_clean_all,
+                    is_transmission_seedlimit_unset=is_transmission_seedlimit_unset,
+                    is_transmission_seedlimit_reached=is_transmission_seedlimit_reached,
+                    is_transmission_idlelimit_reached=is_transmission_idlelimit_reached,
+                    is_minratio_reached=is_minratio_reached,
+                    is_torrent_seed_only=is_torrent_seed_only,
+                    is_torrent_idlelimit_since_added_reached=is_torrent_idlelimit_since_added_reached,
+                    is_torrent_idlelimit_since_finished_reached=is_torrent_idlelimit_since_finished_reached):
                 if task.options.test:
                     log.info('Would remove finished torrent `%s` from transmission', torrent.name)
                     continue
@@ -122,6 +129,43 @@ class CleanTransmissionPlugin:
                 remove_ids.append(torrent.id)
         if remove_ids:
             client.remove_torrent(remove_ids, delete_files)
+
+    # Not much better but more able to reason and test if change is required
+    @staticmethod
+    def _should_remove(downloaded,
+                       is_clean_all,
+
+                       is_transmission_seedlimit_unset,
+                       is_transmission_seedlimit_reached,
+                       is_transmission_idlelimit_reached,
+
+                       is_minratio_reached,
+
+                       is_torrent_seed_only,
+                       is_torrent_idlelimit_since_added_reached,
+                       is_torrent_idlelimit_since_finished_reached,
+
+                       is_directories_matching,
+                       is_preserve_tracker_matching,
+                       is_tracker_matching):
+
+        if not downloaded:
+            return False
+        if not is_directories_matching:
+            return False
+        if is_preserve_tracker_matching or not is_tracker_matching:
+            return False
+
+        conditions = [
+            is_clean_all,
+            is_transmission_seedlimit_unset,
+            is_transmission_seedlimit_reached,
+            is_transmission_idlelimit_reached,
+            is_minratio_reached,
+            is_torrent_seed_only and is_torrent_idlelimit_since_added_reached,
+            not is_torrent_seed_only and is_torrent_idlelimit_since_finished_reached]
+
+        return any(conditions)
 
 
 @event('plugin.register')
