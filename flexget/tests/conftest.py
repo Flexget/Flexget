@@ -68,7 +68,7 @@ def manager(request, config, caplog, monkeypatch, filecopy):  # enforce filecopy
         mockmanager = MockManager(config, request.cls.__name__)
     except Exception:
         # Since we haven't entered the test function yet, pytest won't print the logs on failure. Print them manually.
-        print(caplog.text())
+        print(caplog.text)
         raise
     yield mockmanager
     mockmanager.shutdown()
