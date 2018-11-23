@@ -8,6 +8,27 @@ from flexget.plugins.clients.transmission.utils import torrent_info, check_seed_
 
 
 class FromTransmissionPlugin:
+    """
+    Creates an entry for each item you have loaded in transmission.
+
+    Example::
+
+      from_transmission:
+        host: localhost
+        port: 9091
+        netrc: /home/flexget/.tmnetrc
+        username: myusername
+        password: mypassword
+        path: the download location
+
+    Default values for the config elements::
+
+      from_transmission:
+        host: localhost
+        port: 9091
+        enabled: yes
+        onlycomplete: yes
+    """
     schema = {
         'type': 'object',
         'properties': {

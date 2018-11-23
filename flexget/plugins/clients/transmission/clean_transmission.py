@@ -19,8 +19,6 @@ class CleanTransmissionPlugin:
 
     Examples::
 
-      clean_transmission: yes  # ignore both time and ratio
-
       clean_transmission:      # uses transmission's internal limits for idle time and seed ratio ( if defined )
         transmission_seed_limits: yes
 
@@ -40,6 +38,8 @@ class CleanTransmissionPlugin:
         host: localhost
         port: 9091
         enabled: yes
+        transmission_seed_limits: no
+        delete_files: no
     """
 
     schema = {
@@ -52,7 +52,7 @@ class CleanTransmissionPlugin:
             'password': {'type': 'string'},
             'enabled': {'type': 'boolean', 'default': True},
 
-            'min_ratio': {'type': 'number', 'default': None},
+            'min_ratio': {'type': 'number'},
             'finished_for': {'type': 'string', 'format': 'interval'},
             'transmission_seed_limits': {'type': 'boolean', 'default': False},
             'delete_files': {'type': 'boolean', 'default': False},

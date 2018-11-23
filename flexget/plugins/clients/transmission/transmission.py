@@ -34,6 +34,11 @@ class TransmissionPlugin:
         host: localhost
         port: 9091
         enabled: yes
+        main_file_only: no
+        main_file_ratio: 0.9
+        magnetization_timeout: 0
+        include_subs: no
+        rename_like_files: no
     """
 
     schema = {
