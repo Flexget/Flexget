@@ -1,23 +1,24 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+import httplib
 import logging
 import re
 
-from requests import RequestException
-
 from flexget import plugin
+from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
-from flexget.entry import Entry
 from flexget.utils.soup import get_soup
+from requests import RequestException
 
 log = logging.getLogger('anidb_list')
 USER_ID_RE = r'^\d{1,6}$'
 
 
 class AnidbList(object):
-    """"Creates an entry for each item in your AniDB wishlist.
+    """
+    Creates an entry for each item in your AniDB wishlist.
 
         anidb_list:
           user_id: <required>
@@ -32,8 +33,8 @@ class AnidbList(object):
           adult_only: boolean  # if adult_only is not present, it will be ignored
           buddy_lists: (ignore)/show_in/hide_in/show_watched/hide_watched
           mylist: # this option can also just be the value of "status"
-            status: (ignore)/complete/incomplete/in_mylist/not_in_mylist/related_not_in_mylist
-            state: watching/unknown/collecting/stalled/dropped
+        status: (ignore)/complete/incomplete/in_mylist/not_in_mylist/related_not_in_mylist
+        state: watching/unknown/collecting/stalled/dropped
           watched: # zero or more
             - unwatched
             - partial
@@ -55,14 +56,14 @@ class AnidbList(object):
     ADULT_MODES = {
         'ignore': 0,
         'hide': 1,
-        'only': 2
+        'only': 2,
     }
 
     AIRING_MODES = {
         'ignore': 0,
         'airing': 1,
         'finished': 2,
-        'unknown': 3
+        'unknown': 3,
     }
 
     MEDIA_TYPES = [
@@ -72,7 +73,7 @@ class AnidbList(object):
         'movie',
         'web',
         'musicvideo',
-        'unknown'
+        'unknown',
     ]
 
     BUDDY_MODES = {
@@ -80,7 +81,7 @@ class AnidbList(object):
         'show_in': 1,
         'hide_in': 2,
         'show_watched': 3,
-        'hide_watched': 4
+        'hide_watched': 4,
     }
 
     MYLIST_MODES = {
@@ -89,7 +90,7 @@ class AnidbList(object):
         'incomplete': 2,
         'in_mylist': 3,
         'not_in_mylist': 4,
-        'related_not_in_mylist': 5
+        'related_not_in_mylist': 5,
     }
 
     MYLIST_STATE = [
@@ -97,14 +98,14 @@ class AnidbList(object):
         'unknown',
         'collecting',
         'stalled',
-        'dropped'
+        'dropped',
     ]
 
     WATCHED_STATE = [
-        'unwatched',
+        'unwatched', 
         'partial',
         'complete',
-        'allihave'
+        'allihave',
     ]
 
     VOTE_MODES = {
@@ -112,7 +113,7 @@ class AnidbList(object):
         'permanent': 1,
         'temporary': 2,
         'none': 3,
-        'either': 4
+        'either': 4,
     }
     
     WISHLIST_MODES = {
@@ -121,7 +122,7 @@ class AnidbList(object):
         'watch': 2,
         'get': 3,
         'blacklist': 4,
-        'buddy': 11
+        'buddy': 11,
     }
 
     schema = {
@@ -134,8 +135,8 @@ class AnidbList(object):
             'type': {
                 'oneOf': [
                     {'type': 'string', 'enum': MEDIA_TYPES},
-                    {'type': 'array', 'items': MEDIA_TYPES}
-                ]
+                    {'type': 'array', 'items': {'type': 'string', 'enum': MEDIA_TYPES}},
+                ],
             },
             'is_airing': {'type': 'boolean'},
             'adult_only': {'type': 'string', 'enum': list(ADULT_MODES.keys())},
@@ -149,17 +150,17 @@ class AnidbList(object):
                          'state': {
                              'oneOf': [
                                  {'type': 'string', 'enum': MYLIST_STATE},
-                                 {'type': 'array', 'items': MYLIST_STATE}
-                             ]
-                         }
-                     }}
-                ]
+                                 {'type': 'array', 'items': {'type': 'string', 'enum': MYLIST_STATE}},
+                             ],
+                         },
+                     }},
+                ],
             },
             'watched': {
                 'oneOf': [
                     {'type': 'string', 'enum': WATCHED_STATE},
-                    {'type': 'array', 'items': WATCHED_STATE}
-                ]
+                    {'type': 'array', 'items': {'type': 'string', 'enum': WATCHED_STATE}},
+                ],
             },
             'mode': {
                 'type': 'string',
@@ -167,7 +168,7 @@ class AnidbList(object):
             'pass': {'type': 'string'},
             'strip_dates': {
                 'type': 'boolean',
-                'default': False}
+                'default': False},
         },
         'additionalProperties': False,
         'required': ['user_id'],
@@ -177,16 +178,16 @@ class AnidbList(object):
     def __build_url(self, config):
         params = {
             'show': 'mywishlist',
-            'uid': config['user_id']
+            'uid': config['user_id'],
         }
         if 'mode' in config:
             params['mode'] = self.WISHLIST_MODES[config['mode']]
         if 'type' in config:
             if isinstance(config['type'], str):
-                params['type.%s' % config['type']] = 1
+                params['type.{0}'.format(config['type'])] = 1
             elif isinstance(config['type'], list):
                 for media_type in config['type']:
-                    params['type.%s' % media_type] = 1
+                    params['type.{0}'.format(media_type)] = 1
         if 'is_airing' in config:
             params['airing'] = self.AIRING_MODES[config['is_airing']]
         if 'adult_only' in config:
@@ -197,10 +198,10 @@ class AnidbList(object):
             params['vote'] = self.VOTE_MODES[config['voted']]
         if 'watched' in config:
             if isinstance(config['watched'], str):
-                params['watched.%s' % config['watched']] = 1
+                params['watched.{0}'.format(config['watched'])] = 1
             elif isinstance(config['watched'], list):
                 for watched_type in config['watched']:
-                    params['watched.%s' % watched_type] = 1
+                    params['watched.{0}'.format(watched_type)] = 1
         return params
 
     @cached('anidb_list', persist='2 hours')
@@ -242,22 +243,20 @@ class AnidbList(object):
                 return entries
             for tr in trs:
                 if tr.find('span', title=entry_type):
-                    a = tr.find('td', class_='name').find('a')
-                    if not a:
+                    a_tag = tr.find('td', class_='name').find('a')
+                    if not a_tag:
                         log.debug('No title link found for the row, skipping')
                         continue
 
-                    anime_title = a.string
+                    anime_title = a_tag.string
                     if config.get('strip_dates'):
                         # Remove year from end of series name if present
                         anime_title = re.sub(r'\s+\(\d{4}\)$', '', anime_title)
 
                     entry = Entry()
                     entry['title'] = anime_title
-                    entry['url'] = self.anidb_url + a.get('href')
-                    entry['anidb_id'] = tr['id'][
-                        1:
-                    ]  # The <tr> tag's id is "aN..." where "N..." is the anime id
+                    entry['url'] = (self.anidb_url + a_tag.get('href'))
+                    entry['anidb_id'] = tr['id'][1:]  # The <tr> tag's id is "aN..." where "N..." is the anime id
                     log.debug('%s id is %s', entry['title'], entry['anidb_id'])
                     entry['anidb_name'] = entry['title']
                     entries.append(entry)
@@ -274,9 +273,9 @@ class AnidbList(object):
             log.debug('Requesting: %s', comp_link)
             try:
                 page = task.requests.get(comp_link, headers=task_headers)
-            except RequestException as e:
-                log.error(str(e))
-            if page.status_code != 200:
+            except RequestException as req_except:
+                log.error(str(req_except))
+            if page.status_code != httplib.OK:
                 log.warning('Unable to retrieve next page of wishlist.')
                 break
         return entries
