@@ -59,12 +59,12 @@ class TestCreateTorrentConfigOptions:
     def test_maxupspeed(self):
         options = create_torrent_options({'maxupspeed': 3}, empty_entry)
         assert options[change]['uploadLimit'] == 3
-        assert options[change]['uploadLimited'] is True
+        assert options[change]['uploadLimited']
 
     def test_maxdownspeed(self):
         options = create_torrent_options({'maxdownspeed': 3}, empty_entry)
         assert options[change]['downloadLimit'] == 3
-        assert options[change]['downloadLimited'] is True
+        assert options[change]['downloadLimited']
 
     def test_maxconnections(self):
         options = create_torrent_options({'maxconnections': 3}, empty_entry)
@@ -90,7 +90,7 @@ class TestCreateTorrentConfigOptions:
 
     def test_addpaused(self):
         options = create_torrent_options({'addpaused': True}, empty_entry)
-        assert options[post]['paused'] is True
+        assert options[post]['paused']
 
     def test_content_filename(self):
         options = create_torrent_options({'content_filename': 'You.Shall.Not.Pass'}, empty_entry)
@@ -98,7 +98,7 @@ class TestCreateTorrentConfigOptions:
 
     def test_main_file_only(self):
         options = create_torrent_options({'main_file_only': True}, empty_entry)
-        assert options[post]['main_file_only'] is True
+        assert options[post]['main_file_only']
 
     def test_main_file_ration(self):
         options = create_torrent_options({'main_file_ratio': 0.6}, empty_entry)
@@ -110,7 +110,7 @@ class TestCreateTorrentConfigOptions:
 
     def test_include_subs(self):
         options = create_torrent_options({'include_subs': True}, empty_entry)
-        assert options[post]['include_subs'] is True
+        assert options[post]['include_subs']
 
     def test_bandwidth_priority(self):
         options = create_torrent_options({'bandwidthpriority': 11}, empty_entry)
@@ -118,7 +118,7 @@ class TestCreateTorrentConfigOptions:
 
     def test_honour_limits(self):
         options = create_torrent_options({'honourlimits': False}, empty_entry)
-        assert options[change]['honorsSessionLimits'] is False
+        assert not options[change]['honorsSessionLimits']
 
     def test_include_files(self):
         options = create_torrent_options({'include_files': ['Empire', 'Strikes', 'Back']}, empty_entry)
@@ -126,7 +126,7 @@ class TestCreateTorrentConfigOptions:
 
     def test_rename_like_files(self):
         options = create_torrent_options({'rename_like_files': True}, empty_entry)
-        assert options[post]['rename_like_files'] is True
+        assert options[post]['rename_like_files']
 
     def test_skip_files(self):
         options = create_torrent_options({'skip_files': ['Dragon', 'Reborn']}, empty_entry)
@@ -146,12 +146,12 @@ class TestCreateTorrentEntryOptions:
     def test_maxupspeed(self):
         options = create_torrent_options({'maxupspeed': 3}, Entry({'maxupspeed': 4}))
         assert options[change]['uploadLimit'] == 4
-        assert options[change]['uploadLimited'] is True
+        assert options[change]['uploadLimited']
 
     def test_maxdownspeed(self):
         options = create_torrent_options({'maxdownspeed': 3}, Entry({'maxdownspeed': 6}))
         assert options[change]['downloadLimit'] == 6
-        assert options[change]['downloadLimited'] is True
+        assert options[change]['downloadLimited']
 
     def test_maxconnections(self):
         options = create_torrent_options({'maxconnections': 3}, Entry({'maxconnections': 1}))
@@ -171,7 +171,7 @@ class TestCreateTorrentEntryOptions:
 
     def test_addpaused(self):
         options = create_torrent_options({'addpaused': True}, Entry({'addpaused': False}))
-        assert options[post]['paused'] is False
+        assert not options[post]['paused']
 
     def test_content_filename(self):
         options = create_torrent_options({'content_filename': 'You.Shall.Not.Pass'},
@@ -179,8 +179,8 @@ class TestCreateTorrentEntryOptions:
         assert options[post]['content_filename'] == 'Yes.I.Will'
 
     def test_main_file_only(self):
-        options = create_torrent_options({'main_file_only': True}, Entry({'content_filename': 'Yes.I.Will'}))
-        assert options[post]['main_file_only'] is True
+        options = create_torrent_options({'main_file_only': True}, Entry({'main_file_only': False}))
+        assert not options[post]['main_file_only']
 
     def test_main_file_ration(self):
         options = create_torrent_options({'main_file_ratio': 0.6}, Entry({'main_file_ratio': 0.2}))
@@ -192,7 +192,7 @@ class TestCreateTorrentEntryOptions:
 
     def test_include_subs(self):
         options = create_torrent_options({'include_subs': True}, Entry({'include_subs': False}))
-        assert options[post]['include_subs'] is False
+        assert not options[post]['include_subs']
 
     def test_bandwidth_priority(self):
         options = create_torrent_options({'bandwidthpriority': 11}, Entry({'bandwidthpriority': 22}))
@@ -209,7 +209,7 @@ class TestCreateTorrentEntryOptions:
 
     def test_rename_like_files(self):
         options = create_torrent_options({'rename_like_files': True}, Entry({'rename_like_files': False}))
-        assert options[post]['rename_like_files'] is False
+        assert not options[post]['rename_like_files']
 
     def test_skip_files(self):
         options = create_torrent_options({'skip_files': ['Dragon', 'Reborn']},
