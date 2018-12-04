@@ -117,7 +117,7 @@ class UrlRewritePirateBay(object):
             torrent_url = tag_a.get('href')
             # URL is sometimes missing the schema
             if torrent_url.startswith('//'):
-                torrent_url = 'http:' + torrent_url
+                torrent_url = urlparse(url).scheme + ':' + torrent_url
             return torrent_url
         except Exception as e:
             raise UrlRewritingError(e)
@@ -157,7 +157,10 @@ class UrlRewritePirateBay(object):
                 if not entry['title']:
                     log.error('Malformed search result. No title or url found. Skipping.')
                     continue
-                entry['url'] = self.url + link.get('href')
+                href = link.get('href')
+                if href.startswith('/'):  # relative link?
+                    href = self.url + href
+                entry['url'] = href
                 tds = link.parent.parent.parent.find_all('td')
                 entry['torrent_seeds'] = int(tds[-2].contents[0])
                 entry['torrent_leeches'] = int(tds[-1].contents[0])
