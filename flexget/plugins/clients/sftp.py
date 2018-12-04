@@ -232,7 +232,7 @@ class SftpList(object):
                 return
 
             url = urljoin(url_prefix, quote(sftp.normalize(path)))
-            title = remotepath.basename(path)x
+            title = remotepath.basename(path)
 
             entry = Entry(title, url)
 
