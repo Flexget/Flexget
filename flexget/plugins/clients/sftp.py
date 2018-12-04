@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urljoin, urlparse
+from future.moves.urllib.parse import urljoin, urlparse, quote, unquote
 
 import logging
 import os
@@ -231,7 +231,7 @@ class SftpList(object):
             if is_dir and files_only:
                 return
 
-            url = urljoin(url_prefix, sftp.normalize(path))
+            url = urljoin(url_prefix, quote(sftp.normalize(path)))
             title = remotepath.basename(path)
 
             entry = Entry(title, url)
@@ -393,7 +393,7 @@ class SftpDownload(object):
         Downloads the file(s) described in entry
         """
 
-        path = urlparse(entry['url']).path or '.'
+        path = unquote(urlparse(entry['url']).path) or '.'
         delete_origin = config['delete_origin']
         recursive = config['recursive']
 
