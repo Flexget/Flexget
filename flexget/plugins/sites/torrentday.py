@@ -127,26 +127,29 @@ class UrlRewriteTorrentday(object):
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
 
-            url = 'https://www.torrentday.com/browse.php'
-            params['search'] = normalize_unicode(search_string).replace(':', '')
+            url = 'https://www.torrentday.com/t'
+            params['q'] = normalize_unicode(search_string).replace(':', '')
             cookies = { 'uid': config['uid'], 'pass': config['passkey'], '__cfduid': config['cfduid'] }
 
             try:
-                page = requests.get(url, params=params, cookies=cookies).content
+                page = requests.get(url, params=params, cookies=cookies)
             except RequestException as e:
                 raise PluginError('Could not connect to torrentday: %s' % e)
 
-            soup = get_soup(page)
-
-            for tr in soup.find_all('tr', { 'class': 'browse' }):
+            soup = get_soup(page.content)
+            form = soup.find('form', id='torrents')
+            table = form.find('table', { 'id': 'torrentTable' })
+            # the first row is the header so skip it
+            for tr in table.find_all('tr')[1:-1]:
                 entry = Entry()
                 # find the torrent names
-                title = tr.find('a', { 'class': 'torrentName' })
+                td = tr.find('td', { 'class': 'torrentNameInfo' })
+                title = td.find('a')
                 entry['title'] = title.contents[0]
                 log.debug('title: %s', title.contents[0])
 
                 # find download link
-                torrent_url = tr.find('td', { 'class': 'dlLinksInfo' })
+                torrent_url = tr.find_all('td', { 'class': 'ac' })[0]
                 torrent_url = torrent_url.find('a').get('href')
 
                 # construct download URL
@@ -155,7 +158,7 @@ class UrlRewriteTorrentday(object):
                 entry['url'] = torrent_url
 
                 # us tr object for seeders/leechers
-                seeders, leechers = tr.find_all('td', { 'class': ['seedersInfo', 'leechersInfo']})
+                seeders, leechers = tr.find_all('td', { 'class': ['ac seedersInfo', 'ac leechersInfo']})
                 entry['torrent_seeds'] = int(seeders.contents[0].replace(',', ''))
                 entry['torrent_leeches'] = int(leechers.contents[0].replace(',', ''))
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
