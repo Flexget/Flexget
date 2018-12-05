@@ -132,30 +132,33 @@ class UrlRewriteTorrentday(object):
             cookies = { 'uid': config['uid'], 'pass': config['passkey'], '__cfduid': config['cfduid'] }
 
             try:
-                page = requests.get(url, params=params, cookies=cookies)
+                page = requests.get(url, params=params, cookies=cookies).content
             except RequestException as e:
                 raise PluginError('Could not connect to torrentday: {}'.format(e))
 
-            soup = get_soup(page.content)
+            soup = get_soup(page)
             form = soup.find('form', id='torrents')
             table = form.find('table', { 'id': 'torrentTable' })
             # the first row is the header so skip it
-            for tr in table.find_all('tr')[1:-1]:
+            for tr in table.find_all('tr')[1:]:
                 entry = Entry()
                 # find the torrent names
                 td = tr.find('td', { 'class': 'torrentNameInfo' })
                 if not td:
-                    raise PluginError('Could not find entry torrentNameInfo for {}.'.format(search_string))
+                    log.warning('Could not find entry torrentNameInfo for %s.', search_string)
+                    continue
                 title = td.find('a')
                 if not title:
-                    raise PluginError('Could not determine title for {}.'.format(search_string))
+                    log.warning('Could not determine title for %s.', search_string)
+                    continue
                 entry['title'] = title.contents[0]
                 log.debug('title: %s', title.contents[0])
 
                 # find download link
-                torrent_url = tr.find_all('td', { 'class': 'ac' })[0]
+                torrent_url = tr.find('td', { 'class': 'ac' })
                 if not torrent_url:
-                    raise PluginError('Could not determine download link for {}.'.format(search_string))
+                    log.warning('Could not determine download link for %s.', search_string)
+                    continue
                 torrent_url = torrent_url.find('a').get('href')
 
                 # construct download URL
