@@ -144,12 +144,18 @@ class UrlRewriteTorrentday(object):
                 entry = Entry()
                 # find the torrent names
                 td = tr.find('td', { 'class': 'torrentNameInfo' })
+                if not td:
+                    raise PluginError('Could not find entry torrentNameInfo for {}.'.format(search_string))
                 title = td.find('a')
+                if not title:
+                    raise PluginError('Could not determine title for {}.'.format(search_string))
                 entry['title'] = title.contents[0]
                 log.debug('title: %s', title.contents[0])
 
                 # find download link
                 torrent_url = tr.find_all('td', { 'class': 'ac' })[0]
+                if not torrent_url:
+                    raise PluginError('Could not determine download link for {}.'.format(search_string))
                 torrent_url = torrent_url.find('a').get('href')
 
                 # construct download URL
