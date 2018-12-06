@@ -137,10 +137,8 @@ class UrlRewriteTorrentday(object):
                 raise PluginError('Could not connect to torrentday: {}'.format(e))
 
             soup = get_soup(page)
-            form = soup.find('form', id='torrents')
-            table = form.find('table', { 'id': 'torrentTable' })
             # the first row is the header so skip it
-            for tr in table.find_all('tr')[1:]:
+            for tr in soup.find_all('tr')[1:]:
                 entry = Entry()
                 # find the torrent names
                 td = tr.find('td', { 'class': 'torrentNameInfo' })
@@ -167,7 +165,8 @@ class UrlRewriteTorrentday(object):
                 entry['url'] = torrent_url
 
                 # us tr object for seeders/leechers
-                seeders, leechers = tr.find_all('td', { 'class': ['ac seedersInfo', 'ac leechersInfo']})
+                seeders = tr.find_all('td', { 'class': 'ac seedersInfo'})
+                leechers = tr.find_all('td', { 'class': 'ac leechersInfo'})
                 entry['torrent_seeds'] = int(seeders.contents[0].replace(',', ''))
                 entry['torrent_leeches'] = int(leechers.contents[0].replace(',', ''))
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
