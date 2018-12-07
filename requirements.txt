@@ -37,10 +37,10 @@ pyparsing==2.2.0
 pyrss2gen==1.1
 python-dateutil==2.6.1
 pytz==2017.2              # via apscheduler, flask-restful, flask-restplus, tempora, tzlocal
-pyyaml==3.12
+pyyaml==3.13
 rebulk==0.9.0
 requests==2.20.1
-rpyc==3.3.0
+rpyc==4.0.1
 six==1.10.0               # via apscheduler, cheroot, cherrypy, flask-cors, flask-restful, flask-restplus, html5lib, python-dateutil, rebulk, tempora
 sqlalchemy==1.2.6
 tempora==1.8              # via portend
