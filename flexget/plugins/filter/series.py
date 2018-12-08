@@ -1679,7 +1679,7 @@ class FilterSeries(FilterSeriesBase):
             # Expunge so we can work on de-attached while processing the series to minimize db locks
             session.expunge_all()
 
-        start_time = time.process_time()
+        start_time = preferred_clock()
         for series_item in config:
             with Session() as session:
                 series_name, series_config = list(series_item.items())[0]
@@ -1740,7 +1740,7 @@ class FilterSeries(FilterSeriesBase):
 
                 self.process_series(task, series_entries, series_config)
 
-        log.debug('processing series took %s', time.process_time() - start_time)
+        log.debug('processing series took %s', preferred_clock() - start_time)
 
     def parse_series(self, entries, series_name, config, db_identified_by=None):
         """
