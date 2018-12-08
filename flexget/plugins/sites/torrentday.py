@@ -165,8 +165,8 @@ class UrlRewriteTorrentday(object):
                 entry['url'] = torrent_url
 
                 # us tr object for seeders/leechers
-                seeders = tr.find_all('td', { 'class': 'ac seedersInfo'})
-                leechers = tr.find_all('td', { 'class': 'ac leechersInfo'})
+                seeders = tr.find('td', { 'class': 'ac seedersInfo'})
+                leechers = tr.find('td', { 'class': 'ac leechersInfo'})
                 entry['torrent_seeds'] = int(seeders.contents[0].replace(',', ''))
                 entry['torrent_leeches'] = int(leechers.contents[0].replace(',', ''))
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
