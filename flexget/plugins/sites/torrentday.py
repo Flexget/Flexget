@@ -136,9 +136,15 @@ class UrlRewriteTorrentday(object):
             except RequestException as e:
                 raise PluginError('Could not connect to torrentday: {}'.format(e))
 
-            soup = get_soup(page)
+            # the following should avoid table being None due to a malformed
+            # html in td search results
+            soup = get_soup(page).contents[1].contents[1].next.next.nextSibling
+            table = soup.find('table', {'id': 'torrentTable'})
+            if (table is None):
+                raise PluginError('Search returned by torrentday appears to be empty or malformed.')
+
             # the first row is the header so skip it
-            for tr in soup.find_all('tr')[1:]:
+            for tr in table.find_all('tr')[1:]:
                 entry = Entry()
                 # find the torrent names
                 td = tr.find('td', { 'class': 'torrentNameInfo' })
