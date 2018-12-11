@@ -63,7 +63,7 @@ def manager(request, config, caplog, monkeypatch, filecopy):  # enforce filecopy
     Create a :class:`MockManager` for this test based on `config` argument.
     """
     if 'tmpdir' in request.fixturenames:
-        config = config.replace('__tmp__', request.getfuncargvalue('tmpdir').strpath)
+        config = config.replace('__tmp__', request.getfixturevalue('tmpdir').strpath)
     try:
         mockmanager = MockManager(config, request.cls.__name__)
     except Exception:
@@ -201,7 +201,7 @@ def pytest_runtest_setup(item):
 @pytest.yield_fixture()
 def filecopy(request):
     out_files = []
-    marker = request.node.get_marker('filecopy')
+    marker = request.node.get_closest_marker('filecopy')
     if marker is not None:
         copy_list = marker.args[0] if len(marker.args) == 1 else [marker.args]
 
@@ -209,7 +209,7 @@ def filecopy(request):
             if isinstance(sources, str):
                 sources = [sources]
             if 'tmpdir' in request.fixturenames:
-                dst = dst.replace('__tmp__', request.getfuncargvalue('tmpdir').strpath)
+                dst = dst.replace('__tmp__', request.getfixturevalue('tmpdir').strpath)
             dst = Path(dst)
             for f in itertools.chain(*(Path().glob(src) for src in sources)):
                 dest_path = dst
