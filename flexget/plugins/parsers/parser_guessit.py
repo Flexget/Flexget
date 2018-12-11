@@ -57,6 +57,12 @@ def normalize_component(data):
     return [data.lower().replace('-', '')]
 
 
+try:
+    preferred_clock = time.process_time
+except AttributeError:
+    preferred_clock = time.clock
+
+
 class ParserGuessit(object):
     SOURCE_MAP = {
         'Camera': 'cam',
@@ -168,7 +174,7 @@ class ParserGuessit(object):
     # movie_parser API
     def parse_movie(self, data, **kwargs):
         log.debug('Parsing movie: `%s` [options: %s]', data, kwargs)
-        start = time.clock()
+        start = preferred_clock()
         guessit_options = self._guessit_options(kwargs)
         guessit_options['type'] = 'movie'
         guess_result = guessit_api.guessit(data, options=guessit_options)
@@ -182,8 +188,7 @@ class ParserGuessit(object):
             release_group=guess_result.get('release_group'),
             valid=bool(guess_result.get('title'))  # It's not valid if it didn't find a name, which sometimes happens
         )
-        end = time.clock()
-        log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
+        log.debug('Parsing result: %s (in %s ms)', parsed, (preferred_clock() - start) * 1000)
         return parsed
 
     # series_parser API
@@ -200,7 +205,7 @@ class ParserGuessit(object):
             guessit_options['expected_title'] = ['re:' + title for title in expected_titles]
         if kwargs.get('id_regexps'):
             guessit_options['id_regexps'] = kwargs.get('id_regexps')
-        start = time.clock()
+        start = preferred_clock()
         # If no series name is provided, we don't tell guessit what kind of match we are looking for
         # This prevents guessit from determining that too general of matches are series
         parse_type = 'episode' if kwargs.get('name') else None
@@ -339,8 +344,7 @@ class ParserGuessit(object):
             valid=valid
         )
 
-        end = time.clock()
-        log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
+        log.debug('Parsing result: %s (in %s ms)', parsed, (preferred_clock() - start) * 1000)
         return parsed
 
     # TODO: The following functions are sort of legacy. No idea if they should be changed.
