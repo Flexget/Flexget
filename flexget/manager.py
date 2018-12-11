@@ -336,7 +336,7 @@ class Manager(object):
             console('There is a FlexGet process already running for this config, sending execution there.')
             log.debug('Sending command to running FlexGet process: %s' % self.args)
             try:
-                client = IPCClient(ipc_info['port'], ipc_info['password'])
+                client = IPCClient(ipc_info['port'], ipc_info['password'], sync_request_timeout=self.options.timeout)
             except ValueError as e:
                 log.error(e)
             else:
