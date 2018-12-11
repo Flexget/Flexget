@@ -128,7 +128,7 @@ class DiscordNotifier(object):
         }
 
         try:
-            r = requests.post(config['web_hook_url'], json=web_hook)
+            requests.post(config['web_hook_url'], json=web_hook)
         except RequestException as e:
             raise PluginWarning(e.args[0])
 
