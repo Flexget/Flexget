@@ -9,7 +9,6 @@ from requests.exceptions import RequestException
 
 from flexget.utils import requests
 
-# requests = (max_retires=3)
 
 plugin_name = 'discord'
 
