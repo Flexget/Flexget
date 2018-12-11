@@ -160,7 +160,7 @@ class IPCServer(threading.Thread):
 
 
 class IPCClient(object):
-    def __init__(self, port, password, sync_request_timeout=3600):
+    def __init__(self, port, password, sync_request_timeout=300):
         channel = rpyc.Channel(rpyc.SocketStream.connect('127.0.0.1', port))
         channel.send(password.encode('utf-8'))
         response = channel.recv()
