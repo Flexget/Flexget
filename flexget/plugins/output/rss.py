@@ -95,15 +95,18 @@ class OutputRSS(object):
 
     Generate RSS that will contain last 50 items, regardless of dates.
 
-    RSS location link:
+    RSS feed properties:
 
-    You can specify the url location of the rss file.
+    You can specify the URL, title, and description to include in tthe header
+    of the RSS feed.
 
     Example::
 
       make_rss:
         file: ~/public_html/series.rss
         rsslink: http://my.server.net/series.rss
+        rsstitle: The Flexget RSS Feed
+        rssdesc: Episodes about Flexget.
 
     **RSS item title and link**
 
@@ -140,6 +143,8 @@ class OutputRSS(object):
                     'history': {'type': 'boolean'},
                     'timestamp': {'type': 'boolean'},
                     'rsslink': {'type': 'string'},
+                    'rsstitle': {'type': 'string'},
+                    'rssdesc': {'type': 'string'},
                     'encoding': {'type': 'string'},  # TODO: only valid choices
                     'title': {'type': 'string'},
                     'template': {'type': 'string'},
@@ -250,9 +255,9 @@ class OutputRSS(object):
                 task.session.delete(db_item)
 
         # make rss
-        rss = PyRSS2Gen.RSS2(title='FlexGet',
+        rss = PyRSS2Gen.RSS2(title=config.get('rsstitle', 'FlexGet'),
                              link=config.get('rsslink', 'http://flexget.com'),
-                             description='FlexGet generated RSS feed',
+                             description=config.get('rssdesc', 'FlexGet generated RSS feed'),
                              lastBuildDate=datetime.datetime.utcnow() if config['timestamp'] else None,
                              items=rss_items)
 
