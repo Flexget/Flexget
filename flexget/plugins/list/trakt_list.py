@@ -201,6 +201,8 @@ class TraktSet(MutableSet):
                 else:
                     entry['url'] = 'https://trakt.tv/%ss/%s' % (list_type, item[list_type]['ids'].get('slug'))
 
+                entry.update_using_map(field_maps[list_type], item)
+
                 # get movie name translation
                 language = self.config.get('language')
                 if list_type == 'movie' and language:
@@ -218,10 +220,11 @@ class TraktSet(MutableSet):
                     else:
                         log.verbose('Found `%s` translation for movie `%s`: %s',
                                     language, entry['movie_name'], translation[0]['title'])
-                        entry['title'] = translation[0]['title'] + ' (' + entry['movie_year'] + ')'
+                        entry['title'] = translation[0]['title']
+                        if entry.get('movie_year'):
+                            entry['title'] += ' (' + str(entry['movie_year']) + ')'
                         entry['movie_name'] = translation[0]['title']
 
-                entry.update_using_map(field_maps[list_type], item)
                 # Override the title if strip_dates is on. TODO: a better way?
                 if self.config.get('strip_dates'):
                     if list_type in ['show', 'movie']:
@@ -245,18 +248,20 @@ class TraktSet(MutableSet):
         self._items = None
 
     def get_list_endpoint(self, remove=False, submit=False):
-        # Api restriction, but we could easily extract season and episode info from the 'shows' type
-        if not submit and self.config['list'] in ['collection', 'watched'] and self.config['type'] == 'episodes':
-            raise plugin.PluginError('`type` cannot be `%s` for %s list.' % (self.config['type'], self.config['list']))
+        if not submit and self.config['list'] == 'collection' and self.config['type'] == 'episodes':
+            # API restriction as they don't have an endpoint for collected episodes yet
+            if self.config['list'] == 'collection':
+                raise plugin.PluginError('`type` cannot be `episodes` for collection list.')
+            if self.config.get('account'):
+                return ('sync', 'history', 'episodes')
+            else:
+                raise plugin.PluginError('A trakt `account` needs to be configured to get the episode history.')
 
         if self.config['list'] in ['collection', 'watchlist', 'watched', 'ratings']:
             if self.config.get('account'):
-                if self.config['list'] == 'watched':
-                    endpoint = ('sync', 'history')
-                else:
-                    endpoint = ('sync', self.config['list'])
-                    if not submit:
-                        endpoint += (self.config['type'], )
+                endpoint = ('sync', 'history' if self.config['list'] == 'watched' else self.config['list'])
+                if not submit:
+                    endpoint += (self.config['type'], )
             else:
                 endpoint = ('users', self.config['username'], self.config['list'], self.config['type'])
         else:

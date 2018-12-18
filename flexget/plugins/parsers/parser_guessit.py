@@ -35,7 +35,17 @@ def _id_regexps_function(input_string, context):
 _id_regexps = Rebulk().functional(_id_regexps_function, name='regexpId',
                                   disabled=lambda context: not context.get('id_regexps'))
 
-guessit_api = GuessItApi(rebulk_builder().rebulk(_id_regexps))
+def rules_builder(config):
+    rebulk = rebulk_builder(config)
+    rebulk.rebulk(_id_regexps)
+    return rebulk
+
+
+guessit_api = GuessItApi()
+guessit_api.configure(
+    options={},
+    rules_builder=rules_builder,
+    force=True)
 
 
 def normalize_component(data):
@@ -47,11 +57,34 @@ def normalize_component(data):
     return [data.lower().replace('-', '')]
 
 
+try:
+    preferred_clock = time.process_time
+except AttributeError:
+    preferred_clock = time.clock
+
+
 class ParserGuessit(object):
+    SOURCE_MAP = {
+        'Camera': 'cam',
+        'HD Camera': 'cam',
+        'HD Telesync': 'telesync',
+        'Pay-per-view': 'ppv',
+        'Digital TV': 'dvb',
+        'Video on Demand': 'vod',
+        'Analog HDTV': 'ahdtv',
+        'Ultra HDTV': 'uhdtv',
+        'HD Telecine': 'hdtc',
+        'Web': 'web-dl'
+    }
+
     @staticmethod
     def _guessit_options(options):
-        settings = {'name_only': True, 'allowed_languages': ['en', 'fr'], 'allowed_countries': ['us', 'uk', 'gb']}
-        # 'clean_function': clean_value
+        settings = {
+            'name_only': True,
+            'allowed_languages': ['en', 'fr'],
+            'allowed_countries': ['us', 'uk', 'gb'],
+            'single_value': True
+        }
         options['episode_prefer_number'] = not options.get('identified_by') == 'ep'
         if options.get('allow_groups'):
             options['expected_group'] = options['allow_groups']
@@ -79,17 +112,18 @@ class ParserGuessit(object):
         else:
             version -= 1
         proper_count = guessit_result.get('proper_count', 0)
-        fastsub = 'fastsub' in normalize_component(guessit_result.get('other'))
+        fastsub = 'fast subtitled' in normalize_component(guessit_result.get('other'))
         return version + proper_count - (5 if fastsub else 0)
 
-    def _quality(self, guessit_result):
-        """Generate a FlexGet Quality from a guessit result."""
-        resolution = normalize_component(guessit_result.get('screen_size'))
+    def _source(self, guessit_result):
         other = normalize_component(guessit_result.get('other'))
-        if not resolution and 'hr' in other:
-            resolution.append('hr')
+        source = self.SOURCE_MAP.get(guessit_result.get('source'), guessit_result.get('source'))
+        # special case
+        if source == 'web-dl' and 'Rip' in other:
+            source = 'webrip'
 
-        source = normalize_component(guessit_result.get('format'))
+        source = normalize_component(source)
+
         if 'preair' in other:
             source.append('preair')
         if 'screener' in other:
@@ -100,6 +134,17 @@ class ParserGuessit(object):
         if 'r5' in other:
             source.append('r5')
 
+        return source
+
+    def _quality(self, guessit_result):
+        """Generate a FlexGet Quality from a guessit result."""
+        resolution = normalize_component(guessit_result.get('screen_size'))
+        other = normalize_component(guessit_result.get('other'))
+        if not resolution and 'high resolution' in other:
+            resolution.append('hr')
+
+        source = self._source(guessit_result)
+
         codec = normalize_component(guessit_result.get('video_codec'))
         if '10bit' in normalize_component(guessit_result.get('video_profile')):
             codec.append('10bit')
@@ -108,9 +153,9 @@ class ParserGuessit(object):
         audio_profile = normalize_component(guessit_result.get('audio_profile'))
         audio_channels = normalize_component(guessit_result.get('audio_channels'))
         # unlike the other components, audio can be a bit iffy with multiple codecs, so we limit it to one
-        if 'dts' in audio and any(hd in audio_profile for hd in ['HD', 'HDMA']):
+        if 'dts' in audio and any(hd in audio_profile for hd in ['hd', 'master audio']):
             audio = ['dtshd']
-        elif '5.1' in audio_channels and any(dd in audio for dd in ['ac3', 'dolbydigital']):
+        elif '5.1' in audio_channels and any(dd in audio for dd in ['dolby digital']):
             audio = ['dd5.1']
 
         # Make sure everything are strings (guessit will return lists when there are multiples)
@@ -129,7 +174,7 @@ class ParserGuessit(object):
     # movie_parser API
     def parse_movie(self, data, **kwargs):
         log.debug('Parsing movie: `%s` [options: %s]', data, kwargs)
-        start = time.clock()
+        start = preferred_clock()
         guessit_options = self._guessit_options(kwargs)
         guessit_options['type'] = 'movie'
         guess_result = guessit_api.guessit(data, options=guessit_options)
@@ -143,8 +188,7 @@ class ParserGuessit(object):
             release_group=guess_result.get('release_group'),
             valid=bool(guess_result.get('title'))  # It's not valid if it didn't find a name, which sometimes happens
         )
-        end = time.clock()
-        log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
+        log.debug('Parsing result: %s (in %s ms)', parsed, (preferred_clock() - start) * 1000)
         return parsed
 
     # series_parser API
@@ -161,7 +205,7 @@ class ParserGuessit(object):
             guessit_options['expected_title'] = ['re:' + title for title in expected_titles]
         if kwargs.get('id_regexps'):
             guessit_options['id_regexps'] = kwargs.get('id_regexps')
-        start = time.clock()
+        start = preferred_clock()
         # If no series name is provided, we don't tell guessit what kind of match we are looking for
         # This prevents guessit from determining that too general of matches are series
         parse_type = 'episode' if kwargs.get('name') else None
@@ -300,8 +344,7 @@ class ParserGuessit(object):
             valid=valid
         )
 
-        end = time.clock()
-        log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
+        log.debug('Parsing result: %s (in %s ms)', parsed, (preferred_clock() - start) * 1000)
         return parsed
 
     # TODO: The following functions are sort of legacy. No idea if they should be changed.

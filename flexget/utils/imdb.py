@@ -94,7 +94,7 @@ class ImdbSearch(object):
         parser = get_plugin_by_name('parsing').instance.parse_movie(raw_name)
         name = parser.name
         year = parser.year
-        if name == '':
+        if not name:
             log.critical('Failed to parse name from %s', raw_name)
             return None
         log.debug('smart_match name=%s year=%s' % (name, str(year)))

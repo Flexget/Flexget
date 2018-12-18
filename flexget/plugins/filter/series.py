@@ -41,6 +41,12 @@ log = logging.getLogger('series')
 Base = db_schema.versioned_base('series', SCHEMA_VER)
 
 
+try:
+    preferred_clock = time.process_time
+except AttributeError:
+    preferred_clock = time.clock
+
+
 @db_schema.upgrade('series')
 def upgrade(ver, session):
     if ver is None:
@@ -1606,7 +1612,7 @@ class FilterSeries(FilterSeriesBase):
 
         parser = get_plugin_by_name('parsing').instance
 
-        start_time = time.clock()
+        start_time = preferred_clock()
 
         # Sort Entries into data model similar to https://en.wikipedia.org/wiki/Trie
         # Only process series if both the entry title and series title first letter match
@@ -1648,7 +1654,7 @@ class FilterSeries(FilterSeriesBase):
                 if entries:
                     self.parse_series(entries, series_name, series_config, db_identified_by)
 
-        log.debug('series on_task_metainfo took %s to parse', time.clock() - start_time)
+        log.debug('series on_task_metainfo took %s to parse', preferred_clock() - start_time)
 
     def on_task_filter(self, task, config):
         """Filter series"""
@@ -1673,7 +1679,7 @@ class FilterSeries(FilterSeriesBase):
             # Expunge so we can work on de-attached while processing the series to minimize db locks
             session.expunge_all()
 
-        start_time = time.clock()
+        start_time = preferred_clock()
         for series_item in config:
             with Session() as session:
                 series_name, series_config = list(series_item.items())[0]
@@ -1734,7 +1740,7 @@ class FilterSeries(FilterSeriesBase):
 
                 self.process_series(task, series_entries, series_config)
 
-        log.debug('processing series took %s', time.clock() - start_time)
+        log.debug('processing series took %s', preferred_clock() - start_time)
 
     def parse_series(self, entries, series_name, config, db_identified_by=None):
         """

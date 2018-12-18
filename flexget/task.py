@@ -504,8 +504,7 @@ class Task(object):
         except DependencyError as e:
             msg = ('Plugin `%s` cannot be used because dependency `%s` is missing.' %
                    (keyword, e.missing))
-            log.critical(msg)
-            log.debug(e.message)
+            log.critical(e.message)
             self.abort(msg)
         except Warning as e:
             # If warnings have been elevated to errors

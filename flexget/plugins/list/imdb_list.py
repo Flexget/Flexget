@@ -220,14 +220,11 @@ class ImdbEntrySet(MutableSet):
             try:
                 r = self.session.get('https://www.imdb.com/list/export?list_id=%s&author_id=%s' %
                                      (self.list_id, self.user_id), cookies=self.cookies)
-
+                lines = list(r.iter_lines(decode_unicode=True))
             except RequestException as e:
                 raise PluginError(e.args[0])
-            lines = r.iter_lines(decode_unicode=True)
             # Normalize headers to lowercase
-            headers = next(lines).lower()
-            # Chain them back together
-            lines = chain([headers], lines)
+            lines[0] = lines[0].lower()
             self._items = []
             for row in csv_dictreader(lines):
                 log.debug('parsing line from csv: %s', row)

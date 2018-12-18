@@ -9,16 +9,42 @@ import feedparser
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.search import normalize_unicode
+from flexget.utils.search import normalize_unicode, torrent_availability
+from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('nyaa')
 
-# TODO: Other categories
 CATEGORIES = {'all': '0_0',
+              # Anime
               'anime': '1_0',
+              'anime amv': '1_1',
               'anime eng': '1_2',
               'anime non-eng': '1_3',
-              'anime raw': '1_4'}
+              'anime raw': '1_4',
+              # Audio
+              'audio': '2_0',
+              'audio lless': '2_1',
+              'audio lossy': '2_2',
+              # Literature
+              'lit': '3_0',
+              'lit eng': '3_1',
+              'lit non-eng': '3_2',
+              'lit raw': '3_3',
+              # Live Action
+              'liveact': '4_0',
+              'liveact eng': '4_1',
+              'liveact idol': '4_2',
+              'liveact non-eng': '4_3',
+              'liveact raw': '4_4',
+              # Pictures
+              'pics': '5_0',
+              'pics graphics': '5_1',
+              'pics photos': '5_2',
+              # Software
+              'software': '6_0',
+              'software apps': '6_1',
+              'software games': '6_2',
+              }
 FILTERS = ['all', 'filter remakes', 'trusted only']
 
 
@@ -68,11 +94,12 @@ class UrlRewriteNyaa(object):
                 entry = Entry()
                 entry['title'] = item.title
                 entry['url'] = item.link
-                # TODO: parse some shit
-                # entry['torrent_seeds'] = int(item.seeds)
-                # entry['torrent_leeches'] = int(item.leechs)
-                # entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
-                # entry['content_size'] = int(item.size) / 1024 / 1024
+                entry['torrent_seeds'] = int(item.nyaa_seeders)
+                entry['torrent_leeches'] = int(item.nyaa_leechers)
+                entry['torrent_info_hash'] = item.nyaa_infohash
+                entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+                if item.nyaa_size:
+                    entry['content_size'] = parse_filesize(item.nyaa_size)
 
                 entries.add(entry)
 

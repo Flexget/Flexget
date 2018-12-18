@@ -47,7 +47,9 @@ class FormLogin(object):
         username = config['username']
         password = config['password']
 
-        br = mechanicalsoup.StatefulBrowser(session=task.requests)
+        # Mechanicalsoup will override our session user agent header unless we explicitly pass it in
+        user_agent = task.requests.headers.get('User-Agent')
+        br = mechanicalsoup.StatefulBrowser(session=task.requests, user_agent=user_agent)
 
         try:
             response = br.open(url)

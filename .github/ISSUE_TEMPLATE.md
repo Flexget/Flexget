@@ -26,10 +26,13 @@ if config is too long, attach the file to the ticket
 ```
   
 #### Log:
+<details>
+ <summary>(click to expand)</summary>
+
 ```
-paste log output
-if log output is too long, attach the file to the ticket
+paste log output here
 ```
+</details>
 
 ### Additional information:
 

@@ -16,7 +16,6 @@ from flexget.event import event
 from flexget.db_schema import versioned_base
 from flexget.plugin import PluginError
 from flexget.manager import Session
-from requests import Session as RSession
 from requests.auth import AuthBase
 from requests.utils import dict_from_cookiejar
 from requests.exceptions import RequestException
@@ -67,13 +66,11 @@ class RutrackerAuth(AuthBase):
        if you pass cookies (CookieJar) to constructor then authentication will be bypassed and cookies will be just set
     """
 
-    @staticmethod
-    def update_base_url():
+    def update_base_url(self):
         url = None
         for mirror in MIRRORS:
             try:
-                s = RSession()
-                response = s.get(mirror, timeout=2)
+                response = self.requests.get(mirror, timeout=2)
                 if response.ok:
                     url = mirror
                     break
@@ -87,15 +84,15 @@ class RutrackerAuth(AuthBase):
 
     def try_authenticate(self, payload):
         for _ in range(5):
-            s = RSession()
-            s.post('{}/forum/login.php'.format(self.base_url), data=payload)
-            if s.cookies and len(s.cookies) > 0:
-                return s.cookies
+            self.requests.post('{}/forum/login.php'.format(self.base_url), data=payload)
+            if self.requests.cookies and len(self.requests.cookies) > 0:
+                return self.requests.cookies
             else:
                 sleep(3)
         raise PluginError('unable to obtain cookies from rutracker')
 
-    def __init__(self, login, password, cookies=None, db_session=None):
+    def __init__(self, requests, login, password, cookies=None, db_session=None):
+        self.requests = requests
         self.base_url = self.update_base_url()
         if cookies is None:
             log.debug('rutracker cookie not found. Requesting new one')
@@ -156,7 +153,7 @@ class RutrackerUrlrewrite(object):
         cookies = self.try_find_cookie(db_session, username)
         if username not in self.auth_cache:
             auth_handler = RutrackerAuth(
-                username, config['password'], cookies, db_session)
+                task.requests, username, config['password'], cookies, db_session)
             self.auth_cache[username] = auth_handler
         else:
             auth_handler = self.auth_cache[username]

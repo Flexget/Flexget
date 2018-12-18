@@ -24,6 +24,7 @@ _PLUGIN_NAME = 'telegram'
 
 _PARSERS = ['markdown', 'html']
 
+_DISABLE_PREVIEWS_ATTR = 'disable_previews'
 _TOKEN_ATTR = 'bot_token'
 _PARSE_ATTR = 'parse_mode'
 _RCPTS_ATTR = 'recipients'
@@ -82,6 +83,7 @@ class TelegramNotifier(object):
             telegram:
               bot_token: token
               use_markdown: no
+              disable_previews: yes
               recipients:
                 - username: my-user-name
                 - group: my-group-name
@@ -128,6 +130,7 @@ class TelegramNotifier(object):
         'properties': {
             _TOKEN_ATTR: {'type': 'string'},
             _PARSE_ATTR: {'type': 'string', 'enum': _PARSERS},
+            _DISABLE_PREVIEWS_ATTR: {'type': 'boolean', 'default': False},
             _RCPTS_ATTR: {
                 'type': 'array',
                 'minItems': 1,
@@ -187,6 +190,7 @@ class TelegramNotifier(object):
         """
         self._token = config[_TOKEN_ATTR]
         self._parse_mode = config.get(_PARSE_ATTR)
+        self._disable_previews = config[_DISABLE_PREVIEWS_ATTR]
         self._usernames = []
         self._fullnames = []
         self._groups = []
@@ -205,8 +209,8 @@ class TelegramNotifier(object):
     def _real_init(self, session, config):
         self._enforce_telegram_plugin_ver()
         self._parse_config(config)
-        self.log.debug('token=%s, parse_mode=%s, usernames=%s, fullnames=%s, groups=%s', self._token,
-                       self._parse_mode, self._usernames, self._fullnames, self._groups)
+        self.log.debug('token=%s, parse_mode=%s, disable_previews=%s, usernames=%s, fullnames=%s, groups=%s', self._token,
+                       self._parse_mode, self._disable_previews, self._usernames, self._fullnames, self._groups)
         self._init_bot()
         chat_ids = self._get_chat_ids_n_update_db(session)
         return chat_ids
@@ -239,6 +243,7 @@ class TelegramNotifier(object):
             kwargs['parse_mode'] = telegram.ParseMode.MARKDOWN
         elif self._parse_mode == 'html':
             kwargs['parse_mode'] = telegram.ParseMode.HTML
+        kwargs['disable_web_page_preview'] = self._disable_previews
         for chat_id in (x.id for x in chat_ids):
             try:
                 self.log.debug('sending msg to telegram servers: %s', msg)

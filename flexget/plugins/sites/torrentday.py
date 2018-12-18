@@ -123,30 +123,46 @@ class UrlRewriteTorrentday(object):
             categories = [categories]
         # If there are any text categories, turn them into their id number
         categories = [c if isinstance(c, int) else CATEGORIES[c] for c in categories]
-        params = { 'cata': 'yes', 'c%s' % ','.join(str(c) for c in categories): 1, 'clear-new': 1}
+        params = { 'cata': 'yes', 'c{}'.format(','.join(str(c) for c in categories)): 1, 'clear-new': 1}
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
 
-            url = 'https://www.torrentday.com/browse.php'
-            params['search'] = normalize_unicode(search_string).replace(':', '')
+            url = 'https://www.torrentday.com/t'
+            params['q'] = normalize_unicode(search_string).replace(':', '')
             cookies = { 'uid': config['uid'], 'pass': config['passkey'], '__cfduid': config['cfduid'] }
 
             try:
                 page = requests.get(url, params=params, cookies=cookies).content
             except RequestException as e:
-                raise PluginError('Could not connect to torrentday: %s' % e)
+                raise PluginError('Could not connect to torrentday: {}'.format(e))
 
-            soup = get_soup(page)
+            # the following should avoid table being None due to a malformed
+            # html in td search results
+            soup = get_soup(page).contents[1].contents[1].next.next.nextSibling
+            table = soup.find('table', {'id': 'torrentTable'})
+            if (table is None):
+                raise PluginError('Search returned by torrentday appears to be empty or malformed.')
 
-            for tr in soup.find_all('tr', { 'class': 'browse' }):
+            # the first row is the header so skip it
+            for tr in table.find_all('tr')[1:]:
                 entry = Entry()
                 # find the torrent names
-                title = tr.find('a', { 'class': 'torrentName' })
+                td = tr.find('td', { 'class': 'torrentNameInfo' })
+                if not td:
+                    log.warning('Could not find entry torrentNameInfo for %s.', search_string)
+                    continue
+                title = td.find('a')
+                if not title:
+                    log.warning('Could not determine title for %s.', search_string)
+                    continue
                 entry['title'] = title.contents[0]
                 log.debug('title: %s', title.contents[0])
 
                 # find download link
-                torrent_url = tr.find('td', { 'class': 'dlLinksInfo' })
+                torrent_url = tr.find('td', { 'class': 'ac' })
+                if not torrent_url:
+                    log.warning('Could not determine download link for %s.', search_string)
+                    continue
                 torrent_url = torrent_url.find('a').get('href')
 
                 # construct download URL
@@ -155,7 +171,8 @@ class UrlRewriteTorrentday(object):
                 entry['url'] = torrent_url
 
                 # us tr object for seeders/leechers
-                seeders, leechers = tr.find_all('td', { 'class': ['seedersInfo', 'leechersInfo']})
+                seeders = tr.find('td', { 'class': 'ac seedersInfo'})
+                leechers = tr.find('td', { 'class': 'ac leechersInfo'})
                 entry['torrent_seeds'] = int(seeders.contents[0].replace(',', ''))
                 entry['torrent_leeches'] = int(leechers.contents[0].replace(',', ''))
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])

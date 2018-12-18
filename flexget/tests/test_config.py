@@ -16,7 +16,7 @@ class TestConfig(object):
     @pytest.fixture
     def manager(self, manager):
         # Replace config loading methods of MockManager with the real ones
-        manager.find_config = Manager.find_config.__get__(manager, manager.__class__)
+        manager._init_config = Manager._init_config.__get__(manager, manager.__class__)
         manager.load_config = Manager.load_config.__get__(manager, manager.__class__)
         return manager
 
@@ -24,6 +24,6 @@ class TestConfig(object):
         manager.options.config = config_utf8
 
         manager.config = {}
-        manager.find_config()
+        manager._init_config()
         manager.load_config()
         assert manager.config, 'Config didn\'t load'

@@ -93,10 +93,6 @@ Now, in your checkout directory, run::
 
     virtualenv .
 
-Or, if you need deluge or transmission libraries from system wide python use::
-
-    virtualenv --system-site-packages .
-
 This will initialize python virtualenv. This doesn't need to be directly in
 your checkout directory, but these instructions assume that's where it is.
 

@@ -38,14 +38,13 @@ class KodiLibrary(object):
 
             url = base_url + JSON_URI
             # create the params
-            json_params = {"id": 1, "jsonrpc": "2.0",
-                           'method': '{category}Library.{action}'.format(category=config['category'].title(),
-                                                                         action=config['action'].title())}
-            params = {'request': json.dumps(json_params)}
+            params = {"id": 1, "jsonrpc": "2.0",
+                      'method': '{category}Library.{action}'.format(category=config['category'].title(),
+                                                                    action=config['action'].title())}
             log.debug('Sending request params %s', params)
 
             try:
-                r = task.requests.get(url, params=params, auth=(config.get('username'), config.get('password'))).json()
+                r = task.requests.post(url, json=params, auth=(config.get('username'), config.get('password'))).json()
                 if r.get('result') == 'OK':
                     log.info('Successfully sent a %s request for the %s library', config['action'], config['category'])
                 else:

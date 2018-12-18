@@ -144,6 +144,7 @@ class SearchPassThePopcorn(object):
         """
         cookies = self.get_login_cookie(username, password, passkey, force=force)
         invalid_cookie = False
+        response = None
 
         try:
             response = requests.get(url, params=params, cookies=cookies)
@@ -154,7 +155,7 @@ class SearchPassThePopcorn(object):
             log.debug('PassThePopcorn request failed: Too many redirects. Invalid cookie?')
             invalid_cookie = True
         except RequestException as e:
-            if e.response and e.response.status_code == 429:
+            if e.response is not None and e.response.status_code == 429:
                 log.error('Saved cookie is invalid and will be deleted. Error: %s', str(e))
                 # cookie is invalid and must be deleted
                 with Session() as session:
@@ -224,7 +225,7 @@ class SearchPassThePopcorn(object):
         if 'tags' in config:
             tags = config['tags'] if isinstance(config['tags'], list) else [config['tags']]
             params['taglist'] = ',+'.join(tags)
-        
+
         release_type = config.get('release_type')
         if release_type:
             params['scene'] = RELEASE_TYPES[release_type]
@@ -266,12 +267,16 @@ class SearchPassThePopcorn(object):
             passkey = result['PassKey']
 
             for movie in result['Movies']:
-                # skip movies that are irrelevant
-                if entry.get('movie_year') and int(movie['Year']) != int(entry['movie_year']):
-                    log.debug('Movie year %s does not match %s', movie['Year'], entry['movie_year'])
+                # skip movies with wrong year
+                # don't consider if we have imdb_id (account for year discrepancies if we know we have
+                # the right movie)
+                if ('imdb_id' not in movie and 'movie_year' in movie and
+                        int(movie['Year']) != int(entry['movie_year'])):
+                    log.debug('Movie year %s does not match default %s', movie['Year'], entry['movie_year'])
                     continue
+
                 # imdb id in the json result is without 'tt'
-                if entry.get('imdb_id') and movie['ImdbId'] not in entry['imdb_id']:
+                if 'imdb_id' in movie and movie['ImdbId'] not in entry['imdb_id']:
                     log.debug('imdb id %s does not match %s', movie['ImdbId'], entry['imdb_id'])
                     continue
 
@@ -279,6 +284,8 @@ class SearchPassThePopcorn(object):
                     e = Entry()
 
                     e['title'] = torrent['ReleaseName']
+
+                    e['imdb_id'] = entry.get('imdb_id')
 
                     e['torrent_tags'] = movie['Tags']
                     e['content_size'] = parse_filesize(torrent['Size'] + ' b')
@@ -288,7 +295,15 @@ class SearchPassThePopcorn(object):
                     e['torrent_id'] = int(torrent['Id'])
                     e['golden_popcorn'] = torrent['GoldenPopcorn']
                     e['checked'] = torrent['Checked']
+                    e['scene'] = torrent['Scene']
                     e['uploaded_at'] = dateutil_parse(torrent['UploadTime'])
+
+                    e['ptp_remaster_title'] = torrent.get('RemasterTitle') # tags such as remux, 4k remaster, etc.
+                    e['ptp_quality'] = torrent.get('Quality') # high, ultra high, or standard definition
+                    e['ptp_resolution'] = torrent.get('Resolution') # 1080p, 720p, etc.
+                    e['ptp_source'] = torrent.get('Source') # blu-ray, dvd, etc.
+                    e['ptp_container'] = torrent.get('Container') # mkv, vob ifo, etc.
+                    e['ptp_codec'] = torrent.get('Codec') # x264, XviD, etc.
 
                     e['url'] = self.base_url + 'torrents.php?action=download&id={}&authkey={}&torrent_pass={}'.format(
                         e['torrent_id'], authkey, passkey
