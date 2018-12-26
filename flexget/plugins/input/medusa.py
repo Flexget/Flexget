@@ -1,3 +1,4 @@
+
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import urlparse
@@ -26,10 +27,6 @@ class Medusa(object):
         'additionalProperties': False
     }
 
-    headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json; charset=UTF-8'
-    }
 
     def on_task_input(self, task, config):
         """
@@ -84,12 +81,11 @@ class Medusa(object):
         api_key = task.requests.post(
             '{}/authenticate'.format(base_url),
             json=body_auth,
-            headers=self.headers
         ).json()['token']
 
-        self.headers.update(
-            authorization='Bearer ' + api_key
-        )
+        headers = {
+            'authorization': 'Bearer ' + api_key
+        }
 
         params = {
             'limit': 1000
@@ -98,7 +94,7 @@ class Medusa(object):
         series = task.requests.get(
             '{}/series'.format(base_url),
             params=params,
-            headers=self.headers
+            headers=headers
         ).json()
 
         entries = []
@@ -106,7 +102,7 @@ class Medusa(object):
             log.debug('processing show: %s', show)
             if (show['config']['paused'] and config.get('only_monitored')) or \
                     show['status'] == 'Ended' and not config.get('include_ended'):
-                continue
+                log.debug('discarted show: %s', show)
 
             entry = Entry(title=show['title'],
                           url='',
@@ -123,3 +119,4 @@ class Medusa(object):
 @event('plugin.register')
 def register_plugin():
     plugin.register(Medusa, 'medusa', api_ver=2)
+
