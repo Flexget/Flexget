@@ -3,9 +3,6 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import urlparse
 
 import logging
-import json
-
-from requests import RequestException
 
 from flexget import plugin
 from flexget.event import event
@@ -18,7 +15,7 @@ class Medusa(object):
     schema = {
         'type': 'object',
         'properties': {
-            'base_url': {'type': 'string'},
+            'base_url': {'type': 'string', 'format': 'uri'},
             'port': {'type': 'number', 'default': 8081},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
@@ -84,30 +81,29 @@ class Medusa(object):
             password=config.get('password'),
         )
 
-        try:
-            api_key = json.loads(task.requests.post(
-                '{}/authenticate'.format(base_url),
-                data=json.dumps(body_auth),
-                headers=self.headers
-            ).content.decode('utf-8'))['token']
+        api_key = task.requests.post(
+            '{}/authenticate'.format(base_url),
+            json=body_auth,
+            headers=self.headers
+        ).json()['token']
 
-            self.headers.update(
-                authorization='Bearer ' + api_key
-            )
+        self.headers.update(
+            authorization='Bearer ' + api_key
+        )
 
-            series = json.loads(task.requests.get(
-                '{}/series?limit=1000'.format(base_url),
-                headers=self.headers
-            ).content.decode('utf-8'))
-        except RequestException as e:
-            raise plugin.PluginError(
-                'Unable to get series in Medusa at {}://{}:{}{}. Error: {}'.format(
-                    parsed_url.scheme, parsed_url.netloc, config.get('port'), parsed_url.path, e)
-            )
+        params = {
+            'limit': 1000
+        }
+
+        series = task.requests.get(
+            '{}/series'.format(base_url),
+            params=params,
+            headers=self.headers
+        ).json()
 
         entries = []
         for show in series:
-            log.debug('processing show: {}'.format(show))
+            log.debug('processing show: %s', show)
             if (show['config']['paused'] and config.get('only_monitored')) or \
                     show['status'] == 'Ended' and not config.get('include_ended'):
                 continue
@@ -120,7 +116,6 @@ class Medusa(object):
                 entries.append(entry)
             else:
                 log.error('Invalid entry created? {}'.format(entry))
-                continue
 
         return entries
 
