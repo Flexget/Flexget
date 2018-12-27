@@ -22,7 +22,7 @@ requests = Session()
 requests.headers.update({'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'})
 requests.add_domain_limiter(TimedLimiter('descargas2020.com', '2 seconds'))
 
-DESCARGAS2020_TORRENT_FORMAT = 'http://descargas2020.com/torrents/{:0>6}.torrent'
+DESCARGAS2020_TORRENT_FORMAT = 'http://descargas2020.com/download/{:0>6}.torrent'
 
 class UrlRewriteDescargas2020(object):
     """Descargas2020 urlrewriter and search."""
@@ -67,13 +67,10 @@ class UrlRewriteDescargas2020(object):
                 torrent_id = match.group(1)
         if not torrent_id:
             log.debug('torrent ID not found, searching openTorrent script')
-            torrent_id_prog = re.compile('function openTorrent.*\n.*\{.*(\n.*)+window\.location\.href =\s*\"(.*\/\d+_-.*[^\/])\/?\";')
-            torrent_ids = soup.findAll(text=torrent_id_prog)
-            if torrent_ids:
-                match = torrent_id_prog.search(torrent_ids[0])
-                if match:
-                    torrent_id = match.group(2)
-                    return torrent_id.replace('descargar-torrent', 'download') + '.torrent'
+            match = re.search('function openTorrent.*\n.*\{.*(\n.*)+window\.location\.href =\s*\".*\/(\d+.*)\";',
+                              page.text, re.MULTILINE)
+            if match:
+                torrent_id = match.group(2).rstrip('/')
 
         if not torrent_id:
             raise UrlRewritingError('Unable to locate torrent ID from url %s' % url)
