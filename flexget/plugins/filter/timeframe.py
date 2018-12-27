@@ -65,9 +65,7 @@ class FilterTimeFrame(object):
         if not config:
             return
 
-        identified_by = '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
-
-        grouped_entries = group_entries(task.accepted, identified_by)
+        grouped_entries = group_entries(task.accepted, config['identified_by'])
         if not grouped_entries:
             return
 
@@ -142,9 +140,7 @@ class FilterTimeFrame(object):
         if not config:
             return
 
-        identified_by = '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
-
-        grouped_entries = group_entries(task.accepted, identified_by)
+        grouped_entries = group_entries(task.accepted, config['identified_by'])
         if not grouped_entries:
             return
 
