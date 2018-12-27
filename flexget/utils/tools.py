@@ -540,7 +540,7 @@ def group_entries(entries, identifier):
     # Group by Identifier
     for entry in entries:
         try:
-            if identifier == 'auto':
+            if not identifier:
                 rendered_id = content_id(entry)
             else:
                 rendered_id = entry.render(identifier)
