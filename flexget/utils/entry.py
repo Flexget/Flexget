@@ -21,6 +21,10 @@ def is_movie(entry):
 # This function is a little iffy in that it assumes a general structure that is generally dictated by parser plugins
 # It's related to https://github.com/Flexget/Flexget/issues/2071
 def content_id(entry):
+    if entry.get('id'):
+        return entry['id']
+
+    # I guess we need to generate one then. Robustness of this section is highly debatable
     entry_id = None
     if is_movie(entry):
         entry_id = entry['movie_name']
