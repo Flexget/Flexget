@@ -41,4 +41,7 @@ def content_id(entry):
         elif entry.get('series_date'):
             series_id = entry['series_date']
         entry_id += ' ' + series_id
-    return entry_id.strip().lower()
+
+    if entry_id:
+        entry_id = entry_id.strip().lower()
+    return entry_id
