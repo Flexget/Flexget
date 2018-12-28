@@ -82,6 +82,13 @@ class TestMetainfoSeries(object):
               series: __parser__
             metainfo_series: yes
         tasks:
+          test_jinja_tvdb:
+            thetvdb_lookup: yes
+            mock:
+              - {title: 'Westworld (2016) S01E01', series_name: 'Westworld'}
+            set:
+              title: "{{tvdb_series_name}}"
+            accept_all: yes
           test:
             mock:
               - {title: 'FlexGet.S01E02.TheName.HDTV.xvid'}
@@ -138,6 +145,11 @@ class TestMetainfoSeries(object):
             assert 'series_name' not in entry, error
             assert 'series_guessed' not in entry, error
             assert 'series_parser' not in entry, error
+
+    @pytest.mark.online
+    def test_jinja_tvdb(self, execute_task):
+        task = execute_task('test_jinja_tvdb')
+        assert task.entries[0]['title'] == 'Westworld'
 
 
 class TestMetainfoMovie(object):
