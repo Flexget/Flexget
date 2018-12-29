@@ -1,40 +1,40 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Authorization: [Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a]
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
-    method: GET
-    uri: https://api.trakt.tv/users/me/lists/testlist/items
-  response:
-    body: {string: '[{"rank":1,"listed_at":"2016-04-06T01:08:39.000Z","type":"show","show":{"title":"The
-        Walking Dead","year":2010,"ids":{"trakt":1393,"slug":"the-walking-dead","tvdb":153021,"imdb":"tt1520211","tmdb":1402,"tvrage":25056}}},{"rank":2,"listed_at":"2016-04-06T01:08:56.000Z","type":"movie","movie":{"title":"Deadpool","year":2016,"ids":{"trakt":190430,"slug":"deadpool-2016","imdb":"tt1431045","tmdb":293660}}},{"rank":3,"listed_at":"2016-04-06T01:09:11.000Z","type":"episode","episode":{"season":8,"number":15,"title":"Fidelis
-        Ad Mortem","ids":{"trakt":2125119,"tvdb":5483434,"imdb":"tt5318930","tmdb":1165957,"tvrage":1065902569}},"show":{"title":"Castle","year":2009,"ids":{"trakt":1410,"slug":"castle","tvdb":83462,"imdb":"tt1219024","tmdb":1419,"tvrage":19267}}}]'}
-    headers:
-      CF-RAY: [41e72ae1dd3f3cf5-CPH]
-      Cache-Control: ['max-age=0, private, must-revalidate']
-      Cf-Railgun: [9d1890bb0c 2.91 0.022321 0030 57da]
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Mon, 21 May 2018 12:50:13 GMT']
-      Etag: [W/"7b6e0d2f1f65bce494c5691609a18856"]
-      Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-      Server: [cloudflare]
-      Set-Cookie: ['__cfduid=d611c9d51eb0a60eeaf1d232d8d37dbf61526907013; expires=Tue,
-          21-May-19 12:50:13 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Pagination-Item-Count: ['3']
-      X-Pagination-Page: ['1']
-      X-Pagination-Page-Count: ['1']
-      X-Private-User: ['false']
-      X-Request-Id: [e319ddac-b939-421a-bca1-f05229444883]
-      X-Runtime: ['0.017527']
-      X-Sort-By: [rank]
-      X-Sort-How: [asc]
-      X-Xss-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: ['2']
+      method: GET
+      uri: https://api.trakt.tv/users/me/lists/testlist/items
+    response:
+      body: {string: '[{"rank":1,"id":90056369,"listed_at":"2016-04-06T01:08:39.000Z","type":"show","show":{"title":"The
+          Walking Dead","year":2010,"ids":{"trakt":1393,"slug":"the-walking-dead","tvdb":153021,"imdb":"tt1520211","tmdb":1402,"tvrage":25056}}},{"rank":2,"id":90056392,"listed_at":"2016-04-06T01:08:56.000Z","type":"movie","movie":{"title":"Deadpool","year":2016,"ids":{"trakt":190430,"slug":"deadpool-2016","imdb":"tt1431045","tmdb":293660}}},{"rank":3,"id":90056410,"listed_at":"2016-04-06T01:09:11.000Z","type":"episode","episode":{"season":8,"number":15,"title":"Fidelis
+          Ad Mortem","ids":{"trakt":2125119,"tvdb":5483434,"imdb":"tt5318930","tmdb":1165957,"tvrage":1065902569}},"show":{"title":"Castle","year":2009,"ids":{"trakt":1410,"slug":"castle","tvdb":83462,"imdb":"tt1219024","tmdb":1419,"tvrage":19267}}}]'}
+      headers:
+        CF-RAY: [490a5466fa4f3cfb-CPH]
+        Cache-Control: ['max-age=0, private, must-revalidate']
+        Cf-Railgun: [7bb3e0cc43 2.79 0.052561 0030 57da]
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Sat, 29 Dec 2018 06:49:57 GMT']
+        Etag: [W/"7b6e0d2f1f65bce494c5691609a18856"]
+        Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        Server: [cloudflare]
+        Set-Cookie: ['__cfduid=da6034fd3a53229a5d069dcfc27f738251546066197; expires=Sun,
+            29-Dec-19 06:49:57 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Pagination-Item-Count: ['3']
+        X-Pagination-Page: ['1']
+        X-Pagination-Page-Count: ['1']
+        X-Private-User: ['false']
+        X-Request-Id: [155ea630-434f-4011-9fba-0d6ebd80a92f]
+        X-Runtime: ['0.014572']
+        X-Sort-By: [rank]
+        X-Sort-How: [asc]
+        X-Xss-Protection: [1; mode=block]
+      status: {code: 200, message: OK}
 version: 1

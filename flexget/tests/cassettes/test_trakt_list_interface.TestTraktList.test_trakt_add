@@ -2,134 +2,129 @@ interactions:
   - request:
       body: null
       headers:
-        Authorization: [!!python/unicode 'Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a']
-        Content-Type: [!!python/unicode 'application/json']
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
-        trakt-api-version: [!!python/unicode '2']
+        Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: ['2']
       method: GET
       uri: https://api.trakt.tv/sync/watchlist/shows
     response:
-      body: {string: !!python/unicode '[]'}
+      body: {string: '[]'}
       headers:
-        cache-control: ['max-age=0, private, must-revalidate']
-        cf-railgun: [direct (starting new WAN connection)]
-        cf-ray: [439a5fc06c7a3d25-CPH]
-        connection: [keep-alive]
-        content-length: ['2']
-        content-type: [application/json; charset=utf-8]
-        date: ['Fri, 13 Jul 2018 08:28:05 GMT']
-        etag: [W/"96c03990b70f3bd751465b2e643d2bb4"]
-        expect-ct: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-        last-modified: ['Fri, 13 Jul 2018 08:27:20 GMT']
-        server: [cloudflare]
-        set-cookie: ['__cfduid=d14081071f9f7400f47024d4d009cd86e1531470484; expires=Sat,
-            13-Jul-19 08:28:04 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [f514bfb8-a697-4a55-9291-bfbd0a4d9646]
-        x-runtime: ['0.042495']
-        x-sort-by: [rank]
-        x-sort-how: [asc]
-        x-xss-protection: [1; mode=block]
+        CF-RAY: [490a54b99b263d3d-CPH]
+        Cache-Control: ['max-age=0, private, must-revalidate']
+        Cf-Railgun: [8adeccbc16 99.99 0.029608 0030 57da]
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Sat, 29 Dec 2018 06:50:10 GMT']
+        Etag: [W/"4424072e99830138d0df9ea8ea2b71ec"]
+        Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        Last-Modified: ['Sat, 29 Dec 2018 06:22:36 GMT']
+        Server: [cloudflare]
+        Set-Cookie: ['__cfduid=df6cfde95df30cc35afff5871be2b4b1d1546066210; expires=Sun,
+            29-Dec-19 06:50:10 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [fb04717c-c817-4527-9803-37403d853041]
+        X-Runtime: ['0.018469']
+        X-Sort-By: [rank]
+        X-Sort-How: [asc]
+        X-Xss-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Authorization: [!!python/unicode 'Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a']
-        Content-Type: [!!python/unicode 'application/json']
-        Cookie: [__cfduid=d14081071f9f7400f47024d4d009cd86e1531470484]
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
-        trakt-api-version: [!!python/unicode '2']
+        Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
+        Content-Type: [application/json]
+        Cookie: [__cfduid=df6cfde95df30cc35afff5871be2b4b1d1546066210]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: ['2']
       method: GET
       uri: https://api.trakt.tv/sync/watchlist/shows
     response:
-      body: {string: !!python/unicode '[]'}
+      body: {string: '[]'}
       headers:
-        cache-control: ['max-age=0, private, must-revalidate']
-        cf-railgun: [direct (starting new WAN connection)]
-        cf-ray: [439a5fc948a53d25-CPH]
-        connection: [keep-alive]
-        content-length: ['2']
-        content-type: [application/json; charset=utf-8]
-        date: ['Fri, 13 Jul 2018 08:28:06 GMT']
-        etag: [W/"96c03990b70f3bd751465b2e643d2bb4"]
-        expect-ct: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-        last-modified: ['Fri, 13 Jul 2018 08:27:20 GMT']
-        server: [cloudflare]
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [c369653d-2efc-4499-ad2f-43a2e8c07fbc]
-        x-runtime: ['0.112148']
-        x-sort-by: [rank]
-        x-sort-how: [asc]
-        x-xss-protection: [1; mode=block]
+        CF-RAY: [490a54c5cf623d3d-CPH]
+        Cache-Control: ['max-age=0, private, must-revalidate']
+        Cf-Railgun: [24cdcc5813 99.99 0.022602 0030 57da]
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Sat, 29 Dec 2018 06:50:12 GMT']
+        Etag: [W/"4424072e99830138d0df9ea8ea2b71ec"]
+        Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        Last-Modified: ['Sat, 29 Dec 2018 06:22:36 GMT']
+        Server: [cloudflare]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [dbf12c7d-55bb-4f7e-9c56-49592f4d7f0a]
+        X-Runtime: ['0.020604']
+        X-Sort-By: [rank]
+        X-Sort-How: [asc]
+        X-Xss-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
-      body: !!python/unicode '{"shows": [{"year": 2009, "ids": {}, "title": "White
-        Collar"}]}'
+      body: '{"shows": [{"title": "White Collar", "year": 2009, "ids": {}}]}'
       headers:
-        Authorization: [!!python/unicode 'Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a']
+        Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
         Content-Length: ['63']
-        Content-Type: [!!python/unicode 'application/json']
-        Cookie: [__cfduid=d14081071f9f7400f47024d4d009cd86e1531470484]
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
-        trakt-api-version: [!!python/unicode '2']
+        Content-Type: [application/json]
+        Cookie: [__cfduid=df6cfde95df30cc35afff5871be2b4b1d1546066210]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: ['2']
       method: POST
       uri: https://api.trakt.tv/sync/watchlist
     response:
-      body: {string: !!python/unicode '{"added":{"movies":0,"shows":1,"seasons":0,"episodes":0},"existing":{"movies":0,"shows":0,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
+      body: {string: '{"added":{"movies":0,"shows":1,"seasons":0,"episodes":0},"existing":{"movies":0,"shows":0,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
       headers:
-        cache-control: ['max-age=0, private, must-revalidate']
-        cf-railgun: [direct (starting new WAN connection)]
-        cf-ray: [439a5fd5ce133d25-CPH]
-        connection: [keep-alive]
-        content-length: ['192']
-        content-type: [application/json; charset=utf-8]
-        date: ['Fri, 13 Jul 2018 08:28:08 GMT']
-        etag: [W/"a985f9b80abdce02453ffa525df76638"]
-        expect-ct: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-        server: [cloudflare]
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [94a77360-2be5-401d-949f-416fa33a3048]
-        x-runtime: ['0.027188']
-        x-xss-protection: [1; mode=block]
+        CF-RAY: [490a54d24c173d3d-CPH]
+        Cache-Control: ['max-age=0, private, must-revalidate']
+        Cf-Railgun: [f417e01851 99.99 0.050139 0030 57da]
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Sat, 29 Dec 2018 06:50:14 GMT']
+        Etag: [W/"8d02f602e31d7d84872e75de358d300d"]
+        Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        Server: [cloudflare]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [7f59133a-e651-4870-ac2d-d14dd85c2348]
+        X-Runtime: ['0.046500']
+        X-Xss-Protection: [1; mode=block]
       status: {code: 201, message: Created}
   - request:
       body: null
       headers:
-        Authorization: [!!python/unicode 'Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a']
-        Content-Type: [!!python/unicode 'application/json']
-        Cookie: [__cfduid=d14081071f9f7400f47024d4d009cd86e1531470484]
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
-        trakt-api-version: [!!python/unicode '2']
+        Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
+        Content-Type: [application/json]
+        Cookie: [__cfduid=df6cfde95df30cc35afff5871be2b4b1d1546066210]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: ['2']
       method: GET
       uri: https://api.trakt.tv/sync/watchlist/shows
     response:
-      body: {string: !!python/unicode '[{"rank":1,"listed_at":"2018-07-13T08:28:16.000Z","type":"show","show":{"title":"White
+      body: {string: '[{"rank":1,"id":371589379,"listed_at":"2018-12-29T06:50:57.000Z","type":"show","show":{"title":"White
           Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}}}]'}
       headers:
-        cache-control: ['max-age=0, private, must-revalidate']
-        cf-railgun: [direct (starting new WAN connection)]
-        cf-ray: [439a5ffa484e3d25-CPH]
-        connection: [keep-alive]
-        content-length: ['214']
-        content-type: [application/json; charset=utf-8]
-        date: ['Fri, 13 Jul 2018 08:28:14 GMT']
-        etag: [W/"0557d4b6f4f50f0058e5eebe13d045a5"]
-        expect-ct: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-        last-modified: ['Fri, 13 Jul 2018 08:28:16 GMT']
-        server: [cloudflare]
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [3484b60f-af35-4d56-83ab-fda530160824]
-        x-runtime: ['0.304691']
-        x-sort-by: [rank]
-        x-sort-how: [asc]
-        x-xss-protection: [1; mode=block]
+        CF-RAY: [490a54f2b9f73d3d-CPH]
+        Cache-Control: ['max-age=0, private, must-revalidate']
+        Cf-Railgun: [19dc455a45 99.99 0.174230 0030 57da]
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Sat, 29 Dec 2018 06:50:20 GMT']
+        Etag: [W/"f43e8c8c125db97c38bf93c228dfea27"]
+        Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        Last-Modified: ['Sat, 29 Dec 2018 06:50:57 GMT']
+        Server: [cloudflare]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [5096f728-5741-4d86-99db-4bfe41211eb8]
+        X-Runtime: ['0.110217']
+        X-Sort-By: [rank]
+        X-Sort-How: [asc]
+        X-Xss-Protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1

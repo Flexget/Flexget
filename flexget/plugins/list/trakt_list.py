@@ -3,6 +3,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 from collections import MutableSet
+import math
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -173,6 +174,30 @@ class TraktSet(MutableSet):
                 except ValueError:
                     log.debug('Could not decode json from response: %s', result.text)
                     raise plugin.PluginError('Error getting list from trakt.')
+
+                current_page = int(result.headers.get('X-Pagination-Page', 1))
+                current_page_count = int(result.headers.get('X-Pagination-Page-Count', 1))
+                if current_page < current_page_count:
+                    # Pagination, gotta get it all, but we'll limit it to 1000 per page
+                    # but we'll have to start over from 0
+                    data = []
+
+                    limit = 1000
+                    pagination_item_count = int(result.headers.get('X-Pagination-Item-Count', 0))
+                    number_of_pages = math.ceil(pagination_item_count / limit)
+                    log.debug('Response is paginated. Number of items: %s, number of pages: %s',
+                              pagination_item_count, number_of_pages)
+                    page = int(result.headers.get('X-Pagination-Page'))
+                    while page <= number_of_pages:
+                        paginated_result = self.session.get(get_api_url(endpoint),
+                                                            params={'limit': limit, 'page': page})
+                        page += 1
+                        try:
+                            data.extend(paginated_result.json())
+                        except ValueError:
+                            log.debug('Could not decode json from response: %s', paginated_result.text)
+                            raise plugin.PluginError('Error getting list from trakt.')
+
             except RequestException as e:
                 raise plugin.PluginError('Could not retrieve list from trakt (%s)' % e)
 

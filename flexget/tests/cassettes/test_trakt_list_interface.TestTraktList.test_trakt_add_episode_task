@@ -2,142 +2,138 @@ interactions:
   - request:
       body: null
       headers:
-        Authorization: [!!python/unicode 'Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a']
-        Content-Type: [!!python/unicode 'application/json']
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
-        trakt-api-version: [!!python/unicode '2']
+        Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: ['2']
       method: GET
       uri: https://api.trakt.tv/sync/watchlist/episodes
     response:
-      body: {string: !!python/unicode '[{"rank":1,"listed_at":"2018-07-13T08:24:45.000Z","type":"episode","episode":{"season":4,"number":5,"title":"First
+      body: {string: '[{"rank":1,"id":371589397,"listed_at":"2018-12-29T06:51:09.000Z","type":"episode","episode":{"season":4,"number":5,"title":"First
           of His Name","ids":{"trakt":73674,"tvdb":4801605,"imdb":"tt3060856","tmdb":63098,"tvrage":1065501369}},"show":{"title":"Game
           of Thrones","year":2011,"ids":{"trakt":1390,"slug":"game-of-thrones","tvdb":121361,"imdb":"tt0944947","tmdb":1399,"tvrage":24493}}}]'}
       headers:
-        cache-control: ['max-age=0, private, must-revalidate']
-        cf-railgun: [direct (starting new WAN connection)]
-        cf-ray: [439a5c32ad123cad-CPH]
-        connection: [keep-alive]
-        content-length: ['372']
-        content-type: [application/json; charset=utf-8]
-        date: ['Fri, 13 Jul 2018 08:25:39 GMT']
-        etag: [W/"2314e5337618fdd1d4f610cd0ec00e68"]
-        expect-ct: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-        last-modified: ['Fri, 13 Jul 2018 08:24:45 GMT']
-        server: [cloudflare]
-        set-cookie: ['__cfduid=d38463f9f136ffe566408b09ed9ff38891531470338; expires=Sat,
-            13-Jul-19 08:25:38 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [c1f752af-cc3b-4502-88e7-c84fe7c23b0b]
-        x-runtime: ['0.028295']
-        x-sort-by: [rank]
-        x-sort-how: [asc]
-        x-xss-protection: [1; mode=block]
+        CF-RAY: [490a55d8ae9f3d07-CPH]
+        Cache-Control: ['max-age=0, private, must-revalidate']
+        Cf-Railgun: [544b1da8d3 1.44 0.033414 0030 57da]
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Sat, 29 Dec 2018 06:50:56 GMT']
+        Etag: [W/"6b2bfcc4d121ea7fd3c3476977803c6b"]
+        Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        Last-Modified: ['Sat, 29 Dec 2018 06:51:09 GMT']
+        Server: [cloudflare]
+        Set-Cookie: ['__cfduid=d31b2ebe16023a27f5b4cf2a89ddef78a1546066256; expires=Sun,
+            29-Dec-19 06:50:56 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [19b98b59-2ccc-4b7d-b834-179f1c485de9]
+        X-Runtime: ['0.030775']
+        X-Sort-By: [rank]
+        X-Sort-How: [asc]
+        X-Xss-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
-      body: !!python/unicode '{"shows": [{"seasons": [{"episodes": [{"number": 5}],
-        "number": 4}], "year": 2011, "ids": {"tvdb": 121361, "tvrage": 24493, "imdb":
-        "tt0944947", "trakt": 1390}, "title": "Game of Thrones"}]}'
+      body: '{"shows": [{"year": 2011, "seasons": [{"episodes": [{"number": 5}], "number":
+        4}], "title": "Game of Thrones", "ids": {"imdb": "tt0944947", "trakt": 1390,
+        "tvdb": 121361, "tvrage": 24493}}]}'
       headers:
-        Authorization: [!!python/unicode 'Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a']
+        Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
         Content-Length: ['190']
-        Content-Type: [!!python/unicode 'application/json']
-        Cookie: [__cfduid=d38463f9f136ffe566408b09ed9ff38891531470338]
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
-        trakt-api-version: [!!python/unicode '2']
+        Content-Type: [application/json]
+        Cookie: [__cfduid=d31b2ebe16023a27f5b4cf2a89ddef78a1546066256]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: ['2']
       method: POST
       uri: https://api.trakt.tv/sync/watchlist/remove
     response:
-      body: {string: !!python/unicode '{"deleted":{"movies":0,"shows":0,"seasons":0,"episodes":1},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
+      body: {string: '{"deleted":{"movies":0,"shows":0,"seasons":0,"episodes":1},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
       headers:
-        cache-control: ['max-age=0, private, must-revalidate']
-        cf-railgun: [direct (starting new WAN connection)]
-        cf-ray: [439a5c363e983cad-CPH]
-        connection: [keep-alive]
-        content-length: ['135']
-        content-type: [application/json; charset=utf-8]
-        date: ['Fri, 13 Jul 2018 08:25:39 GMT']
-        etag: [W/"5692e03c7b93d5dbd40a1cb73180c72c"]
-        expect-ct: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-        server: [cloudflare]
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [680f326d-996a-43a4-acfc-79c07d18995e]
-        x-runtime: ['0.043757']
-        x-xss-protection: [1; mode=block]
+        CF-RAY: [490a55e45a583d07-CPH]
+        Cache-Control: ['max-age=0, private, must-revalidate']
+        Cf-Railgun: [fddb2bc305 99.99 0.041686 0030 57da]
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Sat, 29 Dec 2018 06:50:58 GMT']
+        Etag: [W/"4cd7f7b8258ff3a36ca7faaae33dfdd0"]
+        Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        Server: [cloudflare]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [e3cf7af4-3b0f-4f5a-a13e-173926dded71]
+        X-Runtime: ['0.039311']
+        X-Xss-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
-      body: !!python/unicode '{"shows": [{"seasons": [{"episodes": [{"number": 5}],
-        "number": 1}], "ids": {}, "title": "Stranger Things"}, {"seasons": [{"episodes":
-        [{"number": 6}], "number": 1}], "ids": {}, "title": "Stranger Things"}]}'
+      body: '{"shows": [{"seasons": [{"episodes": [{"number": 5}], "number": 1}],
+        "title": "Stranger Things", "ids": {}}, {"seasons": [{"episodes": [{"number":
+        6}], "number": 1}], "title": "Stranger Things", "ids": {}}]}'
       headers:
-        Authorization: [!!python/unicode 'Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a']
+        Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
         Content-Length: ['207']
-        Content-Type: [!!python/unicode 'application/json']
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
-        trakt-api-version: [!!python/unicode '2']
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: ['2']
       method: POST
       uri: https://api.trakt.tv/sync/watchlist
     response:
-      body: {string: !!python/unicode '{"added":{"movies":0,"shows":0,"seasons":0,"episodes":2},"existing":{"movies":0,"shows":0,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
+      body: {string: '{"added":{"movies":0,"shows":0,"seasons":0,"episodes":2},"existing":{"movies":0,"shows":0,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
       headers:
-        cache-control: ['max-age=0, private, must-revalidate']
-        cf-railgun: [direct (starting new WAN connection)]
-        cf-ray: [439a5c4378823d3d-CPH]
-        connection: [keep-alive]
-        content-length: ['192']
-        content-type: [application/json; charset=utf-8]
-        date: ['Fri, 13 Jul 2018 08:25:42 GMT']
-        etag: [W/"984d25b67ab351720c0f3eb730f608e6"]
-        expect-ct: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-        server: [cloudflare]
-        set-cookie: ['__cfduid=d8a5afa7c3fc65f592ab35b0d4e8830311531470341; expires=Sat,
-            13-Jul-19 08:25:41 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [1fb8f16c-1227-484b-94ac-d25578bee0e3]
-        x-runtime: ['0.036457']
-        x-xss-protection: [1; mode=block]
+        CF-RAY: [490a55f0ba143d0d-CPH]
+        Cache-Control: ['max-age=0, private, must-revalidate']
+        Cf-Railgun: [6019b41f82 99.99 0.049252 0030 57da]
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Sat, 29 Dec 2018 06:51:00 GMT']
+        Etag: [W/"a521ce58227919ace1c43ab1fb389170"]
+        Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        Server: [cloudflare]
+        Set-Cookie: ['__cfduid=dccc81e1c2a346b8ed45417275b1634c11546066260; expires=Sun,
+            29-Dec-19 06:51:00 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [c199c345-21a2-41f6-8eba-2d72b1842112]
+        X-Runtime: ['0.046315']
+        X-Xss-Protection: [1; mode=block]
       status: {code: 201, message: Created}
   - request:
       body: null
       headers:
-        Authorization: [!!python/unicode 'Bearer 7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a']
-        Content-Type: [!!python/unicode 'application/json']
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
-        trakt-api-version: [!!python/unicode '2']
+        Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: ['2']
       method: GET
       uri: https://api.trakt.tv/sync/watchlist/episodes
     response:
-      body: {string: !!python/unicode '[{"rank":1,"listed_at":"2018-07-13T08:25:40.000Z","type":"episode","episode":{"season":1,"number":5,"title":"Chapter
+      body: {string: '[{"rank":1,"id":371589401,"listed_at":"2018-12-29T06:51:03.000Z","type":"episode","episode":{"season":1,"number":5,"title":"Chapter
           Five: The Flea and the Acrobat","ids":{"trakt":2124182,"tvdb":5621929,"imdb":"tt4593128","tmdb":1205904,"tvrage":1065933149}},"show":{"title":"Stranger
-          Things","year":2016,"ids":{"trakt":104439,"slug":"stranger-things","tvdb":305288,"imdb":"tt4574334","tmdb":66732,"tvrage":48493}}},{"rank":2,"listed_at":"2018-07-13T08:25:40.000Z","type":"episode","episode":{"season":1,"number":6,"title":"Chapter
+          Things","year":2016,"ids":{"trakt":104439,"slug":"stranger-things","tvdb":305288,"imdb":"tt4574334","tmdb":66732,"tvrage":48493}}},{"rank":2,"id":371589402,"listed_at":"2018-12-29T06:51:03.000Z","type":"episode","episode":{"season":1,"number":6,"title":"Chapter
           Six: The Monster","ids":{"trakt":2124184,"tvdb":5621930,"imdb":"tt4593132","tmdb":1205905,"tvrage":1065933150}},"show":{"title":"Stranger
           Things","year":2016,"ids":{"trakt":104439,"slug":"stranger-things","tvdb":305288,"imdb":"tt4574334","tmdb":66732,"tvrage":48493}}}]'}
       headers:
-        cache-control: ['max-age=0, private, must-revalidate']
-        cf-railgun: [direct (starting new WAN connection)]
-        cf-ray: [439a5c4fedc33d13-CPH]
-        connection: [keep-alive]
-        content-length: ['785']
-        content-type: [application/json; charset=utf-8]
-        date: ['Fri, 13 Jul 2018 08:25:44 GMT']
-        etag: [W/"a1f4aff5ae0c8b117eff871f77ad3e71"]
-        expect-ct: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-        last-modified: ['Fri, 13 Jul 2018 08:25:40 GMT']
-        server: [cloudflare]
-        set-cookie: ['__cfduid=df610a3a1b78393ec6ea11789c0da05e71531470343; expires=Sat,
-            13-Jul-19 08:25:43 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [502557c2-11bf-412d-89e2-92be53ada4fb]
-        x-runtime: ['0.026848']
-        x-sort-by: [rank]
-        x-sort-how: [asc]
-        x-xss-protection: [1; mode=block]
+        CF-RAY: [490a55fd5a193d31-CPH]
+        Cache-Control: ['max-age=0, private, must-revalidate']
+        Cf-Railgun: [1c65c611aa 99.99 0.040913 0030 57da]
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Sat, 29 Dec 2018 06:51:02 GMT']
+        Etag: [W/"275bfc4aa5ea29a6da493e584acad540"]
+        Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        Last-Modified: ['Sat, 29 Dec 2018 06:51:03 GMT']
+        Server: [cloudflare]
+        Set-Cookie: ['__cfduid=dae0b801cb2a68f7c75ac8ef7d6f521f81546066262; expires=Sun,
+            29-Dec-19 06:51:02 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [a431b0ac-99e8-40f8-85bc-79496d167ec0]
+        X-Runtime: ['0.037213']
+        X-Sort-By: [rank]
+        X-Sort-How: [asc]
+        X-Xss-Protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1

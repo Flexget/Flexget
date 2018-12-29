@@ -49,9 +49,9 @@ class TestTraktList(object):
     def db_auth(self, manager):
         kwargs = {
             'account': 'flexget_list_test',
-            'access_token': '7c2898cd175e28c9319f95a351873eaf7a970736cbb07ff015bf7ef652d7736a',
-            'refresh_token': '33918a6b4c3101892c79f6a13c0d15a050afe33491d7702d44bbce052923f745',
-            'created': 1526906378,
+            'access_token': 'c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9',
+            'refresh_token': 'c33d487d3c27e33896a10f0edda08f14040ee27ee195f18442dd72555f9a9b9f',
+            'created': 1546067709,
             'expires': 7776000
         }
 
@@ -202,3 +202,8 @@ class TestTraktList(object):
         trakt_set.remove(entry)
         time.sleep(5)
         assert entry not in trakt_set
+
+    def test_trakt_pagination(self):
+        config = {'account': 'flexget_list_test', 'list': 'watched', 'type': 'movies'}
+        trakt_set = TraktSet(config)
+        assert len(trakt_set) == 25
