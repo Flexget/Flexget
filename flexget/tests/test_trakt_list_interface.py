@@ -202,3 +202,8 @@ class TestTraktList(object):
         trakt_set.remove(entry)
         time.sleep(5)
         assert entry not in trakt_set
+
+    def test_trakt_pagination(self):
+        config = {'account': 'flexget_list_test', 'list': 'watched', 'type': 'movies'}
+        trakt_set = TraktSet(config)
+        assert len(trakt_set) == 25
