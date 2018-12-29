@@ -28,7 +28,8 @@ class MetainfoMediaId(object):
     @staticmethod
     def get_media_id(entry):
         if entry.get('id'):
-            return entry['id']
+            entry['media_id'] = entry['id']
+            return
 
         # I guess we need to generate one then. Robustness of this section is highly debatable
         entry_id = None
@@ -54,7 +55,8 @@ class MetainfoMediaId(object):
 
         if entry_id:
             entry_id = entry_id.strip().lower()
-        return entry_id
+
+        entry['media_id'] = entry_id
 
 
 @event('plugin.register')
