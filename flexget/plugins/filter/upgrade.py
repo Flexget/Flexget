@@ -104,7 +104,7 @@ class FilterUpgrade(object):
         if not config or not config['target']:
             return
 
-        identified_by = None if config['identified_by'] == 'auto' else config['identified_by']
+        identified_by = '{{ media_id }}' if config['identified_by'] == 'auto' else config['identified_by']
         grouped_entries = group_entries(task.accepted + task.undecided, identified_by)
         if not grouped_entries:
             return
@@ -160,7 +160,7 @@ class FilterUpgrade(object):
         if not config or not config['tracking']:
             return
 
-        identified_by = None if config['identified_by'] == 'auto' else config['identified_by']
+        identified_by = '{{ media_id }}' if config['identified_by'] == 'auto' else config['identified_by']
         grouped_entries = group_entries(task.accepted, identified_by)
         if not grouped_entries:
             return

@@ -18,7 +18,6 @@ from datetime import timedelta, datetime
 from pprint import pformat
 
 import flexget
-from flexget.utils.entry import content_id
 import queue
 import requests
 from html.entities import name2codepoint
@@ -540,10 +539,7 @@ def group_entries(entries, identifier):
     # Group by Identifier
     for entry in entries:
         try:
-            if not identifier:
-                rendered_id = content_id(entry)
-            else:
-                rendered_id = entry.render(identifier)
+            rendered_id = entry.render(identifier)
         except RenderError:
             continue
         if not rendered_id:

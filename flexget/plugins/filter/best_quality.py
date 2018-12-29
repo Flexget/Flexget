@@ -32,7 +32,7 @@ class FilterBestQuality(object):
         action_on_best = entry_actions[config['on_best']] if config['on_best'] != 'do_nothing' else None
         action_on_lower = entry_actions[config['on_lower']] if config['on_lower'] != 'do_nothing' else None
 
-        identified_by = None if config['identified_by'] == 'auto' else config['identified_by']
+        identified_by = '{{ media_id }}' if config['identified_by'] == 'auto' else config['identified_by']
         grouped_entries = group_entries(task.accepted + task.undecided, identified_by)
 
         for identifier, entries in grouped_entries.items():
