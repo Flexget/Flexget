@@ -9,38 +9,38 @@ interactions:
       method: GET
       uri: https://api.trakt.tv/sync/watchlist/shows
     response:
-      body: {string: '[{"rank":1,"id":371585967,"listed_at":"2018-12-29T06:20:38.000Z","type":"show","show":{"title":"White
+      body: {string: '[{"rank":1,"id":371589379,"listed_at":"2018-12-29T06:50:57.000Z","type":"show","show":{"title":"White
           Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}}}]'}
       headers:
-        CF-RAY: [490a2b732de73d55-CPH]
+        CF-RAY: [490a561dab7c3d49-CPH]
         Cache-Control: ['max-age=0, private, must-revalidate']
-        Cf-Railgun: [4a78111d34 2.06 0.026758 0030 57da]
+        Cf-Railgun: [3d8e294756 2.05 0.020890 0030 57da]
         Connection: [keep-alive]
         Content-Type: [application/json; charset=utf-8]
-        Date: ['Sat, 29 Dec 2018 06:22:00 GMT']
-        Etag: [W/"7e4b57b61049dff9c5862abb44f02304"]
+        Date: ['Sat, 29 Dec 2018 06:51:07 GMT']
+        Etag: [W/"f43e8c8c125db97c38bf93c228dfea27"]
         Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-        Last-Modified: ['Sat, 29 Dec 2018 06:20:38 GMT']
+        Last-Modified: ['Sat, 29 Dec 2018 06:50:57 GMT']
         Server: [cloudflare]
-        Set-Cookie: ['__cfduid=d804810a0b0c6b461a756559dad47e2fe1546064520; expires=Sun,
-            29-Dec-19 06:22:00 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Set-Cookie: ['__cfduid=d4ec0b278e20fe58622a0ac7cd1e2dd4a1546066267; expires=Sun,
+            29-Dec-19 06:51:07 GMT; path=/; domain=.trakt.tv; HttpOnly']
         Vary: [Accept-Encoding]
         X-Content-Type-Options: [nosniff]
         X-Frame-Options: [SAMEORIGIN]
-        X-Request-Id: [e8cf7ad7-85cc-4ff2-9489-d2f4d7ebc493]
-        X-Runtime: ['0.020063']
+        X-Request-Id: [40fcb3ee-4afa-4722-b829-9aac0b9f1ce9]
+        X-Runtime: ['0.017451']
         X-Sort-By: [rank]
         X-Sort-How: [asc]
         X-Xss-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
-      body: '{"shows": [{"title": "White Collar", "ids": {"tmdb": 21510, "trakt":
-        21410, "tvdb": 108611, "imdb": "tt1358522", "tvrage": 20720}, "year": 2009}]}'
+      body: '{"shows": [{"ids": {"tvrage": 20720, "imdb": "tt1358522", "trakt": 21410,
+        "tmdb": 21510, "tvdb": 108611}, "year": 2009, "title": "White Collar"}]}'
       headers:
         Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
         Content-Length: ['146']
         Content-Type: [application/json]
-        Cookie: [__cfduid=d804810a0b0c6b461a756559dad47e2fe1546064520]
+        Cookie: [__cfduid=d4ec0b278e20fe58622a0ac7cd1e2dd4a1546066267]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: ['2']
       method: POST
@@ -48,20 +48,20 @@ interactions:
     response:
       body: {string: '{"deleted":{"movies":0,"shows":1,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
       headers:
-        CF-RAY: [490a2b7f58813d55-CPH]
+        CF-RAY: [490a5629fed83d49-CPH]
         Cache-Control: ['max-age=0, private, must-revalidate']
-        Cf-Railgun: [e406137d7a 99.99 0.227601 0030 57da]
+        Cf-Railgun: [8a776a60b3 99.99 0.048807 0030 57da]
         Connection: [keep-alive]
         Content-Type: [application/json; charset=utf-8]
-        Date: ['Sat, 29 Dec 2018 06:22:02 GMT']
-        Etag: [W/"21d7c950abb6e8e6d13278dd9011142e"]
+        Date: ['Sat, 29 Dec 2018 06:51:09 GMT']
+        Etag: [W/"0e740e49de52e3dbe254f48d0876a57c"]
         Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
         Server: [cloudflare]
         Vary: [Accept-Encoding]
         X-Content-Type-Options: [nosniff]
         X-Frame-Options: [SAMEORIGIN]
-        X-Request-Id: [99681d8e-86e4-4938-937f-2845d28125e1]
-        X-Runtime: ['0.198144']
+        X-Request-Id: [ab0f1a24-b694-4d94-8795-e3ce57cc203e]
+        X-Runtime: ['0.042223']
         X-Xss-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
@@ -69,7 +69,7 @@ interactions:
       headers:
         Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
         Content-Type: [application/json]
-        Cookie: [__cfduid=d804810a0b0c6b461a756559dad47e2fe1546064520]
+        Cookie: [__cfduid=d4ec0b278e20fe58622a0ac7cd1e2dd4a1546066267]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: ['2']
       method: GET
@@ -77,32 +77,32 @@ interactions:
     response:
       body: {string: '[]'}
       headers:
-        CF-RAY: [490a2b8edc4d3d55-CPH]
+        CF-RAY: [490a5636baca3d49-CPH]
         Cache-Control: ['max-age=0, private, must-revalidate']
-        Cf-Railgun: [0a03541e19 99.99 0.022208 0030 57da]
+        Cf-Railgun: [f77131e17f 99.99 0.072404 0030 57da]
         Connection: [keep-alive]
         Content-Type: [application/json; charset=utf-8]
-        Date: ['Sat, 29 Dec 2018 06:22:04 GMT']
-        Etag: [W/"7e85eafe4e4c6e13a6fa543d4bc408ef"]
+        Date: ['Sat, 29 Dec 2018 06:51:12 GMT']
+        Etag: [W/"6d19be131e3652edb78d06cc822ce7dd"]
         Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-        Last-Modified: ['Sat, 29 Dec 2018 06:22:44 GMT']
+        Last-Modified: ['Sat, 29 Dec 2018 06:51:23 GMT']
         Server: [cloudflare]
         Vary: [Accept-Encoding]
         X-Content-Type-Options: [nosniff]
         X-Frame-Options: [SAMEORIGIN]
-        X-Request-Id: [0f269046-7ff9-4f37-9479-21e19c838704]
-        X-Runtime: ['0.020492']
+        X-Request-Id: [ff2e8cb4-feeb-42b3-9858-2b785e0992c3]
+        X-Runtime: ['0.066145']
         X-Sort-By: [rank]
         X-Sort-How: [asc]
         X-Xss-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
-      body: '{"shows": [{"title": "White Collar", "ids": {}, "year": 2009}]}'
+      body: '{"shows": [{"ids": {}, "year": 2009, "title": "White Collar"}]}'
       headers:
         Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
         Content-Length: ['63']
         Content-Type: [application/json]
-        Cookie: [__cfduid=d804810a0b0c6b461a756559dad47e2fe1546064520]
+        Cookie: [__cfduid=d4ec0b278e20fe58622a0ac7cd1e2dd4a1546066267]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: ['2']
       method: POST
@@ -110,20 +110,20 @@ interactions:
     response:
       body: {string: '{"added":{"movies":0,"shows":1,"seasons":0,"episodes":0},"existing":{"movies":0,"shows":0,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
       headers:
-        CF-RAY: [490a2b9ad8583d55-CPH]
+        CF-RAY: [490a5642be873d49-CPH]
         Cache-Control: ['max-age=0, private, must-revalidate']
-        Cf-Railgun: [bc3276285d 99.99 0.034967 0030 57da]
+        Cf-Railgun: [7071c73887 99.99 0.043799 0030 57da]
         Connection: [keep-alive]
         Content-Type: [application/json; charset=utf-8]
-        Date: ['Sat, 29 Dec 2018 06:22:06 GMT']
-        Etag: [W/"7afbe97deb7ba37ff8486a10c0967842"]
+        Date: ['Sat, 29 Dec 2018 06:51:13 GMT']
+        Etag: [W/"8cc6dbc4103196ad6bd4bcc6a9889921"]
         Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
         Server: [cloudflare]
         Vary: [Accept-Encoding]
         X-Content-Type-Options: [nosniff]
         X-Frame-Options: [SAMEORIGIN]
-        X-Request-Id: [238081f6-40b5-4902-98cd-f5fbbdc9b370]
-        X-Runtime: ['0.027556']
+        X-Request-Id: [db3b1370-af24-48d4-8a92-1ffc846c2287]
+        X-Runtime: ['0.040194']
         X-Xss-Protection: [1; mode=block]
       status: {code: 201, message: Created}
   - request:
@@ -131,41 +131,41 @@ interactions:
       headers:
         Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
         Content-Type: [application/json]
-        Cookie: [__cfduid=d804810a0b0c6b461a756559dad47e2fe1546064520]
+        Cookie: [__cfduid=d4ec0b278e20fe58622a0ac7cd1e2dd4a1546066267]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: ['2']
       method: GET
       uri: https://api.trakt.tv/sync/watchlist/shows
     response:
-      body: {string: '[{"rank":1,"id":371586034,"listed_at":"2018-12-29T06:22:00.000Z","type":"show","show":{"title":"White
+      body: {string: '[{"rank":1,"id":371589410,"listed_at":"2018-12-29T06:51:12.000Z","type":"show","show":{"title":"White
           Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}}}]'}
       headers:
-        CF-RAY: [490a2bbd8a493d55-CPH]
+        CF-RAY: [490a56632a4c3d49-CPH]
         Cache-Control: ['max-age=0, private, must-revalidate']
-        Cf-Railgun: [5e4829cfa3 99.99 0.028423 0030 57da]
+        Cf-Railgun: [909afdfff9 99.99 0.024537 0030 57da]
         Connection: [keep-alive]
         Content-Type: [application/json; charset=utf-8]
-        Date: ['Sat, 29 Dec 2018 06:22:12 GMT']
-        Etag: [W/"ded9cee8b2279968fafede97d17d0571"]
+        Date: ['Sat, 29 Dec 2018 06:51:19 GMT']
+        Etag: [W/"1decfb8c80e9ea27f0fbfad247aaa5b8"]
         Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-        Last-Modified: ['Sat, 29 Dec 2018 06:22:00 GMT']
+        Last-Modified: ['Sat, 29 Dec 2018 06:51:12 GMT']
         Server: [cloudflare]
         Vary: [Accept-Encoding]
         X-Content-Type-Options: [nosniff]
         X-Frame-Options: [SAMEORIGIN]
-        X-Request-Id: [a1739a58-d7c1-4e7d-b926-1249c24d7a08]
-        X-Runtime: ['0.026604']
+        X-Request-Id: [f1b38a46-47b1-477d-bd3a-214024b8e9c8]
+        X-Runtime: ['0.021714']
         X-Sort-By: [rank]
         X-Sort-How: [asc]
         X-Xss-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
-      body: '{"shows": [{"title": "White Collar", "ids": {}, "year": 2009}]}'
+      body: '{"shows": [{"ids": {}, "year": 2009, "title": "White Collar"}]}'
       headers:
         Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
         Content-Length: ['63']
         Content-Type: [application/json]
-        Cookie: [__cfduid=d804810a0b0c6b461a756559dad47e2fe1546064520]
+        Cookie: [__cfduid=d4ec0b278e20fe58622a0ac7cd1e2dd4a1546066267]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: ['2']
       method: POST
@@ -173,20 +173,20 @@ interactions:
     response:
       body: {string: '{"deleted":{"movies":0,"shows":1,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
       headers:
-        CF-RAY: [490a2bc9fd573d55-CPH]
+        CF-RAY: [490a566fadbb3d49-CPH]
         Cache-Control: ['max-age=0, private, must-revalidate']
-        Cf-Railgun: [bb41c74e54 99.99 0.162969 0030 57da]
+        Cf-Railgun: [17e9dd9c0e 99.99 0.034665 0030 57da]
         Connection: [keep-alive]
         Content-Type: [application/json; charset=utf-8]
-        Date: ['Sat, 29 Dec 2018 06:22:14 GMT']
-        Etag: [W/"af972ca788698cd42ff802048cf71324"]
+        Date: ['Sat, 29 Dec 2018 06:51:21 GMT']
+        Etag: [W/"354a870a0022581fe64d680f81cb24c2"]
         Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
         Server: [cloudflare]
         Vary: [Accept-Encoding]
         X-Content-Type-Options: [nosniff]
         X-Frame-Options: [SAMEORIGIN]
-        X-Request-Id: [d9b5b4db-b362-48d8-b31d-272929be897f]
-        X-Runtime: ['0.161104']
+        X-Request-Id: [ddc99a0c-38d6-4041-bc98-07d41bd324f5]
+        X-Runtime: ['0.027887']
         X-Xss-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
@@ -194,7 +194,7 @@ interactions:
       headers:
         Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
         Content-Type: [application/json]
-        Cookie: [__cfduid=d804810a0b0c6b461a756559dad47e2fe1546064520]
+        Cookie: [__cfduid=d4ec0b278e20fe58622a0ac7cd1e2dd4a1546066267]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: ['2']
       method: GET
@@ -202,21 +202,21 @@ interactions:
     response:
       body: {string: '[]'}
       headers:
-        CF-RAY: [490a2bee5f6b3d55-CPH]
+        CF-RAY: [490a568fef1c3d49-CPH]
         Cache-Control: ['max-age=0, private, must-revalidate']
-        Cf-Railgun: [30ab68d4af 99.99 0.326693 0030 57da]
+        Cf-Railgun: [f4803d31eb 99.99 0.020284 0030 57da]
         Connection: [keep-alive]
         Content-Type: [application/json; charset=utf-8]
-        Date: ['Sat, 29 Dec 2018 06:22:20 GMT']
-        Etag: [W/"4424072e99830138d0df9ea8ea2b71ec"]
+        Date: ['Sat, 29 Dec 2018 06:51:26 GMT']
+        Etag: [W/"c12f799cda24d661c3dac0ee106c5e5b"]
         Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-        Last-Modified: ['Sat, 29 Dec 2018 06:22:36 GMT']
+        Last-Modified: ['Sat, 29 Dec 2018 06:51:47 GMT']
         Server: [cloudflare]
         Vary: [Accept-Encoding]
         X-Content-Type-Options: [nosniff]
         X-Frame-Options: [SAMEORIGIN]
-        X-Request-Id: [8dfd3c65-ccb0-45cd-b1fd-8c0fbfe390fa]
-        X-Runtime: ['0.322863']
+        X-Request-Id: [453fda32-485e-4d99-a3d4-c2b07cd61dab]
+        X-Runtime: ['0.018289']
         X-Sort-By: [rank]
         X-Sort-How: [asc]
         X-Xss-Protection: [1; mode=block]
