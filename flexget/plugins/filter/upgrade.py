@@ -68,31 +68,54 @@ class FilterUpgrade(object):
         config.setdefault('propers', True)
         return config
 
-    def filter_entries(self, entries, existing, target, action_on_lower):
+    def filter_entries(self, entries, existing, target, propers, action_on_lower):
 
         target_requirement = qualities.Requirements(target) if target else None
+        target_quality = qualities.Quality(target) if target else None
         filtered = []
 
         for entry in entries:
-            # Filter out entries within target
             if target:
+                # Filter out entries not within target range
                 if not target_requirement.allows(entry['quality']):
-                    log.debug('Skipping %s as does not meet upgrade quality requirements', entry['title'])
+                    if entry['quality'] > target_quality:
+                        reason = '(higher quality)'
+                    else:
+                        reason = '(lower quality)'
+                    log.debug('Skipping %s as does not meet upgrade target quality requirements %s', entry['title'], reason)
+
                     if action_on_lower:
-                        action_on_lower(entry, 'does not meet upgrade quality requirements')
+                        action_on_lower(entry, 'does not meet upgrade target quality requirements %s' % reason)
                     continue
 
+                # Filter if at target quality already, but allow higher propers
+                if existing.quality >= target_quality:
+                    if propers:
+                        if existing.proper_count >= entry.get('proper_count', 0):
+                            log.debug('Skipping %s as already at target quality and proper count', entry['title'])
+                            if action_on_lower:
+                                action_on_lower(entry, 'already at target quality and proper count')
+                            continue
+                    else:
+                        log.debug('Skipping %s as already at target quality', entry['title'])
+                        if action_on_lower:
+                            action_on_lower(entry, 'already at target quality')
+                        continue
+
+            # Filter if entry quality is lower then existing quality
             if entry['quality'] < existing.quality:
                 log.debug('Skipping %s as lower quality then existing', entry['title'])
                 if action_on_lower:
                     action_on_lower(entry, 'lower quality then existing')
                 continue
 
-            if entry['quality'] == existing.quality and entry.get('proper_count', 0) <= existing.proper_count:
-                log.debug('Skipping %s as same quality but lower proper', entry['title'])
-                if action_on_lower:
-                    action_on_lower(entry, 'lower proper then existing')
-                continue
+            # Filter if propers enabled and entry proper is lower then existing
+            if propers:
+                if entry['quality'] == existing.quality and entry.get('proper_count', 0) <= existing.proper_count:
+                    log.debug('Skipping %s as same quality but lower proper', entry['title'])
+                    if action_on_lower:
+                        action_on_lower(entry, 'lower proper then existing')
+                    continue
 
             filtered.append(entry)
 
@@ -136,7 +159,7 @@ class FilterUpgrade(object):
 
                 # Filter out lower quality and propers
                 action_on_lower = entry_actions[config['on_lower']] if config['on_lower'] != 'do_nothing' else None
-                upgradeable = self.filter_entries(entries, existing, config['target'], action_on_lower)
+                upgradeable = self.filter_entries(entries, existing, config['target'], config['propers'], action_on_lower)
 
                 # Skip if we have no entries after filtering
                 if not upgradeable:

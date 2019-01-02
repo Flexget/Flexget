@@ -88,17 +88,18 @@ class TestUpgradeTarget(object):
               - {title: 'Movie.HDRip.XviD.AC3', 'id': 'Movie'}
           target_within_range:
             upgrade:
-              target: 720p-1080p
+              target: 720p-1080p webdl
             mock:
               - {title: 'Movie.2160p WEB-DL X264 AC3', 'id': 'Movie'}
               - {title: 'Movie.1080p WEB-DL X264 AC3', 'id': 'Movie'}
               - {title: 'Movie.720p.WEB-DL.X264.AC3', 'id': 'Movie'}
           target_quality_1080p:
             upgrade:
-              target: 1080p
+              target: 1080p webdl
+              on_lower: reject
             mock:
-              - {title: 'Movie.1080p WEB-DL X264 AC3', 'id': 'Movie'}
-              - {title: 'Movie.720p.WEB-DL.X264.AC3', 'id': 'Movie'}
+              - {title: 'Movie.1080p bluray X264 dts', 'id': 'Movie'}
+              - {title: 'Movie.1080p webdl X264 dts', 'id': 'Movie'}
     """
 
     def test_target_outside_range(self, execute_task):
@@ -120,18 +121,21 @@ class TestUpgradeTarget(object):
     def test_target_quality_1080p(self, execute_task):
         execute_task('existing_download_480p')
         task = execute_task('target_quality_1080p')
-        entry = task.find_entry('accepted', title='Movie.1080p WEB-DL X264 AC3')
-        assert entry, 'Movie.1080p WEB-DL X264 AC3 should have been accepted'
-        entry = task.find_entry('undecided', title='Movie.720p.WEB-DL.X264.AC3')
-        assert entry, 'Movie.720p.WEB-DL.X264.AC3 should have been undecided'
+        entry = task.find_entry('rejected', title='Movie.1080p bluray X264 dts')
+        assert entry, 'Movie.1080p bluray X264 dts should have been rejected'
+        entry = task.find_entry('accepted', title='Movie.1080p webdl X264 dts')
+        assert entry, 'Movie.1080p webdl X264 dts should have been accepted'
 
     def test_at_target(self, execute_task):
-        execute_task('existing_download_1080p')
-        task = execute_task('target_quality_1080p')
-        entry = task.find_entry('undecided', title='Movie.1080p WEB-DL X264 AC3')
-        assert entry, 'Movie.1080p WEB-DL X264 AC3 should have been accepted'
-        entry = task.find_entry('undecided', title='Movie.720p.WEB-DL.X264.AC3')
-        assert entry, 'Movie.720p.WEB-DL.X264.AC3 should have been undecided'
+        task1 = execute_task('existing_download_1080p')
+        entry = task1.find_entry('accepted', title='Movie.1080p.WEB-DL.X264.AC3-GRP1')
+        assert entry, 'Movie.1080p.WEB-DL.X264.AC3-GRP1 AC3 should have been accepted'
+
+        task2 = execute_task('target_quality_1080p')
+        entry = task2.find_entry('rejected', title='Movie.1080p bluray X264 dts')
+        assert entry, 'Movie.1080p bluray X264 dts should have been rejected'
+        entry = task2.find_entry('rejected', title='Movie.1080p webdl X264 dts')
+        assert entry, 'Movie.1080p webdl X264 dts should have been rejected'
 
 
 class TestUpgradeTimeFrame(object):
@@ -178,32 +182,48 @@ class TestUpgradePropers(object):
             upgrade:
               target: 1080p
               tracking: yes
-              propers: yes
         tasks:
           existing_download:
             accept_all: yes
             mock:
               - {title: 'Movie.1080p.WEB-DL.X264.AC3-GRP1'}
           existing_download_proper:
+            upgrade:
+              propers: yes
             accept_all: yes
             mock:
               - {title: 'Movie.1080p PROPER WEB-DL X264 AC3 GRP1'}
           existing_download_proper_repack:
+            upgrade:
+              propers: yes
             accept_all: yes
             mock:
               - {title: 'Movie.1080p PROPER REPACK WEB-DL X264 AC3 GRP1'}
           upgrade_proper:
+            upgrade:
+              propers: yes
             mock:
               - {title: 'Movie.1080p REPACK PROPER WEB-DL X264 AC3'}
               - {title: 'Movie.1080p PROPER WEB-DL X264 AC3'}
+          no_upgrade_proper:
+            upgrade:
+              propers: no
+            mock:
+              - {title: 'Movie.1080p REPACK PROPER WEB-DL X264 AC3'}
           existing_upgrade_proper:
+            upgrade:
+              propers: yes
             mock:
               - {title: 'Movie.1080p REPACK PROPER WEB-DL X264 AC3'}
               - {title: 'Movie.1080p PROPER WEB-DL X264 AC3'}
           existing_higher_proper:
+            upgrade:
+              propers: yes
             mock:
               - {title: 'Movie.1080p PROPER WEB-DL X264 AC3'}
           existing_lower_quality_proper:
+            upgrade:
+              propers: yes
             mock:
               - {title: 'Movie.720p PROPER WEB-DL X264 AC3'}
     """
@@ -213,6 +233,12 @@ class TestUpgradePropers(object):
         task = execute_task('upgrade_proper')
         entry = task.find_entry('accepted', title='Movie.1080p REPACK PROPER WEB-DL X264 AC3')
         assert entry, 'Movie.1080p REPACK PROPER WEB-DL X264 AC3 should have been accepted'
+
+    def test_no_upgrade_proper(self, execute_task):
+        execute_task('existing_download')
+        task = execute_task('no_upgrade_proper')
+        entry = task.find_entry('undecided', title='Movie.1080p REPACK PROPER WEB-DL X264 AC3')
+        assert entry, 'Movie.1080p REPACK PROPER WEB-DL X264 AC3 should not be accepted'
 
     def test_existing_upgrade_proper(self, execute_task):
         execute_task('existing_download_proper')
