@@ -64,13 +64,13 @@ class NextTraktEpisodes(object):
         except RequestException as e:
             raise plugin.PluginError('Unable to get trakt list `%s`: %s' % (config['list'], e))
         if not data:
-            log.warning('The list "%s" is empty.' % config['list'])
+            log.warning('The list "%s" is empty.', config['list'])
             return
         for item in data:
             if item.get('show'):
                 if not item['show']['title']:
                     # Seems we can get entries with a blank show title sometimes
-                    log.warning('Found trakt list show with no series name.')
+                    log.warning('Found trakt list show without series name.')
                     continue
                 trakt_id = item['show']['ids']['trakt']
                 listed_series[trakt_id] = {
@@ -101,7 +101,7 @@ class NextTraktEpisodes(object):
             try:
                 response = session.get(url)
                 if response.status_code == 204:
-                    log.debug('No {} epsisode for {}'.format(config['position'], fields['series_name']))
+                    log.debug('No %s episode for %s', config['position'], fields['series_name'])
                     continue
                 data = response.json()
             except RequestException as e:
