@@ -400,7 +400,7 @@ class Task(object):
             plugins = sorted(get_plugins(phase=phase), key=lambda p: p.phase_handlers[phase], reverse=True)
         else:
             plugins = iter(all_plugins.values())
-        return (p for p in plugins if p.name in self.config or p.builtin and not p.disabled)
+        return (p for p in plugins if p.name in self.config or p.builtin and p.enabled)
 
     def __run_task_phase(self, phase):
         """Executes task phase, ie. call all enabled plugins on the task.

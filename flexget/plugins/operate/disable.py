@@ -57,13 +57,13 @@ class DisablePlugin(object):
                 del (task.config[p])
             # Disable built-in plugins.
             if p in plugin.plugins:
-                plugin.plugins[p].disabled = True
+                plugin.plugins[p].enabled = False
                 self.disabled_plugins.append(p)
 
         # Disable all builtins mode.
         if 'builtins' in config:
             for p in all_builtins():
-                p.disabled = True
+                p.enabled = False
                 self.disabled_plugins.append(p.name)
 
         if self.disabled_plugins:
@@ -77,7 +77,7 @@ class DisablePlugin(object):
             return
 
         for name in self.disabled_plugins:
-            plugin.plugins[name].disabled = False
+            plugin.plugins[name].enabled = True
         log.debug('Re-enabled plugin(s): %s' % ', '.join(self.disabled_plugins))
         self.disabled_plugins = []
 
