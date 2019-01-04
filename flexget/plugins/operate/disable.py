@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 
@@ -41,46 +40,46 @@ class DisablePlugin(object):
     """
 
     schema = one_or_more({'type': 'string'})
-    disabled_builtins = None
+    disabled_plugins = None
 
     @plugin.priority(254)
     def on_task_start(self, task, config):
-        self.disabled_builtins = []
-        disabled = []
+        self.disabled_plugins = []
+        disabled_in_task = []
 
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = [config]
 
         for p in config:
             # Disable plugins explicitly included in config.
             if p in task.config:
-                disabled.append(p)
+                disabled_in_task.append(p)
                 del (task.config[p])
             # Disable built-in plugins.
-            if p in plugin.plugins and plugin.plugins[p].builtin:
-                plugin.plugins[p].builtin = False
-                self.disabled_builtins.append(p)
+            if p in plugin.plugins:
+                plugin.plugins[p].disabled = True
+                self.disabled_plugins.append(p)
 
         # Disable all builtins mode.
         if 'builtins' in config:
             for p in all_builtins():
-                p.builtin = False
-                self.disabled_builtins.append(p.name)
+                p.disabled = True
+                self.disabled_plugins.append(p.name)
 
-        if self.disabled_builtins:
-            log.debug('Disabled built-in plugin(s): %s' % ', '.join(self.disabled_builtins))
-        if disabled:
-            log.debug('Disabled plugin(s): %s' % ', '.join(disabled))
+        if self.disabled_plugins:
+            log.debug('Disabled plugin(s): %s' % ', '.join(self.disabled_plugins))
+        if disabled_in_task:
+            log.debug('Disabled task plugin(s): %s' % ', '.join(disabled_in_task))
 
     @plugin.priority(-255)
     def on_task_exit(self, task, config):
-        if not self.disabled_builtins:
+        if not self.disabled_plugins:
             return
 
-        for name in self.disabled_builtins:
-            plugin.plugins[name].builtin = True
-        log.debug('Re-enabled builtin plugin(s): %s' % ', '.join(self.disabled_builtins))
-        self.disabled_builtins = []
+        for name in self.disabled_plugins:
+            plugin.plugins[name].disabled = False
+        log.debug('Re-enabled plugin(s): %s' % ', '.join(self.disabled_plugins))
+        self.disabled_plugins = []
 
     on_task_abort = on_task_exit
 

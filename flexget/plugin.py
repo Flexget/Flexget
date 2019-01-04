@@ -256,6 +256,7 @@ class PluginInfo(dict):
             warnings.warn('Api versions <2 are no longer supported. Plugin %s' % name, DeprecationWarning, stacklevel=2)
 
         # Set basic info attributes
+        self.disabled = False
         self.api_ver = api_ver
         self.name = name
         self.interfaces = interfaces
@@ -485,6 +486,8 @@ def get_plugins(phase=None, interface=None, category=None, name=None, min_api=No
     def matches(plugin):
         if phase is not None and phase not in phase_methods:
             raise ValueError('Unknown phase %s' % phase)
+        if plugin.disabled:
+            return False
         if phase and phase not in plugin.phase_handlers:
             return False
         if interface and interface not in plugin.interfaces:
