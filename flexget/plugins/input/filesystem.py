@@ -118,7 +118,7 @@ class Filesystem(object):
             entry['url'] = pathlib.Path(filepath).absolute().as_uri()
         entry['filename'] = filepath.name
         if filepath.isfile():
-            entry['title'] = filepath.namebase
+            entry['title'] = filepath.stem
         else:
             entry['title'] = filepath.name
         try:

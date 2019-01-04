@@ -524,5 +524,5 @@ class ServerCrashLogAPI(APIResource):
         """Get Crash logs"""
         path = Path(self.manager.config_base)
         crashes = [{'name': file.name, 'content': file.open().readlines()} for file in
-                   path.listdir(pattern='crash_report*.log')]
+                   path.listdir(match='crash_report*.log')]
         return jsonify(crashes)

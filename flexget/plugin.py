@@ -391,7 +391,7 @@ def _load_plugins_from_dirs(dirs):
                 continue
             # Split the relative path from the plugins dir to current file's parent dir to find subpackage names
             plugin_subpackages = [_f for _f in plugin_path.relpath(plugins_dir).parent.splitall() if _f]
-            module_name = '.'.join([plugins_pkg.__name__] + plugin_subpackages + [plugin_path.namebase])
+            module_name = '.'.join([plugins_pkg.__name__] + plugin_subpackages + [plugin_path.stem])
             try:
                 __import__(module_name)
             except DependencyError as e:
