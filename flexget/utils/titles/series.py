@@ -41,36 +41,36 @@ class SeriesParser(TitleParser):
 
     # Make sure none of these are found embedded within a word or other numbers
     ep_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
-        '(?:series|season|s)\s?(\d{1,4})(?:\s(?:.*\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)(?:\s?e?(\d{1,2}))?' %
+        r'(?:series|season|s)\s?(\d{1,4})(?:\s(?:.*\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)(?:\s?e?(\d{1,2}))?' %
         roman_numeral_re,
-        '(?:series|season)\s?(\d{1,4})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
-        '(\d{1,2})\s?x\s?(\d+)(?:\s(\d{1,2}))?',
-        '(\d{1,3})\s?of\s?(?:\d{1,3})',
-        '(?:episode|e|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
-        'part\s(%s)' % '|'.join(map(str, english_numbers)),
+        r'(?:series|season)\s?(\d{1,4})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
+        r'(\d{1,2})\s?x\s?(\d+)(?:\s(\d{1,2}))?',
+        r'(\d{1,3})\s?of\s?(?:\d{1,3})',
+        r'(?:episode|e|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
+        r'part\s(%s)' % '|'.join(map(str, english_numbers)),
     ]])
     season_pack_regexps = ReList([
         # S01 or Season 1 but not Season 1 Episode|Part 2
         r'(?:season\s?|s)(\d{1,})(?:\s|$)(?!(?:(?:.*?\s)?(?:episode|e|ep|part|pt)\s?(?:\d{1,3}|%s)|(?:\d{1,3})\s?of\s?(?:\d{1,3})))' % roman_numeral_re,
-        '(\d{1,3})\s?x\s?all',  # 1xAll
+        r'(\d{1,3})\s?x\s?all',  # 1xAll
     ])
     unwanted_regexps = ReList([
-        '(\d{1,3})\s?x\s?(0+)[^1-9]',  # 5x0
-        'S(\d{1,3})D(\d{1,3})',  # S3D1
+        r'(\d{1,3})\s?x\s?(0+)[^1-9]',  # 5x0
+        r'S(\d{1,3})D(\d{1,3})',  # S3D1
         r'(?:s|series|\b)\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
-        'disc\s\d'])
+        r'disc\s\d'])
     # Make sure none of these are found embedded within a word or other numbers
     date_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
-        '(\d{2,4})%s(\d{1,2})%s(\d{1,2})' % (separators, separators),
-        '(\d{1,2})%s(\d{1,2})%s(\d{2,4})' % (separators, separators),
-        '(\d{4})x(\d{1,2})%s(\d{1,2})' % separators,
-        '(\d{1,2})(?:st|nd|rd|th)?%s([a-z]{3,10})%s(\d{4})' % (separators, separators)]])
+        r'(\d{2,4})%s(\d{1,2})%s(\d{1,2})' % (separators, separators),
+        r'(\d{1,2})%s(\d{1,2})%s(\d{2,4})' % (separators, separators),
+        r'(\d{4})x(\d{1,2})%s(\d{1,2})' % separators,
+        r'(\d{1,2})(?:st|nd|rd|th)?%s([a-z]{3,10})%s(\d{4})' % (separators, separators)]])
     sequence_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
-        '(\d{1,3})(?:v(?P<version>\d))?',
-        '(?:pt|part)\s?(\d+|%s)' % roman_numeral_re]])
-    unwanted_sequence_regexps = ReList(['seasons?\s?\d{1,2}'])
+        r'(\d{1,3})(?:v(?P<version>\d))?',
+        r'(?:pt|part)\s?(\d+|%s)' % roman_numeral_re]])
+    unwanted_sequence_regexps = ReList([r'seasons?\s?\d{1,2}'])
     id_regexps = ReList([])
-    clean_regexps = ReList(['\[.*?\]', '\(.*?\)'])
+    clean_regexps = ReList([r'\[.*?\]', r'\(.*?\)'])
     # ignore prefix regexps must be passive groups with 0 or 1 occurrences  eg. (?:prefix)?
     ignore_prefixes = default_ignore_prefixes
 
@@ -158,7 +158,7 @@ class SeriesParser(TitleParser):
         """This will attempt to guess a series name based on the provided data."""
         # We need to replace certain characters with spaces to make sure episode parsing works right
         # We don't remove anything, as the match positions should line up with the original title
-        clean_title = re.sub('[_.,\[\]\(\):]', ' ', self.data)
+        clean_title = re.sub(r'[_.,\[\]\(\):]', ' ', self.data)
         if self.parse_unwanted(clean_title):
             return
         match = self.parse_date(clean_title)
@@ -183,7 +183,7 @@ class SeriesParser(TitleParser):
             # Remove possible episode title from series name (anything after a ' - ')
             name = name.split(' - ')[0]
             # Replace some special characters with spaces
-            name = re.sub('[\._\(\) ]+', ' ', name).strip(' -')
+            name = re.sub(r'[\._\(\) ]+', ' ', name).strip(' -')
             # Normalize capitalization to title case
             name = capwords(name)
             self.name = name
@@ -275,7 +275,7 @@ class SeriesParser(TitleParser):
         # Remove unwanted words from data for ep / id parsing
         data_stripped = self.remove_words(data_stripped, self.remove, not_in_word=True)
 
-        data_parts = re.split('[\W_]+', data_stripped)
+        data_parts = re.split(r'[\W_]+', data_stripped)
 
         for part in data_parts[:]:
             if part in self.propers:
