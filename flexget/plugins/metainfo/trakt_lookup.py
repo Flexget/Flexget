@@ -7,7 +7,6 @@ import logging
 from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.utils.entry import is_episode, is_season, is_show, is_movie
 
 try:
     from flexget.plugins.internal.api_trakt import ApiTrakt, list_actors, get_translations_dict
@@ -19,6 +18,22 @@ except ImportError:
                                  message='trakt_lookup requires the `api_trakt` plugin')
 
 log = logging.getLogger('trakt_lookup')
+
+
+def is_show(entry):
+    return entry.get('series_name') or entry.get('tvdb_id', eval_lazy=False)
+
+
+def is_episode(entry):
+    return entry.get('series_season') and entry.get('series_episode')
+
+
+def is_season(entry):
+    return entry.get('series_season') and not is_episode(entry)
+
+
+def is_movie(entry):
+    return bool(entry.get('movie_name'))
 
 
 class TraktLazyLookup(object):
