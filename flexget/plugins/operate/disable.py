@@ -40,11 +40,12 @@ class DisablePlugin(object):
     """
 
     schema = one_or_more({'type': 'string'})
-    disabled_plugins = None
+
+    def __init__(self):
+        self.disabled_plugins = []
 
     @plugin.priority(254)
     def on_task_start(self, task, config):
-        self.disabled_plugins = []
         disabled_in_task = []
 
         if isinstance(config, str):

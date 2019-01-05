@@ -74,7 +74,28 @@ class PluginUrlRewriting(object):
                     raise UrlRewritingError('%s: Internal error with url %s' % (name, entry['url']))
 
 
+class DisableUrlRewriter(object):
+    """Disable certain urlrewriters."""
+
+    schema = {
+        'deprecated': '`disable_urlrewriters` plugin is deprecated, use `disable` plugin instead',
+        'type': 'array',
+        'items': {'type': 'string'}
+    }
+
+    def on_task_start(self, task, config):
+        disable = plugin.get_plugin_by_name('disable')['instance']
+        disable.on_task_start(task, config)
+
+    def on_task_exit(self, task, config):
+        disable = plugin.get_plugin_by_name('disable')['instance']
+        disable.on_task_exit(task, config)
+
+    on_task_abort = on_task_exit
+
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginUrlRewriting, 'urlrewriting', builtin=True, api_ver=2)
+    plugin.register(DisableUrlRewriter, 'disable_urlrewriters', api_ver=2)
     plugin.register_task_phase('urlrewrite', before='download')
