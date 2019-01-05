@@ -18,9 +18,12 @@ class DebugNotification(object):
         self.notifications.append((title, message, config))
 
 
-@event('plugin.register')
-def register_plugin():
-    plugin.register(DebugNotification, 'debug_notification', interfaces=['notifiers'], api_ver=2, debug=True)
+def pytest_collection_modifyitems(items):
+    """
+    Add our debug_notification plugin to all tests in this directory.
+    """
+    for item in items:
+        item.add_marker(pytest.mark.register_plugin(DebugNotification, 'debug_notification', interfaces=['notifiers'], api_ver=2, debug=True))
 
 
 @pytest.fixture()

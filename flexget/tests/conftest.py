@@ -58,7 +58,8 @@ def config(request):
 
 
 @pytest.yield_fixture()
-def manager(request, config, caplog, monkeypatch, filecopy):  # enforce filecopy is run before manager
+# enforce filecopy and register_plugin are run before manager
+def manager(request, config, caplog, monkeypatch, filecopy, register_plugin):
     """
     Create a :class:`MockManager` for this test based on `config` argument.
     """
@@ -183,14 +184,20 @@ def link_headers(manager):
 def pytest_configure(config):
     # register the filecopy marker
     config.addinivalue_line('markers',
-                            'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.'
+                            'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.')
+    config.addinivalue_line('markers',
                             'online: mark a test that goes online. VCR will automatically be used.')
+    config.addinivalue_line('markers',
+                            'register_plugin: load a plugin only for the marked test')
 
 
 def pytest_runtest_setup(item):
     # Add the filcopy fixture to any test marked with filecopy
     if item.get_marker('filecopy'):
         item.fixturenames.append('filecopy')
+    # Add register_plugin fixture to any test marked with register_plugin
+    if item.get_marker('register_plugin'):
+        item.fixturenames.append('register_plugin')
     # Add the online marker to tests that will go online
     if item.get_marker('online'):
         item.fixturenames.append('use_vcr')
@@ -199,10 +206,36 @@ def pytest_runtest_setup(item):
 
 
 @pytest.yield_fixture()
+def register_plugin(request):
+    """
+    A function which loads a plugin only for the test function it is called from.
+    """
+    from flexget.plugin import plugins, register
+    from flexget.event import fire_event
+    loaded_plugins = []
+
+    def load_plugin(*args, **kwargs):
+        result = register(*args, **kwargs)
+        result.initialize()
+        loaded_plugins.append(result.name)
+        # Make sure the config schema updates with the new plugins
+        fire_event('config.register')
+
+    for marker in request.node.iter_markers('register_plugin'):
+        load_plugin(*marker.args, **marker.kwargs)
+
+    yield load_plugin
+
+    for p in loaded_plugins:
+        plugins.pop(p, None)
+    # Make sure config schema removes the temporary plugins
+    fire_event('config.register')
+
+
+@pytest.yield_fixture()
 def filecopy(request):
     out_files = []
-    marker = request.node.get_closest_marker('filecopy')
-    if marker is not None:
+    for marker in request.node.iter_markers('filecopy'):
         copy_list = marker.args[0] if len(marker.args) == 1 else [marker.args]
 
         for sources, dst in copy_list:

@@ -3,6 +3,8 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from datetime import datetime, timedelta
 
+import pytest
+
 from flexget.entry import Entry
 from flexget import plugin
 
@@ -25,9 +27,6 @@ class SearchPlugin(object):
         return [Entry(entry)]
 
 
-plugin.register(SearchPlugin, 'test_search', interfaces=['search'], api_ver=2)
-
-
 class EstRelease(object):
     """Fake release estimate plugin. Just returns 'est_release' entry field."""
 
@@ -35,7 +34,10 @@ class EstRelease(object):
         return entry.get('est_release')
 
 
-plugin.register(EstRelease, 'test_release', interfaces=['estimate_release'], api_ver=2)
+pytestmark = [
+    pytest.mark.register_plugin(SearchPlugin, 'test_search', interfaces=['search'], api_ver=2),
+    pytest.mark.register_plugin(EstRelease, 'test_release', interfaces=['estimate_release'], api_ver=2)
+]
 
 
 class TestDiscover(object):

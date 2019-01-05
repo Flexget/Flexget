@@ -1,8 +1,18 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from flexget import plugin
-from flexget.event import event
+import pytest
+
+
+class PluginFakeUrlrewriter(object):
+    URL = "fake://url.com"
+
+    def url_rewritable(self, task, entry):
+        if entry['url'] != self.URL:
+            return True
+
+    def url_rewrite(self, task, entry):
+        entry['url'] = self.URL
 
 
 class TestDelay(object):
@@ -43,25 +53,10 @@ class TestDelay(object):
         manager.config["tasks"]["disable_builtins"]["disable"] = ["seen"]
         assert len(task.accepted) == 1, "seen builtin should have been disabled"
 
+    @pytest.mark.register_plugin(PluginFakeUrlrewriter, 'fake_urlrewriter', interfaces=['urlrewriter'], api_ver=2)
     def test_disable_urlrewriter(self, execute_task, manager):
         task = execute_task('disable_urlrewriter')
         assert task.accepted[0]['url'] == PluginFakeUrlrewriter.URL
         manager.config["tasks"]["disable_urlrewriter"]["disable"] = ["seen", "fake_urlrewriter"]
         task = execute_task('disable_urlrewriter')
         assert task.accepted[0]['url'] == "blah://aoeu"
-
-
-class PluginFakeUrlrewriter(object):
-    URL = "fake://url.com"
-
-    def url_rewritable(self, task, entry):
-        if entry['url'] != self.URL:
-            return True
-
-    def url_rewrite(self, task, entry):
-        entry['url'] = self.URL
-
-
-@event('plugin.register')
-def register_plugin():
-    plugin.register(PluginFakeUrlrewriter, 'fake_urlrewriter', interfaces=['urlrewriter'], api_ver=2)

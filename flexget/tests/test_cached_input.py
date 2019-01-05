@@ -23,11 +23,9 @@ class InputPersist(object):
         return [Entry(title='Test', url='http://test.com')]
 
 
-plugin.register(InputPersist, 'test_input', api_ver=2)
-
-
 @pytest.mark.filecopy('rss.xml', '__tmp__/cached.xml')
 @pytest.mark.usefixtures('tmpdir')
+@pytest.mark.register_plugin(InputPersist, 'test_input', api_ver=2)
 class TestInputCache(object):
     config = """
         tasks:
