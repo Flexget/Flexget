@@ -218,8 +218,6 @@ def register_plugin(request):
         result = register(*args, **kwargs)
         result.initialize()
         loaded_plugins.append(result.name)
-        # Make sure the config schema updates with the new plugins
-        fire_event('config.register')
 
     for marker in request.node.iter_markers('register_plugin'):
         load_plugin(*marker.args, **marker.kwargs)
@@ -228,8 +226,6 @@ def register_plugin(request):
 
     for p in loaded_plugins:
         plugins.pop(p, None)
-    # Make sure config schema removes the temporary plugins
-    fire_event('config.register')
 
 
 @pytest.yield_fixture()
