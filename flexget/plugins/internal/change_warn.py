@@ -31,10 +31,6 @@ class ChangeWarn(object):
             log.critical('Plugin nzb_size is deprecated, use content_size instead')
             found_deprecated = True
 
-        if 'disable_urlrewriters' in task.config:
-            log.critical('Plugin disable_urlrewriters is deprecated, use disable instead')
-            found_deprecated = True
-
         if found_deprecated:
             task.manager.shutdown(finish_queue=False)
             task.abort('Deprecated config.')
