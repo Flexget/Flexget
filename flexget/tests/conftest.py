@@ -211,7 +211,6 @@ def register_plugin(request):
     A function which loads a plugin only for the test function it is called from.
     """
     from flexget.plugin import plugins, register
-    from flexget.event import fire_event
     loaded_plugins = []
 
     def load_plugin(*args, **kwargs):
