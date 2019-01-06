@@ -249,6 +249,7 @@ class RTorrent(object):
         # Additional fields to set
         for key, val in fields.items():
             # Values must be escaped if within params
+            # TODO: What are the escaping requirements? re.escape works differently on python 3.7+
             params.append('d.%s.set=%s' % (key, re.escape(native_str(val))))
 
         if mkdir and 'directory' in fields:

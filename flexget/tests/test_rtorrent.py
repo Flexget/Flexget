@@ -3,6 +3,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.xmlrpc import client as xmlrpc_client
 
 import os
+import re
 
 import mock
 
@@ -67,7 +68,10 @@ class TestRTorrentClient(object):
 
         fields = [p for p in called_args[2:]]
         assert len(fields) == 3
-        assert 'd.directory.set=\\/data\\/downloads' in fields
+        # TODO: check the note in clients/rtorrent.py about this escaping.
+        # The client should be fixed to work consistenly on all python versions
+        # Calling re.escape here is a workaround so test works on python 3.7 and older versions
+        assert ('d.directory.set=' + re.escape('/data/downloads')) in fields
         assert 'd.custom1.set=testing' in fields
         assert 'd.priority.set=3' in fields
 
