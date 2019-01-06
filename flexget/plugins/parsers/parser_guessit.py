@@ -226,7 +226,9 @@ class ParserGuessit(object):
         country = guess_result.get('country')
         if not name:
             name = guess_result.get('title')
-            if country and hasattr(country, 'alpha2'):
+            if not name:
+                valid = False
+            elif country and hasattr(country, 'alpha2'):
                 name += ' (%s)' % country.alpha2
         elif guess_result.matches['title']:
             # Make sure the name match is up to FlexGet standards

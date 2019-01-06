@@ -31,7 +31,7 @@ class TestNpoWatchlistInfo(object):
         assert entry['npo_name'] == 'Zondag met Lubach'
         assert entry['npo_description'] == 'Zeven dagen nieuws in dertig minuten, satirisch geremixt door Arjen Lubach. Met irrelevante verhalen van relevante gasten. Of andersom. Vanuit theater Bellevue in Amsterdam: platte inhoud en diepgravende grappen.'
         assert entry['npo_runtime'] == '32'
-        assert entry['npo_version'] == 'NPO.release-1.31.1'  # specify for which version of NPO website we did run this unittest
+        assert entry['npo_version'] == 'NPO.release-1.41.4'  # specify for which version of NPO website we did run this unittest
 
         entry = task.find_entry(url='https://www.npostart.nl/14-01-2014/VARA_101348553') is None  # episode with weird (and broken) URL and should be skipped
         entry = task.find_entry(url='https://www.npostart.nl/zembla/12-12-2013/VARA_101320582')  # check that the next episode it there though

@@ -196,7 +196,7 @@ class NPOWatchlist(object):
             for tile in tiles:
                 # there is only one list_item per tile
                 for list_item in get_soup(tile).findAll('div', class_='npo-asset-tile-container'):
-                    episode_id = list_item['id']
+                    episode_id = list_item['data-id']
                     log.debug('Parsing episode: %s', episode_id)
 
                     url = list_item.find('a')['href']

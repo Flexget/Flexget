@@ -88,10 +88,10 @@ class TestFilesystem(object):
             file = Path(file)
             if test_type == 'positive':
                 assertion_error = 'Failed %s %s test, did not find %s' % (test_type, task_name, file)
-                assert task.find_entry(title=file.namebase), assertion_error
+                assert task.find_entry(title=file.stem), assertion_error
             else:
                 assertion_error = 'Failed %s %s test, found %s' % (test_type, task_name, file)
-                assert not task.find_entry(title=file.namebase), assertion_error
+                assert not task.find_entry(title=file.stem), assertion_error
 
     def test_string(self, execute_task):
         task_name = 'string'
