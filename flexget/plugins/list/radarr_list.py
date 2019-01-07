@@ -23,8 +23,7 @@ class RadarrRequestError(Exception):
     def __init__(self, value, logger=log, **kwargs):
         super(RadarrRequestError, self).__init__()
         # Value is expected to be a string
-        if not isinstance(value, str):
-            value = str(value)
+        value = str(value)
         self.value = value
         self.log = logger
         self.kwargs = kwargs
@@ -49,8 +48,6 @@ def spec_exception_from_response_ex(radarr_request_ex):
 
     if error_message.lower() == "this movie has already been added":
         return RadarrMovieAlreadyExistsError()
-
-    return None
 
 
 def request_get_json(url, headers):
@@ -285,7 +282,6 @@ def radarr_quality_to_flexget_quality_req(radarr_quality):
         log.error(
             "Failed to convert %s into a valid quality requirement", flexget_quality_req_string
         )
-        return None
 
 
 def get_flexget_qualities(profile, cutoff_only=False):
@@ -427,8 +423,10 @@ class RadarrSet(MutableSet):
 
     def _find_matching_entry(self, entry):
         """
-        Finds a movie by first checking agains the ids of the provided entry,
-        and if none matches, check by title name
+        Finds a movie by first checking against the ids of the
+        provided entry, and if none matches, check by title name
+
+        :returns entry or None
         """
         for movie_entry in self.items:
             # First check if any of the id attributes match
@@ -444,10 +442,9 @@ class RadarrSet(MutableSet):
             if movie_name:
                 if movie_name.lower() == movie_entry["movie_name"].lower():
                     # The name matches. If we also have a year lets check that as well.
-                    if movie_year and movie_entry["movie_year"]:
-                        if movie_year == movie_entry["movie_year"]:
-                            # Movie name and year matches
-                            return movie_entry
+                    if movie_year == movie_entry.get("movie_year", object()):
+                        # Movie name and year matches
+                        return movie_entry
                     else:
                         # The movie had no year present
                         return movie_entry
@@ -457,14 +454,13 @@ class RadarrSet(MutableSet):
             if title == movie_entry["title"].lower():
                 return movie_entry
 
-        # Did not find a match
-        return None
-
     def _get_movie_entries(self):
         """
         Returns a collection of Entry instances
         that represents the entries in the Radarr
         movie list
+
+        :returns list of entries
         """
         profiles = self.service.get_profiles()
         movies = self.service.get_movies()
@@ -557,8 +553,6 @@ class RadarrSet(MutableSet):
                     return results[0]
             except RadarrRequestError as ex:
                 log.error("The search term lookup raised exception: %s", ex)
-
-        return None
 
 
 class RadarrList(object):
