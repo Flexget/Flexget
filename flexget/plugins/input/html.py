@@ -34,28 +34,43 @@ class InputHtml(object):
         to match only to desired content.
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('text')
-        advanced = root.accept('dict')
-        advanced.accept('url', key='url', required=True)
-        advanced.accept('text', key='username')
-        advanced.accept('text', key='password')
-        advanced.accept('text', key='dump')
-        advanced.accept('text', key='title_from')
-        advanced.accept('boolean', key='allow_empty_links')
-        regexps = advanced.accept('list', key='links_re')
-        regexps.accept('regexp')
-        advanced.accept('boolean', key='increment')
-        increment = advanced.accept('dict', key='increment')
-        increment.accept('integer', key='from')
-        increment.accept('integer', key='to')
-        increment.accept('text', key='name')
-        increment.accept('integer', key='step')
-        increment.accept('boolean', key='stop_when_empty')
-        increment.accept('integer', key='entries_count')
-        return root
+    schema = {
+        'oneOf': [
+            {'type': 'string'},
+            {
+                'type': 'object',
+                'properties': {
+                    'url': {'type': 'string', 'format': 'url'},
+                    'username': {'type': 'string'},
+                    'password': {'type': 'string'},
+                    'dump': {'type': 'string'},
+                    'title_from': {'type': 'string'},
+                    'allow_empty_links': {'type': 'boolean'},
+                    'links_re': {
+                        'type': 'array',
+                        'items': {'type': 'string', 'format': 'regex'}
+                    },
+                    'increment': {'oneOf': [
+                        {'type': 'boolean'},
+                        {
+                            'type': 'object',
+                            'properties': {
+                                'from': {'type': 'integer'},
+                                'to': {'type': 'integer'},
+                                'name': {'type': 'string'},
+                                'step': {'type': 'integer'},
+                                'stop_when_empty': {'type': 'boolean'},
+                                'entries_count': {'type': 'integer'}
+                            },
+                            'additionalProperties': False
+                        }
+                    ]}
+                },
+                'required': ['url'],
+                'additionalProperties': False
+            }
+        ]
+    }
 
     def build_config(self, config):
 
