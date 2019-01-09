@@ -51,7 +51,8 @@ class MetainfoMediaId(object):
                 series_id = (entry['series_season'], 0)
             elif entry.get('series_date'):
                 series_id = entry['series_date']
-            entry_id += ' ' + series_id
+            if series_id:
+                entry_id += ' ' + series_id
 
         if entry_id:
             entry_id = entry_id.strip().lower()
