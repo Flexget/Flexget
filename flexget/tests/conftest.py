@@ -189,10 +189,10 @@ def pytest_configure(config):
 
 def pytest_runtest_setup(item):
     # Add the filcopy fixture to any test marked with filecopy
-    if item.get_marker('filecopy'):
+    if item.get_closest_marker('filecopy'):
         item.fixturenames.append('filecopy')
     # Add the online marker to tests that will go online
-    if item.get_marker('online'):
+    if item.get_closest_marker('online'):
         item.fixturenames.append('use_vcr')
     else:
         item.fixturenames.append('no_requests')
