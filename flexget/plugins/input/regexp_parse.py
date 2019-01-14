@@ -79,49 +79,56 @@ class RegexpParse(object):
                    'VERBOSE': re.VERBOSE
                    }
 
+    FLAG_REGEX = r'^(\s?({})\s?(,|$))+$'.format('|'.join(FLAG_VALUES))
+
+    schema = {
+        'definitions': {
+            'regex_list': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'regexp': {'type': 'string', 'format': 'regex'},
+                        'flags': {
+                            'type': 'string',
+                            'pattern': FLAG_REGEX,
+                            'error_pattern': 'Must be a comma separated list of flags. See python regex docs.'
+                        },
+                    },
+                    'required': ['regexp'],
+                    'additionalProperties': False,
+                }
+            }
+        },
+        'type': 'object',
+        'properties': {
+            'source': {
+                'anyOf': [
+                    {'type': 'string', 'format': 'url'},
+                    {'type': 'string', 'format': 'file'},
+                ]
+            },
+            'sections': {'$ref': '#/definitions/regex_list'},
+            'keys': {
+                'type': 'object',
+                'additionalProperties': {
+                    'type': 'object',
+                    'properties': {
+                        'required': {'type': 'boolean'},
+                        'regexps': {'$ref': '#/definitions/regex_list'},
+                    },
+                    'required': ['regexps'],
+                    'additionalProperties': False,
+                },
+                'required': ['title', 'url'],
+            },
+        },
+        'required': ['source', 'keys'],
+        'additionalProperties': False,
+    }
+
     def __init__(self):
         self.required = []
-
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('dict')
-
-        root.accept('url', key='source', required=True)
-        root.accept('file', key='source', required=True)
-
-        # sections to divied source into
-        sections_regexp_lists = root.accept('list', key='sections')
-        section_regexp_list = sections_regexp_lists.accept('dict', required=True)
-        section_regexp_list.accept('regexp', key='regexp', required=True)
-        section_regexp_list.accept('text', key='flags')
-
-        keys = root.accept('dict', key='keys', required=True)
-
-        # required key need to specify for validator
-        title = keys.accept('dict', key='title', required=True)
-        title.accept('boolean', key='required')
-        regexp_list = title.accept('list', key='regexps', required=True)
-        regexp = regexp_list.accept('dict', required=True)
-        regexp.accept('regexp', key='regexp', required=True)
-        regexp.accept('text', key='flags')
-
-        # required key need to specify for validator
-        url = keys.accept_any_key('dict', key='url', required=True)
-        url.accept('boolean', key='required')
-        regexp_list = url.accept('list', key='regexps', required=True)
-        regexp = regexp_list.accept('dict', required=True)
-        regexp.accept('regexp', key='regexp', required=True)
-        regexp.accept('text', key='flags')
-
-        # accept any other key the user wants to use
-        key = keys.accept_any_key('dict')
-        key.accept('boolean', key='required')
-        regexp_list = key.accept('list', key='regexps', required=True)
-        regexp = regexp_list.accept('dict', required=True)
-        regexp.accept('regexp', key='regexp', required=True)
-        regexp.accept('text', key='flags')
-
-        return root
 
     def flagstr_to_flags(self, flag_str):
         """turns a comma seperated list of flags into the int value."""
