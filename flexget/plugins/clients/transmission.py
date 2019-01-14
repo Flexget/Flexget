@@ -40,17 +40,6 @@ class TransmissionBase(object):
         self.client = None
         self.opener = None
 
-    def _validator(self, advanced):
-        """Return config validator"""
-        advanced.accept('text', key='host')
-        advanced.accept('integer', key='port')
-        # note that password is optional in transmission
-        advanced.accept('file', key='netrc')
-        advanced.accept('text', key='username')
-        advanced.accept('text', key='password')
-        advanced.accept('boolean', key='enabled')
-        return advanced
-
     def prepare_config(self, config):
         if isinstance(config, bool):
             config = {'enabled': config}
@@ -147,14 +136,24 @@ class TransmissionBase(object):
 
 class PluginTransmissionInput(TransmissionBase):
 
-    def validator(self):
-        """Return config validator"""
-        root = validator.factory()
-        root.accept('boolean')
-        advanced = root.accept('dict')
-        self._validator(advanced)
-        advanced.accept('boolean', key='onlycomplete')
-        return root
+    schema = {
+        'anyOf': [
+            {'type': 'boolean'},
+            {
+                'type': 'object',
+                'properties': {
+                    'host': {'type': 'string'},
+                    'port': {'type': 'integer'},
+                    'netrc': {'type': 'string', 'format': 'file'},
+                    'username': {'type': 'string'},
+                    'password': {'type': 'string'},
+                    'enabled': {'type': 'boolean'},
+                    'onlycomplete': {'type': 'boolean'},
+                },
+                'additionalProperties': False,
+            },
+        ]
+    }
 
     def prepare_config(self, config):
         config = TransmissionBase.prepare_config(self, config)
@@ -627,21 +626,33 @@ class PluginTransmissionClean(TransmissionBase):
         enabled: yes
     """
 
-    def validator(self):
-        """Return config validator"""
-        root = validator.factory()
-        root.accept('boolean')
-        advanced = root.accept('dict')
-        self._validator(advanced)
-        advanced.accept('number', key='min_ratio')
-        advanced.accept('interval', key='finished_for')
-        advanced.accept('boolean', key='transmission_seed_limits')
-        advanced.accept('boolean', key='delete_files')
-        advanced.accept('regexp', key='tracker')
-        advanced.accept('regexp', key='preserve_tracker')
-        directories_re = advanced.accept('list', key='directories')
-        directories_re.accept('regexp')
-        return root
+    schema = {
+        "anyOf": [
+            {"type": "boolean"},
+            {
+                "type": "object",
+                "properties": {
+                    "host": {"type": "string"},
+                    "port": {"type": "integer"},
+                    "netrc": {"type": "string", "format": "file"},
+                    "username": {"type": "string"},
+                    "password": {"type": "string"},
+                    "enabled": {"type": "boolean"},
+                    "min_ratio": {"type": "number"},
+                    "finished_for": {"type": "string", "format": "interval"},
+                    "transmission_seed_limits": {"type": "boolean"},
+                    "delete_files": {"type": "boolean"},
+                    "tracker": {"type": "string", "format": "regex"},
+                    "preserve_tracker": {"type": "string", "format": "regex"},
+                    "directories": {
+                        "type": "array",
+                        "items": {"type": "string", "format": "regex"},
+                    },
+                },
+                "additionalProperties": False,
+            },
+        ]
+    }
 
     def on_task_exit(self, task, config):
         config = self.prepare_config(config)
