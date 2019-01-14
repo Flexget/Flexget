@@ -36,18 +36,21 @@ class RottenTomatoesList(object):
 
     """
 
-    def __init__(self):
-        # We could pull these from the API through lists.json but that's extra web/API key usage
-        self.dvd_lists = ['top_rentals', 'current_releases', 'new_releases', 'upcoming']
-        self.movie_lists = ['box_office', 'in_theaters', 'opening', 'upcoming']
-
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('dict')
-        root.accept('list', key='dvds').accept('choice').accept_choices(self.dvd_lists)
-        root.accept('list', key='movies').accept('choice').accept_choices(self.movie_lists)
-        root.accept('text', key='api_key')
-        return root
+    schema = {
+        'type': 'object',
+        'properties': {
+            'dvds': {
+                'type': 'array',
+                'items': {'enum': ['top_rentals', 'current_releases', 'new_releases', 'upcoming']}
+            },
+            'movies': {
+                'type': 'array',
+                'items': {'enum': ['box_office', 'in_theaters', 'opening', 'upcoming']}
+            },
+            'api_key': {'type': 'string'}
+        },
+        'additionalProperties': False
+    }
 
     @cached('rottentomatoes_list', persist='2 hours')
     def on_task_input(self, task, config):
