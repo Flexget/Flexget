@@ -6,6 +6,7 @@ from future.utils import text_type
 
 import os
 import stat
+import sys
 
 import pytest
 
@@ -129,10 +130,8 @@ class TestDownload(object):
               fail_html: no
     """
 
+    @pytest.mark.skipif(sys.platform.startswith('win'), reason="doesn't work on windows")
     def test_download(self, execute_task, tmpdir):
-        # NOTE: what the hell is .obj and where it comes from?
-        # Re: seems to come from python mimetype detection in download plugin ...
-        # Re Re: Implemented in such way that extension does not matter?
         # A little convoluted, but you have to set the umask in order to have
         # the current value returned to you
         curr_umask = os.umask(0)
@@ -143,8 +142,7 @@ class TestDownload(object):
         testfile = task.entries[0]['location']
         assert os.path.exists(testfile), 'download file does not exists'
         testfile_stat = os.stat(testfile)
-        modes_equal = 0o666 & ~curr_umask == stat.S_IMODE(testfile_stat.st_mode)
-        assert modes_equal, 'download file mode not honoring umask'
+        assert 0o666 & ~curr_umask == stat.S_IMODE(testfile_stat.st_mode), 'download file mode not honoring umask'
 
 
 class TestEntryUnicodeError(object):
