@@ -61,29 +61,28 @@ class FilterRottenTomatoes(object):
             - G
     """
 
-    def __init__(self):
-        # We could pull these from the API through lists.json but that's extra web/API key usage
-        self.critics_ratings = {'rotten': 0, 'fresh': 1, 'certified fresh': 2}
-        self.audience_ratings = {'spilled': 0, 'upright': 1}
+    critics_ratings = {'rotten': 0, 'fresh': 1, 'certified fresh': 2}
+    audience_ratings = {'spilled': 0, 'upright': 1}
 
-    def validator(self):
-        from flexget import validator
-        rt = validator.factory('dict')
-        rt.accept('integer', key='min_year')
-        rt.accept('integer', key='max_year')
-        rt.accept('number', key='min_critics_score')
-        rt.accept('number', key='min_audience_score')
-        rt.accept('number', key='min_average_score')
-        rt.accept('choice', key='min_critics_rating').accept_choices(list(self.critics_ratings.keys()))
-        rt.accept('choice', key='min_audience_rating').accept_choices(list(self.audience_ratings.keys()))
-        rt.accept('list', key='reject_genres').accept('text')
-        rt.accept('list', key='reject_actors').accept('text')
-        rt.accept('list', key='accept_actors').accept('text')
-        rt.accept('list', key='reject_directors').accept('text')
-        rt.accept('list', key='accept_directors').accept('text')
-        rt.accept('list', key='reject_mpaa_ratings').accept('text')
-        rt.accept('list', key='accept_mpaa_ratings').accept('text')
-        return rt
+    schema = {
+        'type': 'object',
+        'properties': {
+            'min_year': {'type': 'integer'},
+            'max_year': {'type': 'integer'},
+            'min_critics_score': {'type': 'number'},
+            'min_audience_score': {'type': 'number'},
+            'min_average_score': {'type': 'number'},
+            'min_critics_rating': {'enum': list(critics_ratings)},
+            'min_audience_rating': {'enum': list(audience_ratings)},
+            'reject_genres': {'type': 'array', 'items': {'type': 'string'}},
+            'reject_actors': {'type': 'array', 'items': {'type': 'string'}},
+            'accept_actors': {'type': 'array', 'items': {'type': 'string'}},
+            'reject_directors': {'type': 'array', 'items': {'type': 'string'}},
+            'accept_directors': {'type': 'array', 'items': {'type': 'string'}},
+            'reject_mpaa_ratings': {'type': 'array', 'items': {'type': 'string'}},
+            'accept_mpaa_ratings': {'type': 'array', 'items': {'type': 'string'}}},
+        'additionalProperties': False
+    }
 
     # Run later to avoid unnecessary lookups
     @plugin.priority(115)
