@@ -13,7 +13,7 @@ from datetime import datetime
 from datetime import timedelta
 from netrc import netrc, NetrcParseError
 
-from flexget import plugin, validator
+from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.template import RenderError
