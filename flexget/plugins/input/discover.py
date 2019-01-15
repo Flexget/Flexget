@@ -123,7 +123,8 @@ class Discover(object):
                     for e in search_results:
                         e['discovered_from'] = entry['title']
                         e['discovered_with'] = plugin_name
-                        e.on_complete(self.entry_complete, query=entry, search_results=search_results)
+                        # 'search_results' can be any iterable, make sure it's a list.
+                        e.on_complete(self.entry_complete, query=entry, search_results=list(search_results))
 
                     entry_results.extend(search_results)
 
