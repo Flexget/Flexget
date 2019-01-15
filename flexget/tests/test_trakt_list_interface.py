@@ -80,6 +80,7 @@ class TestTraktList(object):
                 'trakt_series_name': 'Castle',
                 'trakt_series_year': 2009,
                 'title': 'Castle (2009) S08E15 Fidelis Ad Mortem',
+                'original_title': 'Castle (2009) S08E15 Fidelis Ad Mortem',
                 'trakt_show_id': 1410,
                 'trakt_ep_name': 'Fidelis Ad Mortem',
                 'tvrage_id': 19267
@@ -89,6 +90,7 @@ class TestTraktList(object):
                 'original_url': 'https://trakt.tv/movies/deadpool-2016',
                 'tmdb_id': 293660,
                 'title': 'Deadpool (2016)',
+                'original_title': 'Deadpool (2016)',
                 'url': 'https://trakt.tv/movies/deadpool-2016',
                 'trakt_movie_id': 190430,
                 'trakt_movie_name': 'Deadpool',
@@ -101,6 +103,7 @@ class TestTraktList(object):
                 'trakt_show_slug': 'the-walking-dead',
                 'tmdb_id': 1402,
                 'title': 'The Walking Dead (2010)',
+                'original_title': 'The Walking Dead (2010)',
                 'url': 'https://trakt.tv/shows/the-walking-dead',
                 'original_url': 'https://trakt.tv/shows/the-walking-dead',
                 'series_name': 'The Walking Dead (2010)',

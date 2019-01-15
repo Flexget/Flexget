@@ -210,6 +210,7 @@ class Entry(LazyDict):
         if key == 'title':
             if not isinstance(value, (str, LazyLookup)):
                 raise PluginError('Tried to set title to %r' % value)
+            self.setdefault('original_title', value)
 
         try:
             log.trace('ENTRY SET: %s = %r' % (key, value))
@@ -294,10 +295,11 @@ class Entry(LazyDict):
         return render_from_entry(template, self)
 
     def __eq__(self, other):
-        return self.get('title') == other.get('title') and self.get('original_url') == other.get('original_url')
+        return (self.get('original_title') == other.get('original_title') and
+                self.get('original_url') == other.get('original_url'))
 
     def __hash__(self):
-        return hash(self.get('title', '') + self.get('original_url', ''))
+        return hash(self.get('original_title', '') + self.get('original_url', ''))
 
     def __repr__(self):
         return '<Entry(title=%s,state=%s)>' % (self['title'], self._state)

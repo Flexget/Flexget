@@ -202,7 +202,7 @@ class TestNfoLookupWithMovies(object):
             # NOTE: The mock configuration in test_8 only specify the fields "title", "filename" and "nfo_id". The other
             # fields in the assert below are added by the testing framework and the mock plugin. If this change in any
             # future version make the necessary changes in the assert below.
-            assert keys == sorted(['title', 'filename', 'nfo_id', 'task', 'url', 'original_url', 'quality'])
+            assert keys == sorted(['title', 'original_title', 'filename', 'nfo_id', 'task', 'url', 'original_url', 'quality'])
 
     def test_nfo_lookup_with_disabled_configuration(self, execute_task):
         task = execute_task('test_9')
