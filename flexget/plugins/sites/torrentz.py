@@ -16,12 +16,12 @@ from flexget.utils.search import torrent_availability, normalize_unicode
 
 log = logging.getLogger('torrentz')
 
-REGEXP = re.compile(r'https?://torrentz2\.(eu|me|ch|in)/(?P<hash>[a-f0-9]{40})')
+REGEXP = re.compile(r'https?://torrentz2\.(eu|is)/(?P<hash>[a-f0-9]{40})')
 REPUTATIONS = {  # Maps reputation name to feed address
-    'any': 'feed_any',
-    'low': 'feed_low',
+#    'any': 'feed_any',
+#    'low': 'feed_low',
     'good': 'feed',
-    'verified': 'feed_verified'
+#    'verified': 'feed_verified'
 }
 
 
@@ -70,9 +70,9 @@ class Torrentz(object):
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string + config.get('extra_terms', ''))
-            for domain in ['eu', 'me', 'ch', 'in']:
+            for domain in ['eu', 'is']:
                 # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-                url = 'http://torrentz2.%s/%s?q=%s' % (domain, feed, quote(query.encode('utf-8')))
+                url = 'http://torrentz2.%s/%s?f=%s' % (domain, feed, quote(query.encode('utf-8')))
                 log.debug('requesting: %s' % url)
                 try:
                     r = task.requests.get(url)
