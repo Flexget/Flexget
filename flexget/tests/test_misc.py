@@ -12,42 +12,6 @@ import pytest
 from flexget.entry import EntryUnicodeError, Entry
 
 
-class TestDisableBuiltins(object):
-    """
-        Quick a hack, test disable functionality by checking if seen filtering (builtin) is working
-    """
-
-    config = """
-        tasks:
-          test:
-            mock:
-              - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5}
-              - {title: 'dupe2', url: 'http://localhost/dupe', 'imdb_score': 5}
-            accept_all: yes
-            disable: builtins
-
-          test2:
-            mock:
-              - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5,
-                description: 'http://www.imdb.com/title/tt0409459/'}
-              - {title: 'dupe2', url: 'http://localhost/dupe', 'imdb_score': 5}
-            accept_all: yes
-            disable:
-              - seen
-              - cli_config
-    """
-
-    def test_disable_builtins(self, execute_task):
-        # Execute the task once, then we'll make sure seen plugin isn't rejecting on future executions
-        execute_task('test')
-        task = execute_task('test')
-        assert task.find_entry('accepted', title='dupe1') and task.find_entry('accepted', title='dupe2'), \
-            'disable is not working?'
-        task = execute_task('test2')
-        assert task.find_entry(title='dupe1').accepted and task.find_entry('accepted', title='dupe2'), \
-            'disable is not working?'
-
-
 @pytest.mark.online
 class TestInputHtml(object):
     config = """

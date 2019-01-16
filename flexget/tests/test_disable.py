@@ -15,7 +15,7 @@ class PluginFakeUrlrewriter(object):
         entry['url'] = self.URL
 
 
-class TestDelay(object):
+class TestDisable(object):
     config = """
         tasks:
           disable_from_config:
@@ -40,7 +40,7 @@ class TestDelay(object):
         task = execute_task('disable_from_config')
         assert len(task.entries) == 0
 
-    def test_disable_builtin(self, execute_task, manager):
+    def test_disable_builtins(self, execute_task, manager):
         task = execute_task('disable_builtins')
         assert len(task.accepted) == 1
         task = execute_task('disable_builtins')
