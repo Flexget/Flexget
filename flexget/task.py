@@ -254,6 +254,7 @@ class Task(object):
         self._rerun = False
 
         self.disabled_phases = []
+        self.disabled_plugins = set()
 
         # current state
         self.current_phase = None
@@ -357,6 +358,17 @@ class Task(object):
             log.debug('Disabling %s phase' % phase)
             self.disabled_phases.append(phase)
 
+    def disable_plugin(self, plugin):
+        """
+        Disable `plugin` from executing in this task.
+        Any plugins who load subplugins should check Task().disabled_plugins set before executing the plugin.
+
+        :param plugin: Name of the plugin to disable.
+        """
+        if plugin not in all_plugins:
+            raise ValueError('{} is not a valid plugin.'.format(plugin))
+        self.disabled_plugins.add(plugin)
+
     def abort(self, reason='Unknown', silent=False, traceback=None):
         """Abort this task execution, no more plugins will be executed except the abort handling ones."""
         self.aborted = True
@@ -400,7 +412,7 @@ class Task(object):
             plugins = sorted(get_plugins(phase=phase), key=lambda p: p.phase_handlers[phase], reverse=True)
         else:
             plugins = iter(all_plugins.values())
-        return (p for p in plugins if p.name in self.config or p.builtin and p.enabled)
+        return (p for p in plugins if p.name in self.config or p.builtin and p.name not in self.disabled_plugins)
 
     def __run_task_phase(self, phase):
         """Executes task phase, ie. call all enabled plugins on the task.

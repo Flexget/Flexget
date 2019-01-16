@@ -41,48 +41,21 @@ class DisablePlugin(object):
 
     schema = one_or_more({'type': 'string'})
 
-    def __init__(self):
-        self.disabled_plugins = []
-
     @plugin.priority(254)
     def on_task_start(self, task, config):
-        disabled_in_task = []
-
         if isinstance(config, str):
             config = [config]
 
         for p in config:
-            # Disable plugins explicitly included in config.
-            if p in task.config:
-                disabled_in_task.append(p)
-                del (task.config[p])
-            # Disable built-in plugins.
-            if p in plugin.plugins:
-                plugin.plugins[p].enabled = False
-                self.disabled_plugins.append(p)
+            task.disable_plugin(p)
 
         # Disable all builtins mode.
         if 'builtins' in config:
             for p in all_builtins():
-                p.enabled = False
-                self.disabled_plugins.append(p.name)
+                task.disable_plugin(p.name)
 
-        if self.disabled_plugins:
-            log.debug('Disabled plugin(s): %s' % ', '.join(self.disabled_plugins))
-        if disabled_in_task:
-            log.debug('Disabled task plugin(s): %s' % ', '.join(disabled_in_task))
-
-    @plugin.priority(-255)
-    def on_task_exit(self, task, config):
-        if not self.disabled_plugins:
-            return
-
-        for name in self.disabled_plugins:
-            plugin.plugins[name].enabled = True
-        log.debug('Re-enabled plugin(s): %s' % ', '.join(self.disabled_plugins))
-        self.disabled_plugins = []
-
-    on_task_abort = on_task_exit
+        if task.disabled_plugins:
+            log.debug('Disabled plugin(s): %s' % ', '.join(task.disabled_plugins))
 
 
 @event('plugin.register')
