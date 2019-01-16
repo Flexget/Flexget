@@ -36,6 +36,8 @@ class PluginUrlRewriting(object):
     def url_rewritable(self, task, entry):
         """Return True if entry is urlrewritable by registered rewriter."""
         for urlrewriter in plugin.get_plugins(interface='urlrewriter'):
+            if urlrewriter.name in task.disabled_plugins:
+                continue
             log.trace('checking urlrewriter %s', urlrewriter.name)
             if urlrewriter.instance.url_rewritable(task, entry):
                 return True
@@ -53,6 +55,8 @@ class PluginUrlRewriting(object):
                                         'some rewriter is returning always True' % entry)
             for urlrewriter in plugin.get_plugins(interface='urlrewriter'):
                 name = urlrewriter.name
+                if name in task.disabled_plugins:
+                    continue
                 try:
                     if urlrewriter.instance.url_rewritable(task, entry):
                         old_url = entry['url']

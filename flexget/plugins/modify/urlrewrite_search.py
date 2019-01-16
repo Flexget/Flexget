@@ -56,6 +56,8 @@ class PluginSearch(object):
                 if isinstance(name, dict):
                     # the name is the first/only key in the dict.
                     name, search_config = list(name.items())[0]
+                if name in task.disabled_plugins:
+                    continue
                 log.verbose('Searching `%s` from %s' % (entry['title'], name))
                 try:
                     try:
