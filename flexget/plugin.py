@@ -502,11 +502,13 @@ def get_plugins(phase=None, interface=None, category=None, name=None, min_api=No
 
 def plugin_schemas(**kwargs):
     """Create a dict schema that matches plugins specified by `kwargs`"""
-    return {'type': 'object',
-            'properties': dict((p.name, {'$ref': p.schema['id']}) for p in get_plugins(**kwargs)),
-            'additionalProperties': False,
-            'error_additionalProperties': '{{message}} Only known plugin names are valid keys.',
-            'patternProperties': {'^_': {'title': 'Disabled Plugin'}}}
+    return {
+        'type': 'object',
+        'properties': dict((p.name, {'$ref': p.schema['id']}) for p in get_plugins(**kwargs)),
+        'additionalProperties': False,
+        'error_additionalProperties': '{{message}} Only known plugin names are valid keys.',
+        'patternProperties': {'^_': {'title': 'Disabled Plugin'}}
+    }
 
 
 config_schema.register_schema('/schema/plugins', plugin_schemas)
@@ -523,7 +525,11 @@ def get_plugin_keywords():
 
 
 def get_plugin_by_name(name, issued_by='???'):
-    """Get plugin by name, preferred way since this structure may be changed at some point."""
+    """
+    Get plugin by name, preferred way since this structure may be changed at some point.
+
+    :returns PluginInfo instance
+    """
     if name not in plugins:
         raise DependencyError(issued_by=issued_by, missing=name, message='Unknown plugin %s' % name)
     return plugins[name]

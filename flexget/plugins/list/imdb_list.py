@@ -7,7 +7,6 @@ import logging
 import re
 from collections import MutableSet
 from datetime import datetime
-from itertools import chain
 
 from requests.exceptions import RequestException
 from requests.utils import cookiejar_from_dict

@@ -298,6 +298,18 @@ class Task(object):
     def undecided(self):
         """
         .. deprecated:: Use API v3
+
+        .. note:: We did not migrate to v3
+
+            If I remember correctly the idea was to make v3 signature
+            on_task_xxx(task, config, entries)
+
+            Param entries would be EntryContainer, which has convenience
+            iterator methods:
+
+            - entries.accepted
+            - entries.failed
+            - etc, which you see here
         """
         return self.all_entries.undecided
 

@@ -5,7 +5,12 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
-from flexget.plugins.filter.series import Series, set_series_begin
+try:
+    from flexget.plugins.filter.series import Series, set_series_begin
+except ImportError:
+    raise plugin.DependencyError(issued_by='series_begin', missing='series',
+                                 message='series_begin plugin need series plugin to work')
+
 
 log = logging.getLogger('set_series_begin')
 
