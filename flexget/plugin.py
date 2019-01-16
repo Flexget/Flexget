@@ -469,7 +469,7 @@ def load_plugins(extra_dirs=None):
     log.debug('Plugins took %.2f seconds to load. %s plugins in registry.', took, len(plugins.keys()))
 
 
-def get_plugins(phase=None, interface=None, category=None, name=None, min_api=None):
+def get_plugins(phase=None, interface=None, category=None, name=None, min_api=None, exclude=None):
     """
     Query other plugins characteristics.
 
@@ -478,6 +478,7 @@ def get_plugins(phase=None, interface=None, category=None, name=None, min_api=No
     :param string category: Type of plugin, phase names.
     :param string name: Name of the plugin.
     :param int min_api: Minimum api version.
+    :param list exclude: A list of plugin names to be excluded. (Useful to pass task.disabled_plugins here.)
     :return: List of PluginInfo instances.
     :rtype: list
     """
@@ -485,6 +486,8 @@ def get_plugins(phase=None, interface=None, category=None, name=None, min_api=No
     def matches(plugin):
         if phase is not None and phase not in phase_methods:
             raise ValueError('Unknown phase %s' % phase)
+        if exclude and plugin.name in exclude:
+            return False
         if phase and phase not in plugin.phase_handlers:
             return False
         if interface and interface not in plugin.interfaces:
