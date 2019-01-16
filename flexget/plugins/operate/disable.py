@@ -46,13 +46,14 @@ class DisablePlugin(object):
         if isinstance(config, str):
             config = [config]
 
-        for p in config:
-            task.disable_plugin(p)
-
         # Disable all builtins mode.
         if 'builtins' in config:
             for p in all_builtins():
                 task.disable_plugin(p.name)
+            config.remove('builtins')
+
+        for p in config:
+            task.disable_plugin(p)
 
         if task.disabled_plugins:
             log.debug('Disabled plugin(s): %s' % ', '.join(task.disabled_plugins))
