@@ -1,13 +1,29 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from flexget.plugins.parsers.parser_common import normalize_name, remove_dirt
 from flexget import plugin
 from flexget.event import event
-from flexget.plugins.filter.series import populate_entry_fields
 from flexget.plugin import get_plugin_by_name
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.filter import series as plugin_series
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='series',
+    )
+
+from flexget import plugin
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.parsers import parser_common as plugin_parser_common
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='parser_common',
+    )
 
 log = logging.getLogger('metainfo_series')
 
@@ -46,8 +62,8 @@ class MetainfoSeries(object):
         parsed = get_plugin_by_name('parsing').instance.parse_series(data=entry['title'], identified_by=identified_by,
                                                                      allow_seasonless=allow_seasonless)
         if parsed and parsed.valid:
-            parsed.name = normalize_name(remove_dirt(parsed.name))
-            populate_entry_fields(entry, parsed, config)
+            parsed.name = plugin_parser_common.normalize_name(plugin_parser_common.remove_dirt(parsed.name))
+            plugin_series.populate_entry_fields(entry, parsed, config)
             entry['series_guessed'] = True
             return True
         return False

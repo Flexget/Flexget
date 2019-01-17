@@ -1,17 +1,26 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa
 
 import datetime
+from builtins import *  # noqa
 from datetime import timedelta
 
 from colorclass.toggles import disable_all_colors
-from flexget import options
-from flexget.event import event
-from flexget.manager import Session
-from flexget.plugins.operate.status import StatusTask, TaskExecution
-from flexget.terminal import TerminalTable, TerminalTableError, table_parser, colorize, console
 from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
+
+from flexget import options
+from flexget import plugin
+from flexget.event import event
+from flexget.manager import Session
+from flexget.terminal import TerminalTable, TerminalTableError, table_parser, colorize, console
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.operate import status as plugin_status
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='status',
+    )
 
 
 def do_cli(manager, options):
@@ -28,12 +37,12 @@ def do_cli_task(manager, options):
     table_data = [header]
     with Session() as session:
         try:
-            task = session.query(StatusTask).filter(StatusTask.name == options.task).one()
+            task = session.query(plugin_status.StatusTask).filter(plugin_status.StatusTask.name == options.task).one()
         except NoResultFound:
             console('Task name `%s` does not exists or does not have any records' % options.task)
             return
         else:
-            query = task.executions.order_by(desc(TaskExecution.start))[:options.limit]
+            query = task.executions.order_by(desc(plugin_status.TaskExecution.start))[:options.limit]
             for ex in reversed(query):
                 start = ex.start.strftime('%Y-%m-%d %H:%M')
                 start = colorize('green', start) if ex.succeeded else colorize('red', start)
@@ -68,12 +77,12 @@ def do_cli_summary(manager, options):
     table_data = [header]
 
     with Session() as session:
-        for task in session.query(StatusTask).all():
-            ok = session.query(TaskExecution). \
-                filter(TaskExecution.task_id == task.id). \
-                filter(TaskExecution.succeeded == True). \
-                filter(TaskExecution.produced > 0). \
-                order_by(TaskExecution.start.desc()).first()
+        for task in session.query(plugin_status.StatusTask).all():
+            ok = session.query(plugin_status.TaskExecution). \
+                filter(plugin_status.TaskExecution.task_id == task.id). \
+                filter(plugin_status.TaskExecution.succeeded == True). \
+                filter(plugin_status.TaskExecution.produced > 0). \
+                order_by(plugin_status.TaskExecution.start.desc()).first()
 
             if ok is None:
                 duration = None

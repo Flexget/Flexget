@@ -1,8 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from datetime import timedelta
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from datetime import timedelta
 
 from sqlalchemy import desc, func
 
@@ -12,9 +12,12 @@ from flexget.manager import Session
 from flexget.utils.tools import multiply_timedelta
 
 try:
-    from flexget.plugins.filter.series import Series, Episode
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.filter import series as plugin_series
 except ImportError:
-    raise plugin.DependencyError(issued_by='est_released_series', missing='series plugin', silent=True)
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='series',
+    )
 
 log = logging.getLogger('est_series_internal')
 
@@ -26,14 +29,15 @@ class EstimatesSeriesInternal(object):
         if not all(field in entry for field in ['series_name', 'series_season', 'series_episode']):
             return
         with Session() as session:
-            series = session.query(Series).filter(Series.name == entry['series_name']).first()
+            series = session.query(plugin_series.Series).filter(
+                plugin_series.Series.name == entry['series_name']).first()
             if not series:
                 return
-            episodes = (session.query(Episode).join(Episode.series).
-                        filter(Episode.season != None).
-                        filter(Series.id == series.id).
-                        filter(Episode.season == func.max(Episode.season).select()).
-                        order_by(desc(Episode.number)).limit(2).all())
+            episodes = (session.query(plugin_series.Episode).join(plugin_series.Episode.series).
+                        filter(plugin_series.Episode.season != None).
+                        filter(plugin_series.Series.id == series.id).
+                        filter(plugin_series.Episode.season == func.max(plugin_series.Episode.season).select()).
+                        order_by(desc(plugin_series.Episode.number)).limit(2).all())
 
             if len(episodes) < 2:
                 return

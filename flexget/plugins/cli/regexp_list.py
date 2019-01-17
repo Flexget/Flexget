@@ -1,15 +1,22 @@
 from __future__ import unicode_literals, division, absolute_import
+
+import re
+from argparse import ArgumentParser, ArgumentTypeError
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from argparse import ArgumentParser, ArgumentTypeError
-import re
-
 from flexget import options
+from flexget import plugin
 from flexget.event import event
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 from flexget.utils.database import Session
-from flexget.plugins.list.regexp_list import get_regexp_lists, get_list_by_exact_name, get_regexps_by_list_id, \
-    get_regexp, create_list, add_to_list_by_name
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.list import regexp_list as plugin_regexp_list
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='regexp_list',
+    )
 
 
 def do_cli(manager, options):
@@ -27,7 +34,7 @@ def do_cli(manager, options):
 
 def action_all(options):
     """ Show all regexp lists """
-    lists = get_regexp_lists()
+    lists = plugin_regexp_list.get_regexp_lists()
     header = ['#', 'List Name']
     table_data = [header]
     for regexp_list in lists:
@@ -42,13 +49,14 @@ def action_all(options):
 def action_list(options):
     """List regexp list"""
     with Session() as session:
-        regexp_list = get_list_by_exact_name(options.list_name)
+        regexp_list = plugin_regexp_list.get_list_by_exact_name(options.list_name)
         if not regexp_list:
             console('Could not find regexp list with name {}'.format(options.list_name))
             return
         header = ['Regexp']
         table_data = [header]
-        regexps = get_regexps_by_list_id(regexp_list.id, order_by='added', descending=True, session=session)
+        regexps = plugin_regexp_list.get_regexps_by_list_id(regexp_list.id, order_by='added', descending=True,
+                                                            session=session)
         for regexp in regexps:
             regexp_row = [regexp.regexp or '']
             table_data.append(regexp_row)
@@ -61,15 +69,15 @@ def action_list(options):
 
 def action_add(options):
     with Session() as session:
-        regexp_list = get_list_by_exact_name(options.list_name)
+        regexp_list = plugin_regexp_list.get_list_by_exact_name(options.list_name)
         if not regexp_list:
             console('Could not find regexp list with name {}, creating'.format(options.list_name))
-            regexp_list = create_list(options.list_name, session=session)
+            regexp_list = plugin_regexp_list.create_list(options.list_name, session=session)
 
-        regexp = get_regexp(list_id=regexp_list.id, regexp=options.regexp, session=session)
+        regexp = plugin_regexp_list.get_regexp(list_id=regexp_list.id, regexp=options.regexp, session=session)
         if not regexp:
             console("Adding regexp {} to list {}".format(options.regexp, regexp_list.name))
-            add_to_list_by_name(regexp_list.name, options.regexp, session=session)
+            plugin_regexp_list.add_to_list_by_name(regexp_list.name, options.regexp, session=session)
             console('Successfully added regexp {} to regexp list {} '.format(options.regexp, regexp_list.name))
         else:
             console("Regexp {} already exists in list {}".format(options.regexp, regexp_list.name))
@@ -77,11 +85,11 @@ def action_add(options):
 
 def action_del(options):
     with Session() as session:
-        regexp_list = get_list_by_exact_name(options.list_name)
+        regexp_list = plugin_regexp_list.get_list_by_exact_name(options.list_name)
         if not regexp_list:
             console('Could not find regexp list with name {}'.format(options.list_name))
             return
-        regexp = get_regexp(list_id=regexp_list.id, regexp=options.regexp, session=session)
+        regexp = plugin_regexp_list.get_regexp(list_id=regexp_list.id, regexp=options.regexp, session=session)
         if regexp:
             console('Removing regexp {} from list {}'.format(options.regexp, options.list_name))
             session.delete(regexp)
@@ -92,7 +100,7 @@ def action_del(options):
 
 def action_purge(options):
     with Session() as session:
-        regexp_list = get_list_by_exact_name(options.list_name)
+        regexp_list = plugin_regexp_list.get_list_by_exact_name(options.list_name)
         if not regexp_list:
             console('Could not find regexp list with name {}'.format(options.list_name))
             return

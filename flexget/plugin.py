@@ -30,7 +30,7 @@ class DependencyError(Exception):
     Args:
         issued_by: name of the plugin trying to do the import
         missing: name of the plugin or library that is missing
-        message: user readable error message
+        message: customized user readable error message
 
     All args are optional.
     """
@@ -398,7 +398,7 @@ def _load_plugins_from_dirs(dirs):
                 if e.has_message():
                     msg = e.message
                 else:
-                    msg = 'Plugin `%s` requires `%s` to load.', e.issued_by or module_name, e.missing or 'N/A'
+                    msg = 'Plugin `%s` requires plugin `%s` to load.' % (e.issued_by or module_name, e.missing or 'N/A')
                 if not e.silent:
                     log.warning(msg)
                 else:

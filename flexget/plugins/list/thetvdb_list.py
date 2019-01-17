@@ -1,16 +1,23 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from collections import MutableSet
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
-from flexget.plugins.internal.api_tvdb import TVDBRequest, lookup_series
 from flexget.utils.requests import RequestException
 from flexget.utils.tools import split_title_year
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.internal import api_tvdb as plugin_api_tvdb
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='api_tvdb',
+    )
 
 log = logging.getLogger('thetvdb_list')
 
@@ -55,8 +62,10 @@ class TheTVDBSet(MutableSet):
     def items(self):
         if self._items is None:
             try:
-                req = TVDBRequest(username=self.config['username'], account_id=self.config['account_id'], api_key=self.config['api_key']).get(
-                    'user/favorites')
+                req = plugin_api_tvdb.TVDBRequest(
+                    username=self.config['username'],
+                    account_id=self.config['account_id'],
+                    api_key=self.config['api_key']).get('user/favorites')
                 series_ids = [int(f_id) for f_id in req['favorites'] if f_id != '']
             except RequestException as e:
                 raise PluginError('Error retrieving favorites from thetvdb: %s' % str(e))
@@ -64,7 +73,7 @@ class TheTVDBSet(MutableSet):
             for series_id in series_ids:
                 # Lookup the series name from the id
                 try:
-                    series = lookup_series(tvdb_id=series_id)
+                    series = plugin_api_tvdb.lookup_series(tvdb_id=series_id)
                 except LookupError as e:
                     log.error('Error looking up %s from thetvdb: %s' % (series_id, e.args[0]))
                 else:
@@ -87,7 +96,8 @@ class TheTVDBSet(MutableSet):
             log.verbose('entry does not have `tvdb_id`, cannot add to list. Consider using a lookup plugin`')
             return
         try:
-            TVDBRequest(username=self.config['username'], account_id=self.config['account_id'], api_key=self.config['api_key']).put(
+            plugin_api_tvdb.TVDBRequest(username=self.config['username'], account_id=self.config['account_id'],
+                                        api_key=self.config['api_key']).put(
                 'user/favorites/{}'.format(entry['tvdb_id']))
         except RequestException as e:
             log.error('Could not add tvdb_id {} to favourites list: {}'.format(entry['tvdb_id'], e))
@@ -98,7 +108,8 @@ class TheTVDBSet(MutableSet):
             log.verbose('entry does not have `tvdb_id`, cannot remove from list. Consider using a lookup plugin`')
             return
         try:
-            TVDBRequest(username=self.config['username'], account_id=self.config['account_id'], api_key=self.config['api_key']).delete(
+            plugin_api_tvdb.TVDBRequest(username=self.config['username'], account_id=self.config['account_id'],
+                                        api_key=self.config['api_key']).delete(
                 'user/favorites/{}'.format(entry['tvdb_id']))
         except RequestException as e:
             log.error('Could not add tvdb_id {} to favourites list: {}'.format(entry['tvdb_id'], e))

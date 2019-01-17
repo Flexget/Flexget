@@ -1,10 +1,18 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from flexget import options, plugin
+from flexget import options
+from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.plugins.internal.api_trakt import get_access_token, TraktUserAuth, delete_account, PIN_URL
 from flexget.terminal import TerminalTable, table_parser, console, TerminalTableError
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.internal import api_trakt as plugin_api_trakt
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='api_trakt',
+    )
 
 
 def action_auth(options):
@@ -12,7 +20,7 @@ def action_auth(options):
         console('You must specify an account (local identifier) so we know where to save your access token!')
         return
     try:
-        get_access_token(options.account, options.pin, re_auth=True, called_from_cli=True)
+        plugin_api_trakt.get_access_token(options.account, options.pin, re_auth=True, called_from_cli=True)
         console('Successfully authorized Flexget app on Trakt.tv. Enjoy!')
         return
     except plugin.PluginError as e:
@@ -23,7 +31,7 @@ def action_list(options):
     with Session() as session:
         if not options.account:
             # Print all accounts
-            accounts = session.query(TraktUserAuth).all()
+            accounts = session.query(plugin_api_trakt.TraktUserAuth).all()
             if not accounts:
                 console('No trakt authorizations stored in database.')
                 return
@@ -40,7 +48,8 @@ def action_list(options):
                 console('ERROR: %s' % str(e))
 
         # Show a specific account
-        acc = session.query(TraktUserAuth).filter(TraktUserAuth.account == options.account).first()
+        acc = session.query(plugin_api_trakt.TraktUserAuth).filter(
+            plugin_api_trakt.TraktUserAuth.account == options.account).first()
         if acc:
             console('Authorization expires on %s' % acc.expires)
         else:
@@ -52,7 +61,7 @@ def action_refresh(options):
         console('Please specify an account')
         return
     try:
-        get_access_token(options.account, refresh=True)
+        plugin_api_trakt.get_access_token(options.account, refresh=True)
         console('Successfully refreshed your access token.')
         return
     except plugin.PluginError as e:
@@ -64,7 +73,7 @@ def action_delete(options):
         console('Please specify an account')
         return
     try:
-        delete_account(options.account)
+        plugin_api_trakt.delete_account(options.account)
         console('Successfully deleted your access token.')
         return
     except plugin.PluginError as e:
@@ -92,16 +101,20 @@ def register_parser_arguments():
     auth_parser = subparsers.add_parser('auth', help='Authorize Flexget to access your Trakt.tv account')
 
     auth_parser.add_argument('account', metavar='<account>', help=acc_text)
-    auth_parser.add_argument('pin', metavar='<pin>', help='Get this by authorizing FlexGet to use your trakt account '
-                                                          'at %s. WARNING: DEPRECATED.' % PIN_URL, nargs='?')
+    auth_parser.add_argument('pin', metavar='<pin>',
+                             help='Get this by authorizing FlexGet to use your trakt account '
+                                  'at %s. WARNING: DEPRECATED.' % plugin_api_trakt.PIN_URL,
+                             nargs='?')
 
-    show_parser = subparsers.add_parser('list', help='List expiration date for Flexget authorization(s) (don\'t worry, '
-                                                     'they will automatically refresh when expired)',
+    show_parser = subparsers.add_parser('list',
+                                        help='List expiration date for Flexget authorization(s) (don\'t worry, '
+                                             'they will automatically refresh when expired)',
                                         parents=[table_parser])
     show_parser.add_argument('account', metavar='<account>', nargs='?', help=acc_text)
 
-    refresh_parser = subparsers.add_parser('refresh', help='Manually refresh your access token associated with your'
-                                                           ' --account <name>')
+    refresh_parser = subparsers.add_parser('refresh',
+                                           help='Manually refresh your access token associated with your'
+                                                ' --account <name>')
     refresh_parser.add_argument('account', metavar='<account>', help=acc_text)
 
     delete_parser = subparsers.add_parser('delete', help='Delete the specified <account> name from local database')

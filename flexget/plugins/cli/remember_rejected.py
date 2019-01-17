@@ -1,11 +1,20 @@
 from __future__ import unicode_literals, division, absolute_import
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import options
+from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.plugins.filter.remember_rejected import RememberEntry
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.filter import remember_rejected as plugin_remember_rejected
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='remember_rejected',
+    )
 
 
 def do_cli(manager, options):
@@ -17,7 +26,7 @@ def do_cli(manager, options):
 
 def list_rejected(options):
     with Session() as session:
-        results = session.query(RememberEntry).all()
+        results = session.query(plugin_remember_rejected.RememberEntry).all()
         header = ['#', 'Title', 'Task', 'Rejected by', 'Reason']
         table_data = [header]
         for entry in results:
@@ -32,7 +41,7 @@ def list_rejected(options):
 
 def clear_rejected(manager):
     with Session() as session:
-        results = session.query(RememberEntry).delete()
+        results = session.query(plugin_remember_rejected.RememberEntry).delete()
         console('Cleared %i items.' % results)
         session.commit()
         if results:

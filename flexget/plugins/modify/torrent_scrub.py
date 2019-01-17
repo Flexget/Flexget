@@ -1,11 +1,19 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import plugin
 from flexget.event import event
-from flexget.plugins.modify.torrent import TorrentFilename
 from flexget.utils import bittorrent
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.modify import torrent as plugin_torrent
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='torrent',
+    )
 
 log = logging.getLogger('torrent_scrub')
 
@@ -19,7 +27,7 @@ class TorrentScrub(object):
                 torrent_scrub: resume
     """
     # Scrub at high level, but BELOW "torrent"
-    SCRUB_PRIO = TorrentFilename.TORRENT_PRIO - 10
+    SCRUB_PRIO = plugin_torrent.TorrentFilename.TORRENT_PRIO - 10
 
     # Scrubbing modes
     SCRUB_MODES = ("off", "on", "all", "resume", "rtorrent",)

@@ -1,13 +1,22 @@
 from __future__ import unicode_literals, division, absolute_import
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
 from past.builtins import basestring
 
 from flexget import plugin
 from flexget.event import event
-from flexget.plugins.filter.seen import FilterSeen
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.filter import seen as plugin_seen
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='seen',
+    )
 
 
-class FilterSeenInfoHash(FilterSeen):
+class FilterSeenInfoHash(plugin_seen.FilterSeen):
     """Prevents the same torrent from being downloaded twice by remembering the infohash of all downloaded torrents."""
     schema = {
         'oneOf': [
@@ -30,7 +39,7 @@ class FilterSeenInfoHash(FilterSeen):
         for entry in task.entries:
             if isinstance(entry.get('torrent_info_hash'), basestring):
                 entry['torrent_info_hash'] = entry['torrent_info_hash'].upper()
-        FilterSeen.on_task_filter(self, task, config, remember_rejected=True)
+        plugin_seen.FilterSeen.on_task_filter(self, task, config, remember_rejected=True)
 
     def on_task_modify(self, task, config):
         # Return if we are disabled.

@@ -1,15 +1,22 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from requests import RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.plugins.internal.api_trakt import get_session, make_list_slug, get_api_url
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.internal import api_trakt as plugin_api_trakt
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='api_trakt',
+    )
 
 log = logging.getLogger('next_trakt_episodes')
 
@@ -52,15 +59,15 @@ class NextTraktEpisodes(object):
     def on_task_input(self, task, config):
         if config.get('account') and not config.get('username'):
             config['username'] = 'me'
-        session = get_session(account=config.get('account'))
+        session = plugin_api_trakt.get_session(account=config.get('account'))
         listed_series = {}
         args = ('users', config['username'])
         if config['list'] in ['collection', 'watchlist', 'watched']:
             args += (config['list'], 'shows')
         else:
-            args += ('lists', make_list_slug(config['list']), 'items')
+            args += ('lists', plugin_api_trakt.make_list_slug(config['list']), 'items')
         try:
-            data = session.get(get_api_url(args)).json()
+            data = session.get(plugin_api_trakt.get_api_url(args)).json()
         except RequestException as e:
             raise plugin.PluginError('Unable to get trakt list `%s`: %s' % (config['list'], e))
         if not data:
@@ -88,9 +95,9 @@ class NextTraktEpisodes(object):
         entries = []
         for trakt_id, fields in listed_series.items():
             if context == 'aired':
-                url = get_api_url('shows', trakt_id, '{}_episode'.format(config['position']))
+                url = plugin_api_trakt.get_api_url('shows', trakt_id, '{}_episode'.format(config['position']))
             else:
-                url = get_api_url('shows', trakt_id, 'progress', context)
+                url = plugin_api_trakt.get_api_url('shows', trakt_id, 'progress', context)
             try:
                 response = session.get(url)
                 if response.status_code == 204:

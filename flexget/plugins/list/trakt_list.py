@@ -1,18 +1,25 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
-from collections import MutableSet
 import math
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from collections import MutableSet
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.plugins.internal.api_trakt import get_api_url, get_entry_ids, get_session, make_list_slug
 from flexget.utils import json
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException, TimedLimiter
 from flexget.utils.tools import split_title_year
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.internal import api_trakt as plugin_api_trakt
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='',
+    )
 
 log = logging.getLogger('trakt_list')
 IMMUTABLE_LISTS = []
@@ -108,7 +115,7 @@ class TraktSet(MutableSet):
         self.config = config
         if self.config.get('account') and not self.config.get('username'):
             self.config['username'] = 'me'
-        self.session = get_session(self.config.get('account'))
+        self.session = plugin_api_trakt.get_session(self.config.get('account'))
         # Lists may not have modified results if modified then accessed in quick succession.
         self.session.add_domain_limiter(TimedLimiter('trakt.tv', '2 seconds'))
         self._items = None
@@ -168,7 +175,7 @@ class TraktSet(MutableSet):
 
             log.verbose('Retrieving `%s` list `%s`', self.config['type'], self.config['list'])
             try:
-                result = self.session.get(get_api_url(endpoint))
+                result = self.session.get(plugin_api_trakt.get_api_url(endpoint))
                 try:
                     data = result.json()
                 except ValueError:
@@ -189,7 +196,7 @@ class TraktSet(MutableSet):
                               pagination_item_count, number_of_pages)
                     page = int(result.headers.get('X-Pagination-Page'))
                     while page <= number_of_pages:
-                        paginated_result = self.session.get(get_api_url(endpoint),
+                        paginated_result = self.session.get(plugin_api_trakt.get_api_url(endpoint),
                                                             params={'limit': limit, 'page': page})
                         page += 1
                         try:
@@ -233,7 +240,7 @@ class TraktSet(MutableSet):
                 if list_type == 'movie' and language:
                     endpoint = ['movies', entry['trakt_movie_id'], 'translations', language]
                     try:
-                        result = self.session.get(get_api_url(endpoint))
+                        result = self.session.get(plugin_api_trakt.get_api_url(endpoint))
                         try:
                             translation = result.json()
                         except ValueError:
@@ -290,7 +297,7 @@ class TraktSet(MutableSet):
             else:
                 endpoint = ('users', self.config['username'], self.config['list'], self.config['type'])
         else:
-            endpoint = ('users', self.config['username'], 'lists', make_list_slug(self.config['list']), 'items')
+            endpoint = ('users', self.config['username'], 'lists', plugin_api_trakt.make_list_slug(self.config['list']), 'items')
 
         if remove:
             endpoint += ('remove', )
@@ -323,7 +330,7 @@ class TraktSet(MutableSet):
         for entry in entries:
             if self.config['type'] in ['auto', 'shows', 'seasons', 'episodes'] and entry.get('series_name'):
                 show_name, show_year = split_title_year(entry['series_name'])
-                show = {'title': show_name, 'ids': get_entry_ids(entry)}
+                show = {'title': show_name, 'ids': plugin_api_trakt.get_entry_ids(entry)}
                 if show_year:
                     show['year'] = show_year
                 if self.config['type'] in ['auto', 'seasons', 'episodes'] and entry.get('series_season') is not None:
@@ -339,7 +346,7 @@ class TraktSet(MutableSet):
                     continue
                 found.setdefault('shows', []).append(show)
             elif self.config['type'] in ['auto', 'movies']:
-                movie = {'ids': get_entry_ids(entry)}
+                movie = {'ids': plugin_api_trakt.get_entry_ids(entry)}
                 if not movie['ids']:
                     if entry.get('movie_name') is not None:
                         movie['title'] = entry.get('movie_name') or entry.get('imdb_name')
@@ -353,7 +360,7 @@ class TraktSet(MutableSet):
             log.debug('Nothing to submit to trakt.')
             return
 
-        url = get_api_url(self.get_list_endpoint(remove, submit=True))
+        url = plugin_api_trakt.get_api_url(self.get_list_endpoint(remove, submit=True))
 
         log.debug('Submitting data to trakt.tv (%s): %s', url, found)
         try:

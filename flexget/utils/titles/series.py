@@ -10,8 +10,8 @@ from string import capwords
 from dateutil.parser import parse as parsedate
 
 from flexget.utils.titles.parser import TitleParser
-from flexget.plugins.parsers import ParseWarning
-from flexget.plugins.parsers.parser_common import default_ignore_prefixes, name_to_re
+# TODO: core should NOT import plugins directly
+from flexget.plugins.parsers.parser_common import default_ignore_prefixes, name_to_re, ParseWarning
 from flexget.utils import qualities
 from flexget.utils.tools import ReList
 

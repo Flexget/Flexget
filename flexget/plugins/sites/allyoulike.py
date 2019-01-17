@@ -1,16 +1,21 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.event import event
-from flexget.plugins.internal.urlrewriting import UrlRewritingError
-from flexget.utils.soup import get_soup
 from flexget.utils.search import normalize_unicode
+from flexget.utils.soup import get_soup
+try:
+    from flexget.plugins.internal.urlrewriting import UrlRewritingError
+except ImportError:
+    raise plugin.DependencyError(issued_by='allyoulike', missing='urlrewriting',
+                                 message='Plugin allyoulike is missing plugin dependency urlrewriting')
 
-from requests.exceptions import RequestException
 
 log = logging.getLogger('rlsbb')
 

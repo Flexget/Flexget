@@ -1,16 +1,20 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from functools import partial
-
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from functools import partial
 
 from flexget import plugin
 from flexget.event import event
-
-from flexget.plugins.internal.api_tvdb import lookup_series, lookup_episode
 from flexget.utils.database import with_session
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.internal import api_tvdb as plugin_api_tvdb
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='api_tvdb',
+    )
 
 log = logging.getLogger('thetvdb_lookup')
 
@@ -110,7 +114,7 @@ class PluginThetvdbLookup(object):
     @with_session
     def series_lookup(self, entry, language, field_map, session=None):
         try:
-            series = lookup_series(
+            series = plugin_api_tvdb.lookup_series(
                 entry.get('series_name', eval_lazy=False),
                 tvdb_id=entry.get('tvdb_id', eval_lazy=False),
                 language=entry.get('language', language),
@@ -155,7 +159,7 @@ class PluginThetvdbLookup(object):
                 # TODO: Should thetvdb_lookup_episode_offset be used for date lookups as well?
                 lookupargs['first_aired'] = entry['series_date']
 
-            episode = lookup_episode(**lookupargs)
+            episode = plugin_api_tvdb.lookup_episode(**lookupargs)
             entry.update_using_map(self.episode_map, episode)
         except LookupError as e:
             log.debug('Error looking up tvdb episode information for %s: %s', entry['title'], e.args[0])

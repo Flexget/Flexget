@@ -1,12 +1,21 @@
 from __future__ import unicode_literals, division, absolute_import
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import options
+from flexget import plugin
 from flexget.event import event
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
-from flexget.plugins.filter import seen
 from flexget.utils.database import with_session
 from flexget.utils.imdb import is_imdb_url, extract_id
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.filter import seen as plugin_seen
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='seen',
+    )
 
 
 def do_cli(manager, options):
@@ -25,7 +34,7 @@ def seen_forget(manager, options):
         if imdb_id:
             forget_name = imdb_id
 
-    count, fcount = seen.forget(forget_name)
+    count, fcount = plugin_seen.forget(forget_name)
     console('Removed %s titles (%s fields)' % (count, fcount))
     manager.config_changed()
 
@@ -39,7 +48,7 @@ def seen_add(options):
             seen_name = imdb_id
         else:
             console("Could not parse IMDB ID")
-    seen.add(seen_name, 'cli_add', {'cli_add': seen_name})
+    plugin_seen.add(seen_name, 'cli_add', {'cli_add': seen_name})
     console('Added %s as seen. This will affect all tasks.' % seen_name)
 
 
@@ -55,7 +64,7 @@ def seen_search(options, session=None):
             console("Could not parse IMDB ID")
     else:
         search_term = '%' + options.search_term + '%'
-    seen_entries = seen.search(value=search_term, status=None, session=session)
+    seen_entries = plugin_seen.search(value=search_term, status=None, session=session)
     table_data = []
     for se in seen_entries.all():
         table_data.append(['Title', se.title])

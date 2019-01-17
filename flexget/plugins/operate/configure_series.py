@@ -1,18 +1,25 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import plugin
 from flexget.config_schema import process_config
 from flexget.event import event
 from flexget.plugin import PluginError
-from flexget.plugins.filter.series import FilterSeriesBase
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.filter import series as plugin_series
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='series',
+    )
 
 log = logging.getLogger('configure_series')
 
 
-class ConfigureSeries(FilterSeriesBase):
+class ConfigureSeries(plugin_series.FilterSeriesBase):
     """Generates series configuration from any input (supporting API version 2, soon all)
 
     Configuration::

@@ -1,18 +1,21 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
+from past.builtins import basestring
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.log import log_once
 
 try:
-    from flexget.plugins.internal.api_rottentomatoes import lookup_movie, API_KEY
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.internal import api_rottentomatoes as plugin_api_rottentomatoes
 except ImportError:
-    raise plugin.DependencyError(issued_by='rottentomatoes_lookup', missing='api_rottentomatoes',
-                                 message='rottentomatoes_lookup requires the `api_rottentomatoes` plugin')
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='api_rottentomatoes',
+    )
 
 log = logging.getLogger('rottentomatoes_lookup')
 
@@ -70,9 +73,7 @@ class PluginRottenTomatoesLookup(object):
         """Does the lookup for this entry and populates the entry fields.
 
         :param entry: entry to perform lookup on
-        :param field: the field to be populated (others may be populated as well)
         :returns: the field value
-
         """
         try:
             self.lookup(entry, key=self.key)
@@ -89,12 +90,13 @@ class PluginRottenTomatoesLookup(object):
         :raises PluginError: Failure reason
         """
         if not key:
-            key = self.key or API_KEY
-        movie = lookup_movie(smart_match=entry['title'],
-                             rottentomatoes_id=entry.get('rt_id', eval_lazy=False),
-                             only_cached=(not search_allowed),
-                             api_key=key
-                             )
+            key = self.key or plugin_api_rottentomatoes.API_KEY
+        movie = plugin_api_rottentomatoes.lookup_movie(
+            smart_match=entry['title'],
+            rottentomatoes_id=entry.get('rt_id', eval_lazy=False),
+            only_cached=(not search_allowed),
+            api_key=key
+        )
         log.debug(u'Got movie: %s' % movie)
         entry.update_using_map(self.field_map, movie)
 
@@ -124,4 +126,5 @@ class PluginRottenTomatoesLookup(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginRottenTomatoesLookup, 'rottentomatoes_lookup', api_ver=2, interfaces=['task', 'movie_metainfo'])
+    plugin.register(PluginRottenTomatoesLookup, 'rottentomatoes_lookup', api_ver=2,
+                    interfaces=['task', 'movie_metainfo'])

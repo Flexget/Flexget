@@ -1,24 +1,33 @@
 from __future__ import unicode_literals, division, absolute_import
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from sqlalchemy import desc
 
 from flexget import options
+from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
-from flexget.plugins.output.history import History
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.output import history as history_plugin
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='history',
+    )
 
 
 def do_cli(manager, options):
     with Session() as session:
-        query = session.query(History)
+        query = session.query(history_plugin.History)
         if options.search:
             search_term = options.search.replace(' ', '%').replace('.', '%')
-            query = query.filter(History.title.like('%' + search_term + '%'))
+            query = query.filter(history_plugin.History.title.like('%' + search_term + '%'))
         if options.task:
-            query = query.filter(History.task.like('%' + options.task + '%'))
-        query = query.order_by(desc(History.time)).limit(options.limit)
+            query = query.filter(history_plugin.History.task.like('%' + options.task + '%'))
+        query = query.order_by(desc(history_plugin.History.time)).limit(options.limit)
         table_data = []
         if options.short:
             table_data.append(['Time', 'Title'])
