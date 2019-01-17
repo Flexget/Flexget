@@ -150,7 +150,7 @@ class Discover(object):
         if not search_results:
             query.complete()
 
-    def estimated(self, entries, estimation_mode):
+    def estimated(self, task, entries, estimation_mode):
         """
         :param dict estimation_mode: mode -> loose, strict, ignore
         :return: Entries that we have estimated to be available
@@ -158,7 +158,7 @@ class Discover(object):
         estimator = get_plugin_by_name('estimate_release').instance
         result = []
         for entry in entries:
-            est_date = estimator.estimate(entry)
+            est_date = estimator.estimate(task, entry)
             if est_date is None:
                 log.debug('No release date could be determined for %s', entry['title'])
                 if estimation_mode['mode'] == 'strict':
@@ -246,7 +246,7 @@ class Discover(object):
         entries = self.interval_expired(config, task, entries)
         estimation_mode = config['release_estimations']
         if estimation_mode['mode'] != 'ignore':
-            entries = self.estimated(entries, estimation_mode)
+            entries = self.estimated(task, entries, estimation_mode)
         return self.execute_searches(config, entries, task)
 
 

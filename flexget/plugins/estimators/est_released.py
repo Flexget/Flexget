@@ -12,7 +12,7 @@ class EstimateRelease(object):
     for various things (series, movies).
     """
 
-    def estimate(self, entry):
+    def estimate(self, task, entry):
         """
         Estimate release schedule for Entry
 
@@ -21,7 +21,8 @@ class EstimateRelease(object):
         """
 
         log.debug(entry['title'])
-        estimators = [e.instance.estimate for e in plugin.get_plugins(interface='estimate_release')]
+        estimators = [e.instance.estimate for e in
+                      plugin.get_plugins(interface='estimate_release', exclude=task.disabled_plugins)]
         for estimator in sorted(
                 estimators, key=lambda e: getattr(e, 'priority', plugin.DEFAULT_PRIORITY), reverse=True
         ):
