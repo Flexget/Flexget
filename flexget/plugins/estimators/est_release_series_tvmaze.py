@@ -23,20 +23,18 @@ class EstimatesSeriesTVMaze(object):
         # This value should be added to input plugins to trigger a season lookuo
         season_pack = entry.get('season_pack_lookup')
 
-        kwargs = {}
-        kwargs['tvmaze_id'] = entry.get('tvmaze_id')
-        kwargs['tvdb_id'] = entry.get('tvdb_id') or entry.get('trakt_series_tvdb_id')
-        kwargs['tvrage_id'] = entry.get('tvrage_id') or entry.get('trakt_series_tvrage_id')
-        kwargs['imdb_id'] = entry.get('imdb_id')
-        kwargs['show_name'] = title
-        kwargs['show_year'] = entry.get('trakt_series_year') or entry.get('year') or entry.get(
-            'imdb_year') or year_match
-        kwargs['show_network'] = entry.get('network') or entry.get('trakt_series_network')
-        kwargs['show_country'] = entry.get('country') or entry.get('trakt_series_country')
-        kwargs['show_language'] = entry.get('language')
-        kwargs['series_season'] = season
-        kwargs['series_episode'] = episode_number
-        kwargs['series_name'] = series_name
+        kwargs = {
+            'tvmaze_id': entry.get('tvmaze_id'),
+            'tvdb_id': entry.get('tvdb_id') or entry.get('trakt_series_tvdb_id'),
+            'tvrage_id': entry.get('tvrage_id') or entry.get('trakt_series_tvrage_id'),
+            'imdb_id': entry.get('imdb_id'), 'show_name': title,
+            'show_year': entry.get('trakt_series_year') or entry.get('year') or entry.get(
+                'imdb_year') or year_match,
+            'show_network': entry.get('network') or entry.get('trakt_series_network'),
+            'show_country': entry.get('country') or entry.get('trakt_series_country'),
+            'show_language': entry.get('language'), 'series_season': season, 'series_episode': episode_number,
+            'series_name': series_name
+        }
 
         api_tvmaze = plugin.get_plugin_by_name('api_tvmaze').instance
         if season_pack:

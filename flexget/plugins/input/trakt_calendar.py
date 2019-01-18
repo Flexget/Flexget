@@ -1,16 +1,23 @@
 from __future__ import unicode_literals, division, absolute_import
+
+import datetime
+import logging
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-import logging
-import datetime
+from requests import RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.plugins.internal.api_trakt import get_api_url, get_session
 from flexget.utils.cached_input import cached
 
-from requests import RequestException
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.internal import api_trakt as plugin_api_trakt
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='api_trakt',
+    )
 
 log = logging.getLogger('trakt_calendar')
 
@@ -89,10 +96,11 @@ class TraktCalendar(object):
         log.debug('Start date for calendar: %s, end date: %s', start_date,
                   start_date + datetime.timedelta(days=config['days']))
 
-        url = get_api_url('calendars', 'my' if config.get('account') else 'all', 'shows', start_date, config['days'])
+        url = plugin_api_trakt.get_api_url('calendars', 'my' if config.get('account') else 'all', 'shows', start_date,
+                                           config['days'])
 
         try:
-            results = get_session(config.get('account')).get(url, params={'extended': 'full'}).json()
+            results = plugin_api_trakt.get_session(config.get('account')).get(url, params={'extended': 'full'}).json()
             log.debug('Found %s calendar entries', len(results))
         except RequestException as e:
             raise plugin.PluginError('Error while fetching calendar: {0}'.format(e))
@@ -107,9 +115,9 @@ class TraktCalendar(object):
             e['title'] = e['trakt_series_name']
             if not config['strip_dates']:
                 e['title'] = '{0} ({1})'.format(e['title'], e['trakt_series_year'])
-                
+
             e['url'] = e['trakt_series_url']
-            
+
             if config['type'] == 'episodes':
                 e['title'] = '{0} S{1:02d}E{2:02d}'.format(e['title'], e['trakt_season'], e['trakt_episode'])
 

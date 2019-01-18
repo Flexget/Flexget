@@ -1,17 +1,25 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from collections import defaultdict
 
 from flexget import plugin
 from flexget.event import event
-from flexget.plugins.filter.seen import FilterSeen
+from flexget import plugin
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.filter import seen as plugin_seen
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='seen',
+    )
 
 log = logging.getLogger('seenmovies')
 
 
-class FilterSeenMovies(FilterSeen):
+class FilterSeenMovies(plugin_seen.FilterSeen):
     """
         Prevents movies being downloaded twice.
         Works only on entries which have imdb url available.

@@ -1,25 +1,25 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import argparse
 import os
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import timedelta
 
 from colorclass.toggles import disable_all_colors
-from flexget import options, plugin
+
+from flexget import options
+from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, colorize, console
 
 try:
-    from flexget.plugins.filter.series import (
-        Series, remove_series, remove_series_entity, set_series_begin, normalize_series_name, new_entities_after,
-        get_latest_release, get_series_summary, shows_by_name, show_episodes, shows_by_exact_name, get_all_entities,
-        add_series_entity
-    )
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.filter import series as plugin_series
 except ImportError:
-    raise plugin.DependencyError(issued_by='cli_series', missing='series',
-                                 message='Series commandline interface not loaded')
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='series',
+    )
 
 # Environment variables to set defaults for `series list` and `series show`
 ENV_SHOW_SORTBY_FIELD = 'FLEXGET_SERIES_SHOW_SORTBY_FIELD'
@@ -82,7 +82,7 @@ def display_summary(options):
         else:
             kwargs['sort_by'] = 'last_download_date'
 
-        query = get_series_summary(**kwargs)
+        query = plugin_series.get_series_summary(**kwargs)
         header = ['Name', 'Begin', 'Last Encountered', 'Age', 'Downloaded', 'Identified By']
         for index, value in enumerate(header):
             if value.lower() == options.sort_by:
@@ -97,12 +97,12 @@ def display_summary(options):
             latest_release = '-'
             age_col = '-'
             episode_id = '-'
-            latest = get_latest_release(series)
+            latest = plugin_series.get_latest_release(series)
             identifier_type = series.identified_by
             if identifier_type == 'auto':
                 identifier_type = colorize('yellow', 'auto')
             if latest:
-                behind = new_entities_after(latest)
+                behind = plugin_series.new_entities_after(latest)
                 latest_release = get_latest_status(latest)
                 # colorize age
                 age_col = latest.age
@@ -135,9 +135,9 @@ def display_summary(options):
 def begin(manager, options):
     series_name = options.series_name
     series_name = series_name.replace(r'\!', '!')
-    normalized_name = normalize_series_name(series_name)
+    normalized_name = plugin_series.normalize_series_name(series_name)
     with Session() as session:
-        series = shows_by_exact_name(normalized_name, session)
+        series = plugin_series.shows_by_exact_name(normalized_name, session)
         if options.forget:
             if not series:
                 console('Series `%s` was not found in the database.' % series_name)
@@ -151,13 +151,13 @@ def begin(manager, options):
             ep_id = options.episode_id
             if not series:
                 console('Series not yet in database. Adding `%s`.' % series_name)
-                series = Series()
+                series = plugin_series.Series()
                 series.name = series_name
                 session.add(series)
             else:
                 series = series[0]
             try:
-                _, entity_type = set_series_begin(series, ep_id)
+                _, entity_type = plugin_series.set_series_begin(series, ep_id)
             except ValueError as e:
                 console(e)
             else:
@@ -174,7 +174,7 @@ def remove(manager, options, forget=False):
     if options.episode_id:
         for identifier in options.episode_id:
             try:
-                remove_series_entity(name, identifier, forget)
+                plugin_series.remove_series_entity(name, identifier, forget)
             except ValueError as e:
                 console(e.args[0])
             else:
@@ -182,7 +182,7 @@ def remove(manager, options, forget=False):
     else:
         # remove whole series
         try:
-            remove_series(name, forget)
+            plugin_series.remove_series(name, forget)
         except ValueError as e:
             console(e.args[0])
         else:
@@ -218,9 +218,9 @@ def display_details(options):
     else:
         reverse = True if os.environ.get(ENV_SHOW_SORTBY_ORDER) == 'desc' else False
     with Session() as session:
-        name = normalize_series_name(name)
+        name = plugin_series.normalize_series_name(name)
         # Sort by length of name, so that partial matches always show shortest matching title
-        matches = shows_by_name(name, session=session)
+        matches = plugin_series.shows_by_name(name, session=session)
         if not matches:
             console(colorize(ERROR_COLOR, 'ERROR: Unknown series `%s`' % name))
             return
@@ -236,7 +236,7 @@ def display_details(options):
                 console(warning)
         header = ['Identifier', 'Last seen', 'Release titles', 'Release Quality', 'Proper']
         table_data = [header]
-        entities = get_all_entities(series, session=session, sort_by=sort_by, reverse=reverse)
+        entities = plugin_series.get_all_entities(series, session=session, sort_by=sort_by, reverse=reverse)
         for entity in entities:
             if not entity.releases:
                 continue
@@ -295,19 +295,19 @@ def add(manager, options):
     entity_ids = options.entity_id
     quality = options.quality or os.environ.get(ENV_ADD_QUALITY, None)
     series_name = series_name.replace(r'\!', '!')
-    normalized_name = normalize_series_name(series_name)
+    normalized_name = plugin_series.normalize_series_name(series_name)
     with Session() as session:
-        series = shows_by_exact_name(normalized_name, session)
+        series = plugin_series.shows_by_exact_name(normalized_name, session)
         if not series:
             console('Series not yet in database, adding `%s`' % series_name)
-            series = Series()
+            series = plugin_series.Series()
             series.name = series_name
             session.add(series)
         else:
             series = series[0]
         for ent_id in entity_ids:
             try:
-                add_series_entity(session, series, ent_id, quality=quality)
+                plugin_series.add_series_entity(session, series, ent_id, quality=quality)
             except ValueError as e:
                 console(e.args[0])
             else:

@@ -15,8 +15,15 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
-from flexget.plugins.parsers.parser_common import normalize_name, remove_dirt
 from flexget.utils.tools import split_title_year
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.parsers import parser_common as plugin_parser_common
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='parser_common',
+    )
 
 log = logging.getLogger('movie_list')
 Base = versioned_base('movie_list', 0)
@@ -208,7 +215,7 @@ class MovieList(MutableSet):
     def _parse_title(entry):
         parser = get_plugin_by_name('parsing').instance.parse_movie(data=entry['title'])
         if parser and parser.valid:
-            parser.name = normalize_name(remove_dirt(parser.name))
+            parser.name = plugin_parser_common.normalize_name(plugin_parser_common.remove_dirt(parser.name))
             entry.update(parser.fields)
 
     @property

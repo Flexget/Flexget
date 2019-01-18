@@ -25,6 +25,7 @@ future==0.16.0
 guessit==3.0.3
 html5lib==0.999999999
 idna==2.5                 # via requests
+importlib-metadata==0.8   # via path.py
 itsdangerous==0.24        # via flask
 jinja2==2.10
 jsonschema==2.6.0
@@ -32,6 +33,7 @@ markupsafe==1.0           # via jinja2
 path.py==11.5.0
 plumbum==1.6.3            # via rpyc
 portend==1.8              # via cherrypy
+progressbar==2.5
 pynzb==0.1.0
 pyparsing==2.2.0
 pyrss2gen==1.1
@@ -49,4 +51,5 @@ tzlocal==1.4              # via apscheduler
 urllib3==1.21.1           # via requests
 webencodings==0.5.1       # via html5lib
 werkzeug==0.14.1          # via flask
+zipp==0.3.3               # via importlib-metadata
 zxcvbn-python==4.4.15

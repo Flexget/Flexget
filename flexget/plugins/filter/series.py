@@ -1,11 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import argparse
 import logging
 import re
-import time
 import sys
+import time
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from collections import defaultdict
 from copy import copy
 from datetime import datetime, timedelta
@@ -19,12 +19,12 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.orm import relation, backref, object_session, joinedload
 
-from flexget import db_schema, options, plugin
+from flexget import db_schema, options
+from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event, fire_event
 from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
-from flexget.plugins.parsers import SERIES_ID_TYPES
 from flexget.utils import qualities
 from flexget.utils.database import quality_property, with_session
 from flexget.utils.log import log_once
@@ -34,6 +34,14 @@ from flexget.utils.sqlalchemy_utils import (
 from flexget.utils.tools import (
     merge_dict_from_to, parse_timedelta, parse_episode_identifier, get_config_as_array, chunked
 )
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.parsers import parser_common as plugin_parser_common
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='parsers',
+    )
 
 SCHEMA_VER = 14
 
@@ -709,13 +717,10 @@ def get_series_summary(configured=None, premieres=None, start=None, stop=None, c
     Return a query with results for all series.
 
     :param configured: 'configured' for shows in config, 'unconfigured' for shows not in config, 'all' for both.
-    Default is 'all'
+        Default is 'all'
     :param premieres: Return only shows with 1 season and less than 3 episodes
-    :param days: Value to determine stale
-    :param page_size: Number of result per page
-    :param page: Page number to return
     :param count: Decides whether to return count of all shows or data itself
-     :param session: Passed session
+    :param session: Passed session
     :return:
     """
     if not configured:
@@ -813,9 +818,9 @@ def get_latest_season_pack_release(series, downloaded=True, season=None):
 
 def get_latest_episode_release(series, downloaded=True, season=None):
     """
-    :param Series series: SQLAlchemy session
-    :param Downloaded: find only downloaded releases
-    :param Season: season to find newest release for
+    :param series series: SQLAlchemy session
+    :param downloaded: find only downloaded releases
+    :param season: season to find newest release for
     :return: Instance of Episode or None if not found.
     """
     session = Session.object_session(series)
@@ -1746,11 +1751,10 @@ class FilterSeries(FilterSeriesBase):
         """
         Search for `series_name` and populate all `series_*` fields in entries when successfully parsed
 
-        :param session: SQLAlchemy session
         :param entries: List of entries to process
         :param series_name: Series name which is being processed
         :param config: Series config being processed
-        :param identified_by_cache: Series config being processed
+        :param db_identified_by: Series config being processed
         """
 
         # set parser flags flags based on config / database
@@ -1769,7 +1773,7 @@ class FilterSeries(FilterSeriesBase):
                       special_ids=get_config_as_array(config, 'special_ids'),
                       prefer_specials=config.get('prefer_specials'),
                       assume_special=config.get('assume_special'))
-        for id_type in SERIES_ID_TYPES:
+        for id_type in plugin_parser_common.SERIES_ID_TYPES:
             params[id_type + '_regexps'] = get_config_as_array(config, id_type + '_regexp')
 
         parser = get_plugin_by_name('parsing').instance

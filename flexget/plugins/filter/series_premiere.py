@@ -1,12 +1,20 @@
 from __future__ import unicode_literals, division, absolute_import
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import plugin
 from flexget.event import event
-from flexget.plugins.filter.series import FilterSeriesBase, normalize_series_name, Series
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.filter import series as plugin_series
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='series',
+    )
 
 
-class FilterSeriesPremiere(FilterSeriesBase):
+class FilterSeriesPremiere(plugin_series.FilterSeriesBase):
     """
     Accept an entry that appears to be the first episode of any series.
 
@@ -60,8 +68,9 @@ class FilterSeriesPremiere(FilterSeriesBase):
         for entry in task.entries:
             if guess_entry(entry, allow_seasonless=allow_seasonless, config=group_settings):
                 if not entry['season_pack'] and entry['series_season'] == 1 and entry['series_episode'] in desired_eps:
-                    normalized_name = normalize_series_name(entry['series_name'])
-                    db_series = task.session.query(Series).filter(Series.name == normalized_name).first()
+                    normalized_name = plugin_series.normalize_series_name(entry['series_name'])
+                    db_series = task.session.query(plugin_series.Series).filter(
+                        plugin_series.Series.name == normalized_name).first()
                     if db_series and db_series.in_tasks:
                         continue
                     guessed_series.setdefault(normalized_name, entry['series_name'])
@@ -70,7 +79,7 @@ class FilterSeriesPremiere(FilterSeriesBase):
             for series in guessed_series.values():
                 if entry.get('series_name') == series and \
                         (entry.get('season_pack') or not (
-                        entry.get('series_season') == 1 and entry.get('series_episode') in desired_eps)):
+                                entry.get('series_season') == 1 and entry.get('series_episode') in desired_eps)):
                     entry.reject('Non premiere episode or season pack in a premiere series')
 
         # Combine settings and series into series plugin config format

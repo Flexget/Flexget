@@ -29,6 +29,7 @@ def do_cli(manager, options):
         'stop': action_stop
     }
 
+    # NOTE: Direct importing of other plugins is discouraged
     from flexget.plugins.daemon.irc import irc_manager
     if irc_manager is None:
         console('IRC daemon does not appear to be running.')

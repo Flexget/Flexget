@@ -1,12 +1,20 @@
 from __future__ import unicode_literals, division, absolute_import
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import plugin
 from flexget.event import event
-from flexget.plugins.filter.series import FilterSeriesBase, normalize_series_name
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.filter import series as plugin_series
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='series',
+    )
 
 
-class FilterAllSeries(FilterSeriesBase):
+class FilterAllSeries(plugin_series.FilterSeriesBase):
     """
     Grabs all entries that appear to be series episodes in a task.
 
@@ -46,11 +54,12 @@ class FilterAllSeries(FilterSeriesBase):
         guessed_series = {}
         for entry in task.entries:
             if guess_entry(entry, config=group_settings):
-                guessed_series.setdefault(normalize_series_name(entry['series_name']), entry['series_name'])
+                guessed_series.setdefault(plugin_series.normalize_series_name(entry['series_name']),
+                                          entry['series_name'])
         # Combine settings and series into series plugin config format
-        allseries = {'settings': {'all_series': group_settings}, 'all_series': list(guessed_series.values())}
+        all_series = {'settings': {'all_series': group_settings}, 'all_series': list(guessed_series.values())}
         # Merge our config in to the main series config
-        self.merge_config(task, allseries)
+        self.merge_config(task, all_series)
 
 
 @event('plugin.register')

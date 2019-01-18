@@ -1,21 +1,23 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
 
 try:
-    from flexget.plugins.internal.api_trakt import ApiTrakt, list_actors, get_translations_dict
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.internal import api_trakt as plugin_api_trakt
 
-    lookup_series = ApiTrakt.lookup_series
-    lookup_movie = ApiTrakt.lookup_movie
+    lookup_series = plugin_api_trakt.ApiTrakt.lookup_series
+    lookup_movie = plugin_api_trakt.ApiTrakt.lookup_movie
 except ImportError:
-    raise plugin.DependencyError(issued_by='trakt_lookup', missing='api_trakt',
-                                 message='trakt_lookup requires the `api_trakt` plugin')
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='api_trakt',
+    )
 
 log = logging.getLogger('trakt_lookup')
 
@@ -147,10 +149,10 @@ class PluginTraktLookup(object):
     }
 
     series_actor_map = {
-        'trakt_actors': lambda show: list_actors(show.actors),
+        'trakt_actors': lambda show: plugin_api_trakt.list_actors(show.actors),
     }
     show_translate_map = {
-        'trakt_translations': lambda show: get_translations_dict(show.translations, 'show'),
+        'trakt_translations': lambda show: plugin_api_trakt.get_translations_dict(show.translations, 'show'),
     }
 
     # Episode info
@@ -207,11 +209,11 @@ class PluginTraktLookup(object):
     }
 
     movie_translate_map = {
-        'trakt_translations': lambda movie: get_translations_dict(movie.translations, 'movie'),
+        'trakt_translations': lambda movie: plugin_api_trakt.get_translations_dict(movie.translations, 'movie'),
     }
 
     movie_actor_map = {
-        'trakt_actors': lambda movie: list_actors(movie.actors),
+        'trakt_actors': lambda movie: plugin_api_trakt.list_actors(movie.actors),
     }
 
     user_data_map = {
@@ -254,7 +256,7 @@ class PluginTraktLookup(object):
         if not isinstance(config, dict):
             config = {}
 
-        self.trakt = ApiTrakt(username=config.get('username'), account=config.get('account'))
+        self.trakt = plugin_api_trakt.ApiTrakt(username=config.get('username'), account=config.get('account'))
 
     def _get_user_data_field_name(self, data_type, media_type):
         if data_type not in self.user_data_map:

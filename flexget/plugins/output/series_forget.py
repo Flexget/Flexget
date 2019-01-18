@@ -1,16 +1,18 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import plugin
 from flexget.event import event
 
 try:
-    from flexget.plugins.filter.series import remove_series_entity
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins.filter import series as plugin_series
 except ImportError:
-    raise plugin.DependencyError(issued_by='series_remove', missing='series',
-                                 message='series_forget plugin need series plugin to work')
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='series',
+    )
 
 log = logging.getLogger('series_forget')
 
@@ -24,7 +26,7 @@ class OutputSeriesRemove(object):
         for entry in task.accepted:
             if 'series_name' in entry and 'series_id' in entry:
                 try:
-                    remove_series_entity(entry['series_name'], entry['series_id'])
+                    plugin_series.remove_series_entity(entry['series_name'], entry['series_id'])
                     log.info('Removed episode `%s` from series `%s` download history.' %
                              (entry['series_id'], entry['series_name']))
                 except ValueError:

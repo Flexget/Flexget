@@ -1,18 +1,25 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+from past.builtins import basestring
 from path import Path
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
+from flexget.plugin import get_plugin_by_name
 from flexget.utils.log import log_once
 from flexget.utils.template import RenderError
-from flexget.plugins.parsers import ParseWarning
-from flexget.plugin import get_plugin_by_name
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.plugins import parsers as plugin_parsers
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='parsers',
+    )
 
 log = logging.getLogger('exists_series')
 
@@ -89,7 +96,7 @@ class FilterExistsSeries(object):
                     try:
                         disk_parser = get_plugin_by_name('parsing').instance.parse_series(data=filename.name,
                                                                                           name=series_parser.name)
-                    except ParseWarning as pw:
+                    except plugin_parsers.ParseWarning as pw:
                         disk_parser = pw.parsed
                         log_once(pw.value, logger=log)
                     if disk_parser.valid:
