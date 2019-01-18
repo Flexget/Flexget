@@ -1,18 +1,17 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import cmp
 
 import logging
 import re
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime, timedelta
 from string import capwords
 
 from dateutil.parser import parse as parsedate
+from past.builtins import cmp
 
-from flexget.utils.titles.parser import TitleParser
-# TODO: core should NOT import plugins directly
-from flexget.plugins.parsers.parser_common import default_ignore_prefixes, name_to_re, ParseWarning
 from flexget.utils import qualities
+from flexget.utils.parsers.generic import default_ignore_prefixes, name_to_re, ParseWarning
+from flexget.utils.parsers.parser import TitleParser
 from flexget.utils.tools import ReList
 
 log = logging.getLogger('seriesparser')

@@ -1,15 +1,16 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import time
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.log import log_once
-from flexget.utils.titles.movie import MovieParser
-from flexget.utils.titles.series import SeriesParser
-from .parser_common import ParseWarning, MovieParseResult, SeriesParseResult
+from flexget.utils.parsers.generic import ParseWarning
+from flexget.utils.parsers.movie import MovieParser
+from flexget.utils.parsers.series import SeriesParser
+from .parser_common import MovieParseResult, SeriesParseResult
 
 log = logging.getLogger('parser_internal')
 

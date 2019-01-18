@@ -1,13 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
-
-from flexget.utils.titles.parser import TitleParser
-from flexget.utils import qualities
-from flexget.utils.tools import str_to_int
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime
+
+from flexget.utils import qualities
+from flexget.utils.parsers.parser import TitleParser
+from flexget.utils.tools import str_to_int
 
 log = logging.getLogger('movieparser')
 
@@ -94,7 +94,7 @@ class MovieParser(TitleParser):
                 cut = True
             # check for propers
             if part.lower() in self.propers:
-                # 'real' and 'final' are too common in movie titles, only cut if it comes after year
+                # 'real' and 'final' are too common in movie parsers, only cut if it comes after year
                 if part.lower() not in ['real', 'final'] or self.year:
                     self.proper_count += 1
                     cut = True
