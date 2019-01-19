@@ -7,9 +7,9 @@ from functools import partial
 from colorclass.toggles import disable_all_colors
 from sqlalchemy.orm.exc import NoResultFound
 
-from event import event
 from flexget import options
 from flexget import plugin
+from flexget.event import event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console, colorize
 
