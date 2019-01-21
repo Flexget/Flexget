@@ -1,8 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime
 
 from flexget.utils import qualities
