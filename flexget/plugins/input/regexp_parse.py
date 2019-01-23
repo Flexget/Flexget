@@ -160,15 +160,16 @@ class RegexpParse(object):
     @plugin.internet(log)
     def on_task_input(self, task, config):
         url = config['source']
-        encoding = config.get('encoding', 'utf-8')
+        encoding = config.get('encoding')
 
         # if it's a file open it and read into content (assume utf-8 encoding)
         if os.path.isfile(os.path.expanduser(url)):
-            content = codecs.open(url, 'r', encoding=encoding).read()
+            content = codecs.open(url, 'r', encoding=encoding or 'utf-8').read()
         # else use requests to get the data
         else:
             resp = task.requests.get(url)
-            resp.encoding = encoding
+            if encoding:
+                resp.encoding = encoding
             content = resp.text
 
         sections = []
