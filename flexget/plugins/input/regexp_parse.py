@@ -43,6 +43,7 @@ class RegexpParse(object):
 
     regexp_parse:
       source: http://username:password@ezrss.it/feed/
+      encoding: "utf-8"
       sections:
         - {regexp: "(?<=<item>).*?(?=</item>)", flags: "DOTALL,IGNORECASE"}
 
@@ -159,13 +160,16 @@ class RegexpParse(object):
     @plugin.internet(log)
     def on_task_input(self, task, config):
         url = config['source']
+        encoding = config.get('encoding', 'utf-8')
 
         # if it's a file open it and read into content (assume utf-8 encoding)
         if os.path.isfile(os.path.expanduser(url)):
-            content = codecs.open(url, 'r', encoding='utf-8').read()
+            content = codecs.open(url, 'r', encoding=encoding).read()
         # else use requests to get the data
         else:
-            content = task.requests.get(url).text
+            resp = task.requests.get(url)
+            resp.encoding = encoding
+            content = resp.text
 
         sections = []
         seperators = config.get('sections')
