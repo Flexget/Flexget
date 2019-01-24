@@ -33,6 +33,10 @@ _FULLNAME_ATTR = 'fullname'
 _FIRSTNAME_ATTR = 'first'
 _SURNAME_ATTR = 'sur'
 _GROUP_ATTR = 'group'
+_SOCKSPROXY_ATTR = 'socks_proxy'
+_SOCKSPROXYURL_ATTR = 'url'
+_SOCKSPROXYUSERNAME_ATTR = 'username'
+_SOCKSPROXYPASSWORD_ATTR = 'password'
 
 ChatIdsBase = db_schema.versioned_base('telegram_chat_ids', 0)
 
@@ -90,6 +94,10 @@ class TelegramNotifier(object):
                 - fullname:
                     first: my-first-name
                     sur: my-sur-name
+              socks_proxy:
+                url: socks-proxy-url
+                username: socks-proxy-username
+                password: socks-proxy-password
 
 
     Bootstrapping and testing the bot::
@@ -168,6 +176,16 @@ class TelegramNotifier(object):
                     ]
                 },
             },
+            _SOCKSPROXY_ATTR: {
+                'type': 'object',
+                'properties': {
+                    _SOCKSPROXYURL_ATTR: {'type': 'string'},
+                    _SOCKSPROXYUSERNAME_ATTR: {'type': 'string'},
+                    _SOCKSPROXYPASSWORD_ATTR: {'type': 'string'},
+                },
+                'required': [_SOCKSPROXYURL_ATTR],
+                'additionalProperties': False,
+            },
         },
         'required': [_TOKEN_ATTR, _RCPTS_ATTR],
         'additionalProperties': False,
@@ -206,6 +224,15 @@ class TelegramNotifier(object):
             elif _GROUP_ATTR in i:
                 self._groups.append(i[_GROUP_ATTR])
 
+        self._socks_proxy_url = None
+        self._socks_proxy_username = None
+        self._socks_proxy_password = None
+        socksproxy = config.get(_SOCKSPROXY_ATTR)
+        if socksproxy:
+            self._socks_proxy_url = socksproxy[_SOCKSPROXYURL_ATTR]
+            self._socks_proxy_username = socksproxy.get(_SOCKSPROXYUSERNAME_ATTR)
+            self._socks_proxy_password = socksproxy.get(_SOCKSPROXYPASSWORD_ATTR)
+
     def _real_init(self, session, config):
         self._enforce_telegram_plugin_ver()
         self._parse_config(config)
@@ -223,8 +250,24 @@ class TelegramNotifier(object):
         return chat_ids
 
     def _init_bot(self):
-        self._bot = telegram.Bot(self._token)
+        self._bot = telegram.Bot(self._token, request=self._get_request())
         self._check_token()
+
+    def _get_request(self):
+        request = None
+        if self._socks_proxy_url:
+            urllib3_proxy_kwargs = None
+            if self._socks_proxy_username and self._socks_proxy_password:
+                urllib3_proxy_kwargs = {
+                    'username': self._socks_proxy_username,
+                    'password': self._socks_proxy_password,
+                }
+            request = telegram.utils.request.Request(
+                proxy_url=self._socks_proxy_url,
+                urllib3_proxy_kwargs=urllib3_proxy_kwargs
+            )
+
+        return request
 
     def _check_token(self):
         try:
