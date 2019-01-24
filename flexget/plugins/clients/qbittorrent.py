@@ -28,6 +28,8 @@ class OutputQBitTorrent(object):
         verify_cert: <VERIFY> (default: True)
         path: <OUTPUT_DIR> (default: (none))
         label: <LABEL> (default: (none))
+        maxupspeed: <torrent upload speed limit> (default: 0)
+        maxdownspeed: <torrent download speed limit> (default: 0)
     """
     schema = {
         'anyOf': [
@@ -43,6 +45,8 @@ class OutputQBitTorrent(object):
                     'verify_cert': {'type': 'boolean'},
                     'path': {'type': 'string'},
                     'label': {'type': 'string'},
+                    'maxupspeed': {'type': 'integer'},
+                    'maxdownspeed': {'type': 'integer'},
                     'fail_html': {'type': 'boolean'}
                 },
                 'additionalProperties': False
@@ -105,6 +109,8 @@ class OutputQBitTorrent(object):
         config.setdefault('use_ssl', False)
         config.setdefault('verify_cert', True)
         config.setdefault('label', '')
+        config.setdefault('maxupspeed', 0)
+        config.setdefault('maxdownspeed', 0)
         config.setdefault('fail_html', True)
         return config
 
@@ -123,6 +129,14 @@ class OutputQBitTorrent(object):
                 form_data['label'] = label  # qBittorrent v3.3.3-
                 form_data['category'] = label  # qBittorrent v3.3.4+
 
+            maxupspeed = entry.get('maxupspeed', config.get('maxupspeed'))
+            if maxupspeed:
+                form_data['upLimit'] = maxupspeed * 1024
+
+            maxdownspeed = entry.get('maxdownspeed', config.get('maxdownspeed'))
+            if maxdownspeed:
+                form_data['dlLimit'] = maxdownspeed * 1024
+
             is_magnet = entry['url'].startswith('magnet:')
 
             if task.manager.options.test:
@@ -134,6 +148,10 @@ class OutputQBitTorrent(object):
                     log.info('Url: %s', entry.get('url'))
                 log.info('Save path: %s', form_data.get('savepath'))
                 log.info('Label: %s', form_data.get('label'))
+                if maxupspeed:
+                    log.info('Upload Speed Limit: %d', form_data.get('upLimit'))
+                if maxdownspeed:
+                    log.info('Download Speed Limit: %d', form_data.get('dlLimit'))
                 continue
 
             if not is_magnet:
