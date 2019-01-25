@@ -7,6 +7,7 @@ import re
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
+from flexget.utils.template import evaluate_expression
 
 
 log = logging.getLogger('sort_by')
@@ -78,7 +79,7 @@ class PluginSortBy(object):
             re_articles = RE_ARTICLES if ignore_articles is True else ignore_articles
 
             def sort_key(entry):
-                val = entry.get(field)
+                val = evaluate_expression(field, entry)
                 if isinstance(val, str) and re_articles:
                     val = re.sub(re_articles, '', val, flags=re.IGNORECASE)
                 # Sort None values last no matter whether reversed or not

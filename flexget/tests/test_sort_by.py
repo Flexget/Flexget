@@ -87,6 +87,15 @@ class TestSortBy(object):
             - title: B
             - title: C
               maybe_field: 2
+          test_jinja_field:
+            sort_by: "dict_field.b"
+            mock:
+            - title: A
+              dict_field: {a: 0, b: 2}
+            - title: B
+              dict_field: {a: 1, b: 1}
+            - title: C
+              dict_field: {a: 2, b: 0}
     """
 
     def generate_test_ids(param):
@@ -120,7 +129,9 @@ class TestSortBy(object):
         ('test_missing_field',
             ['A', 'C', 'B'], 'Entries without field should be sorted last'),
         ('test_missing_field_reverse',
-            ['C', 'A', 'B'], 'Entries without field should be sorted last')
+            ['C', 'A', 'B'], 'Entries without field should be sorted last'),
+        ('test_jinja_field',
+            ['C', 'B', 'A'], 'Entries without field should be sorted last')
     ], ids=generate_test_ids)
     def test_sort_by(self, execute_task, task_name, result_titles, fail_reason):
         task = execute_task(task_name)
