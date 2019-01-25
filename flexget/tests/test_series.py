@@ -866,7 +866,6 @@ class TestDuplicates(object):
               - {title: 'Foo.Bar.S02E04.DSRIP.XviD-2HD[ASDF]'}
               - {title: 'Foo.Bar.S02E04.HDTV.1080p.XviD-2HD[ASDF]'}
               - {title: 'Foo.Bar.S02E03.HDTV.XviD-FlexGet'}
-              - {title: 'Foo.Bar.S02E05.HDTV.XviD-ZZZ'}
               - {title: 'Foo.Bar.S02E05.720p.HDTV.XviD-YYY'}
             series:
               - foo bar
@@ -978,7 +977,6 @@ class TestQualities(object):
               - title: FooBum.S03E01.720p-ver2 # Duplicate ep
           target_1:
             mock:
-              - title: Food.S06E11.sdtv
               - title: Food.S06E11.hdtv
           target_2:
             mock:
@@ -1277,7 +1275,6 @@ class TestTimeframe(object):
                     - 720p
 
             mock:
-              - {title: 'Q Test.S01E02.hdtv-FlexGet'}
               - {title: 'Q Test.S01E02.1080p-FlexGet'}
 
           test_with_quality_1:

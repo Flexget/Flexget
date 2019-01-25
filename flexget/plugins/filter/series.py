@@ -1811,10 +1811,6 @@ class FilterSeries(FilterSeriesBase):
 
             reason = None
 
-            # sort entities in order of quality
-            entries.sort(key=lambda e: (e['quality'], e['series_parser'].episodes, e['series_parser'].proper_count),
-                         reverse=True)
-
             log.debug('start with entities: %s', [e['title'] for e in entries])
 
             season_packs = self.season_pack_opts(config.get('season_packs', False))
