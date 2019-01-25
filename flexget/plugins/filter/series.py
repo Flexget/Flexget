@@ -1388,6 +1388,20 @@ class FilterSeriesBase(object):
                 'timeframe': {'type': 'string', 'format': 'interval'},
                 'upgrade': {'type': 'boolean'},
                 'target': {'type': 'string', 'format': 'quality_requirements'},
+                # Sort order, a list of either field names, or dicts with field and reverse key
+                'sort': {
+                    'type': 'array',
+                    'items': {'anyOf': [
+                        {'type': 'string'},
+                        {
+                            'type': 'object',
+                            'properties': {
+                                'field': {'type': 'string'},
+                                'reverse': {'type': 'boolean'}
+                            },
+                            'additionalProperties': False
+                        }
+                    ]}},
                 # Specials
                 'specials': {'type': 'boolean'},
                 # Propers (can be boolean, or an interval string)
@@ -1811,9 +1825,22 @@ class FilterSeries(FilterSeriesBase):
 
             reason = None
 
-            # sort entities in order of quality
-            entries.sort(key=lambda e: (e['quality'], e['series_parser'].episodes, e['series_parser'].proper_count),
+            # All specified sort columns being equal, we prefer packs, and higher propers
+            entries.sort(key=lambda e: (e['series_parser'].episodes, e['series_parser'].proper_count),
                          reverse=True)
+            # Now sort by user specified order
+            # Default to highest quality first if user has not specified order
+            sort_keys = config.get('sort', [{'field': 'quality', 'reverse': True}])
+            for key in reversed(sort_keys):
+                if isinstance(key, str):
+                    key = {'field': key, 'reverse': False}
+
+                def sort_func(entry):
+                    # Sort None values last no matter whether reversed or not
+                    field = entry.get(key['field'])
+                    return (entry.get(key['field']) is not None) == key['reverse'], field
+
+                entries.sort(key=sort_func, reverse=key['reverse'])
 
             log.debug('start with entities: %s', [e['title'] for e in entries])
 

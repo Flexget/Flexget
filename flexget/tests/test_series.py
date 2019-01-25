@@ -2419,3 +2419,116 @@ class TestSeriesDDAudio(object):
         assert task.find_entry(title='Channels.S01E01.1080p.HDTV.DD+7.1-FlexGet'), \
             'Channels.S01E01.1080p.HDTV.DD+7.1-FlexGet should have been accepted'
         assert len(task.accepted) == 1, 'should have accepted only one'
+
+
+class TestCustomSort(object):
+
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
+        tasks:
+          default_sorting:
+            seen: local
+            series:
+            - My Show
+            mock:
+            - title: My Show S01E01 720p
+            - title: My Show S01E01 1080p
+            - title: My Show S01E01 720p the second
+          no_sorting:
+            seen: local
+            series:
+            - My Show:
+                sort: []
+            mock:
+            - title: My Show S01E01 720p
+            - title: My Show S01E01 1080p
+            - title: My Show S01E01 720p the second
+          quality_ascending:
+            seen: local
+            series:
+            - My Show:
+                sort: [quality]
+            mock:
+            - title: My Show S01E01 1080p
+            - title: My Show S01E01 720p
+            - title: My Show S01E01 1080p the second
+          multi_field:
+            seen: local
+            series:
+            - My Show:
+                sort: [{field: field1, reverse: yes}, field2]
+            mock:
+            - title: My Show S01E01 480p
+              field1: 0
+              field2: 5
+            - title: My Show S01E01 
+              field1: 1
+              field2: 2
+            # This one should be the top
+            - title: My Show S01E01 720p
+              field1: 1
+              field2: 1
+            - title: My Show S01E01 1080p
+              field1: 1
+              field2: 2
+            - title: My Show S01E01 480p
+              field1: 0
+              field2: 0
+          none_sort:
+            seen: local
+            series:
+            - My Show:
+                sort: [field1]
+            mock:
+            - title: My Show S01E01 480p
+            # This one should be the top
+            - title: My Show S01E01 720p
+              field1: 1
+            - title: My Show S01E01 1080p
+          none_sort_reverse:
+            seen: local
+            series:
+            - My Show:
+                sort: [{field: field1, reverse: yes}]
+            mock:
+            - title: My Show S01E01 480p
+            # This one should be the top
+            - title: My Show S01E01 720p
+              field1: 1
+            - title: My Show S01E01 1080p
+    """
+
+    def test_default_sorting(self, execute_task):
+        task = execute_task('default_sorting')
+        assert len(task.accepted) == 1
+        assert str(task.accepted[0]['quality']) == '1080p', 'default sorting should get highest quality'
+
+    def test_no_sorting(self, execute_task):
+        task = execute_task('no_sorting')
+        assert len(task.accepted) == 1
+        assert str(task.accepted[0]['title']) == 'My Show S01E01 720p', 'entry order in task should be respected'
+
+    def test_quality_ascending(self, execute_task):
+        task = execute_task('quality_ascending')
+        assert len(task.accepted) == 1
+        assert str(task.accepted[0]['quality']) == '720p', 'should have accepted lowest quality release'
+
+    def test_multi_field(self, execute_task):
+        task = execute_task('multi_field')
+        assert len(task.accepted) == 1
+        accepted_entry = task.accepted[0]
+        assert accepted_entry['field1'] == 1
+        assert accepted_entry['field2'] == 1
+
+    def test_none_sorts_last(self, execute_task):
+        task = execute_task('none_sort')
+        assert len(task.accepted) == 1
+        assert task.accepted[0]['field1'] == 1
+
+    def test_none_sorts_last_reverse(self, execute_task):
+        task = execute_task('none_sort_reverse')
+        assert len(task.accepted) == 1
+        assert task.accepted[0]['field1'] == 1
