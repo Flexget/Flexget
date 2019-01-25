@@ -55,6 +55,20 @@ class TestSortBy(object):
               - {title: 'Owl Looked Back Goes to College', url: 'http://localhost/5'}
               - {title: 'New Series 2', url: 'http://localhost/2'}
               - {title: 'An Owl Looked Back', url: 'http://localhost/4'}
+          test_multi_field:
+            sort_by:
+            - field: number1
+            - field: number2
+            mock:
+            - title: A
+              number1: 10
+              number2: 2
+            - title: B
+              number1: 1
+              number2: 15
+            - title: C
+              number1: 10
+              number2: 1
     """
 
     def generate_test_ids(param):
@@ -82,7 +96,9 @@ class TestSortBy(object):
         ('test_ignore_articles_custom',
             ['An Owl Looked Back', 'The Cat Who Looked Back', 'A New Series', 'New Series 2',
              'Owl Looked Back Goes to College'],
-            'Entries should be sorted ignoring articles `a` and `the`')
+            'Entries should be sorted ignoring articles `a` and `the`'),
+        ('test_multi_field',
+            ['B', 'C', 'A'], 'Entries should be sorted by both fields, ascending')
     ], ids=generate_test_ids)
     def test_sort_by(self, execute_task, task_name, result_titles, fail_reason):
         task = execute_task(task_name)
