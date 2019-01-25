@@ -31,6 +31,8 @@ class NPOWatchlist(object):
             is complete.
         If 'max_episode_age_days' is set (and not 0), entries will only be generated for episodes broadcast in the last
             x days.  This only applies to episodes related to series the user is following.
+        If 'download_premium' is set to 'yes', the plugin will also download entries that are marked as exclusive
+            content for NPO Plus subscribers.
 
         For example:
             npo_watchlist:
@@ -38,6 +40,7 @@ class NPOWatchlist(object):
               password: xxx
               remove_accepted: yes
               max_episode_age_days: 7
+              download_premium: no
             accept_all: yes
             exec:
               fail_entries: yes
@@ -55,6 +58,7 @@ class NPOWatchlist(object):
             'password': {'type': 'string'},
             'remove_accepted': {'type': 'boolean', 'default': False},
             'max_episode_age_days': {'type': 'integer', 'default': -1},
+            'download_premium': {'type': 'boolean', 'default': False},
         },
         'required': ['email', 'password'],
         'additionalProperties': False
@@ -190,6 +194,7 @@ class NPOWatchlist(object):
 
     def _parse_tiles(self, task, config, tiles, series_info):
         max_age = config.get('max_episode_age_days')
+        download_premium = config.get('download_premium')
         entries = []
 
         if tiles is not None:
@@ -197,6 +202,7 @@ class NPOWatchlist(object):
                 # there is only one list_item per tile
                 for list_item in get_soup(tile).findAll('div', class_='npo-asset-tile-container'):
                     episode_id = list_item['data-id']
+                    premium = 'npo-premium-content' in list_item['class']
                     log.debug('Parsing episode: %s', episode_id)
 
                     url = list_item.find('a')['href']
@@ -210,12 +216,15 @@ class NPOWatchlist(object):
                         title = '{} ({})'.format(next(episode_name.stripped_strings), episode_id)
                     else:
                         title = '{}'.format(episode_id)
-                    timer = next(list_item.find('div', class_='npo-asset-tile-timer').stripped_strings)
+
+                    timer = '0'
+                    timerdiv = list_item.find('div', class_='npo-asset-tile-timer')
+                    if timerdiv:  # some entries are missing a running time
+                        timer = next(timerdiv.stripped_strings)
                     remove_url = list_item.find('div', class_='npo-asset-tile-delete')
 
-                    not_available = list_item.find('div', class_='npo-asset-tile-availability')['data-to']
-                    if not_available:
-                        log.debug('Skipping %s, no longer available', title)
+                    if premium and not download_premium:
+                        log.debug('Skipping %s, no longer available without premium', title)
                         continue
 
                     entry_date = url.split('/')[-2]
@@ -233,6 +242,7 @@ class NPOWatchlist(object):
                     e['series_date'] = entry_date
                     e['series_id_type'] = 'date'
                     e['npo_id'] = episode_id
+                    e['npo_premium'] = premium
                     e['npo_runtime'] = timer.strip('min').strip()
                     e['language'] = series_info['npo_language']
 
