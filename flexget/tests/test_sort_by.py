@@ -69,6 +69,24 @@ class TestSortBy(object):
             - title: C
               number1: 10
               number2: 1
+          test_missing_field:
+            sort_by: maybe_field
+            mock:
+            - title: A
+              maybe_field: 1
+            - title: B
+            - title: C
+              maybe_field: 2
+          test_missing_field_reverse:
+            sort_by:
+              field: maybe_field
+              reverse: yes
+            mock:
+            - title: A
+              maybe_field: 1
+            - title: B
+            - title: C
+              maybe_field: 2
     """
 
     def generate_test_ids(param):
@@ -98,7 +116,11 @@ class TestSortBy(object):
              'Owl Looked Back Goes to College'],
             'Entries should be sorted ignoring articles `a` and `the`'),
         ('test_multi_field',
-            ['B', 'C', 'A'], 'Entries should be sorted by both fields, ascending')
+            ['B', 'C', 'A'], 'Entries should be sorted by both fields, ascending'),
+        ('test_missing_field',
+            ['A', 'C', 'B'], 'Entries without field should be sorted last'),
+        ('test_missing_field_reverse',
+            ['C', 'A', 'B'], 'Entries without field should be sorted last')
     ], ids=generate_test_ids)
     def test_sort_by(self, execute_task, task_name, result_titles, fail_reason):
         task = execute_task(task_name)
