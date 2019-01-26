@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
 import argparse
+import itertools
 import logging
 import re
 import sys
@@ -1957,14 +1958,11 @@ class FilterSeries(FilterSeriesBase):
         """
 
         pass_filter = []
-        best_propers = []
-        # Since eps is sorted by quality then proper_count we always see the highest proper for a quality first.
-        (last_qual, best_proper) = (None, 0)
+        # First find best available proper for each quality without modifying incoming entry order
+        sorted_entries = sorted(entries, key=lambda e: (e['quality'], e['proper_count']), reverse=True)
+        best_propers = {q: next(e) for q, e in itertools.groupby(sorted_entries, key=lambda e: e['quality'])}
         for entry in entries:
-            if entry['quality'] != last_qual:
-                last_qual, best_proper = entry['quality'], entry['series_parser'].proper_count
-                best_propers.append(entry)
-            if entry['series_parser'].proper_count < best_proper:
+            if entry['proper_count'] < best_propers[entry['quality']]['proper_count']:
                 # nuke qualities which there is a better proper available
                 entry.reject('nuked')
             else:
@@ -1993,9 +1991,8 @@ class FilterSeries(FilterSeriesBase):
         log.debug('propers - downloaded qualities: %s', downloaded_qualities)
 
         # Accept propers we actually need, and remove them from the list of entries to continue processing
-        for entry in best_propers:
-            if (entry['quality'] in downloaded_qualities and
-                        entry['series_parser'].proper_count > downloaded_qualities[entry['quality']]):
+        for quality, entry in best_propers.items():
+            if quality in downloaded_qualities and entry['proper_count'] > downloaded_qualities[quality]:
                 entry.accept('proper')
                 pass_filter.remove(entry)
 
