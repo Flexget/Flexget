@@ -124,7 +124,7 @@ class SearchBTN(object):
                     entry['torrent_seeds'] = int(item['Seeders'])
                     entry['torrent_leeches'] = int(item['Leechers'])
                     entry['torrent_info_hash'] = item['InfoHash']
-                    entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+                    entry['torrent_availability'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
                     entry['btn_origin'] = item['Origin']
                     if item['TvdbID'] and int(item['TvdbID']):
                         entry['tvdb_id'] = int(item['TvdbID'])

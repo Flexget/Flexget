@@ -175,7 +175,7 @@ class UrlRewriteTorrentday(object):
                 leechers = tr.find('td', { 'class': 'ac leechersInfo'})
                 entry['torrent_seeds'] = int(seeders.contents[0].replace(',', ''))
                 entry['torrent_leeches'] = int(leechers.contents[0].replace(',', ''))
-                entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+                entry['torrent_availability'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
 
                 # use tr object for size
                 size = tr.find('td', text=re.compile('([\.\d]+) ([TGMKk]?)B')).contents[0]
@@ -185,7 +185,7 @@ class UrlRewriteTorrentday(object):
 
                 entries.add(entry)
 
-        return sorted(entries, reverse=True, key=lambda x: x.get('search_sort'))
+        return sorted(entries, reverse=True, key=lambda x: x.get('torrent_availability'))
 
 
 @event('plugin.register')

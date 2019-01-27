@@ -95,7 +95,7 @@ class Limetorrents(object):
                     e['title'] = title
                     e['torrent_seeds'] = seeds
                     e['torrent_leeches'] = leeches
-                    e['search_sort'] = torrent_availability(e['torrent_seeds'], e['torrent_leeches'])
+                    e['torrent_availability'] = torrent_availability(e['torrent_seeds'], e['torrent_leeches'])
                     e['content_size'] = size
 
                     entries.add(e)
