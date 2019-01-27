@@ -19,11 +19,9 @@ __author__ = 'danfocus'
 
 log = logging.getLogger('lostfilm')
 
-EPISODE_REGEXP = re.compile(
-    '.*lostfilm.tv/series/.*/season_(\d+)/episode_(\d+)/.*')
-LOSTFILM_ID_REGEXP = re.compile(
-    '.*static.lostfilm.tv/Images/(\d+)/Posters/.*')
-TEXT_REGEXP = re.compile('^\d+\sсезон\s\d+\sсерия\.\s(.+)\s\((.+)\)$')
+EPISODE_REGEXP = re.compile(r'.*lostfilm.tv/series/.*/season_(\d+)/episode_(\d+)/.*')
+LOSTFILM_ID_REGEXP = re.compile(r'.*static.lostfilm.tv/Images/(\d+)/Posters/.*')
+TEXT_REGEXP = re.compile(r'^\d+\s+сезон\s+\d+\s+серия\.\s(.+)\s\((.+)\)$')
 
 quality_map = {
     'SD': ('480p', 'avi'),
@@ -69,7 +67,7 @@ class LostFilm(object):
             return
         try:
             rss = feedparser.parse(config['url'])
-        except:
+        except Exception:
             raise PluginError('Cannot parse rss feed')
         if rss.get('status') != 200:
             raise PluginError('Received not 200 (OK) status')
@@ -82,16 +80,15 @@ class LostFilm(object):
                 log.debug('Item doesn\'t have a description')
                 continue
             try:
-                lostfilm_num = LOSTFILM_ID_REGEXP.search(
-                    item['description']).groups()
-            except:
+                lostfilm_num = LOSTFILM_ID_REGEXP.search(item['description']).groups()
+            except Exception:
                 log.debug('Item doesn\'t have lostfilm id in description')
                 continue
             try:
                 season_num, episode_num = [
                     int(x) for x in EPISODE_REGEXP.search(
                         item['link']).groups()]
-            except:
+            except Exception:
                 log.debug('Item doesn\'t have episode id in link')
                 continue
             params = {
@@ -109,7 +106,7 @@ class LostFilm(object):
             page = get_soup(response.content)
             try:
                 redirect_url = page.head.meta['content'].split('url=')[1]
-            except:
+            except Exception:
                 log.error('Missing redirect')
                 continue
 
@@ -124,30 +121,26 @@ class LostFilm(object):
             episode_name_rus = episode_name_eng = series_name_rus = None
             series_name_eng = None
             try:
-                series_name_rus = page.find(
-                    'div', 'inner-box--title').text.strip()
-                title_eng_div = page.find(
-                    'div', 'inner-box--subtitle').text.strip() or None
-                series_name_eng = (title_eng_div.endswith(
-                    ', сериал')) and title_eng_div[:-8] or None
-                text_div = page.find(
-                    'div', 'inner-box--text').text.strip() or None
-                episode_name_rus, episode_name_eng = TEXT_REGEXP.findall(
-                    text_div).pop()
-            except:
+                series_name_rus = page.find('div', 'inner-box--title').text.strip()
+                title_eng_div = page.find('div', 'inner-box--subtitle').text.strip() or None
+                series_name_eng = (title_eng_div.endswith(', сериал')) \
+                    and title_eng_div[:-8] or None
+                text_div = page.find('div', 'inner-box--text').text.strip() or None
+                episode_name_rus, episode_name_eng = TEXT_REGEXP.findall(text_div).pop()
+                episode_name_rus = episode_name_rus.strip()
+                episode_name_eng = episode_name_eng.strip()
+            except Exception:
                 log.debug('Cannot parse head info')
-                pass
+                continue
 
-            episode_id = 'S{:02d}E{:02d}'.format(
-                season_num, episode_num)
+            episode_id = 'S{:02d}E{:02d}'.format(season_num, episode_num)
 
             for item in page.findAll('div', 'inner-box--item'):
                 torrent_link = quality = None
                 try:
-                    torrent_link = item.find(
-                        'div', 'inner-box--link sub').a['href']
+                    torrent_link = item.find('div', 'inner-box--link sub').a['href']
                     quality = item.find('div', 'inner-box--label').text.strip()
-                except:
+                except Exception:
                     log.debug('Item doesn\'t have a link or quality')
                     continue
                 if torrent_link is None or quality is None:
@@ -170,9 +163,7 @@ class LostFilm(object):
                     ).replace(' ', '.')
                 else:
                     if item.get('title') is not None:
-                        new_title = '{} {}'.format(
-                            item['title'],
-                            quality)
+                        new_title = '{} {}'.format(item['title'], quality)
                     else:
                         log.debug('Item doesn\'t have a title')
                         continue
