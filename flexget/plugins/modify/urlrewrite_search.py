@@ -65,7 +65,7 @@ class PluginSearch(object):
                         log.warning('Search plugin %s does not support latest search api.' % name)
                         results = plugins[name].search(entry, search_config)
                     matcher = SequenceMatcher(a=entry['title'])
-                    for result in sorted(results, key=lambda e: e.get('search_sort'), reverse=True):
+                    for result in results:
                         matcher.set_seq2(result['title'])
                         if matcher.ratio() > 0.9:
                             log.debug('Found url: %s', result['url'])

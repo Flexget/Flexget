@@ -115,7 +115,7 @@ class UrlRewriteFuzer(object):
 
             e['torrent_seeds'] = seeders
             e['torrent_leeches'] = leechers
-            e['search_sort'] = torrent_availability(e['torrent_seeds'], e['torrent_leeches'])
+            e['torrent_availibility'] = torrent_availability(e['torrent_seeds'], e['torrent_leeches'])
 
             size = re.search('(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', raw_size)
             e['content_size'] = parse_filesize(size.group(0))
@@ -162,7 +162,7 @@ class UrlRewriteFuzer(object):
                 text = quote_plus(query.encode('windows-1255'))
                 soup = self.get_fuzer_soup(text, c_list)
                 entries += self.extract_entry_from_soup(soup)
-        return sorted(entries, reverse=True, key=lambda x: x.get('search_sort')) if entries else []
+        return sorted(entries, reverse=True, key=lambda x: x.get('torrent_availability')) if entries else []
 
 
 @event('plugin.register')
