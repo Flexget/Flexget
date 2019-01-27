@@ -1,16 +1,19 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
+import re
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.event import event
-import re
+from flexget.utils.template import evaluate_expression
+
 
 log = logging.getLogger('sort_by')
 
-RE_ARTICLES = '^(the|a|an)\s'
+RE_ARTICLES = r'^(the|a|an)\s'
+
 
 class PluginSortBy(object):
     """
@@ -32,7 +35,7 @@ class PluginSortBy(object):
         reverse: yes
     """
 
-    schema = {
+    schema = one_or_more({
         'oneOf': [
             {'type': 'string'},
             {
@@ -50,31 +53,39 @@ class PluginSortBy(object):
                 'additionalProperties': False
             }
         ]
-    }
+    })
 
     def on_task_filter(self, task, config):
-        if isinstance(config, str):
-            field = config
-            reverse = False
-            ignore_articles = False
-        else:
-            field = config.get('field', None)
-            reverse = config.get('reverse', False)
-            ignore_articles = config.get('ignore_articles', False)
+        if not isinstance(config, list):
+            config = [config]
+        # First item in the config list should be primary sort key, so iterate in reverse
+        for item in reversed(config):
+            if isinstance(item, str):
+                field = item
+                reverse = False
+                ignore_articles = False
+            else:
+                field = item.get('field', None)
+                reverse = item.get('reverse', False)
+                ignore_articles = item.get('ignore_articles', False)
 
-        log.debug('sorting entries by: %s' % config)
+            log.debug('sorting entries by: %s', item)
 
-        if not field:
-            task.all_entries.reverse()
-            return
-        
-        re_articles = ignore_articles if not isinstance(ignore_articles, bool) else RE_ARTICLES
+            if not field:
+                if reverse:
+                    task.all_entries.reverse()
+                continue
 
-        if ignore_articles:
-            task.all_entries.sort(key=lambda e: re.sub(re_articles, '', e.get(field, 0), flags=re.IGNORECASE),
-                                  reverse=reverse)
-        else:
-            task.all_entries.sort(key=lambda e: e.get(field, 0), reverse=reverse)
+            re_articles = RE_ARTICLES if ignore_articles is True else ignore_articles
+
+            def sort_key(entry):
+                val = evaluate_expression(field, entry)
+                if isinstance(val, str) and re_articles:
+                    val = re.sub(re_articles, '', val, flags=re.IGNORECASE)
+                # Sort None values last no matter whether reversed or not
+                return (val is not None) == reverse, val
+
+            task.all_entries.sort(key=sort_key, reverse=reverse)
 
 
 @event('plugin.register')

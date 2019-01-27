@@ -55,6 +55,47 @@ class TestSortBy(object):
               - {title: 'Owl Looked Back Goes to College', url: 'http://localhost/5'}
               - {title: 'New Series 2', url: 'http://localhost/2'}
               - {title: 'An Owl Looked Back', url: 'http://localhost/4'}
+          test_multi_field:
+            sort_by:
+            - field: number1
+            - field: number2
+            mock:
+            - title: A
+              number1: 10
+              number2: 2
+            - title: B
+              number1: 1
+              number2: 15
+            - title: C
+              number1: 10
+              number2: 1
+          test_missing_field:
+            sort_by: maybe_field
+            mock:
+            - title: A
+              maybe_field: 1
+            - title: B
+            - title: C
+              maybe_field: 2
+          test_missing_field_reverse:
+            sort_by:
+              field: maybe_field
+              reverse: yes
+            mock:
+            - title: A
+              maybe_field: 1
+            - title: B
+            - title: C
+              maybe_field: 2
+          test_jinja_field:
+            sort_by: "dict_field.b"
+            mock:
+            - title: A
+              dict_field: {a: 0, b: 2}
+            - title: B
+              dict_field: {a: 1, b: 1}
+            - title: C
+              dict_field: {a: 2, b: 0}
     """
 
     def generate_test_ids(param):
@@ -82,7 +123,15 @@ class TestSortBy(object):
         ('test_ignore_articles_custom',
             ['An Owl Looked Back', 'The Cat Who Looked Back', 'A New Series', 'New Series 2',
              'Owl Looked Back Goes to College'],
-            'Entries should be sorted ignoring articles `a` and `the`')
+            'Entries should be sorted ignoring articles `a` and `the`'),
+        ('test_multi_field',
+            ['B', 'C', 'A'], 'Entries should be sorted by both fields, ascending'),
+        ('test_missing_field',
+            ['A', 'C', 'B'], 'Entries without field should be sorted last'),
+        ('test_missing_field_reverse',
+            ['C', 'A', 'B'], 'Entries without field should be sorted last'),
+        ('test_jinja_field',
+            ['C', 'B', 'A'], 'Entries without field should be sorted last')
     ], ids=generate_test_ids)
     def test_sort_by(self, execute_task, task_name, result_titles, fail_reason):
         task = execute_task(task_name)
