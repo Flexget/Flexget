@@ -10,6 +10,7 @@ import time
 from guessit.rules import rebulk_builder
 from guessit.api import GuessItApi, GuessitException
 from rebulk import Rebulk
+from rebulk.match import MatchesDict
 from rebulk.pattern import RePattern
 
 from flexget import plugin
@@ -230,7 +231,7 @@ class ParserGuessit(object):
                 valid = False
             elif country and hasattr(country, 'alpha2'):
                 name += ' (%s)' % country.alpha2
-        elif guess_result.matches['title']:
+        elif isinstance(guess_result, MatchesDict) and guess_result.matches['title']:
             # Make sure the name match is up to FlexGet standards
             # Check there is no unmatched cruft before the matched name
             title_start = guess_result.matches['title'][0].start
