@@ -52,7 +52,7 @@ class UrlRewriteYTS(object):
                             entry['torrent_seeds'] = torrent['seeds']
                             entry['torrent_leeches'] = torrent['peers']
                             entry['torrent_info_hash'] = torrent['hash']
-                            entry['torrent_availability'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+                            entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
                             entry['quality'] = torrent['quality']
                             entry['imdb_id'] = item['imdb_code']
                             if entry.isvalid():

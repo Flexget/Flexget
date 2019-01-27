@@ -107,9 +107,9 @@ class NewTorrents(object):
 
             # TODO: also parse content_size and peers from results
             torrents.append(Entry(title=release_name, url=torrent_url, torrent_seeds=seed,
-                                  torrent_availability=torrent_availability(seed, 0)))
+                                  search_sort=torrent_availability(seed, 0)))
         # sort with seed number Reverse order
-        torrents.sort(reverse=True, key=lambda x: x.get('torrent_availability', 0))
+        torrents.sort(reverse=True, key=lambda x: x.get('search_sort', 0))
         # choose the torrent
         if not torrents:
             dashindex = name.rfind('-')

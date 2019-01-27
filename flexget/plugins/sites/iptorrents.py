@@ -173,8 +173,8 @@ class UrlRewriteIPTorrents(object):
                 leechers = torrent.findNext('td', {'class': 'ac t_leechers'}).text
                 entry['torrent_seeds'] = int(seeders)
                 entry['torrent_leeches'] = int(leechers)
-                entry['torrent_availability'] = torrent_availability(entry['torrent_seeds'],
-                                                                     entry['torrent_leeches'])
+                entry['search_sort'] = torrent_availability(entry['torrent_seeds'],
+                                                            entry['torrent_leeches'])
 
                 size = torrent.findNext(text=re.compile('^([\.\d]+) ([GMK]?)B$'))
                 size = re.search('^([\.\d]+) ([GMK]?)B$', size)

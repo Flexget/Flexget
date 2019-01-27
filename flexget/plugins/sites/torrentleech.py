@@ -156,11 +156,11 @@ class UrlRewriteTorrentleech(object):
                 # seeders/leechers
                 entry['torrent_seeds'] = torrent['seeders']
                 entry['torrent_leeches'] = torrent['leechers']
-                entry['torrent_availability'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+                entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
                 entry['content_size'] = parse_filesize(str(torrent['size']) + ' b')
                 entries.add(entry)
 
-        return sorted(entries, reverse=True, key=lambda x: x.get('torrent_availability'))
+        return sorted(entries, reverse=True, key=lambda x: x.get('search_sort'))
 
 
 @event('plugin.register')

@@ -109,7 +109,7 @@ class Torrentz(object):
                 entry['torrent_seeds'] = int(m.group(2).replace(',', ''))
                 entry['torrent_leeches'] = int(m.group(3).replace(',', ''))
                 entry['torrent_info_hash'] = m.group(4).upper()
-                entry['torrent_availability'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+                entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
                 entries.add(entry)
 
         log.debug('Search got %d results' % len(entries))
