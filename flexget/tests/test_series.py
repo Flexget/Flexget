@@ -11,16 +11,13 @@ from sqlalchemy.sql import select
 from flexget.entry import Entry
 from flexget.logger import capture_output
 from flexget.manager import Session, get_parser
-from flexget.plugins.filter.series import Series, SeriesTask, Episode, EpisodeRelease, Season, SeasonRelease
 from flexget.task import TaskAbort
-
+from flexget.components.series import db
 
 def age_series(**kwargs):
-    from flexget.plugins.filter.series import EpisodeRelease
-    from flexget.manager import Session
     import datetime
     session = Session()
-    session.query(EpisodeRelease).update({'first_seen': datetime.datetime.now() - datetime.timedelta(**kwargs)})
+    session.query(db.EpisodeRelease).update({'first_seen': datetime.datetime.now() - datetime.timedelta(**kwargs)})
     session.commit()
 
 
@@ -2011,19 +2008,18 @@ class TestAlternateNames(object):
     # Test the DB behaves like we expect ie. alternate names cannot
     def test_alternate_names_are_removed_from_db(self, execute_task):
         from flexget.manager import Session
-        from flexget.plugins.filter.series import AlternateNames
         with Session() as session:
             execute_task('alternate_name')
             # test the current state of alternate names
-            assert len(session.query(AlternateNames).all()) == 1, 'There should be one alternate name present.'
-            assert session.query(AlternateNames).first().alt_name == 'Other Show', \
+            assert len(session.query(db.AlternateNames).all()) == 1, 'There should be one alternate name present.'
+            assert session.query(db.AlternateNames).first().alt_name == 'Other Show', \
                 'Alternate name should have been Other Show.'
 
             # run another task that overwrites the alternate names
             execute_task('another_alternate_name')
-            assert len(session.query(AlternateNames).all()) == 1, \
+            assert len(session.query(db.AlternateNames).all()) == 1, \
                 'The old alternate name should have been removed from the database.'
-            assert session.query(AlternateNames).first().alt_name == 'Good Show', \
+            assert session.query(db.AlternateNames).first().alt_name == 'Good Show', \
                 'The alternate name in the database should be the new one, Good Show.'
 
 

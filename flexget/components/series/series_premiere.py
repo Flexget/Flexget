@@ -5,13 +5,8 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from flexget import plugin
 from flexget.event import event
 
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.filter import series as plugin_series
-except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='series',
-    )
+from . import series as plugin_series
+from . import db
 
 
 class FilterSeriesPremiere(plugin_series.FilterSeriesBase):
@@ -67,24 +62,37 @@ class FilterSeriesPremiere(plugin_series.FilterSeriesBase):
         guessed_series = {}
         for entry in task.entries:
             if guess_entry(entry, allow_seasonless=allow_seasonless, config=group_settings):
-                if not entry['season_pack'] and entry['series_season'] == 1 and entry['series_episode'] in desired_eps:
+                if (
+                    not entry['season_pack']
+                    and entry['series_season'] == 1
+                    and entry['series_episode'] in desired_eps
+                ):
                     normalized_name = plugin_series.normalize_series_name(entry['series_name'])
-                    db_series = task.session.query(plugin_series.Series).filter(
-                        plugin_series.Series.name == normalized_name).first()
+                    db_series = (
+                        task.session.query(db.Series)
+                        .filter(db.Series.name == normalized_name)
+                        .first()
+                    )
                     if db_series and db_series.in_tasks:
                         continue
                     guessed_series.setdefault(normalized_name, entry['series_name'])
         # Reject any further episodes in those series
         for entry in task.entries:
             for series in guessed_series.values():
-                if entry.get('series_name') == series and \
-                        (entry.get('season_pack') or not (
-                                entry.get('series_season') == 1 and entry.get('series_episode') in desired_eps)):
+                if entry.get('series_name') == series and (
+                    entry.get('season_pack')
+                    or not (
+                        entry.get('series_season') == 1
+                        and entry.get('series_episode') in desired_eps
+                    )
+                ):
                     entry.reject('Non premiere episode or season pack in a premiere series')
 
         # Combine settings and series into series plugin config format
-        allseries = {'settings': {'series_premiere': group_settings},
-                     'series_premiere': list(guessed_series.values())}
+        allseries = {
+            'settings': {'series_premiere': group_settings},
+            'series_premiere': list(guessed_series.values()),
+        }
         # Merge the our config in to the main series config
         self.merge_config(task, allseries)
 

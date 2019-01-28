@@ -11,7 +11,7 @@ def assert_mock_calls(expected_calls, mock_object):
 
 
 def assert_series_count_in_db(expected_count):
-    from flexget.plugins.filter.series import Series
+    from flexget.components.series.db import Series
     from flexget.manager import Session
     session = Session()
     actual_series_count = session.query(Series).count()

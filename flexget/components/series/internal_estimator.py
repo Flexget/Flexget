@@ -11,33 +11,32 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.tools import multiply_timedelta
 
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.filter import series as plugin_series
-except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='series',
-    )
+from . import db
 
 log = logging.getLogger('est_series_internal')
 
 
 class EstimatesSeriesInternal(object):
-
     @plugin.priority(0)  # Should always be last priority
     def estimate(self, entry):
         if not all(field in entry for field in ['series_name', 'series_season', 'series_episode']):
             return
         with Session() as session:
-            series = session.query(plugin_series.Series).filter(
-                plugin_series.Series.name == entry['series_name']).first()
+            series = (
+                session.query(db.Series).filter(db.Series.name == entry['series_name']).first()
+            )
             if not series:
                 return
-            episodes = (session.query(plugin_series.Episode).join(plugin_series.Episode.series).
-                        filter(plugin_series.Episode.season != None).
-                        filter(plugin_series.Series.id == series.id).
-                        filter(plugin_series.Episode.season == func.max(plugin_series.Episode.season).select()).
-                        order_by(desc(plugin_series.Episode.number)).limit(2).all())
+            episodes = (
+                session.query(db.Episode)
+                .join(db.Episode.series)
+                .filter(db.Episode.season != None)
+                .filter(db.Series.id == series.id)
+                .filter(db.Episode.season == func.max(db.Episode.season).select())
+                .order_by(desc(db.Episode.number))
+                .limit(2)
+                .all()
+            )
 
             if len(episodes) < 2:
                 return
@@ -63,4 +62,6 @@ class EstimatesSeriesInternal(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EstimatesSeriesInternal, 'est_series_internal', interfaces=['estimate_release'], api_ver=2)
+    plugin.register(
+        EstimatesSeriesInternal, 'est_series_internal', interfaces=['estimate_release'], api_ver=2
+    )

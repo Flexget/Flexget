@@ -11,13 +11,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.filter import series as plugin_series
-except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='series',
-    )
+from . import db
 
 log = logging.getLogger('next_series_episodes')
 
@@ -37,10 +31,10 @@ class NextSeriesEpisodes(object):
                 'properties': {
                     'from_start': {'type': 'boolean', 'default': False},
                     'backfill': {'type': 'boolean', 'default': False},
-                    'only_same_season': {'type': 'boolean', 'default': False}
+                    'only_same_season': {'type': 'boolean', 'default': False},
                 },
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ]
     }
 
@@ -48,8 +42,7 @@ class NextSeriesEpisodes(object):
         self.rerun_entries = []
 
     def ep_identifiers(self, season, episode):
-        return ['S%02dE%02d' % (season, episode),
-                '%dx%02d' % (season, episode)]
+        return ['S%02dE%02d' % (season, episode), '%dx%02d' % (season, episode)]
 
     def sequence_identifiers(self, episode):
         # Use a set to remove doubles, which will happen depending on number of digits in episode
@@ -63,26 +56,39 @@ class NextSeriesEpisodes(object):
         if paren_match.group(2):
             alts.append(paren_match.group(1))
         if series.identified_by == 'ep':
-            search_strings = ['%s %s' % (series.name, id) for id in self.ep_identifiers(season, episode)]
+            search_strings = [
+                '%s %s' % (series.name, id) for id in self.ep_identifiers(season, episode)
+            ]
             series_id = 'S%02dE%02d' % (season, episode)
             for alt in alts:
-                search_strings.extend(['%s %s' % (alt, id) for id in self.ep_identifiers(season, episode)])
+                search_strings.extend(
+                    ['%s %s' % (alt, id) for id in self.ep_identifiers(season, episode)]
+                )
         else:
-            search_strings = ['%s %s' % (series.name, id) for id in self.sequence_identifiers(episode)]
+            search_strings = [
+                '%s %s' % (series.name, id) for id in self.sequence_identifiers(episode)
+            ]
             series_id = episode
             for alt in alts:
-                search_strings.extend(['%s %s' % (alt, id) for id in self.sequence_identifiers(episode)])
-        entry = Entry(title=search_strings[0], url='',
-                      search_strings=search_strings,
-                      series_name=series.name,
-                      series_alternate_names=alts,  # Not sure if this field is useful down the road.
-                      series_season=season,
-                      series_episode=episode,
-                      season_pack_lookup=False,
-                      series_id=series_id,
-                      series_id_type=series.identified_by)
+                search_strings.extend(
+                    ['%s %s' % (alt, id) for id in self.sequence_identifiers(episode)]
+                )
+        entry = Entry(
+            title=search_strings[0],
+            url='',
+            search_strings=search_strings,
+            series_name=series.name,
+            series_alternate_names=alts,  # Not sure if this field is useful down the road.
+            series_season=season,
+            series_episode=episode,
+            season_pack_lookup=False,
+            series_id=series_id,
+            series_id_type=series.identified_by,
+        )
         if rerun:
-            entry.on_complete(self.on_search_complete, task=task, identified_by=series.identified_by)
+            entry.on_complete(
+                self.on_search_complete, task=task, identified_by=series.identified_by
+            )
         return entry
 
     def on_task_input(self, task, config):
@@ -102,8 +108,9 @@ class NextSeriesEpisodes(object):
         entries = []
         impossible = {}
         with Session() as session:
-            for seriestask in session.query(plugin_series.SeriesTask).filter(
-                    plugin_series.SeriesTask.name == task.name).all():
+            for seriestask in (
+                session.query(db.SeriesTask).filter(db.SeriesTask.name == task.name).all()
+            ):
                 series = seriestask.series
                 log.trace('evaluating %s', series.name)
                 if not series:
@@ -126,7 +133,7 @@ class NextSeriesEpisodes(object):
 
                 new_season = None
                 check_downloaded = not config.get('backfill')
-                latest_season = plugin_series.get_latest_release(series, downloaded=check_downloaded)
+                latest_season = db.get_latest_release(series, downloaded=check_downloaded)
                 if latest_season:
                     if latest_season.season <= low_season:
                         latest_season = new_season = low_season + 1
@@ -142,8 +149,14 @@ class NextSeriesEpisodes(object):
                         log.debug('season %s is marked as completed, skipping', season)
                         continue
                     log.trace('Evaluating episodes for series %s, season %d', series.name, season)
-                    latest = plugin_series.get_latest_release(series, season=season, downloaded=check_downloaded)
-                    if series.begin and season == series.begin.season and (not latest or latest < series.begin):
+                    latest = db.get_latest_release(
+                        series, season=season, downloaded=check_downloaded
+                    )
+                    if (
+                        series.begin
+                        and season == series.begin.season
+                        and (not latest or latest < series.begin)
+                    ):
                         # In case series.begin season is already completed, look in next available season
                         lookup_season = series.begin.season
                         ep_number = series.begin.number
@@ -153,25 +166,30 @@ class NextSeriesEpisodes(object):
                             ep_number = 1
                         entries.append(self.search_entry(series, lookup_season, ep_number, task))
                     elif latest and not config.get('backfill'):
-                        entries.append(self.search_entry(series, latest.season, latest.number + 1, task))
+                        entries.append(
+                            self.search_entry(series, latest.season, latest.number + 1, task)
+                        )
                     elif latest:
                         start_at_ep = 1
                         episodes_this_season = (
-                            session.query(plugin_series.Episode).
-                                filter(plugin_series.Episode.series_id == series.id).
-                                filter(plugin_series.Episode.season == season)
+                            session.query(db.Episode)
+                            .filter(db.Episode.series_id == series.id)
+                            .filter(db.Episode.season == season)
                         )
                         if series.identified_by == 'sequence':
                             # Don't look for missing too far back with sequence shows
                             start_at_ep = max(latest.number - 10, 1)
                             episodes_this_season = episodes_this_season.filter(
-                                plugin_series.Episode.number >= start_at_ep)
+                                db.Episode.number >= start_at_ep
+                            )
                         latest_ep_this_season = episodes_this_season.order_by(
-                            desc(plugin_series.Episode.number)).first()
+                            desc(db.Episode.number)
+                        ).first()
                         if latest_ep_this_season:
                             downloaded_this_season = (
-                                episodes_this_season.join(plugin_series.Episode.releases).
-                                    filter(plugin_series.EpisodeRelease.downloaded == True).all()
+                                episodes_this_season.join(db.Episode.releases)
+                                .filter(db.EpisodeRelease.downloaded == True)
+                                .all()
                             )
                             # Calculate the episodes we still need to get from this season
                             if series.begin and series.begin.season == season:
@@ -182,11 +200,17 @@ class NextSeriesEpisodes(object):
                                     eps_to_get.remove(ep.number)
                                 except ValueError:
                                     pass
-                            entries.extend(self.search_entry(series, season, x, task, rerun=False) for x in eps_to_get)
+                            entries.extend(
+                                self.search_entry(series, season, x, task, rerun=False)
+                                for x in eps_to_get
+                            )
                             # If we have already downloaded the latest known episode, try the next episode
                             if latest_ep_this_season.releases:
                                 entries.append(
-                                    self.search_entry(series, season, latest_ep_this_season.number + 1, task))
+                                    self.search_entry(
+                                        series, season, latest_ep_this_season.number + 1, task
+                                    )
+                                )
                         else:
                             # No episode means that latest is a season pack, emit episode 1
                             entries.append(self.search_entry(series, season, 1, task))
@@ -197,9 +221,12 @@ class NextSeriesEpisodes(object):
                         if config.get('from_start') or config.get('backfill'):
                             entries.append(self.search_entry(series, season, 1, task))
                         else:
-                            log.verbose('Series `%s` has no history. Set begin option, '
-                                        'or use CLI `series begin` '
-                                        'subcommand to set first episode to emit', series.name)
+                            log.verbose(
+                                'Series `%s` has no history. Set begin option, '
+                                'or use CLI `series begin` '
+                                'subcommand to set first episode to emit',
+                                series.name,
+                            )
                             break
                     # Skip older seasons if we are not in backfill mode
                     if not config.get('backfill'):
@@ -207,32 +234,41 @@ class NextSeriesEpisodes(object):
                         break
 
         for reason, series in impossible.items():
-            log.verbose('Series `%s` with identified_by value `%s` are not supported. ',
-                        ', '.join(sorted(series)), reason)
+            log.verbose(
+                'Series `%s` with identified_by value `%s` are not supported. ',
+                ', '.join(sorted(series)),
+                reason,
+            )
 
         return entries
 
     def on_search_complete(self, entry, task=None, identified_by=None, **kwargs):
         """Decides whether we should look for next ep/season based on whether we found/accepted any episodes."""
         with Session() as session:
-            series = session.query(plugin_series.Series).filter(
-                plugin_series.Series.name == entry['series_name']).first()
-            latest = plugin_series.get_latest_release(series)
+            series = (
+                session.query(db.Series).filter(db.Series.name == entry['series_name']).first()
+            )
+            latest = db.get_latest_release(series)
             db_release = (
-                session.query(plugin_series.EpisodeRelease).join(plugin_series.EpisodeRelease.episode).join(
-                    plugin_series.Episode.series).
-                    filter(plugin_series.Series.name == entry['series_name']).
-                    filter(plugin_series.Episode.season == entry['series_season']).
-                    filter(plugin_series.Episode.number == entry['series_episode']).first()
+                session.query(db.EpisodeRelease)
+                .join(db.EpisodeRelease.episode)
+                .join(db.Episode.series)
+                .filter(db.Series.name == entry['series_name'])
+                .filter(db.Episode.season == entry['series_season'])
+                .filter(db.Episode.number == entry['series_episode'])
+                .first()
             )
 
             if entry.accepted:
-                log.debug('%s %s was accepted, rerunning to look for next ep.' %
-                          (entry['series_name'], entry['series_id']))
-                self.rerun_entries.append(self.search_entry(series,
-                                                            entry['series_season'],
-                                                            entry['series_episode'] + 1,
-                                                            task))
+                log.debug(
+                    '%s %s was accepted, rerunning to look for next ep.'
+                    % (entry['series_name'], entry['series_id'])
+                )
+                self.rerun_entries.append(
+                    self.search_entry(
+                        series, entry['series_season'], entry['series_episode'] + 1, task
+                    )
+                )
                 # Increase rerun limit by one if we have matches, this way
                 # we keep searching as long as matches are found!
                 # TODO: this should ideally be in discover so it would be more generic
@@ -245,12 +281,22 @@ class NextSeriesEpisodes(object):
                 if latest.is_season:
                     # A season pack was picked up in the task, no need to look for more episodes
                     return
-                elif not self.config.get('only_same_season') and identified_by == 'ep' and (
-                        entry['series_season'] == latest.season and entry['series_episode'] == latest.number + 1):
+                elif (
+                    not self.config.get('only_same_season')
+                    and identified_by == 'ep'
+                    and (
+                        entry['series_season'] == latest.season
+                        and entry['series_episode'] == latest.number + 1
+                    )
+                ):
                     # We searched for next predicted episode of this season unsuccessfully, try the next season
-                    self.rerun_entries.append(self.search_entry(series, latest.season + 1, 1, task))
-                    log.debug('%s %s not found, rerunning to look for next season' %
-                              (entry['series_name'], entry['series_id']))
+                    self.rerun_entries.append(
+                        self.search_entry(series, latest.season + 1, 1, task)
+                    )
+                    log.debug(
+                        '%s %s not found, rerunning to look for next season'
+                        % (entry['series_name'], entry['series_id'])
+                    )
                     task.rerun(plugin='next_series_episodes', reason='Look for next season')
 
 

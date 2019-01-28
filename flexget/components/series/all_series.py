@@ -4,14 +4,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import plugin
 from flexget.event import event
-
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.filter import series as plugin_series
-except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='series',
-    )
+from . import series as plugin_series
 
 
 class FilterAllSeries(plugin_series.FilterSeriesBase):
@@ -54,10 +47,14 @@ class FilterAllSeries(plugin_series.FilterSeriesBase):
         guessed_series = {}
         for entry in task.entries:
             if guess_entry(entry, config=group_settings):
-                guessed_series.setdefault(plugin_series.normalize_series_name(entry['series_name']),
-                                          entry['series_name'])
+                guessed_series.setdefault(
+                    plugin_series.normalize_series_name(entry['series_name']), entry['series_name']
+                )
         # Combine settings and series into series plugin config format
-        all_series = {'settings': {'all_series': group_settings}, 'all_series': list(guessed_series.values())}
+        all_series = {
+            'settings': {'all_series': group_settings},
+            'all_series': list(guessed_series.values()),
+        }
         # Merge our config in to the main series config
         self.merge_config(task, all_series)
 

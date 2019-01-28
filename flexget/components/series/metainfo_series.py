@@ -7,13 +7,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.plugin import get_plugin_by_name
 
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.filter import series as plugin_series
-except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='series',
-    )
+from . import series as plugin_series
 
 from flexget import plugin
 
@@ -21,9 +15,7 @@ try:
     # NOTE: Importing other plugins is discouraged!
     from flexget.plugins.parsers import parser_common as plugin_parser_common
 except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='parser_common',
-    )
+    raise plugin.DependencyError(issued_by=__name__, missing='parser_common')
 
 log = logging.getLogger('metainfo_series')
 
@@ -59,10 +51,13 @@ class MetainfoSeries(object):
         identified_by = 'auto'
         if config and 'identified_by' in config:
             identified_by = config['identified_by']
-        parsed = get_plugin_by_name('parsing').instance.parse_series(data=entry['title'], identified_by=identified_by,
-                                                                     allow_seasonless=allow_seasonless)
+        parsed = get_plugin_by_name('parsing').instance.parse_series(
+            data=entry['title'], identified_by=identified_by, allow_seasonless=allow_seasonless
+        )
         if parsed and parsed.valid:
-            parsed.name = plugin_parser_common.normalize_name(plugin_parser_common.remove_dirt(parsed.name))
+            parsed.name = plugin_parser_common.normalize_name(
+                plugin_parser_common.remove_dirt(parsed.name)
+            )
             plugin_series.populate_entry_fields(entry, parsed, config)
             entry['series_guessed'] = True
             return True

@@ -7,14 +7,7 @@ from flexget import plugin
 from flexget.config_schema import process_config
 from flexget.event import event
 from flexget.plugin import PluginError
-
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.filter import series as plugin_series
-except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='series',
-    )
+from . import series as plugin_series
 
 log = logging.getLogger('configure_series')
 
@@ -46,10 +39,10 @@ class ConfigureSeries(plugin_series.FilterSeriesBase):
             'type': 'object',
             'properties': {
                 'settings': self.settings_schema,
-                'from': {'$ref': '/schema/plugins?phase=input'}
+                'from': {'$ref': '/schema/plugins?phase=input'},
             },
             'required': ['from'],
-            'additionalProperties': False
+            'additionalProperties': False,
         }
 
     def on_task_prepare(self, task, config):
@@ -78,9 +71,14 @@ class ConfigureSeries(plugin_series.FilterSeriesBase):
                 # Allow configure_series to set anything available to series
                 for key, schema in self.settings_schema['properties'].items():
                     if 'configure_series_' + key in entry:
-                        errors = process_config(entry['configure_series_' + key], schema, set_defaults=False)
+                        errors = process_config(
+                            entry['configure_series_' + key], schema, set_defaults=False
+                        )
                         if errors:
-                            log.debug('not setting series option %s for %s. errors: %s' % (key, entry['title'], errors))
+                            log.debug(
+                                'not setting series option %s for %s. errors: %s'
+                                % (key, entry['title'], errors)
+                            )
                         else:
                             s[key] = entry['configure_series_' + key]
 

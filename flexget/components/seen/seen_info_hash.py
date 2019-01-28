@@ -11,12 +11,8 @@ from . import seen as plugin_seen
 
 class FilterSeenInfoHash(plugin_seen.FilterSeen):
     """Prevents the same torrent from being downloaded twice by remembering the infohash of all downloaded torrents."""
-    schema = {
-        'oneOf': [
-            {'type': 'boolean'},
-            {'type': 'string', 'enum': ['global', 'local']}
-        ]
-    }
+
+    schema = {'oneOf': [{'type': 'boolean'}, {'type': 'string', 'enum': ['global', 'local']}]}
 
     def __init__(self):
         # remember and filter by these fields
