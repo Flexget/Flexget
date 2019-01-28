@@ -6,22 +6,14 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from collections import defaultdict
 from datetime import datetime
 
+import flexget.components.archive.db
 from flexget import options
-from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.options import ParseExtrasAction, get_parser
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 from flexget.utils.tools import strip_html
-
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.generic import archive as plugin_archive
-except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='archive',
-    )
 
 log = logging.getLogger('archive_cli')
 
@@ -47,7 +39,7 @@ def consolidate():
     session = Session()
     try:
         log.verbose('Checking archive size ...')
-        count = session.query(plugin_archive.ArchiveEntry).count()
+        count = session.query(flexget.components.archive.db.ArchiveEntry).count()
         log.verbose('Found %i items to migrate, this can be aborted with CTRL-C safely.' % count)
 
         # consolidate old data
@@ -59,7 +51,7 @@ def consolidate():
         # id's for duplicates
         duplicates = []
 
-        for index, orig in enumerate(session.query(plugin_archive.ArchiveEntry).yield_per(5)):
+        for index, orig in enumerate(session.query(flexget.components.archive.db.ArchiveEntry).yield_per(5)):
             bar.update(index)
 
             # item already processed
@@ -74,21 +66,22 @@ def consolidate():
                 return
 
             # add legacy task to the sources list
-            orig.sources.append(plugin_archive.get_source(orig.task, session))
+            orig.sources.append(flexget.components.archive.db.get_source(orig.task, session))
             # remove task, deprecated .. well, let's still keep it ..
             # orig.task = None
 
-            for dupe in session.query(plugin_archive.ArchiveEntry). \
-                    filter(plugin_archive.ArchiveEntry.id != orig.id). \
-                    filter(plugin_archive.ArchiveEntry.title == orig.title). \
-                    filter(plugin_archive.ArchiveEntry.url == orig.url).all():
-                orig.sources.append(plugin_archive.get_source(dupe.task, session))
+            for dupe in session.query(flexget.components.archive.db.ArchiveEntry). \
+                    filter(flexget.components.archive.db.ArchiveEntry.id != orig.id). \
+                    filter(flexget.components.archive.db.ArchiveEntry.title == orig.title). \
+                    filter(flexget.components.archive.db.ArchiveEntry.url == orig.url).all():
+                orig.sources.append(flexget.components.archive.db.get_source(dupe.task, session))
                 duplicates.append(dupe.id)
 
         if duplicates:
             log.info('Consolidated %i items, removing duplicates ...' % len(duplicates))
             for id in duplicates:
-                session.query(plugin_archive.ArchiveEntry).filter(plugin_archive.ArchiveEntry.id == id).delete()
+                session.query(flexget.components.archive.db.ArchiveEntry).filter(
+                    flexget.components.archive.db.ArchiveEntry.id == id).delete()
         session.commit()
         log.info('Completed! This does NOT need to be ran again.')
     except KeyboardInterrupt:
@@ -112,12 +105,13 @@ def tag_source(source_name, tag_names=None):
     session = Session()
     try:
         # check that source exists
-        source = session.query(plugin_archive.ArchiveSource).filter(
-            plugin_archive.ArchiveSource.name == source_name).first()
+        source = session.query(flexget.components.archive.db.ArchiveSource).filter(
+            flexget.components.archive.db.ArchiveSource.name == source_name).first()
         if not source:
             log.critical('Source `%s` does not exists' % source_name)
             srcs = ', '.join([s.name for s in
-                              session.query(plugin_archive.ArchiveSource).order_by(plugin_archive.ArchiveSource.name)])
+                              session.query(flexget.components.archive.db.ArchiveSource).order_by(
+                                  flexget.components.archive.db.ArchiveSource.name)])
             if srcs:
                 log.info('Known sources: %s' % srcs)
             return
@@ -125,12 +119,12 @@ def tag_source(source_name, tag_names=None):
         # construct tags list
         tags = []
         for tag_name in tag_names:
-            tags.append(plugin_archive.get_tag(tag_name, session))
+            tags.append(flexget.components.archive.db.get_tag(tag_name, session))
 
         # tag 'em
         log.verbose('Please wait while adding tags %s ...' % (', '.join(tag_names)))
-        for a in session.query(plugin_archive.ArchiveEntry). \
-                filter(plugin_archive.ArchiveEntry.sources.any(name=source_name)).yield_per(5):
+        for a in session.query(flexget.components.archive.db.ArchiveEntry). \
+                filter(flexget.components.archive.db.ArchiveEntry.sources.any(name=source_name)).yield_per(5):
             a.tags.extend(tags)
     finally:
         session.commit()
@@ -145,7 +139,7 @@ def cli_search(options):
 
     table_data = []
     with Session() as session:
-        for archived_entry in plugin_archive.search(session, query, tags=tags, sources=sources):
+        for archived_entry in flexget.components.archive.db.search(session, query, tags=tags, sources=sources):
             days_ago = (datetime.now() - archived_entry.added).days
             source_names = ', '.join([s.name for s in archived_entry.sources])
             tag_names = ', '.join([t.name for t in archived_entry.tags])
@@ -176,7 +170,7 @@ def cli_inject(manager, options):
     inject_entries = defaultdict(list)
     with Session() as session:
         for id in options.ids:
-            archive_entry = session.query(plugin_archive.ArchiveEntry).get(id)
+            archive_entry = session.query(flexget.components.archive.db.ArchiveEntry).get(id)
 
             # not found
             if not archive_entry:

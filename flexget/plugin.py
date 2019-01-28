@@ -16,6 +16,7 @@ from path import Path
 from requests import RequestException
 
 from flexget import plugins as plugins_pkg
+from flexget import components as components_pkg
 from flexget import config_schema
 from flexget.event import add_event_handler as add_phase_handler
 from flexget.event import fire_event, remove_event_handlers
@@ -356,7 +357,7 @@ def _strip_trailing_sep(path):
 
 def _get_standard_plugins_path():
     """
-    :returns: List of directories where plugins should be tried to load from.
+    :returns: List of directories where traditional plugins should be tried to load from.
     """
     # Get basic path from environment
     paths = []
@@ -369,11 +370,50 @@ def _get_standard_plugins_path():
     return paths
 
 
+def _get_standard_components_path():
+    """
+    :returns: List of directories where component plugins should be tried to load from.
+    """
+    # Get basic path from environment
+    paths = []
+    env_path = os.environ.get('FLEXGET_COMPONENT_PATH')
+    if env_path:
+        paths = env_path.split(os.pathsep)
+
+    # Add flexget.plugins directory (core plugins)
+    paths.append(os.path.abspath(os.path.dirname(components_pkg.__file__)))
+    return paths
+
+
 def _check_phase_queue():
     if _new_phase_queue:
         for phase, args in _new_phase_queue.items():
             log.error('Plugin %s requested new phase %s, but it could not be created at requested '
                       'point (before, after). Plugin is not working properly.', args[0], phase)
+
+
+def _import_plugin(module_name, plugin_path):
+    try:
+        __import__(module_name)
+    except DependencyError as e:
+        if e.has_message():
+            msg = e.message
+        else:
+            msg = 'Plugin `%s` requires plugin `%s` to load.' % (e.issued_by or module_name, e.missing or 'N/A')
+        if not e.silent:
+            log.warning(msg)
+        else:
+            log.debug(msg)
+    except ImportError:
+        log.critical('Plugin `%s` failed to import dependencies', module_name, exc_info=True)
+    except ValueError as e:
+        # Debugging #2755
+        log.error('ValueError attempting to import `%s` (from %s): %s', module_name, plugin_path, e)
+    except Exception:
+        log.critical('Exception while loading plugin %s', module_name, exc_info=True)
+        raise
+    else:
+        log.trace('Loaded module %s from %s', module_name, plugin_path)
 
 
 def _load_plugins_from_dirs(dirs):
@@ -392,27 +432,24 @@ def _load_plugins_from_dirs(dirs):
             # Split the relative path from the plugins dir to current file's parent dir to find subpackage names
             plugin_subpackages = [_f for _f in plugin_path.relpath(plugins_dir).parent.splitall() if _f]
             module_name = '.'.join([plugins_pkg.__name__] + plugin_subpackages + [plugin_path.stem])
-            try:
-                __import__(module_name)
-            except DependencyError as e:
-                if e.has_message():
-                    msg = e.message
-                else:
-                    msg = 'Plugin `%s` requires plugin `%s` to load.' % (e.issued_by or module_name, e.missing or 'N/A')
-                if not e.silent:
-                    log.warning(msg)
-                else:
-                    log.debug(msg)
-            except ImportError:
-                log.critical('Plugin `%s` failed to import dependencies', module_name, exc_info=True)
-            except ValueError as e:
-                # Debugging #2755
-                log.error('ValueError attempting to import `%s` (from %s): %s', module_name, plugin_path, e)
-            except Exception:
-                log.critical('Exception while loading plugin %s', module_name, exc_info=True)
-                raise
-            else:
-                log.trace('Loaded module %s from %s', module_name, plugin_path)
+            _import_plugin(module_name, plugin_path)
+    _check_phase_queue()
+
+
+def _load_components_from_dirs(dirs):
+    """
+    :param list dirs: Directories where plugin components are loaded from
+    """
+    log.debug('Trying to load components from: %s', dirs)
+    dirs = [Path(d) for d in dirs if os.path.isdir(d)]
+    for component_dir in dirs:
+        for component_path in component_dir.walkfiles('*.py'):
+            if component_path.name == '__init__.py':
+                continue
+            # Split the relative path from the plugins dir to current file's parent dir to find subpackage names
+            plugin_subpackages = [_f for _f in component_path.relpath(component_dir).parent.splitall() if _f]
+            package_name = '.'.join([components_pkg.__name__] + plugin_subpackages)
+            _import_plugin(package_name, component_path)
     _check_phase_queue()
 
 
@@ -440,22 +477,28 @@ def _load_plugins_from_packages():
     _check_phase_queue()
 
 
-def load_plugins(extra_dirs=None):
+def load_plugins(extra_plugins=None, extra_components=None):
     """
-    Load plugins from the standard plugin paths.
-    :param list extra_dirs: Extra directories from where plugins are loaded.
+    Load plugins from the standard plugin and component paths.
+
+    :param list extra_plugins: Extra directories from where plugins are loaded.
+    :param list extra_components: Extra directories from where components are loaded.
     """
     global plugins_loaded
 
-    if not extra_dirs:
-        extra_dirs = []
+    if extra_plugins is None:
+        extra_plugins = []
+    if extra_components is None:
+        extra_components = []
 
-    # Add flexget.plugins directory (core plugins)
-    extra_dirs.extend(_get_standard_plugins_path())
+    # Add flexget.plugins and flexget.components directories (core dist)
+    extra_plugins.extend(_get_standard_plugins_path())
+    extra_components.extend(_get_standard_components_path())
 
     start_time = time.time()
     # Import all the plugins
-    _load_plugins_from_dirs(extra_dirs)
+    _load_plugins_from_dirs(extra_plugins)
+    _load_components_from_dirs(extra_components)
     _load_plugins_from_packages()
     # Register them
     fire_event('plugin.register')

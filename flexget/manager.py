@@ -216,7 +216,10 @@ class Manager(object):
         if self.initialized:
             raise RuntimeError('Cannot call initialize on an already initialized manager.')
 
-        plugin.load_plugins(extra_dirs=[os.path.join(self.config_base, 'plugins')])
+        plugin.load_plugins(
+            extra_plugins=[os.path.join(self.config_base, 'plugins')],
+            extra_components=[os.path.join(self.config_base, 'components')],
+        )
 
         # Reparse CLI options now that plugins are loaded
         if not self.args:
