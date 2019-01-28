@@ -74,6 +74,61 @@ def clean_series(manager):
             session.commit()
 
 
+def populate_entry_fields(entry, parser, config):
+    """
+    Populates all series_fields for given entry based on parser.
+
+    :param parser: A valid result from a series parser used to populate the fields.
+    :config dict: If supplied, will use 'path' and 'set' options to populate specified fields.
+    """
+    entry['series_parser'] = copy(parser)
+
+    if parser.identifier:
+        entry['id'] = ('%s %s' % (parser.name, parser.identifier)).lower().strip()
+
+    # add series, season and episode to entry
+    entry['series_name'] = parser.name
+    if 'quality' in entry and entry['quality'] != parser.quality:
+        log.verbose(
+            'Found different quality for `%s`. Was `%s`, overriding with `%s`.',
+            entry['title'],
+            entry['quality'],
+            parser.quality,
+        )
+    entry['quality'] = parser.quality
+    entry['proper'] = parser.proper
+    entry['proper_count'] = parser.proper_count
+    entry['release_group'] = parser.group
+    entry['season_pack'] = parser.season_pack
+    if parser.id_type == 'ep':
+        entry['series_season'] = parser.season
+        if not parser.season_pack:
+            entry['series_episode'] = parser.episode
+    elif parser.id_type == 'date':
+        entry['series_date'] = parser.id
+        entry['series_season'] = parser.id.year
+    else:
+        entry['series_season'] = time.gmtime().tm_year
+    entry['series_episodes'] = parser.episodes
+    entry['series_id'] = parser.pack_identifier
+    entry['series_id_type'] = parser.id_type
+    entry['series_identified_by'] = parser.identified_by
+    entry['series_exact'] = parser.strict_name
+
+    # If a config is passed in, also look for 'path' and 'set' options to set more fields
+    if config:
+        # set custom download path
+        if 'path' in config:
+            log.debug('setting custom path for `%s` to `%s`', entry['title'], config.get('path'))
+            # Just add this to the 'set' dictionary, so that string replacement is done cleanly
+            config.setdefault('set', {}).update(path=config['path'])
+
+        # accept info from set: and place into the entry
+        if 'set' in config:
+            set = plugin.get_plugin_by_name('set')
+            set.instance.modify(entry, config.get('set'))
+
+
 class FilterSeriesBase(object):
     """
     Class that contains helper methods for both filter.series as well as plugins that configure it,
@@ -1155,58 +1210,3 @@ def register_parser_arguments():
         dest='disable_tracking',
         help=argparse.SUPPRESS,
     )
-
-
-def populate_entry_fields(entry, parser, config):
-    """
-    Populates all series_fields for given entry based on parser.
-
-    :param parser: A valid result from a series parser used to populate the fields.
-    :config dict: If supplied, will use 'path' and 'set' options to populate specified fields.
-    """
-    entry['series_parser'] = copy(parser)
-
-    if parser.identifier:
-        entry['id'] = ('%s %s' % (parser.name, parser.identifier)).lower().strip()
-
-    # add series, season and episode to entry
-    entry['series_name'] = parser.name
-    if 'quality' in entry and entry['quality'] != parser.quality:
-        log.verbose(
-            'Found different quality for `%s`. Was `%s`, overriding with `%s`.',
-            entry['title'],
-            entry['quality'],
-            parser.quality,
-        )
-    entry['quality'] = parser.quality
-    entry['proper'] = parser.proper
-    entry['proper_count'] = parser.proper_count
-    entry['release_group'] = parser.group
-    entry['season_pack'] = parser.season_pack
-    if parser.id_type == 'ep':
-        entry['series_season'] = parser.season
-        if not parser.season_pack:
-            entry['series_episode'] = parser.episode
-    elif parser.id_type == 'date':
-        entry['series_date'] = parser.id
-        entry['series_season'] = parser.id.year
-    else:
-        entry['series_season'] = time.gmtime().tm_year
-    entry['series_episodes'] = parser.episodes
-    entry['series_id'] = parser.pack_identifier
-    entry['series_id_type'] = parser.id_type
-    entry['series_identified_by'] = parser.identified_by
-    entry['series_exact'] = parser.strict_name
-
-    # If a config is passed in, also look for 'path' and 'set' options to set more fields
-    if config:
-        # set custom download path
-        if 'path' in config:
-            log.debug('setting custom path for `%s` to `%s`', entry['title'], config.get('path'))
-            # Just add this to the 'set' dictionary, so that string replacement is done cleanly
-            config.setdefault('set', {}).update(path=config['path'])
-
-        # accept info from set: and place into the entry
-        if 'set' in config:
-            set = plugin.get_plugin_by_name('set')
-            set.instance.modify(entry, config.get('set'))
