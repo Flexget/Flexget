@@ -4,30 +4,24 @@ import logging
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from collections import defaultdict
 
-from flexget import plugin
 from flexget.event import event
 from flexget import plugin
+from . import seen as plugin_seen
 
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.filter import seen as plugin_seen
-except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='seen',
-    )
 
-log = logging.getLogger('seenmovies')
+log = logging.getLogger(__name__)
 
 
 class FilterSeenMovies(plugin_seen.FilterSeen):
     """
-        Prevents movies being downloaded twice.
-        Works only on entries which have imdb url available.
+    Prevents movies being downloaded twice.
+    Works only on entries which have imdb url available.
 
-        How duplicate movie detection works:
-        1) Remember all imdb urls from downloaded entries.
-        2) If stored imdb url appears again, entry is rejected.
+    How duplicate movie detection works:
+    1) Remember all imdb urls from downloaded entries.
+    2) If stored imdb url appears again, entry is rejected.
     """
+
     schema = {
         'oneOf': [
             {'type': 'string', 'enum': ['strict', 'loose']},
@@ -35,10 +29,10 @@ class FilterSeenMovies(plugin_seen.FilterSeen):
                 'type': 'object',
                 'properties': {
                     'scope': {'type': 'string', 'enum': ['global', 'local']},
-                    'matching': {'type': 'string', 'enum': ['strict', 'loose']}
+                    'matching': {'type': 'string', 'enum': ['strict', 'loose']},
                 },
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ]
     }
 
@@ -56,7 +50,10 @@ class FilterSeenMovies(plugin_seen.FilterSeen):
         if config.get('matching') == 'strict':
             for entry in task.entries:
                 if not any(field in entry for field in self.fields):
-                    log.info('Rejecting %s because of missing movie (imdb, tmdb or trakt) id' % entry['title'])
+                    log.info(
+                        'Rejecting %s because of missing movie (imdb, tmdb or trakt) id'
+                        % entry['title']
+                    )
                     entry.reject('missing movie (imdb, tmdb or trakt) id, strict')
         # call super
         super(FilterSeenMovies, self).on_task_filter(task, config.get('scope', True))

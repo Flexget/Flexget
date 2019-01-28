@@ -4,9 +4,9 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import copy
 
 from flexget.api.app import base_message
-from flexget.api.plugins.seen import ObjectsContainer as OC
+from flexget.components.seen.api import ObjectsContainer as OC
 from flexget.manager import Session
-from flexget.plugins.filter.seen import SeenEntry, SeenField
+from flexget.components.seen.db import SeenEntry, SeenField
 from flexget.utils import json
 
 

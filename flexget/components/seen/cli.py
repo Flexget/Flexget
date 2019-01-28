@@ -3,19 +3,11 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import options
-from flexget import plugin
 from flexget.event import event
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 from flexget.utils.database import with_session
 from flexget.utils.imdb import is_imdb_url, extract_id
-
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.filter import seen as plugin_seen
-except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='seen',
-    )
+from . import db
 
 
 def do_cli(manager, options):
@@ -34,7 +26,7 @@ def seen_forget(manager, options):
         if imdb_id:
             forget_name = imdb_id
 
-    count, fcount = plugin_seen.forget(forget_name)
+    count, fcount = db.forget(forget_name)
     console('Removed %s titles (%s fields)' % (count, fcount))
     manager.config_changed()
 
@@ -48,7 +40,7 @@ def seen_add(options):
             seen_name = imdb_id
         else:
             console("Could not parse IMDB ID")
-    plugin_seen.add(seen_name, 'cli_add', {'cli_add': seen_name})
+    db.add(seen_name, 'cli_add', {'cli_add': seen_name})
     console('Added %s as seen. This will affect all tasks.' % seen_name)
 
 
@@ -64,7 +56,7 @@ def seen_search(options, session=None):
             console("Could not parse IMDB ID")
     else:
         search_term = '%' + options.search_term + '%'
-    seen_entries = plugin_seen.search(value=search_term, status=None, session=session)
+    seen_entries = db.search(value=search_term, status=None, session=session)
     table_data = []
     for se in seen_entries.all():
         table_data.append(['Title', se.title])
@@ -92,12 +84,21 @@ def seen_search(options, session=None):
 
 @event('options.register')
 def register_parser_arguments():
-    parser = options.register_command('seen', do_cli, help='View or forget entries remembered by the seen plugin')
+    parser = options.register_command(
+        'seen', do_cli, help='View or forget entries remembered by the seen plugin'
+    )
     subparsers = parser.add_subparsers(dest='seen_action', metavar='<action>')
-    forget_parser = subparsers.add_parser('forget', help='Forget entry or entire task from seen plugin database')
-    forget_parser.add_argument('forget_value', metavar='<value>',
-                               help='Title or url of entry to forget, or name of task to forget')
+    forget_parser = subparsers.add_parser(
+        'forget', help='Forget entry or entire task from seen plugin database'
+    )
+    forget_parser.add_argument(
+        'forget_value',
+        metavar='<value>',
+        help='Title or url of entry to forget, or name of task to forget',
+    )
     add_parser = subparsers.add_parser('add', help='Add a title or url to the seen database')
     add_parser.add_argument('add_value', metavar='<value>', help='the title or url to add')
-    search_parser = subparsers.add_parser('search', help='Search text from the seen database', parents=[table_parser])
+    search_parser = subparsers.add_parser(
+        'search', help='Search text from the seen database', parents=[table_parser]
+    )
     search_parser.add_argument('search_term', metavar='<search term>')

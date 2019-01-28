@@ -1,16 +1,22 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from flexget.plugins.filter.seen import forget_by_id
-from future.moves.urllib.parse import unquote
 
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from math import ceil
-from sqlalchemy.orm.exc import NoResultFound
+
 from flask import jsonify, request
 from flask_restplus import inputs
+from future.moves.urllib.parse import unquote
+from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource
-from flexget.api.app import NotFoundError, base_message_schema, success_response, etag, pagination_headers
-from flexget.plugins.filter import seen
+from flexget.api.app import (
+    NotFoundError,
+    base_message_schema,
+    success_response,
+    etag,
+    pagination_headers,
+)
+from . import db
 
 seen_api = api.namespace('seen', description='Managed Flexget seen entries and fields')
 
@@ -23,8 +29,8 @@ class ObjectsContainer(object):
             'field': {'type': 'string'},
             'value': {'type': 'string'},
             'added': {'type': 'string', 'format': 'date-time'},
-            'seen_entry_id': {'type': 'integer'}
-        }
+            'seen_entry_id': {'type': 'integer'},
+        },
     }
 
     seen_object = {
@@ -36,8 +42,8 @@ class ObjectsContainer(object):
             'task': {'type': 'string'},
             'added': {'type': 'string', 'format': 'date-time'},
             'local': {'type': 'boolean'},
-            'fields': {'type': 'array', 'items': seen_field_object}
-        }
+            'fields': {'type': 'array', 'items': seen_field_object},
+        },
     }
 
     seen_search_object = {'type': 'array', 'items': seen_object}
@@ -47,9 +53,12 @@ seen_object_schema = api.schema_model('seen_object_schema', ObjectsContainer.see
 seen_search_schema = api.schema_model('seen_search_schema', ObjectsContainer.seen_search_object)
 
 seen_base_parser = api.parser()
-seen_base_parser.add_argument('value', help='Filter by any field value or leave empty to get all entries')
-seen_base_parser.add_argument('local', type=inputs.boolean, default=None,
-                              help='Filter results by seen locality.')
+seen_base_parser.add_argument(
+    'value', help='Filter by any field value or leave empty to get all entries'
+)
+seen_base_parser.add_argument(
+    'local', type=inputs.boolean, default=None, help='Filter results by seen locality.'
+)
 
 sort_choices = ('title', 'task', 'added', 'local', 'reason', 'id')
 seen_search_parser = api.pagination_parser(seen_base_parser, sort_choices)
@@ -96,15 +105,15 @@ class SeenSearchAPI(APIResource):
             'start': start,
             'order_by': sort_by,
             'descending': descending,
-            'session': session
+            'session': session,
         }
 
-        total_items = seen.search(count=True, **kwargs)
+        total_items = db.search(count=True, **kwargs)
 
         if not total_items:
             return jsonify([])
 
-        raw_seen_entries_list = seen.search(**kwargs).all()
+        raw_seen_entries_list = db.search(**kwargs).all()
 
         converted_seen_entry_list = [entry.to_dict() for entry in raw_seen_entries_list]
 
@@ -139,11 +148,11 @@ class SeenSearchAPI(APIResource):
         if value:
             value = unquote(value)
             value = '%' + value + '%'
-        seen_entries_list = seen.search(value=value, status=local, session=session)
+        seen_entries_list = db.search(value=value, status=local, session=session)
 
         deleted = 0
         for se in seen_entries_list:
-            forget_by_id(se.id, session=session)
+            db.forget_by_id(se.id, session=session)
             deleted += 1
         return success_response('successfully deleted %i entries' % deleted)
 
@@ -157,7 +166,7 @@ class SeenSearchIDAPI(APIResource):
     def get(self, seen_entry_id, session):
         """ Get seen entry by ID """
         try:
-            seen_entry = seen.get_entry_by_id(seen_entry_id, session=session)
+            seen_entry = db.get_entry_by_id(seen_entry_id, session=session)
         except NoResultFound:
             raise NotFoundError('Could not find entry ID {0}'.format(seen_entry_id))
         return jsonify(seen_entry.to_dict())
@@ -166,8 +175,8 @@ class SeenSearchIDAPI(APIResource):
     def delete(self, seen_entry_id, session):
         """ Delete seen entry by ID """
         try:
-            entry = seen.get_entry_by_id(seen_entry_id, session=session)
+            entry = db.get_entry_by_id(seen_entry_id, session=session)
         except NoResultFound:
             raise NotFoundError('Could not delete entry ID {0}'.format(seen_entry_id))
-        forget_by_id(entry.id, session=session)
+        db.forget_by_id(entry.id, session=session)
         return success_response('successfully deleted seen entry {}'.format(seen_entry_id))

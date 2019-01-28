@@ -6,14 +6,7 @@ from past.builtins import basestring
 
 from flexget import plugin
 from flexget.event import event
-
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.filter import seen as plugin_seen
-except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='seen',
-    )
+from . import seen as plugin_seen
 
 
 class FilterSeenInfoHash(plugin_seen.FilterSeen):
