@@ -8,7 +8,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.utils.requests import Session, TimedLimiter, RequestException
-from flexget.utils.search import normalize_scene
+from flexget.plugins.sites import normalize_scene
 from flexget.plugin import PluginError
 
 log = logging.getLogger('rarbg')

@@ -6,7 +6,7 @@ import logging
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.search import normalize_scene
+from flexget.plugins.sites import normalize_scene
 
 log = logging.getLogger('argenteam')
 

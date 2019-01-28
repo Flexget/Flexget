@@ -8,7 +8,7 @@ from jinja2 import TemplateSyntaxError
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.search import normalize_unicode
+from flexget.plugins.sites import normalize_unicode
 
 log = logging.getLogger('search_rss')
 

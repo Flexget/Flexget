@@ -8,7 +8,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.plugins.internal.urlrewriting import UrlRewritingError
 from flexget.utils.soup import get_soup
-from flexget.utils.search import normalize_unicode
+from flexget.plugins.sites import normalize_unicode
 
 from requests.exceptions import RequestException
 

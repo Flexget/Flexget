@@ -15,7 +15,7 @@ from flexget.plugin import PluginError
 from flexget.plugins.internal.urlrewriting import UrlRewritingError
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
-from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.plugins.sites import normalize_unicode, torrent_availability
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('torrentday')

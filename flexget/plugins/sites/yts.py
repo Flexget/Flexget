@@ -6,7 +6,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests
-from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.plugins.sites import normalize_unicode, torrent_availability
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('yts')
