@@ -21,13 +21,7 @@ class Archive(object):
     wrongly.
     """
 
-    schema = {
-        'oneOf': [
-            {'type': 'boolean'},
-            {'type': 'array', 'items': {'type': 'string'}}
-        ]
-
-    }
+    schema = {'oneOf': [{'type': 'boolean'}, {'type': 'array', 'items': {'type': 'string'}}]}
 
     def on_task_learn(self, task, config):
         """Add new entries into archive. We use learn phase in case the task corrects title or url via some plugins."""
@@ -50,9 +44,12 @@ class Archive(object):
             else:
                 processed.append(entry)
 
-            ae = task.session.query(db.ArchiveEntry). \
-                filter(db.ArchiveEntry.title == entry['title']). \
-                filter(db.ArchiveEntry.url == entry['url']).first()
+            ae = (
+                task.session.query(db.ArchiveEntry)
+                .filter(db.ArchiveEntry.title == entry['title'])
+                .filter(db.ArchiveEntry.url == entry['url'])
+                .first()
+            )
             if ae:
                 # add (missing) sources
                 source = db.get_source(task.name, task.session)
@@ -97,14 +94,9 @@ class UrlrewriteArchive(object):
     Provides capability to rewrite urls from archive or make searches with discover.
     """
 
-    entry_map = {'title': 'title',
-                 'url': 'url',
-                 'description': 'description'}
+    entry_map = {'title': 'title', 'url': 'url', 'description': 'description'}
 
-    schema = {'oneOf': [
-        {'type': 'boolean'},
-        {'type': 'array', 'items': {'type': 'string'}}
-    ]}
+    schema = {'oneOf': [{'type': 'boolean'}, {'type': 'array', 'items': {'type': 'string'}}]}
 
     def search(self, task, entry, config=None):
         """Search plugin API method"""

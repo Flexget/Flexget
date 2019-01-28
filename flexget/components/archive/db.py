@@ -16,17 +16,19 @@ SCHEMA_VER = 0
 Base = db_schema.versioned_base('archive', SCHEMA_VER)
 
 archive_tags_table = Table(
-    'archive_entry_tags', Base.metadata,
+    'archive_entry_tags',
+    Base.metadata,
     Column('entry_id', Integer, ForeignKey('archive_entry.id')),
     Column('tag_id', Integer, ForeignKey('archive_tag.id')),
-    Index('ix_archive_tags', 'entry_id', 'tag_id')
+    Index('ix_archive_tags', 'entry_id', 'tag_id'),
 )
 
 archive_sources_table = Table(
-    'archive_entry_sources', Base.metadata,
+    'archive_entry_sources',
+    Base.metadata,
     Column('entry_id', Integer, ForeignKey('archive_entry.id')),
     Column('source_id', Integer, ForeignKey('archive_source.id')),
-    Index('ix_archive_sources', 'entry_id', 'source_id')
+    Index('ix_archive_sources', 'entry_id', 'source_id'),
 )
 
 Base.register_table(archive_tags_table)
@@ -45,14 +47,20 @@ class ArchiveEntry(Base):
     added = Column(DateTime, index=True)
 
     tags = relationship("ArchiveTag", secondary=archive_tags_table)
-    sources = relationship("ArchiveSource", secondary=archive_sources_table, backref='archive_entries')
+    sources = relationship(
+        "ArchiveSource", secondary=archive_sources_table, backref='archive_entries'
+    )
 
     def __init__(self):
         self.added = datetime.now()
 
     def __str__(self):
-        return '<ArchiveEntry(title=%s,url=%s,task=%s,added=%s)>' % \
-               (self.title, self.url, self.task, self.added.strftime('%Y-%m-%d %H:%M'))
+        return '<ArchiveEntry(title=%s,url=%s,task=%s,added=%s)>' % (
+            self.title,
+            self.url,
+            self.task,
+            self.added.strftime('%Y-%m-%d %H:%M'),
+        )
 
 
 class ArchiveTag(Base):
@@ -91,7 +99,9 @@ def upgrade(ver, session):
             log.info('Dropping legacy index (may take a while) ...')
             old_index.drop()
             # create new index by title, url
-        new_index = get_index_by_name(Base.metadata.tables['archive_entry'], 'ix_archive_title_url')
+        new_index = get_index_by_name(
+            Base.metadata.tables['archive_entry'], 'ix_archive_title_url'
+        )
         if new_index:
             log.info('Creating new index (may take a while) ...')
             new_index.create(bind=session.connection())

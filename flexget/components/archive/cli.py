@@ -51,7 +51,9 @@ def consolidate():
         # id's for duplicates
         duplicates = []
 
-        for index, orig in enumerate(session.query(flexget.components.archive.db.ArchiveEntry).yield_per(5)):
+        for index, orig in enumerate(
+            session.query(flexget.components.archive.db.ArchiveEntry).yield_per(5)
+        ):
             bar.update(index)
 
             # item already processed
@@ -60,8 +62,10 @@ def consolidate():
 
             # item already migrated
             if orig.sources:
-                log.info('Database looks like it has already been consolidated, '
-                         'item %s has already sources ...' % orig.title)
+                log.info(
+                    'Database looks like it has already been consolidated, '
+                    'item %s has already sources ...' % orig.title
+                )
                 session.rollback()
                 return
 
@@ -70,10 +74,13 @@ def consolidate():
             # remove task, deprecated .. well, let's still keep it ..
             # orig.task = None
 
-            for dupe in session.query(flexget.components.archive.db.ArchiveEntry). \
-                    filter(flexget.components.archive.db.ArchiveEntry.id != orig.id). \
-                    filter(flexget.components.archive.db.ArchiveEntry.title == orig.title). \
-                    filter(flexget.components.archive.db.ArchiveEntry.url == orig.url).all():
+            for dupe in (
+                session.query(flexget.components.archive.db.ArchiveEntry)
+                .filter(flexget.components.archive.db.ArchiveEntry.id != orig.id)
+                .filter(flexget.components.archive.db.ArchiveEntry.title == orig.title)
+                .filter(flexget.components.archive.db.ArchiveEntry.url == orig.url)
+                .all()
+            ):
                 orig.sources.append(flexget.components.archive.db.get_source(dupe.task, session))
                 duplicates.append(dupe.id)
 
@@ -81,7 +88,8 @@ def consolidate():
             log.info('Consolidated %i items, removing duplicates ...' % len(duplicates))
             for id in duplicates:
                 session.query(flexget.components.archive.db.ArchiveEntry).filter(
-                    flexget.components.archive.db.ArchiveEntry.id == id).delete()
+                    flexget.components.archive.db.ArchiveEntry.id == id
+                ).delete()
         session.commit()
         log.info('Completed! This does NOT need to be ran again.')
     except KeyboardInterrupt:
@@ -105,13 +113,21 @@ def tag_source(source_name, tag_names=None):
     session = Session()
     try:
         # check that source exists
-        source = session.query(flexget.components.archive.db.ArchiveSource).filter(
-            flexget.components.archive.db.ArchiveSource.name == source_name).first()
+        source = (
+            session.query(flexget.components.archive.db.ArchiveSource)
+            .filter(flexget.components.archive.db.ArchiveSource.name == source_name)
+            .first()
+        )
         if not source:
             log.critical('Source `%s` does not exists' % source_name)
-            srcs = ', '.join([s.name for s in
-                              session.query(flexget.components.archive.db.ArchiveSource).order_by(
-                                  flexget.components.archive.db.ArchiveSource.name)])
+            srcs = ', '.join(
+                [
+                    s.name
+                    for s in session.query(flexget.components.archive.db.ArchiveSource).order_by(
+                        flexget.components.archive.db.ArchiveSource.name
+                    )
+                ]
+            )
             if srcs:
                 log.info('Known sources: %s' % srcs)
             return
@@ -123,8 +139,11 @@ def tag_source(source_name, tag_names=None):
 
         # tag 'em
         log.verbose('Please wait while adding tags %s ...' % (', '.join(tag_names)))
-        for a in session.query(flexget.components.archive.db.ArchiveEntry). \
-                filter(flexget.components.archive.db.ArchiveEntry.sources.any(name=source_name)).yield_per(5):
+        for a in (
+            session.query(flexget.components.archive.db.ArchiveEntry)
+            .filter(flexget.components.archive.db.ArchiveEntry.sources.any(name=source_name))
+            .yield_per(5)
+        ):
             a.tags.extend(tags)
     finally:
         session.commit()
@@ -139,7 +158,9 @@ def cli_search(options):
 
     table_data = []
     with Session() as session:
-        for archived_entry in flexget.components.archive.db.search(session, query, tags=tags, sources=sources):
+        for archived_entry in flexget.components.archive.db.search(
+            session, query, tags=tags, sources=sources
+        ):
             days_ago = (datetime.now() - archived_entry.added).days
             source_names = ', '.join([s.name for s in archived_entry.sources])
             tag_names = ', '.join([t.name for t in archived_entry.tags])
@@ -179,8 +200,10 @@ def cli_inject(manager, options):
 
             # find if there is no longer any task within sources
             if not any(source.name in manager.tasks for source in archive_entry.sources):
-                log.error('None of sources (%s) exists anymore, cannot inject `%s` from archive!' %
-                          (', '.join([s.name for s in archive_entry.sources]), archive_entry.title))
+                log.error(
+                    'None of sources (%s) exists anymore, cannot inject `%s` from archive!'
+                    % (', '.join([s.name for s in archive_entry.sources]), archive_entry.title)
+                )
                 continue
 
             inject_entry = Entry(archive_entry.title, archive_entry.url)
@@ -213,23 +236,53 @@ def cli_inject(manager, options):
 
 @event('options.register')
 def register_parser_arguments():
-    archive_parser = options.register_command('archive', do_cli, help='Search and manipulate the archive database')
+    archive_parser = options.register_command(
+        'archive', do_cli, help='Search and manipulate the archive database'
+    )
     archive_parser.add_subparsers(title='Actions', metavar='<action>', dest='archive_action')
     # Default usage shows the positional arguments after the optional ones, override usage to fix it
-    search_parser = archive_parser.add_subparser('search', help='Search from the archive',
-                                                 usage='%(prog)s [-h] <keyword> [<keyword> ...] [optional arguments]',
-                                                 parents=[table_parser])
-    search_parser.add_argument('keywords', metavar='<keyword>', nargs='+', help='Keyword(s) to search for')
-    search_parser.add_argument('--tags', metavar='TAG', nargs='+', default=[], help='Tag(s) to search within')
-    search_parser.add_argument('--sources', metavar='SOURCE', nargs='+', default=[], help='Source(s) to search within')
-    inject_parser = archive_parser.add_subparser('inject', help='Inject entries from the archive back into tasks')
-    inject_parser.add_argument('ids', nargs='+', type=int, metavar='ID', help='Archive ID of an item to inject')
-    inject_parser.add_argument('--immortal', action='store_true', help='Injected entries will not be able to be '
-                                                                       'rejected by any plugins')
+    search_parser = archive_parser.add_subparser(
+        'search',
+        help='Search from the archive',
+        usage='%(prog)s [-h] <keyword> [<keyword> ...] [optional arguments]',
+        parents=[table_parser],
+    )
+    search_parser.add_argument(
+        'keywords', metavar='<keyword>', nargs='+', help='Keyword(s) to search for'
+    )
+    search_parser.add_argument(
+        '--tags', metavar='TAG', nargs='+', default=[], help='Tag(s) to search within'
+    )
+    search_parser.add_argument(
+        '--sources', metavar='SOURCE', nargs='+', default=[], help='Source(s) to search within'
+    )
+    inject_parser = archive_parser.add_subparser(
+        'inject', help='Inject entries from the archive back into tasks'
+    )
+    inject_parser.add_argument(
+        'ids', nargs='+', type=int, metavar='ID', help='Archive ID of an item to inject'
+    )
+    inject_parser.add_argument(
+        '--immortal',
+        action='store_true',
+        help='Injected entries will not be able to be ' 'rejected by any plugins',
+    )
     exec_group = inject_parser.add_argument_group('execute arguments')
-    exec_group.add_argument('execute_options', action=ParseExtrasAction, parser=get_parser('execute'))
-    tag_parser = archive_parser.add_subparser('tag-source', help='Tag all archived entries within a given source')
-    tag_parser.add_argument('source', metavar='<source>', help='The source whose entries you would like to tag')
-    tag_parser.add_argument('tags', nargs='+', metavar='<tag>',
-                            help='The tag(s) you would like to apply to the entries')
-    archive_parser.add_subparser('consolidate', help='Migrate old archive data to new model, may take a long time')
+    exec_group.add_argument(
+        'execute_options', action=ParseExtrasAction, parser=get_parser('execute')
+    )
+    tag_parser = archive_parser.add_subparser(
+        'tag-source', help='Tag all archived entries within a given source'
+    )
+    tag_parser.add_argument(
+        'source', metavar='<source>', help='The source whose entries you would like to tag'
+    )
+    tag_parser.add_argument(
+        'tags',
+        nargs='+',
+        metavar='<tag>',
+        help='The tag(s) you would like to apply to the entries',
+    )
+    archive_parser.add_subparser(
+        'consolidate', help='Migrate old archive data to new model, may take a long time'
+    )

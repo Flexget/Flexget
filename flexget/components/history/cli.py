@@ -5,29 +5,21 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from sqlalchemy import desc
 
 from flexget import options
-from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
-
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.output import history as history_plugin
-except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='history',
-    )
+from . import db
 
 
 def do_cli(manager, options):
     with Session() as session:
-        query = session.query(history_plugin.History)
+        query = session.query(db.History)
         if options.search:
             search_term = options.search.replace(' ', '%').replace('.', '%')
-            query = query.filter(history_plugin.History.title.like('%' + search_term + '%'))
+            query = query.filter(db.History.title.like('%' + search_term + '%'))
         if options.task:
-            query = query.filter(history_plugin.History.task.like('%' + options.task + '%'))
-        query = query.order_by(desc(history_plugin.History.time)).limit(options.limit)
+            query = query.filter(db.History.task.like('%' + options.task + '%'))
+        query = query.order_by(desc(db.History.time)).limit(options.limit)
         table_data = []
         if options.short:
             table_data.append(['Time', 'Title'])
@@ -62,10 +54,29 @@ def do_cli(manager, options):
 
 @event('options.register')
 def register_parser_arguments():
-    parser = options.register_command('history', do_cli, help='View the history of entries that FlexGet has accepted',
-                                      parents=[table_parser])
-    parser.add_argument('--limit', action='store', type=int, metavar='NUM', default=50,
-                        help='limit to %(metavar)s results')
-    parser.add_argument('--search', action='store', metavar='TERM', help='Limit to results that contain %(metavar)s')
-    parser.add_argument('--task', action='store', metavar='TASK', help='Limit to results in specified %(metavar)s')
-    parser.add_argument('--short', '-s', action='store_true', dest='short', default=False, help='Shorter output')
+    parser = options.register_command(
+        'history',
+        do_cli,
+        help='View the history of entries that FlexGet has accepted',
+        parents=[table_parser],
+    )
+    parser.add_argument(
+        '--limit',
+        action='store',
+        type=int,
+        metavar='NUM',
+        default=50,
+        help='limit to %(metavar)s results',
+    )
+    parser.add_argument(
+        '--search',
+        action='store',
+        metavar='TERM',
+        help='Limit to results that contain %(metavar)s',
+    )
+    parser.add_argument(
+        '--task', action='store', metavar='TASK', help='Limit to results in specified %(metavar)s'
+    )
+    parser.add_argument(
+        '--short', '-s', action='store_true', dest='short', default=False, help='Shorter output'
+    )

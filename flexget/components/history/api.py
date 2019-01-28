@@ -9,7 +9,7 @@ from sqlalchemy import desc, asc
 
 from flexget.api import api, APIResource
 from flexget.api.app import BadRequest, etag, pagination_headers, NotFoundError
-from flexget.plugins.output.history import History
+from . import db
 
 log = logging.getLogger('history')
 
@@ -26,10 +26,10 @@ class ObjectsContainer(object):
             'task': {'type': 'string'},
             'time': {'type': 'string', 'format': 'date-time'},
             'title': {'type': 'string'},
-            'url': {'type': 'string'}
+            'url': {'type': 'string'},
         },
         'required': ['details', 'filename', 'id', 'task', 'time', 'title', 'url'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     history_list_object = {'type': 'array', 'items': base_history_object}
@@ -68,9 +68,9 @@ class HistoryAPI(APIResource):
         task = args['task']
 
         # Build query
-        query = session.query(History)
+        query = session.query(db.History)
         if task:
-            query = query.filter(History.task == task)
+            query = query.filter(db.History.task == task)
 
         total_items = query.count()
 
@@ -90,7 +90,7 @@ class HistoryAPI(APIResource):
 
         # Get items
         try:
-            items = query.order_by(order(getattr(History, sort_by))).slice(start, finish)
+            items = query.order_by(order(getattr(db.History, sort_by))).slice(start, finish)
         except AttributeError as e:
             raise BadRequest(str(e))
 
