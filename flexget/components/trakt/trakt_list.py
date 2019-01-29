@@ -13,13 +13,8 @@ from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException, TimedLimiter
 from flexget.utils.tools import split_title_year
 
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.internal import api_trakt as plugin_api_trakt
-except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='',
-    )
+from . import db
+
 
 log = logging.getLogger('trakt_list')
 IMMUTABLE_LISTS = []
@@ -37,17 +32,33 @@ def generate_episode_title(item):
     show_info = item['show']
     episode_info = item['episode']
     if show_info['year']:
-        return ('%s (%s) S%02dE%02d %s' % (show_info['title'], show_info['year'], episode_info['season'],
-                                           episode_info['number'], episode_info['title'] or '')).strip()
+        return (
+            '%s (%s) S%02dE%02d %s'
+            % (
+                show_info['title'],
+                show_info['year'],
+                episode_info['season'],
+                episode_info['number'],
+                episode_info['title'] or '',
+            )
+        ).strip()
     else:
-        return ('%s S%02dE%02d %s' % (show_info['title'], episode_info['season'],
-                                      episode_info['number'], episode_info['title'] or '')).strip()
+        return (
+            '%s S%02dE%02d %s'
+            % (
+                show_info['title'],
+                episode_info['season'],
+                episode_info['number'],
+                episode_info['title'] or '',
+            )
+        ).strip()
 
 
 field_maps = {
     'movie': {
         'title': lambda i: '%s (%s)' % (i['movie']['title'], i['movie']['year'])
-        if i['movie']['year'] else '%s' % i['movie']['title'],
+        if i['movie']['year']
+        else '%s' % i['movie']['title'],
         'movie_name': 'movie.title',
         'movie_year': 'movie.year',
         'trakt_movie_name': 'movie.title',
@@ -55,7 +66,7 @@ field_maps = {
         'imdb_id': 'movie.ids.imdb',
         'tmdb_id': 'movie.ids.tmdb',
         'trakt_movie_id': 'movie.ids.trakt',
-        'trakt_movie_slug': 'movie.ids.slug'
+        'trakt_movie_slug': 'movie.ids.slug',
     },
     'show': {
         'title': generate_show_title,
@@ -67,7 +78,7 @@ field_maps = {
         'tvrage_id': 'show.ids.tvrage',
         'tmdb_id': 'show.ids.tmdb',
         'trakt_show_id': 'show.ids.trakt',
-        'trakt_show_slug': 'show.ids.slug'
+        'trakt_show_slug': 'show.ids.slug',
     },
     'episode': {
         'title': generate_episode_title,
@@ -83,13 +94,12 @@ field_maps = {
         'trakt_episode_id': 'episode.ids.trakt',
         'trakt_show_id': 'show.ids.trakt',
         'trakt_show_slug': 'show.ids.slug',
-        'trakt_ep_name': 'episode.title'
-    }
+        'trakt_ep_name': 'episode.title',
+    },
 }
 
 
 class TraktSet(MutableSet):
-
     @property
     def immutable(self):
         if self.config['list'] in IMMUTABLE_LISTS:
@@ -101,21 +111,25 @@ class TraktSet(MutableSet):
             'username': {'type': 'string'},
             'account': {'type': 'string'},
             'list': {'type': 'string'},
-            'type': {'type': 'string', 'enum': ['shows', 'seasons', 'episodes', 'movies', 'auto'], 'default': 'auto'},
+            'type': {
+                'type': 'string',
+                'enum': ['shows', 'seasons', 'episodes', 'movies', 'auto'],
+                'default': 'auto',
+            },
             'strip_dates': {'type': 'boolean', 'default': False},
-            'language': {'type': 'string', 'minLength': 2, 'maxLength': 2}
+            'language': {'type': 'string', 'minLength': 2, 'maxLength': 2},
         },
         'required': ['list'],
         'anyOf': [{'required': ['username']}, {'required': ['account']}],
         'error_anyOf': 'At least one of `username` or `account` options are needed.',
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def __init__(self, config):
         self.config = config
         if self.config.get('account') and not self.config.get('username'):
             self.config['username'] = 'me'
-        self.session = plugin_api_trakt.get_session(self.config.get('account'))
+        self.session = db.get_session(self.config.get('account'))
         # Lists may not have modified results if modified then accessed in quick succession.
         self.session.add_domain_limiter(TimedLimiter('trakt.tv', '2 seconds'))
         self._items = None
@@ -169,13 +183,15 @@ class TraktSet(MutableSet):
     def items(self):
         if self._items is None:
             if self.config['list'] in ['collection', 'watched'] and self.config['type'] == 'auto':
-                raise plugin.PluginError('`type` cannot be `auto` for %s list.' % self.config['list'])
+                raise plugin.PluginError(
+                    '`type` cannot be `auto` for %s list.' % self.config['list']
+                )
 
             endpoint = self.get_list_endpoint()
 
             log.verbose('Retrieving `%s` list `%s`', self.config['type'], self.config['list'])
             try:
-                result = self.session.get(plugin_api_trakt.get_api_url(endpoint))
+                result = self.session.get(db.get_api_url(endpoint))
                 try:
                     data = result.json()
                 except ValueError:
@@ -192,24 +208,34 @@ class TraktSet(MutableSet):
                     limit = 1000
                     pagination_item_count = int(result.headers.get('X-Pagination-Item-Count', 0))
                     number_of_pages = math.ceil(pagination_item_count / limit)
-                    log.debug('Response is paginated. Number of items: %s, number of pages: %s',
-                              pagination_item_count, number_of_pages)
+                    log.debug(
+                        'Response is paginated. Number of items: %s, number of pages: %s',
+                        pagination_item_count,
+                        number_of_pages,
+                    )
                     page = int(result.headers.get('X-Pagination-Page'))
                     while page <= number_of_pages:
-                        paginated_result = self.session.get(plugin_api_trakt.get_api_url(endpoint),
-                                                            params={'limit': limit, 'page': page})
+                        paginated_result = self.session.get(
+                            db.get_api_url(endpoint), params={'limit': limit, 'page': page}
+                        )
                         page += 1
                         try:
                             data.extend(paginated_result.json())
                         except ValueError:
-                            log.debug('Could not decode json from response: %s', paginated_result.text)
+                            log.debug(
+                                'Could not decode json from response: %s', paginated_result.text
+                            )
                             raise plugin.PluginError('Error getting list from trakt.')
 
             except RequestException as e:
                 raise plugin.PluginError('Could not retrieve list from trakt (%s)' % e)
 
             if not data:
-                log.warning('No data returned from trakt for %s list %s.', self.config['type'], self.config['list'])
+                log.warning(
+                    'No data returned from trakt for %s list %s.',
+                    self.config['type'],
+                    self.config['list'],
+                )
                 return []
 
             entries = []
@@ -219,8 +245,11 @@ class TraktSet(MutableSet):
                     list_type = item['type']
                 # Collection and watched lists don't return 'type' along with the items (right now)
                 if 'type' in item and item['type'] != list_type:
-                    log.debug('Skipping %s because it is not a %s', item[item['type']].get('title', 'unknown'),
-                              list_type)
+                    log.debug(
+                        'Skipping %s because it is not a %s',
+                        item[item['type']].get('title', 'unknown'),
+                        list_type,
+                    )
                     continue
                 if list_type != 'episode' and not item[list_type]['title']:
                     # Skip shows/movies with no title
@@ -229,9 +258,15 @@ class TraktSet(MutableSet):
                 entry = Entry()
                 if list_type == 'episode':
                     entry['url'] = 'https://trakt.tv/shows/%s/seasons/%s/episodes/%s' % (
-                        item['show']['ids']['slug'], item['episode']['season'], item['episode']['number'])
+                        item['show']['ids']['slug'],
+                        item['episode']['season'],
+                        item['episode']['number'],
+                    )
                 else:
-                    entry['url'] = 'https://trakt.tv/%ss/%s' % (list_type, item[list_type]['ids'].get('slug'))
+                    entry['url'] = 'https://trakt.tv/%ss/%s' % (
+                        list_type,
+                        item[list_type]['ids'].get('slug'),
+                    )
 
                 entry.update_using_map(field_maps[list_type], item)
 
@@ -240,18 +275,28 @@ class TraktSet(MutableSet):
                 if list_type == 'movie' and language:
                     endpoint = ['movies', entry['trakt_movie_id'], 'translations', language]
                     try:
-                        result = self.session.get(plugin_api_trakt.get_api_url(endpoint))
+                        result = self.session.get(db.get_api_url(endpoint))
                         try:
                             translation = result.json()
                         except ValueError:
-                            raise plugin.PluginError('Error decoding movie translation from trakt: %s.' % result.text)
+                            raise plugin.PluginError(
+                                'Error decoding movie translation from trakt: %s.' % result.text
+                            )
                     except RequestException as e:
-                        raise plugin.PluginError('Could not retrieve movie translation from trakt: %s' % str(e))
+                        raise plugin.PluginError(
+                            'Could not retrieve movie translation from trakt: %s' % str(e)
+                        )
                     if not translation:
-                        log.warning('No translation data returned from trakt for movie %s.', entry['title'])
+                        log.warning(
+                            'No translation data returned from trakt for movie %s.', entry['title']
+                        )
                     else:
-                        log.verbose('Found `%s` translation for movie `%s`: %s',
-                                    language, entry['movie_name'], translation[0]['title'])
+                        log.verbose(
+                            'Found `%s` translation for movie `%s`: %s',
+                            language,
+                            entry['movie_name'],
+                            translation[0]['title'],
+                        )
                         entry['title'] = translation[0]['title']
                         if entry.get('movie_year'):
                             entry['title'] += ' (' + str(entry['movie_year']) + ')'
@@ -262,7 +307,11 @@ class TraktSet(MutableSet):
                     if list_type in ['show', 'movie']:
                         entry['title'] = item[list_type]['title']
                     elif list_type == 'episode':
-                        entry['title'] = '{show[title]} S{episode[season]:02}E{episode[number]:02}'.format(**item)
+                        entry[
+                            'title'
+                        ] = '{show[title]} S{episode[season]:02}E{episode[number]:02}'.format(
+                            **item
+                        )
                         if item['episode']['title']:
                             entry['title'] += ' {episode[title]}'.format(**item)
                 if entry.isvalid():
@@ -280,47 +329,86 @@ class TraktSet(MutableSet):
         self._items = None
 
     def get_list_endpoint(self, remove=False, submit=False):
-        if not submit and self.config['list'] == 'collection' and self.config['type'] == 'episodes':
+        if (
+            not submit
+            and self.config['list'] == 'collection'
+            and self.config['type'] == 'episodes'
+        ):
             # API restriction as they don't have an endpoint for collected episodes yet
             if self.config['list'] == 'collection':
                 raise plugin.PluginError('`type` cannot be `episodes` for collection list.')
             if self.config.get('account'):
                 return ('sync', 'history', 'episodes')
             else:
-                raise plugin.PluginError('A trakt `account` needs to be configured to get the episode history.')
+                raise plugin.PluginError(
+                    'A trakt `account` needs to be configured to get the episode history.'
+                )
 
         if self.config['list'] in ['collection', 'watchlist', 'watched', 'ratings']:
             if self.config.get('account'):
-                endpoint = ('sync', 'history' if self.config['list'] == 'watched' else self.config['list'])
+                endpoint = (
+                    'sync',
+                    'history' if self.config['list'] == 'watched' else self.config['list'],
+                )
                 if not submit:
-                    endpoint += (self.config['type'], )
+                    endpoint += (self.config['type'],)
             else:
-                endpoint = ('users', self.config['username'], self.config['list'], self.config['type'])
+                endpoint = (
+                    'users',
+                    self.config['username'],
+                    self.config['list'],
+                    self.config['type'],
+                )
         else:
-            endpoint = ('users', self.config['username'], 'lists', plugin_api_trakt.make_list_slug(self.config['list']), 'items')
+            endpoint = (
+                'users',
+                self.config['username'],
+                'lists',
+                db.make_list_slug(self.config['list']),
+                'items',
+            )
 
         if remove:
-            endpoint += ('remove', )
+            endpoint += ('remove',)
         return endpoint
 
     def show_match(self, entry1, entry2):
-        return any(entry1.get(ident) is not None and entry1[ident] == entry2.get(ident) for ident in
-                   ['series_name', 'trakt_show_id', 'tmdb_id', 'tvdb_id', 'imdb_id', 'tvrage_id'])
+        return any(
+            entry1.get(ident) is not None and entry1[ident] == entry2.get(ident)
+            for ident in [
+                'series_name',
+                'trakt_show_id',
+                'tmdb_id',
+                'tvdb_id',
+                'imdb_id',
+                'tvrage_id',
+            ]
+        )
 
     def season_match(self, entry1, entry2):
-        return (self.show_match(entry1, entry2) and entry1.get('series_season') is not None and
-                entry1['series_season'] == entry2.get('series_season'))
+        return (
+            self.show_match(entry1, entry2)
+            and entry1.get('series_season') is not None
+            and entry1['series_season'] == entry2.get('series_season')
+        )
 
     def episode_match(self, entry1, entry2):
-        return (self.season_match(entry1, entry2) and entry1.get('series_episode') is not None and
-                entry1['series_episode'] == entry2.get('series_episode'))
+        return (
+            self.season_match(entry1, entry2)
+            and entry1.get('series_episode') is not None
+            and entry1['series_episode'] == entry2.get('series_episode')
+        )
 
     def movie_match(self, entry1, entry2):
-        if any(entry1.get(id) is not None and entry1[id] == entry2[id] for id in
-               ['trakt_movie_id', 'imdb_id', 'tmdb_id']):
+        if any(
+            entry1.get(id) is not None and entry1[id] == entry2[id]
+            for id in ['trakt_movie_id', 'imdb_id', 'tmdb_id']
+        ):
             return True
-        if entry1.get('movie_name') and ((entry1.get('movie_name'), entry1.get('movie_year')) ==
-                                         (entry2.get('movie_name'), entry2.get('movie_year'))):
+        if entry1.get('movie_name') and (
+            (entry1.get('movie_name'), entry1.get('movie_year'))
+            == (entry2.get('movie_name'), entry2.get('movie_year'))
+        ):
             return True
         return False
 
@@ -328,14 +416,22 @@ class TraktSet(MutableSet):
         """Submits movies or episodes to trakt api."""
         found = {}
         for entry in entries:
-            if self.config['type'] in ['auto', 'shows', 'seasons', 'episodes'] and entry.get('series_name'):
+            if self.config['type'] in ['auto', 'shows', 'seasons', 'episodes'] and entry.get(
+                'series_name'
+            ):
                 show_name, show_year = split_title_year(entry['series_name'])
-                show = {'title': show_name, 'ids': plugin_api_trakt.get_entry_ids(entry)}
+                show = {'title': show_name, 'ids': db.get_entry_ids(entry)}
                 if show_year:
                     show['year'] = show_year
-                if self.config['type'] in ['auto', 'seasons', 'episodes'] and entry.get('series_season') is not None:
+                if (
+                    self.config['type'] in ['auto', 'seasons', 'episodes']
+                    and entry.get('series_season') is not None
+                ):
                     season = {'number': entry['series_season']}
-                    if self.config['type'] in ['auto', 'episodes'] and entry.get('series_episode') is not None:
+                    if (
+                        self.config['type'] in ['auto', 'episodes']
+                        and entry.get('series_episode') is not None
+                    ):
                         season['episodes'] = [{'number': entry['series_episode']}]
                     show['seasons'] = [season]
                 if self.config['type'] in ['seasons', 'episodes'] and 'seasons' not in show:
@@ -346,13 +442,15 @@ class TraktSet(MutableSet):
                     continue
                 found.setdefault('shows', []).append(show)
             elif self.config['type'] in ['auto', 'movies']:
-                movie = {'ids': plugin_api_trakt.get_entry_ids(entry)}
+                movie = {'ids': db.get_entry_ids(entry)}
                 if not movie['ids']:
                     if entry.get('movie_name') is not None:
                         movie['title'] = entry.get('movie_name') or entry.get('imdb_name')
                         movie['year'] = entry.get('movie_year') or entry.get('imdb_year')
                     else:
-                        log.debug('Not submitting `%s`, no movie name or id found.', entry['title'])
+                        log.debug(
+                            'Not submitting `%s`, no movie name or id found.', entry['title']
+                        )
                         continue
                 found.setdefault('movies', []).append(movie)
 
@@ -360,7 +458,7 @@ class TraktSet(MutableSet):
             log.debug('Nothing to submit to trakt.')
             return
 
-        url = plugin_api_trakt.get_api_url(self.get_list_endpoint(remove, submit=True))
+        url = db.get_api_url(self.get_list_endpoint(remove, submit=True))
 
         log.debug('Submitting data to trakt.tv (%s): %s', url, found)
         try:
@@ -374,8 +472,10 @@ class TraktSet(MutableSet):
             # Default to 0 for all categories, even if trakt response didn't include them
             for cat in ('movies', 'shows', 'episodes', 'seasons'):
                 res[action].setdefault(cat, 0)
-            log.info('Successfully {0} to/from list {1}: {movies} movie(s), {shows} show(s), {episodes} episode(s), '
-                     '{seasons} season(s).'.format(action, self.config['list'], **res[action]))
+            log.info(
+                'Successfully {0} to/from list {1}: {movies} movie(s), {shows} show(s), {episodes} episode(s), '
+                '{seasons} season(s).'.format(action, self.config['list'], **res[action])
+            )
             for media_type, request in res['not_found'].items():
                 if request:
                     log.debug('not found %s: %s', media_type, request)

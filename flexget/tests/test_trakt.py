@@ -5,9 +5,12 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import pytest
 
 from flexget.manager import Session
-from flexget.api.plugins.trakt_lookup import ObjectsContainer as OC
-from flexget.plugins.internal.api_trakt import ApiTrakt, TraktActor, TraktMovieSearchResult, TraktShowSearchResult
-from flexget.plugins.internal.api_trakt import TraktShow
+from flexget.components.trakt.api import ObjectsContainer as OC
+
+from flexget.components.trakt.db import (
+    TraktActor, TraktMovieSearchResult, TraktShowSearchResult, TraktShow
+)
+from flexget.components.trakt.api_trakt import ApiTrakt
 
 lookup_series = ApiTrakt.lookup_series
 

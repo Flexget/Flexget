@@ -7,7 +7,8 @@ from flask_restplus import inputs
 
 from flexget.api import api, APIResource
 from flexget.api.app import NotFoundError, etag
-from flexget.plugins.internal.api_trakt import ApiTrakt as at, list_actors, get_translations_dict
+from . import db
+from .api_trakt import ApiTrakt
 
 trakt_api = api.namespace('trakt', description='Trakt lookup endpoint')
 
@@ -16,15 +17,17 @@ class ObjectsContainer(object):
     translation_object = {
         'type': 'object',
         'patternProperties': {
-            '^[/d]$': {'type': 'object',
-                       'properties': {
-                           'overview': {'type': 'string'},
-                           'tagline': {'type': 'string'},
-                           'title': {'type': 'string'},
-                       },
-                       'required': ['overview', 'tagline', 'title'],
-                       'additionalProperties': False}
-        }
+            '^[/d]$': {
+                'type': 'object',
+                'properties': {
+                    'overview': {'type': 'string'},
+                    'tagline': {'type': 'string'},
+                    'title': {'type': 'string'},
+                },
+                'required': ['overview', 'tagline', 'title'],
+                'additionalProperties': False,
+            }
+        },
     }
 
     actor_object = {
@@ -41,12 +44,22 @@ class ObjectsContainer(object):
                     'birthday': {'type': 'string'},
                     'biography': {'type': ['string', 'null']},
                     'homepage': {'type': 'string'},
-                    'death': {'type': ['string', 'null']}
+                    'death': {'type': ['string', 'null']},
                 },
-                'required': ['imdb_id', 'name', 'tmdb_id', 'trakt_id', 'trakt_slug', 'birthday', 'biography',
-                             'homepage', 'death'],
-                'additionalProperties': False
-            }}
+                'required': [
+                    'imdb_id',
+                    'name',
+                    'tmdb_id',
+                    'trakt_id',
+                    'trakt_slug',
+                    'birthday',
+                    'biography',
+                    'homepage',
+                    'death',
+                ],
+                'additionalProperties': False,
+            }
+        },
     }
 
     base_return_object = {
@@ -68,17 +81,35 @@ class ObjectsContainer(object):
             'homepage': {'type': ['string', 'null']},
             'slug': {'type': ['string', 'null']},
             'tmdb_id': {'type': ['integer', 'null']},
-            'imdb_id': {'type': ['string', 'null']}
+            'imdb_id': {'type': ['string', 'null']},
         },
-        'required': ['cached_at', 'genres', 'id', 'overview', 'runtime', 'rating', 'votes', 'language', 'updated_at',
-                     'title', 'year', 'homepage', 'slug', 'tmdb_id', 'imdb_id'],
-        'additionalProperties': False
+        'required': [
+            'cached_at',
+            'genres',
+            'id',
+            'overview',
+            'runtime',
+            'rating',
+            'votes',
+            'language',
+            'updated_at',
+            'title',
+            'year',
+            'homepage',
+            'slug',
+            'tmdb_id',
+            'imdb_id',
+        ],
+        'additionalProperties': False,
     }
 
     series_return_object = copy.deepcopy(base_return_object)
     series_return_object['properties']['tvdb_id'] = {'type': ['integer', 'null']}
     series_return_object['properties']['tvrage_id'] = {'type': ['integer', 'null']}
-    series_return_object['properties']['first_aired'] = {'type': ['string', 'null'], 'format': 'date-time'}
+    series_return_object['properties']['first_aired'] = {
+        'type': ['string', 'null'],
+        'format': 'date-time',
+    }
     series_return_object['properties']['air_day'] = {'type': ['string', 'null']}
     series_return_object['properties']['air_time'] = {'type': ['string', 'null']}
     series_return_object['properties']['certification'] = {'type': ['string', 'null']}
@@ -87,8 +118,19 @@ class ObjectsContainer(object):
     series_return_object['properties']['status'] = {'type': 'string'}
     series_return_object['properties']['timezone'] = {'type': ['string', 'null']}
     series_return_object['properties']['number_of_aired_episodes'] = {'type': ['integer', 'null']}
-    series_return_object['required'] += ['tvdb_id', 'tvrage_id', 'first_aired', 'air_day', 'air_time', 'certification',
-                                         'network', 'country', 'status', 'timezone', 'number_of_aired_episodes']
+    series_return_object['required'] += [
+        'tvdb_id',
+        'tvrage_id',
+        'first_aired',
+        'air_day',
+        'air_time',
+        'certification',
+        'network',
+        'country',
+        'status',
+        'timezone',
+        'number_of_aired_episodes',
+    ]
 
     movie_return_object = copy.deepcopy(base_return_object)
     movie_return_object['properties']['tagline'] = {'type': 'string'}
@@ -97,7 +139,9 @@ class ObjectsContainer(object):
     movie_return_object['required'] += ['tagline', 'released', 'trailer']
 
 
-series_return_schema = api.schema_model('series_return_schema', ObjectsContainer.series_return_object)
+series_return_schema = api.schema_model(
+    'series_return_schema', ObjectsContainer.series_return_object
+)
 movie_return_schema = api.schema_model('movie_return_schema', ObjectsContainer.movie_return_object)
 
 lookup_parser = api.parser()
@@ -108,8 +152,12 @@ lookup_parser.add_argument('tmdb_id', type=int, help='TMDB ID')
 lookup_parser.add_argument('imdb_id', help='IMDB ID')
 lookup_parser.add_argument('tvdb_id', type=int, help='TVDB ID')
 lookup_parser.add_argument('tvrage_id', type=int, help='TVRage ID')
-lookup_parser.add_argument('include_actors', type=inputs.boolean, help='Include actors in response')
-lookup_parser.add_argument('include_translations', type=inputs.boolean, help='Include translations in response')
+lookup_parser.add_argument(
+    'include_actors', type=inputs.boolean, help='Include actors in response'
+)
+lookup_parser.add_argument(
+    'include_translations', type=inputs.boolean, help='Include translations in response'
+)
 
 
 @trakt_api.route('/series/<string:title>/')
@@ -127,14 +175,14 @@ class TraktSeriesSearchApi(APIResource):
         kwargs = args
         kwargs['title'] = title
         try:
-            series = at.lookup_series(session=session, **kwargs)
+            series = ApiTrakt.lookup_series(session=session, **kwargs)
         except LookupError as e:
             raise NotFoundError(e.args[0])
         result = series.to_dict()
         if include_actors:
-            result['actors'] = list_actors(series.actors)
+            result['actors'] = db.list_actors(series.actors)
         if include_translations:
-            result['translations'] = get_translations_dict(series.translations, 'show')
+            result['translations'] = db.get_translations_dict(series.translations, 'show')
         return jsonify(result)
 
 
@@ -153,12 +201,12 @@ class TraktMovieSearchApi(APIResource):
         kwargs = args
         kwargs['title'] = title
         try:
-            movie = at.lookup_movie(session=session, **kwargs)
+            movie = ApiTrakt.lookup_movie(session=session, **kwargs)
         except LookupError as e:
             raise NotFoundError(e.args[0])
         result = movie.to_dict()
         if include_actors:
-            result['actors'] = list_actors(movie.actors)
+            result['actors'] = db.list_actors(movie.actors)
         if include_translations:
-            result['translations'] = get_translations_dict(movie.translations, 'movie')
+            result['translations'] = db.get_translations_dict(movie.translations, 'movie')
         return jsonify(result)

@@ -11,13 +11,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
 
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.internal import api_trakt as plugin_api_trakt
-except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='api_trakt',
-    )
+from . import db
 
 log = logging.getLogger('trakt_calendar')
 
@@ -30,10 +24,10 @@ class TraktCalendar(object):
             'days': {'type': 'integer', 'default': 7},
             'account': {'type': 'string'},
             'strip_dates': {'type': 'boolean', 'default': False},
-            'type': {'type': 'string', 'enum': ['shows', 'episodes']}
+            'type': {'type': 'string', 'enum': ['shows', 'episodes']},
         },
         'required': ['type'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     # Series info
@@ -56,8 +50,10 @@ class TraktCalendar(object):
         'trakt_series_content_rating': 'certification',
         'trakt_genres': 'genres',
         'trakt_series_network': 'network',
-        'imdb_url': lambda s: s['ids']['imdb'] and 'http://www.imdb.com/title/%s' % s['ids']['imdb'],
-        'trakt_series_url': lambda s: s['ids']['slug'] and 'https://trakt.tv/shows/%s' % s['ids']['slug'],
+        'imdb_url': lambda s: s['ids']['imdb']
+        and 'http://www.imdb.com/title/%s' % s['ids']['imdb'],
+        'trakt_series_url': lambda s: s['ids']['slug']
+        and 'https://trakt.tv/shows/%s' % s['ids']['slug'],
         'trakt_series_country': 'country',
         'trakt_series_status': 'status',
         'trakt_series_overview': 'overview',
@@ -87,20 +83,30 @@ class TraktCalendar(object):
         'trakt_ep_runtime': 'runtime',
         'trakt_ep_updated_at': 'updated_at',
         'trakt_ep_rating': 'rating',
-        'trakt_ep_votes': 'votes'
+        'trakt_ep_votes': 'votes',
     }
 
     @cached('trakt_calendar', persist='2 hours')
     def on_task_input(self, task, config):
         start_date = datetime.datetime.now().date() + datetime.timedelta(days=config['start_day'])
-        log.debug('Start date for calendar: %s, end date: %s', start_date,
-                  start_date + datetime.timedelta(days=config['days']))
+        log.debug(
+            'Start date for calendar: %s, end date: %s',
+            start_date,
+            start_date + datetime.timedelta(days=config['days']),
+        )
 
-        url = plugin_api_trakt.get_api_url('calendars', 'my' if config.get('account') else 'all', 'shows', start_date,
-                                           config['days'])
+        url = db.get_api_url(
+            'calendars',
+            'my' if config.get('account') else 'all',
+            'shows',
+            start_date,
+            config['days'],
+        )
 
         try:
-            results = plugin_api_trakt.get_session(config.get('account')).get(url, params={'extended': 'full'}).json()
+            results = (
+                db.get_session(config.get('account')).get(url, params={'extended': 'full'}).json()
+            )
             log.debug('Found %s calendar entries', len(results))
         except RequestException as e:
             raise plugin.PluginError('Error while fetching calendar: {0}'.format(e))
@@ -119,11 +125,13 @@ class TraktCalendar(object):
             e['url'] = e['trakt_series_url']
 
             if config['type'] == 'episodes':
-                e['title'] = '{0} S{1:02d}E{2:02d}'.format(e['title'], e['trakt_season'], e['trakt_episode'])
+                e['title'] = '{0} S{1:02d}E{2:02d}'.format(
+                    e['title'], e['trakt_season'], e['trakt_episode']
+                )
 
-                e['url'] = '{0}/seasons/{1}/episodes/{2}'.format(e['url'],
-                                                                 e['trakt_season'],
-                                                                 e['trakt_episode'])
+                e['url'] = '{0}/seasons/{1}/episodes/{2}'.format(
+                    e['url'], e['trakt_season'], e['trakt_episode']
+                )
 
             entries.add(e)
 

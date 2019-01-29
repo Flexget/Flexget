@@ -10,13 +10,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.internal import api_trakt as plugin_api_trakt
-except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='api_trakt',
-    )
+from . import db
 
 log = logging.getLogger('next_trakt_episodes')
 
@@ -46,28 +40,32 @@ class NextTraktEpisodes(object):
             'username': {'type': 'string'},
             'account': {'type': 'string'},
             'position': {'type': 'string', 'enum': ['last', 'next'], 'default': 'next'},
-            'context': {'type': 'string', 'enum': ['watched', 'collected', 'aired'], 'default': 'watched'},
+            'context': {
+                'type': 'string',
+                'enum': ['watched', 'collected', 'aired'],
+                'default': 'watched',
+            },
             'list': {'type': 'string'},
-            'strip_dates': {'type': 'boolean', 'default': False}
+            'strip_dates': {'type': 'boolean', 'default': False},
         },
         'required': ['list'],
         'anyOf': [{'required': ['username']}, {'required': ['account']}],
         'error_anyOf': 'At least one of `username` or `account` options are needed.',
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def on_task_input(self, task, config):
         if config.get('account') and not config.get('username'):
             config['username'] = 'me'
-        session = plugin_api_trakt.get_session(account=config.get('account'))
+        session = db.get_session(account=config.get('account'))
         listed_series = {}
         args = ('users', config['username'])
         if config['list'] in ['collection', 'watchlist', 'watched']:
             args += (config['list'], 'shows')
         else:
-            args += ('lists', plugin_api_trakt.make_list_slug(config['list']), 'items')
+            args += ('lists', db.make_list_slug(config['list']), 'items')
         try:
-            data = session.get(plugin_api_trakt.get_api_url(args)).json()
+            data = session.get(db.get_api_url(args)).json()
         except RequestException as e:
             raise plugin.PluginError('Unable to get trakt list `%s`: %s' % (config['list'], e))
         if not data:
@@ -86,18 +84,20 @@ class NextTraktEpisodes(object):
                     'trakt_id': trakt_id,
                     'trakt_series_name': item['show']['title'],
                     'trakt_series_year': item['show']['year'],
-                    'trakt_list': config.get('list')
+                    'trakt_list': config.get('list'),
                 }
                 for id_name, id_value in ids.items():
-                    entry_field_name = 'trakt_slug' if id_name == 'slug' else id_name  # rename slug to trakt_slug
+                    entry_field_name = (
+                        'trakt_slug' if id_name == 'slug' else id_name
+                    )  # rename slug to trakt_slug
                     listed_series[trakt_id][entry_field_name] = id_value
         context = 'collection' if config['context'] == 'collected' else config['context']
         entries = []
         for trakt_id, fields in listed_series.items():
             if context == 'aired':
-                url = plugin_api_trakt.get_api_url('shows', trakt_id, '{}_episode'.format(config['position']))
+                url = db.get_api_url('shows', trakt_id, '{}_episode'.format(config['position']))
             else:
-                url = plugin_api_trakt.get_api_url('shows', trakt_id, 'progress', context)
+                url = db.get_api_url('shows', trakt_id, 'progress', context)
             try:
                 response = session.get(url)
                 if response.status_code == 204:
@@ -105,7 +105,9 @@ class NextTraktEpisodes(object):
                     continue
                 data = response.json()
             except RequestException as e:
-                raise plugin.PluginError('An error has occurred looking up: Trakt_id: %s Error: %s' % (trakt_id, e))
+                raise plugin.PluginError(
+                    'An error has occurred looking up: Trakt_id: %s Error: %s' % (trakt_id, e)
+                )
             if context == 'aired':
                 eps = data['season']
                 epn = data['number']
@@ -121,7 +123,9 @@ class NextTraktEpisodes(object):
                         continue
                     season_number = season['number']
                     # Pick the highest collected/watched episode
-                    episode_number = max(item['number'] for item in season['episodes'] if item['completed'])
+                    episode_number = max(
+                        item['number'] for item in season['episodes'] if item['completed']
+                    )
                     # If we are in next episode mode, we have to increment this number
                     if config['position'] == 'next':
                         if season['completed'] >= season['aired']:
@@ -153,7 +157,11 @@ class NextTraktEpisodes(object):
         entry['series_id_type'] = 'ep'
         entry['series_id'] = 'S%02dE%02d' % (season, episode)
         entry['title'] = entry['series_name'] + ' ' + entry['series_id']
-        entry['url'] = 'https://trakt.tv/shows/%s/seasons/%s/episodes/%s' % (fields['trakt_id'], season, episode)
+        entry['url'] = 'https://trakt.tv/shows/%s/seasons/%s/episodes/%s' % (
+            fields['trakt_id'],
+            season,
+            episode,
+        )
         return entry
 
 

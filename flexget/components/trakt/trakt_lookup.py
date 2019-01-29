@@ -8,16 +8,13 @@ from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
 
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.internal import api_trakt as plugin_api_trakt
+from . import api_trakt as plugin_api_trakt
+from . import db
 
-    lookup_series = plugin_api_trakt.ApiTrakt.lookup_series
-    lookup_movie = plugin_api_trakt.ApiTrakt.lookup_movie
-except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='api_trakt',
-    )
+# TODO: not very nice ..
+lookup_series = plugin_api_trakt.ApiTrakt.lookup_series
+lookup_movie = plugin_api_trakt.ApiTrakt.lookup_movie
+
 
 log = logging.getLogger('trakt_lookup')
 
@@ -64,7 +61,9 @@ class TraktUserDataLookup(object):
 
     def __call__(self, entry):
         try:
-            result = self.lookup_function(data_type=self.data_type, media_type=self.media_type, entry=entry)
+            result = self.lookup_function(
+                data_type=self.data_type, media_type=self.media_type, entry=entry
+            )
         except LookupError as e:
             log.debug(e)
         else:
@@ -91,7 +90,7 @@ class PluginTraktLookup(object):
     trakt_series_first_aired_epoch
     trakt_series_first_aired_iso
     trakt_series_air_time
-    trakt_series_content_rating
+    trakt_series_content_ratingi
     trakt_series_genres
     trakt_series_imdb_url
     trakt_series_trakt_url
@@ -135,8 +134,10 @@ class PluginTraktLookup(object):
         'trakt_series_content_rating': 'certification',
         'trakt_genres': lambda i: [db_genre.name for db_genre in i.genres],
         'trakt_series_network': 'network',
-        'imdb_url': lambda series: series.imdb_id and 'http://www.imdb.com/title/%s' % series.imdb_id,
-        'trakt_series_url': lambda series: series.slug and 'https://trakt.tv/shows/%s' % series.slug,
+        'imdb_url': lambda series: series.imdb_id
+        and 'http://www.imdb.com/title/%s' % series.imdb_id,
+        'trakt_series_url': lambda series: series.slug
+        and 'https://trakt.tv/shows/%s' % series.slug,
         'trakt_series_country': 'country',
         'trakt_series_status': 'status',
         'trakt_series_overview': 'overview',
@@ -148,11 +149,9 @@ class PluginTraktLookup(object):
         'trakt_languages': 'translation_languages',
     }
 
-    series_actor_map = {
-        'trakt_actors': lambda show: plugin_api_trakt.list_actors(show.actors),
-    }
+    series_actor_map = {'trakt_actors': lambda show: db.list_actors(show.actors)}
     show_translate_map = {
-        'trakt_translations': lambda show: plugin_api_trakt.get_translations_dict(show.translations, 'show'),
+        'trakt_translations': lambda show: db.get_translations_dict(show.translations, 'show')
     }
 
     # Episode info
@@ -209,12 +208,10 @@ class PluginTraktLookup(object):
     }
 
     movie_translate_map = {
-        'trakt_translations': lambda movie: plugin_api_trakt.get_translations_dict(movie.translations, 'movie'),
+        'trakt_translations': lambda movie: db.get_translations_dict(movie.translations, 'movie')
     }
 
-    movie_actor_map = {
-        'trakt_actors': lambda movie: plugin_api_trakt.list_actors(movie.actors),
-    }
+    movie_actor_map = {'trakt_actors': lambda movie: db.list_actors(movie.actors)}
 
     user_data_map = {
         'collected': 'trakt_collected',
@@ -223,26 +220,22 @@ class PluginTraktLookup(object):
             'show': 'trakt_series_user_rating',
             'season': 'trakt_season_user_rating',
             'episode': 'trakt_ep_user_rating',
-            'movie': 'trakt_movie_user_rating'
-        }
+            'movie': 'trakt_movie_user_rating',
+        },
     }
 
-    schema = {'oneOf': [
-        {
-            'type': 'object',
-            'properties': {
-                'account': {'type': 'string'},
-                'username': {'type': 'string'},
+    schema = {
+        'oneOf': [
+            {
+                'type': 'object',
+                'properties': {'account': {'type': 'string'}, 'username': {'type': 'string'}},
+                'anyOf': [{'required': ['username']}, {'required': ['account']}],
+                'error_anyOf': 'At least one of `username` or `account` options are needed.',
+                'additionalProperties': False,
             },
-            'anyOf': [{'required': ['username']}, {'required': ['account']}],
-            'error_anyOf': 'At least one of `username` or `account` options are needed.',
-            'additionalProperties': False
-
-        },
-        {
-            'type': 'boolean'
-        }
-    ]}
+            {'type': 'boolean'},
+        ]
+    }
 
     def __init__(self):
         self.getter_map = {
@@ -256,7 +249,9 @@ class PluginTraktLookup(object):
         if not isinstance(config, dict):
             config = {}
 
-        self.trakt = plugin_api_trakt.ApiTrakt(username=config.get('username'), account=config.get('account'))
+        self.trakt = plugin_api_trakt.ApiTrakt(
+            username=config.get('username'), account=config.get('account')
+        )
 
     def _get_user_data_field_name(self, data_type, media_type):
         if data_type not in self.user_data_map:
@@ -269,14 +264,17 @@ class PluginTraktLookup(object):
 
     def _get_lookup_args(self, entry):
         args = {
-            'title': entry.get('series_name', eval_lazy=False) or entry.get('title', eval_lazy=False),
+            'title': entry.get('series_name', eval_lazy=False)
+            or entry.get('title', eval_lazy=False),
             'year': entry.get('year', eval_lazy=False),
-            'trakt_slug': (entry.get('trakt_show_slug', eval_lazy=False) or
-                           entry.get('trakt_movie_slug', eval_lazy=False)),
+            'trakt_slug': (
+                entry.get('trakt_show_slug', eval_lazy=False)
+                or entry.get('trakt_movie_slug', eval_lazy=False)
+            ),
             'tmdb_id': entry.get('tmdb_id', eval_lazy=False),
             'tvdb_id': entry.get('tvdb_id', eval_lazy=False),
             'imdb_id': entry.get('imdb_id', eval_lazy=False),
-            'tvrage_id': entry.get('tvrage_id', eval_lazy=False)
+            'tvrage_id': entry.get('tvrage_id', eval_lazy=False),
         }
 
         if entry.get('trakt_movie_id', eval_lazy=False):
@@ -324,7 +322,9 @@ class PluginTraktLookup(object):
             lookup = self.getter_map[media_type]
             user_data_lookup = self.trakt.lookup_map[data_type][media_type]
         except KeyError:
-            raise plugin.PluginError('Unknown data type="%s" or media type="%s"' % (data_type, media_type))
+            raise plugin.PluginError(
+                'Unknown data type="%s" or media type="%s"' % (data_type, media_type)
+            )
 
         with Session() as session:
             try:
@@ -343,22 +343,37 @@ class PluginTraktLookup(object):
 
         for entry in task.entries:
             if is_show(entry):
-                entry.register_lazy_func(TraktLazyLookup(self.series_map, self._get_series), self.series_map)
+                entry.register_lazy_func(
+                    TraktLazyLookup(self.series_map, self._get_series), self.series_map
+                )
                 # TODO cleaner way to do this?
-                entry.register_lazy_func(TraktLazyLookup(self.series_actor_map, self._get_series),
-                                         self.series_actor_map)
-                entry.register_lazy_func(TraktLazyLookup(self.show_translate_map, self._get_series),
-                                         self.show_translate_map)
+                entry.register_lazy_func(
+                    TraktLazyLookup(self.series_actor_map, self._get_series), self.series_actor_map
+                )
+                entry.register_lazy_func(
+                    TraktLazyLookup(self.show_translate_map, self._get_series),
+                    self.show_translate_map,
+                )
                 if is_episode(entry):
-                    entry.register_lazy_func(TraktLazyLookup(self.episode_map, self._get_episode), self.episode_map)
+                    entry.register_lazy_func(
+                        TraktLazyLookup(self.episode_map, self._get_episode), self.episode_map
+                    )
                 elif is_season(entry):
-                    entry.register_lazy_func(TraktLazyLookup(self.season_map, self._get_season), self.season_map)
+                    entry.register_lazy_func(
+                        TraktLazyLookup(self.season_map, self._get_season), self.season_map
+                    )
             else:
-                entry.register_lazy_func(TraktLazyLookup(self.movie_map, self._get_movie), self.movie_map)
+                entry.register_lazy_func(
+                    TraktLazyLookup(self.movie_map, self._get_movie), self.movie_map
+                )
                 # TODO cleaner way to do this?
-                entry.register_lazy_func(TraktLazyLookup(self.movie_actor_map, self._get_movie), self.movie_actor_map)
-                entry.register_lazy_func(TraktLazyLookup(self.movie_translate_map, self._get_movie),
-                                         self.movie_translate_map)
+                entry.register_lazy_func(
+                    TraktLazyLookup(self.movie_actor_map, self._get_movie), self.movie_actor_map
+                )
+                entry.register_lazy_func(
+                    TraktLazyLookup(self.movie_translate_map, self._get_movie),
+                    self.movie_translate_map,
+                )
 
             if config.get('username') or config.get('account'):
                 self._register_lazy_user_data_lookup(entry, 'collected')
@@ -383,18 +398,28 @@ class PluginTraktLookup(object):
         if not media_type:
             return
         field_name = self._get_user_data_field_name(data_type=data_type, media_type=media_type)
-        entry.register_lazy_func(TraktUserDataLookup(field_name, data_type, media_type, self._lazy_user_data_lookup),
-                                 [field_name])
+        entry.register_lazy_func(
+            TraktUserDataLookup(field_name, data_type, media_type, self._lazy_user_data_lookup),
+            [field_name],
+        )
 
     def _register_lazy_user_ratings_lookup(self, entry):
         data_type = 'ratings'
 
         if is_show(entry):
-            self._register_lazy_user_data_lookup(entry=entry, data_type=data_type, media_type='show')
-            self._register_lazy_user_data_lookup(entry=entry, data_type=data_type, media_type='season')
-            self._register_lazy_user_data_lookup(entry=entry, data_type=data_type, media_type='episode')
+            self._register_lazy_user_data_lookup(
+                entry=entry, data_type=data_type, media_type='show'
+            )
+            self._register_lazy_user_data_lookup(
+                entry=entry, data_type=data_type, media_type='season'
+            )
+            self._register_lazy_user_data_lookup(
+                entry=entry, data_type=data_type, media_type='episode'
+            )
         else:
-            self._register_lazy_user_data_lookup(entry=entry, data_type=data_type, media_type='movie')
+            self._register_lazy_user_data_lookup(
+                entry=entry, data_type=data_type, media_type='movie'
+            )
 
     @property
     def series_identifier(self):
@@ -409,5 +434,9 @@ class PluginTraktLookup(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTraktLookup, 'trakt_lookup', api_ver=2, interfaces=['task', 'series_metainfo',
-                                                                              'movie_metainfo'])
+    plugin.register(
+        PluginTraktLookup,
+        'trakt_lookup',
+        api_ver=2,
+        interfaces=['task', 'series_metainfo', 'movie_metainfo'],
+    )
