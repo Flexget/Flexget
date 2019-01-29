@@ -15,7 +15,7 @@ from flexget.utils import json
 from flexget.utils.database import entry_synonym, with_session
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
-log = logging.getLogger('entry_list')
+log = logging.getLogger('entry_list.db')
 Base = versioned_base('entry_list', 1)
 
 
