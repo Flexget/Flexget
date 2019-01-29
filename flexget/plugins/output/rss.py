@@ -168,7 +168,7 @@ class OutputRSS(object):
         config.setdefault('days', 7)
         config.setdefault('items', -1)
         config.setdefault('history', True)
-        config.setdefault('encoding', 'iso-8859-1')
+        config.setdefault('encoding', 'UTF-8')
         config.setdefault('timestamp', False)
         config.setdefault('link', ['imdb_url', 'input_url'])
         config.setdefault('title', '{{title}} (from {{task}})')
