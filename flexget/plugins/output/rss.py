@@ -46,6 +46,8 @@ class RSSEntry(Base):
     rsslink = Column(String)
     file = Column(Unicode)
     published = Column(DateTime, default=datetime.datetime.utcnow)
+    enc_length = Column(Integer)
+    enc_type = Column(String)
 
 
 class OutputRSS(object):
@@ -213,6 +215,9 @@ class OutputRSS(object):
             if 'rss_pubdate' in entry:
                 rss.published = entry['rss_pubdate']
 
+            rss.enc_length = entry['size'] if 'size' in entry else None
+            rss.enc_type = entry['type'] if 'type' in entry else None
+
             # TODO: check if this exists and suggest disabling history if it does since it shouldn't happen normally ...
             log.debug('Saving %s into rss database', entry['title'])
             task.session.add(rss)
@@ -250,6 +255,11 @@ class OutputRSS(object):
                        'link': db_item.link,
                        'pubDate': db_item.published,
                        'guid': guid}
+                if db_item.enc_length is not None and db_item.enc_type is not None:
+                       gen['enclosure'] = PyRSS2Gen.Enclosure(
+                                               db_item.link,
+                                               db_item.enc_length,
+                                               db_item.enc_type)
                 log.trace('Adding %s into rss %s', gen['title'], config['file'])
                 rss_items.append(PyRSS2Gen.RSSItem(**gen))
             else:
