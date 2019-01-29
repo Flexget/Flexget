@@ -1,21 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import pickle
-from collections import MutableSet
 from datetime import datetime
+from typing import MutableSet
 
-from sqlalchemy import Column, Unicode, select, Integer, DateTime, or_, func
+from sqlalchemy import Unicode, select, Column, Integer, DateTime, ForeignKey, or_, func
 from sqlalchemy.orm import relationship
-from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.elements import and_
-from sqlalchemy.sql.schema import ForeignKey
 
-from flexget import plugin, db_schema
+from flexget import db_schema
 from flexget.db_schema import versioned_base
 from flexget.entry import Entry
-from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import json
 from flexget.utils.database import entry_synonym, with_session
@@ -37,8 +31,11 @@ def upgrade(ver, session):
         for row in session.execute(select([table.c.id, table.c.entry])):
             try:
                 p = pickle.loads(row['entry'])
-                session.execute(table.update().where(table.c.id == row['id']).values(
-                    json=json.dumps(p, encode_datetime=True)))
+                session.execute(
+                    table.update()
+                    .where(table.c.id == row['id'])
+                    .values(json=json.dumps(p, encode_datetime=True))
+                )
             except KeyError as e:
                 log.error('Unable error upgrading entry_list pickle object due to %s' % str(e))
 
@@ -51,14 +48,12 @@ class EntryListList(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode, unique=True)
     added = Column(DateTime, default=datetime.now)
-    entries = relationship('EntryListEntry', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic')
+    entries = relationship(
+        'EntryListEntry', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic'
+    )
 
     def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'added_on': self.added
-        }
+        return {'id': self.id, 'name': self.name, 'added_on': self.added}
 
 
 class EntryListEntry(Base):
@@ -87,7 +82,7 @@ class EntryListEntry(Base):
             'added_on': self.added,
             'title': self.title,
             'original_url': self.original_url,
-            'entry': dict(self.entry)
+            'entry': dict(self.entry),
         }
 
 
@@ -102,13 +97,22 @@ class DBEntrySet(MutableSet):
                 session.add(EntryListList(name=self.config))
 
     def _entry_query(self, session, entry):
-        db_entry = session.query(EntryListEntry).filter(and_(
-            EntryListEntry.list_id == self._db_list(session).id,
-            or_(
-                EntryListEntry.title == entry['title'], and_(
-                    EntryListEntry.original_url,
-                    EntryListEntry.original_url == entry[
-                        'original_url'])))).first()
+        db_entry = (
+            session.query(EntryListEntry)
+            .filter(
+                and_(
+                    EntryListEntry.list_id == self._db_list(session).id,
+                    or_(
+                        EntryListEntry.title == entry['title'],
+                        and_(
+                            EntryListEntry.original_url,
+                            EntryListEntry.original_url == entry['original_url'],
+                        ),
+                    ),
+                )
+            )
+            .first()
+        )
 
         return db_entry
 
@@ -177,38 +181,6 @@ class DBEntrySet(MutableSet):
             return Entry(match.entry) if match else None
 
 
-class EntryList(object):
-    schema = {'type': 'string'}
-
-    @staticmethod
-    def get_list(config):
-        return DBEntrySet(config)
-
-    def on_task_input(self, task, config):
-        return list(DBEntrySet(config))
-
-    def search(self, task, entry, config=None):
-        entries = []
-        with Session() as session:
-            try:
-                entry_list = get_list_by_exact_name(config, session=session)
-            except NoResultFound:
-                log.warning('Entry list with name \'%s\' does not exist', config)
-            else:
-                for search_string in entry.get('search_strings', [entry['title']]):
-                    log.debug('searching for entry that matches %s in entry_list %s', search_string, config)
-                    search_string = search_string.replace(' ', '%').replace('.', '%')
-                    query = entry_list.entries.filter(EntryListEntry.title.like('%' + search_string + '%'))
-                    entries += [e.entry for e in query.all()]
-            finally:
-                return entries
-
-
-@event('plugin.register')
-def register_plugin():
-    plugin.register(EntryList, 'entry_list', api_ver=2, interfaces=['task', 'list', 'search'])
-
-
 @with_session
 def get_entry_lists(name=None, session=None):
     log.debug('retrieving entry lists')
@@ -222,7 +194,9 @@ def get_entry_lists(name=None, session=None):
 @with_session
 def get_list_by_exact_name(name, session=None):
     log.debug('returning entry list with name %s', name)
-    return session.query(EntryListList).filter(func.lower(EntryListList.name) == name.lower()).one()
+    return (
+        session.query(EntryListList).filter(func.lower(EntryListList.name) == name.lower()).one()
+    )
 
 
 @with_session
@@ -240,8 +214,9 @@ def delete_list_by_id(list_id, session=None):
 
 
 @with_session
-def get_entries_by_list_id(list_id, start=None, stop=None, order_by='title', descending=False,
-                           session=None):
+def get_entries_by_list_id(
+    list_id, start=None, stop=None, order_by='title', descending=False, session=None
+):
     log.debug('querying entries from entry list with id %d', list_id)
     query = session.query(EntryListEntry).filter(EntryListEntry.list_id == list_id)
     if descending:
@@ -255,12 +230,18 @@ def get_entries_by_list_id(list_id, start=None, stop=None, order_by='title', des
 def get_entry_by_title(list_id, title, session=None):
     entry_list = get_list_by_id(list_id=list_id, session=session)
     if entry_list:
-        return session.query(EntryListEntry).filter(and_(
-            EntryListEntry.title == title, EntryListEntry.list_id == list_id)).first()
+        return (
+            session.query(EntryListEntry)
+            .filter(and_(EntryListEntry.title == title, EntryListEntry.list_id == list_id))
+            .first()
+        )
 
 
 @with_session
 def get_entry_by_id(list_id, entry_id, session=None):
     log.debug('fetching entry with id %d from list id %d', entry_id, list_id)
-    return session.query(EntryListEntry).filter(
-        and_(EntryListEntry.id == entry_id, EntryListEntry.list_id == list_id)).one()
+    return (
+        session.query(EntryListEntry)
+        .filter(and_(EntryListEntry.id == entry_id, EntryListEntry.list_id == list_id))
+        .one()
+    )

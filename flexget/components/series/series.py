@@ -795,8 +795,12 @@ class FilterSeries(FilterSeriesBase):
 
         pass_filter = []
         # First find best available proper for each quality without modifying incoming entry order
-        sorted_entries = sorted(entries, key=lambda e: (e['quality'], e['proper_count']), reverse=True)
-        best_propers = {q: next(e) for q, e in itertools.groupby(sorted_entries, key=lambda e: e['quality'])}
+        sorted_entries = sorted(
+            entries, key=lambda e: (e['quality'], e['proper_count']), reverse=True
+        )
+        best_propers = {
+            q: next(e) for q, e in itertools.groupby(sorted_entries, key=lambda e: e['quality'])
+        }
         for entry in entries:
             if entry['proper_count'] < best_propers[entry['quality']]['proper_count']:
                 # nuke qualities which there is a better proper available
@@ -830,7 +834,10 @@ class FilterSeries(FilterSeriesBase):
 
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for quality, entry in best_propers.items():
-            if quality in downloaded_qualities and entry['proper_count'] > downloaded_qualities[quality]:
+            if (
+                quality in downloaded_qualities
+                and entry['proper_count'] > downloaded_qualities[quality]
+            ):
                 entry.accept('proper')
                 pass_filter.remove(entry)
 
