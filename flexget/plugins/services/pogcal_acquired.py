@@ -1,18 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
 from datetime import datetime
 
-from sqlalchemy import Column, Unicode, Integer
+from sqlalchemy import Column, Integer, Unicode
 
 from flexget import plugin
+from flexget.db_schema import versioned_base
 from flexget.event import event
 from flexget.utils import requests
+from flexget.utils.parsers.generic import name_to_re
 from flexget.utils.soup import get_soup
-from flexget.utils.titles.series import name_to_re
-from flexget.db_schema import versioned_base
 
 log = logging.getLogger('pogcal_acquired')
 Base = versioned_base('pogcal_acquired', 0)
