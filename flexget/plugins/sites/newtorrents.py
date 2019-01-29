@@ -14,14 +14,22 @@ from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
 from flexget.utils import requests
 
-timeout = 10
-socket.setdefaulttimeout(timeout)
-
 log = logging.getLogger('newtorrents')
-
 
 class NewTorrents(object):
     """NewTorrents urlrewriter and search plugin."""
+
+    timeout = 10
+
+    class TimeoutGuard:
+        def __init__(self, timeout):
+            self.timeout = timeout
+        def __enter__(self):
+            self.saved_global_timeout = socket.getdefaulttimeout()
+            socket.setdefaulttimeout(self.timeout)
+        def __exit__(self, type, value, traceback):
+            socket.setdefaulttimeout(self.saved_global_timeout)
+            return False
 
     def __init__(self):
         self.resolved = []
@@ -62,7 +70,8 @@ class NewTorrents(object):
     def url_from_page(self, url):
         """Parses torrent url from newtorrents download page"""
         try:
-            page = requests.get(url)
+            with TimeoutGuard(self.timeout):
+                page = requests.get(url)
             data = page.text
         except Exception:
             raise UrlRewritingError('URLerror when retrieving page')
@@ -83,7 +92,8 @@ class NewTorrents(object):
 
         log.debug('search url: %s' % url)
 
-        html = requests.get(url).text
+        with TimeoutGuard(self.timeout):
+            html = requests.get(url).text
         # fix </SCR'+'IPT> so that BS does not crash
         # TODO: should use beautifulsoup massage
         html = re.sub(r'(</SCR.*?)...(.*?IPT>)', r'\1\2', html)
