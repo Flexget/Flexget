@@ -1,3 +1,6 @@
+from __future__ import unicode_literals
+
+
 TRANSLATE_MAP = {ord(u'&'): u' and '}
 for char in u'\'\\':
     TRANSLATE_MAP[ord(char)] = u''
