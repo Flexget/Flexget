@@ -164,7 +164,7 @@ class UrlRewritePirateBay(object):
                 tds = link.parent.parent.parent.find_all('td')
                 entry['torrent_seeds'] = int(tds[-2].contents[0])
                 entry['torrent_leeches'] = int(tds[-1].contents[0])
-                entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+                entry['torrent_availability'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
                 # Parse content_size
                 size_text = link.find_next(attrs={'class': 'detDesc'}).get_text()
                 if size_text:

@@ -83,7 +83,7 @@ class SearchPTN(object):
             entry['url'] = 'http://piratethenet.org' + dl_href
             entry['torrent_seeds'] = int(row.find(title='Number of Seeders').text)
             entry['torrent_leeches'] = int(row.find(title='Number of Leechers').text)
-            entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+            entry['torrent_availability'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
 
             entry['content_size'] = parse_filesize(str(row.find(title='Torrent size').text), si=False)
 

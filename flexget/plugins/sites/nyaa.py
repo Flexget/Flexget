@@ -97,7 +97,7 @@ class UrlRewriteNyaa(object):
                 entry['torrent_seeds'] = int(item.nyaa_seeders)
                 entry['torrent_leeches'] = int(item.nyaa_leechers)
                 entry['torrent_info_hash'] = item.nyaa_infohash
-                entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+                entry['torrent_availability'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
                 if item.nyaa_size:
                     entry['content_size'] = parse_filesize(item.nyaa_size)
 
