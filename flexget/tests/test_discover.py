@@ -41,19 +41,6 @@ plugin.register(EstRelease, 'test_release', interfaces=['estimate_release'], api
 class TestDiscover(object):
     config = """
         tasks:
-          test_sort:
-            discover:
-              release_estimations: ignore
-              what:
-              - mock:
-                - title: Foo
-                  search_sort: 1
-                - title: Bar
-                  search_sort: 3
-                - title: Baz
-                  search_sort: 2
-              from:
-              - test_search: yes
           test_interval:
             discover:
               release_estimations: ignore
@@ -99,13 +86,6 @@ class TestDiscover(object):
             max_reruns: 3
 
     """
-
-    def test_sort(self, execute_task):
-        task = execute_task('test_sort')
-        assert len(task.entries) == 3
-        # Entries should be ordered by search_sort
-        order = list(e.get('search_sort') for e in task.entries)
-        assert order == sorted(order, reverse=True)
 
     def test_interval(self, execute_task, manager):
         task = execute_task('test_interval')

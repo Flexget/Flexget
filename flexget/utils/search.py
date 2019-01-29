@@ -5,7 +5,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import re
 from unicodedata import normalize
 
-from flexget.utils.titles.parser import TitleParser
+from flexget.utils.parsers.parser import TitleParser
 
 
 def clean_symbols(text):

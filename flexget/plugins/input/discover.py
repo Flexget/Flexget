@@ -118,8 +118,7 @@ class Discover(object):
                         continue
                     log.debug('Discovered %s entries from %s', len(search_results), plugin_name)
                     if config.get('limit'):
-                        search_results = sorted(search_results, reverse=True,
-                                                key=lambda x: x.get('search_sort', ''))[:config['limit']]
+                        search_results = search_results[:config['limit']]
                     for e in search_results:
                         e['discovered_from'] = entry['title']
                         e['discovered_with'] = plugin_name
@@ -138,7 +137,7 @@ class Discover(object):
                 continue
             result.extend(entry_results)
 
-        return sorted(result, reverse=True, key=lambda x: x.get('search_sort', -1))
+        return result
 
     def entry_complete(self, entry, query=None, search_results=None, **kwargs):
         """Callback for Entry"""
