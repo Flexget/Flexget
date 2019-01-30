@@ -227,7 +227,7 @@ class ParserGuessit(object):
             guess_result = guessit_api.guessit(native(data), options=guessit_options)
         except GuessitException:
             log.warning('Parsing %s with guessit failed. Most likely a unicode error.', data)
-            guess_result = MatchesDict()
+            return SeriesParseResult(data=data, valid=False)
 
         if guess_result.get('type') != 'episode':
             valid = False
