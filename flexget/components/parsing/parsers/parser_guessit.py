@@ -227,7 +227,7 @@ class ParserGuessit(object):
             guess_result = guessit_api.guessit(native(data), options=guessit_options)
         except GuessitException:
             log.warning('Parsing %s with guessit failed. Most likely a unicode error.', data)
-            guess_result = {}
+            guess_result = MatchesDict()
 
         if guess_result.get('type') != 'episode':
             valid = False
@@ -240,7 +240,7 @@ class ParserGuessit(object):
                 valid = False
             elif country and hasattr(country, 'alpha2'):
                 name += ' (%s)' % country.alpha2
-        elif isinstance(guess_result, MatchesDict) and guess_result.matches['title']:
+        elif guess_result.matches['title']:
             # Make sure the name match is up to FlexGet standards
             # Check there is no unmatched cruft before the matched name
             title_start = guess_result.matches['title'][0].start
