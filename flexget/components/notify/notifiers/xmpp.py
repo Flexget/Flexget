@@ -20,7 +20,7 @@ class XMPPNotifier(object):
 
     All fields are required.
 
-    Example:
+    Example::
 
       notify:
         entries:

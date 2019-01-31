@@ -17,7 +17,7 @@ log = logging.getLogger(plugin_name)
 
 class MsTeamsNotifier(object):
     """
-    Example:
+    Example::
 
       notify:
         entries:
