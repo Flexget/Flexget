@@ -8,18 +8,10 @@ from colorclass.toggles import disable_all_colors
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import options
-from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console, colorize
-
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.list import pending_list as plugin_pending_list
-except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='pending_list',
-    )
+from . import db
 
 
 def attribute_type(attribute):
@@ -53,7 +45,7 @@ def do_cli(manager, options):
 def pending_list_lists(options):
     """ Show all pending lists """
     with Session() as session:
-        lists = plugin_pending_list.get_pending_lists(session=session)
+        lists = db.get_pending_lists(session=session)
         header = ['#', 'List Name']
         table_data = [header]
         for entry_list in lists:
@@ -69,14 +61,14 @@ def pending_list_list(options):
     """List pending list entries"""
     with Session() as session:
         try:
-            pending_list = plugin_pending_list.get_list_by_exact_name(options.list_name, session=session)
+            pending_list = db.get_list_by_exact_name(options.list_name, session=session)
         except NoResultFound:
             console('Could not find pending list with name `{}`'.format(options.list_name))
             return
         header = ['#', 'Title', '# of fields', 'Approved']
         table_data = [header]
-        for entry in plugin_pending_list.get_entries_by_list_id(pending_list.id, order_by='added', descending=True,
-                                                                session=session):
+        for entry in db.get_entries_by_list_id(pending_list.id, order_by='added', descending=True,
+                                               session=session):
             approved = colorize('green', entry.approved) if entry.approved else entry.approved
             table_data.append([entry.id, entry.title, len(entry.entry), approved])
     table = TerminalTable(options.table_type, table_data)
@@ -89,19 +81,19 @@ def pending_list_list(options):
 def pending_list_show(options):
     with Session() as session:
         try:
-            pending_list = plugin_pending_list.get_list_by_exact_name(options.list_name, session=session)
+            pending_list = db.get_list_by_exact_name(options.list_name, session=session)
         except NoResultFound:
             console('Could not find pending list with name {}'.format(options.list_name))
             return
 
         try:
-            entry = plugin_pending_list.get_entry_by_id(pending_list.id, int(options.entry), session=session)
+            entry = db.get_entry_by_id(pending_list.id, int(options.entry), session=session)
         except NoResultFound:
             console('Could not find matching pending entry with ID {} in list `{}`'.format(int(options.entry),
                                                                                            options.list_name))
             return
         except ValueError:
-            entry = plugin_pending_list.get_entry_by_title(pending_list.id, options.entry, session=session)
+            entry = db.get_entry_by_title(pending_list.id, options.entry, session=session)
             if not entry:
                 console('Could not find matching pending entry with title `{}` in list `{}`'.format(options.entry,
                                                                                                     options.list_name))
@@ -121,23 +113,23 @@ def pending_list_show(options):
 def pending_list_add(options):
     with Session() as session:
         try:
-            pending_list = plugin_pending_list.get_list_by_exact_name(options.list_name, session=session)
+            pending_list = db.get_list_by_exact_name(options.list_name, session=session)
         except NoResultFound:
             console('Could not find a pending list with name `{}`, creating'.format(options.list_name))
-            pending_list = plugin_pending_list.PendingListList(name=options.list_name)
+            pending_list = db.PendingListList(name=options.list_name)
             session.add(pending_list)
         session.merge(pending_list)
         session.commit()
         title = options.entry_title
         entry = {'title': options.entry_title, 'url': options.url}
-        db_entry = plugin_pending_list.get_entry_by_title(list_id=pending_list.id, title=title, session=session)
+        db_entry = db.get_entry_by_title(list_id=pending_list.id, title=title, session=session)
         if db_entry:
             console("Entry with the title `{}` already exist with list `{}`. Will replace identifiers if given".format(
                 title, pending_list.name))
             operation = 'updated'
         else:
             console("Adding entry with title `{}` to list `{}`".format(title, pending_list.name))
-            db_entry = plugin_pending_list.PendingListEntry(entry=entry, pending_list_id=pending_list.id)
+            db_entry = db.PendingListEntry(entry=entry, pending_list_id=pending_list.id)
             if options.approved:
                 console('marking entry as approved')
                 db_entry.approved = True
@@ -155,18 +147,18 @@ def pending_list_add(options):
 def pending_list_approve(options, approve=None):
     with Session() as session:
         try:
-            entry_list = plugin_pending_list.get_list_by_exact_name(options.list_name)
+            entry_list = db.get_list_by_exact_name(options.list_name)
         except NoResultFound:
             console('Could not find pending list with name `{}`'.format(options.list_name))
             return
         try:
-            db_entry = plugin_pending_list.get_entry_by_id(entry_list.id, int(options.entry), session=session)
+            db_entry = db.get_entry_by_id(entry_list.id, int(options.entry), session=session)
         except NoResultFound:
             console('Could not find matching entry with ID {} in list `{}`'.format(int(options.entry),
                                                                                    options.list_name))
             return
         except ValueError:
-            db_entry = plugin_pending_list.get_entry_by_title(entry_list.id, options.entry, session=session)
+            db_entry = db.get_entry_by_title(entry_list.id, options.entry, session=session)
             if not db_entry:
                 console('Could not find matching entry with title `{}` in list `{}`'.format(options.entry,
                                                                                             options.list_name))
@@ -182,19 +174,19 @@ def pending_list_approve(options, approve=None):
 def pending_list_del(options):
     with Session() as session:
         try:
-            entry_list = plugin_pending_list.get_list_by_exact_name(options.list_name)
+            entry_list = db.get_list_by_exact_name(options.list_name)
         except NoResultFound:
             console('Could not find pending list with name `{}`'.format(options.list_name))
             return
         try:
-            db_entry = plugin_pending_list.get_entry_by_id(entry_list.id, int(options.entry), session=session)
+            db_entry = db.get_entry_by_id(entry_list.id, int(options.entry), session=session)
         except NoResultFound:
             console(
                 'Could not find matching entry with ID {} in list `{}`'.format(int(options.entry),
                                                                                options.list_name))
             return
         except ValueError:
-            db_entry = plugin_pending_list.get_entry_by_title(entry_list.id, options.entry, session=session)
+            db_entry = db.get_entry_by_title(entry_list.id, options.entry, session=session)
             if not db_entry:
                 console(
                     'Could not find matching entry with title `{}` in list `{}`'.format(options.entry,
@@ -207,7 +199,7 @@ def pending_list_del(options):
 def pending_list_purge(options):
     with Session() as session:
         try:
-            entry_list = plugin_pending_list.get_list_by_exact_name(options.list_name)
+            entry_list = db.get_list_by_exact_name(options.list_name)
         except NoResultFound:
             console('Could not find entry list with name `{}`'.format(options.list_name))
             return

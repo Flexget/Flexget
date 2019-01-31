@@ -8,14 +8,11 @@ from math import ceil
 from flask import jsonify, request
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.plugins.list.pending_list import (
-    get_pending_lists, get_list_by_exact_name, PendingListList, get_list_by_id, delete_list_by_id,
-    get_entries_by_list_id, get_entry_by_title, PendingListEntry, get_entry_by_id
-)
 from flexget.api import api, APIResource
 from flexget.api.app import (
     NotFoundError, base_message_schema, success_response, etag, pagination_headers, Conflict, BadRequest
 )
+from . import db
 
 log = logging.getLogger('pending_list')
 
@@ -94,7 +91,7 @@ class PendingListListsAPI(APIResource):
         args = list_parser.parse_args()
         name = args.get('name')
 
-        pending_lists = [pending_list.to_dict() for pending_list in get_pending_lists(name=name, session=session)]
+        pending_lists = [pending_list.to_dict() for pending_list in db.get_pending_lists(name=name, session=session)]
         return jsonify(pending_lists)
 
     @api.validate(pending_list_input_object_schema)
@@ -106,13 +103,13 @@ class PendingListListsAPI(APIResource):
         name = data.get('name')
 
         try:
-            get_list_by_exact_name(name=name, session=session)
+            db.get_list_by_exact_name(name=name, session=session)
         except NoResultFound:
             pass
         else:
             raise Conflict('list with name \'%s\' already exists' % name)
 
-        pending_list = PendingListList()
+        pending_list = db.PendingListList()
         pending_list.name = name
         session.add(pending_list)
         session.commit()
@@ -130,7 +127,7 @@ class PendingListListAPI(APIResource):
     def get(self, list_id, session=None):
         """ Get pending list by ID """
         try:
-            list = get_list_by_id(list_id=list_id, session=session)
+            list = db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             raise NotFoundError('list_id %d does not exist' % list_id)
         return jsonify(list.to_dict())
@@ -140,7 +137,7 @@ class PendingListListAPI(APIResource):
     def delete(self, list_id, session=None):
         """ Delete pending list by ID """
         try:
-            delete_list_by_id(list_id=list_id, session=session)
+            db.delete_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             raise NotFoundError('list_id %d does not exist' % list_id)
         return success_response('list successfully deleted')
@@ -166,7 +163,7 @@ class PendingListEntriesAPI(APIResource):
     def get(self, list_id, session=None):
         """ Get entries by list ID """
         try:
-            list = get_list_by_id(list_id=list_id, session=session)
+            list = db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             raise NotFoundError('list_id %d does not exist' % list_id)
 
@@ -204,7 +201,7 @@ class PendingListEntriesAPI(APIResource):
             return jsonify([])
 
         log.debug('pending lists entries count is %d', total_items)
-        entries = [entry.to_dict() for entry in get_entries_by_list_id(**kwargs)]
+        entries = [entry.to_dict() for entry in db.get_entries_by_list_id(**kwargs)]
 
         # Total number of pages
         total_pages = int(ceil(total_items / float(per_page)))
@@ -231,15 +228,15 @@ class PendingListEntriesAPI(APIResource):
     def post(self, list_id, session=None):
         """ Create a new entry object"""
         try:
-            get_list_by_id(list_id=list_id, session=session)
+            db.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             raise NotFoundError('list_id %d does not exist' % list_id)
         data = request.json
         title = data.get('title')
-        entry_object = get_entry_by_title(list_id=list_id, title=title, session=session)
+        entry_object = db.get_entry_by_title(list_id=list_id, title=title, session=session)
         if entry_object:
             raise Conflict('entry with title \'%s\' already exists' % title)
-        entry_object = PendingListEntry(entry=data, pending_list_id=list_id)
+        entry_object = db.PendingListEntry(entry=data, pending_list_id=list_id)
         if data.get('approved'):
             entry_object.approved = data['approved']
         session.add(entry_object)
@@ -258,7 +255,7 @@ class PendingListEntryAPI(APIResource):
     def get(self, list_id, entry_id, session=None):
         """ Get an entry by list ID and entry ID """
         try:
-            entry = get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
+            entry = db.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
             raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
 
@@ -268,7 +265,7 @@ class PendingListEntryAPI(APIResource):
     def delete(self, list_id, entry_id, session=None):
         """ Delete an entry by list ID and entry ID """
         try:
-            entry = get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
+            entry = db.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
             raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
         log.debug('deleting movie %d', entry.id)
@@ -281,7 +278,7 @@ class PendingListEntryAPI(APIResource):
     def put(self, list_id, entry_id, session=None):
         """Sets entry object's pending status"""
         try:
-            entry = get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
+            entry = db.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
             raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
         data = request.json

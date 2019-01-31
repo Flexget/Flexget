@@ -3,7 +3,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
 
-from flexget.plugins.list.imdb_list import ImdbEntrySet
+from flexget.components.managed_lists.lists.imdb_list import ImdbEntrySet
 
 
 @pytest.mark.skip(reason="It rarely works")

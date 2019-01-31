@@ -436,6 +436,7 @@ def _load_plugins_from_dirs(dirs):
     _check_phase_queue()
 
 
+# TODO: this is now identical to _load_plugins_from_dirs, REMOVE
 def _load_components_from_dirs(dirs):
     """
     :param list dirs: Directories where plugin components are loaded from
@@ -448,7 +449,7 @@ def _load_components_from_dirs(dirs):
                 continue
             # Split the relative path from the plugins dir to current file's parent dir to find subpackage names
             plugin_subpackages = [_f for _f in component_path.relpath(component_dir).parent.splitall() if _f]
-            package_name = '.'.join([components_pkg.__name__] + plugin_subpackages)
+            package_name = '.'.join([components_pkg.__name__] + plugin_subpackages + [component_path.stem])
             _import_plugin(package_name, component_path)
     _check_phase_queue()
 

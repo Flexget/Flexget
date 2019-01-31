@@ -4,10 +4,10 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import copy
 
 from flexget.api.app import base_message
-from flexget.api.plugins.pending_list import ObjectsContainer as OC
+from flexget.components.managed_lists.lists.pending_list.api import ObjectsContainer as OC
 from flexget.entry import Entry
 from flexget.manager import Session
-from flexget.plugins.list.pending_list import PendingListList, PendingListEntry
+from flexget.components.managed_lists.lists.pending_list.db import PendingListList, PendingListEntry
 from flexget.utils import json
 
 

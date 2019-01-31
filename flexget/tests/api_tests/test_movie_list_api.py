@@ -1,12 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import copy
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from flexget.api.app import empty_response, base_message
-from flexget.api.plugins.movie_list import ObjectsContainer as OC
+from flexget.api.app import base_message
+from flexget.components.managed_lists.lists.movie_list.api import ObjectsContainer as OC
+from flexget.components.managed_lists.lists.movie_list.db import MovieListBase, MovieListList, MovieListMovie
+from flexget.components.managed_lists.lists.movie_list.movie_list import MovieListBase
 from flexget.manager import Session
-from flexget.plugins.list.movie_list import MovieListBase, MovieListList, MovieListMovie
 from flexget.utils import json
 
 

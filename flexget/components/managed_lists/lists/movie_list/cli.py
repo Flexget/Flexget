@@ -13,14 +13,8 @@ from flexget.manager import Session
 from flexget.plugin import PluginError, DependencyError
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 from flexget.utils.tools import split_title_year
-
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.list import movie_list as plugin_movie_list
-except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='movie_list',
-    )
+from . import db
+from .movie_list import MovieListBase
 
 
 def lookup_movie(title, session, identifiers=None):
@@ -59,9 +53,9 @@ def movie_list_keyword_type(identifier):
         raise ArgumentTypeError('Received identifier in wrong format: {}, '
                                 ' should be in keyword format like `imdb_id=tt1234567`'.format(identifier))
     name, value = identifier.split('=', 2)
-    if name not in plugin_movie_list.MovieListBase().supported_ids:
+    if name not in MovieListBase().supported_ids:
         raise ArgumentTypeError('Received unsupported identifier ID {}. Should be one of {}'
-                                .format(identifier, ' ,'.join(plugin_movie_list.MovieListBase().supported_ids)))
+                                .format(identifier, ' ,'.join(MovieListBase().supported_ids)))
     return {name: value}
 
 
@@ -90,7 +84,7 @@ def do_cli(manager, options):
 
 def movie_list_lists(options):
     """ Show all movie lists """
-    lists = plugin_movie_list.get_movie_lists()
+    lists = db.get_movie_lists()
     header = ['#', 'List Name']
     table_data = [header]
     for movie_list in lists:
@@ -107,17 +101,17 @@ def movie_list_list(options):
     """List movie list"""
     with Session() as session:
         try:
-            movie_list = plugin_movie_list.get_list_by_exact_name(options.list_name)
+            movie_list = db.get_list_by_exact_name(options.list_name)
         except NoResultFound:
             console('Could not find movie list with name {}'.format(options.list_name))
             return
     header = ['#', 'Movie Name', 'Movie year']
-    header += plugin_movie_list.MovieListBase().supported_ids
+    header += db.MovieListBase().supported_ids
     table_data = [header]
-    movies = plugin_movie_list.get_movies_by_list_id(movie_list.id, order_by='added', descending=True, session=session)
+    movies = db.get_movies_by_list_id(movie_list.id, order_by='added', descending=True, session=session)
     for movie in movies:
         movie_row = [movie.id, movie.title, movie.year or '']
-        for identifier in plugin_movie_list.MovieListBase().supported_ids:
+        for identifier in db.MovieListBase().supported_ids:
             movie_row.append(movie.identifiers.get(identifier, ''))
         table_data.append(movie_row)
     title = '{} Movies in movie list: `{}`'.format(len(movies), options.list_name)
@@ -132,10 +126,10 @@ def movie_list_list(options):
 def movie_list_add(options):
     with Session() as session:
         try:
-            movie_list = plugin_movie_list.get_list_by_exact_name(options.list_name, session=session)
+            movie_list = db.get_list_by_exact_name(options.list_name, session=session)
         except NoResultFound:
             console('Could not find movie list with name {}, creating'.format(options.list_name))
-            movie_list = plugin_movie_list.MovieListList(name=options.list_name)
+            movie_list = db.MovieListList(name=options.list_name)
             session.add(movie_list)
             session.commit()
 
@@ -147,11 +141,11 @@ def movie_list_add(options):
             return
 
         title = movie_lookup['movie_name']
-        movie = plugin_movie_list.get_movie_by_title_and_year(list_id=movie_list.id, title=title, year=year,
-                                                              session=session)
+        movie = db.get_movie_by_title_and_year(list_id=movie_list.id, title=title, year=year,
+                                               session=session)
         if not movie:
             console("Adding movie with title {} to list {}".format(title, movie_list.name))
-            movie = plugin_movie_list.MovieListMovie(title=title, year=year, list_id=movie_list.id)
+            movie = db.MovieListMovie(title=title, year=year, list_id=movie_list.id)
         else:
             console("Movie with title {} already exist in list {}".format(title, movie_list.name))
 
@@ -159,7 +153,7 @@ def movie_list_add(options):
         if options.identifiers:
             id_list = options.identifiers
         else:
-            for _id in plugin_movie_list.MovieListBase().supported_ids:
+            for _id in db.MovieListBase().supported_ids:
                 if movie_lookup.get(_id):
                     id_list.append({_id: movie_lookup.get(_id)})
         if id_list:
@@ -167,7 +161,7 @@ def movie_list_add(options):
             for ident in id_list:
                 for key in ident:
                     console('{}: {}'.format(key, ident[key]))
-            movie.ids = plugin_movie_list.get_db_movie_identifiers(identifier_list=id_list, session=session)
+            movie.ids = db.get_db_movie_identifiers(identifier_list=id_list, session=session)
         session.merge(movie)
         console('Successfully added movie {} to movie list {} '.format(title, movie_list.name))
 
@@ -175,21 +169,21 @@ def movie_list_add(options):
 def movie_list_del(options):
     with Session() as session:
         try:
-            movie_list = plugin_movie_list.get_list_by_exact_name(options.list_name)
+            movie_list = db.get_list_by_exact_name(options.list_name)
         except NoResultFound:
             console('Could not find movie list with name {}'.format(options.list_name))
             return
 
         try:
-            movie_exist = plugin_movie_list.get_movie_by_id(list_id=movie_list.id, movie_id=int(options.movie),
-                                                            session=session)
+            movie_exist = db.get_movie_by_id(list_id=movie_list.id, movie_id=int(options.movie),
+                                             session=session)
         except NoResultFound:
             console('Could not find movie with ID {} in list `{}`'.format(int(options.movie), options.list_name))
             return
         except ValueError:
             title, year = split_title_year(options.movie)
-            movie_exist = plugin_movie_list.get_movie_by_title_and_year(list_id=movie_list.id, title=title, year=year,
-                                                                        session=session)
+            movie_exist = db.get_movie_by_title_and_year(list_id=movie_list.id, title=title, year=year,
+                                                         session=session)
         if not movie_exist:
             console('Could not find movie with title {} in list {}'.format(options.movie, options.list_name))
             return
@@ -201,7 +195,7 @@ def movie_list_del(options):
 def movie_list_purge(options):
     with Session() as session:
         try:
-            movie_list = plugin_movie_list.get_list_by_exact_name(options.list_name)
+            movie_list = db.get_list_by_exact_name(options.list_name)
         except NoResultFound:
             console('Could not find movie list with name {}'.format(options.list_name))
             return
