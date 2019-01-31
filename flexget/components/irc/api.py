@@ -52,7 +52,7 @@ class IRCStatus(APIResource):
     @api.response(BadRequest)
     def get(self, session=None):
         """Returns status of IRC connections"""
-        from flexget.plugins.daemon.irc import irc_manager
+        from .irc import irc_manager
         if irc_manager is None:
             raise BadRequest('IRC daemon does not appear to be running')
 
@@ -85,7 +85,7 @@ class IRCRestart(APIResource):
     @api.response(BadRequest)
     def get(self, session=None):
         """Restarts IRC connections"""
-        from flexget.plugins.daemon.irc import irc_manager
+        from .irc import irc_manager
         if irc_manager is None:
             raise BadRequest('IRC daemon does not appear to be running')
 
@@ -110,7 +110,7 @@ class IRCStop(APIResource):
     @api.response(BadRequest)
     def get(self, session=None):
         """Stops IRC connections"""
-        from flexget.plugins.daemon.irc import irc_manager
+        from .irc import irc_manager
         if irc_manager is None:
             raise BadRequest('IRC daemon does not appear to be running')
 
