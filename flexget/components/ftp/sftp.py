@@ -21,7 +21,7 @@ log = logging.getLogger('sftp')
 ConnectionConfig = namedtuple('ConnectionConfig', ['host', 'port', 'username', 'password',
                                                    'private_key', 'private_key_pass'])
 
-# retry configuration contants
+# retry configuration constants
 CONNECT_TRIES = 3
 RETRY_INTERVAL = 15
 RETRY_STEP = 5
