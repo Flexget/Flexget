@@ -9,7 +9,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource
 from flexget.api.app import base_message_schema, success_response, NotFoundError, etag, pagination_headers
-from flexget.plugins.filter.retry_failed import FailedEntry, get_failures
+from . import db
 
 log = logging.getLogger('failed_api')
 
@@ -81,12 +81,12 @@ class RetryFailed(APIResource):
             'session': session
         }
 
-        total_items = get_failures(session, count=True)
+        total_items = db.get_failures(session, count=True)
 
         if not total_items:
             return jsonify([])
 
-        failed_entries = [failed.to_dict() for failed in get_failures(**kwargs)]
+        failed_entries = [failed.to_dict() for failed in db.get_failures(**kwargs)]
 
         total_pages = int(ceil(total_items / float(per_page)))
 
@@ -111,7 +111,7 @@ class RetryFailed(APIResource):
     def delete(self, session=None):
         """ Clear all failed entries """
         log.debug('deleting all failed entries')
-        deleted = session.query(FailedEntry).delete()
+        deleted = session.query(db.FailedEntry).delete()
         return success_response('successfully deleted %d failed entries' % deleted)
 
 
@@ -124,7 +124,7 @@ class RetryFailedID(APIResource):
     def get(self, failed_entry_id, session=None):
         """ Get failed entry by ID """
         try:
-            failed_entry = session.query(FailedEntry).filter(FailedEntry.id == failed_entry_id).one()
+            failed_entry = session.query(db.FailedEntry).filter(db.FailedEntry.id == failed_entry_id).one()
         except NoResultFound:
             raise NotFoundError('could not find entry with ID %i' % failed_entry_id)
         return jsonify(failed_entry.to_dict())
@@ -133,7 +133,7 @@ class RetryFailedID(APIResource):
     def delete(self, failed_entry_id, session=None):
         """ Delete failed entry by ID """
         try:
-            failed_entry = session.query(FailedEntry).filter(FailedEntry.id == failed_entry_id).one()
+            failed_entry = session.query(db.FailedEntry).filter(db.FailedEntry.id == failed_entry_id).one()
         except NoResultFound:
             raise NotFoundError('could not find entry with ID %i' % failed_entry_id)
         log.debug('deleting failed entry: "%s"' % failed_entry.title)

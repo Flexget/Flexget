@@ -3,18 +3,10 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import options
-from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
-
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.filter import retry_failed as plugin_retry_failed
-except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='retry_failed',
-    )
+from . import db
 
 
 def do_cli(manager, options):
@@ -26,7 +18,7 @@ def do_cli(manager, options):
 
 def list_failed(options):
     with Session() as session:
-        results = session.query(plugin_retry_failed.FailedEntry).all()
+        results = session.query(db.FailedEntry).all()
         header = ['#', 'Title', 'Fail count', 'Reason', 'Failure time']
         table_data = [header]
         for entry in results:
@@ -43,8 +35,9 @@ def list_failed(options):
 
 
 def clear_failed(manager):
+    # TODO: this should be a function in db.py
     with Session() as session:
-        results = session.query(plugin_retry_failed.FailedEntry).delete()
+        results = session.query(db.FailedEntry).delete()
         console('Cleared %i items.' % results)
         session.commit()
         if results:
