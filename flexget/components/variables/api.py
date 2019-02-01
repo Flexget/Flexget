@@ -1,5 +1,4 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -7,7 +6,7 @@ from flask import request, jsonify
 
 from flexget.api import api, APIResource
 from flexget.api.app import empty_response, etag
-from flexget.plugins.modify.variables import variables_from_db, variables_to_db
+from flexget.components.variables.variables import variables_from_db, variables_to_db
 
 log = logging.getLogger('variables')
 
