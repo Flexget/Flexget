@@ -7,7 +7,7 @@ import pytest
 from flexget.api.app import base_message
 from flexget.components.series.api import ObjectsContainer as OC
 from flexget.components.thetvdb.api import ObjectsContainer as tvdb
-from flexget.api.plugins.tvmaze_lookup import ObjectsContainer as tvmaze
+from flexget.components.tvmaze.api import ObjectsContainer as tvmaze
 from flexget.components.seen.db import SeenEntry
 from flexget.manager import Session
 # TODO: would be nicer to import db module

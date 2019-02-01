@@ -6,7 +6,7 @@ from flask_restplus import inputs
 
 from flexget.api import api, APIResource
 from flexget.api.app import NotFoundError, BadRequest, etag
-from flexget.plugins.internal.api_tvmaze import APITVMaze as tvm
+from flexget.components.tvmaze.api_tvmaze import APITVMaze as tvm
 
 tvmaze_api = api.namespace('tvmaze', description='TVMaze Shows')
 

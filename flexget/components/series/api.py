@@ -35,7 +35,7 @@ from flexget import plugin
 
 try:
     # NOTE: Importing other plugins is discouraged!
-    from flexget.api.plugins.tvmaze_lookup import ObjectsContainer as tvmaze
+    from flexget.components.tvmaze.api import ObjectsContainer as tvmaze
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='tvmaze_lookup')
 
