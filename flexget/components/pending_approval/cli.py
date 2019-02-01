@@ -8,18 +8,10 @@ from colorclass.toggles import disable_all_colors
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import options
-from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console, colorize
-
-try:
-    # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.filter import pending_approval as plugin_pending_approval
-except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='pending_approval',
-    )
+from . import db
 
 
 def valid_entry(value):
@@ -51,7 +43,7 @@ def list_entries(options):
     task_name = options.task_name
 
     with Session() as session:
-        entries = plugin_pending_approval.list_pending_entries(session=session, task_name=task_name, approved=approved)
+        entries = db.list_pending_entries(session=session, task_name=task_name, approved=approved)
         header = ['#', 'Task Name', 'Title', 'URL', 'Approved', 'Added']
         table_data = [header]
         for entry in entries:
@@ -75,10 +67,10 @@ def manage_entries(options, selection, approved):
     approved_text = 'approved' if approved else 'pending'
     with Session() as session:
         if selection == 'all':
-            entries = plugin_pending_approval.list_pending_entries(session=session, approved=not approved)
+            entries = db.list_pending_entries(session=session, approved=not approved)
         else:
             try:
-                entry = plugin_pending_approval.get_entry_by_id(session, selection)
+                entry = db.get_entry_by_id(session, selection)
                 if entry.approved is approved:
                     console(colorize('red', 'ERROR: ') + 'Entry with ID %s is already %s' % (entry.id, approved_text))
                     sys.exit(1)
@@ -99,9 +91,9 @@ def manage_entries(options, selection, approved):
 def clear_entries(options):
     """Clear pending entries"""
     with Session() as session:
-        query = session.query(plugin_pending_approval.PendingEntry).filter(plugin_pending_approval.PendingEntry.approved == False)
+        query = session.query(db.PendingEntry).filter(db.PendingEntry.approved == False)
         if options.task_name:
-            query = query.filter(plugin_pending_approval.PendingEntry.task_name == options.task_name)
+            query = query.filter(db.PendingEntry.task_name == options.task_name)
         deleted = query.delete()
         console('Successfully deleted %i pending entries' % deleted)
 
