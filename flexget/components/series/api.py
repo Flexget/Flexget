@@ -39,7 +39,7 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='tvmaze_lookup')
 
-series_api = api.namespace('series', description='Flexget Series operations')
+series_api = api.namespace('series', description='FlexGet Series operations')
 
 
 def series_details(show, begin=False, latest=False):
