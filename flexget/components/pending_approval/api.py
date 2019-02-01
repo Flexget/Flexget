@@ -5,10 +5,11 @@ from math import ceil
 
 from flask import jsonify, request
 from flask_restplus import inputs
-from flexget.components.pending_approval.api import list_pending_entries, PendingEntry, get_entry_by_id
 from flexget.api import api, APIResource
 from flexget.api.app import base_message_schema, success_response, NotFoundError, etag, pagination_headers, BadRequest
 from sqlalchemy.orm.exc import NoResultFound
+
+from . import db
 
 pending_api = api.namespace('pending', description='View and manage pending entries')
 
@@ -98,12 +99,12 @@ class PendingEntriesAPI(APIResource):
             'session': session
         }
 
-        total_items = session.query(PendingEntry).count()
+        total_items = session.query(db.PendingEntry).count()
 
         if not total_items:
             return jsonify([])
 
-        pending_entries = [pending.to_dict() for pending in list_pending_entries(**kwargs)]
+        pending_entries = [pending.to_dict() for pending in db.list_pending_entries(**kwargs)]
 
         total_pages = int(ceil(total_items / float(per_page)))
 
@@ -137,7 +138,7 @@ class PendingEntriesAPI(APIResource):
         task_name = args.get('task_name')
 
         pending_entries = []
-        for entry in list_pending_entries(session, task_name=task_name):
+        for entry in db.list_pending_entries(session, task_name=task_name):
             if entry.approved is not approved:
                 entry.approved = approved
                 pending_entries.append(entry.to_dict())
@@ -156,11 +157,11 @@ class PendingEntriesAPI(APIResource):
         task_name = args.get('task_name')
         approved = args.get('approved')
 
-        deleted = session.query(PendingEntry)
+        deleted = session.query(db.PendingEntry)
         if task_name:
-            deleted = deleted.filter(PendingEntry.task_name == task_name)
+            deleted = deleted.filter(db.PendingEntry.task_name == task_name)
         if approved:
-            deleted = deleted.filter(PendingEntry.approved == approved)
+            deleted = deleted.filter(db.PendingEntry.approved == approved)
         deleted = deleted.delete()
 
         return success_response('deleted %s pending entries'.format(deleted))
@@ -175,7 +176,7 @@ class PendingEntryAPI(APIResource):
     def get(self, entry_id, session=None):
         """Get a pending entry by ID"""
         try:
-            entry = get_entry_by_id(session, entry_id)
+            entry = db.get_entry_by_id(session, entry_id)
         except NoResultFound:
             raise NotFoundError('No pending entry with ID %s' % entry_id)
         return jsonify(entry.to_dict())
@@ -186,7 +187,7 @@ class PendingEntryAPI(APIResource):
     def put(self, entry_id, session=None):
         """Approve/Reject the status of a pending entry"""
         try:
-            entry = get_entry_by_id(session, entry_id)
+            entry = db.get_entry_by_id(session, entry_id)
         except NoResultFound:
             raise NotFoundError('No pending entry with ID %s' % entry_id)
 
@@ -206,7 +207,7 @@ class PendingEntryAPI(APIResource):
     def delete(self, entry_id, session=None):
         """Delete a pending entry"""
         try:
-            entry = get_entry_by_id(session, entry_id)
+            entry = db.get_entry_by_id(session, entry_id)
         except NoResultFound:
             raise NotFoundError('No pending entry with ID %s' % entry_id)
         session.delete(entry)

@@ -13,7 +13,7 @@ from flexget.utils.tools import split_title_year
 
 try:
     # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.internal import api_tvdb as plugin_api_tvdb
+    from flexget.components.thetvdb import api_tvdb as plugin_api_tvdb
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='api_tvdb')
 

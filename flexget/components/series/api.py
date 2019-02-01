@@ -27,7 +27,7 @@ from .utils import normalize_series_name
 
 try:
     # NOTE: Importing other plugins is discouraged!
-    from flexget.api.plugins.tvdb_lookup import ObjectsContainer as tvdb
+    from flexget.components.thetvdb.api import ObjectsContainer as tvdb
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='tvdb_lookup')
 

@@ -10,12 +10,12 @@ import mock
 import pytest
 
 from flexget.manager import Session
-from flexget.plugins.internal.api_tvdb import persist, TVDBSearchResult, lookup_series, mark_expired, TVDBRequest, \
+from flexget.components.thetvdb.api_tvdb import persist, TVDBSearchResult, lookup_series, mark_expired, TVDBRequest, \
     TVDBEpisode, \
     find_series_id
 
 
-@mock.patch('flexget.plugins.internal.api_tvdb.mark_expired')
+@mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')
 @pytest.mark.online
 class TestTVDBLookup(object):
     config = """
@@ -272,7 +272,7 @@ class TestTVDBExpire(object):
             assert not ep.series.expired
 
 
-@mock.patch('flexget.plugins.internal.api_tvdb.mark_expired')
+@mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')
 @pytest.mark.online
 class TestTVDBList(object):
     """
@@ -328,7 +328,7 @@ class TestTVDBList(object):
             'series Hawaii Five-0 (2010) should have date stripped'
 
 
-@mock.patch('flexget.plugins.internal.api_tvdb.mark_expired')
+@mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')
 @pytest.mark.online
 class TestTVDBFavorites(object):
     """
@@ -384,7 +384,7 @@ class TestTVDBFavorites(object):
             'series Hawaii Five-0 (2010) should have date stripped'
 
 
-@mock.patch('flexget.plugins.internal.api_tvdb.mark_expired')
+@mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')
 @pytest.mark.online
 class TestTheTVDBLanguages(object):
     config = """
