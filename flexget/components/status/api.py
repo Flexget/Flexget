@@ -31,9 +31,9 @@ class ObjectsContainer(object):
             'rejected': {'type': 'integer'},
             'start': {'type': 'string', 'format': 'date-time'},
             'succeeded': {'type': 'boolean'},
-            'task_id': {'type': 'integer'}
+            'task_id': {'type': 'integer'},
         },
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     executions_list = {'type': 'array', 'items': task_status_execution_schema}
@@ -44,23 +44,29 @@ class ObjectsContainer(object):
             'id': {'type': 'integer'},
             'name': {'type': 'string'},
             'last_execution_time': {'type': ['string', 'null'], 'format': 'date-time'},
-            'last_execution': task_status_execution_schema
+            'last_execution': task_status_execution_schema,
         },
         'required': ['id', 'name'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     task_status_list_schema = {'type': 'array', 'items': task_status_schema}
 
 
 task_status = api.schema_model('tasks.tasks_status', ObjectsContainer.task_status_schema)
-task_status_list = api.schema_model('tasks.tasks_status_list', ObjectsContainer.task_status_list_schema)
+task_status_list = api.schema_model(
+    'tasks.tasks_status_list', ObjectsContainer.task_status_list_schema
+)
 task_executions = api.schema_model('tasks.tasks_executions_list', ObjectsContainer.executions_list)
 
 sort_choices = ('last_execution_time', 'name', 'id')
 tasks_parser = api.pagination_parser(sort_choices=sort_choices)
-tasks_parser.add_argument('include_execution', type=inputs.boolean, default=True,
-                          help='Include the last execution of the task')
+tasks_parser.add_argument(
+    'include_execution',
+    type=inputs.boolean,
+    default=True,
+    help='Include the last execution of the task',
+)
 
 
 @tasks_api.route('/status/')
@@ -95,7 +101,7 @@ class TasksStatusAPI(APIResource):
             'stop': stop,
             'order_by': sort_by,
             'descending': descending,
-            'session': session
+            'session': session,
         }
 
         total_items = session.query(db.StatusTask).count()
@@ -160,15 +166,38 @@ class TaskStatusAPI(APIResource):
 default_start_date = (datetime.now() - timedelta(weeks=1)).strftime('%Y-%m-%d')
 
 executions_parser = api.parser()
-executions_parser.add_argument('succeeded', type=inputs.boolean, default=True, help='Filter by success status')
-executions_parser.add_argument('produced', type=inputs.boolean, default=True, store_missing=False,
-                               help='Filter by tasks that produced entries')
-executions_parser.add_argument('start_date', type=inputs.datetime_from_iso8601, default=default_start_date,
-                               help='Filter by minimal start date. Example: \'2012-01-01\'. Default is 1 week ago.')
-executions_parser.add_argument('end_date', type=inputs.datetime_from_iso8601,
-                               help='Filter by maximal end date. Example: \'2012-01-01\'')
+executions_parser.add_argument(
+    'succeeded', type=inputs.boolean, default=True, help='Filter by success status'
+)
+executions_parser.add_argument(
+    'produced',
+    type=inputs.boolean,
+    default=True,
+    store_missing=False,
+    help='Filter by tasks that produced entries',
+)
+executions_parser.add_argument(
+    'start_date',
+    type=inputs.datetime_from_iso8601,
+    default=default_start_date,
+    help='Filter by minimal start date. Example: \'2012-01-01\'. Default is 1 week ago.',
+)
+executions_parser.add_argument(
+    'end_date',
+    type=inputs.datetime_from_iso8601,
+    help='Filter by maximal end date. Example: \'2012-01-01\'',
+)
 
-sort_choices = ('start', 'end', 'succeeded', 'produced', 'accepted', 'rejected', 'failed', 'abort_reason')
+sort_choices = (
+    'start',
+    'end',
+    'succeeded',
+    'produced',
+    'accepted',
+    'rejected',
+    'failed',
+    'abort_reason',
+)
 executions_parser = api.pagination_parser(executions_parser, sort_choices=sort_choices)
 
 
@@ -217,7 +246,7 @@ class TaskStatusExecutionsAPI(APIResource):
             'produced': produced,
             'start_date': start_date,
             'end_date': end_date,
-            'session': session
+            'session': session,
         }
 
         total_items = task.executions.count()

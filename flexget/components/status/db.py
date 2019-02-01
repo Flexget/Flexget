@@ -30,7 +30,9 @@ class StatusTask(Base):
     __tablename__ = 'status_task'
     id = Column(Integer, primary_key=True)
     name = Column('task', String)
-    executions = relation('TaskExecution', backref='task', cascade='all, delete, delete-orphan', lazy='dynamic')
+    executions = relation(
+        'TaskExecution', backref='task', cascade='all, delete, delete-orphan', lazy='dynamic'
+    )
 
     def __repr__(self):
         return '<StatusTask(id=%s,name=%s)>' % (self.id, self.name)
@@ -43,15 +45,15 @@ class StatusTask(Base):
 
     @last_execution_time.expression
     def last_execution_time(cls):
-        return select([func.max(TaskExecution.start)]).where(TaskExecution.task_id == cls.id). \
-            correlate(StatusTask.__table__).label('last_execution_time')
+        return (
+            select([func.max(TaskExecution.start)])
+            .where(TaskExecution.task_id == cls.id)
+            .correlate(StatusTask.__table__)
+            .label('last_execution_time')
+        )
 
     def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'last_execution_time': self.last_execution_time
-        }
+        return {'id': self.id, 'name': self.name, 'last_execution_time': self.last_execution_time}
 
 
 class TaskExecution(Base):
@@ -70,9 +72,20 @@ class TaskExecution(Base):
     abort_reason = Column(String, nullable=True)
 
     def __repr__(self):
-        return ('<TaskExecution(task_id=%s,start=%s,end=%s,succeeded=%s,p=%s,a=%s,r=%s,f=%s,reason=%s)>' %
-                (self.task_id, self.start, self.end, self.succeeded, self.produced, self.accepted,
-                 self.rejected, self.failed, self.abort_reason))
+        return (
+            '<TaskExecution(task_id=%s,start=%s,end=%s,succeeded=%s,p=%s,a=%s,r=%s,f=%s,reason=%s)>'
+            % (
+                self.task_id,
+                self.start,
+                self.end,
+                self.succeeded,
+                self.produced,
+                self.accepted,
+                self.rejected,
+                self.failed,
+                self.abort_reason,
+            )
+        )
 
     def to_dict(self):
         return {
@@ -85,12 +98,17 @@ class TaskExecution(Base):
             'accepted': self.accepted,
             'rejected': self.rejected,
             'failed': self.failed,
-            'abort_reason': self.abort_reason
+            'abort_reason': self.abort_reason,
         }
 
 
-Index('ix_status_execution_task_id_start_end_succeeded', TaskExecution.task_id, TaskExecution.start, TaskExecution.end,
-      TaskExecution.succeeded)
+Index(
+    'ix_status_execution_task_id_start_end_succeeded',
+    TaskExecution.task_id,
+    TaskExecution.start,
+    TaskExecution.end,
+    TaskExecution.succeeded,
+)
 
 
 @event('manager.db_cleanup')
@@ -102,15 +120,26 @@ def db_cleanup(manager, session):
             session.delete(status_task)
 
     # Purge task executions older than 1 year
-    result = session.query(TaskExecution).filter(
-        TaskExecution.start < datetime.datetime.now() - timedelta(days=365)).delete()
+    result = (
+        session.query(TaskExecution)
+        .filter(TaskExecution.start < datetime.datetime.now() - timedelta(days=365))
+        .delete()
+    )
     if result:
         log.verbose('Removed %s task executions from history older than 1 year', result)
 
 
 @with_session
-def get_status_tasks(start=None, stop=None, order_by='last_execution_time', descending=True, session=None):
-    log.debug('querying status tasks: start=%s, stop=%s, order_by=%s, descending=%s', start, stop, order_by, descending)
+def get_status_tasks(
+    start=None, stop=None, order_by='last_execution_time', descending=True, session=None
+):
+    log.debug(
+        'querying status tasks: start=%s, stop=%s, order_by=%s, descending=%s',
+        start,
+        stop,
+        order_by,
+        descending,
+    )
     query = session.query(StatusTask)
     if descending:
         query = query.order_by(getattr(StatusTask, order_by).desc())
@@ -120,11 +149,31 @@ def get_status_tasks(start=None, stop=None, order_by='last_execution_time', desc
 
 
 @with_session
-def get_executions_by_task_id(task_id, start=None, stop=None, order_by='start', descending=True,
-                              succeeded=None, produced=True, start_date=None, end_date=None, session=None):
-    log.debug('querying task executions: task_id=%s, start=%s, stop=%s, order_by=%s, descending=%s, succeeded=%s,'
-              ' produced=%s, start_date=%s, end_date=%s', task_id, start, stop, order_by, descending, succeeded,
-              produced, start_date, end_date)
+def get_executions_by_task_id(
+    task_id,
+    start=None,
+    stop=None,
+    order_by='start',
+    descending=True,
+    succeeded=None,
+    produced=True,
+    start_date=None,
+    end_date=None,
+    session=None,
+):
+    log.debug(
+        'querying task executions: task_id=%s, start=%s, stop=%s, order_by=%s, descending=%s, succeeded=%s,'
+        ' produced=%s, start_date=%s, end_date=%s',
+        task_id,
+        start,
+        stop,
+        order_by,
+        descending,
+        succeeded,
+        produced,
+        start_date,
+        end_date,
+    )
     query = session.query(TaskExecution).filter(TaskExecution.task_id == task_id)
     if succeeded:
         query = query.filter(TaskExecution.succeeded == succeeded)

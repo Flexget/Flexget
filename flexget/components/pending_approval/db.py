@@ -34,8 +34,9 @@ class PendingEntry(Base):
         self.entry = entry
 
     def __repr__(self):
-        return '<PendingEntry(task_name={},title={},url={},approved={})>' \
-            .format(self.task_name, self.title, self.url, self.approved)
+        return '<PendingEntry(task_name={},title={},url={},approved={})>'.format(
+            self.task_name, self.title, self.url, self.approved
+        )
 
     def to_dict(self):
         return {
@@ -44,20 +45,25 @@ class PendingEntry(Base):
             'title': self.title,
             'url': self.url,
             'approved': self.approved,
-            'added': self.added
+            'added': self.added,
         }
 
 
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
     # Clean unapproved entries older than 1 year
-    deleted = session.query(PendingEntry).filter(PendingEntry.added < datetime.now() - timedelta(days=365)).delete()
+    deleted = (
+        session.query(PendingEntry)
+        .filter(PendingEntry.added < datetime.now() - timedelta(days=365))
+        .delete()
+    )
     if deleted:
         log.info('Purged %i pending entries older than 1 year', deleted)
 
 
-def list_pending_entries(session, task_name=None, approved=None, start=None, stop=None, sort_by='added',
-                         descending=True):
+def list_pending_entries(
+    session, task_name=None, approved=None, start=None, stop=None, sort_by='added', descending=True
+):
     log.debug('querying pending entries')
     query = session.query(PendingEntry)
     if task_name:

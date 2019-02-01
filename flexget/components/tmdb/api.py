@@ -23,11 +23,21 @@ class ObjectsContainer(object):
             'aspect_ratio': {'type': 'number'},
             'vote_average': {'type': 'number'},
             'vote_count': {'type': 'integer'},
-            'language_code': {'type': ['string', 'null']}
+            'language_code': {'type': ['string', 'null']},
         },
-        'required': ['id', 'movie_id', 'urls', 'file_path', 'width', 'height', 'aspect_ratio', 'vote_average',
-                     'vote_count', 'language_code'],
-        'additionalProperties': False
+        'required': [
+            'id',
+            'movie_id',
+            'urls',
+            'file_path',
+            'width',
+            'height',
+            'aspect_ratio',
+            'vote_average',
+            'vote_count',
+            'language_code',
+        ],
+        'additionalProperties': False,
     }
     movie_object = {
         'type': 'object',
@@ -53,12 +63,29 @@ class ObjectsContainer(object):
             'backdrops': {'type': 'array', 'items': poster_object},
             'genres': {'type': 'array', 'items': {'type': 'string'}},
             'updated': {'type': 'string', 'format': 'date-time'},
-            'lookup_language': {'type': ['string', 'null']}
+            'lookup_language': {'type': ['string', 'null']},
         },
-        'required': ['id', 'name', 'year', 'original_name', 'alternative_name', 'runtime', 'language',
-                     'overview', 'tagline', 'rating', 'votes', 'popularity', 'adult', 'budget', 'revenue', 'homepage',
-                     'genres', 'updated'],
-        'additionalProperties': False
+        'required': [
+            'id',
+            'name',
+            'year',
+            'original_name',
+            'alternative_name',
+            'runtime',
+            'language',
+            'overview',
+            'tagline',
+            'rating',
+            'votes',
+            'popularity',
+            'adult',
+            'budget',
+            'revenue',
+            'homepage',
+            'genres',
+            'updated',
+        ],
+        'additionalProperties': False,
     }
 
 
@@ -73,9 +100,15 @@ tmdb_parser.add_argument('tmdb_id', help='TMDB ID')
 tmdb_parser.add_argument('language', help='ISO 639-1 language code')
 tmdb_parser.add_argument('year', type=int, help='Movie year')
 tmdb_parser.add_argument('only_cached', type=int, help='Return only cached results')
-tmdb_parser.add_argument('include_posters', type=inputs.boolean, default=False, help='Include posters in response')
-tmdb_parser.add_argument('include_backdrops', type=inputs.boolean, default=False, help='Include backdrops in response')
-tmdb_parser.add_argument('include_backdrops', type=inputs.boolean, default=False, help='Include backdrops in response')
+tmdb_parser.add_argument(
+    'include_posters', type=inputs.boolean, default=False, help='Include posters in response'
+)
+tmdb_parser.add_argument(
+    'include_backdrops', type=inputs.boolean, default=False, help='Include backdrops in response'
+)
+tmdb_parser.add_argument(
+    'include_backdrops', type=inputs.boolean, default=False, help='Include backdrops in response'
+)
 
 
 @tmdb_api.route('/movies/')

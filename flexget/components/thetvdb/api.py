@@ -35,12 +35,31 @@ class ObjectsContainer(object):
             'aliases': {'type': 'array', 'items': {'type': 'string'}},
             'posters': {'type': 'array', 'items': {'type': 'string'}},
             'genres': {'type': 'array', 'items': {'type': 'string'}},
-            'language': {'type': 'string'}
+            'language': {'type': 'string'},
         },
-        'required': ['tvdb_id', 'last_updated', 'expired', 'series_name', 'rating', 'status', 'runtime', 'airs_time',
-                     'airs_dayofweek', 'content_rating', 'network', 'overview', 'imdb_id', 'zap2it_id', 'banner',
-                     'first_aired', 'aliases', 'posters', 'genres', 'language'],
-        'additionalProperties': False
+        'required': [
+            'tvdb_id',
+            'last_updated',
+            'expired',
+            'series_name',
+            'rating',
+            'status',
+            'runtime',
+            'airs_time',
+            'airs_dayofweek',
+            'content_rating',
+            'network',
+            'overview',
+            'imdb_id',
+            'zap2it_id',
+            'banner',
+            'first_aired',
+            'aliases',
+            'posters',
+            'genres',
+            'language',
+        ],
+        'additionalProperties': False,
     }
 
     episode_object = {
@@ -58,11 +77,24 @@ class ObjectsContainer(object):
             'rating': {'type': 'number'},
             'image': {'type': ['string', 'null']},
             'first_aired': {'type': 'string'},
-            'series_id': {'type': 'integer'}
+            'series_id': {'type': 'integer'},
         },
-        'required': ['id', 'expired', 'last_update', 'season_number', 'episode_number', 'absolute_number',
-                     'episode_name', 'overview', 'director', 'rating', 'image', 'first_aired', 'series_id'],
-        'additionalProperties': False
+        'required': [
+            'id',
+            'expired',
+            'last_update',
+            'season_number',
+            'episode_number',
+            'absolute_number',
+            'episode_name',
+            'overview',
+            'director',
+            'rating',
+            'image',
+            'first_aired',
+            'series_id',
+        ],
+        'additionalProperties': False,
     }
 
     search_result_object = {
@@ -75,23 +107,38 @@ class ObjectsContainer(object):
             'series_name': {'type': 'string'},
             'status': {'type': 'string'},
             'overview': {'type': ['string', 'null']},
-            'tvdb_id': {'type': 'integer'}
+            'tvdb_id': {'type': 'integer'},
         },
-        'required': ['aliases', 'first_aired', 'banner', 'network', 'series_name', 'status', 'overview', 'tvdb_id'],
-        'additionalProperties': False
+        'required': [
+            'aliases',
+            'first_aired',
+            'banner',
+            'network',
+            'series_name',
+            'status',
+            'overview',
+            'tvdb_id',
+        ],
+        'additionalProperties': False,
     }
     search_results_object = {'type': 'array', 'items': search_result_object}
 
 
 tvdb_series_schema = api.schema_model('tvdb_series_schema', ObjectsContainer.tvdb_series_object)
 tvdb_episode_schema = api.schema_model('tvdb_episode_schema', ObjectsContainer.episode_object)
-search_results_schema = api.schema_model('tvdb_search_results_schema', ObjectsContainer.search_results_object)
+search_results_schema = api.schema_model(
+    'tvdb_search_results_schema', ObjectsContainer.search_results_object
+)
 
 base_parser = api.parser()
-base_parser.add_argument('language', default='en', help='Language abbreviation string for different language support')
+base_parser.add_argument(
+    'language', default='en', help='Language abbreviation string for different language support'
+)
 
 series_parser = base_parser.copy()
-series_parser.add_argument('include_actors', type=inputs.boolean, help='Include actors in response')
+series_parser.add_argument(
+    'include_actors', type=inputs.boolean, help='Include actors in response'
+)
 
 
 @tvdb_api.route('/series/<string:title>/')
@@ -110,8 +157,7 @@ class TVDBSeriesLookupAPI(APIResource):
         except ValueError:
             tvdb_id = None
 
-        kwargs = {'session': session,
-                  'language': language}
+        kwargs = {'session': session, 'language': language}
 
         if tvdb_id:
             kwargs['tvdb_id'] = tvdb_id
@@ -133,7 +179,9 @@ episode_parser = base_parser.copy()
 episode_parser.add_argument('season_number', type=int, help='Season number')
 episode_parser.add_argument('ep_number', type=int, help='Episode number')
 episode_parser.add_argument('absolute_number', type=int, help='Absolute episode number')
-episode_parser.add_argument('air_date', type=inputs.date, help='Episode airdate in `YYYY-mm-dd` format')
+episode_parser.add_argument(
+    'air_date', type=inputs.date, help='Episode airdate in `YYYY-mm-dd` format'
+)
 
 
 @tvdb_api.route('/episode/<int:tvdb_id>/')
@@ -154,11 +202,11 @@ class TVDBEpisodeSearchAPI(APIResource):
         air_date = args.get('air_date')
 
         if not ((season_number and ep_number) or absolute_number or air_date):
-            raise BadRequest('not enough parameters for lookup. Either season and episode number or absolute number '
-                             'are required.')
-        kwargs = {'tvdb_id': tvdb_id,
-                  'session': session,
-                  'language': language}
+            raise BadRequest(
+                'not enough parameters for lookup. Either season and episode number or absolute number '
+                'are required.'
+            )
+        kwargs = {'tvdb_id': tvdb_id, 'session': session, 'language': language}
 
         if absolute_number:
             kwargs['absolute_number'] = absolute_number
@@ -179,8 +227,11 @@ search_parser = base_parser.copy()
 search_parser.add_argument('search_name', help='Series Name')
 search_parser.add_argument('imdb_id', help='Series IMDB ID')
 search_parser.add_argument('zap2it_id', help='Series ZAP2IT ID')
-search_parser.add_argument('force_search', type=inputs.boolean,
-                           help='Force online lookup or allow for result to be retrieved from cache')
+search_parser.add_argument(
+    'force_search',
+    type=inputs.boolean,
+    help='Force online lookup or allow for result to be retrieved from cache',
+)
 
 
 @tvdb_api.route('/search/')
@@ -208,7 +259,7 @@ class TVDBSeriesSearchAPI(APIResource):
             'zap2it_id': zap2it_id,
             'force_search': force_search,
             'session': session,
-            'language': language
+            'language': language,
         }
         try:
             search_results = search_for_series(**kwargs)

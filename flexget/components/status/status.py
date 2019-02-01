@@ -65,8 +65,11 @@ def db_cleanup(manager, session):
             session.delete(status_task)
 
     # Purge task executions older than 1 year
-    result = session.query(db.TaskExecution).filter(
-        db.TaskExecution.start < datetime.datetime.now() - timedelta(days=365)).delete()
+    result = (
+        session.query(db.TaskExecution)
+        .filter(db.TaskExecution.start < datetime.datetime.now() - timedelta(days=365))
+        .delete()
+    )
     if result:
         log.verbose('Removed %s task executions from history older than 1 year', result)
 

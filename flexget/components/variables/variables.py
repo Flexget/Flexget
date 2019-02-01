@@ -73,7 +73,7 @@ def process_variables(config, manager):
         'block_start_string': '^^disabled^^',
         'block_end_string': '^^disabled^^',
         'variable_start_string': '{?',
-        'variable_end_string': '?}'
+        'variable_end_string': '?}',
     }
     if 'variables' not in config or config.get('variables') is False:
         return

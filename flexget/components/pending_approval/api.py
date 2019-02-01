@@ -6,7 +6,14 @@ from math import ceil
 from flask import jsonify, request
 from flask_restplus import inputs
 from flexget.api import api, APIResource
-from flexget.api.app import base_message_schema, success_response, NotFoundError, etag, pagination_headers, BadRequest
+from flexget.api.app import (
+    base_message_schema,
+    success_response,
+    NotFoundError,
+    etag,
+    pagination_headers,
+    BadRequest,
+)
 from sqlalchemy.orm.exc import NoResultFound
 
 from . import db
@@ -23,24 +30,24 @@ class ObjectsContainer(object):
             'title': {'type': 'string'},
             'url': {'type': 'string'},
             'approved': {'type': 'boolean'},
-            'added': {'type': 'string', 'format': 'date-time'}
-        }
+            'added': {'type': 'string', 'format': 'date-time'},
+        },
     }
 
     pending_entry_list = {'type': 'array', 'items': pending_entry_object}
 
     operation_object = {
         'type': 'object',
-        'properties': {
-            'operation': {'type': 'string', 'enum': ['approve', 'reject']}
-        },
+        'properties': {'operation': {'type': 'string', 'enum': ['approve', 'reject']}},
         'required': ['operation'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
 
 pending_entry_schema = api.schema_model('pending.entry', ObjectsContainer.pending_entry_object)
-pending_entry_list_schema = api.schema_model('pending.entry_list', ObjectsContainer.pending_entry_list)
+pending_entry_list_schema = api.schema_model(
+    'pending.entry_list', ObjectsContainer.pending_entry_list
+)
 operation_schema = api.schema_model('pending.operation', ObjectsContainer.operation_object)
 
 filter_parser = api.parser()
@@ -96,7 +103,7 @@ class PendingEntriesAPI(APIResource):
             'stop': stop,
             'descending': descending,
             'sort_by': sort_by,
-            'session': session
+            'session': session,
         }
 
         total_items = session.query(db.PendingEntry).count()

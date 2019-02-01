@@ -12,16 +12,20 @@ log = logging.getLogger('pending_approval')
 
 
 class PendingApproval(object):
-    schema = {'type': 'boolean',
-              'deprecated': 'pending_approval is deprecated, switch to using pending_list'}
+    schema = {
+        'type': 'boolean',
+        'deprecated': 'pending_approval is deprecated, switch to using pending_list',
+    }
 
     @staticmethod
     def _item_query(entry, task, session):
-        return session.query(db.PendingEntry) \
-            .filter(db.PendingEntry.task_name == task.name) \
-            .filter(db.PendingEntry.title == entry['title']) \
-            .filter(db.PendingEntry.url == entry['url']) \
+        return (
+            session.query(db.PendingEntry)
+            .filter(db.PendingEntry.task_name == task.name)
+            .filter(db.PendingEntry.title == entry['title'])
+            .filter(db.PendingEntry.url == entry['url'])
             .first()
+        )
 
     def on_task_input(self, task, config):
         if not config:
@@ -29,10 +33,12 @@ class PendingApproval(object):
 
         approved_entries = []
         with Session() as session:
-            for approved_entry in session.query(db.PendingEntry) \
-                    .filter(db.PendingEntry.task_name == task.name) \
-                    .filter(db.PendingEntry.approved == True) \
-                    .all():
+            for approved_entry in (
+                session.query(db.PendingEntry)
+                .filter(db.PendingEntry.task_name == task.name)
+                .filter(db.PendingEntry.approved == True)
+                .all()
+            ):
                 e = approved_entry.entry
                 e['approved'] = True
                 e['immortal'] = True

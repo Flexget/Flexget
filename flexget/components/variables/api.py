@@ -23,7 +23,9 @@ class VariablesAPI(APIResource):
 
     @api.response(201, 'Successfully updated variables file')
     @api.validate(empty_response)
-    @api.doc(description='Note that editing variables may not be persistent, depending on user config')
+    @api.doc(
+        description='Note that editing variables may not be persistent, depending on user config'
+    )
     def put(self, session=None):
         """ Store variables data to DB """
         data = request.json

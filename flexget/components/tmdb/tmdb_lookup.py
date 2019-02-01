@@ -13,9 +13,7 @@ try:
     # NOTE: Importing other plugins is discouraged!
     from flexget.components.imdb.utils import extract_id
 except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='imdb',
-    )
+    raise plugin.DependencyError(issued_by=__name__, missing='imdb')
 
 
 log = logging.getLogger('tmdb_lookup')
@@ -49,29 +47,32 @@ class PluginTmdbLookup(object):
         'tmdb_homepage': 'homepage',
         # Generic fields filled by all movie lookup plugins:
         'movie_name': 'name',
-        'movie_year': 'year'}
+        'movie_year': 'year',
+    }
 
-    schema = {'oneOf': [
-        {'type': 'boolean'},
-        {'type': 'object',
-         'properties': {
-             'language': {'type': 'string', 'default': 'en'}
-         }}
-    ]}
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {'type': 'object', 'properties': {'language': {'type': 'string', 'default': 'en'}}},
+        ]
+    }
 
     def lazy_loader(self, entry, language):
         """Does the lookup for this entry and populates the entry fields."""
         lookup = plugin.get_plugin_by_name('api_tmdb').instance.lookup
 
-        imdb_id = (entry.get('imdb_id', eval_lazy=False) or
-                   extract_id(entry.get('imdb_url', eval_lazy=False)))
+        imdb_id = entry.get('imdb_id', eval_lazy=False) or extract_id(
+            entry.get('imdb_url', eval_lazy=False)
+        )
         try:
             with Session() as session:
-                movie = lookup(smart_match=entry['title'],
-                               tmdb_id=entry.get('tmdb_id', eval_lazy=False),
-                               imdb_id=imdb_id,
-                               language=language,
-                               session=session)
+                movie = lookup(
+                    smart_match=entry['title'],
+                    tmdb_id=entry.get('tmdb_id', eval_lazy=False),
+                    imdb_id=imdb_id,
+                    language=language,
+                    session=session,
+                )
                 entry.update_using_map(self.field_map, movie)
         except LookupError:
             log_once('TMDB lookup failed for %s' % entry['title'], log, logging.WARN)
@@ -102,4 +103,6 @@ class PluginTmdbLookup(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTmdbLookup, 'tmdb_lookup', api_ver=2, interfaces=['task', 'movie_metainfo'])
+    plugin.register(
+        PluginTmdbLookup, 'tmdb_lookup', api_ver=2, interfaces=['task', 'movie_metainfo']
+    )

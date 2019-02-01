@@ -20,16 +20,16 @@ class ObjectsContainer(object):
             "name": {'type': 'string'},
             "original_image": {'type': 'string'},
             "tvmaze_id": {'type': 'integer'},
-            "url": {'type': 'string'}
-        }
+            "url": {'type': 'string'},
+        },
     }
 
     schedule_object = {
         'type': 'object',
         'properties': {
             "days": {'type': 'array', 'items': {'type': 'string'}},
-            "time": {'type': 'string'}
-        }
+            "time": {'type': 'string'},
+        },
     }
 
     tvmaze_series_object = {
@@ -56,12 +56,33 @@ class ObjectsContainer(object):
             'runtime': {'type': 'integer'},
             'show_type': {'type': 'string'},
             'network': {'type': ['string', 'null']},
-            'last_update': {'type': 'string', 'format': 'date-time'}
+            'last_update': {'type': 'string', 'format': 'date-time'},
         },
-        'required': ['tvmaze_id', 'status', 'rating', 'genres', 'weight', 'updated', 'name', 'language',
-                     'schedule', 'url', 'original_image', 'medium_image', 'tvdb_id', 'tvrage_id', 'premiered', 'year',
-                     'summary', 'webchannel', 'runtime', 'show_type', 'network', 'last_update'],
-        'additionalProperties': False
+        'required': [
+            'tvmaze_id',
+            'status',
+            'rating',
+            'genres',
+            'weight',
+            'updated',
+            'name',
+            'language',
+            'schedule',
+            'url',
+            'original_image',
+            'medium_image',
+            'tvdb_id',
+            'tvrage_id',
+            'premiered',
+            'year',
+            'summary',
+            'webchannel',
+            'runtime',
+            'show_type',
+            'network',
+            'last_update',
+        ],
+        'additionalProperties': False,
     }
 
     tvmaze_episode_object = {
@@ -79,16 +100,33 @@ class ObjectsContainer(object):
             'airstamp': {'type': 'string', 'format': 'date-time'},
             'runtime': {'type': 'integer'},
             'summary': {'type': 'string'},
-            'last_update': {'type': 'string', 'format': 'date-time'}
+            'last_update': {'type': 'string', 'format': 'date-time'},
         },
-        'required': ['tvmaze_id', 'series_id', 'number', 'season_number', 'title', 'airdate', 'url', 'original_image',
-                     'medium_image', 'airstamp', 'runtime', 'summary', 'last_update'],
-        'additionalProperties': False
+        'required': [
+            'tvmaze_id',
+            'series_id',
+            'number',
+            'season_number',
+            'title',
+            'airdate',
+            'url',
+            'original_image',
+            'medium_image',
+            'airstamp',
+            'runtime',
+            'summary',
+            'last_update',
+        ],
+        'additionalProperties': False,
     }
 
 
-tvmaze_series_schema = api.schema_model('tvmaze_series_schema', ObjectsContainer.tvmaze_series_object)
-tvmaze_episode_schema = api.schema_model('tvmaze_episode_schema', ObjectsContainer.tvmaze_episode_object)
+tvmaze_series_schema = api.schema_model(
+    'tvmaze_series_schema', ObjectsContainer.tvmaze_series_object
+)
+tvmaze_episode_schema = api.schema_model(
+    'tvmaze_episode_schema', ObjectsContainer.tvmaze_episode_object
+)
 
 
 @tvmaze_api.route('/series/<string:title>/')
@@ -116,7 +154,9 @@ class TVDBSeriesSearchApi(APIResource):
 episode_parser = api.parser()
 episode_parser.add_argument('season_num', type=int, help='Season number')
 episode_parser.add_argument('ep_num', type=int, help='Episode number')
-episode_parser.add_argument('air_date', type=inputs.date_from_iso8601, help="Air date in the format of '2012-01-01'")
+episode_parser.add_argument(
+    'air_date', type=inputs.date_from_iso8601, help="Air date in the format of '2012-01-01'"
+)
 
 
 @tvmaze_api.route('/episode/<int:tvmaze_id>/')
@@ -134,8 +174,7 @@ class TVDBEpisodeSearchAPI(APIResource):
         season_num = args.get('season_num')
         ep_num = args.get('ep_num')
 
-        kwargs = {'tvmaze_id': tvmaze_id,
-                  'session': session}
+        kwargs = {'tvmaze_id': tvmaze_id, 'session': session}
         if air_date:
             kwargs['series_id_type'] = 'date'
             kwargs['series_date'] = air_date

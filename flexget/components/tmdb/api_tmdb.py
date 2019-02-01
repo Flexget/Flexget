@@ -5,7 +5,19 @@ import logging
 from datetime import datetime, timedelta
 
 from flexget.manager import Session
-from sqlalchemy import Table, Column, Integer, String, Float, Unicode, Boolean, DateTime, Date, func, or_
+from sqlalchemy import (
+    Table,
+    Column,
+    Integer,
+    String,
+    Float,
+    Unicode,
+    Boolean,
+    DateTime,
+    Date,
+    func,
+    or_,
+)
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
@@ -77,9 +89,12 @@ def upgrade(ver, session):
 
 
 # association tables
-genres_table = Table('tmdb_movie_genres', Base.metadata,
-                     Column('movie_id', Integer, ForeignKey('tmdb_movies.id')),
-                     Column('genre_id', Integer, ForeignKey('tmdb_genres.id')))
+genres_table = Table(
+    'tmdb_movie_genres',
+    Base.metadata,
+    Column('movie_id', Integer, ForeignKey('tmdb_movies.id')),
+    Column('genre_id', Integer, ForeignKey('tmdb_genres.id')),
+)
 Base.register_table(genres_table)
 
 
@@ -119,7 +134,11 @@ class TMDBMovie(Base):
         """
         self.id = id
         try:
-            movie = tmdb_request('movie/{}'.format(self.id), append_to_response='alternative_titles', language=language)
+            movie = tmdb_request(
+                'movie/{}'.format(self.id),
+                append_to_response='alternative_titles',
+                language=language,
+            )
         except requests.RequestException as e:
             raise LookupError('Error updating data from tmdb: %s' % e)
         self.imdb_id = movie['imdb_id']
@@ -190,7 +209,7 @@ class TMDBMovie(Base):
             'homepage': self.homepage,
             'genres': [g for g in self.genres],
             'updated': self.updated,
-            'lookup_language': self.lookup_language
+            'lookup_language': self.lookup_language,
         }
 
 
@@ -222,7 +241,9 @@ class TMDBImage(Base):
     def to_dict(self):
         return {
             'id': self.id,
-            'urls': {size: self.url(size) for size in get_tmdb_config()['images'][self.type + '_sizes']},
+            'urls': {
+                size: self.url(size) for size in get_tmdb_config()['images'][self.type + '_sizes']
+            },
             'movie_id': self.movie_id,
             'file_path': self.file_path,
             'width': self.width,
@@ -230,7 +251,7 @@ class TMDBImage(Base):
             'aspect_ratio': self.aspect_ratio,
             'vote_average': self.vote_average,
             'vote_count': self.vote_count,
-            'language_code': self.iso_639_1
+            'language_code': self.iso_639_1,
         }
 
 
@@ -262,8 +283,16 @@ class ApiTmdb(object):
 
     @staticmethod
     @with_session
-    def lookup(title=None, year=None, tmdb_id=None, imdb_id=None, smart_match=None, only_cached=False, session=None,
-               language='en'):
+    def lookup(
+        title=None,
+        year=None,
+        tmdb_id=None,
+        imdb_id=None,
+        smart_match=None,
+        only_cached=False,
+        session=None,
+        language='en',
+    ):
         """
         Do a lookup from TMDb for the movie matching the passed arguments.
 
@@ -295,7 +324,9 @@ class ApiTmdb(object):
             year = title_parser.year
         if not (title or tmdb_id or imdb_id):
             raise LookupError('No criteria specified for TMDb lookup')
-        id_str = '<title={}, year={}, tmdb_id={}, imdb_id={}>'.format(title, year, tmdb_id, imdb_id)
+        id_str = '<title={}, year={}, tmdb_id={}, imdb_id={}>'.format(
+            title, year, tmdb_id, imdb_id
+        )
 
         log.debug('Looking up TMDb information for %s', id_str)
         movie = None
@@ -307,14 +338,19 @@ class ApiTmdb(object):
                 ors.append(TMDBMovie.imdb_id == imdb_id)
             movie = session.query(TMDBMovie).filter(or_(*ors)).first()
         elif title:
-            movie_filter = session.query(TMDBMovie).filter(func.lower(TMDBMovie.name) == title.lower())
+            movie_filter = session.query(TMDBMovie).filter(
+                func.lower(TMDBMovie.name) == title.lower()
+            )
             if year:
                 movie_filter = movie_filter.filter(TMDBMovie.year == year)
             movie = movie_filter.first()
             if not movie:
                 search_string = title + ' ({})'.format(year) if year else title
-                found = session.query(TMDBSearchResult). \
-                    filter(TMDBSearchResult.search == search_string.lower()).first()
+                found = (
+                    session.query(TMDBSearchResult)
+                    .filter(TMDBSearchResult.search == search_string.lower())
+                    .first()
+                )
                 if found and found.movie:
                     movie = found.movie
         if movie:
@@ -357,7 +393,9 @@ class ApiTmdb(object):
                 try:
                     results = tmdb_request('search/movie', **search_params)
                 except requests.RequestException as e:
-                    raise LookupError('Error searching for tmdb item {}: {}'.format(search_string, e))
+                    raise LookupError(
+                        'Error searching for tmdb item {}: {}'.format(search_string, e)
+                    )
                 if not results['results']:
                     raise LookupError('No results for {} from tmdb'.format(search_string))
                 tmdb_id = results['results'][0]['id']

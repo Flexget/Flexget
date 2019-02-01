@@ -47,16 +47,20 @@ def list_entries(options):
         header = ['#', 'Task Name', 'Title', 'URL', 'Approved', 'Added']
         table_data = [header]
         for entry in entries:
-            table_data.append([
-                entry.id,
-                entry.task_name,
-                entry.title,
-                entry.url,
-                colorize('green', 'Yes') if entry.approved else 'No',
-                entry.added.strftime("%c"),
-            ])
+            table_data.append(
+                [
+                    entry.id,
+                    entry.task_name,
+                    entry.title,
+                    entry.url,
+                    colorize('green', 'Yes') if entry.approved else 'No',
+                    entry.added.strftime("%c"),
+                ]
+            )
     try:
-        table = TerminalTable(options.table_type, table_data, wrap_columns=[1, 2, 3], drop_columns=[5, 1, 3])
+        table = TerminalTable(
+            options.table_type, table_data, wrap_columns=[1, 2, 3], drop_columns=[5, 1, 3]
+        )
         console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))
@@ -72,7 +76,10 @@ def manage_entries(options, selection, approved):
             try:
                 entry = db.get_entry_by_id(session, selection)
                 if entry.approved is approved:
-                    console(colorize('red', 'ERROR: ') + 'Entry with ID %s is already %s' % (entry.id, approved_text))
+                    console(
+                        colorize('red', 'ERROR: ')
+                        + 'Entry with ID %s is already %s' % (entry.id, approved_text)
+                    )
                     sys.exit(1)
             except NoResultFound:
                 console('Pending entry with ID %s does not exist' % selection)
@@ -84,7 +91,9 @@ def manage_entries(options, selection, approved):
             return
         for entry in entries:
             if entry.approved is not approved:
-                console('Setting pending entry with ID %s status to %s' % (entry.id, approved_text))
+                console(
+                    'Setting pending entry with ID %s status to %s' % (entry.id, approved_text)
+                )
                 entry.approved = approved
 
 
@@ -101,8 +110,9 @@ def clear_entries(options):
 @event('options.register')
 def register_parser_arguments():
     selection_parser = ArgumentParser(add_help=False)
-    selection_parser.add_argument('selection', type=valid_entry,
-                                  help='Entity ID or \'all\' to approve all pending entries')
+    selection_parser.add_argument(
+        'selection', type=valid_entry, help='Entity ID or \'all\' to approve all pending entries'
+    )
 
     filter_parser = ArgumentParser(add_help=False)
     filter_parser.add_argument('--task-name', help='Filter by task name')
@@ -110,14 +120,25 @@ def register_parser_arguments():
     parser = options.register_command('pending', do_cli, help='View and manage pending entries')
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='action')
 
-    list_parser = subparsers.add_parser('list', help='Shows all existing pending entries',
-                                        parents=[table_parser, filter_parser])
+    list_parser = subparsers.add_parser(
+        'list', help='Shows all existing pending entries', parents=[table_parser, filter_parser]
+    )
 
     list_group = list_parser.add_mutually_exclusive_group()
-    list_group.add_argument('--pending', action='store_false', help='Show only pending entries', dest='approved',
-                            default=None)
-    list_group.add_argument('--approved', action='store_true', help='Show only approved entries', dest='approved',
-                            default=None)
+    list_group.add_argument(
+        '--pending',
+        action='store_false',
+        help='Show only pending entries',
+        dest='approved',
+        default=None,
+    )
+    list_group.add_argument(
+        '--approved',
+        action='store_true',
+        help='Show only approved entries',
+        dest='approved',
+        default=None,
+    )
 
     subparsers.add_parser('approve', help='Approve pending entries', parents=[selection_parser])
     subparsers.add_parser('reject', help='Reject pending entries', parents=[selection_parser])

@@ -34,7 +34,7 @@ def do_cli_task(manager, options):
             console('Task name `%s` does not exists or does not have any records' % options.task)
             return
         else:
-            query = task.executions.order_by(desc(db.TaskExecution.start))[:options.limit]
+            query = task.executions.order_by(desc(db.TaskExecution.start))[: options.limit]
             for ex in reversed(query):
                 start = ex.start.strftime('%Y-%m-%d %H:%M')
                 start = colorize('green', start) if ex.succeeded else colorize('red', start)
@@ -53,7 +53,7 @@ def do_cli_task(manager, options):
                         ex.accepted,
                         ex.rejected,
                         ex.failed,
-                        ex.abort_reason if ex.abort_reason is not None else ''
+                        ex.abort_reason if ex.abort_reason is not None else '',
                     ]
                 )
 
@@ -65,16 +65,28 @@ def do_cli_task(manager, options):
 
 
 def do_cli_summary(manager, options):
-    header = ['Task', 'Last execution', 'Last success', 'Produced', 'Accepted', 'Rejected', 'Failed', 'Duration']
+    header = [
+        'Task',
+        'Last execution',
+        'Last success',
+        'Produced',
+        'Accepted',
+        'Rejected',
+        'Failed',
+        'Duration',
+    ]
     table_data = [header]
 
     with Session() as session:
         for task in session.query(db.StatusTask).all():
-            ok = session.query(db.TaskExecution). \
-                filter(db.TaskExecution.task_id == task.id). \
-                filter(db.TaskExecution.succeeded == True). \
-                filter(db.TaskExecution.produced > 0). \
-                order_by(db.TaskExecution.start.desc()).first()
+            ok = (
+                session.query(db.TaskExecution)
+                .filter(db.TaskExecution.task_id == task.id)
+                .filter(db.TaskExecution.succeeded == True)
+                .filter(db.TaskExecution.produced > 0)
+                .order_by(db.TaskExecution.start.desc())
+                .first()
+            )
 
             if ok is None:
                 duration = None
@@ -89,18 +101,23 @@ def do_cli_summary(manager, options):
                 elif age < timedelta(minutes=10):
                     last_success = colorize('green', last_success)
             # Fix weird issue that a task registers StatusTask but without an execution. GH #2022
-            last_exec = task.last_execution_time.strftime('%Y-%m-%d %H:%M') if  task.last_execution_time else '-'
+            last_exec = (
+                task.last_execution_time.strftime('%Y-%m-%d %H:%M')
+                if task.last_execution_time
+                else '-'
+            )
 
-            table_data.append([
-                task.name,
-                last_exec,
-                last_success,
-                ok.produced if ok is not None else '-',
-                ok.accepted if ok is not None else '-',
-                ok.rejected if ok is not None else '-',
-                ok.failed if ok is not None else '-',
-                '%1.fs' % duration.total_seconds() if duration is not None else '-',
-            ]
+            table_data.append(
+                [
+                    task.name,
+                    last_exec,
+                    last_success,
+                    ok.produced if ok is not None else '-',
+                    ok.accepted if ok is not None else '-',
+                    ok.rejected if ok is not None else '-',
+                    ok.failed if ok is not None else '-',
+                    '%1.fs' % duration.total_seconds() if duration is not None else '-',
+                ]
             )
 
     table = TerminalTable(options.table_type, table_data)
@@ -112,7 +129,17 @@ def do_cli_summary(manager, options):
 
 @event('options.register')
 def register_parser_arguments():
-    parser = options.register_command('status', do_cli, help='View task health status', parents=[table_parser])
-    parser.add_argument('--task', action='store', metavar='TASK', help='Limit to results in specified %(metavar)s')
-    parser.add_argument('--limit', action='store', type=int, metavar='NUM', default=50,
-                        help='Limit to %(metavar)s results')
+    parser = options.register_command(
+        'status', do_cli, help='View task health status', parents=[table_parser]
+    )
+    parser.add_argument(
+        '--task', action='store', metavar='TASK', help='Limit to results in specified %(metavar)s'
+    )
+    parser.add_argument(
+        '--limit',
+        action='store',
+        type=int,
+        metavar='NUM',
+        default=50,
+        help='Limit to %(metavar)s results',
+    )

@@ -12,9 +12,7 @@ try:
     # NOTE: Importing other plugins is discouraged!
     from flexget.components.thetvdb import api_tvdb as plugin_api_tvdb
 except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='api_tvdb',
-    )
+    raise plugin.DependencyError(issued_by=__name__, missing='api_tvdb')
 
 log = logging.getLogger('thetvdb_lookup')
 
@@ -75,19 +73,17 @@ class PluginThetvdbLookup(object):
         'tvdb_banner': 'banner',
         'tvdb_language': 'language',
         'tvdb_airs_day_of_week': 'airs_dayofweek',
-        'imdb_url': lambda series: series.imdb_id and 'http://www.imdb.com/title/%s' % series.imdb_id,
+        'imdb_url': lambda series: series.imdb_id
+        and 'http://www.imdb.com/title/%s' % series.imdb_id,
         'imdb_id': 'imdb_id',
         'zap2it_id': 'zap2it_id',
         'tvdb_id': 'id',
-        'tvdb_url': lambda series: 'http://thetvdb.com/index.php?tab=series&id=%s' % str(series.id)
+        'tvdb_url': lambda series: 'http://thetvdb.com/index.php?tab=series&id=%s'
+        % str(series.id),
     }
 
-    series_actor_map = {
-        'tvdb_actors': 'actors',
-    }
-    series_poster_map = {
-        'tvdb_posters': 'posters',
-    }
+    series_actor_map = {'tvdb_actors': 'actors'}
+    series_poster_map = {'tvdb_posters': 'posters'}
 
     # Episode info
     episode_map = {
@@ -100,16 +96,15 @@ class PluginThetvdbLookup(object):
         'tvdb_absolute_number': 'absolute_number',
         'tvdb_season': 'season_number',
         'tvdb_episode': 'episode_number',
-        'tvdb_ep_id': lambda ep: 'S%02dE%02d' % (ep.season_number, ep.episode_number)
+        'tvdb_ep_id': lambda ep: 'S%02dE%02d' % (ep.season_number, ep.episode_number),
     }
 
-    schema = {'oneOf': [
-        {'type': 'boolean'},
-        {'type': 'object',
-         'properties': {
-             'language': {'type': 'string', 'default': 'en'}
-         }}
-    ]}
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {'type': 'object', 'properties': {'language': {'type': 'string', 'default': 'en'}}},
+        ]
+    }
 
     @with_session
     def series_lookup(self, entry, language, field_map, session=None):
@@ -118,11 +113,13 @@ class PluginThetvdbLookup(object):
                 entry.get('series_name', eval_lazy=False),
                 tvdb_id=entry.get('tvdb_id', eval_lazy=False),
                 language=entry.get('language', language),
-                session=session
+                session=session,
             )
             entry.update_using_map(field_map, series)
         except LookupError as e:
-            log.debug('Error looking up tvdb series information for %s: %s', entry['title'], e.args[0])
+            log.debug(
+                'Error looking up tvdb series information for %s: %s', entry['title'], e.args[0]
+            )
         return entry
 
     def lazy_series_lookup(self, entry, language):
@@ -145,11 +142,16 @@ class PluginThetvdbLookup(object):
                 log.error('thetvdb_lookup_episode_offset must be an integer')
                 episode_offset = 0
             if season_offset != 0 or episode_offset != 0:
-                log.debug('Using offset for tvdb lookup: season: %s, episode: %s' % (season_offset, episode_offset))
+                log.debug(
+                    'Using offset for tvdb lookup: season: %s, episode: %s'
+                    % (season_offset, episode_offset)
+                )
 
-            lookupargs = {'name': entry.get('series_name', eval_lazy=False),
-                          'tvdb_id': entry.get('tvdb_id', eval_lazy=False),
-                          'language': entry.get('language', language)}
+            lookupargs = {
+                'name': entry.get('series_name', eval_lazy=False),
+                'tvdb_id': entry.get('tvdb_id', eval_lazy=False),
+                'language': entry.get('language', language),
+            }
             if entry['series_id_type'] == 'ep':
                 lookupargs['season_number'] = entry['series_season'] + season_offset
                 lookupargs['episode_number'] = entry['series_episode'] + episode_offset
@@ -162,7 +164,9 @@ class PluginThetvdbLookup(object):
             episode = plugin_api_tvdb.lookup_episode(**lookupargs)
             entry.update_using_map(self.episode_map, episode)
         except LookupError as e:
-            log.debug('Error looking up tvdb episode information for %s: %s', entry['title'], e.args[0])
+            log.debug(
+                'Error looking up tvdb episode information for %s: %s', entry['title'], e.args[0]
+            )
 
     # Run after series and metainfo series
     @plugin.priority(110)
@@ -176,8 +180,12 @@ class PluginThetvdbLookup(object):
             # If there is information for a series lookup, register our series lazy fields
             if entry.get('series_name') or entry.get('tvdb_id', eval_lazy=False):
                 lazy_series_lookup = partial(self.lazy_series_lookup, language=language)
-                lazy_series_actor_lookup = partial(self.lazy_series_actor_lookup, language=language)
-                lazy_series_poster_lookup = partial(self.lazy_series_poster_lookup, language=language)
+                lazy_series_actor_lookup = partial(
+                    self.lazy_series_actor_lookup, language=language
+                )
+                lazy_series_poster_lookup = partial(
+                    self.lazy_series_poster_lookup, language=language
+                )
 
                 entry.register_lazy_func(lazy_series_lookup, self.series_map)
                 entry.register_lazy_func(lazy_series_actor_lookup, self.series_actor_map)
@@ -186,7 +194,10 @@ class PluginThetvdbLookup(object):
                 # If there is season and ep info as well, register episode lazy fields
                 if entry.get('series_id_type') in ('ep', 'sequence', 'date'):
                     if entry.get('season_pack'):
-                        log.verbose('TheTVDB API does not support season lookup at this time, skipping %s', entry)
+                        log.verbose(
+                            'TheTVDB API does not support season lookup at this time, skipping %s',
+                            entry,
+                        )
                     else:
                         lazy_episode_lookup = partial(self.lazy_episode_lookup, language=language)
                         entry.register_lazy_func(lazy_episode_lookup, self.episode_map)
@@ -199,4 +210,6 @@ class PluginThetvdbLookup(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginThetvdbLookup, 'thetvdb_lookup', api_ver=2, interfaces=['task', 'series_metainfo'])
+    plugin.register(
+        PluginThetvdbLookup, 'thetvdb_lookup', api_ver=2, interfaces=['task', 'series_metainfo']
+    )
