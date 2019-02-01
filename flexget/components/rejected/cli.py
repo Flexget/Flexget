@@ -10,11 +10,9 @@ from flexget.terminal import TerminalTable, TerminalTableError, table_parser, co
 
 try:
     # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.filter import remember_rejected as plugin_remember_rejected
+    from flexget.components.rejected import remember_rejected as plugin_remember_rejected
 except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='remember_rejected',
-    )
+    raise plugin.DependencyError(issued_by=__name__, missing='remember_rejected')
 
 
 def do_cli(manager, options):
@@ -30,7 +28,9 @@ def list_rejected(options):
         header = ['#', 'Title', 'Task', 'Rejected by', 'Reason']
         table_data = [header]
         for entry in results:
-            table_data.append([entry.id, entry.title, entry.task.name, entry.rejected_by, entry.reason or ''])
+            table_data.append(
+                [entry.id, entry.title, entry.task.name, entry.rejected_by, entry.reason or '']
+            )
     try:
         table = TerminalTable(options.table_type, table_data)
         table.table.justify_columns[0] = 'center'
@@ -50,7 +50,13 @@ def clear_rejected(manager):
 
 @event('options.register')
 def register_parser_arguments():
-    parser = options.register_command('rejected', do_cli, help='list or clear remembered rejections')
+    parser = options.register_command(
+        'rejected', do_cli, help='list or clear remembered rejections'
+    )
     subparsers = parser.add_subparsers(dest='rejected_action', metavar='<action>')
-    subparsers.add_parser('list', help='list all the entries that have been rejected', parents=[table_parser])
-    subparsers.add_parser('clear', help='clear all rejected entries from database, so they can be retried')
+    subparsers.add_parser(
+        'list', help='list all the entries that have been rejected', parents=[table_parser]
+    )
+    subparsers.add_parser(
+        'clear', help='clear all rejected entries from database, so they can be retried'
+    )

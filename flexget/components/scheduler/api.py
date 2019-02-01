@@ -5,9 +5,21 @@ import copy
 
 from flask import request, jsonify
 
-from flexget.plugins.daemon.scheduler import schedule_schema, scheduler, scheduler_job_map, DEFAULT_SCHEDULES
+from flexget.components.scheduler.scheduler import (
+    schedule_schema,
+    scheduler,
+    scheduler_job_map,
+    DEFAULT_SCHEDULES,
+)
 from flexget.api import api, APIResource
-from flexget.api.app import NotFoundError, APIError, base_message_schema, success_response, etag, Conflict
+from flexget.api.app import (
+    NotFoundError,
+    APIError,
+    base_message_schema,
+    success_response,
+    etag,
+    Conflict,
+)
 
 schedule_api = api.namespace('schedules', description='Task Scheduler')
 
@@ -35,9 +47,11 @@ def _schedule_by_id(schedule_id, schedules):
     return None, None
 
 
-schedule_desc = "Schedule ID changes upon daemon restart. The schedules object supports either interval or schedule" \
-                " (cron) objects, see the model definition for details. Tasks also support string or list " \
-                "(Not displayed as Swagger does yet not support anyOf or oneOf."
+schedule_desc = (
+    "Schedule ID changes upon daemon restart. The schedules object supports either interval or schedule"
+    " (cron) objects, see the model definition for details. Tasks also support string or list "
+    "(Not displayed as Swagger does yet not support anyOf or oneOf."
+)
 
 
 @schedule_api.route('/')

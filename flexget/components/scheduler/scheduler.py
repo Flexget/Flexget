@@ -1,20 +1,20 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import hashlib
 import logging
 import os
+import struct
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytz
 import tzlocal
-import struct
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 from flexget.config_schema import register_config_key, format_checker, register_schema
 from flexget.event import event
-from flexget.manager import Base, manager
+from flexget.manager import manager
 from flexget.utils import json
 
 log = logging.getLogger('scheduler')
@@ -42,12 +42,12 @@ interval_schema = {
         'minutes': {'type': 'number'},
         'hours': {'type': 'number'},
         'days': {'type': 'number'},
-        'weeks': {'type': 'number'}
+        'weeks': {'type': 'number'},
     },
     # Only allow one unit to be specified
     'maxProperties': 1,
     'error_maxProperties': 'Interval must be specified as one of %s' % ', '.join(UNITS),
-    'additionalProperties': False
+    'additionalProperties': False,
 }
 
 cron_schema = {
@@ -60,9 +60,9 @@ cron_schema = {
         'week': {'type': ['integer', 'string']},
         'day_of_week': {'type': ['integer', 'string']},
         'hour': {'type': ['integer', 'string']},
-        'minute': {'type': ['integer', 'string']}
+        'minute': {'type': ['integer', 'string']},
     },
-    'additionalProperties': False
+    'additionalProperties': False,
 }
 
 schedule_schema = {
@@ -72,28 +72,20 @@ schedule_schema = {
     'properties': {
         'tasks': {'type': ['array', 'string'], 'items': {'type': 'string'}},
         'interval': interval_schema,
-        'schedule': cron_schema
+        'schedule': cron_schema,
     },
     'required': ['tasks'],
     'minProperties': 2,
     'maxProperties': 2,
     'error_minProperties': 'Either `cron` or `interval` must be defined.',
     'error_maxProperties': 'Either `cron` or `interval` must be defined.',
-    'additionalProperties': False
+    'additionalProperties': False,
 }
 
 main_schema = {
     'oneOf': [
-        {
-            'type': 'array',
-            'title': 'Enable',
-            'items': schedule_schema
-        },
-        {
-            'type': 'boolean',
-            'title': 'Disable',
-            'description': 'Disable task schedules',
-        }
+        {'type': 'array', 'title': 'Enable', 'items': schedule_schema},
+        {'type': 'boolean', 'title': 'Disable', 'description': 'Disable task schedules'},
     ]
 }
 
@@ -109,7 +101,9 @@ def job_id(conf):
 def run_job(tasks):
     """Add the execution to the queue and waits until it is finished"""
     log.debug('executing tasks: %s', tasks)
-    finished_events = manager.execute(options={'tasks': tasks, 'cron': True, 'allow_manual': False}, priority=5)
+    finished_events = manager.execute(
+        options={'tasks': tasks, 'cron': True, 'allow_manual': False}, priority=5
+    )
     for _, task_name, event_ in finished_events:
         log.debug('task finished executing: %s', task_name)
         event_.wait()
@@ -145,10 +139,14 @@ def setup_scheduler(manager):
         # The default sqlalchemy jobstore does not work when there isn't a name for the local timezone.
         # Just fall back to utc in this case
         # FlexGet #2741, upstream ticket https://github.com/agronholm/apscheduler/issues/59
-        log.info('Local timezone name could not be determined. Scheduler will display times in UTC for any log'
-                 'messages. To resolve this set up /etc/timezone with correct time zone name.')
+        log.info(
+            'Local timezone name could not be determined. Scheduler will display times in UTC for any log'
+            'messages. To resolve this set up /etc/timezone with correct time zone name.'
+        )
         timezone = pytz.utc
-    scheduler = BackgroundScheduler(jobstores=jobstores, job_defaults=job_defaults, timezone=timezone)
+    scheduler = BackgroundScheduler(
+        jobstores=jobstores, job_defaults=job_defaults, timezone=timezone
+    )
     setup_jobs(manager)
 
 
@@ -162,7 +160,9 @@ def setup_jobs(manager):
     scheduler_job_map = {}
 
     if 'schedules' not in manager.config:
-        log.info('No schedules defined in config. Defaulting to run all tasks on a 1 hour interval.')
+        log.info(
+            'No schedules defined in config. Defaulting to run all tasks on a 1 hour interval.'
+        )
     config = manager.config.get('schedules', True)
     if config is True:
         config = DEFAULT_SCHEDULES
@@ -190,7 +190,9 @@ def setup_jobs(manager):
         if not isinstance(tasks, list):
             tasks = [tasks]
         name = ','.join(tasks)
-        scheduler.add_job(run_job, args=(tasks,), id=jid, name=name, trigger=trigger, **trigger_args)
+        scheduler.add_job(
+            run_job, args=(tasks,), id=jid, name=name, trigger=trigger, **trigger_args
+        )
     # Remove jobs no longer in config
     for jid in existing_job_ids:
         if jid not in configured_job_ids:
