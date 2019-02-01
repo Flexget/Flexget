@@ -9,8 +9,9 @@ from flask import jsonify, request
 from flask_restplus import inputs
 from flexget.api.app import NotFoundError, etag, pagination_headers, api, APIResource
 from flexget.api.core.tasks import tasks_api
-from flexget.plugins.operate.status import StatusTask, TaskExecution, get_executions_by_task_id, get_status_tasks
 from sqlalchemy.orm.exc import NoResultFound
+
+from . import db
 
 log = logging.getLogger('status_api')
 
@@ -97,13 +98,13 @@ class TasksStatusAPI(APIResource):
             'session': session
         }
 
-        total_items = session.query(StatusTask).count()
+        total_items = session.query(db.StatusTask).count()
         log.debug('db has a total of %s status tasks', total_items)
 
         if not total_items:
             return jsonify([])
 
-        db_status_tasks = get_status_tasks(**kwargs)
+        db_status_tasks = db.get_status_tasks(**kwargs)
 
         total_pages = int(ceil(total_items / float(per_page)))
 
@@ -120,7 +121,7 @@ class TasksStatusAPI(APIResource):
         for task in db_status_tasks:
             st_task = task.to_dict()
             if include_execution:
-                execution = task.executions.order_by(TaskExecution.start.desc()).first()
+                execution = task.executions.order_by(db.TaskExecution.start.desc()).first()
                 st_task['last_execution'] = execution.to_dict() if execution else {}
             status_tasks.append(st_task)
 
@@ -142,7 +143,7 @@ class TaskStatusAPI(APIResource):
     def get(self, task_id, session=None):
         """Get status task by ID"""
         try:
-            task = session.query(StatusTask).filter(StatusTask.id == task_id).one()
+            task = session.query(db.StatusTask).filter(db.StatusTask.id == task_id).one()
         except NoResultFound:
             raise NotFoundError('task status with id %d not found' % task_id)
 
@@ -151,7 +152,7 @@ class TaskStatusAPI(APIResource):
 
         st_task = task.to_dict()
         if include_execution:
-            execution = task.executions.order_by(TaskExecution.start.desc()).first()
+            execution = task.executions.order_by(db.TaskExecution.start.desc()).first()
             st_task['last_execution'] = execution.to_dict() if execution else {}
         return jsonify(st_task)
 
@@ -181,7 +182,7 @@ class TaskStatusExecutionsAPI(APIResource):
     def get(self, task_id, session=None):
         """Get task executions by ID"""
         try:
-            task = session.query(StatusTask).filter(StatusTask.id == task_id).one()
+            task = session.query(db.StatusTask).filter(db.StatusTask.id == task_id).one()
         except NoResultFound:
             raise NotFoundError('task status with id %d not found' % task_id)
 
@@ -224,7 +225,7 @@ class TaskStatusExecutionsAPI(APIResource):
         if not total_items:
             return jsonify([])
 
-        executions = [e.to_dict() for e in get_executions_by_task_id(**kwargs)]
+        executions = [e.to_dict() for e in db.get_executions_by_task_id(**kwargs)]
 
         total_pages = int(ceil(total_items / float(per_page)))
 

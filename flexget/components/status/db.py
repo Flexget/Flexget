@@ -10,12 +10,10 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 
-from flexget import db_schema, plugin
+from flexget import db_schema
 from flexget.event import event
 
-from flexget.manager import Session
-
-log = logging.getLogger('status')
+log = logging.getLogger('status.db')
 Base = db_schema.versioned_base('status', 2)
 
 
@@ -95,50 +93,6 @@ Index('ix_status_execution_task_id_start_end_succeeded', TaskExecution.task_id, 
       TaskExecution.succeeded)
 
 
-class Status(object):
-    """Track health status of tasks"""
-
-    schema = {'type': 'boolean'}
-
-    def __init__(self):
-        self.execution = None
-
-    def on_task_start(self, task, config):
-        with Session() as session:
-            st = session.query(StatusTask).filter(StatusTask.name == task.name).first()
-            if not st:
-                log.debug('Adding new task %s', task.name)
-                st = StatusTask()
-                st.name = task.name
-                session.add(st)
-
-        self.execution = TaskExecution()
-        self.execution.start = datetime.datetime.now()
-        self.execution.task = st
-
-    @plugin.priority(-255)
-    def on_task_input(self, task, config):
-        self.execution.produced = len(task.entries)
-
-    @plugin.priority(-255)
-    def on_task_output(self, task, config):
-        self.execution.accepted = len(task.accepted)
-        self.execution.rejected = len(task.rejected)
-        self.execution.failed = len(task.failed)
-
-    def on_task_exit(self, task, config):
-        with Session() as session:
-            if self.execution is None:
-                return
-            if task.aborted:
-                self.execution.succeeded = False
-                self.execution.abort_reason = task.abort_reason
-            self.execution.end = datetime.datetime.now()
-            session.merge(self.execution)
-
-    on_task_abort = on_task_exit
-
-
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
     # Purge all status data for non existing tasks
@@ -152,11 +106,6 @@ def db_cleanup(manager, session):
         TaskExecution.start < datetime.datetime.now() - timedelta(days=365)).delete()
     if result:
         log.verbose('Removed %s task executions from history older than 1 year', result)
-
-
-@event('plugin.register')
-def register_plugin():
-    plugin.register(Status, 'status', builtin=True, api_ver=2)
 
 
 @with_session
