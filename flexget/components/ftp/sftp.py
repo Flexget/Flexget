@@ -18,8 +18,9 @@ from flexget.utils.template import render_from_entry, RenderError
 
 log = logging.getLogger('sftp')
 
-ConnectionConfig = namedtuple('ConnectionConfig', ['host', 'port', 'username', 'password',
-                                                   'private_key', 'private_key_pass'])
+ConnectionConfig = namedtuple(
+    'ConnectionConfig', ['host', 'port', 'username', 'password', 'private_key', 'private_key_pass']
+)
 
 # retry configuration constants
 CONNECT_TRIES = 3
@@ -49,9 +50,14 @@ def sftp_connect(conf):
 
     while not sftp:
         try:
-            sftp = pysftp.Connection(host=conf.host, username=conf.username,
-                                     private_key=conf.private_key, password=conf.password,
-                                     port=conf.port, private_key_pass=conf.private_key_pass)
+            sftp = pysftp.Connection(
+                host=conf.host,
+                username=conf.username,
+                private_key=conf.private_key,
+                password=conf.password,
+                port=conf.port,
+                private_key_pass=conf.private_key_pass,
+            )
             sftp.timeout = SOCKET_TIMEOUT
             log.verbose('Connected to %s' % conf.host)
         except Exception as e:
@@ -59,8 +65,10 @@ def sftp_connect(conf):
                 raise e
             else:
                 log.debug('Caught exception: %s' % e)
-                log.warning('Failed to connect to %s; waiting %d seconds before retrying.' %
-                            (conf.host, retry_interval))
+                log.warning(
+                    'Failed to connect to %s; waiting %d seconds before retrying.'
+                    % (conf.host, retry_interval)
+                )
                 time.sleep(retry_interval)
                 tries -= 1
                 retry_interval += RETRY_STEP
@@ -112,9 +120,11 @@ def dependency_check():
     Check if pysftp module is present
     """
     if not pysftp:
-        raise plugin.DependencyError(issued_by='sftp',
-                                     missing='pysftp',
-                                     message='sftp plugin requires the pysftp Python module.')
+        raise plugin.DependencyError(
+            issued_by='sftp',
+            missing='pysftp',
+            message='sftp plugin requires the pysftp Python module.',
+        )
 
 
 class SftpList(object):
@@ -161,10 +171,10 @@ class SftpList(object):
             'get_size': {'type': 'boolean', 'default': True},
             'private_key': {'type': 'string'},
             'private_key_pass': {'type': 'string'},
-            'dirs': one_or_more({'type': 'string'})
+            'dirs': one_or_more({'type': 'string'}),
         },
         'additionProperties': False,
-        'required': ['host', 'username']
+        'required': ['host', 'username'],
     }
 
     def prepare_config(self, config):
@@ -299,10 +309,10 @@ class SftpDownload(object):
         'properties': {
             'to': {'type': 'string', 'format': 'path'},
             'recursive': {'type': 'boolean', 'default': True},
-            'delete_origin': {'type': 'boolean', 'default': False}
+            'delete_origin': {'type': 'boolean', 'default': False},
         },
         'required': ['to'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def get_sftp_config(self, entry):
@@ -321,7 +331,9 @@ class SftpDownload(object):
         private_key_pass = entry.get('private_key_pass')
 
         if parsed.scheme == 'sftp':
-            config = ConnectionConfig(host, port, username, password, private_key, private_key_pass)
+            config = ConnectionConfig(
+                host, port, username, password, private_key, private_key_pass
+            )
         else:
             log.warning('Scheme does not match SFTP: %s' % entry['url'])
             config = None
@@ -333,7 +345,9 @@ class SftpDownload(object):
         Download a file from path to dest
         """
         dir_name = remotepath.dirname(path)
-        dest_relpath = localpath.join(*remotepath.split(path))  # convert remote path style to local style
+        dest_relpath = localpath.join(
+            *remotepath.split(path)
+        )  # convert remote path style to local style
         destination = localpath.join(dest, dest_relpath)
         dest_dir = localpath.dirname(destination)
 
@@ -423,11 +437,15 @@ class SftpDownload(object):
         elif sftp.isdir(path):
             base_path = remotepath.normpath(remotepath.join(path, '..'))
             dir_name = remotepath.basename(path)
-            handle_file = partial(self.download_file, dest=to, sftp=sftp, delete_origin=delete_origin)
+            handle_file = partial(
+                self.download_file, dest=to, sftp=sftp, delete_origin=delete_origin
+            )
 
             try:
                 sftp.cwd(base_path)
-                sftp.walktree(dir_name, handle_file, self.handle_dir, self.handle_unknown, recursive)
+                sftp.walktree(
+                    dir_name, handle_file, self.handle_dir, self.handle_unknown, recursive
+                )
             except Exception as e:
                 error = 'Failed to download directory %s (%s)' % (path, e)
                 log.error(error)
@@ -505,10 +523,10 @@ class SftpUpload(object):
             'private_key': {'type': 'string'},
             'private_key_pass': {'type': 'string'},
             'to': {'type': 'string'},
-            'delete_origin': {'type': 'boolean', 'default': False}
+            'delete_origin': {'type': 'boolean', 'default': False},
         },
         'additionProperties': False,
-        'required': ['host', 'username']
+        'required': ['host', 'username'],
     }
 
     def prepare_config(self, config):

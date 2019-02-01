@@ -35,14 +35,12 @@ class SMSRuNotifier(object):
                 password: <PASSWORD>
 
     """
+
     schema = {
         'type': 'object',
-        'properties': {
-            'phone_number': {'type': 'string'},
-            'password': {'type': 'string'}
-        },
+        'properties': {'phone_number': {'type': 'string'}, 'password': {'type': 'string'}},
         'additionalProperties': False,
-        'required': ['phone_number', 'password']
+        'required': ['phone_number', 'password'],
     }
 
     def notify(self, title, message, config):
@@ -57,11 +55,13 @@ class SMSRuNotifier(object):
         sha512 = hashlib.sha512(config['password'] + token_response.text).hexdigest()
 
         # Build request params
-        notification = {'login': config['phone_number'],
-                       'sha512': sha512,
-                       'token': token_response.text,
-                       'to': config['phone_number'],
-                       'text': message}
+        notification = {
+            'login': config['phone_number'],
+            'sha512': sha512,
+            'token': token_response.text,
+            'to': config['phone_number'],
+            'text': message,
+        }
 
         try:
             response = requests.get(SMS_SEND_URL, params=notification)

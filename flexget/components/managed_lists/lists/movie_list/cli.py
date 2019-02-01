@@ -50,12 +50,17 @@ def lookup_movie(title, session, identifiers=None):
 
 def movie_list_keyword_type(identifier):
     if identifier.count('=') != 1:
-        raise ArgumentTypeError('Received identifier in wrong format: {}, '
-                                ' should be in keyword format like `imdb_id=tt1234567`'.format(identifier))
+        raise ArgumentTypeError(
+            'Received identifier in wrong format: {}, '
+            ' should be in keyword format like `imdb_id=tt1234567`'.format(identifier)
+        )
     name, value = identifier.split('=', 2)
     if name not in MovieListBase().supported_ids:
-        raise ArgumentTypeError('Received unsupported identifier ID {}. Should be one of {}'
-                                .format(identifier, ' ,'.join(MovieListBase().supported_ids)))
+        raise ArgumentTypeError(
+            'Received unsupported identifier ID {}. Should be one of {}'.format(
+                identifier, ' ,'.join(MovieListBase().supported_ids)
+            )
+        )
     return {name: value}
 
 
@@ -108,7 +113,9 @@ def movie_list_list(options):
     header = ['#', 'Movie Name', 'Movie year']
     header += db.MovieListBase().supported_ids
     table_data = [header]
-    movies = db.get_movies_by_list_id(movie_list.id, order_by='added', descending=True, session=session)
+    movies = db.get_movies_by_list_id(
+        movie_list.id, order_by='added', descending=True, session=session
+    )
     for movie in movies:
         movie_row = [movie.id, movie.title, movie.year or '']
         for identifier in db.MovieListBase().supported_ids:
@@ -137,12 +144,15 @@ def movie_list_add(options):
         console('Trying to lookup movie title: `{}`'.format(title))
         movie_lookup = lookup_movie(title=title, session=session, identifiers=options.identifiers)
         if not movie_lookup:
-            console('ERROR: movie lookup failed for movie {}, aborting'.format(options.movie_title))
+            console(
+                'ERROR: movie lookup failed for movie {}, aborting'.format(options.movie_title)
+            )
             return
 
         title = movie_lookup['movie_name']
-        movie = db.get_movie_by_title_and_year(list_id=movie_list.id, title=title, year=year,
-                                               session=session)
+        movie = db.get_movie_by_title_and_year(
+            list_id=movie_list.id, title=title, year=year, session=session
+        )
         if not movie:
             console("Adding movie with title {} to list {}".format(title, movie_list.name))
             movie = db.MovieListMovie(title=title, year=year, list_id=movie_list.id)
@@ -175,17 +185,27 @@ def movie_list_del(options):
             return
 
         try:
-            movie_exist = db.get_movie_by_id(list_id=movie_list.id, movie_id=int(options.movie),
-                                             session=session)
+            movie_exist = db.get_movie_by_id(
+                list_id=movie_list.id, movie_id=int(options.movie), session=session
+            )
         except NoResultFound:
-            console('Could not find movie with ID {} in list `{}`'.format(int(options.movie), options.list_name))
+            console(
+                'Could not find movie with ID {} in list `{}`'.format(
+                    int(options.movie), options.list_name
+                )
+            )
             return
         except ValueError:
             title, year = split_title_year(options.movie)
-            movie_exist = db.get_movie_by_title_and_year(list_id=movie_list.id, title=title, year=year,
-                                                         session=session)
+            movie_exist = db.get_movie_by_title_and_year(
+                list_id=movie_list.id, title=title, year=year, session=session
+            )
         if not movie_exist:
-            console('Could not find movie with title {} in list {}'.format(options.movie, options.list_name))
+            console(
+                'Could not find movie with title {} in list {}'.format(
+                    options.movie, options.list_name
+                )
+            )
             return
         else:
             console('Removing movie {} from list {}'.format(movie_exist.title, options.list_name))
@@ -210,25 +230,48 @@ def register_parser_arguments():
     movie_parser.add_argument('movie_title', metavar='<MOVIE TITLE>', help="Title of the movie")
 
     name_or_id_parser = ArgumentParser(add_help=False)
-    name_or_id_parser.add_argument('movie', metavar='<NAME or ID>', help="Title or ID of the movie")
+    name_or_id_parser.add_argument(
+        'movie', metavar='<NAME or ID>', help="Title or ID of the movie"
+    )
 
     identifiers_parser = ArgumentParser(add_help=False)
-    identifiers_parser.add_argument('-i', '--identifiers', metavar='<identifiers>', nargs='+',
-                                    type=movie_list_keyword_type,
-                                    help='Can be a string or a list of string with the format imdb_id=XXX,'
-                                         ' tmdb_id=XXX, etc')
+    identifiers_parser.add_argument(
+        '-i',
+        '--identifiers',
+        metavar='<identifiers>',
+        nargs='+',
+        type=movie_list_keyword_type,
+        help='Can be a string or a list of string with the format imdb_id=XXX,'
+        ' tmdb_id=XXX, etc',
+    )
     list_name_parser = ArgumentParser(add_help=False)
-    list_name_parser.add_argument('list_name', nargs='?', metavar='<LIST NAME>', default='movies',
-                                  help='Name of movie list to operate on (Default is \'movies\')')
+    list_name_parser.add_argument(
+        'list_name',
+        nargs='?',
+        metavar='<LIST NAME>',
+        default='movies',
+        help='Name of movie list to operate on (Default is \'movies\')',
+    )
     # Register subcommand
     parser = options.register_command('movie-list', do_cli, help='View and manage movie lists')
     # Set up our subparsers
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='list_action')
     subparsers.add_parser('all', parents=[table_parser], help='Shows all existing movie lists')
-    subparsers.add_parser('list', parents=[list_name_parser, table_parser], help='List movies from a list')
-    subparsers.add_parser('add', parents=[list_name_parser, movie_parser, identifiers_parser],
-                          help='Add a movie to a list')
-    subparsers.add_parser('del', parents=[list_name_parser, name_or_id_parser],
-                          help='Remove a movie from a list using its title or ID')
-    subparsers.add_parser('purge', parents=[list_name_parser],
-                          help='Removes an entire list with all of its movies. Use this with caution')
+    subparsers.add_parser(
+        'list', parents=[list_name_parser, table_parser], help='List movies from a list'
+    )
+    subparsers.add_parser(
+        'add',
+        parents=[list_name_parser, movie_parser, identifiers_parser],
+        help='Add a movie to a list',
+    )
+    subparsers.add_parser(
+        'del',
+        parents=[list_name_parser, name_or_id_parser],
+        help='Remove a movie from a list using its title or ID',
+    )
+    subparsers.add_parser(
+        'purge',
+        parents=[list_name_parser],
+        help='Removes an entire list with all of its movies. Use this with caution',
+    )

@@ -19,7 +19,11 @@ log = logging.getLogger(plugin_name)
 
 class PendingListSet(MutableSet):
     def _db_list(self, session):
-        return session.query(db.PendingListList).filter(db.PendingListList.name == self.config).first()
+        return (
+            session.query(db.PendingListList)
+            .filter(db.PendingListList.name == self.config)
+            .first()
+        )
 
     def __init__(self, config):
         self.config = config
@@ -28,17 +32,31 @@ class PendingListSet(MutableSet):
                 session.add(db.PendingListList(name=self.config))
 
     def _entry_query(self, session, entry, approved=None):
-        query = session.query(db.PendingListEntry).filter(db.PendingListEntry.list_id == self._db_list(session).id). \
-            filter(or_(db.PendingListEntry.title == entry['title'],
-                       and_(db.PendingListEntry.original_url, db.PendingListEntry.original_url == entry['original_url'])))
+        query = (
+            session.query(db.PendingListEntry)
+            .filter(db.PendingListEntry.list_id == self._db_list(session).id)
+            .filter(
+                or_(
+                    db.PendingListEntry.title == entry['title'],
+                    and_(
+                        db.PendingListEntry.original_url,
+                        db.PendingListEntry.original_url == entry['original_url'],
+                    ),
+                )
+            )
+        )
         if approved:
             query = query.filter(db.PendingListEntry.approved == True)
         return query.first()
 
     def __iter__(self):
         with Session() as session:
-            for e in self._db_list(session).entries.filter(db.PendingListEntry.approved == True).order_by(
-                    db.PendingListEntry.added.desc()).all():
+            for e in (
+                self._db_list(session)
+                .entries.filter(db.PendingListEntry.approved == True)
+                .order_by(db.PendingListEntry.added.desc())
+                .all()
+            ):
                 log.debug('returning %s', e.entry)
                 yield e.entry
 
@@ -69,7 +87,9 @@ class PendingListSet(MutableSet):
                 stored_entry.entry = entry
             else:
                 log.debug('adding entry %s to list %s', entry, self._db_list(session).name)
-                stored_entry = db.PendingListEntry(entry=entry, pending_list_id=self._db_list(session).id)
+                stored_entry = db.PendingListEntry(
+                    entry=entry, pending_list_id=self._db_list(session).id
+                )
             session.add(stored_entry)
 
     def __ior__(self, other):

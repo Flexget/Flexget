@@ -20,10 +20,7 @@ ROOTFOLDER_ENDPOINT = 'Rootfolder'
 DELETE_ENDPOINT = 'series/{}'
 
 # Sonarr qualities that do no exist in Flexget
-QUALITY_MAP = {
-    'Raw-HD': 'remux',
-    'DVD': 'dvdrip'
-}
+QUALITY_MAP = {'Raw-HD': 'remux', 'DVD': 'dvdrip'}
 
 
 class SonarrSet(MutableSet):
@@ -45,11 +42,15 @@ class SonarrSet(MutableSet):
             'season_folder': {'type': 'boolean', 'default': False},
             'monitored': {'type': 'boolean', 'default': True},
             'root_folder_path': {'type': 'string'},
-            'series_type': {'type': 'string', 'enum': ['standard', 'daily', 'anime'], 'default': 'standard'},
-            'tags': {'type': 'array', 'items': {'type': 'integer'}, 'default': [0]}
+            'series_type': {
+                'type': 'string',
+                'enum': ['standard', 'daily', 'anime'],
+                'default': 'standard',
+            },
+            'tags': {'type': 'array', 'items': {'type': 'integer'}, 'default': [0]},
         },
         'required': ['api_key'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def _sonarr_request(self, endpoint, term=None, method='get', data=None):
@@ -69,7 +70,9 @@ class SonarrSet(MutableSet):
             base_msg = 'Sonarr returned an error. {}'
             if e.response is not None:
                 error = e.response.json()[0]
-                error = '{}: {} \'{}\''.format(error['errorMessage'], error['propertyName'], error['attemptedValue'])
+                error = '{}: {} \'{}\''.format(
+                    error['errorMessage'], error['propertyName'], error['attemptedValue']
+                )
             else:
                 error = str(e)
             raise plugin.PluginError(base_msg.format(error))
@@ -83,8 +86,11 @@ class SonarrSet(MutableSet):
         return quality_name.replace('-', ' ').lower()
 
     def quality_requirement_builder(self, quality_profile):
-        allowed_qualities = [self.translate_quality(quality['quality']['name']) for quality in quality_profile['items']
-                             if quality['allowed']]
+        allowed_qualities = [
+            self.translate_quality(quality['quality']['name'])
+            for quality in quality_profile['items']
+            if quality['allowed']
+        ]
         cutoff = self.translate_quality(quality_profile['cutoff']['name'])
 
         return allowed_qualities, cutoff
@@ -114,15 +120,17 @@ class SonarrSet(MutableSet):
             if profile:
                 fg_qualities, fg_cutoff = self.quality_requirement_builder(profile)
 
-            entry = Entry(title=show['title'],
-                          url='',
-                          series_name=show['title'],
-                          tvdb_id=show.get('tvdbId'),
-                          tvrage_id=show.get('tvRageId'),
-                          tvmaze_id=show.get('tvMazeId'),
-                          imdb_id=show.get('imdbid'),
-                          slug=show.get('titleSlug'),
-                          sonarr_id=show.get('id'))
+            entry = Entry(
+                title=show['title'],
+                url='',
+                series_name=show['title'],
+                tvdb_id=show.get('tvdbId'),
+                tvrage_id=show.get('tvRageId'),
+                tvmaze_id=show.get('tvMazeId'),
+                imdb_id=show.get('imdbid'),
+                slug=show.get('titleSlug'),
+                sonarr_id=show.get('id'),
+            )
             if len(fg_qualities) > 1:
                 entry['configure_series_qualities'] = fg_qualities
             elif len(fg_qualities) == 1:
@@ -171,7 +179,7 @@ class SonarrSet(MutableSet):
         show['addOptions'] = {
             "ignoreEpisodesWithFiles": self.config.get('ignore_episodes_with_files'),
             "ignoreEpisodesWithoutFiles": self.config.get('ignore_episodes_without_files'),
-            "searchForMissingEpisodes": self.config.get('search_missing_episodes')
+            "searchForMissingEpisodes": self.config.get('search_missing_episodes'),
         }
 
         log.debug('adding show %s to sonarr', show)
@@ -189,7 +197,9 @@ class SonarrSet(MutableSet):
 
     def _find_entry(self, entry, filters=True):
         for show in self.shows(filters=filters):
-            if any(entry.get(id) is not None and entry[id] == show[id] for id in self.supported_ids):
+            if any(
+                entry.get(id) is not None and entry[id] == show[id] for id in self.supported_ids
+            ):
                 return show
             if entry.get('title').lower() == show.get('title').lower():
                 return show

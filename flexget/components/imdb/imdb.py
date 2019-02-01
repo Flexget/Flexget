@@ -100,9 +100,9 @@ class FilterImdb(object):
             'reject_writers': {'type': 'array', 'items': {'type': 'string'}},
             'accept_writers': {'type': 'array', 'items': {'type': 'string'}},
             'reject_mpaa_ratings': {'type': 'array', 'items': {'type': 'string'}},
-            'accept_mpaa_ratings': {'type': 'array', 'items': {'type': 'string'}}
+            'accept_mpaa_ratings': {'type': 'array', 'items': {'type': 'string'}},
         },
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     # Run later to avoid unnecessary lookups
@@ -132,19 +132,30 @@ class FilterImdb(object):
             reasons = []
             if 'min_score' in config:
                 if entry.get('imdb_score', 0) < config['min_score']:
-                    reasons.append('min_score (%s < %s)' % (entry.get('imdb_score'), config['min_score']))
+                    reasons.append(
+                        'min_score (%s < %s)' % (entry.get('imdb_score'), config['min_score'])
+                    )
             if 'min_votes' in config:
                 if entry.get('imdb_votes', 0) < config['min_votes']:
-                    reasons.append('min_votes (%s < %s)' % (entry.get('imdb_votes'), config['min_votes']))
+                    reasons.append(
+                        'min_votes (%s < %s)' % (entry.get('imdb_votes'), config['min_votes'])
+                    )
             if 'min_meta_score' in config:
                 if entry.get('imdb_meta_score', 0) < config['min_meta_score']:
-                    reasons.append('min_meta_score (%s < %s)' % (entry.get('imdb_meta_score'), config['min_meta_score']))
+                    reasons.append(
+                        'min_meta_score (%s < %s)'
+                        % (entry.get('imdb_meta_score'), config['min_meta_score'])
+                    )
             if 'min_year' in config:
                 if entry.get('imdb_year', 0) < config['min_year']:
-                    reasons.append('min_year (%s < %s)' % (entry.get('imdb_year'), config['min_year']))
+                    reasons.append(
+                        'min_year (%s < %s)' % (entry.get('imdb_year'), config['min_year'])
+                    )
             if 'max_year' in config:
                 if entry.get('imdb_year', 0) > config['max_year']:
-                    reasons.append('max_year (%s > %s)' % (entry.get('imdb_year'), config['max_year']))
+                    reasons.append(
+                        'max_year (%s > %s)' % (entry.get('imdb_year'), config['max_year'])
+                    )
 
             if 'accept_genres' in config:
                 accepted = config['accept_genres']
@@ -204,7 +215,10 @@ class FilterImdb(object):
                 accepted = config['accept_directors']
                 for director_id, director_name in entry.get('imdb_directors', {}).items():
                     if director_id in accepted or director_name in accepted:
-                        log.debug('Accepting because of accept_directors %s' % director_name or director_id)
+                        log.debug(
+                            'Accepting because of accept_directors %s' % director_name
+                            or director_id
+                        )
                         force_accept = True
                         break
 
@@ -220,7 +234,9 @@ class FilterImdb(object):
                 accepted = config['accept_writers']
                 for writer_id, writer_name in entry.get('imdb_writers', {}).items():
                     if writer_id in accepted or writer_name in accepted:
-                        log.debug('Accepting because of accept_writers %s' % writer_name or writer_id)
+                        log.debug(
+                            'Accepting because of accept_writers %s' % writer_name or writer_id
+                        )
                         force_accept = True
                         break
 
@@ -235,8 +251,10 @@ class FilterImdb(object):
                     reasons.append('accept_mpaa_ratings %s' % entry.get('imdb_mpaa_rating'))
 
             if reasons and not force_accept:
-                msg = 'Didn\'t accept `%s` because of rule(s) %s' % \
-                      (entry.get('imdb_name', None) or entry['title'], ', '.join(reasons))
+                msg = 'Didn\'t accept `%s` because of rule(s) %s' % (
+                    entry.get('imdb_name', None) or entry['title'],
+                    ', '.join(reasons),
+                )
                 if task.options.debug:
                     log.debug(msg)
                 else:

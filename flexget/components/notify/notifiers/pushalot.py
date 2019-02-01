@@ -36,28 +36,38 @@ class PushalotNotifier(object):
                 source: <string> (default is 'FlexGet')
                 timetolive: <integer>
     """
-    schema = {'type': 'object',
-              'properties': {
-                  'api_key': one_or_more({'type': 'string'}),
-                  'url': {'type': 'string'},
-                  'url_title': {'type': 'string'},
-                  'important': {'type': 'boolean', 'default': False},
-                  'silent': {'type': 'boolean', 'default': False},
-                  'image': {'type': 'string'},
-                  'source': {'type': 'string', 'default': 'FlexGet'},
-                  'timetolive': {'type': 'integer', 'maximum': 43200, 'minimum': 0},
-              },
-              'required': ['api_key'],
-              'additionalProperties': False}
+
+    schema = {
+        'type': 'object',
+        'properties': {
+            'api_key': one_or_more({'type': 'string'}),
+            'url': {'type': 'string'},
+            'url_title': {'type': 'string'},
+            'important': {'type': 'boolean', 'default': False},
+            'silent': {'type': 'boolean', 'default': False},
+            'image': {'type': 'string'},
+            'source': {'type': 'string', 'default': 'FlexGet'},
+            'timetolive': {'type': 'integer', 'maximum': 43200, 'minimum': 0},
+        },
+        'required': ['api_key'],
+        'additionalProperties': False,
+    }
 
     def notify(self, title, message, config):
         """
         Send a Pushalot notification
         """
-        notification = {'Title': title, 'Body': message, 'LinkTitle': config.get('url_title'),
-                        'Link': config.get('url'), 'IsImportant': config.get('important'),
-                        'IsSilent': config.get('silent'), 'Image': config.get('image'), 'Source': config.get('source'),
-                        'TimeToLive': config.get('timetolive')}
+        notification = {
+            'Title': title,
+            'Body': message,
+            'LinkTitle': config.get('url_title'),
+            'Link': config.get('url'),
+            'IsImportant': config.get('important'),
+            'IsSilent': config.get('silent'),
+            'Image': config.get('image'),
+            'Source': config.get('source'),
+            'TimeToLive': config.get('timetolive'),
+        }
 
         if not isinstance(config['api_key'], list):
             config['api_key'] = [config['api_key']]

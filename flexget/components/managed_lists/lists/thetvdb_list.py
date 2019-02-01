@@ -15,9 +15,7 @@ try:
     # NOTE: Importing other plugins is discouraged!
     from flexget.plugins.internal import api_tvdb as plugin_api_tvdb
 except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='api_tvdb',
-    )
+    raise plugin.DependencyError(issued_by=__name__, missing='api_tvdb')
 
 log = logging.getLogger('thetvdb_list')
 
@@ -29,10 +27,10 @@ class TheTVDBSet(MutableSet):
             'username': {'type': 'string'},
             'account_id': {'type': 'string'},
             'api_key': {'type': 'string'},
-            'strip_dates': {'type': 'boolean'}
+            'strip_dates': {'type': 'boolean'},
         },
         'required': ['username', 'account_id', 'api_key'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     @property
@@ -65,7 +63,8 @@ class TheTVDBSet(MutableSet):
                 req = plugin_api_tvdb.TVDBRequest(
                     username=self.config['username'],
                     account_id=self.config['account_id'],
-                    api_key=self.config['api_key']).get('user/favorites')
+                    api_key=self.config['api_key'],
+                ).get('user/favorites')
                 series_ids = [int(f_id) for f_id in req['favorites'] if f_id != '']
             except RequestException as e:
                 raise PluginError('Error retrieving favorites from thetvdb: %s' % str(e))
@@ -83,7 +82,9 @@ class TheTVDBSet(MutableSet):
                         series_name, _ = split_title_year(series_name)
                     entry = Entry()
                     entry['title'] = entry['series_name'] = series_name
-                    entry['url'] = 'http://thetvdb.com/index.php?tab=series&id={}'.format(str(series.id))
+                    entry['url'] = 'http://thetvdb.com/index.php?tab=series&id={}'.format(
+                        str(series.id)
+                    )
                     entry['tvdb_id'] = str(series.id)
                     self._items.append(entry)
         return self._items
@@ -93,26 +94,38 @@ class TheTVDBSet(MutableSet):
 
     def add(self, entry):
         if not entry.get('tvdb_id'):
-            log.verbose('entry does not have `tvdb_id`, cannot add to list. Consider using a lookup plugin`')
+            log.verbose(
+                'entry does not have `tvdb_id`, cannot add to list. Consider using a lookup plugin`'
+            )
             return
         try:
-            plugin_api_tvdb.TVDBRequest(username=self.config['username'], account_id=self.config['account_id'],
-                                        api_key=self.config['api_key']).put(
-                'user/favorites/{}'.format(entry['tvdb_id']))
+            plugin_api_tvdb.TVDBRequest(
+                username=self.config['username'],
+                account_id=self.config['account_id'],
+                api_key=self.config['api_key'],
+            ).put('user/favorites/{}'.format(entry['tvdb_id']))
         except RequestException as e:
-            log.error('Could not add tvdb_id {} to favourites list: {}'.format(entry['tvdb_id'], e))
+            log.error(
+                'Could not add tvdb_id {} to favourites list: {}'.format(entry['tvdb_id'], e)
+            )
         self.invalidate_cache()
 
     def discard(self, entry):
         if not entry.get('tvdb_id'):
-            log.verbose('entry does not have `tvdb_id`, cannot remove from list. Consider using a lookup plugin`')
+            log.verbose(
+                'entry does not have `tvdb_id`, cannot remove from list. Consider using a lookup plugin`'
+            )
             return
         try:
-            plugin_api_tvdb.TVDBRequest(username=self.config['username'], account_id=self.config['account_id'],
-                                        api_key=self.config['api_key']).delete(
-                'user/favorites/{}'.format(entry['tvdb_id']))
+            plugin_api_tvdb.TVDBRequest(
+                username=self.config['username'],
+                account_id=self.config['account_id'],
+                api_key=self.config['api_key'],
+            ).delete('user/favorites/{}'.format(entry['tvdb_id']))
         except RequestException as e:
-            log.error('Could not add tvdb_id {} to favourites list: {}'.format(entry['tvdb_id'], e))
+            log.error(
+                'Could not add tvdb_id {} to favourites list: {}'.format(entry['tvdb_id'], e)
+            )
         self.invalidate_cache()
 
     def _find_entry(self, entry):

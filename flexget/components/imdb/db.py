@@ -19,28 +19,40 @@ SCHEMA_VER = 9
 Base = db_schema.versioned_base('imdb_lookup', SCHEMA_VER)
 
 # association tables
-genres_table = Table('imdb_movie_genres', Base.metadata,
-                     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-                     Column('genre_id', Integer, ForeignKey('imdb_genres.id')),
-                     Index('ix_imdb_movie_genres', 'movie_id', 'genre_id'))
+genres_table = Table(
+    'imdb_movie_genres',
+    Base.metadata,
+    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
+    Column('genre_id', Integer, ForeignKey('imdb_genres.id')),
+    Index('ix_imdb_movie_genres', 'movie_id', 'genre_id'),
+)
 Base.register_table(genres_table)
 
-actors_table = Table('imdb_movie_actors', Base.metadata,
-                     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-                     Column('actor_id', Integer, ForeignKey('imdb_actors.id')),
-                     Index('ix_imdb_movie_actors', 'movie_id', 'actor_id'))
+actors_table = Table(
+    'imdb_movie_actors',
+    Base.metadata,
+    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
+    Column('actor_id', Integer, ForeignKey('imdb_actors.id')),
+    Index('ix_imdb_movie_actors', 'movie_id', 'actor_id'),
+)
 Base.register_table(actors_table)
 
-directors_table = Table('imdb_movie_directors', Base.metadata,
-                        Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-                        Column('director_id', Integer, ForeignKey('imdb_directors.id')),
-                        Index('ix_imdb_movie_directors', 'movie_id', 'director_id'))
+directors_table = Table(
+    'imdb_movie_directors',
+    Base.metadata,
+    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
+    Column('director_id', Integer, ForeignKey('imdb_directors.id')),
+    Index('ix_imdb_movie_directors', 'movie_id', 'director_id'),
+)
 Base.register_table(directors_table)
 
-writers_table = Table('imdb_movie_writers', Base.metadata,
-                      Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-                      Column('writer_id', Integer, ForeignKey('imdb_writers.id')),
-                      Index('ix_imdb_movie_writers', 'movie_id', 'writer_id'))
+writers_table = Table(
+    'imdb_movie_writers',
+    Base.metadata,
+    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
+    Column('writer_id', Integer, ForeignKey('imdb_writers.id')),
+    Index('ix_imdb_movie_writers', 'movie_id', 'writer_id'),
+)
 Base.register_table(writers_table)
 
 
@@ -195,5 +207,7 @@ def upgrade(ver, session):
     # v8 Added writers to the DB Schema
     # v9 Added Metacritic score exftraction/filtering
     if ver is None or ver <= 8:
-        raise UpgradeImpossible('Resetting imdb_lookup caches because bad data may have been cached.')
+        raise UpgradeImpossible(
+            'Resetting imdb_lookup caches because bad data may have been cached.'
+        )
     return ver

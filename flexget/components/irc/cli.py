@@ -7,6 +7,7 @@ from colorclass.toggles import disable_all_colors
 from flexget import options
 from flexget.event import event
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console, colorize
+
 try:
     from irc_bot.simple_irc_bot import IRCChannelStatus, SimpleIRCBot
 except ImportError:
@@ -23,14 +24,11 @@ def do_cli(manager, options):
     if hasattr(options, 'table_type') and options.table_type == 'porcelain':
         disable_all_colors()
 
-    action_map = {
-        'status': action_status,
-        'restart': action_restart,
-        'stop': action_stop
-    }
+    action_map = {'status': action_status, 'restart': action_restart, 'stop': action_stop}
 
     # NOTE: Direct importing of other plugins is discouraged
     from flexget.plugins.daemon.irc import irc_manager
+
     if irc_manager is None:
         console('IRC daemon does not appear to be running.')
         return
@@ -58,7 +56,9 @@ def action_status(options, irc_manager):
                     channels.append(channel_name)
                     if channel_status == IRCChannelStatus.CONNECTED:
                         channels[-1] = colorize('green', '* ' + channels[-1])
-            table_data.append([name, alive, ', '.join(channels), '%s:%s' % (info['server'], info['port'])])
+            table_data.append(
+                [name, alive, ', '.join(channels), '%s:%s' % (info['server'], info['port'])]
+            )
     try:
         table = TerminalTable(options.table_type, table_data)
         console(table.output)
@@ -73,7 +73,10 @@ def action_restart(options, irc_manager):
         console('Restarting irc connection %s. It may take a short while.' % connection)
         irc_manager.restart_connections(connection)
         console(
-            'Successfully restarted {0}. Use `flexget irc status {0}` to check its status.'.format(connection or 'all'))
+            'Successfully restarted {0}. Use `flexget irc status {0}` to check its status.'.format(
+                connection or 'all'
+            )
+        )
     except KeyError:
         console('ERROR: %s is not a valid irc connection' % connection)
 
@@ -84,7 +87,10 @@ def action_stop(options, irc_manager):
         console('Stopping irc connection %s. It may take a short while.' % connection)
         irc_manager.stop_connections(wait=False, name=connection)
         console(
-            'Successfully stopped {0}. Use `flexget irc status {0}` to check its status.'.format(connection or 'all'))
+            'Successfully stopped {0}. Use `flexget irc status {0}` to check its status.'.format(
+                connection or 'all'
+            )
+        )
     except KeyError:
         console('ERROR: %s is not a valid irc connection' % connection)
 
@@ -99,8 +105,10 @@ def register_parser_arguments():
     parser = options.register_command('irc', do_cli, help='View and manage irc connections')
     # Set up our subparsers
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='irc_action')
-    subparsers.add_parser('status', parents=[irc_parser, table_parser], help='Shows status for specific irc connection')
-    subparsers.add_parser('restart', parents=[irc_parser],
-                          help='Restart an irc connection')
-    subparsers.add_parser('stop', parents=[irc_parser],
-                          help='Stops an irc connection')
+    subparsers.add_parser(
+        'status',
+        parents=[irc_parser, table_parser],
+        help='Shows status for specific irc connection',
+    )
+    subparsers.add_parser('restart', parents=[irc_parser], help='Restart an irc connection')
+    subparsers.add_parser('stop', parents=[irc_parser], help='Stops an irc connection')

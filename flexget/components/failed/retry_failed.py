@@ -31,18 +31,20 @@ class PluginFailed(object):
                 "type": "object",
                 "properties": {
                     "retry_time": {"type": "string", "format": "interval", "default": "1 hour"},
-                    "max_retries": {"type": "integer",
-                                    "minimum": 0,
-                                    "maximum": FAIL_LIMIT,
-                                    "default": 3},
+                    "max_retries": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": FAIL_LIMIT,
+                        "default": 3,
+                    },
                     "retry_time_multiplier": {
                         # Allow turning off the retry multiplier with 'no' as well as 1
                         "oneOf": [{"type": "number", "minimum": 0}, {"type": "boolean"}],
-                        "default": 1.5
-                    }
+                        "default": 1.5,
+                    },
                 },
-                "additionalProperties": False
-            }
+                "additionalProperties": False,
+            },
         ]
     }
 
@@ -50,7 +52,9 @@ class PluginFailed(object):
         try:
             self.backlog = plugin.get_plugin_by_name('backlog')
         except plugin.DependencyError:
-            log.warning('Unable utilize backlog plugin, failed entries may not be retried properly.')
+            log.warning(
+                'Unable utilize backlog plugin, failed entries may not be retried properly.'
+            )
 
     def prepare_config(self, config):
         if not isinstance(config, dict):
@@ -91,13 +95,19 @@ class PluginFailed(object):
         reason = str(reason) or 'Unknown'
         with Session() as session:
             # query item's existence
-            item = session.query(db.FailedEntry).filter(db.FailedEntry.title == entry['title']). \
-                filter(db.FailedEntry.url == entry['original_url']).first()
+            item = (
+                session.query(db.FailedEntry)
+                .filter(db.FailedEntry.title == entry['title'])
+                .filter(db.FailedEntry.url == entry['original_url'])
+                .first()
+            )
             if not item:
                 item = db.FailedEntry(entry['title'], entry['original_url'], reason)
                 item.count = 0
             if item.count > FAIL_LIMIT:
-                log.error('entry with title \'%s\' has failed over %s times', entry['title'], FAIL_LIMIT)
+                log.error(
+                    'entry with title \'%s\' has failed over %s times', entry['title'], FAIL_LIMIT
+                )
                 return
             retry_time = self.retry_time(item.count, config)
             item.retry_time = datetime.now() + retry_time
@@ -105,9 +115,11 @@ class PluginFailed(object):
             item.tof = datetime.now()
             item.reason = reason
             session.merge(item)
-            log.debug('Marking %s in failed list. Has failed %s times.', item.title, item.count, )
+            log.debug('Marking %s in failed list. Has failed %s times.', item.title, item.count)
             if self.backlog and item.count <= config['max_retries']:
-                self.backlog.instance.add_backlog(entry.task, entry, amount=retry_time, session=session)
+                self.backlog.instance.add_backlog(
+                    entry.task, entry, amount=retry_time, session=session
+                )
             entry.task.rerun(plugin='retry_failed')
 
     @plugin.priority(255)
@@ -117,15 +129,23 @@ class PluginFailed(object):
         config = self.prepare_config(config)
         max_count = config['max_retries']
         for entry in task.entries:
-            item = task.session.query(db.FailedEntry).filter(db.FailedEntry.title == entry['title']). \
-                filter(db.FailedEntry.url == entry['original_url']).first()
+            item = (
+                task.session.query(db.FailedEntry)
+                .filter(db.FailedEntry.title == entry['title'])
+                .filter(db.FailedEntry.url == entry['original_url'])
+                .first()
+            )
             if item:
                 if item.count > max_count:
-                    entry.reject('Has already failed %s times in the past. (failure reason: %s)' %
-                                 (item.count, item.reason))
+                    entry.reject(
+                        'Has already failed %s times in the past. (failure reason: %s)'
+                        % (item.count, item.reason)
+                    )
                 elif item.retry_time and item.retry_time > datetime.now():
-                    entry.reject('Waiting before retrying entry which has failed in the past. (failure reason: %s)' %
-                                 item.reason)
+                    entry.reject(
+                        'Waiting before retrying entry which has failed in the past. (failure reason: %s)'
+                        % item.reason
+                    )
 
 
 @event('plugin.register')

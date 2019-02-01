@@ -8,7 +8,13 @@ from flask import jsonify, request
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource
-from flexget.api.app import base_message_schema, success_response, NotFoundError, etag, pagination_headers
+from flexget.api.app import (
+    base_message_schema,
+    success_response,
+    NotFoundError,
+    etag,
+    pagination_headers,
+)
 from . import db
 
 log = logging.getLogger('failed_api')
@@ -26,16 +32,20 @@ class ObjectsContainer(object):
             'added_at': {'type': 'string', 'format': 'date-time'},
             'reason': {'type': 'string'},
             'count': {'type': 'integer'},
-            'retry_time': {'type': ['string', 'null'], 'format': 'date-time'}
+            'retry_time': {'type': ['string', 'null'], 'format': 'date-time'},
         },
         'required': ['id', 'title', 'url', 'added_at', 'reason', 'count', 'retry_time'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
     retry_entries_list_object = {'type': 'array', 'items': retry_failed_entry_object}
 
 
-retry_failed_entry_schema = api.schema_model('retry_failed_entry_schema', ObjectsContainer.retry_failed_entry_object)
-retry_entries_list_schema = api.schema_model('retry_entries_list_schema', ObjectsContainer.retry_entries_list_object)
+retry_failed_entry_schema = api.schema_model(
+    'retry_failed_entry_schema', ObjectsContainer.retry_failed_entry_object
+)
+retry_entries_list_schema = api.schema_model(
+    'retry_entries_list_schema', ObjectsContainer.retry_entries_list_object
+)
 
 sort_choices = ('failure_time', 'id', 'title', 'url', 'reason', 'count', 'retry_time')
 failed_parser = api.pagination_parser(sort_choices=sort_choices)
@@ -78,7 +88,7 @@ class RetryFailed(APIResource):
             'stop': stop,
             'descending': descending,
             'sort_by': sort_by,
-            'session': session
+            'session': session,
         }
 
         total_items = db.get_failures(session, count=True)
@@ -124,7 +134,9 @@ class RetryFailedID(APIResource):
     def get(self, failed_entry_id, session=None):
         """ Get failed entry by ID """
         try:
-            failed_entry = session.query(db.FailedEntry).filter(db.FailedEntry.id == failed_entry_id).one()
+            failed_entry = (
+                session.query(db.FailedEntry).filter(db.FailedEntry.id == failed_entry_id).one()
+            )
         except NoResultFound:
             raise NotFoundError('could not find entry with ID %i' % failed_entry_id)
         return jsonify(failed_entry.to_dict())
@@ -133,7 +145,9 @@ class RetryFailedID(APIResource):
     def delete(self, failed_entry_id, session=None):
         """ Delete failed entry by ID """
         try:
-            failed_entry = session.query(db.FailedEntry).filter(db.FailedEntry.id == failed_entry_id).one()
+            failed_entry = (
+                session.query(db.FailedEntry).filter(db.FailedEntry.id == failed_entry_id).one()
+            )
         except NoResultFound:
             raise NotFoundError('could not find entry with ID %i' % failed_entry_id)
         log.debug('deleting failed entry: "%s"' % failed_entry.title)

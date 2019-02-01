@@ -10,7 +10,13 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource
 from flexget.api.app import (
-    NotFoundError, base_message_schema, success_response, etag, pagination_headers, Conflict, BadRequest
+    NotFoundError,
+    base_message_schema,
+    success_response,
+    etag,
+    pagination_headers,
+    Conflict,
+    BadRequest,
 )
 from . import db
 
@@ -25,8 +31,8 @@ class ObjectsContainer(object):
         'properties': {
             'id': {'type': 'integer'},
             'name': {'type': 'string'},
-            'added_on': {'type': 'string'}
-        }
+            'added_on': {'type': 'string'},
+        },
     }
     pending_list_input_object = copy.deepcopy(pending_list_base_object)
     del pending_list_input_object['properties']['id']
@@ -39,10 +45,10 @@ class ObjectsContainer(object):
         'properties': {
             'title': {'type': 'string'},
             'original_url': {'type': 'string'},
-            'approved': {'type': 'boolean'}
+            'approved': {'type': 'boolean'},
         },
         'required': ['title', 'original_url'],
-        'additionalProperties': True
+        'additionalProperties': True,
     }
 
     pending_list_entry_base_object = {
@@ -54,28 +60,35 @@ class ObjectsContainer(object):
             'title': {'type': 'string'},
             'original_url': {'type': 'string'},
             'approved': {'type': 'boolean'},
-            'entry': base_entry_object
-        }
+            'entry': base_entry_object,
+        },
     }
 
     operation_object = {
         'type': 'object',
-        'properties': {
-            'operation': {'type': 'string', 'enum': ['approve', 'reject']}
-        },
+        'properties': {'operation': {'type': 'string', 'enum': ['approve', 'reject']}},
         'required': ['operation'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
-    pending_lists_entries_return_object = {'type': 'array', 'items': pending_list_entry_base_object}
+    pending_lists_entries_return_object = {
+        'type': 'array',
+        'items': pending_list_entry_base_object,
+    }
 
 
-pending_list_object_schema = api.schema_model('pending_list.return_list', ObjectsContainer.pending_list_base_object)
-pending_list_input_object_schema = api.schema_model('pending_list.input_list',
-                                                    ObjectsContainer.pending_list_input_object)
-pending_list_return_lists_schema = api.schema_model('pending_list.return_lists',
-                                                    ObjectsContainer.pending_list_return_lists)
-pending_list_operation_schema = api.schema_model('pending_list.operation_schema', ObjectsContainer.operation_object)
+pending_list_object_schema = api.schema_model(
+    'pending_list.return_list', ObjectsContainer.pending_list_base_object
+)
+pending_list_input_object_schema = api.schema_model(
+    'pending_list.input_list', ObjectsContainer.pending_list_input_object
+)
+pending_list_return_lists_schema = api.schema_model(
+    'pending_list.return_lists', ObjectsContainer.pending_list_return_lists
+)
+pending_list_operation_schema = api.schema_model(
+    'pending_list.operation_schema', ObjectsContainer.operation_object
+)
 
 list_parser = api.parser()
 list_parser.add_argument('name', help='Filter results by list name')
@@ -91,7 +104,10 @@ class PendingListListsAPI(APIResource):
         args = list_parser.parse_args()
         name = args.get('name')
 
-        pending_lists = [pending_list.to_dict() for pending_list in db.get_pending_lists(name=name, session=session)]
+        pending_lists = [
+            pending_list.to_dict()
+            for pending_list in db.get_pending_lists(name=name, session=session)
+        ]
         return jsonify(pending_lists)
 
     @api.validate(pending_list_input_object_schema)
@@ -144,10 +160,12 @@ class PendingListListAPI(APIResource):
 
 
 base_entry_schema = api.schema_model('base_entry_schema', ObjectsContainer.base_entry_object)
-pending_list_entry_base_schema = api.schema_model('pending_list.entry_base_schema',
-                                                  ObjectsContainer.pending_list_entry_base_object)
-pending_lists_entries_return_schema = api.schema_model('pending_list.entry_return_schema',
-                                                       ObjectsContainer.pending_lists_entries_return_object)
+pending_list_entry_base_schema = api.schema_model(
+    'pending_list.entry_base_schema', ObjectsContainer.pending_list_entry_base_object
+)
+pending_lists_entries_return_schema = api.schema_model(
+    'pending_list.entry_return_schema', ObjectsContainer.pending_lists_entries_return_object
+)
 
 sort_choices = ('id', 'added', 'title', 'original_url', 'list_id', 'approved')
 entries_parser = api.pagination_parser(sort_choices=sort_choices, default='title')
@@ -192,7 +210,7 @@ class PendingListEntriesAPI(APIResource):
             'order_by': sort_by,
             'descending': descending,
             'filter': filter_,
-            'session': session
+            'session': session,
         }
 
         total_items = list.entries.count()
@@ -223,7 +241,9 @@ class PendingListEntriesAPI(APIResource):
         return rsp
 
     @api.validate(base_entry_schema)
-    @api.response(201, description='Successfully created entry object', model=pending_list_entry_base_schema)
+    @api.response(
+        201, description='Successfully created entry object', model=pending_list_entry_base_schema
+    )
     @api.response(Conflict)
     def post(self, list_id, session=None):
         """ Create a new entry object"""

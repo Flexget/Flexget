@@ -19,11 +19,11 @@ class ListRemove(object):
                 {
                     'maxProperties': 1,
                     'error_maxProperties': 'Plugin options within list_remove plugin must be indented 2 more spaces '
-                                           'than the first letter of the plugin name.',
-                    'minProperties': 1
-                }
+                    'than the first letter of the plugin name.',
+                    'minProperties': 1,
+                },
             ]
-        }
+        },
     }
 
     def on_task_output(self, task, config):
@@ -34,12 +34,16 @@ class ListRemove(object):
         for item in config:
             for plugin_name, plugin_config in item.items():
                 try:
-                    thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
+                    thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(
+                        plugin_config
+                    )
                 except AttributeError:
                     raise PluginError('Plugin %s does not support list interface' % plugin_name)
                 if task.manager.options.test and thelist.online:
-                    log.info('`%s` is marked as online, would remove accepted items outside of --test mode.',
-                             plugin_name)
+                    log.info(
+                        '`%s` is marked as online, would remove accepted items outside of --test mode.',
+                        plugin_name,
+                    )
                     continue
                 log.verbose('removing accepted entries from %s - %s', plugin_name, plugin_config)
                 thelist -= task.accepted

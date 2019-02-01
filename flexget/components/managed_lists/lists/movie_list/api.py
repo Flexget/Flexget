@@ -10,8 +10,15 @@ from flask import request
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource
-from flexget.api.app import Conflict, NotFoundError, base_message_schema, success_response, BadRequest, etag, \
-    pagination_headers
+from flexget.api.app import (
+    Conflict,
+    NotFoundError,
+    base_message_schema,
+    success_response,
+    BadRequest,
+    etag,
+    pagination_headers,
+)
 from .movie_list import MovieListBase
 from . import db
 
@@ -23,11 +30,7 @@ movie_list_api = api.namespace('movie_list', description='Movie List operations'
 class ObjectsContainer(object):
     input_movie_list_id_object = {
         'type': 'array',
-        'items': {
-            'type': 'object',
-            'minProperties': 1,
-            'additionalProperties': True
-        }
+        'items': {'type': 'object', 'minProperties': 1, 'additionalProperties': True},
     }
 
     input_movie_entry = {
@@ -35,7 +38,7 @@ class ObjectsContainer(object):
         'properties': {
             'movie_name': {'type': 'string'},
             'movie_year': {'type': 'integer'},
-            'movie_identifiers': input_movie_list_id_object
+            'movie_identifiers': input_movie_list_id_object,
         },
         'additionalProperties': True,
         'required': ['movie_name'],
@@ -43,11 +46,14 @@ class ObjectsContainer(object):
 
     return_movie_list_id_object = copy.deepcopy(input_movie_list_id_object)
     return_movie_list_id_object.update(
-        {'properties': {
-            'id': {'type': 'integer'},
-            'added_on': {'type': 'string'},
-            'movie_id': {'type': 'integer'}
-        }})
+        {
+            'properties': {
+                'id': {'type': 'integer'},
+                'added_on': {'type': 'string'},
+                'movie_id': {'type': 'integer'},
+            }
+        }
+    )
 
     movie_list_object = {
         'type': 'object',
@@ -56,11 +62,8 @@ class ObjectsContainer(object):
             'added_on': {'type': 'string'},
             'year': {'type': ['integer', 'null']},
             'list_id': {'type': 'integer'},
-            'movie_list_ids': {
-                'type': 'array',
-                'items': return_movie_list_id_object
-            },
-        }
+            'movie_list_ids': {'type': 'array', 'items': return_movie_list_id_object},
+        },
     }
 
     list_object = {
@@ -68,8 +71,8 @@ class ObjectsContainer(object):
         'properties': {
             'id': {'type': 'integer'},
             'added_on': {'type': 'string'},
-            'name': {'type': 'string'}
-        }
+            'name': {'type': 'string'},
+        },
     }
 
     list_input = copy.deepcopy(list_object)
@@ -83,17 +86,27 @@ class ObjectsContainer(object):
     return_identifiers = {'type': 'array', 'items': {'type': 'string'}}
 
 
-input_movie_entry_schema = api.schema_model('input_movie_entry', ObjectsContainer.input_movie_entry)
-input_movie_list_id_schema = api.schema_model('input_movie_list_id_object', ObjectsContainer.input_movie_list_id_object)
+input_movie_entry_schema = api.schema_model(
+    'input_movie_entry', ObjectsContainer.input_movie_entry
+)
+input_movie_list_id_schema = api.schema_model(
+    'input_movie_list_id_object', ObjectsContainer.input_movie_list_id_object
+)
 
-movie_list_id_object_schema = api.schema_model('movie_list_id_object', ObjectsContainer.return_movie_list_id_object)
-movie_list_object_schema = api.schema_model('movie_list_object', ObjectsContainer.movie_list_object)
+movie_list_id_object_schema = api.schema_model(
+    'movie_list_id_object', ObjectsContainer.return_movie_list_id_object
+)
+movie_list_object_schema = api.schema_model(
+    'movie_list_object', ObjectsContainer.movie_list_object
+)
 list_object_schema = api.schema_model('list_object', ObjectsContainer.list_object)
 return_lists_schema = api.schema_model('return_lists', ObjectsContainer.return_lists)
 return_movies_schema = api.schema_model('return_movies', ObjectsContainer.return_movies)
 
 new_list_schema = api.schema_model('new_list', ObjectsContainer.list_input)
-identifiers_schema = api.schema_model('movie_list.identifiers', ObjectsContainer.return_identifiers)
+identifiers_schema = api.schema_model(
+    'movie_list.identifiers', ObjectsContainer.return_identifiers
+)
 
 movie_list_parser = api.parser()
 movie_list_parser.add_argument('name', help='Filter results by list name')
@@ -108,7 +121,9 @@ class MovieListAPI(APIResource):
         """ Gets movies lists """
         args = movie_list_parser.parse_args()
         name = args.get('name')
-        movie_lists = [movie_list.to_dict() for movie_list in db.get_movie_lists(name=name, session=session)]
+        movie_lists = [
+            movie_list.to_dict() for movie_list in db.get_movie_lists(name=name, session=session)
+        ]
         return jsonify(movie_lists)
 
     @api.validate(new_list_schema)
@@ -158,7 +173,9 @@ class MovieListListAPI(APIResource):
         return success_response('successfully deleted list')
 
 
-movie_identifiers_doc = "Use movie identifier using the following format:\n[{'ID_NAME: 'ID_VALUE'}]."
+movie_identifiers_doc = (
+    "Use movie identifier using the following format:\n[{'ID_NAME: 'ID_VALUE'}]."
+)
 
 sort_choices = ('id', 'added', 'title', 'year')
 movies_parser = api.pagination_parser(sort_choices=sort_choices, default='title')
@@ -190,7 +207,7 @@ class MovieListMoviesAPI(APIResource):
             'list_id': list_id,
             'order_by': sort_by,
             'descending': descending,
-            'session': session
+            'session': session,
         }
         try:
             list = db.get_list_by_id(list_id=list_id, session=session)
@@ -240,7 +257,9 @@ class MovieListMoviesAPI(APIResource):
             if list(id_name)[0] not in MovieListBase().supported_ids:
                 raise BadRequest('movie identifier %s is not allowed' % id_name)
         title, year = data['movie_name'], data.get('movie_year')
-        movie = db.get_movie_by_title_and_year(list_id=list_id, title=title, year=year, session=session)
+        movie = db.get_movie_by_title_and_year(
+            list_id=list_id, title=title, year=year, session=session
+        )
         if movie:
             raise Conflict('movie with name "%s" already exist in list %d' % (title, list_id))
         movie = db.MovieListMovie()
@@ -283,7 +302,9 @@ class MovieListMovieAPI(APIResource):
     @api.validate(model=input_movie_list_id_schema, description=movie_identifiers_doc)
     @api.response(200, model=movie_list_object_schema)
     @api.response(BadRequest)
-    @api.doc(description='Sent movie identifiers will override any existing identifiers that the movie currently holds')
+    @api.doc(
+        description='Sent movie identifiers will override any existing identifiers that the movie currently holds'
+    )
     def put(self, list_id, movie_id, session=None):
         """ Sets movie identifiers """
         try:
@@ -296,7 +317,9 @@ class MovieListMovieAPI(APIResource):
         for id_name in data:
             if list(id_name)[0] not in MovieListBase().supported_ids:
                 raise BadRequest('movie identifier %s is not allowed' % id_name)
-        movie.ids[:] = db.get_db_movie_identifiers(identifier_list=data, movie_id=movie_id, session=session)
+        movie.ids[:] = db.get_db_movie_identifiers(
+            identifier_list=data, movie_id=movie_id, session=session
+        )
         session.commit()
         return jsonify(movie.to_dict())
 

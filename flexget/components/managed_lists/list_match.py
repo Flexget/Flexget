@@ -14,18 +14,25 @@ class ListMatch(object):
     schema = {
         'type': 'object',
         'properties': {
-            'from': {'type': 'array', 'items':
-                {'allOf': [
-                    {'$ref': '/schema/plugins?interface=list'},
-                    {'maxProperties': 1,
-                     'error_maxProperties': 'Plugin options within list_match plugin must be indented '
-                                            '2 more spaces than the first letter of the plugin name.',
-                     'minProperties': 1}]}},
+            'from': {
+                'type': 'array',
+                'items': {
+                    'allOf': [
+                        {'$ref': '/schema/plugins?interface=list'},
+                        {
+                            'maxProperties': 1,
+                            'error_maxProperties': 'Plugin options within list_match plugin must be indented '
+                            '2 more spaces than the first letter of the plugin name.',
+                            'minProperties': 1,
+                        },
+                    ]
+                },
+            },
             'action': {'type': 'string', 'enum': ['accept', 'reject'], 'default': 'accept'},
             'remove_on_match': {'type': 'boolean', 'default': True},
             'single_match': {'type': 'boolean', 'default': True},
         },
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     @plugin.priority(0)
@@ -33,7 +40,9 @@ class ListMatch(object):
         for item in config['from']:
             for plugin_name, plugin_config in item.items():
                 try:
-                    thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
+                    thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(
+                        plugin_config
+                    )
                 except AttributeError:
                     raise PluginError('Plugin %s does not support list interface' % plugin_name)
                 already_accepted = []
@@ -61,12 +70,16 @@ class ListMatch(object):
         for item in config['from']:
             for plugin_name, plugin_config in item.items():
                 try:
-                    thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
+                    thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(
+                        plugin_config
+                    )
                 except AttributeError:
                     raise PluginError('Plugin %s does not support list interface' % plugin_name)
                 if task.manager.options.test and thelist.online:
-                    log.info('`%s` is marked as online, would remove accepted items outside of --test mode.',
-                             plugin_name)
+                    log.info(
+                        '`%s` is marked as online, would remove accepted items outside of --test mode.',
+                        plugin_name,
+                    )
                     continue
                 log.verbose('removing accepted entries from %s - %s', plugin_name, plugin_config)
                 thelist -= task.accepted

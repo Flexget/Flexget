@@ -28,6 +28,7 @@ class MsTeamsNotifier(object):
               [title: <string>]
               [theme_color: <string>]
     """
+
     schema = {
         'type': 'object',
         'properties': {
@@ -36,7 +37,7 @@ class MsTeamsNotifier(object):
             'theme_color': {'type': 'string'},
         },
         'required': ['web_hook_url'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def notify(self, web_hook_url, message, config, title=None, themecolor=None):

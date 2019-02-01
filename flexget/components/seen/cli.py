@@ -13,9 +13,7 @@ try:
     # NOTE: Importing other plugins is discouraged!
     from flexget.components.imdb.utils import is_imdb_url, extract_id
 except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='imdb',
-    )
+    raise plugin.DependencyError(issued_by=__name__, missing='imdb')
 
 
 def do_cli(manager, options):

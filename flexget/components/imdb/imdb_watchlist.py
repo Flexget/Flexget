@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import * # noqa pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -28,7 +28,7 @@ TITLE_TYPE_MAP = {
     'episodes': 'tvEpisode',
     'tv movies': 'tvMovie',
     'tv specials': 'tvSpecial',
-    'videos': 'video'
+    'videos': 'video',
 }
 
 
@@ -41,32 +41,31 @@ class ImdbWatchlist(object):
             'user_id': {
                 'type': 'string',
                 'pattern': USER_ID_RE,
-                'error_pattern': 'user_id must be in the form urXXXXXXX'
+                'error_pattern': 'user_id must be in the form urXXXXXXX',
             },
             'list': {
                 'type': 'string',
-                'oneOf': [
-                    {'enum': USER_LISTS},
-                    {'pattern': CUSTOM_LIST_RE}
-                ],
-                'error_oneOf': 'list must be either %s, or a custom list name (lsXXXXXXXXX)' % ', '.join(USER_LISTS)
+                'oneOf': [{'enum': USER_LISTS}, {'pattern': CUSTOM_LIST_RE}],
+                'error_oneOf': 'list must be either %s, or a custom list name (lsXXXXXXXXX)'
+                % ', '.join(USER_LISTS),
             },
-            'force_language':
-                {'type': 'string',
-                 'default': 'en-us'},
+            'force_language': {'type': 'string', 'default': 'en-us'},
             'type': {
                 'oneOf': [
-                    one_or_more({'type': 'string', 'enum': list(TITLE_TYPE_MAP.keys())}, unique_items=True),
-                    {'type': 'string', 'enum': ['all']}
-                ]}
+                    one_or_more(
+                        {'type': 'string', 'enum': list(TITLE_TYPE_MAP.keys())}, unique_items=True
+                    ),
+                    {'type': 'string', 'enum': ['all']},
+                ]
+            },
         },
         'additionalProperties': False,
         'required': ['list'],
         'anyOf': [
             {'required': ['user_id']},
-            {'properties': {'list': {'pattern': CUSTOM_LIST_RE}}}
+            {'properties': {'list': {'pattern': CUSTOM_LIST_RE}}},
         ],
-        'error_anyOf': 'user_id is required if not using a custom list (lsXXXXXXXXX format)'
+        'error_anyOf': 'user_id is required if not using a custom list (lsXXXXXXXXX format)',
     }
 
     def prepare_config(self, config):
@@ -112,19 +111,23 @@ class ImdbWatchlist(object):
             raise plugin.PluginError(str(e))
         if page.status_code != 200:
             raise plugin.PluginError(
-                'Unable to get imdb list. Either list is private or does not exist.' +
-                ' Html status code was: %d.' % page.status_code)
+                'Unable to get imdb list. Either list is private or does not exist.'
+                + ' Html status code was: %d.' % page.status_code
+            )
         return page
 
     def parse_react_widget(self, task, config, url, params, headers):
         page = self.fetch_page(task, url, params, headers)
         try:
-            json_vars = json.loads(re.search('IMDbReactInitialState.push\((.+?)\);\n', page.text).group(1))
+            json_vars = json.loads(
+                re.search('IMDbReactInitialState.push\((.+?)\);\n', page.text).group(1)
+            )
         except (TypeError, AttributeError, ValueError) as e:
             raise plugin.PluginError(
-                'Unable to get imdb list from imdb react widget.' +
-                ' Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken.' +
-                ' Original error: %s.' % str(e))
+                'Unable to get imdb list from imdb react widget.'
+                + ' Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken.'
+                + ' Original error: %s.' % str(e)
+            )
         total_item_count = 0
         if 'list' in json_vars and 'items' in json_vars['list']:
             total_item_count = len(json_vars['list']['items'])
@@ -140,18 +143,24 @@ class ImdbWatchlist(object):
         try:
             json_data = self.fetch_page(task, url, params, headers).json()
         except (ValueError, TypeError) as e:
-            raise plugin.PluginError('Unable to get imdb list from imdb JSON API.' +
-                ' Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken.' +
-                ' Original error: %s.' % str(e))
+            raise plugin.PluginError(
+                'Unable to get imdb list from imdb JSON API.'
+                + ' Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken.'
+                + ' Original error: %s.' % str(e)
+            )
         log.verbose('imdb list contains %d items', len(json_data))
-        log.debug('First entry (imdb id: %s) looks like this: %s', imdb_ids[0], json_data[imdb_ids[0]])
+        log.debug(
+            'First entry (imdb id: %s) looks like this: %s', imdb_ids[0], json_data[imdb_ids[0]]
+        )
         entries = []
         for imdb_id in imdb_ids:
             entry = Entry()
-            if not ('title' in json_data[imdb_id] and
-                    'primary' in json_data[imdb_id]['title'] and
-                    'href' in json_data[imdb_id]['title']['primary'] and
-                    'title' in json_data[imdb_id]['title']['primary']):
+            if not (
+                'title' in json_data[imdb_id]
+                and 'primary' in json_data[imdb_id]['title']
+                and 'href' in json_data[imdb_id]['title']['primary']
+                and 'title' in json_data[imdb_id]['title']['primary']
+            ):
                 log.debug('no title or link found for item %s, skipping', imdb_id)
                 continue
             if 'type' in json_data[imdb_id]['title']:
@@ -179,8 +188,10 @@ class ImdbWatchlist(object):
             total_item_count = 0
         except (ValueError, TypeError) as e:
             # TODO Something is wrong if we get a ValueError, I think
-            raise plugin.PluginError('Received invalid movie count: %s ; %s' %
-                                     (soup.find('div', class_='lister-total-num-results').string, e))
+            raise plugin.PluginError(
+                'Received invalid movie count: %s ; %s'
+                % (soup.find('div', class_='lister-total-num-results').string, e)
+            )
 
         if not total_item_count:
             log.verbose('No movies were found in imdb list: %s', config['list'])

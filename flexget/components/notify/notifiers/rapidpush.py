@@ -35,6 +35,7 @@ class RapidpushNotifier(object):
                     your devices, default no channel]
                 [priority: 0 - 6 (6 = highest), default 2 (normal)]
     """
+
     schema = {
         'type': 'object',
         'properties': {
@@ -42,16 +43,18 @@ class RapidpushNotifier(object):
             'category': {'type': 'string', 'default': 'Flexget'},
             'group': {'type': 'string'},
             'channel': {'type': 'string'},
-            'priority': {'type': 'integer', 'minimum': 0, 'maximum': 6}
+            'priority': {'type': 'integer', 'minimum': 0, 'maximum': 6},
         },
         'additionalProperties': False,
         'required': ['api_key'],
-        'not':
-            {'anyOf': [
+        'not': {
+            'anyOf': [
                 {'required': ['channel', 'group']},
                 {'required': ['channel', 'category']},
-                {'required': ['channel', 'priority']}]},
-        'error_not': 'Cannot use \'channel\' with \'group\', \'category\' or \'priority\''
+                {'required': ['channel', 'priority']},
+            ]
+        },
+        'error_not': 'Cannot use \'channel\' with \'group\', \'category\' or \'priority\'',
     }
 
     def notify(self, title, message, config):

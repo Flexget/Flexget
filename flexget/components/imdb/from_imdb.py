@@ -47,11 +47,35 @@ class FromIMDB(object):
             movie_queue: add
 
     """
-    job_types = ['actor', 'actress', 'director', 'producer', 'writer', 'self', 'editor', 'miscellaneous',
-                 'editorial department', 'cinematographer', 'visual effects', 'thanks', 'music department',
-                 'in development', 'archive footage', 'soundtrack']
 
-    content_types = ['movie', 'tv series', 'tv mini series', 'video game', 'video movie', 'tv movie', 'episode']
+    job_types = [
+        'actor',
+        'actress',
+        'director',
+        'producer',
+        'writer',
+        'self',
+        'editor',
+        'miscellaneous',
+        'editorial department',
+        'cinematographer',
+        'visual effects',
+        'thanks',
+        'music department',
+        'in development',
+        'archive footage',
+        'soundtrack',
+    ]
+
+    content_types = [
+        'movie',
+        'tv series',
+        'tv mini series',
+        'video game',
+        'video movie',
+        'tv movie',
+        'episode',
+    ]
 
     content_type_conversion = {
         'movie': 'movie',
@@ -60,7 +84,7 @@ class FromIMDB(object):
         'tv movie': 'tv',
         'episode': 'tv',
         'video movie': 'video',
-        'video game': 'video game'
+        'video game': 'video game',
     }
 
     character_content_type_conversion = {
@@ -75,27 +99,36 @@ class FromIMDB(object):
 
     jobs_without_content_type = ['actor', 'actress', 'self', 'in development', 'archive footage']
 
-    imdb_pattern = one_or_more({'type': 'string',
-                                'pattern': r'(nm|co|ch)\d{7}',
-                                'error_pattern': 'Get the id from the url of the person/company you want to use,'
-                                                 ' e.g. http://imdb.com/text/<id here>/blah'}, unique_items=True)
+    imdb_pattern = one_or_more(
+        {
+            'type': 'string',
+            'pattern': r'(nm|co|ch)\d{7}',
+            'error_pattern': 'Get the id from the url of the person/company you want to use,'
+            ' e.g. http://imdb.com/text/<id here>/blah',
+        },
+        unique_items=True,
+    )
 
     schema = {
         'oneOf': [
             imdb_pattern,
-            {'type': 'object',
-             'properties': {
-                 'id': imdb_pattern,
-                 'job_types': one_or_more({'type': 'string', 'enum': job_types}, unique_items=True),
-                 'content_types': one_or_more({'type': 'string', 'enum': content_types}, unique_items=True),
-                 'max_entries': {'type': 'integer'},
-                 'match_type': {'type': 'string', 'enum': ['strict', 'loose']}
-             },
-             'required': ['id'],
-             'additionalProperties': False
-             }
-        ],
-
+            {
+                'type': 'object',
+                'properties': {
+                    'id': imdb_pattern,
+                    'job_types': one_or_more(
+                        {'type': 'string', 'enum': job_types}, unique_items=True
+                    ),
+                    'content_types': one_or_more(
+                        {'type': 'string', 'enum': content_types}, unique_items=True
+                    ),
+                    'max_entries': {'type': 'integer'},
+                    'match_type': {'type': 'string', 'enum': ['strict', 'loose']},
+                },
+                'required': ['id'],
+                'additionalProperties': False,
+            },
+        ]
     }
 
     def prepare_config(self, config):
@@ -136,10 +169,16 @@ class FromIMDB(object):
             except Exception as e:
                 log.error(
                     'Could not resolve entity via ID: {}. '
-                    'Either error in config or unsupported entity. Error:{}'.format(id, e))
+                    'Either error in config or unsupported entity. Error:{}'.format(id, e)
+                )
                 continue
-            items += self.get_items_by_entity(entity_type, entity_object, config.get('content_types'),
-                                              config.get('job_types'), config.get('match_type'))
+            items += self.get_items_by_entity(
+                entity_type,
+                entity_object,
+                config.get('content_types'),
+                config.get('job_types'),
+                config.get('match_type'),
+            )
         return set(items)
 
     def get_entity_type_and_object(self, imdb_id):
@@ -161,7 +200,9 @@ class FromIMDB(object):
             log.info('Starting to retrieve items for Character: %s' % character)
             return 'Character', character
 
-    def get_items_by_entity(self, entity_type, entity_object, content_types, job_types, match_type):
+    def get_items_by_entity(
+        self, entity_type, entity_object, content_types, job_types, match_type
+    ):
         """
         Gets entity object and return movie list using relevant method
         """
@@ -199,7 +240,9 @@ class FromIMDB(object):
                 log.debug('Match type is strict, verifying item type to requested content types')
                 self.ia.update(item)
                 if item['kind'] in content_types:
-                    log.verbose('Adding item "{}" to list. Item kind is "{}"'.format(item, item['kind']))
+                    log.verbose(
+                        'Adding item "{}" to list. Item kind is "{}"'.format(item, item['kind'])
+                    )
                     items.append(item)
                 else:
                     log.verbose('Rejecting item "{}". Item kind is "{}'.format(item, item['kind']))
@@ -214,23 +257,31 @@ class FromIMDB(object):
         """
         unfiltered_items = self.flat_list(
             [self.items_by_job_type(person, job_type, content_types) for job_type in job_types],
-            remove_none=True)
+            remove_none=True,
+        )
 
         return self.filtered_items(unfiltered_items, content_types, match_type)
 
     def items_by_content_type(self, person, job_type, content_type):
-        return [_f for _f in (person.get(job_type + ' ' + self.content_type_conversion[content_type], [])) if _f]
+        return [
+            _f
+            for _f in (person.get(job_type + ' ' + self.content_type_conversion[content_type], []))
+            if _f
+        ]
 
     def items_by_job_type(self, person, job_type, content_types):
-        items = person.get(job_type, []) if job_type in self.jobs_without_content_type else [
-            person.get(job_type + ' ' + 'documentary', []) and
-            person.get(job_type + ' ' + 'short', []) and
-            self.items_by_content_type(person, job_type, content_type)
-            if content_type == 'movie'
-            else
-            self.items_by_content_type(person, job_type, content_type)
-            for content_type in content_types
-        ]
+        items = (
+            person.get(job_type, [])
+            if job_type in self.jobs_without_content_type
+            else [
+                person.get(job_type + ' ' + 'documentary', [])
+                and person.get(job_type + ' ' + 'short', [])
+                and self.items_by_content_type(person, job_type, content_type)
+                if content_type == 'movie'
+                else self.items_by_content_type(person, job_type, content_type)
+                for content_type in content_types
+            ]
+        )
         return [_f for _f in items if _f]
 
     def items_by_character(self, character, content_types, match_type):
@@ -241,8 +292,12 @@ class FromIMDB(object):
         :return:
         """
         unfiltered_items = self.flat_list(
-            [character.get(self.character_content_type_conversion[content_type])
-             for content_type in content_types], remove_none=True)
+            [
+                character.get(self.character_content_type_conversion[content_type])
+                for content_type in content_types
+            ],
+            remove_none=True,
+        )
 
         return self.filtered_items(unfiltered_items, content_types, match_type)
 
@@ -258,9 +313,12 @@ class FromIMDB(object):
     def on_task_input(self, task, config):
         try:
             from imdb import IMDb
+
             self.ia = IMDb()
         except ImportError:
-            log.error('IMDBPY is required for this plugin. Please install using "pip install imdbpy"')
+            log.error(
+                'IMDBPY is required for this plugin. Please install using "pip install imdbpy"'
+            )
             return
 
         entries = []
@@ -270,10 +328,12 @@ class FromIMDB(object):
             log.error('Could not get IMDB item list, check your configuration.')
             return
         for item in items:
-            entry = Entry(title=item['title'],
-                          imdb_id='tt' + self.ia.get_imdbID(item),
-                          url='',
-                          imdb_url=self.ia.get_imdbURL(item))
+            entry = Entry(
+                title=item['title'],
+                imdb_id='tt' + self.ia.get_imdbID(item),
+                url='',
+                imdb_url=self.ia.get_imdbURL(item),
+            )
 
             if entry.isvalid():
                 if entry not in entries:
@@ -289,8 +349,9 @@ class FromIMDB(object):
         else:
             log.warning(
                 'Number of entries (%s) exceeds maximum allowed value %s. '
-                'Edit your filters or raise the maximum value by entering a higher "max_entries"' % (
-                    len(entries), config.get('max_entries')))
+                'Edit your filters or raise the maximum value by entering a higher "max_entries"'
+                % (len(entries), config.get('max_entries'))
+            )
             return
 
 

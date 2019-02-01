@@ -22,7 +22,6 @@ log = logging.getLogger('ftp_list')
 
 
 class FTPList(object):
-
     def __init__(self):
         self.username = None
         self.password = None
@@ -41,9 +40,11 @@ class FTPList(object):
             'dirs': one_or_more({'type': 'string'}),
             'recursion': {'type': 'boolean'},
             'recursion_depth': {'type': 'integer'},
-            'retrieve': one_or_more({'type': 'string', 'enum': ['files', 'dirs', 'symlinks']}, unique_items=True)
+            'retrieve': one_or_more(
+                {'type': 'string', 'enum': ['files', 'dirs', 'symlinks']}, unique_items=True
+            ),
         },
-        'required': ['username', 'host']
+        'required': ['username', 'host'],
     }
 
     @staticmethod
@@ -67,7 +68,9 @@ class FTPList(object):
 
         entry['title'] = title
         entry['location'] = location
-        entry['url'] = 'ftp://{}:{}@{}:{}/{}'.format(self.username, self.password, self.host, self.port, location)
+        entry['url'] = 'ftp://{}:{}@{}:{}/{}'.format(
+            self.username, self.password, self.host, self.port, location
+        )
         entry['filename'] = title
 
         log.debug('adding entry %s', entry)
@@ -91,24 +94,42 @@ class FTPList(object):
                     if 'files' in content_types or 'symlinks' in content_types:
                         for _file in files:
                             content = ftp.path.join(base, _file)
-                            if ftp.path.isfile(content) and 'files' in content_types or ftp.path.islink(
-                                    path) and 'symlinks' in content_types:
-                                log.debug('type match successful for file %s, trying to create entry', _file)
+                            if (
+                                ftp.path.isfile(content)
+                                and 'files' in content_types
+                                or ftp.path.islink(path)
+                                and 'symlinks' in content_types
+                            ):
+                                log.debug(
+                                    'type match successful for file %s, trying to create entry',
+                                    _file,
+                                )
                                 content_list.append(content)
                     if 'dirs' in content_types or 'symlinks' in content_types:
                         for _dir in dirs:
                             content = ftp.path.join(base, _dir)
-                            if ftp.path.isdir(content) and 'dirs' in content_types or ftp.path.islink(
-                                    path) and 'symlinks' in content_types:
-                                log.debug('type match successful for dir %s, trying to create entry', _dir)
+                            if (
+                                ftp.path.isdir(content)
+                                and 'dirs' in content_types
+                                or ftp.path.islink(path)
+                                and 'symlinks' in content_types
+                            ):
+                                log.debug(
+                                    'type match successful for dir %s, trying to create entry',
+                                    _dir,
+                                )
                                 content_list.append(content)
             else:
                 for _object in ftp.listdir(path):
                     content = ftp.path.join('./', path, _object)
-                    if ('files' in content_types and ftp.path.isfile(content)) or (
-                            'dirs' in content_types and ftp.path.isdir(content)) or (
-                            'symlinks' in content_types and ftp.path.islink(content)):
-                        log.debug('type match successful for object %s, trying to create entry', content)
+                    if (
+                        ('files' in content_types and ftp.path.isfile(content))
+                        or ('dirs' in content_types and ftp.path.isdir(content))
+                        or ('symlinks' in content_types and ftp.path.islink(content))
+                    ):
+                        log.debug(
+                            'type match successful for object %s, trying to create entry', content
+                        )
                         content_list.append(content)
         return content_list
 
@@ -131,8 +152,14 @@ class FTPList(object):
         session_factory = ftputil.session.session_factory(port=self.port, base_class=base_class)
         try:
             log.verbose(
-                'trying to establish connection to FTP: %s:<HIDDEN>@%s:%s', self.username, self.host, self.port)
-            self.FTP = ftputil.FTPHost(self.host, self.username, self.password, session_factory=session_factory)
+                'trying to establish connection to FTP: %s:<HIDDEN>@%s:%s',
+                self.username,
+                self.host,
+                self.port,
+            )
+            self.FTP = ftputil.FTPHost(
+                self.host, self.username, self.password, session_factory=session_factory
+            )
         except FTPOSError as e:
             raise PluginError('Could not connect to FTP: {}'.format(e.args[0]))
 

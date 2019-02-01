@@ -59,7 +59,7 @@ class FailedEntry(Base):
             'added_at': self.tof,
             'reason': self.reason,
             'count': self.count,
-            'retry_time': self.retry_time
+            'retry_time': self.retry_time,
         }
 
 
@@ -71,10 +71,14 @@ Index('failed_title_url', columns.title, columns.url, columns.count)
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
     # Delete everything older than 30 days
-    session.query(FailedEntry).filter(FailedEntry.tof < datetime.now() - timedelta(days=30)).delete()
+    session.query(FailedEntry).filter(
+        FailedEntry.tof < datetime.now() - timedelta(days=30)
+    ).delete()
     # Of the remaining, always keep latest 25. Drop any after that if fail was more than a week ago.
     keep_num = 25
-    keep_ids = [fe.id for fe in session.query(FailedEntry).order_by(FailedEntry.tof.desc())[:keep_num]]
+    keep_ids = [
+        fe.id for fe in session.query(FailedEntry).order_by(FailedEntry.tof.desc())[:keep_num]
+    ]
     if len(keep_ids) == keep_num:
         query = session.query(FailedEntry)
         query = query.filter(FailedEntry.id.notin_(keep_ids))

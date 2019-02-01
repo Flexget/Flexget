@@ -18,10 +18,10 @@ class ObjectsContainer(object):
             'name': {'type': 'string'},
             'url': {'type': 'string'},
             'year': {'type': 'number'},
-            'thumbnail': {'type': 'string'}
+            'thumbnail': {'type': 'string'},
         },
         'required': ['imdb_id', 'match', 'name', 'url', 'year'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     return_object = {'type': 'array', 'items': movie_object}

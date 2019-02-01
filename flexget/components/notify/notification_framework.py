@@ -42,10 +42,10 @@ NOTIFY_VIA_SCHEMA = {
             {
                 'minProperties': 1,
                 'maxProperties': 1,
-                'error_maxProperties': 'Plugin options indented 2 more spaces than the first letter of the plugin name.'
-            }
+                'error_maxProperties': 'Plugin options indented 2 more spaces than the first letter of the plugin name.',
+            },
         ]
-    }
+    },
 }
 
 
@@ -68,7 +68,9 @@ def render_config(config, template_renderer, _path=''):
     elif isinstance(config, list):
         if _path:
             _path += '/'
-        return [render_config(v, template_renderer, _path=_path + str(i)) for i, v in enumerate(config)]
+        return [
+            render_config(v, template_renderer, _path=_path + str(i)) for i, v in enumerate(config)
+        ]
     elif isinstance(config, dict):
         if _path:
             _path += '/'
@@ -110,13 +112,22 @@ class NotificationFramework(object):
                     try:
                         rendered_config = render_config(notifier_config, template_renderer)
                     except RenderError as e:
-                        log.error('Error rendering %s plugin config field %s: %s', notifier_name, e.config_path, e)
+                        log.error(
+                            'Error rendering %s plugin config field %s: %s',
+                            notifier_name,
+                            e.config_path,
+                            e,
+                        )
 
                 log.debug('Sending a notification to `%s`', notifier_name)
                 try:
-                    notifier.notify(title, message, rendered_config)  # TODO: Update notifiers for new api
+                    notifier.notify(
+                        title, message, rendered_config
+                    )  # TODO: Update notifiers for new api
                 except PluginWarning as e:
-                    log.warning('Error while sending notification to `%s`: %s', notifier_name, e.value)
+                    log.warning(
+                        'Error while sending notification to `%s`: %s', notifier_name, e.value
+                    )
                 else:
                     log.verbose('Successfully sent a notification to `%s`', notifier_name)
 

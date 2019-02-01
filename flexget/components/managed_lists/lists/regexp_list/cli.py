@@ -18,7 +18,7 @@ def do_cli(manager, options):
         'list': action_list,
         'add': action_add,
         'del': action_del,
-        'purge': action_purge
+        'purge': action_purge,
     }
 
     action_map[options.regexp_action](options)
@@ -47,8 +47,9 @@ def action_list(options):
             return
         header = ['Regexp']
         table_data = [header]
-        regexps = db.get_regexps_by_list_id(regexp_list.id, order_by='added', descending=True,
-                                            session=session)
+        regexps = db.get_regexps_by_list_id(
+            regexp_list.id, order_by='added', descending=True, session=session
+        )
         for regexp in regexps:
             regexp_row = [regexp.regexp or '']
             table_data.append(regexp_row)
@@ -70,7 +71,11 @@ def action_add(options):
         if not regexp:
             console("Adding regexp {} to list {}".format(options.regexp, regexp_list.name))
             db.add_to_list_by_name(regexp_list.name, options.regexp, session=session)
-            console('Successfully added regexp {} to regexp list {} '.format(options.regexp, regexp_list.name))
+            console(
+                'Successfully added regexp {} to regexp list {} '.format(
+                    options.regexp, regexp_list.name
+                )
+            )
         else:
             console("Regexp {} already exists in list {}".format(options.regexp, regexp_list.name))
 
@@ -86,7 +91,11 @@ def action_del(options):
             console('Removing regexp {} from list {}'.format(options.regexp, options.list_name))
             session.delete(regexp)
         else:
-            console('Could not find regexp {} in list {}'.format(options.movie_title, options.list_name))
+            console(
+                'Could not find regexp {} in list {}'.format(
+                    options.movie_title, options.list_name
+                )
+            )
             return
 
 
@@ -115,13 +124,23 @@ def register_parser_arguments():
     regexp_parser.add_argument('regexp', type=regexp_type, help="The regexp")
 
     list_name_parser = ArgumentParser(add_help=False)
-    list_name_parser.add_argument('list_name', nargs='?', help='Name of regexp list to operate on', default='regexps')
+    list_name_parser.add_argument(
+        'list_name', nargs='?', help='Name of regexp list to operate on', default='regexps'
+    )
     # Register subcommand
     parser = options.register_command('regexp-list', do_cli, help='View and manage regexp lists')
     # Set up our subparsers
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='regexp_action')
     subparsers.add_parser('all', parents=[table_parser], help='Shows all existing regexp lists')
-    subparsers.add_parser('list', parents=[list_name_parser, table_parser], help='List regexp from a list')
-    subparsers.add_parser('add', parents=[list_name_parser, regexp_parser], help='Add a regexp to a list')
-    subparsers.add_parser('del', parents=[list_name_parser, regexp_parser], help='Remove a regexp from a list')
-    subparsers.add_parser('purge', parents=[list_name_parser], help='Removes an entire list. Use with caution!')
+    subparsers.add_parser(
+        'list', parents=[list_name_parser, table_parser], help='List regexp from a list'
+    )
+    subparsers.add_parser(
+        'add', parents=[list_name_parser, regexp_parser], help='Add a regexp to a list'
+    )
+    subparsers.add_parser(
+        'del', parents=[list_name_parser, regexp_parser], help='Remove a regexp from a list'
+    )
+    subparsers.add_parser(
+        'purge', parents=[list_name_parser], help='Removes an entire list. Use with caution!'
+    )

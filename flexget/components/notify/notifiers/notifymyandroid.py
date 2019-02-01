@@ -41,19 +41,24 @@ class NotifyMyAndroidNotifier(object):
             'priority': {'type': 'integer', 'minimum': -2, 'maximum': 2},
             'developer_key': {'type': 'string'},
             'url': {'type': 'string'},
-            'html': {'type': 'boolean'}
+            'html': {'type': 'boolean'},
         },
         'required': ['api_key'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def notify(self, title, message, config):
         """
         Send a Notifymyandroid notification
         """
-        notification = {'event': title, 'description': message, 'application': config.get('application'),
-                        'priority': config.get('priority'), 'developerkey': config.get('developer_key'),
-                        'url': config.get('url')}
+        notification = {
+            'event': title,
+            'description': message,
+            'application': config.get('application'),
+            'priority': config.get('priority'),
+            'developerkey': config.get('developer_key'),
+            'url': config.get('url'),
+        }
 
         # Handle multiple API keys
         if isinstance(config['api_key'], list):
@@ -76,8 +81,12 @@ class NotifyMyAndroidNotifier(object):
             raise PluginWarning(error.text)
         else:
             success = request_status.find('success').attrib
-            log.debug('notifymyandroid notification sent. Notifications remaining until next reset: %s. '
-                      'Next reset will occur in %s minutes', success['remaining'], success['resettimer'])
+            log.debug(
+                'notifymyandroid notification sent. Notifications remaining until next reset: %s. '
+                'Next reset will occur in %s minutes',
+                success['remaining'],
+                success['resettimer'],
+            )
 
 
 @event('plugin.register')

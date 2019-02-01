@@ -14,7 +14,6 @@ log = logging.getLogger('est_movies_bluray')
 
 
 class EstimatesMoviesBluray(object):
-
     @plugin.priority(2)
     def estimate(self, entry):
         if 'movie_name' not in entry:
@@ -27,7 +26,9 @@ class EstimatesMoviesBluray(object):
             log.debug('Skipping Blu-ray.com lookup since movie year is %s', movie_year)
             return
 
-        log.debug('Searching Blu-ray.com for release date of {} ({})'.format(movie_name, movie_year))
+        log.debug(
+            'Searching Blu-ray.com for release date of {} ({})'.format(movie_name, movie_year)
+        )
 
         release_date = None
         try:
@@ -45,4 +46,6 @@ class EstimatesMoviesBluray(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EstimatesMoviesBluray, 'est_movies_bluray', interfaces=['estimate_release'], api_ver=2)
+    plugin.register(
+        EstimatesMoviesBluray, 'est_movies_bluray', interfaces=['estimate_release'], api_ver=2
+    )

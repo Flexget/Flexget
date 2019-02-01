@@ -4,12 +4,20 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from flask import jsonify
 from flask_restplus import inputs
 from flexget.api import api, APIResource
-from flexget.api.app import BadRequest, NotFoundError, success_response, base_message_schema, empty_response
+from flexget.api.app import (
+    BadRequest,
+    NotFoundError,
+    success_response,
+    base_message_schema,
+    empty_response,
+)
 
 irc_api = api.namespace('irc', description='View and manage IRC connections')
 
 irc_parser = api.parser()
-irc_parser.add_argument('name', help='Name of connection. Leave empty to apply to all connections.')
+irc_parser.add_argument(
+    'name', help='Name of connection. Leave empty to apply to all connections.'
+)
 
 
 class ObjectsContainer(object):
@@ -18,25 +26,16 @@ class ObjectsContainer(object):
         'properties': {
             'alive': {'type': 'boolean'},
             'channels': {
-                'type': 'array', 'items': {
-                    'type': 'object',
-                    'patternProperties': {
-                        '\w': {'type': 'integer'}
-                    }
-                }
+                'type': 'array',
+                'items': {'type': 'object', 'patternProperties': {'\w': {'type': 'integer'}}},
             },
             'connected_channels': {'type': 'array', 'items': {'type': 'string'}},
             'port': {'type': 'integer'},
-            'server': {'type': 'string'}
-        }
+            'server': {'type': 'string'},
+        },
     }
 
-    connection = {
-        'type': 'object',
-        'patternProperties': {
-            '\w': connection_object
-        }
-    }
+    connection = {'type': 'object', 'patternProperties': {'\w': connection_object}}
 
     return_response = {'type': 'array', 'items': connection}
 
@@ -53,6 +52,7 @@ class IRCStatus(APIResource):
     def get(self, session=None):
         """Returns status of IRC connections"""
         from .irc import irc_manager
+
         if irc_manager is None:
             raise BadRequest('IRC daemon does not appear to be running')
 
@@ -86,6 +86,7 @@ class IRCRestart(APIResource):
     def get(self, session=None):
         """Restarts IRC connections"""
         from .irc import irc_manager
+
         if irc_manager is None:
             raise BadRequest('IRC daemon does not appear to be running')
 
@@ -99,7 +100,9 @@ class IRCRestart(APIResource):
 
 
 irc_stop_parser = irc_parser.copy()
-irc_stop_parser.add_argument('wait', type=inputs.boolean, default=False, help='Wait for connection to exit gracefully')
+irc_stop_parser.add_argument(
+    'wait', type=inputs.boolean, default=False, help='Wait for connection to exit gracefully'
+)
 
 
 @irc_api.route('/stop/')
@@ -111,6 +114,7 @@ class IRCStop(APIResource):
     def get(self, session=None):
         """Stops IRC connections"""
         from .irc import irc_manager
+
         if irc_manager is None:
             raise BadRequest('IRC daemon does not appear to be running')
 

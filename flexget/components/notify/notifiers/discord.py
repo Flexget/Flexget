@@ -52,7 +52,7 @@ class DiscordNotifier(object):
                                 'proxy_icon_url': {'type': 'string', 'format': 'uri'},
                             },
                             'required': ['text'],
-                            'additionalProperties': False
+                            'additionalProperties': False,
                         },
                         'image': {
                             'type': 'object',
@@ -60,7 +60,7 @@ class DiscordNotifier(object):
                                 'url': {'type': 'string', 'format': 'uri'},
                                 'proxy_url': {'type': 'string', 'format': 'uri'},
                             },
-                            'additionalProperties': False
+                            'additionalProperties': False,
                         },
                         'thumbnail': {
                             'type': 'object',
@@ -68,7 +68,7 @@ class DiscordNotifier(object):
                                 'url': {'type': 'string', 'format': 'uri'},
                                 'proxy_url': {'type': 'string', 'format': 'uri'},
                             },
-                            'additionalProperties': False
+                            'additionalProperties': False,
                         },
                         'provider': {
                             'type': 'object',
@@ -76,7 +76,7 @@ class DiscordNotifier(object):
                                 'name': {'type': 'string'},
                                 'url': {'type': 'string', 'format': 'uri'},
                             },
-                            'additionalProperties': False
+                            'additionalProperties': False,
                         },
                         'author': {
                             'type': 'object',
@@ -86,7 +86,7 @@ class DiscordNotifier(object):
                                 'icon_url': {'type': 'string', 'format': 'uri'},
                                 'proxy_icon_url': {'type': 'string', 'format': 'uri'},
                             },
-                            'additionalProperties': False
+                            'additionalProperties': False,
                         },
                         'fields': {
                             'type': 'array',
@@ -96,19 +96,19 @@ class DiscordNotifier(object):
                                 'properties': {
                                     'name': {'type': 'string'},
                                     'value': {'type': 'string'},
-                                    'inline': {'type': 'boolean'}
+                                    'inline': {'type': 'boolean'},
                                 },
                                 'required': ['name', 'value'],
-                                'additionalProperties': False
-                            }
-                        }
+                                'additionalProperties': False,
+                            },
+                        },
                     },
-                    'additionalProperties': False
-                }
+                    'additionalProperties': False,
+                },
             },
         },
         'required': ['web_hook_url'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def notify(self, title, message, config):
@@ -123,7 +123,7 @@ class DiscordNotifier(object):
             'content': message,
             'username': config.get('username'),
             'avatar_url': config.get('avatar_url'),
-            'embeds': config.get('embeds')
+            'embeds': config.get('embeds'),
         }
 
         try:

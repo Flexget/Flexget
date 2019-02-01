@@ -40,12 +40,17 @@ class ImdbLookup(object):
         'imdb_genres': lambda movie: [genre.name for genre in movie.genres],
         'imdb_languages': lambda movie: [lang.language.name for lang in movie.languages],
         'imdb_actors': lambda movie: dict((actor.imdb_id, actor.name) for actor in movie.actors),
-        'imdb_directors': lambda movie: dict((director.imdb_id, director.name) for director in movie.directors),
-        'imdb_writers': lambda movie: dict((writer.imdb_id, writer.name) for writer in movie.writers),
+        'imdb_directors': lambda movie: dict(
+            (director.imdb_id, director.name) for director in movie.directors
+        ),
+        'imdb_writers': lambda movie: dict(
+            (writer.imdb_id, writer.name) for writer in movie.writers
+        ),
         'imdb_mpaa_rating': 'mpaa_rating',
         # Generic fields filled by all movie lookup plugins:
         'movie_name': 'title',
-        'movie_year': 'year'}
+        'movie_year': 'year',
+    }
 
     schema = {'type': 'boolean'}
 
@@ -93,7 +98,9 @@ class ImdbLookup(object):
                 return movie.imdb_id
         if raw_title:
             log.debug('imdb_id_lookup: trying cache with: %s' % raw_title)
-            result = session.query(db.SearchResult).filter(db.SearchResult.title == raw_title).first()
+            result = (
+                session.query(db.SearchResult).filter(db.SearchResult.title == raw_title).first()
+            )
             if result:
                 # this title is hopeless, give up ..
                 if result.fails:
@@ -126,7 +133,9 @@ class ImdbLookup(object):
         elif entry.get('title', eval_lazy=False):
             log.debug('lookup for %s' % entry['title'])
         else:
-            raise plugin.PluginError('looking up IMDB for entry failed, no title, imdb_url or imdb_id passed.')
+            raise plugin.PluginError(
+                'looking up IMDB for entry failed, no title, imdb_url or imdb_id passed.'
+            )
 
         # if imdb_id is included, build the url.
         if entry.get('imdb_id', eval_lazy=False) and not entry.get('imdb_url', eval_lazy=False):
@@ -144,7 +153,11 @@ class ImdbLookup(object):
         # no imdb_url, check if there is cached result for it or if the
         # search is known to fail
         if not entry.get('imdb_url', eval_lazy=False):
-            result = session.query(db.SearchResult).filter(db.SearchResult.title == entry['title']).first()
+            result = (
+                session.query(db.SearchResult)
+                .filter(db.SearchResult.title == entry['title'])
+                .first()
+            )
             if result:
                 # TODO: 1.2 this should really be checking task.options.retry
                 if result.fails and not manager.options.execute.retry:
@@ -171,7 +184,12 @@ class ImdbLookup(object):
                 session.commit()
                 log.verbose('Found %s' % (entry['imdb_url']))
             else:
-                log_once('IMDB lookup failed for %s' % entry['title'], log, logging.WARN, session=session)
+                log_once(
+                    'IMDB lookup failed for %s' % entry['title'],
+                    log,
+                    logging.WARN,
+                    session=session,
+                )
                 # store FAIL for this title
                 result = db.SearchResult(entry['title'])
                 result.fails = True
@@ -204,8 +222,10 @@ class ImdbLookup(object):
         try:
             movie = self._parse_new_movie(entry['imdb_url'], session)
         except UnicodeDecodeError:
-            log.error('Unable to determine encoding for %s. Installing chardet library may help.' %
-                      entry['imdb_url'])
+            log.error(
+                'Unable to determine encoding for %s. Installing chardet library may help.'
+                % entry['imdb_url']
+            )
             # store cache so this will not be tried again
             movie = db.Movie()
             movie.url = entry['imdb_url']
@@ -218,9 +238,19 @@ class ImdbLookup(object):
                 log.exception(e)
             raise plugin.PluginError('Invalid parameter: %s' % entry['imdb_url'], log)
 
-        for att in ['title', 'score', 'votes', 'meta_score', 'year', 'genres', 'languages', 'actors', 'directors',
-                    'writers',
-                    'mpaa_rating']:
+        for att in [
+            'title',
+            'score',
+            'votes',
+            'meta_score',
+            'year',
+            'genres',
+            'languages',
+            'actors',
+            'directors',
+            'writers',
+            'mpaa_rating',
+        ]:
             log.trace('movie.%s: %s' % (att, getattr(movie, att)))
 
         # Update the entry fields

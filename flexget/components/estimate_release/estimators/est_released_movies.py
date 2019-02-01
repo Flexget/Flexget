@@ -11,7 +11,6 @@ log = logging.getLogger('est_movies')
 
 
 class EstimatesReleasedMovies(object):
-
     @plugin.priority(0)
     def estimate(self, entry):
         if 'tmdb_released' in entry:
@@ -22,9 +21,14 @@ class EstimatesReleasedMovies(object):
                 return datetime(year=entry['movie_year'], month=1, day=1)
             except ValueError:
                 pass
-        log.debug('Unable to check release for %s, tmdb_release and movie_year fields are not defined', entry['title'])
+        log.debug(
+            'Unable to check release for %s, tmdb_release and movie_year fields are not defined',
+            entry['title'],
+        )
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EstimatesReleasedMovies, 'est_released_movies', interfaces=['estimate_release'], api_ver=2)
+    plugin.register(
+        EstimatesReleasedMovies, 'est_released_movies', interfaces=['estimate_release'], api_ver=2
+    )

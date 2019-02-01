@@ -20,11 +20,10 @@ try:
     # NOTE: Importing other plugins is discouraged!
     from flexget.plugins.parsers import parser_common as plugin_parser_common
 except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='parser_common',
-    )
+    raise plugin.DependencyError(issued_by=__name__, missing='parser_common')
 
 log = logging.getLogger('movie_list')
+
 
 class MovieListBase(object):
     """
@@ -35,12 +34,16 @@ class MovieListBase(object):
     @property
     def supported_ids(self):
         # Return a list of supported series identifier as registered via their plugins
-        return [p.instance.movie_identifier for p in plugin.get_plugins(interface='movie_metainfo')]
+        return [
+            p.instance.movie_identifier for p in plugin.get_plugins(interface='movie_metainfo')
+        ]
 
 
 class MovieList(MutableSet):
     def _db_list(self, session):
-        return session.query(db.MovieListList).filter(db.MovieListList.name == self.list_name).first()
+        return (
+            session.query(db.MovieListList).filter(db.MovieListList.name == self.list_name).first()
+        )
 
     def _from_iterable(self, it):
         # TODO: is this the right answer? the returned object won't have our custom __contains__ logic
@@ -60,7 +63,9 @@ class MovieList(MutableSet):
 
     def __iter__(self):
         with Session() as session:
-            return iter([movie.to_entry(self.strip_year) for movie in self._db_list(session).movies])
+            return iter(
+                [movie.to_entry(self.strip_year) for movie in self._db_list(session).movies]
+            )
 
     def __len__(self):
         with Session() as session:
@@ -104,11 +109,17 @@ class MovieList(MutableSet):
         for id_name in MovieListBase().supported_ids:
             if entry.get(id_name):
                 log.debug('trying to match movie based off id %s: %s', id_name, entry[id_name])
-                res = (self._db_list(session).movies.join(db.MovieListMovie.ids).filter(
-                    and_(
-                        db.MovieListID.id_name == id_name,
-                        db.MovieListID.id_value == entry[id_name]))
-                       .first())
+                res = (
+                    self._db_list(session)
+                    .movies.join(db.MovieListMovie.ids)
+                    .filter(
+                        and_(
+                            db.MovieListID.id_name == id_name,
+                            db.MovieListID.id_value == entry[id_name],
+                        )
+                    )
+                    .first()
+                )
                 if res:
                     log.debug('found movie %s', res)
                     return res
@@ -122,8 +133,12 @@ class MovieList(MutableSet):
             log.warning('Could not get a movie name, skipping')
             return
         log.debug('trying to match movie based of name: %s and year: %s', name, year)
-        res = (self._db_list(session).movies.filter(func.lower(db.MovieListMovie.title) == name.lower())
-               .filter(db.MovieListMovie.year == year).first())
+        res = (
+            self._db_list(session)
+            .movies.filter(func.lower(db.MovieListMovie.title) == name.lower())
+            .filter(db.MovieListMovie.year == year)
+            .first()
+        )
         if res:
             log.debug('found movie %s', res)
         return res
@@ -132,7 +147,9 @@ class MovieList(MutableSet):
     def _parse_title(entry):
         parser = get_plugin_by_name('parsing').instance.parse_movie(data=entry['title'])
         if parser and parser.valid:
-            parser.name = plugin_parser_common.normalize_name(plugin_parser_common.remove_dirt(parser.name))
+            parser.name = plugin_parser_common.normalize_name(
+                plugin_parser_common.remove_dirt(parser.name)
+            )
             entry.update(parser.fields)
 
     @property
@@ -155,17 +172,18 @@ class MovieList(MutableSet):
 
 class PluginMovieList(object):
     """Remove all accepted elements from your trakt.tv watchlist/library/seen or custom list."""
-    schema = {'oneOf': [
-        {'type': 'string'},
-        {'type': 'object',
-         'properties': {
-             'list_name': {'type': 'string'},
-             'strip_year': {'type': 'boolean'}
-         },
-         'required': ['list_name'],
-         'additionalProperties': False
-         }
-    ]}
+
+    schema = {
+        'oneOf': [
+            {'type': 'string'},
+            {
+                'type': 'object',
+                'properties': {'list_name': {'type': 'string'}, 'strip_year': {'type': 'boolean'}},
+                'required': ['list_name'],
+                'additionalProperties': False,
+            },
+        ]
+    }
 
     @staticmethod
     def get_list(config):

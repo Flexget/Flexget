@@ -36,6 +36,7 @@ class PushbulletNotifier(object):
 
     Configuration parameters are also supported from entries (eg. through set).
     """
+
     schema = {
         'type': 'object',
         'properties': {
@@ -51,10 +52,18 @@ class PushbulletNotifier(object):
             {'required': ['device']},
             {'required': ['channel']},
             {'required': ['email']},
-            {'not': {'anyOf': [{'required': ['device']}, {'required': ['channel']}, {'required': ['email']}]}}
+            {
+                'not': {
+                    'anyOf': [
+                        {'required': ['device']},
+                        {'required': ['channel']},
+                        {'required': ['email']},
+                    ]
+                }
+            },
         ],
         'error_oneOf': 'One (and only one) of `email`, `device` or `channel` are allowed.',
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def notify(self, title, message, config):
@@ -72,7 +81,9 @@ class PushbulletNotifier(object):
 
         for key in config['api_key']:
             if config.get('channel'):
-                self.send_push(key, title, message, config.get('url'), config.get('channel'), 'channel_tag')
+                self.send_push(
+                    key, title, message, config.get('url'), config.get('channel'), 'channel_tag'
+                )
             elif config.get('device'):
                 for d in config['device']:
                     self.send_push(key, title, message, config.get('url'), d, 'device_iden')
@@ -95,7 +106,7 @@ class PushbulletNotifier(object):
             'Authorization': b'Basic ' + base64.b64encode(api_key.encode('ascii')),
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'User-Agent': 'Flexget'
+            'User-Agent': 'Flexget',
         }
         try:
             response = requests.post(PUSHBULLET_URL, headers=headers, json=notification)
@@ -103,8 +114,12 @@ class PushbulletNotifier(object):
             if e.response is not None:
                 if e.response.status_code == 429:
                     reset_time = datetime.datetime.fromtimestamp(
-                        int(e.response.headers['X-Ratelimit-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
-                    message = 'Monthly Pushbullet database operations limit reached. Next reset: %s' % reset_time
+                        int(e.response.headers['X-Ratelimit-Reset'])
+                    ).strftime('%Y-%m-%d %H:%M:%S')
+                    message = (
+                        'Monthly Pushbullet database operations limit reached. Next reset: %s'
+                        % reset_time
+                    )
                 else:
                     message = e.response.json()['error']['message']
             else:
@@ -112,10 +127,15 @@ class PushbulletNotifier(object):
             raise PluginWarning(message)
 
         reset_time = datetime.datetime.fromtimestamp(
-            int(response.headers['X-Ratelimit-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
+            int(response.headers['X-Ratelimit-Reset'])
+        ).strftime('%Y-%m-%d %H:%M:%S')
         remaining = response.headers['X-Ratelimit-Remaining']
-        log.debug('Pushbullet notification sent. Database operations remaining until next reset: %s. '
-                  'Next reset at: %s', remaining, reset_time)
+        log.debug(
+            'Pushbullet notification sent. Database operations remaining until next reset: %s. '
+            'Next reset at: %s',
+            remaining,
+            reset_time,
+        )
 
 
 @event('plugin.register')

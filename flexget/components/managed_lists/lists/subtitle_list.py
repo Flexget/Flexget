@@ -23,13 +23,85 @@ log = logging.getLogger('subtitle_list')
 Base = versioned_base('subtitle_list', 1)
 
 #: Video extensions stolen from https://github.com/Diaoul/subliminal/blob/master/subliminal/video.py
-VIDEO_EXTENSIONS = ('.3g2', '.3gp', '.3gp2', '.3gpp', '.60d', '.ajp', '.asf', '.asx', '.avchd', '.avi', '.bik',
-                    '.bix', '.box', '.cam', '.dat', '.divx', '.dmf', '.dv', '.dvr-ms', '.evo', '.flc', '.fli',
-                    '.flic', '.flv', '.flx', '.gvi', '.gvp', '.h264', '.m1v', '.m2p', '.m2ts', '.m2v', '.m4e',
-                    '.m4v', '.mjp', '.mjpeg', '.mjpg', '.mkv', '.moov', '.mov', '.movhd', '.movie', '.movx', '.mp4',
-                    '.mpe', '.mpeg', '.mpg', '.mpv', '.mpv2', '.mxf', '.nsv', '.nut', '.ogg', '.ogm', '.omf', '.ps',
-                    '.qt', '.ram', '.rm', '.rmvb', '.swf', '.ts', '.vfw', '.vid', '.video', '.viv', '.vivo', '.vob',
-                    '.vro', '.wm', '.wmv', '.wmx', '.wrap', '.wvx', '.wx', '.x264', '.xvid')
+VIDEO_EXTENSIONS = (
+    '.3g2',
+    '.3gp',
+    '.3gp2',
+    '.3gpp',
+    '.60d',
+    '.ajp',
+    '.asf',
+    '.asx',
+    '.avchd',
+    '.avi',
+    '.bik',
+    '.bix',
+    '.box',
+    '.cam',
+    '.dat',
+    '.divx',
+    '.dmf',
+    '.dv',
+    '.dvr-ms',
+    '.evo',
+    '.flc',
+    '.fli',
+    '.flic',
+    '.flv',
+    '.flx',
+    '.gvi',
+    '.gvp',
+    '.h264',
+    '.m1v',
+    '.m2p',
+    '.m2ts',
+    '.m2v',
+    '.m4e',
+    '.m4v',
+    '.mjp',
+    '.mjpeg',
+    '.mjpg',
+    '.mkv',
+    '.moov',
+    '.mov',
+    '.movhd',
+    '.movie',
+    '.movx',
+    '.mp4',
+    '.mpe',
+    '.mpeg',
+    '.mpg',
+    '.mpv',
+    '.mpv2',
+    '.mxf',
+    '.nsv',
+    '.nut',
+    '.ogg',
+    '.ogm',
+    '.omf',
+    '.ps',
+    '.qt',
+    '.ram',
+    '.rm',
+    '.rmvb',
+    '.swf',
+    '.ts',
+    '.vfw',
+    '.vid',
+    '.video',
+    '.viv',
+    '.vivo',
+    '.vob',
+    '.vro',
+    '.wm',
+    '.wmv',
+    '.wmx',
+    '.wrap',
+    '.wvx',
+    '.wx',
+    '.x264',
+    '.xvid',
+)
 
 
 def normalize_language(language):
@@ -47,17 +119,15 @@ class SubtitleListList(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode, unique=True)
     added = Column(DateTime, default=datetime.now)
-    files = relationship('SubtitleListFile', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic')
+    files = relationship(
+        'SubtitleListFile', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic'
+    )
 
     def __repr__(self):
         return '<SubtitleListList name=%s,id=%d>' % (self.name, self.id)
 
     def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'added_on': self.added
-        }
+        return {'id': self.id, 'name': self.name, 'added_on': self.added}
 
 
 class SubtitleListFile(Base):
@@ -67,11 +137,17 @@ class SubtitleListFile(Base):
     title = Column(Unicode)
     location = Column(Unicode)
     list_id = Column(Integer, ForeignKey(SubtitleListList.id), nullable=False)
-    languages = relationship('SubtitleListLanguage', backref='file', lazy='joined', cascade='all, delete-orphan')
+    languages = relationship(
+        'SubtitleListLanguage', backref='file', lazy='joined', cascade='all, delete-orphan'
+    )
     remove_after = Column(Unicode)
 
     def __repr__(self):
-        return '<SubtitleListFile title=%s,path=%s,list_name=%s>' % (self.title, self.location, self.list.name)
+        return '<SubtitleListFile title=%s,path=%s,list_name=%s>' % (
+            self.title,
+            self.location,
+            self.list.name,
+        )
 
     def to_entry(self):
         entry = Entry()
@@ -86,13 +162,15 @@ class SubtitleListFile(Base):
         return entry
 
     def to_dict(self):
-        subtitle_languages = [subtitle_list_language.language for subtitle_list_language in self.languages]
+        subtitle_languages = [
+            subtitle_list_language.language for subtitle_list_language in self.languages
+        ]
         return {
             'id': self.id,
             'added_on': self.added,
             'title': self.title,
             'location': self.location,
-            'subtitle_languages': subtitle_languages
+            'subtitle_languages': subtitle_languages,
         }
 
 
@@ -115,14 +193,18 @@ class SubtitleList(MutableSet):
             'path': {'type': 'string'},
             'allow_dir': {'type': 'boolean', 'default': False},
             'recursion_depth': {'type': 'integer', 'default': 1, 'minimum': 1},
-            'force_file_existence': {'type': 'boolean', 'default': True}
+            'force_file_existence': {'type': 'boolean', 'default': True},
         },
         'required': ['list'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def _db_list(self, session):
-        return session.query(SubtitleListList).filter(SubtitleListList.name == self.config['list']).first()
+        return (
+            session.query(SubtitleListList)
+            .filter(SubtitleListList.name == self.config['list'])
+            .first()
+        )
 
     def _from_iterable(self, it):
         # TODO: is this the right answer? the returned object won't have our custom __contains__ logic
@@ -167,7 +249,9 @@ class SubtitleList(MutableSet):
                 log.error('Path %s does not exist. Not adding to list.', path)
                 return
             elif path_exists and not self.config.get('allow_dir') and os.path.isdir(path):
-                log.error('Path %s is a directory and "allow_dir"=%s.', path, self.config['allow_dir'])
+                log.error(
+                    'Path %s is a directory and "allow_dir"=%s.', path, self.config['allow_dir']
+                )
                 return
 
             # Check if this is already in the list, refresh info if so
@@ -182,8 +266,10 @@ class SubtitleList(MutableSet):
             db_file.languages = []
             db_file.remove_after = self.config.get('remove_after')
             db_file.languages = []
-            normalized_languages = {normalize_language(subtitle_language) for subtitle_language in
-                                    self.config.get('languages', [])}
+            normalized_languages = {
+                normalize_language(subtitle_language)
+                for subtitle_language in self.config.get('languages', [])
+            }
             for subtitle_language in normalized_languages:
                 language = SubtitleListLanguage(language=subtitle_language)
                 db_file.languages.append(language)
@@ -214,9 +300,16 @@ class SubtitleList(MutableSet):
 
     @with_session
     def _find_language(self, file_id, language, session=None):
-        res = session.query(SubtitleListLanguage).filter(and_(
-            func.lower(SubtitleListLanguage.language) == str(language).lower(),
-            SubtitleListLanguage.subtitle_list_file_id == file_id)).first()
+        res = (
+            session.query(SubtitleListLanguage)
+            .filter(
+                and_(
+                    func.lower(SubtitleListLanguage.language) == str(language).lower(),
+                    SubtitleListLanguage.subtitle_list_file_id == file_id,
+                )
+            )
+            .first()
+        )
         return res
 
     @property
@@ -237,6 +330,7 @@ class SubtitleList(MutableSet):
 
 class PluginSubtitleList(object):
     """Subtitle list"""
+
     schema = SubtitleList.schema
 
     @staticmethod
@@ -246,6 +340,7 @@ class PluginSubtitleList(object):
     def all_subtitles_exist(self, file, wanted_languages):
         try:
             import subliminal
+
             existing_subtitles = set(subliminal.core.search_external_subtitles(file).values())
             if wanted_languages and len(wanted_languages - existing_subtitles) == 0:
                 log.info('Local subtitle(s) already exists for %s.', file)
@@ -269,8 +364,11 @@ class PluginSubtitleList(object):
                 subtitle_list.discard(item)
                 continue
             if self._expired(item, config):
-                log.info('File %s has been in the list for %s. Removing from list.', item['location'],
-                         item['remove_after'] or config['remove_after'])
+                log.info(
+                    'File %s has been in the list for %s. Removing from list.',
+                    item['location'],
+                    item['remove_after'] or config['remove_after'],
+                )
                 subtitle_list.discard(item)
                 continue
 
@@ -279,7 +377,9 @@ class PluginSubtitleList(object):
             num_added_files = 0
             if os.path.isdir(item['location']):
                 # recursion depth 1 is no recursion
-                max_depth = len(normalize_path(item['location']).split(os.sep)) + recursion_depth - 1
+                max_depth = (
+                    len(normalize_path(item['location']).split(os.sep)) + recursion_depth - 1
+                )
                 for root_dir, _, files in os.walk(item['location']):
                     current_depth = len(root_dir.split(os.sep))
                     if current_depth > max_depth:
@@ -290,20 +390,33 @@ class PluginSubtitleList(object):
                             continue
                         num_potential_files += 1
                         file_path = normalize_path(os.path.join(root_dir, file))
-                        if not config['check_subtitles'] or not self.all_subtitles_exist(file_path, languages):
+                        if not config['check_subtitles'] or not self.all_subtitles_exist(
+                            file_path, languages
+                        ):
                             subtitle_list.config['languages'] = languages
-                            subtitle_list.add(Entry(title=os.path.splitext(os.path.basename(file_path))[0],
-                                                    url='file://' + file_path, location=file_path))
+                            subtitle_list.add(
+                                Entry(
+                                    title=os.path.splitext(os.path.basename(file_path))[0],
+                                    url='file://' + file_path,
+                                    location=file_path,
+                                )
+                            )
                             num_added_files += 1
                 # delete the original dir if it contains any video files
                 if num_added_files or num_potential_files:
-                    log.debug('Added %s file(s) from %s to subtitle list %s', num_added_files, item['location'],
-                              config['list'])
+                    log.debug(
+                        'Added %s file(s) from %s to subtitle list %s',
+                        num_added_files,
+                        item['location'],
+                        config['list'],
+                    )
                     subtitle_list.discard(item)
                 else:
                     log.debug('No files found in %s. Skipping.', item['location'])
                     temp_discarded_items.add(item)
-            elif config['check_subtitles'] and self.all_subtitles_exist(item['location'], languages):
+            elif config['check_subtitles'] and self.all_subtitles_exist(
+                item['location'], languages
+            ):
                 subtitle_list.discard(item)
 
         return list(set(subtitle_list) - temp_discarded_items)
@@ -313,7 +426,9 @@ class PluginSubtitleList(object):
         added_interval = datetime.combine(date.today(), time()) - file['added']
         if file['remove_after'] and added_interval > parse_timedelta(file['remove_after']):
             return True
-        elif config.get('remove_after') and added_interval > parse_timedelta(config['remove_after']):
+        elif config.get('remove_after') and added_interval > parse_timedelta(
+            config['remove_after']
+        ):
             return True
         return False
 

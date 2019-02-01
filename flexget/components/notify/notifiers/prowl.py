@@ -37,6 +37,7 @@ class ProwlNotifier(object):
                 [description: notification to send]
 
     """
+
     schema = {
         'type': 'object',
         'properties': {
@@ -44,19 +45,24 @@ class ProwlNotifier(object):
             'application': {'type': 'string', 'default': 'FlexGet'},
             'priority': {'type': 'integer', 'minimum': -2, 'maximum': 2},
             'url': {'type': 'string'},
-            'provider_key':{'type': 'string'}
+            'provider_key': {'type': 'string'},
         },
         'required': ['api_key'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def notify(self, title, message, config):
         """
         Send a Prowl notification
         """
-        notification = {'application': config.get('application'), 'event': title, 'description': message,
-                        'url': config.get('url'), 'priority': config.get('priority'),
-                        'providerkey': config.get('provider_key')}
+        notification = {
+            'application': config.get('application'),
+            'event': title,
+            'description': message,
+            'url': config.get('url'),
+            'priority': config.get('priority'),
+            'providerkey': config.get('provider_key'),
+        }
 
         if isinstance(config['api_key'], list):
             config['api_key'] = [config['api_key']]
@@ -73,8 +79,12 @@ class ProwlNotifier(object):
             raise PluginWarning(error.text)
         else:
             success = request_status.find('success').attrib
-            log.debug('prowl notification sent. Notifications remaining until next reset: %s. '
-                      'Next reset will occur in %s minutes', success['remaining'], success['resetdate'])
+            log.debug(
+                'prowl notification sent. Notifications remaining until next reset: %s. '
+                'Next reset will occur in %s minutes',
+                success['remaining'],
+                success['resetdate'],
+            )
 
 
 @event('plugin.register')

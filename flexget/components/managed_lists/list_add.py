@@ -19,18 +19,20 @@ class ListAdd(object):
                 {
                     'maxProperties': 1,
                     'error_maxProperties': 'Plugin options within list_add plugin must be indented 2 more spaces than '
-                                           'the first letter of the plugin name.',
-                    'minProperties': 1
-                }
+                    'the first letter of the plugin name.',
+                    'minProperties': 1,
+                },
             ]
-        }
+        },
     }
 
     def on_task_start(self, task, config):
         for item in config:
             for plugin_name, plugin_config in item.items():
                 try:
-                    thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
+                    thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(
+                        plugin_config
+                    )
                 except AttributeError:
                     raise PluginError('Plugin %s does not support list interface' % plugin_name)
                 if thelist.immutable:
@@ -47,8 +49,11 @@ class ListAdd(object):
             for plugin_name, plugin_config in item.items():
                 thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
                 if task.manager.options.test and thelist.online:
-                    log.info('`%s` is marked as an online plugin, would add accepted items outside of --test mode. '
-                             'Skipping', plugin_name)
+                    log.info(
+                        '`%s` is marked as an online plugin, would add accepted items outside of --test mode. '
+                        'Skipping',
+                        plugin_name,
+                    )
                     continue
                 log.verbose('adding accepted entries into %s - %s', plugin_name, plugin_config)
                 thelist |= task.accepted

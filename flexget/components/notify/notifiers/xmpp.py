@@ -30,15 +30,16 @@ class XMPPNotifier(object):
                 password: sender's password
                 recipients: recipient's JID or list of JIDs
     """
+
     schema = {
         'type': 'object',
         'properties': {
             'sender': {'type': 'string'},
             'password': {'type': 'string'},
-            'recipients': one_or_more({'type': 'string'})
+            'recipients': one_or_more({'type': 'string'}),
         },
         'required': ['sender', 'password', 'recipients'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     __version__ = '1.0'
@@ -48,7 +49,9 @@ class XMPPNotifier(object):
             import sleekxmpp  # noqa
         except ImportError as e:
             log.debug('Error importing SleekXMPP: %s', e)
-            raise DependencyError(plugin_name, 'sleekxmpp', 'SleekXMPP module required. ImportError: %s', e)
+            raise DependencyError(
+                plugin_name, 'sleekxmpp', 'SleekXMPP module required. ImportError: %s', e
+            )
         try:
             import dns  # noqa
         except ImportError:
@@ -56,7 +59,9 @@ class XMPPNotifier(object):
                 import dnspython  # noqa
             except ImportError as e:
                 log.debug('Error importing dnspython: %s', e)
-                raise DependencyError(plugin_name, 'dnspython', 'dnspython module required. ImportError: %s' % e)
+                raise DependencyError(
+                    plugin_name, 'dnspython', 'dnspython module required. ImportError: %s' % e
+                )
 
         class SendMsgBot(sleekxmpp.ClientXMPP):
             def __init__(self, jid, password, recipients, message):

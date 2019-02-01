@@ -117,6 +117,7 @@ class TelegramNotifier(object):
     is much easier to use the `username` configuration.
 
     """
+
     log = None  # initialized during plugin.register
     """:type: flexget.logger.FlexGetLogger"""
     _token = None
@@ -136,36 +137,35 @@ class TelegramNotifier(object):
                 'minItems': 1,
                 'items': {
                     'oneOf': [
-                        {'type': 'object',
-                         'properties': {
-                             _USERNAME_ATTR: {'type': 'string'},
-                         },
-                         'required': [_USERNAME_ATTR],
-                         'additionalProperties': False,
-                         },
-                        {'type': 'object',
-                         'properties': {
-                             _FULLNAME_ATTR: {
-                                 'type': 'object',
-                                 'properties': {
-                                     _FIRSTNAME_ATTR: {'type': 'string'},
-                                     _SURNAME_ATTR: {'type': 'string'},
-                                 },
-                                 'required': [_FIRSTNAME_ATTR, _SURNAME_ATTR],
-                                 'additionalProperties': False,
-                             },
-                         },
-                         'required': [_FULLNAME_ATTR],
-                         'additionalProperties': False,
-                         },
-                        {'type': 'object',
-                         'properties': {
-                             _GROUP_ATTR: {'type': 'string'},
-                         },
-                         'required': [_GROUP_ATTR],
-                         'additionalProperties': False,
-                         },
-                    ],
+                        {
+                            'type': 'object',
+                            'properties': {_USERNAME_ATTR: {'type': 'string'}},
+                            'required': [_USERNAME_ATTR],
+                            'additionalProperties': False,
+                        },
+                        {
+                            'type': 'object',
+                            'properties': {
+                                _FULLNAME_ATTR: {
+                                    'type': 'object',
+                                    'properties': {
+                                        _FIRSTNAME_ATTR: {'type': 'string'},
+                                        _SURNAME_ATTR: {'type': 'string'},
+                                    },
+                                    'required': [_FIRSTNAME_ATTR, _SURNAME_ATTR],
+                                    'additionalProperties': False,
+                                }
+                            },
+                            'required': [_FULLNAME_ATTR],
+                            'additionalProperties': False,
+                        },
+                        {
+                            'type': 'object',
+                            'properties': {_GROUP_ATTR: {'type': 'string'}},
+                            'required': [_GROUP_ATTR],
+                            'additionalProperties': False,
+                        },
+                    ]
                 },
             },
         },
@@ -209,8 +209,15 @@ class TelegramNotifier(object):
     def _real_init(self, session, config):
         self._enforce_telegram_plugin_ver()
         self._parse_config(config)
-        self.log.debug('token=%s, parse_mode=%s, disable_previews=%s, usernames=%s, fullnames=%s, groups=%s', self._token,
-                       self._parse_mode, self._disable_previews, self._usernames, self._fullnames, self._groups)
+        self.log.debug(
+            'token=%s, parse_mode=%s, disable_previews=%s, usernames=%s, fullnames=%s, groups=%s',
+            self._token,
+            self._parse_mode,
+            self._disable_previews,
+            self._usernames,
+            self._fullnames,
+            self._groups,
+        )
         self._init_bot()
         chat_ids = self._get_chat_ids_n_update_db(session)
         return chat_ids
@@ -226,7 +233,10 @@ class TelegramNotifier(object):
             self.log.trace('bot.getMe() raised: %s', repr(e))
             raise plugin.PluginWarning('invalid bot token')
         except (NetworkError, TelegramError) as e:
-            self.log.error('Could not connect Telegram servers at this time, please try again later: %s', e.message)
+            self.log.error(
+                'Could not connect Telegram servers at this time, please try again later: %s',
+                e.message,
+            )
 
     @staticmethod
     def _enforce_telegram_plugin_ver():
@@ -235,7 +245,9 @@ class TelegramNotifier(object):
         elif not hasattr(telegram, str('__version__')):
             raise plugin.PluginWarning('invalid or old python-telegram-bot pkg')
         elif LooseVersion(telegram.__version__) < native_str(_MIN_TELEGRAM_VER):
-            raise plugin.PluginWarning('old python-telegram-bot ({0})'.format(telegram.__version__))
+            raise plugin.PluginWarning(
+                'old python-telegram-bot ({0})'.format(telegram.__version__)
+            )
 
     def _send_msgs(self, msg, chat_ids):
         kwargs = dict()
@@ -250,8 +262,11 @@ class TelegramNotifier(object):
                 self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
             except TelegramError as e:
                 if kwargs.get('parse_mode'):
-                    self.log.warning('Failed to render message using parse mode %s. Falling back to basic parsing: %s',
-                                     kwargs['parse_mode'], e.message)
+                    self.log.warning(
+                        'Failed to render message using parse mode %s. Falling back to basic parsing: %s',
+                        kwargs['parse_mode'],
+                        e.message,
+                    )
                     del kwargs['parse_mode']
                     try:
                         self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
@@ -273,7 +288,9 @@ class TelegramNotifier(object):
         self.log.debug('chat_ids=%s', chat_ids)
 
         if not chat_ids:
-            raise PluginError('no chat id found, try manually sending the bot any message to initialize the chat')
+            raise PluginError(
+                'no chat id found, try manually sending the bot any message to initialize the chat'
+            )
         else:
             if usernames:
                 self.log.warning('no chat id found for usernames: %s', usernames)
@@ -300,7 +317,11 @@ class TelegramNotifier(object):
         """
         self.log.debug('loading cached chat ids')
         chat_ids = self._get_cached_chat_ids(session, usernames, fullnames, groups)
-        self.log.debug('found {0} cached chat_ids: {1}'.format(len(chat_ids), ['{0}'.format(x) for x in chat_ids]))
+        self.log.debug(
+            'found {0} cached chat_ids: {1}'.format(
+                len(chat_ids), ['{0}'.format(x) for x in chat_ids]
+            )
+        )
 
         if not (usernames or fullnames or groups):
             self.log.debug('all chat ids found in cache')
@@ -308,7 +329,11 @@ class TelegramNotifier(object):
 
         self.log.debug('loading new chat ids')
         new_chat_ids = list(self._get_new_chat_ids(usernames, fullnames, groups))
-        self.log.debug('found {0} new chat_ids: {1}'.format(len(new_chat_ids), ['{0}'.format(x) for x in new_chat_ids]))
+        self.log.debug(
+            'found {0} new chat_ids: {1}'.format(
+                len(new_chat_ids), ['{0}'.format(x) for x in new_chat_ids]
+            )
+        )
 
         chat_ids.extend(new_chat_ids)
         return chat_ids, bool(new_chat_ids)
@@ -325,12 +350,18 @@ class TelegramNotifier(object):
 
         """
         chat_ids = list()
-        cached_usernames = dict((x.username, x)
-                                for x in session.query(ChatIdEntry).filter(ChatIdEntry.username != None).all())
-        cached_fullnames = dict(((x.firstname, x.surname), x)
-                                for x in session.query(ChatIdEntry).filter(ChatIdEntry.firstname != None).all())
-        cached_groups = dict((x.group, x)
-                             for x in session.query(ChatIdEntry).filter(ChatIdEntry.group != None).all())
+        cached_usernames = dict(
+            (x.username, x)
+            for x in session.query(ChatIdEntry).filter(ChatIdEntry.username != None).all()
+        )
+        cached_fullnames = dict(
+            ((x.firstname, x.surname), x)
+            for x in session.query(ChatIdEntry).filter(ChatIdEntry.firstname != None).all()
+        )
+        cached_groups = dict(
+            (x.group, x)
+            for x in session.query(ChatIdEntry).filter(ChatIdEntry.group != None).all()
+        )
 
         len_ = len(usernames)
         for i, username in enumerate(reversed(usernames)):
@@ -370,8 +401,12 @@ class TelegramNotifier(object):
         for i, username in enumerate(reversed(usernames)):
             chat = upd_usernames.get(username)
             if chat is not None:
-                entry = ChatIdEntry(id=chat.id, username=chat.username, firstname=chat.first_name,
-                                    surname=chat.last_name)
+                entry = ChatIdEntry(
+                    id=chat.id,
+                    username=chat.username,
+                    firstname=chat.first_name,
+                    surname=chat.last_name,
+                )
                 yield entry
                 usernames.pop(len_ - i - 1)
 
@@ -379,8 +414,12 @@ class TelegramNotifier(object):
         for i, fullname in enumerate(reversed(fullnames)):
             chat = upd_fullnames.get(fullname)
             if chat is not None:
-                entry = ChatIdEntry(id=chat.id, username=chat.username, firstname=chat.first_name,
-                                    surname=chat.last_name)
+                entry = ChatIdEntry(
+                    id=chat.id,
+                    username=chat.username,
+                    firstname=chat.first_name,
+                    surname=chat.last_name,
+                )
                 yield entry
                 fullnames.pop(len_ - i - 1)
 

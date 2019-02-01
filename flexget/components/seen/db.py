@@ -25,9 +25,7 @@ try:
     # NOTE: Importing other plugins is discouraged!
     from flexget.components.imdb.utils import extract_id
 except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='imdb',
-    )
+    raise plugin.DependencyError(issued_by=__name__, missing='imdb')
 
 
 log = logging.getLogger('seen.db')

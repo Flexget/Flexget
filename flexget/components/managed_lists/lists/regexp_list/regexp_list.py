@@ -18,7 +18,9 @@ class RegexpList(MutableSet):
     schema = {'type': 'string'}
 
     def _db_list(self, session):
-        return session.query(db.RegexpListList).filter(db.RegexpListList.name == self.config).first()
+        return (
+            session.query(db.RegexpListList).filter(db.RegexpListList.name == self.config).first()
+        )
 
     def _from_iterable(self, it):
         # TODO: is this the right answer? the returned object won't have our custom __contains__ logic
@@ -73,8 +75,11 @@ class RegexpList(MutableSet):
                 if re.search(regexp.regexp, entry['title'], re.IGNORECASE):
                     res = regexp
         else:
-            res = self._db_list(session).regexps.filter(db.RegexListRegexp.regexp ==
-                                                        entry.get('regexp', entry['title'])).first()
+            res = (
+                self._db_list(session)
+                .regexps.filter(db.RegexListRegexp.regexp == entry.get('regexp', entry['title']))
+                .first()
+            )
         return res
 
     @property
@@ -95,6 +100,7 @@ class RegexpList(MutableSet):
 
 class PluginRegexpList(object):
     """Subtitle list"""
+
     schema = RegexpList.schema
 
     @staticmethod

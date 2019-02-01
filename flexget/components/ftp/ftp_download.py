@@ -41,9 +41,9 @@ class OutputFtp(object):
             'use-ssl': {'type': 'boolean', 'default': False},
             'ftp_tmp_path': {'type': 'string', 'format': 'path'},
             'delete_origin': {'type': 'boolean', 'default': False},
-            'download_empty_dirs': {'type': 'boolean', 'default': False}
+            'download_empty_dirs': {'type': 'boolean', 'default': False},
         },
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def prepare_config(self, config, task):
@@ -96,7 +96,9 @@ class OutputFtp(object):
             try:
                 to_path = entry.render(to_path)
             except RenderError as err:
-                raise plugin.PluginError("Path value replacement `%s` failed: %s" % (to_path, err.args[0]))
+                raise plugin.PluginError(
+                    "Path value replacement `%s` failed: %s" % (to_path, err.args[0])
+                )
 
             # Clean invalid characters with pathscrub plugin
             to_path = pathscrub(to_path)
@@ -152,17 +154,21 @@ class OutputFtp(object):
                 if not os.path.isdir(tmp_path):
                     os.mkdir(tmp_path)
                     log.debug("Directory %s created" % tmp_path)
-                ftp = self.ftp_walk(ftp,
-                                    os.path.join(tmp_path, os.path.basename(file_name)),
-                                    config,
-                                    ftp_url,
-                                    os.path.join(current_path, os.path.basename(file_name)))
+                ftp = self.ftp_walk(
+                    ftp,
+                    os.path.join(tmp_path, os.path.basename(file_name)),
+                    config,
+                    ftp_url,
+                    os.path.join(current_path, os.path.basename(file_name)),
+                )
                 ftp = self.check_connection(ftp, config, ftp_url, current_path)
                 ftp.cwd('..')
                 if config['delete_origin']:
                     ftp.rmd(os.path.basename(file_name))
             except ftplib.error_perm:
-                ftp = self.ftp_down(ftp, os.path.basename(file_name), tmp_path, config, ftp_url, current_path)
+                ftp = self.ftp_down(
+                    ftp, os.path.basename(file_name), tmp_path, config, ftp_url, current_path
+                )
         ftp = self.check_connection(ftp, config, ftp_url, current_path)
         return ftp
 
@@ -202,7 +208,7 @@ class OutputFtp(object):
                         max_attempts -= 1
 
                     size_at_last_err = local_file.tell()
-                    log.debug("Retrying download after error %s" %  error.args[0])
+                    log.debug("Retrying download after error %s" % error.args[0])
                     # Short timeout before retry.
                     time.sleep(1)
                 else:

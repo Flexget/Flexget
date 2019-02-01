@@ -24,17 +24,15 @@ class RegexpListList(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode, unique=True)
     added = Column(DateTime, default=datetime.now)
-    regexps = relationship('RegexListRegexp', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic')
+    regexps = relationship(
+        'RegexListRegexp', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic'
+    )
 
     def __repr__(self):
         return '<RegexpListList name=%s,id=%d>' % (self.name, self.id)
 
     def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'added_on': self.added
-        }
+        return {'id': self.id, 'name': self.name, 'added_on': self.added}
 
 
 class RegexListRegexp(Base):
@@ -54,11 +52,7 @@ class RegexListRegexp(Base):
         return entry
 
     def to_dict(self):
-        return {
-            'id': self.id,
-            'added_on': self.added,
-            'regexp': self.regexp
-        }
+        return {'id': self.id, 'added_on': self.added, 'regexp': self.regexp}
 
 
 @with_session
@@ -74,12 +68,17 @@ def get_regexp_lists(name=None, session=None):
 @with_session
 def get_list_by_exact_name(name, session=None):
     log.debug('returning list with name %s', name)
-    return session.query(RegexpListList).filter(func.lower(RegexpListList.name) == name.lower()).one_or_none()
+    return (
+        session.query(RegexpListList)
+        .filter(func.lower(RegexpListList.name) == name.lower())
+        .one_or_none()
+    )
 
 
 @with_session
-def get_regexps_by_list_id(list_id, count=False, start=None, stop=None, order_by='added', descending=False,
-                          session=None):
+def get_regexps_by_list_id(
+    list_id, count=False, start=None, stop=None, order_by='added', descending=False, session=None
+):
     query = session.query(RegexListRegexp).filter(RegexListRegexp.list_id == list_id)
     if count:
         return query.count()
@@ -102,11 +101,16 @@ def get_regexp(list_id, regexp, session=None):
     regexp_list = get_list_by_id(list_id=list_id, session=session)
     if regexp_list:
         log.debug('searching for regexp %s in list %d', regexp, list_id)
-        return session.query(RegexListRegexp).filter(
-            and_(
-                func.lower(RegexListRegexp.regexp) == regexp.lower(),
-                RegexListRegexp.list_id == list_id)
-        ).first()
+        return (
+            session.query(RegexListRegexp)
+            .filter(
+                and_(
+                    func.lower(RegexListRegexp.regexp) == regexp.lower(),
+                    RegexListRegexp.list_id == list_id,
+                )
+            )
+            .first()
+        )
 
 
 @with_session

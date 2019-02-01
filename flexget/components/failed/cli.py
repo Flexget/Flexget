@@ -23,8 +23,14 @@ def list_failed(options):
         table_data = [header]
         for entry in results:
             table_data.append(
-                [entry.id, entry.title, entry.count, '' if entry.reason == 'None' else entry.reason,
-                 entry.tof.strftime('%Y-%m-%d %H:%M')])
+                [
+                    entry.id,
+                    entry.title,
+                    entry.count,
+                    '' if entry.reason == 'None' else entry.reason,
+                    entry.tof.strftime('%Y-%m-%d %H:%M'),
+                ]
+            )
     try:
         table = TerminalTable(options.table_type, table_data, wrap_columns=[3, 1])
     except TerminalTableError as e:
@@ -48,5 +54,7 @@ def clear_failed(manager):
 def register_parser_arguments():
     parser = options.register_command('failed', do_cli, help='list or clear remembered failures')
     subparsers = parser.add_subparsers(dest='failed_action', metavar='<action>')
-    subparsers.add_parser('list', help='list all the entries that have had failures', parents=[table_parser])
+    subparsers.add_parser(
+        'list', help='list all the entries that have had failures', parents=[table_parser]
+    )
     subparsers.add_parser('clear', help='clear all failures from database, so they can be retried')

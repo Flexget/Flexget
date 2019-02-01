@@ -125,7 +125,9 @@ class EmailNotifier(object):
             if self.username:
                 # Forcing to use `str` type
                 log.debug('logging in to smtp server using username: %s', self.username)
-                self.mail_server.login(text_to_native_str(self.username), text_to_native_str(self.password))
+                self.mail_server.login(
+                    text_to_native_str(self.username), text_to_native_str(self.password)
+                )
         except (IOError, SMTPAuthenticationError) as e:
             raise PluginWarning(str(e))
 
@@ -133,7 +135,11 @@ class EmailNotifier(object):
         'type': 'object',
         'properties': {
             'to': one_or_more({'type': 'string', 'format': 'email'}),
-            'from': {'type': 'string', 'default': 'flexget_notifer@flexget.com', 'format': 'email'},
+            'from': {
+                'type': 'string',
+                'default': 'flexget_notifer@flexget.com',
+                'format': 'email',
+            },
             'autofrom': {'type': 'boolean', 'default': False},
             'smtp_host': {'type': 'string', 'default': 'localhost'},
             'smtp_port': {'type': 'integer', 'default': 25},
@@ -147,7 +153,7 @@ class EmailNotifier(object):
         'dependencies': {
             'smtp_username': ['smtp_password'],
             'smtp_password': ['smtp_username'],
-            'smtp_ssl': ['smtp_tls']
+            'smtp_ssl': ['smtp_tls'],
         },
         'additionalProperties': False,
     }
@@ -166,7 +172,9 @@ class EmailNotifier(object):
 
         email = MIMEMultipart('alternative')
         email['To'] = ','.join(config['to'])
-        email['From'] = getpass.getuser() + '@' + socket.getfqdn() if config['autofrom'] else config['from']
+        email['From'] = (
+            getpass.getuser() + '@' + socket.getfqdn() if config['autofrom'] else config['from']
+        )
         email['Subject'] = title
         email['Date'] = formatdate(localtime=True)
         content_type = 'html' if config['html'] else 'plain'
@@ -175,7 +183,8 @@ class EmailNotifier(object):
         # Making sure mail server connection will remain open per host or username
         # (in case several mail servers are used in the same task)
         if not self.mail_server or not (
-                self.host == config['smtp_host'] and self.username == config.get('smtp_username')):
+            self.host == config['smtp_host'] and self.username == config.get('smtp_username')
+        ):
             self.connect_to_smtp_server(config)
 
         connection_error = None

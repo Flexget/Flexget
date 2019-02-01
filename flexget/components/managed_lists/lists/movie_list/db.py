@@ -21,9 +21,7 @@ try:
     # NOTE: Importing other plugins is discouraged!
     from flexget.plugins.parsers import parser_common as plugin_parser_common
 except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='parser_common',
-    )
+    raise plugin.DependencyError(issued_by=__name__, missing='parser_common')
 
 log = logging.getLogger('movie_list')
 Base = versioned_base('movie_list', 0)
@@ -38,7 +36,9 @@ class MovieListBase(object):
     @property
     def supported_ids(self):
         # Return a list of supported series identifier as registered via their plugins
-        return [p.instance.movie_identifier for p in plugin.get_plugins(interface='movie_metainfo')]
+        return [
+            p.instance.movie_identifier for p in plugin.get_plugins(interface='movie_metainfo')
+        ]
 
 
 class MovieListList(Base):
@@ -46,17 +46,15 @@ class MovieListList(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode, unique=True)
     added = Column(DateTime, default=datetime.now)
-    movies = relationship('MovieListMovie', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic')
+    movies = relationship(
+        'MovieListMovie', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic'
+    )
 
     def __repr__(self):
         return '<MovieListList,name={}id={}>'.format(self.name, self.id)
 
     def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'added_on': self.added
-        }
+        return {'id': self.id, 'name': self.name, 'added_on': self.added}
 
 
 class MovieListMovie(Base):
@@ -69,7 +67,11 @@ class MovieListMovie(Base):
     ids = relationship('MovieListID', backref='movie', cascade='all, delete, delete-orphan')
 
     def __repr__(self):
-        return '<MovieListMovie title=%s,year=%s,list_id=%d>' % (self.title, self.year, self.list_id)
+        return '<MovieListMovie title=%s,year=%s,list_id=%d>' % (
+            self.title,
+            self.year,
+            self.list_id,
+        )
 
     def to_entry(self, strip_year=False):
         entry = Entry()
@@ -91,7 +93,7 @@ class MovieListMovie(Base):
             'title': self.title,
             'year': self.year,
             'list_id': self.list_id,
-            'movies_list_ids': [movie_list_id.to_dict() for movie_list_id in self.ids]
+            'movies_list_ids': [movie_list_id.to_dict() for movie_list_id in self.ids],
         }
 
     @property
@@ -109,7 +111,11 @@ class MovieListID(Base):
     movie_id = Column(Integer, ForeignKey(MovieListMovie.id))
 
     def __repr__(self):
-        return '<MovieListID id_name=%s,id_value=%s,movie_id=%d>' % (self.id_name, self.id_value, self.movie_id)
+        return '<MovieListID id_name=%s,id_value=%s,movie_id=%d>' % (
+            self.id_name,
+            self.id_value,
+            self.movie_id,
+        )
 
     def to_dict(self):
         return {
@@ -117,13 +123,14 @@ class MovieListID(Base):
             'added_on': self.added,
             'id_name': self.id_name,
             'id_value': self.id_value,
-            'movie_id': self.movie_id
+            'movie_id': self.movie_id,
         }
 
 
 @with_session
-def get_movies_by_list_id(list_id, start=None, stop=None, order_by='added', descending=False,
-                          session=None):
+def get_movies_by_list_id(
+    list_id, start=None, stop=None, order_by='added', descending=False, session=None
+):
     query = session.query(MovieListMovie).filter(MovieListMovie.list_id == list_id)
     if descending:
         query = query.order_by(getattr(MovieListMovie, order_by).desc())
@@ -145,7 +152,9 @@ def get_movie_lists(name=None, session=None):
 @with_session
 def get_list_by_exact_name(name, session=None):
     log.debug('returning list with name %s', name)
-    return session.query(MovieListList).filter(func.lower(MovieListList.name) == name.lower()).one()
+    return (
+        session.query(MovieListList).filter(func.lower(MovieListList.name) == name.lower()).one()
+    )
 
 
 @with_session
@@ -157,8 +166,11 @@ def get_list_by_id(list_id, session=None):
 @with_session
 def get_movie_by_id(list_id, movie_id, session=None):
     log.debug('fetching movie with id %d from list id %d', movie_id, list_id)
-    return session.query(MovieListMovie).filter(
-        and_(MovieListMovie.id == movie_id, MovieListMovie.list_id == list_id)).one()
+    return (
+        session.query(MovieListMovie)
+        .filter(and_(MovieListMovie.id == movie_id, MovieListMovie.list_id == list_id))
+        .one()
+    )
 
 
 @with_session
@@ -166,20 +178,32 @@ def get_movie_by_title_and_year(list_id, title, year=None, session=None):
     movie_list = get_list_by_id(list_id=list_id, session=session)
     if movie_list:
         log.debug('searching for movie %s in list %d', title, list_id)
-        return session.query(MovieListMovie).filter(
-            and_(
-                func.lower(MovieListMovie.title) == title.lower(),
-                MovieListMovie.year == year,
-                MovieListMovie.list_id == list_id)
-        ).one_or_none()
+        return (
+            session.query(MovieListMovie)
+            .filter(
+                and_(
+                    func.lower(MovieListMovie.title) == title.lower(),
+                    MovieListMovie.year == year,
+                    MovieListMovie.list_id == list_id,
+                )
+            )
+            .one_or_none()
+        )
 
 
 @with_session
 def get_movie_identifier(identifier_name, identifier_value, movie_id=None, session=None):
-    db_movie_id = session.query(MovieListID).filter(
-        and_(MovieListID.id_name == identifier_name,
-             MovieListID.id_value == identifier_value,
-             MovieListID.movie_id == movie_id)).first()
+    db_movie_id = (
+        session.query(MovieListID)
+        .filter(
+            and_(
+                MovieListID.id_name == identifier_name,
+                MovieListID.id_value == identifier_value,
+                MovieListID.movie_id == movie_id,
+            )
+        )
+        .first()
+    )
     if db_movie_id:
         log.debug('fetching movie identifier %s: %s', db_movie_id.id_name, db_movie_id.id_value)
         return db_movie_id
@@ -191,8 +215,9 @@ def get_db_movie_identifiers(identifier_list, movie_id=None, session=None):
     for identifier in identifier_list:
         for key, value in identifier.items():
             if key in MovieListBase().supported_ids:
-                db_movie_id = get_movie_identifier(identifier_name=key, identifier_value=value, movie_id=movie_id,
-                                                   session=session)
+                db_movie_id = get_movie_identifier(
+                    identifier_name=key, identifier_value=value, movie_id=movie_id, session=session
+                )
                 if not db_movie_id:
                     log.debug('creating movie identifier %s: %s', key, value)
                     db_movie_id = MovieListID(id_name=key, id_value=value, movie_id=movie_id)

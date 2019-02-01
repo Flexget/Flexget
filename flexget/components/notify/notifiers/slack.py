@@ -32,6 +32,7 @@ class SlackNotifier(object):
                 [attachments: <array>[<object>]] (override attachments)
 
     """
+
     schema = {
         'type': 'object',
         'properties': {
@@ -69,24 +70,22 @@ class SlackNotifier(object):
                                 'properties': {
                                     'title': {'type': 'string'},
                                     'value': {'type': 'string'},
-                                    'short': {'type': 'boolean'}
+                                    'short': {'type': 'boolean'},
                                 },
                                 'required': ['title'],
-                                'additionalProperties': False
-                            }
-                        }
+                                'additionalProperties': False,
+                            },
+                        },
                     },
                     'required': ['fallback'],
-                    'additionalProperties': False
-                }
-            }
+                    'additionalProperties': False,
+                },
+            },
         },
-        'not': {
-            'required': ['icon_emoji', 'icon_url']
-        },
+        'not': {'required': ['icon_emoji', 'icon_url']},
         'error_not': 'Can only use one of \'icon_emoji\' or \'icon_url\'',
         'required': ['web_hook_url'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def notify(self, title, message, config):
@@ -97,7 +96,7 @@ class SlackNotifier(object):
             'text': message,
             'username': config.get('username'),
             'channel': config.get('channel'),
-            'attachments': config.get('attachments')
+            'attachments': config.get('attachments'),
         }
         if config.get('icon_emoji'):
             notification['icon_emoji'] = ':%s:' % config['icon_emoji'].strip(':')

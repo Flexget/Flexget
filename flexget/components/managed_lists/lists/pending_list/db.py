@@ -29,14 +29,12 @@ class PendingListList(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode, unique=True)
     added = Column(DateTime, default=datetime.now)
-    entries = relationship('PendingListEntry', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic')
+    entries = relationship(
+        'PendingListEntry', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic'
+    )
 
     def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'added_on': self.added
-        }
+        return {'id': self.id, 'name': self.name, 'added_on': self.added}
 
 
 class PendingListEntry(Base):
@@ -59,7 +57,10 @@ class PendingListEntry(Base):
 
     def __repr__(self):
         return '<PendingListEntry,title=%s,original_url=%s,approved=%s>' % (
-            self.title, self.original_url, self.approved)
+            self.title,
+            self.original_url,
+            self.approved,
+        )
 
     def to_dict(self):
         return {
@@ -69,7 +70,7 @@ class PendingListEntry(Base):
             'title': self.title,
             'original_url': self.original_url,
             'entry': dict(self.entry),
-            'approved': self.approved
+            'approved': self.approved,
         }
 
 
@@ -86,7 +87,11 @@ def get_pending_lists(name=None, session=None):
 @with_session
 def get_list_by_exact_name(name, session=None):
     log.debug('returning pending list with name %s', name)
-    return session.query(PendingListList).filter(func.lower(PendingListList.name) == name.lower()).one()
+    return (
+        session.query(PendingListList)
+        .filter(func.lower(PendingListList.name) == name.lower())
+        .one()
+    )
 
 
 @with_session
@@ -104,8 +109,16 @@ def delete_list_by_id(list_id, session=None):
 
 
 @with_session
-def get_entries_by_list_id(list_id, start=None, stop=None, order_by='title', descending=False, approved=False,
-                           filter=None, session=None):
+def get_entries_by_list_id(
+    list_id,
+    start=None,
+    stop=None,
+    order_by='title',
+    descending=False,
+    approved=False,
+    filter=None,
+    session=None,
+):
     log.debug('querying entries from pending list with id %d', list_id)
     query = session.query(PendingListEntry).filter(PendingListEntry.list_id == list_id)
     if filter:
@@ -124,12 +137,18 @@ def get_entry_by_title(list_id, title, session=None):
     entry_list = get_list_by_id(list_id=list_id, session=session)
     if entry_list:
         log.debug('fetching entry with title `%s` from list id %d', title, list_id)
-        return session.query(PendingListEntry).filter(and_(
-            PendingListEntry.title == title, PendingListEntry.list_id == list_id)).first()
+        return (
+            session.query(PendingListEntry)
+            .filter(and_(PendingListEntry.title == title, PendingListEntry.list_id == list_id))
+            .first()
+        )
 
 
 @with_session
 def get_entry_by_id(list_id, entry_id, session=None):
     log.debug('fetching entry with id %d from list id %d', entry_id, list_id)
-    return session.query(PendingListEntry).filter(
-        and_(PendingListEntry.id == entry_id, PendingListEntry.list_id == list_id)).one()
+    return (
+        session.query(PendingListEntry)
+        .filter(and_(PendingListEntry.id == entry_id, PendingListEntry.list_id == list_id))
+        .one()
+    )

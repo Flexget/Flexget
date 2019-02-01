@@ -45,10 +45,7 @@ class IFTTTNotifier(object):
 
     schema = {
         'type': 'object',
-        'properties': {
-            'event': {'type': 'string'},
-            'keys': one_or_more({'type': 'string'}),
-        },
+        'properties': {'event': {'type': 'string'}, 'keys': one_or_more({'type': 'string'})},
         'required': ['event', 'keys'],
         'additionalProperties': False,
     }

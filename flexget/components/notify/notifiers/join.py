@@ -34,35 +34,40 @@ class JoinNotifier(object):
                 [sms_number: <NOTIFICATION_SMS_NUMBER>]
                 [icon: <NOTIFICATION_ICON>]
     """
+
     schema = {
         'type': 'object',
         'properties': {
             'api_key': {'type': 'string'},
             'group': {
                 'type': 'string',
-                'enum': ['all', 'android', 'chrome', 'windows10', 'phone', 'tablet', 'pc']
+                'enum': ['all', 'android', 'chrome', 'windows10', 'phone', 'tablet', 'pc'],
             },
             'device': one_or_more({'type': 'string'}),
             'device_name': one_or_more({'type': 'string'}),
             'url': {'type': 'string'},
             'icon': {'type': 'string'},
             'sms_number': {'type': 'string'},
-            'priority': {'type': 'integer', 'minimum': -2, 'maximum': 2}
+            'priority': {'type': 'integer', 'minimum': -2, 'maximum': 2},
         },
         'required': ['api_key'],
-        'not': {
-            'required': ['device', 'group']
-        },
+        'not': {'required': ['device', 'group']},
         'error_not': 'Cannot select both \'device\' and \'group\'',
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def notify(self, title, message, config):
         """
         Send Join notifications.
         """
-        notification = {'title': title, 'text': message, 'url': config.get('url'),
-                        'icon': config.get('icon'), 'priority': config.get('priority'), 'apikey': config['api_key']}
+        notification = {
+            'title': title,
+            'text': message,
+            'url': config.get('url'),
+            'icon': config.get('icon'),
+            'priority': config.get('priority'),
+            'apikey': config['api_key'],
+        }
         if config.get('device'):
             if isinstance(config['device'], list):
                 notification['deviceIds'] = ','.join(config['device'])

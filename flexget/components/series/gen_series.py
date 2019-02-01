@@ -31,10 +31,7 @@ class GenSeries(object):
     def __init__(self):
         self.entries = []
 
-    schema = {
-        'type': 'object',
-        'minProperties': 1
-    }
+    schema = {'type': 'object', 'minProperties': 1}
 
     @plugin.priority(200)
     def on_task_start(self, task, config):
@@ -46,10 +43,18 @@ class GenSeries(object):
                 for episode in range(int(config['episodes'])):
                     for quality in config['qualities']:
                         entry = Entry()
-                        entry['title'] = 'series %d name - S%02dE%02d - %s' % \
-                                         (num, season + 1, episode + 1, quality)
-                        entry['url'] = 'http://localhost/mock/%s' % \
-                                       ''.join([random.choice(string.ascii_letters + string.digits) for x in range(1, 30)])
+                        entry['title'] = 'series %d name - S%02dE%02d - %s' % (
+                            num,
+                            season + 1,
+                            episode + 1,
+                            quality,
+                        )
+                        entry['url'] = 'http://localhost/mock/%s' % ''.join(
+                            [
+                                random.choice(string.ascii_letters + string.digits)
+                                for x in range(1, 30)
+                            ]
+                        )
                         self.entries.append(entry)
         log.info('Generated %d entries' % len(self.entries))
 
@@ -62,7 +67,7 @@ class GenSeries(object):
             entries.append(entry)
             if num == PER_RUN - 1:
                 break
-        self.entries = self.entries[len(entries):]
+        self.entries = self.entries[len(entries) :]
         return entries
 
     def on_task_exit(self, task, config):
