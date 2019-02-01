@@ -16,10 +16,19 @@ from sqlalchemy import (
 from sqlalchemy.orm import relation
 
 from flexget import db_schema
+from flexget import plugin
 from flexget.event import event
 from flexget.utils.database import with_session
-from flexget.utils.imdb import extract_id
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.components.imdb.utils import extract_id
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='imdb',
+    )
+
 
 log = logging.getLogger('seen.db')
 Base = db_schema.versioned_base('seen', 4)

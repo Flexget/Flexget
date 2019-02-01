@@ -6,7 +6,7 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.imdb import extract_id, make_url
+from flexget.components.imdb.utils import extract_id, make_url
 
 log = logging.getLogger('metainfo_imdb_url')
 

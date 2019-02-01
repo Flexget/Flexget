@@ -3,11 +3,19 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import options
+from flexget import plugin
 from flexget.event import event
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 from flexget.utils.database import with_session
-from flexget.utils.imdb import is_imdb_url, extract_id
 from . import db
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.components.imdb.utils import is_imdb_url, extract_id
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='imdb',
+    )
 
 
 def do_cli(manager, options):

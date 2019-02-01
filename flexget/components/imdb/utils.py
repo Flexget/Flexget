@@ -15,7 +15,7 @@ from flexget.utils.requests import Session, TimedLimiter
 from flexget.utils.tools import str_to_int
 from flexget.plugin import get_plugin_by_name, PluginError
 
-log = logging.getLogger('utils.imdb')
+log = logging.getLogger('imdb.utils')
 # IMDb delivers a version of the page which is unparsable to unknown (and some known) user agents, such as requests'
 # Spoof the old urllib user agent to keep results consistent
 requests = Session()

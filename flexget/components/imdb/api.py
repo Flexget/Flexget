@@ -4,7 +4,7 @@ from flask import jsonify
 
 from flexget.api import api, APIResource
 from flexget.api.app import etag
-from flexget.utils.imdb import ImdbSearch
+from flexget.components.imdb.utils import ImdbSearch
 
 imdb_api = api.namespace('imdb', description='IMDB lookup endpoint')
 

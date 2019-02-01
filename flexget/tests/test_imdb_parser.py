@@ -3,7 +3,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
 
-from flexget.utils.imdb import ImdbParser
+from flexget.components.imdb.utils import ImdbParser
 
 
 @pytest.mark.online

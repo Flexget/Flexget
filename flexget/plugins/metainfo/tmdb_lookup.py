@@ -1,14 +1,22 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from functools import partial
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from functools import partial
 
 from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.utils import imdb
 from flexget.utils.log import log_once
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.components.imdb.utils import extract_id
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='imdb',
+    )
+
 
 log = logging.getLogger('tmdb_lookup')
 
@@ -56,7 +64,7 @@ class PluginTmdbLookup(object):
         lookup = plugin.get_plugin_by_name('api_tmdb').instance.lookup
 
         imdb_id = (entry.get('imdb_id', eval_lazy=False) or
-                   imdb.extract_id(entry.get('imdb_url', eval_lazy=False)))
+                   extract_id(entry.get('imdb_url', eval_lazy=False)))
         try:
             with Session() as session:
                 movie = lookup(smart_match=entry['title'],

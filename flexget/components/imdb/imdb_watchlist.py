@@ -8,7 +8,7 @@ from flexget.utils.requests import RequestException
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
-from flexget.utils.imdb import is_valid_imdb_title_id, extract_id
+from flexget.components.imdb.utils import is_valid_imdb_title_id, extract_id
 from flexget.utils.cached_input import cached
 from flexget.entry import Entry
 from flexget.utils.soup import get_soup

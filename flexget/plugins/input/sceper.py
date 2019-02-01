@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from bs4 import NavigableString
 from requests import RequestException
@@ -10,8 +10,16 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
-from flexget.utils.imdb import extract_id
 from flexget.utils.soup import get_soup
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.components.imdb.utils import extract_id
+except ImportError:
+    raise plugin.DependencyError(
+        issued_by=__name__, missing='imdb',
+    )
+
 
 log = logging.getLogger('sceper')
 

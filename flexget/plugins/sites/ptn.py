@@ -8,7 +8,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests
-from flexget.utils.imdb import extract_id
+from flexget.components.imdb.utils import extract_id
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability
 from flexget.utils.tools import parse_filesize

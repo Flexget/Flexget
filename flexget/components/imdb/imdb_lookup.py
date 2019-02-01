@@ -1,207 +1,18 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
-from datetime import datetime, timedelta
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from datetime import datetime
 
-from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime
-from sqlalchemy.schema import ForeignKey, Index
-from sqlalchemy.orm import relation
-
-from flexget import db_schema, plugin
-from flexget.db_schema import UpgradeImpossible
-from flexget.event import event
+from flexget import plugin
+from flexget.components.imdb.utils import ImdbSearch, ImdbParser, extract_id, make_url
 from flexget.entry import Entry
-from flexget.utils.log import log_once
-from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id, make_url
+from flexget.event import event
 from flexget.utils.database import with_session
-
-SCHEMA_VER = 9
-
-Base = db_schema.versioned_base('imdb_lookup', SCHEMA_VER)
-
-# association tables
-genres_table = Table('imdb_movie_genres', Base.metadata,
-                     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-                     Column('genre_id', Integer, ForeignKey('imdb_genres.id')),
-                     Index('ix_imdb_movie_genres', 'movie_id', 'genre_id'))
-Base.register_table(genres_table)
-
-actors_table = Table('imdb_movie_actors', Base.metadata,
-                     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-                     Column('actor_id', Integer, ForeignKey('imdb_actors.id')),
-                     Index('ix_imdb_movie_actors', 'movie_id', 'actor_id'))
-Base.register_table(actors_table)
-
-directors_table = Table('imdb_movie_directors', Base.metadata,
-                        Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-                        Column('director_id', Integer, ForeignKey('imdb_directors.id')),
-                        Index('ix_imdb_movie_directors', 'movie_id', 'director_id'))
-Base.register_table(directors_table)
-
-writers_table = Table('imdb_movie_writers', Base.metadata,
-                      Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-                      Column('writer_id', Integer, ForeignKey('imdb_writers.id')),
-                      Index('ix_imdb_movie_writers', 'movie_id', 'writer_id'))
-Base.register_table(writers_table)
-
-
-class Movie(Base):
-    __tablename__ = 'imdb_movies'
-
-    id = Column(Integer, primary_key=True)
-    title = Column(Unicode)
-    original_title = Column(Unicode)
-    url = Column(String, index=True)
-
-    # many-to-many relations
-    genres = relation('Genre', secondary=genres_table, backref='movies')
-    actors = relation('Actor', secondary=actors_table, backref='movies')
-    directors = relation('Director', secondary=directors_table, backref='movies')
-    writers = relation('Writer', secondary=writers_table, backref='movies')
-    languages = relation('MovieLanguage', order_by='MovieLanguage.prominence')
-
-    score = Column(Float)
-    votes = Column(Integer)
-    meta_score = Column(Integer)
-    year = Column(Integer)
-    plot_outline = Column(Unicode)
-    mpaa_rating = Column(String, default='')
-    photo = Column(String)
-
-    # updated time, so we can grab new rating counts after 48 hours
-    # set a default, so existing data gets updated with a rating
-    updated = Column(DateTime)
-
-    @property
-    def imdb_id(self):
-        return extract_id(self.url)
-
-    @property
-    def expired(self):
-        """
-        :return: True if movie details are considered to be expired, ie. need of update
-        """
-        if self.updated is None:
-            log.debug('updated is None: %s' % self)
-            return True
-        refresh_interval = 2
-        if self.year:
-            # Make sure age is not negative
-            age = max((datetime.now().year - self.year), 0)
-            refresh_interval += age * 5
-            log.debug('movie `%s` age %i expires in %i days' % (self.title, age, refresh_interval))
-        return self.updated < datetime.now() - timedelta(days=refresh_interval)
-
-    def __repr__(self):
-        return '<Movie(name=%s,votes=%s,year=%s)>' % (self.title, self.votes, self.year)
-
-
-class MovieLanguage(Base):
-    __tablename__ = 'imdb_movie_languages'
-
-    movie_id = Column(Integer, ForeignKey('imdb_movies.id'), primary_key=True)
-    language_id = Column(Integer, ForeignKey('imdb_languages.id'), primary_key=True)
-    prominence = Column(Integer)
-
-    language = relation('Language')
-
-    def __init__(self, language, prominence=None):
-        self.language = language
-        self.prominence = prominence
-
-
-class Language(Base):
-    __tablename__ = 'imdb_languages'
-
-    id = Column(Integer, primary_key=True)
-    name = Column(Unicode)
-
-    def __init__(self, name):
-        self.name = name
-
-
-class Genre(Base):
-    __tablename__ = 'imdb_genres'
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-
-    def __init__(self, name):
-        self.name = name
-
-
-class Actor(Base):
-    __tablename__ = 'imdb_actors'
-
-    id = Column(Integer, primary_key=True)
-    imdb_id = Column(String)
-    name = Column(Unicode)
-
-    def __init__(self, imdb_id, name=None):
-        self.imdb_id = imdb_id
-        self.name = name
-
-
-class Director(Base):
-    __tablename__ = 'imdb_directors'
-
-    id = Column(Integer, primary_key=True)
-    imdb_id = Column(String)
-    name = Column(Unicode)
-
-    def __init__(self, imdb_id, name=None):
-        self.imdb_id = imdb_id
-        self.name = name
-
-
-class Writer(Base):
-    __tablename__ = 'imdb_writers'
-
-    id = Column(Integer, primary_key=True)
-    imdb_id = Column(String)
-    name = Column(Unicode)
-
-    def __init__(self, imdb_id, name=None):
-        self.imdb_id = imdb_id
-        self.name = name
-
-
-class SearchResult(Base):
-    __tablename__ = 'imdb_search'
-
-    id = Column(Integer, primary_key=True)
-    title = Column(Unicode, index=True)
-    url = Column(String)
-    fails = Column(Boolean, default=False)
-    queried = Column(DateTime)
-
-    @property
-    def imdb_id(self):
-        return extract_id(self.url)
-
-    def __init__(self, title, url=None):
-        self.title = title
-        self.url = url
-        self.queried = datetime.now()
-
-    def __repr__(self):
-        return '<SearchResult(title=%s,url=%s,fails=%s)>' % (self.title, self.url, self.fails)
-
+from flexget.utils.log import log_once
+from . import db
 
 log = logging.getLogger('imdb_lookup')
-
-
-@db_schema.upgrade('imdb_lookup')
-def upgrade(ver, session):
-    # v5 We may have cached bad data due to imdb changes, just wipe everything. GitHub #697
-    # v6 The association tables were not cleared on the last upgrade, clear again. GitHub #714
-    # v7 Another layout change cached bad data. GitHub #729
-    # v8 Added writers to the DB Schema
-    # v9 Added Metacritic score exftraction/filtering
-    if ver is None or ver <= 8:
-        raise UpgradeImpossible('Resetting imdb_lookup caches because bad data may have been cached.')
-    return ver
 
 
 class ImdbLookup(object):
@@ -273,16 +84,16 @@ class ImdbLookup(object):
         """
         if movie_title:
             log.debug('imdb_id_lookup: trying with title: %s' % movie_title)
-            query = session.query(Movie).filter(Movie.title == movie_title)
+            query = session.query(db.Movie).filter(db.Movie.title == movie_title)
             if movie_year is not None:
-                query = query.filter(Movie.year == movie_year)
+                query = query.filter(db.Movie.year == movie_year)
             movie = query.first()
             if movie:
                 log.debug('--> success! got %s returning %s' % (movie, movie.imdb_id))
                 return movie.imdb_id
         if raw_title:
             log.debug('imdb_id_lookup: trying cache with: %s' % raw_title)
-            result = session.query(SearchResult).filter(SearchResult.title == raw_title).first()
+            result = session.query(db.SearchResult).filter(db.SearchResult.title == raw_title).first()
             if result:
                 # this title is hopeless, give up ..
                 if result.fails:
@@ -333,7 +144,7 @@ class ImdbLookup(object):
         # no imdb_url, check if there is cached result for it or if the
         # search is known to fail
         if not entry.get('imdb_url', eval_lazy=False):
-            result = session.query(SearchResult).filter(SearchResult.title == entry['title']).first()
+            result = session.query(db.SearchResult).filter(db.SearchResult.title == entry['title']).first()
             if result:
                 # TODO: 1.2 this should really be checking task.options.retry
                 if result.fails and not manager.options.execute.retry:
@@ -355,21 +166,21 @@ class ImdbLookup(object):
             if search_result:
                 entry['imdb_url'] = search_result['url']
                 # store url for this movie, so we don't have to search on every run
-                result = SearchResult(entry['title'], entry['imdb_url'])
+                result = db.SearchResult(entry['title'], entry['imdb_url'])
                 session.add(result)
                 session.commit()
                 log.verbose('Found %s' % (entry['imdb_url']))
             else:
                 log_once('IMDB lookup failed for %s' % entry['title'], log, logging.WARN, session=session)
                 # store FAIL for this title
-                result = SearchResult(entry['title'])
+                result = db.SearchResult(entry['title'])
                 result.fails = True
                 session.add(result)
                 session.commit()
                 raise plugin.PluginError('Title `%s` lookup failed' % entry['title'])
 
         # check if this imdb page has been parsed & cached
-        movie = session.query(Movie).filter(Movie.url == entry['imdb_url']).first()
+        movie = session.query(db.Movie).filter(db.Movie.url == entry['imdb_url']).first()
 
         # If we have a movie from cache, we are done
         if movie and not movie.expired:
@@ -381,8 +192,8 @@ class ImdbLookup(object):
             if movie.expired:
                 log.verbose('Movie `%s` details expired, refreshing ...' % movie.title)
             # Remove the old movie, we'll store another one later.
-            session.query(MovieLanguage).filter(MovieLanguage.movie_id == movie.id).delete()
-            session.query(Movie).filter(Movie.url == entry['imdb_url']).delete()
+            session.query(db.MovieLanguage).filter(db.MovieLanguage.movie_id == movie.id).delete()
+            session.query(db.Movie).filter(db.Movie.url == entry['imdb_url']).delete()
             session.commit()
 
         # search and store to cache
@@ -396,7 +207,7 @@ class ImdbLookup(object):
             log.error('Unable to determine encoding for %s. Installing chardet library may help.' %
                       entry['imdb_url'])
             # store cache so this will not be tried again
-            movie = Movie()
+            movie = db.Movie()
             movie.url = entry['imdb_url']
             session.add(movie)
             session.commit()
@@ -407,7 +218,8 @@ class ImdbLookup(object):
                 log.exception(e)
             raise plugin.PluginError('Invalid parameter: %s' % entry['imdb_url'], log)
 
-        for att in ['title', 'score', 'votes', 'meta_score', 'year', 'genres', 'languages', 'actors', 'directors', 'writers',
+        for att in ['title', 'score', 'votes', 'meta_score', 'year', 'genres', 'languages', 'actors', 'directors',
+                    'writers',
                     'mpaa_rating']:
             log.trace('movie.%s: %s' % (att, getattr(movie, att)))
 
@@ -425,7 +237,7 @@ class ImdbLookup(object):
         parser = ImdbParser()
         parser.parse(imdb_url)
         # store to database
-        movie = Movie()
+        movie = db.Movie()
         movie.photo = parser.photo
         movie.title = parser.name
         movie.original_title = parser.original_name
@@ -437,29 +249,29 @@ class ImdbLookup(object):
         movie.plot_outline = parser.plot_outline
         movie.url = imdb_url
         for name in parser.genres:
-            genre = session.query(Genre).filter(Genre.name == name).first()
+            genre = session.query(db.Genre).filter(db.Genre.name == name).first()
             if not genre:
-                genre = Genre(name)
+                genre = db.Genre(name)
             movie.genres.append(genre)  # pylint:disable=E1101
         for index, name in enumerate(parser.languages):
-            language = session.query(Language).filter(Language.name == name).first()
+            language = session.query(db.Language).filter(db.Language.name == name).first()
             if not language:
-                language = Language(name)
-            movie.languages.append(MovieLanguage(language, prominence=index))
+                language = db.Language(name)
+            movie.languages.append(db.MovieLanguage(language, prominence=index))
         for imdb_id, name in parser.actors.items():
-            actor = session.query(Actor).filter(Actor.imdb_id == imdb_id).first()
+            actor = session.query(db.Actor).filter(db.Actor.imdb_id == imdb_id).first()
             if not actor:
-                actor = Actor(imdb_id, name)
+                actor = db.Actor(imdb_id, name)
             movie.actors.append(actor)  # pylint:disable=E1101
         for imdb_id, name in parser.directors.items():
-            director = session.query(Director).filter(Director.imdb_id == imdb_id).first()
+            director = session.query(db.Director).filter(db.Director.imdb_id == imdb_id).first()
             if not director:
-                director = Director(imdb_id, name)
+                director = db.Director(imdb_id, name)
             movie.directors.append(director)  # pylint:disable=E1101
         for imdb_id, name in parser.writers.items():
-            writer = session.query(Writer).filter(Writer.imdb_id == imdb_id).first()
+            writer = session.query(db.Writer).filter(db.Writer.imdb_id == imdb_id).first()
             if not writer:
-                writer = Writer(imdb_id, name)
+                writer = db.Writer(imdb_id, name)
             movie.writers.append(writer)  # pylint:disable=E1101
             # so that we can track how long since we've updated the info later
         movie.updated = datetime.now()
