@@ -374,7 +374,7 @@ class ImdbParser(object):
         if title_details:
             # get languages
             for link in title_details.find_all(
-                'a', href=re.compile('^/search/title\?title_type=feature' '&primary_language=')
+                'a', href=re.compile(r'^/search/title\?title_type=feature' '&primary_language=')
             ):
                 lang = link.text.strip().lower()
                 if lang not in self.languages:

@@ -17,13 +17,12 @@ log = logging.getLogger('imdb_lookup')
 
 class ImdbLookup(object):
     """
-        Retrieves imdb information for entries.
+    Retrieves imdb information for entries.
+    Also provides imdb lookup functionality to all other imdb related plugins.
 
-        Example:
+    Example::
 
         imdb_lookup: yes
-
-        Also provides imdb lookup functionality to all other imdb related plugins.
     """
 
     field_map = {
