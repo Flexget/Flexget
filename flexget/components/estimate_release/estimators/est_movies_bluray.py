@@ -6,7 +6,6 @@ import datetime
 
 from flexget import plugin
 from flexget.event import event
-from flexget.plugin import get_plugin_by_name
 from flexget.utils.database import Session
 
 
@@ -33,7 +32,7 @@ class EstimatesMoviesBluray(object):
         release_date = None
         try:
             with Session() as session:
-                lookup = get_plugin_by_name('api_bluray').instance.lookup
+                lookup = plugin.get('api_bluray', self).lookup
                 movie = lookup(title=movie_name, year=movie_year, session=session)
                 if movie:
                     release_date = movie.release_date

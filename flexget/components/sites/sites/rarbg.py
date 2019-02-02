@@ -108,13 +108,13 @@ class SearchRarBG(object):
         return self.token
 
     def get(self, params, token_error=False):
-        '''
+        """
         Simple get-wrapper that allows updating invalid tokens
 
         :param params: the params to be passed to requests
         :param token_error: whether or not we previously have had token errors, if True we should fetch a new one
         :return: json response
-        '''
+        """
         params['token'] = self.get_token(refresh=token_error)
         try:
             response = requests.get(self.base_url, params=params)
@@ -172,7 +172,7 @@ class SearchRarBG(object):
                 query_url_fragment = query.encode('utf8')
                 params['search_string'] = query_url_fragment
                 if config['use_tvdb']:
-                    plugin.get_plugin_by_name('thetvdb_lookup').instance.lazy_series_lookup(
+                    plugin.get('thetvdb_lookup', self).lazy_series_lookup(
                         entry, 'en'
                     )
                     params['search_tvdb'] = entry.get('tvdb_id')

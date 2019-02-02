@@ -56,8 +56,7 @@ class FilterSeriesPremiere(plugin_series.FilterSeriesBase):
             group_settings = config
         group_settings['identified_by'] = 'ep'
         # Generate a list of unique series that have premieres
-        metainfo_series = plugin.get_plugin_by_name('metainfo_series')
-        guess_entry = metainfo_series.instance.guess_entry
+        guess_entry = plugin.get('metainfo_series', self).guess_entry
         # Make a set of unique series according to series name normalization rules
         guessed_series = {}
         for entry in task.entries:

@@ -228,8 +228,7 @@ class FilterRegexp(object):
                     if opts.get('set'):
                         # invoke set plugin with given configuration
                         log.debug('adding set: info to entry:"%s" %s' % (entry['title'], opts['set']))
-                        set = plugin.get_plugin_by_name('set')
-                        set.instance.modify(entry, opts['set'])
+                        plugin.get('set', self).modify(entry, opts['set'])
                     method(entry, matchtext)
                     # We had a match so break out of the regexp loop.
                     break

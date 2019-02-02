@@ -127,7 +127,7 @@ class PluginTVMazeLookup(object):
 
     def lazy_series_lookup(self, entry):
         """Does the lookup for this entry and populates the entry fields."""
-        series_lookup = plugin.get_plugin_by_name('api_tvmaze').instance.series_lookup
+        series_lookup = plugin.get('api_tvmaze', self).series_lookup
         with Session() as session:
             lookupargs = {
                 'title': entry.get('series_name', eval_lazy=False),
@@ -146,7 +146,7 @@ class PluginTVMazeLookup(object):
         return entry
 
     def lazy_season_lookup(self, entry):
-        season_lookup = plugin.get_plugin_by_name('api_tvmaze').instance.season_lookup
+        season_lookup = plugin.get('api_tvmaze', self).season_lookup
         with Session(expire_on_commit=False) as session:
             lookupargs = {
                 'title': entry.get('series_name', eval_lazy=False),
@@ -166,7 +166,7 @@ class PluginTVMazeLookup(object):
         return entry
 
     def lazy_episode_lookup(self, entry):
-        episode_lookup = plugin.get_plugin_by_name('api_tvmaze').instance.episode_lookup
+        episode_lookup = plugin.get('api_tvmaze', self).episode_lookup
         with Session(expire_on_commit=False) as session:
             lookupargs = {
                 'title': entry.get('series_name', eval_lazy=False),

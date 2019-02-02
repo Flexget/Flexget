@@ -306,10 +306,10 @@ class OutputDeluge(DelugePlugin):
             return
         # If the download plugin is not enabled, we need to call it to get our temp .torrent files
         if 'download' not in task.config:
-            download = plugin.get_plugin_by_name('download')
+            download = plugin.get('download', self)
             for entry in task.accepted:
                 if not entry.get('deluge_id'):
-                    download.instance.get_temp_file(task, entry, handle_magnets=True)
+                    download.get_temp_file(task, entry, handle_magnets=True)
 
     @plugin.priority(135)
     def on_task_output(self, task, config):
@@ -461,8 +461,8 @@ class OutputDeluge(DelugePlugin):
         """ Make sure all temp files are cleaned up when entries are learned """
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
-            download = plugin.get_plugin_by_name('download')
-            download.instance.cleanup_temp_files(task)
+            download = plugin.get('download', self)
+            download.cleanup_temp_files(task)
 
     def on_task_abort(self, task, config):
         """Make sure normal cleanup tasks still happen on abort."""

@@ -13,13 +13,11 @@ from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
 from flexget import plugin
-from flexget.event import event
 from flexget.terminal import console
 from flexget.manager import Session
-from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
 from flexget.utils.database import json_synonym
-from flexget.utils.tools import TimedDict, split_title_year
+from flexget.utils.tools import split_title_year
 
 Base = db_schema.versioned_base('api_trakt', 7)
 AuthBase = db_schema.versioned_base('trakt_auth', 0)

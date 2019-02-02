@@ -27,7 +27,6 @@ from flexget import db_schema, plugin
 from flexget.components.series.utils import normalize_series_name
 from flexget.event import event, fire_event
 from flexget.manager import Session
-from flexget.plugin import get_plugin_by_name
 from flexget.utils.database import quality_property, with_session
 from flexget.utils.sqlalchemy_utils import (
     table_exists,
@@ -583,7 +582,7 @@ def upgrade(ver, session):
             for row in session.execute(select([release_table.c.id, release_table.c.title])):
                 # Recalculate the proper_count from title for old episodes
                 proper_count = (
-                    get_plugin_by_name('parsing').parse_series(row['title']).proper_count
+                    plugin.get('parsing', 'series.db').parse_series(row['title']).proper_count
                 )
                 session.execute(
                     update(
@@ -1259,7 +1258,7 @@ def remove_series_entity(name, identifier, forget=False):
             return [release.title for release in entity.downloaded_releases]
 
         name_to_parse = '{} {}'.format(series.name, identifier)
-        parsed = get_plugin_by_name('parsing').instance.parse_series(
+        parsed = plugin.get('parsing', 'series.db').parse_series(
             name_to_parse, name=series.name
         )
         if not parsed.valid:
@@ -1519,7 +1518,7 @@ def add_series_entity(session, series, identifier, quality=None):
     name_to_parse = '{} {}'.format(series.name, identifier)
     if quality:
         name_to_parse += ' {}'.format(quality)
-    parsed = get_plugin_by_name('parsing').instance.parse_series(name_to_parse, name=series.name)
+    parsed = plugin.get('parsing', 'series.db').parse_series(name_to_parse, name=series.name)
     if not parsed.valid:
         raise ValueError(
             'Invalid identifier for series `{}`: `{}`.'.format(series.name, identifier)

@@ -59,7 +59,7 @@ class PluginTmdbLookup(object):
 
     def lazy_loader(self, entry, language):
         """Does the lookup for this entry and populates the entry fields."""
-        lookup = plugin.get_plugin_by_name('api_tmdb').instance.lookup
+        lookup = plugin.get('api_tmdb', self).lookup
 
         imdb_id = entry.get('imdb_id', eval_lazy=False) or extract_id(
             entry.get('imdb_url', eval_lazy=False)

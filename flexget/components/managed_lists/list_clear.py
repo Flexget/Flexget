@@ -43,7 +43,7 @@ class ListClear(object):
         for item in config['what']:
             for plugin_name, plugin_config in item.items():
                 try:
-                    thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(
+                    thelist = plugin.get(plugin_name, self).get_list(
                         plugin_config
                     )
                 except AttributeError:

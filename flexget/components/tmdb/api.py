@@ -5,7 +5,7 @@ from flask_restplus import inputs
 
 from flexget.api import api, APIResource
 from flexget.api.app import etag, BadRequest, NotFoundError
-from flexget.plugin import get_plugin_by_name
+from flexget import plugin
 
 tmdb_api = api.namespace('tmdb', description='TMDB lookup endpoint')
 
@@ -132,7 +132,7 @@ class TMDBMoviesAPI(APIResource):
         if not (title or tmdb_id or imdb_id):
             raise BadRequest(description)
 
-        lookup = get_plugin_by_name('api_tmdb').instance.lookup
+        lookup = plugin.get('api_tmdb', 'tmdb.api').lookup
 
         try:
             movie = lookup(session=session, **args)

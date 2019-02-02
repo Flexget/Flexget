@@ -41,7 +41,7 @@ class EstimatesSeriesTVMaze(object):
             'series_name': series_name,
         }
 
-        api_tvmaze = plugin.get_plugin_by_name('api_tvmaze').instance
+        api_tvmaze = plugin.get('api_tvmaze', self)
         if season_pack:
             lookup = api_tvmaze.season_lookup
             log.debug('Searching api_tvmaze for season')

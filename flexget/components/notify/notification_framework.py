@@ -103,7 +103,7 @@ class NotificationFramework(object):
                 log.error('Error rendering notification body: %s', e)
         for notifier in notifiers:
             for notifier_name, notifier_config in notifier.items():
-                notifier = plugin.get_plugin_by_name(notifier_name).instance
+                notifier_plugin = plugin.get(notifier_name, self)
 
                 rendered_config = notifier_config
 
@@ -121,7 +121,7 @@ class NotificationFramework(object):
 
                 log.debug('Sending a notification to `%s`', notifier_name)
                 try:
-                    notifier.notify(
+                    notifier_plugin.notify(
                         title, message, rendered_config
                     )  # TODO: Update notifiers for new api
                 except PluginWarning as e:

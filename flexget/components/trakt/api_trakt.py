@@ -8,7 +8,6 @@ from dateutil.parser import parse as dateutil_parse
 
 from flexget import plugin
 from flexget.event import event
-from flexget.plugin import get_plugin_by_name
 from flexget.utils.tools import TimedDict
 
 from . import db
@@ -225,7 +224,7 @@ class ApiTrakt(object):
         if movie and not movie.expired:
             return movie
         # Parse the movie for better results
-        title_parser = get_plugin_by_name('parsing').instance.parse_movie(title)
+        title_parser = plugin.get('parsing', 'api_trakt').parse_movie(title)
         y = year or title_parser.year
         parsed_title = title_parser.name
         try:

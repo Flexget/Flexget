@@ -30,7 +30,7 @@ class ListAdd(object):
         for item in config:
             for plugin_name, plugin_config in item.items():
                 try:
-                    thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(
+                    thelist = plugin.get(plugin_name, self).get_list(
                         plugin_config
                     )
                 except AttributeError:
@@ -47,7 +47,7 @@ class ListAdd(object):
 
         for item in config:
             for plugin_name, plugin_config in item.items():
-                thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
+                thelist = plugin.get(plugin_name, self).get_list(plugin_config)
                 if task.manager.options.test and thelist.online:
                     log.info(
                         '`%s` is marked as an online plugin, would add accepted items outside of --test mode. '

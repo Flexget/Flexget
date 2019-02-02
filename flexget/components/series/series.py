@@ -19,7 +19,6 @@ from .utils import normalize_series_name
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.manager import Session
-from flexget.plugin import get_plugin_by_name
 from flexget.utils import qualities
 from flexget.utils.log import log_once
 from flexget.utils.tools import parse_timedelta, get_config_as_array, chunked, merge_dict_from_to
@@ -126,8 +125,7 @@ def populate_entry_fields(entry, parser, config):
 
         # accept info from set: and place into the entry
         if 'set' in config:
-            set = plugin.get_plugin_by_name('set')
-            set.instance.modify(entry, config.get('set'))
+            plugin.get('set', 'series').modify(entry, config.get('set'))
 
 
 class FilterSeriesBase(object):
@@ -369,14 +367,6 @@ class FilterSeries(FilterSeriesBase):
             },
         }
 
-    def __init__(self):
-        try:
-            self.backlog = plugin.get_plugin_by_name('backlog')
-        except plugin.DependencyError:
-            log.warning(
-                'Unable to utilize backlog plugin, so episodes may slip through timeframe.'
-            )
-
     def auto_exact(self, config):
         """Automatically enable exact naming option for series that look like a problem"""
 
@@ -406,7 +396,7 @@ class FilterSeries(FilterSeriesBase):
         config = self.prepare_config(config)
         self.auto_exact(config)
 
-        parser = get_plugin_by_name('parsing').instance
+        parser = plugin.get('parsing', self)
 
         start_time = preferred_clock()
 
@@ -596,7 +586,7 @@ class FilterSeries(FilterSeriesBase):
         for id_type in plugin_parser_common.SERIES_ID_TYPES:
             params[id_type + '_regexps'] = get_config_as_array(config, id_type + '_regexp')
 
-        parser = get_plugin_by_name('parsing').instance
+        parser = plugin.get('parsing', self)
         for entry in entries:
             # skip processed entries
             if (
@@ -1005,8 +995,10 @@ class FilterSeries(FilterSeriesBase):
             )
 
             # add best entry to backlog (backlog is able to handle duplicate adds)
-            if self.backlog:
-                self.backlog.instance.add_backlog(task, best, session=object_session(episode))
+            plugin.get('backlog', self).add_backlog(
+                task, best, session=object_session(episode)
+            )
+
             return True
 
     def process_qualities(self, config, entries, downloaded):

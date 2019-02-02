@@ -211,7 +211,7 @@ class MyEpisodes(object):
             search_value = entry['tvdb_series_name']
         else:
             try:
-                series = plugin.get_plugin_by_name('api_tvdb').instance.lookup_series(
+                series = plugin.get('api_tvdb', self).lookup_series(
                     name=entry['series_name'], tvdb_id=entry.get('tvdb_id'))
                 search_value = series.name
             except LookupError:

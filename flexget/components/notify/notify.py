@@ -99,9 +99,7 @@ class Notify(object):
         return config
 
     def send_notification(self, *args, **kwargs):
-        send_notification = plugin.get_plugin_by_name(
-            'notification_framework'
-        ).instance.send_notification
+        send_notification = plugin.get('notification_framework', 'notify').send_notification
         try:
             send_notification(*args, **kwargs)
         except plugin.PluginError as e:

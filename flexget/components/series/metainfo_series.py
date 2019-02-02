@@ -4,7 +4,6 @@ import logging
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget.event import event
-from flexget.plugin import get_plugin_by_name
 
 from . import series as plugin_series
 
@@ -50,7 +49,7 @@ class MetainfoSeries(object):
         identified_by = 'auto'
         if config and 'identified_by' in config:
             identified_by = config['identified_by']
-        parsed = get_plugin_by_name('parsing').instance.parse_series(
+        parsed = plugin.get('parsing', self).parse_series(
             data=entry['title'], identified_by=identified_by, allow_seasonless=allow_seasonless
         )
         if parsed and parsed.valid:

@@ -79,8 +79,8 @@ class InputSceper(object):
                 temp = {}
                 temp['title'] = release['title']
                 temp['url'] = link_href
-                urlrewriting = plugin.get_plugin_by_name('urlrewriting')
-                if urlrewriting['instance'].url_rewritable(task, temp):
+                urlrewriting = plugin.get('urlrewriting', self)
+                if urlrewriting.url_rewritable(task, temp):
                     release['url'] = link_href
                     log.trace('--> accepting %s (resolvable)' % link_href)
                 else:

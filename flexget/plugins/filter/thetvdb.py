@@ -129,7 +129,7 @@ class FilterTvdb(object):
     @plugin.priority(126)
     def on_task_filter(self, task, config):
 
-        lookup = plugin.get_plugin_by_name('thetvdb_lookup').instance.lookup
+        lookup = plugin.get('thetvdb_lookup', self).lookup
 
         for entry in task.entries:
             force_accept = False
