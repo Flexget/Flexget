@@ -33,6 +33,7 @@ return_schema = api.schema_model('imdb_search_schema', ObjectsContainer.return_o
 @imdb_api.route('/search/<string:title>/')
 @api.doc(params={'title': 'Movie name or IMDB ID'})
 class IMDBMovieSearch(APIResource):
+    # noinspection PyUnusedLocal
     @etag
     @api.response(200, model=return_schema)
     def get(self, title, session=None):

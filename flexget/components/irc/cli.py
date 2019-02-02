@@ -12,6 +12,7 @@ try:
     from irc_bot.simple_irc_bot import IRCChannelStatus, SimpleIRCBot
 except ImportError:
     SimpleIRCBot = None
+    IRCChannelStatus = None
 
 
 def do_cli(manager, options):

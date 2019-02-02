@@ -10,6 +10,7 @@ import time
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError
 
 log = logging.getLogger('ftp')
 

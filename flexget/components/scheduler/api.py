@@ -112,6 +112,7 @@ class SchedulesAPI(APIResource):
         return resp
 
 
+# noinspection PyUnusedLocal
 @schedule_api.route('/<int:schedule_id>/')
 @api.doc(params={'schedule_id': 'ID of Schedule'})
 @api.doc(description=schedule_desc)
