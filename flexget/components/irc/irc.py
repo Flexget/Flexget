@@ -31,7 +31,7 @@ except ImportError as e:
 log = logging.getLogger('irc')
 
 MESSAGE_CLEAN = re.compile(
-    "\x0f|\x1f|\x02|\x03(?:[\d]{1,2}(?:,[\d]{1,2})?)?", re.MULTILINE | re.UNICODE
+    r"\x0f|\x1f|\x02|\x03(?:[\d]{1,2}(?:,[\d]{1,2})?)?", re.MULTILINE | re.UNICODE
 )
 URL_MATCHER = re.compile(
     r'(https?://[\da-z\.-]+\.[a-z\.]{2,6}[/\w\.-\?&]*/?)', re.MULTILINE | re.UNICODE

@@ -74,12 +74,12 @@ class SearchPTN(object):
 
     def create_entries(self, soup, imdb_id=None):
         entries = []
-        links = soup.findAll('a', attrs={'href': re.compile('download\.php\?torrent=\d+')})
+        links = soup.findAll('a', attrs={'href': re.compile(r'download\.php\?torrent=\d+')})
         rows = [l.find_parent('tr') for l in links]
         for row in rows:
             entry = Entry()
-            entry['title'] = row.find('a', attrs={'href': re.compile('detail\.php\?id')}).text
-            dl_href = row.find('a', attrs={'href': re.compile('download\.php\?torrent=\d+')}).get(
+            entry['title'] = row.find('a', attrs={'href': re.compile(r'detail\.php\?id')}).text
+            dl_href = row.find('a', attrs={'href': re.compile(r'download\.php\?torrent=\d+')}).get(
                 'href'
             )
             entry['url'] = 'http://piratethenet.org' + dl_href
@@ -113,7 +113,7 @@ class SearchPTN(object):
                 log.error('Error while logging in to PtN: %s', e)
                 raise plugin.PluginError('Could not log in to PtN')
 
-            passkey = re.search('passkey=([\d\w]+)"', r.text)
+            passkey = re.search(r'passkey=([\d\w]+)"', r.text)
             if not passkey:
                 log.error("It doesn't look like PtN login worked properly.")
                 raise plugin.PluginError('PTN cookie info invalid')

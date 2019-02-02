@@ -174,8 +174,8 @@ class UrlRewriteIPTorrents(object):
                     entry['torrent_seeds'], entry['torrent_leeches']
                 )
 
-                size = torrent.findNext(text=re.compile('^([\.\d]+) ([GMK]?)B$'))
-                size = re.search('^([\.\d]+) ([GMK]?)B$', size)
+                size = torrent.findNext(text=re.compile(r'^([\.\d]+) ([GMK]?)B$'))
+                size = re.search(r'^([\.\d]+) ([GMK]?)B$', size)
 
                 entry['content_size'] = parse_filesize(size.group(0))
                 log.debug('Found entry %s', entry)

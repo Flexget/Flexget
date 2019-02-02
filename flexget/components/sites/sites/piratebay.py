@@ -78,10 +78,10 @@ class UrlRewritePirateBay(object):
             self.url = url
             parsed_url = urlparse(url)
             self.url_match = re.compile(
-                '^%s://(?:torrents\.)?(%s)/.*$'
+                r'^%s://(?:torrents\.)?(%s)/.*$'
                 % (re.escape(parsed_url.scheme), re.escape(parsed_url.netloc))
             )
-            self.url_search = re.compile('^%s/search/.*$' % (re.escape(url)))
+            self.url_search = re.compile(r'^%s/search/.*$' % (re.escape(url)))
 
     # urlrewriter API
     def url_rewritable(self, task, entry):

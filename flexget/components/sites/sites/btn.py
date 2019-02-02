@@ -81,7 +81,7 @@ class SearchBTN(object):
             searches = [search]
             # If searching by series name ending in a parenthetical, try again without it if there are no results.
             if search.get('series') and search['series'].endswith(')'):
-                match = re.match('(.+)\([^\(\)]+\)$', search['series'])
+                match = re.match(r'(.+)\([^\(\)]+\)$', search['series'])
                 if match:
                     searches.append(dict(search, series=match.group(1).strip()))
 

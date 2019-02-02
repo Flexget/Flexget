@@ -6,7 +6,7 @@ from flask_restplus import inputs
 
 from flexget.api import api, APIResource
 from flexget.api.app import NotFoundError, BadRequest, etag
-from flexget.components.tvmaze.api_tvmaze import APITVMaze as tvm
+from flexget.components.tvmaze.api_tvmaze import APITVMaze
 
 tvmaze_api = api.namespace('tvmaze', description='TVMaze Shows')
 
@@ -143,9 +143,9 @@ class TVDBSeriesSearchApi(APIResource):
             tvmaze_id = None
         try:
             if tvmaze_id:
-                series = tvm.series_lookup(tvmaze_id=tvmaze_id, session=session)
+                series = APITVMaze.series_lookup(tvmaze_id=tvmaze_id, session=session)
             else:
-                series = tvm.series_lookup(series_name=title, session=session)
+                series = APITVMaze.series_lookup(series_name=title, session=session)
         except LookupError as e:
             raise NotFoundError(e.args[0])
         return jsonify(series.to_dict())
@@ -185,7 +185,7 @@ class TVDBEpisodeSearchAPI(APIResource):
         else:
             raise BadRequest('not enough parameters sent for lookup')
         try:
-            episode = tvm.episode_lookup(**kwargs)
+            episode = APITVMaze.episode_lookup(**kwargs)
         except LookupError as e:
             raise NotFoundError(e.args[0])
         return jsonify(episode.to_dict())

@@ -70,7 +70,7 @@ class NewTorrents(object):
             data = page.text
         except Exception:
             raise UrlRewritingError('URLerror when retrieving page')
-        p = re.compile("copy\(\'(.*)\'\)", re.IGNORECASE)
+        p = re.compile(r"copy\(\'(.*)\'\)", re.IGNORECASE)
         f = p.search(data)
         if not f:
             # the link in which plugin relies is missing!

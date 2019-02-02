@@ -116,7 +116,7 @@ class ImdbEntrySet(MutableSet):
         except RequestException as e:
             raise PluginError(str(e))
 
-        user_id_match = re.search('ur\d+(?!\d)', response.url)
+        user_id_match = re.search(r'ur\d+(?!\d)', response.url)
         if user_id_match:
             # extract the hidden form value that we need to do post requests later on
             try:

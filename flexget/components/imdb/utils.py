@@ -47,7 +47,7 @@ def is_valid_imdb_title_id(value):
     if not isinstance(value, basestring):
         raise TypeError("is_valid_imdb_title_id expects a string but got {0}".format(type(value)))
     # IMDB IDs for titles have 'tt' followed by 7 digits
-    return re.match('tt[\d]{7}', value) is not None
+    return re.match(r'tt[\d]{7}', value) is not None
 
 
 def is_valid_imdb_person_id(value):
@@ -57,7 +57,7 @@ def is_valid_imdb_person_id(value):
     if not isinstance(value, basestring):
         raise TypeError("is_valid_imdb_person_id expects a string but got {0}".format(type(value)))
     # An IMDB ID for a person is formed by 'nm' followed by 7 digits
-    return re.match('nm[\d]{7}', value) is not None
+    return re.match(r'nm[\d]{7}', value) is not None
 
 
 def extract_id(url):

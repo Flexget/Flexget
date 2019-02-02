@@ -73,7 +73,7 @@ class UrlRewriteSerienjunkies(object):
     # urlrewriter API
     def url_rewrite(self, task, entry):
         series_url = entry['url']
-        search_title = re.sub('\[.*\] ', '', entry['title'])
+        search_title = re.sub(r'\[.*\] ', '', entry['title'])
 
         download_urls = self.parse_downloads(series_url, search_title)
         if not download_urls:
@@ -137,7 +137,7 @@ class UrlRewriteSerienjunkies(object):
 
                 url = link['href']
                 pattern = (
-                    'http:\/\/download\.serienjunkies\.org.*%s_.*\.html' % self.config['hoster']
+                    r'http:\/\/download\.serienjunkies\.org.*%s_.*\.html' % self.config['hoster']
                 )
 
                 if re.match(pattern, url) or self.config['hoster'] == 'all':
@@ -164,9 +164,9 @@ class UrlRewriteSerienjunkies(object):
         elif regex_season.search(search_title):
             log.debug('Title seems to describe one or more season')
             search_string = regex_season.search(search_title).group(0)
-            for s in re.findall('(?<!\-)S\d\d(?!\-)', search_string):
+            for s in re.findall(r'(?<!\-)S\d\d(?!\-)', search_string):
                 search_titles.append(regex_season.sub(s + '[\\\\w\\\\.]*', search_title))
-            for s in re.finditer('(?<!\-)S(\d\d)-S(\d\d)(?!\-)', search_string):
+            for s in re.finditer(r'(?<!\-)S(\d\d)-S(\d\d)(?!\-)', search_string):
                 season_start = int(s.group(1))
                 season_end = int(s.group(2))
                 for i in range(season_start, season_end + 1):

@@ -280,7 +280,8 @@ class SearchMoreThanTV(object):
                 group_info = result.find('td', attrs={'class': 'big_info'}).find(
                     'div', attrs={'class': 'group_info'}
                 )
-                title = group_info.find('a', href=re.compile('torrents.php\?id=\d+')).text
+                # TODO: compiling regexp within loop achieves nothing
+                title = group_info.find('a', href=re.compile(r'torrents.php\?id=\d+')).text
                 url = (
                     self.base_url
                     + group_info.find('a', href=re.compile('torrents.php\?action=download'))[
@@ -288,7 +289,7 @@ class SearchMoreThanTV(object):
                     ]
                 )
                 torrent_info = result.findAll('td', attrs={'class': 'number_column'})
-                size = re.search('(\d+(?:[.,]\d+)*)\s?([KMG]B)', torrent_info[0].text)
+                size = re.search(r'(\d+(?:[.,]\d+)*)\s?([KMG]B)', torrent_info[0].text)
                 torrent_tags = ', '.join(
                     [tag.text for tag in group_info.findAll('div', attrs={'class': 'tags'})]
                 )

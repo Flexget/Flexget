@@ -18,10 +18,6 @@ import unicodedata
 
 log = logging.getLogger('descargas2020')
 
-requests = Session()
-requests.headers.update({'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'})
-requests.add_domain_limiter(TimedLimiter('descargas2020.com', '2 seconds'))
-
 DESCARGAS2020_TORRENT_FORMAT = 'http://descargas2020.com/download/{:0>6}.torrent'
 
 
@@ -30,11 +26,22 @@ class UrlRewriteDescargas2020(object):
 
     schema = {'type': 'boolean', 'default': False}
 
+    def __init__(self):
+        self.requests = None
+
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        rewritable_regex = '^http:\/\/(www.)?(descargas2020|tvsinpagar|tumejortorrent|torrentlocura|torrentrapid).com\/.*'
+        rewritable_regex = r'^http:\/\/(www.)?(descargas2020|tvsinpagar|tumejortorrent|torrentlocura|torrentrapid).com\/.*'
         return re.match(rewritable_regex, url) and not url.endswith('.torrent')
+
+    def session(self):
+        # TODO: This is not used for all requests even ..
+        if self.requests is None:
+            self.requests = Session()
+            requests.headers.update({'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'})
+            requests.add_domain_limiter(TimedLimiter('descargas2020.com', '2 seconds'))
+        return self.requests
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
@@ -45,7 +52,7 @@ class UrlRewriteDescargas2020(object):
         log.verbose('Descargas2020 URL: %s', url)
 
         try:
-            page = requests.get(url)
+            page = self.requests.get(url)
         except requests.exceptions.RequestException as e:
             raise UrlRewritingError(e)
         try:
@@ -57,7 +64,7 @@ class UrlRewriteDescargas2020(object):
         url_format = DESCARGAS2020_TORRENT_FORMAT
 
         torrent_id_prog = re.compile(
-            "(?:parametros\s*=\s*\n?)\s*{\s*\n(?:\s*'\w+'\s*:.*\n)+\s*'(?:torrentID|id)"
+            r"(?:parametros\s*=\s*\n?)\s*{\s*\n(?:\s*'\w+'\s*:.*\n)+\s*'(?:torrentID|id)"
             "'\s*:\s*'(\d+)'"
         )
         torrent_ids = soup.findAll(text=torrent_id_prog)
@@ -68,7 +75,7 @@ class UrlRewriteDescargas2020(object):
         if not torrent_id:
             log.debug('torrent ID not found, searching openTorrent script')
             match = re.search(
-                'function openTorrent.*\n.*\{.*(\n.*)+window\.location\.href =\s*\".*\/(\d+.*)\";',
+                r'function openTorrent.*\n.*\{.*(\n.*)+window\.location\.href =\s*\".*\/(\d+.*)\";',
                 page.text,
                 re.MULTILINE,
             )
@@ -89,7 +96,7 @@ class UrlRewriteDescargas2020(object):
         results = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
-            query = re.sub(' \(\d\d\d\d\)$', '', query)
+            query = re.sub(r' \(\d\d\d\d\)$', '', query)
             log.debug('Searching Descargas2020 %s', query)
             query = unicodedata.normalize('NFD', query).encode('ascii', 'ignore')
             data = {'q': query}
@@ -114,12 +121,12 @@ class UrlRewriteDescargas2020(object):
                     continue
                 try:
                     entry_quality_lan = re.search(
-                        '.+ \[([^\]]+)\](\[[^\]]+\])+$', entry_title
+                        r'.+ \[([^\]]+)\](\[[^\]]+\])+$', entry_title
                     ).group(1)
                 except AttributeError:
                     log.debug('Quality not found')
                     continue
-                entry_title = re.sub(' \[.+]$', '', entry_title)
+                entry_title = re.sub(r' \[.+]$', '', entry_title)
                 entry['title'] = entry_title + ' ' + entry_quality_lan
                 results.add(entry)
         log.debug('Finish search Descargas2020 with %d entries', len(results))

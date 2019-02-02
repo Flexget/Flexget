@@ -226,7 +226,7 @@ class SearchFileList(object):
 
                 title = torrent_info[1].find('a').get('title')
                 # this is a dirty fix to get the full title since their developer is a moron
-                if re.match("\<img src=\'.*\'\>", title):
+                if re.match(r"\<img src=\'.*\'\>", title):
                     title = torrent_info[1].find('b').text
                     # if the title is shortened, then do a request to get the full one :(
                     if title.endswith('...'):

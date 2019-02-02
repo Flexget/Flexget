@@ -80,7 +80,7 @@ class UrlRewriteRlsbb(object):
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        rewritable_regex = '^https?:\/\/(www.)?rlsbb\.(ru|com)\/.*'
+        rewritable_regex = r'^https?:\/\/(www.)?rlsbb\.(ru|com)\/.*'
         return re.match(rewritable_regex, url) is not None
 
     def _get_soup(self, task, url):

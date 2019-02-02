@@ -159,7 +159,7 @@ class RutrackerUrlrewrite(object):
         else:
             auth_handler = self.auth_cache[username]
         for entry in task.accepted:
-            if re.match('https?:\/\/rutracker', entry['url']):
+            if re.match(r'https?:\/\/rutracker', entry['url']):
                 entry['download_auth'] = auth_handler
 
     @staticmethod

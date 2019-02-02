@@ -189,8 +189,8 @@ class UrlRewriteTorrentday(object):
                 )
 
                 # use tr object for size
-                size = tr.find('td', text=re.compile('([\.\d]+) ([TGMKk]?)B')).contents[0]
-                size = re.search('([\.\d]+) ([TGMKk]?)B', str(size))
+                size = tr.find('td', text=re.compile(r'([\.\d]+) ([TGMKk]?)B')).contents[0]
+                size = re.search(r'([\.\d]+) ([TGMKk]?)B', str(size))
 
                 entry['content_size'] = parse_filesize(size.group(0))
 

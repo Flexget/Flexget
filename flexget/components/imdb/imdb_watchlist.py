@@ -120,7 +120,7 @@ class ImdbWatchlist(object):
         page = self.fetch_page(task, url, params, headers)
         try:
             json_vars = json.loads(
-                re.search('IMDbReactInitialState.push\((.+?)\);\n', page.text).group(1)
+                re.search(r'IMDbReactInitialState.push\((.+?)\);\n', page.text).group(1)
             )
         except (TypeError, AttributeError, ValueError) as e:
             raise plugin.PluginError(
