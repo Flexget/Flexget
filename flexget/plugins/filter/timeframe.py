@@ -128,10 +128,7 @@ class FilterTimeFrame(object):
                          minutes, best_entry['title'])
 
                 # add best entry to backlog (backlog is able to handle duplicate adds)
-                try:
-                    plugin.get('backlog', self).add_backlog(task, best_entry, session=session)
-                except plugin.DependencyError:
-                    raise plugin.PluginError('Timeframe requires backlog plugin')
+                plugin.get('backlog', self).add_backlog(task, best_entry, session=session)
 
     def on_task_learn(self, task, config):
         if not config:
