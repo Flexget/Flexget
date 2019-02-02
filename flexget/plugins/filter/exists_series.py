@@ -15,7 +15,7 @@ from flexget.utils.template import RenderError
 
 try:
     # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins import parsers as plugin_parsers
+    from flexget.components.parsing import parsers as plugin_parsers
 except ImportError:
     raise plugin.DependencyError(
         issued_by=__name__, missing='parsers',

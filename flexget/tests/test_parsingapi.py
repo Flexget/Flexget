@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget.plugin import get_plugin_by_name, get_plugins
-from flexget.plugins.parsers import plugin_parsing
+from flexget.components.parsing import plugin_parsing
 
 
 class TestParsingAPI(object):

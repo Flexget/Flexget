@@ -3,7 +3,6 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from flexget import plugin
 from flexget.event import event
 from flexget.plugin import get_plugin_by_name
 
@@ -13,7 +12,7 @@ from flexget import plugin
 
 try:
     # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.parsers import parser_common as plugin_parser_common
+    from flexget.components.parsing.parsers import parser_common as plugin_parser_common
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='parser_common')
 
