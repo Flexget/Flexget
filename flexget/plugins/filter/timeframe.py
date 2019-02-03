@@ -52,13 +52,6 @@ class FilterTimeFrame(object):
         'additionalProperties': False
     }
 
-    def __init__(self):
-        try:
-            self.backlog = plugin.get_plugin_by_name('backlog')
-        except plugin.DependencyError:
-            self.backlog = None
-            log.warning('Unable to utilize backlog plugin, so episodes may slip through timeframe.')
-
     # Run last so we work on only accepted entries
     @plugin.priority(-255)
     def on_task_filter(self, task, config):
@@ -135,8 +128,7 @@ class FilterTimeFrame(object):
                          minutes, best_entry['title'])
 
                 # add best entry to backlog (backlog is able to handle duplicate adds)
-                if self.backlog:
-                    self.backlog.instance.add_backlog(task, best_entry, session=session)
+                plugin.get('backlog', self).add_backlog(task, best_entry, session=session)
 
     def on_task_learn(self, task, config):
         if not config:

@@ -10,7 +10,6 @@ from path import Path
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
-from flexget.plugin import get_plugin_by_name
 from flexget.utils.tools import TimedDict
 
 log = logging.getLogger('exists_movie')
@@ -72,7 +71,7 @@ class FilterExistsMovie(object):
             return
 
         config = self.prepare_config(config)
-        imdb_lookup = plugin.get_plugin_by_name('imdb_lookup').instance
+        imdb_lookup = plugin.get('imdb_lookup', self)
 
         incompatible_files = 0
         incompatible_entries = 0
@@ -125,7 +124,7 @@ class FilterExistsMovie(object):
             for item in items:
                 count_files += 1
 
-                movie = get_plugin_by_name('parsing').instance.parse_movie(item)
+                movie = plugin.get('parsing', self).parse_movie(item)
 
                 if config.get('lookup') == 'imdb':
                     try:
@@ -168,7 +167,7 @@ class FilterExistsMovie(object):
             else:
                 key = 'movie_name'
                 if not entry.get('movie_name', eval_lazy=False):
-                    movie = get_plugin_by_name('parsing').instance.parse_movie(entry['title'])
+                    movie = plugin.get('parsing', self).parse_movie(entry['title'])
                     entry['movie_name'] = movie.name
 
             # actual filtering

@@ -13,7 +13,7 @@ from bs4.element import Tag
 from flexget.utils.soup import get_soup
 from flexget.utils.requests import Session, TimedLimiter
 from flexget.utils.tools import str_to_int
-from flexget.plugin import get_plugin_by_name, PluginError
+from flexget import plugin
 
 log = logging.getLogger('imdb.utils')
 # IMDb delivers a version of the page which is unparsable to unknown (and some known) user agents, such as requests'
@@ -93,7 +93,7 @@ class ImdbSearch(object):
 
     def smart_match(self, raw_name, single_match=True):
         """Accepts messy name, cleans it and uses information available to make smartest and best match"""
-        parser = get_plugin_by_name('parsing').instance.parse_movie(raw_name)
+        parser = plugin.get('parsing', 'imdb_search').parse_movie(raw_name)
         name = parser.name
         year = parser.year
         if not name:
@@ -287,7 +287,7 @@ class ImdbParser(object):
         data = json.loads(soup.find('script', {'type': 'application/ld+json'}).text)
 
         if not data:
-            raise PluginError(
+            raise plugin.PluginError(
                 'IMDB parser needs updating, imdb format changed. Please report on Github.'
             )
 
@@ -297,7 +297,7 @@ class ImdbParser(object):
             self.name = name_elem.strip()
         else:
             log.error('Possible IMDB parser needs updating, Please report on Github.')
-            raise PluginError('Unable to set imdb_name for %s from %s' % (self.imdb_id, self.url))
+            raise plugin.PluginError('Unable to set imdb_name for %s from %s' % (self.imdb_id, self.url))
 
         year = soup.find('span', attrs={'id': 'titleYear'})
         if year:

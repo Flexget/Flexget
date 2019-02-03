@@ -81,8 +81,8 @@ class UrlRewriteGoogle(object):
             # Test if entry with this url would be recognized by some urlrewriter
             log.trace('Checking if %s is known by some rewriter' % href)
             fake_entry = {'title': entry['title'], 'url': href}
-            urlrewriting = plugin.get_plugin_by_name('urlrewriting')
-            if urlrewriting['instance'].url_rewritable(task, fake_entry):
+            urlrewriting = plugin.get('urlrewriting', self)
+            if urlrewriting.url_rewritable(task, fake_entry):
                 log.debug('--> rewriting %s (known url pattern)' % href)
                 entry['url'] = href
                 return

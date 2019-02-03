@@ -57,7 +57,7 @@ class Torrentz(object):
     def url_rewrite(self, task, entry):
         """URL rewrite torrentz domain url with infohash to any torrent cache"""
         thash = REGEXP.match(entry['url']).group(2)
-        torrent_cache = plugin.get_plugin_by_name('torrent_cache').instance
+        torrent_cache = plugin.get('torrent_cache', self)
         urls = torrent_cache.infohash_urls(thash)
         # default to first shuffled url
         entry['url'] = urls[0]

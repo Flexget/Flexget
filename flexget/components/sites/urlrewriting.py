@@ -98,22 +98,22 @@ class DisableUrlRewriter(object):
     schema = {'type': 'array', 'items': {'type': 'string'}}
 
     def on_task_start(self, task, config):
-        urlrewrite = plugin.get_plugin_by_name('urlrewriting')['instance']
+        urlrewriting = plugin.get('urlrewriting', self)
         for disable in config:
             try:
-                plugin.get_plugin_by_name(disable)
+                plugin.get(disable, self)
             except plugin.DependencyError:
                 log.critical('Unknown url-rewriter %s', disable)
                 continue
             log.debug('Disabling url rewriter %s', disable)
-            urlrewrite.disabled_rewriters.append(disable)
+            urlrewriting.disabled_rewriters.append(disable)
 
     def on_task_exit(self, task, config):
-        urlrewrite = plugin.get_plugin_by_name('urlrewriting')['instance']
+        urlrewriting = plugin.get('urlrewriting', self)
         for disable in config:
             log.debug('Enabling url rewriter %s', disable)
             try:
-                urlrewrite.disabled_rewriters.remove(disable)
+                urlrewriting.disabled_rewriters.remove(disable)
             except ValueError:
                 log.debug('%s does not exists', disable)
 

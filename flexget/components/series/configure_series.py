@@ -49,11 +49,8 @@ class ConfigureSeries(plugin_series.FilterSeriesBase):
 
         series = {}
         for input_name, input_config in config.get('from', {}).items():
-            input = plugin.get_plugin_by_name(input_name)
-            if input.api_ver == 1:
-                raise plugin.PluginError('Plugin %s does not support API v2' % input_name)
-
-            method = input.phase_handlers['input']
+            input_plugin = plugin.get_plugin_by_name(input_name)
+            method = input_plugin.phase_handlers['input']
             try:
                 result = method(task, input_config)
             except PluginError as e:

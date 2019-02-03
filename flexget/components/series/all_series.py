@@ -42,8 +42,7 @@ class FilterAllSeries(plugin_series.FilterSeriesBase):
             group_settings = config
         group_settings.setdefault('identified_by', 'auto')
         # Generate a list of unique series that metainfo_series can parse for this task
-        metainfo_series = plugin.get_plugin_by_name('metainfo_series')
-        guess_entry = metainfo_series.instance.guess_entry
+        guess_entry = plugin.get('metainfo_series', 'all_series').guess_entry
         guessed_series = {}
         for entry in task.entries:
             if guess_entry(entry, config=group_settings):

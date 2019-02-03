@@ -221,8 +221,7 @@ class PluginInfo(dict):
     # Counts duplicate registrations
     dupe_counter = 0
 
-    def __init__(self, plugin_class, name=None, interfaces=None, builtin=False, debug=False, api_ver=1, category=None,
-                 groups=None):
+    def __init__(self, plugin_class, name=None, interfaces=None, builtin=False, debug=False, api_ver=1, category=None):
         """
         Register a plugin.
 
@@ -240,10 +239,6 @@ class PluginInfo(dict):
 
         if interfaces is None:
             interfaces = ['task']
-        if groups is not None:
-            warnings.warn('The `groups` argument for plugin registration is deprecated. `interfaces` should be used '
-                          'instead. Plugin %s' % name, DeprecationWarning, stacklevel=2)
-            interfaces.extend(groups)
         if name is None:
             # Convention is to take camel-case class name and rewrite it to an underscore form,
             # e.g. 'PluginName' to 'plugin_name'
@@ -254,7 +249,7 @@ class PluginInfo(dict):
 
         # Check for unsupported api versions
         if api_ver < 2:
-            warnings.warn('Api versions <2 are no longer supported. Plugin %s' % name, DeprecationWarning, stacklevel=2)
+            raise PluginError('Api versions <2 are no longer supported. Plugin %s' % name)
 
         # Set basic info attributes
         self.api_ver = api_ver
@@ -563,17 +558,44 @@ def get_phases_by_plugin(name):
     return list(get_plugin_by_name(name).phase_handlers)
 
 
-def get_plugin_keywords():
-    """Return iterator over all plugin keywords."""
-    return iter(plugins.keys())
-
-
 def get_plugin_by_name(name, issued_by='???'):
     """
     Get plugin by name, preferred way since this structure may be changed at some point.
 
+    Getting plugin via `.get` function is recommended for normal use.
+
+    This results much shorter and cleaner code::
+
+        plugin.get_plugin_by_name('parsing').instance.parse_movie(data=entry['title'])
+
+    Shortens into::
+
+        plugin.get('parsing', self).parse_movie(data=entry['title'])
+
+    This function is still useful if you need to access plugin information (PluginInfo).
+
     :returns PluginInfo instance
     """
     if name not in plugins:
-        raise DependencyError(issued_by=issued_by, missing=name, message='Unknown plugin %s' % name)
+        raise DependencyError(issued_by=issued_by, missing=name)
     return plugins[name]
+
+
+def get(name, requested_by):
+    """
+
+    :param str name: Name of the requested plugin
+    :param requested_by: Plugin class instance OR string value who is making the request.
+    :return: Instance of Plugin class
+    """
+    if name not in plugins:
+        if hasattr(requested_by, 'plugin_info'):
+            who = requested_by.plugin_info.name
+        else:
+            who = requested_by
+        raise DependencyError(issued_by=who, missing=name)
+
+    instance = plugins[name].instance
+    if instance is None:
+        raise Exception('Plugin referred before system initialized?')
+    return instance

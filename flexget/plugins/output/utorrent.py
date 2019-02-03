@@ -45,15 +45,15 @@ class PluginUtorrent(object):
     @plugin.priority(120)
     def on_task_download(self, task, config):
         """
-            Call download plugin to generate the temp files we will load
-            into deluge then verify they are valid torrents
+        Call download plugin to generate the temp files we will load
+        into deluge then verify they are valid torrents
         """
         # If the download plugin is not enabled, we need to call it to get
         # our temp .torrent files
         if 'download' not in task.config:
-            download = plugin.get_plugin_by_name('download')
+            download = plugin.get('download', self)
             for _ in task.accepted:
-                download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
+                download.get_temp_files(task, handle_magnets=True, fail_html=True)
 
     @plugin.priority(135)
     # @plugin.internet(log)
@@ -149,8 +149,7 @@ class PluginUtorrent(object):
         """ Make sure all temp files are cleaned up when entries are learned """
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
-            download = plugin.get_plugin_by_name('download')
-            download.instance.cleanup_temp_files(task)
+            plugin.get('download', self).cleanup_temp_files(task)
 
     on_task_abort = on_task_learn
 

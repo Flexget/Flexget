@@ -48,14 +48,6 @@ class PluginFailed(object):
         ]
     }
 
-    def __init__(self):
-        try:
-            self.backlog = plugin.get_plugin_by_name('backlog')
-        except plugin.DependencyError:
-            log.warning(
-                'Unable utilize backlog plugin, failed entries may not be retried properly.'
-            )
-
     def prepare_config(self, config):
         if not isinstance(config, dict):
             config = {}
@@ -116,8 +108,8 @@ class PluginFailed(object):
             item.reason = reason
             session.merge(item)
             log.debug('Marking %s in failed list. Has failed %s times.', item.title, item.count)
-            if self.backlog and item.count <= config['max_retries']:
-                self.backlog.instance.add_backlog(
+            if item.count <= config['max_retries']:
+                plugin.get('backlog', self).add_backlog(
                     entry.task, entry, amount=retry_time, session=session
                 )
             entry.task.rerun(plugin='retry_failed')

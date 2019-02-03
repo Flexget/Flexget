@@ -25,7 +25,6 @@ from dateutil.parser import parse as dateutil_parse
 
 from flexget import db_schema, plugin
 from flexget.event import event
-from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
 from flexget.utils.database import year_property, with_session, json_synonym
 
@@ -319,7 +318,7 @@ class ApiTmdb(object):
 
         if smart_match and not (title or tmdb_id or imdb_id):
             # If smart_match was specified, parse it into a title and year
-            title_parser = get_plugin_by_name('parsing').instance.parse_movie(smart_match)
+            title_parser = plugin.get('parsing', 'api_tmdb').parse_movie(smart_match)
             title = title_parser.name
             year = title_parser.year
         if not (title or tmdb_id or imdb_id):

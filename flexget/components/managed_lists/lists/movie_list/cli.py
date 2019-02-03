@@ -19,12 +19,12 @@ from .movie_list import MovieListBase
 
 def lookup_movie(title, session, identifiers=None):
     try:
-        imdb_lookup = plugin.get_plugin_by_name('imdb_lookup').instance.lookup
+        imdb_lookup = plugin.get('imdb_lookup', 'movie_list').lookup
     except DependencyError:
         imdb_lookup = None
 
     try:
-        tmdb_lookup = plugin.get_plugin_by_name('tmdb_lookup').instance.lookup
+        tmdb_lookup = plugin.get('tmdb_lookup', 'movie_list').lookup
     except DependencyError:
         tmdb_lookup = None
 

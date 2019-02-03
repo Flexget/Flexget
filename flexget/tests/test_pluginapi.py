@@ -22,6 +22,10 @@ class TestPluginApi(object):
         with pytest.raises(plugin.DependencyError):
             plugin.get_plugin_by_name('nonexisting_plugin')
 
+    def test_unknown_plugin(self):
+        with pytest.raises(plugin.DependencyError):
+            plugin.get('nonexisting_plugin', 'test')
+
     def test_no_dupes(self):
         plugin.load_plugins()
 

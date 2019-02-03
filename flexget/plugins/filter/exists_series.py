@@ -9,7 +9,6 @@ from path import Path
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
-from flexget.plugin import get_plugin_by_name
 from flexget.utils.log import log_once
 from flexget.utils.template import RenderError
 
@@ -94,8 +93,8 @@ class FilterExistsSeries(object):
                 for filename in folder.walk(errors='ignore'):
                     # run parser on filename data
                     try:
-                        disk_parser = get_plugin_by_name('parsing').instance.parse_series(data=filename.name,
-                                                                                          name=series_parser.name)
+                        disk_parser = plugin.get('parsing', self).parse_series(data=filename.name,
+                                                                               name=series_parser.name)
                     except plugin_parsers.ParseWarning as pw:
                         disk_parser = pw.parsed
                         log_once(pw.value, logger=log)
