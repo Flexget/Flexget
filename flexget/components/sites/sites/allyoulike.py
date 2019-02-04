@@ -8,7 +8,7 @@ from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.search import normalize_unicode
+from flexget.components.sites.utils import normalize_unicode
 from flexget.utils.soup import get_soup
 
 try:

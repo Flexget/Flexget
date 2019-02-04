@@ -12,7 +12,7 @@ from flexget.manager import Session
 from flexget.plugin import PluginError
 from flexget.utils.database import json_synonym
 from flexget.utils.requests import TokenBucketLimiter
-from flexget.utils.search import normalize_unicode
+from flexget.components.sites.utils import normalize_unicode
 from flexget.utils.tools import parse_filesize
 
 from sqlalchemy import Column, Unicode, String, DateTime

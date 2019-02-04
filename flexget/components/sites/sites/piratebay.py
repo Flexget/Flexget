@@ -10,7 +10,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.components.sites.urlrewriting import UrlRewritingError
 from flexget.utils.soup import get_soup
-from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.components.sites.utils import torrent_availability, normalize_unicode
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('piratebay')

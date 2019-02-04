@@ -10,7 +10,7 @@ from flexget.event import event
 from flexget.utils import requests
 from flexget.components.imdb.utils import extract_id
 from flexget.utils.soup import get_soup
-from flexget.utils.search import torrent_availability
+from flexget.components.sites.utils import torrent_availability
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('search_ptn')

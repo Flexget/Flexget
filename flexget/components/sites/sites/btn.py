@@ -11,7 +11,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests, json
 from flexget.utils.requests import TokenBucketLimiter
-from flexget.utils.search import torrent_availability
+from flexget.components.sites.utils import torrent_availability
 
 log = logging.getLogger('search_btn')
 

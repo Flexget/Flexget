@@ -12,7 +12,7 @@ from flexget.utils.soup import get_soup
 from flexget.utils import requests
 
 from flexget.entry import Entry
-from flexget.utils.search import normalize_unicode
+from flexget.components.sites.utils import normalize_unicode
 
 import unicodedata
 

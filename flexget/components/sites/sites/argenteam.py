@@ -8,7 +8,7 @@ from requests import RequestException
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.search import normalize_scene
+from flexget.components.sites.utils import normalize_scene
 
 log = logging.getLogger('argenteam')
 

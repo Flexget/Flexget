@@ -9,7 +9,7 @@ import feedparser
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.search import normalize_unicode, torrent_availability
+from flexget.components.sites.utils import normalize_unicode, torrent_availability
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('nyaa')

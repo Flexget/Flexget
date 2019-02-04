@@ -1,17 +1,32 @@
 from __future__ import unicode_literals, division, absolute_import
+
+import re
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
+from unicodedata import normalize
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
-from flexget.utils.search import torrent_availability, clean_symbols
+from flexget.components.sites.utils import torrent_availability
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('limetorrents')
+
+
+def clean_symbols(text):
+    """Replaces common symbols with spaces. Also normalize unicode strings in decomposed form."""
+    result = text
+    if isinstance(result, str):
+        result = normalize('NFKD', result)
+    result = re.sub(r'[ \(\)\-_\[\]\.]+', ' ', result).lower()
+
+    # Leftovers
+    result = re.sub(r"[^a-zA-Z0-9 ]", "", result)
+    return result
 
 
 class Limetorrents(object):

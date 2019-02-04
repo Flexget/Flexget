@@ -12,7 +12,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.components.sites.urlrewriting import UrlRewritingError
-from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.components.sites.utils import torrent_availability, normalize_unicode
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('torrentleech')
