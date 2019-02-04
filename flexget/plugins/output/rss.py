@@ -133,6 +133,7 @@ class OutputRSS(object):
                     'days': {'type': 'integer'},
                     'items': {'type': 'integer'},
                     'history': {'type': 'boolean'},
+                    'timestamp': {'type': 'boolean'},
                     'rsslink': {'type': 'string'},
                     'encoding': {'type': 'string'},  # TODO: only valid choices
                     'title': {'type': 'string'},
@@ -156,6 +157,7 @@ class OutputRSS(object):
         config.setdefault('items', -1)
         config.setdefault('history', True)
         config.setdefault('encoding', 'iso-8859-1')
+        config.setdefault('timestamp', False)
         config.setdefault('link', ['imdb_url', 'input_url'])
         config.setdefault('title', '{{title}} (from {{task}})')
         config.setdefault('template', 'rss')
@@ -246,7 +248,7 @@ class OutputRSS(object):
         rss = PyRSS2Gen.RSS2(title='FlexGet',
                              link=config.get('rsslink', 'http://flexget.com'),
                              description='FlexGet generated RSS feed',
-                             lastBuildDate=datetime.datetime.utcnow(),
+                             lastBuildDate=datetime.datetime.utcnow() if config['timestamp'] else None,
                              items=rss_items)
 
         # don't run with --test
