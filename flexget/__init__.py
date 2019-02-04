@@ -23,7 +23,7 @@ def main(args=None):
         try:
             manager = Manager(args)
         except (IOError, ValueError) as e:
-            if any(arg in ['debug', '--debug'] for arg in [a.lower() for a in sys.argv]):
+            if _is_debug():
                 import traceback
                 traceback.print_exc()
             else:
@@ -41,7 +41,7 @@ def main(args=None):
             else:
                 manager.start()
         except (IOError, ValueError) as e:
-            if any(arg in ['debug', '--debug'] for arg in [a.lower() for a in sys.argv]):
+            if _is_debug():
                 import traceback
                 traceback.print_exc()
             else:
@@ -49,5 +49,16 @@ def main(args=None):
 
             sys.exit(1)
     except KeyboardInterrupt:
+        if _is_debug():
+            import traceback
+            traceback.print_exc()
+
         print('Killed with keyboard interrupt.', file=sys.stderr)
         sys.exit(1)
+
+
+def _is_debug():
+    return any(
+        arg in ['debug', '--debug', '--loglevel=trace', '--loglevel=debug']
+        for arg in [a.lower() for a in sys.argv]
+    )
