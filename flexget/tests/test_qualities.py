@@ -4,8 +4,8 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import pytest
 from jinja2 import Template
 
-from flexget.plugins.parsers.parser_guessit import ParserGuessit
-from flexget.plugins.parsers.parser_internal import ParserInternal
+from flexget.components.parsing.parsers.parser_guessit import ParserGuessit
+from flexget.components.parsing.parsers.parser_internal import ParserInternal
 from flexget.utils.qualities import Quality
 
 

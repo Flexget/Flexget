@@ -559,8 +559,6 @@ def aggregate_inputs(task, inputs):
     for item in inputs:
         for input_name, input_config in item.items():
             input = plugin.get_plugin_by_name(input_name)
-            if input.api_ver == 1:
-                raise plugin.PluginError('Plugin %s does not support API v2' % input_name)
             method = input.phase_handlers['input']
             try:
                 result = method(task, input_config)

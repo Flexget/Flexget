@@ -6,8 +6,8 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from flexget.api.app import base_message
 
 from flexget.manager import Session
-from flexget.api.plugins.status import ObjectsContainer as OC
-from flexget.plugins.operate.status import StatusTask, TaskExecution
+from flexget.components.status.api import ObjectsContainer as OC
+from flexget.components.status.db import StatusTask, TaskExecution
 from flexget.utils import json
 
 

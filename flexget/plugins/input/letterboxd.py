@@ -79,7 +79,7 @@ class Letterboxd(object):
         return config
 
     def tmdb_lookup(self, search):
-        tmdb = plugin.get_plugin_by_name('api_tmdb').instance.lookup(tmdb_id=search)
+        tmdb = plugin.get('api_tmdb', self).lookup(tmdb_id=search)
         result = {
             'title': '%s (%s)' % (tmdb.name, tmdb.year),
             'imdb_id': tmdb.imdb_id,

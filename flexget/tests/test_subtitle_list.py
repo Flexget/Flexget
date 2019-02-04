@@ -8,7 +8,7 @@ import sys
 import pytest
 
 from flexget.manager import Session
-from flexget.plugins.list.subtitle_list import SubtitleListFile, SubtitleListLanguage, normalize_path
+from flexget.components.managed_lists.lists.subtitle_list import SubtitleListFile, SubtitleListLanguage, normalize_path
 
 try:
     import subliminal

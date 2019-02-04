@@ -3,7 +3,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget.entry import Entry
 from flexget.manager import Session
-from flexget.plugins.list.entry_list import EntryListList, EntryListEntry
+from flexget.components.managed_lists.lists.entry_list.db import EntryListList, EntryListEntry
 
 
 class TestEntryListSearch(object):

@@ -1,17 +1,17 @@
 from __future__ import unicode_literals, division, absolute_import
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
-from datetime import datetime, timedelta
-
-from flexget.plugins.filter.seen import SeenEntry
 
 from flexget.api.app import base_message
-from flexget.api.plugins.series import ObjectsContainer as OC
-from flexget.api.plugins.tvdb_lookup import ObjectsContainer as tvdb
-from flexget.api.plugins.tvmaze_lookup import ObjectsContainer as tvmaze
+from flexget.components.series.api import ObjectsContainer as OC
+from flexget.components.thetvdb.api import ObjectsContainer as tvdb
+from flexget.components.tvmaze.api import ObjectsContainer as tvmaze
+from flexget.components.seen.db import SeenEntry
 from flexget.manager import Session
-from flexget.plugins.filter.series import (
+# TODO: would be nicer to import db module
+from flexget.components.series.db import (
     Series, SeriesTask, Episode, EpisodeRelease, AlternateNames, Season, SeasonRelease
 )
 from flexget.utils import json

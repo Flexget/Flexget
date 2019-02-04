@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget.manager import Session
-from flexget.plugins.modify.variables import Variables
+from flexget.components.variables.variables import Variables
 from flexget.utils import json
 
 

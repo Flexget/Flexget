@@ -75,8 +75,7 @@ class TorrentMatch(object):
             if 'file' not in entry and 'download' not in task.config:
                 # If the download plugin is not enabled, we need to call it to get
                 # our temp .torrent files
-                download = plugin.get_plugin_by_name('download')
-                download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
+                plugin.get('download', self).get_temp_files(task, handle_magnets=True, fail_html=True)
 
     def prepare_config(self, config):
         if not isinstance(config['max_size_difference'], float):

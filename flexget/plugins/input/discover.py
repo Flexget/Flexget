@@ -11,7 +11,6 @@ from flexget import options, plugin
 from flexget import db_schema
 from flexget.event import event
 from flexget.manager import Session
-from flexget.plugin import get_plugin_by_name, PluginError, PluginWarning
 from flexget.utils.tools import parse_timedelta, multiply_timedelta, aggregate_inputs
 
 log = logging.getLogger('discover')
@@ -105,7 +104,7 @@ class Discover(object):
                     plugin_name, plugin_config = list(item.items())[0]
                 else:
                     plugin_name, plugin_config = item, None
-                search = get_plugin_by_name(plugin_name).instance
+                search = plugin.get(plugin_name, self)
                 if not callable(getattr(search, 'search')):
                     log.critical('Search plugin %s does not implement search method', plugin_name)
                     continue
@@ -127,9 +126,9 @@ class Discover(object):
 
                     entry_results.extend(search_results)
 
-                except PluginWarning as e:
+                except plugin.PluginWarning as e:
                     log.verbose('No results from %s: %s', plugin_name, e)
-                except PluginError as e:
+                except plugin.PluginError as e:
                     log.error('Error searching with %s: %s', plugin_name, e)
             if not entry_results:
                 log.verbose('No search results for `%s`', entry['title'])
@@ -155,7 +154,7 @@ class Discover(object):
         :param dict estimation_mode: mode -> loose, strict, ignore
         :return: Entries that we have estimated to be available
         """
-        estimator = get_plugin_by_name('estimate_release').instance
+        estimator = plugin.get('estimate_release', self)
         result = []
         for entry in entries:
             est_date = estimator.estimate(entry)

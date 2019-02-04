@@ -178,8 +178,8 @@ class OutputQBitTorrent(object):
         if not config['enabled']:
             return
         if 'download' not in task.config:
-            download = plugin.get_plugin_by_name('download')
-            download.instance.get_temp_files(task, handle_magnets=True, fail_html=config['fail_html'])
+            download = plugin.get('download', self)
+            download.get_temp_files(task, handle_magnets=True, fail_html=config['fail_html'])
 
     @plugin.priority(135)
     def on_task_output(self, task, config):

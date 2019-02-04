@@ -26,7 +26,7 @@ class TestCouchpotato(object):
               api_key: '123abc'
         """
 
-    @mock.patch('flexget.plugins.list.couchpotato_list.CouchPotatoBase.get_json')
+    @mock.patch('flexget.components.managed_lists.lists.couchpotato_list.CouchPotatoBase.get_json')
     def test_couchpotato_no_data(self, mock_get, execute_task):
         mock_get.return_value = movie_list_response
 
@@ -95,7 +95,7 @@ class TestCouchpotatoWithQuality(object):
             'Expected Quality for entry {} should be {}, instead its {}'.format(entry['title'], expected_quality,
                                                                                 entry.store['quality_req'])
 
-    @mock.patch('flexget.plugins.list.couchpotato_list.CouchPotatoBase.get_json')
+    @mock.patch('flexget.components.managed_lists.lists.couchpotato_list.CouchPotatoBase.get_json')
     def test_couchpotato_with_quality(self, mock_get, execute_task):
         mock_get.side_effect = [movie_list_response, qualities_response]
         task = execute_task('couch')

@@ -4,8 +4,8 @@ from time import sleep
 
 import pytest
 
+from flexget.components.managed_lists.lists.thetvdb_list import TheTVDBSet
 from flexget.entry import Entry
-from flexget.plugins.list.thetvdb_list import TheTVDBSet
 
 
 @pytest.mark.online

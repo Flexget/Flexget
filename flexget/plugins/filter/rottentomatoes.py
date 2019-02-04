@@ -87,12 +87,10 @@ class FilterRottenTomatoes(object):
     # Run later to avoid unnecessary lookups
     @plugin.priority(115)
     def on_task_filter(self, task, config):
-
-        lookup = plugin.get_plugin_by_name('rottentomatoes_lookup').instance.lookup
+        lookup = plugin.get('rottentomatoes_lookup', self).lookup
 
         # since the plugin does not reject anything, no sense going trough accepted
         for entry in task.undecided:
-
             force_accept = False
 
             try:

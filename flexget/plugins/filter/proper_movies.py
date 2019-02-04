@@ -12,7 +12,6 @@ from flexget import plugin
 from flexget.event import fire_event, event
 from flexget.manager import Base
 from flexget.utils.log import log_once
-from flexget.plugin import get_plugin_by_name
 from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('proper_movies')
@@ -86,7 +85,7 @@ class FilterProperMovies(object):
         imdb_lookup = plugin.get_plugin_by_name('imdb_lookup').instance
 
         for entry in task.entries:
-            parser = get_plugin_by_name('parsing').instance.parse_movie(entry['title'])
+            parser = plugin.get('parsing', self).parse_movie(entry['title'])
 
             # if we have imdb_id already evaluated
             if entry.get('imdb_id', None, eval_lazy=False) is None:
@@ -152,7 +151,7 @@ class FilterProperMovies(object):
                 log.debug('`%s` does not have imdb_id' % entry['title'])
                 continue
 
-            parser = get_plugin_by_name('parsing').instance.parse_movie(entry['title'])
+            parser = plugin.get('parsing', self).parse_movie(entry['title'])
 
             quality = parser.quality.name
 

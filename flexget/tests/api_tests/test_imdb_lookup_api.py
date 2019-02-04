@@ -3,7 +3,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
 
-from flexget.api.plugins.imdb_lookup import ObjectsContainer as OC
+from flexget.components.imdb.api import ObjectsContainer as OC
 from flexget.utils import json
 
 

@@ -6,7 +6,6 @@ import logging
 from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.plugin import get_plugin_by_name
 from flexget.utils.tools import split_title_year
 from flexget.utils.log import log_once
 
@@ -42,7 +41,7 @@ class PluginBlurayLookup(object):
 
     def lazy_loader(self, entry):
         """Does the lookup for this entry and populates the entry fields."""
-        lookup = get_plugin_by_name('api_bluray').instance.lookup
+        lookup = plugin.get('api_bluray', self).lookup
 
         try:
             with Session() as session:

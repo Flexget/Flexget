@@ -5,7 +5,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import pytest
 from flexget.api.app import base_message
 
-from flexget.api.plugins.tvdb_lookup import ObjectsContainer as OC
+from flexget.components.thetvdb.api import ObjectsContainer as OC
 from flexget.utils import json
 
 

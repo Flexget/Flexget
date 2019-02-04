@@ -3,8 +3,8 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
 
-from flexget.plugins.parsers.parser_guessit import ParserGuessit
-from flexget.plugins.parsers.parser_internal import ParserInternal
+from flexget.components.parsing.parsers.parser_guessit import ParserGuessit
+from flexget.components.parsing.parsers.parser_internal import ParserInternal
 
 
 class TestParser(object):

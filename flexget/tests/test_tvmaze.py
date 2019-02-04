@@ -6,7 +6,7 @@ from datetime import timedelta, datetime
 import pytest
 
 from flexget.manager import Session
-from flexget.plugins.internal.api_tvmaze import APITVMaze, TVMazeLookup, TVMazeSeries, TVMazeEpisodes
+from flexget.components.tvmaze.api_tvmaze import APITVMaze, TVMazeLookup, TVMazeSeries, TVMazeEpisodes
 
 lookup_series = APITVMaze.series_lookup
 

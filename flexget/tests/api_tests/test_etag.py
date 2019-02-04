@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from flexget.api.plugins.movie_list import ObjectsContainer as OC
+from flexget.components.managed_lists.lists.movie_list.api import ObjectsContainer as OC
 from flexget.utils import json
 
 

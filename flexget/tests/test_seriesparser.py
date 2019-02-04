@@ -5,8 +5,8 @@ from past.builtins import basestring
 
 import pytest
 
-from flexget.plugins.parsers.parser_internal import ParserInternal
-from flexget.plugins.parsers.parser_guessit import ParserGuessit
+from flexget.components.parsing.parsers.parser_internal import ParserInternal
+from flexget.components.parsing.parsers.parser_guessit import ParserGuessit
 
 
 class TestSeriesParser(object):
