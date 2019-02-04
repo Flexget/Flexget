@@ -210,6 +210,8 @@ class OutputRSS(object):
                 log.error('Error while rendering entry %s, falling back to plain title: %s', entry, e)
                 rss.description = entry['title'] + ' - (Render Error)'
             rss.file = config['file']
+            if 'rss_pubdate' in entry:
+                rss.published = entry['rss_pubdate']
 
             # TODO: check if this exists and suggest disabling history if it does since it shouldn't happen normally ...
             log.debug('Saving %s into rss database', entry['title'])
