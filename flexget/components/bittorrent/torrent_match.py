@@ -26,13 +26,19 @@ class TorrentMatch(object):
     schema = {
         'type': 'object',
         'properties': {
-            'what': {'type': 'array', 'items': {
-                'allOf': [{'$ref': '/schema/plugins?phase=input'}, {'maxProperties': 1, 'minProperties': 1}]
-            }},
-            'max_size_difference': {'type': 'string', 'format': 'percent', 'default': '0%'}
+            'what': {
+                'type': 'array',
+                'items': {
+                    'allOf': [
+                        {'$ref': '/schema/plugins?phase=input'},
+                        {'maxProperties': 1, 'minProperties': 1},
+                    ]
+                },
+            },
+            'max_size_difference': {'type': 'string', 'format': 'percent', 'default': '0%'},
         },
         'required': ['what'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def get_local_files(self, config, task):
@@ -61,7 +67,9 @@ class TorrentMatch(object):
                         file_path = os.path.join(root, f)
                         # We need normpath to strip out the dot
                         abs_file_path = os.path.normpath(os.path.join(location, file_path))
-                        entry['files'].append(TorrentMatchFile(abs_file_path, os.path.getsize(file_path)))
+                        entry['files'].append(
+                            TorrentMatchFile(abs_file_path, os.path.getsize(file_path))
+                        )
 
         # restore the working directory
         os.chdir(cwd)
@@ -75,7 +83,9 @@ class TorrentMatch(object):
             if 'file' not in entry and 'download' not in task.config:
                 # If the download plugin is not enabled, we need to call it to get
                 # our temp .torrent files
-                plugin.get('download', self).get_temp_files(task, handle_magnets=True, fail_html=True)
+                plugin.get('download', self).get_temp_files(
+                    task, handle_magnets=True, fail_html=True
+                )
 
     def prepare_config(self, config):
         if not isinstance(config['max_size_difference'], float):
@@ -107,7 +117,9 @@ class TorrentMatch(object):
 
             # Iterate over the files/dirs from the  what  plugins
             for local_entry in local_entries:
-                log.debug("Checking local entry %s against %s", local_entry['title'], entry['title'])
+                log.debug(
+                    "Checking local entry %s against %s", local_entry['title'], entry['title']
+                )
 
                 local_files = local_entry['files']
 
@@ -117,7 +129,10 @@ class TorrentMatch(object):
                 if not has_root_dir:  # single-file
                     torrent_file = torrent_files[0]
                     for local_file in local_files:
-                        if torrent_file.path in local_file.path and torrent_file.size == local_file.size:
+                        if (
+                            torrent_file.path in local_file.path
+                            and torrent_file.size == local_file.size
+                        ):
                             # if the filename with ext is contained in 'location', we must grab its parent as path
                             if os.path.basename(torrent_file.path) in local_entry['location']:
                                 entry['path'] = os.path.dirname(local_entry['location'])
@@ -145,13 +160,20 @@ class TorrentMatch(object):
                                     path = os.path.dirname(path)
 
                             candidate_files.append(local_file)
-                    
+
                     log.debug('Path for %s will be set to %s', entry['title'], path)
-                    
+
                     for torrent_file in torrent_files:
                         for candidate in candidate_files:
-                            if torrent_file.path in candidate.path and torrent_file.size == candidate.size:
-                                log.debug('Path %s matched local file path %s', torrent_file.path, candidate.path)
+                            if (
+                                torrent_file.path in candidate.path
+                                and torrent_file.size == candidate.size
+                            ):
+                                log.debug(
+                                    'Path %s matched local file path %s',
+                                    torrent_file.path,
+                                    candidate.path,
+                                )
                                 matches += 1
                                 break
                         else:
@@ -171,7 +193,9 @@ class TorrentMatch(object):
                         break
 
         for entry in set(task.accepted).difference(matched_entries):
-            entry.reject('No local files matched {}% of the torrent size'.format(100 - max_size_difference))
+            entry.reject(
+                'No local files matched {}% of the torrent size'.format(100 - max_size_difference)
+            )
 
 
 @event('plugin.register')

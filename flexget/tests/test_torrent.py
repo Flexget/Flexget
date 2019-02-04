@@ -300,7 +300,7 @@ class TestTorrentAlive(object):
         assert task._rerun_count == 0, 'Torrent should have been accepted without rerun.'
 
     def test_torrent_alive_udp_invalid_port(self):
-        from flexget.plugins.filter.torrent_alive import get_udp_seeds
+        from flexget.components.bittorrent.torrent_alive import get_udp_seeds
         assert get_udp_seeds('udp://[2001::1]/announce', 'HASH') == 0
         assert get_udp_seeds('udp://[::1]/announce', 'HASH') == 0
         assert get_udp_seeds('udp://["2100::1"]:-1/announce', 'HASH') == 0

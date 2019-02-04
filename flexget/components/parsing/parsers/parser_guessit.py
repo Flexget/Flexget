@@ -35,8 +35,10 @@ def _id_regexps_function(input_string, context):
     return ret
 
 
-_id_regexps = Rebulk().functional(_id_regexps_function, name='regexpId',
-                                  disabled=lambda context: not context.get('id_regexps'))
+_id_regexps = Rebulk().functional(
+    _id_regexps_function, name='regexpId', disabled=lambda context: not context.get('id_regexps')
+)
+
 
 def rules_builder(config):
     rebulk = rebulk_builder(config)
@@ -45,10 +47,7 @@ def rules_builder(config):
 
 
 guessit_api = GuessItApi()
-guessit_api.configure(
-    options={},
-    rules_builder=rules_builder,
-    force=True)
+guessit_api.configure(options={}, rules_builder=rules_builder, force=True)
 
 
 def normalize_component(data):
@@ -77,7 +76,7 @@ class ParserGuessit(object):
         'Analog HDTV': 'ahdtv',
         'Ultra HDTV': 'uhdtv',
         'HD Telecine': 'hdtc',
-        'Web': 'web-dl'
+        'Web': 'web-dl',
     }
 
     @staticmethod
@@ -86,7 +85,7 @@ class ParserGuessit(object):
             'name_only': True,
             'allowed_languages': ['en', 'fr'],
             'allowed_countries': ['us', 'uk', 'gb'],
-            'single_value': True
+            'single_value': True,
         }
         options['episode_prefer_number'] = not options.get('identified_by') == 'ep'
         if options.get('allow_groups'):
@@ -169,8 +168,12 @@ class ParserGuessit(object):
             elif isinstance(component, str):
                 flattened_qualities.append(component)
             else:
-                raise ParseWarning(self, 'Guessit quality returned type {}: {}. Expected str or list.'.format(
-                    type(component), component))
+                raise ParseWarning(
+                    self,
+                    'Guessit quality returned type {}: {}. Expected str or list.'.format(
+                        type(component), component
+                    ),
+                )
 
         return qualities.Quality(' '.join(flattened_qualities))
 
@@ -189,7 +192,9 @@ class ParserGuessit(object):
             proper_count=self._proper_count(guess_result),
             quality=self._quality(guess_result),
             release_group=guess_result.get('release_group'),
-            valid=bool(guess_result.get('title'))  # It's not valid if it didn't find a name, which sometimes happens
+            valid=bool(
+                guess_result.get('title')
+            ),  # It's not valid if it didn't find a name, which sometimes happens
         )
         log.debug('Parsing result: %s (in %s ms)', parsed, (preferred_clock() - start) * 1000)
         return parsed
@@ -204,7 +209,9 @@ class ParserGuessit(object):
             if kwargs.get('alternate_names'):
                 expected_titles.extend(kwargs['alternate_names'])
             # apostrophe support
-            expected_titles = [title.replace('\'', '(?:\'|\\\'|\\\\\'|-|)?') for title in expected_titles]
+            expected_titles = [
+                title.replace('\'', '(?:\'|\\\'|\\\\\'|-|)?') for title in expected_titles
+            ]
             guessit_options['expected_title'] = ['re:' + title for title in expected_titles]
         if kwargs.get('id_regexps'):
             guessit_options['id_regexps'] = kwargs.get('id_regexps')
@@ -240,8 +247,13 @@ class ParserGuessit(object):
             title_end = guess_result.matches['title'][0].end
             if title_start != 0:
                 try:
-                    pre_title = max((match[0].end for match in guess_result.matches.values() if
-                                     match[0].end <= title_start))
+                    pre_title = max(
+                        (
+                            match[0].end
+                            for match in guess_result.matches.values()
+                            if match[0].end <= title_start
+                        )
+                    )
                 except ValueError:
                     pre_title = 0
                 for char in reversed(data[pre_title:title_start]):
@@ -252,8 +264,11 @@ class ParserGuessit(object):
                     else:
                         break
             # Check the name doesn't end mid-word (guessit might put the border before or after the space after title)
-            if data[title_end - 1].isalnum() and len(data) <= title_end or \
-                    not self._is_valid_name(data, guessit_options=guessit_options):
+            if (
+                data[title_end - 1].isalnum()
+                and len(data) <= title_end
+                or not self._is_valid_name(data, guessit_options=guessit_options)
+            ):
                 valid = False
             # If we are in exact mode, make sure there is nothing after the title
             if kwargs.get('strict_name'):
@@ -288,7 +303,7 @@ class ParserGuessit(object):
         if country and name.endswith(')'):
             p_start = name.rfind('(')
             if p_start != -1:
-                parenthetical = re.escape(name[p_start + 1:-1])
+                parenthetical = re.escape(name[p_start + 1 : -1])
                 if parenthetical and parenthetical.lower() != str(country).lower():
                     valid = False
         special = guess_result.get('episode_details', '').lower() == 'special'
@@ -311,7 +326,9 @@ class ParserGuessit(object):
                         season = 1
                     else:
                         episode_raw = guess_result.matches['episode'][0].initiator.raw
-                        if episode_raw and any(c.isalpha() and c.lower() != 'v' for c in episode_raw):
+                        if episode_raw and any(
+                            c.isalpha() and c.lower() != 'v' for c in episode_raw
+                        ):
                             season = 1
                 if season is not None:
                     identifier_type = 'ep'
@@ -325,8 +342,9 @@ class ParserGuessit(object):
             if episode is not None:
                 identifier_type = 'sequence'
                 identifier = episode
-        if (not identifier_type or guessit_options.get('prefer_specials')) and (special or
-                                                                        guessit_options.get('assume_special')):
+        if (not identifier_type or guessit_options.get('prefer_specials')) and (
+            special or guessit_options.get('assume_special')
+        ):
             identifier_type = 'special'
             identifier = guess_result.get('episode_title', 'special')
         if not identifier_type:
@@ -346,7 +364,7 @@ class ParserGuessit(object):
             proper_count=proper_count,
             special=special,
             group=group,
-            valid=valid
+            valid=valid,
         )
 
         log.debug('Parsing result: %s (in %s ms)', parsed, (preferred_clock() - start) * 1000)
@@ -364,8 +382,10 @@ class ParserGuessit(object):
         name_regexps = ReList(guessit_options.get('name_regexps', []))
         if not name_regexps:
             # if we don't have name_regexps, generate one from the name
-            name_regexps = ReList(name_to_re(name, default_ignore_prefixes, None)
-                                  for name in [guessit_options['name']] + guessit_options.get('alternate_names', []))
+            name_regexps = ReList(
+                name_to_re(name, default_ignore_prefixes, None)
+                for name in [guessit_options['name']] + guessit_options.get('alternate_names', [])
+            )
             # With auto regex generation, the first regex group captures the name
             re_from_name = True
         # try all specified regexps on this data
@@ -379,8 +399,11 @@ class ParserGuessit(object):
                 log.debug('NAME SUCCESS: %s matched to %s', name_re.pattern, data)
         if not name_end:
             # leave this invalid
-            log.debug('FAIL: name regexps %s do not match %s',
-                      [regexp.pattern for regexp in name_regexps], data)
+            log.debug(
+                'FAIL: name regexps %s do not match %s',
+                [regexp.pattern for regexp in name_regexps],
+                data,
+            )
             return False
         return True
 
@@ -399,4 +422,6 @@ class ParserGuessit(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ParserGuessit, 'parser_guessit', interfaces=['movie_parser', 'series_parser'], api_ver=2)
+    plugin.register(
+        ParserGuessit, 'parser_guessit', interfaces=['movie_parser', 'series_parser'], api_ver=2
+    )

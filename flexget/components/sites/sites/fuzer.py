@@ -116,7 +116,7 @@ class UrlRewriteFuzer(object):
                 e['torrent_seeds'], e['torrent_leeches']
             )
 
-            size = re.search('(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', raw_size)
+            size = re.search(r'(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', raw_size)
             e['content_size'] = parse_filesize(size.group(0))
 
             entries.append(e)

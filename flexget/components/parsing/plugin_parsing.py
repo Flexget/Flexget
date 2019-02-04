@@ -26,10 +26,14 @@ def init_parsers(manager):
             parsers[parser_type][p.name.replace('parser_', '')] = p.instance
         # Select default parsers based on priority
         func_name = 'parse_' + parser_type
-        default_parsers[parser_type] = max(iter(parsers[parser_type].items()),
-                                           key=lambda p: getattr(getattr(p[1], func_name), 'priority', 0))[0]
-        log.debug('setting default %s parser to %s. (options: %s)' %
-                  (parser_type, default_parsers[parser_type], parsers[parser_type]))
+        default_parsers[parser_type] = max(
+            iter(parsers[parser_type].items()),
+            key=lambda p: getattr(getattr(p[1], func_name), 'priority', 0),
+        )[0]
+        log.debug(
+            'setting default %s parser to %s. (options: %s)'
+            % (parser_type, default_parsers[parser_type], parsers[parser_type])
+        )
 
 
 class PluginParsing(object):
@@ -40,13 +44,12 @@ class PluginParsing(object):
         # Create a schema allowing only our registered parsers to be used under the key of each parser type
         properties = {}
         for parser_type in PARSER_TYPES:
-            parser_names = [p.name.replace('parser_', '') for p in plugin.get_plugins(interface=parser_type + '_parser')]
+            parser_names = [
+                p.name.replace('parser_', '')
+                for p in plugin.get_plugins(interface=parser_type + '_parser')
+            ]
             properties[parser_type] = {'type': 'string', 'enum': parser_names}
-        s = {
-            'type': 'object',
-            'properties': properties,
-            'additionalProperties': False
-        }
+        s = {'type': 'object', 'properties': properties, 'additionalProperties': False}
         return s
 
     def on_task_start(self, task, config):

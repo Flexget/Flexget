@@ -17,7 +17,10 @@ class TorrentFiles(object):
     def on_task_modify(self, task, config):
         for entry in task.entries:
             if 'torrent' in entry:
-                files = [posixpath.join(item['path'], item['name']) for item in entry['torrent'].get_filelist()]
+                files = [
+                    posixpath.join(item['path'], item['name'])
+                    for item in entry['torrent'].get_filelist()
+                ]
                 if files:
                     log.debug('%s files: %s' % (entry['title'], files))
                     entry['content_files'] = files

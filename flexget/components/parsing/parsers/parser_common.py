@@ -52,7 +52,16 @@ def normalize_name(name):
 
 
 class MovieParseResult(object):
-    def __init__(self, data=None, name=None, year=None, quality=None, proper_count=0, release_group=None, valid=True):
+    def __init__(
+        self,
+        data=None,
+        name=None,
+        year=None,
+        quality=None,
+        proper_count=0,
+        release_group=None,
+        valid=True,
+    ):
         self.name = name
         self.data = data
         self.year = year
@@ -84,32 +93,43 @@ class MovieParseResult(object):
             'movie_year': self.year,
             'proper': self.proper,
             'proper_count': self.proper_count,
-            'release_group': self.release_group
+            'release_group': self.release_group,
         }
 
     def __str__(self):
         valid = 'OK' if self.valid else 'INVALID'
-        return '<MovieParseResult(data=%s,name=%s,year=%s,id=%s,quality=%s,proper=%s,release_group=%s,status=%s)>' % \
-               (self.data, self.name, self.year, self.identifier, self.quality, self.proper_count, self.release_group,
-                valid)
+        return (
+            '<MovieParseResult(data=%s,name=%s,year=%s,id=%s,quality=%s,proper=%s,release_group=%s,status=%s)>'
+            % (
+                self.data,
+                self.name,
+                self.year,
+                self.identifier,
+                self.quality,
+                self.proper_count,
+                self.release_group,
+                valid,
+            )
+        )
 
 
 class SeriesParseResult(object):
-    def __init__(self,
-                 data=None,
-                 name=None,
-                 identified_by=None,
-                 id_type=None,
-                 id=None,
-                 episodes=1,
-                 season_pack=False,
-                 strict_name=False,
-                 quality=None,
-                 proper_count=0,
-                 special=False,
-                 group=None,
-                 valid=True
-                 ):
+    def __init__(
+        self,
+        data=None,
+        name=None,
+        identified_by=None,
+        id_type=None,
+        id=None,
+        episodes=1,
+        season_pack=False,
+        strict_name=False,
+        quality=None,
+        proper_count=0,
+        special=False,
+        group=None,
+        valid=True,
+    ):
         self.name = name
         self.data = data
         self.episodes = episodes
@@ -176,7 +196,11 @@ class SeriesParseResult(object):
         # Currently only supports ep mode
         if self.id_type == 'ep':
             if self.episodes > 1:
-                return 'S%02dE%02d-E%02d' % (self.season, self.episode, self.episode + self.episodes - 1)
+                return 'S%02dE%02d-E%02d' % (
+                    self.season,
+                    self.episode,
+                    self.episode + self.episodes - 1,
+                )
             else:
                 return self.identifier
         else:
@@ -184,7 +208,19 @@ class SeriesParseResult(object):
 
     def __str__(self):
         valid = 'OK' if self.valid else 'INVALID'
-        return '<SeriesParseResult(data=%s,name=%s,id=%s,season=%s,season_pack=%s,episode=%s,quality=%s,proper=%s,' \
-               'special=%s,status=%s)>' % \
-               (self.data, self.name, str(self.id), self.season, self.season_pack, self.episode, self.quality,
-                self.proper_count, self.special, valid)
+        return (
+            '<SeriesParseResult(data=%s,name=%s,id=%s,season=%s,season_pack=%s,episode=%s,quality=%s,proper=%s,'
+            'special=%s,status=%s)>'
+            % (
+                self.data,
+                self.name,
+                str(self.id),
+                self.season,
+                self.season_pack,
+                self.episode,
+                self.quality,
+                self.proper_count,
+                self.special,
+                valid,
+            )
+        )

@@ -34,9 +34,7 @@ class ListRemove(object):
         for item in config:
             for plugin_name, plugin_config in item.items():
                 try:
-                    thelist = plugin.get(plugin_name, self).get_list(
-                        plugin_config
-                    )
+                    thelist = plugin.get(plugin_name, self).get_list(plugin_config)
                 except AttributeError:
                     raise PluginError('Plugin %s does not support list interface' % plugin_name)
                 if task.manager.options.test and thelist.online:

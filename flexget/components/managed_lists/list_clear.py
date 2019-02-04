@@ -43,9 +43,7 @@ class ListClear(object):
         for item in config['what']:
             for plugin_name, plugin_config in item.items():
                 try:
-                    thelist = plugin.get(plugin_name, self).get_list(
-                        plugin_config
-                    )
+                    thelist = plugin.get(plugin_name, self).get_list(plugin_config)
                 except AttributeError:
                     raise PluginError('Plugin %s does not support list interface' % plugin_name)
                 if thelist.immutable:

@@ -32,7 +32,11 @@ class TorrentAliveThread(threading.Thread):
 
     def run(self):
         self.tracker_seeds = get_tracker_seeds(self.tracker, self.info_hash)
-        log.debug('%s seeds found from %s', self.tracker_seeds, get_scrape_url(self.tracker, self.info_hash))
+        log.debug(
+            '%s seeds found from %s',
+            self.tracker_seeds,
+            get_scrape_url(self.tracker, self.info_hash),
+        )
 
 
 def max_seeds_from_threads(threads):
@@ -54,8 +58,9 @@ def max_seeds_from_threads(threads):
 def get_scrape_url(tracker_url, info_hash):
     if 'announce' in tracker_url:
         v = urlsplit(tracker_url)
-        result = urlunsplit([v.scheme, v.netloc, v.path.replace('announce', 'scrape'),
-                             v.query, v.fragment])
+        result = urlunsplit(
+            [v.scheme, v.netloc, v.path.replace('announce', 'scrape'), v.query, v.fragment]
+        )
     else:
         log.debug('`announce` not contained in tracker url, guessing scrape address.')
         result = tracker_url + '/scrape'
@@ -176,8 +181,8 @@ class TorrentAlive(object):
                     'min_seeds': {'type': 'integer'},
                     'reject_for': {'type': 'string', 'format': 'interval'},
                 },
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ]
     }
 
@@ -197,8 +202,10 @@ class TorrentAlive(object):
         config = self.prepare_config(config)
         for entry in task.entries:
             if 'torrent_seeds' in entry and entry['torrent_seeds'] < config['min_seeds']:
-                entry.reject(reason='Had < %d required seeds. (%s)' %
-                                    (config['min_seeds'], entry['torrent_seeds']))
+                entry.reject(
+                    reason='Had < %d required seeds. (%s)'
+                    % (config['min_seeds'], entry['torrent_seeds'])
+                )
 
     # Run on output phase so that we let torrent plugin output modified torrent file first
     @plugin.priority(250)
@@ -235,7 +242,9 @@ class TorrentAlive(object):
                                 seeds = max(seeds, max_seeds_from_threads(threadlist))
                                 background.start()
                                 threadlist = [background]
-                            log.debug('Started thread to scrape %s with info hash %s', tracker, info_hash)
+                            log.debug(
+                                'Started thread to scrape %s with info hash %s', tracker, info_hash
+                            )
 
                     seeds = max(seeds, max_seeds_from_threads(threadlist))
                     log.debug('Highest number of seeds found: %s', seeds)
@@ -245,16 +254,20 @@ class TorrentAlive(object):
                     try:
                         seeds = get_tracker_seeds(tracker, info_hash)
                     except URLError as e:
-                        log.debug('Error scraping %s: %s', tracker, e, )
+                        log.debug('Error scraping %s: %s', tracker, e)
                 else:
-                    log.warning('Torrent %s does not seem to have a tracker specified, cannot check for seeders',
-                                entry['title'])
+                    log.warning(
+                        'Torrent %s does not seem to have a tracker specified, cannot check for seeders',
+                        entry['title'],
+                    )
                     return
 
                 # Reject if needed
                 if seeds < min_seeds:
-                    entry.reject(reason='Tracker(s) had < %s required seeds. (%s)' % (min_seeds, seeds),
-                                 remember_time=config['reject_for'])
+                    entry.reject(
+                        reason='Tracker(s) had < %s required seeds. (%s)' % (min_seeds, seeds),
+                        remember_time=config['reject_for'],
+                    )
                     # Maybe there is better match that has enough seeds
                     task.rerun(plugin='torrent_alive', reason='Not enough seeds')
                 else:

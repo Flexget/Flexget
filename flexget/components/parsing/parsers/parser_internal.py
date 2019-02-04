@@ -41,7 +41,7 @@ class ParserInternal(object):
             year=parser.year,
             quality=parser.quality,
             proper_count=parser.proper_count,
-            valid=bool(parser.name)
+            valid=bool(parser.name),
         )
         log.debug('Parsing result: %s (in %s ms)', parser, (preferred_clock() - start) * 1000)
         return result
@@ -71,7 +71,7 @@ class ParserInternal(object):
             group=parser.group,
             season_pack=parser.season_pack,
             strict_name=parser.strict_name,
-            identified_by=parser.identified_by
+            identified_by=parser.identified_by,
         )
         log.debug('Parsing result: %s (in %s ms)', parser, (preferred_clock() - start) * 1000)
         return result
@@ -79,4 +79,6 @@ class ParserInternal(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ParserInternal, 'parser_internal', interfaces=['movie_parser', 'series_parser'], api_ver=2)
+    plugin.register(
+        ParserInternal, 'parser_internal', interfaces=['movie_parser', 'series_parser'], api_ver=2
+    )

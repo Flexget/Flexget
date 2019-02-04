@@ -995,9 +995,7 @@ class FilterSeries(FilterSeriesBase):
             )
 
             # add best entry to backlog (backlog is able to handle duplicate adds)
-            plugin.get('backlog', self).add_backlog(
-                task, best, session=object_session(episode)
-            )
+            plugin.get('backlog', self).add_backlog(task, best, session=object_session(episode))
 
             return True
 

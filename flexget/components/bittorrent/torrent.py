@@ -16,6 +16,7 @@ class TorrentFilename(object):
         Makes sure that entries containing torrent-file have .torrent
         extension. This is enabled always by default (builtins).
     """
+
     TORRENT_PRIO = 255
 
     @plugin.priority(TORRENT_PRIO)
@@ -45,7 +46,9 @@ class TorrentFilename(object):
 
                 if 'content-length' in entry:
                     if len(data) != entry['content-length']:
-                        entry.fail('Torrent file length doesn\'t match to the one reported by the server')
+                        entry.fail(
+                            'Torrent file length doesn\'t match to the one reported by the server'
+                        )
                         self.purge(entry)
                         continue
 
@@ -91,7 +94,7 @@ class TorrentFilename(object):
             # single file, if filename is longer than title use it
             fn = files[0]['name']
             if len(fn) > len(title):
-                title = fn[:fn.rfind('.')]
+                title = fn[: fn.rfind('.')]
 
         # neatify title
         title = title.replace('/', '_')

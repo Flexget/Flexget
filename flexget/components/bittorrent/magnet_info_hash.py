@@ -37,6 +37,7 @@ class MagnetBtih(object):
                         entry['torrent_info_hash'] = b16hash.decode('ascii').upper()
                         break
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(MagnetBtih, 'magnet_btih', builtin=True, api_ver=2)

@@ -172,7 +172,7 @@ class UrlRewritePirateBay(object):
                 # Parse content_size
                 size_text = link.find_next(attrs={'class': 'detDesc'}).get_text()
                 if size_text:
-                    size = re.search('Size (\d+(\.\d+)?\xa0(?:[PTGMK])?i?B)', size_text)
+                    size = re.search(r'Size (\d+(\.\d+)?\xa0(?:[PTGMK])?i?B)', size_text)
                     if size:
                         entry['content_size'] = parse_filesize(size.group(1))
                     else:

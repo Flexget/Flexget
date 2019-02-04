@@ -297,7 +297,9 @@ class ImdbParser(object):
             self.name = name_elem.strip()
         else:
             log.error('Possible IMDB parser needs updating, Please report on Github.')
-            raise plugin.PluginError('Unable to set imdb_name for %s from %s' % (self.imdb_id, self.url))
+            raise plugin.PluginError(
+                'Unable to set imdb_name for %s from %s' % (self.imdb_id, self.url)
+            )
 
         year = soup.find('span', attrs={'id': 'titleYear'})
         if year:

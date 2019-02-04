@@ -23,19 +23,20 @@ class ConvertMagnet(object):
                 "type": "object",
                 "properties": {
                     "timeout": {"type": "string", "format": "interval"},
-                    "force": {"type": "boolean"}
+                    "force": {"type": "boolean"},
                 },
-                "additionalProperties": False
-            }
+                "additionalProperties": False,
+            },
         ]
     }
 
     def magnet_to_torrent(self, magnet_uri, destination_folder, timeout):
         import libtorrent
+
         params = libtorrent.parse_magnet_uri(magnet_uri)
         session = libtorrent.session()
         lt_version = [int(v) for v in libtorrent.version.split('.')]
-        if lt_version > [0,16,13,0] and lt_version < [1,1,3,0]:
+        if lt_version > [0, 16, 13, 0] and lt_version < [1, 1, 3, 0]:
             # for some reason the info_hash needs to be bytes but it's a struct called sha1_hash
             params['info_hash'] = params['info_hash'].to_bytes()
         handle = libtorrent.add_magnet_uri(session, magnet_uri, params)
@@ -45,11 +46,15 @@ class ConvertMagnet(object):
             time.sleep(0.1)
             timeout_value -= 0.1
             if timeout_value <= 0:
-                raise plugin.PluginError('Timed out after {} seconds trying to magnetize'.format(timeout))
+                raise plugin.PluginError(
+                    'Timed out after {} seconds trying to magnetize'.format(timeout)
+                )
         log.debug('Metadata acquired')
         torrent_info = handle.get_torrent_info()
         torrent_file = libtorrent.create_torrent(torrent_info)
-        torrent_path = pathscrub(os.path.join(destination_folder, torrent_info.name() + ".torrent"))
+        torrent_path = pathscrub(
+            os.path.join(destination_folder, torrent_info.name() + ".torrent")
+        )
         with open(torrent_path, "wb") as f:
             f.write(libtorrent.bencode(torrent_file.generate()))
         log.debug('Torrent file wrote to %s', torrent_path)
@@ -69,7 +74,9 @@ class ConvertMagnet(object):
         try:
             import libtorrent  # noqa
         except ImportError:
-            raise plugin.DependencyError('convert_magnet', 'libtorrent', 'libtorrent package required', log)
+            raise plugin.DependencyError(
+                'convert_magnet', 'libtorrent', 'libtorrent package required', log
+            )
 
     @plugin.priority(130)
     def on_task_download(self, task, config):
@@ -88,7 +95,9 @@ class ConvertMagnet(object):
             if entry['url'].startswith('magnet:'):
                 entry.setdefault('urls', [entry['url']])
                 try:
-                    log.info('Converting entry {} magnet URI to a torrent file'.format(entry['title']))
+                    log.info(
+                        'Converting entry {} magnet URI to a torrent file'.format(entry['title'])
+                    )
                     torrent_file = self.magnet_to_torrent(entry['url'], converted_path, timeout)
                 except (plugin.PluginError, TypeError) as e:
                     log.error('Unable to convert Magnet URI for entry %s: %s', entry['title'], e)

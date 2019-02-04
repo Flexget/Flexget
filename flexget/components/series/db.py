@@ -1258,9 +1258,7 @@ def remove_series_entity(name, identifier, forget=False):
             return [release.title for release in entity.downloaded_releases]
 
         name_to_parse = '{} {}'.format(series.name, identifier)
-        parsed = plugin.get('parsing', 'series.db').parse_series(
-            name_to_parse, name=series.name
-        )
+        parsed = plugin.get('parsing', 'series.db').parse_series(name_to_parse, name=series.name)
         if not parsed.valid:
             raise ValueError(
                 'Invalid identifier for series `{}`: `{}`'.format(series.name, identifier)

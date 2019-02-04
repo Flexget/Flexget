@@ -9,11 +9,9 @@ from flexget.utils import bittorrent
 
 try:
     # NOTE: Importing other plugins is discouraged!
-    from flexget.plugins.modify import torrent as plugin_torrent
+    from flexget.components.bittorrent import torrent as plugin_torrent
 except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='torrent',
-    )
+    raise plugin.DependencyError(issued_by=__name__, missing='torrent')
 
 log = logging.getLogger('torrent_scrub')
 
@@ -26,11 +24,12 @@ class TorrentScrub(object):
               rutorrent-fast-resume-infected-task:
                 torrent_scrub: resume
     """
+
     # Scrub at high level, but BELOW "torrent"
     SCRUB_PRIO = plugin_torrent.TorrentFilename.TORRENT_PRIO - 10
 
     # Scrubbing modes
-    SCRUB_MODES = ("off", "on", "all", "resume", "rtorrent",)
+    SCRUB_MODES = ("off", "on", "all", "resume", "rtorrent")
 
     # Keys of rTorrent / ruTorrent session data
     RT_KEYS = ("libtorrent_resume", "log_callback", "err_callback", "rtorrent")
@@ -39,7 +38,7 @@ class TorrentScrub(object):
         'oneOf': [
             {'type': 'boolean'},
             {'type': 'string', 'enum': list(SCRUB_MODES)},
-            {'type': 'array', 'items': {'type': 'string'}}  # list of keys to scrub
+            {'type': 'array', 'items': {'type': 'string'}},  # list of keys to scrub
         ]
     }
 
@@ -66,7 +65,9 @@ class TorrentScrub(object):
             infohash = entry["torrent"].info_hash
 
             if mode in ("on", "all", "true"):
-                modified = bittorrent.clean_meta(metainfo, including_info=(mode == "all"), logger=log.debug)
+                modified = bittorrent.clean_meta(
+                    metainfo, including_info=(mode == "all"), logger=log.debug
+                )
             elif mode in ("resume", "rtorrent"):
                 if mode == "resume":
                     self.RT_KEYS = self.RT_KEYS[:1]
@@ -103,12 +104,19 @@ class TorrentScrub(object):
             if modified:
                 entry["torrent"].content = metainfo
                 entry["torrent"].modified = True
-                log.info((("Key %s was" if len(modified) == 1 else "Keys %s were") +
-                          " scrubbed from torrent '%s'!") % (", ".join(sorted(modified)), entry['title']))
+                log.info(
+                    (
+                        ("Key %s was" if len(modified) == 1 else "Keys %s were")
+                        + " scrubbed from torrent '%s'!"
+                    )
+                    % (", ".join(sorted(modified)), entry['title'])
+                )
                 new_infohash = entry["torrent"].info_hash
                 if infohash != new_infohash:
-                    log.warning("Info hash changed from #%s to #%s in '%s'" %
-                                (infohash, new_infohash, entry['filename']))
+                    log.warning(
+                        "Info hash changed from #%s to #%s in '%s'"
+                        % (infohash, new_infohash, entry['filename'])
+                    )
 
 
 @event('plugin.register')
