@@ -163,21 +163,21 @@ class RadarrAPIService:
     def lookup_by_term(self, term):
         """ Returns all movies that matches the search term """
         term = quote(term)
-        request_url = self.api_url + "movies/lookup?term=" + term
+        request_url = self.api_url + "movie/lookup?term=" + term
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def lookup_by_imdb(self, imdb_id):
         """ Returns all movies that matches the imdb id """
         # TODO: make regexp check that imdb_id really is an IMDB_ID
-        request_url = self.api_url + "movies/lookup/imdb?imdbId=" + imdb_id
+        request_url = self.api_url + "movie/lookup/imdb?imdbId=" + imdb_id
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
     def lookup_by_tmdb(self, tmdb_id):
         """ Returns all movies that matches the tmdb id """
         tmdb_id = int(tmdb_id)
-        request_url = self.api_url + "movies/lookup/tmdb?tmdbId=" + str(tmdb_id)
+        request_url = self.api_url + "movie/lookup/tmdb?tmdbId=" + str(tmdb_id)
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
