@@ -105,22 +105,27 @@ class OutputRSS(object):
         file: ~/public_html/series.rss
         rsslink: http://my.server.net/series.rss
 
-    **RSS link**
+    **RSS item title and link**
 
-    You can specify what field from entry is used as a link in generated rss feed.
+    You can specify the title and link for each item in the RSS feed.
+
+    The item title can be any pattern that references fields in the input entry.
+
+    The item link can be created from one of a list of fields in the input
+    entry, in order of preference. The fields should be enumerated in a list.
+    Note that the url field is always used as last possible fallback even
+    without explicitly adding it into the list.
+
+    Default field list for item URL: imdb_url, input_url, url
 
     Example::
 
       make_rss:
         file: ~/public_html/series.rss
+        title: '{{title}} (from {{task}})'
         link:
           - imdb_url
 
-    List should contain a list of fields in order of preference.
-    Note that the url field is always used as last possible fallback
-    even without explicitly adding it into the list.
-
-    Default list: imdb_url, input_url, url
     """
 
     schema = {
