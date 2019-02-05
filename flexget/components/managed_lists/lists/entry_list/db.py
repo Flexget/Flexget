@@ -1,7 +1,7 @@
 import logging
 import pickle
+from collections import MutableSet
 from datetime import datetime
-from typing import MutableSet
 
 from sqlalchemy import Unicode, select, Column, Integer, DateTime, ForeignKey, or_, func
 from sqlalchemy.orm import relationship
