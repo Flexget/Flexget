@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import native
 
 import base64
 import re
@@ -78,66 +77,14 @@ class DelugePlugin(object):
 
 class InputDeluge(DelugePlugin):
     """Create entries for torrents in the deluge session."""
-    #
+    # Fields we provide outside of the deluge_ prefixed namespace
     settings_map = {
         'name': 'title',
         'hash': 'torrent_info_hash',
         'num_peers': 'torrent_peers',
         'num_seeds': 'torrent_seeds',
-        'progress': 'deluge_progress',
-        'seeding_time': ('deluge_seed_time', lambda time: time / 3600),
-        'private': 'deluge_private',
-        'state': 'deluge_state',
-        'eta': 'deluge_eta',
-        'ratio': 'deluge_ratio',
-        'move_on_completed_path': 'deluge_movedone',
-        'save_path': 'deluge_path',
-        'label': 'deluge_label',
         'total_size': ('content_size', lambda size: size / 1024 / 1024),
         'files': ('content_files', lambda file_dicts: [f['path'] for f in file_dicts])}
-
-    extra_settings_map = {
-        'active_time': ('active_time', lambda time: time / 3600),
-        'compact': 'compact',
-        'distributed_copies': 'distributed_copies',
-        'download_payload_rate': 'download_payload_rate',
-        'file_progress': 'file_progress',
-        'is_auto_managed': 'is_auto_managed',
-        'is_seed': 'is_seed',
-        'max_connections': 'max_connections',
-        'max_download_speed': 'max_download_speed',
-        'max_upload_slots': 'max_upload_slots',
-        'max_upload_speed':  'max_upload_speed',
-        'message': 'message',
-        'move_on_completed': 'move_on_completed',
-        'next_announce': 'next_announce',
-        'num_files': 'num_files',
-        'num_pieces': 'num_pieces',
-        'paused': 'paused',
-        'peers': 'peers',
-        'piece_length': 'piece_length',
-        'prioritize_first_last': 'prioritize_first_last',
-        'queue': 'queue',
-        'remove_at_ratio': 'remove_at_ratio',
-        'seed_rank': 'seed_rank',
-        'stop_at_ratio': 'stop_at_ratio',
-        'stop_ratio': 'stop_ratio',
-        'total_done': 'total_done',
-        'total_payload_download': 'total_payload_download',
-        'total_payload_upload': 'total_payload_upload',
-        'total_peers': 'total_peers',
-        'total_seeds': 'total_seeds',
-        'total_uploaded': 'total_uploaded',
-        'total_wanted': 'total_wanted',
-        'tracker': 'tracker',
-        'tracker_host': 'tracker_host',
-        'tracker_status': 'tracker_status',
-        'trackers': 'trackers',
-        'upload_payload_rate': 'upload_payload_rate'
-    }
-
-    def __init__(self):
-        self.entries = []
 
     schema = {
         'anyOf': [
@@ -161,13 +108,6 @@ class InputDeluge(DelugePlugin):
                         },
                         'additionalProperties': False
                     },
-                    'keys': {
-                        'type': 'array',
-                        'items': {
-                            'type': 'string',
-                            'enum': list(extra_settings_map)
-                        }
-                    }
                 },
                 'additionalProperties': False
             }
@@ -193,24 +133,20 @@ class InputDeluge(DelugePlugin):
     def on_task_input(self, task, config):
         """Generates and returns a list of entries from the deluge daemon."""
         # Reset the entries list
-        self.entries = []
         client = self.setup_client(config)
         client.connect()
 
-        self.entries = self.generate_entries(client, config)
+        entries = self.generate_entries(client, config)
         client.disconnect()
-        return self.entries
+        return entries
 
     def generate_entries(self, client, config):
         entries = []
         filter = config.get('filter', {})
-        # deluge client lib chokes on future's newlist, make sure we have a native python list here
-        fields = config.get('keys', [])
-        fields.extend(self.settings_map)
-        torrents = client.call('core.get_torrents_status', filter or {}, fields)
+        torrents = client.call('core.get_torrents_status', filter or {}, [])
         for hash, torrent_dict in torrents.items():
             # Make sure it has a url so no plugins crash
-            entry = Entry(deluge_id=hash, url='')
+            entry = Entry(url='')
             config_path = os.path.expanduser(config.get('config_path', ''))
             if config_path:
                 torrent_path = os.path.join(config_path, 'state', hash + '.torrent')
@@ -222,14 +158,15 @@ class InputDeluge(DelugePlugin):
                 else:
                     log.warning('Did not find torrent file at %s', torrent_path)
             for key, value in torrent_dict.items():
+                # All fields provided by deluge get placed under the deluge_ namespace
+                entry['deluge_' + key] = value
+                # Some fields also get special handling
                 if key in self.settings_map:
                     flexget_key = self.settings_map[key]
-                else:
-                    flexget_key = self.extra_settings_map[key]
-                if isinstance(flexget_key, tuple):
-                    flexget_key, format_func = flexget_key
-                    value = format_func(value)
-                entry[flexget_key] = value
+                    if isinstance(flexget_key, tuple):
+                        flexget_key, format_func = flexget_key
+                        value = format_func(value)
+                    entry[flexget_key] = value
             entries.append(entry)
 
         return entries
