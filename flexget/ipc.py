@@ -160,7 +160,7 @@ class IPCServer(threading.Thread):
 
 
 class IPCClient(object):
-    def __init__(self, port, password, sync_request_timeout=300):
+    def __init__(self, port, password):
         channel = rpyc.Channel(rpyc.SocketStream.connect('127.0.0.1', port))
         channel.send(password.encode('utf-8'))
         response = channel.recv()
@@ -168,7 +168,7 @@ class IPCClient(object):
             # TODO: What to raise here. I guess we create a custom error
             raise ValueError('Invalid password for daemon')
         self.conn = rpyc.utils.factory.connect_channel(
-            channel, service=ClientService, config={'sync_request_timeout': sync_request_timeout})
+            channel, service=ClientService, config={'sync_request_timeout': None})
 
     def close(self):
         self.conn.close()
