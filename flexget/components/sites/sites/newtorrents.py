@@ -4,7 +4,6 @@ from future.moves.urllib.parse import quote
 
 import logging
 import re
-import socket
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -13,9 +12,6 @@ from flexget.components.sites.urlrewriting import UrlRewritingError
 from flexget.utils.soup import get_soup
 from flexget.components.sites.utils import torrent_availability, normalize_unicode
 from flexget.utils import requests
-
-timeout = 10
-socket.setdefaulttimeout(timeout)
 
 log = logging.getLogger('newtorrents')
 
@@ -68,7 +64,7 @@ class NewTorrents(object):
         try:
             page = requests.get(url)
             data = page.text
-        except Exception:
+        except requests.RequestException:
             raise UrlRewritingError('URLerror when retrieving page')
         p = re.compile(r"copy\(\'(.*)\'\)", re.IGNORECASE)
         f = p.search(data)
