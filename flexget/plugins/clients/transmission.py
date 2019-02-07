@@ -93,8 +93,8 @@ class TransmissionBase(object):
         return done, vloc
 
     def check_seed_limits(self, torrent, session):
-        seed_limit_ok = None  # will remain if no seed ratio defined
-        idle_limit_ok = None  # will remain if no idle limit defined
+        seed_limit_ok = True  # will remain if no seed ratio defined
+        idle_limit_ok = True  # will remain if no idle limit defined
 
         if torrent.seedRatioMode == 1:  # use torrent's own seed ratio limit
             seed_limit_ok = torrent.uploadRatio >= torrent.seedRatioLimit
@@ -157,7 +157,7 @@ class PluginTransmissionInput(TransmissionBase):
 
     def prepare_config(self, config):
         config = TransmissionBase.prepare_config(self, config)
-        config.setdefault('onlycomplete', True)
+        config.setdefault('onlycomplete', False)
         return config
 
     def on_task_input(self, task, config):
@@ -177,25 +177,25 @@ class PluginTransmissionInput(TransmissionBase):
         session = self.client.get_session()
 
         for torrent in self.client.get_torrents():
-            downloaded, bigfella = self.torrent_info(torrent, config)
             seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
-            if not config['onlycomplete'] or (downloaded and
-                                              ((
-                                                  torrent.status == 'stopped' and
-                                                  seed_ratio_ok is None and
-                                                  idle_limit_ok is None) or
-                                               (seed_ratio_ok is True or idle_limit_ok is True))):
-                entry = Entry(title=torrent.name,
-                              url='file://%s' % torrent.torrentFile,
-                              torrent_info_hash=torrent.hashString,
-                              content_size=torrent.totalSize / (1024 * 1024))
-                for attr in ['comment', 'downloadDir', 'isFinished', 'isPrivate']:
-                    entry['transmission_' + attr] = getattr(torrent, attr)
-                entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
-                # bigfella? Is this actually the path to the torrent file? see GitHub #1403
-                if bigfella:
-                    entry['location'] = bigfella
-                entries.append(entry)
+            if config['onlycomplete'] and not (seed_ratio_ok and idle_limit_ok and torrent.progress == 100):
+                continue
+            entry = Entry(title=torrent.name,
+                          url='',
+                          torrent_info_hash=torrent.hashString,
+                          content_size=torrent.totalSize / (1024 * 1024))
+            # Location of torrent is only valid if transmission is on same machine as flexget
+            if config['host'] in ('localhost', '127.0.0.1'):
+                entry['location'] = torrent.torrentFile
+                entry['url'] = 'file://' + torrent.torrentFile
+            for attr in ['id', 'comment', 'downloadDir', 'isFinished', 'isPrivate', 'ratio', 'status', 'date_active',
+                         'date_added', 'date_done', 'date_started', 'priority', 'progress', 'secondsDownloading',
+                         'secondsSeeding']:
+                entry['transmission_' + attr] = getattr(torrent, attr)
+            entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
+            entry['transmission_seed_ratio_ok'] = seed_ratio_ok
+            entry['transmission_idle_limit_ok'] = idle_limit_ok
+            entries.append(entry)
         return entries
 
 
