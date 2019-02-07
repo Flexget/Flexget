@@ -132,6 +132,7 @@ class InputDeluge(DelugePlugin):
 
     def on_task_input(self, task, config):
         """Generates and returns a list of entries from the deluge daemon."""
+        config = self.prepare_config(config)
         # Reset the entries list
         client = self.setup_client(config)
         client.connect()
