@@ -146,7 +146,7 @@ class InputDeluge(DelugePlugin):
         torrents = client.call('core.get_torrents_status', filter or {}, [])
         for hash, torrent_dict in torrents.items():
             # Make sure it has a url so no plugins crash
-            entry = Entry(url='')
+            entry = Entry(deluge_id=hash, url='')
             config_path = os.path.expanduser(config.get('config_path', ''))
             if config_path:
                 torrent_path = os.path.join(config_path, 'state', hash + '.torrent')
