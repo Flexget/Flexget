@@ -467,9 +467,9 @@ class OutputDeluge(DelugePlugin):
             if config['action'] in ('remove', 'purge'):
                 client.call('core.remove_torrent', torrent_id, config['action'] == 'purge')
             elif config['action'] == 'pause':
-                client.call('core.pause_torrent', torrent_id)
+                client.call('core.pause_torrent', [torrent_id])
             elif config['action'] == 'resume':
-                client.call('core.resume_torrent', torrent_id)
+                client.call('core.resume_torrent', [torrent_id])
 
         client.disconnect()
 
