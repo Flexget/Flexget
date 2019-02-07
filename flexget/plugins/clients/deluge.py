@@ -247,6 +247,7 @@ class OutputDeluge(DelugePlugin):
                     'port': {'type': 'integer'},
                     'username': {'type': 'string'},
                     'password': {'type': 'string'},
+                    'action': {'type': 'string', 'enum': ['add', 'remove', 'purge', 'pause', 'resume']},
                     'path': {'type': 'string'},
                     'movedone': {'type': 'string'},
                     'label': {'type': 'string'},
@@ -279,6 +280,7 @@ class OutputDeluge(DelugePlugin):
             config = {'enabled': config}
         super(OutputDeluge, self).prepare_config(config)
         config.setdefault('enabled', True)
+        config.setdefault('action', 'add')
         config.setdefault('path', '')
         config.setdefault('movedone', '')
         config.setdefault('label', '')
@@ -412,6 +414,9 @@ class OutputDeluge(DelugePlugin):
                 modify_opts['path'] = add_opts.pop('download_location', None)
                 client.call('core.set_torrent_options', [torrent_id], add_opts)
                 self._set_torrent_options(client, torrent_id, entry, modify_opts)
+            elif config['action'] != 'add':
+                log.warning('Cannot %s %s, because it is not loaded in deluge.', config['action'], entry['title'])
+                continue
             else:
                 magnet, filedump = None, None
                 if entry.get('url', '').startswith('magnet:'):
@@ -454,6 +459,12 @@ class OutputDeluge(DelugePlugin):
                     log.error('There was an error adding %s to deluge.' % entry['title'])
                 else:
                     self._set_torrent_options(client, added_torrent, entry, modify_opts)
+            if config['action'] in ('remove', 'purge'):
+                client.call('core.remove_torrent', torrent_id, config['action'] == 'purge')
+            elif config['action'] == 'pause':
+                client.call('core.pause_torrent', torrent_id)
+            elif config['action'] == 'resume':
+                client.call('core.resume_torrent', torrent_id)
 
         client.disconnect()
 
