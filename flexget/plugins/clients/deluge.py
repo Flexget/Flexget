@@ -310,8 +310,13 @@ class OutputDeluge(DelugePlugin):
         if 'download' not in task.config:
             download = plugin.get('download', self)
             for entry in task.accepted:
-                if not entry.get('deluge_id'):
-                    download.get_temp_file(task, entry, handle_magnets=True)
+                if entry.get('deluge_id'):
+                    # The torrent is already loaded in deluge, we don't need to get anything
+                    continue
+                if config['action'] != 'add' and entry.get('torrent_info_hash'):
+                    # If we aren't adding the torrent new, all we need is info hash
+                    continue
+                download.get_temp_file(task, entry, handle_magnets=True)
 
     @plugin.priority(135)
     def on_task_output(self, task, config):
