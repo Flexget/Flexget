@@ -192,7 +192,7 @@ class PluginTransmissionInput(TransmissionBase):
                          'secondsSeeding']:
                 try:
                     entry['transmission_' + attr] = getattr(torrent, attr)
-                except Exception as e:
+                except Exception:
                     log.debug('error when requesting transmissionrpc attribute %s', attr, exc_info=True)
             entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
             entry['transmission_seed_ratio_ok'] = seed_ratio_ok
@@ -325,7 +325,8 @@ class PluginTransmission(TransmissionBase):
 
             if not torrent_info:
                 if config['action'] != 'add':
-                    log.warning('Cannot %s %s because it is not loaded in transmission.', config['action'], entry['title'])
+                    log.warning('Cannot %s %s because it is not loaded in transmission.',
+                                config['action'], entry['title'])
                     continue
                 downloaded = not entry['url'].startswith('magnet:')
 
