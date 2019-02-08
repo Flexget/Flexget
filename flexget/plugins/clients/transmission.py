@@ -605,6 +605,8 @@ class PluginTransmission(TransmissionBase):
 
 class PluginTransmissionClean(TransmissionBase):
     """
+    DEPRECATED: A separate task using from_transmission and transmission with remove action should be used instead.
+
     Remove completed torrents from Transmission.
 
     Examples::
