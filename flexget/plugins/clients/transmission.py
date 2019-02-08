@@ -236,19 +236,19 @@ class PluginTransmission(TransmissionBase):
                     'password': {'type': 'string'},
                     'action': {'type': 'string', 'enum': ['add', 'remove', 'purge', 'pause', 'resume']},
                     'path': {'type': 'string'},
-                    'maxupspeed': {'type': 'number'},
-                    'maxdownspeed': {'type': 'number'},
-                    'maxconnections': {'type': 'integer'},
+                    'max_up_speed': {'type': 'number'},
+                    'max_down_speed': {'type': 'number'},
+                    'max_connections': {'type': 'integer'},
                     'ratio': {'type': 'number'},
-                    'addpaused': {'type': 'boolean'},
+                    'add_paused': {'type': 'boolean'},
                     'content_filename': {'type': 'string'},
                     'main_file_only': {'type': 'boolean'},
                     'main_file_ratio': {'type': 'number'},
                     'magnetization_timeout': {'type': 'integer'},
                     'enabled': {'type': 'boolean'},
                     'include_subs': {'type': 'boolean'},
-                    'bandwidthpriority': {'type': 'number'},
-                    'honourlimits': {'type': 'boolean'},
+                    'bandwidth_priority': {'type': 'number'},
+                    'honour_limits': {'type': 'boolean'},
                     'include_files': one_or_more({'type': 'string'}),
                     'skip_files': one_or_more({'type': 'string'}),
                     'rename_like_files': {'type': 'boolean'},
@@ -484,7 +484,7 @@ class PluginTransmission(TransmissionBase):
                     self.client.change_torrent(torrent_info.id, 30, **options['change'])
 
                 if config['action'] == 'add':
-                    # if addpaused was defined and set to False start the torrent;
+                    # if add_paused was defined and set to False start the torrent;
                     # prevents downloading data before we set what files we want
                     start_paused = (options['post']['paused'] if 'paused' in options['post'] else
                                     not self.client.get_session().start_added_torrents)
@@ -514,8 +514,8 @@ class PluginTransmission(TransmissionBase):
 
         opt_dic = {}
 
-        for opt_key in ('path', 'addpaused', 'honourlimits', 'bandwidthpriority', 'maxconnections', 'maxupspeed',
-                        'maxdownspeed', 'ratio', 'main_file_only', 'main_file_ratio', 'magnetization_timeout',
+        for opt_key in ('path', 'add_paused', 'honour_limits', 'bandwidth_priority', 'max_connections', 'max_up_speed',
+                        'max_down_speed', 'ratio', 'main_file_only', 'main_file_ratio', 'magnetization_timeout',
                         'include_subs', 'content_filename', 'include_files', 'skip_files', 'rename_like_files',
                         'queue_position'):
             # Values do not merge config with task
@@ -538,18 +538,18 @@ class PluginTransmission(TransmissionBase):
         add['paused'] = True
 
         change = options['change']
-        if 'bandwidthpriority' in opt_dic:
-            change['bandwidthPriority'] = opt_dic['bandwidthpriority']
-        if 'honourlimits' in opt_dic and not opt_dic['honourlimits']:
+        if 'bandwidth_priority' in opt_dic:
+            change['bandwidthPriority'] = opt_dic['bandwidth_priority']
+        if 'honour_limits' in opt_dic and not opt_dic['honour_limits']:
             change['honorsSessionLimits'] = False
-        if 'maxupspeed' in opt_dic:
-            change['uploadLimit'] = opt_dic['maxupspeed']
+        if 'max_up_speed' in opt_dic:
+            change['uploadLimit'] = opt_dic['max_up_speed']
             change['uploadLimited'] = True
-        if 'maxdownspeed' in opt_dic:
-            change['downloadLimit'] = opt_dic['maxdownspeed']
+        if 'max_down_speed' in opt_dic:
+            change['downloadLimit'] = opt_dic['max_down_speed']
             change['downloadLimited'] = True
-        if 'maxconnections' in opt_dic:
-            change['peer_limit'] = opt_dic['maxconnections']
+        if 'max_connections' in opt_dic:
+            change['peer_limit'] = opt_dic['max_connections']
 
         if 'ratio' in opt_dic:
             change['seedRatioLimit'] = opt_dic['ratio']
@@ -567,8 +567,8 @@ class PluginTransmission(TransmissionBase):
 
         post = options['post']
         # set to modify paused status after
-        if 'addpaused' in opt_dic:
-            post['paused'] = opt_dic['addpaused']
+        if 'add_paused' in opt_dic:
+            post['paused'] = opt_dic['add_paused']
         if 'main_file_only' in opt_dic:
             post['main_file_only'] = opt_dic['main_file_only']
         if 'main_file_ratio' in opt_dic:
