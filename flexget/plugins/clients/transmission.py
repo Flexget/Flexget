@@ -248,7 +248,7 @@ class PluginTransmission(TransmissionBase):
                     'enabled': {'type': 'boolean'},
                     'include_subs': {'type': 'boolean'},
                     'bandwidth_priority': {'type': 'number'},
-                    'honour_limits': {'type': 'boolean'},
+                    'honor_limits': {'type': 'boolean'},
                     'include_files': one_or_more({'type': 'string'}),
                     'skip_files': one_or_more({'type': 'string'}),
                     'rename_like_files': {'type': 'boolean'},
@@ -514,7 +514,7 @@ class PluginTransmission(TransmissionBase):
 
         opt_dic = {}
 
-        for opt_key in ('path', 'add_paused', 'honour_limits', 'bandwidth_priority', 'max_connections', 'max_up_speed',
+        for opt_key in ('path', 'add_paused', 'honor_limits', 'bandwidth_priority', 'max_connections', 'max_up_speed',
                         'max_down_speed', 'ratio', 'main_file_only', 'main_file_ratio', 'magnetization_timeout',
                         'include_subs', 'content_filename', 'include_files', 'skip_files', 'rename_like_files',
                         'queue_position'):
@@ -540,7 +540,7 @@ class PluginTransmission(TransmissionBase):
         change = options['change']
         if 'bandwidth_priority' in opt_dic:
             change['bandwidthPriority'] = opt_dic['bandwidth_priority']
-        if 'honour_limits' in opt_dic and not opt_dic['honour_limits']:
+        if 'honor_limits' in opt_dic and not opt_dic['honor_limits']:
             change['honorsSessionLimits'] = False
         if 'max_up_speed' in opt_dic:
             change['uploadLimit'] = opt_dic['max_up_speed']
