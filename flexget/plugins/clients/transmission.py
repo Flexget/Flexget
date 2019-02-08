@@ -147,7 +147,7 @@ class PluginTransmissionInput(TransmissionBase):
                     'username': {'type': 'string'},
                     'password': {'type': 'string'},
                     'enabled': {'type': 'boolean'},
-                    'onlycomplete': {'type': 'boolean'},
+                    'only_complete': {'type': 'boolean'},
                 },
                 'additionalProperties': False,
             },
@@ -156,7 +156,7 @@ class PluginTransmissionInput(TransmissionBase):
 
     def prepare_config(self, config):
         config = TransmissionBase.prepare_config(self, config)
-        config.setdefault('onlycomplete', False)
+        config.setdefault('only_complete', False)
         return config
 
     def on_task_input(self, task, config):
@@ -177,7 +177,7 @@ class PluginTransmissionInput(TransmissionBase):
 
         for torrent in self.client.get_torrents():
             seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
-            if config['onlycomplete'] and not (seed_ratio_ok and idle_limit_ok and torrent.progress == 100):
+            if config['only_complete'] and not (seed_ratio_ok and idle_limit_ok and torrent.progress == 100):
                 continue
             entry = Entry(title=torrent.name,
                           url='',
