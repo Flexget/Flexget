@@ -1,6 +1,16 @@
+"""
+Listens events:
+
+forget (string)
+
+    Given string can be task name, remembered field (url, imdb_url) or a title. If given value is a
+    task name then everything in that task will be forgotten. With title all learned fields from it and the
+    title will be forgotten. With field value only that particular field is forgotten.
+"""
 import logging
 from datetime import datetime
 
+from sqlalchemy import or_
 from sqlalchemy import (
     select,
     update,
@@ -11,13 +21,13 @@ from sqlalchemy import (
     Unicode,
     DateTime,
     ForeignKey,
-    or_,
 )
 from sqlalchemy.orm import relation
 
 from flexget import db_schema
 from flexget import plugin
 from flexget.event import event
+from flexget.manager import Session
 from flexget.utils.database import with_session
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
@@ -152,6 +162,37 @@ def add(title, task_name, fields, reason=None, local=None, session=None):
     session.add(se)
     session.commit()
     return se.to_dict()
+
+
+@event('forget')
+def forget(value):
+    """
+    See module docstring
+
+    :param string value: Can be task name, entry title or field value
+    :return: count, field_count where count is number of entries removed and field_count number of fields
+    """
+    with Session() as session:
+        log.debug('forget called with %s', value)
+        count = 0
+        field_count = 0
+        for se in (
+            session.query(SeenEntry)
+            .filter(or_(SeenEntry.title == value, SeenEntry.task == value))
+            .all()
+        ):
+            field_count += len(se.fields)
+            count += 1
+            log.debug('forgetting %s', se)
+            session.delete(se)
+
+        for sf in session.query(SeenField).filter(SeenField.value == value).all():
+            se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
+            field_count += len(se.fields)
+            count += 1
+            log.debug('forgetting %s', se)
+            session.delete(se)
+    return count, field_count
 
 
 @with_session
