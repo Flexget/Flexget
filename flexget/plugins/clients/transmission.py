@@ -633,6 +633,8 @@ class PluginTransmissionClean(TransmissionBase):
     """
 
     schema = {
+        "deprecated": "The clean_transmission plugin is deprecated. Configure a new task using the from_transmission "
+                      "plugin as well as the transmission plugin using the remove or purge action.",
         "anyOf": [
             {"type": "boolean"},
             {
@@ -666,52 +668,47 @@ class PluginTransmissionClean(TransmissionBase):
             return
         if not self.client:
             self.client = self.create_rpc_client(config)
-        nrat = float(config['min_ratio']) if 'min_ratio' in config else None
-        nfor = parse_timedelta(config['finished_for']) if 'finished_for' in config else None
-        delete_files = bool(config['delete_files']) if 'delete_files' in config else False
-        trans_checks = bool(config['transmission_seed_limits']) if 'transmission_seed_limits' in config else False
         tracker_re = re.compile(config['tracker'], re.IGNORECASE) if 'tracker' in config else None
         preserve_tracker_re = re.compile(config['preserve_tracker'], re.IGNORECASE) if 'preserve_tracker' in config else None
-        directories_re = config.get('directories')
 
         session = self.client.get_session()
 
         remove_ids = []
         for torrent in self.client.get_torrents():
-            log.verbose('Torrent "%s": status: "%s" - ratio: %s -  date added: %s - date done: %s' %
-                        (torrent.name, torrent.status, torrent.ratio, torrent.date_added, torrent.date_done))
+            log.verbose('Torrent "%s": status: "%s" - ratio: %s -  date added: %s' %
+                        (torrent.name, torrent.status, torrent.ratio, torrent.date_added))
             downloaded, dummy = self.torrent_info(torrent, config)
-            seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
-            tracker_hosts = (urlparse(tracker['announce']).hostname for tracker in torrent.trackers)
-            is_clean_all = nrat is None and nfor is None and trans_checks is False
-            is_minratio_reached = nrat and (nrat <= torrent.ratio)
-            is_transmission_seedlimit_unset = trans_checks and seed_ratio_ok is None and idle_limit_ok is None
-            is_transmission_seedlimit_reached = trans_checks and seed_ratio_ok is True
-            is_transmission_idlelimit_reached = trans_checks and idle_limit_ok is True
-            is_torrent_seed_only = torrent.date_done <= torrent.date_added
-            is_torrent_idlelimit_since_added_reached = nfor and (torrent.date_added + nfor) <= datetime.now()
-            is_torrent_idlelimit_since_finished_reached = nfor and (torrent.date_done + nfor) <= datetime.now()
-            is_tracker_matching = not tracker_re or any(tracker_re.search(host) for host in tracker_hosts)
-            is_preserve_tracker_matching = False
-            if preserve_tracker_re is not None:
-                is_preserve_tracker_matching = any(preserve_tracker_re.search(host) for host in tracker_hosts)
-            is_directories_matching = not directories_re or any(
-                re.compile(directory, re.IGNORECASE).search(torrent.downloadDir) for directory in directories_re)
-            if (downloaded and (is_clean_all or
-                                is_transmission_seedlimit_unset or
-                                is_transmission_seedlimit_reached or
-                                is_transmission_idlelimit_reached or
-                                is_minratio_reached or
-                                (is_torrent_seed_only and is_torrent_idlelimit_since_added_reached) or
-                                (not is_torrent_seed_only and is_torrent_idlelimit_since_finished_reached)) and
-                    is_directories_matching and (not is_preserve_tracker_matching and is_tracker_matching)):
-                if task.options.test:
-                    log.info('Would remove finished torrent `%s` from transmission', torrent.name)
+            if not downloaded:
+                continue
+            if config.get('transmission_seed_limits'):
+                seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
+                if not seed_ratio_ok or not idle_limit_ok:
                     continue
-                log.info('Removing finished torrent `%s` from transmission', torrent.name)
-                remove_ids.append(torrent.id)
+            if 'min_ratio' in config:
+                if torrent.ratio < config['min_ratio']:
+                    continue
+            if 'finished_for' in config:
+                # done date might be invalid if this torrent was added to transmission when already completed
+                started_seeding = datetime.fromtimestamp(max(torrent.addedDate, torrent.doneDate))
+                if started_seeding + parse_timedelta(config['finished_for']) > datetime.now():
+                    continue
+            tracker_hosts = (urlparse(tracker['announce']).hostname for tracker in torrent.trackers)
+            if 'tracker' in config:
+                if not any(tracker_re.search(tracker) for tracker in tracker_hosts):
+                    continue
+            if 'preserve_tracker' in config:
+                if any(preserve_tracker_re.search(tracker) for tracker in tracker_hosts):
+                    continue
+            if config.get('directories'):
+                if not any(re.search(d, torrent.downloadDir, re.IGNORECASE) for d in config['directories']):
+                    continue
+            if task.options.test:
+                log.info('Would remove finished torrent `%s` from transmission', torrent.name)
+                continue
+            log.info('Removing finished torrent `%s` from transmission', torrent.name)
+            remove_ids.append(torrent.id)
         if remove_ids:
-            self.client.remove_torrent(remove_ids, delete_files)
+            self.client.remove_torrent(remove_ids, config.get('delete_files'))
 
 
 @event('plugin.register')
