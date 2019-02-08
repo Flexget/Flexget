@@ -190,7 +190,10 @@ class PluginTransmissionInput(TransmissionBase):
             for attr in ['id', 'comment', 'downloadDir', 'isFinished', 'isPrivate', 'ratio', 'status', 'date_active',
                          'date_added', 'date_done', 'date_started', 'priority', 'progress', 'secondsDownloading',
                          'secondsSeeding']:
-                entry['transmission_' + attr] = getattr(torrent, attr)
+                try:
+                    entry['transmission_' + attr] = getattr(torrent, attr)
+                except Exception as e:
+                    log.debug('error when requesting transmissionrpc attribute %s', attr, exc_info=True)
             entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
             entry['transmission_seed_ratio_ok'] = seed_ratio_ok
             entry['transmission_idle_limit_ok'] = idle_limit_ok
