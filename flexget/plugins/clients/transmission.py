@@ -278,9 +278,16 @@ class PluginTransmission(TransmissionBase):
         if not config['enabled']:
             return
         # If the download plugin is not enabled, we need to call it to get our temp .torrent files
-        if 'download' not in task.config and config['action'] == 'add':
+        if 'download' not in task.config:
             download = plugin.get('download', self)
-            download.get_temp_files(task, handle_magnets=True, fail_html=True)
+            for entry in task.accepted:
+                if entry.get('transmission_id'):
+                    # The torrent is already loaded in deluge, we don't need to get anything
+                    continue
+                if config['action'] != 'add' and entry.get('torrent_info_hash'):
+                    # If we aren't adding the torrent new, all we need is info hash
+                    continue
+                download.get_temp_file(task, entry, handle_magnets=True, fail_html=True)
 
     @plugin.priority(135)
     def on_task_output(self, task, config):
@@ -303,14 +310,26 @@ class PluginTransmission(TransmissionBase):
             if task.options.test:
                 log.info('Would %s %s in transmission.', config['action'], entry['title'])
                 continue
-            if config['action'] == 'add':
+            entry_info_hash = entry.get('torrent_info_hash', '').lower()
+            entry_transmission_id = entry.get('transmission_id')
+            in_session = bool(entry_transmission_id)
+            for t in self.client.get_torrents():
+                if t.hashString.lower() == entry_info_hash:
+                    in_session = True
+                    entry_transmission_id = t.id
+                    break
+            if config['action'] == 'add' or in_session:
+                # We run this even when action is not 'add' to make sure options get set
                 self.add_to_transmission(self.client, task, config, entry)
-            elif config['action'] in ('remove', 'purge'):
-                pass
+            else:
+                log.warning('Cannot %s %s because it is not loaded in transmission.', config['action'], entry['title'])
+                continue
+            if config['action'] in ('remove', 'purge'):
+                self.client.remove_torrent([entry_transmission_id], delete_data=config['action'] == 'purge')
             elif config['action'] == 'pause':
-                pass
+                self.client.stop_torrent([entry_transmission_id])
             elif config['action'] == 'resume':
-                pass
+                self.client.start_torrent([entry_transmission_id])
 
     def _make_torrent_options_dict(self, config, entry):
 
@@ -336,14 +355,12 @@ class PluginTransmission(TransmissionBase):
                 add['download_dir'] = text_to_native_str(pathscrub(path), 'utf-8')
             except RenderError as e:
                 log.error('Error setting path for %s: %s' % (entry['title'], e))
-        if 'bandwidthpriority' in opt_dic:
-            add['bandwidthPriority'] = opt_dic['bandwidthpriority']
-        if 'maxconnections' in opt_dic:
-            add['peer_limit'] = opt_dic['maxconnections']
         # make sure we add it paused, will modify status after adding
         add['paused'] = True
 
         change = options['change']
+        if 'bandwidthpriority' in opt_dic:
+            change['bandwidthPriority'] = opt_dic['bandwidthpriority']
         if 'honourlimits' in opt_dic and not opt_dic['honourlimits']:
             change['honorsSessionLimits'] = False
         if 'maxupspeed' in opt_dic:
@@ -352,6 +369,8 @@ class PluginTransmission(TransmissionBase):
         if 'maxdownspeed' in opt_dic:
             change['downloadLimit'] = opt_dic['maxdownspeed']
             change['downloadLimited'] = True
+        if 'maxconnections' in opt_dic:
+            change['peer_limit'] = opt_dic['maxconnections']
 
         if 'ratio' in opt_dic:
             change['seedRatioLimit'] = opt_dic['ratio']
@@ -462,7 +481,7 @@ class PluginTransmission(TransmissionBase):
                 fl = cli.get_files(r.id)
 
                 if ('magnetization_timeout' in options['post'] and
-                    options['post']['magnetization_timeout'] > 0 and
+                        options['post']['magnetization_timeout'] > 0 and
                         not downloaded and
                         len(fl[r.id]) == 0):
                     log.debug('Waiting %d seconds for "%s" to magnetize', options['post']['magnetization_timeout'],
