@@ -29,7 +29,7 @@ class FilterLimitNew(object):
         'minimum': 1
     }
 
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_filter(self, task, config):
         if task.options.learn:
             log.info('Plugin limit_new is disabled with --learn')

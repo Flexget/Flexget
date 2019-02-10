@@ -54,12 +54,12 @@ class FilterRememberRejected(object):
                     log.debug('%s entries have expired from remember_rejected table.' % deleted)
                     task.config_changed()
 
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_input(self, task, config):
         for entry in task.all_entries:
             entry.on_reject(self.on_entry_reject)
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_filter(self, task, config):
         """Reject any remembered entries from previous runs"""
         with Session() as session:
@@ -103,7 +103,7 @@ class FilterRememberRejected(object):
         log.info(message)
         entry['remember_rejected'] = remember_time or remember
 
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_learn(self, task, config):
         with Session() as session:
             for entry in task.all_entries:

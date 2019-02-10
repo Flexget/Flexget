@@ -87,7 +87,7 @@ class MyEpisodes(object):
         self.test_mode = None
         self.http_session = None
 
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_output(self, task, config):
         """
         Mark all accepted episodes as acquired on MyEpisodes

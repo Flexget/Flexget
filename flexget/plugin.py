@@ -23,6 +23,10 @@ from flexget.event import fire_event, remove_event_handlers
 
 log = logging.getLogger('plugin')
 
+PRIORITY_DEFAULT = 128
+PRIORITY_LAST = -255
+PRIORITY_FIRST = 255
+
 
 @python_2_unicode_compatible
 class DependencyError(Exception):
@@ -151,8 +155,6 @@ def priority(value):
 
     return decorator
 
-
-DEFAULT_PRIORITY = 128
 
 # task phases, in order of their execution; note that this can be extended by
 # registering new phases at runtime
@@ -314,7 +316,7 @@ class PluginInfo(dict):
                 if hasattr(method, 'priority'):
                     handler_prio = method.priority
                 else:
-                    handler_prio = DEFAULT_PRIORITY
+                    handler_prio = PRIORITY_DEFAULT
                 event = add_phase_handler('plugin.%s.%s' % (self.name, phase), method, handler_prio)
                 # provides backwards compatibility
                 event.plugin = self

@@ -14,7 +14,7 @@ class ManualTask(object):
 
     schema = {'type': 'boolean'}
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_start(self, task, config):
         # Make sure we need to run
         if not config:

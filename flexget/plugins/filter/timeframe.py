@@ -53,7 +53,7 @@ class FilterTimeFrame(object):
     }
 
     # Run last so we work on only accepted entries
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_filter(self, task, config):
         if not config:
             return

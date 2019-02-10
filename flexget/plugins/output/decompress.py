@@ -190,7 +190,7 @@ class Decompress(object):
         else:
             archive.close()
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_output(self, task, config):
         """Task handler for archive_extract"""
         if isinstance(config, bool) and not config:

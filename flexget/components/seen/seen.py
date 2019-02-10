@@ -14,12 +14,12 @@ log = logging.getLogger(__name__)
 
 class FilterSeen(object):
     """
-        Remembers previously downloaded content and rejects them in
-        subsequent executions. Without this plugin FlexGet would
-        download all matching content on every execution.
+    Remembers previously downloaded content and rejects them in
+    subsequent executions. Without this plugin FlexGet would
+    download all matching content on every execution.
 
-        This plugin is enabled on all tasks by default.
-        See wiki for more information.
+    This plugin is enabled on all tasks by default.
+    See wiki for more information.
     """
 
     schema = {
@@ -61,7 +61,7 @@ class FilterSeen(object):
         config.setdefault('fields', self.fields)
         return config
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_filter(self, task, config, remember_rejected=False):
         """Filter entries already accepted on previous runs."""
         config = self.prepare_config(config)

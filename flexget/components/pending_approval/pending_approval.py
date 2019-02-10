@@ -47,7 +47,7 @@ class PendingApproval(object):
         return approved_entries
 
     # Run after all other filters
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_filter(self, task, config):
         if not config:
             return

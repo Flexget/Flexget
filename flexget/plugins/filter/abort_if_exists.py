@@ -21,7 +21,7 @@ class PluginAbortIfExists(object):
     }
 
     # Execute as the first thing in filter phase
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_filter(self, task, config):
         abort_re = re.compile(config['regexp'], re.IGNORECASE)
         field = config['field']

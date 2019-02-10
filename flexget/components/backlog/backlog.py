@@ -26,7 +26,7 @@ class InputBacklog(object):
 
     schema = {'type': 'string', 'format': 'interval'}
 
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_input(self, task, config):
         # Get a list of entries to inject
         injections = self.get_injections(task)
@@ -39,7 +39,7 @@ class InputBacklog(object):
         # Return the entries from backlog that are not already in the task
         return injections
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_metainfo(self, task, config):
         # Take a snapshot of any new entries' states before metainfo event in case we have to store them to backlog
         # This is really a hack to avoid unnecessary lazy lookups causing db locks. Ideally, saving a snapshot

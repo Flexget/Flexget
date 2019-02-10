@@ -29,7 +29,7 @@ class KodiLibrary(object):
         'additionalProperties': False,
     }
 
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_exit(self, task, config):
         if task.accepted or not config['only_on_accepted']:
             # make the url without trailing slash

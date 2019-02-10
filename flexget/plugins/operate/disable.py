@@ -72,7 +72,7 @@ class DisablePlugin(object):
         if disabled:
             log.debug('Disabled plugin(s): %s' % ', '.join(disabled))
 
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_exit(self, task, config):
         if not self.disabled_builtins:
             return

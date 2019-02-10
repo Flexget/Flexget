@@ -41,7 +41,7 @@ class DownloadAuth(object):
     }
 
     # Run before all downloads
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_download(self, task, config):
         for entry in task.accepted:
             if entry.get('download_auth'):

@@ -26,7 +26,7 @@ class Proxy(object):
         ]
     }
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_start(self, task, config):
         if not config:
             # If no configuration is provided, see if there are any proxy env variables

@@ -24,7 +24,7 @@ class PluginInterval(object):
 
     schema = {'type': 'string', 'format': 'interval'}
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_start(self, task, config):
         if task.options.learn:
             log.info('Ignoring task %s interval for --learn' % task.name)

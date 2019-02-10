@@ -48,7 +48,7 @@ class PluginFreeSpace(object):
             config['path'] = task.manager.config_base
         return config
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_download(self, task, config):
         config = self.prepare_config(config, task)
         # Only bother aborting if there were accepted entries this run.

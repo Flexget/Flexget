@@ -66,7 +66,7 @@ class Manipulate(object):
                 phase = item_config.get('phase', 'metainfo')
                 self.phase_jobs[phase].append(item)
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_metainfo(self, task, config):
         if not self.phase_jobs['metainfo']:
             # return if no jobs for this phase
@@ -74,7 +74,7 @@ class Manipulate(object):
         modified = sum(self.process(entry, self.phase_jobs['metainfo']) for entry in task.entries)
         log.verbose('Modified %d entries.' % modified)
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_filter(self, task, config):
         if not self.phase_jobs['filter']:
             # return if no jobs for this phase
@@ -82,7 +82,7 @@ class Manipulate(object):
         modified = sum(self.process(entry, self.phase_jobs['filter']) for entry in task.entries + task.rejected)
         log.verbose('Modified %d entries.' % modified)
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_modify(self, task, config):
         if not self.phase_jobs['modify']:
             # return if no jobs for this phase

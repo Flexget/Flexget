@@ -17,7 +17,7 @@ class OutputDumpConfig(object):
         Dumps task config in STDOUT in yaml at exit or abort event.
     """
 
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_start(self, task, config):
         if task.options.dump_config:
             import yaml

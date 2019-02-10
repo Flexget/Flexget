@@ -17,7 +17,7 @@ class Verbose(object):
     """
 
     # Run first thing after input phase
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_metainfo(self, task, config):
         if task.options.silent:
             return
