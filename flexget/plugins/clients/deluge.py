@@ -249,17 +249,17 @@ class OutputDeluge(DelugePlugin):
                     'password': {'type': 'string'},
                     'action': {'type': 'string', 'enum': ['add', 'remove', 'purge', 'pause', 'resume']},
                     'path': {'type': 'string'},
-                    'movedone': {'type': 'string'},
+                    'move_completed_path': {'type': 'string'},
                     'label': {'type': 'string'},
-                    'queuetotop': {'type': 'boolean'},
-                    'automanaged': {'type': 'boolean'},
-                    'maxupspeed': {'type': 'number'},
-                    'maxdownspeed': {'type': 'number'},
-                    'maxconnections': {'type': 'integer'},
-                    'maxupslots': {'type': 'integer'},
+                    'queue_to_top': {'type': 'boolean'},
+                    'auto_managed': {'type': 'boolean'},
+                    'max_up_speed': {'type': 'number'},
+                    'max_down_speed': {'type': 'number'},
+                    'max_connections': {'type': 'integer'},
+                    'max_up_slots': {'type': 'integer'},
                     'ratio': {'type': 'number'},
-                    'removeatratio': {'type': 'boolean'},
-                    'addpaused': {'type': 'boolean'},
+                    'remove_at_ratio': {'type': 'boolean'},
+                    'add_paused': {'type': 'boolean'},
                     'compact': {'type': 'boolean'},
                     'content_filename': {'type': 'string'},
                     'main_file_only': {'type': 'boolean'},
@@ -282,7 +282,7 @@ class OutputDeluge(DelugePlugin):
         config.setdefault('enabled', True)
         config.setdefault('action', 'add')
         config.setdefault('path', '')
-        config.setdefault('movedone', '')
+        config.setdefault('move_completed_path', '')
         config.setdefault('label', '')
         config.setdefault('main_file_ratio', 0.90)
         config.setdefault('magnetization_timeout', 0)
@@ -292,10 +292,10 @@ class OutputDeluge(DelugePlugin):
 
     def __init__(self):
         self.deluge_version = None
-        self.options = {'maxupspeed': 'max_upload_speed', 'maxdownspeed': 'max_download_speed',
-                        'maxconnections': 'max_connections', 'maxupslots': 'max_upload_slots',
-                        'automanaged': 'auto_managed', 'ratio': 'stop_ratio', 'removeatratio': 'remove_at_ratio',
-                        'addpaused': 'add_paused', 'compact': 'compact_allocation'}
+        self.options = {'max_up_speed': 'max_upload_speed', 'max_down_speed': 'max_download_speed',
+                        'max_connections': 'max_connections', 'max_up_slots': 'max_upload_slots',
+                        'auto_managed': 'auto_managed', 'ratio': 'stop_ratio', 'remove_at_ratio': 'remove_at_ratio',
+                        'add_paused': 'add_paused', 'compact': 'compact_allocation'}
 
     @plugin.priority(120)
     def on_task_download(self, task, config):
@@ -387,7 +387,7 @@ class OutputDeluge(DelugePlugin):
                         add_opts['stop_at_ratio'] = True
             # Make another set of options, that get set after the torrent has been added
             modify_opts = {
-                'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
+                'queue_to_top': entry.get('queue_to_top', config.get('queue_to_top')),
                 'main_file_only': entry.get('main_file_only', config.get('main_file_only', False)),
                 'main_file_ratio': entry.get('main_file_ratio', config.get('main_file_ratio')),
                 'hide_sparse_files': entry.get('hide_sparse_files', config.get('hide_sparse_files', True)),
@@ -400,10 +400,10 @@ class OutputDeluge(DelugePlugin):
             except RenderError as e:
                 log.error('Error setting label for `%s`: %s', entry['title'], e)
             try:
-                movedone = entry.render(entry.get('movedone', config['movedone']))
-                modify_opts['movedone'] = pathscrub(os.path.expanduser(movedone))
+                move_completed_path = entry.render(entry.get('move_completed_path', config['move_completed_path']))
+                modify_opts['move_completed_path'] = pathscrub(os.path.expanduser(move_completed_path))
             except RenderError as e:
-                log.error('Error setting movedone for %s: %s', entry['title'], e)
+                log.error('Error setting move_completed_path for %s: %s', entry['title'], e)
             try:
                 content_filename = entry.get('content_filename', config.get('content_filename', ''))
                 modify_opts['content_filename'] = pathscrub(entry.render(content_filename))
@@ -496,14 +496,14 @@ class OutputDeluge(DelugePlugin):
         log.info('%s successfully added to deluge.', entry['title'])
         entry['deluge_id'] = torrent_id
 
-        if opts.get('movedone'):
+        if opts.get('move_completed_path'):
             client.call('core.set_torrent_move_completed', torrent_id, True)
-            client.call('core.set_torrent_move_completed_path', torrent_id, opts['movedone'])
-            log.debug('%s move on complete set to %s', entry['title'], opts['movedone'])
+            client.call('core.set_torrent_move_completed_path', torrent_id, opts['move_completed_path'])
+            log.debug('%s move on complete set to %s', entry['title'], opts['move_completed_path'])
         if opts.get('label'):
             client.call('label.set_torrent', torrent_id, opts['label'])
-        if opts.get('queuetotop') is not None:
-            if opts['queuetotop']:
+        if opts.get('queue_to_top') is not None:
+            if opts['queue_to_top']:
                 client.call('core.queue_top', [torrent_id])
                 log.debug('%s moved to top of queue', entry['title'])
             else:
@@ -514,13 +514,13 @@ class OutputDeluge(DelugePlugin):
         status = client.call('core.get_torrent_status', torrent_id, status_keys)
         # Determine where the file should be
         move_now_path = None
-        if opts.get('movedone'):
+        if opts.get('move_completed_path'):
             if status['progress'] == 100:
-                move_now_path = opts['movedone']
+                move_now_path = opts['move_completed_path']
             else:
                 # Deluge will unset the move completed option if we move the storage, forgo setting proper
                 # path, in favor of leaving proper final location.
-                log.debug('Not moving storage for %s, as this will prevent movedone.', entry['title'])
+                log.debug('Not moving storage for %s, as this will prevent move_completed_path.', entry['title'])
         elif opts.get('path'):
             move_now_path = opts['path']
 
