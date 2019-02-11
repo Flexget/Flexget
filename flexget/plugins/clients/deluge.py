@@ -38,7 +38,7 @@ class DelugePlugin(object):
 
         if config['host'] in ['localhost', '127.0.0.1'] and not config.get('username'):
             # If an username is not specified, we have to do a lookup for the localclient username/password
-            auth = self.get_localhost_auth()
+            auth = self.get_localhost_auth(config.get('config_path'))
             if auth and auth[0]:
                 config['username'], config['password'] = auth
             else:
@@ -54,11 +54,14 @@ class DelugePlugin(object):
         return config
 
     @staticmethod
-    def get_localhost_auth():
-        if sys.platform.startswith('win'):
-            auth_file = os.path.join(os.getenv('APPDATA'), 'deluge', 'auth')
+    def get_localhost_auth(config_path=None):
+        if config_path is None:
+            if sys.platform.startswith('win'):
+                auth_file = os.path.join(os.getenv('APPDATA'), 'deluge', 'auth')
+            else:
+                auth_file = os.path.expanduser('~/.config/deluge/auth')
         else:
-            auth_file = os.path.expanduser('~/.config/deluge/auth')
+            auth_file = os.path.join(config_path, 'auth')
         if not os.path.isfile(auth_file):
             return None
 
@@ -185,6 +188,7 @@ class OutputDeluge(DelugePlugin):
                     'port': {'type': 'integer'},
                     'username': {'type': 'string'},
                     'password': {'type': 'string'},
+                    'config_path': {'type': 'string', 'format': 'path'},
                     'action': {'type': 'string', 'enum': ['add', 'remove', 'purge', 'pause', 'resume']},
                     'path': {'type': 'string'},
                     'move_completed_path': {'type': 'string'},
