@@ -1,23 +1,12 @@
-"""
-Listens events:
-
-forget (string)
-
-    Given string can be task name, remembered field (url, imdb_url) or a title. If given value is a
-    task name then everything in that task will be forgotten. With title all learned fields from it and the
-    title will be forgotten. With field value only that particular field is forgotten.
-"""
 from __future__ import unicode_literals, division, absolute_import
 
 import logging
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from past.builtins import basestring
-from sqlalchemy import or_
 
 from flexget import plugin
 from flexget.event import event
-from flexget.manager import Session
 from . import db
 
 log = logging.getLogger(__name__)
@@ -160,37 +149,6 @@ class FilterSeen(object):
             log.debug("Forgotten '%s' (%s fields)" % (title, len(se.fields)))
             task.session.delete(se)
             return True
-
-
-@event('forget')
-def forget(value):
-    """
-    See module docstring
-
-    :param string value: Can be task name, entry title or field value
-    :return: count, field_count where count is number of entries removed and field_count number of fields
-    """
-    with Session() as session:
-        log.debug('forget called with %s', value)
-        count = 0
-        field_count = 0
-        for se in (
-            session.query(db.SeenEntry)
-            .filter(or_(db.SeenEntry.title == value, db.SeenEntry.task == value))
-            .all()
-        ):
-            field_count += len(se.fields)
-            count += 1
-            log.debug('forgetting %s', se)
-            session.delete(se)
-
-        for sf in session.query(db.SeenField).filter(db.SeenField.value == value).all():
-            se = session.query(db.SeenEntry).filter(db.SeenEntry.id == sf.seen_entry_id).first()
-            field_count += len(se.fields)
-            count += 1
-            log.debug('forgetting %s', se)
-            session.delete(se)
-    return count, field_count
 
 
 @event('plugin.register')

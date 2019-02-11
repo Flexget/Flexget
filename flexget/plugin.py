@@ -7,10 +7,10 @@ import logging
 import os
 import re
 import time
-import warnings
 import pkg_resources
 from functools import total_ordering
 from http.client import BadStatusLine
+from importlib import import_module
 
 from path import Path
 from requests import RequestException
@@ -389,7 +389,7 @@ def _check_phase_queue():
 
 def _import_plugin(module_name, plugin_path):
     try:
-        __import__(module_name)
+        import_module(module_name)
     except DependencyError as e:
         if e.has_message():
             msg = e.message
