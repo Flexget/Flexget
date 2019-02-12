@@ -19,6 +19,9 @@ import unicodedata
 log = logging.getLogger('descargas2020')
 
 DESCARGAS2020_TORRENT_FORMAT = 'http://descargas2020.com/download/{:0>6}.torrent'
+REWRITABLE_REGEX = re.compile(
+    r'https?://(www.)?(descargas2020|tvsinpagar|tumejortorrent|torrentlocura|torrentrapid).com/'
+)
 
 
 class UrlRewriteDescargas2020(object):
@@ -27,23 +30,23 @@ class UrlRewriteDescargas2020(object):
     schema = {'type': 'boolean', 'default': False}
 
     def __init__(self):
-        self.requests = None
+        self._session = None
+
+    @property
+    def session(self):
+        # TODO: This is not used for all requests even ..
+        if self._session is None:
+            self._session = Session()
+            self._session.headers.update(
+                {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
+            )
+            self._session.add_domain_limiter(TimedLimiter('descargas2020.com', '2 seconds'))
+        return self._session
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        rewritable_regex = r'^(http|https):\/\/(www.)?(descargas2020|tvsinpagar|tumejortorrent|torrentlocura|torrentrapid).com\/.*'
-        return re.match(rewritable_regex, url) and not url.endswith('.torrent')
-
-    def session(self):
-        # TODO: This is not used for all requests even ..
-        if self.requests is None:
-            self.requests = Session()
-            requests.headers.update(
-                {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
-            )
-            requests.add_domain_limiter(TimedLimiter('descargas2020.com', '2 seconds'))
-        return self.requests
+        return not url.endswith('.torrent') and REWRITABLE_REGEX.match(url)
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
@@ -53,11 +56,8 @@ class UrlRewriteDescargas2020(object):
     def parse_download_page(self, url, task):
         log.verbose('Descargas2020 URL: %s', url)
 
-        if not self.requests:
-            self.requests = Session()
-
         try:
-            page = self.requests.get(url)
+            page = self.session.get(url)
         except requests.RequestException as e:
             raise UrlRewritingError(e)
         try:
@@ -69,8 +69,7 @@ class UrlRewriteDescargas2020(object):
         url_format = DESCARGAS2020_TORRENT_FORMAT
 
         torrent_id_prog = re.compile(
-            r"(?:parametros\s*=\s*\n?)\s*{\s*\n(?:\s*'\w+'\s*:.*\n)+\s*'(?:torrentID|id)"
-            "'\s*:\s*'(\d+)'"
+            r"(?:parametros\s*=\s*\n?)\s*{\s*\n(?:\s*'\w+'\s*:.*\n)+\s*'(?:torrentID|id)'\s*:\s*'(\d+)'"
         )
         torrent_ids = soup.findAll(text=torrent_id_prog)
         if torrent_ids:
