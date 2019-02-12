@@ -16,6 +16,7 @@ class Manipulate(object):
 
       manipulate:
         - <destination field>:
+            [findall]: 
             [phase]: <phase>
             [from]: <source field>
             [extract]: <regexp>
@@ -44,6 +45,7 @@ class Manipulate(object):
                     'extract': {'type': 'string', 'format': 'regex'},
                     'separator': {'type': 'string'},
                     'remove': {'type': 'boolean'},
+                    'findall': {'type': 'boolean'},
                     'replace': {
                         'type': 'object',
                         'properties': {
@@ -117,12 +119,18 @@ class Manipulate(object):
                     if not field_value:
                         log.warning('Cannot extract, field `%s` is not present' % from_field)
                         continue
-                    match = re.search(config['extract'], field_value, re.I | re.U)
-                    if match:
-                        groups = [x for x in match.groups() if x is not None]
-                        log.debug('groups: %s' % groups)
-                        field_value = config.get('separator', ' ').join(groups).strip()
+                    if config.get('findall'):
+                        match = re.findall(config['extract'], field_value)
+                        log.debug('all matches: %s' % match)
+                        field_value = config.get('separator', ' ').join(match).strip()
                         log.debug('field `%s` after extract: `%s`' % (field, field_value))
+                    else:
+                        match = re.search(config['extract'], field_value, re.I | re.U)
+                        if match:
+                            groups = [x for x in match.groups() if x is not None]
+                            log.debug('groups: %s' % groups)
+                            field_value = config.get('separator', ' ').join(groups).strip()
+                            log.debug('field `%s` after extract: `%s`' % (field, field_value))
 
                 if 'replace' in config:
                     if not field_value:
