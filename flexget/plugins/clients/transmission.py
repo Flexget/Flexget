@@ -197,6 +197,9 @@ class PluginTransmissionInput(TransmissionBase):
             entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
             entry['transmission_seed_ratio_ok'] = seed_ratio_ok
             entry['transmission_idle_limit_ok'] = idle_limit_ok
+            # Built in done_date doesn't work when user adds an already completed file to transmission
+            if torrent.progress == 100:
+                entry['transmission_date_done'] = datetime.fromtimestamp(max(torrent.addedDate, torrent.doneDate))
             entries.append(entry)
         return entries
 
