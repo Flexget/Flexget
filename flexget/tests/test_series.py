@@ -1882,7 +1882,9 @@ class TestSpecials(object):
         tasks:
           preferspecials:
             mock:
-            - title: the show s03e04 special
+            # Guessit groups 'unaired' along with special in episode_details
+            # Make sure it still works with 'unaired' before special
+            - title: the show s03e04 unaired special
             series:
             - the show:
                 prefer_specials: True
@@ -1919,7 +1921,7 @@ class TestSpecials(object):
     def test_prefer_specials(self, execute_task):
         # Test that an entry matching both ep and special is flagged as a special when prefer_specials is True
         task = execute_task('preferspecials')
-        entry = task.find_entry('accepted', title='the show s03e04 special')
+        entry = task.find_entry('accepted', title='the show s03e04 unaired special')
         assert entry.get('series_id_type') == 'special', 'Entry which should have been flagged a special was not.'
 
     def test_not_prefer_specials(self, execute_task):

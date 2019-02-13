@@ -306,7 +306,9 @@ class ParserGuessit(object):
                 parenthetical = re.escape(name[p_start + 1 : -1])
                 if parenthetical and parenthetical.lower() != str(country).lower():
                     valid = False
-        special = guess_result.get('episode_details', '').lower() == 'special'
+        # Check the full list of 'episode_details' for special,
+        # since things like 'pilot' and 'unaired' can also show up there
+        special = any(v.lower() == 'special' for v in guess_result.values_list.get('episode_details', []))
         if 'episode' not in guess_result.values_list:
             episodes = len(guess_result.values_list.get('part', []))
         else:
