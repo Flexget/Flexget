@@ -16,7 +16,7 @@ class Manipulate(object):
 
       manipulate:
         - <destination field>:
-            [findall]: 
+            [findall]: <boolean>
             [phase]: <phase>
             [from]: <source field>
             [extract]: <regexp>
@@ -74,7 +74,7 @@ class Manipulate(object):
             # return if no jobs for this phase
             return
         modified = sum(self.process(entry, self.phase_jobs['metainfo']) for entry in task.entries)
-        log.verbose('Modified %d entries.' % modified)
+        log.verbose('Modified %d entries.', modified)
 
     @plugin.priority(255)
     def on_task_filter(self, task, config):
@@ -82,7 +82,7 @@ class Manipulate(object):
             # return if no jobs for this phase
             return
         modified = sum(self.process(entry, self.phase_jobs['filter']) for entry in task.entries + task.rejected)
-        log.verbose('Modified %d entries.' % modified)
+        log.verbose('Modified %d entries.', modified)
 
     @plugin.priority(255)
     def on_task_modify(self, task, config):
@@ -90,7 +90,7 @@ class Manipulate(object):
             # return if no jobs for this phase
             return
         modified = sum(self.process(entry, self.phase_jobs['modify']) for entry in task.entries + task.rejected)
-        log.verbose('Modified %d entries.' % modified)
+        log.verbose('Modified %d entries.', modified)
 
     def process(self, entry, jobs):
         """Process given jobs from config for an entry.
@@ -107,7 +107,7 @@ class Manipulate(object):
                 if 'from' in config:
                     from_field = config['from']
                 field_value = entry.get(from_field)
-                log.debug('field: `%s` from_field: `%s` field_value: `%s`' % (field, from_field, field_value))
+                log.debug('field: `%s` from_field: `%s` field_value: `%s`', (field, from_field, field_value))
 
                 if config.get('remove'):
                     if field in entry:
@@ -117,32 +117,32 @@ class Manipulate(object):
 
                 if 'extract' in config:
                     if not field_value:
-                        log.warning('Cannot extract, field `%s` is not present' % from_field)
+                        log.warning('Cannot extract, field `%s` is not present', from_field)
                         continue
                     if config.get('findall'):
-                        match = re.findall(config['extract'], field_value)
-                        log.debug('all matches: %s' % match)
+                        match = re.findall(config['extract'], field_value, re.I | re.U)
+                        log.debug('all matches: %s', match)
                         field_value = config.get('separator', ' ').join(match).strip()
-                        log.debug('field `%s` after extract: `%s`' % (field, field_value))
+                        log.debug('field `%s` after extract: `%s`', (field, field_value))
                     else:
                         match = re.search(config['extract'], field_value, re.I | re.U)
                         if match:
                             groups = [x for x in match.groups() if x is not None]
-                            log.debug('groups: %s' % groups)
+                            log.debug('groups: %s', groups)
                             field_value = config.get('separator', ' ').join(groups).strip()
-                            log.debug('field `%s` after extract: `%s`' % (field, field_value))
+                            log.debug('field `%s` after extract: `%s`', (field, field_value))
 
                 if 'replace' in config:
                     if not field_value:
-                        log.warning('Cannot replace, field `%s` is not present' % from_field)
+                        log.warning('Cannot replace, field `%s` is not present', from_field)
                         continue
                     replace_config = config['replace']
                     regexp = re.compile(replace_config['regexp'], flags=re.I | re.U)
                     field_value = regexp.sub(replace_config['format'], field_value).strip()
-                    log.debug('field `%s` after replace: `%s`' % (field, field_value))
+                    log.debug('field `%s` after replace: `%s`', (field, field_value))
 
                 if from_field != field or entry[field] != field_value:
-                    log.verbose('Field `%s` is now `%s`' % (field, field_value))
+                    log.verbose('Field `%s` is now `%s`', (field, field_value))
                     modified = True
                 entry[field] = field_value
         return modified
