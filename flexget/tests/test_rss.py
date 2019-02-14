@@ -227,7 +227,7 @@ class TestRssOnline(object):
 
     def test_rss_online(self, execute_task, use_vcr):
         # Make sure entries are created for all test tasks
-        tasks = yaml.load(self.config)['tasks']
+        tasks = yaml.safe_load(self.config)['tasks']
         for task in tasks:
             task = execute_task(task)
             assert task.entries, 'No results for task `%s`' % task

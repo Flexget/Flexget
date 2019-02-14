@@ -140,7 +140,7 @@ def check(manager, options):
         pre_check_config(manager.config_path)
         with codecs.open(manager.config_path, 'r', encoding='utf-8') as config_file:
             try:
-                config = yaml.load(config_file)
+                config = yaml.safe_load(config_file)
             except yaml.error.YAMLError as e:
                 log.critical('Config file is invalid YAML:')
                 for line in str(e).split('\n'):
