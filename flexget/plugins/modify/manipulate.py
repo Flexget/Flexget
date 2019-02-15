@@ -107,7 +107,7 @@ class Manipulate(object):
                 if 'from' in config:
                     from_field = config['from']
                 field_value = entry.get(from_field)
-                log.debug('field: `%s` from_field: `%s` field_value: `%s`', (field, from_field, field_value))
+                log.debug('field: `%s` from_field: `%s` field_value: `%s`', field, from_field, field_value)
 
                 if config.get('remove'):
                     if field in entry:
@@ -123,14 +123,14 @@ class Manipulate(object):
                         match = re.findall(config['extract'], field_value, re.I | re.U)
                         log.debug('all matches: %s', match)
                         field_value = config.get('separator', ' ').join(match).strip()
-                        log.debug('field `%s` after extract: `%s`', (field, field_value))
+                        log.debug('field `%s` after extract: `%s`', field, field_value)
                     else:
                         match = re.search(config['extract'], field_value, re.I | re.U)
                         if match:
                             groups = [x for x in match.groups() if x is not None]
                             log.debug('groups: %s', groups)
                             field_value = config.get('separator', ' ').join(groups).strip()
-                            log.debug('field `%s` after extract: `%s`', (field, field_value))
+                            log.debug('field `%s` after extract: `%s`', field, field_value)
 
                 if 'replace' in config:
                     if not field_value:
@@ -139,10 +139,10 @@ class Manipulate(object):
                     replace_config = config['replace']
                     regexp = re.compile(replace_config['regexp'], flags=re.I | re.U)
                     field_value = regexp.sub(replace_config['format'], field_value).strip()
-                    log.debug('field `%s` after replace: `%s`', (field, field_value))
+                    log.debug('field `%s` after replace: `%s`', field, field_value)
 
                 if from_field != field or entry[field] != field_value:
-                    log.verbose('Field `%s` is now `%s`', (field, field_value))
+                    log.verbose('Field `%s` is now `%s`', field, field_value)
                     modified = True
                 entry[field] = field_value
         return modified
