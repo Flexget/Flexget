@@ -8,7 +8,7 @@ import re
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.template import render_from_entry, RenderError
-from flexget.utils import archive as archiveutil
+from flexget.components.archives import utils as archiveutil
 
 log = logging.getLogger('decompress')
 
@@ -147,7 +147,8 @@ class Decompress(object):
         ]
     }
 
-    def prepare_config(self, config):
+    @staticmethod
+    def prepare_config(config):
         """Prepare config for processing"""
         from fnmatch import translate
 
@@ -168,7 +169,8 @@ class Decompress(object):
 
         return config
 
-    def handle_entry(self, entry, config):
+    @staticmethod
+    def handle_entry(entry, config):
         """
         Extract matching files into the directory specified
 
