@@ -330,6 +330,11 @@ class Manager(object):
         and results will be streamed back.
         If not, this will attempt to obtain a lock, initialize the manager, and run the command here.
         """
+        if sys.version_info <= (2, 7):
+            console('-'*79)
+            console('Python 2.7 will not be maintained past 2020 !')
+            console('Consider upgrading to 3.6 or newer at your earliest convenience.')
+            console('-' * 79)
         # When we are in test mode, we use a different lock file and db
         if self.options.test:
             self.lockfile = os.path.join(self.config_base, '.test-%s-lock' % self.config_name)
