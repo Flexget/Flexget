@@ -14,6 +14,45 @@ log = logging.getLogger('sickbeard')
 
 
 class Sickbeard(object):
+    """
+    This plugin returns ALL of the shows monitored by Sickbeard.
+    This includes both ongoing and ended.
+    Syntax:
+
+    sickbeard:
+      base_url=<value>
+      port=<value>
+      api_key=<value>
+
+    Options base_url and api_key are required.
+
+    Use with input plugin like discover and/or configure_series.
+    Example:
+
+    download-tv-task:
+      configure_series:
+        settings:
+          quality:
+            - 720p
+        from:
+          sickbeard:
+            base_url: http://localhost
+            port: 8531
+            api_key: MYAPIKEY1123
+      discover:
+        what:
+          - next_series_episodes: yes
+        from:
+          torrentz: any
+      download:
+        /download/tv
+
+    Note that when using the configure_series plugin with Sickbeard
+    you are basically synced to it, so removing a show in Sickbeard will
+    remove it in flexget as well, which could be positive or negative,
+    depending on your usage.
+    """
+
     schema = {
         'type': 'object',
         'properties': {
@@ -48,44 +87,6 @@ class Sickbeard(object):
         return [sb_to_fg[quality] for quality in quality_list]
 
     def on_task_input(self, task, config):
-        """
-        This plugin returns ALL of the shows monitored by Sickbeard.
-        This includes both ongoing and ended.
-        Syntax:
-
-        sickbeard:
-          base_url=<value>
-          port=<value>
-          api_key=<value>
-
-        Options base_url and api_key are required.
-
-        Use with input plugin like discover and/or configure_series.
-        Example:
-
-        download-tv-task:
-          configure_series:
-            settings:
-              quality:
-                - 720p
-            from:
-              sickbeard:
-                base_url: http://localhost
-                port: 8531
-                api_key: MYAPIKEY1123
-          discover:
-            what:
-              - next_series_episodes: yes
-            from:
-              torrentz: any
-          download:
-            /download/tv
-
-        Note that when using the configure_series plugin with Sickbeard
-        you are basically synced to it, so removing a show in Sickbeard will
-        remove it in flexget as well, which could be positive or negative,
-        depending on your usage.
-        """
         parsedurl = urlparse(config.get('base_url'))
         url = '%s://%s:%s%s/api/%s/?cmd=shows' % (
             parsedurl.scheme,

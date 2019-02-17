@@ -18,46 +18,45 @@ API_URL_PREFIX = 'https://api.betaseries.com/'
 
 class BetaSeriesList(object):
     """
-        Emits an entry for each serie followed by one or more BetaSeries account.
-        See https://www.betaseries.com/
+    Emits an entry for each serie followed by one or more BetaSeries account.
+    See https://www.betaseries.com/
 
-        Configuration examples:
+    Configuration examples:
 
-        # will get all series followed by the account identified by your_user_name
+    # will get all series followed by the account identified by your_user_name
+    betaseries_list:
+      username: your_user_name
+      password: your_password
+      api_key: your_api_key
+
+    # will get all series followed by the account identified by some_other_guy
+    betaseries_list:
+      username: your_user_name
+      password: your_password
+      api_key: your_api_key
+      members:
+        - some_other_guy
+
+    # will get all series followed by the accounts identified by guy1 and guy2
+    betaseries_list:
+      username: your_user_name
+      password: your_password
+      api_key: your_api_key
+      members:
+        - guy1
+        - guy2
+
+
+    Api key can be requested at https://www.betaseries.com/api.
+
+    This plugin is meant to work with the import_series plugin as follow:
+
+    import_series:
+      from:
         betaseries_list:
-          username: your_user_name
-          password: your_password
-          api_key: your_api_key
-
-        # will get all series followed by the account identified by some_other_guy
-        betaseries_list:
-          username: your_user_name
-          password: your_password
-          api_key: your_api_key
-          members:
-            - some_other_guy
-
-        # will get all series followed by the accounts identified by guy1 and guy2
-        betaseries_list:
-          username: your_user_name
-          password: your_password
-          api_key: your_api_key
-          members:
-            - guy1
-            - guy2
-
-
-        Api key can be requested at https://www.betaseries.com/api.
-
-        This plugin is meant to work with the import_series plugin as follow:
-
-        import_series:
-          from:
-            betaseries_list:
-              username: xxxxx
-              password: xxxxx
-              api_key: xxxxx
-
+          username: xxxxx
+          password: xxxxx
+          api_key: xxxxx
     """
 
     schema = {

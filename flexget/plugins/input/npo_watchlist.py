@@ -24,31 +24,31 @@ requests.add_domain_limiter(TimedLimiter('npostart.nl', '8 seconds'))
 
 class NPOWatchlist(object):
     """
-        Produces entries for every episode on the user's npostart.nl watchlist (Dutch public television).
-        Entries can be downloaded using http://arp242.net/code/download-npo
+    Produces entries for every episode on the user's npostart.nl watchlist (Dutch public television).
+    Entries can be downloaded using http://arp242.net/code/download-npo
 
-        If 'remove_accepted' is set to 'yes', the plugin will delete accepted entries from the watchlist after download
-            is complete.
-        If 'max_episode_age_days' is set (and not 0), entries will only be generated for episodes broadcast in the last
-            x days.  This only applies to episodes related to series the user is following.
-        If 'download_premium' is set to 'yes', the plugin will also download entries that are marked as exclusive
-            content for NPO Plus subscribers.
+    If 'remove_accepted' is set to 'yes', the plugin will delete accepted entries from the watchlist after download
+        is complete.
+    If 'max_episode_age_days' is set (and not 0), entries will only be generated for episodes broadcast in the last
+        x days.  This only applies to episodes related to series the user is following.
+    If 'download_premium' is set to 'yes', the plugin will also download entries that are marked as exclusive
+        content for NPO Plus subscribers.
 
-        For example:
-            npo_watchlist:
-              email: aaaa@bbb.nl
-              password: xxx
-              remove_accepted: yes
-              max_episode_age_days: 7
-              download_premium: no
-            accept_all: yes
-            exec:
-              fail_entries: yes
-              auto_escape: yes
-              on_output:
-                for_accepted:
-                  - download-npo -o "path/to/directory/{{series_name_plain}}" -f "{serie_titel} - {datum} \
-                      {aflevering_titel} ({episode_id})" -t {{url}}
+    For example:
+        npo_watchlist:
+          email: aaaa@bbb.nl
+          password: xxx
+          remove_accepted: yes
+          max_episode_age_days: 7
+          download_premium: no
+        accept_all: yes
+        exec:
+          fail_entries: yes
+          auto_escape: yes
+          on_output:
+            for_accepted:
+              - download-npo -o "path/to/directory/{{series_name_plain}}" -f "{serie_titel} - {datum} \
+                  {aflevering_titel} ({episode_id})" -t {{url}}
         """
 
     schema = {

@@ -14,13 +14,16 @@ log = logging.getLogger('kitsu')
 
 
 class KitsuAnime(object):
-    """Creates an entry for each item in your kitsu.io list.
+    """
+    Creates an entry for each item in your kitsu.io list.
+
     Syntax:
+
     kitsu:
       username: <value>
       lists:
-      	- <current|planned|completed|on_hold|dropped>
-      	- <current|planned|completed|on_hold|dropped>
+        - <current|planned|completed|on_hold|dropped>
+        - <current|planned|completed|on_hold|dropped>
       status: <airing|finished>
       latest: <yes|no>
     """

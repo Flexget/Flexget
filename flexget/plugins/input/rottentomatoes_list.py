@@ -19,21 +19,20 @@ log = logging.getLogger('rottentomatoes_list')
 
 class RottenTomatoesList(object):
     """
-        Emits an entry for each movie in a Rotten Tomatoes list.
+    Emits an entry for each movie in a Rotten Tomatoes list.
 
-        Configuration:
+    Configuration:
 
-        dvds:
-          - top_rentals
-          - upcoming
+    dvds:
+      - top_rentals
+      - upcoming
 
-        movies:
-          - box_office
+    movies:
+      - box_office
 
-        Possible lists are
-          * dvds: top_rentals, current_releases, new_releases, upcoming
-          * movies: box_office, in_theaters, opening, upcoming
-
+    Possible lists are
+      * dvds: top_rentals, current_releases, new_releases, upcoming
+      * movies: box_office, in_theaters, opening, upcoming
     """
 
     schema = {
