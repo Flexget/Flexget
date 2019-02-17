@@ -14,23 +14,20 @@ user_api = api.namespace('user', description='Manage user login credentials')
 class ObjectsContainer(object):
     user_password_input = {
         'type': 'object',
-        'properties': {
-            'password': {'type': 'string'}
-        },
+        'properties': {'password': {'type': 'string'}},
         'required': ['password'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
-    user_token_response = {
-        'type': 'object',
-        'properties': {
-            'token': {'type': 'string'}
-        }
-    }
+    user_token_response = {'type': 'object', 'properties': {'token': {'type': 'string'}}}
 
 
-user_password_input_schema = api.schema_model('user_password_input', ObjectsContainer.user_password_input)
-user_token_response_schema = api.schema_model('user_token_response', ObjectsContainer.user_token_response)
+user_password_input_schema = api.schema_model(
+    'user_password_input', ObjectsContainer.user_password_input
+)
+user_token_response_schema = api.schema_model(
+    'user_token_response', ObjectsContainer.user_token_response
+)
 
 
 @user_api.route('/')
@@ -39,8 +36,10 @@ class UserManagementAPI(APIResource):
     @api.validate(model=user_password_input_schema, description='Password change schema')
     @api.response(BadRequest)
     @api.response(200, 'Success', model=base_message_schema)
-    @api.doc(description='Change user password. A score of at least 3 is needed.'
-                         'See https://github.com/dropbox/zxcvbn for details')
+    @api.doc(
+        description='Change user password. A score of at least 3 is needed.'
+        'See https://github.com/dropbox/zxcvbn for details'
+    )
     def put(self, session=None):
         """ Change user password """
         user = current_user

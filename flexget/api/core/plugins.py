@@ -19,10 +19,7 @@ plugins_api = api.namespace('plugins', description='Get Flexget plugins')
 class ObjectsContainer(object):
     phase_object = {
         'type': 'object',
-        'properties': {
-            'phase': {'type': 'string'},
-            'priority': {'type': 'integer'}
-        }
+        'properties': {'phase': {'type': 'string'}, 'priority': {'type': 'integer'}},
     }
 
     plugin_object = {
@@ -35,24 +32,34 @@ class ObjectsContainer(object):
             'contexts': {'type': 'array', 'items': {'type': 'string'}},
             'debug': {'type': 'boolean'},
             'interfaces': {'type': 'array', 'items': {'type': 'string'}},
-            'phase_handlers': {'type': 'array', 'items': phase_object}
-        }
+            'phase_handlers': {'type': 'array', 'items': phase_object},
+        },
     }
 
     plugin_list_reply = {'type': 'array', 'items': plugin_object}
 
 
 plugin_schema = api.schema_model('plugin_object', ObjectsContainer.plugin_object)
-plugin_list_reply_schema = api.schema_model('plugin_list_reply', ObjectsContainer.plugin_list_reply)
+plugin_list_reply_schema = api.schema_model(
+    'plugin_list_reply', ObjectsContainer.plugin_list_reply
+)
 
 plugin_parser = api.parser()
-plugin_parser.add_argument('include_schema', type=inputs.boolean, default=False,
-                           help='Include plugin schema. This will increase response size')
+plugin_parser.add_argument(
+    'include_schema',
+    type=inputs.boolean,
+    default=False,
+    help='Include plugin schema. This will increase response size',
+)
 
 plugins_parser = api.pagination_parser(plugin_parser)
 
-plugins_parser.add_argument('interface', case_sensitive=False, help='Show plugins which implement this interface')
-plugins_parser.add_argument('phase', case_sensitive=False, help='Show plugins that act on this phase')
+plugins_parser.add_argument(
+    'interface', case_sensitive=False, help='Show plugins which implement this interface'
+)
+plugins_parser.add_argument(
+    'phase', case_sensitive=False, help='Show plugins that act on this phase'
+)
 
 
 def plugin_to_dict(plugin):
@@ -63,8 +70,10 @@ def plugin_to_dict(plugin):
         'category': plugin.category,
         'debug': plugin.debug,
         'interfaces': plugin.interfaces,
-        'phase_handlers': [dict(phase=handler, priority=event.priority) for handler, event in
-                           plugin.phase_handlers.items()]
+        'phase_handlers': [
+            dict(phase=handler, priority=event.priority)
+            for handler, event in plugin.phase_handlers.items()
+        ],
     }
 
 

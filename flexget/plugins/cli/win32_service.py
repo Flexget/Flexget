@@ -34,15 +34,19 @@ try:
         def SvcStop(self):
             self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
             from flexget.manager import manager
+
             manager.shutdown(finish_queue=False)
             self.ReportServiceStatus(win32service.SERVICE_STOPPED)
 
         def SvcDoRun(self):
-            servicemanager.LogMsg(servicemanager.EVENTLOG_INFORMATION_TYPE,
-                                  servicemanager.PYS_SERVICE_STARTED,
-                                  (self._svc_name_, ''))
+            servicemanager.LogMsg(
+                servicemanager.EVENTLOG_INFORMATION_TYPE,
+                servicemanager.PYS_SERVICE_STARTED,
+                (self._svc_name_, ''),
+            )
 
             flexget.main(['daemon', 'start'])
+
 
 except ImportError:
     pass
@@ -56,8 +60,10 @@ def do_cli(manager, options):
         # We are in a virtualenv, there is some special setup
         if not os.path.exists(os.path.join(sys.prefix, 'python.exe')):
             console('Creating a hard link to virtualenv python.exe in root of virtualenv')
-            win32file.CreateHardLink(os.path.join(sys.prefix, 'python.exe'),
-                                     os.path.join(sys.prefix, 'Scripts', 'python.exe'))
+            win32file.CreateHardLink(
+                os.path.join(sys.prefix, 'python.exe'),
+                os.path.join(sys.prefix, 'Scripts', 'python.exe'),
+            )
 
     argv = options.args
     if options.help:
@@ -73,7 +79,10 @@ def register_parser_arguments():
     if not sys.platform.startswith('win'):
         return
     # Still not fully working. Hidden for now.
-    parser = options.register_command('service', do_cli,  # help='set up or control a windows service for the daemon',
-                                      add_help=False)
+    parser = options.register_command(
+        'service',
+        do_cli,  # help='set up or control a windows service for the daemon',
+        add_help=False,
+    )
     parser.add_argument('--help', '-h', action='store_true')
     parser.add_argument('args', nargs=argparse.REMAINDER)

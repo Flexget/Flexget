@@ -18,7 +18,14 @@ from flexget.logger import capture_output
 from flexget.manager import Session
 from flexget.plugin import plugins as all_plugins
 from flexget.plugin import (
-    DependencyError, get_plugins, phase_methods, plugin_schemas, PluginError, PluginWarning, task_phases)
+    DependencyError,
+    get_plugins,
+    phase_methods,
+    plugin_schemas,
+    PluginError,
+    PluginWarning,
+    task_phases,
+)
 from flexget.utils import requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimpleTaskPersistence
@@ -64,6 +71,7 @@ def use_task_logging(func):
     def wrapper(self, *args, **kw):
         # Set the task name in the logger and capture output
         from flexget import logger
+
         with logger.task_logging(self.name):
             if self.output:
                 with capture_output(self.output, loglevel=self.loglevel):
@@ -186,8 +194,17 @@ class Task(object):
     RERUN_DEFAULT = 5
     RERUN_MAX = 100
 
-    def __init__(self, manager, name, config=None, options=None, output=None, loglevel=None, priority=None,
-                 suppress_warnings=None):
+    def __init__(
+        self,
+        manager,
+        name,
+        config=None,
+        options=None,
+        output=None,
+        loglevel=None,
+        priority=None,
+        suppress_warnings=None,
+    ):
         """
         :param Manager manager: Manager instance.
         :param string name: Name of the task.
@@ -409,7 +426,9 @@ class Task(object):
           An iterator over configured :class:`flexget.plugin.PluginInfo` instances enabled on this task.
         """
         if phase:
-            plugins = sorted(get_plugins(phase=phase), key=lambda p: p.phase_handlers[phase], reverse=True)
+            plugins = sorted(
+                get_plugins(phase=phase), key=lambda p: p.phase_handlers[phase], reverse=True
+            )
         else:
             plugins = iter(all_plugins.values())
         return (p for p in plugins if p.name in self.config or p.builtin)
@@ -436,10 +455,15 @@ class Task(object):
                 else:
                     if phase not in self.suppress_warnings:
                         if phase == 'filter':
-                            log.warning('Task does not have any filter plugins to accept entries. '
-                                        'You need at least one to accept the entries you  want.')
+                            log.warning(
+                                'Task does not have any filter plugins to accept entries. '
+                                'You need at least one to accept the entries you  want.'
+                            )
                         else:
-                            log.warning('Task doesn\'t have any %s plugins, you should add (at least) one!' % phase)
+                            log.warning(
+                                'Task doesn\'t have any %s plugins, you should add (at least) one!'
+                                % phase
+                            )
 
         for plugin in self.plugins(phase):
             # Abort this phase if one of the plugins disables it
@@ -502,20 +526,26 @@ class Task(object):
             # check if this warning should be logged only once (may keep repeating)
             if warn.kwargs.get('log_once', False):
                 from flexget.utils.log import log_once
+
                 log_once(warn.value, warn.log)
             else:
                 warn.log.warning(warn)
         except EntryUnicodeError as eue:
-            msg = ('Plugin %s tried to create non-unicode compatible entry (key: %s, value: %r)' %
-                   (keyword, eue.key, eue.value))
+            msg = 'Plugin %s tried to create non-unicode compatible entry (key: %s, value: %r)' % (
+                keyword,
+                eue.key,
+                eue.value,
+            )
             log.critical(msg)
             self.abort(msg)
         except PluginError as err:
             err.log.critical(err.value)
             self.abort(err.value)
         except DependencyError as e:
-            msg = ('Plugin `%s` cannot be used because dependency `%s` is missing.' %
-                   (keyword, e.missing))
+            msg = 'Plugin `%s` cannot be used because dependency `%s` is missing.' % (
+                keyword,
+                e.missing,
+            )
             log.critical(e.message)
             self.abort(msg)
         except Warning as e:
@@ -538,7 +568,8 @@ class Task(object):
         :param str reason: Why the rerun is done
         """
         msg = 'Plugin {0} has requested task to be ran again after execution has completed.'.format(
-            self.current_plugin if plugin is None else plugin)
+            self.current_plugin if plugin is None else plugin
+        )
         if reason:
             msg += ' Reason: {0}'.format(reason)
         # Only print the first request for a rerun to the info log
@@ -574,7 +605,9 @@ class Task(object):
             else:
                 log.error('BUG: No prepared_config on rerun, please report.')
         with Session() as session:
-            last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
+            last_hash = (
+                session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
+            )
             if not last_hash:
                 session.add(TaskConfigHash(task=self.name, hash=config_hash))
                 self.config_changed()
@@ -610,8 +643,12 @@ class Task(object):
                     if phase not in self.suppress_warnings:
                         for plugin in self.plugins(phase):
                             if plugin.name in self.config:
-                                log.info('Plugin %s is not executed in %s phase because the phase is disabled ' \
-                                         '(e.g. --test, --inject)', plugin.name, phase)
+                                log.info(
+                                    'Plugin %s is not executed in %s phase because the phase is disabled '
+                                    '(e.g. --test, --inject)',
+                                    plugin.name,
+                                    phase,
+                                )
                     continue
                 if phase in ('start', 'prepare') and self.is_rerun:
                     log.debug('skipping phase %s during rerun', phase)
@@ -655,7 +692,11 @@ class Task(object):
             while True:
                 self._execute()
                 # rerun task
-                if self._rerun and self._rerun_count < self.max_reruns and self._rerun_count < Task.RERUN_MAX:
+                if (
+                    self._rerun
+                    and self._rerun_count < self.max_reruns
+                    and self._rerun_count < Task.RERUN_MAX
+                ):
                     log.info('Rerunning the task in case better resolution can be achieved.')
                     self._rerun_count += 1
                     # TODO: Potential optimization is to take snapshots (maybe make the ones backlog uses built in
@@ -664,7 +705,10 @@ class Task(object):
                     self._rerun = False
                     continue
                 elif self._rerun:
-                    log.info('Task has been re-run %s times already, stopping for now' % self._rerun_count)
+                    log.info(
+                        'Task has been re-run %s times already, stopping for now'
+                        % self._rerun_count
+                    )
                 break
             fire_event('task.execute.completed', self)
         finally:
@@ -699,7 +743,9 @@ class Task(object):
         """
         if not isinstance(template, (str, FlexGetTemplate)):
             raise ValueError(
-                'Trying to render non string template or unrecognized template format, got %s' % repr(template))
+                'Trying to render non string template or unrecognized template format, got %s'
+                % repr(template)
+            )
         log.trace('rendering: %s', template)
         return render_from_task(template, self)
 
@@ -708,7 +754,7 @@ class Task(object):
 def register_config_key():
     task_config_schema = {
         'type': 'object',
-        'additionalProperties': plugin_schemas(interface='task')
+        'additionalProperties': plugin_schemas(interface='task'),
     }
 
     config_schema.register_config_key('tasks', task_config_schema, required=True)

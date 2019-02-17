@@ -38,7 +38,9 @@ def cached_resource(url, base_dir, force=False, max_size=250, directory='cached_
         size = dir_size(directory) / (1024 * 1024.0)
         if not force:
             while size >= max_size:
-                log.debug('directory %s size is over the allowed limit of %s, trimming', size, max_size)
+                log.debug(
+                    'directory %s size is over the allowed limit of %s, trimming', size, max_size
+                )
                 trim_dir(directory)
                 size = dir_size(directory) / (1024 * 1024.0)
 

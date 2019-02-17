@@ -86,15 +86,26 @@ class TestParseFilesize(object):
 
 
 class TestSplitYearTitle(object):
-    @pytest.mark.parametrize('title, expected_title, expected_year', [
-        ('The Matrix', 'The Matrix', None),
-        ('The Matrix 1999', 'The Matrix', 1999),
-        ('The Matrix (1999)', 'The Matrix', 1999),
-        ('The Matrix - 1999', 'The Matrix -', 1999),
-        ('The.Matrix.1999', 'The.Matrix.', 1999),
-        ('The Human Centipede III (Final Sequence)', 'The Human Centipede III (Final Sequence)', None),
-        ('The Human Centipede III (Final Sequence) (2015)', 'The Human Centipede III (Final Sequence)', 2015),
-        ('2020', '2020', None)
-    ])
+    @pytest.mark.parametrize(
+        'title, expected_title, expected_year',
+        [
+            ('The Matrix', 'The Matrix', None),
+            ('The Matrix 1999', 'The Matrix', 1999),
+            ('The Matrix (1999)', 'The Matrix', 1999),
+            ('The Matrix - 1999', 'The Matrix -', 1999),
+            ('The.Matrix.1999', 'The.Matrix.', 1999),
+            (
+                'The Human Centipede III (Final Sequence)',
+                'The Human Centipede III (Final Sequence)',
+                None,
+            ),
+            (
+                'The Human Centipede III (Final Sequence) (2015)',
+                'The Human Centipede III (Final Sequence)',
+                2015,
+            ),
+            ('2020', '2020', None),
+        ],
+    )
     def test_split_year_title(self, title, expected_title, expected_year):
         assert split_title_year(title) == (expected_title, expected_year)

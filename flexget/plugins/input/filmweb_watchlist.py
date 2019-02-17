@@ -37,8 +37,8 @@ class FilmwebWatchlist(object):
             'min_star': {
                 'type': 'integer',
                 'default': 0,
-                'description': 'Items will be processed with at least this level of "How much I want to see"'
-            }
+                'description': 'Items will be processed with at least this level of "How much I want to see"',
+            },
         },
         'additionalProperties': False,
         'required': ['login', 'password'],
@@ -47,12 +47,15 @@ class FilmwebWatchlist(object):
     def on_task_start(self, task, config):
         """Raise a DependencyError if our dependencies aren't available"""
         try:
-            from filmweb.filmweb import Filmweb as FilmwebAPI # noqa
+            from filmweb.filmweb import Filmweb as FilmwebAPI  # noqa
         except ImportError as e:
             log.debug('Error importing pyfilmweb: %s' % e)
-            raise plugin.DependencyError('filmweb_watchlist', 'pyfilmweb',
-                                         'pyfilmweb==0.1.1.1 module required. ImportError: %s' % e,
-                                         log)
+            raise plugin.DependencyError(
+                'filmweb_watchlist',
+                'pyfilmweb',
+                'pyfilmweb==0.1.1.1 module required. ImportError: %s' % e,
+                log,
+            )
 
     @cached('filmweb_watchlist', persist='2 hours')
     def on_task_input(self, task, config):

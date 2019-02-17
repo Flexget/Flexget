@@ -103,11 +103,15 @@ class TestRegexp(object):
         assert task.find_entry('accepted', title='regexp1'), 'regexp1 should have been accepted'
         assert task.find_entry('accepted', title='regexp2'), 'regexp2 should have been accepted'
         assert task.find_entry('accepted', title='regexp3'), 'regexp3 should have been accepted'
-        assert task.find_entry('entries', title='regexp4') not in task.accepted, 'regexp4 should have been left'
-        assert task.find_entry('accepted', title='regexp2',
-                               path='~'), 'regexp2 should have been accepter with custom path'
-        assert task.find_entry('accepted', title='regexp3',
-                               path='~'), 'regexp3 should have been accepter with custom path'
+        assert (
+            task.find_entry('entries', title='regexp4') not in task.accepted
+        ), 'regexp4 should have been left'
+        assert task.find_entry(
+            'accepted', title='regexp2', path='~'
+        ), 'regexp2 should have been accepter with custom path'
+        assert task.find_entry(
+            'accepted', title='regexp3', path='~'
+        ), 'regexp3 should have been accepter with custom path'
         assert task.find_entry('accepted', title='regexp5'), 'regexp5 should have been accepted'
 
     def test_reject(self, execute_task):
@@ -121,7 +125,9 @@ class TestRegexp(object):
 
     def test_excluding(self, execute_task):
         task = execute_task('test_excluding')
-        assert not task.find_entry('accepted', title='regexp1'), 'regexp1 should not have been accepted'
+        assert not task.find_entry(
+            'accepted', title='regexp1'
+        ), 'regexp1 should not have been accepted'
         assert task.find_entry('accepted', title='regexp2'), 'regexp2 should have been accepted'
         assert task.find_entry('accepted', title='regexp3'), 'regexp3 should have been accepted'
 
@@ -131,16 +137,30 @@ class TestRegexp(object):
 
     def test_multiple_excluding(self, execute_task):
         task = execute_task('test_multiple_excluding')
-        assert task.find_entry('rejected', title='regexp2'), '\'regexp2\' should have been rejected'
-        assert task.find_entry('rejected', title='regexp7'), '\'regexp7\' should have been rejected'
-        assert task.find_entry('accepted', title='regexp5'), '\'regexp5\' should have been accepted'
+        assert task.find_entry(
+            'rejected', title='regexp2'
+        ), '\'regexp2\' should have been rejected'
+        assert task.find_entry(
+            'rejected', title='regexp7'
+        ), '\'regexp7\' should have been rejected'
+        assert task.find_entry(
+            'accepted', title='regexp5'
+        ), '\'regexp5\' should have been accepted'
 
     def test_complicated(self, execute_task):
         task = execute_task('test_complicated')
-        assert task.find_entry('accepted', title='regular'), '\'regular\' should have been accepted'
-        assert task.find_entry('accepted', title='expression'), '\'expression\' should have been accepted'
-        assert task.find_entry('accepted', title='regexp9'), '\'regexp9\' should have been accepted'
-        assert task.find_entry('rejected', title='regexp5'), '\'regexp5\' should have been rejected'
+        assert task.find_entry(
+            'accepted', title='regular'
+        ), '\'regular\' should have been accepted'
+        assert task.find_entry(
+            'accepted', title='expression'
+        ), '\'expression\' should have been accepted'
+        assert task.find_entry(
+            'accepted', title='regexp9'
+        ), '\'regexp9\' should have been accepted'
+        assert task.find_entry(
+            'rejected', title='regexp5'
+        ), '\'regexp5\' should have been rejected'
 
     def test_numeric(self, execute_task):
         task = execute_task('test_numeric')
@@ -151,6 +171,9 @@ class TestRegexp(object):
 
     def test_match_in_list(self, execute_task):
         task = execute_task('test_match_in_list')
-        assert task.find_entry('accepted', title='expression'), '\'expression\' should have been accepted'
-        assert task.find_entry('entries',
-                               title='regular') not in task.accepted, '\'regular\' should not have been accepted'
+        assert task.find_entry(
+            'accepted', title='expression'
+        ), '\'expression\' should have been accepted'
+        assert (
+            task.find_entry('entries', title='regular') not in task.accepted
+        ), '\'regular\' should not have been accepted'

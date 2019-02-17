@@ -28,11 +28,9 @@ class FilterArchives(object):
             {'type': 'boolean'},
             {
                 'type': 'object',
-                'properties': {
-                    'unrar_tool': {'type': 'string'},
-                },
-                'additionalProperties': False
-            }
+                'properties': {'unrar_tool': {'type': 'string'}},
+                'additionalProperties': False,
+            },
         ]
     }
 

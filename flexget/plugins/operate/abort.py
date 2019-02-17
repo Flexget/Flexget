@@ -13,6 +13,7 @@ class AbortPlugin(object):
 
         abort: yes
     """
+
     def on_task_output(self, task, config):
         task.abort('abort plugin')
 

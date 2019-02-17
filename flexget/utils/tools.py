@@ -37,11 +37,15 @@ def str_to_int(string):
 
 
 if PY2:
+
     def native_str_to_text(string, **kwargs):
         if 'encoding' not in kwargs:
             kwargs['encoding'] = 'ascii'
         return string.decode(**kwargs)
+
+
 else:
+
     def native_str_to_text(string, **kwargs):
         return string
 
@@ -78,6 +82,7 @@ class MergeException(Exception):
 def strip_html(text):
     """Tries to strip all HTML tags from *text*. If unsuccessful returns original text."""
     from bs4 import BeautifulSoup
+
     try:
         text = ' '.join(BeautifulSoup(text).find_all(text=True))
         return ' '.join(text.split())
@@ -96,6 +101,7 @@ def _htmldecode(text):
     if isinstance(text, str):
         uchr = chr
     else:
+
         def uchr(value):
             value > 127 and chr(value) or chr(value)
 
@@ -161,14 +167,19 @@ def merge_dict_from_to(d1, d2):
                 elif isinstance(v, (str, bool, int, float, type(None))):
                     pass
                 else:
-                    raise Exception('Unknown type: %s value: %s in dictionary' % (type(v), repr(v)))
-            elif (isinstance(v, (str, bool, int, float, type(None))) and
-                      isinstance(d2[k], (str, bool, int, float, type(None)))):
+                    raise Exception(
+                        'Unknown type: %s value: %s in dictionary' % (type(v), repr(v))
+                    )
+            elif isinstance(v, (str, bool, int, float, type(None))) and isinstance(
+                d2[k], (str, bool, int, float, type(None))
+            ):
                 # Allow overriding of non-container types with other non-container types
                 pass
             else:
-                raise MergeException('Merging key %s failed, conflicting datatypes %r vs. %r.' % (
-                    k, type(v).__name__, type(d2[k]).__name__))
+                raise MergeException(
+                    'Merging key %s failed, conflicting datatypes %r vs. %r.'
+                    % (k, type(v).__name__, type(d2[k]).__name__)
+                )
         else:
             d2[k] = copy.deepcopy(v)
 
@@ -271,9 +282,11 @@ def multiply_timedelta(interval, number):
 
 
 if os.name == 'posix':
+
     def pid_exists(pid):
         """Check whether pid exists in the current process table."""
         import errno
+
         if pid < 0:
             return False
         try:
@@ -282,10 +295,14 @@ if os.name == 'posix':
             return e.errno == errno.EPERM
         else:
             return True
+
+
 else:
+
     def pid_exists(pid):
         import ctypes
         import ctypes.wintypes
+
         kernel32 = ctypes.windll.kernel32
         PROCESS_QUERY_INFORMATION = 0x0400
         STILL_ACTIVE = 259
@@ -304,12 +321,13 @@ else:
         # process is still running.
         return is_running or exit_code.value == STILL_ACTIVE
 
+
 _binOps = {
     ast.Add: operator.add,
     ast.Sub: operator.sub,
     ast.Mult: operator.mul,
     ast.Div: operator.truediv,
-    ast.Mod: operator.mod
+    ast.Mod: operator.mod,
 }
 
 
@@ -378,11 +396,14 @@ class TimedDict(MutableMapping):
 
     def __repr__(self):
         return '%s(%r)' % (
-            self.__class__.__name__, dict(list(zip(self._store, (v[1] for v in list(self._store.values()))))))
+            self.__class__.__name__,
+            dict(list(zip(self._store, (v[1] for v in list(self._store.values()))))),
+        )
 
 
 class BufferQueue(queue.Queue):
     """Used in place of a file-like object to capture text and access it safely from another thread."""
+
     # Allow access to the Empty error from here
     Empty = queue.Empty
 
@@ -451,7 +472,9 @@ def parse_filesize(text_size, si=True):
     """
     prefix_order = {'': 0, 'k': 1, 'm': 2, 'g': 3, 't': 4, 'p': 5}
 
-    parsed_size = re.match('(\d+(?:[.,\s]\d+)*)(?:\s*)((?:[ptgmk]i?)?b)', text_size.strip().lower(), flags=re.UNICODE)
+    parsed_size = re.match(
+        '(\d+(?:[.,\s]\d+)*)(?:\s*)((?:[ptgmk]i?)?b)', text_size.strip().lower(), flags=re.UNICODE
+    )
     if not parsed_size:
         raise ValueError('%s does not look like a file size' % text_size)
     amount = parsed_size.group(1)
@@ -578,11 +601,15 @@ def aggregate_inputs(task, inputs):
                     continue
 
                 if entry['title'] in entry_titles:
-                    log.debug('Ignored duplicate title `%s`', entry['title'])  # TODO: should combine?
+                    log.debug(
+                        'Ignored duplicate title `%s`', entry['title']
+                    )  # TODO: should combine?
                     continue
 
                 if entry.get('location') and entry['location'] in entry_locations:
-                    log.debug('Ignored duplicate location `%s`', entry['location'])  # TODO: should combine?
+                    log.debug(
+                        'Ignored duplicate location `%s`', entry['location']
+                    )  # TODO: should combine?
                     continue
 
                 entries.append(entry)
@@ -599,4 +626,4 @@ def aggregate_inputs(task, inputs):
 def chunked(seq, limit=900):
     """Helper to divide our expired lists into sizes sqlite can handle in a query. (<1000)"""
     for i in range(0, len(seq), limit):
-        yield seq[i:i + limit]
+        yield seq[i : i + limit]

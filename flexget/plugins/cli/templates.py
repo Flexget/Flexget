@@ -30,7 +30,9 @@ def list_file_templates(manager, options):
             table_data.append([name, plugin, template.filename, contents.read()])
 
     try:
-        table = TerminalTable(options.table_type, table_data, wrap_columns=[2, 3], drop_columns=[2, 3])
+        table = TerminalTable(
+            options.table_type, table_data, wrap_columns=[2, 3], drop_columns=[2, 3]
+        )
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))
     else:
@@ -39,6 +41,10 @@ def list_file_templates(manager, options):
 
 @event('options.register')
 def register_parser_arguments():
-    parser = options.register_command('templates', list_file_templates, help='View all available templates',
-                                      parents=[table_parser])
+    parser = options.register_command(
+        'templates',
+        list_file_templates,
+        help='View all available templates',
+        parents=[table_parser],
+    )
     parser.add_argument('--name', help='Filter results by template name')

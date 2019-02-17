@@ -308,7 +308,9 @@ class ParserGuessit(object):
                     valid = False
         # Check the full list of 'episode_details' for special,
         # since things like 'pilot' and 'unaired' can also show up there
-        special = any(v.lower() == 'special' for v in guess_result.values_list.get('episode_details', []))
+        special = any(
+            v.lower() == 'special' for v in guess_result.values_list.get('episode_details', [])
+        )
         if 'episode' not in guess_result.values_list:
             episodes = len(guess_result.values_list.get('part', []))
         else:

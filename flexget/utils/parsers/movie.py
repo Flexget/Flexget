@@ -22,7 +22,6 @@ def diff_pos(string1, string2):
 
 
 class MovieParser(TitleParser):
-
     def __init__(self):
         self.data = None
         self.reset()
@@ -79,7 +78,7 @@ class MovieParser(TitleParser):
                     if self.year_pos == cut_part:
                         # Looks like a year, but we already set the cutpoint to a year, let's move it forward
                         cut_part = part_pos
-                        
+
                     self.year = num
                     self.year_pos = part_pos
                     cut = True
@@ -108,7 +107,9 @@ class MovieParser(TitleParser):
         # calculate cut positon from cut_part
         abs_cut = len(' '.join(parts[:cut_part]))
 
-        log.debug('after parts check, cut data would be: `%s` abs_cut: %i', data[:abs_cut], abs_cut)
+        log.debug(
+            'after parts check, cut data would be: `%s` abs_cut: %i', data[:abs_cut], abs_cut
+        )
 
         # parse quality
         quality = qualities.Quality(data)

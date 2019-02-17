@@ -66,16 +66,10 @@ class BetaSeriesList(object):
             'username': {'type': 'string'},
             'password': {'type': 'string'},
             'api_key': {'type': 'string'},
-            'members': {
-                'type': 'array',
-                'items': {
-                    "title": 'member name',
-                    "type": "string"
-                }
-            }
+            'members': {'type': 'array', 'items': {"title": 'member name', "type": "string"}},
         },
         'required': ['username', 'password', 'api_key'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     @cached('betaseries_list', persist='2 hours')
@@ -112,14 +106,15 @@ def create_token(api_key, login, password):
     :param string password: Password
     :return: User token
     """
-    r = requests.post(API_URL_PREFIX + 'members/auth', params={
-        'login': login,
-        'password': md5(password.encode('utf-8')).hexdigest()
-    }, headers={
-        'Accept': 'application/json',
-        'X-BetaSeries-Version': '2.1',
-        'X-BetaSeries-Key': api_key,
-    })
+    r = requests.post(
+        API_URL_PREFIX + 'members/auth',
+        params={'login': login, 'password': md5(password.encode('utf-8')).hexdigest()},
+        headers={
+            'Accept': 'application/json',
+            'X-BetaSeries-Version': '2.1',
+            'X-BetaSeries-Key': api_key,
+        },
+    )
     assert r.status_code == 200, "Bad HTTP status code: %s" % r.status_code
     j = r.json()
     error_list = j['errors']
@@ -138,14 +133,16 @@ def query_member_id(api_key, user_token, login_name):
     :param string login_name: The login name of the member
     :return: Id of the member identified by its login name or `None` if not found
     """
-    r = requests.get(API_URL_PREFIX + 'members/search', params={
-        'login': login_name
-    }, headers={
-        'Accept': 'application/json',
-        'X-BetaSeries-Version': '2.1',
-        'X-BetaSeries-Key': api_key,
-        'X-BetaSeries-Token': user_token,
-    })
+    r = requests.get(
+        API_URL_PREFIX + 'members/search',
+        params={'login': login_name},
+        headers={
+            'Accept': 'application/json',
+            'X-BetaSeries-Version': '2.1',
+            'X-BetaSeries-Key': api_key,
+            'X-BetaSeries-Token': user_token,
+        },
+    )
     assert r.status_code == 200, "Bad HTTP status code: %s" % r.status_code
     j = r.json()
     error_list = j['errors']
@@ -178,12 +175,16 @@ def query_series(api_key, user_token, member_name=None):
         else:
             log.error("member %r not found" % member_name)
             return []
-    r = requests.get(API_URL_PREFIX + 'members/infos', params=params, headers={
-        'Accept': 'application/json',
-        'X-BetaSeries-Version': '2.1',
-        'X-BetaSeries-Key': api_key,
-        'X-BetaSeries-Token': user_token,
-    })
+    r = requests.get(
+        API_URL_PREFIX + 'members/infos',
+        params=params,
+        headers={
+            'Accept': 'application/json',
+            'X-BetaSeries-Version': '2.1',
+            'X-BetaSeries-Key': api_key,
+            'X-BetaSeries-Token': user_token,
+        },
+    )
     assert r.status_code == 200, "Bad HTTP status code: %s" % r.status_code
     j = r.json()
     error_list = j['errors']

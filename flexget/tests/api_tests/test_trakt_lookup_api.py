@@ -34,7 +34,7 @@ class TestTraktSeriesLookupAPI(object):
             'tmdb_id': 4087,
             'tvdb_id': 77398,
             'tvrage_id': 6312,
-            'year': 1993
+            'year': 1993,
         }
 
         for field, value in values.items():
@@ -49,7 +49,7 @@ class TestTraktSeriesLookupAPI(object):
             'tmdb_id': 236,
             'tvdb_id': 78650,
             'tvrage_id': 5781,
-            'year': 1990
+            'year': 1990,
         }
 
         rsp = api_client.get('/trakt/series/the flash/?year=1990')
@@ -63,12 +63,7 @@ class TestTraktSeriesLookupAPI(object):
             assert data.get(field) == value
 
     def test_trakt_series_lookup_with_trakt_slug_id_param(self, api_client, schema_match):
-        values = {
-            'id': 75481,
-            'title': 'The Flash',
-            'tvdb_id': 272094,
-            'year': 1967
-        }
+        values = {'id': 75481, 'title': 'The Flash', 'tvdb_id': 272094, 'year': 1967}
 
         rsp = api_client.get('/trakt/series/the flash/?trakt_slug=the-flash-1967')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -89,7 +84,7 @@ class TestTraktSeriesLookupAPI(object):
             'tmdb_id': 60735,
             'tvdb_id': 279121,
             'tvrage_id': 36939,
-            'year': 2014
+            'year': 2014,
         }
 
         rsp = api_client.get('/trakt/series/the flash/?tmdb_id=60735')
@@ -110,7 +105,7 @@ class TestTraktSeriesLookupAPI(object):
             'tmdb_id': 60735,
             'tvdb_id': 279121,
             'tvrage_id': 36939,
-            'year': 2014
+            'year': 2014,
         }
 
         rsp = api_client.get('/trakt/series/the flash/?imdb_id=tt3107288')
@@ -128,7 +123,7 @@ class TestTraktSeriesLookupAPI(object):
             'tmdb_id': 60735,
             'tvdb_id': 279121,
             'tvrage_id': 36939,
-            'year': 2014
+            'year': 2014,
         }
 
         rsp = api_client.get('/trakt/series/the flash/?tvdb_id=279121')
@@ -149,7 +144,7 @@ class TestTraktSeriesLookupAPI(object):
             'tmdb_id': 60735,
             'tvdb_id': 279121,
             'tvrage_id': 36939,
-            'year': 2014
+            'year': 2014,
         }
 
         rsp = api_client.get('/trakt/series/the flash/?tvrage_id=36939')
@@ -163,11 +158,7 @@ class TestTraktSeriesLookupAPI(object):
             assert data.get(field) == value
 
     def test_trakt_series_lookup_with_trakt_id_param(self, api_client, schema_match):
-        values = {
-            'id': 75481,
-            'title': 'The Flash',
-            'year': 1967
-        }
+        values = {'id': 75481, 'title': 'The Flash', 'year': 1967}
 
         rsp = api_client.get('/trakt/series/the flash/?trakt_id=75481')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -230,7 +221,7 @@ class TestTraktMovieLookupAPI(object):
             'title': 'The Matrix',
             'year': 1999,
             'tmdb_id': 603,
-            'imdb_id': 'tt0133093'
+            'imdb_id': 'tt0133093',
         }
         for field, value in values.items():
             assert data.get(field) == value
@@ -248,7 +239,7 @@ class TestTraktMovieLookupAPI(object):
             'title': 'The Matrix Revolutions',
             'year': 2003,
             'tmdb_id': 605,
-            'imdb_id': 'tt0242653'
+            'imdb_id': 'tt0242653',
         }
         for field, value in values.items():
             assert data.get(field) == value
@@ -266,7 +257,7 @@ class TestTraktMovieLookupAPI(object):
             'title': 'The Matrix Reloaded',
             'year': 2003,
             'tmdb_id': 604,
-            'imdb_id': 'tt0234215'
+            'imdb_id': 'tt0234215',
         }
         for field, value in values.items():
             assert data.get(field) == value
@@ -284,7 +275,7 @@ class TestTraktMovieLookupAPI(object):
             'title': 'The Matrix',
             'year': 1999,
             'tmdb_id': 603,
-            'imdb_id': 'tt0133093'
+            'imdb_id': 'tt0133093',
         }
         for field, value in values.items():
             assert data.get(field) == value
@@ -305,7 +296,7 @@ class TestTraktMovieLookupAPI(object):
             'title': 'The Matrix',
             'year': 1999,
             'tmdb_id': 603,
-            'imdb_id': 'tt0133093'
+            'imdb_id': 'tt0133093',
         }
         for field, value in values.items():
             assert data.get(field) == value

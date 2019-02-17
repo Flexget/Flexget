@@ -68,10 +68,10 @@ class PluginExec(object):
                     'fail_entries': {'type': 'boolean'},
                     'auto_escape': {'type': 'boolean'},
                     'encoding': {'type': 'string'},
-                    'allow_background': {'type': 'boolean'}
+                    'allow_background': {'type': 'boolean'},
                 },
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ],
         'definitions': {
             'phaseSettings': {
@@ -82,11 +82,11 @@ class PluginExec(object):
                     'for_accepted': one_or_more({'type': 'string'}),
                     'for_rejected': one_or_more({'type': 'string'}),
                     'for_undecided': one_or_more({'type': 'string'}),
-                    'for_failed': one_or_more({'type': 'string'})
+                    'for_failed': one_or_more({'type': 'string'}),
                 },
-                'additionalProperties': False
+                'additionalProperties': False,
             }
-        }
+        },
     }
 
     def prepare_config(self, config):
@@ -106,8 +106,14 @@ class PluginExec(object):
 
     def execute_cmd(self, cmd, allow_background, encoding):
         log.verbose('Executing: %s', cmd)
-        p = subprocess.Popen(text_to_native_str(cmd, encoding=io_encoding), shell=True, stdin=subprocess.PIPE,
-                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=False)
+        p = subprocess.Popen(
+            text_to_native_str(cmd, encoding=io_encoding),
+            shell=True,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            close_fds=False,
+        )
         if not allow_background:
             r, w = (p.stdout, p.stdin)
             response = r.read().decode(io_encoding)
@@ -123,16 +129,23 @@ class PluginExec(object):
             log.debug('phase %s not configured' % phase_name)
             return
 
-        name_map = {'for_entries': task.entries, 'for_accepted': task.accepted,
-                    'for_rejected': task.rejected, 'for_undecided': task.undecided,
-                    'for_failed': task.failed}
+        name_map = {
+            'for_entries': task.entries,
+            'for_accepted': task.accepted,
+            'for_rejected': task.rejected,
+            'for_undecided': task.undecided,
+            'for_failed': task.failed,
+        }
 
         allow_background = config.get('allow_background')
         for operation, entries in name_map.items():
             if operation not in config[phase_name]:
                 continue
 
-            log.debug('running phase_name: %s operation: %s entries: %s' % (phase_name, operation, len(entries)))
+            log.debug(
+                'running phase_name: %s operation: %s entries: %s'
+                % (phase_name, operation, len(entries))
+            )
 
             for entry in entries:
                 for cmd in config[phase_name][operation]:
@@ -144,11 +157,15 @@ class PluginExec(object):
                         log.error('Could not set exec command for %s: %s' % (entry['title'], e))
                         # fail the entry if configured to do so
                         if config.get('fail_entries'):
-                            entry.fail('Entry `%s` does not have required fields for string replacement.' %
-                                       entry['title'])
+                            entry.fail(
+                                'Entry `%s` does not have required fields for string replacement.'
+                                % entry['title']
+                            )
                         continue
 
-                    log.debug('phase_name: %s operation: %s cmd: %s' % (phase_name, operation, cmd))
+                    log.debug(
+                        'phase_name: %s operation: %s cmd: %s' % (phase_name, operation, cmd)
+                    )
                     if task.options.test:
                         log.info('Would execute: %s' % cmd)
                     else:
@@ -157,13 +174,19 @@ class PluginExec(object):
                         try:
                             cmd.encode(config['encoding'])
                         except UnicodeEncodeError:
-                            log.error('Unable to encode cmd `%s` to %s' % (cmd, config['encoding']))
+                            log.error(
+                                'Unable to encode cmd `%s` to %s' % (cmd, config['encoding'])
+                            )
                             if config.get('fail_entries'):
-                                entry.fail('cmd `%s` could not be encoded to %s.' % (cmd, config['encoding']))
+                                entry.fail(
+                                    'cmd `%s` could not be encoded to %s.'
+                                    % (cmd, config['encoding'])
+                                )
                             continue
                         # Run the command, fail entries with non-zero return code if configured to
-                        if (self.execute_cmd(cmd, allow_background, config['encoding']) != 0 and
-                                config.get('fail_entries')):
+                        if self.execute_cmd(
+                            cmd, allow_background, config['encoding']
+                        ) != 0 and config.get('fail_entries'):
                             entry.fail('exec return code was non-zero')
 
         # phase keyword in this

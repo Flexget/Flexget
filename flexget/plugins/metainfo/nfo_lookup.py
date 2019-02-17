@@ -11,9 +11,7 @@ try:
     # NOTE: Importing other plugins is discouraged!
     from flexget.components.imdb.utils import is_valid_imdb_title_id
 except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='imdb',
-    )
+    raise plugin.DependencyError(issued_by=__name__, missing='imdb')
 
 from flexget.event import event
 
@@ -40,6 +38,7 @@ class NfoLookup(object):
 
     Use this only with nfo files you have created yourself.
     """
+
     schema = {'type': 'boolean'}
     nfo_file_extension = '.nfo'
 
@@ -66,7 +65,11 @@ class NfoLookup(object):
                 # This will be None if there is no nfo file
                 nfo_filename = self.get_nfo_filename(entry)
                 if nfo_filename is None:
-                    log.warning("Entry %s has no corresponding %s file", entry.get('title'), self.nfo_file_extension)
+                    log.warning(
+                        "Entry %s has no corresponding %s file",
+                        entry.get('title'),
+                        self.nfo_file_extension,
+                    )
                     continue
 
             # Populate the fields from the information in the .nfo file Note that at this point `nfo_filename` has the
@@ -76,7 +79,10 @@ class NfoLookup(object):
     def lookup(self, entry, nfo_filename):
         # If there is already data from a previous parse then we don't need to do anything
         if entry.get('nfo_id') is not None:
-            log.warning("Entry %s was already parsed by nfo_lookup and it will be skipped. ", entry.get('title'))
+            log.warning(
+                "Entry %s was already parsed by nfo_lookup and it will be skipped. ",
+                entry.get('title'),
+            )
             return
 
         # nfo_filename Should not be None at this point
@@ -99,7 +105,10 @@ class NfoLookup(object):
             if is_valid_imdb_title_id(entry.get('nfo_id', '')):
                 entry.update({'imdb_id': fields['nfo_id']})
             else:
-                log.warning("ID found in nfo file for entry '%s', but it was not a valid IMDB ID", entry.get('title'))
+                log.warning(
+                    "ID found in nfo file for entry '%s', but it was not a valid IMDB ID",
+                    entry.get('title'),
+                )
 
     def get_nfo_filename(self, entry):
         """
@@ -121,6 +130,7 @@ class BadXmlFile(Exception):
     """
     Exception that is raised if the nfo file can't be parsed due to some invalid nfo file.
     """
+
     pass
 
 
@@ -132,6 +142,7 @@ class NfoReader(object):
     fields can appear multiple times (with different values), such as 'thumb', 'genre', etc. These fields are listed in
     the `_fields` attribute.
     """
+
     def __init__(self, filename):
         try:
             tree = ET.parse(filename)
@@ -151,24 +162,26 @@ class NfoReader(object):
         #
         # In the future we could extend the nfo_lookup plugin to accept 'set' in its configuration to add new entries to
         # this dictionary to handle other tags in the nfo file and add the data to the entry.
-        self._fields = {"title": (False, NfoReader._single_elem_getter_func),
-                        "originaltitle": (False, NfoReader._single_elem_getter_func),
-                        "sorttitle": (False, NfoReader._single_elem_getter_func),
-                        "rating": (False, NfoReader._single_elem_getter_func),
-                        "year": (False, NfoReader._single_elem_getter_func),
-                        "votes": (False, NfoReader._single_elem_getter_func),
-                        "plot": (False, NfoReader._single_elem_getter_func),
-                        "runtime": (False, NfoReader._single_elem_getter_func),
-                        "id": (False, NfoReader._single_elem_getter_func),
-                        "filenameandpath": (False, NfoReader._single_elem_getter_func),
-                        "trailer": (False, NfoReader._single_elem_getter_func),
-                        "thumb": (True, NfoReader._single_elem_getter_func),
-                        "genre": (True, NfoReader._single_elem_getter_func),
-                        "director": (True, NfoReader._single_elem_getter_func),
-                        # Actor field has child elements, such as 'name' and 'role'
-                        "actor": (True, NfoReader._composite_elem_getter_func),
-                        "studio": (True, NfoReader._single_elem_getter_func),
-                        "country": (True, NfoReader._single_elem_getter_func)}
+        self._fields = {
+            "title": (False, NfoReader._single_elem_getter_func),
+            "originaltitle": (False, NfoReader._single_elem_getter_func),
+            "sorttitle": (False, NfoReader._single_elem_getter_func),
+            "rating": (False, NfoReader._single_elem_getter_func),
+            "year": (False, NfoReader._single_elem_getter_func),
+            "votes": (False, NfoReader._single_elem_getter_func),
+            "plot": (False, NfoReader._single_elem_getter_func),
+            "runtime": (False, NfoReader._single_elem_getter_func),
+            "id": (False, NfoReader._single_elem_getter_func),
+            "filenameandpath": (False, NfoReader._single_elem_getter_func),
+            "trailer": (False, NfoReader._single_elem_getter_func),
+            "thumb": (True, NfoReader._single_elem_getter_func),
+            "genre": (True, NfoReader._single_elem_getter_func),
+            "director": (True, NfoReader._single_elem_getter_func),
+            # Actor field has child elements, such as 'name' and 'role'
+            "actor": (True, NfoReader._composite_elem_getter_func),
+            "studio": (True, NfoReader._single_elem_getter_func),
+            "country": (True, NfoReader._single_elem_getter_func),
+        }
 
     @staticmethod
     def _single_elem_getter_func(x):

@@ -64,5 +64,10 @@ def key_value_pair(text):
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('--cli-config', nargs='+', type=key_value_pair, metavar='VARIABLE=VALUE',
-                                               help='configuration parameters through commandline')
+    options.get_parser('execute').add_argument(
+        '--cli-config',
+        nargs='+',
+        type=key_value_pair,
+        metavar='VARIABLE=VALUE',
+        help='configuration parameters through commandline',
+    )

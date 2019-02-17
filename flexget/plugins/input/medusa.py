@@ -1,4 +1,3 @@
-
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import urlparse
@@ -24,9 +23,8 @@ class Medusa(object):
             'include_ended': {'type': 'boolean', 'default': False},
         },
         'required': ['username', 'password', 'base_url'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
-
 
     def on_task_input(self, task, config):
         """
@@ -68,45 +66,34 @@ class Medusa(object):
         """
         parsed_url = urlparse(config.get('base_url'))
         base_url = '{scheme}://{url}:{port}/api/v2'.format(
-            scheme=parsed_url.scheme,
-            url=parsed_url.netloc,
-            port=config.get('port'),
+            scheme=parsed_url.scheme, url=parsed_url.netloc, port=config.get('port')
         )
 
-        body_auth = dict(
-            username=config.get('username'),
-            password=config.get('password'),
-        )
+        body_auth = dict(username=config.get('username'), password=config.get('password'))
 
-        api_key = task.requests.post(
-            '{}/authenticate'.format(base_url),
-            json=body_auth,
-        ).json()['token']
+        api_key = task.requests.post('{}/authenticate'.format(base_url), json=body_auth).json()[
+            'token'
+        ]
 
-        headers = {
-            'authorization': 'Bearer ' + api_key
-        }
+        headers = {'authorization': 'Bearer ' + api_key}
 
-        params = {
-            'limit': 1000
-        }
+        params = {'limit': 1000}
 
         series = task.requests.get(
-            '{}/series'.format(base_url),
-            params=params,
-            headers=headers
+            '{}/series'.format(base_url), params=params, headers=headers
         ).json()
 
         entries = []
         for show in series:
             log.debug('processing show: %s', show)
-            if (show['config']['paused'] and config.get('only_monitored')) or \
-                    show['status'] == 'Ended' and not config.get('include_ended'):
+            if (
+                (show['config']['paused'] and config.get('only_monitored'))
+                or show['status'] == 'Ended'
+                and not config.get('include_ended')
+            ):
                 log.debug('discarted show: %s', show)
 
-            entry = Entry(title=show['title'],
-                          url='',
-                          series_name=show['title'])
+            entry = Entry(title=show['title'], url='', series_name=show['title'])
 
             if entry.isvalid():
                 entries.append(entry)
@@ -119,4 +106,3 @@ class Medusa(object):
 @event('plugin.register')
 def register_plugin():
     plugin.register(Medusa, 'medusa', api_ver=2)
-

@@ -70,8 +70,9 @@ def extract_info(info, archive, to, keep_dirs):
     except archiveutil.FileAlreadyExists as error:
         log.warn('File already exists: %s' % destination)
     except archiveutil.ArchiveError as error:
-        log.error('Failed to extract file: %s in %s (%s)' % (info.filename,
-                                                                   entry['location'], error))
+        log.error(
+            'Failed to extract file: %s in %s (%s)' % (info.filename, entry['location'], error)
+        )
 
 
 def get_destination_path(info, to, keep_dirs):
@@ -139,10 +140,10 @@ class Decompress(object):
                     'mask': {'type': 'string'},
                     'regexp': {'type': 'string', 'format': 'regex'},
                     'unrar_tool': {'type': 'string'},
-                    'delete_archive': {'type': 'boolean'}
+                    'delete_archive': {'type': 'boolean'},
                 },
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ]
     }
 

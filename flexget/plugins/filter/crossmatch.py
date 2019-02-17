@@ -32,11 +32,10 @@ class CrossMatch(object):
             'action': {'enum': ['accept', 'reject']},
             'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}},
             'exact': {'type': 'boolean', 'default': True},
-            'all_fields': {'type': 'boolean', 'default': False}
-
+            'all_fields': {'type': 'boolean', 'default': False},
         },
         'required': ['fields', 'action', 'from'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def on_task_filter(self, task, config):
@@ -53,7 +52,10 @@ class CrossMatch(object):
                 log.trace('checking if %s matches %s', entry['title'], generated_entry['title'])
                 common = self.entry_intersects(entry, generated_entry, fields, config.get('exact'))
                 if common and (not all_fields or len(common) == len(fields)):
-                    msg = 'intersects with %s on field(s) %s' % (generated_entry['title'], ', '.join(common))
+                    msg = 'intersects with %s on field(s) %s' % (
+                        generated_entry['title'],
+                        ', '.join(common),
+                    )
                     for key in generated_entry:
                         if key not in entry:
                             entry[key] = generated_entry[key]

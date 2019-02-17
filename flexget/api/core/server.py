@@ -18,7 +18,17 @@ import yaml
 from flask import Response, jsonify, request
 from flexget.utils.tools import get_latest_flexget_version_number
 from pyparsing import (
-    Word, Keyword, Group, Forward, Suppress, OneOrMore, oneOf, White, restOfLine, ParseException, Combine
+    Word,
+    Keyword,
+    Group,
+    Forward,
+    Suppress,
+    OneOrMore,
+    oneOf,
+    White,
+    restOfLine,
+    ParseException,
+    Combine,
 )
 from pyparsing import nums, alphanums, printables
 from yaml.error import YAMLError
@@ -26,8 +36,14 @@ from yaml.error import YAMLError
 from flexget._version import __version__
 from flexget.api import api, APIResource
 from flexget.api.app import (
-    __version__ as __api_version__, APIError, BadRequest, base_message, success_response, base_message_schema,
-    empty_response, etag
+    __version__ as __api_version__,
+    APIError,
+    BadRequest,
+    base_message,
+    success_response,
+    base_message_schema,
+    empty_response,
+    etag,
 )
 
 log = logging.getLogger('api.server')
@@ -45,27 +61,17 @@ class ObjectsContainer(object):
     config_validation_error['properties']['error'] = {'type': 'string'}
     config_validation_error['properties']['config_path'] = {'type': 'string'}
 
-    pid_object = {
-        'type': 'object',
-        'properties': {
-            'pid': {'type': 'integer'}
-        }
-    }
+    pid_object = {'type': 'object', 'properties': {'pid': {'type': 'integer'}}}
 
-    raw_config_object = {
-        'type': 'object',
-        'properties': {
-            'raw_config': {'type': 'string'}
-        }
-    }
+    raw_config_object = {'type': 'object', 'properties': {'raw_config': {'type': 'string'}}}
 
     version_object = {
         'type': 'object',
         'properties': {
             'flexget_version': {'type': 'string'},
             'api_version': {'type': 'string'},
-            'latest_version': {'type': ['string', 'null']}
-        }
+            'latest_version': {'type': ['string', 'null']},
+        },
     }
 
     dump_threads_object = {
@@ -78,39 +84,39 @@ class ObjectsContainer(object):
                     'properties': {
                         'name': {'type': 'string'},
                         'id': {'type': 'string'},
-                        'dump': {
-                            'type': 'array',
-                            'items': {'type': 'string'}
-                        }
+                        'dump': {'type': 'array', 'items': {'type': 'string'}},
                     },
                 },
             }
-        }
+        },
     }
 
     server_manage = {
         'type': 'object',
         'properties': {
             'operation': {'type': 'string', 'enum': ['reload', 'shutdown']},
-            'force': {'type': 'boolean'}
+            'force': {'type': 'boolean'},
         },
         'required': ['operation'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     crash_logs = {
-        'type': 'array', 'items': {
+        'type': 'array',
+        'items': {
             'type': 'object',
             'properties': {
                 'name': {'type': 'string'},
-                'content': {'type': 'array', 'items': {'type': 'string'}}
-            }
-        }
+                'content': {'type': 'array', 'items': {'type': 'string'}},
+            },
+        },
     }
 
 
 yaml_error_schema = api.schema_model('yaml_error_schema', ObjectsContainer.yaml_error_response)
-config_validation_schema = api.schema_model('config_validation_schema', ObjectsContainer.config_validation_error)
+config_validation_schema = api.schema_model(
+    'config_validation_schema', ObjectsContainer.config_validation_error
+)
 pid_schema = api.schema_model('server.pid', ObjectsContainer.pid_object)
 raw_config_schema = api.schema_model('raw_config', ObjectsContainer.raw_config_object)
 version_schema = api.schema_model('server.version', ObjectsContainer.version_object)
@@ -132,20 +138,27 @@ class ServerReloadAPI(APIResource):
             try:
                 self.manager.load_config(output_to_console=False)
             except YAMLError as e:
-                if hasattr(e, 'problem') and hasattr(e, 'context_mark') and hasattr(e, 'problem_mark'):
+                if (
+                    hasattr(e, 'problem')
+                    and hasattr(e, 'context_mark')
+                    and hasattr(e, 'problem_mark')
+                ):
                     error = {}
                     if e.problem is not None:
                         error.update({'reason': e.problem})
                     if e.context_mark is not None:
-                        error.update({'line': e.context_mark.line, 'column': e.context_mark.column})
+                        error.update(
+                            {'line': e.context_mark.line, 'column': e.context_mark.column}
+                        )
                     if e.problem_mark is not None:
-                        error.update({'line': e.problem_mark.line, 'column': e.problem_mark.column})
+                        error.update(
+                            {'line': e.problem_mark.line, 'column': e.problem_mark.column}
+                        )
                     raise APIError(message='Invalid YAML syntax', payload=error)
             except ValueError as e:
                 errors = []
                 for er in e.errors:
-                    errors.append({'error': er.message,
-                                   'config_path': er.json_pointer})
+                    errors.append({'error': er.message, 'config_path': er.json_pointer})
                 raise APIError('Error loading config: %s' % e.args[0], payload={'errors': errors})
             response = 'Config successfully reloaded from disk'
         else:
@@ -175,7 +188,9 @@ class ServerConfigAPI(APIResource):
 class ServerRawConfigAPI(APIResource):
     @etag
     @api.doc(description='Return config file encoded in Base64')
-    @api.response(200, model=raw_config_schema, description='Flexget raw YAML config file encoded in Base64')
+    @api.response(
+        200, model=raw_config_schema, description='Flexget raw YAML config file encoded in Base64'
+    )
     def get(self, session=None):
         """ Get raw YAML config file """
         with open(self.manager.config_path, 'r', encoding='utf-8') as f:
@@ -186,8 +201,10 @@ class ServerRawConfigAPI(APIResource):
     @api.response(200, model=base_message_schema, description='Successfully updated config')
     @api.response(BadRequest)
     @api.response(APIError)
-    @api.doc(description='Config file must be base64 encoded. A backup will be created, and if successful config will'
-                         ' be loaded and saved to original file.')
+    @api.doc(
+        description='Config file must be base64 encoded. A backup will be created, and if successful config will'
+        ' be loaded and saved to original file.'
+    )
     def post(self, session=None):
         """ Update config """
         data = request.json
@@ -214,35 +231,46 @@ class ServerRawConfigAPI(APIResource):
         except ValueError as e:
             errors = []
             for er in e.errors:
-                errors.append({'error': er.message,
-                               'config_path': er.json_pointer})
-            raise BadRequest(message='Error loading config: %s' % e.args[0], payload={'errors': errors})
+                errors.append({'error': er.message, 'config_path': er.json_pointer})
+            raise BadRequest(
+                message='Error loading config: %s' % e.args[0], payload={'errors': errors}
+            )
 
         try:
             self.manager.backup_config()
         except Exception as e:
-            raise APIError(message='Failed to create config backup, config updated but NOT written to file',
-                           payload={'reason': str(e)})
+            raise APIError(
+                message='Failed to create config backup, config updated but NOT written to file',
+                payload={'reason': str(e)},
+            )
 
         try:
             with open(self.manager.config_path, 'w', encoding='utf-8') as f:
                 f.write(raw_config.decode('utf-8').replace('\r\n', '\n'))
         except Exception as e:
-            raise APIError(message='Failed to write new config to file, please load from backup',
-                           payload={'reason': str(e), 'backup_path': backup_path})
+            raise APIError(
+                message='Failed to write new config to file, please load from backup',
+                payload={'reason': str(e), 'backup_path': backup_path},
+            )
         return success_response('Config was loaded and successfully updated to file')
 
 
 @server_api.route('/version/')
-@api.doc(description='In case of a request error when fetching latest flexget version, that value will return as null')
+@api.doc(
+    description='In case of a request error when fetching latest flexget version, that value will return as null'
+)
 class ServerVersionAPI(APIResource):
     @api.response(200, description='Flexget version', model=version_schema)
     def get(self, session=None):
         """ Flexget Version """
         latest = get_latest_flexget_version_number()
-        return jsonify({'flexget_version': __version__,
-                        'api_version': __api_version__,
-                        'latest_version': latest})
+        return jsonify(
+            {
+                'flexget_version': __version__,
+                'api_version': __api_version__,
+                'latest_version': latest,
+            }
+        )
 
 
 @server_api.route('/dump_threads/', doc=False)
@@ -258,17 +286,15 @@ class ServerDumpThreads(APIResource):
                 dump.append('File: "%s", line %d, in %s' % (filename, lineno, name))
                 if line:
                     dump.append(line.strip())
-            threads.append({
-                'name': id2name.get(threadId),
-                'id': threadId,
-                'dump': dump
-            })
+            threads.append({'name': id2name.get(threadId), 'id': threadId, 'dump': dump})
 
         return jsonify(threads=threads)
 
 
 server_log_parser = api.parser()
-server_log_parser.add_argument('lines', type=int, default=200, help='How many lines to find before streaming')
+server_log_parser.add_argument(
+    'lines', type=int, default=200, help='How many lines to find before streaming'
+)
 server_log_parser.add_argument('search', help='Search filter support google like syntax')
 
 
@@ -334,13 +360,17 @@ class ServerLogAPI(APIResource):
             if os.path.isabs(self.manager.options.logfile):
                 base_log_file = self.manager.options.logfile
             else:
-                base_log_file = os.path.join(self.manager.config_base, self.manager.options.logfile)
+                base_log_file = os.path.join(
+                    self.manager.config_base, self.manager.options.logfile
+                )
 
             yield '{"stream": ['  # Start of the json stream
 
             # Read back in the logs until we find enough lines
             for i in range(0, 9):
-                log_file = ('%s.%s' % (base_log_file, i)).rstrip('.0')  # 1st log file has no number
+                log_file = ('%s.%s' % (base_log_file, i)).rstrip(
+                    '.0'
+                )  # 1st log file has no number
 
                 if not os.path.isfile(log_file):
                     break
@@ -430,51 +460,67 @@ class LogParser(object):
             operator_word = Group(Word(alphanums)).setResultsName('word')
 
             operator_quotes_content = Forward()
-            operator_quotes_content << (
-                    (operator_word + operator_quotes_content) | operator_word
+            operator_quotes_content << ((operator_word + operator_quotes_content) | operator_word)
+
+            operator_quotes = (
+                Group(Suppress('"') + operator_quotes_content + Suppress('"')).setResultsName(
+                    'quotes'
+                )
+                | operator_word
             )
 
-            operator_quotes = Group(
-                Suppress('"') + operator_quotes_content + Suppress('"')
-            ).setResultsName('quotes') | operator_word
-
-            operator_parenthesis = Group(
-                (Suppress('(') + operator_or + Suppress(")"))
-            ).setResultsName('parenthesis') | operator_quotes
+            operator_parenthesis = (
+                Group((Suppress('(') + operator_or + Suppress(")"))).setResultsName('parenthesis')
+                | operator_quotes
+            )
 
             operator_not = Forward()
-            operator_not << (Group(
-                Suppress(Keyword('no', caseless=True)) + operator_not
-            ).setResultsName('not') | operator_parenthesis)
+            operator_not << (
+                Group(Suppress(Keyword('no', caseless=True)) + operator_not).setResultsName('not')
+                | operator_parenthesis
+            )
 
             operator_and = Forward()
-            operator_and << (Group(
-                operator_not + Suppress(Keyword('and', caseless=True)) + operator_and
-            ).setResultsName('and') | Group(
-                operator_not + OneOrMore(~oneOf('and or') + operator_and)
-            ).setResultsName('and') | operator_not)
+            operator_and << (
+                Group(
+                    operator_not + Suppress(Keyword('and', caseless=True)) + operator_and
+                ).setResultsName('and')
+                | Group(operator_not + OneOrMore(~oneOf('and or') + operator_and)).setResultsName(
+                    'and'
+                )
+                | operator_not
+            )
 
-            operator_or << (Group(
-                operator_and + Suppress(Keyword('or', caseless=True)) + operator_or
-            ).setResultsName('or') | operator_and)
+            operator_or << (
+                Group(
+                    operator_and + Suppress(Keyword('or', caseless=True)) + operator_or
+                ).setResultsName('or')
+                | operator_and
+            )
 
             self._query_parser = operator_or.parseString(self.query)[0]
         else:
             self._query_parser = False
 
         time_cmpnt = Word(nums).setParseAction(lambda t: t[0].zfill(2))
-        date = Combine((time_cmpnt + '-' + time_cmpnt + '-' + time_cmpnt) + ' ' + time_cmpnt + ':' + time_cmpnt)
+        date = Combine(
+            (time_cmpnt + '-' + time_cmpnt + '-' + time_cmpnt)
+            + ' '
+            + time_cmpnt
+            + ':'
+            + time_cmpnt
+        )
         word = Word(printables)
 
         self._log_parser = (
-                date.setResultsName('timestamp') +
-                word.setResultsName('log_level') +
-                word.setResultsName('plugin') +
-                (
-                        White(min=16).setParseAction(lambda s, l, t: [t[0].strip()]).setResultsName('task') |
-                        (White(min=1).suppress() & word.setResultsName('task'))
-                ) +
-                restOfLine.setResultsName('message')
+            date.setResultsName('timestamp')
+            + word.setResultsName('log_level')
+            + word.setResultsName('plugin')
+            + (
+                White(min=16).setParseAction(lambda s, l, t: [t[0].strip()]).setResultsName('task')
+                | (White(min=1).suppress() & word.setResultsName('task'))
+            )
+            + restOfLine.setResultsName('message')
         )
 
     def evaluate_and(self, argument):
@@ -523,6 +569,8 @@ class ServerCrashLogAPI(APIResource):
     def get(self, session):
         """Get Crash logs"""
         path = Path(self.manager.config_base)
-        crashes = [{'name': file.name, 'content': file.open().readlines()} for file in
-                   path.listdir(match='crash_report*.log')]
+        crashes = [
+            {'name': file.name, 'content': file.open().readlines()}
+            for file in path.listdir(match='crash_report*.log')
+        ]
         return jsonify(crashes)

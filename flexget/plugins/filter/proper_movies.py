@@ -32,13 +32,21 @@ class ProperMovie(Base):
         self.added = datetime.now()
 
     def __repr__(self):
-        return '<ProperMovie(title=%s,task=%s,imdb_id=%s,quality=%s,proper_count=%s,added=%s)>' % \
-               (self.title, self.task, self.imdb_id, self.quality, self.proper_count, self.added)
+        return '<ProperMovie(title=%s,task=%s,imdb_id=%s,quality=%s,proper_count=%s,added=%s)>' % (
+            self.title,
+            self.task,
+            self.imdb_id,
+            self.quality,
+            self.proper_count,
+            self.added,
+        )
 
 
 # create index
 columns = Base.metadata.tables['proper_movies'].c
-Index('proper_movies_imdb_id_quality_proper', columns.imdb_id, columns.quality, columns.proper_count)
+Index(
+    'proper_movies_imdb_id_quality_proper', columns.imdb_id, columns.quality, columns.proper_count
+)
 
 
 class FilterProperMovies(object):
@@ -56,12 +64,7 @@ class FilterProperMovies(object):
         Value no will disable plugin.
     """
 
-    schema = {
-        'oneOf': [
-            {'type': 'boolean'},
-            {'type': 'string', 'format': 'interval'}
-        ]
-    }
+    schema = {'oneOf': [{'type': 'boolean'}, {'type': 'string', 'format': 'interval'}]}
 
     def on_task_filter(self, task, config):
         log.debug('check for enforcing')
@@ -92,9 +95,9 @@ class FilterProperMovies(object):
                 try:
                     # TODO: fix imdb_id_lookup, cumbersome that it returns None and or throws exception
                     # Also it's crappy name!
-                    imdb_id = imdb_lookup.imdb_id_lookup(movie_title=parser.name,
-                                                         movie_year=parser.year,
-                                                         raw_title=entry['title'])
+                    imdb_id = imdb_lookup.imdb_id_lookup(
+                        movie_title=parser.name, movie_year=parser.year, raw_title=entry['title']
+                    )
                     if imdb_id is None:
                         continue
                     entry['imdb_id'] = imdb_id
@@ -108,10 +111,13 @@ class FilterProperMovies(object):
             log.debug('imdb_id: %s' % entry['imdb_id'])
             log.debug('current proper count: %s' % parser.proper_count)
 
-            proper_movie = task.session.query(ProperMovie). \
-                filter(ProperMovie.imdb_id == entry['imdb_id']). \
-                filter(ProperMovie.quality == quality). \
-                order_by(desc(ProperMovie.proper_count)).first()
+            proper_movie = (
+                task.session.query(ProperMovie)
+                .filter(ProperMovie.imdb_id == entry['imdb_id'])
+                .filter(ProperMovie.quality == quality)
+                .order_by(desc(ProperMovie.proper_count))
+                .first()
+            )
 
             if not proper_movie:
                 log.debug('no previous download recorded for %s' % entry['imdb_id'])
@@ -137,7 +143,9 @@ class FilterProperMovies(object):
                         log.verbose('Proper `%s` has past it\'s expiration time' % entry['title'])
 
             if accept_proper:
-                log.info('Accepting proper version previously downloaded movie `%s`' % entry['title'])
+                log.info(
+                    'Accepting proper version previously downloaded movie `%s`' % entry['title']
+                )
                 # TODO: does this need to be called?
                 # fire_event('forget', entry['imdb_url'])
                 fire_event('forget', entry['imdb_id'])
@@ -159,10 +167,13 @@ class FilterProperMovies(object):
             log.debug('imdb_id: %s' % entry['imdb_id'])
             log.debug('proper count: %s' % parser.proper_count)
 
-            proper_movie = task.session.query(ProperMovie). \
-                filter(ProperMovie.imdb_id == entry['imdb_id']). \
-                filter(ProperMovie.quality == quality). \
-                filter(ProperMovie.proper_count == parser.proper_count).first()
+            proper_movie = (
+                task.session.query(ProperMovie)
+                .filter(ProperMovie.imdb_id == entry['imdb_id'])
+                .filter(ProperMovie.quality == quality)
+                .filter(ProperMovie.proper_count == parser.proper_count)
+                .first()
+            )
 
             if not proper_movie:
                 pm = ProperMovie()

@@ -30,9 +30,9 @@ class Subtitles(object):
             'languages': {'type': 'array', 'items': {'type': 'string'}, 'default': ['eng']},
             'min_sub_rating': {'type': 'number', 'default': 0.0},
             'match_limit': {'type': 'number', 'default': 0.8},
-            'output': {'type': 'string', 'format': 'path'}
+            'output': {'type': 'string', 'format': 'path'},
         },
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def prepare_config(self, config, task):
@@ -69,7 +69,9 @@ class Subtitles(object):
         # configuration
         languages = config['languages']
         min_sub_rating = config['min_sub_rating']
-        match_limit = config['match_limit']  # no need to change this, but it should be configurable
+        match_limit = config[
+            'match_limit'
+        ]  # no need to change this, but it should be configurable
 
         # loop through the entries
         for entry in entries:
@@ -92,8 +94,11 @@ class Subtitles(object):
             # filter bad subs
             subtitles = [x for x in subtitles if x['SubBad'] == '0']
             # some quality required (0.0 == not reviewed)
-            subtitles = [x for x in subtitles if
-                         float(x['SubRating']) >= min_sub_rating or float(x['SubRating']) == 0.0]
+            subtitles = [
+                x
+                for x in subtitles
+                if float(x['SubRating']) >= min_sub_rating or float(x['SubRating']) == 0.0
+            ]
 
             filtered_subs = []
 
@@ -120,11 +125,15 @@ class Subtitles(object):
 
             # download
             for sub in filtered_subs:
-                log.debug('SUBS FOUND: %s %s %s' %
-                          (sub['MovieReleaseName'], sub['SubRating'], sub['SubLanguageID']))
+                log.debug(
+                    'SUBS FOUND: %s %s %s'
+                    % (sub['MovieReleaseName'], sub['SubRating'], sub['SubLanguageID'])
+                )
 
                 f = task.requests.get(sub['ZipDownloadLink'])
-                subfilename = re.match('^attachment; filename="(.*)"$', f.headers['content-disposition']).group(1)
+                subfilename = re.match(
+                    '^attachment; filename="(.*)"$', f.headers['content-disposition']
+                ).group(1)
                 outfile = os.path.join(config['output'], subfilename)
                 fp = open(outfile, 'w')
                 fp.write(f.raw)

@@ -57,7 +57,9 @@ class PluginInclude(object):
             try:
                 task.merge_config(include)
             except MergeException:
-                raise plugin.PluginError('Failed to merge include file to task %s, incompatible datatypes' % task.name)
+                raise plugin.PluginError(
+                    'Failed to merge include file to task %s, incompatible datatypes' % task.name
+                )
 
 
 @event('plugin.register')

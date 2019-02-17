@@ -31,7 +31,11 @@ class DiscoverEntry(Base):
         self.last_execution = None
 
     def __str__(self):
-        return '<DiscoverEntry(title=%s,task=%s,added=%s)>' % (self.title, self.task, self.last_execution)
+        return '<DiscoverEntry(title=%s,task=%s,added=%s)>' % (
+            self.title,
+            self.task,
+            self.last_execution,
+        )
 
 
 Index('ix_discover_entry_title_task', DiscoverEntry.title, DiscoverEntry.task)
@@ -40,7 +44,9 @@ Index('ix_discover_entry_title_task', DiscoverEntry.title, DiscoverEntry.task)
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
     value = datetime.datetime.now() - parse_timedelta('7 days')
-    for discover_entry in session.query(DiscoverEntry).filter(DiscoverEntry.last_execution <= value).all():
+    for discover_entry in (
+        session.query(DiscoverEntry).filter(DiscoverEntry.last_execution <= value).all()
+    ):
         log.debug('deleting %s', discover_entry)
         session.delete(discover_entry)
 
@@ -63,29 +69,39 @@ class Discover(object):
     schema = {
         'type': 'object',
         'properties': {
-            'what': {'type': 'array', 'items': {
-                'allOf': [{'$ref': '/schema/plugins?phase=input'}, {'maxProperties': 1, 'minProperties': 1}]
-            }},
-            'from': {'type': 'array', 'items': {
-                'allOf': [{'$ref': '/schema/plugins?interface=search'}, {'maxProperties': 1, 'minProperties': 1}]
-            }},
+            'what': {
+                'type': 'array',
+                'items': {
+                    'allOf': [
+                        {'$ref': '/schema/plugins?phase=input'},
+                        {'maxProperties': 1, 'minProperties': 1},
+                    ]
+                },
+            },
+            'from': {
+                'type': 'array',
+                'items': {
+                    'allOf': [
+                        {'$ref': '/schema/plugins?interface=search'},
+                        {'maxProperties': 1, 'minProperties': 1},
+                    ]
+                },
+            },
             'interval': {'type': 'string', 'format': 'interval', 'default': '5 hours'},
             'release_estimations': {
                 'oneOf': [
                     {'type': 'string', 'default': 'strict', 'enum': ['loose', 'strict', 'ignore']},
                     {
                         'type': 'object',
-                        'properties': {
-                            'optimistic': {'type': 'string', 'format': 'interval'}
-                        },
-                        'required': ['optimistic']
-                    }
+                        'properties': {'optimistic': {'type': 'string', 'format': 'interval'}},
+                        'required': ['optimistic'],
+                    },
                 ]
             },
-            'limit': {'type': 'integer', 'minimum': 1}
+            'limit': {'type': 'integer', 'minimum': 1},
         },
         'required': ['what', 'from'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def execute_searches(self, config, entries, task):
@@ -108,8 +124,13 @@ class Discover(object):
                 if not callable(getattr(search, 'search')):
                     log.critical('Search plugin %s does not implement search method', plugin_name)
                     continue
-                log.verbose('Searching for `%s` with plugin `%s` (%i of %i)', entry['title'], plugin_name, index + 1,
-                            len(entries))
+                log.verbose(
+                    'Searching for `%s` with plugin `%s` (%i of %i)',
+                    entry['title'],
+                    plugin_name,
+                    index + 1,
+                    len(entries),
+                )
                 try:
                     search_results = search.search(task=task, entry=entry, config=plugin_config)
                     if not search_results:
@@ -117,12 +138,14 @@ class Discover(object):
                         continue
                     log.debug('Discovered %s entries from %s', len(search_results), plugin_name)
                     if config.get('limit'):
-                        search_results = search_results[:config['limit']]
+                        search_results = search_results[: config['limit']]
                     for e in search_results:
                         e['discovered_from'] = entry['title']
                         e['discovered_with'] = plugin_name
                         # 'search_results' can be any iterable, make sure it's a list.
-                        e.on_complete(self.entry_complete, query=entry, search_results=list(search_results))
+                        e.on_complete(
+                            self.entry_complete, query=entry, search_results=list(search_results)
+                        )
 
                     entry_results.extend(search_results)
 
@@ -172,9 +195,16 @@ class Discover(object):
             if datetime.datetime.now() >= est_date:
                 log.debug('%s has been released at %s', entry['title'], est_date)
                 result.append(entry)
-            elif datetime.datetime.now() >= est_date - parse_timedelta(estimation_mode['optimistic']):
-                log.debug('%s will be released at %s. Ignoring release estimation because estimated release date is '
-                          'in less than %s', entry['title'], est_date, estimation_mode['optimistic'])
+            elif datetime.datetime.now() >= est_date - parse_timedelta(
+                estimation_mode['optimistic']
+            ):
+                log.debug(
+                    '%s will be released at %s. Ignoring release estimation because estimated release date is '
+                    'in less than %s',
+                    entry['title'],
+                    est_date,
+                    estimation_mode['optimistic'],
+                )
                 result.append(entry)
             else:
                 entry.reject('has not been released')
@@ -197,22 +227,31 @@ class Discover(object):
         interval_count = 0
         with Session() as session:
             for entry in entries:
-                discover_entry = session.query(DiscoverEntry). \
-                    filter(DiscoverEntry.title == entry['title']). \
-                    filter(DiscoverEntry.task == task.name).first()
+                discover_entry = (
+                    session.query(DiscoverEntry)
+                    .filter(DiscoverEntry.title == entry['title'])
+                    .filter(DiscoverEntry.task == task.name)
+                    .first()
+                )
 
                 if not discover_entry:
                     log.debug('%s -> No previous run recorded', entry['title'])
                     discover_entry = DiscoverEntry(entry['title'], task.name)
                     session.add(discover_entry)
-                if (not task.is_rerun and task.options.discover_now) or not discover_entry.last_execution:
+                if (
+                    not task.is_rerun and task.options.discover_now
+                ) or not discover_entry.last_execution:
                     # First time we execute (and on --discover-now) we randomize time to avoid clumping
                     delta = multiply_timedelta(interval, random.random())
                     discover_entry.last_execution = datetime.datetime.now() - delta
                 else:
                     next_time = discover_entry.last_execution + interval
-                    log.debug('last_time: %r, interval: %s, next_time: %r, ',
-                              discover_entry.last_execution, config['interval'], next_time)
+                    log.debug(
+                        'last_time: %r, interval: %s, next_time: %r, ',
+                        discover_entry.last_execution,
+                        config['interval'],
+                        next_time,
+                    )
                     if datetime.datetime.now() < next_time:
                         log.debug('interval not met')
                         interval_count += 1
@@ -223,8 +262,11 @@ class Discover(object):
                 log.trace('interval passed for %s', entry['title'])
                 result.append(entry)
         if interval_count and not task.is_rerun:
-            log.verbose('Discover interval of %s not met for %s entries. Use --discover-now to override.',
-                        config['interval'], interval_count)
+            log.verbose(
+                'Discover interval of %s not met for %s entries. Use --discover-now to override.',
+                config['interval'],
+                interval_count,
+            )
         return result
 
     def on_task_input(self, task, config):
@@ -239,8 +281,10 @@ class Discover(object):
         entries = aggregate_inputs(task, config['what'])
         log.verbose('Discovering %i titles ...', len(entries))
         if len(entries) > 500:
-            log.critical('Looks like your inputs in discover configuration produced '
-                         'over 500 entries, please reduce the amount!')
+            log.critical(
+                'Looks like your inputs in discover configuration produced '
+                'over 500 entries, please reduce the amount!'
+            )
         # TODO: the entries that are estimated should be given priority over expiration
         entries = self.interval_expired(config, task, entries)
         estimation_mode = config['release_estimations']
@@ -256,5 +300,10 @@ def register_plugin():
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('--discover-now', action='store_true', dest='discover_now',
-                                               default=False, help='Immediately try to discover everything')
+    options.get_parser('execute').add_argument(
+        '--discover-now',
+        action='store_true',
+        dest='discover_now',
+        default=False,
+        help='Immediately try to discover everything',
+    )

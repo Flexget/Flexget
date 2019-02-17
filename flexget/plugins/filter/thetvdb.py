@@ -103,10 +103,10 @@ class FilterTvdb(object):
             'accept_directors': {'type': 'array', 'items': {'type': 'string'}},
             'reject_directors': {'type': 'array', 'items': {'type': 'string'}},
         },
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
-    def is_in_set(self, config, configkey, entryitem, ):
+    def is_in_set(self, config, configkey, entryitem):
         '''
         this takes the config object, config key (to a list), and entry
         item so it can return True if the object matches,
@@ -144,18 +144,34 @@ class FilterTvdb(object):
             reasons = []
             if 'min_series_rating' in config:
                 if entry['tvdb_rating'] < config['min_series_rating']:
-                    reasons.append('series_rating (%s < %s)' % (entry['tvdb_rating'], config['min_series_rating']))
+                    reasons.append(
+                        'series_rating (%s < %s)'
+                        % (entry['tvdb_rating'], config['min_series_rating'])
+                    )
             if 'min_episode_rating' in config:
                 if entry['tvdb_ep_rating'] < config['min_episode_rating']:
-                    reasons.append('tvdb_ep_rating (%s < %s)' % (entry['tvdb_ep_rating'], config['min_episode_rating']))
+                    reasons.append(
+                        'tvdb_ep_rating (%s < %s)'
+                        % (entry['tvdb_ep_rating'], config['min_episode_rating'])
+                    )
             if 'min_episode_air_year' in config:
                 if entry['tvdb_ep_air_date'].strftime("%Y") < config['min_episode_air_year']:
-                    reasons.append('tvdb_ep_air_date (%s < %s)' % (entry['tvdb_ep_air_date'].strftime("%Y"),
-                                                                   config['min_episode_air_year']))
+                    reasons.append(
+                        'tvdb_ep_air_date (%s < %s)'
+                        % (
+                            entry['tvdb_ep_air_date'].strftime("%Y"),
+                            config['min_episode_air_year'],
+                        )
+                    )
             if 'max_episode_air_year' in config:
                 if entry['tvdb_ep_air_date'].strftime("%Y") > config['max_episode_air_year']:
-                    reasons.append('tvdb_ep_air_date (%s < %s)' % (entry['tvdb_ep_air_date'].strftime("%Y"),
-                                                                   config['max_episode_air_year']))
+                    reasons.append(
+                        'tvdb_ep_air_date (%s < %s)'
+                        % (
+                            entry['tvdb_ep_air_date'].strftime("%Y"),
+                            config['max_episode_air_year'],
+                        )
+                    )
 
             if self.is_in_set(config, 'reject_content_rating', entry['tvdb_content_rating']):
                 reasons.append('reject_content_rating')
@@ -176,10 +192,14 @@ class FilterTvdb(object):
                 reasons.append('reject_status')
 
             # Accept if actors contains an accepted actor, but don't reject otherwise
-            if self.is_in_set(config, 'accept_actors', entry['tvdb_actors'] + entry['tvdb_ep_guest_stars']):
+            if self.is_in_set(
+                config, 'accept_actors', entry['tvdb_actors'] + entry['tvdb_ep_guest_stars']
+            ):
                 force_accept = True
 
-            if self.is_in_set(config, 'reject_actors', entry['tvdb_actors'] + entry['tvdb_ep_guest_stars']):
+            if self.is_in_set(
+                config, 'reject_actors', entry['tvdb_actors'] + entry['tvdb_ep_guest_stars']
+            ):
                 reasons.append('reject_genres')
 
             # Accept if director is an accepted director, but don't reject otherwise
@@ -190,8 +210,10 @@ class FilterTvdb(object):
                 reasons.append('reject_directors')
 
             if reasons and not force_accept:
-                msg = 'Skipping %s because of rule(s) %s' % \
-                      (entry.get('series_name_thetvdb', None) or entry['title'], ', '.join(reasons))
+                msg = 'Skipping %s because of rule(s) %s' % (
+                    entry.get('series_name_thetvdb', None) or entry['title'],
+                    ', '.join(reasons),
+                )
                 if task.options.debug:
                     log.debug(msg)
                 else:

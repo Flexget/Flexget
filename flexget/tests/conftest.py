@@ -42,11 +42,12 @@ vcr = VCR(
     custom_patches=(
         (backport_client, 'HTTPSConnection', VCRHTTPSConnection),
         (backport_client, 'HTTPConnection', VCRHTTPConnection),
-    )
+    ),
 )
 
 
 # --- These are the public fixtures tests can ask for ---
+
 
 @pytest.fixture(scope='class')
 def config(request):
@@ -58,7 +59,9 @@ def config(request):
 
 
 @pytest.yield_fixture()
-def manager(request, config, caplog, monkeypatch, filecopy):  # enforce filecopy is run before manager
+def manager(
+    request, config, caplog, monkeypatch, filecopy
+):  # enforce filecopy is run before manager
     """
     Create a :class:`MockManager` for this test based on `config` argument.
     """
@@ -182,9 +185,11 @@ def link_headers(manager):
 
 def pytest_configure(config):
     # register the filecopy marker
-    config.addinivalue_line('markers',
-                            'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.'
-                            'online: mark a test that goes online. VCR will automatically be used.')
+    config.addinivalue_line(
+        'markers',
+        'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.'
+        'online: mark a test that goes online. VCR will automatically be used.',
+    )
 
 
 def pytest_runtest_setup(item):
@@ -246,26 +251,31 @@ def no_requests(monkeypatch):
     try:
         import ssl  # noqa
         from ssl import SSLContext  # noqa
+
         online_funcs.append('future.backports.http.client.HTTPSConnection.request')
     except ImportError:
         pass
 
     if PY2:
-        online_funcs.extend(['httplib.HTTPConnection.request',
-                             'httplib.HTTPSConnection.request'])
+        online_funcs.extend(['httplib.HTTPConnection.request', 'httplib.HTTPSConnection.request'])
     else:
-        online_funcs.extend(['http.client.HTTPConnection.request',
-                             'http.client.HTTPSConnection.request'])
+        online_funcs.extend(
+            ['http.client.HTTPConnection.request', 'http.client.HTTPSConnection.request']
+        )
 
     for func in online_funcs:
-        monkeypatch.setattr(func, mock.Mock(side_effect=Exception('Online tests should use @pytest.mark.online')))
+        monkeypatch.setattr(
+            func, mock.Mock(side_effect=Exception('Online tests should use @pytest.mark.online'))
+        )
 
 
 @pytest.fixture(scope='session', autouse=True)
 def setup_once(pytestconfig, request):
     #    os.chdir(os.path.join(pytestconfig.rootdir.strpath, 'flexget', 'tests'))
     flexget.logger.initialize(True)
-    m = MockManager('tasks: {}', 'init')  # This makes sure our template environment is set up before any tests are run
+    m = MockManager(
+        'tasks: {}', 'init'
+    )  # This makes sure our template environment is set up before any tests are run
     m.shutdown()
     logging.getLogger().setLevel(logging.DEBUG)
     load_plugins()

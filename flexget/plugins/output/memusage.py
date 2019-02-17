@@ -49,7 +49,11 @@ def on_manager_shutdown(manager):
         return
 
     import resource
-    console('Resource Module memory usage: %s (kb)' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+
+    console(
+        'Resource Module memory usage: %s (kb)'
+        % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    )
     global heapy
     console('Heapy module calculating memory usage:')
     console(heapy.heap())
@@ -61,5 +65,10 @@ def on_manager_shutdown(manager):
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser().add_argument('--mem-usage', action='store_true', dest='mem_usage', default=False,
-                                      help='display memory usage debug information')
+    options.get_parser().add_argument(
+        '--mem-usage',
+        action='store_true',
+        dest='mem_usage',
+        default=False,
+        help='display memory usage debug information',
+    )

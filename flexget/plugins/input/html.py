@@ -46,34 +46,32 @@ class InputHtml(object):
                     'dump': {'type': 'string'},
                     'title_from': {'type': 'string'},
                     'allow_empty_links': {'type': 'boolean'},
-                    'links_re': {
-                        'type': 'array',
-                        'items': {'type': 'string', 'format': 'regex'}
-                    },
-                    'increment': {'oneOf': [
-                        {'type': 'boolean'},
-                        {
-                            'type': 'object',
-                            'properties': {
-                                'from': {'type': 'integer'},
-                                'to': {'type': 'integer'},
-                                'name': {'type': 'string'},
-                                'step': {'type': 'integer'},
-                                'stop_when_empty': {'type': 'boolean'},
-                                'entries_count': {'type': 'integer'}
+                    'links_re': {'type': 'array', 'items': {'type': 'string', 'format': 'regex'}},
+                    'increment': {
+                        'oneOf': [
+                            {'type': 'boolean'},
+                            {
+                                'type': 'object',
+                                'properties': {
+                                    'from': {'type': 'integer'},
+                                    'to': {'type': 'integer'},
+                                    'name': {'type': 'string'},
+                                    'step': {'type': 'integer'},
+                                    'stop_when_empty': {'type': 'boolean'},
+                                    'entries_count': {'type': 'integer'},
+                                },
+                                'additionalProperties': False,
                             },
-                            'additionalProperties': False
-                        }
-                    ]}
+                        ]
+                    },
                 },
                 'required': ['url'],
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ]
     }
 
     def build_config(self, config):
-
         def get_auth_from_url():
             """Moves basic authentication from url to username and password fields"""
             parts = list(parse.urlsplit(config['url']))
@@ -99,7 +97,10 @@ class InputHtml(object):
 
         auth = None
         if config.get('username') and config.get('password'):
-            log.debug('Basic auth enabled. User: %s Password: %s' % (config['username'], config['password']))
+            log.debug(
+                'Basic auth enabled. User: %s Password: %s'
+                % (config['username'], config['password'])
+            )
             auth = (config['username'], config['password'])
 
         increment = config.get('increment')
@@ -251,8 +252,11 @@ class InputHtml(object):
                         for ext in ('.html', '.php'):
                             if from_url.endswith(ext):
                                 switch_to = 'title'
-                        log.info('Link names seem to be useless, auto-configuring \'title_from: %s\'. '
-                                 'This may not work well, you might need to configure it yourself.' % switch_to)
+                        log.info(
+                            'Link names seem to be useless, auto-configuring \'title_from: %s\'. '
+                            'This may not work well, you might need to configure it yourself.'
+                            % switch_to
+                        )
                         config['title_from'] = switch_to
                         # start from the beginning  ...
                         return self.create_entries(page_url, soup, config)
@@ -275,7 +279,7 @@ class InputHtml(object):
             # in case the title contains xxxxxxx.torrent - foooo.torrent clean it a bit (get up to first .torrent)
             # TODO: hack
             if title.lower().find('.torrent') > 0:
-                title = title[:title.lower().find('.torrent')]
+                title = title[: title.lower().find('.torrent')]
 
             if title_exists(title):
                 # title link should be unique, add CRC32 to end if it's not

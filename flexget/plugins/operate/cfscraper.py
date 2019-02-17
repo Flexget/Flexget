@@ -26,7 +26,9 @@ class CFScraper(object):
             import cfscrape
         except ImportError as e:
             log.debug('Error importing cfscrape: %s' % e)
-            raise plugin.DependencyError('cfscraper', 'cfscrape', 'cfscrape module required. ImportError: %s' % e)
+            raise plugin.DependencyError(
+                'cfscraper', 'cfscrape', 'cfscrape module required. ImportError: %s' % e
+            )
 
         class CFScrapeWrapper(Session, cfscrape.CloudflareScraper):
             """

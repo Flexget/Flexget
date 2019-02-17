@@ -80,8 +80,9 @@ class FilterRottenTomatoes(object):
             'reject_directors': {'type': 'array', 'items': {'type': 'string'}},
             'accept_directors': {'type': 'array', 'items': {'type': 'string'}},
             'reject_mpaa_ratings': {'type': 'array', 'items': {'type': 'string'}},
-            'accept_mpaa_ratings': {'type': 'array', 'items': {'type': 'string'}}},
-        'additionalProperties': False
+            'accept_mpaa_ratings': {'type': 'array', 'items': {'type': 'string'}},
+        },
+        'additionalProperties': False,
     }
 
     # Run later to avoid unnecessary lookups
@@ -109,36 +110,54 @@ class FilterRottenTomatoes(object):
             reasons = []
             if 'min_critics_score' in config:
                 if entry.get('rt_critics_score', 0) < config['min_critics_score']:
-                    reasons.append('min_critics_score (%s < %s)' % (entry.get('rt_critics_score'),
-                                                                    config['min_critics_score']))
+                    reasons.append(
+                        'min_critics_score (%s < %s)'
+                        % (entry.get('rt_critics_score'), config['min_critics_score'])
+                    )
             if 'min_audience_score' in config:
                 if entry.get('rt_audience_score', 0) < config['min_audience_score']:
-                    reasons.append('min_audience_score (%s < %s)' % (entry.get('rt_audience_score'),
-                                                                     config['min_audience_score']))
+                    reasons.append(
+                        'min_audience_score (%s < %s)'
+                        % (entry.get('rt_audience_score'), config['min_audience_score'])
+                    )
             if 'min_average_score' in config:
                 if entry.get('rt_average_score', 0) < config['min_average_score']:
-                    reasons.append('min_average_score (%s < %s)' % (entry.get('rt_average_score'),
-                                                                    config['min_average_score']))
+                    reasons.append(
+                        'min_average_score (%s < %s)'
+                        % (entry.get('rt_average_score'), config['min_average_score'])
+                    )
             if 'min_critics_rating' in config:
                 if not entry.get('rt_critics_rating'):
                     reasons.append('min_critics_rating (no rt_critics_rating)')
-                elif self.critics_ratings.get(entry.get('rt_critics_rating').lower(),
-                                              0) < self.critics_ratings[config['min_critics_rating']]:
-                    reasons.append('min_critics_rating (%s < %s)' % (entry.get('rt_critics_rating').lower(),
-                                                                     config['min_critics_rating']))
+                elif (
+                    self.critics_ratings.get(entry.get('rt_critics_rating').lower(), 0)
+                    < self.critics_ratings[config['min_critics_rating']]
+                ):
+                    reasons.append(
+                        'min_critics_rating (%s < %s)'
+                        % (entry.get('rt_critics_rating').lower(), config['min_critics_rating'])
+                    )
             if 'min_audience_rating' in config:
                 if not entry.get('rt_audience_rating'):
                     reasons.append('min_audience_rating (no rt_audience_rating)')
-                elif self.audience_ratings.get(entry.get('rt_audience_rating').lower(),
-                                               0) < self.audience_ratings[config['min_audience_rating']]:
-                    reasons.append('min_audience_rating (%s < %s)' % (entry.get('rt_audience_rating').lower(),
-                                                                      config['min_audience_rating']))
+                elif (
+                    self.audience_ratings.get(entry.get('rt_audience_rating').lower(), 0)
+                    < self.audience_ratings[config['min_audience_rating']]
+                ):
+                    reasons.append(
+                        'min_audience_rating (%s < %s)'
+                        % (entry.get('rt_audience_rating').lower(), config['min_audience_rating'])
+                    )
             if 'min_year' in config:
                 if entry.get('rt_year', 0) < config['min_year']:
-                    reasons.append('min_year (%s < %s)' % (entry.get('rt_year'), config['min_year']))
+                    reasons.append(
+                        'min_year (%s < %s)' % (entry.get('rt_year'), config['min_year'])
+                    )
             if 'max_year' in config:
                 if entry.get('rt_year', 0) > config['max_year']:
-                    reasons.append('max_year (%s > %s)' % (entry.get('rt_year'), config['max_year']))
+                    reasons.append(
+                        'max_year (%s > %s)' % (entry.get('rt_year'), config['max_year'])
+                    )
             if 'reject_genres' in config:
                 rejected = config['reject_genres']
                 for genre in entry.get('rt_genres', []):
@@ -189,8 +208,10 @@ class FilterRottenTomatoes(object):
                     reasons.append('accept_mpaa_ratings %s' % entry.get('rt_mpaa_rating'))
 
             if reasons and not force_accept:
-                msg = 'Didn\'t accept `%s` because of rule(s) %s' % \
-                      (entry.get('rt_name', None) or entry['title'], ', '.join(reasons))
+                msg = 'Didn\'t accept `%s` because of rule(s) %s' % (
+                    entry.get('rt_name', None) or entry['title'],
+                    ', '.join(reasons),
+                )
                 if task.options.debug:
                     log.debug(msg)
                 else:

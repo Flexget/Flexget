@@ -18,28 +18,24 @@ web_server = None
 web_config_schema = {
     'oneOf': [
         {'type': 'boolean'},
-        {'type': 'integer',
-         'minimum': 0,
-         'maximum': 65536},
+        {'type': 'integer', 'minimum': 0, 'maximum': 65536},
         {
             'type': 'object',
             'properties': {
                 'bind': {'type': 'string', 'format': 'ipv4'},
-                'port': {'type': 'integer',
-                         'minimum': 0,
-                         'maximum': 65536},
+                'port': {'type': 'integer', 'minimum': 0, 'maximum': 65536},
                 'ssl_certificate': {'type': 'string'},
                 'ssl_private_key': {'type': 'string'},
                 'web_ui': {'type': 'boolean'},
                 'base_url': {'type': 'string'},
-                'run_v2': {'type': 'boolean'}
+                'run_v2': {'type': 'boolean'},
             },
             'additionalProperties': False,
             'dependencies': {
                 'ssl_certificate': ['ssl_private_key'],
                 'ssl_private_key': ['ssl_certificate'],
-            }
-        }
+            },
+        },
     ]
 }
 
@@ -95,7 +91,9 @@ def register_web_server(manager):
     if not web_server_config:
         return
 
-    log.info("Running web server at IP %s:%s", web_server_config['bind'], web_server_config['port'])
+    log.info(
+        "Running web server at IP %s:%s", web_server_config['bind'], web_server_config['port']
+    )
     # Register API
     api_app.secret_key = get_secret()
 

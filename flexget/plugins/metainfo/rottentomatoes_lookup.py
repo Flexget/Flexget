@@ -13,9 +13,7 @@ try:
     # NOTE: Importing other plugins is discouraged!
     from flexget.plugins.internal import api_rottentomatoes as plugin_api_rottentomatoes
 except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='api_rottentomatoes',
-    )
+    raise plugin.DependencyError(issued_by=__name__, missing='api_rottentomatoes')
 
 log = logging.getLogger('rottentomatoes_lookup')
 
@@ -42,8 +40,9 @@ class PluginRottenTomatoesLookup(object):
         'rt_mpaa_rating': 'mpaa_rating',
         'rt_runtime': 'runtime',
         'rt_critics_consensus': 'critics_consensus',
-        'rt_releases': lambda movie: dict((release.name, release.date) for
-                                          release in movie.release_dates),
+        'rt_releases': lambda movie: dict(
+            (release.name, release.date) for release in movie.release_dates
+        ),
         'rt_critics_rating': 'critics_rating',
         'rt_critics_score': 'critics_score',
         'rt_audience_rating': 'audience_rating',
@@ -54,17 +53,21 @@ class PluginRottenTomatoesLookup(object):
         'rt_actors': lambda movie: [actor.name for actor in movie.cast],
         'rt_directors': lambda movie: [director.name for director in movie.directors],
         'rt_studio': 'studio',
-        'rt_alternate_ids': lambda movie: dict((alt_id.name, alt_id.id)
-                                               for alt_id in movie.alternate_ids),
+        'rt_alternate_ids': lambda movie: dict(
+            (alt_id.name, alt_id.id) for alt_id in movie.alternate_ids
+        ),
         'rt_url': get_rt_url,
         # Generic fields filled by all movie lookup plugins:
         'movie_name': 'title',
-        'movie_year': 'year'}
+        'movie_year': 'year',
+    }
 
-    schema = {'oneOf': [
-        {'type': 'boolean'},
-        {'type': 'string', 'description': 'provide a custom api key'}
-    ]}
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {'type': 'string', 'description': 'provide a custom api key'},
+        ]
+    }
 
     def __init__(self):
         self.key = None
@@ -95,7 +98,7 @@ class PluginRottenTomatoesLookup(object):
             smart_match=entry['title'],
             rottentomatoes_id=entry.get('rt_id', eval_lazy=False),
             only_cached=(not search_allowed),
-            api_key=key
+            api_key=key,
         )
         log.debug(u'Got movie: %s' % movie)
         entry.update_using_map(self.field_map, movie)
@@ -126,5 +129,9 @@ class PluginRottenTomatoesLookup(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginRottenTomatoesLookup, 'rottentomatoes_lookup', api_ver=2,
-                    interfaces=['task', 'movie_metainfo'])
+    plugin.register(
+        PluginRottenTomatoesLookup,
+        'rottentomatoes_lookup',
+        api_ver=2,
+        interfaces=['task', 'movie_metainfo'],
+    )

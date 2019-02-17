@@ -14,7 +14,9 @@ from flexget.manager import Session
 
 log = logging.getLogger('debug_db_sess')
 
-open_transactions_lock = Lock()  # multiple threads may call events, be safe by getting lock when using
+open_transactions_lock = (
+    Lock()
+)  # multiple threads may call events, be safe by getting lock when using
 open_transactions = {}
 
 
@@ -36,11 +38,19 @@ def after_begin(session, transaction, connection):
     caller_info = find_caller(inspect.stack()[1:])
     with open_transactions_lock:
         if any(info[1] is not connection.connection for info in open_transactions.values()):
-            log.warning('Sessions from 2 threads! Transaction 0x%08X opened %s Already open one(s): %s',
-                        id(transaction), caller_info, open_transactions)
+            log.warning(
+                'Sessions from 2 threads! Transaction 0x%08X opened %s Already open one(s): %s',
+                id(transaction),
+                caller_info,
+                open_transactions,
+            )
         elif open_transactions:
-            log.debug('Transaction 0x%08X opened %s Already open one(s): %s',
-                      id(transaction), caller_info, open_transactions)
+            log.debug(
+                'Transaction 0x%08X opened %s Already open one(s): %s',
+                id(transaction),
+                caller_info,
+                open_transactions,
+            )
         else:
             log.debug('Transaction 0x%08X opened %s', id(transaction), caller_info)
         # Store information about this transaction
@@ -59,8 +69,14 @@ def after_flush(session, flush_context):
                 _iterate_parents = session.transaction._iterate_self_and_parents
 
             tid = next(id(t) for t in _iterate_parents() if t in open_transactions)
-            log.debug('Transaction 0x%08X writing %s new: %s deleted: %s dirty: %s',
-                      tid, caller_info, tuple(session.new), tuple(session.deleted), tuple(session.dirty))
+            log.debug(
+                'Transaction 0x%08X writing %s new: %s deleted: %s dirty: %s',
+                tid,
+                caller_info,
+                tuple(session.new),
+                tuple(session.deleted),
+                tuple(session.dirty),
+            )
 
 
 def after_end(session, transaction):
@@ -70,7 +86,11 @@ def after_end(session, transaction):
             # Transaction was created but a connection was never opened for it
             return
         open_time = time.time() - open_transactions[transaction][0]
-        msg = 'Transaction 0x%08X closed %s (open time %s)' % (id(transaction), caller_info, open_time)
+        msg = 'Transaction 0x%08X closed %s (open time %s)' % (
+            id(transaction),
+            caller_info,
+            open_time,
+        )
         if open_time > 2:
             log.warning(msg)
         else:
@@ -88,5 +108,8 @@ def debug_warnings(manager):
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser().add_argument('--debug-db-sessions', action='store_true',
-                                      help='debug session starts and ends, for finding problems with db locks')
+    options.get_parser().add_argument(
+        '--debug-db-sessions',
+        action='store_true',
+        help='debug session starts and ends, for finding problems with db locks',
+    )

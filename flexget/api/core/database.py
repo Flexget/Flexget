@@ -17,10 +17,10 @@ class ObjectsContainer(object):
         'type': 'object',
         'properties': {
             'operation': {'type': 'string', 'enum': ['cleanup', 'vacuum', 'plugin_reset']},
-            'plugin_name': {'type': 'string'}
+            'plugin_name': {'type': 'string'},
         },
         'required': ['operation'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
 
@@ -46,7 +46,9 @@ class DBOperation(APIResource):
         elif operation == 'plugin_reset':
             plugin_name = data.get('plugin_name')
             if not plugin_name:
-                raise BadRequest('\'plugin_name\' attribute must be used when trying to reset plugin')
+                raise BadRequest(
+                    '\'plugin_name\' attribute must be used when trying to reset plugin'
+                )
             try:
                 reset_schema(plugin_name)
                 msg = 'Plugin {} DB reset was successful'.format(plugin_name)

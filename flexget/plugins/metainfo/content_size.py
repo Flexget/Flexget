@@ -33,7 +33,9 @@ class MetainfoContentSize(object):
         for entry in task.entries:
             if entry.get('content_size'):
                 # Don't override if already set
-                log.trace('skipping content size check because it is already set for %r' % entry['title'])
+                log.trace(
+                    'skipping content size check because it is already set for %r' % entry['title']
+                )
                 continue
             # Try to parse size from description
             match = SIZE_RE.search(entry.get('description', ''))
@@ -41,7 +43,10 @@ class MetainfoContentSize(object):
                 try:
                     amount = float(match.group(1).replace(',', '.'))
                 except Exception:
-                    log.error('BUG: Unable to convert %s into float (%s)' % (match.group(1), entry['title']))
+                    log.error(
+                        'BUG: Unable to convert %s into float (%s)'
+                        % (match.group(1), entry['title'])
+                    )
                     continue
                 unit = match.group(2).lower()
                 count += 1

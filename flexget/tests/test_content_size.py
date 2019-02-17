@@ -42,33 +42,30 @@ class TestTorrentSize(object):
     def test_min(self, execute_task):
         """Content Size: torrent with min size"""
         task = execute_task('test_min')
-        assert task.find_entry('rejected', title='test'), \
-            'should have rejected, minimum size'
+        assert task.find_entry('rejected', title='test'), 'should have rejected, minimum size'
 
     @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
     def test_max(self, execute_task):
         """Content Size: torrent with max size"""
         task = execute_task('test_max')
-        assert task.find_entry('rejected', title='test'), \
-            'should have rejected, maximum size'
+        assert task.find_entry('rejected', title='test'), 'should have rejected, maximum size'
 
     @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
     def test_strict(self, execute_task):
         """Content Size: strict enabled"""
         task = execute_task('test_strict')
-        assert task.find_entry('rejected', title='test'), \
-            'should have rejected non torrent'
+        assert task.find_entry('rejected', title='test'), 'should have rejected non torrent'
 
     def test_cache(self, execute_task):
         """Content Size: caching"""
         task = execute_task('test_cache')
-        assert task.find_entry('rejected', title='test'), \
-            'should have rejected, too small'
+        assert task.find_entry('rejected', title='test'), 'should have rejected, too small'
 
         # Make sure remember_rejected rejects on the second execution
         task = execute_task('test_cache')
-        assert task.find_entry('rejected', title='test', rejected_by='remember_rejected'), \
-            'should have rejected, size present from the cache'
+        assert task.find_entry(
+            'rejected', title='test', rejected_by='remember_rejected'
+        ), 'should have rejected, size present from the cache'
 
 
 @pytest.mark.usefixtures('tmpdir')
@@ -104,8 +101,7 @@ class TestFileSize(object):
         task = execute_task('test_min')
         entry = task.find_entry('rejected', title='test')
         assert entry, 'should have rejected, minimum size'
-        assert entry['content_size'] == 0, \
-            'content_size was not detected'
+        assert entry['content_size'] == 0, 'content_size was not detected'
 
     @pytest.mark.filecopy('test.torrent', '__tmp__/test.file')
     def test_max(self, execute_task):
@@ -113,11 +109,11 @@ class TestFileSize(object):
         task = execute_task('test_max')
         entry = task.find_entry('accepted', title='test')
         assert entry, 'should have been accepted, it is below maximum size'
-        assert entry['content_size'] == 0, \
-            'content_size was not detected'
+        assert entry['content_size'] == 0, 'content_size was not detected'
 
     def test_torrent(self, execute_task):
         task = execute_task('test_torrent')
         entry = task.find_entry('entries', title='test')
-        assert 'content_size' not in entry, \
-            'size of .torrent file should not be read as content_size'
+        assert (
+            'content_size' not in entry
+        ), 'size of .torrent file should not be read as content_size'

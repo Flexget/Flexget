@@ -72,14 +72,18 @@ class TestRadarrListActions(object):
         # By using the list as the input we verify that the
         # movies added above is returned to us
         task = execute_task('radarr_list_as_input_plugin')
-        assert task.find_entry(movie_name='Despicable Me 2'), \
-            "movie should have been present in the list but it wasn't"
-        assert task.find_entry(movie_name='Crimson Peak'), \
-            "movie should have been present in the list but it wasn't"
-        assert task.find_entry(movie_name='Deadpool'), \
-            "movie should have been present in the list but it wasn't"
-        assert task.find_entry(movie_name='Sinister 2'), \
-            "movie should have been present in the list but it wasn't"
+        assert task.find_entry(
+            movie_name='Despicable Me 2'
+        ), "movie should have been present in the list but it wasn't"
+        assert task.find_entry(
+            movie_name='Crimson Peak'
+        ), "movie should have been present in the list but it wasn't"
+        assert task.find_entry(
+            movie_name='Deadpool'
+        ), "movie should have been present in the list but it wasn't"
+        assert task.find_entry(
+            movie_name='Sinister 2'
+        ), "movie should have been present in the list but it wasn't"
 
         # Now we will attempt to remove one existing (Sinister 2) and one
         # non-existing movie which should not affect anything at all
@@ -88,31 +92,39 @@ class TestRadarrListActions(object):
         # And to verify the list we fetch the list again
         # Sinister 2 should now be missing
         task = execute_task('radarr_list_as_input_plugin')
-        assert task.find_entry(movie_name='Despicable Me 2'), \
-            "movie should have been present in the list but it wasn't"
-        assert task.find_entry(movie_name='Crimson Peak'), \
-            "movie should have been present in the list but it wasn't"
-        assert task.find_entry(movie_name='Deadpool'), \
-            "movie should have been present in the list but it wasn't"
-        assert not task.find_entry(movie_name='Sinister 2'), \
-            "movie should not be present in the list but it was"
+        assert task.find_entry(
+            movie_name='Despicable Me 2'
+        ), "movie should have been present in the list but it wasn't"
+        assert task.find_entry(
+            movie_name='Crimson Peak'
+        ), "movie should have been present in the list but it wasn't"
+        assert task.find_entry(
+            movie_name='Deadpool'
+        ), "movie should have been present in the list but it wasn't"
+        assert not task.find_entry(
+            movie_name='Sinister 2'
+        ), "movie should not be present in the list but it was"
 
         # Now we will try to match a bunch of input entries with
         # the list. Two of the movies should not have been matched.
         task = execute_task('match_radarr_list')
-        assert task.find_entry('accepted', title='Despicable.Me.2.2013.1080p.BluRay.x264-FlexGet'), \
-            "movie should have been matched but it wasn't"
-        assert task.find_entry('accepted', title='Crimson.Peak.2015.720p.BluRay.x264-FlexGet'), \
-            "movie should have been matched but it wasn't"
-        assert task.find_entry('accepted', title='Deadpool.2016.1080p.BluRay.x264-FlexGet'), \
-            "movie should have been matched but it wasn't"
-        assert task.find_entry('undecided', title='Sinister.2.2015.720p.BluRay.x264-FlexGet'), \
-            "movie should not have been matched but it was"
-        assert task.find_entry('undecided', title='Kung.Fu.Panda.3.2016.720p.BluRay.x264-FlexGet'), \
-            "movie should not have been matched but it was"
+        assert task.find_entry(
+            'accepted', title='Despicable.Me.2.2013.1080p.BluRay.x264-FlexGet'
+        ), "movie should have been matched but it wasn't"
+        assert task.find_entry(
+            'accepted', title='Crimson.Peak.2015.720p.BluRay.x264-FlexGet'
+        ), "movie should have been matched but it wasn't"
+        assert task.find_entry(
+            'accepted', title='Deadpool.2016.1080p.BluRay.x264-FlexGet'
+        ), "movie should have been matched but it wasn't"
+        assert task.find_entry(
+            'undecided', title='Sinister.2.2015.720p.BluRay.x264-FlexGet'
+        ), "movie should not have been matched but it was"
+        assert task.find_entry(
+            'undecided', title='Kung.Fu.Panda.3.2016.720p.BluRay.x264-FlexGet'
+        ), "movie should not have been matched but it was"
 
         # list_match should have removed all the matched movies
         # so no movies should remain
         task = execute_task('radarr_list_as_input_plugin')
-        assert len(task.all_entries) == 0, \
-            "there should be no movies left in the list"
+        assert len(task.all_entries) == 0, "there should be no movies left in the list"

@@ -7,17 +7,18 @@ from flexget.event import event
 
 log = logging.getLogger('abort_if_exists')
 
+
 class PluginAbortIfExists(object):
     """Aborts a task if an entry field matches the regexp"""
 
     schema = {
         'type': 'object',
-        'properties' : {
+        'properties': {
             'regexp': {'type': 'string', 'format': 'regex'},
-            'field': {'type': 'string'}
+            'field': {'type': 'string'},
         },
         'required': ['regexp', 'field'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     # Execute as the first thing in filter phase
@@ -32,6 +33,7 @@ class PluginAbortIfExists(object):
                 continue
             if abort_re.search(entry[field]):
                 task.abort('An entry contained %s in field %s. Abort!' % (config['regexp'], field))
+
 
 @event('plugin.register')
 def register_plugin():

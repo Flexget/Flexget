@@ -28,11 +28,11 @@ class PluginInputs(object):
                 {
                     'maxProperties': 1,
                     'error_maxProperties': 'Plugin options within inputs plugin must be indented 2 more spaces than '
-                                           'the first letter of the plugin name.',
-                    'minProperties': 1
-                }
+                    'the first letter of the plugin name.',
+                    'minProperties': 1,
+                },
             ]
-        }
+        },
     }
 
     def on_task_input(self, task, config):

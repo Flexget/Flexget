@@ -35,48 +35,96 @@ class SeriesParser(TitleParser):
 
     separators = '[/ -]'
     roman_numeral_re = 'X{0,3}(?:IX|XI{0,4}|VI{0,4}|IV|V|I{1,4})'
-    english_numbers = ['one', 'two', 'three', 'four', 'five', 'six', 'seven',
-                       'eight', 'nine', 'ten']
+    english_numbers = [
+        'one',
+        'two',
+        'three',
+        'four',
+        'five',
+        'six',
+        'seven',
+        'eight',
+        'nine',
+        'ten',
+    ]
 
     # Make sure none of these are found embedded within a word or other numbers
-    ep_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
-        r'(?:series|season|s)\s?(\d{1,4})(?:\s(?:.*\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)(?:\s?e?(\d{1,2}))?' %
-        roman_numeral_re,
-        r'(?:series|season)\s?(\d{1,4})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
-        r'(\d{1,2})\s?x\s?(\d+)(?:\s(\d{1,2}))?',
-        r'(\d{1,3})\s?of\s?(?:\d{1,3})',
-        r'(?:episode|e|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
-        r'part\s(%s)' % '|'.join(map(str, english_numbers)),
-    ]])
-    season_pack_regexps = ReList([
-        # S01 or Season 1 but not Season 1 Episode|Part 2
-        r'(?:season\s?|s)(\d{1,})(?:\s|$)(?!(?:(?:.*?\s)?(?:episode|e|ep|part|pt)\s?(?:\d{1,3}|%s)|(?:\d{1,3})\s?of\s?(?:\d{1,3})))' % roman_numeral_re,
-        r'(\d{1,3})\s?x\s?all',  # 1xAll
-    ])
-    unwanted_regexps = ReList([
-        r'(\d{1,3})\s?x\s?(0+)[^1-9]',  # 5x0
-        r'S(\d{1,3})D(\d{1,3})',  # S3D1
-        r'(?:s|series|\b)\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
-        r'disc\s\d'])
+    ep_regexps = ReList(
+        [
+            TitleParser.re_not_in_word(regexp)
+            for regexp in [
+                r'(?:series|season|s)\s?(\d{1,4})(?:\s(?:.*\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)(?:\s?e?(\d{1,2}))?'
+                % roman_numeral_re,
+                r'(?:series|season)\s?(\d{1,4})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
+                r'(\d{1,2})\s?x\s?(\d+)(?:\s(\d{1,2}))?',
+                r'(\d{1,3})\s?of\s?(?:\d{1,3})',
+                r'(?:episode|e|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
+                r'part\s(%s)' % '|'.join(map(str, english_numbers)),
+            ]
+        ]
+    )
+    season_pack_regexps = ReList(
+        [
+            # S01 or Season 1 but not Season 1 Episode|Part 2
+            r'(?:season\s?|s)(\d{1,})(?:\s|$)(?!(?:(?:.*?\s)?(?:episode|e|ep|part|pt)\s?(?:\d{1,3}|%s)|(?:\d{1,3})\s?of\s?(?:\d{1,3})))'
+            % roman_numeral_re,
+            r'(\d{1,3})\s?x\s?all',  # 1xAll
+        ]
+    )
+    unwanted_regexps = ReList(
+        [
+            r'(\d{1,3})\s?x\s?(0+)[^1-9]',  # 5x0
+            r'S(\d{1,3})D(\d{1,3})',  # S3D1
+            r'(?:s|series|\b)\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
+            r'disc\s\d',
+        ]
+    )
     # Make sure none of these are found embedded within a word or other numbers
-    date_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
-        r'(\d{2,4})%s(\d{1,2})%s(\d{1,2})' % (separators, separators),
-        r'(\d{1,2})%s(\d{1,2})%s(\d{2,4})' % (separators, separators),
-        r'(\d{4})x(\d{1,2})%s(\d{1,2})' % separators,
-        r'(\d{1,2})(?:st|nd|rd|th)?%s([a-z]{3,10})%s(\d{4})' % (separators, separators)]])
-    sequence_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
-        r'(\d{1,3})(?:v(?P<version>\d))?',
-        r'(?:pt|part)\s?(\d+|%s)' % roman_numeral_re]])
+    date_regexps = ReList(
+        [
+            TitleParser.re_not_in_word(regexp)
+            for regexp in [
+                r'(\d{2,4})%s(\d{1,2})%s(\d{1,2})' % (separators, separators),
+                r'(\d{1,2})%s(\d{1,2})%s(\d{2,4})' % (separators, separators),
+                r'(\d{4})x(\d{1,2})%s(\d{1,2})' % separators,
+                r'(\d{1,2})(?:st|nd|rd|th)?%s([a-z]{3,10})%s(\d{4})' % (separators, separators),
+            ]
+        ]
+    )
+    sequence_regexps = ReList(
+        [
+            TitleParser.re_not_in_word(regexp)
+            for regexp in [
+                r'(\d{1,3})(?:v(?P<version>\d))?',
+                r'(?:pt|part)\s?(\d+|%s)' % roman_numeral_re,
+            ]
+        ]
+    )
     unwanted_sequence_regexps = ReList([r'seasons?\s?\d{1,2}'])
     id_regexps = ReList([])
     clean_regexps = ReList([r'\[.*?\]', r'\(.*?\)'])
     # ignore prefix regexps must be passive groups with 0 or 1 occurrences  eg. (?:prefix)?
     ignore_prefixes = default_ignore_prefixes
 
-    def __init__(self, name=None, alternate_names=None, identified_by='auto', name_regexps=None, ep_regexps=None,
-                 date_regexps=None, sequence_regexps=None, id_regexps=None, strict_name=False, allow_groups=None,
-                 allow_seasonless=True, date_dayfirst=None, date_yearfirst=None, special_ids=None,
-                 prefer_specials=False, assume_special=False):
+    def __init__(
+        self,
+        name=None,
+        alternate_names=None,
+        identified_by='auto',
+        name_regexps=None,
+        ep_regexps=None,
+        date_regexps=None,
+        sequence_regexps=None,
+        id_regexps=None,
+        strict_name=False,
+        allow_groups=None,
+        allow_seasonless=True,
+        date_dayfirst=None,
+        date_yearfirst=None,
+        special_ids=None,
+        prefer_specials=False,
+        assume_special=False,
+    ):
         """
         Init SeriesParser.
 
@@ -118,7 +166,9 @@ class SeriesParser(TitleParser):
         for mode in ID_TYPES:
             listname = mode + '_regexps'
             if locals()[listname]:
-                setattr(self, listname, ReList(locals()[listname] + getattr(SeriesParser, listname)))
+                setattr(
+                    self, listname, ReList(locals()[listname] + getattr(SeriesParser, listname))
+                )
         self.specials = self.specials + [i.lower() for i in (special_ids or [])]
         self.prefer_specials = prefer_specials
         self.assume_special = assume_special
@@ -178,7 +228,7 @@ class SeriesParser(TitleParser):
             if prefix:
                 start = prefix.end()
             # If an episode id is found, assume everything before it is series name
-            name = self.data[start:match['match'].start()]
+            name = self.data[start : match['match'].start()]
             # Remove possible episode title from series name (anything after a ' - ')
             name = name.split(' - ')[0]
             # Replace some special characters with spaces
@@ -207,7 +257,9 @@ class SeriesParser(TitleParser):
 
         # check if data appears to be unwanted (abort)
         if self.parse_unwanted(self.remove_dirt(self.data)):
-            raise ParseWarning(self, '`{data}` appears to be an episode pack'.format(data=self.data))
+            raise ParseWarning(
+                self, '`{data}` appears to be an episode pack'.format(data=self.data)
+            )
 
         name = self.remove_dirt(self.name)
 
@@ -221,7 +273,9 @@ class SeriesParser(TitleParser):
         if not self.name_regexps:
             # if we don't have name_regexps, generate one from the name
             self.name_regexps = ReList(
-                name_to_re(name, self.ignore_prefixes, self) for name in [self.name] + self.alternate_names)
+                name_to_re(name, self.ignore_prefixes, self)
+                for name in [self.name] + self.alternate_names
+            )
             # With auto regex generation, the first regex group captures the name
             self.re_from_name = True
         # try all specified regexps on this data
@@ -235,8 +289,11 @@ class SeriesParser(TitleParser):
                 log.debug('NAME SUCCESS: %s matched to %s', name_re.pattern, self.data)
         if not name_end:
             # leave this invalid
-            log.debug('FAIL: name regexps %s do not match %s',
-                      [regexp.pattern for regexp in self.name_regexps], self.data)
+            log.debug(
+                'FAIL: name regexps %s do not match %s',
+                [regexp.pattern for regexp in self.name_regexps],
+                self.data,
+            )
             return
 
         # remove series name from raw data, move any prefix to end of string
@@ -318,8 +375,10 @@ class SeriesParser(TitleParser):
 
                 if ep_match['end_episode'] and ep_match['end_episode'] > ep_match['episode'] + 2:
                     # This is a pack of too many episodes, ignore it.
-                    log.debug('Series pack contains too many episodes (%d). Rejecting',
-                              ep_match['end_episode'] - ep_match['episode'])
+                    log.debug(
+                        'Series pack contains too many episodes (%d). Rejecting',
+                        ep_match['end_episode'] - ep_match['episode'],
+                    )
                     return
 
                 self.season = ep_match['season']
@@ -352,7 +411,11 @@ class SeriesParser(TitleParser):
                 # ressu: Added matching for 0101, 0102... It will fail on
                 #        season 11 though
                 log.debug('ep identifier expected. Attempting SEE format parsing.')
-                match = re.search(self.re_not_in_word(r'(\d?\d)(\d\d)'), data_stripped, re.IGNORECASE | re.UNICODE)
+                match = re.search(
+                    self.re_not_in_word(r'(\d?\d)(\d\d)'),
+                    data_stripped,
+                    re.IGNORECASE | re.UNICODE,
+                )
                 if match:
                     # strict_name
                     if self.strict_name:
@@ -482,7 +545,11 @@ class SeriesParser(TitleParser):
                     yearfirst_opts = [True, False]
                     if self.date_yearfirst is not None:
                         yearfirst_opts = [self.date_yearfirst]
-                    kwargs_list = ({'dayfirst': d, 'yearfirst': y} for d in dayfirst_opts for y in yearfirst_opts)
+                    kwargs_list = (
+                        {'dayfirst': d, 'yearfirst': y}
+                        for d in dayfirst_opts
+                        for y in yearfirst_opts
+                    )
                     for kwargs in kwargs_list:
                         possdate = parsedate(' '.join(match.groups()), **kwargs)
                         # Don't accept dates farther than a day in the future
@@ -518,7 +585,9 @@ class SeriesParser(TitleParser):
             match = re.search(ep_re, data)
 
             if match:
-                log.debug('found episode number with regexp %s (%s)', ep_re.pattern, match.groups())
+                log.debug(
+                    'found episode number with regexp %s (%s)', ep_re.pattern, match.groups()
+                )
                 matches = match.groups()
                 if len(matches) >= 2:
                     season = matches[0]
@@ -542,8 +611,12 @@ class SeriesParser(TitleParser):
                     else:
                         episode = int(episode)
                 except ValueError:
-                    log.critical('Invalid episode number match %s returned with regexp `%s` for %s',
-                                 match.groups(), ep_re.pattern, self.data)
+                    log.critical(
+                        'Invalid episode number match %s returned with regexp `%s` for %s',
+                        match.groups(),
+                        ep_re.pattern,
+                        self.data,
+                    )
                     raise
                 end_episode = None
                 if len(matches) == 3 and matches[2]:
@@ -553,10 +626,12 @@ class SeriesParser(TitleParser):
                         # Assume large ranges are not episode packs, ticket #1271 TODO: is this the best way?
                         end_episode = None
                 # Successfully found an identifier, return the results
-                return {'season': season,
-                        'episode': episode,
-                        'end_episode': end_episode,
-                        'match': match}
+                return {
+                    'season': season,
+                    'episode': episode,
+                    'end_episode': end_episode,
+                    'match': match,
+                }
         return False
 
     def parse_season_packs(self, data):
@@ -569,10 +644,7 @@ class SeriesParser(TitleParser):
                 if len(matches) == 1:
                     # Single season full pack, no parts etc
                     season = int(matches[0])
-                    return {
-                        'season': season,
-                        'match': match
-                    }
+                    return {'season': season, 'match': match}
                 elif len(matches) == 2:
                     # TODO support other formats of season packs: 1xall, s01-PART1, etc.
                     pass
@@ -591,7 +663,7 @@ class SeriesParser(TitleParser):
         # Add up the parts of the numeral
         i = result = 0
         for numeral, integer in roman_map:
-            while roman[i:i + len(numeral)] == numeral:
+            while roman[i : i + len(numeral)] == numeral:
                 result += integer
                 i += len(numeral)
         return result
@@ -602,14 +674,28 @@ class SeriesParser(TitleParser):
         valid = 'INVALID'
         if self.valid:
             valid = 'OK'
-        return '<SeriesParser(data=%s,name=%s,id=%s,season=%s,season_pack=%s,episode=%s,quality=%s,proper=%s,' \
-               'status=%s)>' % (self.data, self.name, str(self.id), self.season, self.season_pack, self.episode,
-                                self.quality, self.proper_count, valid)
+        return (
+            '<SeriesParser(data=%s,name=%s,id=%s,season=%s,season_pack=%s,episode=%s,quality=%s,proper=%s,'
+            'status=%s)>'
+            % (
+                self.data,
+                self.name,
+                str(self.id),
+                self.season,
+                self.season_pack,
+                self.episode,
+                self.quality,
+                self.proper_count,
+                valid,
+            )
+        )
 
     def __cmp__(self, other):
         """Compares quality of parsers, if quality is equal, compares proper_count."""
-        return cmp((self.quality, self.episodes, self.proper_count),
-                   (other.quality, other.episodes, other.proper_count))
+        return cmp(
+            (self.quality, self.episodes, self.proper_count),
+            (other.quality, other.episodes, other.proper_count),
+        )
 
     def __eq__(self, other):
         return self is other

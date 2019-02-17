@@ -26,10 +26,10 @@ class OutputNzbget(object):
             'url': {'type': 'string'},
             'category': {'type': 'string', 'default': ''},
             'priority': {'type': 'integer', 'default': 0},
-            'top': {'type': 'boolean', 'default': False}
+            'top': {'type': 'boolean', 'default': False},
         },
         'required': ['url'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def on_task_output(self, task, config):
@@ -49,11 +49,13 @@ class OutputNzbget(object):
                 params['category'] = entry['category']
 
             try:
-                server.appendurl(entry['title'] + '.nzb',
-                                 params['category'],
-                                 params['priority'],
-                                 params['top'],
-                                 entry['url'])
+                server.appendurl(
+                    entry['title'] + '.nzb',
+                    params['category'],
+                    params['priority'],
+                    params['top'],
+                    entry['url'],
+                )
                 log.info('Added `%s` to nzbget', entry['title'])
             except Exception as e:
                 log.critical('rpc call to nzbget failed: %s', e)

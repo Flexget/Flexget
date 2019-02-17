@@ -27,14 +27,20 @@ class MetainfoSubs(object):
             import subliminal
         except ImportError as e:
             log.debug('Error importing Subliminal: %s' % e)
-            raise plugin.DependencyError('subliminal', 'subliminal',
-                                         'Subliminal module required. ImportError: %s' % e)
+            raise plugin.DependencyError(
+                'subliminal', 'subliminal', 'Subliminal module required. ImportError: %s' % e
+            )
         from subliminal.cli import MutexLock
         from dogpile.cache.exception import RegionAlreadyConfigured
+
         try:
-            subliminal.region.configure('dogpile.cache.dbm',
-                                        arguments={'filename': os.path.join(tempfile.gettempdir(), 'cachefile.dbm'),
-                                                   'lock_factory': MutexLock})
+            subliminal.region.configure(
+                'dogpile.cache.dbm',
+                arguments={
+                    'filename': os.path.join(tempfile.gettempdir(), 'cachefile.dbm'),
+                    'lock_factory': MutexLock,
+                },
+            )
         except RegionAlreadyConfigured:
             pass
         logging.getLogger("subliminal").setLevel(logging.CRITICAL)
@@ -48,11 +54,16 @@ class MetainfoSubs(object):
             entry.register_lazy_func(self.get_subtitles, ['subtitles'])
 
     def get_subtitles(self, entry):
-        if entry.get('subtitles', eval_lazy=False) or not ('location' in entry) or \
-                ('$RECYCLE.BIN' in entry['location']) or not os.path.exists(entry['location']):
+        if (
+            entry.get('subtitles', eval_lazy=False)
+            or not ('location' in entry)
+            or ('$RECYCLE.BIN' in entry['location'])
+            or not os.path.exists(entry['location'])
+        ):
             return
         from subliminal import scan_video
         from subliminal.core import search_external_subtitles, refine
+
         try:
             video = scan_video(entry['location'])
             # grab external and internal subtitles

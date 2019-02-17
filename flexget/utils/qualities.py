@@ -47,7 +47,7 @@ class QualityComponent(object):
             return False, ""
         else:
             # remove matching part from the text
-            text = text[:match.start()] + text[match.end():]
+            text = text[: match.start()] + text[match.end() :]
         return True, text
 
     def __hash__(self):
@@ -127,7 +127,7 @@ _resolutions = [
     QualityComponent('resolution', 60, '720p', '(1280x)?720(p|hd)?x?([56]0)?'),
     QualityComponent('resolution', 70, '1080i'),
     QualityComponent('resolution', 80, '1080p', '(1920x)?1080p?x?([56]0)?'),
-    QualityComponent('resolution', 90, '2160p', '((3840x)?2160p?x?([56]0)?)|4k')
+    QualityComponent('resolution', 90, '2160p', '((3840x)?2160p?x?([56]0)?)|4k'),
 ]
 _sources = [
     QualityComponent('source', 10, 'workprint', modifier=-8),
@@ -148,7 +148,7 @@ _sources = [
     QualityComponent('source', 160, 'webdl', 'web(?:[\W_]?(dl|hd))?'),
     QualityComponent('source', 170, 'dvdrip', 'dvd(?:[\W_]?rip)?'),
     QualityComponent('source', 175, 'remux'),
-    QualityComponent('source', 180, 'bluray', '(?:b[dr][\W_]?rip|blu[\W_]?ray(?:[\W_]?rip)?)')
+    QualityComponent('source', 180, 'bluray', '(?:b[dr][\W_]?rip|blu[\W_]?ray(?:[\W_]?rip)?)'),
 ]
 _codecs = [
     QualityComponent('codec', 10, 'divx'),
@@ -156,7 +156,7 @@ _codecs = [
     QualityComponent('codec', 30, 'h264', '[hx].?264'),
     QualityComponent('codec', 35, 'vp9'),
     QualityComponent('codec', 40, 'h265', '[hx].?265|hevc'),
-    QualityComponent('codec', 50, '10bit', '10.?bit|hi10p')
+    QualityComponent('codec', 50, '10bit', '10.?bit|hi10p'),
 ]
 channels = '(?:(?:[^\w+]?[1-7][\W_]?(?:0|1|ch)))'
 _audios = [
@@ -170,14 +170,14 @@ _audios = [
     # The DTSs are a bit backwards, but the more specific one needs to be parsed first
     QualityComponent('audio', 60, 'dtshd', 'dts[\W_]?hd(?:[\W_]?ma)?%s?' % channels),
     QualityComponent('audio', 70, 'dts'),
-    QualityComponent('audio', 80, 'truehd', 'truehd%s?' % channels)
+    QualityComponent('audio', 80, 'truehd', 'truehd%s?' % channels),
 ]
 
 _UNKNOWNS = {
     'resolution': QualityComponent('resolution', 0, 'unknown'),
     'source': QualityComponent('source', 0, 'unknown'),
     'codec': QualityComponent('codec', 0, 'unknown'),
-    'audio': QualityComponent('audio', 0, 'unknown')
+    'audio': QualityComponent('audio', 0, 'unknown'),
 }
 
 # For wiki generating help
@@ -253,7 +253,9 @@ class Quality(object):
 
     @property
     def name(self):
-        name = ' '.join(str(p) for p in (self.resolution, self.source, self.codec, self.audio) if p.value != 0)
+        name = ' '.join(
+            str(p) for p in (self.resolution, self.source, self.codec, self.audio) if p.value != 0
+        )
         return name or 'unknown'
 
     @property
@@ -308,8 +310,12 @@ class Quality(object):
         return not self.__le__(other)
 
     def __repr__(self):
-        return '<Quality(resolution=%s,source=%s,codec=%s,audio=%s)>' % (self.resolution, self.source,
-                                                                         self.codec, self.audio)
+        return '<Quality(resolution=%s,source=%s,codec=%s,audio=%s)>' % (
+            self.resolution,
+            self.source,
+            self.codec,
+            self.audio,
+        )
 
     def __str__(self):
         return self.name
@@ -403,11 +409,19 @@ class RequirementComponent(object):
                     self.none_of.add(qual)
 
     def __eq__(self, other):
-        return ((self.max, self.max, self.acceptable, self.none_of) ==
-                (other.max, other.max, other.acceptable, other.none_of))
+        return (self.max, self.max, self.acceptable, self.none_of) == (
+            other.max,
+            other.max,
+            other.acceptable,
+            other.none_of,
+        )
 
     def __hash__(self):
-        return hash(tuple([self.min, self.max, tuple(sorted(self.acceptable)), tuple(sorted(self.none_of))]))
+        return hash(
+            tuple(
+                [self.min, self.max, tuple(sorted(self.acceptable)), tuple(sorted(self.none_of))]
+            )
+        )
 
 
 class Requirements(object):

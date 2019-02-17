@@ -45,8 +45,11 @@ class Verbose(object):
                 undecided = True
                 log.verbose('UNDECIDED: `%s`' % entry['title'])
             if undecided:
-                log_once('Undecided entries have not been accepted or rejected. If you expected these to reach output,'
-                         ' you must set up filter plugin(s) to accept them.', logger=log)
+                log_once(
+                    'Undecided entries have not been accepted or rejected. If you expected these to reach output,'
+                    ' you must set up filter plugin(s) to accept them.',
+                    logger=log,
+                )
 
 
 @event('plugin.register')
@@ -57,7 +60,19 @@ def register_plugin():
 @event('options.register')
 def register_parser_arguments():
     exec_parser = options.get_parser('execute')
-    exec_parser.add_argument('-v', '--verbose', action='store_true', dest='verbose', default=False,
-                             help='verbose undecided entries')
-    exec_parser.add_argument('-s', '--silent', action='store_true', dest='silent', default=False,
-                             help='don\'t verbose any actions (accept, reject, fail)')
+    exec_parser.add_argument(
+        '-v',
+        '--verbose',
+        action='store_true',
+        dest='verbose',
+        default=False,
+        help='verbose undecided entries',
+    )
+    exec_parser.add_argument(
+        '-s',
+        '--silent',
+        action='store_true',
+        dest='silent',
+        default=False,
+        help='don\'t verbose any actions (accept, reject, fail)',
+    )

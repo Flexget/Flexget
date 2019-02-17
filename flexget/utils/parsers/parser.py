@@ -15,8 +15,28 @@ class TitleParser(object):
     codecs = ['x264', 'x.264', 'h264', 'h.264', 'XViD']
 
     # lowercase required
-    cutoffs = ['limited', 'xvid', 'h264', 'x264', 'h.264', 'x.264', 'screener', 'unrated', '3d', 'extended',
-               'directors', 'director\'s', 'multisubs', 'dubbed', 'subbed', 'multi'] + specials + editions
+    cutoffs = (
+        [
+            'limited',
+            'xvid',
+            'h264',
+            'x264',
+            'h.264',
+            'x.264',
+            'screener',
+            'unrated',
+            '3d',
+            'extended',
+            'directors',
+            'director\'s',
+            'multisubs',
+            'dubbed',
+            'subbed',
+            'multi',
+        ]
+        + specials
+        + editions
+    )
 
     remove = ['imax']
 

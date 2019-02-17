@@ -51,8 +51,12 @@ def plugins_summary(manager, options):
 
 @event('options.register')
 def register_parser_arguments():
-    parser = options.register_command('plugins', plugins_summary, help='Print registered plugin summaries',
-                                      parents=[table_parser])
+    parser = options.register_command(
+        'plugins',
+        plugins_summary,
+        help='Print registered plugin summaries',
+        parents=[table_parser],
+    )
     parser.add_argument('--interface', help='Show plugins belonging to this interface')
     parser.add_argument('--phase', help='Show plugins that act on this phase')
     parser.add_argument('--builtins', action='store_true', help='Show just builtin plugins')

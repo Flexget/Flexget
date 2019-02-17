@@ -21,17 +21,12 @@ class AnidbList(object):
 
     anidb_url = 'http://anidb.net/perl-bin/'
 
-    default_user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebkit/537.36 (KHTML, like Gecko) ' \
-                         'Chrome/69.0.3497.100 Safari/537.36'
+    default_user_agent = (
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebkit/537.36 (KHTML, like Gecko) '
+        'Chrome/69.0.3497.100 Safari/537.36'
+    )
 
-    MODE_MAP = {
-        'all': 0,
-        'undefined': 1,
-        'watch': 2,
-        'get': 3,
-        'blacklist': 4,
-        'buddy': 11
-    }
+    MODE_MAP = {'all': 0, 'undefined': 1, 'watch': 2, 'get': 3, 'blacklist': 4, 'buddy': 11}
 
     schema = {
         'type': 'object',
@@ -39,30 +34,21 @@ class AnidbList(object):
             'user_id': {
                 'type': 'integer',
                 'pattern': USER_ID_RE,
-                'error_pattern': 'user_id must be in the form XXXXXXX'},
-            'type': {
-                'type': 'string',
-                'enum': ['shows', 'movies', 'ovas'],
-                'default': 'movies'},
-            'mode': {
-                'type': 'string',
-                'enum': list(MODE_MAP.keys()),
-                'default': 'all'},
-            'pass': {
-                'type': 'string'},
-            'strip_dates': {
-                'type': 'boolean',
-                'default': False}
+                'error_pattern': 'user_id must be in the form XXXXXXX',
+            },
+            'type': {'type': 'string', 'enum': ['shows', 'movies', 'ovas'], 'default': 'movies'},
+            'mode': {'type': 'string', 'enum': list(MODE_MAP.keys()), 'default': 'all'},
+            'pass': {'type': 'string'},
+            'strip_dates': {'type': 'boolean', 'default': False},
         },
         'additionalProperties': False,
         'required': ['user_id'],
-        'error_required': 'user_id is required'
+        'error_required': 'user_id is required',
     }
 
     def __build_url(self, config):
         base_url = self.anidb_url + 'animedb.pl?show=mywishlist&uid=%s' % config['user_id']
-        base_url = base_url +\
-            ('' if config['mode'] == 'all' else '&mode=%s' % config['mode'])
+        base_url = base_url + ('' if config['mode'] == 'all' else '&mode=%s' % config['mode'])
         base_url = base_url + ('' if config['pass'] is None else '&pass=%s' % config['pass'])
         return base_url
 
@@ -81,7 +67,9 @@ class AnidbList(object):
         except RequestException as e:
             raise plugin.PluginError(str(e))
         if page.status_code != 200:
-            raise plugin.PluginError('Unable to get AniDB list. Either the list is private or does not exist.')
+            raise plugin.PluginError(
+                'Unable to get AniDB list. Either the list is private or does not exist.'
+            )
 
         entries = []
         entry_type = ''
@@ -115,8 +103,10 @@ class AnidbList(object):
 
                     entry = Entry()
                     entry['title'] = anime_title
-                    entry['url'] = (self.anidb_url + a.get('href'))
-                    entry['anidb_id'] = tr['id'][1:]  # The <tr> tag's id is "aN..." where "N..." is the anime id
+                    entry['url'] = self.anidb_url + a.get('href')
+                    entry['anidb_id'] = tr['id'][
+                        1:
+                    ]  # The <tr> tag's id is "aN..." where "N..." is the anime id
                     log.debug('%s id is %s', entry['title'], entry['anidb_id'])
                     entry['anidb_name'] = entry['title']
                     entries.append(entry)

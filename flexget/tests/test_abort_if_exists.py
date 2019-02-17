@@ -5,6 +5,7 @@ import pytest
 
 from flexget.task import TaskAbort
 
+
 class TestAbortIfExists(object):
     config = """
         templates:

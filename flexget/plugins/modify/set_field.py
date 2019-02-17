@@ -23,10 +23,7 @@ class ModifySet(object):
       path: ~/download/path/
     """
 
-    schema = {
-        'type': 'object',
-        "minProperties": 1
-    }
+    schema = {'type': 'object', "minProperties": 1}
 
     def on_task_metainfo(self, task, config):
         """Adds the set dict to all accepted entries."""
@@ -48,7 +45,8 @@ class ModifySet(object):
                 except KeyError:
                     pass
                 entry.register_lazy_func(
-                    partial(self.lazy_set, config, field, orig_value, errors=errors), config)
+                    partial(self.lazy_set, config, field, orig_value, errors=errors), config
+                )
 
     def lazy_set(self, config, field, orig_field_value, entry, errors=True):
         logger = log.error if errors else log.debug

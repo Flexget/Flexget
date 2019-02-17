@@ -35,10 +35,10 @@ class PluginCookies(object):
                 'type': 'object',
                 'properties': {
                     'file': {'type': 'string', 'format': 'file'},
-                    'type': {'type': 'string', 'enum': ['firefox3', 'mozilla', 'lwp']}
+                    'type': {'type': 'string', 'enum': ['firefox3', 'mozilla', 'lwp']},
                 },
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ]
     }
 
@@ -55,6 +55,7 @@ class PluginCookies(object):
 
     def sqlite2cookie(self, filename):
         from io import StringIO
+
         try:
             from pysqlite2 import dbapi2 as sqlite
         except ImportError:
@@ -73,16 +74,20 @@ class PluginCookies(object):
         try:
             cur.execute('select host, path, isSecure, expiry, name, value from moz_cookies')
         except sqlite.Error:
-            raise plugin.PluginError('%s does not appear to be a valid Firefox 3 cookies file' % filename, log)
+            raise plugin.PluginError(
+                '%s does not appear to be a valid Firefox 3 cookies file' % filename, log
+            )
 
         ftstr = ['FALSE', 'TRUE']
 
         s = StringIO()
-        s.write("""\
+        s.write(
+            """\
 # Netscape HTTP Cookie File
 # http://www.netscape.com/newsref/std/cookie_spec.html
 # This is a generated file!  Do not edit.
-""")
+"""
+        )
         count = 0
         failed = 0
 
@@ -99,10 +104,22 @@ class PluginCookies(object):
                 # remove \t from item (#582)
                 item = [notabs(field) for field in item]
                 try:
-                    s.write('%s\t%s\t%s\t%s\t%s\t%s\t%s\n' % (item[0], ftstr[item[0].startswith('.')], item[1],
-                                                              ftstr[item[2]], item[3], item[4], item[5]))
+                    s.write(
+                        '%s\t%s\t%s\t%s\t%s\t%s\t%s\n'
+                        % (
+                            item[0],
+                            ftstr[item[0].startswith('.')],
+                            item[1],
+                            ftstr[item[2]],
+                            item[3],
+                            item[4],
+                            item[5],
+                        )
+                    )
 
-                    log.trace('Adding cookie for %s. key: %s value: %s' % (item[0], item[4], item[5]))
+                    log.trace(
+                        'Adding cookie for %s. key: %s value: %s' % (item[0], item[4], item[5])
+                    )
                     count += 1
                 except IOError:
 
@@ -137,6 +154,7 @@ class PluginCookies(object):
     def on_task_start(self, task, config):
         """Task starting, install cookiejar"""
         import os
+
         config = self.prepare_config(config)
         cookie_type = config.get('type')
         cookie_file = os.path.expanduser(config.get('file'))
@@ -164,7 +182,10 @@ class PluginCookies(object):
                 log.debug('%s cookies loaded' % cookie_type)
             except (http.cookiejar.LoadError, IOError):
                 import sys
-                raise plugin.PluginError('Cookies could not be loaded: %s' % sys.exc_info()[1], log)
+
+                raise plugin.PluginError(
+                    'Cookies could not be loaded: %s' % sys.exc_info()[1], log
+                )
 
         # Add cookiejar to our requests session
         task.requests.add_cookiejar(cj)

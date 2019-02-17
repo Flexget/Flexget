@@ -48,10 +48,15 @@ class Manipulate(object):
                         'type': 'object',
                         'properties': {
                             'regexp': {'type': 'string', 'format': 'regex'},
-                            'format': {'type': 'string'}},
+                            'format': {'type': 'string'},
+                        },
                         'required': ['regexp', 'format'],
-                        'additionalProperties': False}},
-                'additionalProperties': False}}
+                        'additionalProperties': False,
+                    },
+                },
+                'additionalProperties': False,
+            },
+        },
     }
 
     def on_task_start(self, task, config):
@@ -79,7 +84,10 @@ class Manipulate(object):
         if not self.phase_jobs['filter']:
             # return if no jobs for this phase
             return
-        modified = sum(self.process(entry, self.phase_jobs['filter']) for entry in task.entries + task.rejected)
+        modified = sum(
+            self.process(entry, self.phase_jobs['filter'])
+            for entry in task.entries + task.rejected
+        )
         log.verbose('Modified %d entries.' % modified)
 
     @plugin.priority(plugin.PRIORITY_FIRST)
@@ -87,7 +95,10 @@ class Manipulate(object):
         if not self.phase_jobs['modify']:
             # return if no jobs for this phase
             return
-        modified = sum(self.process(entry, self.phase_jobs['modify']) for entry in task.entries + task.rejected)
+        modified = sum(
+            self.process(entry, self.phase_jobs['modify'])
+            for entry in task.entries + task.rejected
+        )
         log.verbose('Modified %d entries.' % modified)
 
     def process(self, entry, jobs):
@@ -105,7 +116,10 @@ class Manipulate(object):
                 if 'from' in config:
                     from_field = config['from']
                 field_value = entry.get(from_field)
-                log.debug('field: `%s` from_field: `%s` field_value: `%s`' % (field, from_field, field_value))
+                log.debug(
+                    'field: `%s` from_field: `%s` field_value: `%s`'
+                    % (field, from_field, field_value)
+                )
 
                 if config.get('remove'):
                     if field in entry:

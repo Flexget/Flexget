@@ -24,10 +24,7 @@ class FilterLimitNew(object):
     FlexGet is executed.
     """
 
-    schema = {
-        'type': 'integer',
-        'minimum': 1
-    }
+    schema = {'type': 'integer', 'minimum': 1}
 
     @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_filter(self, task, config):
@@ -44,7 +41,9 @@ class FilterLimitNew(object):
                 # Also save this in backlog so that it can be accepted next time.
                 plugin.get('backlog', self).add_backlog(task, entry)
 
-        log.debug('Rejected: %s Allowed: %s' % (len(task.accepted[amount:]), len(task.accepted[:amount])))
+        log.debug(
+            'Rejected: %s Allowed: %s' % (len(task.accepted[amount:]), len(task.accepted[:amount]))
+        )
 
 
 @event('plugin.register')

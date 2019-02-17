@@ -25,8 +25,13 @@ needs_sphinx = '1.0'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.coverage', 'sphinx.ext.extlinks', 'sphinx.ext.doctest',
-              'sphinx.ext.intersphinx']
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.coverage',
+    'sphinx.ext.extlinks',
+    'sphinx.ext.doctest',
+    'sphinx.ext.intersphinx',
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['templates']
@@ -178,20 +183,15 @@ htmlhelp_basename = 'FlexGetDocs'
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     # 'papersize': 'letterpaper',
-
     # The font size ('10pt', '11pt' or '12pt').
     # 'pointsize': '10pt',
-
     # Additional stuff for the LaTeX preamble.
     # 'preamble': '',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
-latex_documents = [
-    ('index', 'FlexGet.tex', u'FlexGet Documentation',
-     u'FlexGet', 'manual'),
-]
+latex_documents = [('index', 'FlexGet.tex', u'FlexGet Documentation', u'FlexGet', 'manual')]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
@@ -218,10 +218,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    ('index', 'flexget', u'FlexGet Documentation',
-     [u'FlexGet'], 1)
-]
+man_pages = [('index', 'flexget', u'FlexGet Documentation', [u'FlexGet'], 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
@@ -233,9 +230,15 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'FlexGet', u'FlexGet Technical Documentation',
-     u'FlexGet', 'FlexGet', 'Automation tool.',
-     'Miscellaneous'),
+    (
+        'index',
+        'FlexGet',
+        u'FlexGet Technical Documentation',
+        u'FlexGet',
+        'FlexGet',
+        'Automation tool.',
+        'Miscellaneous',
+    )
 ]
 
 # Documents to append as an appendix to all manuals.
@@ -250,8 +253,10 @@ texinfo_documents = [
 # -- Extlinks for Trac ---------------------------------------------------------
 
 # sphinx.ext.extlinks
-extlinks = {'ticket': ('http://flexget.com/ticket/%s', 'ticket '),
-            'wiki': ('http://flexget.com/wiki/%s', 'wiki ')}
+extlinks = {
+    'ticket': ('http://flexget.com/ticket/%s', 'ticket '),
+    'wiki': ('http://flexget.com/wiki/%s', 'wiki '),
+}
 
 intersphinx_mapping = {
     'flask': ('http://flask.pocoo.org/docs/0.10/', None),
@@ -259,5 +264,5 @@ intersphinx_mapping = {
     'flask_restplus': ('http://flask-restplus.readthedocs.org/en/stable/', None),
     'jsonschema': ('http://python-jsonschema.readthedocs.org/en/latest/', None),
     'python': ('https://docs.python.org/2.7', None),
-    'requests': ('http://docs.python-requests.org/en/latest/', None)
+    'requests': ('http://docs.python-requests.org/en/latest/', None),
 }

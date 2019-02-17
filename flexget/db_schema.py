@@ -82,11 +82,15 @@ def get_version(plugin, session=None):
 @with_session
 def set_version(plugin, version, session=None):
     if plugin not in plugin_schemas:
-        raise ValueError('Tried to set schema version for %s plugin with no versioned_base.' % plugin)
+        raise ValueError(
+            'Tried to set schema version for %s plugin with no versioned_base.' % plugin
+        )
     base_version = plugin_schemas[plugin]['version']
     if version != base_version:
-        raise ValueError('Tried to set %s plugin schema version to %d when '
-                         'it should be %d as defined in versioned_base.' % (plugin, version, base_version))
+        raise ValueError(
+            'Tried to set %s plugin schema version to %d when '
+            'it should be %d as defined in versioned_base.' % (plugin, version, base_version)
+        )
     schema = session.query(PluginSchema).filter(PluginSchema.plugin == plugin).first()
     if not schema:
         log.debug('Initializing plugin %s schema version to %i' % (plugin, version))
@@ -108,7 +112,10 @@ def upgrade_required(session=None):
     if len(old_schemas) < len(plugin_schemas):
         return True
     for old_schema in old_schemas:
-        if old_schema.plugin in plugin_schemas and old_schema.version < plugin_schemas[old_schema.plugin]['version']:
+        if (
+            old_schema.plugin in plugin_schemas
+            and old_schema.version < plugin_schemas[old_schema.plugin]['version']
+        ):
             return True
     return False
 
@@ -141,7 +148,6 @@ def upgrade(plugin):
     """
 
     def upgrade_decorator(upgrade_func):
-
         @event('manager.upgrade')
         def upgrade_wrapper(manager):
             with Session() as session:
@@ -149,7 +155,10 @@ def upgrade(plugin):
                 try:
                     new_ver = upgrade_func(current_ver, session)
                 except UpgradeImpossible:
-                    log.info('Plugin %s database is not upgradable. Flushing data and regenerating.' % plugin)
+                    log.info(
+                        'Plugin %s database is not upgradable. Flushing data and regenerating.'
+                        % plugin
+                    )
                     reset_schema(plugin, session=session)
                     manager.db_upgraded = True
                 except Exception as e:
@@ -163,8 +172,10 @@ def upgrade(plugin):
                         set_version(plugin, new_ver, session=session)
                         manager.db_upgraded = True
                     elif new_ver < current_ver:
-                        log.critical('A lower schema version was returned (%s) from plugin %s upgrade function '
-                                     'than passed in (%s)' % (new_ver, plugin, current_ver))
+                        log.critical(
+                            'A lower schema version was returned (%s) from plugin %s upgrade function '
+                            'than passed in (%s)' % (new_ver, plugin, current_ver)
+                        )
                         session.rollback()
                         manager.shutdown(finish_queue=False)
 
@@ -176,7 +187,8 @@ def upgrade(plugin):
 @with_session
 def reset_schema(plugin, session=None):
     """
-    Removes all tables from given plugin from the database, as well as removing current stored schema number.
+    Removes all tables from given plugin from the database,
+    as well as removing current stored schema number.
 
     :param plugin: The plugin whose schema should be reset
     """
@@ -227,6 +239,7 @@ class Meta(type):
 
                     class mcs(type(Base), mcs):
                         pass
+
             else:
                 new_bases.append(base)
 
@@ -249,9 +262,14 @@ class Meta(type):
 
 
 def versioned_base(plugin, version):
-    """Returns a class which can be used like Base, but automatically stores schema version when tables are created."""
+    """
+    Returns a class which can be used like Base,
+    but automatically stores schema version when tables are created.
+    """
 
-    return Meta('VersionedBase', (object,), {'__metaclass__': Meta, 'plugin': plugin, 'version': version})
+    return Meta(
+        'VersionedBase', (object,), {'__metaclass__': Meta, 'plugin': plugin, 'version': version}
+    )
 
 
 def after_table_create(event, target, bind, tables=None, **kw):

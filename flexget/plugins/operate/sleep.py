@@ -24,15 +24,25 @@ class PluginSleep(object):
                     'seconds': {'type': 'integer'},
                     'phase': {
                         'type': 'string',
-                        'enum': ['start', 'input', 'metainfo', 'filter', 'download',
-                                 'modify', 'output', 'learn', 'abort', 'exit'],
-                        'default': 'start'
-                    }
+                        'enum': [
+                            'start',
+                            'input',
+                            'metainfo',
+                            'filter',
+                            'download',
+                            'modify',
+                            'output',
+                            'learn',
+                            'abort',
+                            'exit',
+                        ],
+                        'default': 'start',
+                    },
                 },
                 'required': ['seconds'],
-                'additionalProperties': False
+                'additionalProperties': False,
             },
-            {'type': 'integer'}
+            {'type': 'integer'},
         ]
     }
 

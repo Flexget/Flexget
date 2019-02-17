@@ -9,6 +9,7 @@ import logging
 from datetime import timedelta, datetime
 
 import requests
+
 # Allow some request objects to be imported from here instead of requests
 import warnings
 from requests import RequestException
@@ -70,6 +71,7 @@ class TokenBucketLimiter(DomainLimiter):
 
     New instances for the same domain will restore previous values.
     """
+
     # This is just an in memory cache right now, it works for the daemon, and across tasks in a single execution
     # but not for multiple executions via cron. Do we need to store this to db?
     state_cache = {}
@@ -85,7 +87,9 @@ class TokenBucketLimiter(DomainLimiter):
         self.rate = parse_timedelta(rate)
         self.wait = wait
         # Restore previous state for this domain, or establish new state cache
-        self.state = self.state_cache.setdefault(domain, {'tokens': self.max_tokens, 'last_update': datetime.now()})
+        self.state = self.state_cache.setdefault(
+            domain, {'tokens': self.max_tokens, 'last_update': datetime.now()}
+        )
 
     @property
     def tokens(self):
@@ -105,8 +109,9 @@ class TokenBucketLimiter(DomainLimiter):
 
     def __call__(self):
         if self.tokens < self.max_tokens:
-            regen = (timedelta_total_seconds(datetime.now() - self.last_update) /
-                     timedelta_total_seconds(self.rate))
+            regen = timedelta_total_seconds(
+                datetime.now() - self.last_update
+            ) / timedelta_total_seconds(self.rate)
             self.tokens += regen
         self.last_update = datetime.now()
         if self.tokens < 1:
@@ -201,7 +206,11 @@ class Session(requests.Session):
         :param domain: The domain to set the interval on
         :param delay: The amount of time between requests, can be a timedelta or string like '3 seconds'
         """
-        warnings.warn('set_domain_delay is deprecated, use add_domain_limiter', DeprecationWarning, stacklevel=2)
+        warnings.warn(
+            'set_domain_delay is deprecated, use add_domain_limiter',
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self.domain_limiters[domain] = TimedLimiter(domain, delay)
 
     def add_domain_limiter(self, limiter):
@@ -222,8 +231,10 @@ class Session(requests.Session):
 
         # Raise Timeout right away if site is known to timeout
         if is_unresponsive(url):
-            raise requests.Timeout('Requests to this site (%s) have timed out recently. Waiting before trying again.' %
-                                   urlparse(url).hostname)
+            raise requests.Timeout(
+                'Requests to this site (%s) have timed out recently. Waiting before trying again.'
+                % urlparse(url).hostname
+            )
 
         # Run domain limiters for this url
         limit_domains(url, self.domain_limiters)

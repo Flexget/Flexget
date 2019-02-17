@@ -18,10 +18,7 @@ class PluginSequence(object):
       - rss: http://feedb.com
     """
 
-    schema = {
-        'type': 'array',
-        'items': {'$ref': '/schema/plugins'}
-    }
+    schema = {'type': 'array', 'items': {'$ref': '/schema/plugins'}}
 
     def __getattr__(self, item):
         """Returns a function for all on_task_* events, that runs all the configured plugins."""

@@ -60,7 +60,10 @@ class TaskQueue(object):
 
         remaining_jobs = self.run_queue.qsize()
         if remaining_jobs:
-            log.warning('task queue shut down with %s tasks remaining in the queue to run.' % remaining_jobs)
+            log.warning(
+                'task queue shut down with %s tasks remaining in the queue to run.'
+                % remaining_jobs
+            )
         else:
             log.debug('task queue shut down')
 
@@ -84,8 +87,10 @@ class TaskQueue(object):
         if finish_queue:
             self._shutdown_when_finished = True
             if self.run_queue.qsize():
-                log.verbose('There are %s tasks to execute. Shutdown will commence when they have completed.' %
-                            self.run_queue.qsize())
+                log.verbose(
+                    'There are %s tasks to execute. Shutdown will commence when they have completed.'
+                    % self.run_queue.qsize()
+                )
         else:
             self._shutdown_now = True
 

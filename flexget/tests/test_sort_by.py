@@ -3,6 +3,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
 
+
 class TestSortBy(object):
     config = """
         tasks:
@@ -103,36 +104,66 @@ class TestSortBy(object):
             return param
         return '|'
 
-    @pytest.mark.parametrize('task_name,result_titles,fail_reason', [
-        ('test_title',
-            ['A B C', 'A P E', 'B C D'],
-            'Entries should be sorted alphabetically by title'),
-        ('test_title_reverse',
-            ['B C D', 'A P E', 'A B C'],
-            'Entries should be sorted alphabetically by title'),
-        ('test_reverse',
-            ['A P E', 'A B C', 'B C D'],
-            'Entries should be sorted alphabetically by title'),
-        ('test_quality',
-            ['Test.1080p', 'Test.720p', 'Test.hdtv'],
-            'Entries should be sorted by descending quality'),
-        ('test_ignore_articles',
-            ['The Cat Who Looked Back', 'A New Series', 'New Series 2', 'An Owl Looked Back',
-             'Owl Looked Back Goes to College'],
-            'Entries should be sorted ignoring articles `a`, `an`, and `the`'),
-        ('test_ignore_articles_custom',
-            ['An Owl Looked Back', 'The Cat Who Looked Back', 'A New Series', 'New Series 2',
-             'Owl Looked Back Goes to College'],
-            'Entries should be sorted ignoring articles `a` and `the`'),
-        ('test_multi_field',
-            ['B', 'C', 'A'], 'Entries should be sorted by both fields, ascending'),
-        ('test_missing_field',
-            ['A', 'C', 'B'], 'Entries without field should be sorted last'),
-        ('test_missing_field_reverse',
-            ['C', 'A', 'B'], 'Entries without field should be sorted last'),
-        ('test_jinja_field',
-            ['C', 'B', 'A'], 'Entries without field should be sorted last')
-    ], ids=generate_test_ids)
+    @pytest.mark.parametrize(
+        'task_name,result_titles,fail_reason',
+        [
+            (
+                'test_title',
+                ['A B C', 'A P E', 'B C D'],
+                'Entries should be sorted alphabetically by title',
+            ),
+            (
+                'test_title_reverse',
+                ['B C D', 'A P E', 'A B C'],
+                'Entries should be sorted alphabetically by title',
+            ),
+            (
+                'test_reverse',
+                ['A P E', 'A B C', 'B C D'],
+                'Entries should be sorted alphabetically by title',
+            ),
+            (
+                'test_quality',
+                ['Test.1080p', 'Test.720p', 'Test.hdtv'],
+                'Entries should be sorted by descending quality',
+            ),
+            (
+                'test_ignore_articles',
+                [
+                    'The Cat Who Looked Back',
+                    'A New Series',
+                    'New Series 2',
+                    'An Owl Looked Back',
+                    'Owl Looked Back Goes to College',
+                ],
+                'Entries should be sorted ignoring articles `a`, `an`, and `the`',
+            ),
+            (
+                'test_ignore_articles_custom',
+                [
+                    'An Owl Looked Back',
+                    'The Cat Who Looked Back',
+                    'A New Series',
+                    'New Series 2',
+                    'Owl Looked Back Goes to College',
+                ],
+                'Entries should be sorted ignoring articles `a` and `the`',
+            ),
+            (
+                'test_multi_field',
+                ['B', 'C', 'A'],
+                'Entries should be sorted by both fields, ascending',
+            ),
+            ('test_missing_field', ['A', 'C', 'B'], 'Entries without field should be sorted last'),
+            (
+                'test_missing_field_reverse',
+                ['C', 'A', 'B'],
+                'Entries without field should be sorted last',
+            ),
+            ('test_jinja_field', ['C', 'B', 'A'], 'Entries without field should be sorted last'),
+        ],
+        ids=generate_test_ids,
+    )
     def test_sort_by(self, execute_task, task_name, result_titles, fail_reason):
         task = execute_task(task_name)
         for count, title in enumerate(result_titles):

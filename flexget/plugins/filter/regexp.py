@@ -50,7 +50,7 @@ class FilterRegexp(object):
             'accept_excluding': {'$ref': '#/definitions/regex_list'},
             'reject_excluding': {'$ref': '#/definitions/regex_list'},
             'rest': {'type': 'string', 'enum': ['accept', 'reject']},
-            'from': one_or_more({'type': 'string'})
+            'from': one_or_more({'type': 'string'}),
         },
         'additionalProperties': False,
         'definitions': {
@@ -74,18 +74,20 @@ class FilterRegexp(object):
                                         'properties': {
                                             'path': {'type': 'string', 'format': 'path'},
                                             'set': {'type': 'object'},
-                                            'not': one_or_more({'type': 'string', 'format': 'regex'}),
-                                            'from': one_or_more({'type': 'string'})
+                                            'not': one_or_more(
+                                                {'type': 'string', 'format': 'regex'}
+                                            ),
+                                            'from': one_or_more({'type': 'string'}),
                                         },
-                                        'additionalProperties': False
-                                    }
+                                        'additionalProperties': False,
+                                    },
                                 ]
-                            }
-                        }
+                            },
+                        },
                     ]
-                }
+                },
             }
-        }
+        },
     }
 
     def prepare_config(self, config):
@@ -129,7 +131,9 @@ class FilterRegexp(object):
 
                 # compile `not` option regexps
                 if 'not' in opts:
-                    opts['not'] = [re.compile(not_re, re.IGNORECASE | re.UNICODE) for not_re in opts['not']]
+                    opts['not'] = [
+                        re.compile(not_re, re.IGNORECASE | re.UNICODE) for not_re in opts['not']
+                    ]
 
                 # compile regexp and make sure regexp is a string for series like '24'
                 try:
@@ -219,15 +223,18 @@ class FilterRegexp(object):
                 # Run if we are in match mode and have a hit, or are in non-match mode and don't have a hit
                 if match_mode == bool(field):
                     # Creates the string with the reason for the hit
-                    matchtext = 'regexp \'%s\' ' % regexp.pattern + ('matched field \'%s\'' %
-                                                                     field if match_mode else 'didn\'t match')
+                    matchtext = 'regexp \'%s\' ' % regexp.pattern + (
+                        'matched field \'%s\'' % field if match_mode else 'didn\'t match'
+                    )
                     log.debug('%s for %s' % (matchtext, entry['title']))
                     # apply settings to entry and run the method on it
                     if opts.get('path'):
                         entry['path'] = opts['path']
                     if opts.get('set'):
                         # invoke set plugin with given configuration
-                        log.debug('adding set: info to entry:"%s" %s' % (entry['title'], opts['set']))
+                        log.debug(
+                            'adding set: info to entry:"%s" %s' % (entry['title'], opts['set'])
+                        )
                         plugin.get('set', self).modify(entry, opts['set'])
                     method(entry, matchtext)
                     # We had a match so break out of the regexp loop.

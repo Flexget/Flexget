@@ -32,14 +32,15 @@ schema = {
     'oneOf': [
         {'type': 'boolean'},
         {'type': 'string', 'enum': ['always', 'by_interval']},
-        {'type': 'object',
-         'properties': {
-             'lookup': {'type': 'string', 'enum': ['always', 'by_interval']},
-             'check_for_dev_version': {'type': 'boolean'},
-             'interval': {'type': 'integer'}
-         },
-         'additionalProperties': False}
-
+        {
+            'type': 'object',
+            'properties': {
+                'lookup': {'type': 'string', 'enum': ['always', 'by_interval']},
+                'check_for_dev_version': {'type': 'boolean'},
+                'interval': {'type': 'integer'},
+            },
+            'additionalProperties': False,
+        },
     ]
 }
 
@@ -98,8 +99,11 @@ class VersionChecker(object):
             log.warning('Could not get latest version of flexget')
             return
         elif latest_version != current_version:
-            log.warning('You are not running latest Flexget Version. Current is %s and latest is %s',
-                        current_version, latest_version)
+            log.warning(
+                'You are not running latest Flexget Version. Current is %s and latest is %s',
+                current_version,
+                latest_version,
+            )
         if last_check:
             log.debug('updating last check time')
             last_check.update()

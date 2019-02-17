@@ -90,5 +90,6 @@ def cleanup(manager, options):
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('--debug-perf', action='store_true', dest='debug_perf', default=False,
-                                               help=SUPPRESS)
+    options.get_parser('execute').add_argument(
+        '--debug-perf', action='store_true', dest='debug_perf', default=False, help=SUPPRESS
+    )

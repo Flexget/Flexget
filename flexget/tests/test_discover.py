@@ -92,7 +92,9 @@ class TestDiscover(object):
         assert len(task.entries) == 1
 
         # Insert a new entry into the search input
-        manager.config['tasks']['test_interval']['discover']['what'][0]['mock'].append({'title': 'Bar'})
+        manager.config['tasks']['test_interval']['discover']['what'][0]['mock'].append(
+            {'title': 'Bar'}
+        )
         task = execute_task('test_interval')
         # First entry should be waiting for interval
         assert len(task.entries) == 1
@@ -122,8 +124,9 @@ class TestDiscover(object):
         for epnum in range(1, 5):
             title = 'My Show S01E0%d' % epnum
             assert any(e['title'] == title for e in task.mock_output), '%s not accepted' % title
-        assert len(task.mock_output) == 4, \
-            '4 episodes should have been accepted, not %s' % len(task.mock_output)
+        assert len(task.mock_output) == 4, '4 episodes should have been accepted, not %s' % len(
+            task.mock_output
+        )
 
 
 class TestEmitSeriesInDiscover(object):
@@ -189,7 +192,9 @@ class TestEmitSeriesInDiscover(object):
     """
 
     def test_next_series_episodes_backfill(self, execute_task):
-        execute_task('inject_series', options={'inject': [Entry(title='My Show 2 S02E01', url='')]})
+        execute_task(
+            'inject_series', options={'inject': [Entry(title='My Show 2 S02E01', url='')]}
+        )
         task = execute_task('test_next_series_episodes_backfill')
         assert task.find_entry(title='My Show 2 S01E01')
         assert task.find_entry(title='My Show 2 S02E02')
@@ -200,13 +205,22 @@ class TestEmitSeriesInDiscover(object):
         assert task.find_entry(title='My Show 2 S01E01')
 
     def test_next_series_episodes_with_completed_season(self, execute_task):
-        execute_task('inject_series',
-                     options={'inject': [Entry(title='My Show 2 S02', url=''), Entry(title='My Show 2 S01', url='')]})
+        execute_task(
+            'inject_series',
+            options={
+                'inject': [
+                    Entry(title='My Show 2 S02', url=''),
+                    Entry(title='My Show 2 S01', url=''),
+                ]
+            },
+        )
         task = execute_task('test_next_series_episodes')
         assert task.find_entry(title='My Show 2 S03E01')
 
     def test_next_series_episodes_with_uncompleted_season(self, execute_task):
-        execute_task('inject_series', options={'inject': [Entry(title='My Show 1 S02 480p', url='')]})
+        execute_task(
+            'inject_series', options={'inject': [Entry(title='My Show 1 S02 480p', url='')]}
+        )
         task = execute_task('test_next_series_episodes_with_unaccepted_season')
         assert task.find_entry(title='My Show 1 S02E01')
 
@@ -215,9 +229,14 @@ class TestEmitSeriesInDiscover(object):
         assert task.find_entry(title='My Show 2 S02')
 
     def test_next_series_seasons_with_completed_seasons(self, execute_task):
-        execute_task('inject_series',
-                     options={'inject': [Entry(title='My Show 2 S02', url=''), Entry(title='My Show 2 S01', url='')]})
+        execute_task(
+            'inject_series',
+            options={
+                'inject': [
+                    Entry(title='My Show 2 S02', url=''),
+                    Entry(title='My Show 2 S01', url=''),
+                ]
+            },
+        )
         task = execute_task('test_next_series_seasons')
         assert task.find_entry(title='My Show 2 S03')
-
-

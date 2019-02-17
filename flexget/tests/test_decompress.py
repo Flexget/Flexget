@@ -101,7 +101,9 @@ class TestExtract(object):
         """Test basic RAR extraction"""
         execute_task('test_rar')
 
-        assert tmpdir.join(self.out_file).exists(), 'Output file does not exist at the correct path.'
+        assert tmpdir.join(
+            self.out_file
+        ).exists(), 'Output file does not exist at the correct path.'
         assert tmpdir.join(self.rar_name).exists(), 'RAR archive should still exist.'
 
     @pytest.mark.skipif(rarfile is None, reason='rarfile module required')
@@ -115,14 +117,18 @@ class TestExtract(object):
     def test_zip(self, execute_task, tmpdir):
         """Test basic Zip extraction"""
         execute_task('test_zip')
-        assert tmpdir.join(self.out_file).exists(), 'Output file does not exist at the correct path.'
+        assert tmpdir.join(
+            self.out_file
+        ).exists(), 'Output file does not exist at the correct path.'
         assert tmpdir.join(self.zip_name).exists(), 'Zip archive should still exist.'
 
     @pytest.mark.filecopy(zip_path, '__tmp__')
     def test_keep_dirs(self, execute_task, tmpdir):
         """Test directory creation"""
         execute_task('test_keep_dirs')
-        assert tmpdir.join(self.out_dir, self.out_file).exists(), 'Output file does not exist at the correct path.'
+        assert tmpdir.join(
+            self.out_dir, self.out_file
+        ).exists(), 'Output file does not exist at the correct path.'
 
     @pytest.mark.filecopy(zip_path, '__tmp__')
     def test_delete_zip(self, execute_task, tmpdir):
@@ -133,7 +139,9 @@ class TestExtract(object):
     def test_empty_path(self, execute_task, caplog):
         """Test when an empty location is provided"""
         execute_task('test_empty_path')
-        assert self.error_not_local in caplog.text, 'Plugin logs an error when entry has an empty path.'
+        assert (
+            self.error_not_local in caplog.text
+        ), 'Plugin logs an error when entry has an empty path.'
 
     def test_no_path(self, execute_task, caplog):
         """Test when no location is provided"""
@@ -143,4 +151,6 @@ class TestExtract(object):
     def test_not_a_file(self, execute_task, caplog):
         """Test when a non-existent path is provided"""
         execute_task('test_file_not_exists')
-        assert self.error_not_exists in caplog.text, 'Plugin logs an error when file does not exist.'
+        assert (
+            self.error_not_exists in caplog.text
+        ), 'Plugin logs an error when file does not exist.'

@@ -65,20 +65,21 @@ class RegexpParse(object):
     """
 
     # dict used to convert string values of regexp flags to int
-    FLAG_VALUES = {'DEBUG': re.DEBUG,
-                   'I': re.I,
-                   'IGNORECASE': re.IGNORECASE,
-                   'L': re.L,
-                   'LOCALE': re.LOCALE,
-                   'M': re.M,
-                   'MULTILINE': re.MULTILINE,
-                   'S': re.S,
-                   'DOTALL': re.DOTALL,
-                   'U': re.U,
-                   'UNICODE': re.UNICODE,
-                   'X': re.X,
-                   'VERBOSE': re.VERBOSE
-                   }
+    FLAG_VALUES = {
+        'DEBUG': re.DEBUG,
+        'I': re.I,
+        'IGNORECASE': re.IGNORECASE,
+        'L': re.L,
+        'LOCALE': re.LOCALE,
+        'M': re.M,
+        'MULTILINE': re.MULTILINE,
+        'S': re.S,
+        'DOTALL': re.DOTALL,
+        'U': re.U,
+        'UNICODE': re.UNICODE,
+        'X': re.X,
+        'VERBOSE': re.VERBOSE,
+    }
 
     FLAG_REGEX = r'^(\s?({})\s?(,|$))+$'.format('|'.join(FLAG_VALUES))
 
@@ -93,12 +94,12 @@ class RegexpParse(object):
                         'flags': {
                             'type': 'string',
                             'pattern': FLAG_REGEX,
-                            'error_pattern': 'Must be a comma separated list of flags. See python regex docs.'
+                            'error_pattern': 'Must be a comma separated list of flags. See python regex docs.',
                         },
                     },
                     'required': ['regexp'],
                     'additionalProperties': False,
-                }
+                },
             }
         },
         'type': 'object',

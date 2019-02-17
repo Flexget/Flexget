@@ -27,12 +27,9 @@ class FilterIf(object):
         'items': {
             'type': 'object',
             'additionalProperties': {
-                'anyOf': [
-                    {'$ref': '/schema/plugins'},
-                    {'enum': ['accept', 'reject', 'fail']}
-                ]
-            }
-        }
+                'anyOf': [{'$ref': '/schema/plugins'}, {'enum': ['accept', 'reject', 'fail']}]
+            },
+        },
     }
 
     def check_condition(self, condition, entry):
@@ -40,10 +37,14 @@ class FilterIf(object):
         # Make entry fields and other utilities available in the eval namespace
         # We need our namespace to be an Entry instance for lazy loading to work
         eval_locals = copy(entry)
-        eval_locals.update({'has_field': lambda f: f in entry,
-                            'timedelta': datetime.timedelta,
-                            'utcnow': datetime.datetime.utcnow(),
-                            'now': datetime.datetime.now()})
+        eval_locals.update(
+            {
+                'has_field': lambda f: f in entry,
+                'timedelta': datetime.timedelta,
+                'utcnow': datetime.datetime.utcnow(),
+                'now': datetime.datetime.now(),
+            }
+        )
         try:
             # Restrict eval namespace to have no globals and locals only from eval_locals
             passed = evaluate_expression(condition, eval_locals)
@@ -66,10 +67,7 @@ class FilterIf(object):
             raise AttributeError(item)
 
         def handle_phase(task, config):
-            entry_actions = {
-                'accept': Entry.accept,
-                'reject': Entry.reject,
-                'fail': Entry.fail}
+            entry_actions = {'accept': Entry.accept, 'reject': Entry.reject, 'fail': Entry.fail}
             for item in config:
                 requirement, action = list(item.items())[0]
                 passed_entries = (e for e in task.entries if self.check_condition(requirement, e))

@@ -20,25 +20,14 @@ class DownloadAuth(object):
             'properties': {
                 'username': {'type': 'string'},
                 'password': {'type': 'string'},
-                'type': {
-                    'type': 'string',
-                    'enum': ['basic', 'digest'],
-                    'default': 'basic'
-                }
+                'type': {'type': 'string', 'enum': ['basic', 'digest'], 'default': 'basic'},
             },
-            'required': ['username', 'password']
+            'required': ['username', 'password'],
         }
     }
-    schema = {
-        'type': 'array',
-        'items': host_schema,
-        'minimumItems': 1
-    }
+    schema = {'type': 'array', 'items': host_schema, 'minimumItems': 1}
 
-    auth_mapper = {
-        'basic': HTTPBasicAuth,
-        'digest': HTTPDigestAuth
-    }
+    auth_mapper = {'basic': HTTPBasicAuth, 'digest': HTTPDigestAuth}
 
     # Run before all downloads
     @plugin.priority(plugin.PRIORITY_FIRST)

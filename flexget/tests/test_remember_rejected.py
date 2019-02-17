@@ -34,5 +34,6 @@ class TestRememberRejected(object):
         task = execute_task('test')
         assert task.find_entry('rejected', title='title 1', rejected_by='test_remember_reject')
         task = execute_task('test')
-        assert task.find_entry('rejected', title='title 1', rejected_by='remember_rejected'), \
-            'remember_rejected should have rejected'
+        assert task.find_entry(
+            'rejected', title='title 1', rejected_by='remember_rejected'
+        ), 'remember_rejected should have rejected'

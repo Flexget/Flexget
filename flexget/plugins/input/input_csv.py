@@ -47,11 +47,11 @@ class InputCSV(object):
             'values': {
                 'type': 'object',
                 'additionalProperties': {'type': 'integer'},
-                'required': ['title', 'url']
-            }
+                'required': ['title', 'url'],
+            },
         },
         'required': ['url', 'values'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     @cached('csv')

@@ -8,7 +8,13 @@ from colorclass import Windows, Color
 from flexget.logger import local_context
 from flexget.options import ArgumentParser
 from flexget.utils.tools import io_encoding
-from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable, PorcelainTable
+from terminaltables import (
+    AsciiTable,
+    SingleTable,
+    DoubleTable,
+    GithubFlavoredMarkdownTable,
+    PorcelainTable,
+)
 from terminaltables.terminal_io import terminal_size
 
 # Enable terminal colors on windows.
@@ -107,7 +113,7 @@ class TerminalTable(object):
             'porcelain': PorcelainTable,
             'single': SingleTable,
             'double': DoubleTable,
-            'github': GithubFlavoredMarkdownTable
+            'github': GithubFlavoredMarkdownTable,
         }
 
     @property
@@ -207,7 +213,9 @@ class TerminalTable(object):
                     # This probably shouldn't happen, can be caused by wrong parameters sent to drop_columns and
                     # wrap_columns
                     if wrapped_width <= 0:
-                        raise TerminalTableError('Table could not be rendered correctly using it given data')
+                        raise TerminalTableError(
+                            'Table could not be rendered correctly using it given data'
+                        )
                     output_value = word_wrap(str(value), wrapped_width)
                 output_row.append(output_value)
             output_table.append(output_row)
@@ -219,10 +227,19 @@ class TerminalTableError(Exception):
 
 
 table_parser = ArgumentParser(add_help=False)
-table_parser.add_argument('--table-type', choices=list(TerminalTable.supported_table_types()), default='single',
-                          help='Select output table style')
-table_parser.add_argument('--porcelain', dest='table_type', action='store_const', const='porcelain',
-                          help='Make the output parseable. Similar to using `--table-type porcelain`')
+table_parser.add_argument(
+    '--table-type',
+    choices=list(TerminalTable.supported_table_types()),
+    default='single',
+    help='Select output table style',
+)
+table_parser.add_argument(
+    '--porcelain',
+    dest='table_type',
+    action='store_const',
+    const='porcelain',
+    help='Make the output parseable. Similar to using `--table-type porcelain`',
+)
 
 
 def word_wrap(text, max_length):

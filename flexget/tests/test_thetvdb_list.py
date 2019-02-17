@@ -14,9 +14,11 @@ class TestTheTVDBList(object):
       tasks: {}
     """
 
-    tvdb_config = {'username': 'flexget',
-                   'account_id': '80FB8BD0720CA5EC',
-                   'api_key': '4D297D8CFDE0E105'}
+    tvdb_config = {
+        'username': 'flexget',
+        'account_id': '80FB8BD0720CA5EC',
+        'api_key': '4D297D8CFDE0E105',
+    }
 
     def test_thetvdb_list_add(self):
         tvdb_set = TheTVDBSet(self.tvdb_config)

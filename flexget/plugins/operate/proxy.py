@@ -20,9 +20,11 @@ class Proxy(object):
             {'type': 'string', 'format': 'url'},
             {
                 'type': 'object',
-                'properties': dict((prot, {'type': 'string', 'format': 'url'}) for prot in PROTOCOLS),
-                'additionalProperties': False
-            }
+                'properties': dict(
+                    (prot, {'type': 'string', 'format': 'url'}) for prot in PROTOCOLS
+                ),
+                'additionalProperties': False,
+            },
         ]
     }
 

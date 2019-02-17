@@ -28,12 +28,9 @@ class Mock(object):
         'type': 'array',
         'items': {
             'type': 'object',
-            'properties': {
-                'title': {'type': 'string'},
-                'url': {'type': 'string'}
-            },
-            'required': ['title']
-        }
+            'properties': {'title': {'type': 'string'}, 'url': {'type': 'string'}},
+            'required': ['title'],
+        },
     }
 
     def on_task_input(self, task, config):

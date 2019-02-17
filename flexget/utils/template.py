@@ -12,8 +12,16 @@ from copy import copy
 from datetime import datetime, date, time
 
 import jinja2.filters
-from jinja2 import (Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader, Template,
-                    TemplateNotFound, TemplateSyntaxError)
+from jinja2 import (
+    Environment,
+    StrictUndefined,
+    ChoiceLoader,
+    FileSystemLoader,
+    PackageLoader,
+    Template,
+    TemplateNotFound,
+    TemplateSyntaxError,
+)
 from dateutil import parser as dateutil_parse
 
 from flexget.event import event
@@ -28,6 +36,7 @@ environment = None
 
 class RenderError(Exception):
     """Error raised when there is a problem with jinja rendering."""
+
     pass
 
 
@@ -76,7 +85,9 @@ def filter_formatdate(val, format):
     encoding = locale.getpreferredencoding()
     if not isinstance(val, (datetime, date, time)):
         return val
-    return native_str_to_text(val.strftime(text_to_native_str(format, encoding=encoding)), encoding=encoding)
+    return native_str_to_text(
+        val.strftime(text_to_native_str(format, encoding=encoding)), encoding=encoding
+    )
 
 
 def filter_parsedate(val):
@@ -143,10 +154,16 @@ class FlexGetTemplate(Template):
 def make_environment(manager):
     """Create our environment and add our custom filters"""
     global environment
-    environment = Environment(undefined=StrictUndefined,
-                              loader=ChoiceLoader([PackageLoader('flexget'),
-                                                   FileSystemLoader(os.path.join(manager.config_base, 'templates'))]),
-                              extensions=['jinja2.ext.loopcontrols'])
+    environment = Environment(
+        undefined=StrictUndefined,
+        loader=ChoiceLoader(
+            [
+                PackageLoader('flexget'),
+                FileSystemLoader(os.path.join(manager.config_base, 'templates')),
+            ]
+        ),
+        extensions=['jinja2.ext.loopcontrols'],
+    )
     environment.template_class = FlexGetTemplate
     for name, filt in list(globals().items()):
         if name.startswith('filter_'):

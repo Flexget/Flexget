@@ -8,10 +8,7 @@ from flexget.utils.tools import group_entries
 
 log = logging.getLogger('best_quality')
 
-entry_actions = {
-    'accept': Entry.accept,
-    'reject': Entry.reject,
-}
+entry_actions = {'accept': Entry.accept, 'reject': Entry.reject}
 
 
 class FilterBestQuality(object):
@@ -19,20 +16,34 @@ class FilterBestQuality(object):
         'type': 'object',
         'properties': {
             'identified_by': {'type': 'string', 'default': 'auto'},
-            'on_best': {'type': 'string', 'enum': ['accept', 'reject', 'do_nothing'], 'default': 'do_nothing'},
-            'on_lower': {'type': 'string', 'enum': ['accept', 'reject', 'do_nothing'], 'default': 'reject'},
+            'on_best': {
+                'type': 'string',
+                'enum': ['accept', 'reject', 'do_nothing'],
+                'default': 'do_nothing',
+            },
+            'on_lower': {
+                'type': 'string',
+                'enum': ['accept', 'reject', 'do_nothing'],
+                'default': 'reject',
+            },
         },
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def on_task_filter(self, task, config):
         if not config:
             return
 
-        identified_by = '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
+        identified_by = (
+            '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
+        )
 
-        action_on_best = entry_actions[config['on_best']] if config['on_best'] != 'do_nothing' else None
-        action_on_lower = entry_actions[config['on_lower']] if config['on_lower'] != 'do_nothing' else None
+        action_on_best = (
+            entry_actions[config['on_best']] if config['on_best'] != 'do_nothing' else None
+        )
+        action_on_lower = (
+            entry_actions[config['on_lower']] if config['on_lower'] != 'do_nothing' else None
+        )
 
         grouped_entries = group_entries(task.accepted + task.undecided, identified_by)
 

@@ -16,9 +16,7 @@ try:
     # NOTE: Importing other plugins is discouraged!
     from flexget.components.parsing import parsers as plugin_parsers
 except ImportError:
-    raise plugin.DependencyError(
-        issued_by=__name__, missing='parsers',
-    )
+    raise plugin.DependencyError(issued_by=__name__, missing='parsers')
 
 log = logging.getLogger('exists_series')
 
@@ -39,11 +37,14 @@ class FilterExistsSeries(object):
                 'type': 'object',
                 'properties': {
                     'path': one_or_more({'type': 'string', 'format': 'path'}),
-                    'allow_different_qualities': {'enum': ['better', True, False], 'default': False}
+                    'allow_different_qualities': {
+                        'enum': ['better', True, False],
+                        'default': False,
+                    },
                 },
                 'required': ['path'],
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ]
     }
 
@@ -76,7 +77,9 @@ class FilterExistsSeries(object):
                 else:
                     log.debug('entry %s series_parser invalid', entry['title'])
         if not accepted_series:
-            log.warning('No accepted entries have series information. exists_series cannot filter them')
+            log.warning(
+                'No accepted entries have series information. exists_series cannot filter them'
+            )
             return
 
         # scan through
@@ -93,8 +96,9 @@ class FilterExistsSeries(object):
                 for filename in folder.walk(errors='ignore'):
                     # run parser on filename data
                     try:
-                        disk_parser = plugin.get('parsing', self).parse_series(data=filename.name,
-                                                                               name=series_parser.name)
+                        disk_parser = plugin.get('parsing', self).parse_series(
+                            data=filename.name, name=series_parser.name
+                        )
                     except plugin_parsers.ParseWarning as pw:
                         disk_parser = pw.parsed
                         log_once(pw.value, logger=log)
@@ -105,7 +109,9 @@ class FilterExistsSeries(object):
                         log.debug('disk_parser.proper_count = %s', disk_parser.proper_count)
 
                         for entry in accepted_series[series]:
-                            log.debug('series_parser.identifier = %s', entry['series_parser'].identifier)
+                            log.debug(
+                                'series_parser.identifier = %s', entry['series_parser'].identifier
+                            )
                             if disk_parser.identifier != entry['series_parser'].identifier:
                                 log.trace('wrong identifier')
                                 continue
@@ -118,7 +124,10 @@ class FilterExistsSeries(object):
                                 if disk_parser.quality != entry['series_parser'].quality:
                                     log.trace('wrong quality')
                                     continue
-                            log.debug('entry parser.proper_count = %s', entry['series_parser'].proper_count)
+                            log.debug(
+                                'entry parser.proper_count = %s',
+                                entry['series_parser'].proper_count,
+                            )
                             if disk_parser.proper_count >= entry['series_parser'].proper_count:
                                 entry.reject('episode already exists')
                                 continue

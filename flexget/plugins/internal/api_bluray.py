@@ -21,9 +21,12 @@ log = logging.getLogger('api_bluray')
 Base = db_schema.versioned_base('api_bluray', 0)
 
 # association tables
-genres_table = Table('bluray_movie_genres', Base.metadata,
-                     Column('movie_id', Integer, ForeignKey('bluray_movies.id')),
-                     Column('genre_name', Integer, ForeignKey('bluray_genres.name')))
+genres_table = Table(
+    'bluray_movie_genres',
+    Base.metadata,
+    Column('movie_id', Integer, ForeignKey('bluray_movies.id')),
+    Column('genre_name', Integer, ForeignKey('bluray_genres.name')),
+)
 Base.register_table(genres_table)
 
 BASE_URL = 'http://m.blu-ray.com/'
@@ -71,7 +74,7 @@ class BlurayMovie(Base):
             'section': 'bluraymovies',
             'country': 'ALL',
             'keyword': title,
-            '_': str(int(time.time() * 1000))
+            '_': str(int(time.time() * 1000)),
         }
 
         country_params = {'_': params['_']}
@@ -79,12 +82,16 @@ class BlurayMovie(Base):
             response = bluray_request('quicksearch/search.php', **params)
 
             if not response or 'items' not in response:
-                raise LookupError('No search results found for {} on blu-ray.com'.format(title_year))
+                raise LookupError(
+                    'No search results found for {} on blu-ray.com'.format(title_year)
+                )
 
             search_results = response['items']
             countries = bluray_request('countries.json.php', **country_params) or {}
 
-            search_results = sorted(search_results, key=lambda k: extract_release_date(k.get('reldate')))
+            search_results = sorted(
+                search_results, key=lambda k: extract_release_date(k.get('reldate'))
+            )
         except requests.RequestException as e:
             raise LookupError('Error searching for {} on blu-ray.com: {}'.format(title_year, e))
 
@@ -97,7 +104,9 @@ class BlurayMovie(Base):
             self.name = result['title']
 
             flag = result['flag']
-            country_code = flag.split('/')[-1].split('.')[0].lower()  # eg. http://some/url/UK.png -> uk
+            country_code = (
+                flag.split('/')[-1].split('.')[0].lower()
+            )  # eg. http://some/url/UK.png -> uk
             # find country based on flag url, default United States
             country = 'United States'
             for c in countries['countries']:
@@ -116,7 +125,9 @@ class BlurayMovie(Base):
 
             # runtime and rating, should be the last span tag with class subheading
             bluray_info = movie_info.find('div', attrs={'class': 'bluray'})
-            bluray_info = bluray_info.find_all('span', attrs={'class': 'subheading'})[-1].text.split('|')
+            bluray_info = bluray_info.find_all('span', attrs={'class': 'subheading'})[
+                -1
+            ].text.split('|')
 
             self.studio = bluray_info[0].strip()
 
@@ -187,13 +198,18 @@ class ApiBluray(object):
             raise LookupError('No criteria specified for blu-ray.com lookup')
         title_year = title + ' ({})'.format(year) if year else title
 
-        movie_filter = session.query(BlurayMovie).filter(func.lower(BlurayMovie.name) == title.lower())
+        movie_filter = session.query(BlurayMovie).filter(
+            func.lower(BlurayMovie.name) == title.lower()
+        )
         if year:
             movie_filter = movie_filter.filter(BlurayMovie.year == year)
         movie = movie_filter.first()
         if not movie:
-            found = session.query(BluraySearchResult). \
-                filter(BluraySearchResult.search == title_year.lower()).first()
+            found = (
+                session.query(BluraySearchResult)
+                .filter(BluraySearchResult.search == title_year.lower())
+                .first()
+            )
             if found and found.movie:
                 movie = found.movie
 
@@ -208,12 +224,17 @@ class ApiBluray(object):
                     age_in_years = (datetime.now().date() - movie.release_date).days / 365
                     refresh_time += timedelta(days=age_in_years * 5)
             if movie.updated < datetime.now() - refresh_time and not only_cached:
-                log.debug('Cache has expired for %s, attempting to refresh from blu-ray.com.', movie.name)
+                log.debug(
+                    'Cache has expired for %s, attempting to refresh from blu-ray.com.', movie.name
+                )
                 try:
                     updated_movie = BlurayMovie(title=title, year=year)
                 except LookupError as e:
-                    log.error('Error refreshing movie details for %s from blu-ray.com, cached info being used. %s',
-                              title, e)
+                    log.error(
+                        'Error refreshing movie details for %s from blu-ray.com, cached info being used. %s',
+                        title,
+                        e,
+                    )
                 else:
                     movie = session.merge(updated_movie)
             else:

@@ -101,6 +101,7 @@ class TestPathSelect(object):
     @pytest.fixture()
     def no_path_validation(self, monkeypatch):
         from flexget.config_schema import format_checker
+
         monkeypatch.delitem(format_checker.checkers, 'path')
 
     def test_most_free(self, disk_static_fun, no_path_validation, execute_task):

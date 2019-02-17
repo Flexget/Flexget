@@ -11,6 +11,7 @@ from git import Repo
 
 class MDChangeSet(object):
     """Represets a markdown changeset for a single version."""
+
     CATEGORIES = [
         ('### Added\n', ['add', 'added', 'feature']),
         ('### Changed\n', ['change', 'changed', 'update']),
@@ -46,7 +47,9 @@ class MDChangeSet(object):
         found = False
         for cat, item in self.change_items(message):
             found = True
-            item = re.sub('#(\d{3,4})', r'[#\1](https://github.com/Flexget/Flexget/issues/\1)', item)
+            item = re.sub(
+                '#(\d{3,4})', r'[#\1](https://github.com/Flexget/Flexget/issues/\1)', item
+            )
             item = '- {0}\n'.format(item)
             self.sections.setdefault(cat, ['\n']).insert(0, item)
         return found
@@ -121,13 +124,19 @@ if __name__ == '__main__':
                 modified = True
                 # Tag changeset with release date and version and create new current changeset
                 version = tags[commit.hexsha].tag
-                release_date = datetime.datetime.fromtimestamp(tags[commit.hexsha].tagged_date).strftime('%Y-%m-%d')
+                release_date = datetime.datetime.fromtimestamp(
+                    tags[commit.hexsha].tagged_date
+                ).strftime('%Y-%m-%d')
                 cur_ver.version_header = '## {0} ({1})\n'.format(version, release_date)
                 diffstartref = oldestref
                 if oldestref in tags:
                     diffstartref = tags[oldestref].tag
-                cur_ver.post_header.insert(0, '[all commits](https://github.com/Flexget/Flexget/compare/{0}...{1})\n'.
-                                           format(diffstartref, version))
+                cur_ver.post_header.insert(
+                    0,
+                    '[all commits](https://github.com/Flexget/Flexget/compare/{0}...{1})\n'.format(
+                        diffstartref, version
+                    ),
+                )
                 released_vers.insert(0, cur_ver)
                 cur_ver = MDChangeSet()
                 oldestref = commit.hexsha

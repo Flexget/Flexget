@@ -16,11 +16,15 @@ class RunTask(object):
         'type': 'object',
         'properties': {
             'task': one_or_more({'type': 'string'}),
-            'when': one_or_more({'type': 'string',
-                                 'enum': ['accepted', 'rejected', 'failed', 'no_entries', 'aborted', 'always']})
+            'when': one_or_more(
+                {
+                    'type': 'string',
+                    'enum': ['accepted', 'rejected', 'failed', 'no_entries', 'aborted', 'always'],
+                }
+            ),
         },
         'required': ['task'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def prepare_config(self, config):
@@ -43,7 +47,7 @@ class RunTask(object):
             task.rejected and 'rejected' in config['when'],
             task.failed and 'failed' in config['when'],
             not task.all_entries and 'no_entries' in config['when'],
-            'always' in config['when']
+            'always' in config['when'],
         ]
         if any(conditions):
             self.run_tasks(task, config['task'])

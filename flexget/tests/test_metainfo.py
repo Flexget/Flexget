@@ -37,14 +37,18 @@ class TestMetainfoImdb(object):
     def test_imdb(self, execute_task):
         """Metainfo: imdb url"""
         task = execute_task('test')
-        assert task.find_entry(imdb_url='https://www.imdb.com/title/tt0330793/'), \
-            'Failed to pick url from test 1'
-        assert task.find_entry(imdb_url='https://www.imdb.com/title/tt0472198/'), \
-            'Failed to pick url from test 2'
-        assert not task.find_entry(imdb_url='https://www.imdb.com/title/tt66666/'), \
-            'Failed to ignore multiple imdb urls in test 4'
-        assert not task.find_entry(imdb_url='https://www.imdb.com/title/tt99999/'), \
-            'Failed to ignore multiple imdb urls in test 4'
+        assert task.find_entry(
+            imdb_url='https://www.imdb.com/title/tt0330793/'
+        ), 'Failed to pick url from test 1'
+        assert task.find_entry(
+            imdb_url='https://www.imdb.com/title/tt0472198/'
+        ), 'Failed to pick url from test 2'
+        assert not task.find_entry(
+            imdb_url='https://www.imdb.com/title/tt66666/'
+        ), 'Failed to ignore multiple imdb urls in test 4'
+        assert not task.find_entry(
+            imdb_url='https://www.imdb.com/title/tt99999/'
+        ), 'Failed to ignore multiple imdb urls in test 4'
 
 
 class TestMetainfoQuality(object):
@@ -62,16 +66,21 @@ class TestMetainfoQuality(object):
         entry = task.find_entry(title='FooBar.S01E02.720p.HDTV')
         assert entry, 'entry not found?'
         assert 'quality' in entry, 'failed to pick up quality'
-        assert entry['quality'].name == '720p hdtv', 'picked up wrong quality %s' % entry.get('quality', None)
+        assert entry['quality'].name == '720p hdtv', 'picked up wrong quality %s' % entry.get(
+            'quality', None
+        )
         entry = task.find_entry(title='ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264')
         assert entry, 'entry not found?'
         assert 'quality' in entry, 'failed to pick up quality'
-        assert entry['quality'].name == '720p webdl h264 dd5.1', \
-            'picked up wrong quality %s' % entry.get('quality', None)
+        assert (
+            entry['quality'].name == '720p webdl h264 dd5.1'
+        ), 'picked up wrong quality %s' % entry.get('quality', None)
         # quality in description should not override one found in title
         entry = task.find_entry(title='Good.Movie.hdtv')
         assert 'quality' in entry, 'failed to pick up quality'
-        assert entry['quality'].name == 'hdtv', 'picked up wrong quality %s' % entry.get('quality', None)
+        assert entry['quality'].name == 'hdtv', 'picked up wrong quality %s' % entry.get(
+            'quality', None
+        )
 
 
 class TestMetainfoSeries(object):
@@ -112,22 +121,57 @@ class TestMetainfoSeries(object):
         """Metainfo series: name/episode"""
         # We search for series name in title case to make sure case is being normalized
         task = execute_task('test')
-        assert task.find_entry(series_name='Flexget', series_season=1, series_episode=2, quality='hdtv xvid',
-                               id='flexget s01e02'), 'Failed to parse series info'
-        assert task.find_entry(series_name='Some Series', series_season=3, series_episode=14, quality='720p',
-                               id='some series s03e14'), 'Failed to parse series info'
-        assert task.find_entry(series_name='Something', series_season=2, series_episode=1, quality='hdtv',
-                               id='something s02e01'), 'Failed to parse series info'
+        assert task.find_entry(
+            series_name='Flexget',
+            series_season=1,
+            series_episode=2,
+            quality='hdtv xvid',
+            id='flexget s01e02',
+        ), 'Failed to parse series info'
+        assert task.find_entry(
+            series_name='Some Series',
+            series_season=3,
+            series_episode=14,
+            quality='720p',
+            id='some series s03e14',
+        ), 'Failed to parse series info'
+        assert task.find_entry(
+            series_name='Something',
+            series_season=2,
+            series_episode=1,
+            quality='hdtv',
+            id='something s02e01',
+        ), 'Failed to parse series info'
         # Test unwanted prefixes get stripped from series name
-        assert task.find_entry(series_name='Some Series', series_season=3, series_episode=15, quality='720p',
-                               id='some series s03e15'), 'Failed to parse series info'
-        assert task.find_entry(series_name='Some Series', series_season=3, series_episode=16, quality='720p',
-                               id='some series s03e16'), 'Failed to parse series info'
+        assert task.find_entry(
+            series_name='Some Series',
+            series_season=3,
+            series_episode=15,
+            quality='720p',
+            id='some series s03e15',
+        ), 'Failed to parse series info'
+        assert task.find_entry(
+            series_name='Some Series',
+            series_season=3,
+            series_episode=16,
+            quality='720p',
+            id='some series s03e16',
+        ), 'Failed to parse series info'
         # Test episode title and parentheses are stripped from series name
-        assert task.find_entry(series_name='Show-a Us', series_season=2, series_episode=9, quality='hdtv',
-                               id='show-a us s02e09'), 'Failed to parse series info'
-        assert task.find_entry(series_name='Jack\'s Show', series_season=3, series_episode=1, quality='1080p',
-                               id='jack\'s show s03e01'), 'Failed to parse series info'
+        assert task.find_entry(
+            series_name='Show-a Us',
+            series_season=2,
+            series_episode=9,
+            quality='hdtv',
+            id='show-a us s02e09',
+        ), 'Failed to parse series info'
+        assert task.find_entry(
+            series_name='Jack\'s Show',
+            series_season=3,
+            series_episode=1,
+            quality='1080p',
+            id='jack\'s show s03e01',
+        ), 'Failed to parse series info'
 
     def test_false_positives(self, execute_task):
         """Metainfo series: check for false positives"""
@@ -163,52 +207,59 @@ class TestMetainfoMovie(object):
 
     def test_metainfo_movie(self, execute_task):
         task = execute_task('test')
-        assert task.find_entry(movie_name='Flexget',
-                               quality='720p hdtv xvid',
-                               id='flexget')
-        assert task.find_entry(movie_name='Flexget2',
-                               movie_year=1999,
-                               quality='720p hdtv xvid',
-                               id='flexget2 1999')
-        assert task.find_entry(movie_name='Flexget3',
-                               movie_year=2004,
-                               proper=True,
-                               quality='1080p BluRay xvid',
-                               id='flexget3 2004')
+        assert task.find_entry(movie_name='Flexget', quality='720p hdtv xvid', id='flexget')
+        assert task.find_entry(
+            movie_name='Flexget2', movie_year=1999, quality='720p hdtv xvid', id='flexget2 1999'
+        )
+        assert task.find_entry(
+            movie_name='Flexget3',
+            movie_year=2004,
+            proper=True,
+            quality='1080p BluRay xvid',
+            id='flexget3 2004',
+        )
 
     @pytest.mark.skip(msg='Parsers have been simplified')
     def test_metainfo_movie_with_guessit(self, execute_task):
         task = execute_task('test_guessit')
-        assert task.find_entry(movie_name='Flexget',
-                               format='HDTV',
-                               screen_size='720p',
-                               video_codec='XviD',
-                               release_group='TheName',
-                               id='flexget')
+        assert task.find_entry(
+            movie_name='Flexget',
+            format='HDTV',
+            screen_size='720p',
+            video_codec='XviD',
+            release_group='TheName',
+            id='flexget',
+        )
 
-        assert task.find_entry(movie_name='Flexget3',
-                               movie_year=2004,
-                               proper=True,
-                               format='BluRay',
-                               screen_size='1080p',
-                               video_codec='XviD',
-                               release_group='TheName',
-                               id='flexget3 2004')
+        assert task.find_entry(
+            movie_name='Flexget3',
+            movie_year=2004,
+            proper=True,
+            format='BluRay',
+            screen_size='1080p',
+            video_codec='XviD',
+            release_group='TheName',
+            id='flexget3 2004',
+        )
 
-        assert task.find_entry(movie_name='The Flexget',
-                               audio_channels='5.1',
-                               audio_codec='TrueHD',
-                               movie_year=2000,
-                               format='BluRay',
-                               screen_size='1080p',
-                               release_group='FQ',
-                               id='the flexget 2000')
+        assert task.find_entry(
+            movie_name='The Flexget',
+            audio_channels='5.1',
+            audio_codec='TrueHD',
+            movie_year=2000,
+            format='BluRay',
+            screen_size='1080p',
+            release_group='FQ',
+            id='the flexget 2000',
+        )
 
-        assert task.find_entry(movie_name='The Flexget Winters War',
-                               audio_codec='AC3',
-                               movie_year=2016,
-                               format='WEB-DL',
-                               screen_size='1080p',
-                               video_codec='h264',
-                               release_group='FlexO',
-                               id='the flexget winters war 2016')
+        assert task.find_entry(
+            movie_name='The Flexget Winters War',
+            audio_codec='AC3',
+            movie_year=2016,
+            format='WEB-DL',
+            screen_size='1080p',
+            video_codec='h264',
+            release_group='FlexO',
+            id='the flexget winters war 2016',
+        )

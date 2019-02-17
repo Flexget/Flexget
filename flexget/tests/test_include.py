@@ -18,15 +18,21 @@ class TestInclude(object):
         test_dir = tmpdir.mkdir('include')
         file_1 = test_dir.join('foo.yml')
         file_2 = test_dir.join('baz.yml')
-        file_1.write("""
+        file_1.write(
+            """
             mock:
             - title: foo
-        """)
-        file_2.write("""
+        """
+        )
+        file_2.write(
+            """
             mock:
             - title: baz
-        """)
-        return Template(self._config).render({'tmpfile_1': file_1.strpath, 'tmpfile_2': file_2.strpath})
+        """
+        )
+        return Template(self._config).render(
+            {'tmpfile_1': file_1.strpath, 'tmpfile_2': file_2.strpath}
+        )
 
     def test_include(self, execute_task):
         task = execute_task('include_test')
@@ -47,10 +53,12 @@ class TestIncludeChange(object):
     def config(self, tmpdir):
         test_dir = tmpdir.mkdir('include')
         file_1 = test_dir.join('foo.yml')
-        file_1.write("""
+        file_1.write(
+            """
             mock:
             - title: foo
-        """)
+        """
+        )
         return Template(self._config).render({'tmpfile_1': file_1.strpath})
 
     def test_include_update(self, execute_task, manager, tmpdir):
@@ -65,10 +73,12 @@ class TestIncludeChange(object):
         # Change file name
         test_dir = tmpdir.mkdir('include_changed')
         file_1 = test_dir.join('foo.yml')
-        file_1.write("""
+        file_1.write(
+            """
             mock:
             - title: foo_change_1
-        """)
+        """
+        )
         new_file = Template('{{ tmpfile_1 }}').render({'tmpfile_1': file_1.strpath})
         manager.config['tasks']['include_test']['include'].pop()
         manager.config['tasks']['include_test']['include'].append(new_file)
@@ -79,10 +89,12 @@ class TestIncludeChange(object):
         assert task.config_modified
 
         # Change file contents
-        file_1.write("""
+        file_1.write(
+            """
             mock:
             - title: foo_change_2
-        """)
+        """
+        )
         task = execute_task('include_test')
         assert len(task.all_entries) == 1
         assert task.find_entry(title='foo_change_2')

@@ -9,16 +9,18 @@ from flexget.event import event
 
 log = logging.getLogger('output.sns')
 
-DEFAULT_TEMPLATE_VALUE = json.dumps({
-    'entry': {
-        'title': '{{title}}',
-        'url': '{{url}}',
-        'original_url': '{{original_url}}',
-        'series': '{{series_name}}',
-        'series_id': '{{series_id}}',
-    },
-    'task': '{{task}}',
-})
+DEFAULT_TEMPLATE_VALUE = json.dumps(
+    {
+        'entry': {
+            'title': '{{title}}',
+            'url': '{{url}}',
+            'original_url': '{{original_url}}',
+            'series': '{{series_name}}',
+            'series_id': '{{series_id}}',
+        },
+        'task': '{{task}}',
+    }
+)
 
 
 class SNSNotification(object):
@@ -60,7 +62,9 @@ class SNSNotification(object):
             import boto3  # noqa
         except ImportError as e:
             log.debug("Error importing boto3: %s", e)
-            raise plugin.DependencyError("sns", "boto3", "Boto3 module required. ImportError: %s" % e)
+            raise plugin.DependencyError(
+                "sns", "boto3", "Boto3 module required. ImportError: %s" % e
+            )
 
     # this has to run near the end of the plugin chain, because we
     # should notify after all other outputs.
@@ -71,13 +75,15 @@ class SNSNotification(object):
 
 
 class SNSNotificationEmitter(object):
-
     def __init__(self, config):
         self.config = config
         import boto3
+
         self.boto3 = boto3
 
-        self.sns_notification_template = self.config.get('sns_notification_template', DEFAULT_TEMPLATE_VALUE)
+        self.sns_notification_template = self.config.get(
+            'sns_notification_template', DEFAULT_TEMPLATE_VALUE
+        )
 
     def build_session(self):
         self.session = self.boto3.Session(
@@ -99,7 +105,9 @@ class SNSNotificationEmitter(object):
         for entry in task.accepted:
             message = entry.render(self.sns_notification_template)
             if task.options.test:
-                log.info("SNS publication: region=%s, arn=%s", self.config['aws_region'], topic.arn)
+                log.info(
+                    "SNS publication: region=%s, arn=%s", self.config['aws_region'], topic.arn
+                )
                 log.info("Message: %s", message)
                 continue
 
