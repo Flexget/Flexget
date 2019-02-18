@@ -125,8 +125,12 @@ class OmbiSet(MutableSet):
     def generate_movie_entry(self, parent_request):
         entry = Entry()
         log.debug('Found: %s', parent_request.get('title'))
+        if not parent_request.get('imdbId'):
+            simdburl = ''
+        else:
+            simdburl = 'http://www.imdb.com/title/' + parent_request.get('imdbId') +'/'
         entry = Entry(title=self.generate_title(parent_request),
-                      url='http://www.imdb.com/title/' + parent_request.get('imdbId') +'/',
+                      url=simdburl,
                       imdb_id=parent_request.get('imdbId'),
                       tmdb_id=parent_request.get('theMovieDbId'),
                       movie_name=parent_request.get('title'),
@@ -143,8 +147,12 @@ class OmbiSet(MutableSet):
         entry = Entry()
         if self.config.get('type') == 'shows':
             log.debug('Found: %s', parent_request.get('title'))
+            if not parent_request.get('imdbId'):
+                simdburl = ''
+            else:
+                simdburl = 'http://www.imdb.com/title/' + parent_request.get('imdbId') + '/'
             entry = Entry(title=self.generate_title(parent_request),
-                          url='http://www.imdb.com/title/' + parent_request.get('imdbId') +'/',
+                          url=simdburl,
                           series_name=self.generate_title(parent_request),
                           tvdb_id=parent_request.get('tvDbId'),
                           imdb_id=parent_request.get('imdbId'),
@@ -152,8 +160,12 @@ class OmbiSet(MutableSet):
                           ombi_request_id=parent_request.get('id'))
         elif self.config.get('type') == 'seasons':
             log.debug('Found: %s S%s', parent_request.get('title'), season.get('seasonNumber'))
+            if not parent_request.get('imdbId'):
+                simdburl = ''
+            else:
+                simdburl = 'http://www.imdb.com/title/' + parent_request.get('imdbId') + '/'
             entry = Entry(title=self.generate_title(parent_request, season),
-                          url='http://www.imdb.com/title/' + parent_request.get('imdbId') +'/',
+                          url=simdburl,
                           series_name=self.generate_title(parent_request),
                           series_season=season.get('seasonNumber'),
                           series_id=self.generate_series_id(season),
