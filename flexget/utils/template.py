@@ -22,6 +22,7 @@ from jinja2 import (
     TemplateNotFound,
     TemplateSyntaxError,
 )
+from jinja2.nativetypes import NativeTemplate
 from dateutil import parser as dateutil_parse
 
 from flexget.event import event
@@ -140,7 +141,6 @@ def filter_default(value, default_value='', boolean=True):
 filter_d = filter_default
 
 
-# TODO: In Jinja 2.8 we will be able to override the Context class to be used explicitly
 class FlexGetTemplate(Template):
     """Adds lazy lookup support when rendering templates."""
 
@@ -148,6 +148,11 @@ class FlexGetTemplate(Template):
         context = super(FlexGetTemplate, self).new_context(vars, shared, locals)
         context.parent = LazyDict(context.parent)
         return context
+
+
+class FlexGetNativeTemplate(FlexGetTemplate, NativeTemplate):
+    """Lazy lookup support and native python return types."""
+    pass
 
 
 @event('manager.initialize')

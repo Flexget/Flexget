@@ -7,7 +7,7 @@ from functools import partial
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.template import RenderError
+from flexget.utils.template import RenderError, FlexGetNativeTemplate
 
 log = logging.getLogger('set')
 
@@ -53,7 +53,7 @@ class ModifySet(object):
         if orig_field_value is not UNSET:
             entry[field] = orig_field_value
         try:
-            entry[field] = entry.render(config[field])
+            entry[field] = entry.render(FlexGetNativeTemplate(config[field]))
         except RenderError as e:
             logger('Could not set %s for %s: %s' % (field, entry['title'], e))
 
