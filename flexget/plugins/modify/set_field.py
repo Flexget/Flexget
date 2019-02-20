@@ -1,13 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 from functools import partial
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.template import RenderError, FlexGetNativeTemplate
+from flexget.utils.template import RenderError
 
 log = logging.getLogger('set')
 
@@ -34,7 +33,7 @@ class ModifySet(object):
         """This can be called from a plugin to add set values to an entry"""
         for field in config:
             # If this doesn't appear to be a jinja template, just set it right away.
-            if not isinstance(config[field], basestring) or '{' not in config[field]:
+            if not isinstance(config[field], str) or '{' not in config[field]:
                 entry[field] = config[field]
             # Store original values before overwriting with a lazy field, so that set directives can reference
             # themselves.
@@ -53,7 +52,7 @@ class ModifySet(object):
         if orig_field_value is not UNSET:
             entry[field] = orig_field_value
         try:
-            entry[field] = entry.render(FlexGetNativeTemplate(config[field]))
+            entry[field] = entry.render(config[field], native=True)
         except RenderError as e:
             logger('Could not set %s for %s: %s' % (field, entry['title'], e))
 

@@ -268,7 +268,7 @@ class TestSetPlugin(object):
         task = execute_task('test_jinja')
         entry = task.find_entry('entries', title='Entry 1')
         assert entry['field'] == 'The VALUE'
-        assert entry['otherfield'] == ''
+        assert not entry['otherfield']
         assert entry['alu'] == 'alu'
         entry = task.find_entry('entries', title='Entry 2')
         assert entry['field'] is None, '`field` should be None when jinja rendering fails'

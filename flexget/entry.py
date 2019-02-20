@@ -284,11 +284,12 @@ class Entry(LazyDict):
                 continue
             self[field] = v
 
-    def render(self, template):
+    def render(self, template, native=False):
         """
         Renders a template string based on fields in the entry.
 
         :param template: A template string or FlexGetTemplate that uses jinja2 or python string replacement format.
+        :param native: If True, and the rendering result can be all native python types, not just strings.
         :return: The result of the rendering.
         :rtype: string
         :raises RenderError: If there is a problem.
@@ -299,7 +300,7 @@ class Entry(LazyDict):
                 % repr(template)
             )
         log.trace('rendering: %s', template)
-        return render_from_entry(template, self)
+        return render_from_entry(template, self, native=native)
 
     def __eq__(self, other):
         return self.get('original_title') == other.get('original_title') and self.get(
