@@ -256,6 +256,11 @@ class TestSetPlugin(object):
             set:
               title: "{{ao"
               other: "{{eaeou}"
+          test_native_types:
+            mock:
+            - title: Entry 1
+            set:
+              int_field: "{{3}}"
     """
 
     def test_set(self, execute_task):
@@ -293,3 +298,9 @@ class TestSetPlugin(object):
             entry['title'] == 'Entry 1'
         ), 'should fall back to original value when template fails'
         assert entry['other'] is None
+
+    def test_native_types(self, execute_task):
+        task = execute_task('test_native_types')
+        entry = task.find_entry('entries', title='Entry 1')
+        assert (isinstance(entry['int_field'], int)), 'should allow setting values as integers rather than strings'
+        assert entry['int_field'] == 3
