@@ -2,7 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 from future.utils import text_to_native_str
 from flexget.utils.tools import native_str_to_text
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 import os
@@ -22,6 +21,7 @@ from jinja2 import (
     TemplateNotFound,
     TemplateSyntaxError,
 )
+from jinja2.nativetypes import NativeTemplate
 from dateutil import parser as dateutil_parse
 
 from flexget.event import event
@@ -72,7 +72,7 @@ def filter_re_replace(val, pattern, repl):
 
 def filter_re_search(val, pattern):
     """Perform a search for given regexp pattern, return the matching portion of the text."""
-    if not isinstance(val, basestring):
+    if not isinstance(val, str):
         return val
     result = re.search(pattern, val, re.IGNORECASE)
     if result:
@@ -140,7 +140,6 @@ def filter_default(value, default_value='', boolean=True):
 filter_d = filter_default
 
 
-# TODO: In Jinja 2.8 we will be able to override the Context class to be used explicitly
 class FlexGetTemplate(Template):
     """Adds lazy lookup support when rendering templates."""
 
@@ -148,6 +147,11 @@ class FlexGetTemplate(Template):
         context = super(FlexGetTemplate, self).new_context(vars, shared, locals)
         context.parent = LazyDict(context.parent)
         return context
+
+
+class FlexGetNativeTemplate(FlexGetTemplate, NativeTemplate):
+    """Lazy lookup support and native python return types."""
+    pass
 
 
 @event('manager.initialize')
@@ -210,17 +214,21 @@ def get_template(template_name, scope='task'):
         raise ValueError(err)
 
 
-def render(template, context):
+def render(template, context, native=False):
     """
     Renders a Template with `context` as its context.
 
     :param template: Template or template string to render.
     :param context: Context to render the template from.
+    :param native: If True, and the rendering result can be all native python types, not just strings.
     :return: The rendered template text.
     """
-    if isinstance(template, basestring):
+    if isinstance(template, str):
+        template_class = None
+        if native:
+            template_class = FlexGetNativeTemplate
         try:
-            template = environment.from_string(template)
+            template = environment.from_string(template, template_class=template_class)
         except TemplateSyntaxError as e:
             raise RenderError('Error in template syntax: ' + e.message)
     try:
@@ -233,7 +241,7 @@ def render(template, context):
     return result
 
 
-def render_from_entry(template_string, entry):
+def render_from_entry(template_string, entry, native=False):
     """Renders a Template or template string with an Entry as its context."""
 
     # Make a copy of the Entry so we can add some more fields
@@ -246,7 +254,7 @@ def render_from_entry(template_string, entry):
         # Since `task` has different meaning between entry and task scope, the `task_name` field is create to be
         # consistent
         variables['task_name'] = entry.task.name
-    return render(template_string, variables)
+    return render(template_string, variables, native=native)
 
 
 def render_from_task(template, task):
