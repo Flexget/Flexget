@@ -658,9 +658,12 @@ class PluginTransmission(TransmissionBase):
         if opt_dic.get('path'):
             try:
                 path = os.path.expanduser(entry.render(opt_dic['path']))
-                add['download_dir'] = text_to_native_str(pathscrub(path), 'utf-8')
             except RenderError as e:
                 log.error('Error setting path for %s: %s' % (entry['title'], e))
+            else:
+                # Transmission doesn't like it when paths end in a separator
+                path = path.rstrip('\\/')
+                add['download_dir'] = text_to_native_str(pathscrub(path), 'utf-8')
         # make sure we add it paused, will modify status after adding
         add['paused'] = True
 
