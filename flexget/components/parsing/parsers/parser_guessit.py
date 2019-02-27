@@ -157,7 +157,9 @@ class ParserGuessit(object):
         # unlike the other components, audio can be a bit iffy with multiple codecs, so we limit it to one
         if 'dts' in audio and any(hd in audio_profile for hd in ['hd', 'master audio']):
             audio = ['dtshd']
-        elif '5.1' in audio_channels and any(dd in audio for dd in ['dolby digital']):
+        elif '5.1' in audio_channels and 'dolby digital plus' in audio:
+            audio = ['dd+5.1']
+        elif '5.1' in audio_channels and 'dolby digital' in audio:
             audio = ['dd5.1']
 
         # Make sure everything are strings (guessit will return lists when there are multiples)
