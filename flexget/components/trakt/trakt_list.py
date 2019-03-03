@@ -182,7 +182,7 @@ class TraktSet(MutableSet):
     @property
     def items(self):
         if self._items is None:
-            if self.config['list'] in ['collection', 'watched'] and self.config['type'] == 'auto':
+            if self.config['list'] in ['collection', 'watched', 'trending', 'popular'] and self.config['type'] == 'auto':
                 raise plugin.PluginError(
                     '`type` cannot be `auto` for %s list.' % self.config['list']
                 )
@@ -243,6 +243,8 @@ class TraktSet(MutableSet):
             for item in data:
                 if self.config['type'] == 'auto':
                     list_type = item['type']
+                if self.config['list'] == 'popular':
+                    item = {list_type: item}
                 # Collection and watched lists don't return 'type' along with the items (right now)
                 if 'type' in item and item['type'] != list_type:
                     log.debug(
@@ -358,6 +360,11 @@ class TraktSet(MutableSet):
                     self.config['username'],
                     self.config['list'],
                     self.config['type'],
+                )
+        elif self.config['list'] in ['trending', 'popular']:
+                endpoint = (
+                    self.config['type'],
+                    self.config['list'],
                 )
         else:
             endpoint = (
