@@ -17,7 +17,7 @@ from . import db
 
 
 log = logging.getLogger('trakt_list')
-IMMUTABLE_LISTS = []
+IMMUTABLE_LISTS = ['trending', 'popular']
 
 
 def generate_show_title(item):
