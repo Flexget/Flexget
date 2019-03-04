@@ -120,7 +120,12 @@ class TraktSet(MutableSet):
             'language': {'type': 'string', 'minLength': 2, 'maxLength': 2},
         },
         'required': ['list'],
-        'anyOf': [{'required': ['username']}, {'required': ['account']}],
+        'anyOf': [
+            {'required': ['username']},
+            {'required': ['account']},
+            # The 'trending' and 'popular' lists don't require an username
+            {'properties': {'list': {'enum': ['trending', 'popular']}}},
+        ],
         'error_anyOf': 'At least one of `username` or `account` options are needed.',
         'additionalProperties': False,
     }
