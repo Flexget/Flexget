@@ -17,7 +17,7 @@ from . import db
 
 
 log = logging.getLogger('trakt_list')
-IMMUTABLE_LISTS = []
+IMMUTABLE_LISTS = ['trending', 'popular']
 
 
 def generate_show_title(item):
@@ -120,7 +120,12 @@ class TraktSet(MutableSet):
             'language': {'type': 'string', 'minLength': 2, 'maxLength': 2},
         },
         'required': ['list'],
-        'anyOf': [{'required': ['username']}, {'required': ['account']}],
+        'anyOf': [
+            {'required': ['username']},
+            {'required': ['account']},
+            # The 'trending' and 'popular' lists don't require an username
+            {'properties': {'list': {'enum': ['trending', 'popular']}}},
+        ],
         'error_anyOf': 'At least one of `username` or `account` options are needed.',
         'additionalProperties': False,
     }
@@ -182,7 +187,7 @@ class TraktSet(MutableSet):
     @property
     def items(self):
         if self._items is None:
-            if self.config['list'] in ['collection', 'watched'] and self.config['type'] == 'auto':
+            if self.config['list'] in ['collection', 'watched', 'trending', 'popular'] and self.config['type'] == 'auto':
                 raise plugin.PluginError(
                     '`type` cannot be `auto` for %s list.' % self.config['list']
                 )
@@ -243,6 +248,8 @@ class TraktSet(MutableSet):
             for item in data:
                 if self.config['type'] == 'auto':
                     list_type = item['type']
+                if self.config['list'] == 'popular':
+                    item = {list_type: item}
                 # Collection and watched lists don't return 'type' along with the items (right now)
                 if 'type' in item and item['type'] != list_type:
                     log.debug(
@@ -358,6 +365,11 @@ class TraktSet(MutableSet):
                     self.config['username'],
                     self.config['list'],
                     self.config['type'],
+                )
+        elif self.config['list'] in ['trending', 'popular']:
+                endpoint = (
+                    self.config['type'],
+                    self.config['list'],
                 )
         else:
             endpoint = (
