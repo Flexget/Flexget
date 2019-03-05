@@ -85,10 +85,16 @@ schema = {
                     'use_ssl': {'type': 'boolean', 'default': False},
                     'task_delay': {'type': 'integer'},
                 },
-                'anyOf': [{'required': ['server', 'channels']}, {'required': ['tracker_file']}],
-                'error_anyOf': 'Must specify a tracker file or server and channel(s)',
-                'oneOf': [{'required': ['task']}, {'required': ['task_re']}],
-                'error_oneOf': 'Must specify a task',
+                'allOf': [
+                    {
+                        'anyOf': [{'required': ['server', 'channels']}, {'required': ['tracker_file']}],
+                        'error': 'Must specify a tracker file or server and channel(s)',
+                    },
+                    {
+                        'anyOf': [{'required': ['task']}, {'required': ['task_re']}],
+                        'error': 'Must specify a task',
+                    }
+                ],
                 'required': ['port'],
                 'additionalProperties': False,
             },
