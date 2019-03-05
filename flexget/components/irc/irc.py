@@ -90,7 +90,7 @@ schema = {
                 'oneOf': [{'required': ['task']}, {'required': ['task_re']}],
                 'error_oneOf': 'Must specify a task',
                 'required': ['port'],
-                'additionalProperties': {'type': 'string'},
+                'additionalProperties': False,
             },
         },
         {'type': 'boolean', 'enum': [False]},
