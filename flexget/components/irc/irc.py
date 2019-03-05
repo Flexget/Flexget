@@ -69,7 +69,7 @@ schema = {
                                     'items': {
                                         'type': 'object',
                                         'properties': {
-                                            'regexp': {'type': 'string'},
+                                            'regexp': {'type': 'string', 'format': 'regex'},
                                             'field': {'type': 'string'},
                                         },
                                         'required': ['regexp', 'field'],
