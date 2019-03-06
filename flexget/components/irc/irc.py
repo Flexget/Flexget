@@ -96,7 +96,7 @@ schema = {
                     }
                 ],
                 'required': ['port'],
-                'additionalProperties': False,
+                'additionalProperties': {'type': 'string'},
             },
         },
         {'type': 'boolean', 'enum': [False]},
