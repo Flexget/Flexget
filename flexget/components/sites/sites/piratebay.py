@@ -184,7 +184,7 @@ class UrlRewritePirateBay(object):
 
                 entries.add(entry)
 
-        return sorted(entries, reverse=True, key=lambda x: x.get('search_sort'))
+        return sorted(entries, reverse=True, key=lambda x: x.get('torrent_availability'))
 
     @staticmethod
     def extract_title(soup):
