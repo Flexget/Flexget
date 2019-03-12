@@ -121,7 +121,7 @@ class ParserGuessit(object):
         other = normalize_component(guessit_result.get('other'))
         source = self.SOURCE_MAP.get(guessit_result.get('source'), guessit_result.get('source'))
         # special case
-        if source == 'web-dl' and 'Rip' in other:
+        if source == 'web-dl' and 'rip' in other:
             source = 'webrip'
 
         source = normalize_component(source)
