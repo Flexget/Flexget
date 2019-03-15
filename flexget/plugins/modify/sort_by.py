@@ -54,6 +54,7 @@ class PluginSortBy(object):
         }
     )
 
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_filter(self, task, config):
         if not isinstance(config, list):
             config = [config]
