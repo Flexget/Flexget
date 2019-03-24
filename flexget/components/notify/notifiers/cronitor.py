@@ -45,8 +45,10 @@ class Cronitor(object):
 
     def __init__(self):
         self.config = None
+        self.task_name = None
 
-    def prepare_config(self, config):
+    @staticmethod
+    def prepare_config(config):
         if isinstance(config, str):
             config = {"monitor_code": config}
         config.setdefault("on_start", True)
@@ -54,14 +56,14 @@ class Cronitor(object):
         config.setdefault("host", socket.gethostname())
         return config
 
-    def _send_request(self, config, status, task_name):
-        url = self.base_url.format(monitor_code=config["monitor_code"], status=status)
-        message = config.get(
-            "message", "{task} task {status}".format(task=task_name, status=status)
+    def _send_request(self, status):
+        url = self.base_url.format(monitor_code=self.config["monitor_code"], status=status)
+        message = self.config.get(
+            "message", "{task} task {status}".format(task=self.task_name, status=status)
         )
-        data = {"msg": message, "host": config["host"]}
-        if config.get("auth_key"):
-            data["auth_key"] = config["auth_key"]
+        data = {"msg": message, "host": self.config["host"]}
+        if self.config.get("auth_key"):
+            data["auth_key"] = self.config["auth_key"]
         try:
             rsp = requests.get(url, params=data)
             rsp.raise_for_status()
@@ -70,17 +72,18 @@ class Cronitor(object):
 
     def on_task_start(self, task, config):
         self.config = self.prepare_config(config)
+        self.task_name = task.name
         if not self.config["on_start"]:
             return
-        self._send_request(self.config, "run", task.name)
+        self._send_request("run")
 
     def on_task_abort(self, task, config):
         if not self.config["on_abort"]:
             return
-        self._send_request(self.config, "fail", task.name)
+        self._send_request("fail")
 
     def on_task_exit(self, task, config):
-        self._send_request(self.config, "complete", task.name)
+        self._send_request("complete")
 
 
 @event("plugin.register")
