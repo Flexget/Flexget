@@ -43,10 +43,6 @@ class Cronitor(object):
         ]
     }
 
-    def __init__(self):
-        self.config = None
-        self.task_name = None
-
     @staticmethod
     def prepare_config(config):
         if isinstance(config, str):
@@ -56,14 +52,14 @@ class Cronitor(object):
         config.setdefault("host", socket.gethostname())
         return config
 
-    def _send_request(self, status):
-        url = self.base_url.format(monitor_code=self.config["monitor_code"], status=status)
-        message = self.config.get(
-            "message", "{task} task {status}".format(task=self.task_name, status=status)
+    def _send_request(self, status, config, task_name):
+        url = self.base_url.format(monitor_code=config["monitor_code"], status=status)
+        message = config.get(
+            "message", "{task} task {status}".format(task=task_name, status=status)
         )
-        data = {"msg": message, "host": self.config["host"]}
-        if self.config.get("auth_key"):
-            data["auth_key"] = self.config["auth_key"]
+        data = {"msg": message, "host": config["host"]}
+        if config.get("auth_key"):
+            data["auth_key"] = config["auth_key"]
         try:
             rsp = requests.get(url, params=data)
             rsp.raise_for_status()
@@ -71,19 +67,20 @@ class Cronitor(object):
             raise PluginWarning("Could not report to cronitor: {}".format(e))
 
     def on_task_start(self, task, config):
-        self.config = self.prepare_config(config)
-        self.task_name = task.name
-        if not self.config["on_start"]:
+        config = self.prepare_config(config)
+        if not config["on_start"]:
             return
-        self._send_request("run")
+        self._send_request("run", config, task.nam)
 
     def on_task_abort(self, task, config):
-        if not self.config["on_abort"]:
+        config = self.prepare_config(config)
+        if not config["on_abort"]:
             return
-        self._send_request("fail")
+        self._send_request("fail", config, task.name)
 
     def on_task_exit(self, task, config):
-        self._send_request("complete")
+        config = self.prepare_config(config)
+        self._send_request("complete", config, task.name)
 
 
 @event("plugin.register")
