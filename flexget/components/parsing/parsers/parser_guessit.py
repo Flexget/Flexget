@@ -133,7 +133,7 @@ class ParserGuessit(object):
                 source.append('bdscr')
             else:
                 source.append('dvdscr')
-        if 'r5' in other:
+        if 'region 5' in other or 'region c' in other:
             source.append('r5')
 
         return source
