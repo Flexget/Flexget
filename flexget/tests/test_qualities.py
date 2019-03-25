@@ -47,19 +47,20 @@ class TestQualityParser(object):
             ('Test.File.2160p.bluray', '2160p bluray'),
             ('Test.File.1080p.cam', '1080p cam'),
             ('A Movie 2011 TS 576P XviD-DTRG', '576p ts xvid'),
-            ('Test.File.720p.bluray.r5', '720p r5'),
-            ('Test.File.1080p.bluray.rc', '1080p r5'),
+            ('Test.File.720p.bluray.r5', '720p r5', False),
+            ('Test.File.1080p.bluray.rc', '1080p r5', False),
             # 10bit
-            ('Test.File.480p.10bit', '480p 10bit'),
-            ('Test.File.720p.10bit', '720p 10bit'),
-            ('Test.File.720p.bluray.10bit', '720p bluray 10bit'),
-            ('Test.File.1080p.10bit', '1080p 10bit'),
-            ('Test.File.1080p.bluray.10bit', '1080p bluray 10bit'),
+            ('Test.File.480p.10bit', '480p 10bit', False),
+            ('Test.File.720p.10bit', '720p 10bit', False),
+            ('Test.File.720p.bluray.10bit', '720p bluray 10bit', False),
+            ('Test.File.1080p.10bit', '1080p 10bit', False),
+            ('Test.File.1080p.bluray.10bit', '1080p bluray 10bit', False),
             ('Test.File.720p.web', '720p webdl'),
             ('Test.File.720p.webdl', '720p webdl'),
             ('Test.File.1280x720_web dl', '720p webdl'),
             ('Test.File.720p.h264.web.dl', '720p webdl h264'),
             ('Test.File.1080p.webhd.x264', '1080p webdl h264'),
+            ('Test.File.REPACK.1080p.WEBRip.DDP5.1.x264', '1080p webrip h264 dd+5.1'),
             ('Test.File.480.hdtv.x265', '480p hdtv h265'),
             ('Test.File.web', 'webdl'),
             ('Test.File.web-dl', 'webdl'),
@@ -73,7 +74,7 @@ class TestQualityParser(object):
             ('Test.File.720p50', '720p'),
             ('Test.File.720p60', '720p'),
             ('Test.File.dvd.rip', 'dvdrip'),
-            ('Test.File.dvd.rip.r5', 'r5'),
+            ('Test.File.dvd.rip.r5', 'r5', False),
             ('Test.File.[576p][00112233].mkv', '576p'),
             ('Test.TS.FooBar', 'ts'),
             ('Test.File.360p.avi', '360p'),
@@ -101,13 +102,13 @@ class TestQualityParser(object):
             ('Test.File.truehd.7.1', 'truehd'),
             ('Test.File.DTSHDMA', 'dtshd'),
             ('Test.File.DTSHDMA5.1', 'dtshd'),
-            ('Test.File.DD2.0', 'dd5.1'),
-            ('Test.File.AC35.1', 'ac3'),
+            ('Test.File.DD2.0', 'dd5.1', False),
+            ('Test.File.AC35.1', 'ac3', False),
         ],
     )
     def test_quality_failures(self, parser, test_quality):
         # Kind of a hack to get around the awful limitations of Guessit without creating extra tests
-        guessit = test_quality[2] if len(test_quality) > 2 else False
+        guessit = test_quality[2] if len(test_quality) > 2 else True
         if not guessit and parser.__name__ == 'ParserGuessit':
             return
         quality = parser().parse_movie(test_quality[0]).quality

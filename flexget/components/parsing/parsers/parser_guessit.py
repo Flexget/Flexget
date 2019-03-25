@@ -118,7 +118,7 @@ class ParserGuessit(object):
         return version + proper_count - (5 if fastsub else 0)
 
     def _source(self, guessit_result):
-        other = normalize_component(guessit_result.get('other'))
+        other = normalize_component(guessit_result.values_list.get('other'))
         source = self.SOURCE_MAP.get(guessit_result.get('source'), guessit_result.get('source'))
         # special case
         if source == 'web-dl' and 'rip' in other:
