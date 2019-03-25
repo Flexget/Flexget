@@ -33,7 +33,8 @@ class TestQualityParser(object):
     @pytest.mark.parametrize(
         "test_quality",
         [
-            ('Test.File 1080p.web.vp9', '1080p webdl vp9', False),
+            ('Test.File.dvdscr', 'dvdscr'),
+            ('Test.File 1080p.web.vp9', '1080p webdl vp9'),
             ('Test.File 1080p.web', '1080p webdl'),
             ('Test.File.2160p.web', '2160p webdl'),
             ('Test.File.1080.web-random', '1080p webdl'),

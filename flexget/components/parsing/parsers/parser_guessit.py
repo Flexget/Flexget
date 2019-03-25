@@ -114,7 +114,7 @@ class ParserGuessit(object):
         else:
             version -= 1
         proper_count = guessit_result.get('proper_count', 0)
-        fastsub = 'fast subtitled' in normalize_component(guessit_result.get('other'))
+        fastsub = 'fast subtitled' in normalize_component(guessit_result.values_list.get('other'))
         return version + proper_count - (5 if fastsub else 0)
 
     def _source(self, guessit_result):
@@ -140,20 +140,20 @@ class ParserGuessit(object):
 
     def _quality(self, guessit_result):
         """Generate a FlexGet Quality from a guessit result."""
-        resolution = normalize_component(guessit_result.get('screen_size'))
-        other = normalize_component(guessit_result.get('other'))
+        resolution = normalize_component(guessit_result.values_list.get('screen_size'))
+        other = normalize_component(guessit_result.values_list.get('other'))
         if not resolution and 'high resolution' in other:
             resolution.append('hr')
 
         source = self._source(guessit_result)
 
-        codec = normalize_component(guessit_result.get('video_codec'))
+        codec = normalize_component(guessit_result.values_list.get('video_codec'))
         if '10bit' in normalize_component(guessit_result.values_list.get('color_depth')):
             codec.append('10bit')
 
-        audio = normalize_component(guessit_result.get('audio_codec'))
-        audio_profile = normalize_component(guessit_result.get('audio_profile'))
-        audio_channels = normalize_component(guessit_result.get('audio_channels'))
+        audio = normalize_component(guessit_result.values_list.get('audio_codec'))
+        audio_profile = normalize_component(guessit_result.values_list.get('audio_profile'))
+        audio_channels = normalize_component(guessit_result.values_list.get('audio_channels'))
         # unlike the other components, audio can be a bit iffy with multiple codecs, so we limit it to one
         if 'dts' in audio and any(hd in audio_profile for hd in ['hd', 'master audio']):
             audio = ['dtshd']
