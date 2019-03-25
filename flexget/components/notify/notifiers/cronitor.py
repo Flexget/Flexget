@@ -1,3 +1,4 @@
+from __future__ import unicode_literals, division, absolute_import
 from builtins import *
 
 import logging
@@ -18,8 +19,16 @@ log = logging.getLogger(plugin_name)
 class Cronitor(object):
     """
     Example::
+      cronitor: ABC123
+
+    Or:
       cronitor:
         monitor_code: ABC123
+        on_start: yes
+        on_abort: no
+        message: Ping
+        host: foo.bar
+        auth_key: secret
     """
 
     base_url = "https://cronitor.link/{monitor_code}/{status}"
