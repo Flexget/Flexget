@@ -30,6 +30,7 @@ itsdangerous==0.24        # via flask
 jinja2==2.10
 jsonschema==2.6.0
 markupsafe==1.0           # via jinja2
+path.py==11.5.0
 plumbum==1.6.3            # via rpyc
 portend==1.8              # via cherrypy
 progressbar==2.5
