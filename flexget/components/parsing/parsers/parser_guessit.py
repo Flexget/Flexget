@@ -148,7 +148,7 @@ class ParserGuessit(object):
         source = self._source(guessit_result)
 
         codec = normalize_component(guessit_result.get('video_codec'))
-        if '10bit' in normalize_component(guessit_result.get('video_profile')):
+        if '10bit' in normalize_component(guessit_result.values_list.get('color_depth')):
             codec.append('10bit')
 
         audio = normalize_component(guessit_result.get('audio_codec'))
