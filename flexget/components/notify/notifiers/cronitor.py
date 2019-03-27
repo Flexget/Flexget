@@ -57,7 +57,7 @@ class Cronitor(object):
         if isinstance(config, str):
             config = {"monitor_code": config}
         config.setdefault("on_start", True)
-        config.setdefault("on_start", True)
+        config.setdefault("on_abort", True)
         config.setdefault("host", socket.gethostname())
         return config
 
@@ -79,7 +79,7 @@ class Cronitor(object):
         config = self.prepare_config(config)
         if not config["on_start"]:
             return
-        self._send_request("run", config, task.nam)
+        self._send_request("run", config, task.name)
 
     def on_task_abort(self, task, config):
         config = self.prepare_config(config)
