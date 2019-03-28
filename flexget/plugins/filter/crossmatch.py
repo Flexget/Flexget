@@ -85,12 +85,14 @@ class CrossMatch(object):
                 log.trace('field %s is not in both entries', field)
                 continue
 
-            if case_sensitive:
-                v1 = e1[field]
-                v2 = e2[field]
-            else:
+            if not case_sensitive and isinstance(e1[field], str):
                 v1 = e1[field].lower()
+            else:
+                v1 = e1[field]
+            if not case_sensitive and isinstance(e1[field], str):
                 v2 = e2[field].lower()
+            else:
+                v2 = e2[field]
 
             try:
                 if v1 == v2 or not exact and (v2 in v1 or v1 in v2):
