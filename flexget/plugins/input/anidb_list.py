@@ -1,11 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-import httplib
 import logging
 import re
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
@@ -22,27 +22,27 @@ class AnidbList(object):
 
         anidb_list:
           user_id: <required>
-          type: # zero or more
+          [adult_only]: (ignore)/hide/only
+          [is_airing]: (ignore)/airing/finished/unknown
+          [type]: # zero or more
             - tvseries
             - tvspecial
             - ova
             - movie
             - web
             - musicvideo
-          is_airing: (ignore)/airing/finished/unknown
-          adult_only: boolean  # if adult_only is not present, it will be ignored
-          buddy_lists: (ignore)/show_in/hide_in/show_watched/hide_watched
-          mylist: # this option can also just be the value of "status"
-        status: (ignore)/complete/incomplete/in_mylist/not_in_mylist/related_not_in_mylist
-        state: watching/unknown/collecting/stalled/dropped
-          watched: # zero or more
+          [buddy_lists]: (ignore)/show_in/hide_in/show_watched/hide_watched
+          [mylist]: # this option can also just be the value of "status"
+            [state]: watching/unknown/collecting/stalled/dropped
+            [status]: (ignore)/complete/incomplete/in_mylist/not_in_mylist/related_not_in_mylist
+          [vote]: (ignore)/permanent/temporary/none/either
+          [watched]: # zero or more
             - unwatched
             - partial
             - complete
             - allihave
-          mode: (all)/undefined/watch/get/blacklist/buddy
+          [mode]: (all)/undefined/watch/get/blacklist/buddy
           pass: <guest pass set on anidb settings>
-          voted: (ignore)/permanent/temporary/none/either
           strip_dates: (no)/yes
 
     """
@@ -102,7 +102,7 @@ class AnidbList(object):
     ]
 
     WATCHED_STATE = [
-        'unwatched', 
+        'unwatched',
         'partial',
         'complete',
         'allihave',
@@ -115,7 +115,7 @@ class AnidbList(object):
         'none': 3,
         'either': 4,
     }
-    
+
     WISHLIST_MODES = {
         'all': 0,
         'undefined': 1,
@@ -132,14 +132,9 @@ class AnidbList(object):
                 'type': 'integer',
                 'pattern': USER_ID_RE,
                 'error_pattern': 'user_id must be in the form XXXXXXX'},
-            'type': {
-                'oneOf': [
-                    {'type': 'string', 'enum': MEDIA_TYPES},
-                    {'type': 'array', 'items': {'type': 'string', 'enum': MEDIA_TYPES}},
-                ],
-            },
+            'type': {one_or_more({'type': 'string', 'enum': MEDIA_TYPES})},
             'is_airing': {'type': 'boolean'},
-            'adult_only': {'type': 'string', 'enum': list(ADULT_MODES.keys())},
+            'adult_only': {'type': 'string', 'enum': list(ADULT_MODES.keys()), 'default': 'ignore'},
             'buddy_lists': {'type': 'string', 'enum': list(BUDDY_MODES.keys())},
             'mylist': {
                 'oneOf': [
@@ -147,12 +142,7 @@ class AnidbList(object):
                     {'type': 'object',
                      'properties': {
                          'status': {'type': 'string', 'enum': list(MYLIST_MODES.keys())},
-                         'state': {
-                             'oneOf': [
-                                 {'type': 'string', 'enum': MYLIST_STATE},
-                                 {'type': 'array', 'items': {'type': 'string', 'enum': MYLIST_STATE}},
-                             ],
-                         },
+                         'state': {one_or_more({'type': 'string', 'enum': MYLIST_STATE})},
                      }},
                 ],
             },
@@ -165,6 +155,7 @@ class AnidbList(object):
             'mode': {
                 'type': 'string',
                 'enum': list(WISHLIST_MODES.keys())},
+            'list_type': {'type': 'string', 'enum': ['wish', 'my'], 'default': 'wish'},
             'pass': {'type': 'string'},
             'strip_dates': {
                 'type': 'boolean',
@@ -202,6 +193,18 @@ class AnidbList(object):
             elif isinstance(config['watched'], list):
                 for watched_type in config['watched']:
                     params['watched.{0}'.format(watched_type)] = 1
+        if 'mylist' in config:
+            if isinstance(config['mylist'], str):
+                params['mylist'] = self.MYLIST_MODES[config['mylist']]
+            else:
+                if 'status' in config['mylist']:
+                    params['mylist'] = self.MYLIST_MODES[config['mylist']['status']]
+                if 'state' in config['mylist']:
+                    if isinstance(config['mylist']['state'], str):
+                        params['liststate.{0}'.format(config['mylist']['state'])] = 1
+                    else:
+                        for state in config['mylist']['state']:
+                            params['liststate.{0}'.format(state)] = 1
         return params
 
     @cached('anidb_list', persist='2 hours')
@@ -224,14 +227,6 @@ class AnidbList(object):
             )
 
         entries = []
-        entry_type = ''
-
-        if config['type'] == 'movies':
-            entry_type = 'Type: Movie'
-        elif config['type'] == 'shows':
-            entry_type = 'Type: TV Series'
-        elif config['type'] == 'ovas':
-            entry_type = 'Type: OVA'
 
         while True:
             soup = get_soup(page.text)
@@ -242,26 +237,23 @@ class AnidbList(object):
                 log.verbose('No movies were found in AniDB list: mywishlist')
                 return entries
             for tr in trs:
-                if tr.find('span', title=entry_type):
-                    a_tag = tr.find('td', class_='name').find('a')
-                    if not a_tag:
-                        log.debug('No title link found for the row, skipping')
-                        continue
+                a_tag = tr.find('td', class_='name').find('a')
+                if not a_tag:
+                    log.debug('No title link found for the row, skipping')
+                    continue
 
-                    anime_title = a_tag.string
-                    if config.get('strip_dates'):
-                        # Remove year from end of series name if present
-                        anime_title = re.sub(r'\s+\(\d{4}\)$', '', anime_title)
+                anime_title = a_tag.string
+                if config.get('strip_dates'):
+                    # Remove year from end of series name if present
+                    anime_title = re.sub(r'\s+\(\d{4}\)$', '', anime_title)
 
-                    entry = Entry()
-                    entry['title'] = anime_title
-                    entry['url'] = (self.anidb_url + a_tag.get('href'))
-                    entry['anidb_id'] = tr['id'][1:]  # The <tr> tag's id is "aN..." where "N..." is the anime id
-                    log.debug('%s id is %s', entry['title'], entry['anidb_id'])
-                    entry['anidb_name'] = entry['title']
-                    entries.append(entry)
-                else:
-                    log.verbose('Entry does not match the requested type')
+                entry = Entry()
+                entry['title'] = anime_title
+                entry['url'] = (self.anidb_url + a_tag.get('href'))
+                entry['anidb_id'] = tr['id'][1:]  # The <tr> tag's id is "aN..." where "N..." is the anime id
+                log.debug('%s id is %s', entry['title'], entry['anidb_id'])
+                entry['anidb_name'] = entry['title']
+                entries.append(entry)
             try:
                 # Try to get the link to the next page.
                 next_link = soup.find('li', class_='next').find('a')['href']
@@ -275,7 +267,7 @@ class AnidbList(object):
                 page = task.requests.get(comp_link, headers=task_headers)
             except RequestException as req_except:
                 log.error(str(req_except))
-            if page.status_code != httplib.OK:
+            if page.status_code != 200:
                 log.warning('Unable to retrieve next page of wishlist.')
                 break
         return entries
