@@ -23,6 +23,7 @@ class CrossMatch(object):
           - title
         action: reject
         exact: yes
+        case_sensitive: yes
     """
 
     schema = {
@@ -33,6 +34,7 @@ class CrossMatch(object):
             'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}},
             'exact': {'type': 'boolean', 'default': True},
             'all_fields': {'type': 'boolean', 'default': False},
+            'case_sensitive': {'type': 'boolean', 'default': True}
         },
         'required': ['fields', 'action', 'from'],
         'additionalProperties': False,
@@ -50,7 +52,7 @@ class CrossMatch(object):
         for entry in task.entries:
             for generated_entry in match_entries:
                 log.trace('checking if %s matches %s', entry['title'], generated_entry['title'])
-                common = self.entry_intersects(entry, generated_entry, fields, config.get('exact'))
+                common = self.entry_intersects(entry, generated_entry, fields, config.get('exact'), config.get('case_sensitive'))
                 if common and (not all_fields or len(common) == len(fields)):
                     msg = 'intersects with %s on field(s) %s' % (
                         generated_entry['title'],
@@ -64,7 +66,7 @@ class CrossMatch(object):
                     if action == 'accept':
                         entry.accept(msg)
 
-    def entry_intersects(self, e1, e2, fields=None, exact=True):
+    def entry_intersects(self, e1, e2, fields=None, exact=True, case_sensitive=True):
         """
         :param e1: First :class:`flexget.entry.Entry`
         :param e2: Second :class:`flexget.entry.Entry`
@@ -83,8 +85,14 @@ class CrossMatch(object):
                 log.trace('field %s is not in both entries', field)
                 continue
 
-            v1 = e1[field]
-            v2 = e2[field]
+            if not case_sensitive and isinstance(e1[field], str):
+                v1 = e1[field].lower()
+            else:
+                v1 = e1[field]
+            if not case_sensitive and isinstance(e1[field], str):
+                v2 = e2[field].lower()
+            else:
+                v2 = e2[field]
 
             try:
                 if v1 == v2 or not exact and (v2 in v1 or v1 in v2):
