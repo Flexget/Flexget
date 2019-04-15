@@ -259,7 +259,7 @@ def is_url(instance):
         return True
     regexp = (
         '('
-        + '|'.join(['ftp', 'http', 'https', 'file', 'udp', 'socks5'])
+        + '|'.join(['ftp', 'http', 'https', 'file', 'udp', 'socks5h?'])
         + '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
     )
     return re.match(regexp, instance)
