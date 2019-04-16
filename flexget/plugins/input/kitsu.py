@@ -24,6 +24,9 @@ class KitsuAnime(object):
       lists:
         - <current|planned|completed|on_hold|dropped>
         - <current|planned|completed|on_hold|dropped>
+      type:
+        - <ona|ova|tv|movie|music|special>
+        - <ona|ova|tv|movie|music|special>
       status: <airing|finished>
       latest: <yes|no>
     """
@@ -36,6 +39,12 @@ class KitsuAnime(object):
                 {
                     'type': 'string',
                     'enum': ['current', 'planned', 'completed', 'on_hold', 'dropped'],
+                }
+            ),
+            'type': one_or_more(
+                {
+                    'type': 'string',
+                    'enum': ['ona', 'ova', 'tv', 'movie', 'music', 'special'],
                 }
             ),
             'latest': {'type': 'boolean', 'default': False},
@@ -100,6 +109,12 @@ class KitsuAnime(object):
                     if status == 'finished' and anime['attributes']['endDate'] is None:
                         continue
 
+                types = config.get('type')
+                if types is not None:
+                    subType = anime['attributes']['subtype']
+                    if subType is None or not subType.lower() in types:
+                        continue
+                    
                 entry = Entry()
                 entry['title'] = anime['attributes']['canonicalTitle']
                 titles_en = anime['attributes']['titles'].get('en')
