@@ -1,16 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import re
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+from requests import RequestException
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.utils.soup import get_soup
-from requests import RequestException
 
 log = logging.getLogger('anidb_list')
 USER_ID_RE = r'^\d{1,6}$'
@@ -42,8 +42,8 @@ class AnidbList(object):
             - complete
             - allihave
           [mode]: (all)/undefined/watch/get/blacklist/buddy
-          pass: <guest pass set on anidb settings>
-          strip_dates: (no)/yes
+          [pass]: <guest pass set on anidb settings>
+          [strip_dates]: (no)/yes
 
     """
 
@@ -132,30 +132,23 @@ class AnidbList(object):
                 'type': 'integer',
                 'pattern': USER_ID_RE,
                 'error_pattern': 'user_id must be in the form XXXXXXX'},
-            'type': {one_or_more({'type': 'string', 'enum': MEDIA_TYPES})},
-            'is_airing': {'type': 'boolean'},
             'adult_only': {'type': 'string', 'enum': list(ADULT_MODES.keys()), 'default': 'ignore'},
-            'buddy_lists': {'type': 'string', 'enum': list(BUDDY_MODES.keys())},
+            'is_airing': {'type': 'string', 'enum': list(AIRING_MODES.keys()), 'default': 'ignore'},
+            'type': one_or_more({'type': 'string', 'enum': MEDIA_TYPES}),  # todo: this is optional
+            'buddy_lists': {'type': 'string', 'enum': list(BUDDY_MODES.keys()), 'default': 'ignore'},
             'mylist': {
                 'oneOf': [
-                    {'type': 'string', 'enum': list(MYLIST_MODES.keys())},
+                    {'type': 'string', 'enum': list(MYLIST_MODES.keys()), 'default': 'ignore'},
                     {'type': 'object',
                      'properties': {
-                         'status': {'type': 'string', 'enum': list(MYLIST_MODES.keys())},
-                         'state': {one_or_more({'type': 'string', 'enum': MYLIST_STATE})},
+                         'status': {'type': 'string', 'enum': list(MYLIST_MODES.keys()), 'default': 'ignore'},
+                         'state': one_or_more({'type': 'string', 'enum': MYLIST_STATE}),  # todo: this is optional
                      }},
                 ],
             },
-            'watched': {
-                'oneOf': [
-                    {'type': 'string', 'enum': WATCHED_STATE},
-                    {'type': 'array', 'items': {'type': 'string', 'enum': WATCHED_STATE}},
-                ],
-            },
-            'mode': {
-                'type': 'string',
-                'enum': list(WISHLIST_MODES.keys())},
-            'list_type': {'type': 'string', 'enum': ['wish', 'my'], 'default': 'wish'},
+            'vote': {'type': 'string', 'enum': list(VOTE_MODES.keys()), 'default': 'ignore'},
+            'watched': one_or_more({'type': 'string', 'enum': WATCHED_STATE}),  # todo: this is optional
+            'mode': {'type': 'string', 'enum': list(WISHLIST_MODES.keys()), 'default': 'all'},
             'pass': {'type': 'string'},
             'strip_dates': {
                 'type': 'boolean',
@@ -167,6 +160,7 @@ class AnidbList(object):
     }
 
     def __build_url(self, config):
+        # todo: this function is a mess
         params = {
             'show': 'mywishlist',
             'uid': config['user_id'],
@@ -185,8 +179,8 @@ class AnidbList(object):
             params['h'] = self.ADULT_MODES[config['adult_only']]
         if 'pass' in config:
             params['pass'] = config['pass']
-        if 'voted' in config:
-            params['vote'] = self.VOTE_MODES[config['voted']]
+        if 'vote' in config:
+            params['vote'] = self.VOTE_MODES[config['vote']]
         if 'watched' in config:
             if isinstance(config['watched'], str):
                 params['watched.{0}'.format(config['watched'])] = 1
@@ -248,7 +242,7 @@ class AnidbList(object):
                 entry = Entry()
                 entry['title'] = anime_title
                 entry['url'] = (self.anidb_url + a_tag.get('href'))
-                entry['anidb_id'] = tr['id'][1:]  # The <tr> tag's id is "aN..." where "N..." is the anime id
+                entry['anidb_id'] = tr['id'][1:]  # The <tr> tag's id is "a\d+" where "\d+" is the anime id
                 log.debug('%s id is %s', entry['title'], entry['anidb_id'])
                 entry['anidb_name'] = entry['title']
                 entries.append(entry)
