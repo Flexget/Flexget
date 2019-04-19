@@ -48,10 +48,10 @@ class AnidbList(object):
     """
 
     anidb_url = 'http://anidb.net/perl-bin/'
-    anidb_url_pl = anidb_url + 'animedb.pl'
+    anidb_url_pl = anidb_url + 'animedb.pl'  # Next link already has animedb.pl
 
-    default_user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebkit/537.36 (KHTML, like Gecko) ' \
-                         'Chrome/69.0.3497.100 Safari/537.36'
+    default_user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebkit/537.36 ' \
+        '(KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36'
 
     ADULT_MODES = {
         'ignore': 0,
@@ -132,23 +132,23 @@ class AnidbList(object):
                 'type': 'integer',
                 'pattern': USER_ID_RE,
                 'error_pattern': 'user_id must be in the form XXXXXXX'},
-            'adult_only': {'type': 'string', 'enum': list(ADULT_MODES.keys()), 'default': 'ignore'},
-            'is_airing': {'type': 'string', 'enum': list(AIRING_MODES.keys()), 'default': 'ignore'},
-            'type': one_or_more({'type': 'string', 'enum': MEDIA_TYPES}),  # todo: this is optional
-            'buddy_lists': {'type': 'string', 'enum': list(BUDDY_MODES.keys()), 'default': 'ignore'},
+            'adult_only': {'type': 'string', 'enum': list(ADULT_MODES.keys())},
+            'is_airing': {'type': 'string', 'enum': list(AIRING_MODES.keys())},
+            'type': one_or_more({'type': 'string', 'enum': MEDIA_TYPES}),
+            'buddy_lists': {'type': 'string', 'enum': list(BUDDY_MODES.keys())},
             'mylist': {
                 'oneOf': [
-                    {'type': 'string', 'enum': list(MYLIST_MODES.keys()), 'default': 'ignore'},
+                    {'type': 'string', 'enum': list(MYLIST_MODES.keys())},
                     {'type': 'object',
                      'properties': {
-                         'status': {'type': 'string', 'enum': list(MYLIST_MODES.keys()), 'default': 'ignore'},
-                         'state': one_or_more({'type': 'string', 'enum': MYLIST_STATE}),  # todo: this is optional
+                         'status': {'type': 'string', 'enum': list(MYLIST_MODES.keys())},
+                         'state': one_or_more({'type': 'string', 'enum': MYLIST_STATE}),
                      }},
                 ],
             },
-            'vote': {'type': 'string', 'enum': list(VOTE_MODES.keys()), 'default': 'ignore'},
-            'watched': one_or_more({'type': 'string', 'enum': WATCHED_STATE}),  # todo: this is optional
-            'mode': {'type': 'string', 'enum': list(WISHLIST_MODES.keys()), 'default': 'all'},
+            'vote': {'type': 'string', 'enum': list(VOTE_MODES.keys())},
+            'watched': one_or_more({'type': 'string', 'enum': WATCHED_STATE}),
+            'mode': {'type': 'string', 'enum': list(WISHLIST_MODES.keys())},
             'pass': {'type': 'string'},
             'strip_dates': {
                 'type': 'boolean',
@@ -216,9 +216,8 @@ class AnidbList(object):
         except RequestException as e:
             raise plugin.PluginError(str(e))
         if page.status_code != 200:
-            raise plugin.PluginError(
-                'Unable to get AniDB list. Either the list is private or does not exist.'
-            )
+            raise plugin.PluginError('Unable to get AniDB list. '
+                                     'Either the list is private or does not exist.')
 
         entries = []
 
