@@ -213,8 +213,8 @@ class AnidbList(object):
 
         try:
             page = task.requests.get(self.anidb_url_pl, headers=task_headers, params=comp_link)
-        except RequestException as e:
-            raise plugin.PluginError(str(e))
+        except RequestException as req_except:
+            raise plugin.PluginError(str(req_except))
         if page.status_code != 200:
             raise plugin.PluginError('Unable to get AniDB list. '
                                      'Either the list is private or does not exist.')
