@@ -76,6 +76,21 @@ class SlackNotifier(object):
                                 'additionalProperties': False,
                             },
                         },
+                        'actions': {
+                            'type': 'array',
+                            'minItems': 1,
+                            'items': {
+                                'type': 'object',
+                                'properties': {
+                                    'name': {'type': 'string'},
+                                    'text': {'type': 'string'},
+                                    'type': {'type': 'boolean'},
+                                    'value': {'type': 'string'},
+                                },
+                                'required': ['name', 'text', 'type', 'value'],
+                                'additionalProperties': False,
+                            },
+                        },
                     },
                     'required': ['fallback'],
                     'additionalProperties': False,
@@ -86,6 +101,9 @@ class SlackNotifier(object):
         'error_not': 'Can only use one of \'icon_emoji\' or \'icon_url\'',
         'required': ['web_hook_url'],
         'additionalProperties': False,
+        'dependencies': {
+            'actions': ['callback_id'],
+        },
     }
 
     def notify(self, title, message, config):
