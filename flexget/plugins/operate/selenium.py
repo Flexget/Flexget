@@ -36,9 +36,19 @@ class Selenium(object):
     ## Configuration
 
     Currently, the following actions are supported:
-    1. `cloudflare_ddos`: circumvent cloudflare protection. Parameters: 'url`: url to page that is protected by cloudflare
-    2. `imdb_login`: log in to imdb. So that the rest of the task can be performed as logged in user. Parameters: `username`: email used for login, `password`: password used for login.
-    3. `login`: log in to arbirtrary page. Parameters: `url`: url to login page, `username`: user name (or email) used for login, `password`: password used for login, `input_username_id`: id tag of field where username (or email) is to be entered, `input_password_id`: id tag of field where password is to be entered, `login_button_id`: id tag of button that must be clicked in order to log in, `element_after_login_id`: id of an element that appears on the page only after login, used to wait for successful loading of the page after login.
+    1. `cloudflare_ddos`: circumvent cloudflare protection. Parameters:
+        * 'url`: url to page that is protected by cloudflare
+    2. `imdb_login`: log in to imdb. So that the rest of the task can be performed as logged in user. Parameters: 
+        * `username`: email used for login, 
+        * `password`: password used for login.
+    3. `login`: log in to arbirtrary page. Parameters: 
+        * `url`: url to login page, 
+        * `username`: user name (or email) used for login,
+        * `password`: password used for login,
+        * `input_username_id`: id tag of field where username (or email) is to be entered,
+        * `input_password_id`: id tag of field where password is to be entered,
+        * `login_button_id`: id tag of button that must be clicked in order to log in,
+        * `element_after_login_id`: id of an element that appears on the page only after login, used to wait for successful loading of the page after login.
 
     **Configuration example for cloudflare DDOS protection:**
     ```yaml
@@ -114,7 +124,7 @@ class Selenium(object):
     '''
     schema = {
         'type': 'object',
-        'properties': {'chromedriver': {'type': 'string'}, 'action': {'type': 'string'}, 'parameters': {'type': 'object'}},
+        'properties': {'action': {'type': 'string'}, 'parameters': {'type': 'object'}},
         'additionalProperties': False,
     }
 
@@ -136,7 +146,7 @@ class Selenium(object):
             from selenium.webdriver.support.ui import WebDriverWait
             from selenium.common.exceptions import WebDriverException
         except ImportError as e:
-            log.error('Error importing selenium: %s' % e)
+            log.error('Error importing selenium: %s', e)
             raise plugin.DependencyError(
                 'selenium', 'selenium', 'Selenium module required. run "pip install selenium". Also needs chromedriver and chromium (for example in Alpine Linux run: "apk add chromium chromium-chromedriver"). ImportError: %s' % e)
         self.config.update(config)
@@ -171,7 +181,7 @@ class Selenium(object):
             implemented_action = getattr(self, config['action'])
             implemented_action(task, self.config['parameters'])
         else:
-            log.debug('The selenium plugin does not support this action: %s. Allowed values for the "action" config parameter are: %s' %
+            log.debug('The selenium plugin does not support this action: %s. Allowed values for the "action" config parameter are: %s',
                       config['action'], self.implemented_actions)
 
     def __del__(self):
@@ -185,7 +195,7 @@ class Selenium(object):
         Adds a cookie obtained by selenium to the cookiejar.
         @param cookie:  a cookie object returned by selenium driver.get_cookie()
         '''
-        log.debug('Added cookie: %s' % pformat(cookie))
+        log.debug('Added cookie: %s', pformat(cookie))
         default_attributes = ['name', 'value', 'secure', 'discard', 'comment', 'comment_url']
         cookie_attributes = {'domain': None, 'domain_specified': False, 'domain_initial_dot': False,
                              'path': None, 'path_specified': False, 'port': None, 'port_specified': False, 'expires': None}
@@ -242,7 +252,7 @@ class Selenium(object):
         task.requests.add_cookiejar(self.cj)
         # update the header of flexgets requests session to match the header used to circumvent cloudflare
         task.requests.headers.update({'User-Agent': user_agent})
-        log.debug('Cookies now stored in task.requests.cookies: %s' % pformat(task.requests.cookies))
+        log.debug('Cookies now stored in task.requests.cookies: %s', pformat(task.requests.cookies))
         self.driver.quit()
 
     def login(self, task, parameters):
@@ -265,7 +275,7 @@ class Selenium(object):
         try:
             self.wait.until(EC.presence_of_element_located((By.ID, parameters['element_after_login_id'])))
         except TimeoutException:
-            log.warning('Could not verify the presence of an element with the id "%s". Login may have failed.' %
+            log.warning('Could not verify the presence of an element with the id "%s". Login may have failed.',
                         parameters['element_after_login_id'])
         log.verbose('Logged in at url: "%s". Page title is now: %s', parameters['url'], self.driver.title)
         for cookie in self.driver.get_cookies():
