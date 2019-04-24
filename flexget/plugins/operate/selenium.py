@@ -256,7 +256,6 @@ class Selenium(object):
         from selenium.webdriver.common.by import By
         from selenium.common.exceptions import TimeoutException
         self.driver.get(parameters['url'])
-        self.driver.save_screenshot('/config/screenshot.png')
         input_email = self.driver.find_element_by_id(parameters['input_username_id'])
         input_email.send_keys(parameters['username'])
         input_password = self.driver.find_element_by_id(parameters['input_password_id'])
@@ -268,7 +267,6 @@ class Selenium(object):
         except TimeoutException:
             log.warning('Could not verify the presence of an element with the id "%s". Login may have failed.' %
                         parameters['element_after_login_id'])
-        self.driver.save_screenshot('/config/screenshot1.png')
         log.verbose('Logged in at url: "%s". Page title is now: %s', parameters['url'], self.driver.title)
         for cookie in self.driver.get_cookies():
             self.add_selenium_cookie(cookie)
