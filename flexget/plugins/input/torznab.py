@@ -2,12 +2,15 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from future.moves.urllib.parse import urlencode
+from past.utils import old_div
 from bs4 import BeautifulSoup, element
 import logging
 
 from flexget import plugin
+from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
+from flexget.components.sites.utils import torrent_availability
 
 log = logging.getLogger('torznab')
 
@@ -44,7 +47,7 @@ class Torznab(object):
             params = self._gather_tvsearch_params(entry)
         if 'q' not in params.keys():
             params['q'] = entry['title']
-        return []
+        return self.create_entries_from_query(self._build_url(**params), task)
 
     def _build_url(self, **kwargs):
         """Builds the url with query parameters from the arguments"""
@@ -138,6 +141,99 @@ class Torznab(object):
         if used_categories:
             log.debug('Setting search categories to {}'.format(used_categories))
             self.params['cat'] = ','.join(str(e) for e in used_categories)
+
+    @plugin.internet(log)
+    def create_entries_from_query(self, url, task):
+        """Fetch feed and fill entries from"""
+
+        log.info('Fetching URL: {}'.format(url))
+
+        try:
+            response = task.requests.get(url)
+        except task.requests.RequestException as e:
+            raise PluginError("Failed fetching '{}': {}".format(url, e))
+
+        entries = []
+        soup = BeautifulSoup(response.content, 'lxml')
+        for item in soup.find_all('item'):
+            entry = Entry()
+            enclosure = item.find('enclosure', type='application/x-bittorrent')
+            if enclosure is None:
+                log.warn("Item '{}' does not contain a bittorent enclosure.".format(item.title.string))
+                continue
+            else:
+                entry['url'] = enclosure.get('url')
+                try:
+                    entry['content_size'] = old_div(int(enclosure.get('length')), 2 ** 20)
+                except ValueError:
+                    entry['content_size'] = 0
+                entry['type'] = enclosure.get('type')
+
+            # Filtering for 'torznab:attr' doesn't work, let's do the next best thing
+            self._parse_torznab_attrs(entry, item.find_all(name=True, value=True))
+
+            for child in item.descendants:
+                if type(child) is element.Tag:
+                    if child.name == 'torznab:attr' or child.name == 'enclosure':
+                        continue
+                    else:
+                        for string in child.stripped_strings:
+                            log.debug('{}: {}'.format(child.name, string))
+                            if child.name == 'description' or child.name == 'title':
+                                entry[child.name] = string
+            entries.append(entry)
+        return entries
+
+    def _parse_torznab_attrs(self, entry, attrs):
+        """Parse the torznab::attr values from the response
+
+        https://github.com/Sonarr/Sonarr/wiki/Implementing-a-Torznab-indexer#torznab-results
+        """
+        dictionary = {
+            'episode': {'name': 'series_episode', 'type': int},
+            'imdbid': {'name': 'imdb_id', 'type': str},
+            'infohash': {'name': 'torrent_info_hash', 'type': str},
+            'leechers': {'name': 'torrent_leeches', 'type': int},
+            'rageid': {'name': 'tvrage_id', 'type': int},
+            'season': {'name': 'series_season', 'type': int},
+            'seeders': {'name': 'torrent_seeds', 'type': int},
+            'title': {'name': 'series_name', 'type': str},
+            'tmdbid': {'name': 'tmdb_id', 'type': int},
+            'traktid': {'name': 'trakt_id', 'type': int},
+            'tvdbid': {'name': 'tvdb_id', 'type': int},
+            'tvmazeid': {'name': 'tvmaze_series_id', 'type': int},
+            'tvrageid': {'name': 'tvrage_id', 'type': int}
+        }
+        misc = {}
+        for attr in attrs:
+            if attr.name != 'torznab:attr':
+                continue
+            name = attr.get('name')
+            if name in dictionary.keys():
+                entry[dictionary[name]['name']] = dictionary[name]['type'](attr.get('value'))
+            elif name == 'peers':
+                misc['peers'] = int(attr.get('value'))
+            elif name == 'imdb':
+                misc['imdb'] = str(attr.get('value'))
+            elif name == 'size':
+                misc['size'] = int(attr.get('value'))
+
+        if 'imdb_id' not in entry.keys() and 'imdb' in misc.keys():
+            entry['imdb_id'] = 'tt{}'.format(misc['imdb'])
+
+        if 'peers' in misc.keys():
+            if 'torrent_leeches' not in entry.keys() and 'torrent_seeds' in entry.keys():
+                entry['torrent_leeches'] = misc['peers'] - entry['torrent_seeds']
+            if 'torrent_leeches' in entry.keys() and 'torrent_seeds' not in entry.keys():
+                entry['torrent_seeds'] = misc['peers'] - entry['torrent_leeches']
+
+        if 'content_size' not in entry.keys() and 'size' in misc.keys():
+            entry['content_size'] = old_div(misc['size'], 2 ** 20)
+
+        if 'torrent_seeds' in entry.keys() and 'torrent_leeches' in entry.keys():
+            entry['torrent_availability'] = torrent_availability(
+                entry['torrent_seeds'], entry['torrent_leeches']
+            )
 
     def _gather_movie_params(self, entry):
         """Gather query parameters for 'movie' searcher
