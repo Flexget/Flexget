@@ -1,16 +1,15 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from bs4 import element
 from future.moves.urllib.parse import urlencode
 from past.utils import old_div
+from xml.etree import ElementTree
 import logging
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
-from flexget.utils import soup
 from flexget.components.sites.utils import torrent_availability
 
 log = logging.getLogger('torznab')
@@ -80,7 +79,7 @@ class Torznab(object):
 
         response = task.requests.get(self._build_url(t='caps'))
         log.debug('Raw caps response {}'.format(response.content))
-        root = soup.get_soup(response.content, 'lxml')
+        root = ElementTree.fromstring(response.content)
         self._setup_searcher(root, searcher, categories)
 
     def _setup_searcher(self, xml_root, searcher, categories):
@@ -91,19 +90,19 @@ class Torznab(object):
             'tvsearch': 'tv-search'
         }
 
-        searchers = {item.name: item.attrs for item in list(xml_root.find('searching')) if type(item) == element.Tag}
+        searchers = {item.tag: item.attrib for item in list(xml_root.find('searching'))}
         if searchers:
             if self._check_searcher(searchers, aliases[searcher]):
-                self.supported_params = searchers[aliases[searcher]]['supportedparams'].split(',')
+                self.supported_params = searchers[aliases[searcher]]['supportedParams'].split(',')
                 self.params['t'] = searcher
                 log.debug("Searcher '{}' set up with '{}' parameters".format(
-                         aliases[searcher],
-                         self.supported_params))
+                          aliases[searcher],
+                          self.supported_params))
                 if searcher != 'search':
                     self._setup_categories(xml_root, categories)
             elif searcher != 'search' and self._check_searcher(searchers, 'search'):
                 log.warn("'{}' searcher not availble, falling back to 'search'.".format(aliases[searcher]))
-                self.supported_params = searchers['search']['supportedparams'].split(',')
+                self.supported_params = searchers['search']['supportedParams'].split(',')
                 self.params['t'] = 'search'
                 log.debug("Searcher '{}' set up with '{}' parameters".format(
                          aliases[searcher],
@@ -117,7 +116,7 @@ class Torznab(object):
         """Check if the given searchers is in the list, available and has supported params"""
         return searcher in searchers.keys() and \
             searchers[searcher]['available'] == 'yes' and \
-            searchers[searcher]['supportedparams']
+            searchers[searcher]['supportedParams']
 
     def _setup_categories(self, xml_root, categories):
         """Gets the available search categories for the indexer"""
@@ -126,11 +125,9 @@ class Torznab(object):
         elif self.params['t'] == 'tvsearch':
             category_range = range(5000, 6000)
         used_categories = []
-        for category in [item for item in xml_root.find('categories') if type(item) == element.Tag]:
-            if 'id' not in category.attrs.keys():
-                continue
+        for category in xml_root.findall('categories//*[@id][@name]'):
             try:
-                category_id = int(category.attrs['id'])
+                category_id = int(category.attrib['id'])
                 if category_id in category_range and category_id not in used_categories:
                     if categories:
                         if category_id in categories:
@@ -155,33 +152,30 @@ class Torznab(object):
             raise PluginError("Failed fetching '{}': {}".format(url, e))
 
         entries = []
-        root = soup.get_soup(response.content)
-        for item in root.find_all('item'):
+        root = ElementTree.fromstring(response.content)
+        for item in root.findall('.//item'):
             entry = Entry()
-            enclosure = item.find('enclosure', type='application/x-bittorrent')
+            enclosure = item.find("enclosure[@type='application/x-bittorrent']")
             if enclosure is None:
                 log.warn("Item '{}' does not contain a bittorent enclosure.".format(item.title.string))
                 continue
             else:
-                entry['url'] = enclosure.get('url')
+                entry['url'] = enclosure.attrib['url']
                 try:
-                    entry['content_size'] = old_div(int(enclosure.get('length')), 2 ** 20)
+                    entry['content_size'] = old_div(int(enclosure.attrib['length']), 2 ** 20)
                 except ValueError:
                     entry['content_size'] = 0
-                entry['type'] = enclosure.get('type')
+                entry['type'] = enclosure.attrib['type']
 
-            # Filtering for 'torznab:attr' doesn't work, let's do the next best thing
-            self._parse_torznab_attrs(entry, item.find_all(name=True, value=True))
+            ns = {'torznab': 'http://torznab.com/schemas/2015/feed'}
+            self._parse_torznab_attrs(entry, item.findall('torznab:attr', ns))
 
-            for child in item.descendants:
-                if type(child) is element.Tag:
-                    if child.name == 'torznab:attr' or child.name == 'enclosure':
-                        continue
-                    else:
-                        for string in child.stripped_strings:
-                            log.debug('{}: {}'.format(child.name, string))
-                            if child.name == 'description' or child.name == 'title':
-                                entry[child.name] = string
+            for child in item.iter():
+                if child.tag in ['{http://torznab.com/schemas/2015/feed}attr', 'enclosure']:
+                    continue
+                else:
+                    if child.tag in ['description', 'title']:
+                        entry[child.tag] = child.text
             entries.append(entry)
         return entries
 
@@ -207,8 +201,6 @@ class Torznab(object):
         }
         misc = {}
         for attr in attrs:
-            if attr.name != 'torznab:attr':
-                continue
             name = attr.get('name')
             if name in dictionary.keys():
                 entry[dictionary[name]['name']] = dictionary[name]['type'](attr.get('value'))
