@@ -1,15 +1,16 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+from bs4 import element
 from future.moves.urllib.parse import urlencode
 from past.utils import old_div
-from bs4 import BeautifulSoup, element
 import logging
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
+from flexget.utils import soup
 from flexget.components.sites.utils import torrent_availability
 
 log = logging.getLogger('torznab')
@@ -79,7 +80,7 @@ class Torznab(object):
 
         response = task.requests.get(self._build_url(t='caps'))
         log.debug('Raw caps response {}'.format(response.content))
-        root = BeautifulSoup(response.content, 'lxml')
+        root = soup.get_soup(response.content, 'lxml')
         self._setup_searcher(root, searcher, categories)
 
     def _setup_searcher(self, xml_root, searcher, categories):
@@ -154,8 +155,8 @@ class Torznab(object):
             raise PluginError("Failed fetching '{}': {}".format(url, e))
 
         entries = []
-        soup = BeautifulSoup(response.content, 'lxml')
-        for item in soup.find_all('item'):
+        root = soup.get_soup(response.content)
+        for item in root.find_all('item'):
             entry = Entry()
             enclosure = item.find('enclosure', type='application/x-bittorrent')
             if enclosure is None:
