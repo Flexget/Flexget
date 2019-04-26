@@ -37,6 +37,13 @@ class Torznab(object):
     def search(self, task, entry, config=None):
         """Search interface"""
         self._setup(task, config)
+        params = {}
+        if self.params['t'] == 'movie':
+            params = self._gather_movie_params(entry)
+        elif self.params['t'] == 'tvsearch':
+            params = self._gather_tvsearch_params(entry)
+        if 'q' not in params.keys():
+            params['q'] = entry['title']
         return []
 
     def _build_url(self, **kwargs):
@@ -131,6 +138,57 @@ class Torznab(object):
         if used_categories:
             log.debug('Setting search categories to {}'.format(used_categories))
             self.params['cat'] = ','.join(str(e) for e in used_categories)
+
+    def _gather_movie_params(self, entry):
+        """Gather query parameters for 'movie' searcher
+
+        Conversion from Flexget Entry fields to znab query parameters
+        https://flexget.com/Entry
+        https://github.com/nZEDb/nZEDb/blob/0.x/docs/newznab_api_specification.txt#L441
+        """
+        params = {}
+        dictionary = {
+            'imdbid': 'imdb_id'
+        }
+
+        for k, v in [item for item in dictionary.items() if item[0] in self.supported_params]:
+            if v in entry.keys() and entry[v]:
+                params[k] = entry[v]
+        for k in ['trakt_movie_name', 'imdb_name', 'movie_name']:
+            if k in entry.keys() and entry[k]:
+                params['q'] = entry[k]
+                break
+
+        return params
+
+    def _gather_tvsearch_params(self, entry):
+        """Gather query parameters for 'tvsearch' searcher
+
+        Conversion from Flexget Entry fields to znab query parameters
+        https://flexget.com/Entry
+        https://github.com/nZEDb/nZEDb/blob/0.x/docs/newznab_api_specification.txt#L343
+        """
+        params = {}
+        dictionary = {
+            'rid': 'tvrage_id',
+            'tvdbid': 'tvdb_id',
+            'traktid': 'trakt_show_id',
+            'tvmazeid': 'tvmaze_series_id',
+            'imdbid': 'imdb_id',
+            'tmdbid': 'tmdb_id',
+            'season': 'series_season',
+            'ep': 'series_episode'
+        }
+
+        for k, v in [item for item in dictionary.items() if item[0] in self.supported_params]:
+            if v in entry.keys() and entry[v]:
+                params[k] = entry[v]
+        for k in ['tvdb_series_name', 'trakt_series_name', 'tvmaze_series_name', 'imdb_name', 'series_name']:
+            if k in entry.keys() and entry[k]:
+                params['q'] = entry[k]
+                break
+
+        return params
 
 
 @event('plugin.register')
