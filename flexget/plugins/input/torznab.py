@@ -70,10 +70,9 @@ class Torznab(object):
         response = task.requests.get(self._build_url(t='caps'))
         log.debug('Raw caps response {}'.format(response.content))
         root = BeautifulSoup(response.content, 'lxml')
-        self._setup_searcher(root, searcher)
-        self._setup_categories(root, categories)
+        self._setup_searcher(root, searcher, categories)
 
-    def _setup_searcher(self, xml_root, searcher):
+    def _setup_searcher(self, xml_root, searcher, categories):
         """Gets the available searchers (tv, movie, etc) for the indexer and their supported parameters"""
         aliases = {
             'movie': 'movie-search',
@@ -89,6 +88,8 @@ class Torznab(object):
                 log.debug("Searcher '{}' set up with '{}' parameters".format(
                          aliases[searcher],
                          self.supported_params))
+                if searcher != 'search':
+                    self._setup_categories(xml_root, categories)
             elif searcher != 'search' and self._check_searcher(searchers, 'search'):
                 log.warn("'{}' searcher not availble, falling back to 'search'.".format(aliases[searcher]))
                 self.supported_params = searchers['search']['supportedparams'].split(',')
@@ -109,7 +110,27 @@ class Torznab(object):
 
     def _setup_categories(self, xml_root, categories):
         """Gets the available search categories for the indexer"""
-        pass
+        if self.params['t'] == 'movie':
+            category_range = range(2000, 3000)
+        elif self.params['t'] == 'tvsearch':
+            category_range = range(5000, 6000)
+        used_categories = []
+        for category in [item for item in xml_root.find('categories') if type(item) == element.Tag]:
+            if 'id' not in category.attrs.keys():
+                continue
+            try:
+                category_id = int(category.attrs['id'])
+                if category_id in category_range and category_id not in used_categories:
+                    if categories:
+                        if category_id in categories:
+                            used_categories.append(category_id)
+                    else:
+                        used_categories.append(category_id)
+            except ValueError:
+                continue
+        if used_categories:
+            log.debug('Setting search categories to {}'.format(used_categories))
+            self.params['cat'] = ','.join(str(e) for e in used_categories)
 
 
 @event('plugin.register')
