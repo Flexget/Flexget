@@ -105,7 +105,6 @@ class SlackNotifier(object):
         'error_not': 'Can only use one of \'icon_emoji\' or \'icon_url\'',
         'required': ['web_hook_url'],
         'additionalProperties': False,
-
     }
 
     def notify(self, title, message, config):
