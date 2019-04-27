@@ -94,6 +94,9 @@ class SlackNotifier(object):
                         'callback_id': {'type': 'string'},
                     },
                     'required': ['fallback'],
+                    'dependencies': {
+                        'actions': ['callback_id'],
+                    },
                     'additionalProperties': False,
                 },
             },
@@ -102,9 +105,7 @@ class SlackNotifier(object):
         'error_not': 'Can only use one of \'icon_emoji\' or \'icon_url\'',
         'required': ['web_hook_url'],
         'additionalProperties': False,
-        'dependencies': {
-            'actions': ['callback_id'],
-        },
+
     }
 
     def notify(self, title, message, config):
