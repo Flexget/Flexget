@@ -76,8 +76,27 @@ class SlackNotifier(object):
                                 'additionalProperties': False,
                             },
                         },
+                        'actions': {
+                            'type': 'array',
+                            'minItems': 1,
+                            'items': {
+                                'type': 'object',
+                                'properties': {
+                                    'name': {'type': 'string'},
+                                    'text': {'type': 'string'},
+                                    'type': {'type': 'string'},
+                                    'value': {'type': 'string'},
+                                },
+                                'required': ['name', 'text', 'type', 'value'],
+                                'additionalProperties': False,
+                            },
+                        },
+                        'callback_id': {'type': 'string'},
                     },
                     'required': ['fallback'],
+                    'dependencies': {
+                        'actions': ['callback_id'],
+                    },
                     'additionalProperties': False,
                 },
             },
