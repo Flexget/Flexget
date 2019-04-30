@@ -42,9 +42,15 @@ class Torznab(object):
         self._setup(task, config)
         params = {}
         if self.params['t'] == 'movie':
-            params = self._gather_movie_params(entry)
+            params = self._convert_query_parameters(
+                entry,
+                ['imdbid']
+            )
         elif self.params['t'] == 'tvsearch':
-            params = self._gather_tvsearch_params(entry)
+            params = self._convert_query_parameters(
+                entry,
+                ['rid', 'tvdbid', 'traktid', 'tvmazeid', 'imdbid', 'tmdbid', 'season', 'ep']
+            )
         if 'q' not in params.keys():
             params['q'] = entry['title']
         return self.create_entries_from_query(self._build_url(**params), task)
@@ -228,34 +234,11 @@ class Torznab(object):
                 entry['torrent_seeds'], entry['torrent_leeches']
             )
 
-    def _gather_movie_params(self, entry):
-        """Gather query parameters for 'movie' searcher
+    def _convert_query_parameters(self, entry, fields):
+        """Convert from Flexget fields to query parameters for torznab.
 
-        Conversion from Flexget Entry fields to znab query parameters
         https://flexget.com/Entry
         https://github.com/nZEDb/nZEDb/blob/0.x/docs/newznab_api_specification.txt#L441
-        """
-        params = {}
-        dictionary = {
-            'imdbid': 'imdb_id'
-        }
-
-        for k, v in [item for item in dictionary.items() if item[0] in self.supported_params]:
-            if v in entry.keys() and entry[v]:
-                params[k] = entry[v]
-        for k in ['trakt_movie_name', 'imdb_name', 'movie_name']:
-            if k in entry.keys() and entry[k]:
-                params['q'] = entry[k]
-                break
-
-        return params
-
-    def _gather_tvsearch_params(self, entry):
-        """Gather query parameters for 'tvsearch' searcher
-
-        Conversion from Flexget Entry fields to znab query parameters
-        https://flexget.com/Entry
-        https://github.com/nZEDb/nZEDb/blob/0.x/docs/newznab_api_specification.txt#L343
         """
         params = {}
         dictionary = {
@@ -269,7 +252,9 @@ class Torznab(object):
             'ep': 'series_episode'
         }
 
-        for k, v in [item for item in dictionary.items() if item[0] in self.supported_params]:
+        for k, v in dictionary.items():
+            if k not in self.supported_params or k not in fields:
+                continue
             if v in entry.keys() and entry[v]:
                 params[k] = entry[v]
         for k in ['tvdb_series_name', 'trakt_series_name', 'tvmaze_series_name', 'imdb_name', 'series_name']:
