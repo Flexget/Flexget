@@ -23,16 +23,16 @@ class CFScraper(object):
     @plugin.priority(253)
     def on_task_start(self, task, config):
         try:
-            import cfscrape
+            import cloudscraper
         except ImportError as e:
-            log.debug('Error importing cfscrape: %s' % e)
+            log.debug('Error importing cloudscraper: %s' % e)
             raise plugin.DependencyError(
-                'cfscraper', 'cfscrape', 'cfscrape module required. ImportError: %s' % e
+                'cfscraper', 'cloudscraper', 'cloudscraper module required. ImportError: %s' % e
             )
 
-        class CFScrapeWrapper(Session, cfscrape.CloudflareScraper):
+        class CFScrapeWrapper(Session, cloudscraper.CloudScraper):
             """
-            This class allows the FlexGet session to inherit from CFScraper instead of the requests.Session directly.
+            This class allows the FlexGet session to inherit from CloudScraper instead of the requests.Session directly.
             """
 
         if config is True:
