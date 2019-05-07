@@ -10,6 +10,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
+from flexget.utils.requests import RequestException
 from flexget.components.sites.utils import torrent_availability
 
 log = logging.getLogger('torznab')
@@ -154,7 +155,7 @@ class Torznab(object):
 
         try:
             response = task.requests.get(url)
-        except task.requests.RequestException as e:
+        except RequestException as e:
             raise PluginError("Failed fetching '{}': {}".format(url, e))
 
         entries = []
