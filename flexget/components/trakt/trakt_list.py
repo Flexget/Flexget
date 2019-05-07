@@ -118,6 +118,7 @@ class TraktSet(MutableSet):
             },
             'strip_dates': {'type': 'boolean', 'default': False},
             'language': {'type': 'string', 'minLength': 2, 'maxLength': 2},
+            'limit': {'type': 'integer', 'default': 0},
         },
         'required': ['list'],
         'anyOf': [
@@ -326,6 +327,9 @@ class TraktSet(MutableSet):
                         # Remove year from end of name if present
                         entry['title'] = split_title_year(entry['title'])[0]
                     entries.append(entry)
+
+                    if self.config.get('limit') and len(entries) >= self.config.get('limit'):
+                        break
                 else:
                     log.debug('Invalid entry created? %s', entry)
 
