@@ -132,6 +132,8 @@ class TraktSet(MutableSet):
     }
 
     def __init__(self, config):
+        if config.get('list') in ['popular', 'trending']:
+            config.setdefault('limit', 1000)
         self.config = config
         if self.config.get('account') and not self.config.get('username'):
             self.config['username'] = 'me'
