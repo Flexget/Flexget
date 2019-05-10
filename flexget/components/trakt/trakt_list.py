@@ -118,7 +118,7 @@ class TraktSet(MutableSet):
             },
             'strip_dates': {'type': 'boolean', 'default': False},
             'language': {'type': 'string', 'minLength': 2, 'maxLength': 2},
-            'limit': {'type': 'integer', 'default': 0},
+            'limit': {'type': 'integer'},
         },
         'required': ['list'],
         'anyOf': [
@@ -134,6 +134,8 @@ class TraktSet(MutableSet):
     def __init__(self, config):
         if config.get('list') in ['popular', 'trending']:
             config.setdefault('limit', 1000)
+        else:
+            config.setdefault('limit', 0)
         self.config = config
         if self.config.get('account') and not self.config.get('username'):
             self.config['username'] = 'me'
