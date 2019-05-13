@@ -316,7 +316,7 @@ class InputGazelle(object):
         self.setup(task, config)
 
         params = self.params_from_config(config)
-        return list(self.get_entries(self.search_results(params)))
+        return self.get_entries(self.search_results(params))
 
 
 class InputGazelleMusic(InputGazelle):
