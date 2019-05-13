@@ -7,7 +7,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: ['2']
       method: GET
-      uri: https://api.trakt.tv/sync/watchlist/episodes
+      uri: https://api.trakt.tv/sync/watchlist/episodes?limit=1000&page=1
     response:
       body: {string: '[{"rank":1,"id":371589391,"listed_at":"2018-12-29T06:50:37.000Z","type":"episode","episode":{"season":4,"number":5,"title":"First
           of His Name","ids":{"trakt":73674,"tvdb":4801605,"imdb":"tt3060856","tmdb":63098,"tvrage":1065501369}},"show":{"title":"Game
@@ -75,7 +75,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: ['2']
       method: GET
-      uri: https://api.trakt.tv/sync/watchlist/episodes
+      uri: https://api.trakt.tv/sync/watchlist/episodes?limit=1000&page=1
     response:
       body: {string: '[]'}
       headers:
@@ -138,7 +138,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: ['2']
       method: GET
-      uri: https://api.trakt.tv/sync/watchlist/episodes
+      uri: https://api.trakt.tv/sync/watchlist/episodes?limit=1000&page=1
     response:
       body: {string: '[{"rank":1,"id":371589397,"listed_at":"2018-12-29T06:51:09.000Z","type":"episode","episode":{"season":4,"number":5,"title":"First
           of His Name","ids":{"trakt":73674,"tvdb":4801605,"imdb":"tt3060856","tmdb":63098,"tvrage":1065501369}},"show":{"title":"Game

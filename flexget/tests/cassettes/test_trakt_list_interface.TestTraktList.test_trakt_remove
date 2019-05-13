@@ -7,7 +7,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: ['2']
       method: GET
-      uri: https://api.trakt.tv/sync/watchlist/shows
+      uri: https://api.trakt.tv/sync/watchlist/shows?limit=1000&page=1
     response:
       body: {string: '[{"rank":1,"id":371589379,"listed_at":"2018-12-29T06:50:57.000Z","type":"show","show":{"title":"White
           Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}}}]'}
@@ -73,7 +73,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: ['2']
       method: GET
-      uri: https://api.trakt.tv/sync/watchlist/shows
+      uri: https://api.trakt.tv/sync/watchlist/shows?limit=1000&page=1
     response:
       body: {string: '[]'}
       headers:
@@ -135,7 +135,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: ['2']
       method: GET
-      uri: https://api.trakt.tv/sync/watchlist/shows
+      uri: https://api.trakt.tv/sync/watchlist/shows?limit=1000&page=1
     response:
       body: {string: '[{"rank":1,"id":371589410,"listed_at":"2018-12-29T06:51:12.000Z","type":"show","show":{"title":"White
           Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}}}]'}
@@ -198,7 +198,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: ['2']
       method: GET
-      uri: https://api.trakt.tv/sync/watchlist/shows
+      uri: https://api.trakt.tv/sync/watchlist/shows?limit=1000&page=1
     response:
       body: {string: '[]'}
       headers:
