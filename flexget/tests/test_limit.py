@@ -22,7 +22,7 @@ class TestLimit(object):
           test_limit:
             limit:
               amount: 2
-              plugin:
+              from:
                 mock:
                 - title: Entry 1
                 - title: Entry 2
@@ -30,7 +30,7 @@ class TestLimit(object):
           test_limit_generator:
             limit:
               amount: 1
-              plugin:
+              from:
                 one_entry_input: yes
     """
 

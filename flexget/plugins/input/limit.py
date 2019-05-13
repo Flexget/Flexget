@@ -19,7 +19,7 @@ class PluginInputs(object):
         'type': 'object',
         'properties': {
             'amount': {'type': 'integer', 'minimum': -1},
-            'plugin': {
+            'from': {
                 'allOf': [
                     {'$ref': '/schema/plugins?phase=input'},
                     {
@@ -31,12 +31,12 @@ class PluginInputs(object):
                 ]
             },
         },
-        'required': ['amount', 'plugin'],
+        'required': ['amount', 'from'],
         'additionalProperties': False,
     }
 
     def on_task_input(self, task, config):
-        for input_name, input_config in config['plugin'].items():
+        for input_name, input_config in config['from'].items():
             input = plugin.get_plugin_by_name(input_name)
             method = input.phase_handlers['input']
             try:
