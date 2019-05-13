@@ -56,7 +56,6 @@ class KitsuAnime(object):
 
     @cached('kitsu', persist='2 hours')
     def on_task_input(self, task, config):
-        entries = []
         user_payload = {'filter[name]': config['username']}
         try:
             user_response = task.requests.get(
@@ -132,7 +131,7 @@ class KitsuAnime(object):
                         entry['series_episode'] = item['progress']
                         entry['series_id_type'] = 'sequence'
                         entry['title'] += ' ' + str(entry['progress'])
-                    entries.append(entry)
+                    yield entry
 
             next_url = json_data['links'].get('next')
             if next_url:
@@ -149,8 +148,6 @@ class KitsuAnime(object):
                 json_data = response.json()
             else:
                 break
-
-        return entries
 
 
 @event('plugin.register')
