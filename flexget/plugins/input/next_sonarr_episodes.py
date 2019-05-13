@@ -101,7 +101,6 @@ class NextSonarrEpisodes(object):
 
     def on_task_input(self, task, config):
         json = self.get_page(task, config, 1)
-        entries = []
         pages = int(
             math.ceil(json['totalRecords'] / config.get('page_size'))
         )  # Sets number of requested pages
@@ -125,16 +124,15 @@ class NextSonarrEpisodes(object):
                         tvmaze_id=record['series'].get('tvMazeId'),
                         title=record['series']['title'] + ' ' + 'S%02dE%02d' % (season, episode),
                     )
-                    if entry.isvalid():
-                        entries.append(entry)
-                    else:
-                        log.error('Invalid entry created? {}'.format(entry))
                     # Test mode logging
                     if entry and task.options.test:
                         log.verbose("Test mode. Entry includes:")
                         for key, value in list(entry.items()):
                             log.verbose('     {}: {}'.format(key.capitalize(), value))
-        return entries
+                    if entry.isvalid():
+                        yield entry
+                    else:
+                        log.error('Invalid entry created? {}'.format(entry))
 
 
 @event('plugin.register')
