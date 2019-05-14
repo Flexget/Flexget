@@ -100,22 +100,7 @@ class cached(object):
         def wrapped_func(*args, **kwargs):
             # get task from method parameters
             task = args[1]
-
-            # detect api version
-            api_ver = 1
-            if len(args) == 3:
-                api_ver = 2
-
-            if api_ver == 1:
-                # get name for a cache from tasks configuration
-                if self.name not in task.config:
-                    raise Exception(
-                        '@cache config name %s is not configured in task %s'
-                        % (self.name, task.name)
-                    )
-                hash = get_config_hash(task.config[self.name])
-            else:
-                hash = get_config_hash(args[2])
+            hash = get_config_hash(args[2])
 
             log.trace('self.name: %s' % self.name)
             log.trace('hash: %s' % hash)
@@ -182,8 +167,6 @@ class cached(object):
                                 return entries
                     # If there was nothing in the db cache, re-raise the error.
                     raise
-                if api_ver == 1:
-                    response = task.entries
                 if not isinstance(response, list):
                     log.warning('Input %s did not return a list, cannot cache.' % self.name)
                     return response
