@@ -179,7 +179,7 @@ class TraktSet(MutableSet):
         return self._find_entry(entry) is not None
 
     def clear(self):
-        if self.items:
+        if self._items:
             for item in self.items:
                 self.discard(item)
             self._items = None

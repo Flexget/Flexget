@@ -1,40 +1,5 @@
 interactions:
   - request:
-      body: null
-      headers:
-        Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
-        Content-Type: [application/json]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-        trakt-api-version: ['2']
-      method: GET
-      uri: https://api.trakt.tv/sync/watchlist/episodes?limit=1000&page=1
-    response:
-      body: {string: '[{"rank":1,"id":371589391,"listed_at":"2018-12-29T06:50:37.000Z","type":"episode","episode":{"season":4,"number":5,"title":"First
-          of His Name","ids":{"trakt":73674,"tvdb":4801605,"imdb":"tt3060856","tmdb":63098,"tvrage":1065501369}},"show":{"title":"Game
-          of Thrones","year":2011,"ids":{"trakt":1390,"slug":"game-of-thrones","tvdb":121361,"imdb":"tt0944947","tmdb":1399,"tvrage":24493}}}]'}
-      headers:
-        CF-RAY: [490a557888433d01-CPH]
-        Cache-Control: ['max-age=0, private, must-revalidate']
-        Cf-Railgun: [1af5c26562 1.45 0.028909 0030 57da]
-        Connection: [keep-alive]
-        Content-Type: [application/json; charset=utf-8]
-        Date: ['Sat, 29 Dec 2018 06:50:41 GMT']
-        Etag: [W/"9da3e90234f93b5f7cd3fde8ccd0a042"]
-        Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-        Last-Modified: ['Sat, 29 Dec 2018 06:50:37 GMT']
-        Server: [cloudflare]
-        Set-Cookie: ['__cfduid=dc8d32cf3445894e466e5bcbb98b00e591546066241; expires=Sun,
-            29-Dec-19 06:50:41 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        Vary: [Accept-Encoding]
-        X-Content-Type-Options: [nosniff]
-        X-Frame-Options: [SAMEORIGIN]
-        X-Request-Id: [02673565-39dd-44b7-9fd3-a6a0f46b36d2]
-        X-Runtime: ['0.024268']
-        X-Sort-By: [rank]
-        X-Sort-How: [asc]
-        X-Xss-Protection: [1; mode=block]
-      status: {code: 200, message: OK}
-  - request:
       body: '{"shows": [{"year": 2011, "seasons": [{"number": 4, "episodes": [{"number":
         5}]}], "ids": {"imdb": "tt0944947", "tvdb": 121361, "trakt": 1390, "tvrage":
         24493}, "title": "Game of Thrones"}]}'
