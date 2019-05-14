@@ -138,7 +138,6 @@ class TestTraktList(object):
         assert entry not in trakt_set
 
         trakt_set.add(entry)
-        time.sleep(5)
         assert entry in trakt_set
 
     def test_trakt_add_episode(self):
@@ -223,11 +222,9 @@ class TestTraktList(object):
         assert entry not in trakt_set
 
         trakt_set.add(entry)
-        time.sleep(5)
         assert entry in trakt_set
 
         trakt_set.remove(entry)
-        time.sleep(5)
         assert entry not in trakt_set
 
     def test_trakt_pagination(self):
