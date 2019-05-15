@@ -56,5 +56,7 @@ class TestInputCache(object):
 
         task = execute_task('test_db')
         assert task.entries, 'should have created entries at the start'
+        # Clear out the memory cache to make sure we are loading from db
+        cached.cache.clear()
         task = execute_task('test_db')
         assert task.entries, 'should have created entries from the cache'
