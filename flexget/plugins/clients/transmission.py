@@ -237,6 +237,16 @@ class PluginTransmissionInput(TransmissionBase):
                     log.debug(
                         'error when requesting transmissionrpc attribute %s', attr, exc_info=True
                     )
+            st_status_to_desc = {
+                0: 'stopped',
+                1: 'check_wait',
+                2: 'checking',
+                3: 'download_wait',
+                4: 'downloading',
+                5: 'seed_wait',
+                6: 'seeding'
+            }
+            entry['transmission_status_desc'] = st_status_to_desc[torrent.status]
             entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
             entry['transmission_seed_ratio_ok'] = seed_ratio_ok
             entry['transmission_idle_limit_ok'] = idle_limit_ok
