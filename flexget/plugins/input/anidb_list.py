@@ -71,7 +71,6 @@ class AnidbList(object):
                 'Unable to get AniDB list. Either the list is private or does not exist.'
             )
 
-        entries = []
         entry_type = ''
 
         if config['type'] == 'movies':
@@ -88,7 +87,7 @@ class AnidbList(object):
             trs = soup_table.find_all('tr')
             if not trs:
                 log.verbose('No movies were found in AniDB list: mywishlist')
-                return entries
+                return
             for tr in trs:
                 if tr.find('span', title=entry_type):
                     a = tr.find('td', class_='name').find('a')
@@ -109,7 +108,7 @@ class AnidbList(object):
                     ]  # The <tr> tag's id is "aN..." where "N..." is the anime id
                     log.debug('%s id is %s', entry['title'], entry['anidb_id'])
                     entry['anidb_name'] = entry['title']
-                    entries.append(entry)
+                    yield entry
                 else:
                     log.verbose('Entry does not match the requested type')
             try:
@@ -128,7 +127,6 @@ class AnidbList(object):
             if page.status_code != 200:
                 log.warning('Unable to retrieve next page of wishlist.')
                 break
-        return entries
 
 
 @event('plugin.register')

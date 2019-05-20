@@ -97,7 +97,11 @@ class FromDigest(object):
         'type': 'object',
         'properties': {
             'list': {'type': 'string'},
-            'limit': {'type': 'integer', 'default': -1},
+            'limit': {
+                'deprecated': 'The `limit` option of from_digest is deprecated. Use the `limit` plugin instead.',
+                'type': 'integer',
+                'default': -1
+            },
             'expire': {
                 'oneOf': [{'type': 'string', 'format': 'interval'}, {'type': 'boolean'}],
                 'default': True,

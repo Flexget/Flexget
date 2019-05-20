@@ -36,7 +36,6 @@ class PluginInputs(object):
     }
 
     def on_task_input(self, task, config):
-        entries = []
         entry_titles = set()
         entry_urls = set()
         for item in config:
@@ -63,10 +62,9 @@ class PluginInputs(object):
                     if any(url in entry_urls for url in urls):
                         log.debug('URL for `%s` already in entry list, skipping.' % entry['title'])
                         continue
-                    entries.append(entry)
+                    yield entry
                     entry_titles.add(entry['title'])
                     entry_urls.update(urls)
-        return entries
 
 
 @event('plugin.register')

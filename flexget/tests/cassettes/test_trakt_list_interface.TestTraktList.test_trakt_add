@@ -4,44 +4,11 @@ interactions:
       headers:
         Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
         Content-Type: [application/json]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-        trakt-api-version: ['2']
-      method: GET
-      uri: https://api.trakt.tv/sync/watchlist/shows
-    response:
-      body: {string: '[]'}
-      headers:
-        CF-RAY: [490a54b99b263d3d-CPH]
-        Cache-Control: ['max-age=0, private, must-revalidate']
-        Cf-Railgun: [8adeccbc16 99.99 0.029608 0030 57da]
-        Connection: [keep-alive]
-        Content-Type: [application/json; charset=utf-8]
-        Date: ['Sat, 29 Dec 2018 06:50:10 GMT']
-        Etag: [W/"4424072e99830138d0df9ea8ea2b71ec"]
-        Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
-        Last-Modified: ['Sat, 29 Dec 2018 06:22:36 GMT']
-        Server: [cloudflare]
-        Set-Cookie: ['__cfduid=df6cfde95df30cc35afff5871be2b4b1d1546066210; expires=Sun,
-            29-Dec-19 06:50:10 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        Vary: [Accept-Encoding]
-        X-Content-Type-Options: [nosniff]
-        X-Frame-Options: [SAMEORIGIN]
-        X-Request-Id: [fb04717c-c817-4527-9803-37403d853041]
-        X-Runtime: ['0.018469']
-        X-Sort-By: [rank]
-        X-Sort-How: [asc]
-        X-Xss-Protection: [1; mode=block]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
-        Content-Type: [application/json]
         Cookie: [__cfduid=df6cfde95df30cc35afff5871be2b4b1d1546066210]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: ['2']
       method: GET
-      uri: https://api.trakt.tv/sync/watchlist/shows
+      uri: https://api.trakt.tv/sync/watchlist/shows?limit=1000&page=1
     response:
       body: {string: '[]'}
       headers:
@@ -103,7 +70,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: ['2']
       method: GET
-      uri: https://api.trakt.tv/sync/watchlist/shows
+      uri: https://api.trakt.tv/sync/watchlist/shows?limit=1000&page=1
     response:
       body: {string: '[{"rank":1,"id":371589379,"listed_at":"2018-12-29T06:50:57.000Z","type":"show","show":{"title":"White
           Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}}}]'}

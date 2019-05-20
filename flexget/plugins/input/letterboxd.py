@@ -46,7 +46,10 @@ class Letterboxd(object):
             'username': {'type': 'string'},
             'list': {'type': 'string'},
             'sort_by': {'type': 'string', 'enum': list(SORT_BY.keys()), 'default': 'default'},
-            'max_results': {'type': 'integer'},
+            'max_results': {
+                'type': 'integer',
+                'deprecated': '`limit` plugin should be used instead of letterboxd `max_results` option'
+            },
         },
         'required': ['username', 'list'],
         'additionalProperties': False,
@@ -109,7 +112,6 @@ class Letterboxd(object):
 
         log.verbose('Looking for films in Letterboxd list: %s' % url)
 
-        entries = []
         while next_page is not None and rcount < max_results:
             try:
                 page = requests.get(url).content
@@ -119,8 +121,7 @@ class Letterboxd(object):
 
             for film in soup.find_all(attrs={config['f_slug']: True}):
                 if rcount < max_results:
-                    entry = self.parse_film(film, config)
-                    entries.append(entry)
+                    yield self.parse_film(film, config)
                     if 'max_results' in config:
                         rcount += 1
 
@@ -129,8 +130,6 @@ class Letterboxd(object):
                 next_page = next_page.get('href')
                 if next_page is not None:
                     url = base_url + next_page
-
-        return entries
 
 
 @event('plugin.register')

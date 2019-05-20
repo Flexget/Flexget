@@ -491,7 +491,7 @@ class Task(object):
                         # add entries returned by input to self.all_entries
                         for e in response:
                             e.task = self
-                        self.all_entries.extend(response)
+                            self.all_entries.append(e)
                 finally:
                     fire_event('task.execute.after_plugin', self, plugin.name)
                 self.session = None
