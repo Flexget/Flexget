@@ -754,6 +754,8 @@ class Task(object):
 def register_config_key():
     task_config_schema = {
         'type': 'object',
+        # Don't validate commented out plugins
+        'patternProperties': {'^_': {}},
         'additionalProperties': plugin_schemas(interface='task'),
     }
 
