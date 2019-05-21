@@ -42,7 +42,10 @@ def substitute_cli_variables(config, manager):
     env = NativeEnvironment(**env_params)
     if manager.options.execute.cli_config:
         raise plugin.PluginError("--cli-config has been overhauled, check wiki for updated documentation.", logger=log)
-    variables = dict(manager.options.cli_config)
+    if manager.options.cli_config:
+        variables = dict(manager.options.cli_config)
+    else:
+        variables = {}
     env.globals = variables
     for key in config:
         if key == 'tasks':
