@@ -551,13 +551,11 @@ class InputRSS(object):
 
             if config.get('group_links'):
                 # Append a list of urls from enclosures to the urls field if group_links is enabled
-                e.setdefault('urls', [e['url']]).extend(
-                    [
-                        enc.href
-                        for enc in entry.get('enclosures', [])
-                        if enc.get('href') not in e['urls']
-                    ]
-                )
+                enclosure_urls = [enc.href for enc in entry.get('enclosures', [])]
+                if enclosure_urls:
+                    e.setdefault('url', enclosure_urls[0])
+                    e.setdefault('urls', [e['url']])
+                    e['urls'].extend(url for url in enclosure_urls if url not in e['urls'])
 
             if not e.get('url'):
                 log.debug('%s does not have link (%s) or enclosure', entry.title, config['link'])
