@@ -164,6 +164,18 @@ class TestEmitSeriesInDiscover(object):
                 begin: s02e01
                 identified_by: ep
             max_reruns: 0
+          test_next_series_episodes_rerun:
+            discover:
+              release_estimations: ignore
+              what:
+              - next_series_episodes: yes
+              from:
+              - test_search: yes
+            series:
+            - My Show 2:
+                begin: s02e01
+                identified_by: ep
+            max_reruns: 3
           test_next_series_episodes_with_unaccepted_season:
             discover:
               release_estimations: ignore
@@ -190,6 +202,11 @@ class TestEmitSeriesInDiscover(object):
                 season_packs: yes
             max_reruns: 0          
     """
+
+    def test_next_series_episodes_rerun(self, execute_task):
+        task = execute_task('test_next_series_episodes_rerun')
+        # It should rerun 3 times, and on the last time accept episode 4
+        assert task.find_entry(category='accepted', title='My Show 2 S02E04')
 
     def test_next_series_episodes_backfill(self, execute_task):
         execute_task(
