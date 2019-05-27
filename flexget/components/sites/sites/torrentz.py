@@ -51,6 +51,7 @@ class Torrentz(object):
             config['extra_terms'] = ' ' + config['extra_terms']
         return config
 
+    # TODO: The torrent_cache plugin is broken, so urlrewriting has been disabled for this plugin. #2307 #2363
     def url_rewritable(self, task, entry):
         return REGEXP.match(entry['url'])
 
@@ -125,4 +126,5 @@ class Torrentz(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Torrentz, 'torrentz', interfaces=['urlrewriter', 'search'], api_ver=2)
+    # TODO: The torrent_cache plugin is broken, so urlrewriting has been disabled for this plugin. #2307 #2363
+    plugin.register(Torrentz, 'torrentz', interfaces=['search'], api_ver=2)
