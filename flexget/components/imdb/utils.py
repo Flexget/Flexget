@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import difflib
 import json
@@ -34,7 +33,7 @@ requests.add_domain_limiter(TimedLimiter('imdb.com', '3 seconds'))
 
 def is_imdb_url(url):
     """Tests the url to see if it's for imdb.com."""
-    if not isinstance(url, basestring):
+    if not isinstance(url, str):
         return
     # Probably should use urlparse.
     return re.match(r'https?://[^/]*imdb\.com/', url)
@@ -44,7 +43,7 @@ def is_valid_imdb_title_id(value):
     """
     Return True if `value` is a valid IMDB ID for titles (movies, series, etc).
     """
-    if not isinstance(value, basestring):
+    if not isinstance(value, str):
         raise TypeError("is_valid_imdb_title_id expects a string but got {0}".format(type(value)))
     # IMDB IDs for titles have 'tt' followed by 7 or 8 digits
     return re.match(r'tt\d{7,8}', value) is not None
@@ -54,7 +53,7 @@ def is_valid_imdb_person_id(value):
     """
     Return True if `value` is a valid IMDB ID for a person.
     """
-    if not isinstance(value, basestring):
+    if not isinstance(value, str):
         raise TypeError("is_valid_imdb_person_id expects a string but got {0}".format(type(value)))
     # An IMDB ID for a person is formed by 'nm' followed by 7 digits
     return re.match(r'nm\d{7,8}', value) is not None
@@ -62,7 +61,7 @@ def is_valid_imdb_person_id(value):
 
 def extract_id(url):
     """Return IMDb ID of the given URL. Return None if not valid or if URL is not a string."""
-    if not isinstance(url, basestring):
+    if not isinstance(url, str):
         return
     m = re.search(r'((?:nm|tt)\d{7,8})', url)
     if m:

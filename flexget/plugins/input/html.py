@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 from future.moves.urllib import parse
 
 
@@ -85,7 +84,7 @@ class InputHtml(object):
                 parts[1] = split[1]
                 config['url'] = parse.urlunsplit(parts)
 
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = {'url': config}
         get_auth_from_url()
         return config

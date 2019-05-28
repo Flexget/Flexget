@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 import pickle
@@ -117,7 +116,7 @@ class FromDigest(object):
         with Session() as session:
             digest_entries = session.query(DigestEntry).filter(DigestEntry.list == config['list'])
             # Remove any entries older than the expire time, if defined.
-            if isinstance(config.get('expire'), basestring):
+            if isinstance(config.get('expire'), str):
                 expire_time = parse_timedelta(config['expire'])
                 digest_entries.filter(DigestEntry.added < datetime.now() - expire_time).delete()
             for index, digest_entry in enumerate(

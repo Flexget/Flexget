@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import argparse
 import functools
@@ -33,7 +32,7 @@ Commandline example::
 
 def replace_in_item(replaces, item):
     replace = functools.partial(replace_in_item, replaces)
-    if isinstance(item, basestring):
+    if isinstance(item, str):
         # Do replacement in text objects
         for key, val in replaces.items():
             item = item.replace('$%s' % key, val)

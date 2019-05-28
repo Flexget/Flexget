@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 from datetime import datetime
@@ -58,7 +57,7 @@ class VersionChecker(object):
     def prepare_config(self, config):
         if isinstance(config, bool) and config is True:
             config = {'lookup': 'by_interval'}
-        elif isinstance(config, basestring):
+        elif isinstance(config, str):
             config = {'lookup': config}
 
         config.setdefault('lookup', 'by_interval')

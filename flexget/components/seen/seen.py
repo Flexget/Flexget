@@ -3,8 +3,6 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from past.builtins import basestring
-
 from flexget import plugin
 from flexget.event import event
 from . import db
@@ -54,7 +52,7 @@ class FilterSeen(object):
                 return config
             else:
                 config = {'local': False}
-        elif isinstance(config, basestring):
+        elif isinstance(config, str):
             config = {'local': config == 'local'}
 
         config.setdefault('local', False)

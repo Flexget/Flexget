@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import pytest
 
@@ -322,7 +321,7 @@ class TestSeriesParser(object):
             s = parse(name='Test', data=data)
             id = s.identifier
             assert s.valid, 'parser not a valid for %s' % data
-            assert isinstance(id, basestring), 'id is not a string for %s' % data
+            assert isinstance(id, str), 'id is not a string for %s' % data
             assert isinstance(s.season, int), 'season is not a int for %s' % data
             assert isinstance(s.episode, int), 'season is not a int for %s' % data
 

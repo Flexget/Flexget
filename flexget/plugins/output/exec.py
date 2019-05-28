@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 from future.utils import text_to_native_str
 
 import logging
@@ -25,7 +24,7 @@ class EscapingEntry(Entry):
     def __getitem__(self, key):
         value = super(EscapingEntry, self).__getitem__(key)
         # TODO: May need to be different depending on OS
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             value = value.replace('"', '\\"')
         return value
 
@@ -90,7 +89,7 @@ class PluginExec(object):
     }
 
     def prepare_config(self, config):
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = [config]
         if isinstance(config, list):
             config = {'on_output': {'for_accepted': config}}
@@ -99,7 +98,7 @@ class PluginExec(object):
         for phase_name in config:
             if phase_name.startswith('on_'):
                 for items_name in config[phase_name]:
-                    if isinstance(config[phase_name][items_name], basestring):
+                    if isinstance(config[phase_name][items_name], str):
                         config[phase_name][items_name] = [config[phase_name][items_name]]
 
         return config

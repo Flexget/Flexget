@@ -136,7 +136,7 @@ class FromIMDB(object):
         Converts config to dict form and sets defaults if needed
         """
         config = config
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = {'id': [config]}
         elif isinstance(config, list):
             config = {'id': config}

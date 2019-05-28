@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 import os
@@ -132,7 +131,7 @@ class PluginPathBySpace(object):
 
         # Convert within to bytes (int) or percent (float)
         within = config.get('within')
-        if isinstance(within, basestring) and '%' in within:
+        if isinstance(within, str) and '%' in within:
             within = parse_percent(within)
         else:
             within = parse_size(within)

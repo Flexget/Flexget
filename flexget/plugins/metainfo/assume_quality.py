@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 from collections import namedtuple
@@ -75,7 +74,7 @@ class AssumeQuality(object):
         log.debug('Quality updated: %s', entry.get('quality'))
 
     def on_task_start(self, task, config):
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = {'any': config}
         assume = namedtuple('assume', ['target', 'quality'])
         self.assumptions = []

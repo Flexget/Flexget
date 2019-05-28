@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 import os
@@ -227,7 +226,7 @@ class SubtitleList(MutableSet):
 
     def _extract_path(self, entry):
         path = ''
-        if isinstance(self.config.get('path'), basestring):
+        if isinstance(self.config.get('path'), str):
             try:
                 path = entry.render(self.config['path'])
             except RenderError as e:

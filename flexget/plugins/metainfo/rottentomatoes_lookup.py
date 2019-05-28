@@ -3,8 +3,6 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from past.builtins import basestring
-
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.log import log_once
@@ -113,7 +111,7 @@ class PluginRottenTomatoesLookup(object):
         if not config:
             return
 
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             self.key = config.lower()
         else:
             self.key = None

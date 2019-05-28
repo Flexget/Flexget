@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 from future.moves.urllib.parse import quote
 
 import logging
@@ -45,7 +44,7 @@ class Torrentz(object):
 
     def process_config(self, config):
         """Return plugin configuration in advanced form"""
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = {'reputation': config}
         if config.get('extra_terms'):
             config['extra_terms'] = ' ' + config['extra_terms']

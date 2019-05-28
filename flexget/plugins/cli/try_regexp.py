@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 import re
@@ -23,7 +22,7 @@ class PluginTryRegexp(object):
     def matches(self, entry, regexp):
         """Return True if any of the entry string fields match given regexp"""
         for field, value in entry.items():
-            if not isinstance(value, basestring):
+            if not isinstance(value, str):
                 continue
             if re.search(regexp, value, re.IGNORECASE | re.UNICODE):
                 return (True, field)

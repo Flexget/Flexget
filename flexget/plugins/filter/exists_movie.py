@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 import re
@@ -63,7 +62,7 @@ class FilterExistsMovie(object):
             config['type'] = 'dirs'
 
         # if only a single path is passed turn it into a 1 element list
-        if isinstance(config['path'], basestring):
+        if isinstance(config['path'], str):
             config['path'] = [config['path']]
         return config
 

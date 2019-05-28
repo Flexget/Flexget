@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 import re
@@ -124,9 +123,9 @@ class FilterRegexp(object):
                 if config.get('from'):
                     opts.setdefault('from', config['from'])
                 # Put plain strings into list form for `from` and `not` options
-                if 'from' in opts and isinstance(opts['from'], basestring):
+                if 'from' in opts and isinstance(opts['from'], str):
                     opts['from'] = [opts['from']]
-                if 'not' in opts and isinstance(opts['not'], basestring):
+                if 'not' in opts and isinstance(opts['not'], str):
                     opts['not'] = [opts['not']]
 
                 # compile `not` option regexps
@@ -186,7 +185,7 @@ class FilterRegexp(object):
             if not isinstance(values, list):
                 values = [values]
             for value in values:
-                if not isinstance(value, basestring):
+                if not isinstance(value, str):
                     value = str(value)
                 if field in unquote_fields:
                     value = unquote(value)

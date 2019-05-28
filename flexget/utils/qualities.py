@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import re
 import copy
@@ -57,7 +56,7 @@ class QualityComponent(object):
         return bool(self.value)
 
     def __eq__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             other = _registry.get(other)
         if not isinstance(other, QualityComponent):
             raise TypeError('Cannot compare %r and %r' % (self, other))
@@ -70,7 +69,7 @@ class QualityComponent(object):
         return not self.__eq__(other)
 
     def __lt__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             other = _registry.get(other)
         if not isinstance(other, QualityComponent):
             raise TypeError('Cannot compare %r and %r' % (self, other))
@@ -268,7 +267,7 @@ class Quality(object):
         return [modifier] + self.components
 
     def __contains__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             other = Quality(other)
         if not other or not self:
             return False
@@ -282,7 +281,7 @@ class Quality(object):
         return any(self._comparator)
 
     def __eq__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             other = Quality(other)
         if not isinstance(other, Quality):
             if other is None:
@@ -294,7 +293,7 @@ class Quality(object):
         return not self.__eq__(other)
 
     def __lt__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             other = Quality(other)
         if not isinstance(other, Quality):
             raise TypeError('Cannot compare %r and %r' % (self, other))
@@ -479,7 +478,7 @@ class Requirements(object):
         :rtype: bool
         :returns: True if given quality passes all component requirements.
         """
-        if isinstance(qual, basestring):
+        if isinstance(qual, str):
             qual = Quality(qual)
         for r_component, q_component in zip(self.components, qual.components):
             if not r_component.allows(q_component, loose=loose):

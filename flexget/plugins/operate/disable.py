@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 
@@ -48,7 +47,7 @@ class DisablePlugin(object):
         self.disabled_builtins = []
         disabled = []
 
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = [config]
 
         for p in config:
