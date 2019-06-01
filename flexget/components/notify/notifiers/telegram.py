@@ -263,8 +263,7 @@ class TelegramNotifier(object):
                     'password': self._socks_proxy_password,
                 }
             request = telegram.utils.request.Request(
-                proxy_url=self._socks_proxy_url,
-                urllib3_proxy_kwargs=urllib3_proxy_kwargs
+                proxy_url=self._socks_proxy_url, urllib3_proxy_kwargs=urllib3_proxy_kwargs
             )
 
         return request

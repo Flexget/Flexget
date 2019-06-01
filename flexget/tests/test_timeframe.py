@@ -68,7 +68,7 @@ class TestTimeFrame(object):
         age_timeframe(hours=1)
 
         # simulate movie going away from the task/feed
-        del (manager.config['tasks']['reached_and_backlog']['mock'])
+        del manager.config['tasks']['reached_and_backlog']['mock']
 
         task = execute_task('reached_and_backlog')
         entry = task.find_entry('accepted', title='Movie.BRRip.x264.720p')

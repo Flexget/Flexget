@@ -22,9 +22,8 @@ DESCARGAS2020_TORRENT_FORMAT = 'http://descargas2020.com/download/{:0>6}.torrent
 REWRITABLE_REGEX = re.compile(
     r'https?://(www.)?(descargas2020|tvsinpagar|tumejortorrent|torrentlocura|torrentrapid).com/'
 )
-NONREWRITABLE_REGEX = re.compile(
-    r'(.*/descargar-torrent/|.*\.torrent$)'
-)
+NONREWRITABLE_REGEX = re.compile(r'(.*/descargar-torrent/|.*\.torrent$)')
+
 
 class UrlRewriteDescargas2020(object):
     """Descargas2020 urlrewriter and search."""

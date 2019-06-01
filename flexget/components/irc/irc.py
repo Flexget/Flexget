@@ -87,13 +87,16 @@ schema = {
                 },
                 'allOf': [
                     {
-                        'anyOf': [{'required': ['server', 'channels']}, {'required': ['tracker_file']}],
+                        'anyOf': [
+                            {'required': ['server', 'channels']},
+                            {'required': ['tracker_file']},
+                        ],
                         'error': 'Must specify a tracker file or server and channel(s)',
                     },
                     {
                         'anyOf': [{'required': ['task']}, {'required': ['task_re']}],
                         'error': 'Must specify a task',
-                    }
+                    },
                 ],
                 'required': ['port'],
                 'additionalProperties': {'type': 'string'},

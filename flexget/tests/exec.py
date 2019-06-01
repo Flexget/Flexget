@@ -12,13 +12,13 @@ import os
 if __name__ == "__main__":
     # Make sure we have an output folder argument
     if len(sys.argv) < 3:
-        print("exec.py must have parameter for output directory and filename")
+        print ("exec.py must have parameter for output directory and filename")
         sys.exit(1)
     out_dir = sys.argv[1]
     filename = sys.argv[2]
     # Make sure the output folder exists
     if not os.path.exists(out_dir):
-        print("output dir %s does not exist" % sys.argv[1])
+        print ("output dir %s does not exist" % sys.argv[1])
         sys.exit(1)
 
     with open(os.path.join(out_dir, filename), 'w') as outfile:

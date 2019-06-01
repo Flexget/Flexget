@@ -117,7 +117,7 @@ class TestTraktShowLookup(object):
     def test_search_results(self, execute_task):
         task = execute_task('test_search_result')
         entry = task.entries[0]
-        print(entry['trakt_series_name'].lower())
+        print (entry['trakt_series_name'].lower())
         assert entry['trakt_series_name'].lower() == 'Shameless'.lower(), 'lookup failed'
         with Session() as session:
             assert (

@@ -30,11 +30,15 @@ class Torznab(object):
             'properties': {
                 'apikey': {'type': 'string'},
                 'categories': {'type': 'array', 'items': {'type': 'integer'}, 'default': []},
-                'searcher': {'type': 'string', 'enum': ['movie', 'tv', 'tvsearch', 'search'], 'default': 'search'},
-                'website': {'type': 'string', 'format': 'url'}
+                'searcher': {
+                    'type': 'string',
+                    'enum': ['movie', 'tv', 'tvsearch', 'search'],
+                    'default': 'search',
+                },
+                'website': {'type': 'string', 'format': 'url'},
             },
             'required': ['website', 'apikey'],
-            'additionalProperties': False
+            'additionalProperties': False,
         }
         return schema
 
@@ -43,14 +47,10 @@ class Torznab(object):
         self._setup(task, config)
         params = {}
         if self.params['t'] == 'movie':
-            params = self._convert_query_parameters(
-                entry,
-                ['imdbid']
-            )
+            params = self._convert_query_parameters(entry, ['imdbid'])
         elif self.params['t'] == 'tvsearch':
             params = self._convert_query_parameters(
-                entry,
-                ['rid', 'tvdbid', 'traktid', 'tvmazeid', 'imdbid', 'tmdbid', 'season', 'ep']
+                entry, ['rid', 'tvdbid', 'traktid', 'tvmazeid', 'imdbid', 'tmdbid', 'season', 'ep']
             )
         if 'q' not in params.keys():
             params['q'] = entry['title']
@@ -72,10 +72,7 @@ class Torznab(object):
         if config['searcher'] == 'tv':
             config['searcher'] = 'tvsearch'
 
-        self.params = {
-            'apikey': config['apikey'],
-            'extended': 1,
-        }
+        self.params = {'apikey': config['apikey'], 'extended': 1}
 
         log.debug('Config: {}'.format(config))
         self._setup_caps(task, config['searcher'], config['categories'])
@@ -91,29 +88,33 @@ class Torznab(object):
 
     def _setup_searcher(self, xml_root, searcher, categories):
         """Gets the available searchers (tv, movie, etc) for the indexer and their supported parameters"""
-        aliases = {
-            'movie': 'movie-search',
-            'search': 'search',
-            'tvsearch': 'tv-search'
-        }
+        aliases = {'movie': 'movie-search', 'search': 'search', 'tvsearch': 'tv-search'}
 
         searchers = {item.tag: item.attrib for item in list(xml_root.find('searching'))}
         if searchers:
             if self._check_searcher(searchers, aliases[searcher]):
                 self.supported_params = searchers[aliases[searcher]]['supportedParams'].split(',')
                 self.params['t'] = searcher
-                log.debug("Searcher '{}' set up with '{}' parameters".format(
-                          aliases[searcher],
-                          self.supported_params))
+                log.debug(
+                    "Searcher '{}' set up with '{}' parameters".format(
+                        aliases[searcher], self.supported_params
+                    )
+                )
                 if searcher != 'search':
                     self._setup_categories(xml_root, categories)
             elif searcher != 'search' and self._check_searcher(searchers, 'search'):
-                log.warn("'{}' searcher not availble, falling back to 'search'.".format(aliases[searcher]))
+                log.warn(
+                    "'{}' searcher not availble, falling back to 'search'.".format(
+                        aliases[searcher]
+                    )
+                )
                 self.supported_params = searchers['search']['supportedParams'].split(',')
                 self.params['t'] = 'search'
-                log.debug("Searcher '{}' set up with '{}' parameters".format(
-                         aliases[searcher],
-                         self.supported_params))
+                log.debug(
+                    "Searcher '{}' set up with '{}' parameters".format(
+                        aliases[searcher], self.supported_params
+                    )
+                )
             else:
                 raise PluginError('No searcher available on {}'.format(self.base_url))
         else:
@@ -121,9 +122,11 @@ class Torznab(object):
 
     def _check_searcher(self, searchers, searcher):
         """Check if the given searchers is in the list, available and has supported params"""
-        return searcher in searchers.keys() and \
-            searchers[searcher]['available'] == 'yes' and \
-            searchers[searcher]['supportedParams']
+        return (
+            searcher in searchers.keys()
+            and searchers[searcher]['available'] == 'yes'
+            and searchers[searcher]['supportedParams']
+        )
 
     def _setup_categories(self, xml_root, categories):
         """Gets the available search categories for the indexer"""
@@ -164,7 +167,9 @@ class Torznab(object):
             entry = Entry()
             enclosure = item.find("enclosure[@type='application/x-bittorrent']")
             if enclosure is None:
-                log.warn("Item '{}' does not contain a bittorent enclosure.".format(item.title.string))
+                log.warn(
+                    "Item '{}' does not contain a bittorent enclosure.".format(item.title.string)
+                )
                 continue
             else:
                 entry['url'] = enclosure.attrib['url']
@@ -204,7 +209,7 @@ class Torznab(object):
             'traktid': {'name': 'trakt_id', 'type': int},
             'tvdbid': {'name': 'tvdb_id', 'type': int},
             'tvmazeid': {'name': 'tvmaze_series_id', 'type': int},
-            'tvrageid': {'name': 'tvrage_id', 'type': int}
+            'tvrageid': {'name': 'tvrage_id', 'type': int},
         }
         misc = {}
         for attr in attrs:
@@ -250,7 +255,7 @@ class Torznab(object):
             'imdbid': 'imdb_id',
             'tmdbid': 'tmdb_id',
             'season': 'series_season',
-            'ep': 'series_episode'
+            'ep': 'series_episode',
         }
 
         for k, v in dictionary.items():
@@ -258,7 +263,13 @@ class Torznab(object):
                 continue
             if v in entry.keys() and entry[v]:
                 params[k] = entry[v]
-        for k in ['tvdb_series_name', 'trakt_series_name', 'tvmaze_series_name', 'imdb_name', 'series_name']:
+        for k in [
+            'tvdb_series_name',
+            'trakt_series_name',
+            'tvmaze_series_name',
+            'imdb_name',
+            'series_name',
+        ]:
             if k in entry.keys() and entry[k]:
                 params['q'] = entry[k]
                 break

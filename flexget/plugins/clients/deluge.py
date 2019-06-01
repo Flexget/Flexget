@@ -412,7 +412,7 @@ class OutputDeluge(DelugePlugin):
                 else:
                     if not os.path.exists(entry['file']):
                         entry.fail('Downloaded temp file \'%s\' doesn\'t exist!' % entry['file'])
-                        del (entry['file'])
+                        del entry['file']
                         return
                     with open(entry['file'], 'rb') as f:
                         filedump = base64.encodestring(f.read())

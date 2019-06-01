@@ -157,9 +157,9 @@ class cached(object):
         with Session() as session:
             db_cache = (
                 session.query(InputCache)
-                    .filter(InputCache.name == self.name)
-                    .filter(InputCache.hash == self.config_hash)
-                    .first()
+                .filter(InputCache.name == self.name)
+                .filter(InputCache.hash == self.config_hash)
+                .first()
             )
             if not db_cache:
                 db_cache = InputCache(name=self.name, hash=self.config_hash)
@@ -171,8 +171,8 @@ class cached(object):
         with Session() as session:
             db_cache = (
                 session.query(InputCache)
-                    .filter(InputCache.name == self.name)
-                    .filter(InputCache.hash == self.config_hash)
+                .filter(InputCache.name == self.name)
+                .filter(InputCache.hash == self.config_hash)
             )
             if not load_expired:
                 db_cache = db_cache.filter(InputCache.added > datetime.now() - self.persist)
@@ -190,6 +190,7 @@ class IterableCache(object):
     Can cache any iterable (including generators) without immediately evaluating all entries.
     If `finished_hook` is supplied, it will be called the first time the iterable is run to the end.
     """
+
     def __init__(self, iterable, finished_hook=None):
         self.iterable = iter(iterable)
         self.cache = []

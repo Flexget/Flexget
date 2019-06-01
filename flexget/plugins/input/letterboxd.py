@@ -48,7 +48,7 @@ class Letterboxd(object):
             'sort_by': {'type': 'string', 'enum': list(SORT_BY.keys()), 'default': 'default'},
             'max_results': {
                 'type': 'integer',
-                'deprecated': '`limit` plugin should be used instead of letterboxd `max_results` option'
+                'deprecated': '`limit` plugin should be used instead of letterboxd `max_results` option',
             },
         },
         'required': ['username', 'list'],

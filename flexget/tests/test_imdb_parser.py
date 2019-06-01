@@ -29,7 +29,7 @@ class TestImdbParser(object):
             'nm0000860': 'Paul Bartel',
         }, 'Actors not parsed correctly'
         assert parser.directors == {'nm0001741': 'Bryan Singer'}, 'Directors not parsed correctly'
-        print(parser.genres)
+        print (parser.genres)
         assert len(set(parser.genres).intersection([u'crime', u'mystery', u'thriller'])) == len(
             [u'crime', u'mystery', u'thriller']
         ), 'Genres not parsed correctly'

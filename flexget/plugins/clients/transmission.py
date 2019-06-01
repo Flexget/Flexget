@@ -244,7 +244,7 @@ class PluginTransmissionInput(TransmissionBase):
                 0: 'OK',
                 1: 'tracker_warning',
                 2: 'tracker_error',
-                3: 'local_error'
+                3: 'local_error',
             }
             entry['transmission_error_state'] = st_error_to_desc[torrent.error]
             # Built in done_date doesn't work when user adds an already completed file to transmission

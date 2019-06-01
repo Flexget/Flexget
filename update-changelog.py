@@ -99,7 +99,7 @@ if __name__ == '__main__':
     try:
         filename = sys.argv[1]
     except IndexError:
-        print('No filename specified, using changelog.md')
+        print ('No filename specified, using changelog.md')
         filename = 'changelog.md'
     with io.open(filename, encoding='utf-8') as logfile:
         pre_lines, start_comment, tail = isplit('<!---', logfile)
@@ -144,7 +144,7 @@ if __name__ == '__main__':
                 verfile = repo.tree('HEAD')['flexget/_version.py'].data_stream.read()
                 __version__ = None
                 try:
-                    exec(verfile)  # pylint: disable=W0122
+                    exec (verfile)  # pylint: disable=W0122
                 except Exception:
                     pass
                 new_version_header = '## {0} (unreleased)\n'.format(__version__)
@@ -153,7 +153,7 @@ if __name__ == '__main__':
                     modified = True
 
     if modified:
-        print('Writing modified changelog.')
+        print ('Writing modified changelog.')
         with io.open(filename, 'w', encoding='utf-8') as logfile:
             logfile.writelines(pre_lines)
             logfile.write('<!---{0}--->\n'.format(commit.hexsha))
@@ -163,4 +163,4 @@ if __name__ == '__main__':
                 logfile.writelines(ver.to_md_lines())
             logfile.writelines(post_lines)
     else:
-        print('No updates to write.')
+        print ('No updates to write.')

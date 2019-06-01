@@ -30,9 +30,7 @@ def normalize_scene(text):
     #     abcdefghijklmnopqrstuvwxyz
     #     0123456789-._()
     text = normalize('NFKD', text).encode('ASCII', 'ignore').decode()
-    return re.sub(
-        r'[^a-zA-Z0-9 \-._()]', '', text.replace('...', '')
-    )
+    return re.sub(r'[^a-zA-Z0-9 \-._()]', '', text.replace('...', ''))
 
 
 def torrent_availability(seeds, leeches):

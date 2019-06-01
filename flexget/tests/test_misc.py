@@ -215,7 +215,7 @@ class TestHtmlUtils(object):
         # why this does not encode < ?
         from flexget.utils.tools import encode_html
 
-        print(encode_html('<3'))
+        print (encode_html('<3'))
         assert encode_html('<3') == '&lt;3'
 
 
@@ -302,5 +302,7 @@ class TestSetPlugin(object):
     def test_native_types(self, execute_task):
         task = execute_task('test_native_types')
         entry = task.find_entry('entries', title='Entry 1')
-        assert (isinstance(entry['int_field'], int)), 'should allow setting values as integers rather than strings'
+        assert isinstance(
+            entry['int_field'], int
+        ), 'should allow setting values as integers rather than strings'
         assert entry['int_field'] == 3

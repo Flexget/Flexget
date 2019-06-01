@@ -151,6 +151,7 @@ class FlexGetTemplate(Template):
 
 class FlexGetNativeTemplate(FlexGetTemplate, NativeTemplate):
     """Lazy lookup support and native python return types."""
+
     pass
 
 

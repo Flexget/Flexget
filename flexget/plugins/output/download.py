@@ -550,7 +550,7 @@ class PluginDownload(object):
                 os.remove(entry['file'])
             if os.path.exists(os.path.dirname(entry['file'])):
                 shutil.rmtree(os.path.dirname(entry['file']))
-            del (entry['file'])
+            del entry['file']
 
     def cleanup_temp_files(self, task):
         """Checks all entries for leftover temp files and deletes them."""

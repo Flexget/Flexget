@@ -37,17 +37,15 @@ class CFScraper(object):
             """
 
         if config is True:
-            task.requests.headers = (
-                OrderedDict(
-                    [
-                        ('User-Agent', task.requests.headers['User-Agent']),
-                        ('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'),
-                        ('Accept-Language', 'en-US,en;q=0.5'),
-                        ('Accept-Encoding', 'gzip, deflate'),
-                        ('Connection',  'close'),
-                        ('Upgrade-Insecure-Requests', '1')
-                    ]
-                )
+            task.requests.headers = OrderedDict(
+                [
+                    ('User-Agent', task.requests.headers['User-Agent']),
+                    ('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'),
+                    ('Accept-Language', 'en-US,en;q=0.5'),
+                    ('Accept-Encoding', 'gzip, deflate'),
+                    ('Connection', 'close'),
+                    ('Upgrade-Insecure-Requests', '1'),
+                ]
             )
             task.requests = CFScrapeWrapper.create_scraper(task.requests)
 
