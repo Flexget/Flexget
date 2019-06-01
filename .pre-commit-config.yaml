@@ -1,4 +1,12 @@
 repos:
+- repo: https://github.com/timothycrosley/isort
+  # TODO: Bug with 4.3.20, can switch to release after that
+  rev: d093f97c1d26854fbb082e43cfae8a062dacda56
+  hooks:
+  - id: isort
+    language_version: python3.6
+    additional_dependencies:
+    - toml
 - repo: https://github.com/ambv/black
   rev: stable
   hooks:

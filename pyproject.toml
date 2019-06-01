@@ -11,3 +11,16 @@ exclude = '''
     | dist
   )/
 )
+'''
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+line_length = 99
+not_skip = ['__init__.py']
+not_known_standard_library = ['builtins']
+known_future_library = ['future', 'past' , 'builtins']
+known_first_party = ['flexget']
+default_section = 'THIRDPARTY'
