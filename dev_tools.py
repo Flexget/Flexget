@@ -124,7 +124,7 @@ def autoformat():
     if not venv_path:
         raise Exception('Virtualenv and activation required')
 
-    subprocess.call(['black', '-S', '-l', '99', project_root])
+    subprocess.call(['black', '-S', project_root])
     # isort configuration is .isort.cfg, (setup.cfg did not work for some reason)
     subprocess.call(['isort', '--virtual-env', venv_path, '-rc', project_root])
 
