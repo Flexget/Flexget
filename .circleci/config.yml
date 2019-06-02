@@ -7,9 +7,9 @@ install_deps: &install_deps
       virtualenv venv
     fi
     . venv/bin/activate
-    pip install -r requirements.txt
-    pip install -r dev-requirements.txt
-    pip install -r dev-requirements-extras.txt
+    pip install -U -r requirements.txt
+    pip install -U -r dev-requirements.txt
+    pip install -U -r dev-requirements-extras.txt
 
 run_tests: &run_tests
   name: Run Tests
@@ -116,6 +116,31 @@ jobs:
           key: py3.7-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
       - run: *run_tests
 
+  formatting:
+    docker:
+      - image: flexget/cci-python:3.6
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - py3.6-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+          - py3.6-deps- # fallback to using the latest cache if no exact match is found
+      - run: *install_deps
+      - save_cache:
+          paths:
+            - ./venv
+          key: py3.6-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
+      - run:
+          name: isort import order
+          command: |
+            . venv/bin/activate
+            isort --check-only -rc .
+      - run:
+          name: Black Formatting
+          command: |
+            . venv/bin/activate
+            black --check .
+
   deploy:
     docker:
       - image: flexget/cci-python:3.5
@@ -152,6 +177,7 @@ workflows:
       - "test-py35"
       - "test-py36"
       - "test-py37"
+      - "formatting"
 
   auto-build-test-and-deploy:
     triggers:

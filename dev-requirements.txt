@@ -17,5 +17,5 @@ codacy-coverage>=1.2.18
 pip-tools==3.2.0
 twine==1.11.0
 # TODO: Bug with 4.3.20, can switch to release after that
-git+https://github.com/timothycrosley/isort.git@d093f97c1d26854fbb082e43cfae8a062dacda56#egg=isort[pyproject]
+git+https://github.com/timothycrosley/isort.git@d093f97c1d26854fbb082e43cfae8a062dacda56#egg=isort[pyproject]; python_version >= '3.5'
 black==18.9b0; python_version >= '3.6'
