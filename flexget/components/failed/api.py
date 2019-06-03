@@ -1,20 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from math import ceil
 
 from flask import jsonify, request
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource
-from flexget.api.app import (
-    base_message_schema,
-    success_response,
-    NotFoundError,
-    etag,
-    pagination_headers,
-)
+from flexget.api import APIResource, api
+from flexget.api.app import (NotFoundError, base_message_schema, etag,
+                             pagination_headers, success_response)
+
 from . import db
 
 log = logging.getLogger('failed_api')

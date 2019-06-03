@@ -1,20 +1,21 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urljoin, urlparse, quote, unquote
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import os
 import posixpath
 import time
-from functools import partial
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from collections import namedtuple
+from functools import partial
 from itertools import groupby
 
+from future.moves.urllib.parse import quote, unquote, urljoin, urlparse
+
 from flexget import plugin
-from flexget.event import event
-from flexget.entry import Entry
 from flexget.config_schema import one_or_more
-from flexget.utils.template import render_from_entry, RenderError
+from flexget.entry import Entry
+from flexget.event import event
+from flexget.utils.template import RenderError, render_from_entry
 
 log = logging.getLogger('sftp')
 

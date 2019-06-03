@@ -1,11 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import native_str
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime
+from future.utils import native_str
+from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.exc import OperationalError
 
 import flexget

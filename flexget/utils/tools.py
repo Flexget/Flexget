@@ -1,26 +1,27 @@
 """Contains miscellaneous helpers"""
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib import request
-from future.utils import PY2
+from __future__ import absolute_import, division, unicode_literals
 
-import logging
 import ast
 import copy
 import hashlib
 import locale
+import logging
 import operator
 import os
+import queue
 import re
 import sys
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from collections import MutableMapping, defaultdict
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
+from html.entities import name2codepoint
 from pprint import pformat
 
-import flexget
-import queue
 import requests
-from html.entities import name2codepoint
+from future.moves.urllib import request
+from future.utils import PY2
+
+import flexget
 
 log = logging.getLogger('utils')
 

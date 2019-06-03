@@ -1,15 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import native_str
+from __future__ import absolute_import, division, unicode_literals
 
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from distutils.version import LooseVersion
 
+from future.utils import native_str
 from sqlalchemy import Column, Integer, String
 
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.plugin import PluginWarning, PluginError
+from flexget.plugin import PluginError, PluginWarning
 
 try:
     import telegram

@@ -1,11 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.xmlrpc.client import ServerProxy
+from __future__ import absolute_import, division, unicode_literals
 
-import re
 import difflib
-import os.path
 import logging
+import os.path
+import re
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
+from future.moves.xmlrpc.client import ServerProxy
 
 from flexget import plugin
 from flexget.event import event

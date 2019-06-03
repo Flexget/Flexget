@@ -1,26 +1,25 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
+import base64
+import logging
+import os
+import re
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from datetime import datetime, timedelta
+from fnmatch import fnmatch
+from netrc import NetrcParseError, netrc
+from time import sleep
+
 from future.moves.urllib.parse import urlparse
 from future.utils import text_to_native_str
 
-import os
-import logging
-import base64
-import re
-from datetime import datetime
-from datetime import timedelta
-from netrc import netrc, NetrcParseError
-from time import sleep
-
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError
 from flexget.utils.tools import parse_timedelta
-
-from flexget.config_schema import one_or_more
-from fnmatch import fnmatch
 
 try:
     import transmissionrpc

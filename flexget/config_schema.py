@@ -1,21 +1,20 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from flexget.utils.template import get_template
+from __future__ import absolute_import, division, unicode_literals
 
-from future.moves.urllib.parse import urlparse, parse_qsl
-
+import logging
 import os
 import re
-import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from collections import defaultdict
 from datetime import datetime
 
 import jsonschema
-from jsonschema.compat import str_types, int_types
+from future.moves.urllib.parse import parse_qsl, urlparse
+from jsonschema.compat import int_types, str_types
 
 from flexget.event import fire_event
 from flexget.utils import qualities, template
-from flexget.utils.tools import parse_timedelta, parse_episode_identifier
+from flexget.utils.template import get_template
+from flexget.utils.tools import parse_episode_identifier, parse_timedelta
 
 schema_paths = {}
 

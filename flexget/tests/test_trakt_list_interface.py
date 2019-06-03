@@ -1,14 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import time
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
 
 from flexget.components.trakt.db import TraktUserAuth
+from flexget.components.trakt.trakt_list import TraktSet
 from flexget.entry import Entry
 from flexget.manager import Session
-from flexget.components.trakt.trakt_list import TraktSet
 
 
 @pytest.mark.online

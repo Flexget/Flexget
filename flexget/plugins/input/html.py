@@ -1,21 +1,20 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib import parse
+from __future__ import absolute_import, division, unicode_literals
 
-
+import io
 import logging
 import posixpath
-import zlib
 import re
-import io
+import zlib
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+from future.moves.urllib import parse
 from jinja2 import Template
 
 from flexget import plugin
-from flexget.event import event
 from flexget.entry import Entry
-from flexget.utils.soup import get_soup
+from flexget.event import event
 from flexget.utils.cached_input import cached
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('html')
 

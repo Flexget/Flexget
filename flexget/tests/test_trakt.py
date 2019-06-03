@@ -1,19 +1,15 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
 
-from flexget.manager import Session
 from flexget.components.trakt.api import ObjectsContainer as OC
-
-from flexget.components.trakt.db import (
-    TraktActor,
-    TraktMovieSearchResult,
-    TraktShowSearchResult,
-    TraktShow,
-)
 from flexget.components.trakt.api_trakt import ApiTrakt
+from flexget.components.trakt.db import (TraktActor, TraktMovieSearchResult,
+                                         TraktShow, TraktShowSearchResult)
+from flexget.manager import Session
 
 lookup_series = ApiTrakt.lookup_series
 
@@ -117,7 +113,7 @@ class TestTraktShowLookup(object):
     def test_search_results(self, execute_task):
         task = execute_task('test_search_result')
         entry = task.entries[0]
-        print (entry['trakt_series_name'].lower())
+        print(entry['trakt_series_name'].lower())
         assert entry['trakt_series_name'].lower() == 'Shameless'.lower(), 'lookup failed'
         with Session() as session:
             assert (

@@ -1,16 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urlparse, urlsplit, urlunsplit, quote
-from future.moves.urllib.error import URLError
+from __future__ import absolute_import, division, unicode_literals
 
+import binascii
 import itertools
 import logging
-import threading
 import socket
 import struct
-import binascii
-from random import randrange
+import threading
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from http.client import BadStatusLine
+from random import randrange
+
+from future.moves.urllib.error import URLError
+from future.moves.urllib.parse import quote, urlparse, urlsplit, urlunsplit
 from requests import RequestException
 
 from flexget import plugin

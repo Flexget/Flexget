@@ -1,13 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-
-from datetime import datetime, timedelta
+from __future__ import absolute_import, division, unicode_literals
 
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from flexget.api.app import base_message
+from datetime import datetime, timedelta
 
-from flexget.manager import Session
+from flexget.api.app import base_message
 from flexget.components.status.api import ObjectsContainer as OC
 from flexget.components.status.db import StatusTask, TaskExecution
+from flexget.manager import Session
 from flexget.utils import json
 
 

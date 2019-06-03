@@ -1,21 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 import sys
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from textwrap import wrap
 
-from colorclass import Windows, Color
+from colorclass import Color, Windows
+from terminaltables import (AsciiTable, DoubleTable,
+                            GithubFlavoredMarkdownTable, PorcelainTable,
+                            SingleTable)
+from terminaltables.terminal_io import terminal_size
+
 from flexget.logger import local_context
 from flexget.options import ArgumentParser
 from flexget.utils.tools import io_encoding
-from terminaltables import (
-    AsciiTable,
-    SingleTable,
-    DoubleTable,
-    GithubFlavoredMarkdownTable,
-    PorcelainTable,
-)
-from terminaltables.terminal_io import terminal_size
 
 # Enable terminal colors on windows.
 # pythonw (flexget-headless) does not have a sys.stdout, this command would crash in that case

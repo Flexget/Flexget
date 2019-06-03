@@ -1,4 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import math
@@ -14,7 +14,6 @@ from flexget.utils.requests import RequestException, TimedLimiter
 from flexget.utils.tools import split_title_year
 
 from . import db
-
 
 log = logging.getLogger('trakt_list')
 IMMUTABLE_LISTS = ['trending', 'popular']

@@ -1,11 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import sys
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from flexget.utils.log import log_once
 from flexget.event import event
+from flexget.utils.log import log_once
 from flexget.utils.simple_persistence import SimplePersistence
 
 __author__ = 'paranoidi'

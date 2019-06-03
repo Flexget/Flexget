@@ -1,24 +1,19 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import PY3
+from __future__ import absolute_import, division, unicode_literals
 
 import re
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime, timedelta
 
 import mock
 import pytest
+from future.utils import PY3
 
+from flexget.components.thetvdb.api_tvdb import (TVDBEpisode, TVDBRequest,
+                                                 TVDBSearchResult,
+                                                 find_series_id, lookup_series,
+                                                 mark_expired, persist)
 from flexget.manager import Session
-from flexget.components.thetvdb.api_tvdb import (
-    persist,
-    TVDBSearchResult,
-    lookup_series,
-    mark_expired,
-    TVDBRequest,
-    TVDBEpisode,
-    find_series_id,
-)
 
 
 @mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')

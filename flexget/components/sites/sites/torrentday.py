@@ -1,19 +1,20 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
-import re
 import logging
+import re
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from requests.exceptions import RequestException
 
 from flexget import plugin
+from flexget.components.sites.urlrewriting import UrlRewritingError
+from flexget.components.sites.utils import (normalize_unicode,
+                                            torrent_availability)
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
-from flexget.components.sites.urlrewriting import UrlRewritingError
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
-from flexget.components.sites.utils import torrent_availability, normalize_unicode
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('torrentday')

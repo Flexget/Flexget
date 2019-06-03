@@ -1,4 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
 
 import re
 from argparse import ArgumentParser, ArgumentTypeError
@@ -6,8 +6,10 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import options
 from flexget.event import event
-from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
+from flexget.terminal import (TerminalTable, TerminalTableError, console,
+                              table_parser)
 from flexget.utils.database import Session
+
 from . import db
 
 

@@ -1,19 +1,21 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime, timedelta
 
-from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime, Text
+from sqlalchemy import (Boolean, Column, DateTime, Float, Integer, Table, Text,
+                        Unicode)
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
 from flexget.utils import requests
-from flexget.utils.tools import split_title_year, chunked
-from flexget.utils.database import with_session, text_date_synonym, json_synonym, Session
+from flexget.utils.database import (Session, json_synonym, text_date_synonym,
+                                    with_session)
 from flexget.utils.simple_persistence import SimplePersistence
+from flexget.utils.tools import chunked, split_title_year
 
 log = logging.getLogger('api_tvdb')
 Base = db_schema.versioned_base('api_tvdb', 7)

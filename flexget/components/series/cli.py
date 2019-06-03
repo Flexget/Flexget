@@ -1,4 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
 
 import argparse
 import os
@@ -11,7 +11,8 @@ import flexget.components.series.utils
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, TerminalTableError, table_parser, colorize, console
+from flexget.terminal import (TerminalTable, TerminalTableError, colorize,
+                              console, table_parser)
 
 from . import db
 

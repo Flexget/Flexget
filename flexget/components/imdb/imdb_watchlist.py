@@ -1,19 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import re
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from flexget.utils.requests import RequestException
 from flexget import plugin
+from flexget.components.imdb.utils import extract_id, is_valid_imdb_title_id
 from flexget.config_schema import one_or_more
-from flexget.event import event
-from flexget.components.imdb.utils import is_valid_imdb_title_id, extract_id
-from flexget.utils.cached_input import cached
 from flexget.entry import Entry
-from flexget.utils.soup import get_soup
+from flexget.event import event
 from flexget.utils import json
-
+from flexget.utils.cached_input import cached
+from flexget.utils.requests import RequestException
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('imdb_watchlist')
 USER_ID_RE = r'^ur\d{7,9}$'

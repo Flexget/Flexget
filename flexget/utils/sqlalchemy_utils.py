@@ -1,18 +1,17 @@
 """
 Miscellaneous SQLAlchemy helpers.
 """
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import sqlalchemy
-
-from sqlalchemy import ColumnDefault, Sequence, Index
-from sqlalchemy.types import TypeEngine
-from sqlalchemy.schema import Table, MetaData
+from past.builtins import basestring
+from sqlalchemy import ColumnDefault, Index, Sequence
 from sqlalchemy.exc import NoSuchTableError, OperationalError
+from sqlalchemy.schema import MetaData, Table
+from sqlalchemy.types import TypeEngine
 
 log = logging.getLogger('sql_utils')
 

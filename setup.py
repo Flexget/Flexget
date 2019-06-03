@@ -1,8 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
 import io
 import sys
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 with io.open('README.rst', encoding='utf-8') as readme:
     long_description = readme.read()
@@ -10,9 +11,9 @@ with io.open('README.rst', encoding='utf-8') as readme:
 # Populates __version__ without importing the package
 __version__ = None
 with io.open('flexget/_version.py', encoding='utf-8') as ver_file:
-    exec (ver_file.read())  # pylint: disable=W0122
+    exec(ver_file.read())  # pylint: disable=W0122
 if not __version__:
-    print ('Could not find __version__ from flexget/_version.py')
+    print('Could not find __version__ from flexget/_version.py')
     sys.exit(1)
 
 

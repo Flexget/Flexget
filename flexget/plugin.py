@@ -1,23 +1,23 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.error import HTTPError, URLError
-from future.utils import python_2_unicode_compatible
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import os
 import re
 import time
-import pkg_resources
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from functools import total_ordering
 from http.client import BadStatusLine
 from importlib import import_module
 
+from future.moves.urllib.error import HTTPError, URLError
+from future.utils import python_2_unicode_compatible
 from path import Path
 from requests import RequestException
 
-from flexget import plugins as plugins_pkg
+import pkg_resources
 from flexget import components as components_pkg
 from flexget import config_schema
+from flexget import plugins as plugins_pkg
 from flexget.event import add_event_handler as add_phase_handler
 from flexget.event import fire_event, remove_event_handlers
 

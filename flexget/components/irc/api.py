@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flask import jsonify
 from flask_restplus import inputs
-from flexget.api import api, APIResource
-from flexget.api.app import (
-    BadRequest,
-    NotFoundError,
-    success_response,
-    base_message_schema,
-    empty_response,
-)
+
+from flexget.api import APIResource, api
+from flexget.api.app import (BadRequest, NotFoundError, base_message_schema,
+                             empty_response, success_response)
 
 irc_api = api.namespace('irc', description='View and manage IRC connections')
 

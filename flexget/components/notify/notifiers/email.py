@@ -1,15 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import text_to_native_str
+from __future__ import absolute_import, division, unicode_literals
 
+import getpass
 import logging
 import smtplib
 import socket
-import getpass
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
-from smtplib import SMTPAuthenticationError, SMTPServerDisconnected, SMTPSenderRefused
+from smtplib import (SMTPAuthenticationError, SMTPSenderRefused,
+                     SMTPServerDisconnected)
+
+from future.utils import text_to_native_str
 
 from flexget import plugin
 from flexget.config_schema import one_or_more

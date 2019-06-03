@@ -1,16 +1,16 @@
 # pylint: disable=no-self-use
 
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import text_type
+from __future__ import absolute_import, division, unicode_literals
 
 import os
 import stat
 import sys
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
+from future.utils import text_type
 
-from flexget.entry import EntryUnicodeError, Entry
+from flexget.entry import Entry, EntryUnicodeError
 
 
 class TestDisableBuiltins(object):
@@ -215,7 +215,7 @@ class TestHtmlUtils(object):
         # why this does not encode < ?
         from flexget.utils.tools import encode_html
 
-        print (encode_html('<3'))
+        print(encode_html('<3'))
         assert encode_html('<3') == '&lt;3'
 
 

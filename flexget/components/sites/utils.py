@@ -5,10 +5,10 @@
   We have normalizers in way too many places as is ...
 
 """
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import re
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from unicodedata import normalize
 
 

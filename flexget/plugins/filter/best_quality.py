@@ -1,9 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
 import logging
 
 from flexget import plugin
-from flexget.event import event
 from flexget.entry import Entry
+from flexget.event import event
 from flexget.utils.tools import group_entries
 
 log = logging.getLogger('best_quality')

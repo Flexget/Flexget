@@ -1,25 +1,25 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.xmlrpc import client as xmlrpc_client
-from future.moves.urllib.parse import urlparse, urljoin, urlsplit
-from future.utils import native_str
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import os
-import socket
 import re
+import socket
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from io import BytesIO
 from time import sleep
 
-from flexget.utils.template import RenderError
-from flexget.utils.pathscrub import pathscrub
-from flexget import plugin
-from flexget.event import event
-from flexget.entry import Entry
-from flexget.config_schema import one_or_more
-from flexget.utils.bittorrent import Torrent, is_torrent_file
+from future.moves.urllib.parse import urljoin, urlparse, urlsplit
+from future.moves.xmlrpc import client as xmlrpc_client
+from future.utils import native_str
+from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 
-from requests.auth import HTTPDigestAuth, HTTPBasicAuth
+from flexget import plugin
+from flexget.config_schema import one_or_more
+from flexget.entry import Entry
+from flexget.event import event
+from flexget.utils.bittorrent import Torrent, is_torrent_file
+from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError
 
 log = logging.getLogger('rtorrent')
 

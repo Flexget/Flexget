@@ -1,7 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import unquote
+from __future__ import absolute_import, division, unicode_literals
 
 import hashlib
 import io
@@ -12,16 +9,18 @@ import shutil
 import socket
 import sys
 import tempfile
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from cgi import parse_header
 from http.client import BadStatusLine
 
+from future.moves.urllib.parse import unquote
 from requests import RequestException
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.utils.tools import decode_html, native_str_to_text
-from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError
+from flexget.utils.tools import decode_html, native_str_to_text
 
 log = logging.getLogger('download')
 

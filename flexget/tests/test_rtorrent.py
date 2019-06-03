@@ -1,11 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.xmlrpc import client as xmlrpc_client
+from __future__ import absolute_import, division, unicode_literals
 
 import os
 import re
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import mock
+from future.moves.xmlrpc import client as xmlrpc_client
 
 from flexget.plugins.clients.rtorrent import RTorrent
 

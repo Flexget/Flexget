@@ -1,8 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from flexget.manager import Session
 from flexget.components.pending_approval.db import PendingEntry
+from flexget.manager import Session
 
 
 class TestPendingApproval(object):

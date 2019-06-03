@@ -1,10 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
+import os
+import sys
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
-import sys
-import os
-
 from jinja2 import Template
 
 

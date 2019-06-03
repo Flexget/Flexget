@@ -1,7 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import os
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import mock
 import pytest
@@ -231,8 +231,8 @@ class TestTorrentScrub(object):
 
             # Dump small torrents on demand
             if 0 and not clean:
-                print ("original=%r" % original.content)
-                print ("modified=%r" % modified.content)
+                print("original=%r" % original.content)
+                print("modified=%r" % modified.content)
 
             # Make sure essentials survived
             assert 'announce' in modified.content

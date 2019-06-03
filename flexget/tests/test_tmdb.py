@@ -1,10 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
 
-from flexget.manager import Session
 from flexget.components.tmdb.api_tmdb import TMDBSearchResult
+from flexget.manager import Session
 
 
 @pytest.mark.online

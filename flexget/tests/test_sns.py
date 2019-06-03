@@ -1,10 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from mock import patch, Mock
+from mock import Mock, patch
 
-from flexget.task import Task
 from flexget.plugins.output import sns
+from flexget.task import Task
 
 
 class TestNotifySNS(object):

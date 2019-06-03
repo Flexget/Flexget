@@ -1,12 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from flask import request, jsonify
+from flask import jsonify, request
 from flask_login import current_user
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import BadRequest, base_message_schema, success_response
-from flexget.webserver import change_password, generate_token, WeakPassword
+from flexget.webserver import WeakPassword, change_password, generate_token
 
 user_api = api.namespace('user', description='Manage user login credentials')
 

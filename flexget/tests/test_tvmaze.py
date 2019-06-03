@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
 
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 
 import pytest
 
+from flexget.components.tvmaze.api_tvmaze import (APITVMaze, TVMazeEpisodes,
+                                                  TVMazeLookup, TVMazeSeries)
 from flexget.manager import Session
-from flexget.components.tvmaze.api_tvmaze import (
-    APITVMaze,
-    TVMazeLookup,
-    TVMazeSeries,
-    TVMazeEpisodes,
-)
 
 lookup_series = APITVMaze.series_lookup
 
@@ -175,7 +171,7 @@ class TestTVMazeShowLookup(object):
     def test_search_results(self, execute_task):
         task = execute_task('test_search_result')
         entry = task.entries[0]
-        print (entry['tvmaze_series_name'].lower())
+        print(entry['tvmaze_series_name'].lower())
         assert entry['tvmaze_series_name'].lower() == 'Shameless'.lower(), 'lookup failed'
         with Session() as session:
             assert (

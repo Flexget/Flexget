@@ -1,11 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import random
 import string
 import sys
 import threading
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import rpyc
 from rpyc.utils.server import ThreadedServer
@@ -13,8 +13,8 @@ from terminaltables.terminal_io import terminal_size
 
 from flexget import terminal
 from flexget.logger import capture_output
-from flexget.terminal import console
 from flexget.options import get_parser
+from flexget.terminal import console
 
 log = logging.getLogger('ipc')
 

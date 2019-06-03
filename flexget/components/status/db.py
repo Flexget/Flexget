@@ -1,17 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import
-import logging
+from __future__ import absolute_import, division, unicode_literals
+
 import datetime
+import logging
 from datetime import timedelta
 
-from flexget.utils.database import with_session
-from flexget.utils.sqlalchemy_utils import create_index
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, select, func, Index
+from sqlalchemy import (Boolean, Column, DateTime, Index, Integer, String,
+                        func, select)
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
+from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
 from flexget.event import event
+from flexget.utils.database import with_session
+from flexget.utils.sqlalchemy_utils import create_index
 
 log = logging.getLogger('status.db')
 Base = db_schema.versioned_base('status', 2)

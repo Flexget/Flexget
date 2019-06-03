@@ -1,9 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+from flexget.components.managed_lists.lists.entry_list.db import (EntryListEntry,
+                                                                  EntryListList)
 from flexget.entry import Entry
 from flexget.manager import Session
-from flexget.components.managed_lists.lists.entry_list.db import EntryListList, EntryListEntry
 
 
 class TestEntryListSearch(object):

@@ -1,15 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import quote
+from __future__ import absolute_import, division, unicode_literals
 
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from logging import getLogger
 
+from future.moves.urllib.parse import quote
 from requests.exceptions import RequestException
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils import json
-from flexget.config_schema import one_or_more
 from flexget.utils.template import RenderError
 
 log = getLogger('pyload')

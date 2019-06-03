@@ -1,8 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
 
 from flask import jsonify
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import etag
 from flexget.components.imdb.utils import ImdbSearch
 

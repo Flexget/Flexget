@@ -1,32 +1,21 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime, timedelta
 
-from flexget.manager import Session
-from sqlalchemy import (
-    Table,
-    Column,
-    Integer,
-    String,
-    Float,
-    Unicode,
-    Boolean,
-    DateTime,
-    Date,
-    func,
-    or_,
-)
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation
 from dateutil.parser import parse as dateutil_parse
+from sqlalchemy import (Boolean, Column, Date, DateTime, Float, Integer,
+                        String, Table, Unicode, func, or_)
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import relation
+from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
 from flexget.event import event
+from flexget.manager import Session
 from flexget.utils import requests
-from flexget.utils.database import year_property, with_session, json_synonym
+from flexget.utils.database import json_synonym, with_session, year_property
 
 log = logging.getLogger('api_tmdb')
 Base = db_schema.versioned_base('api_tmdb', 6)

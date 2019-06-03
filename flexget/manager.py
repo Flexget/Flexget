@@ -1,15 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import, print_function
-
-# This needs to remain before the builtins import!
-native_int = int
-
-from builtins import *  # noqa  pylint: disable=unused-import, redefined-builtin
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 import atexit  # noqa
 import codecs  # noqa
 import copy  # noqa
 import errno  # noqa
 import fnmatch  # noqa
+import hashlib  # noqa
+import io  # noqa
 import logging  # noqa
 import os  # noqa
 import shutil  # noqa
@@ -17,10 +15,9 @@ import signal  # noqa
 import sys  # noqa
 import threading  # noqa
 import traceback  # noqa
-import hashlib  # noqa
+from builtins import *  # noqa  pylint: disable=unused-import, redefined-builtin
 from contextlib import contextmanager  # noqa
 from datetime import datetime, timedelta  # noqa
-import io  # noqa
 
 import sqlalchemy  # noqa
 import yaml  # noqa
@@ -28,26 +25,29 @@ from sqlalchemy.exc import OperationalError  # noqa
 from sqlalchemy.ext.declarative import declarative_base  # noqa
 from sqlalchemy.orm import sessionmaker  # noqa
 
+from flexget import config_schema, db_schema, logger, plugin  # noqa
+from flexget.event import fire_event  # noqa
+from flexget.ipc import IPCClient, IPCServer  # noqa
+from flexget.options import (CoreArgumentParser, ParserError,  # noqa
+                             get_parser, manager_parser, unicode_argv)
+from flexget.task import Task  # noqa
+from flexget.task_queue import TaskQueue  # noqa
+from flexget.terminal import console  # noqa
 # These need to be declared before we start importing from other flexget modules, since they might import them
 from flexget.utils.sqlalchemy_utils import ContextSession  # noqa
+from flexget.utils.tools import (get_current_flexget_version,  # noqa
+                                 io_encoding, pid_exists)
+
+# This needs to remain before the builtins import!
+native_int = int
+
+
+
+
 
 Base = declarative_base()
 Session = sessionmaker(class_=ContextSession)
 
-from flexget import config_schema, db_schema, logger, plugin  # noqa
-from flexget.event import fire_event  # noqa
-from flexget.ipc import IPCClient, IPCServer  # noqa
-from flexget.options import (
-    CoreArgumentParser,
-    get_parser,
-    manager_parser,
-    ParserError,
-    unicode_argv,
-)  # noqa
-from flexget.task import Task  # noqa
-from flexget.task_queue import TaskQueue  # noqa
-from flexget.utils.tools import pid_exists, get_current_flexget_version, io_encoding  # noqa
-from flexget.terminal import console  # noqa
 
 log = logging.getLogger('manager')
 

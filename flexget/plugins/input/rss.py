@@ -1,19 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import tobytes
-from future.moves.urllib.parse import urlparse, urlsplit
+from __future__ import absolute_import, division, unicode_literals
 
 import hashlib
-import os
-import logging
-import xml.sax
-import posixpath
 import http.client
+import logging
+import os
+import posixpath
+import xml.sax
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime
 
 import dateutil.parser
-
 import feedparser
+from future.moves.urllib.parse import urlparse, urlsplit
+from future.utils import tobytes
 from requests import RequestException
 
 from flexget import plugin
@@ -21,8 +20,8 @@ from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
-from flexget.utils.tools import decode_html
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.tools import decode_html
 
 log = logging.getLogger('rss')
 feedparser.registerDateHandler(lambda date_string: dateutil.parser.parse(date_string).timetuple())

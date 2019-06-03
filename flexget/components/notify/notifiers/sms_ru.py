@@ -1,14 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
+import hashlib
+import logging
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-import logging
-import hashlib
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from flexget.utils.requests import Session as RequestSession, TimedLimiter
-from requests.exceptions import RequestException
+from flexget.utils.requests import Session as RequestSession
+from flexget.utils.requests import TimedLimiter
 
 plugin_name = 'sms_ru'
 log = logging.getLogger(plugin_name)

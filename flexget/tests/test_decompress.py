@@ -1,8 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
+import os.path
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
-import os.path
 
 try:
     import rarfile

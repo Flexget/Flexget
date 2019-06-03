@@ -1,21 +1,21 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.request import urlopen
-from future.moves.urllib.parse import urlparse
-from future.utils import text_to_native_str
+from __future__ import absolute_import, division, unicode_literals
 
-import time
 import logging
-from datetime import timedelta, datetime
-
-import requests
-
+import time
 # Allow some request objects to be imported from here instead of requests
 import warnings
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from datetime import datetime, timedelta
+
+import requests
+from future.moves.urllib.parse import urlparse
+from future.moves.urllib.request import urlopen
+from future.utils import text_to_native_str
 from requests import RequestException
 
 from flexget import __version__ as version
-from flexget.utils.tools import parse_timedelta, TimedDict, timedelta_total_seconds
+from flexget.utils.tools import (TimedDict, parse_timedelta,
+                                 timedelta_total_seconds)
 
 # If we use just 'requests' here, we'll get the logger created by requests, rather than our own
 log = logging.getLogger('utils.requests')

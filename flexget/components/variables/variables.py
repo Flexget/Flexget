@@ -1,18 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import codecs
 import logging
 import os
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime
 
 import yaml
-
 from jinja2 import TemplateError
 from jinja2.nativetypes import NativeEnvironment
-
 from sqlalchemy import Column
-from sqlalchemy.sql.sqltypes import Unicode, DateTime, Integer
+from sqlalchemy.sql.sqltypes import DateTime, Integer, Unicode
 
 from flexget import db_schema
 from flexget.config_schema import register_config_key

@@ -1,9 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import os
 import xmlrpc.client
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from socket import error as socket_error
 
 from flexget import plugin

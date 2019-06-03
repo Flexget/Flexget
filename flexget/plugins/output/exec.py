@@ -1,15 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import text_to_native_str
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import subprocess
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
+from future.utils import text_to_native_str
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.config_schema import one_or_more
-from flexget.utils.template import render_from_entry, render_from_task, RenderError
+from flexget.utils.template import (RenderError, render_from_entry,
+                                    render_from_task)
 from flexget.utils.tools import io_encoding
 
 log = logging.getLogger('exec')

@@ -1,4 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
 
 import json
 import logging
@@ -6,7 +6,7 @@ from builtins import *
 from collections import MutableSet
 
 import requests
-from future.moves.urllib.parse import urlparse, quote
+from future.moves.urllib.parse import quote, urlparse
 from future.utils import python_2_unicode_compatible
 from requests import RequestException
 

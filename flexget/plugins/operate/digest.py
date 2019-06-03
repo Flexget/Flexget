@@ -1,21 +1,21 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import pickle
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime
 
-from sqlalchemy import Column, Unicode, Integer, DateTime, select
+from sqlalchemy import Column, DateTime, Integer, Unicode, select
 
-from flexget import plugin, db_schema
+from flexget import db_schema, plugin
 from flexget.config_schema import one_or_more
 from flexget.db_schema import versioned_base
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import json
 from flexget.utils.database import entry_synonym
+from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 from flexget.utils.tools import parse_timedelta
-from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
 log = logging.getLogger('digest')
 Base = versioned_base('digest', 1)

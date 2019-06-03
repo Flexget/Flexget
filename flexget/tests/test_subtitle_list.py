@@ -1,18 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import datetime
 import os
 import sys
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
 
+from flexget.components.managed_lists.lists.subtitle_list import (SubtitleListFile,
+                                                                  SubtitleListLanguage,
+                                                                  normalize_path)
 from flexget.manager import Session
-from flexget.components.managed_lists.lists.subtitle_list import (
-    SubtitleListFile,
-    SubtitleListLanguage,
-    normalize_path,
-)
 
 try:
     import subliminal

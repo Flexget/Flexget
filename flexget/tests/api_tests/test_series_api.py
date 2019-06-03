@@ -1,26 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
 
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
 
 from flexget.api.app import base_message
+from flexget.components.seen.db import SeenEntry
 from flexget.components.series.api import ObjectsContainer as OC
+# TODO: would be nicer to import db module
+from flexget.components.series.db import (AlternateNames, Episode,
+                                          EpisodeRelease, Season,
+                                          SeasonRelease, Series, SeriesTask)
 from flexget.components.thetvdb.api import ObjectsContainer as tvdb
 from flexget.components.tvmaze.api import ObjectsContainer as tvmaze
-from flexget.components.seen.db import SeenEntry
 from flexget.manager import Session
-
-# TODO: would be nicer to import db module
-from flexget.components.series.db import (
-    Series,
-    SeriesTask,
-    Episode,
-    EpisodeRelease,
-    AlternateNames,
-    Season,
-    SeasonRelease,
-)
 from flexget.utils import json
 
 

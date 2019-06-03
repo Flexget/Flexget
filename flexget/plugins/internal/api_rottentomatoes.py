@@ -1,24 +1,23 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-from future.moves.urllib.parse import quote_plus
-from future.moves.urllib.error import URLError
+from __future__ import absolute_import, division, unicode_literals
 
-import time
-import logging
 import difflib
+import logging
+import time
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime, timedelta
 
-from sqlalchemy import Table, Column, Integer, String, DateTime, func, sql
-from sqlalchemy.schema import ForeignKey, Index
+from future.moves.urllib.error import URLError
+from future.moves.urllib.parse import quote_plus
+from past.builtins import basestring
+from sqlalchemy import Column, DateTime, Integer, String, Table, func, sql
 from sqlalchemy.orm import relation
+from sqlalchemy.schema import ForeignKey, Index
 
-from flexget import db_schema
-from flexget.plugin import internet, PluginError
+from flexget import db_schema, plugin
+from flexget.plugin import PluginError, internet
 from flexget.utils import requests
 from flexget.utils.database import text_date_synonym, with_session
-from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
-from flexget import plugin
+from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
 log = logging.getLogger('api_rottentomatoes')
 Base = db_schema.versioned_base('api_rottentomatoes', 2)

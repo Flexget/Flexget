@@ -1,32 +1,25 @@
-from __future__ import unicode_literals, division, absolute_import
-from future.utils import text_to_native_str
-from flexget.utils.tools import native_str_to_text
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
+import locale
 import logging
 import os
 import re
-import locale
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from copy import copy
-from datetime import datetime, date, time
+from datetime import date, datetime, time
 
 import jinja2.filters
-from jinja2 import (
-    Environment,
-    StrictUndefined,
-    ChoiceLoader,
-    FileSystemLoader,
-    PackageLoader,
-    Template,
-    TemplateNotFound,
-    TemplateSyntaxError,
-)
-from jinja2.nativetypes import NativeTemplate
 from dateutil import parser as dateutil_parse
+from future.utils import text_to_native_str
+from jinja2 import (ChoiceLoader, Environment, FileSystemLoader, PackageLoader,
+                    StrictUndefined, Template, TemplateNotFound,
+                    TemplateSyntaxError)
+from jinja2.nativetypes import NativeTemplate
 
 from flexget.event import event
 from flexget.utils.lazy_dict import LazyDict
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.tools import native_str_to_text
 
 log = logging.getLogger('utils.template')
 

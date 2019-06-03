@@ -4,13 +4,13 @@ Utilities for handling RAR and ZIP archives
 Provides wrapper archive and exception classes to simplify
 archive extraction
 """
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
-import zipfile
+import logging
 import os
 import shutil
-import logging
+import zipfile
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 try:
     import rarfile

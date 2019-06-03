@@ -1,15 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
-from flexget.utils.requests import Session
 from flexget.plugin import PluginWarning
-
-from requests.exceptions import RequestException
+from flexget.utils.requests import Session
 
 plugin_name = 'ifttt'
 log = logging.getLogger(plugin_name)

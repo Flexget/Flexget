@@ -1,11 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urlparse, unquote
+from __future__ import absolute_import, division, unicode_literals
 
+import ftplib
 import logging
 import os
-import ftplib
 import time
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
+from future.moves.urllib.parse import unquote, urlparse
 
 from flexget import plugin
 from flexget.event import event

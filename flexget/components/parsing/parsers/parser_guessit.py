@@ -1,12 +1,12 @@
 from __future__ import absolute_import, division, unicode_literals
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import native
 
 import logging
 import re
 import sys
 import time
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+from future.utils import native
 from guessit.api import GuessItApi, GuessitException
 from guessit.rules import rebulk_builder
 from rebulk import Rebulk
@@ -16,7 +16,8 @@ from rebulk.pattern import RePattern
 from flexget import plugin
 from flexget.event import event
 from flexget.utils import qualities
-from flexget.utils.parsers.generic import ParseWarning, default_ignore_prefixes, name_to_re
+from flexget.utils.parsers.generic import (ParseWarning,
+                                           default_ignore_prefixes, name_to_re)
 from flexget.utils.tools import ReList
 
 from .parser_common import MovieParseResult, SeriesParseResult

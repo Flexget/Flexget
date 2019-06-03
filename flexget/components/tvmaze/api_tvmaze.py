@@ -1,31 +1,21 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime, timedelta
 
 from dateutil import parser
 from future.utils import native
 from requests.exceptions import RequestException
-from sqlalchemy import (
-    Column,
-    Integer,
-    Float,
-    DateTime,
-    String,
-    Unicode,
-    ForeignKey,
-    Table,
-    or_,
-    and_,
-)
+from sqlalchemy import (Column, DateTime, Float, ForeignKey, Integer, String,
+                        Table, Unicode, and_, or_)
 from sqlalchemy.orm import relation
 from sqlalchemy.orm.exc import MultipleResultsFound
 
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.utils import requests
-from flexget.utils.database import with_session, json_synonym
+from flexget.utils.database import json_synonym, with_session
 from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('api_tvmaze')

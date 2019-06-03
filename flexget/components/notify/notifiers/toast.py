@@ -1,11 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
 import logging
-import sys
 import os
+import sys
 
 from flexget import plugin
 from flexget.event import event
-from flexget.plugin import PluginWarning, DependencyError
+from flexget.plugin import DependencyError, PluginWarning
 
 plugin_name = 'toast'
 

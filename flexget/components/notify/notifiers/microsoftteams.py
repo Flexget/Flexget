@@ -1,11 +1,11 @@
+import logging
 from builtins import *
 
-import logging
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from requests.exceptions import RequestException
 from flexget.utils.requests import Session as RequestSession
 
 requests = RequestSession(max_retries=3)

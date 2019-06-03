@@ -1,4 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
@@ -6,6 +6,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
+
 from . import db
 
 log = logging.getLogger('pending_approval')

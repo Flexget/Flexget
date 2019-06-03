@@ -1,17 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import re
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, DateTime, Integer, String
 
 from flexget import plugin
+from flexget.db_schema import versioned_base
 from flexget.event import event
 from flexget.utils import requests
-from flexget.db_schema import versioned_base
-
 
 log = logging.getLogger('myepisodes')
 Base = versioned_base('myepisodes', 0)

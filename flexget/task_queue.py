@@ -1,13 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import queue
 import sys
 import threading
 import time
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from sqlalchemy.exc import ProgrammingError, OperationalError
+from sqlalchemy.exc import OperationalError, ProgrammingError
 
 from flexget.task import TaskAbort
 

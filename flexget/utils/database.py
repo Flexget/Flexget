@@ -1,18 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring, long, unicode
+from __future__ import absolute_import, division, unicode_literals
 
 import functools
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from collections import Mapping
 from datetime import datetime
 
+from past.builtins import basestring, long, unicode
 from sqlalchemy import extract, func
-from sqlalchemy.orm import synonym
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
+from sqlalchemy.orm import synonym
 
-from flexget.manager import Session
-from flexget.utils import qualities, json
 from flexget.entry import Entry
+from flexget.manager import Session
+from flexget.utils import json, qualities
 
 
 def with_session(*args, **kwargs):

@@ -1,23 +1,24 @@
-from __future__ import unicode_literals, division, absolute_import, with_statement
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-from future.moves.urllib.parse import quote
+from __future__ import (absolute_import, division, unicode_literals,
+                        with_statement)
 
+import io
+import logging
 import os
 import re
 import threading
-import logging
-from xml.etree.ElementTree import parse
-import io
-from uuid import uuid4
 import time
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime, timedelta
+from uuid import uuid4
+from xml.etree.ElementTree import parse
 
+from future.moves.urllib.parse import quote
+from past.builtins import basestring
+
+from flexget.config_schema import one_or_more, register_config_key
 from flexget.entry import Entry
-from flexget.config_schema import register_config_key
 from flexget.event import event
 from flexget.manager import manager
-from flexget.config_schema import one_or_more
 from flexget.utils import requests
 from flexget.utils.tools import get_config_hash
 

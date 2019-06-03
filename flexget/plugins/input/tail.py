@@ -1,10 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import io
+import logging
 import os
 import re
-import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from sqlalchemy import Column, Integer, Unicode
 

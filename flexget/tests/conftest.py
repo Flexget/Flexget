@@ -1,35 +1,31 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import jsonschema
-from future.utils import PY2
-from future.backports.http import client as backport_client
-
-import re
-import os
-import sys
-import yaml
-import logging
-import shutil
-import requests
+from __future__ import absolute_import, division, unicode_literals
 
 import itertools
-
+import logging
+import os
+import re
+import shutil
+import sys
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from contextlib import contextmanager
 
+import jsonschema
 import mock
 import pytest
+import requests
+import yaml
+from future.backports.http import client as backport_client
+from future.utils import PY2
 from path import Path
 from vcr import VCR
-from vcr.stubs import VCRHTTPSConnection, VCRHTTPConnection
+from vcr.stubs import VCRHTTPConnection, VCRHTTPSConnection
 
 import flexget.logger
-from flexget.manager import Manager
+from flexget.api import api_app
+from flexget.manager import Manager, Session
 from flexget.plugin import load_plugins
 from flexget.task import Task, TaskAbort
 from flexget.webserver import User
-from flexget.manager import Session
-from flexget.api import api_app
 
 log = logging.getLogger('tests')
 
@@ -71,7 +67,7 @@ def manager(
         mockmanager = MockManager(config, request.cls.__name__)
     except Exception:
         # Since we haven't entered the test function yet, pytest won't print the logs on failure. Print them manually.
-        print (caplog.text)
+        print(caplog.text)
         raise
     yield mockmanager
     mockmanager.shutdown()
@@ -237,7 +233,7 @@ def filecopy(request):
                 else:
                     f.remove()
             except OSError as e:
-                print ("couldn't remove %s: %s" % (f, e))
+                print("couldn't remove %s: %s" % (f, e))
 
 
 @pytest.fixture()

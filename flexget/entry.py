@@ -1,14 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import PY2, native_str, text_type
+from __future__ import absolute_import, division, unicode_literals
 
 import copy
 import functools
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
+from future.utils import PY2, native_str, text_type
 
 from flexget.plugin import PluginError
 from flexget.utils.lazy_dict import LazyDict, LazyLookup
-from flexget.utils.template import render_from_entry, FlexGetTemplate
+from flexget.utils.template import FlexGetTemplate, render_from_entry
 
 log = logging.getLogger('entry')
 

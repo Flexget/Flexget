@@ -1,10 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime, timedelta
 
-from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime
+from sqlalchemy import (Boolean, Column, DateTime, Float, Integer, String,
+                        Table, Unicode)
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey, Index
 

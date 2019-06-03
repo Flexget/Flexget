@@ -1,19 +1,21 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
-import logging
 import io
+import logging
 import os
 import socket
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
+import requests
+
+from flexget import plugin
+from flexget.event import event
 
 try:
     import mechanicalsoup
 except ImportError:
     mechanicalsoup = None
-import requests
 
-from flexget import plugin
-from flexget.event import event
 
 log = logging.getLogger('formlogin')
 

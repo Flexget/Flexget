@@ -1,16 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
+import logging
 import os
 import shutil
-import logging
 import time
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
-from flexget.utils.template import RenderError
+from flexget.event import event
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError
 
 
 def get_directory_size(directory):

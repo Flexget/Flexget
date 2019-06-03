@@ -4,10 +4,10 @@ Plugins can just import the methods from this module.
 
 Also allows date and datetime objects to be encoded/decoded.
 """
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import datetime
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget.plugin import DependencyError
 

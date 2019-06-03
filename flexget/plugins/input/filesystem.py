@@ -1,18 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import PY2
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import re
 import sys
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime
 
+from future.utils import PY2
 from path import Path
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
 from flexget.entry import Entry
+from flexget.event import event
 
 log = logging.getLogger('filesystem')
 

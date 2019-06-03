@@ -1,12 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa
+from __future__ import absolute_import, division, unicode_literals
 
 import io
+from builtins import *  # noqa
 
-from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 from flexget import options
 from flexget.event import event
-from flexget.utils.template import list_templates, get_template
+from flexget.terminal import (TerminalTable, TerminalTableError, console,
+                              table_parser)
+from flexget.utils.template import get_template, list_templates
 
 
 def list_file_templates(manager, options):

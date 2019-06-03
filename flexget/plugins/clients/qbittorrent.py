@@ -1,8 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
-import os
 import logging
+import os
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from requests import Session
 from requests.exceptions import RequestException
@@ -10,7 +10,6 @@ from requests.exceptions import RequestException
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.template import RenderError
-
 
 log = logging.getLogger('qbittorrent')
 

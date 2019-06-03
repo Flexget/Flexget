@@ -1,10 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
+from __future__ import absolute_import, division, unicode_literals
 
-import re
 import copy
 import logging
+import re
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
+from past.builtins import basestring
 
 log = logging.getLogger('utils.qualities')
 

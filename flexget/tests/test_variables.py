@@ -1,11 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
 
+from flexget.components.variables.variables import Variables
 from flexget.event import fire_event
 from flexget.manager import Session
-from flexget.components.variables.variables import Variables
 
 
 @pytest.mark.usefixtures('tmpdir')

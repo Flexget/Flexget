@@ -1,5 +1,6 @@
 # coding=utf-8
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
@@ -117,7 +118,7 @@ class TestInputRSS(object):
         # grab other_fields and attach to entry
         task = execute_task('test3')
         for entry in task.rejected:
-            print (entry['title'])
+            print(entry['title'])
         assert task.find_entry(
             title='Other fields', otherfield='otherfield'
         ), 'Specified other_field not attached to entry'

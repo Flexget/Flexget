@@ -1,18 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
 import difflib
 import json
 import logging
-import re
 import random
+import re
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from bs4.element import Tag
 
-from flexget.utils.soup import get_soup
-from flexget.utils.requests import Session, TimedLimiter
-from flexget.utils.tools import str_to_int
 from flexget import plugin
+from flexget.utils.requests import Session, TimedLimiter
+from flexget.utils.soup import get_soup
+from flexget.utils.tools import str_to_int
 
 log = logging.getLogger('imdb.utils')
 # IMDb delivers a version of the page which is unparsable to unknown (and some known) user agents, such as requests'

@@ -1,15 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urlencode
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
-
 import re
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
+from future.moves.urllib.parse import urlencode
+from requests import Request, RequestException
+from requests.utils import cookiejar_from_dict, dict_from_cookiejar
+
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginError
-from requests import Request, RequestException
-from requests.utils import dict_from_cookiejar, cookiejar_from_dict
 
 log = logging.getLogger('wordpress_auth')
 

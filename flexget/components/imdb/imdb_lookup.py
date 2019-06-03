@@ -1,15 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
 
 import logging
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime
 
 from flexget import plugin
-from flexget.components.imdb.utils import ImdbSearch, ImdbParser, extract_id, make_url
+from flexget.components.imdb.utils import (ImdbParser, ImdbSearch, extract_id,
+                                           make_url)
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.database import with_session
 from flexget.utils.log import log_once
+
 from . import db
 
 log = logging.getLogger('imdb_lookup')

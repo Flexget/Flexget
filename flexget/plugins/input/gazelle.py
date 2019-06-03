@@ -1,10 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from __future__ import absolute_import, division, unicode_literals
 
-from datetime import datetime
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from datetime import datetime
 
-from flexget import plugin, db_schema
+from sqlalchemy import Column, DateTime, String, Unicode
+
+from flexget import db_schema, plugin
+from flexget.components.sites.utils import normalize_unicode
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
@@ -12,11 +15,7 @@ from flexget.manager import Session
 from flexget.plugin import PluginError
 from flexget.utils.database import json_synonym
 from flexget.utils.requests import TokenBucketLimiter
-from flexget.components.sites.utils import normalize_unicode
 from flexget.utils.tools import parse_filesize
-
-from sqlalchemy import Column, Unicode, String, DateTime
-
 
 DETECT_2FA = ("Authenticator Code", "TOTP code")
 log = logging.getLogger('gazelle')
