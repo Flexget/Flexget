@@ -39,9 +39,12 @@ def bluray_request(endpoint, **params):
         return response.json(strict=False)
 
 
-def extract_release_date(release_date):
+def extract_release_date(bluray_entry):
+    release_date = bluray_entry.get('reldate')
     if not release_date or release_date.lower() == 'no release date':
-        release_date = 'Dec 31, %s' % datetime.now().year
+        if bluray_entry.get('year'):
+            return datetime(int(bluray_entry['year']), 12, 31)
+        return datetime.now().date().replace(month=12, day=31)
     return dateutil_parse(release_date).date()
 
 
@@ -90,7 +93,7 @@ class BlurayMovie(Base):
             countries = bluray_request('countries.json.php', **country_params) or {}
 
             search_results = sorted(
-                search_results, key=lambda k: extract_release_date(k.get('reldate'))
+                search_results, key=lambda k: extract_release_date(k)
             )
         except requests.RequestException as e:
             raise LookupError('Error searching for {} on blu-ray.com: {}'.format(title_year, e))
@@ -113,7 +116,7 @@ class BlurayMovie(Base):
                 if c['c'].lower() == country_code:
                     country = c['n']
             self.country = country
-            self.release_date = extract_release_date(result.get('reldate'))
+            self.release_date = extract_release_date(result)
             self.bluray_rating = int(result['rating']) if result['rating'] else None
 
             # Used for parsing some more data, sadly with soup
