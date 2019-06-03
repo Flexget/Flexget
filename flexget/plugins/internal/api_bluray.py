@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 import time
 
 from sqlalchemy import Table, Column, Integer, Float, Unicode, DateTime, Date, func
@@ -43,7 +43,7 @@ def extract_release_date(bluray_entry):
     release_date = bluray_entry.get('reldate')
     if not release_date or release_date.lower() == 'no release date':
         if bluray_entry.get('year'):
-            return datetime(int(bluray_entry['year']), 12, 31)
+            return date(int(bluray_entry['year']), 12, 31)
         return datetime.now().date().replace(month=12, day=31)
     return dateutil_parse(release_date).date()
 
