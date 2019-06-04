@@ -16,5 +16,5 @@ gitpython==2.1.5
 codacy-coverage>=1.2.18
 pip-tools==3.2.0
 twine==1.11.0
-isort==4.3.4
-black==18.9b0; python_version >= '3.6'
+isort[pyproject]>=4.3.20; python_version >= '3.5'
+black>=18.9b0; python_version >= '3.6'
