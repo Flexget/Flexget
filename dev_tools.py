@@ -117,16 +117,19 @@ def bundle_webui():
 
 
 @cli.command()
-def autoformat():
+@click.argument('files', nargs=-1)
+def autoformat(files):
     """Reformat code with black and isort"""
-    project_root = os.path.dirname(os.path.realpath(__file__))
+    if not files:
+        project_root = os.path.dirname(os.path.realpath(__file__))
+        files = (project_root,)
     venv_path = os.environ['VIRTUAL_ENV']
     if not venv_path:
         raise Exception('Virtualenv and activation required')
 
-    subprocess.call(['black', '-S', '-l', '99', project_root])
-    # isort configuration is .isort.cfg, (setup.cfg did not work for some reason)
-    subprocess.call(['isort', '--virtual-env', venv_path, '-rc', project_root])
+    # black and isort config are in pyproject.toml
+    subprocess.call(('black',) + files)
+    subprocess.call(('isort', '--virtual-env', venv_path, '-rc') + files)
 
 
 if __name__ == '__main__':
