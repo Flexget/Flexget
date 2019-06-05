@@ -432,6 +432,17 @@ class PluginTransmission(TransmissionBase):
                 log.info('"%s" torrent added to transmission', entry['title'])
                 # The info returned by the add call is incomplete, refresh it
                 torrent_info = self.client.get_torrent(torrent_info.id)
+            else:
+                # Torrent already loaded in transmission
+                if options['add'].get('download_dir'):
+                    log.verbose('Moving %s to "%s"', torrent_info.name, options['add']['download_dir'])
+                    # Move data even if current reported torrent location matches new location
+                    # as transmission may fail to automatically move completed file to final
+                    # location but continue reporting final location instead of real location.
+                    # In such case this will kick transmission to really move data.
+                    # If data is already located at new location then transmission just ignore
+                    # this command.
+                    self.client.move_torrent_data(torrent_info.id, options['add']['download_dir'], 120)
 
             try:
                 total_size = torrent_info.totalSize
