@@ -7,6 +7,7 @@ import logging
 import os
 import re
 import locale
+import os.path
 from copy import copy
 from datetime import datetime, date, time
 
@@ -140,6 +141,21 @@ def filter_default(value, default_value='', boolean=True):
 filter_d = filter_default
 
 
+def is_fs_file(pathname):
+    """Test whether item is existing file in filesystem"""
+    return os.path.isfile(pathname)
+
+
+def is_fs_dir(pathname):
+    """Test whether item is existing directory in filesystem"""
+    return os.path.isdir(pathname)
+
+
+def is_fs_link(pathname):
+    """Test whether item is existing link in filesystem"""
+    return os.path.islink(pathname)
+
+
 class FlexGetTemplate(Template):
     """Adds lazy lookup support when rendering templates."""
 
@@ -172,6 +188,9 @@ def make_environment(manager):
     for name, filt in list(globals().items()):
         if name.startswith('filter_'):
             environment.filters[name.split('_', 1)[1]] = filt
+    for name, test in list(globals().items()):
+        if name.startswith('is_'):
+            environment.tests[name.split('_', 1)[1]] = test
 
 
 def list_templates(extensions=None):
