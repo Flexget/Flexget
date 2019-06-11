@@ -15,8 +15,8 @@ class TestTheTVDBList(object):
     """
 
     tvdb_config = {
-        'username': 'flexget',
-        'account_id': '80FB8BD0720CA5EC',
+        'username': 'flexget2',
+        'account_id': 'D3405F10B200C4DB',
         'api_key': '4D297D8CFDE0E105',
     }
 
