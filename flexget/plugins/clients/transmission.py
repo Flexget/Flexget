@@ -215,7 +215,7 @@ class PluginTransmissionInput(TransmissionBase):
                 entry['location'] = torrent.torrentFile
                 entry['url'] = 'file://' + torrent.torrentFile
 
-            entry = self._parse_torrent_fields(torrent, entry)
+            entry = self._populate_entry_from_torrent_attrs(torrent, entry)
 
             entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
             entry['transmission_seed_ratio_ok'] = seed_ratio_ok
@@ -235,13 +235,13 @@ class PluginTransmissionInput(TransmissionBase):
             entries.append(entry)
         return entries
 
-    def _parse_torrent_fields(self, torrent, entry):
+    def _populate_entry_from_torrent_attrs(self, torrent, entry):
         """
         Populates an entry with its corresponding fields from a
         TransmissionRPC torrent object
         """
 
-        transmission_fields = {
+        attr_map = {
             'id': 'transmission_id',
             'comment': 'transmission_comment',
             'downloadDir': 'transmission_downloadDir',
@@ -261,9 +261,9 @@ class PluginTransmissionInput(TransmissionBase):
             'leecherCount': 'torrent_leeches',
         }
 
-        for source_field, dest_field in transmission_fields.iteritems():
+        for attr, entry_field in attr_map.iteritems():
             try:
-                entry[dest_field] = getattr(torrent, source_field)
+                entry[entry_field] = getattr(torrent, attr)
             except Exception:
                 log.debug(
                     'error when requesting transmissionrpc attribute %s', attr, exc_info=True
