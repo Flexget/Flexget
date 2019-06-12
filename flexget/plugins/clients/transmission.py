@@ -235,7 +235,7 @@ class PluginTransmissionInput(TransmissionBase):
             entries.append(entry)
         return entries
 
-    def _parse_torrent_fields(torrent, entry):
+    def _parse_torrent_fields(self, torrent, entry):
         """
         Populates an entry with its corresponding fields from a
         TransmissionRPC torrent object
