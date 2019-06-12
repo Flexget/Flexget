@@ -215,7 +215,7 @@ class PluginTransmissionInput(TransmissionBase):
                 entry['location'] = torrent.torrentFile
                 entry['url'] = 'file://' + torrent.torrentFile
 
-            entry = self._parse_torrent(torrent, entry)
+            entry = self._parse_torrent_fields(torrent, entry)
 
             entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
             entry['transmission_seed_ratio_ok'] = seed_ratio_ok
@@ -235,7 +235,7 @@ class PluginTransmissionInput(TransmissionBase):
             entries.append(entry)
         return entries
 
-    def _parse_torrent(torrent, entry):
+    def _parse_torrent_fields(torrent, entry):
         """
         Populates an entry with its corresponding fields from a
         TransmissionRPC torrent object
