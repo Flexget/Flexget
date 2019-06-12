@@ -214,29 +214,9 @@ class PluginTransmissionInput(TransmissionBase):
             if config['host'] in ('localhost', '127.0.0.1'):
                 entry['location'] = torrent.torrentFile
                 entry['url'] = 'file://' + torrent.torrentFile
-            for attr in [
-                'id',
-                'comment',
-                'downloadDir',
-                'isFinished',
-                'isPrivate',
-                'ratio',
-                'status',
-                'date_active',
-                'date_added',
-                'date_done',
-                'date_started',
-                'priority',
-                'progress',
-                'secondsDownloading',
-                'secondsSeeding',
-            ]:
-                try:
-                    entry['transmission_' + attr] = getattr(torrent, attr)
-                except Exception:
-                    log.debug(
-                        'error when requesting transmissionrpc attribute %s', attr, exc_info=True
-                    )
+
+            entry = self._parse_torrent(torrent, entry)
+
             entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
             entry['transmission_seed_ratio_ok'] = seed_ratio_ok
             entry['transmission_idle_limit_ok'] = idle_limit_ok
@@ -254,6 +234,42 @@ class PluginTransmissionInput(TransmissionBase):
                 )
             entries.append(entry)
         return entries
+
+    def _parse_torrent(torrent, entry):
+        """
+        Populates an entry with its corresponding fields from a
+        TransmissionRPC torrent object
+        """
+
+        transmission_fields = {
+            'id': 'transmission_id',
+            'comment': 'transmission_comment',
+            'downloadDir': 'transmission_downloadDir',
+            'isFinished': 'transmission_isFinished',
+            'isPrivate': 'transmission_isPrivate',
+            'ratio': 'transmission_ratio',
+            'status': 'transmission_status',
+            'date_active': 'transmission_date_active',
+            'date_added': 'transmission_date_added',
+            'date_done': 'transmission_date_done',
+            'date_started': 'transmission_date_started',
+            'priority': 'transmission_priority',
+            'progress': 'transmission_progress',
+            'secondsDownloading': 'transmission_secondsDownloading',
+            'secondsSeeding': 'transmission_secondsSeeding',
+            'seederCount': 'torrent_seeds',
+            'leecherCount': 'torrent_leeches',
+        }
+
+        for source_field, dest_field in transmission_fields.iteritems():
+            try:
+                entry[dest_field] = getattr(torrent, source_field)
+            except Exception:
+                log.debug(
+                    'error when requesting transmissionrpc attribute %s', attr, exc_info=True
+                )
+
+        return entry
 
 
 class PluginTransmission(TransmissionBase):
