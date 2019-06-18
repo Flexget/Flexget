@@ -22,7 +22,7 @@ IMMUTABLE_LISTS = ['trending', 'popular']
 
 def generate_show_title(item):
     show_info = item['show']
-    if show_info['year']:
+    if show_info['year'] and not item['strip_dates']:
         return '%s (%s)' % (show_info['title'], show_info['year'])
     else:
         return show_info['title']
@@ -31,7 +31,7 @@ def generate_show_title(item):
 def generate_episode_title(item):
     show_info = item['show']
     episode_info = item['episode']
-    if show_info['year']:
+    if show_info['year'] and not item['strip_dates']:
         return (
             '%s (%s) S%02dE%02d %s'
             % (
@@ -57,7 +57,7 @@ def generate_episode_title(item):
 field_maps = {
     'movie': {
         'title': lambda i: '%s (%s)' % (i['movie']['title'], i['movie']['year'])
-        if i['movie']['year']
+        if i['movie']['year'] and not i['strip_dates']
         else '%s' % i['movie']['title'],
         'movie_name': 'movie.title',
         'movie_year': 'movie.year',
@@ -260,6 +260,8 @@ class TraktSet(MutableSet):
                             item[list_type]['ids'].get('slug'),
                         )
 
+                    # Pass the strip dates option in so it can be used in the update maps
+                    item['strip_dates'] = self.config.get('strip_dates')
                     entry.update_using_map(field_maps[list_type], item)
 
                     # get movie name translation
@@ -290,26 +292,11 @@ class TraktSet(MutableSet):
                                 translation[0]['title'],
                             )
                             entry['title'] = translation[0]['title']
-                            if entry.get('movie_year'):
-                                entry['title'] += ' (' + str(entry['movie_year']) + ')'
+                            if entry.get('movie_year') and not self.config.get('strip_dates'):
+                                entry['title'] += ' ({})'.format(entry['movie_year'])
                             entry['movie_name'] = translation[0]['title']
 
-                    # Override the title if strip_dates is on. TODO: a better way?
-                    if self.config.get('strip_dates'):
-                        if list_type in ['show', 'movie']:
-                            entry['title'] = item[list_type]['title']
-                        elif list_type == 'episode':
-                            entry[
-                                'title'
-                            ] = '{show[title]} S{episode[season]:02}E{episode[number]:02}'.format(
-                                **item
-                            )
-                            if item['episode']['title']:
-                                entry['title'] += ' {episode[title]}'.format(**item)
                     if entry.isvalid():
-                        if self.config.get('strip_dates'):
-                            # Remove year from end of name if present
-                            entry['title'] = split_title_year(entry['title'])[0]
                         yield entry
                     else:
                         log.debug('Invalid entry created? %s', entry)
