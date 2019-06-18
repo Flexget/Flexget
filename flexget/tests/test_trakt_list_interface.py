@@ -205,8 +205,8 @@ class TestTraktList(object):
 
         task = execute_task('test_list')
         assert len(task.entries) == 2
-        assert task.entries[0]['series_name'] == 'Stranger Things (2016)'
-        assert task.entries[1]['series_name'] == 'Stranger Things (2016)'
+        assert task.entries[0]['series_name'] == 'Stranger Things'
+        assert task.entries[1]['series_name'] == 'Stranger Things'
         for series_id in ['S01E05', 'S01E06']:
             entry1 = task.entries[0]
             entry2 = task.entries[1]
