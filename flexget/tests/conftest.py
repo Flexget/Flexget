@@ -288,7 +288,7 @@ def chdir(pytestconfig, request):
     to that module location. Task configuration can then assume this being
     location for relative paths
     """
-    if 'chdir' in request.funcargnames:
+    if 'chdir' in request.fixturenames:
         os.chdir(os.path.dirname(request.module.__file__))
 
 
