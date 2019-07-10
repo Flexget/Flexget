@@ -308,12 +308,10 @@ class OutputDeluge(DelugePlugin):
         # loop through entries to get a list of labels to add
         labels = set()
         for entry in task.accepted:
-            label = entry.get('label', config.get('label'))
+            label = entry.get('label') or config.get('label')
             if label and label.lower() != 'no label':
                 try:
-                    label = self._format_label(
-                        entry.render(entry.get('label', config.get('label')))
-                    )
+                    label = self._format_label(entry.render(label))
                     log.debug('Rendered label: %s', label)
                 except RenderError as e:
                     log.error('Error rendering label `%s`: %s', label, e)
@@ -345,7 +343,7 @@ class OutputDeluge(DelugePlugin):
             # Generate deluge options dict for torrent add
             add_opts = {}
             try:
-                path = entry.render(entry.get('path', config['path']))
+                path = entry.render(entry.get('path') or config['path'])
                 if path:
                     add_opts['download_location'] = pathscrub(os.path.expanduser(path))
             except RenderError as e:
@@ -368,13 +366,13 @@ class OutputDeluge(DelugePlugin):
                 'container_directory': config.get('container_directory', ''),
             }
             try:
-                label = entry.render(entry.get('label', config['label']))
+                label = entry.render(entry.get('label') or config['label'])
                 modify_opts['label'] = self._format_label(label)
             except RenderError as e:
                 log.error('Error setting label for `%s`: %s', entry['title'], e)
             try:
                 move_completed_path = entry.render(
-                    entry.get('move_completed_path', config['move_completed_path'])
+                    entry.get('move_completed_path') or config['move_completed_path']
                 )
                 modify_opts['move_completed_path'] = pathscrub(
                     os.path.expanduser(move_completed_path)
@@ -382,8 +380,8 @@ class OutputDeluge(DelugePlugin):
             except RenderError as e:
                 log.error('Error setting move_completed_path for %s: %s', entry['title'], e)
             try:
-                content_filename = entry.get(
-                    'content_filename', config.get('content_filename', '')
+                content_filename = entry.get('content_filename') or config.get(
+                    'content_filename', ''
                 )
                 modify_opts['content_filename'] = pathscrub(entry.render(content_filename))
             except RenderError as e:
@@ -412,7 +410,7 @@ class OutputDeluge(DelugePlugin):
                 else:
                     if not os.path.exists(entry['file']):
                         entry.fail('Downloaded temp file \'%s\' doesn\'t exist!' % entry['file'])
-                        del (entry['file'])
+                        del entry['file']
                         return
                     with open(entry['file'], 'rb') as f:
                         filedump = base64.encodestring(f.read())
@@ -656,7 +654,7 @@ class OutputDeluge(DelugePlugin):
                 )
 
         container_directory = pathscrub(
-            entry.render(entry.get('container_directory', opts.get('container_directory', '')))
+            entry.render(entry.get('container_directory') or opts.get('container_directory', ''))
         )
         if container_directory:
             if big_file_name:
