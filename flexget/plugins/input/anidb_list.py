@@ -46,24 +46,28 @@ class AnidbList(object):
         'error_required': 'user_id is required',
     }
 
-    def __build_url(self, config):
-        base_url = self.anidb_url + 'animedb.pl?show=mywishlist&uid=%s' % config['user_id']
-        base_url = base_url + ('' if config['mode'] == 'all' else '&mode=%s' % config['mode'])
-        base_url = base_url + ('' if config['pass'] is None else '&pass=%s' % config['pass'])
-        return base_url
+    def _build_url_params(self, config):
+        params = {'show': 'mywishlist', 'uid': config['user_id']}
+        if config.get('mode') != 'all':
+            params['mode'] = config['mode']
+        if config.get('pass'):
+            params['pass'] = config['pass']
+        return params
 
     @cached('anidb_list', persist='2 hours')
     def on_task_input(self, task, config):
         # Create entries by parsing AniDB wishlist page html using beautifulsoup
         log.verbose('Retrieving AniDB list: mywishlist:%s', config['mode'])
-        comp_link = self.__build_url(config)
-        log.debug('Requesting: %s', comp_link)
 
         task_headers = task.requests.headers.copy()
         task_headers['User-Agent'] = self.default_user_agent
 
         try:
-            page = task.requests.get(comp_link, headers=task_headers)
+            page = task.requests.get(
+                self.anidb_url + 'animedb.pl',
+                params=self._build_url_params(config),
+                headers=task_headers,
+            )
         except RequestException as e:
             raise plugin.PluginError(str(e))
         if page.status_code != 200:
