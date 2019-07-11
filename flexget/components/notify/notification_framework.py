@@ -49,32 +49,37 @@ NOTIFY_VIA_SCHEMA = {
 }
 
 
-def render_config(config, template_renderer, _path=''):
+def render_config(config, template_renderer, notifier_name, _path=''):
     """
     Recurse through config data structures attempting to render any string fields against a given context.
 
     :param config: Any simple data structure as retrieved from the FlexGet config.
     :param template_renderer: A function that should take a string or Template argument, and return the result of
         rendering it with the appropriate context.
-    :raises: If an error is raised, it will have the additional `config_path` property to indicate where in the config
-        the error occurred, in JSON pointer notation.
+    :param notifier_name: This is used in log messages to let user know which notifier had a problem
+        when there are rendering errors.
     """
     if isinstance(config, (str, Template)):
         try:
             return template_renderer(config)
         except Exception as e:
-            e.config_path = _path
-            raise
+            log.error('Error rendering %s plugin config field `%s`: %s', notifier_name, config, e)
+            log.debug('%s notifier config location of error: %s', notifier_name, _path)
+            return config
     elif isinstance(config, list):
         if _path:
             _path += '/'
         return [
-            render_config(v, template_renderer, _path=_path + str(i)) for i, v in enumerate(config)
+            render_config(v, template_renderer, notifier_name, _path=_path + str(i))
+            for i, v in enumerate(config)
         ]
     elif isinstance(config, dict):
         if _path:
             _path += '/'
-        return {k: render_config(v, template_renderer, _path=_path + k) for k, v in config.items()}
+        return {
+            k: render_config(v, template_renderer, notifier_name, _path=_path + k)
+            for k, v in config.items()
+        }
     else:
         return config
 
@@ -109,15 +114,9 @@ class NotificationFramework(object):
 
                 # If a template renderer is specified, try to render all the notifier config values
                 if template_renderer:
-                    try:
-                        rendered_config = render_config(notifier_config, template_renderer)
-                    except RenderError as e:
-                        log.error(
-                            'Error rendering %s plugin config field %s: %s',
-                            notifier_name,
-                            e.config_path,
-                            e,
-                        )
+                    rendered_config = render_config(
+                        notifier_config, template_renderer, notifier_name
+                    )
 
                 log.debug('Sending a notification to `%s`', notifier_name)
                 try:
