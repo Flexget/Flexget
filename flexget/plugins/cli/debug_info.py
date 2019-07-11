@@ -1,8 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-import pathlib
 import sys
+
+from path import Path
 
 import flexget
 from flexget import options
@@ -12,7 +13,7 @@ from flexget.utils.tools import io_encoding
 
 
 def print_debug_info(manager, options):
-    install_location = pathlib.Path(__file__).absolute().parent.parent.parent
+    install_location = Path(__file__).abspath().parent.parent.parent
     console('FlexGet Version: {}'.format(flexget.__version__))
     console('Install location: {}'.format(install_location))
     console('Config location: {}'.format(manager.config_path))
