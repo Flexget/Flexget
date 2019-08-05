@@ -1,8 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import copy
-import hashlib
 import itertools
 import logging
 import threading
@@ -19,10 +18,19 @@ from flexget.logger import capture_output
 from flexget.manager import Session
 from flexget.plugin import plugins as all_plugins
 from flexget.plugin import (
-    DependencyError, get_plugins, phase_methods, plugin_schemas, PluginError, PluginWarning, task_phases)
+    DependencyError,
+    get_plugins,
+    phase_methods,
+    plugin_schemas,
+    PluginError,
+    PluginWarning,
+    task_phases,
+)
 from flexget.utils import requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimpleTaskPersistence
+from flexget.utils.tools import get_config_hash, MergeException, merge_dict_from_to
+from flexget.utils.template import render_from_task, FlexGetTemplate
 
 log = logging.getLogger('task')
 Base = db_schema.versioned_base('feed', 0)
@@ -47,6 +55,8 @@ def config_changed(task=None, session=None):
     Forces config_modified flag to come out true on next run of `task`. Used when the db changes, and all
     entries need to be reprocessed.
 
+    .. WARNING: DO NOT (FURTHER) USE FROM PLUGINS
+
     :param task: Name of the task. If `None`, will be set for all tasks.
     """
     log.debug('Marking config for %s as changed.' % (task or 'all tasks'))
@@ -57,11 +67,11 @@ def config_changed(task=None, session=None):
 
 
 def use_task_logging(func):
-
     @wraps(func)
     def wrapper(self, *args, **kw):
         # Set the task name in the logger and capture output
         from flexget import logger
+
         with logger.task_logging(self.name):
             if self.output:
                 with capture_output(self.output, loglevel=self.loglevel):
@@ -148,7 +158,6 @@ class TaskAbort(Exception):
 
 @total_ordering
 class Task(object):
-
     """
     Represents one task in the configuration.
 
@@ -179,11 +188,23 @@ class Task(object):
 
     """
 
-    max_reruns = 5
     # Used to determine task order, when priority is the same
     _counter = itertools.count()
 
-    def __init__(self, manager, name, config=None, options=None, output=None, loglevel=None, priority=None):
+    RERUN_DEFAULT = 5
+    RERUN_MAX = 100
+
+    def __init__(
+        self,
+        manager,
+        name,
+        config=None,
+        options=None,
+        output=None,
+        loglevel=None,
+        priority=None,
+        suppress_warnings=None,
+    ):
         """
         :param Manager manager: Manager instance.
         :param string name: Name of the task.
@@ -193,6 +214,7 @@ class Task(object):
         :param loglevel: Custom loglevel, only log messages at this level will be sent to `output`
         :param priority: If multiple tasks are waiting to run, the task with the lowest priority will be run first.
             The default is 0, if the cron option is set though, the default is lowered to 10.
+        :param suppress_warnings: Allows suppressing log warning about missing plugin in key phases
 
         """
         self.name = str(name)
@@ -208,9 +230,13 @@ class Task(object):
             options_namespace = copy.copy(self.manager.options.execute)
             options_namespace.__dict__.update(options)
             options = options_namespace
+        # If execution hasn't specifically set the `allow_manual` flag, set it to False by default
+        if not hasattr(options, 'allow_manual'):
+            setattr(options, 'allow_manual', False)
         self.options = options
         self.output = output
         self.loglevel = loglevel
+        self.suppress_warnings = suppress_warnings or []
         if priority is None:
             self.priority = 10 if self.options.cron else 0
         else:
@@ -222,8 +248,10 @@ class Task(object):
         # simple persistence
         self.simple_persistence = SimpleTaskPersistence(self)
 
-        # not to be reset
+        # rerun related flags and values
         self._rerun_count = 0
+        self._max_reruns = Task.RERUN_DEFAULT
+        self._reruns_locked = False
 
         self.config_modified = None
 
@@ -249,9 +277,56 @@ class Task(object):
         self.current_plugin = None
 
     @property
+    def max_reruns(self):
+        """How many times task can be rerunned before stopping"""
+        return self._max_reruns
+
+    @max_reruns.setter
+    def max_reruns(self, value):
+        """Set new maximum value for reruns unless property has been locked"""
+        if not self._reruns_locked:
+            self._max_reruns = value
+        else:
+            log.debug('max_reruns is locked, %s tried to modify it', self.current_plugin)
+
+    def lock_reruns(self):
+        """Prevent modification of max_reruns property"""
+        log.debug('Enabling rerun lock')
+        self._reruns_locked = True
+
+    def unlock_reruns(self):
+        """Allow modification of max_reruns property"""
+        log.debug('Releasing rerun lock')
+        self._reruns_locked = False
+
+    @property
+    def reruns_locked(self):
+        return self._reruns_locked
+
+    @property
+    def is_rerun(self):
+        return bool(self._rerun_count)
+
+    @property
+    def rerun_count(self):
+        return self._rerun_count
+
+    @property
     def undecided(self):
         """
         .. deprecated:: Use API v3
+
+        .. note:: We did not migrate to v3
+
+            If I remember correctly the idea was to make v3 signature
+            on_task_xxx(task, config, entries)
+
+            Param entries would be EntryContainer, which has convenience
+            iterator methods:
+
+            - entries.accepted
+            - entries.failed
+            - etc, which you see here
         """
         return self.all_entries.undecided
 
@@ -290,10 +365,6 @@ class Task(object):
         """
         return self._all_entries
 
-    @property
-    def is_rerun(self):
-        return self._rerun_count
-
     def __lt__(self, other):
         return (self.priority, self._count) < (other.priority, other._count)
 
@@ -306,9 +377,6 @@ class Task(object):
     def disable_phase(self, phase):
         """Disable ``phase`` from execution.
 
-        All disabled phases are re-enabled by :meth:`Task._reset()` after task
-        execution has been completed.
-
         :param string phase: Name of ``phase``
         :raises ValueError: *phase* could not be found.
         """
@@ -318,11 +386,12 @@ class Task(object):
             log.debug('Disabling %s phase' % phase)
             self.disabled_phases.append(phase)
 
-    def abort(self, reason='Unknown', silent=False):
+    def abort(self, reason='Unknown', silent=False, traceback=None):
         """Abort this task execution, no more plugins will be executed except the abort handling ones."""
         self.aborted = True
         self.abort_reason = reason
         self.silent_abort = silent
+        self.traceback = traceback
         if not self.silent_abort:
             log.warning('Aborting task (plugin: %s)' % self.current_plugin)
         else:
@@ -357,7 +426,9 @@ class Task(object):
           An iterator over configured :class:`flexget.plugin.PluginInfo` instances enabled on this task.
         """
         if phase:
-            plugins = sorted(get_plugins(phase=phase), key=lambda p: p.phase_handlers[phase], reverse=True)
+            plugins = sorted(
+                get_plugins(phase=phase), key=lambda p: p.phase_handlers[phase], reverse=True
+            )
         else:
             plugins = iter(all_plugins.values())
         return (p for p in plugins if p.name in self.config or p.builtin)
@@ -382,11 +453,17 @@ class Task(object):
                     if not p.builtin:
                         break
                 else:
-                    if phase == 'filter':
-                        log.warning('Task does not have any filter plugins to accept entries. '
-                                    'You need at least one to accept the entries you  want.')
-                    else:
-                        log.warning('Task doesn\'t have any %s plugins, you should add (at least) one!' % phase)
+                    if phase not in self.suppress_warnings:
+                        if phase == 'filter':
+                            log.warning(
+                                'Task does not have any filter plugins to accept entries. '
+                                'You need at least one to accept the entries you  want.'
+                            )
+                        else:
+                            log.warning(
+                                'Task doesn\'t have any %s plugins, you should add (at least) one!'
+                                % phase
+                            )
 
         for plugin in self.plugins(phase):
             # Abort this phase if one of the plugins disables it
@@ -414,10 +491,13 @@ class Task(object):
                         # add entries returned by input to self.all_entries
                         for e in response:
                             e.task = self
-                        self.all_entries.extend(response)
+                            self.all_entries.append(e)
                 finally:
                     fire_event('task.execute.after_plugin', self, plugin.name)
                 self.session = None
+        # check config hash for changes at the end of 'prepare' phase
+        if phase == 'prepare':
+            self.check_config_hash()
 
     def __run_plugin(self, plugin, phase, args=None, kwargs=None):
         """
@@ -446,22 +526,27 @@ class Task(object):
             # check if this warning should be logged only once (may keep repeating)
             if warn.kwargs.get('log_once', False):
                 from flexget.utils.log import log_once
+
                 log_once(warn.value, warn.log)
             else:
                 warn.log.warning(warn)
         except EntryUnicodeError as eue:
-            msg = ('Plugin %s tried to create non-unicode compatible entry (key: %s, value: %r)' %
-                   (keyword, eue.key, eue.value))
+            msg = 'Plugin %s tried to create non-unicode compatible entry (key: %s, value: %r)' % (
+                keyword,
+                eue.key,
+                eue.value,
+            )
             log.critical(msg)
             self.abort(msg)
         except PluginError as err:
             err.log.critical(err.value)
             self.abort(err.value)
         except DependencyError as e:
-            msg = ('Plugin `%s` cannot be used because dependency `%s` is missing.' %
-                   (keyword, e.missing))
-            log.critical(msg)
-            log.debug(e.message)
+            msg = 'Plugin `%s` cannot be used because dependency `%s` is missing.' % (
+                keyword,
+                e.missing,
+            )
+            log.critical(e.message)
             self.abort(msg)
         except Warning as e:
             # If warnings have been elevated to errors
@@ -471,15 +556,27 @@ class Task(object):
         except Exception as e:
             msg = 'BUG: Unhandled error in plugin %s: %s' % (keyword, e)
             log.critical(msg)
-            self.manager.crash_report()
-            self.abort(msg)
+            traceback = self.manager.crash_report()
+            self.abort(msg, traceback=traceback)
 
-    def rerun(self):
-        """Immediately re-run the task after execute has completed,
-        task can be re-run up to :attr:`.max_reruns` times."""
-        msg = 'Plugin %s has requested task to be ran again after execution has completed.' % self.current_plugin
+    def rerun(self, plugin=None, reason=None):
+        """
+        Immediately re-run the task after execute has completed,
+        task can be re-run up to :attr:`.max_reruns` times.
+
+        :param str plugin: Plugin name
+        :param str reason: Why the rerun is done
+        """
+        msg = 'Plugin {0} has requested task to be ran again after execution has completed.'.format(
+            self.current_plugin if plugin is None else plugin
+        )
+        if reason:
+            msg += ' Reason: {0}'.format(reason)
         # Only print the first request for a rerun to the info log
-        log.debug(msg) if self._rerun else log.info(msg)
+        if self._rerun:
+            log.debug(msg)
+        else:
+            log.info(msg)
         self._rerun = True
 
     def config_changed(self):
@@ -488,6 +585,35 @@ class Task(object):
         Used when the db changes, and all entries need to be reprocessed.
         """
         self.config_modified = True
+
+    def merge_config(self, new_config):
+        try:
+            merge_dict_from_to(new_config, self.config)
+        except MergeException as e:
+            raise PluginError('Failed to merge configs for task %s: %s' % (self.name, e))
+
+    def check_config_hash(self):
+        """
+        Checks the task's config hash and updates the hash if necessary.
+        """
+        # Save current config hash and set config_modified flag
+        config_hash = get_config_hash(self.config)
+        if self.is_rerun:
+            # Restore the config to state right after start phase
+            if self.prepared_config:
+                self.config = copy.deepcopy(self.prepared_config)
+            else:
+                log.error('BUG: No prepared_config on rerun, please report.')
+        with Session() as session:
+            last_hash = (
+                session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
+            )
+            if not last_hash:
+                session.add(TaskConfigHash(task=self.name, hash=config_hash))
+                self.config_changed()
+            elif last_hash.hash != config_hash:
+                last_hash.hash = config_hash
+                self.config_changed()
 
     def _execute(self):
         """Executes the task without rerunning."""
@@ -507,41 +633,25 @@ class Task(object):
         if self.options.inject:
             # If entries are passed for this execution (eg. rerun), disable the input phase
             self.disable_phase('input')
-            self.all_entries.extend(self.options.inject)
-
-        # Save current config hash and set config_modidied flag
-        with Session() as session:
-            config_hash = hashlib.md5(str(sorted(self.config.items())).encode('utf-8')).hexdigest()
-            last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
-            if self.is_rerun:
-                # Restore the config to state right after start phase
-                if self.prepared_config:
-                    self.config = copy.deepcopy(self.prepared_config)
-                else:
-                    log.error('BUG: No prepared_config on rerun, please report.')
-                self.config_modified = False
-            elif not last_hash:
-                self.config_modified = True
-                last_hash = TaskConfigHash(task=self.name, hash=config_hash)
-                session.add(last_hash)
-            elif last_hash.hash != config_hash:
-                self.config_modified = True
-                last_hash.hash = config_hash
-            else:
-                self.config_modified = False
+            self.all_entries.extend(copy.deepcopy(self.options.inject))
 
         # run phases
         try:
             for phase in task_phases:
                 if phase in self.disabled_phases:
                     # log keywords not executed
-                    for plugin in self.plugins(phase):
-                        if plugin.name in self.config:
-                            log.info('Plugin %s is not executed because %s phase is disabled (e.g. --test)' %
-                                     (plugin.name, phase))
+                    if phase not in self.suppress_warnings:
+                        for plugin in self.plugins(phase):
+                            if plugin.name in self.config:
+                                log.info(
+                                    'Plugin %s is not executed in %s phase because the phase is disabled '
+                                    '(e.g. --test, --inject)',
+                                    plugin.name,
+                                    phase,
+                                )
                     continue
-                if phase == 'start' and self.is_rerun:
-                    log.debug('skipping task_start during rerun')
+                if phase in ('start', 'prepare') and self.is_rerun:
+                    log.debug('skipping phase %s during rerun', phase)
                 elif phase == 'exit' and self._rerun and self._rerun_count < self.max_reruns:
                     log.debug('not running task_exit yet because task will rerun')
                 else:
@@ -582,7 +692,11 @@ class Task(object):
             while True:
                 self._execute()
                 # rerun task
-                if self._rerun and self._rerun_count < self.max_reruns:
+                if (
+                    self._rerun
+                    and self._rerun_count < self.max_reruns
+                    and self._rerun_count < Task.RERUN_MAX
+                ):
                     log.info('Rerunning the task in case better resolution can be achieved.')
                     self._rerun_count += 1
                     # TODO: Potential optimization is to take snapshots (maybe make the ones backlog uses built in
@@ -591,7 +705,10 @@ class Task(object):
                     self._rerun = False
                     continue
                 elif self._rerun:
-                    log.info('Task has been re-run %s times already, stopping for now' % self._rerun_count)
+                    log.info(
+                        'Task has been re-run %s times already, stopping for now'
+                        % self._rerun_count
+                    )
                 break
             fire_event('task.execute.completed', self)
         finally:
@@ -599,7 +716,7 @@ class Task(object):
 
     @staticmethod
     def validate_config(config):
-        schema = plugin_schemas(context='task')
+        schema = plugin_schemas(interface='task')
         # Don't validate commented out plugins
         schema['patternProperties'] = {'^_': {}}
         return config_schema.process_config(config, schema)
@@ -615,12 +732,29 @@ class Task(object):
 
     copy = __copy__
 
+    def render(self, template):
+        """
+        Renders a template string based on fields in the entry.
+
+        :param template: A template string or FlexGetTemplate that uses jinja2 or python string replacement format.
+        :return: The result of the rendering.
+        :rtype: string
+        :raises RenderError: If there is a problem.
+        """
+        if not isinstance(template, (str, FlexGetTemplate)):
+            raise ValueError(
+                'Trying to render non string template or unrecognized template format, got %s'
+                % repr(template)
+            )
+        log.trace('rendering: %s', template)
+        return render_from_task(template, self)
+
 
 @event('config.register')
 def register_config_key():
     task_config_schema = {
         'type': 'object',
-        'additionalProperties': plugin_schemas(context='task')
+        'additionalProperties': plugin_schemas(interface='task'),
     }
 
     config_schema.register_config_key('tasks', task_config_schema, required=True)

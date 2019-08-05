@@ -1,0 +1,6 @@
+<div layout="column" flex>
+    <md-content>
+		<seen-entry ng-repeat="entry in vm.entries" entry="entry" delete-entry="vm.deleteEntry(entry)"></seen-entry>
+    </md-content>
+    <fg-pagination load-data="vm.getSeen(page)" link-header="vm.linkHeader" current-page="vm.currentPage"></fg-pagination>
+</div>

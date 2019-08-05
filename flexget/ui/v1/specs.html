@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+  <title>Spec Runner</title>
+
+  <style>
+    body {
+      font: 20px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      padding-left: 20px;
+    }
+  </style>
+
+  <!--BEWARE of using any app styles as @media can screw up tests -->
+
+  <link rel="stylesheet" href="/node_modules/mocha/mocha.css">
+
+</head>
+
+<body>
+
+  <h1><a href="specs.html">Spec Runner</a></h1>
+  <p><strong>Make sure the REMOTE server is running</strong>
+    <br/> Click on a <em>description title</em> to narrow the scope to just its specs (see "<a href="http://mochajs.github.io/mocha/#grep-option"
+    target="_blank" title="MochaJS grep option">
+        ?grep</a>" in address bar).
+    <br/> Click on a <em>spec title</em> to see the test implementation.
+    <br/> Click on <em>page title</em> to start over.
+  </p>
+
+  <div id="mocha"></div>
+
+  <!-- inject:testlibraries:js -->
+  <script src="/node_modules/mocha/mocha.js"></script>
+  <script src="/node_modules/chai/chai.js"></script>
+  <script src="/node_modules/sinon-chai/lib/sinon-chai.js"></script>
+  <script src="/node_modules/sinon/lib/sinon.js"></script>
+  <!-- endinject -->
+
+  <script>
+    expect = chai.expect;
+        AssertionError = chai.AssertionError;
+        mocha.setup('bdd');
+        mocha.traceIgnores = ['mocha.js', 'chai.js', 'angular.js'];
+  </script>
+
+  <!-- bower:js -->
+  <script src="bower_components/jquery/dist/jquery.js"></script>
+  <script src="bower_components/angular/angular.js"></script>
+  <script src="bower_components/angular-animate/angular-animate.js"></script>
+  <script src="bower_components/angular-aria/angular-aria.js"></script>
+  <script src="bower_components/angular-messages/angular-messages.js"></script>
+  <script src="bower_components/angular-material/angular-material.js"></script>
+  <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+  <script src="bower_components/angular-filter/dist/angular-filter.min.js"></script>
+  <script src="bower_components/tv4/tv4.js"></script>
+  <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+  <script src="bower_components/objectpath/lib/ObjectPath.js"></script>
+  <script src="bower_components/angular-schema-form/dist/schema-form.js"></script>
+  <script src="bower_components/angular-schema-form/dist/bootstrap-decorator.js"></script>
+  <script src="bower_components/angular-ui-grid/ui-grid.js"></script>
+  <script src="bower_components/bootstrap-sass/assets/javascripts/bootstrap.js"></script>
+  <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+  <script src="bower_components/please-wait/build/please-wait.js"></script>
+  <script src="bower_components/oboe/dist/oboe-browser.js"></script>
+  <script src="bower_components/angular-spinkit/build/angular-spinkit.js"></script>
+  <script src="bower_components/angular-loading-bar/build/loading-bar.js"></script>
+  <script src="bower_components/ui-grid-auto-scroll/js/auto-scroll.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/ace.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/ext-themelist.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/ext-searchbox.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/mode-yaml.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-ambiance.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-chaos.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-chrome.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-clouds_midnight.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-clouds.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-cobalt.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-crimson_editor.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-dawn.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-dreamweaver.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-eclipse.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-github.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-idle_fingers.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-iplastic.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-katzenmilch.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-kr_theme.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-kuroir.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-merbivore_soft.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-merbivore.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-mono_industrial.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-monokai.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-pastel_on_dark.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-solarized_dark.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-solarized_light.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-sqlserver.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-terminal.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-textmate.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-tomorrow_night_blue.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-tomorrow_night_bright.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-tomorrow_night_eighties.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-tomorrow_night.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-tomorrow.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-twilight.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-vibrant_ink.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-xcode.js"></script>
+  <script src="bower_components/angular-ui-ace/ui-ace.js"></script>
+  <script src="bower_components/angular-utf8-base64/angular-utf8-base64.js"></script>
+  <script src="bower_components/angular-cache/dist/angular-cache.js"></script>
+  <script src="bower_components/clipboard/dist/clipboard.js"></script>
+  <script src="bower_components/ngclipboard/dist/ngclipboard.js"></script>
+  <script src="bower_components/angular-http-etag/release/angular-http-etag.js"></script>
+  <script src="bower_components/angular-mocks/angular-mocks.js"></script>
+  <script src="bower_components/sinon/index.js"></script>
+  <script src="bower_components/bardjs/dist/bard.js"></script>
+  <script src="bower_components/bardjs/dist/bard-ngRouteTester.js"></script>
+  <!-- endbower -->
+
+  <!-- inject:spechelpers:js -->
+  <script src="/tests-mock-data/config.js"></script>
+  <script src="/tests-mock-data/execute.js"></script>
+  <script src="/tests-mock-data/history.js"></script>
+  <script src="/tests-mock-data/movie_list.js"></script>
+  <script src="/tests-mock-data/registerPlugin.js"></script>
+  <script src="/tests-mock-data/schedules.js"></script>
+  <script src="/tests-mock-data/seen.js"></script>
+  <script src="/tests-mock-data/series.js"></script>
+  <script src="/tests-mock-data/states.js"></script>
+  <!-- endinject -->
+
+  <script src="/src/app.utils.js"></script>
+  <!-- inject:js -->
+  <script src="/src/plugins/series/series.module.js"></script>
+  <script src="/src/plugins/series/components/series-episodes/series-episodes.component.js"></script>
+  <script src="/src/plugins/series/components/series-episode/series-episode.component.js"></script>
+  <script src="/src/plugins/series/components/series-begin-dialog/series-begin-dialog.component.js"></script>
+  <script src="/src/plugins/series/components/series-entry/series-entry.component.js"></script>
+  <script src="/src/plugins/series/components/episode-releases/episode-releases.component.js"></script>
+  <script src="/src/plugins/series/components/episode-release/episode-release.component.js"></script>
+  <script src="/src/plugins/seen/components/seen-field/seen-field.component.js"></script>
+  <script src="/src/plugins/movies/movies.module.js"></script>
+  <script src="/src/plugins/movies/components/movie-list/movie-list.component.js"></script>
+  <script src="/src/plugins/seen/seen.module.js"></script>
+  <script src="/src/plugins/seen/components/seen-entry/seen-entry.component.js"></script>
+  <script src="/src/plugins/movies/components/new-list/new-list.component.js"></script>
+  <script src="/src/plugins/movies/components/movie-entry/movie-entry.component.js"></script>
+  <script src="/src/plugins/movies/components/add-movie/add-movie.service.js"></script>
+  <script src="/src/plugins/movies/components/add-movie/add-movie.controller.js"></script>
+  <script src="/src/plugins/movies/components/add-movie/add-movie-item.component.js"></script>
+  <script src="/src/plugins/execute/execute.module.js"></script>
+  <script src="/src/plugins/execute/components/execute-input/execute-input.component.js"></script>
+  <script src="/src/plugins/execute/components/execute-stream/execute-stream.component.js"></script>
+  <script src="/src/plugins/server/server.module.js"></script>
+  <script src="/src/plugins/server/server.service.js"></script>
+  <script src="/src/plugins/server/server.config.js"></script>
+  <script src="/src/plugins/server/loading-dialog.component.js"></script>
+  <script src="/src/plugins/series/series.service.js"></script>
+  <script src="/src/plugins/series/series.route.js"></script>
+  <script src="/src/plugins/series/series.component.js"></script>
+  <script src="/src/plugins/seen/seen.service.js"></script>
+  <script src="/src/plugins/seen/seen.route.js"></script>
+  <script src="/src/plugins/seen/seen.component.js"></script>
+  <script src="/src/plugins/schedule/schedule.module.js"></script>
+  <script src="/src/plugins/schedule/schedule.service.js"></script>
+  <script src="/src/plugins/schedule/schedule.route.js"></script>
+  <script src="/src/plugins/schedule/schedule.component.js"></script>
+  <script src="/src/plugins/movies/movies.service.js"></script>
+  <script src="/src/plugins/movies/movies.route.js"></script>
+  <script src="/src/plugins/movies/movies.component.js"></script>
+  <script src="/src/plugins/log/log.module.js"></script>
+  <script src="/src/plugins/log/log.service.js"></script>
+  <script src="/src/plugins/log/log.route.js"></script>
+  <script src="/src/plugins/log/log.component.js"></script>
+  <script src="/src/plugins/history/history.module.js"></script>
+  <script src="/src/plugins/history/history.service.js"></script>
+  <script src="/src/plugins/history/history.route.js"></script>
+  <script src="/src/plugins/history/history.component.js"></script>
+  <script src="/src/plugins/config/config.module.js"></script>
+  <script src="/src/plugins/config/config.service.js"></script>
+  <script src="/src/plugins/config/config.route.js"></script>
+  <script src="/src/plugins/config/config.component.js"></script>
+  <script src="/src/plugins/execute/execute.service.js"></script>
+  <script src="/src/plugins/execute/execute.route.js"></script>
+  <script src="/src/plugins/execute/execute.filter.js"></script>
+  <script src="/src/plugins/execute/execute.component.js"></script>
+  <script src="/src/directives/directives.module.js"></script>
+  <script src="/src/directives/palette-background/palette-background.directive.js"></script>
+  <script src="/src/directives/material-pagination/material-pagination.directive.js"></script>
+  <script src="/src/components/user/user.module.js"></script>
+  <script src="/src/components/toolbar/toolbar.module.js"></script>
+  <script src="/src/components/toolbar/toolbar.provider.js"></script>
+  <script src="/src/components/toolbar/toolbar.config.js"></script>
+  <script src="/src/components/toolbar/toolbar.component.js"></script>
+  <script src="/src/components/sidenav/sidenav.module.js"></script>
+  <script src="/src/components/sidenav/sidenav.service.js"></script>
+  <script src="/src/components/sidenav/sidenav.semver.js"></script>
+  <script src="/src/components/sidenav/sidenav.component.js"></script>
+  <script src="/src/components/home/home.module.js"></script>
+  <script src="/src/components/home/home.route.js"></script>
+  <script src="/src/components/home/home.component.js"></script>
+  <script src="/src/components/core/core.module.js"></script>
+  <script src="/src/components/core/core.route.js"></script>
+  <script src="/src/components/core/core.provider.js"></script>
+  <script src="/src/components/core/core.config.js"></script>
+  <script src="/src/components/auth/auth.module.js"></script>
+  <script src="/src/components/auth/login.route.js"></script>
+  <script src="/src/components/auth/login.component.js"></script>
+  <script src="/src/components/auth/auth.service.js"></script>
+  <script src="/src/components/auth/auth.config.js"></script>
+  <script src="/src/components/404/404.module.js"></script>
+  <script src="/src/components/404/404.route.js"></script>
+  <script src="/src/components/404/404.component.js"></script>
+  <script src="/src/blocks/url-interceptor/url-interceptor.module.js"></script>
+  <script src="/src/blocks/url-interceptor/url-interceptor.service.js"></script>
+  <script src="/src/blocks/url-interceptor/url-interceptor.config.js"></script>
+  <script src="/src/blocks/router/router-helper.module.js"></script>
+  <script src="/src/blocks/router/router-helper.provider.js"></script>
+  <script src="/src/blocks/exception/exception.module.js"></script>
+  <script src="/src/blocks/exception/exception.service.js"></script>
+  <script src="/src/blocks/error/error.module.js"></script>
+  <script src="/src/blocks/error/error.service.js"></script>
+  <script src="/src/blocks/error/error-dialog.component.js"></script>
+  <script src="/src/services/schema.service.js"></script>
+  <script src="/src/plugins/plugins.module.js"></script>
+  <script src="/src/components/components.module.js"></script>
+  <!-- endinject -->
+
+  <!-- inject:specs:js -->
+  <script src="/src/blocks/error/error-dialog.component.spec.js"></script>
+  <script src="/src/blocks/error/error.service.spec.js"></script>
+  <script src="/src/blocks/exception/exception.service.spec.js"></script>
+  <script src="/src/blocks/router/router-helper.provider.spec.js"></script>
+  <script src="/src/blocks/url-interceptor/url-interceptor.service.spec.js"></script>
+  <script src="/src/components/404/404.component.spec.js"></script>
+  <script src="/src/components/404/404.route.spec.js"></script>
+  <script src="/src/components/auth/auth.config.spec.js"></script>
+  <script src="/src/components/auth/auth.service.spec.js"></script>
+  <script src="/src/components/auth/login.component.spec.js"></script>
+  <script src="/src/components/auth/login.route.spec.js"></script>
+  <script src="/src/components/core/core.route.spec.js"></script>
+  <script src="/src/components/home/home.component.spec.js"></script>
+  <script src="/src/components/home/home.route.spec.js"></script>
+  <script src="/src/components/sidenav/sidenav.component.spec.js"></script>
+  <script src="/src/components/sidenav/sidenav.service.spec.js"></script>
+  <script src="/src/components/toolbar/toolbar.component.spec.js"></script>
+  <script src="/src/plugins/execute/execute.component.spec.js"></script>
+  <script src="/src/plugins/execute/execute.filter.spec.js"></script>
+  <script src="/src/plugins/execute/execute.route.spec.js"></script>
+  <script src="/src/plugins/execute/execute.service.spec.js"></script>
+  <script src="/src/plugins/config/config.component.spec.js"></script>
+  <script src="/src/plugins/config/config.route.spec.js"></script>
+  <script src="/src/plugins/history/history.component.spec.js"></script>
+  <script src="/src/plugins/history/history.route.spec.js"></script>
+  <script src="/src/plugins/history/history.service.spec.js"></script>
+  <script src="/src/plugins/log/log.component.spec.js"></script>
+  <script src="/src/plugins/log/log.route.spec.js"></script>
+  <script src="/src/plugins/movies/movies.component.spec.js"></script>
+  <script src="/src/plugins/movies/movies.route.spec.js"></script>
+  <script src="/src/plugins/movies/movies.service.spec.js"></script>
+  <script src="/src/plugins/schedule/schedule.component.spec.js"></script>
+  <script src="/src/plugins/schedule/schedule.route.spec.js"></script>
+  <script src="/src/plugins/schedule/schedule.service.spec.js"></script>
+  <script src="/src/plugins/seen/seen.component.spec.js"></script>
+  <script src="/src/plugins/seen/seen.route.spec.js"></script>
+  <script src="/src/plugins/seen/seen.service.spec.js"></script>
+  <script src="/src/plugins/series/series.component.spec.js"></script>
+  <script src="/src/plugins/series/series.route.spec.js"></script>
+  <script src="/src/plugins/series/series.service.spec.js"></script>
+  <script src="/src/plugins/execute/components/execute-stream/execute-stream.component.spec.js"></script>
+  <script src="/src/plugins/execute/components/execute-input/execute-input.component.spec.js"></script>
+  <script src="/src/plugins/movies/components/movie-entry/movie-entry.component.spec.js"></script>
+  <script src="/src/plugins/movies/components/new-list/new-list.component.spec.js"></script>
+  <script src="/src/plugins/seen/components/seen-entry/seen-entry.component.spec.js"></script>
+  <script src="/src/plugins/movies/components/movie-list/movie-list.component.spec.js"></script>
+  <script src="/src/plugins/series/components/episode-release/episode-release.component.spec.js"></script>
+  <script src="/src/plugins/series/components/episode-releases/episode-releases.component.spec.js"></script>
+  <script src="/src/plugins/series/components/series-entry/series-entry.component.spec.js"></script>
+  <script src="/src/plugins/series/components/series-episode/series-episode.component.spec.js"></script>
+  <script src="/src/plugins/series/components/series-episodes/series-episodes.component.spec.js"></script>
+  <!-- endinject -->
+
+  <script>
+    mocha.run();
+  </script>
+
+</body>
+
+</html>

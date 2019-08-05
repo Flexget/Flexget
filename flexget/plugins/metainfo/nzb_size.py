@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import mimetypes
@@ -14,7 +14,6 @@ mimetypes.add_type('application/x-nzb', '.nzb')
 
 
 class NzbSize(object):
-
     """
     Provides entry size information when dealing with nzb files
     """
@@ -32,12 +31,17 @@ class NzbSize(object):
             raise plugin.DependencyError(issued_by='nzb_size', missing='lib pynzb')
 
         for entry in task.accepted:
-            if entry.get('mime-type', None) in [u'text/nzb', u'application/x-nzb'] or \
-                    entry.get('filename', '').endswith('.nzb'):
+            if (
+                entry.get('mime-type') in ['text/nzb', 'application/x-nzb']
+                or entry.get('filename')
+                and entry['filename'].endswith('.nzb')
+            ):
 
                 if 'file' not in entry:
-                    log.warning('`%s` does not have a `file` that could be used to get size information' %
-                                entry['title'])
+                    log.warning(
+                        '`%s` does not have a `file` that could be used to get size information'
+                        % entry['title']
+                    )
                     continue
 
                 filename = entry['file']
@@ -46,7 +50,7 @@ class NzbSize(object):
 
                 try:
                     nzbfiles = nzb_parser.parse(xmldata)
-                except:
+                except Exception:
                     log.debug('%s is not a valid nzb' % entry['title'])
                     continue
 

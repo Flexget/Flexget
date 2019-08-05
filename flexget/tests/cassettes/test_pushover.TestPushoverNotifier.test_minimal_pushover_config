@@ -1,0 +1,66 @@
+interactions:
+- request:
+    body: !!python/unicode user=ua2g3vqjyvqpkyntx19zeruqrn3eim&token=aPwSHwkLcNaavShxktBpgJH4bRWc3m&message=test&title=test
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['96']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [!!python/unicode FlexGet/2.6.4.dev (www.flexget.com)]
+    method: POST
+    uri: https://api.pushover.net/1/messages.json
+  response:
+    body: {string: !!python/unicode '{"status":1,"request":"1391817ec3448171405da9eec16389d5"}'}
+    headers:
+      access-control-allow-headers: ['X-Requested-With, X-Prototype-Version, Origin,
+          Accept, Content-Type, X-CSRF-Token, X-Pushover-App']
+      access-control-allow-methods: ['POST, OPTIONS']
+      access-control-allow-origin: ['*']
+      access-control-max-age: ['1728000']
+      cache-control: ['max-age=0, private, must-revalidate']
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Mon, 28 Nov 2016 12:32:32 GMT']
+      etag: ['"e0e89d4db9ddafd8fbd79e335c68f638"']
+      strict-transport-security: [max-age=31536000]
+      x-frame-options: [DENY]
+      x-limit-app-limit: ['7500']
+      x-limit-app-remaining: ['7341']
+      x-limit-app-reset: ['1480572000']
+      x-request-id: [1391817ec3448171405da9eec16389d5]
+      x-runtime: ['0.025245']
+      x-ua-compatible: ['IE=Edge,chrome=1']
+    status: {code: 200, message: OK}
+- request:
+    body: !!python/unicode user=crash&token=aPwSHwkLcNaavShxktBpgJH4bRWc3m&message=test&title=test
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['71']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [!!python/unicode FlexGet/2.6.4.dev (www.flexget.com)]
+    method: POST
+    uri: https://api.pushover.net/1/messages.json
+  response:
+    body: {string: !!python/unicode '{"user":"invalid","errors":["user identifier
+        is not a valid user, group, or subscribed user key"],"status":0,"request":"afc66eadb23e66a70209ddc932b3045e"}'}
+    headers:
+      access-control-allow-headers: ['X-Requested-With, X-Prototype-Version, Origin,
+          Accept, Content-Type, X-CSRF-Token, X-Pushover-App']
+      access-control-allow-methods: ['POST, OPTIONS']
+      access-control-allow-origin: ['*']
+      access-control-max-age: ['1728000']
+      cache-control: [no-cache]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Mon, 28 Nov 2016 12:32:37 GMT']
+      x-limit-app-limit: ['7500']
+      x-limit-app-remaining: ['7341']
+      x-limit-app-reset: ['1480572000']
+      x-request-id: [afc66eadb23e66a70209ddc932b3045e]
+      x-runtime: ['0.009751']
+      x-ua-compatible: ['IE=Edge,chrome=1']
+    status: {code: 400, message: Bad Request}
+version: 1

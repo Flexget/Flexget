@@ -1,6 +1,6 @@
 """Logging utilities"""
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import hashlib
@@ -55,21 +55,27 @@ def purge(manager, session):
 
 
 @with_session
-def log_once(message, logger=logging.getLogger('log_once'), once_level=logging.INFO, suppressed_level=f_logger.VERBOSE,
-             session=None):
+def log_once(
+    message,
+    logger=logging.getLogger('log_once'),
+    once_level=logging.INFO,
+    suppressed_level=f_logger.VERBOSE,
+    session=None,
+):
     """
     Log message only once using given logger`. Returns False if suppressed logging.
     When suppressed, `suppressed_level` level is still logged.
     """
     # If there is no active manager, don't access the db
     from flexget.manager import manager
+
     if not manager:
         log.warning('DB not initialized. log_once will not work properly.')
         logger.log(once_level, message)
         return
 
     digest = hashlib.md5()
-    digest.update(message.encode('latin1', 'replace')) # ticket:250
+    digest.update(message.encode('latin1', 'replace'))  # ticket:250
     md5sum = digest.hexdigest()
 
     # abort if this has already been logged

@@ -1,0 +1,42 @@
+// import animate scss
+@import "../bower_components/animate.css-scss/animate.scss";
+
+// import angular material
+@import "../bower_components/angular-material/angular-material.scss";
+
+// Import main flexget app
+@import "scss/flexget";
+
+// set template font family
+button, select, html, textarea, input {
+  font-family: RobotoDraft, Roboto, 'Helvetica Neue', sans-serif;
+}
+
+body {
+    font-family: RobotoDraft, Roboto, 'Helvetica Neue', sans-serif;
+    font-weight: 400;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.construction-icon {
+	font-size: 10em;
+}
+
+.animate-remove.ng-leave {
+	-webkit-transition: all 0.75s ease-in-out;
+	-moz-transition: all 0.75s ease-in-out;
+  	transition: all 0.75s ease-in-out;
+}
+
+.animate-remove.ng-leave {
+	opacity: 1;
+}
+
+.animate-remove.ng-leave.ng-leave-active {
+	opacity: 0;
+}
+
+/*  inject sass files automatically */
+// injector
+// endinjector

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import time
@@ -11,8 +11,11 @@ log = logging.getLogger('sleep')
 
 
 class PluginSleep(object):
-    """Causes a pause to occur during the specified phase of a task"""
-    
+    """
+    Causes a pause in execution to occur at the beginning of the specified phase of a task.
+    The point at which the pause occurs can be adjusted using the `plugin_priority` plugin.
+    """
+
     schema = {
         'oneOf': [
             {
@@ -21,15 +24,25 @@ class PluginSleep(object):
                     'seconds': {'type': 'integer'},
                     'phase': {
                         'type': 'string',
-                        'enum': ['start', 'input', 'metainfo', 'filter', 'download',
-                                 'modify', 'output', 'learn', 'abort', 'exit'],
-                        'default': 'start'
-                    }
+                        'enum': [
+                            'start',
+                            'input',
+                            'metainfo',
+                            'filter',
+                            'download',
+                            'modify',
+                            'output',
+                            'learn',
+                            'abort',
+                            'exit',
+                        ],
+                        'default': 'start',
+                    },
                 },
                 'required': ['seconds'],
-                'additionalProperties': False
+                'additionalProperties': False,
             },
-            {'type': 'integer'}
+            {'type': 'integer'},
         ]
     }
 
@@ -40,43 +53,43 @@ class PluginSleep(object):
             log.verbose('Sleeping for %d seconds.' % config['seconds'])
             time.sleep(int(config['seconds']))
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_start(self, task, config):
         self.do_sleep(config, 'start')
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_input(self, task, config):
         self.do_sleep(config, 'input')
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_metainfo(self, task, config):
         self.do_sleep(config, 'metainfo')
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_filter(self, task, config):
         self.do_sleep(config, 'filter')
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_download(self, task, config):
         self.do_sleep(config, 'download')
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_modify(self, task, config):
         self.do_sleep(config, 'modify')
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_output(self, task, config):
         self.do_sleep(config, 'output')
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_learn(self, task, config):
         self.do_sleep(config, 'learn')
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_abort(self, task, config):
         self.do_sleep(config, 'abort')
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_exit(self, task, config):
         self.do_sleep(config, 'exit')
 

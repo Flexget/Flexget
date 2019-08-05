@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<movie>
+    <title>A Bela e a Fera</title>
+    <originaltitle>La Belle et la Bête</originaltitle>
+    <rating>6</rating>
+    <votes>210</votes>
+    <top250>0</top250>
+    <year>2014</year>
+    <plot>Um romance inesperado floresce depois que a filha mais nova de um mercador em dificuldades se oferece para uma misteriosa besta com a qual seu pai ficou endividado.</plot>
+    <tagline></tagline>
+    <runtime>153</runtime>
+    <mpaa></mpaa>
+    <playcount>0</playcount>
+    <id>tt2316801</id>
+    <tmdbid>197796</tmdbid>
+    <set></set>
+    <sorttitle></sorttitle>
+    <trailer>http://www.youtube.com/watch?v=P-WF6ugqIY8</trailer>
+    <director>Christophe Gans</director>
+    <studio>Canal Plus</studio>
+    <studio>Studio Babelsberg</studio>
+    <studio>Eskwad</studio>
+    <genre>Fantasia</genre>
+    <genre>Romance</genre>
+    <country>France</country>
+    <country>Germany</country>
+    <thumb preview="http://image.tmdb.org/t/p/w342/5E6Gum49yMCbBzLgzrdJIbABHZ0.jpg">http://image.tmdb.org/t/p/original/5E6Gum49yMCbBzLgzrdJIbABHZ0.jpg</thumb>
+    <thumb preview="http://image.tmdb.org/t/p/w342/zfj4GFogxs3czkCbPYBpcIjBTXL.jpg">http://image.tmdb.org/t/p/original/zfj4GFogxs3czkCbPYBpcIjBTXL.jpg</thumb>
+    <thumb preview="http://image.tmdb.org/t/p/w342/46NEkiNyBvK1RpH3kQ0xCKO8A1D.jpg">http://image.tmdb.org/t/p/original/46NEkiNyBvK1RpH3kQ0xCKO8A1D.jpg</thumb>
+    <actor>
+        <name>Vincent Cassel</name>
+        <role>La bête</role>
+        <thumb>http://image.tmdb.org/t/p/original/yTTyX7xziiMibm0nzcH5z6xxLLv.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Léa Seydoux</name>
+        <role>La belle</role>
+        <thumb>http://image.tmdb.org/t/p/original/19gU2MSmsauB9TIh8gcd8JzvD2g.jpg</thumb>
+    </actor>
+    <actor>
+        <name>André Dussollier</name>
+        <role>Belle's father</role>
+        <thumb>http://image.tmdb.org/t/p/original/rKZXoZJBUMKRbACbAGEat7wvAr7.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Eduardo Noriega</name>
+        <role>Perducas</role>
+        <thumb>http://image.tmdb.org/t/p/original/5B1D3MChVAZ5z7cypJbCbSGgDge.jpg</thumb>
+    </actor>
+    <actor>
+        <name>Myriam Charleins</name>
+        <role>Astrid</role>
+        <thumb>http://image.tmdb.org/t/p/original/ifdV5J1OrWzv88TK0qqUDTg3OE9.jpg</thumb>
+    </actor>
+    <fileinfo>
+        <streamdetails>
+            <video>
+                <aspect>2.4</aspect>
+                <codec>h264</codec>
+                <durationinseconds>6785</durationinseconds>
+                <height>804</height>
+                <scantype>progressive</scantype>
+                <width>1920</width>
+            </video>
+            <audio>
+                <channels>6</channels>
+                <codec>ac3</codec>
+                <language>por</language>
+            </audio>
+            <subtitle>
+                <language></language>
+                <file>A.Bela.e.a.Fera.2014.1080p.Dublado-WOLVERDONFILMES.COM.srt</file>
+            </subtitle>
+        </streamdetails>
+    </fileinfo>
+</movie>

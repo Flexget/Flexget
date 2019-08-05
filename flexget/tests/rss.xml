@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:other="http://localhost/flexget"
+xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>FlexGet RSS test</title>
+    <ttl>15</ttl>
+    <link>http://localhost/invalid</link>
+    <description>This is FlexGet RSS test feed that is used in automated Unit Tests.</description>
+
+    <item>
+      <title>Zero sized enclosure</title>
+      <link>http://localhost/zero_sized_enclosure</link>
+      <pubDate>Sun, 28 Dec 2008 14:00:00 -0200</pubDate>
+      <description>Description, single enclosure, no size</description>
+      <enclosure url="http://localhost/enclosure" length="0" type="application/x-bittorrent" />
+    </item>
+
+    <item>
+      <title>Multiple enclosures</title>
+      <link>http://localhost/multiple_enclosures</link>
+      <pubDate>Sun, 28 Dec 2008 14:10:00 -0200</pubDate>
+      <description>Description, multiple</description>
+      <enclosure url="http://localhost/enclosure1"/>
+      <enclosure url="http://localhost/enclosure2"/>
+      <enclosure url="http://localhost/enclosure3"/>
+    </item>
+
+    <item>
+      <title>Normal</title>
+      <link>http://localhost/normal</link>
+      <pubDate>Sun, 28 Dec 2008 14:20:00 -0200</pubDate>
+      <description>Description, normal</description>
+    </item>
+
+    <item>
+      <title>Messy enclosure</title>
+      <link>http://localhost/messy_enclosure</link>
+      <pubDate>Sun, 28 Dec 2008 14:00:00 -0200</pubDate>
+      <description>Description, messy enclosure</description>
+      <enclosure url="http://localhost/enclosure.mp3?param=value&amp;another=foobar" length="123"/>
+    </item>
+
+    <item>
+      <title>Guid link</title>
+      <guid>http://localhost/guid</guid>
+      <pubDate>Sun, 28 Dec 2008 14:20:00 -0200</pubDate>
+      <description>Description, guid</description>
+      <otherlink>http://localhost/otherlink</otherlink>
+    </item>
+
+    <item>
+      <title>Other fields</title>
+      <link>http://localhost/otherfields</link>
+      <pubDate>Sun, 28 Dec 2008 14:20:00 -0200</pubDate>
+      <description>Description, other fields</description>
+      <otherfield>otherfield</otherfield>
+    </item>
+
+    <item>
+      <title>Colon fields</title>
+      <link>http://localhost/otherfields</link>
+      <pubDate>Sun, 28 Dec 2008 14:20:00 -0200</pubDate>
+      <description>Description, colon fields</description>
+      <other:Field>otherfield</other:Field>
+      <other:title>alt title</other:title>
+      <other:link>http://localhost/altlink</other:link>
+    </item>
+
+    <item>
+      <title>Content</title>
+      <link>http://localhost/content</link>
+      <pubDate>Sun, 28 Dec 2008 14:20:00 -0200</pubDate>
+      <description>Description, content</description>
+      <content:encoded><![CDATA[<p>test content:encoded</p>]]></content:encoded>
+    </item>
+
+    <item>
+      <title>Multiple content items</title>
+      <link>http://localhost/multi_content</link>
+      <pubDate>Sun, 28 Dec 2008 14:20:00 -0200</pubDate>
+      <description>Description, multi_content</description>
+      <content:encoded><![CDATA[<p>test content1</p>]]></content:encoded>
+      <content:encoded><![CDATA[<p>test content2</p>]]></content:encoded>
+    </item>
+
+    <item>
+      <title></title>
+      <link>http://localhost/empty</link>
+      <pubDate>Sun, 28 Dec 2008 14:00:00 -0200</pubDate>
+      <description>Description, empty title</description>
+    </item>
+
+  </channel>
+</rss>

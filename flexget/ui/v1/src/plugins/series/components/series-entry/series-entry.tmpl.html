@@ -1,0 +1,50 @@
+<md-card flex class="series-entry">
+    <img ng-src="api/cached/?url={{ ::vm.show.metadata.banner }}" class="md-card-image">
+    <md-card-title flex="initial">
+        <md-card-title-text>
+            <span class="md-headline">{{ ::vm.show.name }}
+                <span class="rating" ng-if="::vm.show.metadata">
+                    <md-icon md-font-set="fa" md-font-icon="fa-star"></md-icon>
+                    <span class="md-suhead">
+                        {{ ::vm.show.metadata.rating }}
+                    </span>
+                </span>
+            </span>
+            <md-divider></md-divider>
+            <span class="md-subhead">Latest: {{ ::vm.show.latest_episode.identifier || 'No episode downloaded' }}</span>
+            <span class="md-subhead second-subhead">Begin Episode: {{ vm.show.begin_episode.identifier || 'No begin set' }}</span>
+            <md-divider></md-divider>
+            <md-chips ng-model="vm.show.metadata.genres" readonly="true" ng-if="::vm.show.metadata">
+                <md-chip-template>
+                    {{ $chip }}
+                </md-chip-template>
+            </md-chips>
+        </md-card-title-text>
+    </md-card-title>
+    <md-card-content flex layout-gt-xs="row" layout-xs="column" class="custom-card">
+        <p ng-if="::vm.show.metadata">{{ ::vm.show.metadata.overview }}</p>
+        <p ng-hide="::vm.show.metadata">No metadata found</p>
+    </md-card-content>
+	<md-card-actions layout="row" layout-align="start center">
+		<md-button class="md-primary md-raised" ng-click="vm.toggleEpisodes(show)">Episodes</md-button>
+	</md-card-actions>
+    <md-fab-speed-dial md-direction="left" class="md-scale more-btn">
+        <md-fab-trigger>
+            <md-button aria-label="More" class="md-fab md-mini">
+                <i class="fa fa-bars" aria-hidden="true"></i>
+            </md-button>
+        </md-fab-trigger>
+        <md-fab-actions>
+            <md-button ng-click="vm.setBegin()" aria-label="Set Series begin" class="md-fab md-raised md-mini">
+                <i class="fa fa-play" aria-hidden="true"></i>
+            </md-button>
+            <md-button ng-click="vm.forgetShow()" aria-label="forget show" class="md-fab md-raised md-mini">
+                <i class="fa fa-trash-o" aria-hidden="true"></i>
+            </md-button>
+            <md-button ng-click="vm.alternateName()" aria-label="alternate names" class="md-fab md-raised md-mini">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </md-button>
+        </md-fab-actions>
+    </md-fab-speed-dial>
+	<ng-transclude></ng-transclude>
+</md-card>

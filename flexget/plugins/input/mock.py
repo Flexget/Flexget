@@ -1,6 +1,6 @@
 """Plugin for mocking task data."""
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -28,12 +28,9 @@ class Mock(object):
         'type': 'array',
         'items': {
             'type': 'object',
-            'properties': {
-                'title': {'type': 'string'},
-                'url': {'type': 'string'}
-            },
-            'required': ['title']
-        }
+            'properties': {'title': {'type': 'string'}, 'url': {'type': 'string'}},
+            'required': ['title'],
+        },
     }
 
     def on_task_input(self, task, config):

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import base64
 import hashlib
@@ -21,7 +21,7 @@ Base = db_schema.versioned_base('make_rss', 0)
 rss2gen = True
 try:
     import PyRSS2Gen
-except:
+except ImportError:
     rss2gen = False
 
 
@@ -37,7 +37,6 @@ def upgrade(ver, session):
 
 
 class RSSEntry(Base):
-
     __tablename__ = 'make_rss'
 
     id = Column(Integer, primary_key=True)
@@ -47,6 +46,8 @@ class RSSEntry(Base):
     rsslink = Column(String)
     file = Column(Unicode)
     published = Column(DateTime, default=datetime.datetime.utcnow)
+    enc_length = Column(Integer)
+    enc_type = Column(String)
 
 
 class OutputRSS(object):
@@ -96,32 +97,40 @@ class OutputRSS(object):
 
     Generate RSS that will contain last 50 items, regardless of dates.
 
-    RSS location link:
+    RSS feed properties:
 
-    You can specify the url location of the rss file.
+    You can specify the URL, title, and description to include in tthe header
+    of the RSS feed.
 
     Example::
 
       make_rss:
         file: ~/public_html/series.rss
         rsslink: http://my.server.net/series.rss
+        rsstitle: The Flexget RSS Feed
+        rssdesc: Episodes about Flexget.
 
-    **RSS link**
+    **RSS item title and link**
 
-    You can specify what field from entry is used as a link in generated rss feed.
+    You can specify the title and link for each item in the RSS feed.
+
+    The item title can be any pattern that references fields in the input entry.
+
+    The item link can be created from one of a list of fields in the input
+    entry, in order of preference. The fields should be enumerated in a list.
+    Note that the url field is always used as last possible fallback even
+    without explicitly adding it into the list.
+
+    Default field list for item URL: imdb_url, input_url, url
 
     Example::
 
       make_rss:
         file: ~/public_html/series.rss
+        title: '{{title}} (from {{task}})'
         link:
           - imdb_url
 
-    List should contain a list of fields in order of preference.
-    Note that the url field is always used as last possible fallback
-    even without explicitly adding it into the list.
-
-    Default list: imdb_url, input_url, url
     """
 
     schema = {
@@ -134,15 +143,18 @@ class OutputRSS(object):
                     'days': {'type': 'integer'},
                     'items': {'type': 'integer'},
                     'history': {'type': 'boolean'},
+                    'timestamp': {'type': 'boolean'},
                     'rsslink': {'type': 'string'},
+                    'rsstitle': {'type': 'string'},
+                    'rssdesc': {'type': 'string'},
                     'encoding': {'type': 'string'},  # TODO: only valid choices
                     'title': {'type': 'string'},
                     'template': {'type': 'string'},
-                    'link': {'type': 'array', 'items': {'type': 'string'}}
+                    'link': {'type': 'array', 'items': {'type': 'string'}},
                 },
                 'required': ['file'],
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ]
     }
 
@@ -156,10 +168,11 @@ class OutputRSS(object):
         config.setdefault('days', 7)
         config.setdefault('items', -1)
         config.setdefault('history', True)
-        config.setdefault('encoding', 'iso-8859-1')
+        config.setdefault('encoding', 'UTF-8')
+        config.setdefault('timestamp', False)
         config.setdefault('link', ['imdb_url', 'input_url'])
         config.setdefault('title', '{{title}} (from {{task}})')
-        config.setdefault('template', 'default')
+        config.setdefault('template', 'rss')
         # add url as last resort
         config['link'].append('url')
         return config
@@ -182,7 +195,11 @@ class OutputRSS(object):
             try:
                 rss.title = entry.render(config['title'])
             except RenderError as e:
-                log.error('Error rendering jinja title for `%s` falling back to entry title: %s' % (entry['title'], e))
+                log.error(
+                    'Error rendering jinja title for `%s` falling back to entry title: %s',
+                    entry['title'],
+                    e,
+                )
                 rss.title = entry['title']
             for field in config['link']:
                 if field in entry:
@@ -190,18 +207,25 @@ class OutputRSS(object):
                     break
 
             try:
-                template = get_template(config['template'], 'rss')
+                template = get_template(config['template'], scope='task')
             except ValueError as e:
                 raise plugin.PluginError('Invalid template specified: %s' % e)
             try:
                 rss.description = render_from_entry(template, entry)
             except RenderError as e:
-                log.error('Error while rendering entry %s, falling back to plain title: %s' % (entry, e))
+                log.error(
+                    'Error while rendering entry %s, falling back to plain title: %s', entry, e
+                )
                 rss.description = entry['title'] + ' - (Render Error)'
             rss.file = config['file']
+            if 'rss_pubdate' in entry:
+                rss.published = entry['rss_pubdate']
+
+            rss.enc_length = entry['size'] if 'size' in entry else None
+            rss.enc_type = entry['type'] if 'type' in entry else None
 
             # TODO: check if this exists and suggest disabling history if it does since it shouldn't happen normally ...
-            log.debug('Saving %s into rss database' % entry['title'])
+            log.debug('Saving %s into rss database', entry['title'])
             task.session.add(rss)
 
         if not rss2gen:
@@ -210,8 +234,12 @@ class OutputRSS(object):
         if task.options.learn:
             return
 
-        db_items = task.session.query(RSSEntry).filter(RSSEntry.file == config['file']).\
-            order_by(RSSEntry.published.desc()).all()
+        db_items = (
+            task.session.query(RSSEntry)
+            .filter(RSSEntry.file == config['file'])
+            .order_by(RSSEntry.published.desc())
+            .all()
+        )
 
         # make items
         rss_items = []
@@ -221,7 +249,10 @@ class OutputRSS(object):
                 if len(rss_items) > config['items']:
                     add = False
             if config['days'] != -1:
-                if datetime.datetime.today() - datetime.timedelta(days=config['days']) > db_item.published:
+                if (
+                    datetime.datetime.today() - datetime.timedelta(days=config['days'])
+                    > db_item.published
+                ):
                     add = False
             if add:
                 # add into generated feed
@@ -232,23 +263,31 @@ class OutputRSS(object):
                 guid = base64.urlsafe_b64encode(hasher.digest()).decode('ascii')
                 guid = PyRSS2Gen.Guid(guid, isPermaLink=False)
 
-                gen = {'title': db_item.title,
-                       'description': db_item.description,
-                       'link': db_item.link,
-                       'pubDate': db_item.published,
-                       'guid': guid}
-                log.trace('Adding %s into rss %s' % (gen['title'], config['file']))
+                gen = {
+                    'title': db_item.title,
+                    'description': db_item.description,
+                    'link': db_item.link,
+                    'pubDate': db_item.published,
+                    'guid': guid,
+                }
+                if db_item.enc_length is not None and db_item.enc_type is not None:
+                    gen['enclosure'] = PyRSS2Gen.Enclosure(
+                        db_item.link, db_item.enc_length, db_item.enc_type
+                    )
+                log.trace('Adding %s into rss %s', gen['title'], config['file'])
                 rss_items.append(PyRSS2Gen.RSSItem(**gen))
             else:
                 # no longer needed
                 task.session.delete(db_item)
 
         # make rss
-        rss = PyRSS2Gen.RSS2(title='FlexGet',
-                             link=config.get('rsslink', 'http://flexget.com'),
-                             description='FlexGet generated RSS feed',
-                             lastBuildDate=datetime.datetime.utcnow(),
-                             items=rss_items)
+        rss = PyRSS2Gen.RSS2(
+            title=config.get('rsstitle', 'FlexGet'),
+            link=config.get('rsslink', 'http://flexget.com'),
+            description=config.get('rssdesc', 'FlexGet generated RSS feed'),
+            lastBuildDate=datetime.datetime.utcnow() if config['timestamp'] else None,
+            items=rss_items,
+        )
 
         # don't run with --test
         if task.options.test:
@@ -259,14 +298,14 @@ class OutputRSS(object):
         fn = os.path.expanduser(config['file'])
         with io.open(fn, 'wb') as file:
             try:
-                log.verbose('Writing output rss to %s' % fn)
+                log.verbose('Writing output rss to %s', fn)
                 rss.write_xml(file, encoding=config['encoding'])
             except LookupError:
-                log.critical('Unknown encoding %s' % config['encoding'])
+                log.critical('Unknown encoding %s', config['encoding'])
                 return
             except IOError:
                 # TODO: plugins cannot raise PluginWarnings in terminate event ..
-                log.critical('Unable to write %s' % fn)
+                log.critical('Unable to write %s', fn)
                 return
 
 

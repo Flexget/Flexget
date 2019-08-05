@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import logging
 import time
 
@@ -90,5 +90,6 @@ def cleanup(manager, options):
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('--debug-perf', action='store_true', dest='debug_perf', default=False,
-                                               help=SUPPRESS)
+    options.get_parser('execute').add_argument(
+        '--debug-perf', action='store_true', dest='debug_perf', default=False, help=SUPPRESS
+    )

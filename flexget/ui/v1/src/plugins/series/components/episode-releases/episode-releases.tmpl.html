@@ -1,0 +1,19 @@
+<md-toolbar>
+	<div class="md-toolbar-tools">
+		<h2>Releases for {{ ::vm.show.name }} - {{ ::vm.episode.identifier }}</h2>
+		<span flex></span>
+		<md-button class="md-icon-button" ng-click="vm.cancel()">
+			<md-icon md-font-icon="fa-times" class="fa fa-lg" aria-label="close dialog"></md-icon>
+		</md-button>
+	</div>
+</md-toolbar>
+<md-dialog-content>
+	<div class="md-dialog-content">
+		<md-list flex>
+			<episode-release ng-repeat="release in vm.releases | orderBy : 'downloaded' : true"
+			show="vm.show"
+			episode="vm.episode"
+			release="release"></episode-release>
+		</md-list>
+	</div>
+</md-dialog-content>

@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 from fnmatch import fnmatch
@@ -32,15 +31,15 @@ class FilterContentFilter(object):
             'require_all': one_or_more({'type': 'string'}),
             'reject': one_or_more({'type': 'string'}),
             'require_mainfile': {'type': 'boolean', 'default': False},
-            'strict': {'type': 'boolean', 'default': False}
+            'strict': {'type': 'boolean', 'default': False},
         },
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def prepare_config(self, config):
         for key in ['require', 'require_all', 'reject']:
             if key in config:
-                if isinstance(config[key], basestring):
+                if isinstance(config[key], str):
                     config[key] = [config[key]]
         return config
 
@@ -68,13 +67,21 @@ class FilterContentFilter(object):
             # download plugin has already printed a downloading message.
             if config.get('require'):
                 if not matching_mask(files, config['require']):
-                    log.info('Entry %s does not have any of the required filetypes, rejecting' % entry['title'])
+                    log.info(
+                        'Entry %s does not have any of the required filetypes, rejecting'
+                        % entry['title']
+                    )
                     entry.reject('does not have any of the required filetypes', remember=True)
                     return True
             if config.get('require_all'):
                 # Make sure each mask matches at least one of the contained files
-                if not all(any(fnmatch(file, mask) for file in files) for mask in config['require_all']):
-                    log.info('Entry %s does not have all of the required filetypes, rejecting' % entry['title'])
+                if not all(
+                    any(fnmatch(file, mask) for file in files) for mask in config['require_all']
+                ):
+                    log.info(
+                        'Entry %s does not have all of the required filetypes, rejecting'
+                        % entry['title']
+                    )
                     entry.reject('does not have all of the required filetypes', remember=True)
                     return True
             if config.get('reject'):
@@ -96,17 +103,19 @@ class FilterContentFilter(object):
     @plugin.priority(150)
     def on_task_modify(self, task, config):
         if task.options.test or task.options.learn:
-            log.info('Plugin is partially disabled with --test and --learn \
-because content filename information may not be available')
+            log.info(
+                'Plugin is partially disabled with --test and --learn '
+                'because content filename information may not be available'
+            )
             # return
 
         config = self.prepare_config(config)
         for entry in task.accepted:
             if self.process_entry(task, entry, config):
-                task.rerun()
+                task.rerun(plugin='content_filter')
             elif 'content_files' not in entry and config.get('strict'):
                 entry.reject('no content files parsed for entry', remember=True)
-                task.rerun()
+                task.rerun(plugin='content_filter')
 
 
 @event('plugin.register')

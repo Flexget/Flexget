@@ -1,0 +1,107 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/search?year=2016&type=movie&query=Doctor+Strange
+  response:
+    body: {string: '[{"type":"movie","score":83.59071,"movie":{"title":"Doctor Strange","overview":"After
+        his career is destroyed, a brilliant but arrogant surgeon gets a new lease
+        on life when a sorcerer takes him under his wing and trains him to defend
+        the world against evil.","year":2016,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":181311,"slug":"doctor-strange-2016","imdb":"tt1211837","tmdb":284052}}},{"type":"movie","score":0.5110413,"movie":{"title":"My
+        Future Love","overview":"In 1973, the 20-year-old Svante has a heart condition
+        that the doctors cannot fix. When he has a breakdown on a subway platform,
+        a strange train suddenly appears. He steps into the subway car filled with
+        wonder, without knowing that the destination is the future. In the future
+        he meets Elsa and together they must solve Svante''s problems and figure out
+        how to live together when they are from two different eras.","year":2016,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":280281,"slug":"my-future-love-2016","imdb":"tt5194446","tmdb":425553}}}]'}
+    headers:
+      CF-Cache-Status: [MISS]
+      CF-RAY: [3549f1dacb4e3d3d-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Mon, 24 Apr 2017 15:02:38 GMT']
+      ETag: [W/"e027d2010454cfe5b2b61efa3e9cfe25"]
+      Expires: ['Mon, 24 Apr 2017 23:02:38 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=de5f6ff62c6de4e4c8de145ad4b0d7f161493046158; expires=Tue,
+          24-Apr-18 15:02:38 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Pagination-Item-Count: ['2']
+      X-Pagination-Limit: ['10']
+      X-Pagination-Page: ['1']
+      X-Pagination-Page-Count: ['1']
+      X-Request-Id: [be56536f-e846-4391-b182-283b548e2586]
+      X-Runtime: ['0.128512']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      Cookie: [__cfduid=de5f6ff62c6de4e4c8de145ad4b0d7f161493046158]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/movies/181311?extended=full
+  response:
+    body: {string: '{"title":"Doctor Strange","year":2016,"ids":{"trakt":181311,"slug":"doctor-strange-2016","imdb":"tt1211837","tmdb":284052},"tagline":"Open
+        your mind. Change your reality.","overview":"After his career is destroyed,
+        a brilliant but arrogant surgeon gets a new lease on life when a sorcerer
+        takes him under his wing and trains him to defend the world against evil.","released":"2016-11-04","runtime":115,"trailer":null,"homepage":"http://marvel.com/doctorstrange","rating":7.85966,"votes":25808,"updated_at":"2017-04-22T09:11:09.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fi","fr","he","hr","hu","id","it","ja","ka","ko","lt","nl","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","vi","zh"],"genres":["action","adventure","science-fiction","fantasy"],"certification":"PG-13"}'}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [3549f1dc9be33d3d-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Mon, 24 Apr 2017 15:02:38 GMT']
+      ETag: [W/"eefc9890c7c8513e617bcbc4bd6efe5e"]
+      Expires: ['Mon, 24 Apr 2017 23:02:38 GMT']
+      Last-Modified: ['Sat, 22 Apr 2017 09:11:09 GMT']
+      Server: [cloudflare-nginx]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [a3b97d4b-845f-4b24-b17b-e4d1a1c35024]
+      X-Runtime: ['0.013714']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/users/flexgettest/ratings/movies
+  response:
+    body: {string: '[{"rated_at":"2017-04-23T19:37:42.000Z","rating":9,"type":"movie","movie":{"title":"Doctor
+        Strange","year":2016,"ids":{"trakt":181311,"slug":"doctor-strange-2016","imdb":"tt1211837","tmdb":284052}}}]'}
+    headers:
+      CF-RAY: [3549f1dd8d983cc5-CPH]
+      Cache-Control: ['max-age=0, private, must-revalidate']
+      Cf-Railgun: [d7ac9e9b62 stream 0.000000 0200 e6be]
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Mon, 24 Apr 2017 15:02:39 GMT']
+      Etag: [W/"c6cd96bd892f46c28ba57ce8f1e4bfad"]
+      Last-Modified: ['Sun, 23 Apr 2017 19:37:42 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d7302d9ae904026440e49309f496d95231493046158; expires=Tue,
+          24-Apr-18 15:02:38 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Private-User: ['false']
+      X-Request-Id: [62ebd470-403f-41a9-adf4-a5f08cacc965]
+      X-Runtime: ['0.032675']
+      X-Xss-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1

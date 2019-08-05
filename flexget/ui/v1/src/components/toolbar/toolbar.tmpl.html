@@ -1,0 +1,29 @@
+<div class="admin-toolbar">
+    <md-toolbar class="admin-toolbar">
+        <div class="md-toolbar-tools">
+            <md-button class="md-icon-button" ng-click="vm.toggle()" style="width: 40px">
+                <md-icon class="fa fa-bars" aria-label="Menu"></md-icon>
+            </md-button>
+            <span flex></span>
+            <div ng-repeat="item in ::vm.toolBarItems | orderBy:'order'">
+                <md-button aria-label="{{ item.label }}" class="md-icon-button" ng-click="item.action()" ng-if="::item.type == 'button'">
+                    <md-tooltip>{{ ::item.label }}</md-tooltip>
+                    <md-icon md-menu-origin class="fa fa-{{ ::item.icon }}"></md-icon>
+                </md-button>
+                <md-menu ng-if="::(item.type == 'menu' && item.items.length > 0)">
+                    <md-button aria-label="{{ ::item.label }}" class="md-icon-button" ng-click="$mdOpenMenu($event)">
+                        <md-tooltip>{{ ::item.label }}</md-tooltip>
+                        <md-icon md-menu-origin class="fa fa-{{ ::item.icon }}"></md-icon>
+                    </md-button>
+                    <md-menu-content>
+                        <md-menu-item ng-repeat="menuItem in ::item.items | orderBy:'order'">
+                            <md-button ng-click="menuItem.action()">
+                                <md-icon md-menu-origin class="fa fa-{{ ::menuItem.icon }}"></md-icon>
+                                {{ ::menuItem.label }}</md-button>
+                        </md-menu-item>
+                    </md-menu-content>
+                </md-menu>
+            </div>
+        </div>
+    </md-toolbar>
+</div>

@@ -1,17 +1,16 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from future.utils import text_to_native_str
 
 import logging
 import subprocess
-
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.utils.template import render_from_entry, render_from_task, RenderError
-from flexget.utils.tools import io_encoding, native_str_to_text
+from flexget.utils.tools import io_encoding
 
 log = logging.getLogger('exec')
 
@@ -25,7 +24,7 @@ class EscapingEntry(Entry):
     def __getitem__(self, key):
         value = super(EscapingEntry, self).__getitem__(key)
         # TODO: May need to be different depending on OS
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             value = value.replace('"', '\\"')
         return value
 
@@ -68,10 +67,10 @@ class PluginExec(object):
                     'fail_entries': {'type': 'boolean'},
                     'auto_escape': {'type': 'boolean'},
                     'encoding': {'type': 'string'},
-                    'allow_background': {'type': 'boolean'}
+                    'allow_background': {'type': 'boolean'},
                 },
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ],
         'definitions': {
             'phaseSettings': {
@@ -81,15 +80,16 @@ class PluginExec(object):
                     'for_entries': one_or_more({'type': 'string'}),
                     'for_accepted': one_or_more({'type': 'string'}),
                     'for_rejected': one_or_more({'type': 'string'}),
-                    'for_failed': one_or_more({'type': 'string'})
+                    'for_undecided': one_or_more({'type': 'string'}),
+                    'for_failed': one_or_more({'type': 'string'}),
                 },
-                'additionalProperties': False
+                'additionalProperties': False,
             }
-        }
+        },
     }
 
     def prepare_config(self, config):
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = [config]
         if isinstance(config, list):
             config = {'on_output': {'for_accepted': config}}
@@ -98,23 +98,28 @@ class PluginExec(object):
         for phase_name in config:
             if phase_name.startswith('on_'):
                 for items_name in config[phase_name]:
-                    if isinstance(config[phase_name][items_name], basestring):
+                    if isinstance(config[phase_name][items_name], str):
                         config[phase_name][items_name] = [config[phase_name][items_name]]
 
         return config
 
     def execute_cmd(self, cmd, allow_background, encoding):
-        log.verbose('Executing: %s' % cmd)
-        # if PY2: cmd = cmd.encode(encoding) ?
-        p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                             stderr=subprocess.STDOUT, close_fds=False)
+        log.verbose('Executing: %s', cmd)
+        p = subprocess.Popen(
+            text_to_native_str(cmd, encoding=io_encoding),
+            shell=True,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            close_fds=False,
+        )
         if not allow_background:
-            (r, w) = (p.stdout, p.stdin)
-            response = native_str_to_text(r.read(), encoding=encoding, errors='replace')
+            r, w = (p.stdout, p.stdin)
+            response = r.read().decode(io_encoding)
             r.close()
             w.close()
             if response:
-                log.info('Stdout: %s' % response)
+                log.info('Stdout: %s', response.rstrip())  # rstrip to get rid of newlines
         return p.wait()
 
     def execute(self, task, phase_name, config):
@@ -123,15 +128,23 @@ class PluginExec(object):
             log.debug('phase %s not configured' % phase_name)
             return
 
-        name_map = {'for_entries': task.entries, 'for_accepted': task.accepted,
-                    'for_rejected': task.rejected, 'for_failed': task.failed}
+        name_map = {
+            'for_entries': task.entries,
+            'for_accepted': task.accepted,
+            'for_rejected': task.rejected,
+            'for_undecided': task.undecided,
+            'for_failed': task.failed,
+        }
 
         allow_background = config.get('allow_background')
         for operation, entries in name_map.items():
             if operation not in config[phase_name]:
                 continue
 
-            log.debug('running phase_name: %s operation: %s entries: %s' % (phase_name, operation, len(entries)))
+            log.debug(
+                'running phase_name: %s operation: %s entries: %s'
+                % (phase_name, operation, len(entries))
+            )
 
             for entry in entries:
                 for cmd in config[phase_name][operation]:
@@ -143,11 +156,15 @@ class PluginExec(object):
                         log.error('Could not set exec command for %s: %s' % (entry['title'], e))
                         # fail the entry if configured to do so
                         if config.get('fail_entries'):
-                            entry.fail('Entry `%s` does not have required fields for string replacement.' %
-                                       entry['title'])
+                            entry.fail(
+                                'Entry `%s` does not have required fields for string replacement.'
+                                % entry['title']
+                            )
                         continue
 
-                    log.debug('phase_name: %s operation: %s cmd: %s' % (phase_name, operation, cmd))
+                    log.debug(
+                        'phase_name: %s operation: %s cmd: %s' % (phase_name, operation, cmd)
+                    )
                     if task.options.test:
                         log.info('Would execute: %s' % cmd)
                     else:
@@ -156,13 +173,19 @@ class PluginExec(object):
                         try:
                             cmd.encode(config['encoding'])
                         except UnicodeEncodeError:
-                            log.error('Unable to encode cmd `%s` to %s' % (cmd, config['encoding']))
+                            log.error(
+                                'Unable to encode cmd `%s` to %s' % (cmd, config['encoding'])
+                            )
                             if config.get('fail_entries'):
-                                entry.fail('cmd `%s` could not be encoded to %s.' % (cmd, config['encoding']))
+                                entry.fail(
+                                    'cmd `%s` could not be encoded to %s.'
+                                    % (cmd, config['encoding'])
+                                )
                             continue
                         # Run the command, fail entries with non-zero return code if configured to
-                        if (self.execute_cmd(cmd, allow_background, config['encoding']) != 0 and
-                                config.get('fail_entries')):
+                        if self.execute_cmd(
+                            cmd, allow_background, config['encoding']
+                        ) != 0 and config.get('fail_entries'):
                             entry.fail('exec return code was non-zero')
 
         # phase keyword in this

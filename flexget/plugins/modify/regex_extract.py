@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -47,13 +46,13 @@ class RegexExtract(object):
 
     def on_task_start(self, task, config):
         regex = config.get('regex')
-        if isinstance(regex, basestring):
+        if isinstance(regex, str):
             regex = [regex]
         self.regex_list = ReList(regex)
 
         # Check the regex
         try:
-            for rx in self.regex_list:
+            for _ in self.regex_list:
                 pass
         except re.error as e:
             raise plugin.PluginError('Error compiling regex: %s' % str(e))

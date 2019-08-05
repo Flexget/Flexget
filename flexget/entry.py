@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from future.utils import PY2, native_str
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from future.utils import PY2, native_str, text_type
 
 import copy
 import functools
@@ -8,7 +8,7 @@ import logging
 
 from flexget.plugin import PluginError
 from flexget.utils.lazy_dict import LazyDict, LazyLookup
-from flexget.utils.template import render_from_entry
+from flexget.utils.template import render_from_entry, FlexGetTemplate
 
 log = logging.getLogger('entry')
 
@@ -195,6 +195,12 @@ class Entry(LazyDict):
                 raise EntryUnicodeError(key, value)
         elif isinstance(value, bytes):
             raise EntryUnicodeError(key, value)
+        # Coerce any enriched strings (such as those returned by BeautifulSoup) to plain strings to avoid serialization
+        # troubles.
+        elif (
+            isinstance(value, text_type) and type(value) != text_type
+        ):  # pylint: disable=unidiomatic-typecheck
+            value = text_type(value)
 
         # url and original_url handling
         if key == 'url':
@@ -206,6 +212,7 @@ class Entry(LazyDict):
         if key == 'title':
             if not isinstance(value, (str, LazyLookup)):
                 raise PluginError('Tried to set title to %r' % value)
+            self.setdefault('original_title', value)
 
         try:
             log.trace('ENTRY SET: %s = %r' % (key, value))
@@ -244,7 +251,10 @@ class Entry(LazyDict):
             try:
                 snapshot[field] = copy.deepcopy(value)
             except TypeError:
-                log.warning('Unable to take `%s` snapshot for field `%s` in `%s`' % (name, field, self['title']))
+                log.warning(
+                    'Unable to take `%s` snapshot for field `%s` in `%s`'
+                    % (name, field, self['title'])
+                )
         if snapshot:
             if name in self.snapshots:
                 log.warning('Snapshot `%s` is being overwritten for `%s`' % (name, self['title']))
@@ -274,25 +284,31 @@ class Entry(LazyDict):
                 continue
             self[field] = v
 
-    def render(self, template):
+    def render(self, template, native=False):
         """
         Renders a template string based on fields in the entry.
 
-        :param string template: A template string that uses jinja2 or python string replacement format.
+        :param template: A template string or FlexGetTemplate that uses jinja2 or python string replacement format.
+        :param native: If True, and the rendering result can be all native python types, not just strings.
         :return: The result of the rendering.
         :rtype: string
         :raises RenderError: If there is a problem.
         """
-        if not isinstance(template, str):
-            raise ValueError('Trying to render non string template, got %s' % repr(template))
-        log.trace('rendering: %s' % template)
-        return render_from_entry(template, self)
+        if not isinstance(template, (str, FlexGetTemplate)):
+            raise ValueError(
+                'Trying to render non string template or unrecognized template format, got %s'
+                % repr(template)
+            )
+        log.trace('rendering: %s', template)
+        return render_from_entry(template, self, native=native)
 
     def __eq__(self, other):
-        return self.get('title') == other.get('title') and self.get('original_url') == other.get('original_url')
+        return self.get('original_title') == other.get('original_title') and self.get(
+            'original_url'
+        ) == other.get('original_url')
 
     def __hash__(self):
-        return hash(self.get('title', '') + self.get('original_url', ''))
+        return hash(self.get('original_title', '') + self.get('original_url', ''))
 
     def __repr__(self):
         return '<Entry(title=%s,state=%s)>' % (self['title'], self._state)

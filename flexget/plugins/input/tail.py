@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+import io
 import os
 import re
 import logging
@@ -8,7 +9,6 @@ import logging
 from sqlalchemy import Column, Integer, Unicode
 
 from flexget import options, plugin
-from flexget.utils.tools import native_str_to_text
 from flexget.db_schema import versioned_base
 from flexget.entry import Entry
 from flexget.event import event
@@ -27,7 +27,6 @@ class TailPosition(Base):
 
 
 class InputTail(object):
-
     """
     Parse any text for entries using regular expression.
 
@@ -54,6 +53,7 @@ class InputTail(object):
           url: 'URL: (.*)'
         encoding: utf8
     """
+
     schema = {
         'type': 'object',
         'properties': {
@@ -63,17 +63,14 @@ class InputTail(object):
                 'type': 'object',
                 'properties': {
                     'url': {'type': 'string', 'format': 'regex'},
-                    'title': {'type': 'string', 'format': 'regex'}
+                    'title': {'type': 'string', 'format': 'regex'},
                 },
-                'required': ['url', 'title']
+                'required': ['url', 'title'],
             },
-            'format': {
-                'type': 'object',
-                'additionalProperties': {'type': 'string'}
-            }
+            'format': {'type': 'object', 'additionalProperties': {'type': 'string'}},
         },
         'required': ['file', 'entry'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def format_entry(self, entry, d):
@@ -86,25 +83,33 @@ class InputTail(object):
         task.no_entries_ok = True
 
         filename = os.path.expanduser(config['file'])
-        encoding = config.get('encoding', None)
+        encoding = config.get('encoding', 'utf-8')
         with Session() as session:
-            db_pos = (session.query(TailPosition).
-                      filter(TailPosition.task == task.name).filter(TailPosition.filename == filename).first())
+            db_pos = (
+                session.query(TailPosition)
+                .filter(TailPosition.task == task.name)
+                .filter(TailPosition.filename == filename)
+                .first()
+            )
             if db_pos:
                 last_pos = db_pos.position
             else:
                 last_pos = 0
 
-            with open(filename, 'r') as file:
+            with io.open(filename, 'r', encoding=encoding, errors='replace') as file:
                 if task.options.tail_reset == filename or task.options.tail_reset == task.name:
                     if last_pos == 0:
                         log.info('Task %s tail position is already zero' % task.name)
                     else:
-                        log.info('Task %s tail position (%s) reset to zero' % (task.name, last_pos))
+                        log.info(
+                            'Task %s tail position (%s) reset to zero' % (task.name, last_pos)
+                        )
                         last_pos = 0
 
                 if os.path.getsize(filename) < last_pos:
-                    log.info('File size is smaller than in previous execution, resetting to beginning of the file')
+                    log.info(
+                        'File size is smaller than in previous execution, resetting to beginning of the file'
+                    )
                     last_pos = 0
 
                 file.seek(last_pos)
@@ -121,14 +126,7 @@ class InputTail(object):
 
                 # now parse text
 
-                while True:
-                    line = file.readline()
-                    if encoding:
-                        try:
-                            line = native_str_to_text(line, encoding=encoding)
-                        except UnicodeError:
-                            raise plugin.PluginError('Failed to decode file using %s. Check encoding.' % encoding)
-
+                for line in file:
                     if not line:
                         break
 
@@ -139,13 +137,18 @@ class InputTail(object):
                             # check if used field detected, in such case start with new entry
                             if field in used:
                                 if entry.isvalid():
-                                    log.info('Found field %s again before entry was completed. \
-                                              Adding current incomplete, but valid entry and moving to next.' % field)
+                                    log.info(
+                                        'Found field %s again before entry was completed. \
+                                              Adding current incomplete, but valid entry and moving to next.'
+                                        % field
+                                    )
                                     self.format_entry(entry, format_config)
                                     entries.append(entry)
                                 else:
                                     log.info(
-                                        'Invalid data, entry field %s is already found once. Ignoring entry.' % field)
+                                        'Invalid data, entry field %s is already found once. Ignoring entry.'
+                                        % field
+                                    )
                                 # start new entry
                                 entry = Entry()
                                 used = {}
@@ -159,7 +162,9 @@ class InputTail(object):
                         if len(used) == len(entry_config):
                             # check that entry has at least title and url
                             if not entry.isvalid():
-                                log.info('Invalid data, constructed entry is missing mandatory fields (title or url)')
+                                log.info(
+                                    'Invalid data, constructed entry is missing mandatory fields (title or url)'
+                                )
                             else:
                                 self.format_entry(entry, format_config)
                                 entries.append(entry)
@@ -182,5 +187,11 @@ def register_plugin():
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('--tail-reset', action='store', dest='tail_reset', default=False,
-                                               metavar='FILE|TASK', help='reset tail position for a file')
+    options.get_parser('execute').add_argument(
+        '--tail-reset',
+        action='store',
+        dest='tail_reset',
+        default=False,
+        metavar='FILE|TASK',
+        help='reset tail position for a file',
+    )

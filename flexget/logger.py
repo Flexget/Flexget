@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+import codecs
 import collections
 import contextlib
 import logging
@@ -9,12 +10,7 @@ import sys
 import threading
 import uuid
 import warnings
-
-# Support order in python 2.7 and 3
-try:
-    from collections import OrderedDict
-except ImportError:
-    pass
+import os
 
 from flexget import __version__
 from flexget.utils.tools import io_encoding
@@ -23,6 +19,9 @@ from flexget.utils.tools import io_encoding
 TRACE = 5
 # A level more detailed than INFO
 VERBOSE = 15
+# environment variables to modify rotating log parameters from defaults of 1 MB and 9 files
+ENV_MAXBYTES = 'FLEXGET_LOG_MAXBYTES'
+ENV_MAXCOUNT = 'FLEXGET_LOG_MAXCOUNT'
 
 # Stores `task`, logging `session_id`, and redirected `output` stream in a thread local context
 local_context = threading.local()
@@ -104,24 +103,9 @@ def get_capture_loglevel():
     return getattr(local_context, 'loglevel', None)
 
 
-def console(text, *args, **kwargs):
-    """
-    Print to console safely. Output is able to be captured by different streams in different contexts.
-
-    Any plugin wishing to output to the user's console should use this function instead of print so that
-    output can be redirected when FlexGet is invoked from another process.
-
-    Accepts arguments like the `print` function does.
-    """
-    if not isinstance(text, str):
-        text = str(text).encode(io_encoding, 'replace')
-    kwargs['file'] = getattr(local_context, 'output', sys.stdout)
-    print(text, *args, **kwargs)
-    kwargs['file'].flush()  # flush to make sure the output is printed right away
-
-
 class RollingBuffer(collections.deque):
     """File-like that keeps a certain number of lines of text in memory."""
+
     def write(self, line):
         self.append(line)
 
@@ -133,12 +117,15 @@ class FlexGetLogger(logging.Logger):
         extra = extra or {}
         extra.update(
             task=getattr(local_context, 'task', ''),
-            session_id=getattr(local_context, 'session_id', ''))
+            session_id=getattr(local_context, 'session_id', ''),
+        )
         # Replace newlines in log messages with \n
         if isinstance(msg, str):
             msg = msg.replace('\n', '\\n')
 
-        return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra, *exargs)
+        return logging.Logger.makeRecord(
+            self, name, level, fn, lno, msg, args, exc_info, func, extra, *exargs
+        )
 
     def trace(self, msg, *args, **kwargs):
         """Log at TRACE level (more detailed than DEBUG)."""
@@ -151,6 +138,7 @@ class FlexGetLogger(logging.Logger):
 
 class FlexGetFormatter(logging.Formatter):
     """Custom formatter that can handle both regular log records and those created by FlexGetLogger"""
+
     flexget_fmt = '%(asctime)-15s %(levelname)-8s %(name)-13s %(task)-15s %(message)s'
 
     def __init__(self):
@@ -218,14 +206,24 @@ def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
 
     formatter = FlexGetFormatter()
     if to_file:
-        file_handler = logging.handlers.RotatingFileHandler(filename, maxBytes=1000 * 1024, backupCount=9)
+        file_handler = logging.handlers.RotatingFileHandler(
+            filename,
+            maxBytes=int(os.environ.get(ENV_MAXBYTES, 1000 * 1024)),
+            backupCount=int(os.environ.get(ENV_MAXCOUNT, 9)),
+        )
         file_handler.setFormatter(formatter)
         file_handler.setLevel(level)
         logger.addHandler(file_handler)
 
     # without --cron we log to console
     if to_console:
-        console_handler = logging.StreamHandler(sys.stdout)
+        # Make sure we don't send any characters that the current terminal doesn't support printing
+        stdout = sys.stdout
+        if hasattr(stdout, 'buffer'):
+            # On python 3, we need to get the buffer directly to support writing bytes
+            stdout = stdout.buffer
+        safe_stdout = codecs.getwriter(io_encoding)(stdout, 'replace')
+        console_handler = logging.StreamHandler(safe_stdout)
         console_handler.setFormatter(formatter)
         console_handler.setLevel(level)
         logger.addHandler(console_handler)

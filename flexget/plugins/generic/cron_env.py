@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import sys
@@ -20,13 +20,17 @@ def check_env(manager, options):
     if options.cron:
         if 'terminal_encoding' in persistence:
             terminal_encoding = persistence['terminal_encoding']
-            if terminal_encoding != encoding:
-                log.warning('Your cron environment has different filesystem encoding '
-                            '(%s) compared to your terminal environment (%s).' %
-                            (encoding, terminal_encoding))
+            if terminal_encoding.lower() != encoding.lower():
+                log.warning(
+                    'Your cron environment has different filesystem encoding '
+                    '(%s) compared to your terminal environment (%s).'
+                    % (encoding, terminal_encoding)
+                )
                 if encoding == 'ANSI_X3.4-1968':
-                    log.warning('Your current cron environment results filesystem encoding ANSI_X3.4-1968 '
-                                'which supports only ASCII letters in filenames.')
+                    log.warning(
+                        'Your current cron environment results filesystem encoding ANSI_X3.4-1968 '
+                        'which supports only ASCII letters in filenames.'
+                    )
             else:
                 log_once('Good! Your crontab environment seems to be same as terminal.')
         else:

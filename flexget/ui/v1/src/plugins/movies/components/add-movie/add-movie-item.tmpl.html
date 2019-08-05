@@ -1,0 +1,14 @@
+<md-list-item flex class="list">
+    <img ng-src="{{ vm.movie.thumbnail }}"/>
+    <a flex ng-href="{{ vm.movie.url }}" target="_blank" class="title md-subhead">{{ vm.movie.name }} ({{ vm.movie.year }})</a>
+    <md-input-container>
+        <md-select ng-model="vm.selectedList"
+                placeholder="Movie list">
+            <md-option ng-repeat="list in ::vm.lists" value="{{ list.id }}">
+                    {{ list.name }}
+            </md-option>
+        </md-select>
+    </md-input-container>
+    <md-button class="md-raised md-secondary" ng-disabled="!vm.selectedList" ng-click="vm.addMovie()">Add</md-button>
+	<ng-transclude></ng-transclude>
+</md-list-item>

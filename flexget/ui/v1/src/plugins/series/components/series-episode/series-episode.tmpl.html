@@ -1,0 +1,18 @@
+<md-list-item layout="row" layout-align="space-between" class="series-episode">
+    <h3 flex> {{ ::vm.episode.identifier }} </h3>
+
+    <md-button ng-disabled="vm.episode.number_of_releases == 0" ng-click="vm.showReleases()">
+        Releases
+    </md-button>
+
+    <md-button ng-click="vm.deleteEpisode()">
+        Delete Episode
+    </md-button>
+    <md-button ng-disabled="vm.episode.number_of_releases == 0" ng-click="vm.deleteReleases()" >
+        Delete Releases
+    </md-button>
+    <md-button ng-disabled="vm.episode.number_of_releases == 0" ng-click="vm.resetReleases()">
+        Reset Releases
+    </md-button>
+
+</md-list-item>

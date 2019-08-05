@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -32,37 +32,46 @@ class Manipulate(object):
             extract: \[\d\d\d\d\](.*)
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        bundle = root.accept('list').accept('dict')
-        # prevent invalid indentation level
-        bundle.reject_keys(['from', 'extract', 'replace', 'phase'],
-            'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
-        edit = bundle.accept_any_key('dict')
-        edit.accept('choice', key='phase').accept_choices(['metainfo', 'filter'], ignore_case=True)
-        edit.accept('text', key='from')
-        edit.accept('regexp', key='extract')
-        edit.accept('text', key='separator')
-        edit.accept('boolean', key='remove')
-        replace = edit.accept('dict', key='replace')
-        replace.accept('regexp', key='regexp', required=True)
-        replace.accept('text', key='format', required=True)
-        return root
+    schema = {
+        'type': 'array',
+        'items': {
+            'type': 'object',
+            'additionalProperties': {
+                'type': 'object',
+                'properties': {
+                    'phase': {'enum': ['metainfo', 'filter', 'modify']},
+                    'from': {'type': 'string'},
+                    'extract': {'type': 'string', 'format': 'regex'},
+                    'separator': {'type': 'string'},
+                    'remove': {'type': 'boolean'},
+                    'replace': {
+                        'type': 'object',
+                        'properties': {
+                            'regexp': {'type': 'string', 'format': 'regex'},
+                            'format': {'type': 'string'},
+                        },
+                        'required': ['regexp', 'format'],
+                        'additionalProperties': False,
+                    },
+                },
+                'additionalProperties': False,
+            },
+        },
+    }
 
     def on_task_start(self, task, config):
         """
         Separates the config into a dict with a list of jobs per phase.
         Allows us to skip phases without any jobs in them.
         """
-        self.phase_jobs = {'filter': [], 'metainfo': []}
+        self.phase_jobs = {'filter': [], 'metainfo': [], 'modify': []}
         for item in config:
             for item_config in item.values():
                 # Get the phase specified for this item, or use default of metainfo
                 phase = item_config.get('phase', 'metainfo')
                 self.phase_jobs[phase].append(item)
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_metainfo(self, task, config):
         if not self.phase_jobs['metainfo']:
             # return if no jobs for this phase
@@ -70,12 +79,26 @@ class Manipulate(object):
         modified = sum(self.process(entry, self.phase_jobs['metainfo']) for entry in task.entries)
         log.verbose('Modified %d entries.' % modified)
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_filter(self, task, config):
         if not self.phase_jobs['filter']:
             # return if no jobs for this phase
             return
-        modified = sum(self.process(entry, self.phase_jobs['filter']) for entry in task.entries + task.rejected)
+        modified = sum(
+            self.process(entry, self.phase_jobs['filter'])
+            for entry in task.entries + task.rejected
+        )
+        log.verbose('Modified %d entries.' % modified)
+
+    @plugin.priority(plugin.PRIORITY_FIRST)
+    def on_task_modify(self, task, config):
+        if not self.phase_jobs['modify']:
+            # return if no jobs for this phase
+            return
+        modified = sum(
+            self.process(entry, self.phase_jobs['modify'])
+            for entry in task.entries + task.rejected
+        )
         log.verbose('Modified %d entries.' % modified)
 
     def process(self, entry, jobs):
@@ -93,7 +116,10 @@ class Manipulate(object):
                 if 'from' in config:
                     from_field = config['from']
                 field_value = entry.get(from_field)
-                log.debug('field: `%s` from_field: `%s` field_value: `%s`' % (field, from_field, field_value))
+                log.debug(
+                    'field: `%s` from_field: `%s` field_value: `%s`'
+                    % (field, from_field, field_value)
+                )
 
                 if config.get('remove'):
                     if field in entry:

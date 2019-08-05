@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -24,12 +23,15 @@ class FilterRequireField(object):
 
     @plugin.priority(32)
     def on_task_filter(self, task, config):
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = [config]
         for entry in task.entries:
             for field in config:
-                if not entry.get(field):
+                if field not in entry:
                     entry.reject('Required field %s is not present' % field)
+                    break
+                if entry[field] is None:
+                    entry.reject('Required field %s is `None`' % field)
                     break
 
 

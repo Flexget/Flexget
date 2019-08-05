@@ -1,0 +1,79 @@
+// Core
+@import "variables";
+@import "header";
+@import "loading-bar";
+// Components
+@import "../components/sidenav/sidenav";
+@import "../components/auth/login";
+@import "../components/database/database";
+@import "../blocks/error/error-dialog";
+@import "../blocks/pagination/pagination";
+
+body {
+  background: $flexget-background-color;
+}
+
+ui-view {
+  display: inherit;
+  width: 100%;
+}
+
+// Directives
+md-input-container .hint {
+  left: 2px;
+  right: auto;
+  bottom: 7px;
+  font-size: 12px;
+  line-height: 14px;
+  transition: all 0.3s cubic-bezier(0.55, 0, 0.55, 0.2);
+  color: grey;
+}
+
+.text-lightgrey {
+  color: #B8B8B8;
+}
+
+.text-white {
+  color: white;
+}
+
+@font-face {
+  font-family: 'FontAwesome';
+  font-style: normal;
+  font-weight: 400;
+}
+
+#content {
+  padding: 0px;
+  background: $flexget-background-color;
+  md-content.md-default-theme, md-content {
+    background: $flexget-background-color;
+  }
+}
+
+#loading-bar-spinner {
+  top: 50%;
+  left: 50%;
+}
+
+#loading-bar {
+
+}
+
+.fg-material-paging .fg-pagination-button {
+  width: 50px;
+  min-width: 50px;
+  margin: 3px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.operation-toolbar {
+  font-size: 16px;
+}
+
+.md-errors-spacer:empty {
+  display: none;
+}

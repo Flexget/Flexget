@@ -1,0 +1,21 @@
+.execute {
+
+    .task-search .md-chips {
+        padding: 0px;
+    }
+    .wave-spinner {
+        margin: -15px;
+        width: auto;
+        height: auto;
+    }
+
+    .wave-spinner>div {
+        width: 2px;
+        height: 2px;
+        background-color: #F6A52F;
+    }
+}
+
+.tooltip-fix {
+	pointer-events: auto;
+}

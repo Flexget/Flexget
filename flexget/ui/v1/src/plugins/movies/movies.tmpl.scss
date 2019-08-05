@@ -1,0 +1,85 @@
+.tab-icon {
+  margin-left: 25px;
+  padding: 3px;
+  height: auto;
+}
+
+.tab-tab-plus {
+  padding: 3px;
+  height: auto;
+}
+
+md-toolbar.movie-tabsbar {
+  background-color: transparent;
+
+  md-tabs > md-tabs-wrapper {
+    background-color: transparent;
+
+    > md-prev-button > md-icon {
+      color: rgba(0,0,0,0.54);
+      fill: currentColor;
+    }
+
+    > md-next-button > md-icon {
+      color: rgba(0,0,0,0.54);
+      fill: currentColor
+    }
+
+    > md-tabs-canvas > md-pagination-wrapper > md-tab-item {
+      max-width: none !important;
+
+      > section > md-icon {
+        color: inherit;
+      }
+    }
+  }
+
+  .add-movie-input {
+    margin-bottom: 5px;
+  }
+}
+
+md-tabs.movie-tabs md-tabs-wrapper {
+  display:none !important;
+}
+
+//nth-last-child(2), because 1 doesnt work
+.movie-tabs .md-tab:nth-last-child(2) {
+	padding: 0px;
+	
+	section {
+		padding: 12px 24px;
+	}
+}
+
+.list-selection {
+  z-index: 101;
+}
+
+.add-movie-panel {
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 7px 8px -4px rgba(0, 0, 0, 0.2),
+      0 13px 19px 2px rgba(0, 0, 0, 0.14),
+      0 5px 24px 4px rgba(0, 0, 0, 0.12);
+  min-width: 250px;
+
+  md-content {
+    max-height: 500px;
+  }
+
+  .list {
+      padding-left: 6px;
+  }
+
+  img {
+      height: 60px;
+  }
+
+  .title {
+      margin-left: 7px;
+      margin-right: 15px;
+      color: black;
+      text-decoration: none;
+  }
+}

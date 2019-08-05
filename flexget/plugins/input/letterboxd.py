@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -11,31 +11,18 @@ from flexget.utils.requests import RequestException, Session, TimedLimiter
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('letterboxd')
-logging.getLogger('api_tmdb').setLevel(logging.CRITICAL)
 
 requests = Session(max_retries=5)
 requests.add_domain_limiter(TimedLimiter('letterboxd.com', '1 seconds'))
 base_url = 'http://letterboxd.com'
 
 SLUGS = {
-    'default': {
-        'p_slug': '/%(user)s/list/%(list)s/',
-        'f_slug': 'data-film-slug'},
-    'diary': {
-        'p_slug': '/%(user)s/films/diary/',
-        'f_slug': 'data-film-slug'},
-    'likes': {
-        'p_slug': '/%(user)s/likes/films/',
-        'f_slug': 'data-film-link'},
-    'rated': {
-        'p_slug': '/%(user)s/films/ratings/',
-        'f_slug': 'data-film-slug'},
-    'watched': {
-        'p_slug': '/%(user)s/films/',
-        'f_slug': 'data-film-slug'},
-    'watchlist': {
-        'p_slug': '/%(user)s/watchlist/',
-        'f_slug': 'data-film-slug'}
+    'default': {'p_slug': '/%(user)s/list/%(list)s/', 'f_slug': 'data-film-slug'},
+    'diary': {'p_slug': '/%(user)s/films/diary/', 'f_slug': 'data-film-slug'},
+    'likes': {'p_slug': '/%(user)s/likes/films/', 'f_slug': 'data-film-link'},
+    'rated': {'p_slug': '/%(user)s/films/ratings/', 'f_slug': 'data-film-slug'},
+    'watched': {'p_slug': '/%(user)s/films/', 'f_slug': 'data-film-slug'},
+    'watchlist': {'p_slug': '/%(user)s/watchlist/', 'f_slug': 'data-film-slug'},
 }
 
 SORT_BY = {
@@ -48,25 +35,24 @@ SORT_BY = {
     'rating-ascending': 'by/rating-lowest/',
     'rating-descending': 'by/rating/',
     'release-ascending': 'by/release-earliest/',
-    'release-descending': 'by/release/'
+    'release-descending': 'by/release/',
 }
 
 
 class Letterboxd(object):
-
     schema = {
         'type': 'object',
         'properties': {
             'username': {'type': 'string'},
             'list': {'type': 'string'},
-            'sort_by': {
-                'type': 'string',
-                'enum': list(SORT_BY.keys()),
-                'default': 'default'},
-            'max_results': {'type': 'integer'}
+            'sort_by': {'type': 'string', 'enum': list(SORT_BY.keys()), 'default': 'default'},
+            'max_results': {
+                'type': 'integer',
+                'deprecated': '`limit` plugin should be used instead of letterboxd `max_results` option'
+            },
         },
         'required': ['username', 'list'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def build_config(self, config):
@@ -74,20 +60,23 @@ class Letterboxd(object):
         list_key = config['list']
         if list_key not in list(SLUGS.keys()):
             list_key = 'default'
-        config['p_slug'] = SLUGS[list_key]['p_slug'] % {'user': config['username'], 'list': config['list']}
+        config['p_slug'] = SLUGS[list_key]['p_slug'] % {
+            'user': config['username'],
+            'list': config['list'],
+        }
         config['f_slug'] = SLUGS[list_key]['f_slug']
         config['sort_by'] = SORT_BY[config['sort_by']]
 
         return config
 
     def tmdb_lookup(self, search):
-        tmdb = plugin.get_plugin_by_name('api_tmdb').instance.lookup(tmdb_id=search)
+        tmdb = plugin.get('api_tmdb', self).lookup(tmdb_id=search)
         result = {
             'title': '%s (%s)' % (tmdb.name, tmdb.year),
             'imdb_id': tmdb.imdb_id,
             'tmdb_id': tmdb.id,
             'movie_name': tmdb.name,
-            'movie_year': tmdb.year
+            'movie_year': tmdb.year,
         }
 
         return result
@@ -105,7 +94,9 @@ class Letterboxd(object):
         except AttributeError:
             pass
         if config['list'] == 'diary':
-            entry['letterboxd_uscore'] = int(film.find_next(attrs={'data-rating': True}).get('data-rating'))
+            entry['letterboxd_uscore'] = int(
+                film.find_next(attrs={'data-rating': True}).get('data-rating')
+            )
         elif config['list'] == 'rated':
             entry['letterboxd_uscore'] = int(film.find_next(itemprop='rating').get('content'))
 
@@ -121,7 +112,6 @@ class Letterboxd(object):
 
         log.verbose('Looking for films in Letterboxd list: %s' % url)
 
-        entries = []
         while next_page is not None and rcount < max_results:
             try:
                 page = requests.get(url).content
@@ -131,18 +121,15 @@ class Letterboxd(object):
 
             for film in soup.find_all(attrs={config['f_slug']: True}):
                 if rcount < max_results:
-                    entry = self.parse_film(film, config)
-                    entries.append(entry)
+                    yield self.parse_film(film, config)
                     if 'max_results' in config:
                         rcount += 1
 
-            next_page = soup.find(class_='paginate-next')
+            next_page = soup.select_one('.paginate-nextprev .next')
             if next_page is not None:
                 next_page = next_page.get('href')
                 if next_page is not None:
                     url = base_url + next_page
-
-        return entries
 
 
 @event('plugin.register')

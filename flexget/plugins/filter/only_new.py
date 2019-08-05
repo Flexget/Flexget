@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -17,13 +17,15 @@ class FilterOnlyNew(object):
     def on_task_start(self, task, config):
         """Make sure the remember_rejected plugin is available"""
         # Raises an error if plugin isn't available
-        plugin.get_plugin_by_name('remember_rejected')
+        plugin.get('remember_rejected', self)
 
     def on_task_learn(self, task, config):
         """Reject all entries so remember_rejected will reject them next time"""
         if not config or not task.entries:
             return
-        log.verbose('Rejecting entries after the task has run so they are not processed next time.')
+        log.verbose(
+            'Rejecting entries after the task has run so they are not processed next time.'
+        )
         for entry in task.entries:
             entry.reject('Already processed entry', remember=True)
 

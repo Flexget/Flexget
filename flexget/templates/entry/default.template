@@ -1,0 +1,8 @@
+{% if series_name is defined %}
+{{ tvdb_series_name|d(series_name) }}
+{{series_id}} {{tvdb_ep_name|d('')}}
+{% elif imdb_name is defined %}
+{{imdb_name}} {{imdb_year}}
+{% elif title is defined %}
+{{ title }}
+{% endif %}

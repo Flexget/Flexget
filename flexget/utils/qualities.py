@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import re
@@ -11,6 +11,7 @@ log = logging.getLogger('utils.qualities')
 
 class QualityComponent(object):
     """"""
+
     def __init__(self, type, value, name, regexp=None, modifier=None, defaults=None):
         """
         :param type: Type of quality component. (resolution, source, codec, or audio)
@@ -46,7 +47,7 @@ class QualityComponent(object):
             return False, ""
         else:
             # remove matching part from the text
-            text = text[:match.start()] + text[match.end():]
+            text = text[: match.start()] + text[match.end() :]
         return True, text
 
     def __hash__(self):
@@ -115,6 +116,7 @@ class QualityComponent(object):
         # No mutable attributes, return a regular copy
         return copy.copy(self)
 
+
 _resolutions = [
     QualityComponent('resolution', 10, '360p'),
     QualityComponent('resolution', 20, '368p', '368p?'),
@@ -122,9 +124,10 @@ _resolutions = [
     QualityComponent('resolution', 40, '576p', '576p?'),
     QualityComponent('resolution', 45, 'hr'),
     QualityComponent('resolution', 50, '720i'),
-    QualityComponent('resolution', 60, '720p', '(1280x)?720(p|hd)?x?(50)?'),
+    QualityComponent('resolution', 60, '720p', '(1280x)?720(p|hd)?x?([56]0)?'),
     QualityComponent('resolution', 70, '1080i'),
-    QualityComponent('resolution', 80, '1080p', '(1920x)?1080p?x?(50)?')
+    QualityComponent('resolution', 80, '1080p', '(1920x)?1080p?x?([56]0)?'),
+    QualityComponent('resolution', 90, '2160p', '((3840x)?2160p?x?([56]0)?)|4k'),
 ]
 _sources = [
     QualityComponent('source', 10, 'workprint', modifier=-8),
@@ -138,41 +141,43 @@ _sources = [
     QualityComponent('source', 90, 'tvrip', 'tv[\W_]?rip'),
     QualityComponent('source', 100, 'dsr', 'dsr|ds[\W_]?rip'),
     QualityComponent('source', 110, 'sdtv', '(?:[sp]dtv|dvb)(?:[\W_]?rip)?'),
-    QualityComponent('source', 120, 'webrip', 'web[\W_]?rip'),
-    QualityComponent('source', 130, 'dvdscr', '(?:(?:dvd|web)[\W_]?)?scr(?:eener)?', modifier=0),
-    QualityComponent('source', 140, 'bdscr', 'bdscr(?:eener)?'),
+    QualityComponent('source', 120, 'dvdscr', '(?:(?:dvd|web)[\W_]?)?scr(?:eener)?', modifier=0),
+    QualityComponent('source', 130, 'bdscr', 'bdscr(?:eener)?'),
+    QualityComponent('source', 140, 'webrip', 'web[\W_]?rip'),
     QualityComponent('source', 150, 'hdtv', 'a?hdtv(?:[\W_]?rip)?'),
-    QualityComponent('source', 160, 'webdl', 'web(?:[\W_]?(dl|hd))'),
+    QualityComponent('source', 160, 'webdl', 'web(?:[\W_]?(dl|hd))?'),
     QualityComponent('source', 170, 'dvdrip', 'dvd(?:[\W_]?rip)?'),
     QualityComponent('source', 175, 'remux'),
-    QualityComponent('source', 180, 'bluray', '(?:b[dr][\W_]?rip|blu[\W_]?ray(?:[\W_]?rip)?)')
+    QualityComponent('source', 180, 'bluray', '(?:b[dr][\W_]?rip|blu[\W_]?ray(?:[\W_]?rip)?)'),
 ]
 _codecs = [
     QualityComponent('codec', 10, 'divx'),
     QualityComponent('codec', 20, 'xvid'),
     QualityComponent('codec', 30, 'h264', '[hx].?264'),
+    QualityComponent('codec', 35, 'vp9'),
     QualityComponent('codec', 40, 'h265', '[hx].?265|hevc'),
-    QualityComponent('codec', 50, '10bit', '10.?bit|hi10p')
+    QualityComponent('codec', 50, '10bit', '10.?bit|hi10p'),
 ]
-channels = '(?:(?:[\W_]?5[\W_]?1)|(?:[\W_]?2[\W_]?(?:0|ch)))'
+channels = '(?:(?:[^\w+]?[1-7][\W_]?(?:0|1|ch)))'
 _audios = [
     QualityComponent('audio', 10, 'mp3'),
     # TODO: No idea what order these should go in or if we need different regexps
     QualityComponent('audio', 20, 'aac', 'aac%s?' % channels),
     QualityComponent('audio', 30, 'dd5.1', 'dd%s' % channels),
     QualityComponent('audio', 40, 'ac3', 'ac3%s?' % channels),
+    QualityComponent('audio', 45, 'dd+5.1', 'dd[p+]%s' % channels),
     QualityComponent('audio', 50, 'flac', 'flac%s?' % channels),
     # The DTSs are a bit backwards, but the more specific one needs to be parsed first
-    QualityComponent('audio', 60, 'dtshd', 'dts[\W_]?hd(?:[\W_]?ma)?'),
+    QualityComponent('audio', 60, 'dtshd', 'dts[\W_]?hd(?:[\W_]?ma)?%s?' % channels),
     QualityComponent('audio', 70, 'dts'),
-    QualityComponent('audio', 80, 'truehd')
+    QualityComponent('audio', 80, 'truehd', 'truehd%s?' % channels),
 ]
 
 _UNKNOWNS = {
     'resolution': QualityComponent('resolution', 0, 'unknown'),
     'source': QualityComponent('source', 0, 'unknown'),
     'codec': QualityComponent('codec', 0, 'unknown'),
-    'audio': QualityComponent('audio', 0, 'unknown')
+    'audio': QualityComponent('audio', 0, 'unknown'),
 }
 
 # For wiki generating help
@@ -182,7 +187,6 @@ _UNKNOWNS = {
         print '- ' + item.name
     print '}}}'
 '''
-
 
 _registry = {}
 for items in (_resolutions, _sources, _codecs, _audios):
@@ -249,7 +253,9 @@ class Quality(object):
 
     @property
     def name(self):
-        name = ' '.join(str(p) for p in (self.resolution, self.source, self.codec, self.audio) if p.value != 0)
+        name = ' '.join(
+            str(p) for p in (self.resolution, self.source, self.codec, self.audio) if p.value != 0
+        )
         return name or 'unknown'
 
     @property
@@ -278,8 +284,6 @@ class Quality(object):
     def __eq__(self, other):
         if isinstance(other, basestring):
             other = Quality(other)
-            if not other:
-                raise TypeError('`%s` does not appear to be a valid quality string.' % other.text)
         if not isinstance(other, Quality):
             if other is None:
                 return False
@@ -292,8 +296,6 @@ class Quality(object):
     def __lt__(self, other):
         if isinstance(other, basestring):
             other = Quality(other)
-            if not other:
-                raise TypeError('`%s` does not appear to be a valid quality string.' % other.text)
         if not isinstance(other, Quality):
             raise TypeError('Cannot compare %r and %r' % (self, other))
         return self._comparator < other._comparator
@@ -308,8 +310,12 @@ class Quality(object):
         return not self.__le__(other)
 
     def __repr__(self):
-        return '<Quality(resolution=%s,source=%s,codec=%s,audio=%s)>' % (self.resolution, self.source,
-                                                                         self.codec, self.audio)
+        return '<Quality(resolution=%s,source=%s,codec=%s,audio=%s)>' % (
+            self.resolution,
+            self.source,
+            self.codec,
+            self.audio,
+        )
 
     def __str__(self):
         return self.name
@@ -403,15 +409,24 @@ class RequirementComponent(object):
                     self.none_of.add(qual)
 
     def __eq__(self, other):
-        return ((self.max, self.max, self.acceptable, self.none_of) ==
-                (other.max, other.max, other.acceptable, other.none_of))
+        return (self.max, self.max, self.acceptable, self.none_of) == (
+            other.max,
+            other.max,
+            other.acceptable,
+            other.none_of,
+        )
 
     def __hash__(self):
-        return hash(tuple([self.min, self.max, tuple(sorted(self.acceptable)), tuple(sorted(self.none_of))]))
+        return hash(
+            tuple(
+                [self.min, self.max, tuple(sorted(self.acceptable)), tuple(sorted(self.none_of))]
+            )
+        )
 
 
 class Requirements(object):
     """Represents requirements for allowable qualities. Can determine whether a given Quality passes requirements."""
+
     def __init__(self, req=''):
         self.text = ''
         self.resolution = RequirementComponent('resolution')
@@ -466,15 +481,13 @@ class Requirements(object):
         """
         if isinstance(qual, basestring):
             qual = Quality(qual)
-            if not qual:
-                raise TypeError('`%s` does not appear to be a valid quality string.' % qual.text)
         for r_component, q_component in zip(self.components, qual.components):
             if not r_component.allows(q_component, loose=loose):
                 return False
         return True
 
     def __eq__(self, other):
-        if isinstance(other, str):
+        if isinstance(other, basestring):
             other = Requirements(other)
         return self.components == other.components
 

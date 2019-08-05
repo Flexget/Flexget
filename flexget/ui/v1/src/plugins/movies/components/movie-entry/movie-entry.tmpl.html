@@ -1,0 +1,42 @@
+<md-card class="movie-entry">
+  <div class="movie-poster">
+    <img ng-src="{{ vm.metadata.posters[0] ? 'api/cached/?url=' + (vm.metadata.posters[0].urls.w185 ? vm.metadata.posters[0].urls.w185 : vm.metadata.posters[0].urls.original) : null }}"/>
+  </div>
+  <div class="movie-info">
+    <h3>{{ ::vm.movie.title }} ({{ ::vm.movie.year }})
+      <span class="rating">
+        <md-icon md-font-set="fa" md-font-icon="fa-star"></md-icon>
+        <span class="md-suhead">
+        {{ ::vm.metadata.rating | number:2 }}
+        </span>
+      </span>
+    </h3>
+
+    <md-chips ng-model="::vm.metadata.genres" readonly="true">
+      <md-chip-template>
+        {{ $chip }}
+      </md-chip-template>
+    </md-chips>
+
+    <p class="movie-plot">
+      {{ ::vm.metadata.overview }}
+    </p>
+  </div>
+
+  <md-fab-speed-dial md-direction="left" class="md-scale more-btn">
+    <md-fab-trigger>
+      <md-button aria-label="More" class="md-fab md-mini">
+        <i class="fa fa-bars" aria-hidden="true"></i>
+      </md-button>
+    </md-fab-trigger>
+    <md-fab-actions>
+      <md-button aria-label="delete movie" ng-click="vm.deleteMovie()" class="md-fab md-raised md-mini">
+        <i class="fa fa-trash" aria-hidden="true"></i>
+      </md-button>
+
+      <md-button aria-label="More info" class="md-fab md-raised md-mini">
+        <a target="_blank" ng-href="http://www.imdb.com/title/{{ ::vm.metadata.imdb_id }}"><i class="fa fa-film" aria-hidden="true"></i></a>
+      </md-button>
+    </md-fab-actions>
+  </md-fab-speed-dial>
+</md-card>

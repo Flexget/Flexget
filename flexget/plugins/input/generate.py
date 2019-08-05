@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -22,11 +22,19 @@ class Generate(object):
             entry = Entry()
             import string
             import random
+
             entry['url'] = 'http://localhost/generate/%s/%s' % (
                 i,
-                ''.join([random.choice(string.letters + string.digits) for x in range(1, 30)]))
-            entry['title'] = ''.join([random.choice(string.letters + string.digits) for x in range(1, 30)])
-            entry['description'] = ''.join([random.choice(string.letters + string.digits) for x in range(1, 1000)])
+                ''.join(
+                    [random.choice(string.ascii_letters + string.digits) for x in range(1, 30)]
+                ),
+            )
+            entry['title'] = ''.join(
+                [random.choice(string.ascii_letters + string.digits) for x in range(1, 30)]
+            )
+            entry['description'] = ''.join(
+                [random.choice(string.ascii_letters + string.digits) for x in range(1, 1000)]
+            )
             entries.append(entry)
         return entries
 

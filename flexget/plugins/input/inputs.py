@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -28,23 +28,19 @@ class PluginInputs(object):
                 {
                     'maxProperties': 1,
                     'error_maxProperties': 'Plugin options within inputs plugin must be indented 2 more spaces than '
-                                           'the first letter of the plugin name.',
-                    'minProperties': 1
-                }
+                    'the first letter of the plugin name.',
+                    'minProperties': 1,
+                },
             ]
-        }
+        },
     }
 
     def on_task_input(self, task, config):
-        entries = []
         entry_titles = set()
         entry_urls = set()
         for item in config:
             for input_name, input_config in item.items():
                 input = plugin.get_plugin_by_name(input_name)
-                if input.api_ver == 1:
-                    raise plugin.PluginError('Plugin %s does not support API v2' % input_name)
-
                 method = input.phase_handlers['input']
                 try:
                     result = method(task, input_config)
@@ -66,10 +62,9 @@ class PluginInputs(object):
                     if any(url in entry_urls for url in urls):
                         log.debug('URL for `%s` already in entry list, skipping.' % entry['title'])
                         continue
-                    entries.append(entry)
+                    yield entry
                     entry_titles.add(entry['title'])
                     entry_urls.update(urls)
-        return entries
 
 
 @event('plugin.register')

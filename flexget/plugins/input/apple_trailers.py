@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -59,19 +59,18 @@ class AppleTrailers(object):
                     'quality': {
                         'type': 'string',
                         'enum': list(qualities.keys()),
-                        'default': '720p'
+                        'default': '720p',
                     },
-                    'genres': {'type': 'array', 'items': {'type': 'string'}}
+                    'genres': {'type': 'array', 'items': {'type': 'string'}},
                 },
-                'additionalProperties': False
+                'additionalProperties': False,
             },
-            {'title': 'justquality', 'type': 'string', 'enum': list(qualities.keys())}
+            {'title': 'justquality', 'type': 'string', 'enum': list(qualities.keys())},
         ]
-
     }
 
     def broken(self, error_message):
-        raise plugin.PluginError('Plugin is most likely broken. Got: %s', error_message)
+        raise plugin.PluginError('Plugin is most likely broken. Got: %s' % error_message)
 
     @plugin.priority(127)
     @cached('apple_trailers')
@@ -83,7 +82,7 @@ class AppleTrailers(object):
         try:
             r = task.requests.get(self.rss_url)
         except RequestException as e:
-            raise plugin.PluginError('Retrieving Apple Trailers RSS feed failed: %s', e.args[0])
+            raise plugin.PluginError('Retrieving Apple Trailers RSS feed failed: %s' % e)
 
         rss = feedparser.parse(r.content)
 
@@ -100,7 +99,7 @@ class AppleTrailers(object):
             entry = Entry()
             movie_url = item['link']
             entry['title'] = item['title']
-            entry['movie_name'], entry['apple_trailers_name'] = entry['title'].split(' - ')
+            entry['movie_name'], entry['apple_trailers_name'] = entry['title'].split(' - ', 1)
             if not trailers.get(movie_url):
                 try:
                     movie_page = task.requests.get(movie_url).text
@@ -117,7 +116,7 @@ class AppleTrailers(object):
                     log.error('Failed to get trailer %s: %s', entry['title'], e.args[0])
                     continue
             else:
-                movie_data = trailers['movie_url']['json']
+                movie_data = trailers[movie_url]['json']
             genres = {genre.get('name') for genre in movie_data.get('details').get('genres')}
             config_genres = set(config.get('genres', []))
             if genres and config_genres and not set.intersection(config_genres, genres):
@@ -129,7 +128,9 @@ class AppleTrailers(object):
             for clip in movie_data.get('clips'):
                 if clip.get('title') == entry['apple_trailers_name']:
                     try:
-                        trailer_url = clip['versions']['enus']['sizes'][self.qualities[desired_quality]]
+                        trailer_url = clip['versions']['enus']['sizes'][
+                            self.qualities[desired_quality]
+                        ]
                         src = trailer_url.get('src')
                         src_alt = trailer_url.get('srcAlt')
                         # .mov tends to be a streaming video file, but the real video file is the same url, but
@@ -168,7 +169,6 @@ class AppleTrailers(object):
 
 
 class AppleTrailersHeader(AuthBase):
-
     def __call__(self, request):
         request.headers['User-Agent'] = 'QuickTime/7.7'
         return request

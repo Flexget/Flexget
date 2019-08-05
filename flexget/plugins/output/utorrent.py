@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import os
 from logging import getLogger
@@ -36,24 +36,24 @@ class PluginUtorrent(object):
             'url': {'type': 'string', 'format': 'url'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
-            'path': {'type': 'string'}
+            'path': {'type': 'string'},
         },
         'required': ['username', 'password', 'url'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
-    
+
     @plugin.priority(120)
     def on_task_download(self, task, config):
         """
-            Call download plugin to generate the temp files we will load
-            into deluge then verify they are valid torrents
+        Call download plugin to generate the temp files we will load
+        into deluge then verify they are valid torrents
         """
         # If the download plugin is not enabled, we need to call it to get
         # our temp .torrent files
         if 'download' not in task.config:
-            download = plugin.get_plugin_by_name('download')
-            for entry in task.accepted:
-                download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
+            download = plugin.get('download', self)
+            for _ in task.accepted:
+                download.get_temp_files(task, handle_magnets=True, fail_html=True)
 
     @plugin.priority(135)
     # @plugin.internet(log)
@@ -76,35 +76,44 @@ class PluginUtorrent(object):
             response = session.get(url + 'token.html', auth=auth)
         except requests.RequestException as e:
             if hasattr(e, 'response') and e.response.status_code == '401':
-                raise plugin.PluginError('Invalid credentials, check your utorrent webui username and password.', log)
+                raise plugin.PluginError(
+                    'Invalid credentials, check your utorrent webui username and password.', log
+                )
             raise plugin.PluginError('%s' % e, log)
         token = get_soup(response.text).find('div', id='token').text
         result = session.get(url, auth=auth, params={'action': 'list-dirs', 'token': token}).json()
-        download_dirs = dict((os.path.normcase(dir['path']), i) for i, dir in enumerate(result['download-dirs']))
-        
+        download_dirs = dict(
+            (os.path.normcase(dir['path']), i) for i, dir in enumerate(result['download-dirs'])
+        )
+
         for entry in task.accepted:
             # bunch of urls now going to check
-            
+
             folder = 0
             path = entry.get('path', config.get('path', ''))
             try:
                 path = os.path.expanduser(entry.render(path))
             except RenderError as e:
-                log.error('Could not render path for `%s` downloading to default directory.' % entry['title'])
+                log.error(
+                    'Could not render path for `%s` downloading to default directory.'
+                    % entry['title']
+                )
                 # Add to default folder
                 path = ''
             if path:
                 path_normcase = os.path.normcase(path)
-                
+
                 for dir in download_dirs:
-                    if path_normcase.startswith(dir):
+                    if path_normcase.startswith(dir.lower()):
                         folder = download_dirs[dir]
-                        path = path[len(dir):].lstrip('\\')
+                        path = path[len(dir) :].lstrip('\\')
                         break
                 else:
-                    log.error('path `%s` (or one of its parents)is not added to utorrent webui allowed download '
-                              'directories. You must add it there before you can use it from flexget. '
-                              'Adding to default download directory instead.' % path)
+                    log.error(
+                        'path `%s` (or one of its parents)is not added to utorrent webui allowed download '
+                        'directories. You must add it there before you can use it from flexget. '
+                        'Adding to default download directory instead.' % path
+                    )
                     path = ''
 
             if task.options.test:
@@ -113,12 +122,12 @@ class PluginUtorrent(object):
 
             # Get downloaded
             downloaded = not entry['url'].startswith('magnet:')
-            
+
             # Check that file is downloaded
             if downloaded and 'file' not in entry:
                 entry.fail('file missing?')
                 continue
-                
+
             # Verify the temp file exists
             if downloaded and not os.path.exists(entry['file']):
                 tmp_path = os.path.join(task.manager.config_base, 'temp')
@@ -126,7 +135,7 @@ class PluginUtorrent(object):
                 log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
                 entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
                 continue
-            
+
             # Add torrent
             if downloaded:
                 # HTTP://[IP]:[PORT]/GUI/?ACTION=ADD-FILE
@@ -135,9 +144,15 @@ class PluginUtorrent(object):
                 result = session.post(url, params=data, auth=auth, files=files)
             else:
                 # http://[IP]:[PORT]/gui/?action=add-url&s=[TORRENT URL]
-                data = {'action': 'add-url', 's': entry['url'], 'token': token, 'download_dir': folder, 'path': path}
+                data = {
+                    'action': 'add-url',
+                    's': entry['url'],
+                    'token': token,
+                    'download_dir': folder,
+                    'path': path,
+                }
                 result = session.get(url, params=data, auth=auth)
-                
+
             # Check result
             if 'build' in result.json():
                 log.info('Added `%s` to utorrent' % entry['url'])
@@ -145,14 +160,13 @@ class PluginUtorrent(object):
             else:
                 entry.fail('Fail to add `%s` to utorrent' % entry['url'])
 
-    def on_task_exit(self, task, config):
-        """Make sure all temp files are cleaned up when task exits"""
+    def on_task_learn(self, task, config):
+        """ Make sure all temp files are cleaned up when entries are learned """
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
-            download = plugin.get_plugin_by_name('download')
-            download.instance.cleanup_temp_files(task)
-            
-    on_task_abort = on_task_exit
+            plugin.get('download', self).cleanup_temp_files(task)
+
+    on_task_abort = on_task_learn
 
 
 @event('plugin.register')

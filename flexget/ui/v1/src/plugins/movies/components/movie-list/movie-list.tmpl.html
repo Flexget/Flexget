@@ -1,0 +1,15 @@
+<md-tab md-on-select="vm.tabSelected()" md-on-deselect="vm.tabDeselected()" label="{{ ::vm.list.name }}">
+    <!--<md-tab-label layout-fill>
+    	<section layout="row" layout-align="center center" layout-fill>
+            <span>{{ ::vm.list.name }}</span>
+            <a href>
+				<md-icon md-font-icon="fa-trash-o" class="fa tab-icon fa-lg" ng-click="vm.deleteList($event)"></md-icon>
+			</a>
+        </section>
+    </md-tab-label>-->
+    <md-tab-body>
+    	<div layout="row" layout-wrap layout-padding>
+        	<movie-entry flex="100" flex-gt-md="50" flex-gt-lg="33" movie="::movie" delete-movie="vm.deleteMovie(vm.list, movie)" ng-repeat="movie in vm.movies" class="animate-remove"></movie-entry>
+        </div>
+    </md-tab-body>
+</md-tab>

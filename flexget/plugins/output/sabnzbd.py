@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import urlencode
 
 import logging
@@ -30,6 +30,7 @@ class OutputSabnzbd(object):
         pp: ...
         priority: ...
     """
+
     schema = {
         'type': 'object',
         'properties': {
@@ -62,7 +63,6 @@ class OutputSabnzbd(object):
             params['ma_username'] = config['username']
         if 'password' in config:
             params['ma_password'] = config['password']
-        params['mode'] = 'addurl'
         return params
 
     def on_task_output(self, task, config):
@@ -81,6 +81,13 @@ class OutputSabnzbd(object):
             params['name'] = ''.join([x for x in entry['url'] if ord(x) < 128])
             # add cleaner nzb name (undocumented api feature)
             params['nzbname'] = ''.join([x for x in entry['title'] if ord(x) < 128])
+
+            # check whether file is local or remote
+            if entry['url'].startswith('file://'):
+                params['mode'] = 'addlocalfile'
+                params['name'] = entry['location']
+            else:
+                params['mode'] = 'addurl'
 
             request_url = config['url'] + urlencode(params)
             log.debug('request_url: %s' % request_url)

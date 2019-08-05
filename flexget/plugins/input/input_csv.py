@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from future.utils import PY3
 
 import logging
 import csv
@@ -16,27 +17,27 @@ log = logging.getLogger('csv')
 
 class InputCSV(object):
     """
-        Adds support for CSV format. Configuration may seem a bit complex,
-        but this has advantage of being universal solution regardless of CSV
-        and internal entry fields.
+    Adds support for CSV format. Configuration may seem a bit complex,
+    but this has advantage of being universal solution regardless of CSV
+    and internal entry fields.
 
-        Configuration format:
+    Configuration format:
 
-        csv:
-          url: <url>
-          values:
-            <field>: <number>
+    csv:
+      url: <url>
+      values:
+        <field>: <number>
 
-        Example DB-fansubs:
+    Example DB-fansubs:
 
-        csv:
-          url: http://www.dattebayo.com/t/dump
-          values:
-            title: 3  # title is in 3th field
-            url: 1    # download url is in 1st field
+    csv:
+      url: http://www.dattebayo.com/t/dump
+      values:
+        title: 3  # title is in 3th field
+        url: 1    # download url is in 1st field
 
-        Fields title and url are mandatory. First field is 1.
-        List of other common (optional) fields can be found from wiki.
+    Fields title and url are mandatory. First field is 1.
+    List of other common (optional) fields can be found from wiki.
     """
 
     schema = {
@@ -46,11 +47,11 @@ class InputCSV(object):
             'values': {
                 'type': 'object',
                 'additionalProperties': {'type': 'integer'},
-                'required': ['title', 'url']
-            }
+                'required': ['title', 'url'],
+            },
         },
         'required': ['url', 'values'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     @cached('csv')
@@ -61,7 +62,10 @@ class InputCSV(object):
         except RequestException as e:
             raise plugin.PluginError('Error fetching `%s`: %s' % (config['url'], e))
         # CSV module needs byte strings, we'll convert back to unicode later
-        page = r.text.encode('utf-8').splitlines()
+        if PY3:
+            page = r.text.splitlines()
+        else:
+            page = r.text.encode('utf-8').splitlines()
         for row in csv.reader(page):
             if not row:
                 continue
@@ -69,7 +73,10 @@ class InputCSV(object):
             for name, index in list(config.get('values', {}).items()):
                 try:
                     # Convert the value back to unicode
-                    entry[name] = row[index - 1].decode('utf-8').strip()
+                    if PY3:
+                        entry[name] = row[index - 1].strip()
+                    else:
+                        entry[name] = row[index - 1].decode('utf-8').strip()
                 except IndexError:
                     raise plugin.PluginError('Field `%s` index is out of range' % name)
 

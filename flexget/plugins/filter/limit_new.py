@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -24,18 +24,9 @@ class FilterLimitNew(object):
     FlexGet is executed.
     """
 
-    schema = {
-        'type': 'integer',
-        'minimum': 1
-    }
+    schema = {'type': 'integer', 'minimum': 1}
 
-    def __init__(self):
-        try:
-            self.backlog = plugin.get_plugin_by_name('backlog')
-        except plugin.DependencyError:
-            log.warning('Unable utilize backlog plugin, entries may slip trough limit_new in some rare cases')
-
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_filter(self, task, config):
         if task.options.learn:
             log.info('Plugin limit_new is disabled with --learn')
@@ -48,10 +39,11 @@ class FilterLimitNew(object):
             else:
                 entry.reject('limit exceeded')
                 # Also save this in backlog so that it can be accepted next time.
-                if self.backlog:
-                    self.backlog.instance.add_backlog(task, entry)
+                plugin.get('backlog', self).add_backlog(task, entry)
 
-        log.debug('Rejected: %s Allowed: %s' % (len(task.accepted[amount:]), len(task.accepted[:amount])))
+        log.debug(
+            'Rejected: %s Allowed: %s' % (len(task.accepted[amount:]), len(task.accepted[:amount]))
+        )
 
 
 @event('plugin.register')

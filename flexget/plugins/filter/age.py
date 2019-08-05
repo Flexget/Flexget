@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 from datetime import datetime
@@ -30,10 +30,10 @@ class Age(object):
         'properties': {
             'field': {'type': 'string'},
             'action': {'type': 'string', 'enum': ['accept', 'reject']},
-            'age': {'type': 'string', 'format': 'interval'}
+            'age': {'type': 'string', 'format': 'interval'},
         },
         'required': ['field', 'action', 'age'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def on_task_filter(self, task, config):
@@ -52,11 +52,15 @@ class Age(object):
             elif isinstance(field_value, str):
                 try:
                     field_date = dateutil_parse(entry[field])
-                except ValueError as e:
-                    log.warning('Entry %s ignored: %s is not a valid date', entry['title'], field_value)
+                except ValueError:
+                    log.warning(
+                        'Entry %s ignored: %s is not a valid date', entry['title'], field_value
+                    )
                     continue
             else:
-                log.warning('Entry %s ignored: %s is not a valid date', entry['title'], field_value)
+                log.warning(
+                    'Entry %s ignored: %s is not a valid date', entry['title'], field_value
+                )
                 continue
 
             age_cutoff = datetime.now() - parse_timedelta(config['age'])
@@ -67,8 +71,13 @@ class Age(object):
                     entry.accept(info_string)
                 else:
                     entry.reject(info_string)
-                log.debug('Entry %s was %sed because date in field `%s` is older than %s', entry['title'],
-                          config['action'], field, config['age'])
+                log.debug(
+                    'Entry %s was %sed because date in field `%s` is older than %s',
+                    entry['title'],
+                    config['action'],
+                    field,
+                    config['age'],
+                )
 
 
 @event('plugin.register')

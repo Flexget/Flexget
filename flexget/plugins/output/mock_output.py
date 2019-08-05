@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -14,6 +14,7 @@ class MockOutput(object):
     Debugging plugin which records a copy of all accepted entries into a list stored in `mock_output` attribute
     of the task.
     """
+
     schema = {'type': 'boolean'}
 
     def on_task_start(self, task, config):
@@ -23,8 +24,10 @@ class MockOutput(object):
         task.mock_output.extend(e.copy() for e in task.all_entries if e.accepted)
 
     def on_task_exit(self, task, config):
-        log.verbose('The following titles were output during this task run: %s' %
-                    ', '.join(e['title'] for e in task.mock_output))
+        log.verbose(
+            'The following titles were output during this task run: %s'
+            % ', '.join(e['title'] for e in task.mock_output)
+        )
 
 
 @event('plugin.register')

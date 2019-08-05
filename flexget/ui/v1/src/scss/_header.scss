@@ -1,0 +1,56 @@
+.header {
+  /*overflow: hidden;*/
+
+  .logo {
+    background: #222D32 url($header-image) no-repeat center !important;
+    background-size: 175px !important;
+    float: left;
+    width: 190px;
+    -webkit-transition: width 0.5s ease;
+    -moz-transition: width 0.5s ease;
+    -o-transition: width 0.5s ease;
+    transition: width 0.5s ease;
+  }
+
+  .logo a {
+    height: 50px;
+    display: block;
+  }
+
+  .admin-toolbar {
+    overflow: hidden;
+    max-height: 50px;
+    min-height: 50px;
+  }
+
+  .admin-toolbar md-icon {
+    color: white;
+    font-size: 20px;
+  }
+
+  .admin-toolbar md-menu {
+    padding: 0px;
+  }
+
+  .admin-toolbar .md-button {
+    min-width: inherit;
+  }
+
+}
+
+.header-mini {
+
+  .logo {
+    background-size: 240px !important;
+    width: 50px !important;
+  }
+
+}
+
+@media screen and (max-width: 960px) {
+  .header .logo {
+    float: none;
+    width: auto;
+    border: 0;
+  }
+}

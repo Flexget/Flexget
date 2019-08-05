@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 from collections import MutableMapping
@@ -27,6 +26,7 @@ class LazyLookup(object):
 
     def __getitem__(self, key):
         from flexget.plugin import PluginError
+
         while self.store.is_lazy(key):
             index = next((i for i, keys in enumerate(self.key_list) if key in keys), None)
             if index is None:
@@ -39,8 +39,9 @@ class LazyLookup(object):
             except PluginError as e:
                 e.log.info(e)
             except Exception as e:
-                log.error('Unhandled error in lazy lookup plugin')
+                log.error('Unhandled error in lazy lookup plugin: %s', e)
                 from flexget.manager import manager
+
                 if manager:
                     manager.crash_report()
                 else:
@@ -78,7 +79,7 @@ class LazyDict(MutableMapping):
 
     copy = __copy__
 
-    def get(self, key, default=None, eval_lazy=True):
+    def get(self, key, default=None, eval_lazy=True):  # pylint: disable=W0221
         """
         Adds the `eval_lazy` keyword argument to the normal :func:`dict.get` method.
 

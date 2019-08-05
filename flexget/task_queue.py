@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import queue
@@ -19,6 +19,7 @@ class TaskQueue(object):
     Task processing thread.
     Only executes one task at a time, if more are requested they are queued up and run in turn.
     """
+
     def __init__(self):
         self.run_queue = queue.PriorityQueue()
         self._shutdown_now = False
@@ -59,7 +60,10 @@ class TaskQueue(object):
 
         remaining_jobs = self.run_queue.qsize()
         if remaining_jobs:
-            log.warning('task queue shut down with %s tasks remaining in the queue to run.' % remaining_jobs)
+            log.warning(
+                'task queue shut down with %s tasks remaining in the queue to run.'
+                % remaining_jobs
+            )
         else:
             log.debug('task queue shut down')
 
@@ -83,8 +87,10 @@ class TaskQueue(object):
         if finish_queue:
             self._shutdown_when_finished = True
             if self.run_queue.qsize():
-                log.verbose('There are %s tasks to execute. Shutdown will commence when they have completed.' %
-                            self.run_queue.qsize())
+                log.verbose(
+                    'There are %s tasks to execute. Shutdown will commence when they have completed.'
+                    % self.run_queue.qsize()
+                )
         else:
             self._shutdown_now = True
 

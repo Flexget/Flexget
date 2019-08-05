@@ -1,0 +1,66 @@
+
+
+.movie-entry {
+  position: relative;
+  flex-direction: row;
+  padding: 20px;
+  height: 300px;
+}
+
+
+.movie-poster {
+  margin-right: 20px;
+  height:100%;
+
+  img {
+    max-height:100%;
+    width: auto;
+
+  }
+}
+
+.movie-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+
+
+  /*
+    thanks to https://codepen.io/martinwolf/pen/qlFdp
+
+  */
+
+  $font-size: 16px;
+  $line-height: 1.4;
+  $lines-to-show: 4;
+
+  .movie-plot {
+    display: block; /* Fallback for non-webkit */
+    display: -webkit-box;
+    height: $font-size*$line-height*$lines-to-show; /* Fallback for non-webkit */
+    margin: 0 auto;
+    font-size: $font-size;
+    line-height: $line-height;
+    -webkit-line-clamp: $lines-to-show;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  h3 {
+    font-variant: small-caps;
+  }
+
+
+}
+
+.more-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  // 26px is half the siwe of a md-fab md-mini
+  // you cannot do 50% since the box encapsulates the box of the fab actios
+  transform: translate(26px, -50%);
+}

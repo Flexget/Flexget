@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import argparse
 import functools
@@ -10,7 +9,6 @@ from flexget import options
 from flexget.event import event
 
 log = logging.getLogger('cli_config')
-
 
 """
 Allows specifying yml configuration values from commandline parameters.
@@ -34,7 +32,7 @@ Commandline example::
 
 def replace_in_item(replaces, item):
     replace = functools.partial(replace_in_item, replaces)
-    if isinstance(item, basestring):
+    if isinstance(item, str):
         # Do replacement in text objects
         for key, val in replaces.items():
             item = item.replace('$%s' % key, val)
@@ -65,5 +63,10 @@ def key_value_pair(text):
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('--cli-config', nargs='+', type=key_value_pair, metavar='VARIABLE=VALUE',
-                                               help='configuration parameters through commandline')
+    options.get_parser('execute').add_argument(
+        '--cli-config',
+        nargs='+',
+        type=key_value_pair,
+        metavar='VARIABLE=VALUE',
+        help='configuration parameters through commandline',
+    )

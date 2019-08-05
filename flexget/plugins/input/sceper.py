@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from bs4 import NavigableString
 from requests import RequestException
@@ -10,8 +10,14 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
-from flexget.utils.imdb import extract_id
 from flexget.utils.soup import get_soup
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.components.imdb.utils import extract_id
+except ImportError:
+    raise plugin.DependencyError(issued_by=__name__, missing='imdb')
+
 
 log = logging.getLogger('sceper')
 
@@ -33,7 +39,7 @@ class InputSceper(object):
         try:
             page = task.requests.get(url).content
         except RequestException as e:
-            raise plugin.PluginError('Error getting input page: %e' % e)
+            raise plugin.PluginError('Error getting input page: %s' % e)
         soup = get_soup(page)
 
         releases = []
@@ -71,8 +77,8 @@ class InputSceper(object):
                 temp = {}
                 temp['title'] = release['title']
                 temp['url'] = link_href
-                urlrewriting = plugin.get_plugin_by_name('urlrewriting')
-                if urlrewriting['instance'].url_rewritable(task, temp):
+                urlrewriting = plugin.get('urlrewriting', self)
+                if urlrewriting.url_rewritable(task, temp):
                     release['url'] = link_href
                     log.trace('--> accepting %s (resolvable)' % link_href)
                 else:
@@ -81,8 +87,12 @@ class InputSceper(object):
             # reject if no torrent link
             if 'url' not in release:
                 from flexget.utils.log import log_once
-                log_once('%s skipped due to missing or unsupported (unresolvable) download link' % (release['title']),
-                         log)
+
+                log_once(
+                    '%s skipped due to missing or unsupported (unresolvable) download link'
+                    % (release['title']),
+                    log,
+                )
             else:
                 releases.append(release)
 

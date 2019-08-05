@@ -2,7 +2,7 @@
 # Torrent decoding is a short fragment from effbot.org. Site copyright says:
 # Test scripts and other short code fragments can be considered as being in the public domain.
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import binascii
 import functools
@@ -16,23 +16,26 @@ TORRENT_RE = re.compile(br'^d\d{1,3}:')
 
 # List of all standard keys in a metafile
 # See http://packages.python.org/pyrocore/apidocs/pyrocore.util.metafile-module.html#METAFILE_STD_KEYS
-METAFILE_STD_KEYS = [i.split('.') for i in (
-    "announce",
-    "announce-list", # BEP-0012
-    "comment",
-    "created by",
-    "creation date",
-    "encoding",
-    "info",
-    "info.length",
-    "info.name",
-    "info.piece length",
-    "info.pieces",
-    "info.private",
-    "info.files",
-    "info.files.length",
-    "info.files.path",
-)]
+METAFILE_STD_KEYS = [
+    i.split('.')
+    for i in (
+        "announce",
+        "announce-list",  # BEP-0012
+        "comment",
+        "created by",
+        "creation date",
+        "encoding",
+        "info",
+        "info.length",
+        "info.name",
+        "info.piece length",
+        "info.pieces",
+        "info.private",
+        "info.files",
+        "info.files.length",
+        "info.files.path",
+    )
+]
 
 
 def clean_meta(meta, including_info=False, logger=None):
@@ -85,7 +88,10 @@ def is_torrent_file(metafilepath):
 
     magic_marker = bool(TORRENT_RE.match(data))
     if not magic_marker:
-        log.trace('%s doesn\'t seem to be a torrent, got `%s` (hex)' % (metafilepath, binascii.hexlify(data)))
+        log.trace(
+            '%s doesn\'t seem to be a torrent, got `%s` (hex)'
+            % (metafilepath, binascii.hexlify(data))
+        )
 
     return bool(magic_marker)
 
@@ -98,7 +104,7 @@ def tokenize(text, match=re.compile(b'([idel])|(\d+):|(-?\d+)').match):
         i = m.end()
         if m.lastindex == 2:
             yield b's'
-            yield text[i:i + int(s)]
+            yield text[i : i + int(s)]
             i += int(s)
         else:
             yield s
@@ -116,7 +122,7 @@ def decode_item(next, token):
         # Strings in torrent file are defined as utf-8 encoded
         try:
             data = data.decode('utf-8')
-        except UnicodeDecodeError as e:
+        except UnicodeDecodeError:
             # The pieces field is a byte string, and should be left as such.
             pass
     elif token == b'l' or token == b'd':
@@ -137,9 +143,9 @@ def bdecode(text):
     try:
         src = tokenize(text)
         data = decode_item(functools.partial(next, src), next(src))  # pylint:disable=E1101
-        for token in src: # look for more tokens
+        for _ in src:  # look for more tokens
             raise SyntaxError("trailing junk")
-    except (AttributeError, ValueError, StopIteration) as e:
+    except (AttributeError, ValueError, StopIteration, TypeError) as e:
         raise SyntaxError("syntax error: %s" % e)
     return data
 
@@ -188,11 +194,12 @@ def bencode(data):
     if isinstance(data, dict):
         return encode_dictionary(data)
 
-    raise TypeError
+    raise TypeError('Unknown type for bencode: ' + str(type(data)))
 
 
 class Torrent(object):
     """Represents a torrent"""
+
     # string type used for keys, if this ever changes, stuff like "x in y"
     # gets broken unless you coerce to this type
     KEY_TYPE = str
@@ -212,27 +219,34 @@ class Torrent(object):
         self.modified = False
 
     def __repr__(self):
-        return "%s(%s, %s)" % (self.__class__.__name__,
-            ", ".join("%s=%r" % (key, self.content["info"].get(key))
-               for key in ("name", "length", "private",)),
-            ", ".join("%s=%r" % (key, self.content.get(key))
-               for key in ("announce", "comment",)))
+        return "%s(%s, %s)" % (
+            self.__class__.__name__,
+            ", ".join(
+                "%s=%r" % (key, self.content["info"].get(key))
+                for key in ("name", "length", "private")
+            ),
+            ", ".join("%s=%r" % (key, self.content.get(key)) for key in ("announce", "comment")),
+        )
 
     def get_filelist(self):
         """Return array containing fileinfo dictionaries (name, length, path)"""
         files = []
         if 'length' in self.content['info']:
             # single file torrent
-            t = {'name': self.content['info']['name'],
-                 'size': self.content['info']['length'],
-                 'path': ''}
+            if 'name.utf-8' in self.content['info']:
+                name = self.content['info']['name.utf-8']
+            else:
+                name = self.content['info']['name']
+            t = {'name': name, 'size': self.content['info']['length'], 'path': ''}
             files.append(t)
         else:
             # multifile torrent
             for item in self.content['info']['files']:
-                t = {'path': '/'.join(item['path'][:-1]),
-                     'name': item['path'][-1],
-                     'size': item['length']}
+                if 'path.utf-8' in item:
+                    path = item['path.utf-8']
+                else:
+                    path = item['path']
+                t = {'path': '/'.join(path[:-1]), 'name': path[-1], 'size': item['length']}
                 files.append(t)
 
         # Decode strings
@@ -245,11 +259,23 @@ class Torrent(object):
                     except UnicodeError:
                         # Broken beyond anything reasonable
                         fallback = item[field].decode('utf-8', 'replace').replace(u'\ufffd', '_')
-                        log.warning('%s=%r field in torrent %r is wrongly encoded, falling back to `%s`' %
-                                    (field, item[field], self.content['info']['name'], fallback))
+                        log.warning(
+                            '%s=%r field in torrent %r is wrongly encoded, falling back to `%s`'
+                            % (field, item[field], self.content['info']['name'], fallback)
+                        )
                         item[field] = fallback
 
         return files
+
+    @property
+    def is_multi_file(self):
+        """Return True if the torrent is a multi-file torrent"""
+        return 'files' in self.content['info']
+
+    @property
+    def name(self):
+        """Return name of the torrent"""
+        return self.content['info'].get('name', '')
 
     @property
     def size(self):
@@ -288,6 +314,7 @@ class Torrent(object):
     def info_hash(self):
         """Return Torrent info hash"""
         import hashlib
+
         hash = hashlib.sha1()
         info_data = encode_dictionary(self.content['info'])
         hash.update(info_data)
@@ -302,6 +329,20 @@ class Torrent(object):
         self.content['comment'] = comment
         self.modified = True
 
+    @property
+    def piece_size(self):
+        return int(self.content['info']['piece length'])
+
+    @property
+    def libtorrent_resume(self):
+        return self.content.get('libtorrent_resume', {})
+
+    def set_libtorrent_resume(self, chunks, files):
+        self.content['libtorrent_resume'] = {}
+        self.content['libtorrent_resume']['bitfield'] = chunks
+        self.content['libtorrent_resume']['files'] = files
+        self.modified = True
+
     def remove_multitracker(self, tracker):
         """Removes passed multi-tracker from this torrent"""
         for tl in self.content.get('announce-list', [])[:]:
@@ -311,7 +352,7 @@ class Torrent(object):
                 # if no trackers left in list, remove whole list
                 if not tl:
                     self.content['announce-list'].remove(tl)
-            except:
+            except (AttributeError, ValueError):
                 pass
 
     def add_multitracker(self, tracker):

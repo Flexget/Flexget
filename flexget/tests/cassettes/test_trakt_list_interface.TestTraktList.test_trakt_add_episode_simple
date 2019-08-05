@@ -1,0 +1,166 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: ['2']
+      method: GET
+      uri: https://api.trakt.tv/sync/watchlist/episodes?limit=1000&page=1
+    response:
+      body: {string: '[{"rank":1,"id":371589391,"listed_at":"2018-12-29T06:50:37.000Z","type":"episode","episode":{"season":4,"number":5,"title":"First
+          of His Name","ids":{"trakt":73674,"tvdb":4801605,"imdb":"tt3060856","tmdb":63098,"tvrage":1065501369}},"show":{"title":"Game
+          of Thrones","year":2011,"ids":{"trakt":1390,"slug":"game-of-thrones","tvdb":121361,"imdb":"tt0944947","tmdb":1399,"tvrage":24493}}}]'}
+      headers:
+        CF-RAY: [490a557888433d01-CPH]
+        Cache-Control: ['max-age=0, private, must-revalidate']
+        Cf-Railgun: [1af5c26562 1.45 0.028909 0030 57da]
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Sat, 29 Dec 2018 06:50:41 GMT']
+        Etag: [W/"9da3e90234f93b5f7cd3fde8ccd0a042"]
+        Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        Last-Modified: ['Sat, 29 Dec 2018 06:50:37 GMT']
+        Server: [cloudflare]
+        Set-Cookie: ['__cfduid=dc8d32cf3445894e466e5bcbb98b00e591546066241; expires=Sun,
+            29-Dec-19 06:50:41 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [02673565-39dd-44b7-9fd3-a6a0f46b36d2]
+        X-Runtime: ['0.024268']
+        X-Sort-By: [rank]
+        X-Sort-How: [asc]
+        X-Xss-Protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: '{"shows": [{"year": 2011, "seasons": [{"number": 4, "episodes": [{"number":
+        5}]}], "ids": {"imdb": "tt0944947", "tvdb": 121361, "trakt": 1390, "tvrage":
+        24493}, "title": "Game of Thrones"}]}'
+      headers:
+        Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
+        Content-Length: ['190']
+        Content-Type: [application/json]
+        Cookie: [__cfduid=dc8d32cf3445894e466e5bcbb98b00e591546066241]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: ['2']
+      method: POST
+      uri: https://api.trakt.tv/sync/watchlist/remove
+    response:
+      body: {string: '{"deleted":{"movies":0,"shows":0,"seasons":0,"episodes":1},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
+      headers:
+        CF-RAY: [490a5584cd303d01-CPH]
+        Cache-Control: ['max-age=0, private, must-revalidate']
+        Cf-Railgun: [1d4456ff61 99.99 0.055212 0030 57da]
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Sat, 29 Dec 2018 06:50:43 GMT']
+        Etag: [W/"0f7f63620db9aa5e105e61f0dc596dd3"]
+        Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        Server: [cloudflare]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [d940968c-0cef-4ae4-9858-1df00cfc4c79]
+        X-Runtime: ['0.048661']
+        X-Xss-Protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
+        Content-Type: [application/json]
+        Cookie: [__cfduid=dc8d32cf3445894e466e5bcbb98b00e591546066241]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: ['2']
+      method: GET
+      uri: https://api.trakt.tv/sync/watchlist/episodes?limit=1000&page=1
+    response:
+      body: {string: '[]'}
+      headers:
+        CF-RAY: [490a559139ac3d01-CPH]
+        Cache-Control: ['max-age=0, private, must-revalidate']
+        Cf-Railgun: [3118b38de0 99.99 0.030003 0030 57da]
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Sat, 29 Dec 2018 06:50:45 GMT']
+        Etag: [W/"a55e6f9a0cf19d5f540044128e809434"]
+        Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        Last-Modified: ['Sat, 29 Dec 2018 06:50:39 GMT']
+        Server: [cloudflare]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [bec035d6-773d-4133-aa46-6a342797a695]
+        X-Runtime: ['0.023485']
+        X-Sort-By: [rank]
+        X-Sort-How: [asc]
+        X-Xss-Protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: '{"shows": [{"year": 2011, "seasons": [{"number": 4, "episodes": [{"number":
+        5}]}], "ids": {}, "title": "Game of Thrones"}]}'
+      headers:
+        Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
+        Content-Length: ['123']
+        Content-Type: [application/json]
+        Cookie: [__cfduid=dc8d32cf3445894e466e5bcbb98b00e591546066241]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: ['2']
+      method: POST
+      uri: https://api.trakt.tv/sync/watchlist
+    response:
+      body: {string: '{"added":{"movies":0,"shows":0,"seasons":0,"episodes":1},"existing":{"movies":0,"shows":0,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
+      headers:
+        CF-RAY: [490a559dbdab3d01-CPH]
+        Cache-Control: ['max-age=0, private, must-revalidate']
+        Cf-Railgun: [d1c7d723f0 99.99 0.049316 0030 57da]
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Sat, 29 Dec 2018 06:50:47 GMT']
+        Etag: [W/"73a1231765543ab248b05fc799421a3a"]
+        Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        Server: [cloudflare]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [77745a41-780c-424d-b360-30d7ebdd9894]
+        X-Runtime: ['0.042071']
+        X-Xss-Protection: [1; mode=block]
+      status: {code: 201, message: Created}
+  - request:
+      body: null
+      headers:
+        Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
+        Content-Type: [application/json]
+        Cookie: [__cfduid=dc8d32cf3445894e466e5bcbb98b00e591546066241]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: ['2']
+      method: GET
+      uri: https://api.trakt.tv/sync/watchlist/episodes?limit=1000&page=1
+    response:
+      body: {string: '[{"rank":1,"id":371589397,"listed_at":"2018-12-29T06:51:09.000Z","type":"episode","episode":{"season":4,"number":5,"title":"First
+          of His Name","ids":{"trakt":73674,"tvdb":4801605,"imdb":"tt3060856","tmdb":63098,"tvrage":1065501369}},"show":{"title":"Game
+          of Thrones","year":2011,"ids":{"trakt":1390,"slug":"game-of-thrones","tvdb":121361,"imdb":"tt0944947","tmdb":1399,"tvrage":24493}}}]'}
+      headers:
+        CF-RAY: [490a55aa38c83d01-CPH]
+        Cache-Control: ['max-age=0, private, must-revalidate']
+        Cf-Railgun: [7429473ea6 99.99 0.096474 0030 57da]
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Sat, 29 Dec 2018 06:50:49 GMT']
+        Etag: [W/"6b2bfcc4d121ea7fd3c3476977803c6b"]
+        Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        Last-Modified: ['Sat, 29 Dec 2018 06:51:09 GMT']
+        Server: [cloudflare]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [97c60758-08f4-4ef4-a830-187440260d9b]
+        X-Runtime: ['0.065919']
+        X-Sort-By: [rank]
+        X-Sort-How: [asc]
+        X-Xss-Protection: [1; mode=block]
+      status: {code: 200, message: OK}
+version: 1
