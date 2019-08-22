@@ -536,7 +536,7 @@ class PluginTransmission(TransmissionBase):
                         # Get new filename without ext
                         file_ext = os.path.splitext(file_list[main_id]['name'])[1]
                         file_path = os.path.dirname(
-                            os.path.join(download_dir, file_list[main_id]['name'])
+                            os.path.join(download_dir.decode('utf-8'), file_list[main_id]['name'])
                         )
                         filename = options['post']['content_filename']
                         if config['host'] == 'localhost' or config['host'] == '127.0.0.1':
