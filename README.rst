@@ -54,7 +54,7 @@ To get a sense of the many things that can be done with FlexGet you can take a l
 
 **Help:** https://discuss.flexget.com/
 
-**Chat:** http://webchat.freenode.net/?channels=#flexget or https://gitter.im/Flexget/Flexget
+**Chat:** https://flexget.com/Chat
 
 **Bugs:** https://github.com/Flexget/Flexget/issues
 
