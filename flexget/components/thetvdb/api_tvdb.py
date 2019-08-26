@@ -211,6 +211,13 @@ class TVDBSeries(Base):
         self._banner = series['banner']
         self._genres = [TVDBGenre(id=name) for name in series['genre']] if series['genre'] else []
 
+        if self.first_aired is None:
+            try:
+                episode = TVDBRequest().get('series/%s/episodes/query?absoluteNumber=1' % self.id, language=language)
+                self.first_aired = episode[0]['firstAired']
+            except requests.RequestException as e:
+                raise LookupError('Error updating first_aired from tvdb first episode: %s' % e)
+
         # Actors and Posters are lazy populated
         self._actors = None
         self._posters = None
