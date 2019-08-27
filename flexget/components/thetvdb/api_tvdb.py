@@ -212,11 +212,12 @@ class TVDBSeries(Base):
         self._genres = [TVDBGenre(id=name) for name in series['genre']] if series['genre'] else []
 
         if self.first_aired is None:
+            log.debug('Falling back to getting first episode aired date for series %s', self.name)
             try:
-                episode = TVDBRequest().get('series/%s/episodes/query?absoluteNumber=1' % self.id, language=language)
+                episode = TVDBRequest().get('series/%s/episodes/query?airedSeason=1&airedEpisode=1' % self.id, language=language)
                 self.first_aired = episode[0]['firstAired']
             except requests.RequestException as e:
-                raise LookupError('Error updating first_aired from tvdb first episode: %s' % e)
+                log.error('Failed to get first episode for series %s' % self.name)
 
         # Actors and Posters are lazy populated
         self._actors = None
