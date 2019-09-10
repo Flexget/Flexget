@@ -19,7 +19,7 @@ class TestTVDBSeriesLookupAPI(object):
             'imdb_id': 'tt0106179',
             'language': 'en',
             'series_name': 'The X-Files',
-            'zap2it_id': 'EP00080955'
+            'zap2it_id': 'EP00080955',
         }
 
         rsp = api_client.get('/tvdb/series/The X-Files/')
@@ -39,7 +39,7 @@ class TestTVDBSeriesLookupAPI(object):
             'imdb_id': 'tt0106179',
             'language': 'en',
             'series_name': 'The X-Files',
-            'zap2it_id': 'EP00080955'
+            'zap2it_id': 'EP00080955',
         }
 
         rsp = api_client.get('/tvdb/series/77398/')
@@ -71,7 +71,7 @@ class TestTVDBSeriesActorsLookupAPI(object):
             'imdb_id': 'tt0106179',
             'language': 'en',
             'series_name': 'The X-Files',
-            'zap2it_id': 'EP00080955'
+            'zap2it_id': 'EP00080955',
         }
 
         rsp = api_client.get('/tvdb/series/The X-Files/?include_actors=true')
@@ -99,7 +99,7 @@ class TestTVDBEpisodeLookupAPI(object):
             'id': 5313345,
             'season_number': 10,
             'series_id': 77398,
-            'absolute_number': None
+            'absolute_number': None,
         }
 
         rsp = api_client.get('/tvdb/episode/77398/?season_number=10&ep_number=6')
@@ -123,7 +123,7 @@ class TestTVDBEpisodeABSLookupAPI(object):
             'id': 5598674,
             'season_number': 2,
             'series_id': 279121,
-            'absolute_number': 46
+            'absolute_number': 46,
         }
 
         rsp = api_client.get('/tvdb/episode/279121/?absolute_number=46')
@@ -147,7 +147,7 @@ class TestTVDBEpisodeAirDateLookupAPI(object):
             'id': 5598674,
             'season_number': 2,
             'series_id': 279121,
-            'absolute_number': 46
+            'absolute_number': 46,
         }
 
         rsp = api_client.get('/tvdb/episode/279121/?air_date=2016-05-24')
@@ -174,10 +174,7 @@ class TestTVDSearchNameLookupAPI(object):
         errors = schema_match(OC.search_results_object, data)
         assert not errors
 
-        values = {
-            'series_name': "Supernatural",
-            'tvdb_id': 78901
-        }
+        values = {'series_name': "Supernatural", 'tvdb_id': 78901}
 
         for field, value in values.items():
             assert data[0].get(field) == value
@@ -195,10 +192,7 @@ class TestTVDSearchIMDBLookupAPI(object):
         errors = schema_match(OC.search_results_object, data)
         assert not errors
 
-        values = {
-            'series_name': "Game of Thrones",
-            'tvdb_id': 121361
-        }
+        values = {'series_name': "Game of Thrones", 'tvdb_id': 121361}
 
         for field, value in values.items():
             assert data[0].get(field) == value
@@ -216,10 +210,7 @@ class TestTVDSearchZAP2ITLookupAPI(object):
         errors = schema_match(OC.search_results_object, data)
         assert not errors
 
-        values = {
-            'series_name': "The Flash (2014)",
-            'tvdb_id': 279121
-        }
+        values = {'series_name': "The Flash (2014)", 'tvdb_id': 279121}
 
         for field, value in values.items():
             assert data[0].get(field) == value
@@ -256,7 +247,7 @@ class TestTVDBLanguages(object):
             'imdb_id': 'tt0913290',
             'language': 'nl',
             'series_name': 'Tegenlicht',
-            'network': 'VPRO'
+            'network': 'VPRO',
         }
 
         rsp = api_client.get('/tvdb/series/Tegenlicht/?language=nl')
@@ -276,7 +267,7 @@ class TestTVDBLanguages(object):
             'id': 4532248,
             'season_number': 10,
             'series_id': 252712,
-            'episode_name': 'Gasland'
+            'episode_name': 'Gasland',
         }
 
         rsp = api_client.get('/tvdb/episode/252712/?season_number=10&ep_number=1&language=nl')
@@ -297,10 +288,7 @@ class TestTVDBLanguages(object):
         errors = schema_match(OC.search_results_object, data)
         assert not errors
 
-        values = {
-            'series_name': "Tegenlicht",
-            'tvdb_id': 252712
-        }
+        values = {'series_name': "Tegenlicht", 'tvdb_id': 252712}
 
         for field, value in values.items():
             assert data[0].get(field) == value

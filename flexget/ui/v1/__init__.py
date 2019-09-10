@@ -30,7 +30,9 @@ webui_app.url_path = '/'
 def serve_app(path):
     if debug:
         if path.startswith('bower_components'):
-            return send_from_directory(bower_components, path.lstrip('bower_components').lstrip('/'))
+            return send_from_directory(
+                bower_components, path.lstrip('bower_components').lstrip('/')
+            )
 
         if os.path.exists(os.path.join(ui_src, path)):
             return send_from_directory(ui_src, path)
@@ -71,17 +73,21 @@ def register_web_ui(mgr):
     if debug:
         app_base = os.path.join(ui_base, '.tmp', 'serve')
         if not os.path.exists(app_base):
-            log.warning('Unable to start web ui in debug mode. To enable debug mode please run the debug build, '
-                        'see http://flexget.com/wiki/Web-UI for instructions')
+            log.warning(
+                'Unable to start web ui in debug mode. To enable debug mode please run the debug build, '
+                'see http://flexget.com/wiki/Web-UI for instructions'
+            )
             log.warning('Attempting to serve web ui from complied directory')
             app_base = None
 
     if not app_base:
         app_base = ui_dist
         if not os.path.exists(app_base):
-            log.fatal('Failed to start web ui,'
-                      ' this can happen if you are running from GitHub version and forgot to run the web ui build, '
-                      'see http://flexget.com/wiki/Web-UI for instructions')
+            log.fatal(
+                'Failed to start web ui,'
+                ' this can happen if you are running from GitHub version and forgot to run the web ui build, '
+                'see http://flexget.com/wiki/Web-UI for instructions'
+            )
             app_base = None
 
     register_app(webui_app.url_path, webui_app)

@@ -48,7 +48,7 @@ class PluginUrlRewriting(object):
         return False
 
     # API method - why priority though?
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def url_rewrite(self, task, entry):
         """Rewrites given entry url. Raises UrlRewritingError if failed."""
         tries = 0

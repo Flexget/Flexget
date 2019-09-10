@@ -77,7 +77,9 @@ class TestNfoLookupWithMovies(object):
               path: {0}/test_13
               mask: '*.mkv'
             nfo_lookup: yes
-    """.format(base)
+    """.format(
+        base
+    )
 
     def test_nfo_with_only_id(self, execute_task):
         task = execute_task('test_1')
@@ -142,9 +144,11 @@ class TestNfoLookupWithMovies(object):
             # Check that the 'nfo_id' field is set to the correct movie
             assert entry['nfo_id'] == 'tt2316801'
             assert entry['nfo_title'] == 'A Bela e a Fera'
-            assert entry['nfo_plot'] == ("Um romance inesperado floresce depois que a filha mais nova de um mercador "
-                                         "em dificuldades se oferece para uma misteriosa besta com a qual seu pai "
-                                         "ficou endividado.")
+            assert entry['nfo_plot'] == (
+                "Um romance inesperado floresce depois que a filha mais nova de um mercador "
+                "em dificuldades se oferece para uma misteriosa besta com a qual seu pai "
+                "ficou endividado."
+            )
             assert entry['imdb_id'] == 'tt2316801'
 
     def test_nfo_with_id_genres(self, execute_task):
@@ -202,7 +206,18 @@ class TestNfoLookupWithMovies(object):
             # NOTE: The mock configuration in test_8 only specify the fields "title", "filename" and "nfo_id". The other
             # fields in the assert below are added by the testing framework and the mock plugin. If this change in any
             # future version make the necessary changes in the assert below.
-            assert keys == sorted(['title', 'original_title', 'filename', 'nfo_id', 'task', 'url', 'original_url', 'quality'])
+            assert keys == sorted(
+                [
+                    'title',
+                    'original_title',
+                    'filename',
+                    'nfo_id',
+                    'task',
+                    'url',
+                    'original_url',
+                    'quality',
+                ]
+            )
 
     def test_nfo_lookup_with_disabled_configuration(self, execute_task):
         task = execute_task('test_9')
@@ -249,9 +264,23 @@ class TestNfoLookupWithMovies(object):
         for entry in task.entries:
             # Get all 'nfo' keys in the entry
             nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
-            assert nfo_keys == ['nfo_actor', 'nfo_country', 'nfo_director', 'nfo_genre', 'nfo_id', 'nfo_originaltitle',
-                                'nfo_plot', 'nfo_rating', 'nfo_runtime', 'nfo_studio', 'nfo_thumb', 'nfo_title',
-                                'nfo_trailer', 'nfo_votes', 'nfo_year']
+            assert nfo_keys == [
+                'nfo_actor',
+                'nfo_country',
+                'nfo_director',
+                'nfo_genre',
+                'nfo_id',
+                'nfo_originaltitle',
+                'nfo_plot',
+                'nfo_rating',
+                'nfo_runtime',
+                'nfo_studio',
+                'nfo_thumb',
+                'nfo_title',
+                'nfo_trailer',
+                'nfo_votes',
+                'nfo_year',
+            ]
 
             # Check that the 'nfo_id' field is set to the correct movie
             assert entry['nfo_id'] == 'tt2316801'
@@ -278,9 +307,11 @@ class TestNfoLookupWithMovies(object):
             assert entry['nfo_director'] == ["Christophe Gans"]
             assert entry['nfo_genre'] == ["Fantasia", "Romance"]
             assert entry['nfo_originaltitle'] == "La Belle et la Bête"
-            assert entry['nfo_plot'] == ("Um romance inesperado floresce depois que a filha mais nova de um mercador "
-                                         "em dificuldades se oferece para uma misteriosa besta com a qual seu pai "
-                                         "ficou endividado.")
+            assert entry['nfo_plot'] == (
+                "Um romance inesperado floresce depois que a filha mais nova de um mercador "
+                "em dificuldades se oferece para uma misteriosa besta com a qual seu pai "
+                "ficou endividado."
+            )
             assert entry['nfo_rating'] == "6"
             assert entry['nfo_runtime'] == "153"
             assert entry['nfo_studio'] == ["Canal Plus", "Studio Babelsberg", "Eskwad"]
@@ -322,5 +353,6 @@ class TestNfoLookupWithMovies(object):
             # 'nfo_id'. However, it is not added as the 'imdb_id' field.
             assert entry['nfo_id'] == 'tt1234'
             assert entry['nfo_title'] == 'A Bela e a Fera'
+
 
 # TODO: Test with series

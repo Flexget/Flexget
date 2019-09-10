@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 from future.moves.urllib.parse import quote
 
 import logging
@@ -45,12 +44,13 @@ class Torrentz(object):
 
     def process_config(self, config):
         """Return plugin configuration in advanced form"""
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = {'reputation': config}
         if config.get('extra_terms'):
             config['extra_terms'] = ' ' + config['extra_terms']
         return config
 
+    # TODO: The torrent_cache plugin is broken, so urlrewriting has been disabled for this plugin. #2307 #2363
     def url_rewritable(self, task, entry):
         return REGEXP.match(entry['url'])
 
@@ -125,4 +125,5 @@ class Torrentz(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Torrentz, 'torrentz', interfaces=['urlrewriter', 'search'], api_ver=2)
+    # TODO: The torrent_cache plugin is broken, so urlrewriting has been disabled for this plugin. #2307 #2363
+    plugin.register(Torrentz, 'torrentz', interfaces=['search'], api_ver=2)

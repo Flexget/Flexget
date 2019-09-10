@@ -5,7 +5,11 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget.api.app import base_message
 from flexget.components.managed_lists.lists.movie_list.api import ObjectsContainer as OC
-from flexget.components.managed_lists.lists.movie_list.db import MovieListBase, MovieListList, MovieListMovie
+from flexget.components.managed_lists.lists.movie_list.db import (
+    MovieListBase,
+    MovieListList,
+    MovieListMovie,
+)
 from flexget.components.managed_lists.lists.movie_list.movie_list import MovieListBase
 from flexget.manager import Session
 from flexget.utils import json
@@ -41,10 +45,7 @@ class TestMovieListAPI(object):
         errors = schema_match(OC.list_object, data)
         assert not errors
 
-        values = {
-            'name': 'test',
-            'id': 1
-        }
+        values = {'name': 'test', 'id': 1}
         for field, value in values.items():
             assert data.get(field) == value
 
@@ -75,10 +76,7 @@ class TestMovieListAPI(object):
         errors = schema_match(OC.list_object, data)
         assert not errors
 
-        values = {
-            'name': 'test',
-            'id': 1
-        }
+        values = {'name': 'test', 'id': 1}
         for field, value in values.items():
             assert data.get(field) == value
 
@@ -89,10 +87,7 @@ class TestMovieListAPI(object):
         errors = schema_match(OC.list_object, data)
         assert not errors
 
-        values = {
-            'name': 'test',
-            'id': 1
-        }
+        values = {'name': 'test', 'id': 1}
         for field, value in values.items():
             assert data.get(field) == value
 
@@ -157,8 +152,7 @@ class TestMovieListAPI(object):
         assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
 
         identifier = {'imdb_id': 'tt1234567'}
-        movie_data = {'movie_name': 'title',
-                      'movie_identifiers': [identifier]}
+        movie_data = {'movie_name': 'title', 'movie_identifiers': [identifier]}
 
         # Add movie to list
         rsp = api_client.json_post('/movie_list/1/movies/', data=json.dumps(movie_data))
@@ -175,7 +169,9 @@ class TestMovieListAPI(object):
         assert not errors
 
         returned_identifier = data[0]['movies_list_ids'][0]
-        assert returned_identifier['id_name'], returned_identifier['id_value'] == identifier.items()[0]
+        assert returned_identifier['id_name'], (
+            returned_identifier['id_value'] == identifier.items()[0]
+        )
 
         # Add movie to non-existent list
         rsp = api_client.json_post('/movie_list/10/movies/', data=json.dumps(movie_data))
@@ -185,8 +181,7 @@ class TestMovieListAPI(object):
         assert not errors
 
         non_valid_identifier = {'bla': 'tt1234567'}
-        movie_data = {'movie_name': 'title2',
-                      'movie_identifiers': [non_valid_identifier]}
+        movie_data = {'movie_name': 'title2', 'movie_identifiers': [non_valid_identifier]}
 
         # Add movie with invalid identifier to list
         rsp = api_client.json_post('/movie_list/1/movies/', data=json.dumps(movie_data))
@@ -203,8 +198,7 @@ class TestMovieListAPI(object):
         assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
 
         identifier = {'imdb_id': 'tt1234567'}
-        movie_data = {'movie_name': 'title',
-                      'movie_identifiers': [identifier]}
+        movie_data = {'movie_name': 'title', 'movie_identifiers': [identifier]}
 
         # Add movie to list
         rsp = api_client.json_post('/movie_list/1/movies/', data=json.dumps(movie_data))
@@ -219,7 +213,9 @@ class TestMovieListAPI(object):
         assert not errors
 
         returned_identifier = data['movies_list_ids'][0]
-        assert returned_identifier['id_name'], returned_identifier['id_value'] == identifier.items()[0]
+        assert returned_identifier['id_name'], (
+            returned_identifier['id_value'] == identifier.items()[0]
+        )
 
         identifiers = [{'trakt_movie_id': '12345'}]
 
@@ -232,7 +228,9 @@ class TestMovieListAPI(object):
         assert not errors
 
         returned_identifier = data['movies_list_ids'][0]
-        assert returned_identifier['id_name'], returned_identifier['id_value'] == identifiers[0].items()
+        assert returned_identifier['id_name'], (
+            returned_identifier['id_value'] == identifiers[0].items()
+        )
 
         # PUT non-existent movie from list
         rsp = api_client.json_put('/movie_list/1/movies/10/', data=json.dumps(identifiers))
@@ -281,8 +279,7 @@ class TestMovieListUseCases(object):
         errors = schema_match(OC.list_object, data)
         assert not errors
 
-        movie = {'movie_name': 'test movie',
-                 'movie_year': 2000}
+        movie = {'movie_name': 'test movie', 'movie_year': 2000}
 
         # Add movie to list
         rsp = api_client.json_post('/movie_list/1/movies/', data=json.dumps(movie))

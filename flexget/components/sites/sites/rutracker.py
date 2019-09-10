@@ -25,7 +25,7 @@ __author__ = 'asm0dey'
 log = logging.getLogger('rutracker_auth')
 Base = versioned_base('rutracker_auth', 0)
 
-MIRRORS = ['https://rutracker.cr', 'https://rutracker.net', 'https://rutracker.org']
+MIRRORS = ['https://rutracker.net', 'https://rutracker.org']
 
 
 class JSONEncodedDict(TypeDecorator):

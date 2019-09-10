@@ -64,9 +64,11 @@ class HTTPDigestTransport(xmlrpc_client.Transport):
 
         # if status code is 401, it means we used the wrong auth method
         if response.status_code == 401:
-            log.warning('%s auth failed. Retrying with %s. Please change your config.',
-                        'Digest' if self.__digest_auth else 'Basic',
-                        'Basic' if self.__digest_auth else 'Digest')
+            log.warning(
+                '%s auth failed. Retrying with %s. Please change your config.',
+                'Digest' if self.__digest_auth else 'Basic',
+                'Basic' if self.__digest_auth else 'Digest',
+            )
             self.__digest_auth = not self.__digest_auth
 
             auth = self.get_auth()
@@ -80,7 +82,7 @@ class HTTPDigestTransport(xmlrpc_client.Transport):
         if self.__digest_auth:
             return HTTPDigestAuth(self.__username, self.__password)
         return HTTPBasicAuth(self.__username, self.__password)
-    
+
     def send_request(self, url, auth, data):
         return self.__session.post(url, auth=auth, data=data, raise_status=False)
 
@@ -109,6 +111,7 @@ class SCGITransport(xmlrpc_client.Transport):
     Public domain SCGITrannsport implementation from:
     https://github.com/JohnDoee/autotorrent/blob/develop/autotorrent/scgitransport.py
     """
+
     def __init__(self, *args, **kwargs):
         self.socket_path = kwargs.pop('socket_path', '')
         xmlrpc_client.Transport.__init__(self, *args, **kwargs)
@@ -167,20 +170,27 @@ class RTorrent(object):
     default_fields = (
         'hash',
         'name',
-        'up_total', 'down_total', 'down_rate',
-        'is_open', 'is_active',
-        'custom1', 'custom2', 'custom3', 'custom4', 'custom5',
-        'state', 'complete',
-        'bytes_done', 'down.rate', 'left_bytes',
+        'up_total',
+        'down_total',
+        'down_rate',
+        'is_open',
+        'is_active',
+        'custom1',
+        'custom2',
+        'custom3',
+        'custom4',
+        'custom5',
+        'state',
+        'complete',
+        'bytes_done',
+        'down.rate',
+        'left_bytes',
         'ratio',
-        'base_path', 'load_date'
+        'base_path',
+        'load_date',
     )
 
-    required_fields = (
-        'hash',
-        'name',
-        'base_path'
-    )
+    required_fields = ('hash', 'name', 'base_path')
 
     def __init__(self, uri, username=None, password=None, digest_auth=None, session=None):
         """
@@ -214,8 +224,12 @@ class RTorrent(object):
 
         # Use a special transport if http(s)
         if parsed_uri.scheme in ['http', 'https']:
-            self._server = sp(self.uri, transport=HTTPDigestTransport(parsed_uri.scheme, self.digest_auth,
-                                                                      self.username, self.password, session))
+            self._server = sp(
+                self.uri,
+                transport=HTTPDigestTransport(
+                    parsed_uri.scheme, self.digest_auth, self.username, self.password, session
+                ),
+            )
         else:
             self._server = sp(self.uri)
 
@@ -258,7 +272,9 @@ class RTorrent(object):
                 raise xmlrpc_client.Error('Failed creating directory %s' % fields['directory'])
 
         # by default rtorrent won't allow calls over 512kb in size.
-        xmlrpc_size = len(xmlrpc_client.dumps(tuple(params), 'raw_start')) + 71680  # Add 70kb for buffer
+        xmlrpc_size = (
+            len(xmlrpc_client.dumps(tuple(params), 'raw_start')) + 71680
+        )  # Add 70kb for buffer
         if xmlrpc_size > 524288:
             prev_size = self._server.network.xmlrpc.size_limit()
             self._server.network.xmlrpc.size_limit.set('', xmlrpc_size)
@@ -345,17 +361,21 @@ class RTorrent(object):
 
 
 class RTorrentPluginBase(object):
-    priority_map = {
-        'high': 3,
-        'medium': 2,
-        'low': 1,
-        'off': 0,
-    }
+    priority_map = {'high': 3, 'medium': 2, 'low': 1, 'off': 0}
 
     def _build_options(self, config, entry, entry_first=True):
         options = {}
 
-        for opt_key in ('path', 'message', 'priority', 'custom1', 'custom2', 'custom3', 'custom4', 'custom5'):
+        for opt_key in (
+            'path',
+            'message',
+            'priority',
+            'custom1',
+            'custom2',
+            'custom3',
+            'custom4',
+            'custom5',
+        ):
             # Values do not merge config with task
             # Task takes priority then config is used
             entry_value = entry.get(opt_key)
@@ -409,7 +429,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             'custom3': {'type': 'string'},
             'custom4': {'type': 'string'},
             'custom5': {'type': 'string'},
-            'fast_resume': {'type': 'boolean', 'default': False}
+            'fast_resume': {'type': 'boolean', 'default': False},
         },
         'required': ['uri'],
         'additionalProperties': False,
@@ -436,11 +456,13 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
     @plugin.priority(135)
     def on_task_output(self, task, config):
 
-        client = RTorrent(os.path.expanduser(config['uri']),
-                          username=config.get('username'),
-                          password=config.get('password'),
-                          digest_auth=config['digest_auth'],
-                          session=task.requests)
+        client = RTorrent(
+            os.path.expanduser(config['uri']),
+            username=config.get('username'),
+            password=config.get('password'),
+            digest_auth=config['digest_auth'],
+            session=task.requests,
+        )
 
         try:
             for entry in task.accepted:
@@ -456,8 +478,14 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
                     # fast_resume is not really an rtorrent option so it's not in _build_options
                     fast_resume = entry.get('fast_resume', config['fast_resume'])
-                    self.add_entry(client, entry, options, start=config['start'], mkdir=config['mkdir'],
-                                   fast_resume=fast_resume)
+                    self.add_entry(
+                        client,
+                        entry,
+                        options,
+                        start=config['start'],
+                        mkdir=config['mkdir'],
+                        fast_resume=fast_resume,
+                    )
 
                 info_hash = entry.get('torrent_info_hash')
 
@@ -467,13 +495,21 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
                 if config['action'] == 'delete':
                     if task.options.test:
-                        log.info('Would delete %s (%s) from rTorrent', entry['title'], entry['torrent_info_hash'])
+                        log.info(
+                            'Would delete %s (%s) from rTorrent',
+                            entry['title'],
+                            entry['torrent_info_hash'],
+                        )
                         continue
                     self.delete_entry(client, entry)
 
                 if config['action'] == 'update':
                     if task.options.test:
-                        log.info('Would update %s (%s) in rTorrent', entry['title'], entry['torrent_info_hash'])
+                        log.info(
+                            'Would update %s (%s) in rTorrent',
+                            entry['title'],
+                            entry['torrent_info_hash'],
+                        )
                         continue
                     self.update_entry(client, entry, config)
 
@@ -483,7 +519,9 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
     def delete_entry(self, client, entry):
         try:
             client.delete(entry['torrent_info_hash'])
-            log.verbose('Deleted %s (%s) in rtorrent ' % (entry['title'], entry['torrent_info_hash']))
+            log.verbose(
+                'Deleted %s (%s) in rtorrent ' % (entry['title'], entry['torrent_info_hash'])
+            )
         except xmlrpc_client.Error as e:
             entry.fail('Failed to delete: %s' % str(e))
             return
@@ -506,11 +544,14 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
         if existing and 'directory' in options:
             # Check if changing to another directory which requires a move
-            if options['directory'] != existing['base_path'] \
-                    and options['directory'] != os.path.dirname(existing['base_path']):
+            if options['directory'] != existing['base_path'] and options[
+                'directory'
+            ] != os.path.dirname(existing['base_path']):
                 try:
-                    log.verbose("Path is changing, moving files from '%s' to '%s'"
-                                % (existing['base_path'], options['directory']))
+                    log.verbose(
+                        "Path is changing, moving files from '%s' to '%s'"
+                        % (existing['base_path'], options['directory'])
+                    )
                     client.move(info_hash, options['directory'])
                 except xmlrpc_client.Error as e:
                     entry.fail('Failed moving torrent: %s' % str(e))
@@ -563,7 +604,9 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                 for f in entry['torrent'].get_filelist():
                     relative_file_path = os.path.join(f['path'], f['name'])
                     if entry['torrent'].is_multi_file:
-                        relative_file_path = os.path.join(entry['torrent'].name, relative_file_path)
+                        relative_file_path = os.path.join(
+                            entry['torrent'].name, relative_file_path
+                        )
                     file_path = os.path.join(base, relative_file_path)
                     # TODO should it simply add the torrent anyway?
                     if not os.path.exists(file_path) and not os.path.isfile(file_path):
@@ -638,15 +681,17 @@ class RTorrentInputPlugin(RTorrentPluginBase):
             'fields': one_or_more({'type': 'string', 'enum': list(RTorrent.default_fields)}),
         },
         'required': ['uri'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def on_task_input(self, task, config):
-        client = RTorrent(os.path.expanduser(config['uri']),
-                          username=config.get('username'),
-                          password=config.get('password'),
-                          digest_auth=config['digest_auth'],
-                          session=task.requests)
+        client = RTorrent(
+            os.path.expanduser(config['uri']),
+            username=config.get('username'),
+            password=config.get('password'),
+            digest_auth=config['digest_auth'],
+            session=task.requests,
+        )
 
         fields = config.get('fields')
 
@@ -661,8 +706,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
         for torrent in torrents:
             entry = Entry(
                 title=torrent['name'],
-                url='%s/%s' % (os.path.expanduser(config['uri']),
-                               torrent['hash']),
+                url='%s/%s' % (os.path.expanduser(config['uri']), torrent['hash']),
                 path=torrent['base_path'],
                 torrent_info_hash=torrent['hash'],
             )

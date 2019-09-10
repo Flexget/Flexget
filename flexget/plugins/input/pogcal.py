@@ -15,20 +15,23 @@ log = logging.getLogger('pogcal')
 class InputPogDesign(object):
     schema = {
         'type': 'object',
-        'properties': {
-            'username': {'type': 'string'},
-            'password': {'type': 'string'}
-        },
+        'properties': {'username': {'type': 'string'}, 'password': {'type': 'string'}},
         'required': ['username', 'password'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
-    name_map = {'The Tonight Show [Leno]': 'The Tonight Show With Jay Leno',
-                'Late Show [Letterman]': 'David Letterman'}
+    name_map = {
+        'The Tonight Show [Leno]': 'The Tonight Show With Jay Leno',
+        'Late Show [Letterman]': 'David Letterman',
+    }
 
     def on_task_input(self, task, config):
         session = requests.Session()
-        data = {'username': config['username'], 'password': config['password'], 'sub_login': 'Account Login'}
+        data = {
+            'username': config['username'],
+            'password': config['password'],
+            'sub_login': 'Account Login',
+        }
         try:
             r = session.post('https://www.pogdesign.co.uk/cat/login', data=data)
             if 'Login to Your Account' in r.text:
@@ -60,7 +63,9 @@ class InputPogDesign(object):
 
             e = Entry()
             e['title'] = t
-            e['url'] = 'https://www.pogdesign.co.uk/{0}'.format(row.find_next('a')['href'].lstrip('/'))
+            e['url'] = 'https://www.pogdesign.co.uk/{0}'.format(
+                row.find_next('a')['href'].lstrip('/')
+            )
             entries.append(e)
 
         return entries

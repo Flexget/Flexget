@@ -20,15 +20,12 @@ class TestPushoverNotifier(object):
         """
         config2 = {
             'user_key': 'ua2g3vqjyvqpkyntx19zeruqrn3eim',
-            'api_key': 'aPwSHwkLcNaavShxktBpgJH4bRWc3m'
+            'api_key': 'aPwSHwkLcNaavShxktBpgJH4bRWc3m',
         }
 
         # No exception should be raised
         PushoverNotifier().notify('test', 'test', config2)
 
-        config1 = {
-            'user_key': 'crash',
-            'api_key': 'aPwSHwkLcNaavShxktBpgJH4bRWc3m'
-        }
+        config1 = {'user_key': 'crash', 'api_key': 'aPwSHwkLcNaavShxktBpgJH4bRWc3m'}
         with pytest.raises(PluginWarning):
             PushoverNotifier().notify('test', 'test', config1)

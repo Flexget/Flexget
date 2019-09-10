@@ -29,7 +29,7 @@ class EntryOperations(object):
       reason: <given message by plugin>
     """
 
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_input(self, task, config):
         for entry in task.all_entries:
             entry.on_accept(on_entry_action, act='accepted', task=task)

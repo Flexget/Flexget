@@ -127,7 +127,9 @@ def entry_synonym(name):
 
     def setter(self, entry):
         if isinstance(entry, Entry) or isinstance(entry, dict):
-            setattr(self, name, unicode(json.dumps(only_builtins(dict(entry)), encode_datetime=True)))
+            setattr(
+                self, name, unicode(json.dumps(only_builtins(dict(entry)), encode_datetime=True))
+            )
         else:
             raise TypeError('%r is not of type Entry or dict.' % type(entry))
 
@@ -188,7 +190,6 @@ def quality_property(text_attr):
             setattr(self, text_attr, value.name)
 
     class QualComparator(Comparator):
-
         def operate(self, op, other):
             if isinstance(other, qualities.Quality):
                 other = other.name

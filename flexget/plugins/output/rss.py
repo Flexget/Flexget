@@ -150,11 +150,11 @@ class OutputRSS(object):
                     'encoding': {'type': 'string'},  # TODO: only valid choices
                     'title': {'type': 'string'},
                     'template': {'type': 'string'},
-                    'link': {'type': 'array', 'items': {'type': 'string'}}
+                    'link': {'type': 'array', 'items': {'type': 'string'}},
                 },
                 'required': ['file'],
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ]
     }
 
@@ -195,7 +195,11 @@ class OutputRSS(object):
             try:
                 rss.title = entry.render(config['title'])
             except RenderError as e:
-                log.error('Error rendering jinja title for `%s` falling back to entry title: %s', entry['title'], e)
+                log.error(
+                    'Error rendering jinja title for `%s` falling back to entry title: %s',
+                    entry['title'],
+                    e,
+                )
                 rss.title = entry['title']
             for field in config['link']:
                 if field in entry:
@@ -209,7 +213,9 @@ class OutputRSS(object):
             try:
                 rss.description = render_from_entry(template, entry)
             except RenderError as e:
-                log.error('Error while rendering entry %s, falling back to plain title: %s', entry, e)
+                log.error(
+                    'Error while rendering entry %s, falling back to plain title: %s', entry, e
+                )
                 rss.description = entry['title'] + ' - (Render Error)'
             rss.file = config['file']
             if 'rss_pubdate' in entry:
@@ -228,8 +234,12 @@ class OutputRSS(object):
         if task.options.learn:
             return
 
-        db_items = task.session.query(RSSEntry).filter(RSSEntry.file == config['file']). \
-            order_by(RSSEntry.published.desc()).all()
+        db_items = (
+            task.session.query(RSSEntry)
+            .filter(RSSEntry.file == config['file'])
+            .order_by(RSSEntry.published.desc())
+            .all()
+        )
 
         # make items
         rss_items = []
@@ -239,7 +249,10 @@ class OutputRSS(object):
                 if len(rss_items) > config['items']:
                     add = False
             if config['days'] != -1:
-                if datetime.datetime.today() - datetime.timedelta(days=config['days']) > db_item.published:
+                if (
+                    datetime.datetime.today() - datetime.timedelta(days=config['days'])
+                    > db_item.published
+                ):
                     add = False
             if add:
                 # add into generated feed
@@ -250,16 +263,17 @@ class OutputRSS(object):
                 guid = base64.urlsafe_b64encode(hasher.digest()).decode('ascii')
                 guid = PyRSS2Gen.Guid(guid, isPermaLink=False)
 
-                gen = {'title': db_item.title,
-                       'description': db_item.description,
-                       'link': db_item.link,
-                       'pubDate': db_item.published,
-                       'guid': guid}
+                gen = {
+                    'title': db_item.title,
+                    'description': db_item.description,
+                    'link': db_item.link,
+                    'pubDate': db_item.published,
+                    'guid': guid,
+                }
                 if db_item.enc_length is not None and db_item.enc_type is not None:
-                       gen['enclosure'] = PyRSS2Gen.Enclosure(
-                                               db_item.link,
-                                               db_item.enc_length,
-                                               db_item.enc_type)
+                    gen['enclosure'] = PyRSS2Gen.Enclosure(
+                        db_item.link, db_item.enc_length, db_item.enc_type
+                    )
                 log.trace('Adding %s into rss %s', gen['title'], config['file'])
                 rss_items.append(PyRSS2Gen.RSSItem(**gen))
             else:
@@ -267,11 +281,13 @@ class OutputRSS(object):
                 task.session.delete(db_item)
 
         # make rss
-        rss = PyRSS2Gen.RSS2(title=config.get('rsstitle', 'FlexGet'),
-                             link=config.get('rsslink', 'http://flexget.com'),
-                             description=config.get('rssdesc', 'FlexGet generated RSS feed'),
-                             lastBuildDate=datetime.datetime.utcnow() if config['timestamp'] else None,
-                             items=rss_items)
+        rss = PyRSS2Gen.RSS2(
+            title=config.get('rsstitle', 'FlexGet'),
+            link=config.get('rsslink', 'http://flexget.com'),
+            description=config.get('rssdesc', 'FlexGet generated RSS feed'),
+            lastBuildDate=datetime.datetime.utcnow() if config['timestamp'] else None,
+            items=rss_items,
+        )
 
         # don't run with --test
         if task.options.test:

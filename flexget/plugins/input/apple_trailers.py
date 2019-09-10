@@ -59,15 +59,14 @@ class AppleTrailers(object):
                     'quality': {
                         'type': 'string',
                         'enum': list(qualities.keys()),
-                        'default': '720p'
+                        'default': '720p',
                     },
-                    'genres': {'type': 'array', 'items': {'type': 'string'}}
+                    'genres': {'type': 'array', 'items': {'type': 'string'}},
                 },
-                'additionalProperties': False
+                'additionalProperties': False,
             },
-            {'title': 'justquality', 'type': 'string', 'enum': list(qualities.keys())}
+            {'title': 'justquality', 'type': 'string', 'enum': list(qualities.keys())},
         ]
-
     }
 
     def broken(self, error_message):
@@ -129,7 +128,9 @@ class AppleTrailers(object):
             for clip in movie_data.get('clips'):
                 if clip.get('title') == entry['apple_trailers_name']:
                     try:
-                        trailer_url = clip['versions']['enus']['sizes'][self.qualities[desired_quality]]
+                        trailer_url = clip['versions']['enus']['sizes'][
+                            self.qualities[desired_quality]
+                        ]
                         src = trailer_url.get('src')
                         src_alt = trailer_url.get('srcAlt')
                         # .mov tends to be a streaming video file, but the real video file is the same url, but
@@ -168,7 +169,6 @@ class AppleTrailers(object):
 
 
 class AppleTrailersHeader(AuthBase):
-
     def __call__(self, request):
         request.headers['User-Agent'] = 'QuickTime/7.7'
         return request

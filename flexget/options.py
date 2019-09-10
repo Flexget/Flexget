@@ -6,8 +6,16 @@ import copy
 import random
 import string
 from argparse import ArgumentParser as ArgParser, _UNRECOGNIZED_ARGS_ATTR
-from argparse import (_VersionAction, Action, ArgumentError, Namespace, PARSER, REMAINDER, SUPPRESS,
-                      _SubParsersAction)
+from argparse import (
+    _VersionAction,
+    Action,
+    ArgumentError,
+    Namespace,
+    PARSER,
+    REMAINDER,
+    SUPPRESS,
+    _SubParsersAction,
+)
 
 import flexget
 
@@ -52,7 +60,9 @@ def register_command(command, callback, **kwargs):
     :param kwargs: Other keyword arguments will be passed to the :class:`arparse.ArgumentParser` constructor
     :returns: An :class:`argparse.ArgumentParser` instance ready to be configured with the options for this command.
     """
-    return get_parser().add_subparser(command, parent_defaults={'cli_command_callback': callback}, **kwargs)
+    return get_parser().add_subparser(
+        command, parent_defaults={'cli_command_callback': callback}, **kwargs
+    )
 
 
 def required_length(nmin, nmax):
@@ -72,6 +82,7 @@ class VersionAction(_VersionAction):
 
     def __call__(self, parser, namespace, values, option_string=None):
         from flexget.terminal import console
+
         current = get_current_flexget_version()
         latest = get_latest_flexget_version_number()
 
@@ -84,7 +95,9 @@ class VersionAction(_VersionAction):
             else:
                 console('Latest release: %s' % latest)
         else:
-            console('Error getting latest version number from https://pypi.python.org/pypi/FlexGet')
+            console(
+                'Error getting latest version number from https://pypi.python.org/pypi/FlexGet'
+            )
         parser.exit()
 
 
@@ -116,7 +129,9 @@ class InjectAction(Action):
         if values:
             kwargs['url'] = values.pop(0)
         else:
-            kwargs['url'] = 'http://localhost/inject/%s' % ''.join(random.sample(string.ascii_letters + string.digits, 30))
+            kwargs['url'] = 'http://localhost/inject/%s' % ''.join(
+                random.sample(string.ascii_letters + string.digits, 30)
+            )
         if 'force' in [v.lower() for v in values]:
             kwargs['immortal'] = True
         entry = Entry(**kwargs)
@@ -135,8 +150,14 @@ class ParseExtrasAction(Action):
         if help is None:
             help = 'arguments for the `%s` command are allowed here' % parser.prog
         self._parser = parser
-        super(ParseExtrasAction, self).__init__(option_strings=option_strings, dest=SUPPRESS, help=help,
-                                                metavar=metavar, nargs=REMAINDER, required=required)
+        super(ParseExtrasAction, self).__init__(
+            option_strings=option_strings,
+            dest=SUPPRESS,
+            help=help,
+            metavar=metavar,
+            nargs=REMAINDER,
+            required=required,
+        )
 
     def __call__(self, parser, namespace, values, option_string=None):
         namespace, extras = self._parser.parse_known_args(values, namespace)
@@ -202,7 +223,9 @@ class NestedSubparserAction(_SubParsersAction):
                     setattr(namespace, dest, self.parent_defaults[parser_name][dest])
         if self.nested_namespaces:
             subnamespace = ScopedNamespace()
-            super(NestedSubparserAction, self).__call__(parser, subnamespace, values, option_string)
+            super(NestedSubparserAction, self).__call__(
+                parser, subnamespace, values, option_string
+            )
             # If dest is set, it should be set on the parent namespace, not subnamespace
             if self.dest is not SUPPRESS:
                 setattr(namespace, self.dest, parser_name)
@@ -210,7 +233,9 @@ class NestedSubparserAction(_SubParsersAction):
             setattr(namespace, parser_name, subnamespace)
             # Propagate unrecognized arguments back to parent namespace
             vars(namespace).setdefault(_UNRECOGNIZED_ARGS_ATTR, [])
-            getattr(namespace, _UNRECOGNIZED_ARGS_ATTR).extend(getattr(subnamespace, _UNRECOGNIZED_ARGS_ATTR))
+            getattr(namespace, _UNRECOGNIZED_ARGS_ATTR).extend(
+                getattr(subnamespace, _UNRECOGNIZED_ARGS_ATTR)
+            )
         else:
             super(NestedSubparserAction, self).__call__(parser, namespace, values, option_string)
 
@@ -247,7 +272,10 @@ class ArgumentParser(ArgParser):
     - If the `raise_errors` keyword argument to `parse_args` is True, a `ParserError` will be raised instead of sys.exit
     - If the `file` argument is given to `parse_args`, output will be printed there instead of sys.stdout or stderr
     """
-    file = None  # This is created as a class attribute so that we can set it for parser and all subparsers at once
+
+    file = (
+        None
+    )  # This is created as a class attribute so that we can set it for parser and all subparsers at once
 
     def __init__(self, **kwargs):
         """
@@ -302,7 +330,9 @@ class ArgumentParser(ArgParser):
     def error(self, msg):
         raise ParserError(msg, self)
 
-    def parse_args(self, args=None, namespace=None, raise_errors=False, file=None):  # pylint: disable=W0221
+    def parse_args(
+        self, args=None, namespace=None, raise_errors=False, file=None
+    ):  # pylint: disable=W0221
         """
         :param raise_errors: If this is true, errors will be raised as `ParserError`s instead of calling sys.exit
         """
@@ -374,38 +404,75 @@ class ArgumentParser(ArgParser):
 
     def _debug_tb_callback(self, *dummy):
         import cgitb
+
         cgitb.enable(format="text")
 
 
 # This will hold just the arguments directly for Manager.
 manager_parser = ArgumentParser(add_help=False)
-manager_parser.add_argument('-V', '--version', action=VersionAction, version=flexget.__version__,
-                            help='Print FlexGet version and exit.')
-manager_parser.add_argument('--test', action='store_true', dest='test', default=0,
-                            help='Verbose what would happen on normal execution.')
-manager_parser.add_argument('-c', dest='config', default='config.yml',
-                            help='Specify configuration file. Default: %(default)s')
-manager_parser.add_argument('--logfile', '-l', default='flexget.log',
-                            help='Specify a custom logfile name/location. '
-                                 'Default: %(default)s in the config directory.')
-manager_parser.add_argument('--loglevel', '-L', metavar='LEVEL',
-                            help='Set the verbosity of the logger. Levels: %(choices)s',
-                            choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'])
+manager_parser.add_argument(
+    '-V',
+    '--version',
+    action=VersionAction,
+    version=flexget.__version__,
+    help='Print FlexGet version and exit.',
+)
+manager_parser.add_argument(
+    '--test',
+    action='store_true',
+    dest='test',
+    default=0,
+    help='Verbose what would happen on normal execution.',
+)
+manager_parser.add_argument(
+    '-c',
+    dest='config',
+    default='config.yml',
+    help='Specify configuration file. Default: %(default)s',
+)
+manager_parser.add_argument(
+    '--logfile',
+    '-l',
+    default='flexget.log',
+    help='Specify a custom logfile name/location. '
+    'Default: %(default)s in the config directory.',
+)
+manager_parser.add_argument(
+    '--loglevel',
+    '-L',
+    metavar='LEVEL',
+    help='Set the verbosity of the logger. Levels: %(choices)s',
+    choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'],
+)
 manager_parser.set_post_defaults(loglevel='verbose')
 # This option is already handled above.
-manager_parser.add_argument('--bugreport', action='store_true', dest='debug_tb',
-                            help='Use this option to create a detailed bug report, '
-                                 'note that the output might contain PRIVATE data, so edit that out')
-manager_parser.add_argument('--profile', metavar='OUTFILE', nargs='?', const='flexget.profile',
-                            help='Use the python profiler for this run to debug performance issues.')
+manager_parser.add_argument(
+    '--bugreport',
+    action='store_true',
+    dest='debug_tb',
+    help='Use this option to create a detailed bug report, '
+    'note that the output might contain PRIVATE data, so edit that out',
+)
+manager_parser.add_argument(
+    '--profile',
+    metavar='OUTFILE',
+    nargs='?',
+    const='flexget.profile',
+    help='Use the python profiler for this run to debug performance issues.',
+)
 manager_parser.add_argument('--debug', action=DebugAction, nargs=0, help=SUPPRESS)
 manager_parser.add_argument('--debug-trace', action=DebugTraceAction, nargs=0, help=SUPPRESS)
 manager_parser.add_argument('--debug-sql', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--experimental', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--ipc-port', type=int, help=SUPPRESS)
-manager_parser.add_argument('--cron', action=CronAction, default=False, nargs=0,
-                            help='use when executing FlexGet non-interactively: allows background '
-                                 'maintenance to run, disables stdout and stderr output, reduces logging level')
+manager_parser.add_argument(
+    '--cron',
+    action=CronAction,
+    default=False,
+    nargs=0,
+    help='use when executing FlexGet non-interactively: allows background '
+    'maintenance to run, disables stdout and stderr output, reduces logging level',
+)
 
 
 class CoreArgumentParser(ArgumentParser):
@@ -420,41 +487,69 @@ class CoreArgumentParser(ArgumentParser):
         kwargs.setdefault('parents', [manager_parser])
         kwargs.setdefault('prog', 'flexget')
         super(CoreArgumentParser, self).__init__(**kwargs)
-        self.add_subparsers(title='commands', metavar='<command>', dest='cli_command', nested_namespaces=True)
+        self.add_subparsers(
+            title='commands', metavar='<command>', dest='cli_command', nested_namespaces=True
+        )
 
         # The parser for the execute command
         exec_parser = self.add_subparser('execute', help='execute tasks now')
-        exec_parser.add_argument('--tasks', nargs='+', metavar='TASK',
-                                 help='run only specified task(s), optionally using glob patterns ("tv-*"). '
-                                      'matching is case-insensitive')
-        exec_parser.add_argument('--learn', action='store_true', dest='learn', default=False,
-                                 help='matches are not downloaded but will be skipped in the future')
+        exec_parser.add_argument(
+            '--tasks',
+            nargs='+',
+            metavar='TASK',
+            help='run only specified task(s), optionally using glob patterns ("tv-*"). '
+            'matching is case-insensitive',
+        )
+        exec_parser.add_argument(
+            '--learn',
+            action='store_true',
+            dest='learn',
+            default=False,
+            help='matches are not downloaded but will be skipped in the future',
+        )
         exec_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
         exec_parser.add_argument('--disable-phases', nargs='*', help=SUPPRESS)
         exec_parser.add_argument('--inject', nargs='+', action=InjectAction, help=SUPPRESS)
         # Plugins should respect these flags where appropriate
-        exec_parser.add_argument('--retry', action='store_true', dest='retry', default=False, help=SUPPRESS)
-        exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=False,
-                                 help='disable caches. works only in plugins that have explicit support')
+        exec_parser.add_argument(
+            '--retry', action='store_true', dest='retry', default=False, help=SUPPRESS
+        )
+        exec_parser.add_argument(
+            '--no-cache',
+            action='store_true',
+            dest='nocache',
+            default=False,
+            help='disable caches. works only in plugins that have explicit support',
+        )
 
         daemonize_help = SUPPRESS
         if not sys.platform.startswith('win'):
             daemonize_help = 'causes process to daemonize after starting'
 
         # The parser for the daemon command
-        daemon_parser = self.add_subparser('daemon', parent_defaults={'loglevel': 'info'},
-                                           help='run continuously, executing tasks according to schedules defined '
-                                                'in config')
+        daemon_parser = self.add_subparser(
+            'daemon',
+            parent_defaults={'loglevel': 'info'},
+            help='run continuously, executing tasks according to schedules defined ' 'in config',
+        )
         daemon_parser.add_subparsers(title='actions', metavar='<action>', dest='action')
         start_parser = daemon_parser.add_subparser('start', help='start the daemon')
         start_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
-        start_parser.add_argument('--autoreload-config', action='store_true',
-                                  help='automatically reload the config from disk if the daemon detects any changes')
+        start_parser.add_argument(
+            '--autoreload-config',
+            action='store_true',
+            help='automatically reload the config from disk if the daemon detects any changes',
+        )
         stop_parser = daemon_parser.add_subparser('stop', help='shutdown the running daemon')
-        stop_parser.add_argument('--wait', action='store_true',
-                                 help='wait for all queued tasks to finish before stopping daemon')
+        stop_parser.add_argument(
+            '--wait',
+            action='store_true',
+            help='wait for all queued tasks to finish before stopping daemon',
+        )
         daemon_parser.add_subparser('status', help='check if a daemon is running')
-        daemon_parser.add_subparser('reload-config', help='causes a running daemon to reload the config from disk')
+        daemon_parser.add_subparser(
+            'reload-config', help='causes a running daemon to reload the config from disk'
+        )
 
     def add_subparsers(self, **kwargs):
         # The subparsers should not be CoreArgumentParsers

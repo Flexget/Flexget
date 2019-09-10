@@ -56,13 +56,29 @@ def reset_plugin(options):
 @event('options.register')
 def register_parser_arguments():
     plugins_parser = ArgumentParser(add_help=False)
-    plugins_parser.add_argument('plugin_name', help="Name of plugin to reset", nargs=1, choices=list(plugin_schemas))
+    plugins_parser.add_argument(
+        'plugin_name', help="Name of plugin to reset", nargs=1, choices=list(plugin_schemas)
+    )
 
-    parser = options.register_command('database', do_cli, help='Utilities to manage the FlexGet database')
+    parser = options.register_command(
+        'database', do_cli, help='Utilities to manage the FlexGet database'
+    )
     subparsers = parser.add_subparsers(title='Actions', metavar='<action>', dest='db_action')
-    subparsers.add_parser('cleanup', help='Make all plugins clean un-needed data from the database')
-    subparsers.add_parser('vacuum', help='Running vacuum can increase performance and decrease database size')
-    reset_parser = subparsers.add_parser('reset', add_help=False, help='Reset the entire database (DANGEROUS!)')
-    reset_parser.add_argument('--sure', action='store_true', required=True,
-                              help='You must use this flag to indicate you REALLY want to do this')
-    subparsers.add_parser('reset-plugin', help='Reset the database for a specific plugin', parents=[plugins_parser])
+    subparsers.add_parser(
+        'cleanup', help='Make all plugins clean un-needed data from the database'
+    )
+    subparsers.add_parser(
+        'vacuum', help='Running vacuum can increase performance and decrease database size'
+    )
+    reset_parser = subparsers.add_parser(
+        'reset', add_help=False, help='Reset the entire database (DANGEROUS!)'
+    )
+    reset_parser.add_argument(
+        '--sure',
+        action='store_true',
+        required=True,
+        help='You must use this flag to indicate you REALLY want to do this',
+    )
+    subparsers.add_parser(
+        'reset-plugin', help='Reset the database for a specific plugin', parents=[plugins_parser]
+    )

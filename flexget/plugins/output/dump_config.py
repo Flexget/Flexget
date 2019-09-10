@@ -17,10 +17,11 @@ class OutputDumpConfig(object):
         Dumps task config in STDOUT in yaml at exit or abort event.
     """
 
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_start(self, task, config):
         if task.options.dump_config:
             import yaml
+
             console('--- config from task: %s' % task.name)
             console(yaml.safe_dump(task.config))
             console('---')
@@ -38,7 +39,17 @@ def register_plugin():
 @event('options.register')
 def register_parser_arguments():
     exec_parser = options.get_parser('execute')
-    exec_parser.add_argument('--dump-config', action='store_true', dest='dump_config', default=False,
-                             help='display the config of each feed after template merging/config generation occurs')
-    exec_parser.add_argument('--dump-config-python', action='store_true', dest='dump_config_python', default=False,
-                             help=SUPPRESS)
+    exec_parser.add_argument(
+        '--dump-config',
+        action='store_true',
+        dest='dump_config',
+        default=False,
+        help='display the config of each feed after template merging/config generation occurs',
+    )
+    exec_parser.add_argument(
+        '--dump-config-python',
+        action='store_true',
+        dest='dump_config_python',
+        default=False,
+        help=SUPPRESS,
+    )

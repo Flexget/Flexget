@@ -25,6 +25,7 @@ def main(args=None):
         except (IOError, ValueError) as e:
             if _is_debug():
                 import traceback
+
                 traceback.print_exc()
             else:
                 print('Could not instantiate manager: %s' % e, file=sys.stderr)
@@ -36,13 +37,18 @@ def main(args=None):
                     import cProfile as profile
                 except ImportError:
                     import profile
-                profile.runctx('manager.start()', globals(), locals(),
-                               os.path.join(manager.config_base, manager.options.profile))
+                profile.runctx(
+                    'manager.start()',
+                    globals(),
+                    locals(),
+                    os.path.join(manager.config_base, manager.options.profile),
+                )
             else:
                 manager.start()
         except (IOError, ValueError) as e:
             if _is_debug():
                 import traceback
+
                 traceback.print_exc()
             else:
                 print('Could not start manager: %s' % e, file=sys.stderr)
@@ -51,6 +57,7 @@ def main(args=None):
     except KeyboardInterrupt:
         if _is_debug():
             import traceback
+
             traceback.print_exc()
 
         print('Killed with keyboard interrupt.', file=sys.stderr)

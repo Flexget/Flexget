@@ -38,7 +38,7 @@ class ListClear(object):
         if phase.replace('on_task_', '') in plugin.task_phases:
             return self.clear
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def clear(self, task, config):
         for item in config['what']:
             for plugin_name, plugin_config in item.items():

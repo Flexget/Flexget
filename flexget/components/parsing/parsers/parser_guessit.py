@@ -114,14 +114,14 @@ class ParserGuessit(object):
         else:
             version -= 1
         proper_count = guessit_result.get('proper_count', 0)
-        fastsub = 'fast subtitled' in normalize_component(guessit_result.get('other'))
+        fastsub = 'fast subtitled' in normalize_component(guessit_result.values_list.get('other'))
         return version + proper_count - (5 if fastsub else 0)
 
     def _source(self, guessit_result):
-        other = normalize_component(guessit_result.get('other'))
+        other = normalize_component(guessit_result.values_list.get('other'))
         source = self.SOURCE_MAP.get(guessit_result.get('source'), guessit_result.get('source'))
         # special case
-        if source == 'web-dl' and 'Rip' in other:
+        if source == 'web-dl' and 'rip' in other:
             source = 'webrip'
 
         source = normalize_component(source)
@@ -133,31 +133,33 @@ class ParserGuessit(object):
                 source.append('bdscr')
             else:
                 source.append('dvdscr')
-        if 'r5' in other:
+        if 'region 5' in other or 'region c' in other:
             source.append('r5')
 
         return source
 
     def _quality(self, guessit_result):
         """Generate a FlexGet Quality from a guessit result."""
-        resolution = normalize_component(guessit_result.get('screen_size'))
-        other = normalize_component(guessit_result.get('other'))
+        resolution = normalize_component(guessit_result.values_list.get('screen_size'))
+        other = normalize_component(guessit_result.values_list.get('other'))
         if not resolution and 'high resolution' in other:
             resolution.append('hr')
 
         source = self._source(guessit_result)
 
-        codec = normalize_component(guessit_result.get('video_codec'))
-        if '10bit' in normalize_component(guessit_result.get('video_profile')):
+        codec = normalize_component(guessit_result.values_list.get('video_codec'))
+        if '10bit' in normalize_component(guessit_result.values_list.get('color_depth')):
             codec.append('10bit')
 
-        audio = normalize_component(guessit_result.get('audio_codec'))
-        audio_profile = normalize_component(guessit_result.get('audio_profile'))
-        audio_channels = normalize_component(guessit_result.get('audio_channels'))
+        audio = normalize_component(guessit_result.values_list.get('audio_codec'))
+        audio_profile = normalize_component(guessit_result.values_list.get('audio_profile'))
+        audio_channels = normalize_component(guessit_result.values_list.get('audio_channels'))
         # unlike the other components, audio can be a bit iffy with multiple codecs, so we limit it to one
         if 'dts' in audio and any(hd in audio_profile for hd in ['hd', 'master audio']):
             audio = ['dtshd']
-        elif '5.1' in audio_channels and any(dd in audio for dd in ['dolby digital']):
+        elif '5.1' in audio_channels and 'dolby digital plus' in audio:
+            audio = ['dd+5.1']
+        elif '5.1' in audio_channels and 'dolby digital' in audio:
             audio = ['dd5.1']
 
         # Make sure everything are strings (guessit will return lists when there are multiples)
@@ -306,7 +308,11 @@ class ParserGuessit(object):
                 parenthetical = re.escape(name[p_start + 1 : -1])
                 if parenthetical and parenthetical.lower() != str(country).lower():
                     valid = False
-        special = guess_result.get('episode_details', '').lower() == 'special'
+        # Check the full list of 'episode_details' for special,
+        # since things like 'pilot' and 'unaired' can also show up there
+        special = any(
+            v.lower() == 'special' for v in guess_result.values_list.get('episode_details', [])
+        )
         if 'episode' not in guess_result.values_list:
             episodes = len(guess_result.values_list.get('part', []))
         else:

@@ -28,6 +28,7 @@ class TheTVDBSet(MutableSet):
             'account_id': {'type': 'string'},
             'api_key': {'type': 'string'},
             'strip_dates': {'type': 'boolean'},
+            'language': {'type': 'string'},
         },
         'required': ['username', 'account_id', 'api_key'],
         'additionalProperties': False,
@@ -72,7 +73,9 @@ class TheTVDBSet(MutableSet):
             for series_id in series_ids:
                 # Lookup the series name from the id
                 try:
-                    series = plugin_api_tvdb.lookup_series(tvdb_id=series_id)
+                    series = plugin_api_tvdb.lookup_series(
+                        tvdb_id=series_id, language=self.config.get('language')
+                    )
                 except LookupError as e:
                     log.error('Error looking up %s from thetvdb: %s' % (series_id, e.args[0]))
                 else:

@@ -24,31 +24,31 @@ requests.add_domain_limiter(TimedLimiter('npostart.nl', '8 seconds'))
 
 class NPOWatchlist(object):
     """
-        Produces entries for every episode on the user's npostart.nl watchlist (Dutch public television).
-        Entries can be downloaded using http://arp242.net/code/download-npo
+    Produces entries for every episode on the user's npostart.nl watchlist (Dutch public television).
+    Entries can be downloaded using http://arp242.net/code/download-npo
 
-        If 'remove_accepted' is set to 'yes', the plugin will delete accepted entries from the watchlist after download
-            is complete.
-        If 'max_episode_age_days' is set (and not 0), entries will only be generated for episodes broadcast in the last
-            x days.  This only applies to episodes related to series the user is following.
-        If 'download_premium' is set to 'yes', the plugin will also download entries that are marked as exclusive
-            content for NPO Plus subscribers.
+    If 'remove_accepted' is set to 'yes', the plugin will delete accepted entries from the watchlist after download
+        is complete.
+    If 'max_episode_age_days' is set (and not 0), entries will only be generated for episodes broadcast in the last
+        x days.  This only applies to episodes related to series the user is following.
+    If 'download_premium' is set to 'yes', the plugin will also download entries that are marked as exclusive
+        content for NPO Plus subscribers.
 
-        For example:
-            npo_watchlist:
-              email: aaaa@bbb.nl
-              password: xxx
-              remove_accepted: yes
-              max_episode_age_days: 7
-              download_premium: no
-            accept_all: yes
-            exec:
-              fail_entries: yes
-              auto_escape: yes
-              on_output:
-                for_accepted:
-                  - download-npo -o "path/to/directory/{{series_name_plain}}" -f "{serie_titel} - {datum} \
-                      {aflevering_titel} ({episode_id})" -t {{url}}
+    For example:
+        npo_watchlist:
+          email: aaaa@bbb.nl
+          password: xxx
+          remove_accepted: yes
+          max_episode_age_days: 7
+          download_premium: no
+        accept_all: yes
+        exec:
+          fail_entries: yes
+          auto_escape: yes
+          on_output:
+            for_accepted:
+              - download-npo -o "path/to/directory/{{series_name_plain}}" -f "{serie_titel} - {datum} \
+                  {aflevering_titel} ({episode_id})" -t {{url}}
         """
 
     schema = {
@@ -61,14 +61,17 @@ class NPOWatchlist(object):
             'download_premium': {'type': 'boolean', 'default': False},
         },
         'required': ['email', 'password'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     csrf_token = None
 
     def _convert_plain(self, s):
-        return ''.join(c for c in unicodedata.normalize('NFD', s)
-                       if not re.match('Mn|P[^cd]', unicodedata.category(c)))
+        return ''.join(
+            c
+            for c in unicodedata.normalize('NFD', s)
+            if not re.match('Mn|P[^cd]', unicodedata.category(c))
+        )
 
     def _parse_date(self, date_text):
         return datetime.strptime(date_text, '%d-%m-%Y').date()
@@ -79,7 +82,9 @@ class NPOWatchlist(object):
             log.debug('Fetching NPO profile page: %s', url)
             page_response = requests.get(url)
             if page_response.url != url:
-                raise plugin.PluginError('Unexpected page: {} (expected {})'.format(page_response.url, url))
+                raise plugin.PluginError(
+                    'Unexpected page: {} (expected {})'.format(page_response.url, url)
+                )
             return page_response
         except RequestException as e:
             raise plugin.PluginError('Request error: %s' % str(e))
@@ -103,10 +108,9 @@ class NPOWatchlist(object):
             email = config.get('email')
             password = config.get('password')
 
-            profile_response = requests.post(login_api_url,
-                                             {'_token': token,
-                                              'username': email,
-                                              'password': password})
+            profile_response = requests.post(
+                login_api_url, {'_token': token, 'username': email, 'password': password}
+            )
 
             if 'isAuthenticatedUser' not in profile_response.cookies:
                 raise plugin.PluginError('Failed to login. Check username and password.')
@@ -135,9 +139,11 @@ class NPOWatchlist(object):
 
     def _get_series_episodes(self, task, config, mediaId, series_info=None, page=1):
         episode_tiles_url = 'https://www.npostart.nl/media/series/{0}/episodes'
-        episode_tiles_parameters = {'page': str(page),
-                                    'tileMapping': 'dedicated',
-                                    'tileType': 'asset'}
+        episode_tiles_parameters = {
+            'page': str(page),
+            'tileMapping': 'dedicated',
+            'tileType': 'asset',
+        }
         entries = []
 
         if not series_info:
@@ -146,24 +152,37 @@ class NPOWatchlist(object):
                 log.error('Failed to fetch series information for %s, skipping series', mediaId)
                 return entries
 
-        headers = {'Origin': 'https://www.npostart.nl',
-                   'X-XSRF-TOKEN': requests.cookies['XSRF-TOKEN'],
-                   'X-Requested-With': 'XMLHttpRequest'}
+        headers = {
+            'Origin': 'https://www.npostart.nl',
+            'X-XSRF-TOKEN': requests.cookies['XSRF-TOKEN'],
+            'X-Requested-With': 'XMLHttpRequest',
+        }
         if page > 1:
-            headers['Referer'] = episode_tiles_url.format(mediaId) + '?page={0}'.format(page-1)  # referer from prev page
+            headers['Referer'] = episode_tiles_url.format(mediaId) + '?page={0}'.format(
+                page - 1
+            )  # referer from prev page
 
-        log.debug('Retrieving episodes page %s for %s (%s)', page, series_info['npo_name'], mediaId)
+        log.debug(
+            'Retrieving episodes page %s for %s (%s)', page, series_info['npo_name'], mediaId
+        )
         try:
-            episodes = requests.get(episode_tiles_url.format(mediaId),
-                                    params=episode_tiles_parameters,
-                                    headers=headers).json()
+            episodes = requests.get(
+                episode_tiles_url.format(mediaId), params=episode_tiles_parameters, headers=headers
+            ).json()
             new_entries = self._parse_tiles(task, config, episodes['tiles'], series_info)
             entries += new_entries
 
-            if new_entries and episodes['nextLink']:  # only fetch next page if we accepted any from current page
+            if (
+                new_entries and episodes['nextLink']
+            ):  # only fetch next page if we accepted any from current page
                 log.debug('NextLink for more episodes: %s', episodes['nextLink'])
-                entries += self._get_series_episodes(task, config, mediaId, series_info,
-                                                     page=int(episodes['nextLink'].rsplit('page=')[1]))
+                entries += self._get_series_episodes(
+                    task,
+                    config,
+                    mediaId,
+                    series_info,
+                    page=int(episodes['nextLink'].rsplit('page=')[1]),
+                )
         except RequestException as e:
             log.error('Request error: %s' % str(e))  # if it fails, just go to next favourite
 
@@ -182,11 +201,13 @@ class NPOWatchlist(object):
             series = page.find('section', class_='npo-header-episode-meta')
             if series:  # sometimes the NPO page does not return valid content
                 # create a stub to store the common values for all episodes of this series
-                series_info = {'npo_url': response.url,  # we were redirected to the true URL
-                               'npo_name': series.find('h1').text,
-                               'npo_description': series.find('div', id='metaContent').find('p').text,
-                               'npo_language': 'nl',  # hard-code the language as if in NL, for lookup plugins
-                               'npo_version': page.find('meta', attrs={'name': 'generator'})['content']}  # include NPO website version
+                series_info = {
+                    'npo_url': response.url,  # we were redirected to the true URL
+                    'npo_name': series.find('h1').text,
+                    'npo_description': series.find('div', id='metaContent').find('p').text,
+                    'npo_language': 'nl',  # hard-code the language as if in NL, for lookup plugins
+                    'npo_version': page.find('meta', attrs={'name': 'generator'})['content'],
+                }  # include NPO website version
                 log.debug('Parsed series info for: %s (%s)', series_info['npo_name'], mediaId)
         except RequestException as e:
             log.error('Request error: %s' % str(e))
@@ -208,7 +229,9 @@ class NPOWatchlist(object):
                     url = list_item.find('a')['href']
                     # Check if the URL found to the episode matches the expected pattern
                     if len(url.split('/')) != 6:
-                        log.verbose('Skipping %s, the URL has an unexpected pattern: %s', episode_id, url)
+                        log.verbose(
+                            'Skipping %s, the URL has an unexpected pattern: %s', episode_id, url
+                        )
                         continue  # something is wrong; skip this episode
 
                     episode_name = list_item.find('h2')
@@ -283,16 +306,24 @@ class NPOWatchlist(object):
                 'Origin': 'https://www.npostart.nl',
                 'Referer': 'https://www.npostart.nl/mijn_npo',
                 'X-XSRF-TOKEN': requests.cookies['XSRF-TOKEN'],
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
             }
 
             try:
-                delete_response = requests.post(e['remove_url'], headers=headers, cookies=requests.cookies)
+                delete_response = requests.post(
+                    e['remove_url'], headers=headers, cookies=requests.cookies
+                )
             except HTTPError as error:
-                log.error('Failed to remove %s, got status %s', e['title'], error.response.status_code)
+                log.error(
+                    'Failed to remove %s, got status %s', e['title'], error.response.status_code
+                )
             else:
                 if delete_response.status_code != requests.codes.ok:
-                    log.warning('Failed to remove %s, got status %s', e['title'], delete_response.status_code)
+                    log.warning(
+                        'Failed to remove %s, got status %s',
+                        e['title'],
+                        delete_response.status_code,
+                    )
 
 
 @event('plugin.register')

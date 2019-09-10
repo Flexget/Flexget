@@ -12,13 +12,18 @@ from flexget.api.core.database import ObjectsContainer as OC
 class TestDatabaseAPI(object):
     config = 'tasks: {}'
 
-    @pytest.mark.parametrize('operation, plugin_name, status, schema', [
-        ('cleanup', None, 200, base_message),
-        ('vacuum', None, 200, base_message),
-        ('plugin_reset', 'bla', 400, base_message),
-        ('plugin_reset', 'tvmaze', 200, base_message),
-    ])
-    def test_database_methods(self, operation, plugin_name, status, schema, api_client, schema_match):
+    @pytest.mark.parametrize(
+        'operation, plugin_name, status, schema',
+        [
+            ('cleanup', None, 200, base_message),
+            ('vacuum', None, 200, base_message),
+            ('plugin_reset', 'bla', 400, base_message),
+            ('plugin_reset', 'tvmaze', 200, base_message),
+        ],
+    )
+    def test_database_methods(
+        self, operation, plugin_name, status, schema, api_client, schema_match
+    ):
         payload = {'operation': operation}
         if plugin_name:
             payload['plugin_name'] = plugin_name

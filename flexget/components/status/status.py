@@ -33,11 +33,11 @@ class Status(object):
         self.execution.start = datetime.datetime.now()
         self.execution.task = st
 
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_input(self, task, config):
         self.execution.produced = len(task.entries)
 
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_output(self, task, config):
         self.execution.accepted = len(task.accepted)
         self.execution.rejected = len(task.rejected)

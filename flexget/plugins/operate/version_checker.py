@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 from datetime import datetime
@@ -32,14 +31,15 @@ schema = {
     'oneOf': [
         {'type': 'boolean'},
         {'type': 'string', 'enum': ['always', 'by_interval']},
-        {'type': 'object',
-         'properties': {
-             'lookup': {'type': 'string', 'enum': ['always', 'by_interval']},
-             'check_for_dev_version': {'type': 'boolean'},
-             'interval': {'type': 'integer'}
-         },
-         'additionalProperties': False}
-
+        {
+            'type': 'object',
+            'properties': {
+                'lookup': {'type': 'string', 'enum': ['always', 'by_interval']},
+                'check_for_dev_version': {'type': 'boolean'},
+                'interval': {'type': 'integer'},
+            },
+            'additionalProperties': False,
+        },
     ]
 }
 
@@ -57,7 +57,7 @@ class VersionChecker(object):
     def prepare_config(self, config):
         if isinstance(config, bool) and config is True:
             config = {'lookup': 'by_interval'}
-        elif isinstance(config, basestring):
+        elif isinstance(config, str):
             config = {'lookup': config}
 
         config.setdefault('lookup', 'by_interval')
@@ -98,8 +98,11 @@ class VersionChecker(object):
             log.warning('Could not get latest version of flexget')
             return
         elif latest_version != current_version:
-            log.warning('You are not running latest Flexget Version. Current is %s and latest is %s',
-                        current_version, latest_version)
+            log.warning(
+                'You are not running latest Flexget Version. Current is %s and latest is %s',
+                current_version,
+                latest_version,
+            )
         if last_check:
             log.debug('updating last check time')
             last_check.update()

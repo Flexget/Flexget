@@ -30,6 +30,7 @@ class OutputSabnzbd(object):
         pp: ...
         priority: ...
     """
+
     schema = {
         'type': 'object',
         'properties': {

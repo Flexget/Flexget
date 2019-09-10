@@ -24,7 +24,7 @@ class TestTVMAzeSeriesLookupAPI(object):
             'tvrage_id': 6312,
             'url': 'http://www.tvmaze.com/shows/430/the-x-files',
             'webchannel': None,
-            'year': 1993
+            'year': 1993,
         }
 
         rsp = api_client.get('/tvmaze/series/The X-Files/')
@@ -64,7 +64,7 @@ class TestTVMAzeSeriesLookupAPI(object):
             'tvmaze_id': 13,
             'tvrage_id': 36939,
             'url': 'http://www.tvmaze.com/shows/13/the-flash',
-            'year': 2014
+            'year': 2014,
         }
 
         for field, value in values.items():
@@ -86,7 +86,7 @@ class TestTVMAzeSeriesLookupAPI(object):
             'series_id': 13,
             'title': 'City of Heroes',
             'tvmaze_id': 592,
-            'url': 'http://www.tvmaze.com/episodes/592/the-flash-1x01-city-of-heroes'
+            'url': 'http://www.tvmaze.com/episodes/592/the-flash-1x01-city-of-heroes',
         }
 
         for field, value in values.items():
@@ -109,7 +109,7 @@ class TestTVMAzeSeriesLookupAPI(object):
             'summary': '<p>Rapper T.I. Harris.</p>',
             'title': 'T.I. Harris',
             'tvmaze_id': 925421,
-            'url': 'http://www.tvmaze.com/episodes/925421/the-daily-show-with-trevor-noah-2016-09-12-ti-harris'
+            'url': 'http://www.tvmaze.com/episodes/925421/the-daily-show-with-trevor-noah-2016-09-12-ti-harris',
         }
 
         for field, value in values.items():

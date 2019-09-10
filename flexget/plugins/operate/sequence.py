@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+import itertools
 import logging
 
 from flexget import plugin
@@ -18,10 +19,7 @@ class PluginSequence(object):
       - rss: http://feedb.com
     """
 
-    schema = {
-        'type': 'array',
-        'items': {'$ref': '/schema/plugins'}
-    }
+    schema = {'type': 'array', 'items': {'$ref': '/schema/plugins'}}
 
     def __getattr__(self, item):
         """Returns a function for all on_task_* events, that runs all the configured plugins."""
@@ -41,9 +39,9 @@ class PluginSequence(object):
                         method = plugin.get_plugin_by_name(plugin_name).phase_handlers[phase]
                         log.debug('Running plugin %s' % plugin_name)
                         result = method(task, plugin_config)
-                        if isinstance(result, list):
-                            results.extend(result)
-            return results
+                        if phase == 'input' and result:
+                            results.append(result)
+            return itertools.chain(*results)
 
         return handle_phase
 

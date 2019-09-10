@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 import re
@@ -47,7 +46,7 @@ class RegexExtract(object):
 
     def on_task_start(self, task, config):
         regex = config.get('regex')
-        if isinstance(regex, basestring):
+        if isinstance(regex, str):
             regex = [regex]
         self.regex_list = ReList(regex)
 

@@ -41,8 +41,8 @@ class FilterSeenMovies(plugin_seen.FilterSeen):
         self.fields = ['imdb_id', 'tmdb_id', 'trakt_movie_id']
         self.keyword = 'seen_movies'
 
-    # We run last (-255) to make sure we don't reject duplicates before all the other plugins get a chance to reject.
-    @plugin.priority(-255)
+    # We run last to make sure we don't reject duplicates before all the other plugins get a chance to reject.
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_filter(self, task, config):  # pylint: disable=W0221
         if not isinstance(config, dict):
             config = {'matching': config}

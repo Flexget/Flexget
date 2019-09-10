@@ -9,7 +9,6 @@ import re
 
 
 class ParseWarning(Warning):
-
     def __init__(self, parsed, value, **kwargs):
         self.value = value
         self.parsed = parsed
@@ -29,7 +28,7 @@ default_ignore_prefixes = [
     r'(?:\[[^\[\]]*\])',  # ignores group names before the name, eg [foobar] name
     r'(?:HD.720p?:)',
     r'(?:HD.1080p?:)',
-    r'(?:HD.2160p?:)'
+    r'(?:HD.2160p?:)',
 ]
 
 
@@ -41,8 +40,8 @@ def name_to_re(name, ignore_prefixes=None, parser=None):
     if name.endswith(')'):
         p_start = name.rfind('(')
         if p_start != -1:
-            parenthetical = re.escape(name[p_start + 1:-1])
-            name = name[:p_start - 1]
+            parenthetical = re.escape(name[p_start + 1 : -1])
+            name = name[: p_start - 1]
     # Blanks are any non word characters except & and _
     blank = r'(?:[^\w&]|_)'
     ignore = '(?:' + '|'.join(ignore_prefixes) + ')?'

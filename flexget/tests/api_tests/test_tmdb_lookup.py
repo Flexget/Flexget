@@ -28,12 +28,7 @@ class TestTMDBMovieLookupAPI(object):
         errors = schema_match(oc.movie_object, data)
         assert not errors
 
-        values = {
-            'id': 603,
-            'name': 'The Matrix',
-            'year': 1999,
-            'imdb_id': 'tt0133093'
-        }
+        values = {'id': 603, 'name': 'The Matrix', 'year': 1999, 'imdb_id': 'tt0133093'}
         for field, value in values.items():
             assert data.get(field) == value
 
@@ -45,12 +40,7 @@ class TestTMDBMovieLookupAPI(object):
         errors = schema_match(oc.movie_object, data)
         assert not errors
 
-        values = {
-            'id': 604,
-            'name': 'The Matrix Reloaded',
-            'year': 2003,
-            'imdb_id': 'tt0234215'
-        }
+        values = {'id': 604, 'name': 'The Matrix Reloaded', 'year': 2003, 'imdb_id': 'tt0234215'}
         for field, value in values.items():
             assert data.get(field) == value
 

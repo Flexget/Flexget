@@ -92,8 +92,9 @@ class TestSeriesPremiere(object):
     def test_only_one(self, execute_task):
         task = execute_task('test_only_one')
         assert len(task.accepted) == 1, 'should only have accepted one'
-        assert not task.find_entry('accepted', title='Foos and Bars 2009 S01E02 HDTV Xvid-2HD[AOEU]'), \
-            'Non premiere accepted'
+        assert not task.find_entry(
+            'accepted', title='Foos and Bars 2009 S01E02 HDTV Xvid-2HD[AOEU]'
+        ), 'Non premiere accepted'
 
     def test_dupes_across_tasks(self, execute_task):
         task = execute_task('test_dupes_across_tasks_1')

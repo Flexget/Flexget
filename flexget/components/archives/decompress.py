@@ -8,7 +8,7 @@ import re
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.template import render_from_entry, RenderError
-from flexget.utils import archive as archiveutil
+from flexget.components.archives import utils as archiveutil
 
 log = logging.getLogger('decompress')
 
@@ -70,8 +70,9 @@ def extract_info(info, archive, to, keep_dirs):
     except archiveutil.FileAlreadyExists as error:
         log.warn('File already exists: %s' % destination)
     except archiveutil.ArchiveError as error:
-        log.error('Failed to extract file: %s in %s (%s)' % (info.filename,
-                                                                   entry['location'], error))
+        log.error(
+            'Failed to extract file: %s in %s (%s)' % (info.filename, entry['location'], error)
+        )
 
 
 def get_destination_path(info, to, keep_dirs):
@@ -139,14 +140,15 @@ class Decompress(object):
                     'mask': {'type': 'string'},
                     'regexp': {'type': 'string', 'format': 'regex'},
                     'unrar_tool': {'type': 'string'},
-                    'delete_archive': {'type': 'boolean'}
+                    'delete_archive': {'type': 'boolean'},
                 },
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ]
     }
 
-    def prepare_config(self, config):
+    @staticmethod
+    def prepare_config(config):
         """Prepare config for processing"""
         from fnmatch import translate
 
@@ -167,7 +169,8 @@ class Decompress(object):
 
         return config
 
-    def handle_entry(self, entry, config):
+    @staticmethod
+    def handle_entry(entry, config):
         """
         Extract matching files into the directory specified
 
@@ -190,7 +193,7 @@ class Decompress(object):
         else:
             archive.close()
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_output(self, task, config):
         """Task handler for archive_extract"""
         if isinstance(config, bool) and not config:

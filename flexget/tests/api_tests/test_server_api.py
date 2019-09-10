@@ -73,8 +73,8 @@ class TestServerAPI(object):
                         'ascii': False,
                         'escape': False,
                         'silent': False,
-                        'all_entries': True
-                    }
+                        'all_entries': True,
+                    },
                 }
             }
         }
@@ -89,8 +89,11 @@ class TestServerAPI(object):
         errors = schema_match(OC.raw_config_object, data)
         assert not errors
 
-        assert data['raw_config'] == 'dGFza3M6CiAgdGVzdDoKICAgIHJzczoKICAgICAgdXJsOiBodHRwOi8vdGVzdC9yc3MKICAgIG1' \
-                                     'vY2s6CiAgICAgIC0gdGl0bGU6IGVudHJ5IDE='
+        assert (
+            data['raw_config']
+            == 'dGFza3M6CiAgdGVzdDoKICAgIHJzczoKICAgICAgdXJsOiBodHRwOi8vdGVzdC9yc3MKICAgIG1'
+            'vY2s6CiAgICAgIC0gdGl0bGU6IGVudHJ5IDE='
+        )
 
     @pytest.mark.online
     def test_version(self, api_client, schema_match):
@@ -102,9 +105,11 @@ class TestServerAPI(object):
 
         errors = schema_match(OC.version_object, data)
         assert not errors
-        assert data == {'flexget_version': __version__,
-                        'api_version': __api_version__,
-                        'latest_version': latest}
+        assert data == {
+            'flexget_version': __version__,
+            'api_version': __api_version__,
+            'latest_version': latest,
+        }
 
     def test_crash_logs_without_crash_log(self, api_client, schema_match):
         rsp = api_client.get('/server/crash_logs')

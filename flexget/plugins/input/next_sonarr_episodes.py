@@ -62,6 +62,7 @@ class NextSonarrEpisodes(object):
       accept_all: yes
       set_series_begin: yes
     """
+
     schema = {
         'type': 'object',
         'properties': {
@@ -70,31 +71,39 @@ class NextSonarrEpisodes(object):
             'api_key': {'type': 'string'},
             'include_ended': {'type': 'boolean', 'default': True},
             'only_monitored': {'type': 'boolean', 'default': True},
-            'page_size': {'type': 'number', 'default': 50}
+            'page_size': {'type': 'number', 'default': 50},
         },
         'required': ['api_key', 'base_url'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     # Function that gets a page number and page size and returns the responding result json
     def get_page(self, task, config, page_number):
         parsedurl = urlparse(config.get('base_url'))
         url = '{}://{}:{}{}/api/wanted/missing?page={}&pageSize={}&sortKey=series.title&sortdir=asc'.format(
-            parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path, page_number,
-            config.get('page_size'))
+            parsedurl.scheme,
+            parsedurl.netloc,
+            config.get('port'),
+            parsedurl.path,
+            page_number,
+            config.get('page_size'),
+        )
         headers = {'X-Api-Key': config['api_key']}
         try:
             json = task.requests.get(url, headers=headers).json()
         except RequestException as e:
             raise plugin.PluginError(
-                'Unable to connect to Sonarr at {}://{}:{}{}. Error: {}'.format(parsedurl.scheme, parsedurl.netloc,
-                                                                                config.get('port'), parsedurl.path, e))
+                'Unable to connect to Sonarr at {}://{}:{}{}. Error: {}'.format(
+                    parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path, e
+                )
+            )
         return json
 
     def on_task_input(self, task, config):
         json = self.get_page(task, config, 1)
-        entries = []
-        pages = int(math.ceil(json['totalRecords'] / config.get('page_size')))  # Sets number of requested pages
+        pages = int(
+            math.ceil(json['totalRecords'] / config.get('page_size'))
+        )  # Sets number of requested pages
         current_series_id = 0  # Initializes current series parameter
         for page in range(1, pages + 1):
             json = self.get_page(task, config, page)
@@ -104,25 +113,26 @@ class NextSonarrEpisodes(object):
                     current_series_id = record['seriesId']
                     season = record['seasonNumber']
                     episode = record['episodeNumber']
-                    entry = Entry(url='',
-                                  series_name=record['series']['title'],
-                                  series_season=season,
-                                  series_episode=episode,
-                                  series_id='S%02dE%02d' % (season, episode),
-                                  tvdb_id=record['series'].get('tvdbId'),
-                                  tvrage_id=record['series'].get('tvRageId'),
-                                  tvmaze_id=record['series'].get('tvMazeId'),
-                                  title=record['series']['title'] + ' ' + 'S%02dE%02d' % (season, episode))
-                    if entry.isvalid():
-                        entries.append(entry)
-                    else:
-                        log.error('Invalid entry created? {}'.format(entry))
+                    entry = Entry(
+                        url='',
+                        series_name=record['series']['title'],
+                        series_season=season,
+                        series_episode=episode,
+                        series_id='S%02dE%02d' % (season, episode),
+                        tvdb_id=record['series'].get('tvdbId'),
+                        tvrage_id=record['series'].get('tvRageId'),
+                        tvmaze_id=record['series'].get('tvMazeId'),
+                        title=record['series']['title'] + ' ' + 'S%02dE%02d' % (season, episode),
+                    )
                     # Test mode logging
                     if entry and task.options.test:
                         log.verbose("Test mode. Entry includes:")
                         for key, value in list(entry.items()):
                             log.verbose('     {}: {}'.format(key.capitalize(), value))
-        return entries
+                    if entry.isvalid():
+                        yield entry
+                    else:
+                        log.error('Invalid entry created? {}'.format(entry))
 
 
 @event('plugin.register')

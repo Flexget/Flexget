@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 import re
@@ -35,13 +34,16 @@ class FilterExistsMovie(object):
                 'type': 'object',
                 'properties': {
                     'path': one_or_more({'type': 'string', 'format': 'path'}),
-                    'allow_different_qualities': {'enum': ['better', True, False], 'default': False},
+                    'allow_different_qualities': {
+                        'enum': ['better', True, False],
+                        'default': False,
+                    },
                     'type': {'enum': ['files', 'dirs'], 'default': 'dirs'},
-                    'lookup': {'enum': ['imdb', False], 'default': False}
+                    'lookup': {'enum': ['imdb', False], 'default': False},
                 },
                 'required': ['path'],
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ]
     }
 
@@ -60,7 +62,7 @@ class FilterExistsMovie(object):
             config['type'] = 'dirs'
 
         # if only a single path is passed turn it into a 1 element list
-        if isinstance(config['path'], basestring):
+        if isinstance(config['path'], str):
             config['path'] = [config['path']]
         return config
 
@@ -118,7 +120,9 @@ class FilterExistsMovie(object):
                     items.append(f.name)
 
             if not items:
-                log.verbose('No items with type %s were found in %s' % (config.get('type'), folder))
+                log.verbose(
+                    'No items with type %s were found in %s' % (config.get('type'), folder)
+                )
                 continue
 
             for item in items:
@@ -128,10 +132,12 @@ class FilterExistsMovie(object):
 
                 if config.get('lookup') == 'imdb':
                     try:
-                        imdb_id = imdb_lookup.imdb_id_lookup(movie_title=movie.name,
-                                                             movie_year=movie.year,
-                                                             raw_title=item,
-                                                             session=task.session)
+                        imdb_id = imdb_lookup.imdb_id_lookup(
+                            movie_title=movie.name,
+                            movie_year=movie.year,
+                            raw_title=item,
+                            session=task.session,
+                        )
                         if imdb_id in path_ids:
                             log.trace('duplicate %s' % item)
                             continue
@@ -184,9 +190,11 @@ class FilterExistsMovie(object):
                 entry.reject('movie exists')
 
         if incompatible_files or incompatible_entries:
-            log.verbose('There were some incompatible items. %s of %s entries '
-                        'and %s of %s directories could not be verified.' %
-                        (incompatible_entries, count_entries, incompatible_files, count_files))
+            log.verbose(
+                'There were some incompatible items. %s of %s entries '
+                'and %s of %s directories could not be verified.'
+                % (incompatible_entries, count_entries, incompatible_files, count_files)
+            )
 
         log.debug('-- Finished filtering entries -------------------------------')
 

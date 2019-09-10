@@ -12,7 +12,9 @@ cached_api = api.namespace('cached', description='Cache remote resources')
 
 cached_parser = api.parser()
 cached_parser.add_argument('url', required=True, help='URL to cache')
-cached_parser.add_argument('force', type=inputs.boolean, default=False, help='Force fetching remote resource')
+cached_parser.add_argument(
+    'force', type=inputs.boolean, default=False, help='Force fetching remote resource'
+)
 
 
 @cached_api.route('/')

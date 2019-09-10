@@ -63,26 +63,35 @@ class Filesystem(object):
           - dirs
 
     """
+
     retrieval_options = ['files', 'dirs', 'symlinks']
     paths = one_or_more({'type': 'string', 'format': 'path'}, unique_items=True)
 
     schema = {
         'oneOf': [
             paths,
-            {'type': 'object',
-             'properties': {
-                 'path': paths,
-                 'mask': {'type': 'string'},
-                 'regexp': {'type': 'string', 'format': 'regex'},
-                 'recursive': {'oneOf': [{'type': 'integer', 'minimum': 2}, {'type': 'boolean'}]},
-                 'retrieve': one_or_more({'type': 'string', 'enum': retrieval_options}, unique_items=True)
-             },
-             'required': ['path'],
-             'additionalProperties': False}]
+            {
+                'type': 'object',
+                'properties': {
+                    'path': paths,
+                    'mask': {'type': 'string'},
+                    'regexp': {'type': 'string', 'format': 'regex'},
+                    'recursive': {
+                        'oneOf': [{'type': 'integer', 'minimum': 2}, {'type': 'boolean'}]
+                    },
+                    'retrieve': one_or_more(
+                        {'type': 'string', 'enum': retrieval_options}, unique_items=True
+                    ),
+                },
+                'required': ['path'],
+                'additionalProperties': False,
+            },
+        ]
     }
 
     def prepare_config(self, config):
         from fnmatch import translate
+
         config = config
 
         # Converts config to a dict with a list of paths
@@ -112,9 +121,11 @@ class Filesystem(object):
         if PY2:
             import urllib
             import urlparse
+
             entry['url'] = urlparse.urljoin('file:', urllib.pathname2url(filepath.encode('utf8')))
         else:
             import pathlib
+
             entry['url'] = pathlib.Path(filepath).absolute().as_uri()
         entry['filename'] = filepath.name
         if filepath.isfile():
@@ -156,7 +167,9 @@ class Filesystem(object):
         else:
             return folder.walk(errors='ignore')
 
-    def get_entries_from_path(self, path_list, match, recursion, test_mode, get_files, get_dirs, get_symlinks):
+    def get_entries_from_path(
+        self, path_list, match, recursion, test_mode, get_files, get_dirs, get_symlinks
+    ):
         entries = []
 
         for folder in path_list:
@@ -171,19 +184,26 @@ class Filesystem(object):
                 try:
                     path_object.exists()
                 except UnicodeError:
-                    log.error('File %s not decodable with filesystem encoding: %s' % (
-                        path_object, sys.getfilesystemencoding()))
+                    log.error(
+                        'File %s not decodable with filesystem encoding: %s'
+                        % (path_object, sys.getfilesystemencoding())
+                    )
                     continue
                 entry = None
                 object_depth = len(path_object.splitall())
                 if object_depth <= max_depth:
                     if match(path_object):
-                        if (path_object.isdir() and get_dirs) or (
-                                path_object.islink() and get_symlinks) or (
-                                path_object.isfile() and not path_object.islink() and get_files):
+                        if (
+                            (path_object.isdir() and get_dirs)
+                            or (path_object.islink() and get_symlinks)
+                            or (path_object.isfile() and not path_object.islink() and get_files)
+                        ):
                             entry = self.create_entry(path_object, test_mode)
                         else:
-                            log.debug("Path object's %s type doesn't match requested object types." % path_object)
+                            log.debug(
+                                "Path object's %s type doesn't match requested object types."
+                                % path_object
+                            )
                         if entry and entry not in entries:
                             entries.append(entry)
 
@@ -201,7 +221,9 @@ class Filesystem(object):
         get_symlinks = 'symlinks' in config['retrieve']
 
         log.verbose('Starting to scan folders.')
-        return self.get_entries_from_path(path_list, match, recursive, test_mode, get_files, get_dirs, get_symlinks)
+        return self.get_entries_from_path(
+            path_list, match, recursive, test_mode, get_files, get_dirs, get_symlinks
+        )
 
 
 @event('plugin.register')

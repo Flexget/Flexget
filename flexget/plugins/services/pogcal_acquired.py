@@ -28,23 +28,24 @@ class PogcalShow(Base):
 class PogcalAcquired(object):
     schema = {
         'type': 'object',
-        'properties': {
-            'username': {'type': 'string'},
-            'password': {'type': 'string'}
-        },
+        'properties': {'username': {'type': 'string'}, 'password': {'type': 'string'}},
         'required': ['username', 'password'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_output(self, task, config):
         if not task.accepted and not task.options.test:
             return
         try:
-            result = session.post('http://www.pogdesign.co.uk/cat/login',
-                                  data={'username': config['username'],
-                                        'password': config['password'],
-                                        'sub_login': 'Account Login'})
+            result = session.post(
+                'http://www.pogdesign.co.uk/cat/login',
+                data={
+                    'username': config['username'],
+                    'password': config['password'],
+                    'sub_login': 'Account Login',
+                },
+            )
         except requests.RequestException as e:
             log.error('Error logging in to pog calendar: %s' % e)
             return
@@ -61,18 +62,33 @@ class PogcalAcquired(object):
                 log.debug('Could not find pogdesign calendar id for `%s`' % entry['series_name'])
                 continue
             if task.options.test:
-                log.verbose('Would mark %s %s in pogdesign calenadar.' % (entry['series_name'], entry['series_id']))
+                log.verbose(
+                    'Would mark %s %s in pogdesign calenadar.'
+                    % (entry['series_name'], entry['series_id'])
+                )
                 continue
             else:
-                log.verbose('Marking %s %s in pogdesign calenadar.' % (entry['series_name'], entry['series_id']))
-            shid = '%s-%s-%s/%s-%s' % (show_id, entry['series_season'], entry['series_episode'],
-                                       datetime.now().month, datetime.now().year)
+                log.verbose(
+                    'Marking %s %s in pogdesign calenadar.'
+                    % (entry['series_name'], entry['series_id'])
+                )
+            shid = '%s-%s-%s/%s-%s' % (
+                show_id,
+                entry['series_season'],
+                entry['series_episode'],
+                datetime.now().month,
+                datetime.now().year,
+            )
             try:
-                session.post('http://www.pogdesign.co.uk/cat/watchhandle',
-                             data={'watched': 'adding', 'shid': shid})
+                session.post(
+                    'http://www.pogdesign.co.uk/cat/watchhandle',
+                    data={'watched': 'adding', 'shid': shid},
+                )
             except requests.RequestException as e:
-                log.error('Error marking %s %s in pogdesign calendar: %s' %
-                          (entry['series_name'], entry['series_id'], e))
+                log.error(
+                    'Error marking %s %s in pogdesign calendar: %s'
+                    % (entry['series_name'], entry['series_id'], e)
+                )
 
     def find_show_id(self, show_name, db_sess):
         # Check if we have this show id cached

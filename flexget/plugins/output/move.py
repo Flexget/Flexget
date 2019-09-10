@@ -35,11 +35,13 @@ def get_siblings(ext, main_file_no_ext, main_file_ext, abs_path):
         if filename == main_file_no_ext + main_file_ext:
             continue
         filename_lower = filename.lower()
-        if not filename_lower.startswith(main_file_no_ext.lower()) or not filename_lower.endswith(ext.lower()):
+        if not filename_lower.startswith(main_file_no_ext.lower()) or not filename_lower.endswith(
+            ext.lower()
+        ):
             continue
         # we have to use the length of the main file (no ext) to extract the rest of the filename
         # for the future renaming
-        file_ext = filename[len(main_file_no_ext):]
+        file_ext = filename[len(main_file_no_ext) :]
         file_path = os.path.join(abs_path, filename)
         if os.path.exists(file_path):
             siblings[file_path] = file_ext
@@ -53,10 +55,10 @@ class BaseFileOps(object):
         'type': 'object',
         'properties': {
             'extensions': one_or_more({'type': 'string'}),
-            'subdirs': one_or_more({'type': 'string'})
+            'subdirs': one_or_more({'type': 'string'}),
         },
         'additionalProperties': False,
-        'required': ['extensions']
+        'required': ['extensions'],
     }
 
     def prepare_config(self, config):
@@ -84,7 +86,9 @@ class BaseFileOps(object):
             return
         for entry in task.accepted:
             if 'location' not in entry:
-                self.log.verbose('Cannot handle %s because it does not have the field location.', entry['title'])
+                self.log.verbose(
+                    'Cannot handle %s because it does not have the field location.', entry['title']
+                )
                 continue
             src = entry['location']
             src_isdir = os.path.isdir(src)
@@ -119,7 +123,9 @@ class BaseFileOps(object):
                         if not os.path.isdir(subdir_path):
                             continue
                         for ext in config['along']['extensions']:
-                            siblings.update(get_siblings(ext, filename_no_ext, filename_ext, subdir_path))
+                            siblings.update(
+                                get_siblings(ext, filename_no_ext, filename_ext, subdir_path)
+                            )
                 # execute action in subclasses
                 self.handle_entry(task, config, entry, siblings)
             except (OSError, IOError) as err:
@@ -134,18 +140,26 @@ class BaseFileOps(object):
         # everything here happens after a successful execution of the main action: the entry has been moved in a
         # different location, or it does not exists anymore. so from here we can just log warnings and move on.
         if not os.path.isdir(base_path):
-            self.log.warning('Cannot delete path `%s` because it does not exists (anymore).', base_path)
+            self.log.warning(
+                'Cannot delete path `%s` because it does not exists (anymore).', base_path
+            )
             return
         dir_size = get_directory_size(base_path) / 1024 / 1024
         if dir_size >= min_size:
-            self.log.info('Path `%s` left because it exceeds safety value set in clean_source option.', base_path)
+            self.log.info(
+                'Path `%s` left because it exceeds safety value set in clean_source option.',
+                base_path,
+            )
             return
         if task.options.test:
             self.log.info('Would delete `%s` and everything under it.', base_path)
             return
         try:
             shutil.rmtree(base_path)
-            self.log.info('Path `%s` has been deleted because was less than clean_source safe value.', base_path)
+            self.log.info(
+                'Path `%s` has been deleted because was less than clean_source safe value.',
+                base_path,
+            )
         except Exception as err:
             self.log.warning('Unable to delete path `%s`: %s', base_path, err)
 
@@ -164,10 +178,10 @@ class DeleteFiles(BaseFileOps):
                 'properties': {
                     'allow_dir': {'type': 'boolean'},
                     'along': BaseFileOps.along,
-                    'clean_source': {'type': 'number'}
+                    'clean_source': {'type': 'number'},
                 },
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ]
     }
 
@@ -226,11 +240,15 @@ class TransformingOps(BaseFileOps):
         try:
             dst_path = entry.render(dst_path)
         except RenderError as err:
-            raise plugin.PluginError('Path value replacement `%s` failed: %s' % (dst_path, err.args[0]))
+            raise plugin.PluginError(
+                'Path value replacement `%s` failed: %s' % (dst_path, err.args[0])
+            )
         try:
             dst_name = entry.render(dst_name)
         except RenderError as err:
-            raise plugin.PluginError('Filename value replacement `%s` failed: %s' % (dst_name, err.args[0]))
+            raise plugin.PluginError(
+                'Filename value replacement `%s` failed: %s' % (dst_name, err.args[0])
+            )
 
         # Clean invalid characters with pathscrub plugin
         dst_path = pathscrub(os.path.expanduser(dst_path))
@@ -255,13 +273,17 @@ class TransformingOps(BaseFileOps):
             count = 0
             while True:
                 if count > 60 * 30:
-                    raise plugin.PluginWarning('The task has been waiting unpacking for 30 minutes')
+                    raise plugin.PluginWarning(
+                        'The task has been waiting unpacking for 30 minutes'
+                    )
                 size = os.path.getsize(src)
                 time.sleep(1)
                 new_size = os.path.getsize(src)
                 if size != new_size:
                     if not count % 10:
-                        self.log.verbose('File `%s` is possibly being unpacked, waiting ...', src_name)
+                        self.log.verbose(
+                            'File `%s` is possibly being unpacked, waiting ...', src_name
+                        )
                 else:
                     break
                 count += 1
@@ -274,7 +296,9 @@ class TransformingOps(BaseFileOps):
             if not src_isdir and dst_ext != src_ext:
                 self.log.verbose('Adding extension `%s` to dst `%s`', src_ext, dst)
                 dst += src_ext
-                dst_file += dst_ext  # this is used for sibling files. dst_ext turns out not to be an extension!
+                dst_file += (
+                    dst_ext
+                )  # this is used for sibling files. dst_ext turns out not to be an extension!
 
         funct_name = 'move' if self.move else 'copy'
         funct_done = 'moved' if self.move else 'copied'
@@ -326,10 +350,10 @@ class CopyFiles(TransformingOps):
                     'allow_dir': {'type': 'boolean'},
                     'unpack_safety': {'type': 'boolean'},
                     'keep_extension': {'type': 'boolean'},
-                    'along': TransformingOps.along
+                    'along': TransformingOps.along,
                 },
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ]
     }
 
@@ -353,10 +377,10 @@ class MoveFiles(TransformingOps):
                     'unpack_safety': {'type': 'boolean'},
                     'keep_extension': {'type': 'boolean'},
                     'along': TransformingOps.along,
-                    'clean_source': {'type': 'number'}
+                    'clean_source': {'type': 'number'},
                 },
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ]
     }
 

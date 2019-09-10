@@ -7,6 +7,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
+from . import db
 
 try:
     # NOTE: Importing other plugins is discouraged!
@@ -24,7 +25,7 @@ def do_cli(manager, options):
 
 def list_rejected(options):
     with Session() as session:
-        results = session.query(plugin_remember_rejected.RememberEntry).all()
+        results = session.query(db.RememberEntry).all()
         header = ['#', 'Title', 'Task', 'Rejected by', 'Reason']
         table_data = [header]
         for entry in results:
@@ -41,7 +42,7 @@ def list_rejected(options):
 
 def clear_rejected(manager):
     with Session() as session:
-        results = session.query(plugin_remember_rejected.RememberEntry).delete()
+        results = session.query(db.RememberEntry).delete()
         console('Cleared %i items.' % results)
         session.commit()
         if results:

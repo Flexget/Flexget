@@ -73,8 +73,14 @@ def one_or_more(schema, unique_items=False):
     schema.setdefault('title', 'single value')
     return {
         'oneOf': [
-            {'title': 'multiple values', 'type': 'array', 'items': schema, 'minItems': 1, 'uniqueItems': unique_items},
-            schema
+            {
+                'title': 'multiple values',
+                'type': 'array',
+                'items': schema,
+                'minItems': 1,
+                'uniqueItems': unique_items,
+            },
+            schema,
         ]
     }
 
@@ -240,7 +246,7 @@ def is_path(instance):
     pat = re.compile(r'{[{%].*[}%]}')
     result = pat.search(instance)
     if result:
-        instance = os.path.dirname(instance[0:result.start()])
+        instance = os.path.dirname(instance[0 : result.start()])
     if os.path.isdir(os.path.expanduser(instance)):
         return True
     raise ValueError('`%s` does not exist' % instance)
@@ -251,8 +257,11 @@ def is_path(instance):
 def is_url(instance):
     if not isinstance(instance, str_types):
         return True
-    regexp = ('(' + '|'.join(['ftp', 'http', 'https', 'file', 'udp', 'socks5']) +
-              '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?')
+    regexp = (
+        '('
+        + '|'.join(['ftp', 'http', 'https', 'file', 'udp', 'socks5h?'])
+        + '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
+    )
     return re.match(regexp, instance)
 
 
@@ -302,14 +311,20 @@ def set_error_message(error):
         if error.cause:
             error.message = str(error.cause)
     elif error.validator == 'enum':
-        error.message = 'Must be one of the following: %s' % ', '.join(map(str, error.validator_value))
+        error.message = 'Must be one of the following: %s' % ', '.join(
+            map(str, error.validator_value)
+        )
     elif error.validator == 'additionalProperties':
         if error.validator_value is False:
-            extras = set(jsonschema._utils.find_additional_properties(error.instance, error.schema))
+            extras = set(
+                jsonschema._utils.find_additional_properties(error.instance, error.schema)
+            )
             if len(extras) == 1:
                 error.message = 'The key `%s` is not valid here.' % extras.pop()
             else:
-                error.message = 'The keys %s are not valid here.' % ', '.join('`%s`' % e for e in extras)
+                error.message = 'The keys %s are not valid here.' % ', '.join(
+                    '`%s`' % e for e in extras
+                )
     else:
         # Remove u'' string representation from jsonschema error messages
         error.message = re.sub('u\'(.*?)\'', '`\\1`', error.message)
@@ -367,7 +382,9 @@ def validate_properties_w_defaults(validator, properties, instance, schema):
     for key, subschema in properties.items():
         if 'default' in subschema:
             instance.setdefault(key, subschema['default'])
-    for error in jsonschema.Draft4Validator.VALIDATORS["properties"](validator, properties, instance, schema):
+    for error in jsonschema.Draft4Validator.VALIDATORS["properties"](
+        validator, properties, instance, schema
+    ):
         yield error
 
 
@@ -388,10 +405,6 @@ def validate_deprecated(validator, message, instance, schema):
     log.warning(message)
 
 
-validators = {
-    'anyOf': validate_anyOf,
-    'oneOf': validate_oneOf,
-    'deprecated': validate_deprecated
-}
+validators = {'anyOf': validate_anyOf, 'oneOf': validate_oneOf, 'deprecated': validate_deprecated}
 
 SchemaValidator = jsonschema.validators.extend(jsonschema.Draft4Validator, validators)

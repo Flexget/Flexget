@@ -58,9 +58,13 @@ def load_user(username, session=None):
 @api_app.before_request
 def check_valid_login():
     # Allow access to root, login and swagger documentation without authentication
-    if request.path == '/' or request.path.startswith('/auth/login') or \
-            request.path.startswith('/auth/logout') or request.path.startswith('/swagger') or \
-            request.method == 'OPTIONS':
+    if (
+        request.path == '/'
+        or request.path.startswith('/auth/login')
+        or request.path.startswith('/auth/logout')
+        or request.path.startswith('/swagger')
+        or request.method == 'OPTIONS'
+    ):
         return
 
     if not current_user.is_authenticated:
@@ -70,19 +74,24 @@ def check_valid_login():
 # API Authentication and Authorization
 auth_api = api.namespace('auth', description='Authentication')
 
-login_api_schema = api.schema_model('auth.login', {
-    'type': 'object',
-    'properties': {
-        'username': {'type': 'string'},
-        'password': {'type': 'string'}
+login_api_schema = api.schema_model(
+    'auth.login',
+    {
+        'type': 'object',
+        'properties': {'username': {'type': 'string'}, 'password': {'type': 'string'}},
+        'required': ['username', 'password'],
+        'additionalProperties': False,
     },
-    'required': ['username', 'password'],
-    'additionalProperties': False
-})
+)
 
 login_parser = api.parser()
-login_parser.add_argument('remember', type=inputs.boolean, required=False, default=False,
-                          help='Remember login (sets persistent session cookies)')
+login_parser.add_argument(
+    'remember',
+    type=inputs.boolean,
+    required=False,
+    default=False,
+    help='Remember login (sets persistent session cookies)',
+)
 
 
 @auth_api.route('/login/')
@@ -101,8 +110,10 @@ class LoginAPI(APIResource):
             user = session.query(User).filter(User.name == user_name.lower()).first()
             if user:
                 if user_name == 'flexget' and not user.password:
-                    raise Unauthorized('If this is your first time running the WebUI you need to set a password via'
-                                       ' the command line by running `flexget web passwd <new_password>`')
+                    raise Unauthorized(
+                        'If this is your first time running the WebUI you need to set a password via'
+                        ' the command line by running `flexget web passwd <new_password>`'
+                    )
 
                 if user.password and check_password_hash(user.password, password):
                     args = login_parser.parse_args()

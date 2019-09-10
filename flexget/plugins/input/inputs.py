@@ -28,15 +28,14 @@ class PluginInputs(object):
                 {
                     'maxProperties': 1,
                     'error_maxProperties': 'Plugin options within inputs plugin must be indented 2 more spaces than '
-                                           'the first letter of the plugin name.',
-                    'minProperties': 1
-                }
+                    'the first letter of the plugin name.',
+                    'minProperties': 1,
+                },
             ]
-        }
+        },
     }
 
     def on_task_input(self, task, config):
-        entries = []
         entry_titles = set()
         entry_urls = set()
         for item in config:
@@ -63,10 +62,9 @@ class PluginInputs(object):
                     if any(url in entry_urls for url in urls):
                         log.debug('URL for `%s` already in entry list, skipping.' % entry['title'])
                         continue
-                    entries.append(entry)
+                    yield entry
                     entry_titles.add(entry['title'])
                     entry_urls.update(urls)
-        return entries
 
 
 @event('plugin.register')

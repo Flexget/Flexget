@@ -15,7 +15,10 @@ __author__ = 'andy'
 log = logging.getLogger('sort_by_weight')
 
 ENTRY_WEIGHT_FIELD_NAME = 'sort_by_weight_sum'
-DEFAULT_STRIDE = 10  # its a design choice to allow 'similar' values to-be grouped under the same slot/weight
+DEFAULT_STRIDE = (
+    10
+)  # its a design choice to allow 'similar' values to-be grouped under the same slot/weight
+
 
 class PluginSortByWeight(object):
     """
@@ -74,7 +77,8 @@ class PluginSortByWeight(object):
     """
 
     schema = {
-        'type': 'array', 'items': {
+        'type': 'array',
+        'items': {
             'type': 'object',
             'properties': {
                 'field': {'type': 'string'},
@@ -83,20 +87,20 @@ class PluginSortByWeight(object):
                 'upper_limit': {
                     'oneOf': [
                         {'type': 'integer', 'minimum': 1},
-                        {'type': 'string', 'format': 'interval'}
+                        {'type': 'string', 'format': 'interval'},
                     ]
                 },
                 'delta_distance': {
                     'oneOf': [
                         {'type': 'integer', 'minimum': 1},
-                        {'type': 'string', 'format': 'interval'}
+                        {'type': 'string', 'format': 'interval'},
                     ]
                 },
             },
             'required': ['field', 'weight'],
             'additionalProperties': False,
         },
-        'minItems': 2
+        'minItems': 2,
     }
 
     def prepare_config(self, config):
@@ -120,11 +124,14 @@ class PluginSortByWeight(object):
         if len(entries) < 2:
             return
         config = self.prepare_config(config)
-        log.verbose('Calculating weights for undecided, accepted entries and sorting by result field: %s' % ENTRY_WEIGHT_FIELD_NAME)
+        log.verbose(
+            'Calculating weights for undecided, accepted entries and sorting by result field: %s'
+            % ENTRY_WEIGHT_FIELD_NAME
+        )
         self.calc_weights(entries, config)
         task.all_entries.sort(key=lambda e: e.get(ENTRY_WEIGHT_FIELD_NAME, 0), reverse=True)
         # debug
-        #for entry in task.all_entries:
+        # for entry in task.all_entries:
         #    log.verbose('sum[ %s ] weights: %s, title: %s', entry.get(ENTRY_WEIGHT_FIELD_NAME, -1), entry.get('weights', -1), entry['title'])
 
     @staticmethod
@@ -195,17 +202,21 @@ class PluginSortByWeight(object):
                 stride, delta = self._calc_stride_delta(key, entries, config)
             except Exception as ex:
                 delta = None
-                log.warning('Could not calculate stride for key: %s, type: %s, using fallback sort. Error: %s',
-                            key, type(entries[0][key]), ex)
+                log.warning(
+                    'Could not calculate stride for key: %s, type: %s, using fallback sort. Error: %s',
+                    key,
+                    type(entries[0][key]),
+                    ex,
+                )
                 lower_default = self._get_lower_limit(entries[0][key])
-                entries.sort(key=lambda e, k=key,d=lower_default: e.get(k, d), reverse=True)
+                entries.sort(key=lambda e, k=key, d=lower_default: e.get(k, d), reverse=True)
             if not stride:
                 stride = DEFAULT_STRIDE
             max_weight = config[key]['weight']
             weight_step = max_weight / max(int(stride), 1)
             current_value = None
             weight = None
-            #log.verbose('*** key: `%s`, delta: %s, weight_step: %s', key, delta, weight_step)
+            # log.verbose('*** key: `%s`, delta: %s, weight_step: %s', key, delta, weight_step)
             for entry in entries:
                 if ENTRY_WEIGHT_FIELD_NAME not in entry:
                     entry[ENTRY_WEIGHT_FIELD_NAME] = 0
@@ -228,8 +239,12 @@ class PluginSortByWeight(object):
                             value_normalized = abs(value - self._get_lower_limit(value))
                             weight = (value_normalized / delta) * weight_step
                         except Exception as ex:
-                            log.warning('Skipping entry: %s, could not calc weight for key: %s, error: %s',
-                                        entry, key, ex)
+                            log.warning(
+                                'Skipping entry: %s, could not calc weight for key: %s, error: %s',
+                                entry,
+                                key,
+                                ex,
+                            )
                             continue
                     current_value = value
                 elif value < current_value:
@@ -240,7 +255,7 @@ class PluginSortByWeight(object):
 
                 weight = int(max(weight, 0))
                 entry[ENTRY_WEIGHT_FIELD_NAME] += weight
-                #self._add_debug_info(key, entry, weight, entry[key], value)  # debug only
+                # self._add_debug_info(key, entry, weight, entry[key], value)  # debug only
 
     def _add_debug_info(self, key, entry, weight, *args):
         if 'weights' not in entry:
@@ -253,12 +268,17 @@ class PluginSortByWeight(object):
                 date = arg.date()
                 short_args.append('%s-%s-%s' % (date.year, date.month, date.day))
             elif isinstance(arg, Quality):
-                quality_string = '[ %s ]-%s-%s, [ %s ]' % (arg.resolution, arg.source, arg.codec, arg.audio)
+                quality_string = '[ %s ]-%s-%s, [ %s ]' % (
+                    arg.resolution,
+                    arg.source,
+                    arg.codec,
+                    arg.audio,
+                )
                 if quality_string not in short_args:
                     short_args.append(quality_string)
             else:
                 short_args.append(arg)
-        entry['weights'][key] = '%s = %s' % (weight,  short_args)
+        entry['weights'][key] = '%s = %s' % (weight, short_args)
 
 
 @event('plugin.register')

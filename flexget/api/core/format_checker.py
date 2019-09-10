@@ -4,7 +4,9 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from flexget.api import api, APIResource
 from flexget.api.app import base_message_schema, success_response
 
-schema_api = api.namespace('format_check', description='Test Flexget custom schema format validations')
+schema_api = api.namespace(
+    'format_check', description='Test Flexget custom schema format validations'
+)
 
 
 class ObjectContainer(object):
@@ -22,8 +24,8 @@ class ObjectContainer(object):
             'path': {'type': 'string', 'format': 'path'},
             'url': {'type': 'string', 'format': 'url'},
             'episode_identifier': {'type': 'string', 'format': 'episode_identifier'},
-            'episode_or_season_id': {'type': 'string', 'format': 'episode_or_season_id'}
-        }
+            'episode_or_season_id': {'type': 'string', 'format': 'episode_or_season_id'},
+        },
     }
 
 

@@ -46,7 +46,9 @@ class TestDownload(object):
         temp_path_1 = tmpdir.mkdir('temp_path_1')
         temp_path_2 = tmpdir.mkdir('temp_path_2')
 
-        return Template(self._config).render({'temp_path_1': temp_path_1.strpath, 'temp_path_2': temp_path_2.strpath})
+        return Template(self._config).render(
+            {'temp_path_1': temp_path_1.strpath, 'temp_path_2': temp_path_2.strpath}
+        )
 
     def test_path_and_temp(self, execute_task):
         """Download plugin: Path and Temp directories set"""
@@ -75,8 +77,10 @@ class TestDownload(object):
 
 # TODO: Fix this test
 @pytest.mark.usefixtures('tmpdir')
-@pytest.mark.skip(reason='TODO: These are really just config validation tests, and I have config validation turned off'
-                         ' at the moment for unit tests due to some problems')
+@pytest.mark.skip(
+    reason='TODO: These are really just config validation tests, and I have config validation turned off'
+    ' at the moment for unit tests due to some problems'
+)
 class TestDownloadTemp(object):
     config = """
         tasks:
@@ -105,8 +109,10 @@ class TestDownloadTemp(object):
               temp:
         """
 
-    @pytest.mark.skipif(sys.platform.startswith('win'),
-                        reason='Windows does not have a guaranteed "private" directory afaik')
+    @pytest.mark.skipif(
+        sys.platform.startswith('win'),
+        reason='Windows does not have a guaranteed "private" directory afaik',
+    )
     def test_wrong_permission(self, execute_task):
         """Download plugin: Temp directory has wrong permissions"""
         task = execute_task('temp_wrong_permission', abort_ok=True)

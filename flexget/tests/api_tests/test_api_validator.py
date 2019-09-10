@@ -12,8 +12,8 @@ class TestValidator(object):
             'name': 'new_task',
             'config': {
                 'invalid_plugin': [{'title': 'entry 1'}],
-                'fake_plugin2': {'url': 'http://test/rss'}
-            }
+                'fake_plugin2': {'url': 'http://test/rss'},
+            },
         }
 
         rsp = api_client.json_post('/tasks/', data=json.dumps(new_task))

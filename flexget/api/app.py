@@ -43,7 +43,9 @@ class APIClient(object):
         if method is None:
             method = 'POST' if data is not None else 'GET'
         auth_header = dict(Authorization='Token %s' % api_key())
-        response = self.app.open(url, data=data, follow_redirects=True, method=method, headers=auth_header)
+        response = self.app.open(
+            url, data=data, follow_redirects=True, method=method, headers=auth_header
+        )
         result = json.loads(response.get_data(as_text=True))
         # TODO: Proper exceptions
         if 200 > response.status_code >= 300:
@@ -79,6 +81,7 @@ def api_version(f):
 
 class APIResource(Resource):
     """All api resources should subclass this class."""
+
     method_decorators = [with_session, api_version]
 
     def __init__(self, api, *args, **kwargs):
@@ -129,7 +132,14 @@ class API(RestPlusAPI):
             if issubclass(code_or_apierror, APIError):
                 description = code_or_apierror.description or description
                 return self.doc(
-                    responses={code_or_apierror.status_code: (description, code_or_apierror.response_model)}, **kwargs)
+                    responses={
+                        code_or_apierror.status_code: (
+                            description,
+                            code_or_apierror.response_model,
+                        )
+                    },
+                    **kwargs
+                )
         except TypeError:
             # If first argument isn't a class this happens
             pass
@@ -150,10 +160,16 @@ class API(RestPlusAPI):
         pagination.add_argument('page', type=int, default=1, help='Page number')
         pagination.add_argument('per_page', type=int, default=50, help='Results per page')
         if sort_choices or add_sort:
-            pagination.add_argument('order', choices=('desc', 'asc'), default='desc', help='Sorting order')
+            pagination.add_argument(
+                'order', choices=('desc', 'asc'), default='desc', help='Sorting order'
+            )
         if sort_choices:
-            pagination.add_argument('sort_by', choices=sort_choices, default=default or sort_choices[0],
-                                    help='Sort by attribute')
+            pagination.add_argument(
+                'sort_by',
+                choices=sort_choices,
+                default=default or sort_choices[0],
+                help='Sort by attribute',
+            )
 
         return pagination
 
@@ -172,8 +188,8 @@ api = API(
     title='Flexget API v{}'.format(__version__),
     version=__version__,
     description='View and manage flexget core operations and plugins. Open each endpoint view for usage information.'
-                ' Navigate to http://flexget.com/API for more details.',
-    format_checker=format_checker
+    ' Navigate to http://flexget.com/API for more details.',
+    format_checker=format_checker,
 )
 
 base_message = {
@@ -181,10 +197,9 @@ base_message = {
     'properties': {
         'status_code': {'type': 'integer'},
         'message': {'type': 'string'},
-        'status': {'type': 'string'}
+        'status': {'type': 'string'},
     },
-    'required': ['status_code', 'message', 'status']
-
+    'required': ['status_code', 'message', 'status'],
 }
 
 base_message_schema = api.schema_model('base_message', base_message)
@@ -244,35 +259,52 @@ class ValidationError(APIError):
     status_code = 422
     description = 'Validation error'
 
-    response_model = api.schema_model('validation_error', {
-        'type': 'object',
-        'properties': {
-            'validation_errors': {
-                'type': 'array',
-                'items': {
-                    'type': 'object',
-                    'properties': {
-                        'message': {'type': 'string', 'description': 'A human readable message explaining the error.'},
-                        'validator': {'type': 'string', 'description': 'The name of the failed validator.'},
-                        'validator_value': {
-                            'type': 'string', 'description': 'The value for the failed validator in the schema.'
+    response_model = api.schema_model(
+        'validation_error',
+        {
+            'type': 'object',
+            'properties': {
+                'validation_errors': {
+                    'type': 'array',
+                    'items': {
+                        'type': 'object',
+                        'properties': {
+                            'message': {
+                                'type': 'string',
+                                'description': 'A human readable message explaining the error.',
+                            },
+                            'validator': {
+                                'type': 'string',
+                                'description': 'The name of the failed validator.',
+                            },
+                            'validator_value': {
+                                'type': 'string',
+                                'description': 'The value for the failed validator in the schema.',
+                            },
+                            'path': {'type': 'string'},
+                            'schema_path': {'type': 'string'},
                         },
-                        'path': {'type': 'string'},
-                        'schema_path': {'type': 'string'},
-                    }
+                    },
                 }
-            }
+            },
+            'required': ['validation_errors'],
         },
-        'required': ['validation_errors']
-    })
+    )
 
     verror_attrs = (
-        'message', 'cause', 'validator', 'validator_value',
-        'path', 'schema_path', 'parent'
+        'message',
+        'cause',
+        'validator',
+        'validator_value',
+        'path',
+        'schema_path',
+        'parent',
     )
 
     def __init__(self, validation_errors, message='validation error'):
-        payload = {'validation_errors': [self._verror_to_dict(error) for error in validation_errors]}
+        payload = {
+            'validation_errors': [self._verror_to_dict(error) for error in validation_errors]
+        }
         super(ValidationError, self).__init__(message, payload=payload)
 
     def _verror_to_dict(self, error):
@@ -289,11 +321,7 @@ empty_response = api.schema_model('empty', {'type': 'object'})
 
 
 def success_response(message, status_code=200, status='success'):
-    rsp_dict = {
-        'message': message,
-        'status_code': status_code,
-        'status': status
-    }
+    rsp_dict = {'message': message, 'status_code': status_code, 'status': status}
     rsp = jsonify(rsp_dict)
     rsp.status_code = status_code
     return rsp
@@ -341,7 +369,11 @@ def etag(method=None, cache_age=0):
         rv = make_response(rv)
 
         # Some headers can change without data change for specific page
-        content_headers = rv.headers.get('link', '') + rv.headers.get('count', '') + rv.headers.get('total-count', '')
+        content_headers = (
+            rv.headers.get('link', '')
+            + rv.headers.get('count', '')
+            + rv.headers.get('total-count', '')
+        )
         data = (rv.get_data().decode() + content_headers).encode()
         etag = generate_etag(data)
         rv.headers['Cache-Control'] = 'max-age=%s' % cache_age
@@ -398,8 +430,4 @@ def pagination_headers(total_pages, total_items, page_count, request):
         link_string += LINKTEMPLATE.format(page + 1, 'next') + ', '
     link_string += LINKTEMPLATE.format(total_pages, 'last')
 
-    return {
-        'Link': link_string,
-        'Total-Count': total_items,
-        'Count': page_count
-    }
+    return {'Link': link_string, 'Total-Count': total_items, 'Count': page_count}

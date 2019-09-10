@@ -50,10 +50,15 @@ class Manipulate(object):
                         'type': 'object',
                         'properties': {
                             'regexp': {'type': 'string', 'format': 'regex'},
-                            'format': {'type': 'string'}},
+                            'format': {'type': 'string'},
+                        },
                         'required': ['regexp', 'format'],
-                        'additionalProperties': False}},
-                'additionalProperties': False}}
+                        'additionalProperties': False,
+                    },
+                },
+                'additionalProperties': False,
+            },
+        },
     }
 
     def on_task_start(self, task, config):
@@ -68,7 +73,7 @@ class Manipulate(object):
                 phase = item_config.get('phase', 'metainfo')
                 self.phase_jobs[phase].append(item)
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_metainfo(self, task, config):
         if not self.phase_jobs['metainfo']:
             # return if no jobs for this phase
@@ -76,7 +81,7 @@ class Manipulate(object):
         modified = sum(self.process(entry, self.phase_jobs['metainfo']) for entry in task.entries)
         log.verbose('Modified %d entries.', modified)
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_filter(self, task, config):
         if not self.phase_jobs['filter']:
             # return if no jobs for this phase
@@ -84,11 +89,12 @@ class Manipulate(object):
         modified = sum(self.process(entry, self.phase_jobs['filter']) for entry in task.entries + task.rejected)
         log.verbose('Modified %d entries.', modified)
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_modify(self, task, config):
         if not self.phase_jobs['modify']:
             # return if no jobs for this phase
             return
+
         modified = sum(self.process(entry, self.phase_jobs['modify']) for entry in task.entries + task.rejected)
         log.verbose('Modified %d entries.', modified)
 
@@ -108,13 +114,11 @@ class Manipulate(object):
                     from_field = config['from']
                 field_value = entry.get(from_field)
                 log.debug('field: `%s` from_field: `%s` field_value: `%s`', field, from_field, field_value)
-
                 if config.get('remove'):
                     if field in entry:
                         del entry[field]
                         modified = True
                     continue
-
                 if 'extract' in config:
                     if not field_value:
                         log.warning('Cannot extract, field `%s` is not present', from_field)

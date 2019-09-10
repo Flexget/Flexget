@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 from collections import namedtuple
@@ -34,10 +33,11 @@ class AssumeQuality(object):
         'oneOf': [
             {'title': 'simple config', 'type': 'string', 'format': 'quality'},
             {
-                'title': 'advanced config', 'type': 'object',
+                'title': 'advanced config',
+                'type': 'object',
                 # Can't validate dict keys, so allow any
-                'additionalProperties': {'type': 'string', 'format': 'quality'}
-            }
+                'additionalProperties': {'type': 'string', 'format': 'quality'},
+            },
         ]
     }
 
@@ -74,7 +74,7 @@ class AssumeQuality(object):
         log.debug('Quality updated: %s', entry.get('quality'))
 
     def on_task_start(self, task, config):
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = {'any': config}
         assume = namedtuple('assume', ['target', 'quality'])
         self.assumptions = []
@@ -83,15 +83,23 @@ class AssumeQuality(object):
             try:
                 target = qualities.Requirements(target)
             except ValueError:
-                raise plugin.PluginError('%s is not a valid quality. Forgetting assumption.' % target)
+                raise plugin.PluginError(
+                    '%s is not a valid quality. Forgetting assumption.' % target
+                )
             try:
                 quality = qualities.get(quality)
             except ValueError:
-                raise plugin.PluginError('%s is not a valid quality. Forgetting assumption.' % quality)
+                raise plugin.PluginError(
+                    '%s is not a valid quality. Forgetting assumption.' % quality
+                )
             self.assumptions.append(assume(target, quality))
-        self.assumptions.sort(key=lambda assumption: self.precision(assumption.target), reverse=True)
+        self.assumptions.sort(
+            key=lambda assumption: self.precision(assumption.target), reverse=True
+        )
         for assumption in self.assumptions:
-            log.debug('Target %s - Priority %s' % (assumption.target, self.precision(assumption.target)))
+            log.debug(
+                'Target %s - Priority %s' % (assumption.target, self.precision(assumption.target))
+            )
 
     @plugin.priority(100)  # run after other plugins which fill quality (series, quality)
     def on_task_metainfo(self, task, config):

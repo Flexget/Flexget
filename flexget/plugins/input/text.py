@@ -39,13 +39,14 @@ class Text(object):
         format:
           url: http://www.nbc.com%(url)s
     """
+
     schema = {
         'type': 'object',
         'properties': {
             'url': {
                 'oneOf': [
                     {'type': 'string', 'format': 'url'},
-                    {'type': 'string', 'format': 'file'}
+                    {'type': 'string', 'format': 'file'},
                 ]
             },
             'encoding': {'type': 'string'},
@@ -53,18 +54,15 @@ class Text(object):
                 'type': 'object',
                 'properties': {
                     'url': {'type': 'string', 'format': 'regex'},
-                    'title': {'type': 'string', 'format': 'regex'}
+                    'title': {'type': 'string', 'format': 'regex'},
                 },
                 'additionalProperties': {'type': 'string', 'format': 'regex'},
-                'required': ['url', 'title']
+                'required': ['url', 'title'],
             },
-            'format': {
-                'type': 'object',
-                'additionalProperties': {'type': 'string'}
-            }
+            'format': {'type': 'object', 'additionalProperties': {'type': 'string'}},
         },
         'required': ['entry', 'url'],
-        'additonalProperties': False
+        'additonalProperties': False,
     }
 
     def format_entry(self, entry, d):
@@ -97,12 +95,18 @@ class Text(object):
                     # check if used field detected, in such case start with new entry
                     if field in used:
                         if entry.isvalid():
-                            log.info('Found field %s again before entry was completed. \
-                                      Adding current incomplete, but valid entry and moving to next.' % field)
+                            log.info(
+                                'Found field %s again before entry was completed. \
+                                      Adding current incomplete, but valid entry and moving to next.'
+                                % field
+                            )
                             self.format_entry(entry, format_config)
                             entries.append(entry)
                         else:
-                            log.info('Invalid data, entry field %s is already found once. Ignoring entry.' % field)
+                            log.info(
+                                'Invalid data, entry field %s is already found once. Ignoring entry.'
+                                % field
+                            )
                         # start new entry
                         entry = Entry()
                         used = {}
@@ -112,7 +116,9 @@ class Text(object):
                         entry[field] = match.group(1)
                     except IndexError:
                         log.error('regex for field `%s` must contain a capture group' % field)
-                        raise plugin.PluginError('Your text plugin config contains errors, please correct them.')
+                        raise plugin.PluginError(
+                            'Your text plugin config contains errors, please correct them.'
+                        )
                     used[field] = True
                     log.debug('found field: %s value: %s' % (field, entry[field]))
 
@@ -120,7 +126,9 @@ class Text(object):
                 if len(used) == len(entry_config):
                     # check that entry has atleast title and url
                     if not entry.isvalid():
-                        log.info('Invalid data, constructed entry is missing mandatory fields (title or url)')
+                        log.info(
+                            'Invalid data, constructed entry is missing mandatory fields (title or url)'
+                        )
                     else:
                         self.format_entry(entry, format_config)
                         entries.append(entry)

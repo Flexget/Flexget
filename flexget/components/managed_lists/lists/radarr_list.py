@@ -182,15 +182,15 @@ class RadarrAPIService:
         return request_get_json(request_url, headers)
 
     def add_movie(
-            self,
-            title,
-            quality_profile_id,
-            title_slug,
-            images,
-            tmdb_id,
-            root_folder_path,
-            monitored=True,
-            add_options=None,
+        self,
+        title,
+        quality_profile_id,
+        title_slug,
+        images,
+        tmdb_id,
+        root_folder_path,
+        monitored=True,
+        add_options=None,
     ):
         """ Adds a movie """
         request_url = self.api_url + "movie"
@@ -345,9 +345,7 @@ class RadarrSet(MutableSet):
         # first use the lookup API. Using that we will get
         # a json response which gives us most of the input
         # we need for the POST request.
-        result = self._lookup_movie(
-            entry.get("title"), entry.get("imdb_id"), entry.get("tmdb_id")
-        )
+        result = self._lookup_movie(entry.get("title"), entry.get("imdb_id"), entry.get("tmdb_id"))
 
         if result:
             root_folders = self.service.get_root_folders()

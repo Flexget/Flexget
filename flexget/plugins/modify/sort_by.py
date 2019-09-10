@@ -35,26 +35,26 @@ class PluginSortBy(object):
         reverse: yes
     """
 
-    schema = one_or_more({
-        'oneOf': [
-            {'type': 'string'},
-            {
-                'type': 'object',
-                'properties': {
-                    'field': {'type': 'string'},
-                    'reverse': {'type': 'boolean'},
-                    'ignore_articles': {
-                        'oneOf': [
-                            {'type': 'boolean'},
-                            {'type': 'string', 'format': 'regex'}
-                        ]
-                    }
+    schema = one_or_more(
+        {
+            'oneOf': [
+                {'type': 'string'},
+                {
+                    'type': 'object',
+                    'properties': {
+                        'field': {'type': 'string'},
+                        'reverse': {'type': 'boolean'},
+                        'ignore_articles': {
+                            'oneOf': [{'type': 'boolean'}, {'type': 'string', 'format': 'regex'}]
+                        },
+                    },
+                    'additionalProperties': False,
                 },
-                'additionalProperties': False
-            }
-        ]
-    })
+            ]
+        }
+    )
 
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_filter(self, task, config):
         if not isinstance(config, list):
             config = [config]

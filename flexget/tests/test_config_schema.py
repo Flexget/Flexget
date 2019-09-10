@@ -20,7 +20,11 @@ class TestSchemaValidator(object):
                 config_schema.SchemaValidator.check_schema(schema)
             except jsonschema.SchemaError as e:
                 assert False, 'plugin `%s` has an invalid schema. %s %s %s' % (
-                    path, '/'.join(str(p) for p in e.path), e.validator, e.message)
+                    path,
+                    '/'.join(str(p) for p in e.path),
+                    e.validator,
+                    e.message,
+                )
             except Exception as e:
                 assert False, 'plugin `%s` has an invalid schema. %s' % (path, e)
 
@@ -64,7 +68,11 @@ class TestSchemaValidator(object):
         assert errors[0].message == schema['error']
 
     def test_custom_error_template(self):
-        schema = {'type': 'string', 'minLength': 10, 'error': '{{validator}} failed for {{instance}}'}
+        schema = {
+            'type': 'string',
+            'minLength': 10,
+            'error': '{{validator}} failed for {{instance}}',
+        }
         errors = config_schema.process_config(13, schema)
         assert errors[0].message == "type failed for 13"
         errors = config_schema.process_config('aoeu', schema)
@@ -97,12 +105,7 @@ class TestSchemaValidator(object):
         schema = {
             "anyOf": [
                 {"type": ["string", "array"]},
-                {
-                    "anyOf": [
-                        {"type": "integer"},
-                        {"type": "number", "minimum": 5}
-                    ]
-                }
+                {"anyOf": [{"type": "integer"}, {"type": "number", "minimum": 5}]},
             ]
         }
         # If there are type errors on both sides, it should be a virtual type error with all types
@@ -120,12 +123,7 @@ class TestSchemaValidator(object):
         schema = {
             "oneOf": [
                 {"type": ["string", "array"]},
-                {
-                    "oneOf": [
-                        {"type": "integer"},
-                        {"type": "number", "minimum": 5}
-                    ]
-                }
+                {"oneOf": [{"type": "integer"}, {"type": "number", "minimum": 5}]},
             ]
         }
         errors = config_schema.process_config(True, schema)
@@ -183,13 +181,7 @@ class TestSchemaFormats(object):
             '2TB',
         ]
 
-        invalid_sizes = [
-            '1AiB',
-            '1bytes',
-            '1megabytes',
-            '1gig',
-            '1gigabytes',
-        ]
+        invalid_sizes = ['1AiB', '1bytes', '1megabytes', '1gig', '1gigabytes']
 
         failures = self._test_format('size', valid_sizes)
         failures.extend(self._test_format('size', invalid_sizes, invalid=True))
@@ -197,18 +189,9 @@ class TestSchemaFormats(object):
         assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
 
     def test_format_interval(self):
-        valid_intervals = [
-            '3 days',
-            '12 hours',
-            '1 minute',
-        ]
+        valid_intervals = ['3 days', '12 hours', '1 minute']
 
-        invalid_intervals = [
-            'aoeu',
-            '14',
-            '3 dayz',
-            'about 5 minutes',
-        ]
+        invalid_intervals = ['aoeu', '14', '3 dayz', 'about 5 minutes']
 
         failures = self._test_format('interval', valid_intervals)
         failures.extend(self._test_format('interval', invalid_intervals, invalid=True))
@@ -216,16 +199,9 @@ class TestSchemaFormats(object):
         assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
 
     def test_format_percent(self):
-        valid_percent = [
-            '1%',
-            '1 %',
-            '70.05 %',
-        ]
+        valid_percent = ['1%', '1 %', '70.05 %']
 
-        invalid_percent = [
-            '%5',
-            'abc%',
-        ]
+        invalid_percent = ['%5', 'abc%']
 
         failures = self._test_format('percent', valid_percent)
         failures.extend(self._test_format('percent', invalid_percent, invalid=True))
@@ -276,11 +252,7 @@ class TestFormatParsers(object):
         assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
 
     def test_parser_percent(self):
-        percent_tests = [
-            ('3%', 3.0),
-            ('30.05%', 30.05),
-            ('30 %', 30.0),
-        ]
+        percent_tests = [('3%', 3.0), ('30.05%', 30.05), ('30 %', 30.0)]
 
         failures = self._test_parser(config_schema.parse_percent, percent_tests)
 

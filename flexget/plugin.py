@@ -23,6 +23,10 @@ from flexget.event import fire_event, remove_event_handlers
 
 log = logging.getLogger('plugin')
 
+PRIORITY_DEFAULT = 128
+PRIORITY_LAST = -255
+PRIORITY_FIRST = 255
+
 
 @python_2_unicode_compatible
 class DependencyError(Exception):
@@ -58,8 +62,12 @@ class DependencyError(Exception):
     message = property(_get_message, _set_message)
 
     def __str__(self):
-        return '<DependencyError(issued_by=%r,missing=%r,message=%r,silent=%r)>' % \
-               (self.issued_by, self.missing, self.message, self.silent)
+        return '<DependencyError(issued_by=%r,missing=%r,message=%r,silent=%r)>' % (
+            self.issued_by,
+            self.missing,
+            self.message,
+            self.silent,
+        )
 
 
 class RegisterException(Exception):
@@ -113,7 +121,6 @@ class internet(object):
             self.log = logging.getLogger('@internet')
 
     def __call__(self, func):
-
         def wrapped_func(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
@@ -136,7 +143,10 @@ class internet(object):
                 if hasattr(e, 'reason'):
                     raise PluginError('Failed to reach server. Reason: %s' % e.reason, self.log)
                 elif hasattr(e, 'code'):
-                    raise PluginError('The server couldn\'t fulfill the request. Error code: %s' % e.code, self.log)
+                    raise PluginError(
+                        'The server couldn\'t fulfill the request. Error code: %s' % e.code,
+                        self.log,
+                    )
                 raise PluginError('IOError when connecting to server: %s' % e, self.log)
 
         return wrapped_func
@@ -152,11 +162,20 @@ def priority(value):
     return decorator
 
 
-DEFAULT_PRIORITY = 128
-
 # task phases, in order of their execution; note that this can be extended by
 # registering new phases at runtime
-task_phases = ['prepare', 'start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'learn', 'exit']
+task_phases = [
+    'prepare',
+    'start',
+    'input',
+    'metainfo',
+    'filter',
+    'download',
+    'modify',
+    'output',
+    'learn',
+    'exit',
+]
 
 # map phase names to method names
 phase_methods = {
@@ -218,10 +237,20 @@ class PluginInfo(dict):
     Allows accessing key/value pairs of this dictionary subclass via
     attributes. Also instantiates a plugin and initializes properties.
     """
+
     # Counts duplicate registrations
     dupe_counter = 0
 
-    def __init__(self, plugin_class, name=None, interfaces=None, builtin=False, debug=False, api_ver=1, category=None):
+    def __init__(
+        self,
+        plugin_class,
+        name=None,
+        interfaces=None,
+        builtin=False,
+        debug=False,
+        api_ver=1,
+        category=None,
+    ):
         """
         Register a plugin.
 
@@ -242,7 +271,9 @@ class PluginInfo(dict):
         if name is None:
             # Convention is to take camel-case class name and rewrite it to an underscore form,
             # e.g. 'PluginName' to 'plugin_name'
-            name = re.sub('[A-Z]+', lambda i: '_' + i.group(0).lower(), plugin_class.__name__).lstrip('_')
+            name = re.sub(
+                '[A-Z]+', lambda i: '_' + i.group(0).lower(), plugin_class.__name__
+            ).lstrip('_')
         if category is None and plugin_class.__module__.startswith('flexget.plugins'):
             # By default look at the containing package of the plugin.
             category = plugin_class.__module__.split('.')[-2]
@@ -265,8 +296,11 @@ class PluginInfo(dict):
 
         if self.name in plugins:
             PluginInfo.dupe_counter += 1
-            log.critical('Error while registering plugin %s. '
-                         'A plugin with the same name is already registered', self.name)
+            log.critical(
+                'Error while registering plugin %s. '
+                'A plugin with the same name is already registered',
+                self.name,
+            )
         else:
             plugins[self.name] = self
 
@@ -277,7 +311,9 @@ class PluginInfo(dict):
         # Create plugin instance
         self.instance = self.plugin_class()
         self.instance.plugin_info = self  # give plugin easy access to its own info
-        self.instance.log = logging.getLogger(getattr(self.instance, "LOGGER_NAME", None) or self.name)
+        self.instance.log = logging.getLogger(
+            getattr(self.instance, "LOGGER_NAME", None) or self.name
+        )
         if hasattr(self.instance, 'schema'):
             self.schema = self.instance.schema
         elif hasattr(self.instance, 'validator'):
@@ -314,8 +350,10 @@ class PluginInfo(dict):
                 if hasattr(method, 'priority'):
                     handler_prio = method.priority
                 else:
-                    handler_prio = DEFAULT_PRIORITY
-                event = add_phase_handler('plugin.%s.%s' % (self.name, phase), method, handler_prio)
+                    handler_prio = PRIORITY_DEFAULT
+                event = add_phase_handler(
+                    'plugin.%s.%s' % (self.name, phase), method, handler_prio
+                )
                 # provides backwards compatibility
                 event.plugin = self
                 self.phase_handlers[phase] = event
@@ -383,8 +421,12 @@ def _get_standard_components_path():
 def _check_phase_queue():
     if _new_phase_queue:
         for phase, args in _new_phase_queue.items():
-            log.error('Plugin %s requested new phase %s, but it could not be created at requested '
-                      'point (before, after). Plugin is not working properly.', args[0], phase)
+            log.error(
+                'Plugin %s requested new phase %s, but it could not be created at requested '
+                'point (before, after). Plugin is not working properly.',
+                args[0],
+                phase,
+            )
 
 
 def _import_plugin(module_name, plugin_path):
@@ -394,7 +436,10 @@ def _import_plugin(module_name, plugin_path):
         if e.has_message():
             msg = e.message
         else:
-            msg = 'Plugin `%s` requires plugin `%s` to load.' % (e.issued_by or module_name, e.missing or 'N/A')
+            msg = 'Plugin `%s` requires plugin `%s` to load.' % (
+                e.issued_by or module_name,
+                e.missing or 'N/A',
+            )
         if not e.silent:
             log.warning(msg)
         else:
@@ -403,7 +448,9 @@ def _import_plugin(module_name, plugin_path):
         log.critical('Plugin `%s` failed to import dependencies', module_name, exc_info=True)
     except ValueError as e:
         # Debugging #2755
-        log.error('ValueError attempting to import `%s` (from %s): %s', module_name, plugin_path, e)
+        log.error(
+            'ValueError attempting to import `%s` (from %s): %s', module_name, plugin_path, e
+        )
     except Exception:
         log.critical('Exception while loading plugin %s', module_name, exc_info=True)
         raise
@@ -425,8 +472,12 @@ def _load_plugins_from_dirs(dirs):
             if plugin_path.name == '__init__.py':
                 continue
             # Split the relative path from the plugins dir to current file's parent dir to find subpackage names
-            plugin_subpackages = [_f for _f in plugin_path.relpath(plugins_dir).parent.splitall() if _f]
-            module_name = '.'.join([plugins_pkg.__name__] + plugin_subpackages + [plugin_path.stem])
+            plugin_subpackages = [
+                _f for _f in plugin_path.relpath(plugins_dir).parent.splitall() if _f
+            ]
+            module_name = '.'.join(
+                [plugins_pkg.__name__] + plugin_subpackages + [plugin_path.stem]
+            )
             _import_plugin(module_name, plugin_path)
     _check_phase_queue()
 
@@ -443,8 +494,12 @@ def _load_components_from_dirs(dirs):
             if component_path.name == '__init__.py':
                 continue
             # Split the relative path from the plugins dir to current file's parent dir to find subpackage names
-            plugin_subpackages = [_f for _f in component_path.relpath(component_dir).parent.splitall() if _f]
-            package_name = '.'.join([components_pkg.__name__] + plugin_subpackages + [component_path.stem])
+            plugin_subpackages = [
+                _f for _f in component_path.relpath(component_dir).parent.splitall() if _f
+            ]
+            package_name = '.'.join(
+                [components_pkg.__name__] + plugin_subpackages + [component_path.stem]
+            )
             _import_plugin(package_name, component_path)
     _check_phase_queue()
 
@@ -458,18 +513,28 @@ def _load_plugins_from_packages():
             if e.has_message():
                 msg = e.message
             else:
-                msg = 'Plugin `%s` requires `%s` to load.', e.issued_by or entrypoint.module_name, e.missing or 'N/A'
+                msg = (
+                    'Plugin `%s` requires `%s` to load.',
+                    e.issued_by or entrypoint.module_name,
+                    e.missing or 'N/A',
+                )
             if not e.silent:
                 log.warning(msg)
             else:
                 log.debug(msg)
         except ImportError:
-            log.critical('Plugin `%s` failed to import dependencies', entrypoint.module_name, exc_info=True)
+            log.critical(
+                'Plugin `%s` failed to import dependencies', entrypoint.module_name, exc_info=True
+            )
         except Exception:
-            log.critical('Exception while loading plugin %s', entrypoint.module_name, exc_info=True)
+            log.critical(
+                'Exception while loading plugin %s', entrypoint.module_name, exc_info=True
+            )
             raise
         else:
-            log.trace('Loaded packaged module %s from %s', entrypoint.module_name, plugin_module.__file__)
+            log.trace(
+                'Loaded packaged module %s from %s', entrypoint.module_name, plugin_module.__file__
+            )
     _check_phase_queue()
 
 
@@ -505,7 +570,9 @@ def load_plugins(extra_plugins=None, extra_components=None):
         plugin.initialize()
     took = time.time() - start_time
     plugins_loaded = True
-    log.debug('Plugins took %.2f seconds to load. %s plugins in registry.', took, len(plugins.keys()))
+    log.debug(
+        'Plugins took %.2f seconds to load. %s plugins in registry.', took, len(plugins.keys())
+    )
 
 
 def get_plugins(phase=None, interface=None, category=None, name=None, min_api=None):
@@ -546,7 +613,7 @@ def plugin_schemas(**kwargs):
         'properties': dict((p.name, {'$ref': p.schema['id']}) for p in get_plugins(**kwargs)),
         'additionalProperties': False,
         'error_additionalProperties': '{{message}} Only known plugin names are valid keys.',
-        'patternProperties': {'^_': {'title': 'Disabled Plugin'}}
+        'patternProperties': {'^_': {'title': 'Disabled Plugin'}},
     }
 
 

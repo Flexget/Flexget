@@ -16,11 +16,7 @@ log = logging.getLogger('upgrade')
 
 Base = db_schema.versioned_base('upgrade', 0)
 
-entry_actions = {
-    'accept': Entry.accept,
-    'reject': Entry.reject,
-    'fail': Entry.fail
-}
+entry_actions = {'accept': Entry.accept, 'reject': Entry.reject, 'fail': Entry.fail}
 
 
 class EntryUpgrade(Base):
@@ -35,8 +31,7 @@ class EntryUpgrade(Base):
     updated = Column(DateTime, index=True, default=datetime.now)
 
     def __str__(self):
-        return '<Upgrade(id=%s,added=%s,quality=%s)>' % \
-               (self.id, self.added, self.quality)
+        return '<Upgrade(id=%s,added=%s,quality=%s)>' % (self.id, self.added, self.quality)
 
 
 class FilterUpgrade(object):
@@ -48,9 +43,9 @@ class FilterUpgrade(object):
             'target': {'type': 'string', 'format': 'quality_requirements'},
             'on_lower': {'type': 'string', 'enum': ['accept', 'reject', 'do_nothing']},
             'timeframe': {'type': 'string', 'format': 'interval'},
-            'propers': {'type': 'boolean'}
+            'propers': {'type': 'boolean'},
         },
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def prepare_config(self, config):
@@ -77,7 +72,9 @@ class FilterUpgrade(object):
             # Filter out entries within target
             if target:
                 if not target_requirement.allows(entry['quality']):
-                    log.debug('Skipping %s as does not meet upgrade quality requirements', entry['title'])
+                    log.debug(
+                        'Skipping %s as does not meet upgrade quality requirements', entry['title']
+                    )
                     if action_on_lower:
                         action_on_lower(entry, 'does not meet upgrade quality requirements')
                     continue
@@ -88,7 +85,10 @@ class FilterUpgrade(object):
                     action_on_lower(entry, 'lower quality then existing')
                 continue
 
-            if entry['quality'] == existing.quality and entry.get('proper_count', 0) <= existing.proper_count:
+            if (
+                entry['quality'] == existing.quality
+                and entry.get('proper_count', 0) <= existing.proper_count
+            ):
                 log.debug('Skipping %s as same quality but lower proper', entry['title'])
                 if action_on_lower:
                     action_on_lower(entry, 'lower proper then existing')
@@ -104,7 +104,9 @@ class FilterUpgrade(object):
         if not config or not config['target']:
             return
 
-        identified_by = '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
+        identified_by = (
+            '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
+        )
 
         grouped_entries = group_entries(task.accepted + task.undecided, identified_by)
         if not grouped_entries:
@@ -112,7 +114,11 @@ class FilterUpgrade(object):
 
         with Session() as session:
             # Prefetch Data
-            existing_ids = session.query(EntryUpgrade).filter(EntryUpgrade.id.in_(grouped_entries.keys())).all()
+            existing_ids = (
+                session.query(EntryUpgrade)
+                .filter(EntryUpgrade.id.in_(grouped_entries.keys()))
+                .all()
+            )
             existing_ids = {e.id: e for e in existing_ids}
 
             for identifier, entries in grouped_entries.items():
@@ -124,35 +130,53 @@ class FilterUpgrade(object):
                     # No existing, do_nothing
                     continue
 
-                log.debug('Looking for upgrades for identifier %s (within %s entries)', identifier, len(entries))
+                log.debug(
+                    'Looking for upgrades for identifier %s (within %s entries)',
+                    identifier,
+                    len(entries),
+                )
 
                 # Check if passed allowed timeframe
                 if config['timeframe']:
                     expires = existing.first_seen + parse_timedelta(config['timeframe'])
                     if expires <= datetime.now():
                         # Timeframe reached, allow
-                        log.debug('Skipping upgrade with identifier %s as timeframe reached', identifier)
+                        log.debug(
+                            'Skipping upgrade with identifier %s as timeframe reached', identifier
+                        )
                         continue
 
                 # Filter out lower quality and propers
-                action_on_lower = entry_actions[config['on_lower']] if config['on_lower'] != 'do_nothing' else None
-                upgradeable = self.filter_entries(entries, existing, config['target'], action_on_lower)
+                action_on_lower = (
+                    entry_actions[config['on_lower']]
+                    if config['on_lower'] != 'do_nothing'
+                    else None
+                )
+                upgradeable = self.filter_entries(
+                    entries, existing, config['target'], action_on_lower
+                )
 
                 # Skip if we have no entries after filtering
                 if not upgradeable:
                     continue
 
                 # Sort entities in order of quality and best proper
-                upgradeable.sort(key=lambda e: (e['quality'], e.get('proper_count', 0)), reverse=True)
+                upgradeable.sort(
+                    key=lambda e: (e['quality'], e.get('proper_count', 0)), reverse=True
+                )
 
                 # First entry will be the best quality
                 best = upgradeable.pop(0)
                 best.accept('upgraded quality')
-                log.debug('Found %s as upgraded quality for identifier %s', best['title'], identifier)
+                log.debug(
+                    'Found %s as upgraded quality for identifier %s', best['title'], identifier
+                )
 
                 # Process rest
                 for entry in upgradeable:
-                    log.debug('Skipping %s as lower quality then best %s', entry['title'], best['title'])
+                    log.debug(
+                        'Skipping %s as lower quality then best %s', entry['title'], best['title']
+                    )
                     if action_on_lower:
                         action_on_lower(entry, 'lower quality then best match')
 
@@ -161,7 +185,9 @@ class FilterUpgrade(object):
         if not config or not config['tracking']:
             return
 
-        identified_by = '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
+        identified_by = (
+            '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
+        )
 
         grouped_entries = group_entries(task.accepted, identified_by)
         if not grouped_entries:
@@ -169,7 +195,11 @@ class FilterUpgrade(object):
 
         with Session() as session:
             # Prefetch Data
-            existing_ids = session.query(EntryUpgrade).filter(EntryUpgrade.id.in_(grouped_entries.keys())).all()
+            existing_ids = (
+                session.query(EntryUpgrade)
+                .filter(EntryUpgrade.id.in_(grouped_entries.keys()))
+                .all()
+            )
             existing_ids = {e.id: e for e in existing_ids}
 
             for identifier, entries in grouped_entries.items():
@@ -195,7 +225,11 @@ class FilterUpgrade(object):
                 existing.proper_count = best_entry.get('proper_count', 0)
                 existing.updated = datetime.now()
 
-                log.debug('Tracking upgrade on identifier `%s` current quality `%s`', identifier, best_entry['quality'])
+                log.debug(
+                    'Tracking upgrade on identifier `%s` current quality `%s`',
+                    identifier,
+                    best_entry['quality'],
+                )
 
 
 @event('plugin.register')

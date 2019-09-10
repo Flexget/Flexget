@@ -3,8 +3,6 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from past.builtins import basestring
-
 from flexget import plugin
 from flexget.event import event
 from . import db
@@ -14,12 +12,12 @@ log = logging.getLogger(__name__)
 
 class FilterSeen(object):
     """
-        Remembers previously downloaded content and rejects them in
-        subsequent executions. Without this plugin FlexGet would
-        download all matching content on every execution.
+    Remembers previously downloaded content and rejects them in
+    subsequent executions. Without this plugin FlexGet would
+    download all matching content on every execution.
 
-        This plugin is enabled on all tasks by default.
-        See wiki for more information.
+    This plugin is enabled on all tasks by default.
+    See wiki for more information.
     """
 
     schema = {
@@ -54,14 +52,14 @@ class FilterSeen(object):
                 return config
             else:
                 config = {'local': False}
-        elif isinstance(config, basestring):
+        elif isinstance(config, str):
             config = {'local': config == 'local'}
 
         config.setdefault('local', False)
         config.setdefault('fields', self.fields)
         return config
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_filter(self, task, config, remember_rejected=False):
         """Filter entries already accepted on previous runs."""
         config = self.prepare_config(config)

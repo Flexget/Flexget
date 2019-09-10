@@ -23,7 +23,9 @@ class FilterOnlyNew(object):
         """Reject all entries so remember_rejected will reject them next time"""
         if not config or not task.entries:
             return
-        log.verbose('Rejecting entries after the task has run so they are not processed next time.')
+        log.verbose(
+            'Rejecting entries after the task has run so they are not processed next time.'
+        )
         for entry in task.entries:
             entry.reject('Already processed entry', remember=True)
 

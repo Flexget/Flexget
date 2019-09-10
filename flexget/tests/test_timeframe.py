@@ -8,7 +8,9 @@ from flexget.plugins.filter.timeframe import EntryTimeFrame
 
 def age_timeframe(**kwargs):
     with Session() as session:
-        session.query(EntryTimeFrame).update({'first_seen': datetime.datetime.now() - datetime.timedelta(**kwargs)})
+        session.query(EntryTimeFrame).update(
+            {'first_seen': datetime.datetime.now() - datetime.timedelta(**kwargs)}
+        )
 
 
 class TestTimeFrame(object):

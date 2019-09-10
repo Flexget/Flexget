@@ -31,6 +31,7 @@ class OutputQBitTorrent(object):
         maxupspeed: <torrent upload speed limit> (default: 0)
         maxdownspeed: <torrent download speed limit> (default: 0)
     """
+
     schema = {
         'anyOf': [
             {'type': 'boolean'},
@@ -47,10 +48,10 @@ class OutputQBitTorrent(object):
                     'label': {'type': 'string'},
                     'maxupspeed': {'type': 'integer'},
                     'maxdownspeed': {'type': 'integer'},
-                    'fail_html': {'type': 'boolean'}
+                    'fail_html': {'type': 'boolean'},
                 },
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ]
     }
 
@@ -58,12 +59,18 @@ class OutputQBitTorrent(object):
         try:
             response = self.session.request(method, url, **kwargs)
             if response == 'Fails.':
-                msg = 'Failure. URL: {}, data: {}'.format(url, kwargs) if not msg_on_fail else msg_on_fail
+                msg = (
+                    'Failure. URL: {}, data: {}'.format(url, kwargs)
+                    if not msg_on_fail
+                    else msg_on_fail
+                )
             else:
                 return response
         except RequestException as e:
             msg = str(e)
-        raise plugin.PluginError('Error when trying to send request to qBittorrent: {}'.format(msg))
+        raise plugin.PluginError(
+            'Error when trying to send request to qBittorrent: {}'.format(msg)
+        )
 
     def connect(self, config):
         """
@@ -72,12 +79,18 @@ class OutputQBitTorrent(object):
         'localhost'.
         """
         self.session = Session()
-        self.url = '{}://{}:{}'.format('https' if config['use_ssl'] else 'http', config['host'], config['port'])
+        self.url = '{}://{}:{}'.format(
+            'https' if config['use_ssl'] else 'http', config['host'], config['port']
+        )
         if config.get('username') and config.get('password'):
-            data = {'username': config['username'],
-                    'password': config['password']}
-            self._request('post', self.url + '/login', data=data, msg_on_fail='Authentication failed.',
-                          verify=config['verify_cert'])
+            data = {'username': config['username'], 'password': config['password']}
+            self._request(
+                'post',
+                self.url + '/login',
+                data=data,
+                msg_on_fail='Authentication failed.',
+                verify=config['verify_cert'],
+            )
         log.debug('Successfully connected to qBittorrent')
         self.connected = True
 
@@ -87,8 +100,13 @@ class OutputQBitTorrent(object):
         multipart_data = {k: (None, v) for k, v in data.items()}
         with open(file_path, 'rb') as f:
             multipart_data['torrents'] = f
-            self._request('post', self.url + '/command/upload', msg_on_fail='Failed to add file to qBittorrent',
-                          files=multipart_data, verify=verify_cert)
+            self._request(
+                'post',
+                self.url + '/command/upload',
+                msg_on_fail='Failed to add file to qBittorrent',
+                files=multipart_data,
+                verify=verify_cert,
+            )
         log.debug('Added torrent file %s to qBittorrent', file_path)
 
     def add_torrent_url(self, url, data, verify_cert):
@@ -96,8 +114,13 @@ class OutputQBitTorrent(object):
             raise plugin.PluginError('Not connected.')
         data['urls'] = url
         multipart_data = {k: (None, v) for k, v in data.items()}
-        self._request('post', self.url + '/command/download', msg_on_fail='Failed to add file to qBittorrent',
-                      files=multipart_data, verify=verify_cert)
+        self._request(
+            'post',
+            self.url + '/command/download',
+            msg_on_fail='Failed to add file to qBittorrent',
+            files=multipart_data,
+            verify=verify_cert,
+        )
         log.debug('Added url %s to qBittorrent', url)
 
     def prepare_config(self, config):

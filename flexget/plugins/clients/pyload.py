@@ -16,7 +16,6 @@ log = getLogger('pyload')
 
 
 class PyloadApi(object):
-
     def __init__(self, requests, url):
         self.requests = requests
         self.url = url
@@ -43,7 +42,9 @@ class PyloadApi(object):
             return self.requests.post(self.url.rstrip("/") + "/" + method.strip("/"), data=data)
         except RequestException as e:
             if e.response and e.response.status_code == 500:
-                raise plugin.PluginError('Internal API Error: <%s> <%s> <%s>' % (method, self.url, data), log)
+                raise plugin.PluginError(
+                    'Internal API Error: <%s> <%s> <%s>' % (method, self.url, data), log
+                )
             raise
 
 
@@ -105,10 +106,10 @@ class PluginPyLoad(object):
             'hoster': one_or_more({'type': 'string'}),
             'preferred_hoster_only': {'type': 'boolean'},
             'handle_no_url_as_failure': {'type': 'boolean'},
-            'enabled': {'type': 'boolean'}
+            'enabled': {'type': 'boolean'},
         },
         'required': ['username', 'password'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def on_task_output(self, task, config):
@@ -141,7 +142,11 @@ class PluginPyLoad(object):
             content = entry.get('description', '') + ' ' + quote(entry['url'])
             content = json.dumps(content)
 
-            url = json.dumps(entry['url']) if config.get('parse_url', self.DEFAULT_PARSE_URL) else "''"
+            url = (
+                json.dumps(entry['url'])
+                if config.get('parse_url', self.DEFAULT_PARSE_URL)
+                else "''"
+            )
 
             log.debug('Parsing url %s', url)
 
@@ -160,7 +165,9 @@ class PluginPyLoad(object):
                         break
 
             # no preferred hoster and not preferred hoster only - add all recognized plugins
-            if not urls and not config.get('preferred_hoster_only', self.DEFAULT_PREFERRED_HOSTER_ONLY):
+            if not urls and not config.get(
+                'preferred_hoster_only', self.DEFAULT_PREFERRED_HOSTER_ONLY
+            ):
                 for name, purls in parsed.items():
                     if name != 'BasePlugin':
                         urls.extend(purls)
@@ -192,10 +199,12 @@ class PluginPyLoad(object):
                     name = entry['title']
                     log.error('Error rendering jinja event: %s', e)
 
-                data = {'name': json.dumps(name.encode('ascii', 'ignore').decode()),
-                        'links': json.dumps(urls),
-                        'dest': json.dumps(dest),
-                        'session': session}
+                data = {
+                    'name': json.dumps(name.encode('ascii', 'ignore').decode()),
+                    'links': json.dumps(urls),
+                    'dest': json.dumps(dest),
+                    'session': session,
+                }
 
                 pid = api.post('addPackage', data=data).text
                 log.debug('added package pid: %s', pid)

@@ -55,4 +55,6 @@ class TorrentCache(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(TorrentCache, 'torrent_cache', api_ver=2, builtin=True)
+    # Built-in status is disabled due to this not working properly currently
+    # https://github.com/Flexget/Flexget/issues/2307
+    plugin.register(TorrentCache, 'torrent_cache', api_ver=2, builtin=False)

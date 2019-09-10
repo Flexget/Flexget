@@ -16,10 +16,7 @@ log = logging.getLogger('timeframe')
 
 Base = db_schema.versioned_base('upgrade', 0)
 
-entry_actions = {
-    'accept': Entry.accept,
-    'reject': Entry.reject,
-}
+entry_actions = {'accept': Entry.accept, 'reject': Entry.reject}
 
 
 class EntryTimeFrame(Base):
@@ -34,8 +31,7 @@ class EntryTimeFrame(Base):
     proper_count = Column(Integer, default=0)
 
     def __str__(self):
-        return '<Timeframe(id=%s,added=%s,quality=%s)>' % \
-               (self.id, self.added, self.quality)
+        return '<Timeframe(id=%s,added=%s,quality=%s)>' % (self.id, self.added, self.quality)
 
 
 class FilterTimeFrame(object):
@@ -45,31 +41,49 @@ class FilterTimeFrame(object):
             'identified_by': {'type': 'string', 'default': 'auto'},
             'target': {'type': 'string', 'format': 'quality_requirements'},
             'wait': {'type': 'string', 'format': 'interval'},
-            'on_waiting': {'type': 'string', 'enum': ['accept', 'reject', 'do_nothing'], 'default': 'reject'},
-            'on_reached': {'type': 'string', 'enum': ['accept', 'reject', 'do_nothing'], 'default': 'do_nothing'},
+            'on_waiting': {
+                'type': 'string',
+                'enum': ['accept', 'reject', 'do_nothing'],
+                'default': 'reject',
+            },
+            'on_reached': {
+                'type': 'string',
+                'enum': ['accept', 'reject', 'do_nothing'],
+                'default': 'do_nothing',
+            },
         },
         'required': ['target', 'wait'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     # Run last so we work on only accepted entries
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_filter(self, task, config):
         if not config:
             return
 
-        identified_by = '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
+        identified_by = (
+            '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
+        )
 
         grouped_entries = group_entries(task.accepted, identified_by)
         if not grouped_entries:
             return
 
-        action_on_waiting = entry_actions[config['on_waiting']] if config['on_waiting'] != 'do_nothing' else None
-        action_on_reached = entry_actions[config['on_reached']] if config['on_reached'] != 'do_nothing' else None
+        action_on_waiting = (
+            entry_actions[config['on_waiting']] if config['on_waiting'] != 'do_nothing' else None
+        )
+        action_on_reached = (
+            entry_actions[config['on_reached']] if config['on_reached'] != 'do_nothing' else None
+        )
 
         with Session() as session:
             # Prefetch Data
-            existing_ids = session.query(EntryTimeFrame).filter(EntryTimeFrame.id.in_(grouped_entries.keys())).all()
+            existing_ids = (
+                session.query(EntryTimeFrame)
+                .filter(EntryTimeFrame.id.in_(grouped_entries.keys()))
+                .all()
+            )
             existing_ids = {e.id: e for e in existing_ids}
 
             for identifier, entries in grouped_entries.items():
@@ -85,7 +99,9 @@ class FilterTimeFrame(object):
                     session.add(id_timeframe)
 
                 if id_timeframe.status == 'accepted':
-                    log.debug('Previously accepted %s with %s skipping', identifier, id_timeframe.title)
+                    log.debug(
+                        'Previously accepted %s with %s skipping', identifier, id_timeframe.title
+                    )
                     continue
 
                 # Sort entities in order of quality and best proper
@@ -101,8 +117,14 @@ class FilterTimeFrame(object):
                 # Check we hit target or better
                 target_requirement = qualities.Requirements(config['target'])
                 target_quality = qualities.Quality(config['target'])
-                if target_requirement.allows(best_entry['quality']) or best_entry['quality'] >= target_quality:
-                    log.debug('timeframe reach target quality %s or higher for %s' % (target_quality, identifier))
+                if (
+                    target_requirement.allows(best_entry['quality'])
+                    or best_entry['quality'] >= target_quality
+                ):
+                    log.debug(
+                        'timeframe reach target quality %s or higher for %s'
+                        % (target_quality, identifier)
+                    )
                     if action_on_reached:
                         action_on_reached(best_entry, 'timeframe reached target quality or higher')
                     continue
@@ -110,7 +132,9 @@ class FilterTimeFrame(object):
                 # Check if passed wait time
                 expires = id_timeframe.first_seen + parse_timedelta(config['wait'])
                 if expires <= datetime.now():
-                    log.debug('timeframe expired, releasing quality restriction for %s' % identifier)
+                    log.debug(
+                        'timeframe expired, releasing quality restriction for %s' % identifier
+                    )
                     if action_on_reached:
                         action_on_reached(best_entry, 'timeframe wait expired')
                     continue
@@ -124,8 +148,13 @@ class FilterTimeFrame(object):
                 hours += diff.days * 24
                 minutes, _ = divmod(remainder, 60)
 
-                log.info('`%s`: timeframe waiting for %02dh:%02dmin. Currently best is `%s`.', identifier, hours,
-                         minutes, best_entry['title'])
+                log.info(
+                    '`%s`: timeframe waiting for %02dh:%02dmin. Currently best is `%s`.',
+                    identifier,
+                    hours,
+                    minutes,
+                    best_entry['title'],
+                )
 
                 # add best entry to backlog (backlog is able to handle duplicate adds)
                 plugin.get('backlog', self).add_backlog(task, best_entry, session=session)
@@ -134,7 +163,9 @@ class FilterTimeFrame(object):
         if not config:
             return
 
-        identified_by = '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
+        identified_by = (
+            '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
+        )
 
         grouped_entries = group_entries(task.accepted, identified_by)
         if not grouped_entries:
@@ -142,7 +173,11 @@ class FilterTimeFrame(object):
 
         with Session() as session:
             # Prefetch Data
-            existing_ids = session.query(EntryTimeFrame).filter(EntryTimeFrame.id.in_(grouped_entries.keys())).all()
+            existing_ids = (
+                session.query(EntryTimeFrame)
+                .filter(EntryTimeFrame.id.in_(grouped_entries.keys()))
+                .all()
+            )
             existing_ids = {e.id: e for e in existing_ids}
 
             for identifier, entries in grouped_entries.items():

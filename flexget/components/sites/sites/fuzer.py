@@ -112,7 +112,7 @@ class UrlRewriteFuzer(object):
 
             e['torrent_seeds'] = seeders
             e['torrent_leeches'] = leechers
-            e['torrent_availibility'] = torrent_availability(
+            e['torrent_availability'] = torrent_availability(
                 e['torrent_seeds'], e['torrent_leeches']
             )
 

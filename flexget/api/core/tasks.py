@@ -12,8 +12,15 @@ from flask_restplus import inputs
 from queue import Queue, Empty
 
 from flexget.api import api, APIResource
-from flexget.api.app import APIError, NotFoundError, Conflict, BadRequest, success_response, \
-    base_message_schema, etag
+from flexget.api.app import (
+    APIError,
+    NotFoundError,
+    Conflict,
+    BadRequest,
+    success_response,
+    base_message_schema,
+    etag,
+)
 from flexget.config_schema import process_config
 from flexget.entry import Entry
 from flexget.event import event
@@ -28,21 +35,18 @@ tasks_api = api.namespace('tasks', description='Manage Tasks')
 
 
 class ObjectsContainer(object):
-    tasks_list_object = {'oneOf': [
-        {'type': 'array',
-         'items': {'$ref': '#/definitions/tasks.task'}},
-        {'type': 'array', 'items': {'type': 'string'}}
-    ]
+    tasks_list_object = {
+        'oneOf': [
+            {'type': 'array', 'items': {'$ref': '#/definitions/tasks.task'}},
+            {'type': 'array', 'items': {'type': 'string'}},
+        ]
     }
 
     task_input_object = {
         'type': 'object',
-        'properties': {
-            'name': {'type': 'string'},
-            'config': {'$ref': '/schema/plugins'}
-        },
+        'properties': {'name': {'type': 'string'}, 'config': {'$ref': '/schema/plugins'}},
         'required': ['name', 'config'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     task_return_object = copy.deepcopy(task_input_object)
@@ -57,7 +61,8 @@ class ObjectsContainer(object):
                 'name': {'type': 'string'},
                 'current_phase': {'type': ['string', 'null']},
                 'current_plugin': {'type': ['string', 'null']},
-            }}
+            },
+        },
     }
 
     task_execution_results_schema = {
@@ -74,11 +79,14 @@ class ObjectsContainer(object):
                             'progress': {
                                 'type': 'object',
                                 'properties': {
-                                    'status': {'type': 'string', 'enum': ['pending', 'running', 'complete']},
+                                    'status': {
+                                        'type': 'string',
+                                        'enum': ['pending', 'running', 'complete'],
+                                    },
                                     'phase': {'type': 'string', 'enum': task_phases},
                                     'plugin': {'type': 'string'},
-                                    'percent': {'type': 'float'}
-                                }
+                                    'percent': {'type': 'float'},
+                                },
                             },
                             'summary': {
                                 'type': 'object',
@@ -89,64 +97,74 @@ class ObjectsContainer(object):
                                     'undecided': {'type': 'integer'},
                                     'aborted': {'type': 'boolean'},
                                     'abort_reason': {'type': 'string'},
-                                }
+                                },
                             },
                             'entry_dump': {'type': 'array', 'items': {'type': 'object'}},
-                            'log': {'type': 'string'}
-                        }
-                    }
-                }
+                            'log': {'type': 'string'},
+                        },
+                    },
+                },
             }
-        }
+        },
     }
 
     inject_input = {
         'type': 'object',
         'properties': {
-            'title': {'type': 'string',
-                      'description': 'Title of the entry. If not supplied it will be attempted to retrieve it from '
-                                     'URL headers'},
-            'url': {'type': 'string',
-                    'format': 'url',
-                    'description': 'URL of the entry'},
-            'force': {'type': 'boolean',
-                      'description': 'Prevent any plugins from rejecting this entry'},
-            'accept': {'type': 'boolean',
-                       'description': 'Accept this entry immediately upon injection (disregard task filters)'},
-            'fields': {'type': 'object',
-                       'description': 'A array of objects that can contain any other value for the entry'}
+            'title': {
+                'type': 'string',
+                'description': 'Title of the entry. If not supplied it will be attempted to retrieve it from '
+                'URL headers',
+            },
+            'url': {'type': 'string', 'format': 'url', 'description': 'URL of the entry'},
+            'force': {
+                'type': 'boolean',
+                'description': 'Prevent any plugins from rejecting this entry',
+            },
+            'accept': {
+                'type': 'boolean',
+                'description': 'Accept this entry immediately upon injection (disregard task filters)',
+            },
+            'fields': {
+                'type': 'object',
+                'description': 'A array of objects that can contain any other value for the entry',
+            },
         },
-        'required': ['url']
+        'required': ['url'],
     }
 
     task_execution_input = {
         'type': 'object',
         'properties': {
-            'tasks': {'type': 'array',
-                      'items': {'type': 'string'},
-                      'minItems': 1,
-                      'uniqueItems': True},
+            'tasks': {
+                'type': 'array',
+                'items': {'type': 'string'},
+                'minItems': 1,
+                'uniqueItems': True,
+            },
             'progress': {
                 'type': 'boolean',
                 'default': True,
-                'description': 'Include task progress updates'},
-            'summary': {
-                'type': 'boolean',
-                'default': True,
-                'description': 'Include task summary'},
+                'description': 'Include task progress updates',
+            },
+            'summary': {'type': 'boolean', 'default': True, 'description': 'Include task summary'},
             'entry_dump': {
                 'type': 'boolean',
                 'default': True,
-                'description': 'Include dump of entries including fields'},
-            'inject': {'type': 'array',
-                       'items': inject_input,
-                       'description': 'A List of entry objects'},
-            'loglevel': {'type': 'string',
-                         'description': 'Specify log level',
-                         'enum': ['critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace']}
+                'description': 'Include dump of entries including fields',
+            },
+            'inject': {
+                'type': 'array',
+                'items': inject_input,
+                'description': 'A List of entry objects',
+            },
+            'loglevel': {
+                'type': 'string',
+                'description': 'Specify log level',
+                'enum': ['critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'],
+            },
         },
-        'required': ['tasks']
-
+        'required': ['tasks'],
     }
 
     params_return_schema = {'type': 'array', 'items': {'type': 'object'}}
@@ -156,14 +174,24 @@ tasks_list_schema = api.schema_model('tasks.list', ObjectsContainer.tasks_list_o
 task_input_schema = api.schema_model('tasks.task', ObjectsContainer.task_input_object)
 task_return_schema = api.schema_model('tasks.task', ObjectsContainer.task_return_object)
 task_api_queue_schema = api.schema_model('task.queue', ObjectsContainer.task_queue_schema)
-task_api_execute_schema = api.schema_model('task.execution', ObjectsContainer.task_execution_results_schema)
-task_execution_schema = api.schema_model('task_execution_input', ObjectsContainer.task_execution_input)
-task_execution_params = api.schema_model('tasks.execution_params', ObjectsContainer.params_return_schema)
+task_api_execute_schema = api.schema_model(
+    'task.execution', ObjectsContainer.task_execution_results_schema
+)
+task_execution_schema = api.schema_model(
+    'task_execution_input', ObjectsContainer.task_execution_input
+)
+task_execution_params = api.schema_model(
+    'tasks.execution_params', ObjectsContainer.params_return_schema
+)
 
-task_api_desc = 'Task config schema too large to display, you can view the schema using the schema API'
+task_api_desc = (
+    'Task config schema too large to display, you can view the schema using the schema API'
+)
 
 tasks_parser = api.parser()
-tasks_parser.add_argument('include_config', type=inputs.boolean, default=True, help='Include task config')
+tasks_parser.add_argument(
+    'include_config', type=inputs.boolean, default=True, help='Include task config'
+)
 
 
 @tasks_api.route('/')
@@ -175,8 +203,11 @@ class TasksAPI(APIResource):
     def get(self, session=None):
         """ List all tasks """
 
-        active_tasks = {task: task_data for task, task_data in self.manager.user_config.get('tasks', {}).items()
-                        if not task.startswith('_')}
+        active_tasks = {
+            task: task_data
+            for task, task_data in self.manager.user_config.get('tasks', {}).items()
+            if not task.startswith('_')
+        }
 
         args = tasks_parser.parse_args()
         if not args.get('include_config'):
@@ -204,7 +235,9 @@ class TasksAPI(APIResource):
             self.manager.config['tasks'] = {}
 
         task_schema_processed = copy.deepcopy(data)
-        errors = process_config(task_schema_processed, schema=task_input_schema.__schema__, set_defaults=True)
+        errors = process_config(
+            task_schema_processed, schema=task_input_schema.__schema__, set_defaults=True
+        )
 
         if errors:
             raise APIError('problem loading config, raise a BUG as this should not happen!')
@@ -261,7 +294,9 @@ class TaskAPI(APIResource):
 
         # Process the task config
         task_schema_processed = copy.deepcopy(data)
-        errors = process_config(task_schema_processed, schema=task_return_schema.__schema__, set_defaults=True)
+        errors = process_config(
+            task_schema_processed, schema=task_return_schema.__schema__, set_defaults=True
+        )
 
         if errors:
             raise APIError('problem loading config, raise a BUG as this should not happen!')
@@ -272,7 +307,9 @@ class TaskAPI(APIResource):
         self.manager.save_config()
         self.manager.config_changed()
 
-        rsp = jsonify({'name': new_task_name, 'config': self.manager.user_config['tasks'][new_task_name]})
+        rsp = jsonify(
+            {'name': new_task_name, 'config': self.manager.user_config['tasks'][new_task_name]}
+        )
         rsp.status_code = 200
         return rsp
 
@@ -294,15 +331,33 @@ class TaskAPI(APIResource):
 default_start_date = (datetime.now() - timedelta(weeks=1)).strftime('%Y-%m-%d')
 
 status_parser = api.parser()
-status_parser.add_argument('succeeded', type=inputs.boolean, default=True, help='Filter by success status')
-status_parser.add_argument('produced', type=inputs.boolean, default=True, store_missing=False,
-                           help='Filter by tasks that produced entries')
-status_parser.add_argument('start_date', type=inputs.datetime_from_iso8601, default=default_start_date,
-                           help='Filter by minimal start date. Example: \'2012-01-01\'')
-status_parser.add_argument('end_date', type=inputs.datetime_from_iso8601,
-                           help='Filter by maximal end date. Example: \'2012-01-01\'')
-status_parser.add_argument('limit', default=100, type=int,
-                           help='Limit return of executions per task, as that number can be huge')
+status_parser.add_argument(
+    'succeeded', type=inputs.boolean, default=True, help='Filter by success status'
+)
+status_parser.add_argument(
+    'produced',
+    type=inputs.boolean,
+    default=True,
+    store_missing=False,
+    help='Filter by tasks that produced entries',
+)
+status_parser.add_argument(
+    'start_date',
+    type=inputs.datetime_from_iso8601,
+    default=default_start_date,
+    help='Filter by minimal start date. Example: \'2012-01-01\'',
+)
+status_parser.add_argument(
+    'end_date',
+    type=inputs.datetime_from_iso8601,
+    help='Filter by maximal end date. Example: \'2012-01-01\'',
+)
+status_parser.add_argument(
+    'limit',
+    default=100,
+    type=int,
+    help='Limit return of executions per task, as that number can be huge',
+)
 
 
 def _task_info_dict(task):
@@ -363,19 +418,30 @@ class TaskExecutionAPI(APIResource):
         """ Execute task and stream results """
         data = request.json
         for task in data.get('tasks'):
-            if task.lower() not in [t.lower() for t in self.manager.user_config.get('tasks', {}).keys()]:
+            if task.lower() not in [
+                t.lower() for t in self.manager.user_config.get('tasks', {}).keys()
+            ]:
                 raise NotFoundError('task %s does not exist' % task)
 
         queue = ExecuteLog()
         output = queue if data.get('loglevel') else None
-        stream = True if any(
-            arg[0] in ['progress', 'summary', 'loglevel', 'entry_dump'] for arg in data.items() if arg[1]) else False
+        stream = (
+            True
+            if any(
+                arg[0] in ['progress', 'summary', 'loglevel', 'entry_dump']
+                for arg in data.items()
+                if arg[1]
+            )
+            else False
+        )
         loglevel = data.pop('loglevel', None)
 
         # This emulates the CLI command of using `--now` and `no-cache`
-        options = {'interval_ignore': data.pop('now', None),
-                   'nocache': data.pop('no_cache', None),
-                   'allow_manual': True}
+        options = {
+            'interval_ignore': data.pop('now', None),
+            'nocache': data.pop('no_cache', None),
+            'allow_manual': True,
+        }
 
         for option, value in data.items():
             options[option] = value
@@ -387,10 +453,14 @@ class TaskExecutionAPI(APIResource):
                 entry['url'] = item['url']
                 if not item.get('title'):
                     try:
-                        value, params = cgi.parse_header(requests.head(item['url']).headers['Content-Disposition'])
+                        value, params = cgi.parse_header(
+                            requests.head(item['url']).headers['Content-Disposition']
+                        )
                         entry['title'] = params['filename']
                     except KeyError:
-                        raise BadRequest('No title given, and couldn\'t get one from the URL\'s HTTP response')
+                        raise BadRequest(
+                            'No title given, and couldn\'t get one from the URL\'s HTTP response'
+                        )
 
                 else:
                     entry['title'] = item.get('title')
@@ -410,19 +480,19 @@ class TaskExecutionAPI(APIResource):
 
         for task_id, task_name, task_event in executed_tasks:
             tasks_queued.append({'id': task_id, 'name': task_name, 'event': task_event})
-            _streams[task_id] = {
-                'queue': queue,
-                'last_update': datetime.now(),
-                'args': data
-            }
+            _streams[task_id] = {'queue': queue, 'last_update': datetime.now(), 'args': data}
 
         if not stream:
-            return jsonify({'tasks': [{'id': task['id'], 'name': task['name']} for task in tasks_queued]})
+            return jsonify(
+                {'tasks': [{'id': task['id'], 'name': task['name']} for task in tasks_queued]}
+            )
 
         def stream_response():
             # First return the tasks to execute
             yield '{"stream": ['
-            yield json.dumps({'tasks': [{'id': task['id'], 'name': task['name']} for task in tasks_queued]}) + ',\n'
+            yield json.dumps(
+                {'tasks': [{'id': task['id'], 'name': task['name']} for task in tasks_queued]}
+            ) + ',\n'
 
             while True:
                 try:
@@ -504,7 +574,7 @@ def update_stream(task, status='pending'):
         'status': status,
         'phase': task.current_phase,
         'plugin': task.current_plugin,
-        'percent': task.stream.get('percent', 0)
+        'percent': task.stream.get('percent', 0),
     }
 
     task.stream['queue'].put(json.dumps({'progress': progress}))
@@ -529,16 +599,20 @@ def finish_task(task):
             task.stream['queue'].put(EntryDecoder().encode({'entry_dump': entries}))
 
         if task.stream['args'].get('summary'):
-            task.stream['queue'].put(json.dumps({
-                'summary': {
-                    'accepted': len(task.accepted),
-                    'rejected': len(task.rejected),
-                    'failed': len(task.failed),
-                    'undecided': len(task.undecided),
-                    'aborted': task.aborted,
-                    'abort_reason': task.abort_reason,
-                }
-            }))
+            task.stream['queue'].put(
+                json.dumps(
+                    {
+                        'summary': {
+                            'accepted': len(task.accepted),
+                            'rejected': len(task.rejected),
+                            'failed': len(task.failed),
+                            'undecided': len(task.undecided),
+                            'aborted': task.aborted,
+                            'abort_reason': task.abort_reason,
+                        }
+                    }
+                )
+            )
 
 
 @event('task.execute.before_plugin')

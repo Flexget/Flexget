@@ -52,12 +52,18 @@ def upgrade(ver, session):
         for row in session.execute(select([table.c.id, table.c.entry])):
             try:
                 p = pickle.loads(row['entry'])
-                session.execute(table.update().where(table.c.id == row['id']).values(
-                    json=json.dumps(p, encode_datetime=True)))
+                session.execute(
+                    table.update()
+                    .where(table.c.id == row['id'])
+                    .values(json=json.dumps(p, encode_datetime=True))
+                )
             except (KeyError, ImportError):
                 failures += 1
         if failures > 0:
-            log.error('Error upgrading %s pickle objects. Some delay information has been lost.' % failures)
+            log.error(
+                'Error upgrading %s pickle objects. Some delay information has been lost.'
+                % failures
+            )
         ver = 2
 
     return ver
@@ -95,9 +101,12 @@ class FilterDelay(object):
         for entry in task.entries:
             log.debug('Delaying %s' % entry['title'])
             # check if already in queue
-            if not task.session.query(DelayedEntry). \
-                    filter(DelayedEntry.title == entry['title']). \
-                    filter(DelayedEntry.task == task.name).first():
+            if (
+                not task.session.query(DelayedEntry)
+                .filter(DelayedEntry.title == entry['title'])
+                .filter(DelayedEntry.task == task.name)
+                .first()
+            ):
                 delay_entry = DelayedEntry()
                 delay_entry.title = entry['title']
                 delay_entry.entry = entry
@@ -109,9 +118,11 @@ class FilterDelay(object):
         task.all_entries[:] = []
 
         # Generate the list of entries whose delay has passed
-        passed_delay = task.session.query(DelayedEntry). \
-            filter(datetime.now() > DelayedEntry.expire). \
-            filter(DelayedEntry.task == task.name)
+        passed_delay = (
+            task.session.query(DelayedEntry)
+            .filter(datetime.now() > DelayedEntry.expire)
+            .filter(DelayedEntry.task == task.name)
+        )
         delayed_entries = [item.entry for item in passed_delay.all()]
         for entry in delayed_entries:
             entry['passed_delay'] = True

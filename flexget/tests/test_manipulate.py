@@ -64,7 +64,10 @@ class TestManipulate(object):
     def test_replace_with_group(self, execute_task):
         task = execute_task('test_replace_with_group')
         entry = task.all_entries[0]
-        assert entry['title'] == 'e7890', 'Title should have been %s but was %s' % ('e7890', entry['title'])
+        assert entry['title'] == 'e7890', 'Title should have been %s but was %s' % (
+            'e7890',
+            entry['title'],
+        )
 
     def test_extract(self, execute_task):
         task = execute_task('test_2')

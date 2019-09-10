@@ -30,18 +30,17 @@ class OutputAria2(object):
             'server': {'type': 'string', 'default': 'localhost'},
             'port': {'type': 'integer', 'default': 6800},
             'secret': {'type': 'string', 'default': ''},
-            'username': {'type': 'string', 'default': ''}, # NOTE: To be deprecated by aria2
+            'username': {'type': 'string', 'default': ''},  # NOTE: To be deprecated by aria2
             'password': {'type': 'string', 'default': ''},
             'path': {'type': 'string'},
             'filename': {'type': 'string'},
             'options': {
                 'type': 'object',
-                'additionalProperties': {'oneOf': [{'type': 'string'}, {'type': 'integer'}]}
-            }
-
+                'additionalProperties': {'oneOf': [{'type': 'string'}, {'type': 'integer'}]},
+            },
         },
         'required': ['path'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def aria2_connection(self, server, port, username=None, password=None):
@@ -55,13 +54,21 @@ class OutputAria2(object):
         try:
             return xmlrpc.client.ServerProxy(url).aria2
         except xmlrpc.client.ProtocolError as err:
-            raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s'
-                              % (url, err.errcode, err.errmsg), log)
+            raise plugin.PluginError(
+                'Could not connect to aria2 at %s. Protocol error %s: %s'
+                % (url, err.errcode, err.errmsg),
+                log,
+            )
         except xmlrpc.client.Fault as err:
-            raise plugin.PluginError('XML-RPC fault: Unable to connect to aria2 daemon at %s: %s'
-                              % (url, err.faultString), log)
+            raise plugin.PluginError(
+                'XML-RPC fault: Unable to connect to aria2 daemon at %s: %s'
+                % (url, err.faultString),
+                log,
+            )
         except socket_error as e:
-            raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s' % (url, e), log)
+            raise plugin.PluginError(
+                'Socket connection issue with aria2 daemon at %s: %s' % (url, e), log
+            )
         except:
             log.debug('Unexpected error during aria2 connection', exc_info=True)
             raise plugin.PluginError('Unidentified error during connection to aria2 daemon', log)
@@ -80,8 +87,9 @@ class OutputAria2(object):
         if task.options.learn:
             return
         config = self.prepare_config(config)
-        aria2 = self.aria2_connection(config['server'], config['port'],
-                                      config['username'], config['password'])
+        aria2 = self.aria2_connection(
+            config['server'], config['port'], config['username'], config['password']
+        )
         for entry in task.accepted:
             if task.options.test:
                 log.verbose('Would add `%s` to aria2.', entry['title'])
@@ -108,11 +116,11 @@ class OutputAria2(object):
             entry.fail('failed to render \'path\': %s' % e)
             return
         if 'filename' in config:
-             try:
-                 options['out'] = os.path.expanduser(entry.render(config['filename']))
-             except RenderError as e:
-                 entry.fail('failed to render \'filename\': %s' % e)
-                 return
+            try:
+                options['out'] = os.path.expanduser(entry.render(config['filename']))
+            except RenderError as e:
+                entry.fail('failed to render \'filename\': %s' % e)
+                return
         secret = None
         if config['secret']:
             secret = 'token:%s' % config['secret']
@@ -127,8 +135,12 @@ class OutputAria2(object):
                 entry.fail('Cannot find torrent file')
                 return
             if secret:
-                return aria2.addTorrent(secret, xmlrpc.client.Binary(open(torrent_file, mode='rb').read()), [], options)
-            return aria2.addTorrent(xmlrpc.client.Binary(open(torrent_file, mode='rb').read()), [], options)
+                return aria2.addTorrent(
+                    secret, xmlrpc.client.Binary(open(torrent_file, mode='rb').read()), [], options
+                )
+            return aria2.addTorrent(
+                xmlrpc.client.Binary(open(torrent_file, mode='rb').read()), [], options
+            )
         # handle everything else (except metalink -- which is unsupported)
         # so magnets, https, http, ftp .. etc
         if secret:

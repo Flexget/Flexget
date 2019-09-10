@@ -17,11 +17,13 @@ class TestUrlfix(object):
     def test_urlfix(self, execute_task):
         task = execute_task('test')
         entry = task.find_entry('entries', title='Test')
-        assert entry['url'] == 'http://localhost/foo?bar=asdf&xxx=yyy', \
+        assert entry['url'] == 'http://localhost/foo?bar=asdf&xxx=yyy', (
             'failed to auto fix url, got %s' % entry['url']
+        )
 
     def test_urlfix_disabled(self, execute_task):
         task = execute_task('test2')
         entry = task.find_entry('entries', title='Test')
-        assert entry['url'] != 'http://localhost/foo?bar=asdf&xxx=yyy', \
+        assert entry['url'] != 'http://localhost/foo?bar=asdf&xxx=yyy', (
             'fixed even when disabled, got %s' % entry['url']
+        )

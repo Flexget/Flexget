@@ -67,7 +67,7 @@ class ConvertMagnet(object):
         config.setdefault('force', False)
         return config
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_start(self, task, config):
         if config is False:
             return

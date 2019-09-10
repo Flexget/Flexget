@@ -17,12 +17,12 @@ from . import db
 
 
 log = logging.getLogger('trakt_list')
-IMMUTABLE_LISTS = []
+IMMUTABLE_LISTS = ['trending', 'popular']
 
 
 def generate_show_title(item):
     show_info = item['show']
-    if show_info['year']:
+    if show_info['year'] and not item['strip_dates']:
         return '%s (%s)' % (show_info['title'], show_info['year'])
     else:
         return show_info['title']
@@ -31,7 +31,7 @@ def generate_show_title(item):
 def generate_episode_title(item):
     show_info = item['show']
     episode_info = item['episode']
-    if show_info['year']:
+    if show_info['year'] and not item['strip_dates']:
         return (
             '%s (%s) S%02dE%02d %s'
             % (
@@ -57,7 +57,7 @@ def generate_episode_title(item):
 field_maps = {
     'movie': {
         'title': lambda i: '%s (%s)' % (i['movie']['title'], i['movie']['year'])
-        if i['movie']['year']
+        if i['movie']['year'] and not i['strip_dates']
         else '%s' % i['movie']['title'],
         'movie_name': 'movie.title',
         'movie_year': 'movie.year',
@@ -117,10 +117,15 @@ class TraktSet(MutableSet):
                 'default': 'auto',
             },
             'strip_dates': {'type': 'boolean', 'default': False},
-            'language': {'type': 'string', 'minLength': 2, 'maxLength': 2},
+            'language': {'type': 'string', 'minLength': 2, 'maxLength': 2}
         },
         'required': ['list'],
-        'anyOf': [{'required': ['username']}, {'required': ['account']}],
+        'anyOf': [
+            {'required': ['username']},
+            {'required': ['account']},
+            # The 'trending' and 'popular' lists don't require an username
+            {'properties': {'list': {'enum': ['trending', 'popular']}}},
+        ],
         'error_anyOf': 'At least one of `username` or `account` options are needed.',
         'additionalProperties': False,
     }
@@ -132,7 +137,7 @@ class TraktSet(MutableSet):
         self.session = db.get_session(self.config.get('account'))
         # Lists may not have modified results if modified then accessed in quick succession.
         self.session.add_domain_limiter(TimedLimiter('trakt.tv', '2 seconds'))
-        self._items = None
+        self._cached_items = None
 
     def __iter__(self):
         return iter(self.items)
@@ -172,161 +177,141 @@ class TraktSet(MutableSet):
         if self.items:
             for item in self.items:
                 self.discard(item)
-            self._items = None
+            self._cached_items = None
 
     def get(self, entry):
         return self._find_entry(entry)
 
     # -- Public interface ends here -- #
 
-    @property
-    def items(self):
-        if self._items is None:
-            if self.config['list'] in ['collection', 'watched'] and self.config['type'] == 'auto':
-                raise plugin.PluginError(
-                    '`type` cannot be `auto` for %s list.' % self.config['list']
+    def get_items(self):
+        """Iterator over etrieved itesms from the trakt api."""
+        if self.config['list'] in ['collection', 'watched', 'trending', 'popular'] and self.config['type'] == 'auto':
+            raise plugin.PluginError(
+                '`type` cannot be `auto` for %s list.' % self.config['list']
+            )
+
+        limit_per_page = 1000
+
+        endpoint = self.get_list_endpoint()
+
+        list_type = (self.config['type']).rstrip('s')
+
+        log.verbose('Retrieving `%s` list `%s`', self.config['type'], self.config['list'])
+        try:
+            page = 1
+            collecting_finished = False
+            while not collecting_finished:
+                result = self.session.get(
+                    db.get_api_url(endpoint), params={'limit': limit_per_page, 'page': page}
                 )
+                page = int(result.headers.get('X-Pagination-Page', 1))
+                number_of_pages = int(result.headers.get('X-Pagination-Page-Count', 1))
+                if page == 2:
+                    # If there is more than one page (more than 1000 items) warn user they may want to limit
+                    log.verbose('There are a large number of items in trakt `%s` list. You may want to enable `limit`'
+                                ' plugin to reduce the amount of entries in this task.', self.config['list'])
 
-            endpoint = self.get_list_endpoint()
+                collecting_finished = page >= number_of_pages
+                page += 1
 
-            log.verbose('Retrieving `%s` list `%s`', self.config['type'], self.config['list'])
-            try:
-                result = self.session.get(db.get_api_url(endpoint))
                 try:
-                    data = result.json()
+                    trakt_items = result.json()
                 except ValueError:
-                    log.debug('Could not decode json from response: %s', result.text)
+                    log.debug(
+                        'Could not decode json from response: %s', result.text
+                    )
                     raise plugin.PluginError('Error getting list from trakt.')
-
-                current_page = int(result.headers.get('X-Pagination-Page', 1))
-                current_page_count = int(result.headers.get('X-Pagination-Page-Count', 1))
-                if current_page < current_page_count:
-                    # Pagination, gotta get it all, but we'll limit it to 1000 per page
-                    # but we'll have to start over from 0
-                    data = []
-
-                    limit = 1000
-                    pagination_item_count = int(result.headers.get('X-Pagination-Item-Count', 0))
-                    number_of_pages = math.ceil(pagination_item_count / limit)
-                    log.debug(
-                        'Response is paginated. Number of items: %s, number of pages: %s',
-                        pagination_item_count,
-                        number_of_pages,
+                if not trakt_items:
+                    log.warning(
+                        'No data returned from trakt for %s list %s.',
+                        self.config['type'],
+                        self.config['list'],
                     )
-                    page = int(result.headers.get('X-Pagination-Page'))
-                    while page <= number_of_pages:
-                        paginated_result = self.session.get(
-                            db.get_api_url(endpoint), params={'limit': limit, 'page': page}
+                    return
+
+                for item in trakt_items:
+                    if self.config['type'] == 'auto':
+                        list_type = item['type']
+                    if self.config['list'] == 'popular':
+                        item = {list_type: item}
+                    # Collection and watched lists don't return 'type' along with the items (right now)
+                    if 'type' in item and item['type'] != list_type:
+                        log.debug(
+                            'Skipping %s because it is not a %s',
+                            item[item['type']].get('title', 'unknown'),
+                            list_type,
                         )
-                        page += 1
-                        try:
-                            data.extend(paginated_result.json())
-                        except ValueError:
-                            log.debug(
-                                'Could not decode json from response: %s', paginated_result.text
-                            )
-                            raise plugin.PluginError('Error getting list from trakt.')
-
-            except RequestException as e:
-                raise plugin.PluginError('Could not retrieve list from trakt (%s)' % e)
-
-            if not data:
-                log.warning(
-                    'No data returned from trakt for %s list %s.',
-                    self.config['type'],
-                    self.config['list'],
-                )
-                return []
-
-            entries = []
-            list_type = (self.config['type']).rstrip('s')
-            for item in data:
-                if self.config['type'] == 'auto':
-                    list_type = item['type']
-                # Collection and watched lists don't return 'type' along with the items (right now)
-                if 'type' in item and item['type'] != list_type:
-                    log.debug(
-                        'Skipping %s because it is not a %s',
-                        item[item['type']].get('title', 'unknown'),
-                        list_type,
-                    )
-                    continue
-                if list_type != 'episode' and not item[list_type]['title']:
-                    # Skip shows/movies with no title
-                    log.warning('Item in trakt list does not appear to have a title, skipping.')
-                    continue
-                entry = Entry()
-                if list_type == 'episode':
-                    entry['url'] = 'https://trakt.tv/shows/%s/seasons/%s/episodes/%s' % (
-                        item['show']['ids']['slug'],
-                        item['episode']['season'],
-                        item['episode']['number'],
-                    )
-                else:
-                    entry['url'] = 'https://trakt.tv/%ss/%s' % (
-                        list_type,
-                        item[list_type]['ids'].get('slug'),
-                    )
-
-                entry.update_using_map(field_maps[list_type], item)
-
-                # get movie name translation
-                language = self.config.get('language')
-                if list_type == 'movie' and language:
-                    endpoint = ['movies', entry['trakt_movie_id'], 'translations', language]
-                    try:
-                        result = self.session.get(db.get_api_url(endpoint))
-                        try:
-                            translation = result.json()
-                        except ValueError:
-                            raise plugin.PluginError(
-                                'Error decoding movie translation from trakt: %s.' % result.text
-                            )
-                    except RequestException as e:
-                        raise plugin.PluginError(
-                            'Could not retrieve movie translation from trakt: %s' % str(e)
-                        )
-                    if not translation:
-                        log.warning(
-                            'No translation data returned from trakt for movie %s.', entry['title']
+                        continue
+                    if list_type != 'episode' and not item[list_type]['title']:
+                        # Skip shows/movies with no title
+                        log.warning('Item in trakt list does not appear to have a title, skipping.')
+                        continue
+                    entry = Entry()
+                    if list_type == 'episode':
+                        entry['url'] = 'https://trakt.tv/shows/%s/seasons/%s/episodes/%s' % (
+                            item['show']['ids']['slug'],
+                            item['episode']['season'],
+                            item['episode']['number'],
                         )
                     else:
-                        log.verbose(
-                            'Found `%s` translation for movie `%s`: %s',
-                            language,
-                            entry['movie_name'],
-                            translation[0]['title'],
+                        entry['url'] = 'https://trakt.tv/%ss/%s' % (
+                            list_type,
+                            item[list_type]['ids'].get('slug'),
                         )
-                        entry['title'] = translation[0]['title']
-                        if entry.get('movie_year'):
-                            entry['title'] += ' (' + str(entry['movie_year']) + ')'
-                        entry['movie_name'] = translation[0]['title']
 
-                # Override the title if strip_dates is on. TODO: a better way?
-                if self.config.get('strip_dates'):
-                    if list_type in ['show', 'movie']:
-                        entry['title'] = item[list_type]['title']
-                    elif list_type == 'episode':
-                        entry[
-                            'title'
-                        ] = '{show[title]} S{episode[season]:02}E{episode[number]:02}'.format(
-                            **item
-                        )
-                        if item['episode']['title']:
-                            entry['title'] += ' {episode[title]}'.format(**item)
-                if entry.isvalid():
-                    if self.config.get('strip_dates'):
-                        # Remove year from end of name if present
-                        entry['title'] = split_title_year(entry['title'])[0]
-                    entries.append(entry)
-                else:
-                    log.debug('Invalid entry created? %s', entry)
+                    # Pass the strip dates option in so it can be used in the update maps
+                    item['strip_dates'] = self.config.get('strip_dates')
+                    entry.update_using_map(field_maps[list_type], item)
 
-            self._items = entries
-        return self._items
+                    # get movie name translation
+                    language = self.config.get('language')
+                    if list_type == 'movie' and language:
+                        endpoint = ['movies', entry['trakt_movie_id'], 'translations', language]
+                        try:
+                            result = self.session.get(db.get_api_url(endpoint))
+                            try:
+                                translation = result.json()
+                            except ValueError:
+                                raise plugin.PluginError(
+                                    'Error decoding movie translation from trakt: %s.' % result.text
+                                )
+                        except RequestException as e:
+                            raise plugin.PluginError(
+                                'Could not retrieve movie translation from trakt: %s' % str(e)
+                            )
+                        if not translation:
+                            log.warning(
+                                'No translation data returned from trakt for movie %s.', entry['title']
+                            )
+                        else:
+                            log.verbose(
+                                'Found `%s` translation for movie `%s`: %s',
+                                language,
+                                entry['movie_name'],
+                                translation[0]['title'],
+                            )
+                            entry['title'] = translation[0]['title']
+                            if entry.get('movie_year') and not self.config.get('strip_dates'):
+                                entry['title'] += ' ({})'.format(entry['movie_year'])
+                            entry['movie_name'] = translation[0]['title']
+
+                    if entry.isvalid():
+                        yield entry
+                    else:
+                        log.debug('Invalid entry created? %s', entry)
+
+        except RequestException as e:
+            raise plugin.PluginError('Could not retrieve list from trakt (%s)' % e)
+
+    @property
+    def items(self):
+        if self._cached_items is None:
+            self._cached_items = list(self.get_items())
+        return self._cached_items
 
     def invalidate_cache(self):
-        self._items = None
+        self._cached_items = None
 
     def get_list_endpoint(self, remove=False, submit=False):
         if (
@@ -358,6 +343,11 @@ class TraktSet(MutableSet):
                     self.config['username'],
                     self.config['list'],
                     self.config['type'],
+                )
+        elif self.config['list'] in ['trending', 'popular']:
+                endpoint = (
+                    self.config['type'],
+                    self.config['list'],
                 )
         else:
             endpoint = (
@@ -507,7 +497,8 @@ class TraktList(object):
     # TODO: we should somehow invalidate this cache when the list is modified
     @cached('trakt_list', persist='2 hours')
     def on_task_input(self, task, config):
-        return list(TraktSet(config))
+        # We use the generator here rather than the cached list in case limit plugin is used.
+        return TraktSet(config).get_items()
 
 
 @event('plugin.register')

@@ -44,8 +44,10 @@ def register_web_ui(mgr):
 
     if not os.path.exists(ui_dist):
         exists = False
-        log.fatal('Failed to start web ui,'
-                  ' this can happen if you are running from GitHub version and forgot to run the web ui build, '
-                  'see http://flexget.com/wiki/Web-UI/v2 for instructions')
+        log.fatal(
+            'Failed to start web ui,'
+            ' this can happen if you are running from GitHub version and forgot to run the web ui build, '
+            'see http://flexget.com/wiki/Web-UI/v2 for instructions'
+        )
 
     register_app(webui_app.url_path, webui_app)

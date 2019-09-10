@@ -57,10 +57,16 @@ class TwitterFeed(object):
             'access_token_key': {'type': 'string'},
             'access_token_secret': {'type': 'string'},
             'all_entries': {'type': 'boolean', 'default': True},
-            'tweets': {'type': 'number', 'default': 50}
+            'tweets': {'type': 'number', 'default': 50},
         },
-        'required': ['account', 'consumer_key', 'consumer_secret', 'access_token_secret', 'access_token_key'],
-        'additionalProperties': False
+        'required': [
+            'account',
+            'consumer_key',
+            'consumer_secret',
+            'access_token_secret',
+            'access_token_key',
+        ],
+        'additionalProperties': False,
     }
 
     def on_task_start(self, task, config):
@@ -76,23 +82,29 @@ class TwitterFeed(object):
         log.debug('Looking at twitter account `%s`', account)
 
         try:
-            self.api = twitter.Api(consumer_key=config['consumer_key'],
-                                   consumer_secret=config['consumer_secret'],
-                                   access_token_key=config['access_token_key'],
-                                   access_token_secret=config['access_token_secret'])
+            self.api = twitter.Api(
+                consumer_key=config['consumer_key'],
+                consumer_secret=config['consumer_secret'],
+                access_token_key=config['access_token_key'],
+                access_token_secret=config['access_token_secret'],
+            )
         except twitter.TwitterError as ex:
-            raise plugin.PluginError('Unable to authenticate to twitter for task %s: %s' %
-                                     (task.name, ex))
+            raise plugin.PluginError(
+                'Unable to authenticate to twitter for task %s: %s' % (task.name, ex)
+            )
 
         if config['all_entries']:
-            log.debug('Fetching %d last tweets from %s timeline' %
-                      (config['tweets'], config['account']))
+            log.debug(
+                'Fetching %d last tweets from %s timeline' % (config['tweets'], config['account'])
+            )
             tweets = self.get_tweets(account, number=config['tweets'])
         else:
             # Fetching from where we left off last time
             since_id = task.simple_persistence.get('since_id', None)
             if since_id:
-                log.debug('Fetching from tweet id %d from %s timeline' % (since_id, config['account']))
+                log.debug(
+                    'Fetching from tweet id %d from %s timeline' % (since_id, config['account'])
+                )
                 kwargs = {'since_id': since_id}
             else:
                 log.debug('No since_id, fetching last %d tweets' % config['tweets'])
@@ -122,12 +134,14 @@ class TwitterFeed(object):
         all_tweets = []
         while number > 0:
             try:
-                tweets = self.api.GetUserTimeline(screen_name=account,
-                                                  include_rts=False,
-                                                  exclude_replies=True,
-                                                  count=min(number, CHUNK_SIZE),
-                                                  since_id=since_id,
-                                                  max_id=max_id)
+                tweets = self.api.GetUserTimeline(
+                    screen_name=account,
+                    include_rts=False,
+                    exclude_replies=True,
+                    count=min(number, CHUNK_SIZE),
+                    since_id=since_id,
+                    max_id=max_id,
+                )
             except twitter.TwitterError as e:
                 raise plugin.PluginError('Unable to fetch timeline %s for %s' % (account, e))
 

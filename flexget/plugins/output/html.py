@@ -16,12 +16,9 @@ log = logging.getLogger(PLUGIN_NAME)
 class OutputHtml(object):
     schema = {
         'type': 'object',
-        'properties': {
-            'template': {'type': 'string'},
-            'file': {'type': 'string'}
-        },
+        'properties': {'template': {'type': 'string'}, 'file': {'type': 'string'}},
         'required': ['file'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def on_task_output(self, task, config):

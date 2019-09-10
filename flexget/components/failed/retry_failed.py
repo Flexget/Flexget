@@ -73,7 +73,7 @@ class PluginFailed(object):
             retry_secs = max
         return timedelta(seconds=retry_secs)
 
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_input(self, task, config):
         if config is False:
             return
@@ -114,7 +114,7 @@ class PluginFailed(object):
                 )
             entry.task.rerun(plugin='retry_failed')
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_filter(self, task, config):
         if config is False:
             return

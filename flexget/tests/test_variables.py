@@ -40,7 +40,7 @@ class TestVariablesFromFile(object):
         assert task.accepted[0]['a_field'] == 'first bar then foo end'
 
 
-class TestVariablesFromConfig():
+class TestVariablesFromConfig:
     config = """
       variables:
         mock_entry_list:

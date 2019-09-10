@@ -10,9 +10,16 @@ from flexget.components.thetvdb.api import ObjectsContainer as tvdb
 from flexget.components.tvmaze.api import ObjectsContainer as tvmaze
 from flexget.components.seen.db import SeenEntry
 from flexget.manager import Session
+
 # TODO: would be nicer to import db module
 from flexget.components.series.db import (
-    Series, SeriesTask, Episode, EpisodeRelease, AlternateNames, Season, SeasonRelease
+    Series,
+    SeriesTask,
+    Episode,
+    EpisodeRelease,
+    AlternateNames,
+    Season,
+    SeasonRelease,
 )
 from flexget.utils import json
 
@@ -245,8 +252,7 @@ class TestSeriesRootAPI(object):
         errors = schema_match(base_message, data)
         assert not errors
 
-        payload2 = {'name': 'test series 2',
-                    'begin_episode': 'bla'}
+        payload2 = {'name': 'test series 2', 'begin_episode': 'bla'}
 
         # Invalid begin episode
         rsp = api_client.json_post('/series/', data=json.dumps(payload2))
@@ -256,11 +262,11 @@ class TestSeriesRootAPI(object):
         errors = schema_match(base_message, data)
         assert not errors
 
-        payload3 = {'name': 'test series 2',
-                    'begin_episode': 's01e01',
-                    'alternate_names': [
-                        'show1', 'show2'
-                    ]}
+        payload3 = {
+            'name': 'test series 2',
+            'begin_episode': 's01e01',
+            'alternate_names': ['show1', 'show2'],
+        }
 
         # Maximal payload
         rsp = api_client.json_post('/series/', data=json.dumps(payload3))
@@ -274,8 +280,7 @@ class TestSeriesRootAPI(object):
         assert data['alternate_names'] == payload3['alternate_names']
         assert data['begin_episode']['identifier'].lower() == payload3['begin_episode']
 
-        payload4 = {'name': 'test series 3',
-                    'alternate_names': ['show1']}
+        payload4 = {'name': 'test series 3', 'alternate_names': ['show1']}
 
         # Alternate name already added to different show
         rsp = api_client.json_post('/series/', data=json.dumps(payload4))
@@ -394,8 +399,7 @@ class TestSeriesSingleAPI(object):
         errors = schema_match(base_message, data)
         assert not errors
 
-        payload1 = {'begin_episode': 's01e01',
-                    'alternate_names': ['show1']}
+        payload1 = {'begin_episode': 's01e01', 'alternate_names': ['show1']}
 
         rsp = api_client.json_put('/series/1/', data=json.dumps(payload1))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code

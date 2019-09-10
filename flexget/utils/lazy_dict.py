@@ -26,6 +26,7 @@ class LazyLookup(object):
 
     def __getitem__(self, key):
         from flexget.plugin import PluginError
+
         while self.store.is_lazy(key):
             index = next((i for i, keys in enumerate(self.key_list) if key in keys), None)
             if index is None:
@@ -40,6 +41,7 @@ class LazyLookup(object):
             except Exception as e:
                 log.error('Unhandled error in lazy lookup plugin: %s', e)
                 from flexget.manager import manager
+
                 if manager:
                     manager.crash_report()
                 else:
@@ -51,7 +53,6 @@ class LazyLookup(object):
 
 
 class LazyDict(MutableMapping):
-
     def __init__(self, *args, **kwargs):
         self.store = dict(*args, **kwargs)
 

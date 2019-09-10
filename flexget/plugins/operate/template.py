@@ -32,24 +32,25 @@ class PluginTemplate(object):
             {
                 'description': 'Apply multiple templates to this task.',
                 'type': 'array',
-                'items': {'$ref': '#/definitions/template'}},
+                'items': {'$ref': '#/definitions/template'},
+            },
             {
                 'description': 'Apply a single template to this task.',
-                'allOf': [{'$ref': '#/definitions/template'}]
+                'allOf': [{'$ref': '#/definitions/template'}],
             },
             {
                 'description': 'Disable all templates on this task.',
                 'type': 'boolean',
-                'enum': [False]
-            }
+                'enum': [False],
+            },
         ],
         'definitions': {
             'template': {
                 'type': 'string',
                 'description': 'Name of a template which will be applied to this task.',
-                'links': [{'rel': 'settings', 'href': '/api/config/templates/{$}'}]
+                'links': [{'rel': 'settings', 'href': '/api/config/templates/{$}'}],
             }
-        }
+        },
     }
 
     def prepare_config(self, config):
@@ -85,7 +86,9 @@ class PluginTemplate(object):
             if template not in toplevel_templates:
                 if template == 'global':
                     continue
-                raise plugin.PluginError('Unable to find template %s for task %s' % (template, task.name), log)
+                raise plugin.PluginError(
+                    'Unable to find template %s for task %s' % (template, task.name), log
+                )
             if toplevel_templates[template] is None:
                 log.warning('Template `%s` is empty. Nothing to merge.' % template)
                 continue
@@ -110,8 +113,10 @@ class PluginTemplate(object):
             try:
                 task.merge_config(template_config)
             except MergeException as exc:
-                raise plugin.PluginError('Failed to merge template %s to task %s. Error: %s' %
-                                         (template, task.name, exc.value))
+                raise plugin.PluginError(
+                    'Failed to merge template %s to task %s. Error: %s'
+                    % (template, task.name, exc.value)
+                )
 
         log.trace('templates: %s', config)
 
@@ -125,12 +130,13 @@ def register_plugin():
 def register_config():
     root_config_schema = {
         'type': 'object',
-        'additionalProperties': plugin.plugin_schemas(interface='task')
+        'additionalProperties': plugin.plugin_schemas(interface='task'),
     }
     register_config_key('templates', root_config_schema)
 
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('-T', '--template', metavar='NAME',
-                                               help='execute tasks using given template')
+    options.get_parser('execute').add_argument(
+        '-T', '--template', metavar='NAME', help='execute tasks using given template'
+    )

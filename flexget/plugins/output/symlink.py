@@ -21,10 +21,10 @@ class Symlink(object):
                 'properties': {
                     'to': {'type': 'string', 'format': 'path'},
                     'existing': {'type': 'string', 'enum': ['ignore', 'fail']},
-                    'link_type': {'type': 'string', 'enum': ['soft', 'hard']}
+                    'link_type': {'type': 'string', 'enum': ['soft', 'hard']},
                 },
                 'required': ['to'],
-                'additionalProperties': False
+                'additionalProperties': False,
             },
             {'title': 'specify path', 'type': 'string', 'format': 'path'},
         ]
@@ -59,7 +59,9 @@ class Symlink(object):
                 entry.fail(str(error))
                 return
             # Hardlinks for dirs will not be failed here
-            if os.path.exists(lnkto) and (config['link_type'] == 'soft' or os.path.isfile(lnkfrom)):
+            if os.path.exists(lnkto) and (
+                config['link_type'] == 'soft' or os.path.isfile(lnkfrom)
+            ):
                 msg = 'Symlink destination %s already exists' % lnkto
                 if existing == 'ignore':
                     log.verbose(msg)

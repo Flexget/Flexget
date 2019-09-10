@@ -64,12 +64,12 @@ class PluginDownload(object):
                     'fail_html': {'type': 'boolean', 'default': True},
                     'overwrite': {'type': 'boolean', 'default': False},
                     'temp': {'type': 'string', 'format': 'path'},
-                    'filename': {'type': 'string'}
+                    'filename': {'type': 'string'},
                 },
-                'additionalProperties': False
+                'additionalProperties': False,
             },
             {'title': 'specify path', 'type': 'string', 'format': 'path'},
-            {'title': 'no options', 'type': 'boolean', 'enum': [True]}
+            {'title': 'no options', 'type': 'boolean', 'enum': [True]},
         ]
     }
 
@@ -90,11 +90,22 @@ class PluginDownload(object):
         # set temporary download path based on user's config setting or use fallback
         tmp = config.get('temp', os.path.join(task.manager.config_base, 'temp'))
 
-        self.get_temp_files(task, require_path=config.get('require_path', False), fail_html=config['fail_html'],
-                            tmp_path=tmp)
+        self.get_temp_files(
+            task,
+            require_path=config.get('require_path', False),
+            fail_html=config['fail_html'],
+            tmp_path=tmp,
+        )
 
-    def get_temp_file(self, task, entry, require_path=False, handle_magnets=False, fail_html=True,
-                      tmp_path=tempfile.gettempdir()):
+    def get_temp_file(
+        self,
+        task,
+        entry,
+        require_path=False,
+        handle_magnets=False,
+        fail_html=True,
+        tmp_path=tempfile.gettempdir(),
+    ):
         """
         Download entry content and store in temporary folder.
         Fails entry with a reason if there was problem.
@@ -134,7 +145,10 @@ class PluginDownload(object):
             # disallow html content
             html_mimes = ['html', 'text/html']
             if entry.get('mime-type') in html_mimes and fail_html:
-                error = 'Unexpected html content received from `%s` - maybe a login page?' % entry['url']
+                error = (
+                    'Unexpected html content received from `%s` - maybe a login page?'
+                    % entry['url']
+                )
                 self.cleanup_temp_file(entry)
 
             if not error:
@@ -157,12 +171,20 @@ class PluginDownload(object):
         if not os.path.isdir(received):
             os.makedirs(received)
         filename = os.path.join(received, pathscrub('%s.error' % entry['title'], filename=True))
-        log.error('Error retrieving %s, the error page has been saved to %s', entry['title'], filename)
+        log.error(
+            'Error retrieving %s, the error page has been saved to %s', entry['title'], filename
+        )
         with io.open(filename, 'wb') as outfile:
             outfile.write(page)
 
-    def get_temp_files(self, task, require_path=False, handle_magnets=False, fail_html=True,
-                       tmp_path=tempfile.gettempdir()):
+    def get_temp_files(
+        self,
+        task,
+        require_path=False,
+        handle_magnets=False,
+        fail_html=True,
+        tmp_path=tempfile.gettempdir(),
+    ):
         """Download all task content and store in temporary folder.
 
         :param bool require_path:
@@ -230,12 +252,18 @@ class PluginDownload(object):
         auth = None
         if 'download_auth' in entry:
             auth = entry['download_auth']
-            log.debug('Custom auth enabled for %s download: %s', entry['title'], entry['download_auth'])
+            log.debug(
+                'Custom auth enabled for %s download: %s', entry['title'], entry['download_auth']
+            )
 
         headers = task.requests.headers
         if 'download_headers' in entry:
             headers.update(entry['download_headers'])
-            log.debug('Custom headers enabled for %s download: %s', entry['title'], entry['download_headers'])
+            log.debug(
+                'Custom headers enabled for %s download: %s',
+                entry['title'],
+                entry['download_headers'],
+            )
 
         try:
             response = task.requests.get(url, auth=auth, raise_status=False, headers=headers)
@@ -346,7 +374,11 @@ class PluginDownload(object):
             filename = decode_html(filename)
             log.debug('Found filename from headers: %s', filename)
             if 'filename' in entry:
-                log.debug('Overriding filename %s with %s from content-disposition', entry['filename'], filename)
+                log.debug(
+                    'Overriding filename %s with %s from content-disposition',
+                    entry['filename'],
+                    filename,
+                )
             entry['filename'] = filename
 
     def filename_ext_from_mime(self, entry):
@@ -388,7 +420,9 @@ class PluginDownload(object):
 
         if 'file' not in entry and not task.options.test:
             log.debug('file missing, entry: %s', entry)
-            raise plugin.PluginError('Entry `%s` has no temp file associated with' % entry['title'])
+            raise plugin.PluginError(
+                'Entry `%s` has no temp file associated with' % entry['title']
+            )
 
         try:
             # use path from entry if has one, otherwise use from download definition parameter
@@ -428,7 +462,9 @@ class PluginDownload(object):
             # check that temp file is present
             if not os.path.exists(entry['file']):
                 log.debug('entry: %s', entry)
-                raise plugin.PluginWarning('Downloaded temp file `%s` doesn\'t exist!?' % entry['file'])
+                raise plugin.PluginWarning(
+                    'Downloaded temp file `%s` doesn\'t exist!?' % entry['file']
+                )
 
             if config.get('filename'):
                 try:
@@ -442,7 +478,9 @@ class PluginDownload(object):
                 entry['filename'] = entry['title']
                 log.debug('set filename from title %s', entry['filename'])
                 if 'mime-type' not in entry:
-                    log.warning('Unable to figure proper filename for %s. Using title.', entry['title'])
+                    log.warning(
+                        'Unable to figure proper filename for %s. Using title.', entry['title']
+                    )
                 else:
                     guess = mimetypes.guess_extension(entry['mime-type'])
                     if not guess:
@@ -465,12 +503,15 @@ class PluginDownload(object):
 
             if os.path.exists(destfile):
                 import filecmp
+
                 if filecmp.cmp(entry['file'], destfile):
                     log.debug("Identical destination file '%s' already exists", destfile)
                 elif config.get('overwrite'):
                     log.debug("Overwriting already existing file %s", destfile)
                 else:
-                    log.info('File `%s` already exists and is not identical, download failed.', destfile)
+                    log.info(
+                        'File `%s` already exists and is not identical, download failed.', destfile
+                    )
                     entry.fail('File `%s` already exists and is not identical.' % destfile)
                     return
             else:
@@ -482,6 +523,7 @@ class PluginDownload(object):
                 except (IOError, OSError) as err:
                     # ignore permission errors, see ticket #555
                     import errno
+
                     if not os.path.exists(destfile):
                         raise plugin.PluginError('Unable to write %s: %s' % (destfile, err))
                     if err.errno != errno.EPERM and err.errno != errno.EACCES:
@@ -523,5 +565,10 @@ def register_plugin():
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('--dl-path', dest='dl_path', default=False, metavar='PATH',
-                                               help='override path for download plugin, applies to all executed tasks')
+    options.get_parser('execute').add_argument(
+        '--dl-path',
+        dest='dl_path',
+        default=False,
+        metavar='PATH',
+        help='override path for download plugin, applies to all executed tasks',
+    )

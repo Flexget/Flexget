@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 import pickle
@@ -34,8 +33,11 @@ def upgrade(ver, session):
         for row in session.execute(select([table.c.id, table.c.entry])):
             try:
                 p = pickle.loads(row['entry'])
-                session.execute(table.update().where(table.c.id == row['id']).values(
-                    json=json.dumps(p, encode_datetime=True)))
+                session.execute(
+                    table.update()
+                    .where(table.c.id == row['id'])
+                    .values(json=json.dumps(p, encode_datetime=True))
+                )
             except KeyError as e:
                 log.error('Unable error upgrading backlog pickle object due to %s' % str(e))
 
@@ -60,11 +62,13 @@ class OutputDigest(object):
                 'type': 'object',
                 'properties': {
                     'list': {'type': 'string'},
-                    'state': one_or_more({'type': 'string', 'enum': ['accepted', 'rejected', 'failed', 'undecided']})
+                    'state': one_or_more(
+                        {'type': 'string', 'enum': ['accepted', 'rejected', 'failed', 'undecided']}
+                    ),
                 },
                 'required': ['list'],
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ]
     }
 
@@ -92,17 +96,19 @@ class FromDigest(object):
         'type': 'object',
         'properties': {
             'list': {'type': 'string'},
-            'limit': {'type': 'integer', 'default': -1},
-            'expire': {
-                'oneOf': [
-                    {'type': 'string', 'format': 'interval'},
-                    {'type': 'boolean'}],
-                'default': True
+            'limit': {
+                'deprecated': 'The `limit` option of from_digest is deprecated. Use the `limit` plugin instead.',
+                'type': 'integer',
+                'default': -1
             },
-            'restore_state': {'type': 'boolean', 'default': False}
+            'expire': {
+                'oneOf': [{'type': 'string', 'format': 'interval'}, {'type': 'boolean'}],
+                'default': True,
+            },
+            'restore_state': {'type': 'boolean', 'default': False},
         },
         'required': ['list'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def on_task_input(self, task, config):
@@ -110,10 +116,12 @@ class FromDigest(object):
         with Session() as session:
             digest_entries = session.query(DigestEntry).filter(DigestEntry.list == config['list'])
             # Remove any entries older than the expire time, if defined.
-            if isinstance(config.get('expire'), basestring):
+            if isinstance(config.get('expire'), str):
                 expire_time = parse_timedelta(config['expire'])
                 digest_entries.filter(DigestEntry.added < datetime.now() - expire_time).delete()
-            for index, digest_entry in enumerate(digest_entries.order_by(DigestEntry.added.desc()).all()):
+            for index, digest_entry in enumerate(
+                digest_entries.order_by(DigestEntry.added.desc()).all()
+            ):
                 # Just remove any entries past the limit, if set.
                 if 0 < config.get('limit', -1) <= index:
                     session.delete(digest_entry)

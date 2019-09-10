@@ -75,7 +75,10 @@ class HistoryAPI(APIResource):
         total_items = query.count()
 
         if not total_items:
-            return jsonify([])
+            pagination = pagination_headers(0, 0, 0, request)
+            rsp = jsonify([])
+            rsp.headers.extend(pagination)
+            return rsp
 
         total_pages = int(ceil(total_items / float(per_page)))
 

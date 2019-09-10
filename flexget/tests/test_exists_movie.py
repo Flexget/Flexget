@@ -94,66 +94,80 @@ class TestExistsMovie(object):
         # create test files
         for test_file in self.test_files:
             tmpdir.join(test_file).write('')
-        return Template(self._config).render({'parser': request.param}).replace('__tmp__', tmpdir.strpath)
+        return (
+            Template(self._config)
+            .render({'parser': request.param})
+            .replace('__tmp__', tmpdir.strpath)
+        )
 
     def test_existing_dirs(self, execute_task):
         """exists_movie plugin: existing"""
         task = execute_task('test_dirs')
-        assert not task.find_entry('accepted', title='Existence.2012'), \
-            'Existence.2012 should not have been accepted (exists)'
-        assert task.find_entry('accepted', title='The.Missing.2014'), \
-            'The.Missing.2014 should have been accepted'
+        assert not task.find_entry(
+            'accepted', title='Existence.2012'
+        ), 'Existence.2012 should not have been accepted (exists)'
+        assert task.find_entry(
+            'accepted', title='The.Missing.2014'
+        ), 'The.Missing.2014 should have been accepted'
 
     def test_existing_files(self, execute_task):
         """exists_movie plugin: existing"""
         task = execute_task('test_files')
-        assert not task.find_entry('accepted', title='Downloaded.2013'), \
-            'Downloaded.2013 should not have been accepted (exists)'
-        assert task.find_entry('accepted', title='Gone.Missing.2013'), \
-            'Gone.Missing.2013 should have been accepted'
+        assert not task.find_entry(
+            'accepted', title='Downloaded.2013'
+        ), 'Downloaded.2013 should not have been accepted (exists)'
+        assert task.find_entry(
+            'accepted', title='Gone.Missing.2013'
+        ), 'Gone.Missing.2013 should have been accepted'
 
     @pytest.mark.online
     def test_lookup_imdb(self, execute_task):
         """exists_movie plugin: existing"""
         task = execute_task('test_lookup_imdb')
-        assert task.find_entry('accepted', title='The.Matrix.1999')['imdb_id'], \
-            'The.Matrix.1999 should have an `imdb_id`'
-        assert not task.find_entry('accepted', title='Existence.2012'), \
-            'Existence.2012 should not have been accepted (exists)'
+        assert task.find_entry('accepted', title='The.Matrix.1999')[
+            'imdb_id'
+        ], 'The.Matrix.1999 should have an `imdb_id`'
+        assert not task.find_entry(
+            'accepted', title='Existence.2012'
+        ), 'Existence.2012 should not have been accepted (exists)'
 
     def test_diff_qualities_allowed(self, execute_task):
         """exists_movie plugin: existsting but w. diff quality"""
         task = execute_task('test_diff_qualities_allowed')
-        assert task.find_entry('accepted', title='Quality.of.Life.480p'), \
-            'Quality.of.Life.480p should have been accepted'
+        assert task.find_entry(
+            'accepted', title='Quality.of.Life.480p'
+        ), 'Quality.of.Life.480p should have been accepted'
 
     def test_diff_qualities_not_allowed(self, execute_task):
         """exists_movie plugin: existsting but w. diff quality"""
         task = execute_task('test_diff_qualities_not_allowed')
-        assert task.find_entry('rejected', title='Quality.of.Life.1080p'), \
-            'Quality.of.Life.1080p should have been rejected'
+        assert task.find_entry(
+            'rejected', title='Quality.of.Life.1080p'
+        ), 'Quality.of.Life.1080p should have been rejected'
 
     def test_diff_qualities_downgrade(self, execute_task):
         """Test worse qualities than exist are rejected."""
         task = execute_task('test_diff_qualities_downgrade')
-        assert task.find_entry('rejected', title='Quality.of.Life.480p'), \
-            'Quality.of.Life.480p should have been rejected'
+        assert task.find_entry(
+            'rejected', title='Quality.of.Life.480p'
+        ), 'Quality.of.Life.480p should have been rejected'
 
     def test_diff_qualities_upgrade(self, execute_task):
         """Test better qualities than exist are accepted."""
         task = execute_task('test_diff_qualities_upgrade')
-        assert task.find_entry('accepted', title='Quality.of.Life.1080p'), \
-            'Quality.of.Life.1080p should have been accepted'
+        assert task.find_entry(
+            'accepted', title='Quality.of.Life.1080p'
+        ), 'Quality.of.Life.1080p should have been accepted'
 
     # TODO: Fix tests
     @pytest.mark.skip(reason='test is broken')
     def test_propers(self, execute_task):
         """exists_movie plugin: new proper & proper already exists"""
         task = execute_task('test_propers')
-        assert task.find_entry('accepted', title='Mock.S01E01.Proper'), \
-            'new proper not accepted'
-        assert task.find_entry('rejected', title='Test.S01E01'), \
-            'pre-existin proper should have caused reject'
+        assert task.find_entry('accepted', title='Mock.S01E01.Proper'), 'new proper not accepted'
+        assert task.find_entry(
+            'rejected', title='Test.S01E01'
+        ), 'pre-existin proper should have caused reject'
 
     @pytest.mark.skip(reason='test is broken')
     def test_invalid(self, execute_task):
@@ -165,7 +179,9 @@ class TestExistsMovie(object):
     def test_with_metainfo_series(self, execute_task):
         """Tests that exists_movie works with series data from metainfo_series"""
         task = execute_task('test_with_metainfo_series')
-        assert task.find_entry('rejected', title='Foo.Bar.S01E02.XViD'), \
-            'Foo.Bar.S01E02.XViD should have been rejected(exists)'
-        assert not task.find_entry('rejected', title='Foo.Bar.S01E03.XViD'), \
-            'Foo.Bar.S01E03.XViD should not have been rejected'
+        assert task.find_entry(
+            'rejected', title='Foo.Bar.S01E02.XViD'
+        ), 'Foo.Bar.S01E02.XViD should have been rejected(exists)'
+        assert not task.find_entry(
+            'rejected', title='Foo.Bar.S01E03.XViD'
+        ), 'Foo.Bar.S01E03.XViD should not have been rejected'

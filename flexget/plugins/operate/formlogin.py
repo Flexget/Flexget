@@ -30,15 +30,17 @@ class FormLogin(object):
             'username': {'type': 'string'},
             'password': {'type': 'string'},
             'userfield': {'type': 'string'},
-            'passfield': {'type': 'string'}
+            'passfield': {'type': 'string'},
         },
         'required': ['url', 'username', 'password'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def on_task_start(self, task, config):
         if not mechanicalsoup:
-            raise plugin.PluginError('mechanicalsoup required (python module), please install it.', log)
+            raise plugin.PluginError(
+                'mechanicalsoup required (python module), please install it.', log
+            )
 
         userfield = config.get('userfield', 'username')
         passfield = config.get('passfield', 'password')

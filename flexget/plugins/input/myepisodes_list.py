@@ -52,16 +52,17 @@ class MyEpisodesList(object):
             password = config['password']
 
             log.debug("Logging in to %s ..." % URL)
-            params = {
-                'username': username,
-                'password': password,
-                'action': 'Login'
-            }
+            params = {'username': username, 'password': password, 'action': 'Login'}
             try:
                 loginsrc = task.requests.post(URL + 'login.php', data=params)
                 if 'login' in loginsrc.url:
-                    raise plugin.PluginWarning(('Login to myepisodes.com failed, please check '
-                                                'your account data or see if the site is down.'), log)
+                    raise plugin.PluginWarning(
+                        (
+                            'Login to myepisodes.com failed, please check '
+                            'your account data or see if the site is down.'
+                        ),
+                        log,
+                    )
             except RequestException as e:
                 raise plugin.PluginError("Error logging in to myepisodes: %s" % e)
 

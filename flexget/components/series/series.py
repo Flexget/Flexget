@@ -765,7 +765,7 @@ class FilterSeries(FilterSeriesBase):
                     continue
 
             # Just pick the best ep if we get here
-            reason = reason or 'choosing best available quality'
+            reason = reason or 'choosing first acceptable match'
             best.accept(reason)
 
             # need to reject all other episode/season packs for an accepted season during the task,

@@ -89,5 +89,3 @@ class TestEntryListQuality(object):
         task = execute_task('verify_quality_2')
         entry = task.find_entry(title='foo.bar.720p.hdtv-Flexget')
         assert entry['quality'] == '720p hdtv'
-
-

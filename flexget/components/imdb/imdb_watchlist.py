@@ -16,7 +16,7 @@ from flexget.utils import json
 
 
 log = logging.getLogger('imdb_watchlist')
-USER_ID_RE = r'^ur\d{7,8}$'
+USER_ID_RE = r'^ur\d{7,9}$'
 CUSTOM_LIST_RE = r'^ls\d{7,10}$'
 USER_LISTS = ['watchlist', 'ratings', 'checkins']
 TITLE_TYPE_MAP = {

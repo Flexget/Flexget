@@ -117,12 +117,15 @@ class FlexGetLogger(logging.Logger):
         extra = extra or {}
         extra.update(
             task=getattr(local_context, 'task', ''),
-            session_id=getattr(local_context, 'session_id', ''))
+            session_id=getattr(local_context, 'session_id', ''),
+        )
         # Replace newlines in log messages with \n
         if isinstance(msg, str):
             msg = msg.replace('\n', '\\n')
 
-        return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra, *exargs)
+        return logging.Logger.makeRecord(
+            self, name, level, fn, lno, msg, args, exc_info, func, extra, *exargs
+        )
 
     def trace(self, msg, *args, **kwargs):
         """Log at TRACE level (more detailed than DEBUG)."""
@@ -135,6 +138,7 @@ class FlexGetLogger(logging.Logger):
 
 class FlexGetFormatter(logging.Formatter):
     """Custom formatter that can handle both regular log records and those created by FlexGetLogger"""
+
     flexget_fmt = '%(asctime)-15s %(levelname)-8s %(name)-13s %(task)-15s %(message)s'
 
     def __init__(self):
@@ -202,9 +206,11 @@ def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
 
     formatter = FlexGetFormatter()
     if to_file:
-        file_handler = logging.handlers.RotatingFileHandler(filename,
-                                                            maxBytes=int(os.environ.get(ENV_MAXBYTES, 1000 * 1024)),
-                                                            backupCount=int(os.environ.get(ENV_MAXCOUNT, 9)))
+        file_handler = logging.handlers.RotatingFileHandler(
+            filename,
+            maxBytes=int(os.environ.get(ENV_MAXBYTES, 1000 * 1024)),
+            backupCount=int(os.environ.get(ENV_MAXCOUNT, 9)),
+        )
         file_handler.setFormatter(formatter)
         file_handler.setLevel(level)
         logger.addHandler(file_handler)

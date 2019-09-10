@@ -8,7 +8,10 @@ from flexget.manager import Session
 from flexget.components.trakt.api import ObjectsContainer as OC
 
 from flexget.components.trakt.db import (
-    TraktActor, TraktMovieSearchResult, TraktShowSearchResult, TraktShow
+    TraktActor,
+    TraktMovieSearchResult,
+    TraktShowSearchResult,
+    TraktShow,
 )
 from flexget.components.trakt.api_trakt import ApiTrakt
 
@@ -80,22 +83,29 @@ class TestTraktShowLookup(object):
         """trakt: Test Lookup (ONLINE)"""
         task = execute_task('test')
         entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
-        assert entry['trakt_show_id'] == 1399, \
-            'Trakt_ID should be 1339 is %s for %s' % (entry['trakt_show_id'], entry['series_name'])
-        assert entry['trakt_series_status'] == 'ended', 'Series Status should be "ENDED" returned %s' \
-                                                        % (entry['trakt_series_status'])
+        assert entry['trakt_show_id'] == 1399, 'Trakt_ID should be 1339 is %s for %s' % (
+            entry['trakt_show_id'],
+            entry['series_name'],
+        )
+        assert (
+            entry['trakt_series_status'] == 'ended'
+        ), 'Series Status should be "ENDED" returned %s' % (entry['trakt_series_status'])
 
     def test_lookup(self, execute_task):
         """trakt: Test Lookup (ONLINE)"""
         task = execute_task('test')
         entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
-        assert entry['trakt_ep_name'] == 'Paternity', \
+        assert entry['trakt_ep_name'] == 'Paternity', (
             '%s trakt_ep_name should be Paternity' % entry['title']
-        assert entry['trakt_series_status'] == 'ended', \
-            'runtime for %s is %s, should be "ended"' % (entry['title'], entry['trakt_series_status'])
+        )
+        assert entry['trakt_series_status'] == 'ended', (
+            'runtime for %s is %s, should be "ended"'
+            % (entry['title'], entry['trakt_series_status'])
+        )
         assert entry['afield'] == '73255Paternity', 'afield was not set correctly'
-        assert task.find_entry(trakt_ep_name='School Reunion'), \
-            'Failed imdb lookup Doctor Who 2005 S02E03'
+        assert task.find_entry(
+            trakt_ep_name='School Reunion'
+        ), 'Failed imdb lookup Doctor Who 2005 S02E03'
 
     def test_unknown_series(self, execute_task):
         # Test an unknown series does not cause any exceptions
@@ -110,23 +120,38 @@ class TestTraktShowLookup(object):
         print(entry['trakt_series_name'].lower())
         assert entry['trakt_series_name'].lower() == 'Shameless'.lower(), 'lookup failed'
         with Session() as session:
-            assert task.entries[1]['trakt_series_name'].lower() == 'Shameless'.lower(), 'second lookup failed'
+            assert (
+                task.entries[1]['trakt_series_name'].lower() == 'Shameless'.lower()
+            ), 'second lookup failed'
 
-            assert len(session.query(TraktShowSearchResult).all()) == 1, 'should have added 1 show to search result'
+            assert (
+                len(session.query(TraktShowSearchResult).all()) == 1
+            ), 'should have added 1 show to search result'
 
-            assert len(session.query(TraktShow).all()) == 1, 'should only have added one show to show table'
-            assert session.query(TraktShow).first().title == 'Shameless', 'should have added Shameless and' \
-                                                                          'not Shameless (2011)'
+            assert (
+                len(session.query(TraktShow).all()) == 1
+            ), 'should only have added one show to show table'
+            assert session.query(TraktShow).first().title == 'Shameless', (
+                'should have added Shameless and' 'not Shameless (2011)'
+            )
             # change the search query
-            session.query(TraktShowSearchResult).update({'search': "shameless.s01e03.hdtv-flexget"})
+            session.query(TraktShowSearchResult).update(
+                {'search': "shameless.s01e03.hdtv-flexget"}
+            )
             session.commit()
 
             lookupargs = {'title': "Shameless.S01E03.HDTV-FlexGet"}
             series = ApiTrakt.lookup_series(session=session, **lookupargs)
 
-            assert series.tvdb_id == entry['tvdb_id'], 'tvdb id should be the same as the first entry'
-            assert series.id == entry['trakt_show_id'], 'trakt id should be the same as the first entry'
-            assert series.title.lower() == entry['trakt_series_name'].lower(), 'series name should match first entry'
+            assert (
+                series.tvdb_id == entry['tvdb_id']
+            ), 'tvdb id should be the same as the first entry'
+            assert (
+                series.id == entry['trakt_show_id']
+            ), 'trakt id should be the same as the first entry'
+            assert (
+                series.title.lower() == entry['trakt_series_name'].lower()
+            ), 'series name should match first entry'
 
     def test_search_success(self, execute_task):
         task = execute_task('test_search_success')
@@ -142,8 +167,9 @@ class TestTraktShowLookup(object):
         if entry.get('trakt_episode_id') == 173423:
             assert False, 'We support trakt episode lookup by date now? Great! Change this test.'
         else:
-            assert entry.get('trakt_episode_id') is None, 'false positive for episode match, we don\'t ' \
-                                                          'support lookup by date'
+            assert entry.get('trakt_episode_id') is None, (
+                'false positive for episode match, we don\'t ' 'support lookup by date'
+            )
 
     def test_absolute(self, execute_task):
         task = execute_task('test_absolute')
@@ -152,18 +178,25 @@ class TestTraktShowLookup(object):
         assert entry.get('trakt_show_id') == 46003, 'should have populated trakt show data'
         # We don't support lookup by absolute number at the moment, make sure there isn't a false positive
         if entry.get('trakt_show_id') == 916040:
-            assert False, 'We support trakt episode lookup by absolute number now? Great! Change this test.'
+            assert (
+                False
+            ), 'We support trakt episode lookup by absolute number now? Great! Change this test.'
         else:
-            assert entry.get('trakt_episode_id') is None, 'false positive for episode match, we don\'t ' \
-                                                          'support lookup by absolute number'
+            assert entry.get('trakt_episode_id') is None, (
+                'false positive for episode match, we don\'t ' 'support lookup by absolute number'
+            )
 
     def test_lookup_actors(self, execute_task):
         task = execute_task('test')
         entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert entry['series_name'] == 'House', 'series lookup failed'
         assert entry['trakt_actors']['297390']['name'] == 'Hugh Laurie', 'trakt id mapping failed'
-        assert entry['trakt_actors']['297390']['imdb_id'] == 'nm0491402', 'fetching imdb id for actor failed'
-        assert entry['trakt_actors']['297390']['tmdb_id'] == '41419', 'fetching tmdb id for actor failed'
+        assert (
+            entry['trakt_actors']['297390']['imdb_id'] == 'nm0491402'
+        ), 'fetching imdb id for actor failed'
+        assert (
+            entry['trakt_actors']['297390']['tmdb_id'] == '41419'
+        ), 'fetching tmdb id for actor failed'
         with Session() as session:
             actor = session.query(TraktActor).filter(TraktActor.name == 'Hugh Laurie').first()
             assert actor is not None, 'adding actor to actors table failed'
@@ -307,7 +340,9 @@ class TestTraktWatchedAndCollected(object):
 
     def test_trakt_watched_movie_lookup(self, execute_task):
         task = execute_task('test_trakt_watched_movie')
-        assert len(task.accepted) == 1, 'Movie should have been accepted as it is watched on Trakt profile'
+        assert (
+            len(task.accepted) == 1
+        ), 'Movie should have been accepted as it is watched on Trakt profile'
         entry = task.accepted[0]
         assert entry['title'] == 'Inside.Out.2015.1080p.BDRip-FlexGet', 'title was not accepted?'
         assert entry['movie_name'] == 'Inside Out', 'wrong movie name'
@@ -315,7 +350,9 @@ class TestTraktWatchedAndCollected(object):
 
     def test_trakt_collected_movie_lookup(self, execute_task):
         task = execute_task('test_trakt_collected_movie')
-        assert len(task.accepted) == 1, 'Movie should have been accepted as it is collected on Trakt profile'
+        assert (
+            len(task.accepted) == 1
+        ), 'Movie should have been accepted as it is collected on Trakt profile'
         entry = task.accepted[0]
         assert entry['title'] == 'Inside.Out.2015.1080p.BDRip-FlexGet', 'title was not accepted?'
         assert entry['movie_name'] == 'Inside Out', 'wrong movie name'
@@ -323,14 +360,18 @@ class TestTraktWatchedAndCollected(object):
 
     def test_trakt_show_watched_progress(self, execute_task):
         task = execute_task('test_trakt_show_watched_progress')
-        assert len(task.accepted) == 1, 'One show should have been accepted as it is watched on Trakt profile'
+        assert (
+            len(task.accepted) == 1
+        ), 'One show should have been accepted as it is watched on Trakt profile'
         entry = task.accepted[0]
         assert entry['trakt_series_name'] == 'Chuck', 'wrong series was accepted'
         assert entry['trakt_watched'] == True, 'the whole series should be marked as watched'
 
     def test_trakt_show_collected_progress(self, execute_task):
         task = execute_task('test_trakt_show_collected_progress')
-        assert len(task.accepted) == 1, 'One show should have been accepted as it is collected on Trakt profile'
+        assert (
+            len(task.accepted) == 1
+        ), 'One show should have been accepted as it is collected on Trakt profile'
         entry = task.accepted[0]
         assert entry['trakt_series_name'] == 'White Collar', 'wrong series was accepted'
         assert entry['trakt_collected'] == True, 'the whole series should be marked as collected'
@@ -393,12 +434,18 @@ class TestTraktMovieLookup(object):
     def test_search_results(self, execute_task):
         task = execute_task('test_search_results')
         entry = task.entries[0]
-        assert entry['movie_name'].lower() == 'Harry Potter and The Philosopher\'s Stone'.lower(), 'lookup failed'
+        assert (
+            entry['movie_name'].lower() == 'Harry Potter and The Philosopher\'s Stone'.lower()
+        ), 'lookup failed'
         with Session() as session:
-            assert len(session.query(TraktMovieSearchResult).all()) == 1, 'should have added one movie to search result'
+            assert (
+                len(session.query(TraktMovieSearchResult).all()) == 1
+            ), 'should have added one movie to search result'
 
             # change the search query
-            session.query(TraktMovieSearchResult).update({'search': "harry.potter.and.the.philosopher's"})
+            session.query(TraktMovieSearchResult).update(
+                {'search': "harry.potter.and.the.philosopher's"}
+            )
             session.commit()
 
             lookupargs = {'title': "harry.potter.and.the.philosopher's"}
@@ -411,49 +458,57 @@ class TestTraktMovieLookup(object):
         task = execute_task('test_lookup_actors')
         assert len(task.entries) == 1
         entry = task.entries[0]
-        actors = ['Keanu Reeves',
-                  'Laurence Fishburne',
-                  'Carrie-Anne Moss',
-                  'Hugo Weaving',
-                  'Gloria Foster',
-                  'Joe Pantoliano',
-                  'Marcus Chong',
-                  'Julian Arahanga',
-                  'Matt Doran',
-                  'Belinda McClory',
-                  'Anthony Ray Parker',
-                  'Paul Goddard',
-                  'Robert Taylor',
-                  'David Aston',
-                  'Marc Aden',
-                  'Ada Nicodemou',
-                  'Deni Gordon',
-                  'Rowan Witt',
-                  'Bill Young',
-                  'Eleanor Witt',
-                  'Tamara Brown',
-                  'Janaya Pender',
-                  'Adryn White',
-                  'Natalie Tjen',
-                  'David O\'Connor',
-                  'Jeremy Ball',
-                  'Fiona Johnson',
-                  'Harry Lawrence',
-                  'Steve Dodd',
-                  'Luke Quinton',
-                  'Lawrence Woodward',
-                  'Michael Butcher',
-                  'Bernard Ledger',
-                  'Robert Simper',
-                  'Chris Pattinson',
-                  'Nigel Harbach']
+        actors = [
+            'Keanu Reeves',
+            'Laurence Fishburne',
+            'Carrie-Anne Moss',
+            'Hugo Weaving',
+            'Gloria Foster',
+            'Joe Pantoliano',
+            'Marcus Chong',
+            'Julian Arahanga',
+            'Matt Doran',
+            'Belinda McClory',
+            'Anthony Ray Parker',
+            'Paul Goddard',
+            'Robert Taylor',
+            'David Aston',
+            'Marc Aden',
+            'Ada Nicodemou',
+            'Deni Gordon',
+            'Rowan Witt',
+            'Bill Young',
+            'Eleanor Witt',
+            'Tamara Brown',
+            'Janaya Pender',
+            'Adryn White',
+            'Natalie Tjen',
+            'David O\'Connor',
+            'Jeremy Ball',
+            'Fiona Johnson',
+            'Harry Lawrence',
+            'Steve Dodd',
+            'Luke Quinton',
+            'Lawrence Woodward',
+            'Michael Butcher',
+            'Bernard Ledger',
+            'Robert Simper',
+            'Chris Pattinson',
+            'Nigel Harbach',
+        ]
         trakt_actors = list(entry['trakt_actors'].values())
         trakt_actors = [trakt_actor['name'] for trakt_actor in trakt_actors]
         assert entry['movie_name'] == 'The Matrix', 'movie lookup failed'
-        assert set(trakt_actors) == set(actors), 'looking up actors for %s failed' % entry.get('title')
+        assert set(trakt_actors) == set(actors), 'looking up actors for %s failed' % entry.get(
+            'title'
+        )
         assert entry['trakt_actors']['7134']['name'] == 'Keanu Reeves', 'trakt id mapping failed'
-        assert entry['trakt_actors']['7134']['imdb_id'] == 'nm0000206', 'fetching imdb id for actor failed'
-        assert entry['trakt_actors']['7134']['tmdb_id'] == '6384', 'fetching tmdb id for actor failed'
+        assert (
+            entry['trakt_actors']['7134']['imdb_id'] == 'nm0000206'
+        ), 'fetching imdb id for actor failed'
+        assert (
+            entry['trakt_actors']['7134']['tmdb_id'] == '6384'
+        ), 'fetching tmdb id for actor failed'
         with Session() as session:
             actor = session.query(TraktActor).filter(TraktActor.name == 'Keanu Reeves').first()
             assert actor is not None, 'adding actor to actors table failed'
@@ -492,8 +547,9 @@ class TestTraktUnicodeLookup(object):
         with Session() as session:
             r = session.query(TraktMovieSearchResult).all()
             assert len(r) == 1, 'Should have added a search result'
-            assert r[0].search == '\u0417\u0435\u0440\u043a\u0430\u043b\u0430 Mirrors 2008'.lower(), \
-                'The search result should be lower case'
+            assert (
+                r[0].search == '\u0417\u0435\u0440\u043a\u0430\u043b\u0430 Mirrors 2008'.lower()
+            ), 'The search result should be lower case'
         execute_task('test_unicode')
         with Session() as session:
             r = session.query(TraktMovieSearchResult).all()
@@ -536,14 +592,18 @@ class TestTraktRatingsLookup(object):
         assert len(task.entries) == 1
         entry = task.entries[0]
 
-        assert entry['trakt_season_user_rating'] == 10, 'Wrong rating received for Season 1 of The Expanse'
+        assert (
+            entry['trakt_season_user_rating'] == 10
+        ), 'Wrong rating received for Season 1 of The Expanse'
 
     def test_trakt_ratings_show(self, execute_task):
         task = execute_task('test_trakt_ratings_show')
         assert len(task.entries) == 1
         entry = task.entries[0]
 
-        assert entry['trakt_series_user_rating'] == 1, 'Wrong rating received for Time After Time 2017'
+        assert (
+            entry['trakt_series_user_rating'] == 1
+        ), 'Wrong rating received for Time After Time 2017'
 
     def test_trakt_ratings_movie(self, execute_task):
         task = execute_task('test_trakt_ratings_movie')

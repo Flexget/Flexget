@@ -102,7 +102,7 @@ class FromIMDB(object):
     imdb_pattern = one_or_more(
         {
             'type': 'string',
-            'pattern': r'(nm|co|ch)\d{7}',
+            'pattern': r'(nm|co|ch)\d{7,8}',
             'error_pattern': 'Get the id from the url of the person/company you want to use,'
             ' e.g. http://imdb.com/text/<id here>/blah',
         },
@@ -136,7 +136,7 @@ class FromIMDB(object):
         Converts config to dict form and sets defaults if needed
         """
         config = config
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = {'id': [config]}
         elif isinstance(config, list):
             config = {'id': config}

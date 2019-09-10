@@ -43,7 +43,7 @@ class PluginInclude(object):
             if not os.path.isabs(file):
                 file = os.path.join(task.manager.config_base, file)
             with io.open(file, encoding='utf-8') as inc_file:
-                include = yaml.load(inc_file)
+                include = yaml.safe_load(inc_file)
                 inc_file.flush()
             errors = process_config(include, plugin.plugin_schemas(interface='task'))
             if errors:
@@ -57,7 +57,9 @@ class PluginInclude(object):
             try:
                 task.merge_config(include)
             except MergeException:
-                raise plugin.PluginError('Failed to merge include file to task %s, incompatible datatypes' % task.name)
+                raise plugin.PluginError(
+                    'Failed to merge include file to task %s, incompatible datatypes' % task.name
+                )
 
 
 @event('plugin.register')

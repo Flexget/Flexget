@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 import platform
@@ -27,7 +26,7 @@ class FilterExists(object):
 
     def prepare_config(self, config):
         # If only a single path is passed turn it into a 1 element list
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = [config]
         return config
 

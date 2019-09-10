@@ -39,9 +39,13 @@ class PluginPeriscope(object):
             'languages': {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1},
             'alternatives': {'type': 'array', 'items': {'type': 'string'}},
             'overwrite': {'type': 'boolean', 'default': False},
-            'subexts': {'type': 'array', 'items': {'type': 'string'}, 'default': ['srt', 'stp', 'sub', 'stl', 'ssa']},
+            'subexts': {
+                'type': 'array',
+                'items': {'type': 'string'},
+                'default': ['srt', 'stp', 'sub', 'stl', 'ssa'],
+            },
         },
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def on_task_start(self, task, config):
@@ -49,8 +53,9 @@ class PluginPeriscope(object):
             import periscope  # noqa
         except ImportError as e:
             log.debug('Error importing Periscope: %s' % e)
-            raise plugin.DependencyError('periscope', 'periscope',
-                                         'Periscope module required. ImportError: %s' % e)
+            raise plugin.DependencyError(
+                'periscope', 'periscope', 'Periscope module required. ImportError: %s' % e
+            )
 
     def subbed(self, filename):
         for ext in self.exts:
@@ -72,6 +77,7 @@ class PluginPeriscope(object):
             log.debug('nothing accepted, aborting')
             return
         import periscope
+
         psc = periscope.Periscope(tempfile.gettempdir())
         logging.getLogger('periscope').setLevel(logging.CRITICAL)  # LOT of messages otherwise
         langs = [s.encode('utf8') for s in config['languages']]  # avoid unicode warnings

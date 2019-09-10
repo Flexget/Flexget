@@ -37,7 +37,13 @@ Session = sessionmaker(class_=ContextSession)
 from flexget import config_schema, db_schema, logger, plugin  # noqa
 from flexget.event import fire_event  # noqa
 from flexget.ipc import IPCClient, IPCServer  # noqa
-from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv  # noqa
+from flexget.options import (
+    CoreArgumentParser,
+    get_parser,
+    manager_parser,
+    ParserError,
+    unicode_argv,
+)  # noqa
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
 from flexget.utils.tools import pid_exists, get_current_flexget_version, io_encoding  # noqa
@@ -72,22 +78,23 @@ class Manager(object):
 
     * manager.startup
 
-      After manager has been initialized. This is when application becomes ready to use, however no database lock is
-      present, so the database must not be modified on this event.
+      After manager has been initialized. This is when application becomes ready to use,
+      however no database lock is present, so the database must not be modified on this event.
 
     * manager.lock_acquired
 
-      The manager does not always require a lock on startup, if one is requested, this event will run when it has been
-      acquired successfully
+      The manager does not always require a lock on startup, if one is requested,
+      this event will run when it has been acquired successfully
 
     * manager.upgrade
 
-      If any plugins have declared a newer schema version than exists in the database, this event will be fired to
-      allow plugins to upgrade their tables
+      If any plugins have declared a newer schema version than exists in the database,
+      this event will be fired to allow plugins to upgrade their tables
 
     * manager.shutdown_requested
 
-      When shutdown has been requested. Any plugins which might add to execution queue should stop when this is fired.
+      When shutdown has been requested. Any plugins which might add to
+      execution queue should stop when this is fired.
 
     * manager.shutdown
 
@@ -153,10 +160,15 @@ class Manager(object):
         log.debug('sys.getfilesystemencoding: %s', sys.getfilesystemencoding())
         log.debug('flexget detected io encoding: %s', io_encoding)
         log.debug('os.path.supports_unicode_filenames: %s' % os.path.supports_unicode_filenames)
-        if codecs.lookup(sys.getfilesystemencoding()).name == 'ascii' and not os.path.supports_unicode_filenames:
-            log.warning('Your locale declares ascii as the filesystem encoding. Any plugins reading filenames from '
-                        'disk will not work properly for filenames containing non-ascii characters. Make sure your '
-                        'locale env variables are set up correctly for the environment which is launching FlexGet.')
+        if (
+            codecs.lookup(sys.getfilesystemencoding()).name == 'ascii'
+            and not os.path.supports_unicode_filenames
+        ):
+            log.warning(
+                'Your locale declares ascii as the filesystem encoding. Any plugins reading filenames from '
+                'disk will not work properly for filenames containing non-ascii characters. Make sure your '
+                'locale env variables are set up correctly for the environment which is launching FlexGet.'
+            )
 
     def _init_options(self, args):
         """
@@ -189,14 +201,17 @@ class Manager(object):
                 print('\nCommand missing, eg. execute or daemon ...')
                 # TODO: oh dear ...
                 if '--help' in args or '-h' in args:
-                    print('NOTE: The help may be incomplete due issues with argparse. Try without --help.')
+                    print(
+                        'NOTE: The help may be incomplete due issues with argparse. Try without --help.'
+                    )
                 else:
-                    print('NOTE: The help may be incomplete due issues with argparse. Try with --help.')
+                    print(
+                        'NOTE: The help may be incomplete due issues with argparse. Try with --help.'
+                    )
                 sys.exit(1)
         except AttributeError:
             pass  # TODO: hack .. this is getting out of hand
         return options
-
 
     def _init_logging(self):
         """
@@ -240,6 +255,7 @@ class Manager(object):
 
         # cannot be imported at module level because of circular references
         from flexget.utils.simple_persistence import SimplePersistence
+
         self.persist = SimplePersistence('manager')
 
         if db_schema.upgrade_required():
@@ -261,7 +277,9 @@ class Manager(object):
     def has_lock(self):
         return self._has_lock
 
-    def execute(self, options=None, output=None, loglevel=None, priority=1, suppress_warnings=None):
+    def execute(
+        self, options=None, output=None, loglevel=None, priority=1, suppress_warnings=None
+    ):
         """
         Run all (can be limited with options) tasks from the config.
 
@@ -299,7 +317,9 @@ class Manager(object):
                 # Create list of tasks to run, preserving order
                 task_names = []
                 for arg in options.tasks:
-                    matches = [t for t in self.tasks if fnmatch.fnmatchcase(str(t).lower(), arg.lower())]
+                    matches = [
+                        t for t in self.tasks if fnmatch.fnmatchcase(str(t).lower(), arg.lower())
+                    ]
                     if not matches:
                         msg = '`%s` does not match any tasks' % arg
                         log.error(msg)
@@ -310,13 +330,20 @@ class Manager(object):
                 # Set the option as a list of matching task names so plugins can use it easily
                 options.tasks = task_names
         # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
-        task_names = sorted(task_names, key=lambda t: self.config['tasks'][t].get('priority', 65535))
+        task_names = sorted(
+            task_names, key=lambda t: self.config['tasks'][t].get('priority', 65535)
+        )
 
         finished_events = []
         for task_name in task_names:
             task = Task(
-                self, task_name, options=options, output=output,
-                loglevel=loglevel, priority=priority, suppress_warnings=suppress_warnings
+                self,
+                task_name,
+                options=options,
+                output=output,
+                loglevel=loglevel,
+                priority=priority,
+                suppress_warnings=suppress_warnings,
             )
             self.task_queue.put(task)
             finished_events.append((task.id, task.name, task.finished_event))
@@ -330,13 +357,20 @@ class Manager(object):
         and results will be streamed back.
         If not, this will attempt to obtain a lock, initialize the manager, and run the command here.
         """
+        if sys.version_info <= (2, 7):
+            console('-' * 79)
+            console('Python 2.7 will not be maintained past 2020 !')
+            console('Consider upgrading to 3.6 or newer at your earliest convenience.')
+            console('-' * 79)
         # When we are in test mode, we use a different lock file and db
         if self.options.test:
             self.lockfile = os.path.join(self.config_base, '.test-%s-lock' % self.config_name)
         # If another process is started, send the execution to the running process
         ipc_info = self.check_ipc_info()
         if ipc_info:
-            console('There is a FlexGet process already running for this config, sending execution there.')
+            console(
+                'There is a FlexGet process already running for this config, sending execution there.'
+            )
             log.debug('Sending command to running FlexGet process: %s' % self.args)
             try:
                 client = IPCClient(ipc_info['port'], ipc_info['password'])
@@ -346,8 +380,10 @@ class Manager(object):
                 try:
                     client.handle_cli(self.args)
                 except KeyboardInterrupt:
-                    log.error('Disconnecting from daemon due to ctrl-c. Executions will still continue in the '
-                              'background.')
+                    log.error(
+                        'Disconnecting from daemon due to ctrl-c. Executions will still continue in the '
+                        'background.'
+                    )
                 except EOFError:
                     log.error('Connection from daemon was severed.')
             return
@@ -409,14 +445,17 @@ class Manager(object):
         fire_event('manager.execute.started', self, options)
         if self.task_queue.is_alive() or self.is_daemon:
             if not self.task_queue.is_alive():
-                log.error('Task queue has died unexpectedly. Restarting it. Please open an issue on Github and include'
-                          ' any previous error logs.')
+                log.error(
+                    'Task queue has died unexpectedly. Restarting it. Please open an issue on Github and include'
+                    ' any previous error logs.'
+                )
                 self.task_queue = TaskQueue()
                 self.task_queue.start()
             if len(self.task_queue):
                 log.verbose('There is a task already running, execution queued.')
-            finished_events = self.execute(options, output=logger.get_capture_stream(),
-                                           loglevel=logger.get_capture_loglevel())
+            finished_events = self.execute(
+                options, output=logger.get_capture_stream(), loglevel=logger.get_capture_loglevel()
+            )
             if not options.cron:
                 # Wait until execution of all tasks has finished
                 for _, _, event in finished_events:
@@ -447,7 +486,9 @@ class Manager(object):
                 log.error('Daemon already running for this config.')
                 return
             elif self.task_queue.is_alive():
-                log.error('Non-daemon execution of FlexGet is running. Cannot start daemon until it is finished.')
+                log.error(
+                    'Non-daemon execution of FlexGet is running. Cannot start daemon until it is finished.'
+                )
                 return
             if options.daemonize:
                 self.daemonize()
@@ -472,8 +513,15 @@ class Manager(object):
             if options.action == 'status':
                 log.info('Daemon running. (PID: %s)' % os.getpid())
             elif options.action == 'stop':
-                tasks = 'all queued tasks (if any) have' if options.wait else 'currently running task (if any) has'
-                log.info('Daemon shutdown requested. Shutdown will commence when %s finished executing.' % tasks)
+                tasks = (
+                    'all queued tasks (if any) have'
+                    if options.wait
+                    else 'currently running task (if any) has'
+                )
+                log.info(
+                    'Daemon shutdown requested. Shutdown will commence when %s finished executing.'
+                    % tasks
+                )
                 self.shutdown(options.wait)
             elif options.action == 'reload-config':
                 log.info('Reloading config from disk.')
@@ -549,7 +597,9 @@ class Manager(object):
                 possible.append(home_path)
             else:
                 # The freedesktop.org standard config location
-                xdg_config = os.environ.get('XDG_CONFIG_HOME', os.path.join(os.path.expanduser('~'), '.config'))
+                xdg_config = os.environ.get(
+                    'XDG_CONFIG_HOME', os.path.join(os.path.expanduser('~'), '.config')
+                )
                 possible.append(os.path.join(xdg_config, 'flexget'))
 
             for path in possible:
@@ -621,12 +671,18 @@ class Manager(object):
                 print(' o Indentation error')
                 print(' o Missing : from end of the line')
                 print(' o Non ASCII characters (use UTF8)')
-                print(' o If text contains any of :[]{}% characters it must be single-quoted '
-                      '(eg. value{1} should be \'value{1}\')\n')
+                print(
+                    ' o If text contains any of :[]{}% characters it must be single-quoted '
+                    '(eg. value{1} should be \'value{1}\')\n'
+                )
 
                 # Not very good practice but we get several kind of exceptions here, I'm not even sure all of them
                 # At least: ReaderError, YmlScannerError (or something like that)
-                if hasattr(e, 'problem') and hasattr(e, 'context_mark') and hasattr(e, 'problem_mark'):
+                if (
+                    hasattr(e, 'problem')
+                    and hasattr(e, 'context_mark')
+                    and hasattr(e, 'problem_mark')
+                ):
                     lines = 0
                     if e.problem is not None:
                         print(' Reason: %s\n' % e.problem)
@@ -634,12 +690,16 @@ class Manager(object):
                             print(' ----> MOST LIKELY REASON: Missing : from end of the line!')
                             print('')
                     if e.context_mark is not None:
-                        print(' Check configuration near line %s, column %s' % (
-                            e.context_mark.line, e.context_mark.column))
+                        print(
+                            ' Check configuration near line %s, column %s'
+                            % (e.context_mark.line, e.context_mark.column)
+                        )
                         lines += 1
                     if e.problem_mark is not None:
-                        print(' Check configuration near line %s, column %s' % (
-                            e.problem_mark.line, e.problem_mark.column))
+                        print(
+                            ' Check configuration near line %s, column %s'
+                            % (e.problem_mark.line, e.problem_mark.column)
+                        )
                         lines += 1
                     if lines:
                         print('')
@@ -680,8 +740,10 @@ class Manager(object):
         fire_event('manager.config_updated', self)
 
     def backup_config(self):
-        backup_path = os.path.join(self.config_base,
-                                   '%s-%s.bak' % (self.config_name, datetime.now().strftime('%y%m%d%H%M%S')))
+        backup_path = os.path.join(
+            self.config_base,
+            '%s-%s.bak' % (self.config_name, datetime.now().strftime('%y%m%d%H%M%S')),
+        )
 
         log.debug('backing up old config to %s before new save' % backup_path)
         try:
@@ -707,6 +769,7 @@ class Manager(object):
         """Makes sure that all tasks will have the config_modified flag come out true on the next run.
         Useful when changing the db and all tasks need to be completely reprocessed."""
         from flexget.task import config_changed
+
         config_changed()
         fire_event('manager.config_updated', self)
 
@@ -734,7 +797,10 @@ class Manager(object):
         """Initialize SQLAlchemy"""
         try:
             if [int(part) for part in sqlalchemy.__version__.split('.')] < [0, 7, 0]:
-                print('FATAL: SQLAlchemy 0.7.0 or newer required. Please upgrade your SQLAlchemy.', file=sys.stderr)
+                print(
+                    'FATAL: SQLAlchemy 0.7.0 or newer required. Please upgrade your SQLAlchemy.',
+                    file=sys.stderr,
+                )
                 sys.exit(1)
         except ValueError as e:
             log.critical('Failed to check SQLAlchemy version, you may need to upgrade it')
@@ -751,16 +817,21 @@ class Manager(object):
         # fire up the engine
         log.debug('Connecting to: %s' % self.database_uri)
         try:
-            self.engine = sqlalchemy.create_engine(self.database_uri,
-                                                   echo=self.options.debug_sql,
-                                                   connect_args={'check_same_thread': False, 'timeout': 10})
+            self.engine = sqlalchemy.create_engine(
+                self.database_uri,
+                echo=self.options.debug_sql,
+                connect_args={'check_same_thread': False, 'timeout': 10},
+            )
         except ImportError as e:
-            print('FATAL: Unable to use SQLite. Are you running Python 2.7, 3.3 or newer ?\n'
-                  'Python should normally have SQLite support built in.\n'
-                  'If you\'re running correct version of Python then it is not equipped with SQLite.\n'
-                  'You can try installing `pysqlite`. If you have compiled python yourself, '
-                  'recompile it with SQLite support.\n'
-                  'Error: %s' % e, file=sys.stderr)
+            print(
+                'FATAL: Unable to use SQLite. Are you running Python 2.7, 3.3 or newer ?\n'
+                'Python should normally have SQLite support built in.\n'
+                'If you\'re running correct version of Python then it is not equipped with SQLite.\n'
+                'You can try installing `pysqlite`. If you have compiled python yourself, '
+                'recompile it with SQLite support.\n'
+                'Error: %s' % e,
+                file=sys.stderr,
+            )
             sys.exit(1)
         Session.configure(bind=self.engine)
         # create all tables, doesn't do anything to existing tables
@@ -768,11 +839,17 @@ class Manager(object):
             Base.metadata.create_all(bind=self.engine)
         except OperationalError as e:
             if os.path.exists(self.db_filename):
-                print('%s - make sure you have write permissions to file %s' %
-                      (e.message, self.db_filename), file=sys.stderr)
+                print(
+                    '%s - make sure you have write permissions to file %s'
+                    % (e.message, self.db_filename),
+                    file=sys.stderr,
+                )
             else:
-                print('%s - make sure you have write permissions to directory %s' %
-                      (e.message, self.config_base), file=sys.stderr)
+                print(
+                    '%s - make sure you have write permissions to directory %s'
+                    % (e.message, self.config_base),
+                    file=sys.stderr,
+                )
             raise
 
     def _read_lock(self):
@@ -831,9 +908,15 @@ class Manager(object):
                 if self.check_lock():
                     with io.open(self.lockfile, encoding='utf-8') as f:
                         pid = f.read()
-                    print('Another process (%s) is running, will exit.' % pid.split('\n')[0], file=sys.stderr)
-                    print('If you\'re sure there is no other instance running, delete %s' % self.lockfile,
-                          file=sys.stderr)
+                    print(
+                        'Another process (%s) is running, will exit.' % pid.split('\n')[0],
+                        file=sys.stderr,
+                    )
+                    print(
+                        'If you\'re sure there is no other instance running, delete %s'
+                        % self.lockfile,
+                        file=sys.stderr,
+                    )
                     sys.exit(1)
 
                 self._has_lock = True
@@ -871,8 +954,10 @@ class Manager(object):
             log.error('Cannot daemonize on windows')
             return
         if threading.activeCount() != 1:
-            log.critical('There are %r active threads. '
-                         'Daemonizing now may cause strange failures.' % threading.enumerate())
+            log.critical(
+                'There are %r active threads. '
+                'Daemonizing now may cause strange failures.' % threading.enumerate()
+            )
 
         log.info('Daemonizing...')
 
@@ -931,7 +1016,10 @@ class Manager(object):
 
         :param bool force: Run the cleanup no matter whether the interval has been met.
         """
-        expired = self.persist.get('last_cleanup', datetime(1900, 1, 1)) < datetime.now() - DB_CLEANUP_INTERVAL
+        expired = (
+            self.persist.get('last_cleanup', datetime(1900, 1, 1))
+            < datetime.now() - DB_CLEANUP_INTERVAL
+        )
         if force or expired:
             log.info('Running database cleanup.')
             with Session() as session:
@@ -979,14 +1067,20 @@ class Manager(object):
         debug messages as well as the crash traceback.
         """
         if not self.unit_test:
-            filename = os.path.join(self.config_base, datetime.now().strftime('crash_report.%Y.%m.%d.%H%M%S%f.log'))
+            filename = os.path.join(
+                self.config_base, datetime.now().strftime('crash_report.%Y.%m.%d.%H%M%S%f.log')
+            )
             with codecs.open(filename, 'w', encoding='utf-8') as outfile:
                 outfile.writelines(logger.debug_buffer)
                 traceback.print_exc(file=outfile)
-            log.critical('An unexpected crash has occurred. Writing crash report to %s. '
-                         'Please verify you are running the latest version of flexget by using "flexget -V" '
-                         'from CLI or by using version_checker plugin'
-                         ' at http://flexget.com/wiki/Plugins/version_checker. You are currently using'
-                         ' version %s', filename, get_current_flexget_version())
+            log.critical(
+                'An unexpected crash has occurred. Writing crash report to %s. '
+                'Please verify you are running the latest version of flexget by using "flexget -V" '
+                'from CLI or by using version_checker plugin'
+                ' at http://flexget.com/wiki/Plugins/version_checker. You are currently using'
+                ' version %s',
+                filename,
+                get_current_flexget_version(),
+            )
         log.debug('Traceback:', exc_info=True)
         return traceback.format_exc()

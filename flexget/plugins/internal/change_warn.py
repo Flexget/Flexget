@@ -45,8 +45,10 @@ def register_plugin():
 try:
     import os.path
 
-    plugin_dirs = (os.path.normpath(sys.path[0] + '/../flexget/plugins/'),
-                   os.path.normpath(sys.path[0] + '/../flexget/plugins/input/'))
+    plugin_dirs = (
+        os.path.normpath(sys.path[0] + '/../flexget/plugins/'),
+        os.path.normpath(sys.path[0] + '/../flexget/plugins/input/'),
+    )
     for plugin_dir in plugin_dirs:
         for name in os.listdir(plugin_dir):
             require_clean = False
@@ -88,10 +90,15 @@ try:
                 log.critical('-' * 79)
                 log.critical('IMPORTANT: Your installation has some files from older FlexGet!')
                 log.critical('')
-                log.critical('           Please remove all pre-compiled .pyc and .pyo files from %s' % plugin_dir)
+                log.critical(
+                    '           Please remove all pre-compiled .pyc and .pyo files from %s'
+                    % plugin_dir
+                )
                 log.critical('           Offending file: %s' % name)
                 log.critical('')
-                log.critical('           After getting rid of these FlexGet should run again normally')
+                log.critical(
+                    '           After getting rid of these FlexGet should run again normally'
+                )
 
                 log.critical('')
                 log.critical('-' * 79)

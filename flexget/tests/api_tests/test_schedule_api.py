@@ -23,10 +23,7 @@ class TestEmptyScheduledAPI(object):
 
     @patch.object(Manager, 'save_config')
     def test_schedules_post(self, mocked_save_config, api_client, schema_match):
-        payload = {
-            'tasks': ['test2', 'test3'],
-            'interval': {'minutes': 10}
-        }
+        payload = {'tasks': ['test2', 'test3'], 'interval': {'minutes': 10}}
 
         rsp = api_client.json_post('/schedules/', data=json.dumps(payload))
         assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
@@ -41,8 +38,7 @@ class TestEmptyScheduledAPI(object):
 
 
 class TestScheduledAPI(object):
-    schedule = {'tasks': ['test1'],
-                'interval': {'minutes': 15}}
+    schedule = {'tasks': ['test1'], 'interval': {'minutes': 15}}
 
     config = """
             schedules:
@@ -71,10 +67,7 @@ class TestScheduledAPI(object):
 
     @patch.object(Manager, 'save_config')
     def test_schedules_post(self, mocked_save_config, api_client, schema_match):
-        payload = {
-            'tasks': ['test2', 'test3'],
-            'interval': {'minutes': 10}
-        }
+        payload = {'tasks': ['test2', 'test3'], 'interval': {'minutes': 10}}
 
         rsp = api_client.json_post('/schedules/', data=json.dumps(payload))
         assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
@@ -128,10 +121,7 @@ class TestScheduledAPI(object):
         assert not errors
 
         schedule_id = data[0]['id']
-        payload = {
-            'tasks': ['test2', 'test3'],
-            'interval': {'minutes': 10}
-        }
+        payload = {'tasks': ['test2', 'test3'], 'interval': {'minutes': 10}}
         rsp = api_client.json_put('/schedules/{}/'.format(schedule_id), data=json.dumps(payload))
         assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
@@ -200,10 +190,7 @@ class TestPositiveBooleanSchedule(object):
 
     @patch.object(Manager, 'save_config')
     def test_schedules_post(self, mocked_save_config, api_client, schema_match):
-        payload = {
-            'tasks': ['test2', 'test3'],
-            'interval': {'minutes': 10}
-        }
+        payload = {'tasks': ['test2', 'test3'], 'interval': {'minutes': 10}}
 
         rsp = api_client.json_post('/schedules/', data=json.dumps(payload))
         assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
@@ -254,10 +241,7 @@ class TestPositiveBooleanSchedule(object):
         assert not errors
 
         schedule_id = data[0]['id']
-        payload = {
-            'tasks': ['test2', 'test3'],
-            'interval': {'minutes': 10}
-        }
+        payload = {'tasks': ['test2', 'test3'], 'interval': {'minutes': 10}}
         rsp = api_client.json_put('/schedules/{}/'.format(schedule_id), data=json.dumps(payload))
         assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
@@ -315,10 +299,7 @@ class TestNegativeBooleanSchedule(object):
         assert not errors
 
     def test_schedules_post(self, api_client, schema_match):
-        payload = {
-            'tasks': ['test2', 'test3'],
-            'interval': {'minutes': 10}
-        }
+        payload = {'tasks': ['test2', 'test3'], 'interval': {'minutes': 10}}
 
         rsp = api_client.json_post('/schedules/', data=json.dumps(payload))
         assert rsp.status_code == 409, 'Response code is %s' % rsp.status_code
@@ -336,10 +317,7 @@ class TestNegativeBooleanSchedule(object):
         assert not errors
 
     def test_schedules_id_put(self, api_client, schema_match):
-        payload = {
-            'tasks': ['test2', 'test3'],
-            'interval': {'minutes': 10}
-        }
+        payload = {'tasks': ['test2', 'test3'], 'interval': {'minutes': 10}}
         rsp = api_client.json_put('/schedules/1/', data=json.dumps(payload))
         assert rsp.status_code == 409, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))

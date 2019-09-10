@@ -16,7 +16,6 @@ log = logging.getLogger('explain_sql')
 
 
 class Explain(Executable, ClauseElement):
-
     def __init__(self, stmt):
         self.statement = _literal_as_text(stmt)
 
@@ -28,7 +27,6 @@ def explain(element, compiler, **kw):
 
 
 class ExplainQuery(Query):
-
     def __iter__(self):
         log.info('Query:\n\t%s' % str(self).replace('\n', '\n\t'))
         explain = self.session.execute(Explain(self)).fetchall()
@@ -53,5 +51,6 @@ def deregister_sql_explain(man, options):
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('--explain-sql', action='store_true', dest='explain_sql',
-                                               default=False, help=SUPPRESS)
+    options.get_parser('execute').add_argument(
+        '--explain-sql', action='store_true', dest='explain_sql', default=False, help=SUPPRESS
+    )

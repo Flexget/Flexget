@@ -28,7 +28,7 @@ class MetainfoImdbUrl(object):
             # Don't override already populated imdb_ids
             if entry.get('imdb_id', eval_lazy=False):
                 continue
-            if 'description' not in entry:
+            if not entry.get('description'):
                 continue
             urls = re.findall(r'\bimdb.com/title/tt\d+\b', entry['description'])
             # Find unique imdb ids

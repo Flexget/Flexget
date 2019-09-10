@@ -20,12 +20,9 @@ class Duplicates(object):
 
     schema = {
         'type': 'object',
-        'properties': {
-            'field': {'type': 'string'},
-            'action': {'enum': ['accept', 'reject']},
-        },
+        'properties': {'field': {'type': 'string'}, 'action': {'enum': ['accept', 'reject']}},
         'required': ['field', 'action'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def on_task_filter(self, task, config):
@@ -37,7 +34,8 @@ class Duplicates(object):
                     continue
                 if entry.get(field) is not None and entry[field] == prospect.get(field):
                     msg = 'Field {} value {} equals on {} and {}'.format(
-                        field, entry[field], entry['title'], prospect['title'])
+                        field, entry[field], entry['title'], prospect['title']
+                    )
                     if action == 'accept':
                         entry.accept(msg)
                     else:

@@ -14,14 +14,20 @@ class ManualTask(object):
 
     schema = {'type': 'boolean'}
 
-    @plugin.priority(255)
+    @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_start(self, task, config):
         # Make sure we need to run
         if not config:
             return
         # If --task hasn't been specified disable this plugin
-        if not task.options.tasks or task.name not in task.options.tasks or not task.options.allow_manual:
-            log.debug('Disabling task %s, task can only run in manual mode (via API/CLI)' % task.name)
+        if (
+            not task.options.tasks
+            or task.name not in task.options.tasks
+            or not task.options.allow_manual
+        ):
+            log.debug(
+                'Disabling task %s, task can only run in manual mode (via API/CLI)' % task.name
+            )
             task.abort('manual task not specified in --tasks', silent=True)
 
 

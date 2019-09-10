@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 
@@ -24,7 +23,7 @@ class FilterRequireField(object):
 
     @plugin.priority(32)
     def on_task_filter(self, task, config):
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = [config]
         for entry in task.entries:
             for field in config:

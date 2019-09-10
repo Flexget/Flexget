@@ -28,11 +28,7 @@ class TestNotifyAbort(object):
 
     def test_notify_abort(self, execute_task, debug_notifications):
         execute_task('test_abort', abort=True)
-        data = (
-            'Task test_abort has aborted!',
-            'Reason: abort plugin',
-            {'user_key': 'user_key'}
-        )
+        data = ('Task test_abort has aborted!', 'Reason: abort plugin', {'user_key': 'user_key'})
 
         assert debug_notifications[0] == data
         assert len(debug_notifications) == 1

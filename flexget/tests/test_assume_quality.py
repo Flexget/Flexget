@@ -111,12 +111,16 @@ class TestAssumeQuality(object):
     def test_default(self, execute_task):
         task = execute_task('test_default')
         entry = task.find_entry('entries', title='Testfile.noquality')
-        assert entry.get('quality') == qualities.Quality('720p h264'), 'Testfile.noquality quality not \'720p h264\''
+        assert entry.get('quality') == qualities.Quality(
+            '720p h264'
+        ), 'Testfile.noquality quality not \'720p h264\''
 
     def test_simple(self, execute_task):
         task = execute_task('test_simple')
         entry = task.find_entry('entries', title='Testfile.noquality')
-        assert entry.get('quality') == qualities.Quality('720p h264'), 'Testfile.noquality quality not \'720p h264\''
+        assert entry.get('quality') == qualities.Quality(
+            '720p h264'
+        ), 'Testfile.noquality quality not \'720p h264\''
 
     def test_priority(self, execute_task):
         task = execute_task('test_priority')

@@ -52,7 +52,10 @@ class PluginRtorrentMagnet(object):
 
         for entry in task.accepted:
             if 'output' in entry:
-                log.debug('Ignoring, %s already has an output file: %s' % (entry['title'], entry['output']))
+                log.debug(
+                    'Ignoring, %s already has an output file: %s'
+                    % (entry['title'], entry['output'])
+                )
                 continue
 
             for url in entry.get('urls', [entry['url']]):

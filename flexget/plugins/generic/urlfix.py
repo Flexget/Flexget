@@ -17,7 +17,7 @@ class UrlFix(object):
 
     schema = {'type': 'boolean'}
 
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_input(self, task, config):
         if config is False:
             return
