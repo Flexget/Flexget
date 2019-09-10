@@ -16,7 +16,7 @@ class Manipulate(object):
 
       manipulate:
         - <destination field>:
-            [findall]: <boolean>
+            [find_all]: <boolean>
             [phase]: <phase>
             [from]: <source field>
             [extract]: <regexp>
@@ -45,7 +45,7 @@ class Manipulate(object):
                     'extract': {'type': 'string', 'format': 'regex'},
                     'separator': {'type': 'string'},
                     'remove': {'type': 'boolean'},
-                    'findall': {'type': 'boolean'},
+                    'find_all': {'type': 'boolean'},
                     'replace': {
                         'type': 'object',
                         'properties': {
@@ -119,7 +119,7 @@ class Manipulate(object):
                     if not field_value:
                         log.warning('Cannot extract, field `%s` is not present', from_field)
                         continue
-                    if config.get('findall'):
+                    if config.get('find_all'):
                         match = re.findall(config['extract'], field_value, re.I | re.U)
                         log.debug('all matches: %s', match)
                         field_value = config.get('separator', ' ').join(match).strip()
