@@ -812,7 +812,7 @@ class Manager(object):
             self.database_uri = 'sqlite:///%s' % filename
 
         if self.db_filename and not os.path.exists(self.db_filename):
-            log.verbose('Creating new database %s - DO NOT INTERUPT ...' % self.db_filename)
+            log.verbose('Creating new database %s - DO NOT INTERRUPT ...', self.db_filename)
 
         # fire up the engine
         log.debug('Connecting to: %s' % self.database_uri)
