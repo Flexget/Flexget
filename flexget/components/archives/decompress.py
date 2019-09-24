@@ -68,10 +68,10 @@ def extract_info(info, archive, to, keep_dirs):
     except archiveutil.FSError as error:
         log.error('OS error while creating file: %s (%s)' % (destination, error))
     except archiveutil.FileAlreadyExists as error:
-        log.warn('File already exists: %s' % destination)
+        log.warning('File already exists: %s' % destination)
     except archiveutil.ArchiveError as error:
         log.error(
-            'Failed to extract file: %s in %s (%s)' % (info.filename, entry['location'], error)
+            'Failed to extract file: %s from %s (%s)' % (info.filename, archive.path, error)
         )
 
 
