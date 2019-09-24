@@ -479,7 +479,7 @@ class OutputDeluge(DelugePlugin):
         # "No Label" is a special identifier to unset a label
         if label.lower() == 'no label':
             return 'No Label'
-        return re.sub('[^\w-]+', '_', label.lower())
+        return re.sub(r'[^\w-]+', '_', label.lower())
 
     def _set_torrent_options(self, client, torrent_id, entry, opts):
         """Gets called when a torrent was added to the daemon."""
