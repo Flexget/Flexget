@@ -22,9 +22,6 @@ terminaltables>=3.1.0
 colorclass>=2.2.0
 # WebUI Requirements
 cherrypy>=3.7.0
-# this is indirectly required by cherrypy on windows, we add it here manually so that the conditional platform
-# requirement is added to requirements.txt
-pywin32; sys_platform == 'win32'
 flask>=0.7
 flask-restful>=0.3.3
 flask-restplus==0.10.1
