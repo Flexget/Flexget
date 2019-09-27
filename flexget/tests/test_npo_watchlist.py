@@ -33,12 +33,12 @@ class TestNpoWatchlistInfo(object):
         assert entry['npo_name'] == 'Zondag met Lubach'
         assert (
             entry['npo_description']
-            == 'Zeven dagen nieuws in dertig minuten, satirisch geremixt door Arjen Lubach. Met irrelevante verhalen van relevante gasten. Of andersom. Vanuit theater Bellevue in Amsterdam: platte inhoud en diepgravende grappen.'
+            == 'Zeven dagen nieuws in dertig minuten, satirisch geremixt door Arjen Lubach. Nog actueler, nog satirischer en nog vaker nog het woord nog.'
         )
         assert entry['npo_runtime'] == '32'
         assert entry['npo_premium'] is False
         assert (
-            entry['npo_version'] == 'NPO.release-1.43.1'
+            entry['npo_version'] == 'NPO.release-1.53.1'
         )  # specify for which version of NPO website we did run this unittest
 
         entry = (
@@ -91,12 +91,12 @@ class TestNpoWatchlistPremium(object):
 
         task = execute_task('test')
         entry = task.find_entry(
-            url='https://www.npostart.nl/dynasties/29-06-2021/POW_04072126'
+            url='https://www.npostart.nl/hollands-hoop/04-11-2017/BV_101385161'
         )  # a premium serie
-        assert entry['npo_id'] == 'POW_04072126'
-        assert entry['npo_url'] == 'https://www.npostart.nl/dynasties/POW_04005761'
-        assert entry['npo_name'] == 'Dynasties'
-        assert entry['npo_runtime'] == '50'
+        assert entry['npo_id'] == 'BV_101385161'
+        assert entry['npo_url'] == 'https://www.npostart.nl/hollands-hoop/BV_101385153'
+        assert entry['npo_name'] == 'Hollands Hoop'
+        assert entry['npo_runtime'] == '53'
         assert entry['npo_premium'] is True
 
 
