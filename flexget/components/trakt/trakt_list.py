@@ -243,6 +243,10 @@ class TraktSet(MutableSet):
                             list_type,
                         )
                         continue
+                    if list_type not in item:
+                        # Issue 2445
+                        log.warning("Item type can not be determined, skipping item %s", item)
+                        continue
                     if list_type != 'episode' and not item[list_type]['title']:
                         # Skip shows/movies with no title
                         log.warning('Item in trakt list does not appear to have a title, skipping.')
