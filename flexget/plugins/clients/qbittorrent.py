@@ -154,7 +154,7 @@ class OutputQBitTorrent(object):
                 form_data['label'] = label  # qBittorrent v3.3.3-
                 form_data['category'] = label  # qBittorrent v3.3.4+
 
-            add_paused = entry.get('paused', config.get('paused'))
+            add_paused = entry.get('add_paused', config.get('add_paused'))
             if add_paused:
                 form_data['paused'] = 'true'
 
