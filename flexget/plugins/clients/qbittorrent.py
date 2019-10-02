@@ -30,6 +30,7 @@ class OutputQBitTorrent(object):
         label: <LABEL> (default: (none))
         maxupspeed: <torrent upload speed limit> (default: 0)
         maxdownspeed: <torrent download speed limit> (default: 0)
+        add_paused: <ADD_PAUSED> (default: False)
     """
 
     schema = {
@@ -49,6 +50,7 @@ class OutputQBitTorrent(object):
                     'maxupspeed': {'type': 'integer'},
                     'maxdownspeed': {'type': 'integer'},
                     'fail_html': {'type': 'boolean'},
+                    'add_paused': {'type': 'boolean'},
                 },
                 'additionalProperties': False,
             },
@@ -152,6 +154,10 @@ class OutputQBitTorrent(object):
                 form_data['label'] = label  # qBittorrent v3.3.3-
                 form_data['category'] = label  # qBittorrent v3.3.4+
 
+            add_paused = entry.get('add_paused', config.get('add_paused'))
+            if add_paused:
+                form_data['paused'] = 'true'
+
             maxupspeed = entry.get('maxupspeed', config.get('maxupspeed'))
             if maxupspeed:
                 form_data['upLimit'] = maxupspeed * 1024
@@ -171,6 +177,7 @@ class OutputQBitTorrent(object):
                     log.info('Url: %s', entry.get('url'))
                 log.info('Save path: %s', form_data.get('savepath'))
                 log.info('Label: %s', form_data.get('label'))
+                log.info('Paused: %s', form_data.get('paused', 'false'))
                 if maxupspeed:
                     log.info('Upload Speed Limit: %d', form_data.get('upLimit'))
                 if maxdownspeed:
