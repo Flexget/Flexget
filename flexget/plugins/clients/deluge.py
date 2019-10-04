@@ -487,9 +487,10 @@ class OutputDeluge(DelugePlugin):
         entry['deluge_id'] = torrent_id
 
         if opts.get('move_completed_path'):
-            client.call('core.set_torrent_move_completed', torrent_id, True)
             client.call(
-                'core.set_torrent_move_completed_path', torrent_id, opts['move_completed_path']
+                'core.set_torrent_options',
+                [torrent_id],
+                {'move_completed': True, 'move_completed_path': opts['move_completed_path']},
             )
             log.debug('%s move on complete set to %s', entry['title'], opts['move_completed_path'])
         if opts.get('label'):
@@ -627,7 +628,11 @@ class OutputDeluge(DelugePlugin):
                         1 if f == main_file or f == sub_file and keep_subs else 0
                         for f in status['files']
                     ]
-                    client.call('core.set_torrent_file_priorities', torrent_id, file_priorities)
+                    client.call(
+                        'core.set_torrent_options',
+                        [torrent_id],
+                        {'file_priorities': file_priorities},
+                    )
 
                     if opts.get('hide_sparse_files'):
                         # hide the other sparse files that are not supposed to download but are created anyway
