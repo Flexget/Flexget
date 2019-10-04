@@ -41,6 +41,7 @@ pip-selfcheck.json
 !.circleci/config.yml
 !raw_config.yml
 !variables.yml
+!.github/**/*
 cached_resources/
 pyvenv.cfg
 .pytest_cache
