@@ -206,8 +206,7 @@ def pytest_runtest_setup(item):
 @pytest.yield_fixture()
 def filecopy(request):
     out_files = []
-    marker = request.node.get_closest_marker('filecopy')
-    if marker is not None:
+    for marker in request.node.iter_markers('filecopy'):
         copy_list = marker.args[0] if len(marker.args) == 1 else [marker.args]
 
         for sources, dst in copy_list:
