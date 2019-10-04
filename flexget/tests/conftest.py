@@ -71,7 +71,7 @@ def manager(
         mockmanager = MockManager(config, request.cls.__name__)
     except Exception:
         # Since we haven't entered the test function yet, pytest won't print the logs on failure. Print them manually.
-        print(caplog.text)
+        print (caplog.text)
         raise
     yield mockmanager
     mockmanager.shutdown()
@@ -187,8 +187,10 @@ def pytest_configure(config):
     # register the filecopy marker
     config.addinivalue_line(
         'markers',
-        'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.'
-        'online: mark a test that goes online. VCR will automatically be used.',
+        'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.',
+    )
+    config.addinivalue_line(
+        'markers', 'online: mark a test that goes online. VCR will automatically be used.'
     )
 
 
@@ -236,7 +238,7 @@ def filecopy(request):
                 else:
                     f.remove()
             except OSError as e:
-                print("couldn't remove %s: %s" % (f, e))
+                print ("couldn't remove %s: %s" % (f, e))
 
 
 @pytest.fixture()
