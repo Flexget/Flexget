@@ -1,6 +1,12 @@
 name: Run all tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+    - develop
+  pull_request:
+    branches:
+    - *
 
 jobs:
   build:
