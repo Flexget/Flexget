@@ -10,6 +10,7 @@ install_deps: &install_deps
     pip install -r requirements.txt
     pip install -r dev-requirements.txt
     pip install -r dev-requirements-extras.txt
+    pip freeze
 
 run_tests: &run_tests
   name: Run Tests
