@@ -453,13 +453,17 @@ class OutputDeluge(DelugePlugin):
                 if not added_torrent:
                     log.error('There was an error adding %s to deluge.' % entry['title'])
                 else:
+                    log.info('%s successfully added to deluge.', entry['title'])
                     self._set_torrent_options(client, added_torrent, entry, modify_opts)
             if config['action'] in ('remove', 'purge'):
                 client.call('core.remove_torrent', torrent_id, config['action'] == 'purge')
+                log.info('%s removed from deluge.', entry['title'])
             elif config['action'] == 'pause':
                 client.call('core.pause_torrent', [torrent_id])
+                log.info('%s has been paused in deluge.', entry['title'])
             elif config['action'] == 'resume':
                 client.call('core.resume_torrent', [torrent_id])
+                log.info('%s has been resumed in deluge.', entry['title'])
 
         client.disconnect()
 
@@ -483,7 +487,6 @@ class OutputDeluge(DelugePlugin):
 
     def _set_torrent_options(self, client, torrent_id, entry, opts):
         """Gets called when a torrent was added to the daemon."""
-        log.info('%s successfully added to deluge.', entry['title'])
         entry['deluge_id'] = torrent_id
 
         if opts.get('move_completed_path'):
