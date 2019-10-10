@@ -108,11 +108,11 @@ def filter_date_suffix(date):
 
 def filter_format_number(val, places=None, grouping=True):
     """Formats a number according to the user's locale."""
-    if not isinstance(val, (int, float, int)):
+    if not isinstance(val, (int, float)):
         return val
     if places is not None:
         format = '%.' + str(places) + 'f'
-    elif isinstance(val, (int, int)):
+    elif isinstance(val, int):
         format = '%d'
     else:
         format = '%.02f'
