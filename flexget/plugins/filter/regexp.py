@@ -148,16 +148,14 @@ class FilterRegexp(object):
     def on_task_filter(self, task, config):
         # TODO: what if accept and accept_excluding configured? Should raise error ...
         config = self.prepare_config(config)
-        rest = []
+        # Keep track of all entries which have not matched any regexp
+        rest = set(task.entries)
         for operation, regexps in config.items():
             if operation == 'rest':
                 continue
-            leftovers = self.filter(task, operation, regexps)
-            if not rest:
-                rest = leftovers
-            else:
-                # If there is already something in rest, take the intersection with r (entries no operations matched)
-                rest = [entry for entry in leftovers if entry in rest]
+            matched = self.filter(task.entries, operation, regexps)
+            # Remove any entries from rest which matched this regexp
+            rest -= matched
 
         if 'rest' in config:
             rest_method = Entry.accept if config['rest'] == 'accept' else Entry.reject
@@ -199,19 +197,19 @@ class FilterRegexp(object):
                     else:  # None of the not_regexps matched
                         return field
 
-    def filter(self, task, operation, regexps):
+    def filter(self, entries, operation, regexps):
         """
-        :param task: Task instance
+        :param entries: entries to filter
         :param operation: one of 'accept' 'reject' 'accept_excluding' and 'reject_excluding'
-                          accept and reject will be called on the entry if any of the regxps match
+                          accept and reject will be called on the entry if any of the regexps match
                           *_excluding operations will be called if any of the regexps don't match
         :param regexps: list of {compiled_regexp: options} dictionaries
-        :return: Return list of entries that didn't match regexps
+        :return: Return set of entries that matched regexps
         """
-        rest = []
+        matched = set()
         method = Entry.accept if 'accept' in operation else Entry.reject
         match_mode = 'excluding' not in operation
-        for entry in task.entries:
+        for entry in entries:
             log.trace('testing %i regexps to %s' % (len(regexps), entry['title']))
             for regexp_opts in regexps:
                 regexp, opts = list(regexp_opts.items())[0]
@@ -236,13 +234,13 @@ class FilterRegexp(object):
                         )
                         plugin.get('set', self).modify(entry, opts['set'])
                     method(entry, matchtext)
+                    matched.add(entry)
                     # We had a match so break out of the regexp loop.
                     break
             else:
                 # We didn't run method for any of the regexps, add this entry to rest
                 entry.trace('None of configured %s regexps matched' % operation)
-                rest.append(entry)
-        return rest
+        return matched
 
 
 @event('plugin.register')
