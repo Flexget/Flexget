@@ -176,12 +176,14 @@ class FilterExistsMovie(object):
                 key = entry[keyImdb]
             else:
                 keyName = 'movie_name'
+                keyYear = 'movie_year'
                 if not entry.get(keyName, eval_lazy=False):
                     movie = plugin.get('parsing', self).parse_movie(entry['title'])
                     entry[keyName] = movie.name
+                    entry[keyYear] = movie.year
                     
-                if entry.get('movie_year', eval_lazy=False):
-                    key = "%s %s" % (entry[keyName], entry['movie_year'])
+                if entry.get(keyYear, eval_lazy=False):
+                    key = "%s %s" % (entry[keyName], entry[keyYear])
                 else:
                     key = entry[keyName]
 
