@@ -148,8 +148,11 @@ class FilterExistsMovie(object):
                         log.trace('%s lookup failed (%s)' % (item, e.value))
                         incompatible_files += 1
                 else:
-                    path_ids[movie.name] = movie.quality
-                    log.trace('adding: %s' % movie.name)
+                    movie_id = movie.name
+                    if movie.name is not None and movie.year is not None:
+                        movie_id = "%s %s" % (movie.name, movie.year)
+                    path_ids[movie_id] = movie.quality
+                    log.trace('adding: %s' % movie_id)
 
             # store to cache and extend to found list
             self.cache[folder] = path_ids
@@ -162,28 +165,34 @@ class FilterExistsMovie(object):
             count_entries += 1
             log.debug('trying to parse entry %s' % entry['title'])
             if config.get('lookup') == 'imdb':
-                key = 'imdb_id'
-                if not entry.get('imdb_id', eval_lazy=False):
+                keyImdb = 'imdb_id'
+                if not entry.get(keyImdb, eval_lazy=False):
                     try:
                         imdb_lookup.lookup(entry)
                     except plugin.PluginError as e:
                         log.trace('entry %s imdb failed (%s)' % (entry['title'], e.value))
                         incompatible_entries += 1
                         continue
+                key = entry[keyImdb]
             else:
-                key = 'movie_name'
-                if not entry.get('movie_name', eval_lazy=False):
+                keyName = 'movie_name'
+                if not entry.get(keyName, eval_lazy=False):
                     movie = plugin.get('parsing', self).parse_movie(entry['title'])
-                    entry['movie_name'] = movie.name
+                    entry[keyName] = movie.name
+                    
+                if entry.get('movie_year', eval_lazy=False):
+                    key = "%s %s" % (entry[keyName], entry['movie_year'])
+                else:
+                    key = entry[keyName]
 
             # actual filtering
-            if entry[key] in qualities:
+            if key in qualities:
                 if config.get('allow_different_qualities') == 'better':
-                    if entry['quality'] > qualities[entry[key]]:
+                    if entry['quality'] > qualities[key]:
                         log.trace('better quality')
                         continue
                 elif config.get('allow_different_qualities'):
-                    if entry['quality'] != qualities[entry[key]]:
+                    if entry['quality'] != qualities[key]:
                         log.trace('wrong quality')
                         continue
 
