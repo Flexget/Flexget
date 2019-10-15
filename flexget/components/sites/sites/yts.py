@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from future.moves.urllib.parse import urlparse
+
 import logging
-import urllib
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -24,7 +26,7 @@ class UrlRewriteYTS(object):
         ]
         for search_string in search_strings:
             url = 'https://yts.am/api/v2/list_movies.json?query_term=%s' % (
-                urllib.quote(search_string.encode('utf-8'))
+                quote(search_string.encode('utf-8'))
             )
 
             log.debug('requesting: %s' % url)
