@@ -30,5 +30,5 @@ flask-login>=0.4.0
 flask-cors>=2.1.2
 pyparsing>=2.0.3
 zxcvbn-python
-future>=0.15.2
+future>=0.18.0
 progressbar==2.5

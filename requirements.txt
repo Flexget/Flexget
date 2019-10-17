@@ -21,7 +21,7 @@ flask-login==0.4.0
 flask-restful==0.3.6
 flask-restplus==0.10.1
 flask==1.0.2
-future==0.16.0
+future==0.18.0
 guessit==3.0.3
 html5lib==0.999999999
 idna==2.5                 # via requests
