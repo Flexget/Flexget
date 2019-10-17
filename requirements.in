@@ -1,5 +1,5 @@
 FeedParser>=5.2.1
-SQLAlchemy >=1.0.9, <1.999
+SQLAlchemy >=1.3.10, <1.999
 PyYAML>=4.2b1
 # Beautifulsoup 4.5+ is required to support different versions of html5lib
 beautifulsoup4>=4.5
