@@ -54,7 +54,7 @@ class TestManipulate(object):
               - title:
                   replace:
                     regexp: (1234)\-(7890)
-                    format: 'e\\2'
+                    format: 'e\2'
     """
 
     def test_replace(self, execute_task):
