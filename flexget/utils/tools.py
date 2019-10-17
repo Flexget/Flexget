@@ -473,7 +473,7 @@ def parse_filesize(text_size, si=True):
     prefix_order = {'': 0, 'k': 1, 'm': 2, 'g': 3, 't': 4, 'p': 5}
 
     parsed_size = re.match(
-        '(\d+(?:[.,\s]\d+)*)(?:\s*)((?:[ptgmk]i?)?b)', text_size.strip().lower(), flags=re.UNICODE
+        r'(\d+(?:[.,\s]\d+)*)(?:\s*)((?:[ptgmk]i?)?b)', text_size.strip().lower(), flags=re.UNICODE
     )
     if not parsed_size:
         raise ValueError('%s does not look like a file size' % text_size)

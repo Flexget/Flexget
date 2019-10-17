@@ -3,7 +3,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 
 class TestManipulate(object):
-    config = """
+    config = r"""
         tasks:
 
           test_1:

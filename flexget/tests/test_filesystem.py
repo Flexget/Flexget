@@ -54,7 +54,7 @@ class TestFilesystem(object):
             filesystem:
               path: """
         + test1
-        + """
+        + r"""
               regexp: '.*\.(mkv)$'
 
           recursive_true:

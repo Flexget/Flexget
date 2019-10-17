@@ -75,7 +75,7 @@ class TestURLRewriters(object):
 class TestRegexpurlrewriter(object):
     # TODO: this test is broken?
 
-    config = """
+    config = r"""
         tasks:
           test:
             mock:

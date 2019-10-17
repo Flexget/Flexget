@@ -16,7 +16,7 @@ log = logging.getLogger('rlsbb')
 
 
 class UrlRewriteRlsbb(object):
-    """
+    r"""
     rlsbb.ru urlrewriter
     Version 0.1
 

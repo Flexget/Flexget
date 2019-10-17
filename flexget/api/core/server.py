@@ -13,7 +13,7 @@ import traceback
 from time import sleep
 from path import Path
 import binascii
-import cherrypy
+#import cherrypy
 import yaml
 from flask import Response, jsonify, request
 from flexget.utils.tools import get_latest_flexget_version_number

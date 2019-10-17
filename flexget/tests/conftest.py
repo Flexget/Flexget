@@ -173,7 +173,7 @@ def link_headers(manager):
         links = {}
         for link in requests.utils.parse_header_links(response.headers.get('link')):
             url = link['url']
-            page = int(re.search('(?<!per_)page=(\d)', url).group(1))
+            page = int(re.search(r'(?<!per_)page=(\d)', url).group(1))
             links[link['rel']] = dict(url=url, page=page)
         return links
 

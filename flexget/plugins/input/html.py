@@ -172,7 +172,7 @@ class InputHtml(object):
         parts = parse.urlsplit(url)
         name = ''
         if parts.scheme == 'magnet':
-            match = re.search('(?:&dn(?:\.\d)?=)(.+?)(?:&)', parts.query)
+            match = re.search(r'(?:&dn(?:\.\d)?=)(.+?)(?:&)', parts.query)
             if match:
                 name = match.group(1)
         else:

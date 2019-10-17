@@ -15,7 +15,7 @@ log = logging.getLogger('regexp_parse')
 
 
 class RegexpParse(object):
-    """This plugin is designed to take input from a web resource or a file.
+    r"""This plugin is designed to take input from a web resource or a file.
     It then parses the text via regexps supplied in the config file.
 
     source: is a file or url to get the data from. You can specify a username:password

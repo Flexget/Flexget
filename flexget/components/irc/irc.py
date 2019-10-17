@@ -39,7 +39,7 @@ URL_MATCHER = re.compile(
 
 channel_pattern = {
     'type': 'string',
-    'pattern': '^([#&][^\x07\x2C\s]{0,200})',
+    'pattern': '^([#&][^\x07\x2C\\s]{0,200})',
     'error_pattern': 'channel name must start with # or & and contain no commas and whitespace',
 }
 schema = {

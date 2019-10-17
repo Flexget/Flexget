@@ -284,7 +284,7 @@ class SearchMoreThanTV(object):
                 title = group_info.find('a', href=re.compile(r'torrents.php\?id=\d+')).text
                 url = (
                     self.base_url
-                    + group_info.find('a', href=re.compile('torrents.php\?action=download'))[
+                    + group_info.find('a', href=re.compile(r'torrents.php\?action=download'))[
                         'href'
                     ]
                 )

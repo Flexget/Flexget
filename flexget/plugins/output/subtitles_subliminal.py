@@ -23,7 +23,7 @@ AUTHENTICATION_SCHEMA = dict((provider, {'type': 'object'}) for provider in PROV
 
 
 class PluginSubliminal(object):
-    """
+    r"""
     Search and download subtitles using Subliminal by Antoine Bertin
     (https://pypi.python.org/pypi/subliminal).
 

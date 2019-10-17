@@ -96,7 +96,7 @@ def process_variables(config, manager):
 
 def _process(element, environment):
     if isinstance(element, dict):
-        for k, v in element.items():
+        for k, v in list(element.items()):
             new_key = _process(k, environment)
             if new_key:
                 element[new_key] = element.pop(k)

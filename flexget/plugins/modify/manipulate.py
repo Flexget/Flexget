@@ -11,7 +11,7 @@ log = logging.getLogger('manipulate')
 
 
 class Manipulate(object):
-    """
+    r"""
     Usage:
 
       manipulate:

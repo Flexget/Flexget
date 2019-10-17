@@ -5,7 +5,7 @@ import pytest
 
 
 class TestSortBy(object):
-    config = """
+    config = r"""
         tasks:
           test_title:
             sort_by: title

@@ -267,18 +267,18 @@ class SearchAlphaRatio(object):
                 group_info = result.find('td', attrs={'class': 'big_info'}).find(
                     'div', attrs={'class': 'group_info'}
                 )
-                title = group_info.find('a', href=re.compile('torrents.php\?id=\d+')).text
+                title = group_info.find('a', href=re.compile(r'torrents.php\?id=\d+')).text
                 url = (
                     self.base_url
                     + group_info.find(
-                        'a', href=re.compile('torrents.php\?action=download(?!usetoken)')
+                        'a', href=re.compile(r'torrents.php\?action=download(?!usetoken)')
                     )['href']
                 )
 
                 torrent_info = result.findAll('td')
                 size_col = torrent_info[size_idx].text
                 log.debug('AlphaRatio size: %s', size_col)
-                size = re.search('(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', size_col)
+                size = re.search(r'(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', size_col)
                 torrent_tags = ', '.join(
                     [tag.text for tag in group_info.findAll('div', attrs={'class': 'tags'})]
                 )

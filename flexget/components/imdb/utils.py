@@ -194,7 +194,7 @@ class ImdbSearch(object):
             movie = {}
             additional = re.findall(r'\((.*?)\)', result_text.text)
             if len(additional) > 0:
-                if re.match('^\d{4}$', additional[-1]):
+                if re.match(r'^\d{4}$', additional[-1]):
                     movie['year'] = str_to_int(additional[-1])
                 elif len(additional) > 1:
                     movie['year'] = str_to_int(additional[-2])
