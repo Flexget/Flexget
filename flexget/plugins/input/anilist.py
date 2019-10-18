@@ -68,10 +68,11 @@ class AniList(object):
     @cached('anilist', persist='2 hours')
     def on_task_input(self, task, config):
         entries = []
+        if isinstance(config, str):
+            config = {'username': config}
         selected_list_status = config['status'] if 'status' in config else ['current', 'planning']
         selected_release_status = config['release_status'] if 'release_status' in config else ['all']
         selected_formats = config['format'] if 'format' in config else ['all']
-        username = config if isinstance(config, unicode) else config['username']
 
         if not isinstance(selected_list_status, list):
             selected_list_status = [selected_list_status]
@@ -89,7 +90,7 @@ class AniList(object):
         req_query = ('fragment aniList on MediaList{ media{ status, title{ romaji, english }, synonyms, siteUrl, '
                     'idMal, format, episodes, trailer{ site, id }, coverImage{ large }, bannerImage, genres, '
                     'tags{ name }, externalLinks{ site, url }}} query ($user: String){')
-        req_variables = {'user': username}
+        req_variables = {'user': config['username']}
 
         for s in selected_list_status:
             req_query += ('%s: Page {mediaList(userName: $user, type: ANIME, status: %s) {...aniList}}' % (
