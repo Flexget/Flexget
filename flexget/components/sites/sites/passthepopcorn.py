@@ -117,6 +117,7 @@ class SearchPassThePopcorn(object):
             'order_desc': {'type': 'boolean', 'default': True},
             'freeleech': {'type': 'boolean'},
             'release_type': {'type': 'string', 'enum': list(RELEASE_TYPES.keys())},
+            'grouping': {'type': 'boolean', 'default': True},
         },
         'required': ['username', 'password', 'passkey'],
         'additionalProperties': False,
@@ -246,6 +247,8 @@ class SearchPassThePopcorn(object):
 
         ordering = 'desc' if config['order_desc'] else 'asc'
 
+        grouping = int(config['grouping'])
+
         entries = set()
 
         params.update(
@@ -254,6 +257,7 @@ class SearchPassThePopcorn(object):
                 'order_way': ordering,
                 'action': 'advanced',
                 'json': 'noredirect',
+                'grouping': grouping,
             }
         )
 
