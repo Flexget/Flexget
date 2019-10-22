@@ -175,7 +175,7 @@ def query_series(api_key, user_token, member_name=None):
             log.error("member %r not found" % member_name)
             return []
     r = requests.get(
-        API_URL_PREFIX + 'members/infos',
+        API_URL_PREFIX + 'shows/member',
         params=params,
         headers={
             'Accept': 'application/json',
@@ -190,7 +190,7 @@ def query_series(api_key, user_token, member_name=None):
     for err in error_list:
         log.error(str(err))
     if not error_list:
-        return [x['title'] for x in j['member']['shows'] if x['user']['archived'] is False]
+        return [x['title'] for x in j['shows'] if x['user']['archived'] is False]
     else:
         return []
 
