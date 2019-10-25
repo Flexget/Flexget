@@ -32,3 +32,12 @@ class TestVariablesAPI(object):
         rsp = api_client.get('/variables/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         assert json.loads(rsp.get_data(as_text=True)) == self.variables_dict
+
+    def test_variables_patch(self, api_client):
+        data = {'a': 'b', 'c': 'd'}
+        api_client.json_put('/variables/', data=json.dumps(data))
+        new_data = {'a': [1, 2, 3], 'foo': 'bar'}
+
+        rsp = api_client.json_patch('/variables/', data=json.dumps(new_data))
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert json.loads(rsp.get_data(as_text=True)) == {'a': [1, 2, 3], 'foo': 'bar', 'c': 'd'}
