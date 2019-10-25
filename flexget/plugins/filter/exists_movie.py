@@ -165,27 +165,27 @@ class FilterExistsMovie(object):
             count_entries += 1
             log.debug('trying to parse entry %s' % entry['title'])
             if config.get('lookup') == 'imdb':
-                keyImdb = 'imdb_id'
-                if not entry.get(keyImdb, eval_lazy=False):
+                key_imdb = 'imdb_id'
+                if not entry.get(key_imdb, eval_lazy=False):
                     try:
                         imdb_lookup.lookup(entry)
                     except plugin.PluginError as e:
                         log.trace('entry %s imdb failed (%s)' % (entry['title'], e.value))
                         incompatible_entries += 1
                         continue
-                key = entry[keyImdb]
+                key = entry[key_imdb]
             else:
-                keyName = 'movie_name'
-                keyYear = 'movie_year'
-                if not entry.get(keyName, eval_lazy=False):
+                key_name = 'movie_name'
+                key_year = 'movie_year'
+                if not entry.get(key_name, eval_lazy=False):
                     movie = plugin.get('parsing', self).parse_movie(entry['title'])
-                    entry[keyName] = movie.name
-                    entry[keyYear] = movie.year
+                    entry[key_name] = movie.name
+                    entry[key_year] = movie.year
                     
-                if entry.get(keyYear, eval_lazy=False):
-                    key = "%s %s" % (entry[keyName], entry[keyYear])
+                if entry.get(key_year, eval_lazy=False):
+                    key = "%s %s" % (entry[key_name], entry[key_year])
                 else:
-                    key = entry[keyName]
+                    key = entry[key_name]
 
             # actual filtering
             if key in qualities:
