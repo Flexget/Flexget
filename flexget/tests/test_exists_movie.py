@@ -30,6 +30,16 @@ class TestExistsMovie(object):
               path: __tmp__
               type: files
 
+          test_same_name_diff_year:
+            mock:
+              - {title: 'Downloaded.2013'}
+              - {title: 'Downloaded.2019'}
+              - {title: 'Downloaded'}
+            accept_all: yes
+            exists_movie:
+              path: __tmp__
+              type: files
+
           test_lookup_imdb:
             mock:
               - {title: 'Existence.2012'}
@@ -119,6 +129,19 @@ class TestExistsMovie(object):
         assert task.find_entry(
             'accepted', title='Gone.Missing.2013'
         ), 'Gone.Missing.2013 should have been accepted'
+
+    def test_same_name_diff_year(self, execute_task):
+        """exists_movie plugin: existing with same name with different year"""
+        task = execute_task('test_same_name_diff_year')
+        assert not task.find_entry(
+            'accepted', title='Downloaded.2013'
+        ), 'Downloaded.2013 should not have been accepted (exists)'
+        assert task.find_entry(
+            'accepted', title='Downloaded'
+        ), 'Downloaded should have been accepted'
+        assert task.find_entry(
+            'accepted', title='Downloaded.2019'
+        ), 'Downloaded.2019 should have been accepted'
 
     @pytest.mark.online
     def test_lookup_imdb(self, execute_task):
