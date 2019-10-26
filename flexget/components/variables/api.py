@@ -35,3 +35,18 @@ class VariablesAPI(APIResource):
         rsp = jsonify(variables_from_db())
         rsp.status_code = 201
         return rsp
+
+    @api.response(200, 'Successfully updated variables file')
+    @api.validate(empty_response)
+    @api.doc(
+        description='Note that editing variables may not be persistent, depending on user config'
+    )
+    def patch(self, session=None):
+        """ Update variables data to DB """
+        data = request.json
+        existing_variables = variables_from_db()
+        existing_variables.update(data)
+        variables_to_db(existing_variables)
+        # This will trigger reloading the variables file
+        self.manager.validate_config()
+        return jsonify(variables_from_db())

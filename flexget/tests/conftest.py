@@ -375,6 +375,12 @@ class APIClient(object):
             self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
         return self.client.put(*args, **kwargs)
 
+    def json_patch(self, *args, **kwargs):
+        self._append_header('Content-Type', 'application/json', kwargs)
+        if kwargs.get('auth', True):
+            self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
+        return self.client.patch(*args, **kwargs)
+
     def get(self, *args, **kwargs):
         if kwargs.get('auth', True):
             self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
