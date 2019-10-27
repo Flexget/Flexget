@@ -73,7 +73,7 @@ class AniList(object):
         selected_list_status = config['status'] if 'status' in config else ['current', 'planning']
         selected_release_status = config['release_status'] if 'release_status' in config else ['all']
         selected_formats = config['format'] if 'format' in config else ['all']
-        lightweight = config['title_only'] if 'title_only' in config else False
+        lightweight = config.get('title_only', False)
 
         if not isinstance(selected_list_status, list):
             selected_list_status = [selected_list_status]
