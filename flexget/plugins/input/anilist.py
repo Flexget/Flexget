@@ -92,12 +92,14 @@ class AniList(object):
         list_json = []
         req_variables = {'user': config['username']}
         req_chunk = 1
+        req_fields = ('status, title{ romaji, english }, synonyms, siteUrl, idMal, format, episodes, '
+                    'trailer{ site, id }, coverImage{ large }, bannerImage, genres, tags{ name }, '
+                    'externalLinks{ site, url }' if not lightweight else 'status, format, title{ romaji }')
         while req_chunk:
             req_query = ('query ($user: String){collection: MediaListCollection(userName: $user, type: ANIME, '
                         'perChunk: 500, chunk: %s, status_in: [%s]){ hasNextChunk, statuses: lists { list: entries { '
-                        'anime: media { status, title{ romaji, english }, synonyms, siteUrl, idMal, format, episodes, '
-                        'trailer{ site, id }, coverImage{ large }, bannerImage, genres, tags{ name }, externalLinks{ '
-                        'site, url }}}}}}' % (req_chunk, ', '.join([s.upper() for s in selected_list_status])))
+                        'anime: media { %s }}}}}' % (req_chunk, ', '.join([s.upper() for s in selected_list_status]), 
+                        req_fields))
 
             try:
                 list_response = task.requests.post(
