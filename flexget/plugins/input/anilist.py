@@ -57,7 +57,8 @@ class AniList(object):
                     ),
                     'format': one_or_more(
                         {'type': 'string', 'enum': ANIME_FORMAT}, unique_items=True
-                    )
+                    ),
+                    'title_only': {'type': 'boolean'}
                 },
                 'required': ['username'],
                 'additionalProperties': False,
@@ -73,6 +74,7 @@ class AniList(object):
         selected_list_status = config['status'] if 'status' in config else ['current', 'planning']
         selected_release_status = config['release_status'] if 'release_status' in config else ['all']
         selected_formats = config['format'] if 'format' in config else ['all']
+        lightweight = config['title_only'] if 'title_only' in config else False
 
         if not isinstance(selected_list_status, list):
             selected_list_status = [selected_list_status]
@@ -125,8 +127,7 @@ class AniList(object):
                         or 'all' in selected_formats
                     )
                     if has_selected_type and has_selected_release_status:
-                        entries.append(
-                            Entry(
+                        entries.append( Entry(title = anime['title']['romaji']) if lightweight else Entry(
                                 title = anime['title']['romaji'],
                                 alternate_name = [anime['title']['english']] + anime['synonyms'],
                                 url = anime['siteUrl'],
