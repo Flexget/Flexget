@@ -68,7 +68,6 @@ class AniList(object):
 
     @cached('anilist', persist='2 hours')
     def on_task_input(self, task, config):
-        entries = []
         if isinstance(config, str):
             config = {'username': config}
         selected_list_status = config['status'] if 'status' in config else ['current', 'planning']
@@ -110,45 +109,43 @@ class AniList(object):
 
             try:
                 list_response = list_response.json()['data']
-                list_json.append(list_response)
+                log.debug('JSON output: %s' % list_response)
+                for list_status in list_response['collection']['statuses']:
+                    for anime in list_status['list']:
+                        anime = anime['anime']
+                        has_selected_release_status = (
+                            anime['status'].lower() in selected_release_status
+                            or 'all' in selected_release_status
+                        )
+                        has_selected_type = (
+                            anime['format'].lower() in selected_formats
+                            or 'all' in selected_formats
+                        )
+                        if has_selected_type and has_selected_release_status:
+                            entry = Entry()
+                            entry['title'] = anime['title']['romaji']
+                            entry['al_title'] = anime['title']
+                            if not lightweight:
+                                entry['alternate_name'] = [anime['title']['english']] + anime['synonyms']
+                                entry['url'] = anime['siteUrl']
+                                entry['al_release_status'] = anime['status'].capitalize()
+                                entry['al_list_status'] = list_status
+                                entry['al_idMal'] = anime['idMal']
+                                entry['al_format'] = anime['format']
+                                entry['al_episodes'] = anime['episodes']
+                                entry['al_trailer'] = (TRAILER_SOURCE[anime['trailer']['site']]
+                                    + anime['trailer']['id'] if anime['trailer'] else '')
+                                entry['al_cover'] = anime['coverImage']['large']
+                                entry['al_banner'] = anime['bannerImage']
+                                entry['al_genres'] = anime['genres']
+                                entry['al_tags'] = [t['name'] for t in anime['tags']]
+                                entry['al_links'] = anime['externalLinks']
+                            if entry.isvalid():
+                                yield entry
+                req_chunk = req_chunk + 1 if list_response['collection']['hasNextChunk'] else False
+
             except ValueError:
                 raise plugin.PluginError('Invalid JSON response')
-            req_chunk = req_chunk + 1 if list_response['collection']['hasNextChunk'] else False
-
-        log.debug('JSON output: %s' % list_json)
-        for list_index in list_json:
-            for list_status in list_index['collection']['statuses']:
-                for anime in list_status['list']:
-                    anime = anime['anime']
-                    has_selected_release_status = (
-                        anime['status'].lower() in selected_release_status
-                        or 'all' in selected_release_status
-                    )
-                    has_selected_type = (
-                        anime['format'].lower() in selected_formats
-                        or 'all' in selected_formats
-                    )
-                    if has_selected_type and has_selected_release_status:
-                        entries.append( Entry(title = anime['title']['romaji']) if lightweight else Entry(
-                                title = anime['title']['romaji'],
-                                alternate_name = [anime['title']['english']] + anime['synonyms'],
-                                url = anime['siteUrl'],
-                                al_release_status = anime['status'].capitalize(),
-                                al_list_status = list_status,
-                                al_idMal = anime['idMal'],
-                                al_format = anime['format'],
-                                al_episodes = anime['episodes'],
-                                al_trailer = (TRAILER_SOURCE[anime['trailer']['site']]
-                                    + anime['trailer']['id'] if anime['trailer'] else ''),
-                                al_cover = anime['coverImage']['large'],
-                                al_banner = anime['bannerImage'],
-                                al_genres = anime['genres'],
-                                al_tags = [t['name'] for t in anime['tags']],
-                                al_title = anime['title'],
-                                al_links = anime['externalLinks']
-                            )
-                        )
-        return entries
 
 
 @event('plugin.register')
