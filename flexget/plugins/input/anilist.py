@@ -87,15 +87,12 @@ class AniList(object):
         log.debug('selected_release_status: %s' % selected_release_status)
         log.debug('selected_formats: %s' % selected_formats)
 
-        req_query = ('fragment aniList on MediaList{ media{ status, title{ romaji, english }, synonyms, siteUrl, '
-                    'idMal, format, episodes, trailer{ site, id }, coverImage{ large }, bannerImage, genres, '
-                    'tags{ name }, externalLinks{ site, url }}} query ($user: String){')
         req_variables = {'user': config['username']}
-
-        for s in selected_list_status:
-            req_query += ('%s: Page {mediaList(userName: $user, type: ANIME, status: %s) {...aniList}}' % (
-                s.capitalize(), s.upper()))
-        req_query += '}'
+        req_query = ('query ($user: String){collection: MediaListCollection(userName: $user, type: ANIME, '
+                    'status_in: [%s]){ statuses: lists { list: entries { anime: media { status, '
+                    'title{ romaji, english }, synonyms, siteUrl, idMal, format, episodes, trailer{ site, id }, '
+                    'coverImage{ large }, bannerImage, genres, tags{ name }, externalLinks{ site, url }}}}}}'
+                    % ', '.join([s.upper() for s in selected_list_status]))
 
         try:
             list_response = task.requests.post(
@@ -110,9 +107,9 @@ class AniList(object):
             raise plugin.PluginError('Invalid JSON response')
 
         log.debug('JSON output: %s' % list_json)
-        for list_status in list_json:
-            for anime in list_json[list_status]['mediaList']:
-                anime = anime['media']
+        for list_status in list_json['collection']['statuses']:
+            for anime in list_status['list']:
+                anime = anime['anime']
                 has_selected_release_status = (
                     anime['status'].lower() in selected_release_status
                     or 'all' in selected_release_status
