@@ -1,10 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from datetime import datetime, timedelta
 
-from flexget.entry import Entry
 from flexget import plugin
+from flexget.entry import Entry
 
 
 class SearchPlugin(object):

@@ -1,10 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import json
 import os
 
-import mock
+from unittest import mock
 
 movie_list_file = os.path.join(
     os.path.dirname(__file__), 'couchpotato_movie_list_test_response.json'
@@ -40,7 +37,7 @@ class TestCouchpotato(object):
         assert len(task._all_entries) == 31, 'Did not produce 31 entries'
         for entry in task._all_entries:
             assert (
-                entry['quality_req'] == ''
+                    entry['quality_req'] == ''
             ), 'Quality for entry {} should be empty, instead its {}'.format(
                 entry['title'], entry['quality_req']
             )
@@ -92,7 +89,7 @@ class TestCouchpotatoWithQuality(object):
 
     def quality_assertion(self, entry):
         assert (
-            entry['title'] in self.expected_qualities
+                entry['title'] in self.expected_qualities
         ), 'Could not find entry {} in qualities list.'.format(entry)
         expected_quality = self.expected_qualities[entry['title']]
 
