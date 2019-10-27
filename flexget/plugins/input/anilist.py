@@ -40,6 +40,7 @@ class AniList(object):
         - <all|tv|tv_short|movie|special|ova|ona>
         - <tv|tv_short|movie|special|ova|ona>
         ...
+      title_only: <boolean>
     """
 
     schema = {
@@ -88,7 +89,6 @@ class AniList(object):
         log.debug('selected_release_status: %s' % selected_release_status)
         log.debug('selected_formats: %s' % selected_formats)
 
-        list_json = []
         req_variables = {'user': config['username']}
         req_chunk = 1
         req_fields = ('status, title{ romaji, english }, synonyms, siteUrl, idMal, format, episodes, '
