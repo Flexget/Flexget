@@ -3,7 +3,6 @@ click==6.7
 pylint
 coverage==4.4.1
 flake8
-mock==2.0.0
 vcrpy~=1.11.1  # requests 2.16.3 doesn't work with vcrpy <1.11.1
 virtualenv==15.1.0
 boto3

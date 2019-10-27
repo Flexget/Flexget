@@ -1,11 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flask import jsonify, request
 
-from flexget.db_schema import reset_schema, plugin_schemas
 from flexget.api import api, APIResource
 from flexget.api.app import base_message_schema, success_response, BadRequest
+from flexget.db_schema import reset_schema, plugin_schemas
 
 db_api = api.namespace('database', description='Manage Flexget DB')
 

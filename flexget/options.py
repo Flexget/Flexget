@@ -1,10 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import sys
 import copy
 import random
 import string
+import sys
 from argparse import ArgumentParser as ArgParser, _UNRECOGNIZED_ARGS_ATTR
 from argparse import (
     _VersionAction,
@@ -18,10 +15,8 @@ from argparse import (
 )
 
 import flexget
-
 from flexget.entry import Entry
 from flexget.event import fire_event
-from flexget.utils import requests
 from flexget.utils.tools import get_latest_flexget_version_number, get_current_flexget_version
 
 _UNSET = object()

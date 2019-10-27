@@ -1,7 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import base64
 
 from flask import request, session as flask_session
@@ -59,11 +55,11 @@ def load_user(username, session=None):
 def check_valid_login():
     # Allow access to root, login and swagger documentation without authentication
     if (
-        request.path == '/'
-        or request.path.startswith('/auth/login')
-        or request.path.startswith('/auth/logout')
-        or request.path.startswith('/swagger')
-        or request.method == 'OPTIONS'
+            request.path == '/'
+            or request.path.startswith('/auth/login')
+            or request.path.startswith('/auth/logout')
+            or request.path.startswith('/swagger')
+            or request.method == 'OPTIONS'
     ):
         return
 

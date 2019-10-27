@@ -1,22 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-import copy
-
 import base64
-
-import os
+import binascii
+import copy
 import json
-import sys
 import logging
+import os
+import sys
 import threading
 import traceback
+from pathlib import Path
 from time import sleep
-from path import Path
-import binascii
+
 import cherrypy
 import yaml
 from flask import Response, jsonify, request
-from flexget.utils.tools import get_latest_flexget_version_number
 from pyparsing import (
     Word,
     Keyword,
@@ -45,6 +41,7 @@ from flexget.api.app import (
     empty_response,
     etag,
 )
+from flexget.utils.tools import get_latest_flexget_version_number
 
 log = logging.getLogger('api.server')
 

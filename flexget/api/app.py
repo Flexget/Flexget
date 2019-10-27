@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import json
 import logging
 import os
@@ -188,7 +185,7 @@ api = API(
     title='Flexget API v{}'.format(__version__),
     version=__version__,
     description='View and manage flexget core operations and plugins. Open each endpoint view for usage information.'
-    ' Navigate to http://flexget.com/API for more details.',
+                ' Navigate to http://flexget.com/API for more details.',
     format_checker=format_checker,
 )
 
@@ -370,9 +367,9 @@ def etag(method=None, cache_age=0):
 
         # Some headers can change without data change for specific page
         content_headers = (
-            rv.headers.get('link', '')
-            + rv.headers.get('count', '')
-            + rv.headers.get('total-count', '')
+                rv.headers.get('link', '')
+                + rv.headers.get('count', '')
+                + rv.headers.get('total-count', '')
         )
         data = (rv.get_data().decode() + content_headers).encode()
         etag = generate_etag(data)

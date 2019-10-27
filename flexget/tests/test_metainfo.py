@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
 
@@ -73,7 +70,7 @@ class TestMetainfoQuality(object):
         assert entry, 'entry not found?'
         assert 'quality' in entry, 'failed to pick up quality'
         assert (
-            entry['quality'].name == '720p webdl h264 dd5.1'
+                entry['quality'].name == '720p webdl h264 dd5.1'
         ), 'picked up wrong quality %s' % entry.get('quality', None)
         # quality in description should not override one found in title
         entry = task.find_entry(title='Good.Movie.hdtv')

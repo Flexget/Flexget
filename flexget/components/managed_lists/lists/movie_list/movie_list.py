@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from collections import MutableSet
+from collections.abc import MutableSet
 
 from sqlalchemy import func
 from sqlalchemy.sql.elements import and_

@@ -1,7 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import native_str
-
 import logging
 from datetime import datetime
 
@@ -243,7 +239,7 @@ class Meta(type):
             else:
                 new_bases.append(base)
 
-        return type.__new__(mcs, native_str(metaname), tuple(new_bases), dict_)
+        return type.__new__(mcs, str(metaname), tuple(new_bases), dict_)
 
     def register_table(cls, table):
         """

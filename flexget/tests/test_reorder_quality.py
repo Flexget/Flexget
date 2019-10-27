@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
 from flexget.task import TaskAbort
@@ -36,12 +33,12 @@ class TestQualityPriority(object):
         task = execute_task('test_reorder_quality')
 
         assert (
-            task.all_entries[0]['title'] == 'Some Show S01E01 WEBRip'
+                task.all_entries[0]['title'] == 'Some Show S01E01 WEBRip'
         ), 'WEBRip should have been accepted'
 
         task = execute_task('test_normal_quality_priority')
         assert (
-            task.all_entries[0]['title'] == 'Some Show S01E02 HDTV'
+                task.all_entries[0]['title'] == 'Some Show S01E02 HDTV'
         ), 'HDTV should have been accepted'
 
     def test_invalid_reorder_quality(self, execute_task):

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import collections
 import datetime
 import io
@@ -10,7 +8,7 @@ from git import Repo
 
 
 class MDChangeSet(object):
-    """Represets a markdown changeset for a single version."""
+    """Represents a markdown change-set for a single version."""
 
     CATEGORIES = [
         ('### Added\n', ['add', 'added', 'feature']),

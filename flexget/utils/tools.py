@@ -1,26 +1,23 @@
 """Contains miscellaneous helpers"""
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib import request
-from future.utils import PY2
-
-import logging
 import ast
 import copy
 import hashlib
 import locale
+import logging
 import operator
 import os
+import queue
 import re
 import sys
 from collections import MutableMapping, defaultdict
 from datetime import timedelta, datetime
+from html.entities import name2codepoint
 from pprint import pformat
+from urllib import request
+
+import requests
 
 import flexget
-import queue
-import requests
-from html.entities import name2codepoint
 
 log = logging.getLogger('utils')
 
@@ -34,20 +31,6 @@ def str_to_int(string):
         return int(string.replace(',', ''))
     except ValueError:
         return None
-
-
-if PY2:
-
-    def native_str_to_text(string, **kwargs):
-        if 'encoding' not in kwargs:
-            kwargs['encoding'] = 'ascii'
-        return string.decode(**kwargs)
-
-
-else:
-
-    def native_str_to_text(string, **kwargs):
-        return string
 
 
 def convert_bytes(bytes):
@@ -171,7 +154,7 @@ def merge_dict_from_to(d1, d2):
                         'Unknown type: %s value: %s in dictionary' % (type(v), repr(v))
                     )
             elif isinstance(v, (str, bool, int, float, type(None))) and isinstance(
-                d2[k], (str, bool, int, float, type(None))
+                    d2[k], (str, bool, int, float, type(None))
             ):
                 # Allow overriding of non-container types with other non-container types
                 pass
@@ -320,7 +303,6 @@ else:
         # See if we couldn't get the exit code or the exit code indicates that the
         # process is still running.
         return is_running or exit_code.value == STILL_ACTIVE
-
 
 _binOps = {
     ast.Add: operator.add,
@@ -626,4 +608,4 @@ def aggregate_inputs(task, inputs):
 def chunked(seq, limit=900):
     """Helper to divide our expired lists into sizes sqlite can handle in a query. (<1000)"""
     for i in range(0, len(seq), limit):
-        yield seq[i : i + limit]
+        yield seq[i: i + limit]

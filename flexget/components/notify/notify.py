@@ -1,9 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
+import itertools
 import logging
 
-import itertools
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event

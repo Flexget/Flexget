@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
-from collections import MutableMapping
+from collections.abc import MutableMapping
 
 log = logging.getLogger('lazy_lookup')
 

@@ -1,17 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from future.utils import text_to_native_str
-from flexget.utils.tools import native_str_to_text
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
+import locale
 import logging
 import os
-import re
-import locale
 import os.path
+import re
 from copy import copy
 from datetime import datetime, date, time
 
 import jinja2.filters
+from dateutil import parser as dateutil_parse
 from jinja2 import (
     Environment,
     StrictUndefined,
@@ -23,7 +19,6 @@ from jinja2 import (
     TemplateSyntaxError,
 )
 from jinja2.nativetypes import NativeTemplate
-from dateutil import parser as dateutil_parse
 
 from flexget.event import event
 from flexget.utils.lazy_dict import LazyDict
@@ -86,9 +81,7 @@ def filter_formatdate(val, format):
     encoding = locale.getpreferredencoding()
     if not isinstance(val, (datetime, date, time)):
         return val
-    return native_str_to_text(
-        val.strftime(text_to_native_str(format, encoding=encoding)), encoding=encoding
-    )
+    return val.strftime(format)
 
 
 def filter_parsedate(val):

@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
-from collections import MutableSet
+from collections.abc import MutableSet
 
 from requests import RequestException
 
@@ -198,7 +195,7 @@ class SonarrSet(MutableSet):
     def _find_entry(self, entry, filters=True):
         for show in self.shows(filters=filters):
             if any(
-                entry.get(id) is not None and entry[id] == show[id] for id in self.supported_ids
+                    entry.get(id) is not None and entry[id] == show[id] for id in self.supported_ids
             ):
                 return show
             if entry.get('title').lower() == show.get('title').lower():

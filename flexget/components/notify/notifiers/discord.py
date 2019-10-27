@@ -1,14 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
+
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from requests.exceptions import RequestException
-
 from flexget.utils import requests
-
 
 plugin_name = 'discord'
 

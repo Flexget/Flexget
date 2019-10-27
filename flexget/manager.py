@@ -1,15 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import, print_function
-
-# This needs to remain before the builtins import!
-native_int = int
-
-from builtins import *  # noqa  pylint: disable=unused-import, redefined-builtin
-
 import atexit  # noqa
 import codecs  # noqa
 import copy  # noqa
 import errno  # noqa
 import fnmatch  # noqa
+import hashlib  # noqa
+import io  # noqa
 import logging  # noqa
 import os  # noqa
 import shutil  # noqa
@@ -17,10 +12,8 @@ import signal  # noqa
 import sys  # noqa
 import threading  # noqa
 import traceback  # noqa
-import hashlib  # noqa
 from contextlib import contextmanager  # noqa
 from datetime import datetime, timedelta  # noqa
-import io  # noqa
 
 import sqlalchemy  # noqa
 import yaml  # noqa
@@ -869,7 +862,7 @@ class Manager(object):
                 result[key.strip().lower()] = value.strip()
             for key in result:
                 if result[key].isdigit():
-                    result[key] = native_int(result[key])
+                    result[key] = int(result[key])
             result.setdefault('pid', None)
             if not result['pid']:
                 log.error('Invalid lock file. Make sure FlexGet is not running, then delete it.')

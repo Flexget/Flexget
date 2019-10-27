@@ -1,15 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import argparse
 import cgi
 import copy
 from datetime import datetime, timedelta
 from json import JSONEncoder
+from queue import Queue, Empty
 
 from flask import jsonify, Response, request
 from flask_restplus import inputs
-from queue import Queue, Empty
 
 from flexget.api import api, APIResource
 from flexget.api.app import (
@@ -114,7 +111,7 @@ class ObjectsContainer(object):
             'title': {
                 'type': 'string',
                 'description': 'Title of the entry. If not supplied it will be attempted to retrieve it from '
-                'URL headers',
+                               'URL headers',
             },
             'url': {'type': 'string', 'format': 'url', 'description': 'URL of the entry'},
             'force': {

@@ -1,7 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib import parse
-
+from urllib.parse import urlparse as parse
 
 import logging
 import posixpath

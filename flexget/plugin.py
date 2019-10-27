@@ -1,23 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.error import HTTPError, URLError
-from future.utils import python_2_unicode_compatible
-
 import logging
 import os
 import re
 import time
-import pkg_resources
 from functools import total_ordering
 from http.client import BadStatusLine
 from importlib import import_module
+from pathlib import Path
+from urllib.error import HTTPError, URLError
 
-from path import Path
+import pkg_resources
 from requests import RequestException
 
-from flexget import plugins as plugins_pkg
 from flexget import components as components_pkg
 from flexget import config_schema
+from flexget import plugins as plugins_pkg
 from flexget.event import add_event_handler as add_phase_handler
 from flexget.event import fire_event, remove_event_handlers
 
@@ -28,7 +24,6 @@ PRIORITY_LAST = -255
 PRIORITY_FIRST = 255
 
 
-@python_2_unicode_compatible
 class DependencyError(Exception):
     """Plugin depends on other plugin, but it cannot be loaded.
 
@@ -79,7 +74,6 @@ class RegisterException(Exception):
         return repr(self.value)
 
 
-@python_2_unicode_compatible
 class PluginWarning(Warning):
     def __init__(self, value, logger=log, **kwargs):
         super(PluginWarning, self).__init__()
@@ -91,7 +85,6 @@ class PluginWarning(Warning):
         return self.value
 
 
-@python_2_unicode_compatible
 class PluginError(Exception):
     def __init__(self, value, logger=log, **kwargs):
         super(PluginError, self).__init__()
@@ -242,14 +235,14 @@ class PluginInfo(dict):
     dupe_counter = 0
 
     def __init__(
-        self,
-        plugin_class,
-        name=None,
-        interfaces=None,
-        builtin=False,
-        debug=False,
-        api_ver=1,
-        category=None,
+            self,
+            plugin_class,
+            name=None,
+            interfaces=None,
+            builtin=False,
+            debug=False,
+            api_ver=1,
+            category=None,
     ):
         """
         Register a plugin.

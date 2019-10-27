@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import hashlib
 import logging
 import random
@@ -32,7 +29,7 @@ def generate_key():
 
 
 def get_random_string(
-    length=12, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+        length=12, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 ):
     """
     Returns a securely generated random string.
@@ -152,7 +149,7 @@ class WebServer(threading.Thread):
     triggers_lock = threading.Lock()
 
     def __init__(
-        self, bind='0.0.0.0', port=5050, ssl_certificate=None, ssl_private_key=None, base_url=''
+            self, bind='0.0.0.0', port=5050, ssl_certificate=None, ssl_private_key=None, base_url=''
     ):
         threading.Thread.__init__(self, name='web_server')
         self.bind = str(bind)  # String to remove unicode warning from cherrypy startup

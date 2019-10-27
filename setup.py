@@ -1,15 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-import io
 import sys
+from pathlib import Path
 
 from setuptools import setup, find_packages
 
-with io.open('README.rst', encoding='utf-8') as readme:
-    long_description = readme.read()
+long_description = Path('README.rst').read_text()
 
 # Populates __version__ without importing the package
 __version__ = None
-with io.open('flexget/_version.py', encoding='utf-8') as ver_file:
+with open('flexget/_version.py', encoding='utf-8') as ver_file:
     exec(ver_file.read())  # pylint: disable=W0122
 if not __version__:
     print('Could not find __version__ from flexget/_version.py')
@@ -17,15 +15,14 @@ if not __version__:
 
 
 def load_requirements(filename):
-    with io.open(filename, encoding='utf-8') as reqfile:
-        return [line.strip() for line in reqfile if not line.startswith('#')]
+    return [line.strip() for line in Path(filename).read_text() if not line.startswith('#')]
 
 
 setup(
     name='FlexGet',
     version=__version__,
     description='FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) '
-    'from different sources like RSS-feeds, html-pages, various sites and more.',
+                'from different sources like RSS-feeds, html-pages, various sites and more.',
     long_description=long_description,
     long_description_content_type='text/x-rst',
     author='Marko Koivusalo',

@@ -1,35 +1,28 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+import itertools
+import logging
+import os
+import re
+import shutil
+import sys
+from contextlib import contextmanager
+from http import client
+from pathlib import Path
 
 import jsonschema
-from future.utils import PY2
-from future.backports.http import client as backport_client
-
-import re
-import os
-import sys
-import yaml
-import logging
-import shutil
-import requests
-
-import itertools
-
-from contextlib import contextmanager
-
 import mock
 import pytest
-from path import Path
+import requests
+import yaml
 from vcr import VCR
 from vcr.stubs import VCRHTTPSConnection, VCRHTTPConnection
 
 import flexget.logger
+from flexget.api import api_app
 from flexget.manager import Manager
+from flexget.manager import Session
 from flexget.plugin import load_plugins
 from flexget.task import Task, TaskAbort
 from flexget.webserver import User
-from flexget.manager import Session
-from flexget.api import api_app
 
 log = logging.getLogger('tests')
 
@@ -40,8 +33,8 @@ vcr = VCR(
     cassette_library_dir=VCR_CASSETTE_DIR,
     record_mode=VCR_RECORD_MODE,
     custom_patches=(
-        (backport_client, 'HTTPSConnection', VCRHTTPSConnection),
-        (backport_client, 'HTTPConnection', VCRHTTPConnection),
+        (client, 'HTTPSConnection', VCRHTTPSConnection),
+        (client, 'HTTPConnection', VCRHTTPConnection),
     ),
 )
 
@@ -256,12 +249,9 @@ def no_requests(monkeypatch):
     except ImportError:
         pass
 
-    if PY2:
-        online_funcs.extend(['httplib.HTTPConnection.request', 'httplib.HTTPSConnection.request'])
-    else:
-        online_funcs.extend(
-            ['http.client.HTTPConnection.request', 'http.client.HTTPSConnection.request']
-        )
+    online_funcs.extend(
+        ['http.client.HTTPConnection.request', 'http.client.HTTPSConnection.request']
+    )
 
     for func in online_funcs:
         monkeypatch.setattr(

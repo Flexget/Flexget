@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
 
@@ -115,5 +112,5 @@ class TestFileSize(object):
         task = execute_task('test_torrent')
         entry = task.find_entry('entries', title='test')
         assert (
-            'content_size' not in entry
+                'content_size' not in entry
         ), 'size of .torrent file should not be read as content_size'
