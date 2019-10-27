@@ -93,7 +93,7 @@ class AniList(object):
         req_chunk = 1
         req_fields = ('status, title{ romaji, english }, synonyms, siteUrl, idMal, format, episodes, '
                     'trailer{ site, id }, coverImage{ large }, bannerImage, genres, tags{ name }, '
-                    'externalLinks{ site, url }' if not lightweight else 'status, format, title{ romaji }')
+                    'externalLinks{ site, url }' if not lightweight else 'status, format, title{ romaji, english }')
         while req_chunk:
             req_query = ('query ($user: String){collection: MediaListCollection(userName: $user, type: ANIME, '
                         'perChunk: 500, chunk: %s, status_in: [%s]){ hasNextChunk, statuses: lists { list: entries { '
