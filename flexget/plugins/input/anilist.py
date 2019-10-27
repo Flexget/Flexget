@@ -105,10 +105,11 @@ class AniList(object):
                 raise plugin.PluginError('Error reading list - {url}'.format(url=e))
 
             try:
-                list_json.append(list_response.json()['data'])
+                list_response = list_response.json()['data']
+                list_json.append(list_response)
             except ValueError:
                 raise plugin.PluginError('Invalid JSON response')
-            req_chunk = req_chunk + 1 if list_response.json()['data']['collection']['hasNextChunk'] else False
+            req_chunk = req_chunk + 1 if list_response['collection']['hasNextChunk'] else False
 
         log.debug('JSON output: %s' % list_json)
         for list_index in list_json:
