@@ -46,6 +46,28 @@ class InputHtml(object):
                     'title_from': {'type': 'string'},
                     'allow_empty_links': {'type': 'boolean'},
                     'links_re': {'type': 'array', 'items': {'type': 'string', 'format': 'regex'}},
+                    'limit_scope': {
+                        'type': 'array',
+                        'items': {
+                            'oneOf': [
+                                {'type': 'string'},
+                                {
+                                    'type': 'object',
+                                    'additionalProperties': {
+                                        'type': 'object',
+                                        'properties': {
+                                            'attribute_name': {'type': 'string'},
+                                            'attribute_value': {'type': 'string'},
+                                            'start': {'type': 'integer', 'default': 1, 'minimum': 1},
+                                            'end': {'type': 'integer', 'default': 31415, 'minimum': 1},
+                                        },
+                                        'dependencies': {'attribute_value': ['attribute_name']},
+                                        'additionalProperties': False,
+                                    },
+                                },
+                            ]
+                        },
+                    },
                     'increment': {
                         'oneOf': [
                             {'type': 'boolean'},
@@ -179,6 +201,81 @@ class InputHtml(object):
             name = posixpath.basename(parts.path)
         return parse.unquote_plus(name)
 
+    def _get_anchor_list(self, element_tag_list, scope_num, search_terms, anchor_list):
+
+        if scope_num < len(search_terms):
+            temp_list = []
+            for x in range(len(element_tag_list[scope_num])):
+                result_set = (
+                    element_tag_list[scope_num][x].find_all(search_terms[scope_num][0], search_terms[scope_num][1])
+                )
+                if (eval(search_terms[scope_num][2]) >= eval(search_terms[scope_num][3]) or
+                    eval(search_terms[scope_num][2]) >= len(result_set)):
+                    log.warning(
+                        f"The specified start ({eval(search_terms[scope_num][2]) + 1}) for scope_limit "
+                        f"#{scope_num + 1} is the same as or after the specified end "
+                        f"({eval(search_terms[scope_num][3])}) or actual end ({len(result_set)}) for match "
+                        f"#{x+1}. The start will be set to the beginning, by default."
+                    )
+                    start = "0"
+                else:
+                    start = search_terms[scope_num][2]
+                if eval(search_terms[scope_num][3]) > len(result_set):
+                    log.warning(
+                        f"The specified end ({eval(search_terms[scope_num][3])}) for scope_limit #{scope_num + 1} "
+                        f"is after the actual end ({len(result_set)}) for match #{x+1}. The end will be set to the "
+                        f"actual end, by default."
+                    )
+                    end = str(len(result_set))
+                else:
+                    end = search_terms[scope_num][3]
+                for y in range(eval(start), eval(end)):
+                    temp_list.append(result_set[y])
+
+            element_tag_list.append(temp_list)
+            return self._get_anchor_list(element_tag_list, scope_num + 1, search_terms, anchor_list)
+        else:
+            for x in range(len(element_tag_list[scope_num])):
+                tmp_list = element_tag_list[scope_num][x].find_all('a')
+                for item in tmp_list:
+                    anchor_list.append(item)
+
+            return anchor_list
+
+    def _limit_scope(self, soup, config):
+
+        search_terms = []
+        scope_list = config.get('limit_scope')
+
+        for element in scope_list:
+            element_name = next(iter(element))
+            if isinstance(element, str):
+                element_name = re.compile(f"^{element}$")
+                refine_dict = {}
+                start = "0"
+                end = f"len(result_set)"
+            else:
+                element_name = next(iter(element))
+                start = str(element[f"{element_name}"].get('start') - 1)
+                end = element[f"{element_name}"].get('end')
+                attribute_name = element[f"{element_name}"].get('attribute_name')
+                attribute_value = element[f"{element_name}"].get('attribute_value')
+                if not attribute_name and not attribute_value:
+                    refine_dict = {}
+                else:
+                    if not attribute_value:
+                        attribute_value = '.*'
+                    refine_dict = {f"{attribute_name}": re.compile(f"^{attribute_value}$")}
+
+                if end == 31415:
+                    end = f"len(result_set)"
+                else:
+                    end = str(end)
+                element_name = re.compile(f"^{next(iter(element))}$")
+
+            search_terms.append([element_name, refine_dict, start, end])
+        return self._get_anchor_list([[soup]], 0, search_terms, [])
+
     def create_entries(self, page_url, soup, config):
 
         queue = []
@@ -191,7 +288,13 @@ class InputHtml(object):
                 if entry['title'] == title:
                     return True
 
-        for link in soup.find_all('a'):
+        if config.get('limit_scope'):
+            anchor_list = self._limit_scope(soup, config)
+        else:
+            anchor_list = soup.find_all('a')
+
+        for link in anchor_list:
+
             # not a valid link
             if not link.has_attr('href'):
                 continue
