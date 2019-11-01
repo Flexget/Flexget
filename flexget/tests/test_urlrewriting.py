@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flexget.plugin import get_plugin_by_name
 
 
@@ -67,8 +64,8 @@ class TestURLRewriters(object):
         assert urlrewriter.url_rewritable(task, entry)
         urlrewriter.url_rewrite(task, entry)
         assert (
-            entry['url']
-            == 'http://cinemageddon.net/download.php?id=1234&name=cinemageddon%20download.torrent'
+                entry['url']
+                == 'http://cinemageddon.net/download.php?id=1234&name=cinemageddon%20download.torrent'
         )
 
 

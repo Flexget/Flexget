@@ -1,7 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-
 class TestDigest(object):
     config = """
         tasks:
@@ -95,5 +91,5 @@ class TestDigest(object):
         task = execute_task('emit state')
         for entry in task.all_entries:
             assert (
-                entry.state == entry['title']
+                    entry.state == entry['title']
             ), 'Should have been emitted in same state as when digested'

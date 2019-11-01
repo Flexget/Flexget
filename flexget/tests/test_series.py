@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from io import StringIO
 
 import pytest
 from jinja2 import Template
 
+from flexget.components.series import db
 from flexget.entry import Entry
 from flexget.logger import capture_output
 from flexget.manager import get_parser, Session
 from flexget.task import TaskAbort
-from flexget.components.series import db
 
 
 def age_series(**kwargs):

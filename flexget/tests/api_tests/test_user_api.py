@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flexget.api.app import base_message
 from flexget.api.core.user import ObjectsContainer as OC
 from flexget.utils import json

@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-from datetime import datetime
 import math
+from datetime import datetime
 
 import pytest
 
@@ -95,14 +92,14 @@ class TestSplitYearTitle(object):
             ('The Matrix - 1999', 'The Matrix -', 1999),
             ('The.Matrix.1999', 'The.Matrix.', 1999),
             (
-                'The Human Centipede III (Final Sequence)',
-                'The Human Centipede III (Final Sequence)',
-                None,
+                    'The Human Centipede III (Final Sequence)',
+                    'The Human Centipede III (Final Sequence)',
+                    None,
             ),
             (
-                'The Human Centipede III (Final Sequence) (2015)',
-                'The Human Centipede III (Final Sequence)',
-                2015,
+                    'The Human Centipede III (Final Sequence) (2015)',
+                    'The Human Centipede III (Final Sequence)',
+                    2015,
             ),
             ('2020', '2020', None),
         ],

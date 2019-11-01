@@ -1,11 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import json
 import os
+from unittest.mock import patch
 
 import pytest
-from mock import patch
 
 from flexget import __version__
 from flexget.api.app import __version__ as __api_version__, base_message
@@ -90,9 +87,9 @@ class TestServerAPI(object):
         assert not errors
 
         assert (
-            data['raw_config']
-            == 'dGFza3M6CiAgdGVzdDoKICAgIHJzczoKICAgICAgdXJsOiBodHRwOi8vdGVzdC9yc3MKICAgIG1'
-            'vY2s6CiAgICAgIC0gdGl0bGU6IGVudHJ5IDE='
+                data['raw_config']
+                == 'dGFza3M6CiAgdGVzdDoKICAgIHJzczoKICAgICAgdXJsOiBodHRwOi8vdGVzdC9yc3MKICAgIG1'
+                   'vY2s6CiAgICAgIC0gdGl0bGU6IGVudHJ5IDE='
         )
 
     @pytest.mark.online

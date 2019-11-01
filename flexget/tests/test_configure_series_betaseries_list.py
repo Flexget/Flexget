@@ -1,7 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from unittest import mock
 
-import mock
 import pytest
 
 
@@ -19,7 +17,7 @@ def assert_series_count_in_db(expected_count):
     session = Session()
     actual_series_count = session.query(Series).count()
     assert (
-        expected_count == actual_series_count
+            expected_count == actual_series_count
     ), "expecting %s series stored in db, got %s instead" % (expected_count, actual_series_count)
 
 

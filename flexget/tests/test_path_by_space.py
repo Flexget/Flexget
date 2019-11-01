@@ -1,9 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import os
+from unittest import mock
 
-import mock
 import pytest
 
 from flexget.config_schema import parse_size

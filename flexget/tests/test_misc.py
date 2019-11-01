@@ -1,9 +1,4 @@
 # pylint: disable=no-self-use
-
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import text_type
-
 import os
 import stat
 import sys
@@ -160,12 +155,9 @@ class TestEntryUnicodeError(object):
 
 class TestEntryStringCoercion(object):
     def test_coercion(self):
-        class EnrichedString(text_type):
-            pass
-
         e = Entry('title', 'url')
-        e['test'] = EnrichedString("test")
-        assert type(e['test']) == text_type  # pylint: disable=unidiomatic-typecheck
+        e['test'] = str("test")
+        assert type(e['test']) == str  # pylint: disable=unidiomatic-typecheck
 
 
 class TestFilterRequireField(object):
@@ -295,7 +287,7 @@ class TestSetPlugin(object):
         task = execute_task('test_lazy_err')
         entry = task.find_entry('entries', title='Entry 1')
         assert (
-            entry['title'] == 'Entry 1'
+                entry['title'] == 'Entry 1'
         ), 'should fall back to original value when template fails'
         assert entry['other'] is None
 

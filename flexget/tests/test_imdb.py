@@ -8,9 +8,6 @@
    switch to find_entry to use that instead!
 """
 
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
 
@@ -203,7 +200,7 @@ class TestImdb(object):
         matrix = task.find_entry(imdb_name='The Matrix')
         assert 'nm0905154' in matrix['imdb_directors'], 'Lana Wachowski is missing'
         assert (
-            matrix['imdb_directors']['nm0905154'] == 'Lana Wachowski'
+                matrix['imdb_directors']['nm0905154'] == 'Lana Wachowski'
         ), 'Lana Wachowski name is missing'
 
         assert task.find_entry(
@@ -222,7 +219,7 @@ class TestImdb(object):
 
         assert 'nm0942367' in hotfuzz['imdb_writers'], 'Edgar Wright is missing'
         assert (
-            hotfuzz['imdb_writers']['nm0942367'] == 'Edgar Wright'
+                hotfuzz['imdb_writers']['nm0942367'] == 'Edgar Wright'
         ), 'Edgar Wright name is missing'
 
         assert task.find_entry(
@@ -238,15 +235,15 @@ class TestImdb(object):
         matrix = float(task.find_entry(imdb_name='The Matrix')['imdb_score'])
         # Currently The Matrix has an 8.7, check a range in case it changes
         assert 8.6 < matrix < 8.8, (
-            'The Matrix should have score 8.7 not %s. (Did the rating change?)' % matrix
+                'The Matrix should have score 8.7 not %s. (Did the rating change?)' % matrix
         )
         assert (
-            int(task.find_entry(imdb_name='The Matrix')['imdb_votes']) > 450000
+                int(task.find_entry(imdb_name='The Matrix')['imdb_votes']) > 450000
         ), 'The Matrix should have more than 450000 votes'
         bfe = float(task.find_entry(title='Battlefield Earth')['imdb_score'])
         # Currently Battlefield Earth has an 2.4, check a range in case it changes
         assert 2.3 <= bfe <= 2.5, (
-            'Battlefield Earth should have score 2.3 not %s. (Did the rating change?)' % bfe
+                'Battlefield Earth should have score 2.3 not %s. (Did the rating change?)' % bfe
         )
         assert task.find_entry(
             'accepted', imdb_name='The Matrix'
@@ -288,7 +285,7 @@ class TestImdb(object):
         assert bullets[0] == 'french', 'Could not find languages for 22 Bullets'
         for movie in ['The Matrix', 'Crank', 'The Damned United']:
             assert task.find_entry('accepted', imdb_name=movie), (
-                '%s should\'ve been accepted' % movie
+                    '%s should\'ve been accepted' % movie
             )
         assert not task.find_entry(
             'rejected', title='22 Bullets'
@@ -307,8 +304,8 @@ class TestImdb(object):
         task = execute_task('mpaa')
         aladdin = task.find_entry(imdb_name='Aladdin')
         assert aladdin['imdb_mpaa_rating'] == 'G', (
-            'Didn\'t get right rating for Aladdin. Should be G got %s'
-            % aladdin['imdb_mpaa_rating']
+                'Didn\'t get right rating for Aladdin. Should be G got %s'
+                % aladdin['imdb_mpaa_rating']
         )
         assert aladdin.accepted, 'Non R rated movie should have been accepted'
         saw = task.find_entry(imdb_name='Saw')

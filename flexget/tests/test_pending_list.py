@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-
 from flexget.components.managed_lists.lists.pending_list.db import PendingListList
 from flexget.manager import Session
 

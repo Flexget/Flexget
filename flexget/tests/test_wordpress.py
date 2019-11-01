@@ -1,12 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from unittest import mock
 
-import mock
 import pytest
-
 from requests import RequestException
-from requests.utils import cookiejar_from_dict
 from requests.cookies import RequestsCookieJar
+from requests.utils import cookiejar_from_dict
 
 from flexget.task import TaskAbort
 

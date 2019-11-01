@@ -43,8 +43,6 @@ Within this file we will add our plugin.
 
 .. testcode::
 
-   from __future__ import unicode_literals, division, absolute_import
-
    from flexget import plugin
    from flexget.event import event
 
@@ -95,8 +93,6 @@ Add functionality to plugin
 Continue by implementing the test case.
 
 .. testcode::
-
-   from __future__ import unicode_literals, division, absolute_import
 
    from flexget import plugin
    from flexget.event import event

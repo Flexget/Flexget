@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import os
 import logging
+import os
 import tempfile
 
 from flexget import plugin
@@ -55,10 +52,10 @@ class MetainfoSubs(object):
 
     def get_subtitles(self, entry):
         if (
-            entry.get('subtitles', eval_lazy=False)
-            or not ('location' in entry)
-            or ('$RECYCLE.BIN' in entry['location'])
-            or not os.path.exists(entry['location'])
+                entry.get('subtitles', eval_lazy=False)
+                or not ('location' in entry)
+                or ('$RECYCLE.BIN' in entry['location'])
+                or not os.path.exists(entry['location'])
         ):
             return
         from subliminal import scan_video

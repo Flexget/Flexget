@@ -1,7 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-
 class TestRegexp(object):
     config = """
         templates:
@@ -118,7 +114,7 @@ class TestRegexp(object):
         assert task.find_entry('accepted', title='regexp2'), 'regexp2 should have been accepted'
         assert task.find_entry('accepted', title='regexp3'), 'regexp3 should have been accepted'
         assert (
-            task.find_entry('entries', title='regexp4') not in task.accepted
+                task.find_entry('entries', title='regexp4') not in task.accepted
         ), 'regexp4 should have been left'
         assert task.find_entry(
             'accepted', title='regexp2', path='~'
@@ -197,5 +193,5 @@ class TestRegexp(object):
             'accepted', title='expression'
         ), '\'expression\' should have been accepted'
         assert (
-            task.find_entry('entries', title='regular') not in task.accepted
+                task.find_entry('entries', title='regular') not in task.accepted
         ), '\'regular\' should not have been accepted'

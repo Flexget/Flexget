@@ -1,7 +1,4 @@
 # coding=utf-8
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 import yaml
 
@@ -87,7 +84,7 @@ class TestInputRSS(object):
         e = task.find_entry(title='Zero sized enclosure')
         assert e, 'RSS entry missing: zero sized'
         assert (
-            'filename' not in e
+                'filename' not in e
         ), 'RSS entry with 0-sized enclosure should not have explicit filename'
 
         # messy enclosure

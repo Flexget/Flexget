@@ -1,8 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+import os.path
 
 import pytest
-import os.path
 
 try:
     import rarfile
@@ -140,7 +138,7 @@ class TestExtract(object):
         """Test when an empty location is provided"""
         execute_task('test_empty_path')
         assert (
-            self.error_not_local in caplog.text
+                self.error_not_local in caplog.text
         ), 'Plugin logs an error when entry has an empty path.'
 
     def test_no_path(self, execute_task, caplog):
@@ -152,5 +150,5 @@ class TestExtract(object):
         """Test when a non-existent path is provided"""
         execute_task('test_file_not_exists')
         assert (
-            self.error_not_exists in caplog.text
+                self.error_not_exists in caplog.text
         ), 'Plugin logs an error when file does not exist.'

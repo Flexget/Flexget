@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import PY3
-
 import re
 from datetime import datetime, timedelta
 
@@ -188,7 +184,6 @@ class TestTVDBLookup(object):
         assert find_series_id('House M.D.') == 73255
         assert find_series_id('House') == 73255
 
-    @pytest.mark.skipif(not PY3, reason='VCRPY can\'t handle unicode in py2')
     def test_find_series_with_languages(self, mocked_expired, execute_task):
         assert find_series_id('Tegenlicht', 'nl') == 252712
         assert find_series_id('החממה', 'he') == 270698

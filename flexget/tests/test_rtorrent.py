@@ -1,11 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.xmlrpc import client as xmlrpc_client
-
 import os
 import re
-
-import mock
+from unittest import mock
+from xmlrpc import client as xmlrpc_client
 
 from flexget.plugins.clients.rtorrent import RTorrent
 
@@ -226,14 +222,14 @@ class TestRTorrentClient(object):
 @mock.patch('flexget.plugins.clients.rtorrent.RTorrent')
 class TestRTorrentOutputPlugin(object):
     config = (
-        """
-        tasks:
-          test_add_torrent:
-            accept_all: yes
-            mock:
-              - {title: 'test', url: '"""
-        + torrent_url
-        + """'}
+            """
+            tasks:
+              test_add_torrent:
+                accept_all: yes
+                mock:
+                  - {title: 'test', url: '"""
+            + torrent_url
+            + """'}
             rtorrent:
               action: add
               start: yes
@@ -251,8 +247,8 @@ class TestRTorrentOutputPlugin(object):
               custom2: test_custom2
             mock:
               - {title: 'test', url: '"""
-        + torrent_url
-        + """'}
+            + torrent_url
+            + """'}
             rtorrent:
               action: add
               start: no
@@ -265,8 +261,8 @@ class TestRTorrentOutputPlugin(object):
               priority: low
             mock:
               - {title: 'test', url: '"""
-        + torrent_url
-        + """', 'torrent_info_hash': '09977FE761B8D293AD8A929CCAF2E9322D525A6C'}
+            + torrent_url
+            + """', 'torrent_info_hash': '09977FE761B8D293AD8A929CCAF2E9322D525A6C'}
             rtorrent:
               action: update
               uri: http://localhost/SCGI
@@ -275,8 +271,8 @@ class TestRTorrentOutputPlugin(object):
             accept_all: yes
             mock:
               - {title: 'test', url: '"""
-        + torrent_url
-        + """', 'torrent_info_hash': '09977FE761B8D293AD8A929CCAF2E9322D525A6C'}
+            + torrent_url
+            + """', 'torrent_info_hash': '09977FE761B8D293AD8A929CCAF2E9322D525A6C'}
             rtorrent:
               action: update
               custom1: test_custom1
@@ -286,8 +282,8 @@ class TestRTorrentOutputPlugin(object):
             accept_all: yes
             mock:
               - {title: 'test', url: '"""
-        + torrent_url
-        + """', 'torrent_info_hash': '09977FE761B8D293AD8A929CCAF2E9322D525A6C'}
+            + torrent_url
+            + """', 'torrent_info_hash': '09977FE761B8D293AD8A929CCAF2E9322D525A6C'}
             rtorrent:
               action: delete
               uri: http://localhost/SCGI

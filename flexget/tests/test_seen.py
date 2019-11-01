@@ -1,7 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-
 class TestFilterSeen(object):
     config = """
         templates:
@@ -157,8 +153,8 @@ class TestFilterSeenMovies(object):
     def test_seen_movies(self, execute_task):
         task = execute_task('test_1')
         assert not (
-            task.find_entry(title='Seen movie title 1')
-            and task.find_entry(title='Seen movie title 2')
+                task.find_entry(title='Seen movie title 1')
+                and task.find_entry(title='Seen movie title 2')
         ), 'Movie accepted twice in one run'
 
         # execute again

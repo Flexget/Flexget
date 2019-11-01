@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 from jinja2 import Template
 
@@ -106,8 +103,8 @@ class TestExistsMovie(object):
             tmpdir.join(test_file).write('')
         return (
             Template(self._config)
-            .render({'parser': request.param})
-            .replace('__tmp__', tmpdir.strpath)
+                .render({'parser': request.param})
+                .replace('__tmp__', tmpdir.strpath)
         )
 
     def test_existing_dirs(self, execute_task):

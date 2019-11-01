@@ -1,10 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+import os
+import sys
 
 import pytest
-import sys
-import os
-
 from jinja2 import Template
 
 
@@ -79,7 +76,7 @@ class TestDownload(object):
 @pytest.mark.usefixtures('tmpdir')
 @pytest.mark.skip(
     reason='TODO: These are really just config validation tests, and I have config validation turned off'
-    ' at the moment for unit tests due to some problems'
+           ' at the moment for unit tests due to some problems'
 )
 class TestDownloadTemp(object):
     config = """
