@@ -56,13 +56,19 @@ class InputHtml(object):
                                     'additionalProperties': {
                                         'type': 'object',
                                         'properties': {
-                                            'attribute_name': {'type': 'string'},
+                                            'element_name': {'type': 'string'},
+                                            'attribute_name': {'type': 'string'}, # ADD LIMIT OF ONE PER 'SCOPE'?
                                             'attribute_value': {'type': 'string'},
                                             'start': {'type': 'integer', 'default': 1, 'minimum': 1},
                                             'end': {'type': 'integer', 'default': 31415, 'minimum': 1},
                                         },
-                                        'dependencies': {'attribute_value': ['attribute_name']},
                                         'additionalProperties': False,
+                                        'anyOf': [
+                                            {'required': ['element_name']},
+                                            {'required': ['attribute_name']},
+                                            {'required': ['attribute_value']},
+                                        ],
+                                        'dependencies': {'attribute_value': ['attribute_name']},
                                     },
                                 },
                             ]
@@ -248,18 +254,19 @@ class InputHtml(object):
         scope_list = config.get('limit_scope')
 
         for element in scope_list:
-            element_name = next(iter(element))
             if isinstance(element, str):
                 element_name = re.compile(f"^{element}$")
                 refine_dict = {}
                 start = "0"
                 end = f"len(result_set)"
             else:
-                element_name = next(iter(element))
-                start = str(element[f"{element_name}"].get('start') - 1)
-                end = element[f"{element_name}"].get('end')
-                attribute_name = element[f"{element_name}"].get('attribute_name')
-                attribute_value = element[f"{element_name}"].get('attribute_value')
+                scope_name = next(iter(element))
+                scope_info = element[scope_name]
+                element_name = re.compile(f"^{scope_info.get('element_name')}$")
+                start = str(scope_info.get('start') - 1)
+                end = scope_info.get('end')
+                attribute_name = scope_info.get('attribute_name')
+                attribute_value = scope_info.get('attribute_value')
                 if not attribute_name and not attribute_value:
                     refine_dict = {}
                 else:
@@ -271,7 +278,6 @@ class InputHtml(object):
                     end = f"len(result_set)"
                 else:
                     end = str(end)
-                element_name = re.compile(f"^{next(iter(element))}$")
 
             search_terms.append([element_name, refine_dict, start, end])
         return self._get_anchor_list([[soup]], 0, search_terms, [])
