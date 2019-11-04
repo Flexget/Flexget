@@ -109,8 +109,8 @@ class NextTraktEpisodes(object):
                     'An error has occurred looking up: Trakt_id: %s Error: %s' % (trakt_id, e)
                 )
             if context == 'aired':
-                eps = data['season']
-                epn = data['number']
+                season_number = data['season']
+                episode_number = data['number']
             elif config['position'] == 'next' and data.get('next_episode'):
                 # If the next episode is already in the trakt database, we'll get it here
                 season_number = data['next_episode']['season']
