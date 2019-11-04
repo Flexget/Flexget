@@ -57,7 +57,7 @@ class InputHtml(object):
                                         'type': 'object',
                                         'properties': {
                                             'element_name': {'type': 'string'},
-                                            'attribute_name': {'type': 'string'}, # ADD LIMIT OF ONE PER 'SCOPE'?
+                                            'attribute_name': {'type': 'string'},
                                             'attribute_value': {'type': 'string'},
                                             'start': {'type': 'integer', 'default': 1, 'minimum': 1},
                                             'end': {'type': 'integer', 'default': 31415, 'minimum': 1},
@@ -262,7 +262,11 @@ class InputHtml(object):
             else:
                 scope_name = next(iter(element))
                 scope_info = element[scope_name]
-                element_name = re.compile(f"^{scope_info.get('element_name')}$")
+                raw_element_name = scope_info.get('element_name')
+                if not raw_element_name:
+                    element_name = re.compile('.*')
+                else:
+                    element_name = re.compile(f"^{raw_element_name}$")
                 start = str(scope_info.get('start') - 1)
                 end = scope_info.get('end')
                 attribute_name = scope_info.get('attribute_name')
