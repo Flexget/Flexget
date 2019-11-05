@@ -43,8 +43,8 @@ class FilterExistsMovie(object):
         ]
     }
 
-    dir_pattern = re.compile('\b(cd.\d|subs?|samples?)\b', re.IGNORECASE)
-    file_pattern = re.compile('\.(avi|mkv|mp4|mpg|webm)$', re.IGNORECASE)
+    dir_pattern = re.compile(r'\b(cd.\d|subs?|samples?)\b', re.IGNORECASE)
+    file_pattern = re.compile(r'\.(avi|mkv|mp4|mpg|webm)$', re.IGNORECASE)
 
     def __init__(self):
         self.cache = TimedDict(cache_time='1 hour')
