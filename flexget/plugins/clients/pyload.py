@@ -1,15 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import quote
-
 from logging import getLogger
+from urllib.parse import quote
 
 from requests.exceptions import RequestException
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils import json
-from flexget.config_schema import one_or_more
 from flexget.utils.template import RenderError
 
 log = getLogger('pyload')
@@ -166,7 +163,7 @@ class PluginPyLoad(object):
 
             # no preferred hoster and not preferred hoster only - add all recognized plugins
             if not urls and not config.get(
-                'preferred_hoster_only', self.DEFAULT_PREFERRED_HOSTER_ONLY
+                    'preferred_hoster_only', self.DEFAULT_PREFERRED_HOSTER_ONLY
             ):
                 for name, purls in parsed.items():
                     if name != 'BasePlugin':

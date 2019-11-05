@@ -1,7 +1,3 @@
-from __future__ import absolute_import, division, unicode_literals
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import native
-
 import logging
 import re
 import sys
@@ -10,7 +6,6 @@ import time
 from guessit.api import GuessItApi, GuessitException
 from guessit.rules import rebulk_builder
 from rebulk import Rebulk
-from rebulk.match import MatchesDict
 from rebulk.pattern import RePattern
 
 from flexget import plugin
@@ -18,7 +13,6 @@ from flexget.event import event
 from flexget.utils import qualities
 from flexget.utils.parsers.generic import ParseWarning, default_ignore_prefixes, name_to_re
 from flexget.utils.tools import ReList
-
 from .parser_common import MovieParseResult, SeriesParseResult
 
 log = logging.getLogger('parser_guessit')
@@ -226,7 +220,7 @@ class ParserGuessit(object):
 
         # NOTE: Guessit expects str on PY3 and unicode on PY2 hence the use of future.utils.native
         try:
-            guess_result = guessit_api.guessit(native(data), options=guessit_options)
+            guess_result = guessit_api.guessit(data, options=guessit_options)
         except GuessitException:
             log.warning('Parsing %s with guessit failed. Most likely a unicode error.', data)
             return SeriesParseResult(data=data, valid=False)
@@ -267,9 +261,9 @@ class ParserGuessit(object):
                         break
             # Check the name doesn't end mid-word (guessit might put the border before or after the space after title)
             if (
-                data[title_end - 1].isalnum()
-                and len(data) <= title_end
-                or not self._is_valid_name(data, guessit_options=guessit_options)
+                    data[title_end - 1].isalnum()
+                    and len(data) <= title_end
+                    or not self._is_valid_name(data, guessit_options=guessit_options)
             ):
                 valid = False
             # If we are in exact mode, make sure there is nothing after the title
@@ -305,7 +299,7 @@ class ParserGuessit(object):
         if country and name.endswith(')'):
             p_start = name.rfind('(')
             if p_start != -1:
-                parenthetical = re.escape(name[p_start + 1 : -1])
+                parenthetical = re.escape(name[p_start + 1: -1])
                 if parenthetical and parenthetical.lower() != str(country).lower():
                     valid = False
         # Check the full list of 'episode_details' for special,
@@ -333,7 +327,7 @@ class ParserGuessit(object):
                     else:
                         episode_raw = guess_result.matches['episode'][0].initiator.raw
                         if episode_raw and any(
-                            c.isalpha() and c.lower() != 'v' for c in episode_raw
+                                c.isalpha() and c.lower() != 'v' for c in episode_raw
                         ):
                             season = 1
                 if season is not None:
@@ -349,7 +343,7 @@ class ParserGuessit(object):
                 identifier_type = 'sequence'
                 identifier = episode
         if (not identifier_type or guessit_options.get('prefer_specials')) and (
-            special or guessit_options.get('assume_special')
+                special or guessit_options.get('assume_special')
         ):
             identifier_type = 'special'
             identifier = guess_result.get('episode_title', 'special')

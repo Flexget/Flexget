@@ -1,7 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import native_str
-
 from distutils.version import LooseVersion
 
 from sqlalchemy import Column, Integer, String
@@ -287,7 +283,7 @@ class TelegramNotifier(object):
             raise plugin.PluginWarning('missing python-telegram-bot pkg')
         elif not hasattr(telegram, str('__version__')):
             raise plugin.PluginWarning('invalid or old python-telegram-bot pkg')
-        elif LooseVersion(telegram.__version__) < native_str(_MIN_TELEGRAM_VER):
+        elif LooseVersion(telegram.__version__) < _MIN_TELEGRAM_VER:
             raise plugin.PluginWarning(
                 'old python-telegram-bot ({0})'.format(telegram.__version__)
             )

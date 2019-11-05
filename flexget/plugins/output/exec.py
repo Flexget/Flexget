@@ -1,14 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import text_to_native_str
-
 import logging
 import subprocess
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.config_schema import one_or_more
 from flexget.utils.template import render_from_entry, render_from_task, RenderError
 from flexget.utils.tools import io_encoding
 
@@ -106,7 +102,7 @@ class PluginExec(object):
     def execute_cmd(self, cmd, allow_background, encoding):
         log.verbose('Executing: %s', cmd)
         p = subprocess.Popen(
-            text_to_native_str(cmd, encoding=io_encoding),
+            cmd,
             shell=True,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
@@ -184,7 +180,7 @@ class PluginExec(object):
                             continue
                         # Run the command, fail entries with non-zero return code if configured to
                         if self.execute_cmd(
-                            cmd, allow_background, config['encoding']
+                                cmd, allow_background, config['encoding']
                         ) != 0 and config.get('fail_entries'):
                             entry.fail('exec return code was non-zero')
 

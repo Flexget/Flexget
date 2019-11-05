@@ -1,13 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import json
 import logging
-from builtins import *
 from collections import MutableSet
+from urllib.parse import urlparse, quote
 
 import requests
-from future.moves.urllib.parse import urlparse, quote
-from future.utils import python_2_unicode_compatible
 from requests import RequestException
 
 from flexget import plugin
@@ -18,7 +14,6 @@ from flexget.utils.qualities import Requirements
 log = logging.getLogger('radarr')
 
 
-@python_2_unicode_compatible
 class RadarrRequestError(Exception):
     def __init__(self, value, logger=log, **kwargs):
         super(RadarrRequestError, self).__init__()
@@ -182,15 +177,15 @@ class RadarrAPIService:
         return request_get_json(request_url, headers)
 
     def add_movie(
-        self,
-        title,
-        quality_profile_id,
-        title_slug,
-        images,
-        tmdb_id,
-        root_folder_path,
-        monitored=True,
-        add_options=None,
+            self,
+            title,
+            quality_profile_id,
+            title_slug,
+            images,
+            tmdb_id,
+            root_folder_path,
+            monitored=True,
+            add_options=None,
     ):
         """ Adds a movie """
         request_url = self.api_url + "movie"

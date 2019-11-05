@@ -1,11 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import text_to_native_str
-
+import getpass
 import logging
 import smtplib
 import socket
-import getpass
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
@@ -125,9 +121,7 @@ class EmailNotifier(object):
             if self.username:
                 # Forcing to use `str` type
                 log.debug('logging in to smtp server using username: %s', self.username)
-                self.mail_server.login(
-                    text_to_native_str(self.username), text_to_native_str(self.password)
-                )
+                self.mail_server.login(self.username, self.password)
         except (IOError, SMTPAuthenticationError) as e:
             raise PluginWarning(str(e))
 
@@ -183,7 +177,7 @@ class EmailNotifier(object):
         # Making sure mail server connection will remain open per host or username
         # (in case several mail servers are used in the same task)
         if not self.mail_server or not (
-            self.host == config['smtp_host'] and self.username == config.get('smtp_username')
+                self.host == config['smtp_host'] and self.username == config.get('smtp_username')
         ):
             self.connect_to_smtp_server(config)
 

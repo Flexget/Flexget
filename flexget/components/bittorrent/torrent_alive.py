@@ -1,16 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urlparse, urlsplit, urlunsplit, quote
-from future.moves.urllib.error import URLError
-
+import binascii
 import itertools
 import logging
-import threading
 import socket
 import struct
-import binascii
-from random import randrange
+import threading
 from http.client import BadStatusLine
+from random import randrange
+from urllib.error import URLError
+from urllib.parse import urlparse, urlsplit, urlunsplit, quote
+
 from requests import RequestException
 
 from flexget import plugin
@@ -204,7 +202,7 @@ class TorrentAlive(object):
             if 'torrent_seeds' in entry and entry['torrent_seeds'] < config['min_seeds']:
                 entry.reject(
                     reason='Had < %d required seeds. (%s)'
-                    % (config['min_seeds'], entry['torrent_seeds'])
+                           % (config['min_seeds'], entry['torrent_seeds'])
                 )
 
     # Run on output phase so that we let torrent plugin output modified torrent file first

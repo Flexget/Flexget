@@ -1,18 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from future.moves.urllib.parse import quote
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import re
+from urllib.parse import quote
 
 from flexget import plugin
+from flexget.components.sites.urlrewriting import UrlRewritingError
+from flexget.components.sites.utils import torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
-from flexget.components.sites.utils import torrent_availability
 from flexget.utils.tools import parse_filesize
-from flexget.components.sites.urlrewriting import UrlRewritingError
 
 log = logging.getLogger('1337x')
 
@@ -112,9 +109,8 @@ class Site1337x(object):
             soup = get_soup(page.content)
             if soup.find('div', attrs={'class': 'table-list-wrap'}) is not None:
                 for link in soup.find('div', attrs={'class': 'table-list-wrap'}).findAll(
-                    'a', href=re.compile('^/torrent/')
+                        'a', href=re.compile('^/torrent/')
                 ):
-
                     li = link.parent.parent
 
                     title = str(link.text).replace('...', '')

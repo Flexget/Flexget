@@ -1,15 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urlencode
-
 import logging
-
 import re
+from urllib.parse import urlencode
+
+from requests import Request, RequestException
+from requests.utils import dict_from_cookiejar, cookiejar_from_dict
+
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginError
-from requests import Request, RequestException
-from requests.utils import dict_from_cookiejar, cookiejar_from_dict
 
 log = logging.getLogger('wordpress_auth')
 
@@ -17,7 +15,7 @@ log = logging.getLogger('wordpress_auth')
 def construct_request(url, username='', password='', redirect='/wp-admin/'):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) '
-        'Chrome/50.0.2661.102 Safari/537.36',
+                      'Chrome/50.0.2661.102 Safari/537.36',
         'Content-Type': 'application/x-www-form-urlencoded',
         'DNT': '1',
     }

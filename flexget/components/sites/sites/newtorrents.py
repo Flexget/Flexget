@@ -1,17 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import quote
-
 import logging
 import re
+from urllib.parse import quote
 
 from flexget import plugin
+from flexget.components.sites.urlrewriting import UrlRewritingError
+from flexget.components.sites.utils import torrent_availability, normalize_unicode
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.components.sites.urlrewriting import UrlRewritingError
-from flexget.utils.soup import get_soup
-from flexget.components.sites.utils import torrent_availability, normalize_unicode
 from flexget.utils import requests
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('newtorrents')
 
@@ -28,15 +25,15 @@ class NewTorrents(object):
         if entry['url'].startswith('http://www.newtorrents.info/down.php?'):
             return False
         return (
-            entry['url'].startswith('http://www.newtorrents.info')
-            and not entry['url'] in self.resolved
+                entry['url'].startswith('http://www.newtorrents.info')
+                and not entry['url'] in self.resolved
         )
 
     # UrlRewriter plugin API
     def url_rewrite(self, task, entry):
         url = entry['url']
         if url.startswith('http://www.newtorrents.info/?q=') or url.startswith(
-            'http://www.newtorrents.info/search'
+                'http://www.newtorrents.info/search'
         ):
             results = self.entries_from_search(entry['title'], url=url)
             if not results:

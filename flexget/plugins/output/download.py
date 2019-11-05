@@ -1,8 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import unquote
-
 import hashlib
 import io
 import logging
@@ -14,14 +9,15 @@ import sys
 import tempfile
 from cgi import parse_header
 from http.client import BadStatusLine
+from urllib.parse import unquote
 
 from requests import RequestException
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.utils.tools import decode_html, native_str_to_text
-from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError
+from flexget.utils.tools import decode_html
 
 log = logging.getLogger('download')
 
@@ -98,13 +94,13 @@ class PluginDownload(object):
         )
 
     def get_temp_file(
-        self,
-        task,
-        entry,
-        require_path=False,
-        handle_magnets=False,
-        fail_html=True,
-        tmp_path=tempfile.gettempdir(),
+            self,
+            task,
+            entry,
+            require_path=False,
+            handle_magnets=False,
+            fail_html=True,
+            tmp_path=tempfile.gettempdir(),
     ):
         """
         Download entry content and store in temporary folder.
@@ -146,8 +142,8 @@ class PluginDownload(object):
             html_mimes = ['html', 'text/html']
             if entry.get('mime-type') in html_mimes and fail_html:
                 error = (
-                    'Unexpected html content received from `%s` - maybe a login page?'
-                    % entry['url']
+                        'Unexpected html content received from `%s` - maybe a login page?'
+                        % entry['url']
                 )
                 self.cleanup_temp_file(entry)
 
@@ -178,12 +174,12 @@ class PluginDownload(object):
             outfile.write(page)
 
     def get_temp_files(
-        self,
-        task,
-        require_path=False,
-        handle_magnets=False,
-        fail_html=True,
-        tmp_path=tempfile.gettempdir(),
+            self,
+            task,
+            require_path=False,
+            handle_magnets=False,
+            fail_html=True,
+            tmp_path=tempfile.gettempdir(),
     ):
         """Download all task content and store in temporary folder.
 
@@ -361,16 +357,6 @@ class PluginDownload(object):
         filename = parse_header(response.headers['content-disposition'])[1].get('filename')
 
         if filename:
-            # try to decode to unicode, specs allow latin1, some may do utf-8 anyway
-            try:
-                filename = native_str_to_text(filename, encoding='latin1')
-                log.debug('filename header latin1 decoded')
-            except UnicodeError:
-                try:
-                    filename = native_str_to_text(filename, encoding='utf-8')
-                    log.debug('filename header UTF-8 decoded')
-                except UnicodeError:
-                    pass
             filename = decode_html(filename)
             log.debug('Found filename from headers: %s', filename)
             if 'filename' in entry:

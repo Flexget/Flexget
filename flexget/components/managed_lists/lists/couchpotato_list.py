@@ -1,9 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urlparse
-
 import logging
 from collections import MutableSet
+from urllib.parse import urlparse
 
 import requests
 from requests import RequestException
@@ -159,7 +156,7 @@ class CouchPotatoBase(object):
                 if config.get('include_data') and profile_json:
                     for profile in profile_json['list']:
                         if (
-                            profile['_id'] == movie['profile_id']
+                                profile['_id'] == movie['profile_id']
                         ):  # Matches movie profile with profile JSON
                             quality_req = CouchPotatoBase.quality_requirement_builder(profile)
                 entry = Entry(
@@ -233,9 +230,9 @@ class CouchPotatoSet(MutableSet):
         for cp_entry in self.movies:
             for sup_id in self.supported_ids:
                 if (
-                    entry.get(sup_id) is not None
-                    and entry[sup_id] == cp_entry[sup_id]
-                    or entry.get('title').lower() == cp_entry.get('title').lower()
+                        entry.get(sup_id) is not None
+                        and entry[sup_id] == cp_entry[sup_id]
+                        or entry.get('title').lower() == cp_entry.get('title').lower()
                 ):
                     return cp_entry
 

@@ -1,7 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import PY3
-
 import csv
 import logging
 import re
@@ -17,8 +13,8 @@ from sqlalchemy.schema import ForeignKey
 from flexget import plugin, db_schema
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.plugin import PluginError
 from flexget.manager import Session
+from flexget.plugin import PluginError
 from flexget.utils.database import json_synonym
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from flexget.utils.soup import get_soup
@@ -60,20 +56,6 @@ class IMDBListList(Base):
         self.list_id = list_id
         self.list_name = list_name
         self.user_id = user_id
-
-
-if PY3:
-    csv_dictreader = csv.DictReader
-else:
-
-    def csv_dictreader(iterable, dialect='excel', *args, **kwargs):
-        """
-        Compatibilty function to make python 2 act like python 3
-        Always takes and returns text (no bytes).
-        """
-        iterable = (l.encode('utf-8') for l in iterable)
-        for row in csv.DictReader(iterable):
-            yield {header.decode('utf-8'): value.decode('utf-8') for header, value in row.items()}
 
 
 class ImdbEntrySet(MutableSet):
@@ -138,8 +120,8 @@ class ImdbEntrySet(MutableSet):
         with Session() as session:
             user = (
                 session.query(IMDBListUser)
-                .filter(IMDBListUser.user_name == self.config.get('login'))
-                .one_or_none()
+                    .filter(IMDBListUser.user_name == self.config.get('login'))
+                    .one_or_none()
             )
             if user and user.cookies and user.user_id:
                 log.debug('login credentials found in cache, testing')
@@ -209,7 +191,7 @@ class ImdbEntrySet(MutableSet):
                             'manually adding an item to it and try again'
                         )
                 elif self.config['list'] in IMMUTABLE_LISTS or self.config['list'].startswith(
-                    'ls'
+                        'ls'
                 ):
                     self.list_id = self.config['list']
                 else:
@@ -252,7 +234,7 @@ class ImdbEntrySet(MutableSet):
             # Normalize headers to lowercase
             lines[0] = lines[0].lower()
             self._items = []
-            for row in csv_dictreader(lines):
+            for row in csv.DictReader(lines):
                 log.debug('parsing line from csv: %s', row)
 
                 try:

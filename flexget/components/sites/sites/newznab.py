@@ -1,16 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.utils import old_div
-from future.moves.urllib.parse import urlencode, quote
-
 import logging
+from urllib.parse import quote, urlencode
+
+import feedparser
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.requests import RequestException
-
-import feedparser
 
 __author__ = 'deksan'
 
@@ -81,7 +77,7 @@ class Newznab(object):
             new_entry['url'] = new_entry['link']
             if rss_entry.enclosures:
                 size = int(rss_entry.enclosures[0]['length'])  # B
-                new_entry['content_size'] = old_div(size, 2 ** 20)  # MB
+                new_entry['content_size'] = size / (2 ** 20)  # MB
             entries.append(new_entry)
         return entries
 
@@ -100,9 +96,9 @@ class Newznab(object):
         log.info('Searching for %s' % (arg_entry['title']))
         # normally this should be used with next_series_episodes who has provided season and episodenumber
         if (
-            'series_name' not in arg_entry
-            or 'series_season' not in arg_entry
-            or 'series_episode' not in arg_entry
+                'series_name' not in arg_entry
+                or 'series_season' not in arg_entry
+                or 'series_episode' not in arg_entry
         ):
             return []
         if arg_entry.get('tvrage_id'):
@@ -110,9 +106,9 @@ class Newznab(object):
         else:
             lookup = '&q=%s' % quote(arg_entry['series_name'])
         url = (
-            config['url']
-            + lookup
-            + '&season=%s&ep=%s' % (arg_entry['series_season'], arg_entry['series_episode'])
+                config['url']
+                + lookup
+                + '&season=%s&ep=%s' % (arg_entry['series_season'], arg_entry['series_episode'])
         )
         return self.fill_entries_for_url(url, task)
 

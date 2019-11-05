@@ -1,11 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from math import ceil
+from urllib.parse import unquote
 
 from flask import jsonify, request
 from flask_restplus import inputs
-from future.moves.urllib.parse import unquote
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource

@@ -1,15 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import re
+from urllib.parse import unquote
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-
-from future.moves.urllib.parse import unquote
 
 log = logging.getLogger('regexp')
 

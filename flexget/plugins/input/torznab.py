@@ -1,17 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-from future.moves.urllib.parse import urlencode
-from past.utils import old_div
-from xml.etree import ElementTree
 import logging
+from urllib.parse import urlencode
+from xml.etree import ElementTree
 
 from flexget import plugin
+from flexget.components.sites.utils import torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.utils.requests import RequestException
-from flexget.components.sites.utils import torrent_availability
 
 log = logging.getLogger('torznab')
 
@@ -102,18 +98,16 @@ class Torznab(object):
             if self._check_searcher(searchers, aliases[searcher]):
                 self.supported_params = searchers[aliases[searcher]]['supportedParams'].split(',')
                 self.params['t'] = searcher
-                log.debug("Searcher '{}' set up with '{}' parameters".format(
-                          aliases[searcher],
-                          self.supported_params))
+                log.debug("Searcher '%s' set up with '%s' parameters", aliases[searcher], self.supported_params)
                 if searcher != 'search':
                     self._setup_categories(xml_root, categories)
             elif searcher != 'search' and self._check_searcher(searchers, 'search'):
-                log.warn("'{}' searcher not availble, falling back to 'search'.".format(aliases[searcher]))
+                log.warning("'%s' searcher not available, falling back to 'search'.", aliases[searcher])
                 self.supported_params = searchers['search']['supportedParams'].split(',')
                 self.params['t'] = 'search'
                 log.debug("Searcher '{}' set up with '{}' parameters".format(
-                         aliases[searcher],
-                         self.supported_params))
+                    aliases[searcher],
+                    self.supported_params))
             else:
                 raise PluginError('No searcher available on {}'.format(self.base_url))
         else:
@@ -122,8 +116,8 @@ class Torznab(object):
     def _check_searcher(self, searchers, searcher):
         """Check if the given searchers is in the list, available and has supported params"""
         return searcher in searchers.keys() and \
-            searchers[searcher]['available'] == 'yes' and \
-            searchers[searcher]['supportedParams']
+               searchers[searcher]['available'] == 'yes' and \
+               searchers[searcher]['supportedParams']
 
     def _setup_categories(self, xml_root, categories):
         """Gets the available search categories for the indexer"""
@@ -169,7 +163,7 @@ class Torznab(object):
             else:
                 entry['url'] = enclosure.attrib['url']
                 try:
-                    entry['content_size'] = old_div(int(enclosure.attrib['length']), 2 ** 20)
+                    entry['content_size'] = int(enclosure.attrib['length']) // (2 ** 20)
                 except ValueError:
                     entry['content_size'] = 0
                 entry['type'] = enclosure.attrib['type']
@@ -228,7 +222,7 @@ class Torznab(object):
                 entry['torrent_seeds'] = misc['peers'] - entry['torrent_leeches']
 
         if 'content_size' not in entry.keys() and 'size' in misc.keys():
-            entry['content_size'] = old_div(misc['size'], 2 ** 20)
+            entry['content_size'] = misc['size'] // (2 ** 20)
 
         if 'torrent_seeds' in entry.keys() and 'torrent_leeches' in entry.keys():
             entry['torrent_availability'] = torrent_availability(

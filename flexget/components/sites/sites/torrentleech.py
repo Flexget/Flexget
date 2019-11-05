@@ -1,18 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import quote
-
 import logging
+from urllib.parse import quote
 
 from requests.exceptions import RequestException
 
 from flexget import plugin
+from flexget.components.sites.urlrewriting import UrlRewritingError
+from flexget.components.sites.utils import torrent_availability, normalize_unicode
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
-from flexget.components.sites.urlrewriting import UrlRewritingError
-from flexget.components.sites.utils import torrent_availability, normalize_unicode
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('torrentleech')
@@ -136,9 +133,9 @@ class UrlRewriteTorrentleech(object):
             # so encode in utf-8 beforehand
 
             url = (
-                'https://www.torrentleech.org/torrents/browse/list/query/'
-                + quote(query.encode('utf-8'))
-                + filter_url
+                    'https://www.torrentleech.org/torrents/browse/list/query/'
+                    + quote(query.encode('utf-8'))
+                    + filter_url
             )
             log.debug('Using %s as torrentleech search url', url)
 

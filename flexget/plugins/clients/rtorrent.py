@@ -1,25 +1,21 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.xmlrpc import client as xmlrpc_client
-from future.moves.urllib.parse import urlparse, urljoin, urlsplit
-from future.utils import native_str
-
 import logging
 import os
-import socket
 import re
+import socket
 from io import BytesIO
 from time import sleep
-
-from flexget.utils.template import RenderError
-from flexget.utils.pathscrub import pathscrub
-from flexget import plugin
-from flexget.event import event
-from flexget.entry import Entry
-from flexget.config_schema import one_or_more
-from flexget.utils.bittorrent import Torrent, is_torrent_file
+from urllib.parse import urlparse, urljoin, urlsplit
+from xmlrpc import client as xmlrpc_client
 
 from requests.auth import HTTPDigestAuth, HTTPBasicAuth
+
+from flexget import plugin
+from flexget.config_schema import one_or_more
+from flexget.entry import Entry
+from flexget.event import event
+from flexget.utils.bittorrent import Torrent, is_torrent_file
+from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError
 
 log = logging.getLogger('rtorrent')
 
@@ -240,7 +236,7 @@ class RTorrent(object):
         if reverse:
             for field in ['up.total', 'down.total', 'down.rate']:
                 if field in fields:
-                    fields[fields.index(field)] = native_str(field.replace('.', '_'))
+                    fields[fields.index(field)] = field.replace('.', '_')
             return fields
 
         for required_field in self.required_fields:
@@ -249,7 +245,7 @@ class RTorrent(object):
 
         for field in ['up_total', 'down_total', 'down_rate']:
             if field in fields:
-                fields[fields.index(field)] = native_str(field.replace('_', '.'))
+                fields[fields.index(field)] = field.replace('_', '.')
 
         return fields
 
@@ -264,7 +260,7 @@ class RTorrent(object):
         for key, val in fields.items():
             # Values must be escaped if within params
             # TODO: What are the escaping requirements? re.escape works differently on python 3.7+
-            params.append('d.%s.set=%s' % (key, re.escape(native_str(val))))
+            params.append('d.%s.set=%s' % (key, re.escape(val)))
 
         if mkdir and 'directory' in fields:
             result = self._server.execute.throw('', 'mkdir', '-p', fields['directory'])
@@ -273,7 +269,7 @@ class RTorrent(object):
 
         # by default rtorrent won't allow calls over 512kb in size.
         xmlrpc_size = (
-            len(xmlrpc_client.dumps(tuple(params), 'raw_start')) + 71680
+                len(xmlrpc_client.dumps(tuple(params), 'raw_start')) + 71680
         )  # Add 70kb for buffer
         if xmlrpc_size > 524288:
             prev_size = self._server.network.xmlrpc.size_limit()
@@ -295,7 +291,6 @@ class RTorrent(object):
 
     def torrent(self, info_hash, fields=None):
         """ Get the details of a torrent """
-        info_hash = native_str(info_hash)
         if not fields:
             fields = list(self.default_fields)
 
@@ -329,22 +324,21 @@ class RTorrent(object):
 
         for key, val in fields.items():
             method_name = 'd.%s.set' % key
-            getattr(multi_call, method_name)(native_str(info_hash), native_str(val))
+            getattr(multi_call, method_name)(info_hash, val)
 
         return multi_call()[0]
 
     def delete(self, info_hash):
-        return self._server.d.erase(native_str(info_hash))
+        return self._server.d.erase(info_hash)
 
     def stop(self, info_hash):
         self._server.d.stop(info_hash)
-        return self._server.d.close(native_str(info_hash))
+        return self._server.d.close(info_hash)
 
     def start(self, info_hash):
-        return self._server.d.start(native_str(info_hash))
+        return self._server.d.start(info_hash)
 
     def move(self, info_hash, dst_path):
-        info_hash = native_str(info_hash)
         self.stop(info_hash)
 
         torrent = self.torrent(info_hash, fields=['base_path'])
@@ -367,14 +361,14 @@ class RTorrentPluginBase(object):
         options = {}
 
         for opt_key in (
-            'path',
-            'message',
-            'priority',
-            'custom1',
-            'custom2',
-            'custom3',
-            'custom4',
-            'custom5',
+                'path',
+                'message',
+                'priority',
+                'custom1',
+                'custom2',
+                'custom3',
+                'custom4',
+                'custom5',
         ):
             # Values do not merge config with task
             # Task takes priority then config is used

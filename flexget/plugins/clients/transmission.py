@@ -1,26 +1,21 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urlparse
-from future.utils import text_to_native_str
-
-import os
-import logging
 import base64
+import logging
+import os
 import re
 from datetime import datetime
 from datetime import timedelta
+from fnmatch import fnmatch
 from netrc import netrc, NetrcParseError
 from time import sleep
+from urllib.parse import urlparse
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError
 from flexget.utils.tools import parse_timedelta
-
-from flexget.config_schema import one_or_more
-from fnmatch import fnmatch
 
 try:
     import transmissionrpc
@@ -95,10 +90,10 @@ class TransmissionBase(object):
                 if not best or tf['size'] > best[1]:
                     best = (tf['name'], tf['size'])
         if (
-            done
-            and best
-            and (100 * float(best[1]) / float(torrent.totalSize))
-            >= (config['main_file_ratio'] * 100)
+                done
+                and best
+                and (100 * float(best[1]) / float(torrent.totalSize))
+                >= (config['main_file_ratio'] * 100)
         ):
             vloc = ('%s/%s' % (torrent.downloadDir, best[0])).replace('/', os.sep)
         return done, vloc
@@ -115,13 +110,13 @@ class TransmissionBase(object):
 
         if torrent.seedIdleMode == 1:  # use torrent's own idle limit
             idle_limit_ok = (
-                torrent.date_active + timedelta(minutes=torrent.seedIdleLimit) < datetime.now()
+                    torrent.date_active + timedelta(minutes=torrent.seedIdleLimit) < datetime.now()
             )
         elif torrent.seedIdleMode == 0:  # use global rules
             if session.idle_seeding_limit_enabled:
                 idle_limit_ok = (
-                    torrent.date_active + timedelta(minutes=session.idle_seeding_limit)
-                    < datetime.now()
+                        torrent.date_active + timedelta(minutes=session.idle_seeding_limit)
+                        < datetime.now()
                 )
 
         return seed_limit_ok, idle_limit_ok
@@ -155,7 +150,6 @@ class TransmissionBase(object):
 
 
 class PluginTransmissionInput(TransmissionBase):
-
     schema = {
         'anyOf': [
             {'type': 'boolean'},
@@ -201,7 +195,7 @@ class PluginTransmissionInput(TransmissionBase):
         for torrent in self.client.get_torrents():
             seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
             if config['only_complete'] and not (
-                seed_ratio_ok and idle_limit_ok and torrent.progress == 100
+                    seed_ratio_ok and idle_limit_ok and torrent.progress == 100
             ):
                 continue
             entry = Entry(
@@ -376,7 +370,7 @@ class PluginTransmission(TransmissionBase):
             torrent_info = None
             for t in session_torrents:
                 if t.hashString.lower() == entry.get(
-                    'torrent_info_hash', ''
+                        'torrent_info_hash', ''
                 ).lower() or t.id == entry.get('transmission_id'):
                     torrent_info = t
                     log.debug(
@@ -448,7 +442,7 @@ class PluginTransmission(TransmissionBase):
                 total_size = torrent_info.totalSize
                 main_id = None
                 find_main_file = (
-                    options['post'].get('main_file_only') or 'content_filename' in options['post']
+                        options['post'].get('main_file_only') or 'content_filename' in options['post']
                 )
                 skip_files = options['post'].get('skip_files')
                 # We need to index the files if any of the following are defined
@@ -493,12 +487,12 @@ class PluginTransmission(TransmissionBase):
 
                         if 'include_files' in options['post']:
                             if any(
-                                fnmatch(file_list[f]['name'], mask)
-                                for mask in options['post']['include_files']
+                                    fnmatch(file_list[f]['name'], mask)
+                                    for mask in options['post']['include_files']
                             ):
                                 dl_list.append(f)
                             elif options['post'].get('include_subs') and any(
-                                fnmatch(file_list[f]['name'], mask) for mask in ext_list
+                                    fnmatch(file_list[f]['name'], mask) for mask in ext_list
                             ):
                                 dl_list.append(f)
 
@@ -583,7 +577,7 @@ class PluginTransmission(TransmissionBase):
                             len(file_list),
                         )
                     elif (
-                        not options['post'].get('main_file_only') or main_id is None
+                            not options['post'].get('main_file_only') or main_id is None
                     ) and skip_files:
                         # If no main file and we want to skip files
 
@@ -645,23 +639,23 @@ class PluginTransmission(TransmissionBase):
         opt_dic = {}
 
         for opt_key in (
-            'path',
-            'add_paused',
-            'honor_limits',
-            'bandwidth_priority',
-            'max_connections',
-            'max_up_speed',
-            'max_down_speed',
-            'ratio',
-            'main_file_only',
-            'main_file_ratio',
-            'magnetization_timeout',
-            'include_subs',
-            'content_filename',
-            'include_files',
-            'skip_files',
-            'rename_like_files',
-            'queue_position',
+                'path',
+                'add_paused',
+                'honor_limits',
+                'bandwidth_priority',
+                'max_connections',
+                'max_up_speed',
+                'max_down_speed',
+                'ratio',
+                'main_file_only',
+                'main_file_ratio',
+                'magnetization_timeout',
+                'include_subs',
+                'content_filename',
+                'include_files',
+                'skip_files',
+                'rename_like_files',
+                'queue_position',
         ):
             # Values do not merge config with task
             # Task takes priority then config is used
@@ -681,7 +675,7 @@ class PluginTransmission(TransmissionBase):
             else:
                 # Transmission doesn't like it when paths end in a separator
                 path = path.rstrip('\\/')
-                add['download_dir'] = text_to_native_str(pathscrub(path), 'utf-8')
+                add['download_dir'] = str(pathscrub(path), 'utf-8')
         # make sure we add it paused, will modify status after adding
         add['paused'] = True
 
@@ -785,7 +779,7 @@ class PluginTransmissionClean(TransmissionBase):
 
     schema = {
         "deprecated": "The clean_transmission plugin is deprecated. Configure a new task using the from_transmission "
-        "plugin as well as the transmission plugin using the remove or purge action.",
+                      "plugin as well as the transmission plugin using the remove or purge action.",
         "anyOf": [
             {"type": "boolean"},
             {
@@ -860,7 +854,7 @@ class PluginTransmissionClean(TransmissionBase):
                     continue
             if config.get('directories'):
                 if not any(
-                    re.search(d, torrent.downloadDir, re.IGNORECASE) for d in config['directories']
+                        re.search(d, torrent.downloadDir, re.IGNORECASE) for d in config['directories']
                 ):
                     continue
             if task.options.test:

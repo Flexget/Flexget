@@ -1,15 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urlparse, urlunparse
-
-import re
 import logging
+import re
+from urllib.parse import urlparse, urlunparse
 
 from requests import RequestException
 
 from flexget import plugin
-from flexget.event import event
 from flexget.components.sites.urlrewriting import UrlRewritingError
+from flexget.event import event
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('eztv')
