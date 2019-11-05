@@ -228,7 +228,7 @@ def filecopy(request):
                 if os.path.isdir(f):
                     shutil.rmtree(f)
                 else:
-                    f.remove()
+                    f.unlink()
             except OSError as e:
                 print("couldn't remove %s: %s" % (f, e))
 
