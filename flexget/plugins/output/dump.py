@@ -1,7 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-
 import logging
 
 from flexget import options, plugin
@@ -25,12 +21,12 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
     def sort_key(field):
         # Sort certain fields above the rest
         if field == 'title':
-            return (0,)
+            return 0,
         if field == 'url':
-            return (1,)
+            return 1,
         if field == 'original_url':
-            return (2,)
-        return (3, field)
+            return 2,
+        return 3, field
 
     for entry in entries:
         for field in sorted(entry, key=sort_key):
@@ -43,7 +39,7 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
                     value = entry[field]
                 except KeyError:
                     value = '<LazyField - lazy lookup failed>'
-            if isinstance(value, basestring):
+            if isinstance(value, str):
                 try:
                     console('%-17s: %s' % (field, value.replace('\r', '').replace('\n', '')))
                 except Exception:

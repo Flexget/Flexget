@@ -1,7 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-
 import collections
 import logging
 
@@ -220,7 +216,7 @@ class FromIMDB(object):
         Gets a list of lists and returns a flat list
         """
         for el in _list:
-            if isinstance(el, collections.Iterable) and not isinstance(el, basestring):
+            if isinstance(el, collections.Iterable) and not isinstance(el, str):
                 for sub in self.flatten_list(el):
                     yield sub
             else:

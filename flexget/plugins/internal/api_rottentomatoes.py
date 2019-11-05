@@ -1,24 +1,20 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-from future.moves.urllib.parse import quote_plus
-from future.moves.urllib.error import URLError
-
-import time
-import logging
 import difflib
+import logging
+import time
 from datetime import datetime, timedelta
+from urllib.error import URLError
+from urllib.parse import quote_plus
 
 from sqlalchemy import Table, Column, Integer, String, DateTime, func, sql
-from sqlalchemy.schema import ForeignKey, Index
 from sqlalchemy.orm import relation
+from sqlalchemy.schema import ForeignKey, Index
 
 from flexget import db_schema
+from flexget import plugin
 from flexget.plugin import internet, PluginError
 from flexget.utils import requests
 from flexget.utils.database import text_date_synonym, with_session
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
-from flexget import plugin
 
 log = logging.getLogger('api_rottentomatoes')
 Base = db_schema.versioned_base('api_rottentomatoes', 2)
@@ -104,7 +100,7 @@ class RottenTomatoesContainer(object):
     def update_from_dict(self, update_dict):
         """Populates any simple (string or number) attributes from a dict"""
         for col in self.__table__.columns:
-            if isinstance(update_dict.get(col.name), (basestring, int, float)):
+            if isinstance(update_dict.get(col.name), (str, int, float)):
                 setattr(self, col.name, update_dict[col.name])
 
 
@@ -263,13 +259,13 @@ class RottenTomatoesSearchResult(Base):
 @internet(log)
 @with_session
 def lookup_movie(
-    title=None,
-    year=None,
-    rottentomatoes_id=None,
-    smart_match=None,
-    only_cached=False,
-    session=None,
-    api_key=None,
+        title=None,
+        year=None,
+        rottentomatoes_id=None,
+        smart_match=None,
+        only_cached=False,
+        session=None,
+        api_key=None,
 ):
     """
     Do a lookup from Rotten Tomatoes for the movie matching the passed arguments.
@@ -313,8 +309,8 @@ def lookup_movie(
     if rottentomatoes_id:
         movie = (
             session.query(RottenTomatoesMovie)
-            .filter(RottenTomatoesMovie.id == rottentomatoes_id)
-            .first()
+                .filter(RottenTomatoesMovie.id == rottentomatoes_id)
+                .first()
         )
     if not movie and title:
         movie_filter = session.query(RottenTomatoesMovie).filter(
@@ -327,8 +323,8 @@ def lookup_movie(
             log.debug('No matches in movie cache found, checking search cache.')
             found = (
                 session.query(RottenTomatoesSearchResult)
-                .filter(func.lower(RottenTomatoesSearchResult.search) == search_string)
-                .first()
+                    .filter(func.lower(RottenTomatoesSearchResult.search) == search_string)
+                    .first()
             )
             if found and found.movie:
                 log.debug('Movie found in search cache.')
@@ -444,8 +440,8 @@ def lookup_movie(
 
                         movie = (
                             session.query(RottenTomatoesMovie)
-                            .filter(RottenTomatoesMovie.id == result['id'])
-                            .first()
+                                .filter(RottenTomatoesMovie.id == result['id'])
+                                .first()
                         )
 
                         if not movie:
@@ -511,8 +507,8 @@ def _set_movie_details(movie, session, movie_data=None, api_key=None):
             for name in genres:
                 genre = (
                     session.query(RottenTomatoesGenre)
-                    .filter(func.lower(RottenTomatoesGenre.name) == name.lower())
-                    .first()
+                        .filter(func.lower(RottenTomatoesGenre.name) == name.lower())
+                        .first()
                 )
                 if not genre:
                     genre = RottenTomatoesGenre(name)
@@ -530,8 +526,8 @@ def _set_movie_details(movie, session, movie_data=None, api_key=None):
             for res_actor in cast:
                 actor = (
                     session.query(RottenTomatoesActor)
-                    .filter(func.lower(RottenTomatoesActor.rt_id) == res_actor['id'])
-                    .first()
+                        .filter(func.lower(RottenTomatoesActor.rt_id) == res_actor['id'])
+                        .first()
                 )
                 if not actor:
                     actor = RottenTomatoesActor(res_actor['name'], res_actor['id'])
@@ -541,10 +537,10 @@ def _set_movie_details(movie, session, movie_data=None, api_key=None):
             for res_director in directors:
                 director = (
                     session.query(RottenTomatoesDirector)
-                    .filter(
+                        .filter(
                         func.lower(RottenTomatoesDirector.name) == res_director['name'].lower()
                     )
-                    .first()
+                        .first()
                 )
                 if not director:
                     director = RottenTomatoesDirector(res_director['name'])
@@ -574,9 +570,9 @@ def movies_info(id, api_key=None):
 
 
 def lists(list_type, list_name, limit=20, page_limit=20, page=None, api_key=None):
-    if isinstance(list_type, basestring):
+    if isinstance(list_type, str):
         list_type = list_type.replace(' ', '_')
-    if isinstance(list_name, basestring):
+    if isinstance(list_name, str):
         list_name = list_name.replace(' ', '_')
 
     if not api_key:
@@ -596,7 +592,7 @@ def lists(list_type, list_name, limit=20, page_limit=20, page=None, api_key=None
 
 
 def movies_search(q, page_limit=None, page=None, api_key=None):
-    if isinstance(q, basestring):
+    if isinstance(q, str):
         q = quote_plus(q.encode('latin-1', errors='ignore'))
 
     if not api_key:

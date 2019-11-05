@@ -66,7 +66,7 @@ def text_date_synonym(name):
         return getattr(self, name)
 
     def setter(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             try:
                 setattr(self, name, datetime.strptime(value, '%Y-%m-%d'))
             except ValueError:
@@ -124,7 +124,7 @@ def entry_synonym(name):
     def setter(self, entry):
         if isinstance(entry, Entry) or isinstance(entry, dict):
             setattr(
-                self, name, unicode(json.dumps(only_builtins(dict(entry)), encode_datetime=True))
+                self, name, json.dumps(only_builtins(dict(entry)), encode_datetime=True)
             )
         else:
             raise TypeError('%r is not of type Entry or dict.' % type(entry))
@@ -139,7 +139,7 @@ def json_synonym(name):
         return json.loads(getattr(self, name), decode_datetime=True)
 
     def setter(self, entry):
-        setattr(self, name, unicode(json.dumps(entry, encode_datetime=True)))
+        setattr(self, name, json.dumps(entry, encode_datetime=True))
 
     return synonym(name, descriptor=property(getter, setter))
 

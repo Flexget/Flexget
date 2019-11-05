@@ -1,23 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import, with_statement
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-from future.moves.urllib.parse import quote
-
+import io
+import logging
 import os
 import re
 import threading
-import logging
-from xml.etree.ElementTree import parse
-import io
-from uuid import uuid4
 import time
 from datetime import datetime, timedelta
+from urllib.parse import quote
+from uuid import uuid4
+from xml.etree.ElementTree import parse
 
-from flexget.entry import Entry
+from flexget.config_schema import one_or_more
 from flexget.config_schema import register_config_key
+from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import manager
-from flexget.config_schema import one_or_more
 from flexget.utils import requests
 from flexget.utils.tools import get_config_hash
 
@@ -128,7 +124,7 @@ def irc_prefix(var):
     :param var: Variable to prefix
     :return: Prefixed variable
     """
-    if isinstance(var, basestring):
+    if isinstance(var, str):
         return 'irc_%s' % var.lower()
 
 
@@ -138,7 +134,7 @@ def strip_whitespace(value):
     :param value:
     :return: stripped string or value
     """
-    if isinstance(value, basestring):
+    if isinstance(value, str):
         return value.strip()
     return value
 
@@ -340,8 +336,8 @@ class IRCConnection(SimpleIRCBot):
                         'https://api.github.com/repos/autodl-community/'
                         'autodl-trackers/git/trees/master?recursive=1'
                     )
-                    .json()
-                    .get('tree', [])
+                        .json()
+                        .get('tree', [])
                 )
                 for t in trackers:
                     name = t.get('path', '')
@@ -399,7 +395,7 @@ class IRCConnection(SimpleIRCBot):
         tasks = self.config.get('task')
         tasks_re = self.config.get('task_re')
         if tasks:
-            if isinstance(tasks, basestring):
+            if isinstance(tasks, str):
                 tasks = [tasks]
             log.debug(
                 'Injecting %d entries into tasks %s', len(self.entry_queue), ', '.join(tasks)
@@ -420,7 +416,7 @@ class IRCConnection(SimpleIRCBot):
                     pattern_match = 0
                     for pattern in task_config.get('patterns'):
                         if re.search(
-                            pattern['regexp'], entry.get(pattern['field'], ''), re.IGNORECASE
+                                pattern['regexp'], entry.get(pattern['field'], ''), re.IGNORECASE
                         ):
                             pattern_match += 1
 
@@ -534,11 +530,11 @@ class IRCConnection(SimpleIRCBot):
                 regex = rule.get('regex')
                 replace = rule.get('replace')
                 if (
-                    source_var
-                    and target_var
-                    and regex is not None
-                    and replace is not None
-                    and source_var in fields
+                        source_var
+                        and target_var
+                        and regex is not None
+                        and replace is not None
+                        and source_var in fields
                 ):
                     fields[target_var] = re.sub(regex, replace, fields[source_var])
                     log.debug('varreplace: %s=%s', target_var, fields[target_var])
@@ -805,7 +801,7 @@ class IRCConnection(SimpleIRCBot):
                     rest = matched_lines + lines
                     break
                 elif (
-                    idx == 0
+                        idx == 0
                 ):  # if it's the first regex that fails, then it's probably just garbage
                     log.error('No matches found for pattern %s', rx.pattern)
                     lines.remove(line)
