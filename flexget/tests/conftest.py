@@ -212,7 +212,7 @@ def filecopy(request):
             for f in itertools.chain(*(Path().glob(src) for src in sources)):
                 dest_path = dst
                 if dest_path.is_dir():
-                    dest_path = dest_path / f.basename()
+                    dest_path = dest_path / f.name
                 log.debug('copying %s to %s', f, dest_path)
                 if not os.path.isdir(os.path.dirname(dest_path)):
                     os.makedirs(os.path.dirname(dest_path))
