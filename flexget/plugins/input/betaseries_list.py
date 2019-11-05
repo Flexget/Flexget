@@ -1,7 +1,4 @@
 """Input plugin for www.betaseries.com"""
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from hashlib import md5
 import logging
 

@@ -1,20 +1,15 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
+import re
+import unicodedata
+from datetime import datetime, date, timedelta
+
+from requests.exceptions import HTTPError, RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from flexget.utils.soup import get_soup
-from requests.exceptions import HTTPError, RequestException
-
-from datetime import datetime, date, timedelta
-
-import unicodedata
-import re
 
 log = logging.getLogger('search_npo')
 

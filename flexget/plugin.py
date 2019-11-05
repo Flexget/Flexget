@@ -479,12 +479,12 @@ def _load_components_from_dirs(dirs):
     log.debug('Trying to load components from: %s', dirs)
     dirs = [Path(d) for d in dirs if os.path.isdir(d)]
     for component_dir in dirs:
-        for component_path in component_dir.walkfiles('*.py'):
+        for component_path in component_dir.glob('*.py'):
             if component_path.name == '__init__.py':
                 continue
             # Split the relative path from the plugins dir to current file's parent dir to find subpackage names
             plugin_subpackages = [
-                _f for _f in component_path.relpath(component_dir).parent.splitall() if _f
+                _f for _f in component_path.relative_to(component_dir).parent.splitall() if _f
             ]
             package_name = '.'.join(
                 [components_pkg.__name__] + plugin_subpackages + [component_path.stem]

@@ -1,18 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import tobytes
-from future.moves.urllib.parse import urlparse, urlsplit
-
 import hashlib
-import os
-import logging
-import xml.sax
-import posixpath
 import http.client
+import logging
+import os
+import posixpath
+import xml.sax
 from datetime import datetime
+from urllib.parse import urlparse, urlsplit
 
 import dateutil.parser
-
 import feedparser
 from requests import RequestException
 
@@ -21,8 +16,8 @@ from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
-from flexget.utils.tools import decode_html
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.tools import decode_html
 
 log = logging.getLogger('rss')
 feedparser.registerDateHandler(lambda date_string: dateutil.parser.parse(date_string).timetuple())
@@ -166,7 +161,7 @@ class InputRSS(object):
             log.critical('Received empty page - no content')
             return
         else:
-            data = tobytes(data)
+            data = bytes(data) # ahem, dunno about this?
 
         ext = 'xml'
         if b'<html>' in data.lower():
@@ -198,11 +193,11 @@ class InputRSS(object):
 
             char = bytes([char])
             if not in_cdata_block and char == b'&':
-                if not content[idx : idx + 7].startswith(valid_escapes):
+                if not content[idx: idx + 7].startswith(valid_escapes):
                     char = b'&amp;'
-            elif not in_cdata_block and char == b'<' and content[idx : idx + 9] == b'<![CDATA[':
+            elif not in_cdata_block and char == b'<' and content[idx: idx + 9] == b'<![CDATA[':
                 in_cdata_block = True
-            elif in_cdata_block and char == b']' and content[idx - 1 : idx + 2] == b']]>':
+            elif in_cdata_block and char == b']' and content[idx - 1: idx + 2] == b']]>':
                 in_cdata_block = False
             future_result.append(char)
         return b''.join(future_result)
@@ -239,10 +234,10 @@ class InputRSS(object):
         # set etag and last modified headers if config has not changed since
         # last run and if caching wasn't disabled with --no-cache argument.
         all_entries = (
-            config['all_entries']
-            or task.config_modified
-            or task.options.nocache
-            or task.options.retry
+                config['all_entries']
+                or task.config_modified
+                or task.options.nocache
+                or task.options.retry
         )
         headers = task.requests.headers
         if not all_entries:
@@ -345,8 +340,8 @@ class InputRSS(object):
         if ex or rss.get('bozo'):
             if rss.entries:
                 msg = (
-                    'Bozo error %s while parsing feed, but entries were produced, ignoring the error.'
-                    % type(ex)
+                        'Bozo error %s while parsing feed, but entries were produced, ignoring the error.'
+                        % type(ex)
                 )
                 if config.get('silent', False):
                     log.debug(msg)
@@ -362,7 +357,7 @@ class InputRSS(object):
                 elif isinstance(ex, UnicodeEncodeError):
                     raise plugin.PluginError('Feed has UnicodeEncodeError while parsing...')
                 elif isinstance(
-                    ex, (xml.sax._exceptions.SAXParseException, xml.sax._exceptions.SAXException)
+                        ex, (xml.sax._exceptions.SAXParseException, xml.sax._exceptions.SAXException)
                 ):
                     # save invalid data for review, this is a bit ugly but users seem to really confused when
                     # html pages (login pages) are received
@@ -390,9 +385,9 @@ class InputRSS(object):
         if not all_entries:
             # Test to make sure entries are in descending order
             if (
-                rss.entries
-                and rss.entries[0].get('published_parsed')
-                and rss.entries[-1].get('published_parsed')
+                    rss.entries
+                    and rss.entries[0].get('published_parsed')
+                    and rss.entries[-1].get('published_parsed')
             ):
                 if rss.entries[0]['published_parsed'] < rss.entries[-1]['published_parsed']:
                     # Sort them if they are not
@@ -527,7 +522,7 @@ class InputRSS(object):
                 if config['link'] == 'auto':
                     # Auto mode, check for a single enclosure url first
                     if len(entry.get('enclosures', [])) == 1 and entry['enclosures'][0].get(
-                        'href'
+                            'href'
                     ):
                         self.add_enclosure_info(
                             e, entry['enclosures'][0], config.get('filename', True)
