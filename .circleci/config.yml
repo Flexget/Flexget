@@ -18,60 +18,6 @@ run_tests: &run_tests
     py.test -n 6
 
 jobs:
-  test-py27:
-    docker:
-      - image: flexget/cci-python:2.7
-    environment:
-      - VCR_RECORD_MODE=none
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-          - py2.7-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
-          - py2.7-deps- # fallback to using the latest cache if no exact match is found
-      - run: *install_deps
-      - save_cache:
-          paths:
-            - ./venv
-          key: py2.7-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
-      - run: *run_tests
-
-  test-py34:
-    docker:
-      - image: flexget/cci-python:3.4
-    environment:
-      - VCR_RECORD_MODE=none
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-          - py3.4-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
-          - py3.4-deps- # fallback to using the latest cache if no exact match is found
-      - run: *install_deps
-      - save_cache:
-          paths:
-            - ./venv
-          key: py3.4-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
-      - run: *run_tests
-
-  test-py35:
-    docker:
-      - image: flexget/cci-python:3.5
-    environment:
-      - VCR_RECORD_MODE=none
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-          - py3.5-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
-          - py3.5-deps- # fallback to using the latest cache if no exact match is found
-      - run: *install_deps
-      - save_cache:
-          paths:
-            - ./venv
-          key: py3.5-deps-{{ checksum "requirements.txt" }}{{ checksum "dev-requirements.txt" }}{{ checksum "dev-requirements-extras.txt" }}
-      - run: *run_tests
-
   test-py36:
     docker:
       - image: flexget/cci-python:3.6
@@ -118,7 +64,7 @@ jobs:
 
   deploy:
     docker:
-      - image: flexget/cci-python:3.5
+      - image: flexget/cci-python:3.6
     steps:
       - add-ssh-keys
       - run:
@@ -147,9 +93,6 @@ workflows:
 
   run-tests:
     jobs:
-      - "test-py27"
-      - "test-py34"
-      - "test-py35"
       - "test-py36"
       - "test-py37"
 
@@ -162,16 +105,10 @@ workflows:
               only:
                 - develop
     jobs:
-      - "test-py27"
-      - "test-py34"
-      - "test-py35"
       - "test-py36"
       - "test-py37"
       - deploy:
           requires:
-            - "test-py27"
-            - "test-py34"
-            - "test-py35"
             - "test-py36"
             - "test-py37"
 
