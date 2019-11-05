@@ -1,10 +1,6 @@
 """
 Miscellaneous SQLAlchemy helpers.
 """
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-
 import logging
 
 import sqlalchemy
@@ -49,7 +45,7 @@ def table_columns(table, session):
     """
 
     res = []
-    if isinstance(table, basestring):
+    if isinstance(table, str):
         table = table_schema(table, session)
     for column in table.columns:
         res.append(column.name)
@@ -68,7 +64,7 @@ def table_add_column(table, name, col_type, session, default=None):
     :param Session session: SQLAlchemy Session to do the alteration
     :param default: Default value for the created column (optional)
     """
-    if isinstance(table, basestring):
+    if isinstance(table, str):
         table = table_schema(table, session)
     if name in table_columns(table, session):
         # If the column already exists, we don't have to do anything.

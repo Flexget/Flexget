@@ -1,7 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import copy
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget.api.app import base_message
 from flexget.components.managed_lists.lists.movie_list.api import ObjectsContainer as OC
@@ -170,7 +167,7 @@ class TestMovieListAPI(object):
 
         returned_identifier = data[0]['movies_list_ids'][0]
         assert returned_identifier['id_name'], (
-            returned_identifier['id_value'] == identifier.items()[0]
+                returned_identifier['id_value'] == identifier.items()[0]
         )
 
         # Add movie to non-existent list
@@ -214,7 +211,7 @@ class TestMovieListAPI(object):
 
         returned_identifier = data['movies_list_ids'][0]
         assert returned_identifier['id_name'], (
-            returned_identifier['id_value'] == identifier.items()[0]
+                returned_identifier['id_value'] == identifier.items()[0]
         )
 
         identifiers = [{'trakt_movie_id': '12345'}]
@@ -229,7 +226,7 @@ class TestMovieListAPI(object):
 
         returned_identifier = data['movies_list_ids'][0]
         assert returned_identifier['id_name'], (
-            returned_identifier['id_value'] == identifiers[0].items()
+                returned_identifier['id_value'] == identifiers[0].items()
         )
 
         # PUT non-existent movie from list

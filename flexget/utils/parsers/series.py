@@ -1,7 +1,3 @@
-from __future__ import absolute_import, division, unicode_literals
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import cmp
-
 import logging
 import re
 from datetime import datetime, timedelta
@@ -53,14 +49,14 @@ class SeriesParser(TitleParser):
         [
             TitleParser.re_not_in_word(regexp)
             for regexp in [
-                r'(?:series|season|s)\s?(\d{1,4})(?:\s(?:.*\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)(?:\s?e?(\d{1,2}))?'
-                % roman_numeral_re,
-                r'(?:series|season)\s?(\d{1,4})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
-                r'(\d{1,2})\s?x\s?(\d+)(?:\s(\d{1,2}))?',
-                r'(\d{1,3})\s?of\s?(?:\d{1,3})',
-                r'(?:episode|e|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
-                r'part\s(%s)' % '|'.join(map(str, english_numbers)),
-            ]
+            r'(?:series|season|s)\s?(\d{1,4})(?:\s(?:.*\s)?)?(?:episode|ep|e|part|pt)\s?(\d{1,3}|%s)(?:\s?e?(\d{1,2}))?'
+            % roman_numeral_re,
+            r'(?:series|season)\s?(\d{1,4})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
+            r'(\d{1,2})\s?x\s?(\d+)(?:\s(\d{1,2}))?',
+            r'(\d{1,3})\s?of\s?(?:\d{1,3})',
+            r'(?:episode|e|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
+            r'part\s(%s)' % '|'.join(map(str, english_numbers)),
+        ]
         ]
     )
     season_pack_regexps = ReList(
@@ -84,20 +80,20 @@ class SeriesParser(TitleParser):
         [
             TitleParser.re_not_in_word(regexp)
             for regexp in [
-                r'(\d{2,4})%s(\d{1,2})%s(\d{1,2})' % (separators, separators),
-                r'(\d{1,2})%s(\d{1,2})%s(\d{2,4})' % (separators, separators),
-                r'(\d{4})x(\d{1,2})%s(\d{1,2})' % separators,
-                r'(\d{1,2})(?:st|nd|rd|th)?%s([a-z]{3,10})%s(\d{4})' % (separators, separators),
-            ]
+            r'(\d{2,4})%s(\d{1,2})%s(\d{1,2})' % (separators, separators),
+            r'(\d{1,2})%s(\d{1,2})%s(\d{2,4})' % (separators, separators),
+            r'(\d{4})x(\d{1,2})%s(\d{1,2})' % separators,
+            r'(\d{1,2})(?:st|nd|rd|th)?%s([a-z]{3,10})%s(\d{4})' % (separators, separators),
+        ]
         ]
     )
     sequence_regexps = ReList(
         [
             TitleParser.re_not_in_word(regexp)
             for regexp in [
-                r'(\d{1,3})(?:v(?P<version>\d))?',
-                r'(?:pt|part)\s?(\d+|%s)' % roman_numeral_re,
-            ]
+            r'(\d{1,3})(?:v(?P<version>\d))?',
+            r'(?:pt|part)\s?(\d+|%s)' % roman_numeral_re,
+        ]
         ]
     )
     unwanted_sequence_regexps = ReList([r'seasons?\s?\d{1,2}'])
@@ -107,23 +103,23 @@ class SeriesParser(TitleParser):
     ignore_prefixes = default_ignore_prefixes
 
     def __init__(
-        self,
-        name=None,
-        alternate_names=None,
-        identified_by='auto',
-        name_regexps=None,
-        ep_regexps=None,
-        date_regexps=None,
-        sequence_regexps=None,
-        id_regexps=None,
-        strict_name=False,
-        allow_groups=None,
-        allow_seasonless=True,
-        date_dayfirst=None,
-        date_yearfirst=None,
-        special_ids=None,
-        prefer_specials=False,
-        assume_special=False,
+            self,
+            name=None,
+            alternate_names=None,
+            identified_by='auto',
+            name_regexps=None,
+            ep_regexps=None,
+            date_regexps=None,
+            sequence_regexps=None,
+            id_regexps=None,
+            strict_name=False,
+            allow_groups=None,
+            allow_seasonless=True,
+            date_dayfirst=None,
+            date_yearfirst=None,
+            special_ids=None,
+            prefer_specials=False,
+            assume_special=False,
     ):
         """
         Init SeriesParser.
@@ -228,7 +224,7 @@ class SeriesParser(TitleParser):
             if prefix:
                 start = prefix.end()
             # If an episode id is found, assume everything before it is series name
-            name = self.data[start : match['match'].start()]
+            name = self.data[start: match['match'].start()]
             # Remove possible episode title from series name (anything after a ' - ')
             name = name.split(' - ')[0]
             # Replace some special characters with spaces
@@ -663,7 +659,7 @@ class SeriesParser(TitleParser):
         # Add up the parts of the numeral
         i = result = 0
         for numeral, integer in roman_map:
-            while roman[i : i + len(numeral)] == numeral:
+            while roman[i: i + len(numeral)] == numeral:
                 result += integer
                 i += len(numeral)
         return result
@@ -675,19 +671,19 @@ class SeriesParser(TitleParser):
         if self.valid:
             valid = 'OK'
         return (
-            '<SeriesParser(data=%s,name=%s,id=%s,season=%s,season_pack=%s,episode=%s,quality=%s,proper=%s,'
-            'status=%s)>'
-            % (
-                self.data,
-                self.name,
-                str(self.id),
-                self.season,
-                self.season_pack,
-                self.episode,
-                self.quality,
-                self.proper_count,
-                valid,
-            )
+                '<SeriesParser(data=%s,name=%s,id=%s,season=%s,season_pack=%s,episode=%s,quality=%s,proper=%s,'
+                'status=%s)>'
+                % (
+                    self.data,
+                    self.name,
+                    str(self.id),
+                    self.season,
+                    self.season_pack,
+                    self.episode,
+                    self.quality,
+                    self.proper_count,
+                    valid,
+                )
         )
 
     def __cmp__(self, other):

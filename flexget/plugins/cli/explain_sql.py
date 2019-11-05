@@ -1,12 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
-from time import time
 from argparse import SUPPRESS
+from time import time
 
-from sqlalchemy.orm.query import Query
 from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.orm.query import Query
 from sqlalchemy.sql.expression import Executable, ClauseElement, _literal_as_text
 
 from flexget import manager, options

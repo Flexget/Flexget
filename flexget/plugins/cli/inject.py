@@ -1,10 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import argparse
 import cgi
-import string
 import random
+import string
+
 import yaml
 
 from flexget import options
@@ -71,7 +69,7 @@ def register_parser_arguments():
         parents=[exec_parser],
         help='inject an entry from command line into tasks',
         usage='%(prog)s title/url [url] [--accept] [--force] '
-        '[--fields NAME=VALUE [NAME=VALUE...]] [<execute arguments>]',
+              '[--fields NAME=VALUE [NAME=VALUE...]] [<execute arguments>]',
         epilog=(
             'If only a URL and no title is given, Flexget will attempt to '
             'find a title in the URL\'s response headers.'

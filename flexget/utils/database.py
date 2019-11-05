@@ -1,18 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring, long, unicode
-
 import functools
 from collections import Mapping
 from datetime import datetime
 
 from sqlalchemy import extract, func
-from sqlalchemy.orm import synonym
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
+from sqlalchemy.orm import synonym
 
+from flexget.entry import Entry
 from flexget.manager import Session
 from flexget.utils import qualities, json
-from flexget.entry import Entry
 
 
 def with_session(*args, **kwargs):
@@ -86,7 +82,7 @@ def entry_synonym(name):
     """Use json to serialize python objects for db storage."""
 
     def only_builtins(item):
-        supported_types = (str, unicode, int, float, long, bool, datetime)
+        supported_types = str, int, float, bool, datetime
         # dict, list, tuple and set are also supported, but handled separately
 
         if isinstance(item, supported_types):

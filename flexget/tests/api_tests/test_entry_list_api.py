@@ -1,13 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
 
 from flexget.api.app import base_message
 from flexget.components.managed_lists.lists.entry_list.api import ObjectsContainer as OC
+from flexget.components.managed_lists.lists.entry_list.db import EntryListList, EntryListEntry
 from flexget.entry import Entry
 from flexget.manager import Session
-from flexget.components.managed_lists.lists.entry_list.db import EntryListList, EntryListEntry
 from flexget.utils import json
 
 

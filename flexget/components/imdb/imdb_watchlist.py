@@ -1,19 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import re
 
-from flexget.utils.requests import RequestException
 from flexget import plugin
-from flexget.config_schema import one_or_more
-from flexget.event import event
 from flexget.components.imdb.utils import is_valid_imdb_title_id, extract_id
-from flexget.utils.cached_input import cached
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
-from flexget.utils.soup import get_soup
+from flexget.event import event
 from flexget.utils import json
-
+from flexget.utils.cached_input import cached
+from flexget.utils.requests import RequestException
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('imdb_watchlist')
 USER_ID_RE = r'^ur\d{7,9}$'
@@ -47,7 +43,7 @@ class ImdbWatchlist(object):
                 'type': 'string',
                 'oneOf': [{'enum': USER_LISTS}, {'pattern': CUSTOM_LIST_RE}],
                 'error_oneOf': 'list must be either %s, or a custom list name (lsXXXXXXXXX)'
-                % ', '.join(USER_LISTS),
+                               % ', '.join(USER_LISTS),
             },
             'force_language': {'type': 'string', 'default': 'en-us'},
             'type': {
@@ -156,10 +152,10 @@ class ImdbWatchlist(object):
         for imdb_id in imdb_ids:
             entry = Entry()
             if not (
-                'title' in json_data[imdb_id]
-                and 'primary' in json_data[imdb_id]['title']
-                and 'href' in json_data[imdb_id]['title']['primary']
-                and 'title' in json_data[imdb_id]['title']['primary']
+                    'title' in json_data[imdb_id]
+                    and 'primary' in json_data[imdb_id]['title']
+                    and 'href' in json_data[imdb_id]['title']['primary']
+                    and 'title' in json_data[imdb_id]['title']['primary']
             ):
                 log.debug('no title or link found for item %s, skipping', imdb_id)
                 continue

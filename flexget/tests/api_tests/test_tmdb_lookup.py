@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import pytest
 from flexget.api.app import base_message
 
 from flexget.components.tmdb.api import ObjectsContainer as oc

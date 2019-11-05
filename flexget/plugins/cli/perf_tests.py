@@ -1,12 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import options
 from flexget.event import event
-from flexget.terminal import console
 from flexget.manager import Session
+from flexget.terminal import console
 
 log = logging.getLogger('perftests')
 
@@ -61,9 +58,9 @@ def imdb_query(session):
 
         movie = (
             session.query(Movie)
-            .options(joinedload_all(Movie.genres, Movie.languages, Movie.actors, Movie.directors))
-            .filter(Movie.url == url)
-            .first()
+                .options(joinedload_all(Movie.genres, Movie.languages, Movie.actors, Movie.directors))
+                .filter(Movie.url == url)
+                .first()
         )
 
         # access it's members so they're loaded

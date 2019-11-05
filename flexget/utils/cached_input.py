@@ -1,11 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import copy
 import logging
 import pickle
 from datetime import datetime, timedelta
 
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from sqlalchemy import Column, Integer, String, DateTime, Unicode, select, ForeignKey
+from sqlalchemy.orm import relation
+
 from flexget import db_schema
 from flexget.event import event
 from flexget.manager import Session
@@ -14,8 +14,6 @@ from flexget.utils import json
 from flexget.utils.database import entry_synonym
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 from flexget.utils.tools import parse_timedelta, TimedDict, get_config_hash
-from sqlalchemy import Column, Integer, String, DateTime, Unicode, select, ForeignKey
-from sqlalchemy.orm import relation
 
 log = logging.getLogger('input_cache')
 Base = db_schema.versioned_base('input_cache', 1)
@@ -33,8 +31,8 @@ def upgrade(ver, session):
                 p = pickle.loads(row['entry'])
                 session.execute(
                     table.update()
-                    .where(table.c.id == row['id'])
-                    .values(json=json.dumps(p, encode_datetime=True))
+                        .where(table.c.id == row['id'])
+                        .values(json=json.dumps(p, encode_datetime=True))
                 )
             except KeyError as e:
                 log.error('Unable error upgrading input_cache pickle object due to %s' % str(e))
@@ -68,8 +66,8 @@ def db_cleanup(manager, session):
     """Removes old input caches from plugins that are no longer configured."""
     result = (
         session.query(InputCache)
-        .filter(InputCache.added < datetime.now() - timedelta(days=7))
-        .delete()
+            .filter(InputCache.added < datetime.now() - timedelta(days=7))
+            .delete()
     )
     if result:
         log.verbose('Removed %s old input caches.' % result)
@@ -190,6 +188,7 @@ class IterableCache(object):
     Can cache any iterable (including generators) without immediately evaluating all entries.
     If `finished_hook` is supplied, it will be called the first time the iterable is run to the end.
     """
+
     def __init__(self, iterable, finished_hook=None):
         self.iterable = iter(iterable)
         self.cache = []
