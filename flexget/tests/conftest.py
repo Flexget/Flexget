@@ -237,7 +237,7 @@ def filecopy(request):
 def no_requests(monkeypatch):
     online_funcs = [
         'requests.sessions.Session.request',
-        'future.backports.http.client.HTTPConnection.request',
+        'http.client.HTTPConnection.request',
     ]
 
     # Don't monkey patch HTTPSConnection if ssl not installed as it won't exist in backports
@@ -245,7 +245,7 @@ def no_requests(monkeypatch):
         import ssl  # noqa
         from ssl import SSLContext  # noqa
 
-        online_funcs.append('future.backports.http.client.HTTPSConnection.request')
+        online_funcs.append('http.client.HTTPSConnection.request')
     except ImportError:
         pass
 
