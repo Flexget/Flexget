@@ -377,10 +377,6 @@ class PluginInfo(dict):
 register = PluginInfo
 
 
-def _strip_trailing_sep(path):
-    return path.rstrip("\\/")
-
-
 def _get_standard_plugins_path():
     """
     :returns: List of directories where traditional plugins should be tried to load from.
@@ -459,14 +455,14 @@ def _load_plugins_from_dirs(dirs):
     log.debug('Trying to load plugins from: %s', dirs)
     dirs = [Path(d) for d in dirs if os.path.isdir(d)]
     # add all dirs to plugins_pkg load path so that imports work properly from any of the plugin dirs
-    plugins_pkg.__path__ = list(map(_strip_trailing_sep, dirs))
+    plugins_pkg.__path__ = dirs
     for plugins_dir in dirs:
-        for plugin_path in plugins_dir.walkfiles('*.py'):
+        for plugin_path in plugins_dir.glob('*.py'):
             if plugin_path.name == '__init__.py':
                 continue
             # Split the relative path from the plugins dir to current file's parent dir to find subpackage names
             plugin_subpackages = [
-                _f for _f in plugin_path.relpath(plugins_dir).parent.splitall() if _f
+                _f for _f in plugin_path.relative_to(plugins_dir).parent.splitall() if _f
             ]
             module_name = '.'.join(
                 [plugins_pkg.__name__] + plugin_subpackages + [plugin_path.stem]

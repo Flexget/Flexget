@@ -56,10 +56,6 @@ def _find(path, f):
     return matches
 
 
-def _strip_trailing_sep(path):
-    return path.rstrip('\\/')
-
-
 def register_web_ui(mgr):
     global manager, app_base, debug
     manager = mgr
