@@ -1,9 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
 import re
 import time
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from requests import RequestException
 

@@ -1,7 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-
 
 from flexget import plugin
 from flexget.config_schema import one_or_more

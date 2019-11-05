@@ -102,18 +102,17 @@ class FilterExistsMovie(object):
 
             # scan through
             items = []
-            if config.get('type') == 'dirs':
-                for d in folder.walkdirs(errors='ignore'):
-                    if self.dir_pattern.search(d.name):
+            for p in folder.iterdir():
+                if config.get('type') == 'dirs' and p.is_dir():
+                    if not self.dir_pattern.search(p.name):
                         continue
-                    log.debug('detected dir with name %s, adding to check list' % d.name)
-                    items.append(d.name)
-            elif config.get('type') == 'files':
-                for f in folder.walkfiles(errors='ignore'):
-                    if not self.file_pattern.search(f.name):
+                    log.debug('detected dir with name %s, adding to check list' % p.name)
+                    items.append(p.name)
+                elif config.get('type') == 'files' and p.is_file():
+                    if not self.file_pattern.search(p.name):
                         continue
-                    log.debug('detected file with name %s, adding to check list' % f.name)
-                    items.append(f.name)
+                    log.debug('detected file with name %s, adding to check list' % p.name)
+                    items.append(p.name)
 
             if not items:
                 log.verbose(
