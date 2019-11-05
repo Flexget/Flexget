@@ -3,9 +3,9 @@ import logging
 import os
 import sys
 
+from ._version import __version__  # noqa
 from flexget import logger
 from flexget.manager import Manager
-from ._version import __version__  # noqa
 
 log = logging.getLogger('main')
 
