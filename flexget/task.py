@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import copy
+import inspect
 import itertools
 import logging
 import threading
@@ -519,7 +520,11 @@ class Task(object):
         # log.trace('Running %s method %s' % (keyword, method))
         # call the plugin
         try:
-            return method(*args, **kwargs)
+            result = method(*args, **kwargs)
+            # We exhaust any generator inputs here to make sure we catch exceptions properly.
+            if inspect.isgenerator(result):
+                result = list(result)
+            return result
         except TaskAbort:
             raise
         except PluginWarning as warn:
