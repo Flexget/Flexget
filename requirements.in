@@ -14,7 +14,7 @@ requests>=2.20.0
 python-dateutil
 jsonschema>=2.0
 guessit==3.0.3
-rebulk>=0.9.0
+rebulk>=2.0.0
 apscheduler>=3.2.0
 terminaltables>=3.1.0
 colorclass>=2.2.0
