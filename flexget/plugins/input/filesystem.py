@@ -151,7 +151,7 @@ class Filesystem(object):
 
     @staticmethod
     def get_folder_objects(folder: Path, recursion: bool):
-        return folder.rglob('*.*') if recursion else folder.iterdir()
+        return folder.rglob('*') if recursion else folder.iterdir()
 
     def get_entries_from_path(
             self, path_list, match, recursion, test_mode, get_files, get_dirs, get_symlinks
