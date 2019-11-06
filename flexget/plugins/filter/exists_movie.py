@@ -104,7 +104,7 @@ class FilterExistsMovie(object):
             items = []
             for p in folder.iterdir():
                 if config.get('type') == 'dirs' and p.is_dir():
-                    if not self.dir_pattern.search(p.name):
+                    if self.dir_pattern.search(p.name):
                         continue
                     log.debug('detected dir with name %s, adding to check list' % p.name)
                     items.append(p.name)
