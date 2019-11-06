@@ -111,7 +111,7 @@ class ObjectsContainer(object):
             'title': {
                 'type': 'string',
                 'description': 'Title of the entry. If not supplied it will be attempted to retrieve it from '
-                               'URL headers',
+                'URL headers',
             },
             'url': {'type': 'string', 'format': 'url', 'description': 'URL of the entry'},
             'force': {

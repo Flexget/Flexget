@@ -120,8 +120,8 @@ class ImdbEntrySet(MutableSet):
         with Session() as session:
             user = (
                 session.query(IMDBListUser)
-                    .filter(IMDBListUser.user_name == self.config.get('login'))
-                    .one_or_none()
+                .filter(IMDBListUser.user_name == self.config.get('login'))
+                .one_or_none()
             )
             if user and user.cookies and user.user_id:
                 log.debug('login credentials found in cache, testing')
@@ -191,7 +191,7 @@ class ImdbEntrySet(MutableSet):
                             'manually adding an item to it and try again'
                         )
                 elif self.config['list'] in IMMUTABLE_LISTS or self.config['list'].startswith(
-                        'ls'
+                    'ls'
                 ):
                     self.list_id = self.config['list']
                 else:

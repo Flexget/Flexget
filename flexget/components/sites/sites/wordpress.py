@@ -15,7 +15,7 @@ log = logging.getLogger('wordpress_auth')
 def construct_request(url, username='', password='', redirect='/wp-admin/'):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) '
-                      'Chrome/50.0.2661.102 Safari/537.36',
+        'Chrome/50.0.2661.102 Safari/537.36',
         'Content-Type': 'application/x-www-form-urlencoded',
         'DNT': '1',
     }

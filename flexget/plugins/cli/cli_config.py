@@ -26,7 +26,6 @@ from flexget.event import event
 log = logging.getLogger('cli_config')
 
 
-
 def replace_in_item(replaces, item):
     replace = functools.partial(replace_in_item, replaces)
     if isinstance(item, str):

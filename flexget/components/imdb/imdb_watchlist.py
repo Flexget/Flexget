@@ -43,7 +43,7 @@ class ImdbWatchlist(object):
                 'type': 'string',
                 'oneOf': [{'enum': USER_LISTS}, {'pattern': CUSTOM_LIST_RE}],
                 'error_oneOf': 'list must be either %s, or a custom list name (lsXXXXXXXXX)'
-                               % ', '.join(USER_LISTS),
+                % ', '.join(USER_LISTS),
             },
             'force_language': {'type': 'string', 'default': 'en-us'},
             'type': {
@@ -152,10 +152,10 @@ class ImdbWatchlist(object):
         for imdb_id in imdb_ids:
             entry = Entry()
             if not (
-                    'title' in json_data[imdb_id]
-                    and 'primary' in json_data[imdb_id]['title']
-                    and 'href' in json_data[imdb_id]['title']['primary']
-                    and 'title' in json_data[imdb_id]['title']['primary']
+                'title' in json_data[imdb_id]
+                and 'primary' in json_data[imdb_id]['title']
+                and 'href' in json_data[imdb_id]['title']['primary']
+                and 'title' in json_data[imdb_id]['title']['primary']
             ):
                 log.debug('no title or link found for item %s, skipping', imdb_id)
                 continue

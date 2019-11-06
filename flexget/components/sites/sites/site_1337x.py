@@ -109,7 +109,7 @@ class Site1337x(object):
             soup = get_soup(page.content)
             if soup.find('div', attrs={'class': 'table-list-wrap'}) is not None:
                 for link in soup.find('div', attrs={'class': 'table-list-wrap'}).findAll(
-                        'a', href=re.compile('^/torrent/')
+                    'a', href=re.compile('^/torrent/')
                 ):
                     li = link.parent.parent
 

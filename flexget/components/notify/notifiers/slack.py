@@ -94,9 +94,7 @@ class SlackNotifier(object):
                         'callback_id': {'type': 'string'},
                     },
                     'required': ['fallback'],
-                    'dependencies': {
-                        'actions': ['callback_id'],
-                    },
+                    'dependencies': {'actions': ['callback_id'],},
                     'additionalProperties': False,
                 },
             },

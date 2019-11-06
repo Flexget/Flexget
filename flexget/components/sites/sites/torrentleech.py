@@ -133,9 +133,9 @@ class UrlRewriteTorrentleech(object):
             # so encode in utf-8 beforehand
 
             url = (
-                    'https://www.torrentleech.org/torrents/browse/list/query/'
-                    + quote(query.encode('utf-8'))
-                    + filter_url
+                'https://www.torrentleech.org/torrents/browse/list/query/'
+                + quote(query.encode('utf-8'))
+                + filter_url
             )
             log.debug('Using %s as torrentleech search url', url)
 

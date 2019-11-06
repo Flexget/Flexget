@@ -35,7 +35,7 @@ class UserManagementAPI(APIResource):
     @api.response(200, 'Success', model=base_message_schema)
     @api.doc(
         description='Change user password. A score of at least 3 is needed.'
-                    'See https://github.com/dropbox/zxcvbn for details'
+        'See https://github.com/dropbox/zxcvbn for details'
     )
     def put(self, session=None):
         """ Change user password """

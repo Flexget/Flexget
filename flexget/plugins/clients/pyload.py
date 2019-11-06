@@ -163,7 +163,7 @@ class PluginPyLoad(object):
 
             # no preferred hoster and not preferred hoster only - add all recognized plugins
             if not urls and not config.get(
-                    'preferred_hoster_only', self.DEFAULT_PREFERRED_HOSTER_ONLY
+                'preferred_hoster_only', self.DEFAULT_PREFERRED_HOSTER_ONLY
             ):
                 for name, purls in parsed.items():
                     if name != 'BasePlugin':

@@ -117,7 +117,7 @@ class TraktSet(MutableSet):
                 'default': 'auto',
             },
             'strip_dates': {'type': 'boolean', 'default': False},
-            'language': {'type': 'string', 'minLength': 2, 'maxLength': 2}
+            'language': {'type': 'string', 'minLength': 2, 'maxLength': 2},
         },
         'required': ['list'],
         'anyOf': [
@@ -186,10 +186,11 @@ class TraktSet(MutableSet):
 
     def get_items(self):
         """Iterator over etrieved itesms from the trakt api."""
-        if self.config['list'] in ['collection', 'watched', 'trending', 'popular'] and self.config['type'] == 'auto':
-            raise plugin.PluginError(
-                '`type` cannot be `auto` for %s list.' % self.config['list']
-            )
+        if (
+            self.config['list'] in ['collection', 'watched', 'trending', 'popular']
+            and self.config['type'] == 'auto'
+        ):
+            raise plugin.PluginError('`type` cannot be `auto` for %s list.' % self.config['list'])
 
         limit_per_page = 1000
 
@@ -209,8 +210,11 @@ class TraktSet(MutableSet):
                 number_of_pages = int(result.headers.get('X-Pagination-Page-Count', 1))
                 if page == 2:
                     # If there is more than one page (more than 1000 items) warn user they may want to limit
-                    log.verbose('There are a large number of items in trakt `%s` list. You may want to enable `limit`'
-                                ' plugin to reduce the amount of entries in this task.', self.config['list'])
+                    log.verbose(
+                        'There are a large number of items in trakt `%s` list. You may want to enable `limit`'
+                        ' plugin to reduce the amount of entries in this task.',
+                        self.config['list'],
+                    )
 
                 collecting_finished = page >= number_of_pages
                 page += 1
@@ -218,9 +222,7 @@ class TraktSet(MutableSet):
                 try:
                     trakt_items = result.json()
                 except ValueError:
-                    log.debug(
-                        'Could not decode json from response: %s', result.text
-                    )
+                    log.debug('Could not decode json from response: %s', result.text)
                     raise plugin.PluginError('Error getting list from trakt.')
                 if not trakt_items:
                     log.warning(
@@ -249,7 +251,9 @@ class TraktSet(MutableSet):
                         continue
                     if list_type != 'episode' and not item[list_type]['title']:
                         # Skip shows/movies with no title
-                        log.warning('Item in trakt list does not appear to have a title, skipping.')
+                        log.warning(
+                            'Item in trakt list does not appear to have a title, skipping.'
+                        )
                         continue
                     entry = Entry()
                     if list_type == 'episode':
@@ -278,7 +282,8 @@ class TraktSet(MutableSet):
                                 translation = result.json()
                             except ValueError:
                                 raise plugin.PluginError(
-                                    'Error decoding movie translation from trakt: %s.' % result.text
+                                    'Error decoding movie translation from trakt: %s.'
+                                    % result.text
                                 )
                         except RequestException as e:
                             raise plugin.PluginError(
@@ -286,7 +291,8 @@ class TraktSet(MutableSet):
                             )
                         if not translation:
                             log.warning(
-                                'No translation data returned from trakt for movie %s.', entry['title']
+                                'No translation data returned from trakt for movie %s.',
+                                entry['title'],
                             )
                         else:
                             log.verbose(
@@ -349,10 +355,10 @@ class TraktSet(MutableSet):
                     self.config['type'],
                 )
         elif self.config['list'] in ['trending', 'popular']:
-                endpoint = (
-                    self.config['type'],
-                    self.config['list'],
-                )
+            endpoint = (
+                self.config['type'],
+                self.config['list'],
+            )
         else:
             endpoint = (
                 'users',

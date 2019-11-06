@@ -177,7 +177,7 @@ class EmailNotifier(object):
         # Making sure mail server connection will remain open per host or username
         # (in case several mail servers are used in the same task)
         if not self.mail_server or not (
-                self.host == config['smtp_host'] and self.username == config.get('smtp_username')
+            self.host == config['smtp_host'] and self.username == config.get('smtp_username')
         ):
             self.connect_to_smtp_server(config)
 

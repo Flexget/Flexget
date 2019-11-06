@@ -25,15 +25,15 @@ class NewTorrents(object):
         if entry['url'].startswith('http://www.newtorrents.info/down.php?'):
             return False
         return (
-                entry['url'].startswith('http://www.newtorrents.info')
-                and not entry['url'] in self.resolved
+            entry['url'].startswith('http://www.newtorrents.info')
+            and not entry['url'] in self.resolved
         )
 
     # UrlRewriter plugin API
     def url_rewrite(self, task, entry):
         url = entry['url']
         if url.startswith('http://www.newtorrents.info/?q=') or url.startswith(
-                'http://www.newtorrents.info/search'
+            'http://www.newtorrents.info/search'
         ):
             results = self.entries_from_search(entry['title'], url=url)
             if not results:

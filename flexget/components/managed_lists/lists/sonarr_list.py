@@ -195,7 +195,7 @@ class SonarrSet(MutableSet):
     def _find_entry(self, entry, filters=True):
         for show in self.shows(filters=filters):
             if any(
-                    entry.get(id) is not None and entry[id] == show[id] for id in self.supported_ids
+                entry.get(id) is not None and entry[id] == show[id] for id in self.supported_ids
             ):
                 return show
             if entry.get('title').lower() == show.get('title').lower():

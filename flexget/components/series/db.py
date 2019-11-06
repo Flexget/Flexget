@@ -1254,8 +1254,8 @@ def remove_series_entity(name, identifier, forget=False):
         def remove_entity(entity):
             if not series.begin:
                 series.identified_by = (
-                    ''
-                )  # reset identified_by flag so that it will be recalculated
+                    ''  # reset identified_by flag so that it will be recalculated
+                )
             session.delete(entity)
             log.debug('Entity `%s` from series `%s` removed from database.', identifier, name)
             return [release.title for release in entity.downloaded_releases]

@@ -268,9 +268,7 @@ class ArgumentParser(ArgParser):
     - If the `file` argument is given to `parse_args`, output will be printed there instead of sys.stdout or stderr
     """
 
-    file = (
-        None
-    )  # This is created as a class attribute so that we can set it for parser and all subparsers at once
+    file = None  # This is created as a class attribute so that we can set it for parser and all subparsers at once
 
     def __init__(self, **kwargs):
         """

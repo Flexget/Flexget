@@ -375,10 +375,10 @@ def from_cache(session=None, search_params=None, cache_type=None):
         )
         result = (
             session.query(cache_type)
-                .filter(
+            .filter(
                 or_(getattr(cache_type, col) == val for col, val in search_params.items() if val)
             )
-                .first()
+            .first()
         )
     return result
 
@@ -415,9 +415,9 @@ def prepare_lookup_for_tvmaze(**lookup_params):
     prepared_params = {}
     title = None
     series_name = (
-            lookup_params.get('series_name')
-            or lookup_params.get('show_name')
-            or lookup_params.get('title')
+        lookup_params.get('series_name')
+        or lookup_params.get('show_name')
+        or lookup_params.get('title')
     )
     if series_name:
         title, _ = split_title_year(series_name)
@@ -450,9 +450,9 @@ class APITVMaze(object):
         search = None
         # Preparing search from lookup table
         title = (
-                lookup_params.get('series_name')
-                or lookup_params.get('show_name')
-                or lookup_params.get('title')
+            lookup_params.get('series_name')
+            or lookup_params.get('show_name')
+            or lookup_params.get('title')
         )
         if not series and title:
             log.debug(
@@ -531,9 +531,9 @@ class APITVMaze(object):
         log.debug('searching for season %s of show %s in cache', season_number, series.name)
         season = (
             session.query(TVMazeSeason)
-                .filter(TVMazeSeason.series_id == series.tvmaze_id)
-                .filter(TVMazeSeason.number == season_number)
-                .one_or_none()
+            .filter(TVMazeSeason.series_id == series.tvmaze_id)
+            .filter(TVMazeSeason.number == season_number)
+            .one_or_none()
         )
 
         # Logic for cache only mode
@@ -552,9 +552,9 @@ class APITVMaze(object):
         # Query again
         season = (
             session.query(TVMazeSeason)
-                .filter(TVMazeSeason.tvmaze_id == series.tvmaze_id)
-                .filter(TVMazeSeason.number == season_number)
-                .one_or_none()
+            .filter(TVMazeSeason.tvmaze_id == series.tvmaze_id)
+            .filter(TVMazeSeason.number == season_number)
+            .one_or_none()
         )
         if season:
             return season
@@ -592,14 +592,14 @@ class APITVMaze(object):
         log.debug('searching for episode of show %s in cache', series.name)
         episode = (
             session.query(TVMazeEpisodes)
-                .filter(
+            .filter(
                 and_(
                     TVMazeEpisodes.series_id == series.tvmaze_id,
                     TVMazeEpisodes.season_number == season_number,
                     TVMazeEpisodes.number == episode_number,
                 )
             )
-                .one_or_none()
+            .one_or_none()
         )
 
         # Logic for cache only mode
@@ -638,7 +638,7 @@ class APITVMaze(object):
         try:
             episode = (
                 session.query(TVMazeEpisodes)
-                    .filter(
+                .filter(
                     or_(
                         TVMazeEpisodes.tvmaze_id == tvmaze_episode['id'],
                         and_(
@@ -648,7 +648,7 @@ class APITVMaze(object):
                         ),
                     )
                 )
-                    .one_or_none()
+                .one_or_none()
             )
         except MultipleResultsFound:
             # TVMaze must have fucked up and now we have to clean up that mess. Delete any row for this season
@@ -659,14 +659,14 @@ class APITVMaze(object):
             )
             deleted_rows = (
                 session.query(TVMazeEpisodes)
-                    .filter(
+                .filter(
                     and_(
                         TVMazeEpisodes.season_number == tvmaze_episode['season'],
                         TVMazeEpisodes.series_id == series.tvmaze_id,
                     )
                 )
-                    .filter(TVMazeEpisodes.last_update <= datetime.now() - timedelta(hours=1))
-                    .delete()
+                .filter(TVMazeEpisodes.last_update <= datetime.now() - timedelta(hours=1))
+                .delete()
             )
             log.debug('Deleted %s rows', deleted_rows)
             episode = None

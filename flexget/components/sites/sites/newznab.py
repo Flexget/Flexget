@@ -96,9 +96,9 @@ class Newznab(object):
         log.info('Searching for %s' % (arg_entry['title']))
         # normally this should be used with next_series_episodes who has provided season and episodenumber
         if (
-                'series_name' not in arg_entry
-                or 'series_season' not in arg_entry
-                or 'series_episode' not in arg_entry
+            'series_name' not in arg_entry
+            or 'series_season' not in arg_entry
+            or 'series_episode' not in arg_entry
         ):
             return []
         if arg_entry.get('tvrage_id'):
@@ -106,9 +106,9 @@ class Newznab(object):
         else:
             lookup = '&q=%s' % quote(arg_entry['series_name'])
         url = (
-                config['url']
-                + lookup
-                + '&season=%s&ep=%s' % (arg_entry['series_season'], arg_entry['series_episode'])
+            config['url']
+            + lookup
+            + '&season=%s&ep=%s' % (arg_entry['series_season'], arg_entry['series_episode'])
         )
         return self.fill_entries_for_url(url, task)
 

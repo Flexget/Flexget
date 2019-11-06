@@ -261,9 +261,9 @@ class ParserGuessit(object):
                         break
             # Check the name doesn't end mid-word (guessit might put the border before or after the space after title)
             if (
-                    data[title_end - 1].isalnum()
-                    and len(data) <= title_end
-                    or not self._is_valid_name(data, guessit_options=guessit_options)
+                data[title_end - 1].isalnum()
+                and len(data) <= title_end
+                or not self._is_valid_name(data, guessit_options=guessit_options)
             ):
                 valid = False
             # If we are in exact mode, make sure there is nothing after the title
@@ -299,7 +299,7 @@ class ParserGuessit(object):
         if country and name.endswith(')'):
             p_start = name.rfind('(')
             if p_start != -1:
-                parenthetical = re.escape(name[p_start + 1: -1])
+                parenthetical = re.escape(name[p_start + 1 : -1])
                 if parenthetical and parenthetical.lower() != str(country).lower():
                     valid = False
         # Check the full list of 'episode_details' for special,
@@ -327,7 +327,7 @@ class ParserGuessit(object):
                     else:
                         episode_raw = guess_result.matches['episode'][0].initiator.raw
                         if episode_raw and any(
-                                c.isalpha() and c.lower() != 'v' for c in episode_raw
+                            c.isalpha() and c.lower() != 'v' for c in episode_raw
                         ):
                             season = 1
                 if season is not None:
@@ -343,7 +343,7 @@ class ParserGuessit(object):
                 identifier_type = 'sequence'
                 identifier = episode
         if (not identifier_type or guessit_options.get('prefer_specials')) and (
-                special or guessit_options.get('assume_special')
+            special or guessit_options.get('assume_special')
         ):
             identifier_type = 'special'
             identifier = guess_result.get('episode_title', 'special')

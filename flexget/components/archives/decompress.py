@@ -70,9 +70,7 @@ def extract_info(info, archive, to, keep_dirs):
     except archiveutil.FileAlreadyExists as error:
         log.warning('File already exists: %s' % destination)
     except archiveutil.ArchiveError as error:
-        log.error(
-            'Failed to extract file: %s from %s (%s)' % (info.filename, archive.path, error)
-        )
+        log.error('Failed to extract file: %s from %s (%s)' % (info.filename, archive.path, error))
 
 
 def get_destination_path(info, to, keep_dirs):

@@ -83,13 +83,16 @@ schema = {
                 },
                 'allOf': [
                     {
-                        'anyOf': [{'required': ['server', 'channels']}, {'required': ['tracker_file']}],
+                        'anyOf': [
+                            {'required': ['server', 'channels']},
+                            {'required': ['tracker_file']},
+                        ],
                         'error': 'Must specify a tracker file or server and channel(s)',
                     },
                     {
                         'anyOf': [{'required': ['task']}, {'required': ['task_re']}],
                         'error': 'Must specify a task',
-                    }
+                    },
                 ],
                 'required': ['port'],
                 'additionalProperties': {'type': 'string'},
@@ -256,8 +259,8 @@ class IRCConnection(SimpleIRCBot):
         self.entry_queue = []
         self.line_cache = {}
         self.processing_message = (
-            False
-        )  # if set to True, it means there's a message processing queued
+            False  # if set to True, it means there's a message processing queued
+        )
         self.thread = create_thread(self.connection_name, self)
 
     @classmethod
@@ -336,8 +339,8 @@ class IRCConnection(SimpleIRCBot):
                         'https://api.github.com/repos/autodl-community/'
                         'autodl-trackers/git/trees/master?recursive=1'
                     )
-                        .json()
-                        .get('tree', [])
+                    .json()
+                    .get('tree', [])
                 )
                 for t in trackers:
                     name = t.get('path', '')
@@ -416,7 +419,7 @@ class IRCConnection(SimpleIRCBot):
                     pattern_match = 0
                     for pattern in task_config.get('patterns'):
                         if re.search(
-                                pattern['regexp'], entry.get(pattern['field'], ''), re.IGNORECASE
+                            pattern['regexp'], entry.get(pattern['field'], ''), re.IGNORECASE
                         ):
                             pattern_match += 1
 
@@ -530,11 +533,11 @@ class IRCConnection(SimpleIRCBot):
                 regex = rule.get('regex')
                 replace = rule.get('replace')
                 if (
-                        source_var
-                        and target_var
-                        and regex is not None
-                        and replace is not None
-                        and source_var in fields
+                    source_var
+                    and target_var
+                    and regex is not None
+                    and replace is not None
+                    and source_var in fields
                 ):
                     fields[target_var] = re.sub(regex, replace, fields[source_var])
                     log.debug('varreplace: %s=%s', target_var, fields[target_var])
@@ -801,7 +804,7 @@ class IRCConnection(SimpleIRCBot):
                     rest = matched_lines + lines
                     break
                 elif (
-                        idx == 0
+                    idx == 0
                 ):  # if it's the first regex that fails, then it's probably just garbage
                     log.error('No matches found for pattern %s', rx.pattern)
                     lines.remove(line)

@@ -235,14 +235,14 @@ class PluginInfo(dict):
     dupe_counter = 0
 
     def __init__(
-            self,
-            plugin_class,
-            name=None,
-            interfaces=None,
-            builtin=False,
-            debug=False,
-            api_ver=1,
-            category=None,
+        self,
+        plugin_class,
+        name=None,
+        interfaces=None,
+        builtin=False,
+        debug=False,
+        api_ver=1,
+        category=None,
     ):
         """
         Register a plugin.

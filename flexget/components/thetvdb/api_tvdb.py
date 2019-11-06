@@ -214,7 +214,10 @@ class TVDBSeries(Base):
         if self.first_aired is None:
             log.debug('Falling back to getting first episode aired date for series %s', self.name)
             try:
-                episode = TVDBRequest().get('series/%s/episodes/query?airedSeason=1&airedEpisode=1' % self.id, language=language)
+                episode = TVDBRequest().get(
+                    'series/%s/episodes/query?airedSeason=1&airedEpisode=1' % self.id,
+                    language=language,
+                )
                 self.first_aired = episode[0]['firstAired']
             except requests.RequestException as e:
                 log.error('Failed to get first episode for series %s' % self.name)

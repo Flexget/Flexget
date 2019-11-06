@@ -23,4 +23,6 @@ def print_debug_info(manager, options):
 
 @event('options.register')
 def register_parser_arguments():
-    options.register_command('debug-info', print_debug_info, help='display useful info for debugging')
+    options.register_command(
+        'debug-info', print_debug_info, help='display useful info for debugging'
+    )

@@ -69,7 +69,7 @@ def register_parser_arguments():
         parents=[exec_parser],
         help='inject an entry from command line into tasks',
         usage='%(prog)s title/url [url] [--accept] [--force] '
-              '[--fields NAME=VALUE [NAME=VALUE...]] [<execute arguments>]',
+        '[--fields NAME=VALUE [NAME=VALUE...]] [<execute arguments>]',
         epilog=(
             'If only a URL and no title is given, Flexget will attempt to '
             'find a title in the URL\'s response headers.'

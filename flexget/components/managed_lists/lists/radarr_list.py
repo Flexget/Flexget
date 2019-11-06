@@ -177,15 +177,15 @@ class RadarrAPIService:
         return request_get_json(request_url, headers)
 
     def add_movie(
-            self,
-            title,
-            quality_profile_id,
-            title_slug,
-            images,
-            tmdb_id,
-            root_folder_path,
-            monitored=True,
-            add_options=None,
+        self,
+        title,
+        quality_profile_id,
+        title_slug,
+        images,
+        tmdb_id,
+        root_folder_path,
+        monitored=True,
+        add_options=None,
     ):
         """ Adds a movie """
         request_url = self.api_url + "movie"
