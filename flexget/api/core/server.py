@@ -136,9 +136,9 @@ class ServerReloadAPI(APIResource):
                 self.manager.load_config(output_to_console=False)
             except YAMLError as e:
                 if (
-                    hasattr(e, 'problem')
-                    and hasattr(e, 'context_mark')
-                    and hasattr(e, 'problem_mark')
+                        hasattr(e, 'problem')
+                        and hasattr(e, 'context_mark')
+                        and hasattr(e, 'problem_mark')
                 ):
                     error = {}
                     if e.problem is not None:
@@ -200,7 +200,7 @@ class ServerRawConfigAPI(APIResource):
     @api.response(APIError)
     @api.doc(
         description='Config file must be base64 encoded. A backup will be created, and if successful config will'
-        ' be loaded and saved to original file.'
+                    ' be loaded and saved to original file.'
     )
     def post(self, session=None):
         """ Update config """
@@ -460,39 +460,39 @@ class LogParser(object):
             operator_quotes_content << ((operator_word + operator_quotes_content) | operator_word)
 
             operator_quotes = (
-                Group(Suppress('"') + operator_quotes_content + Suppress('"')).setResultsName(
-                    'quotes'
-                )
-                | operator_word
+                    Group(Suppress('"') + operator_quotes_content + Suppress('"')).setResultsName(
+                        'quotes'
+                    )
+                    | operator_word
             )
 
             operator_parenthesis = (
-                Group((Suppress('(') + operator_or + Suppress(")"))).setResultsName('parenthesis')
-                | operator_quotes
+                    Group((Suppress('(') + operator_or + Suppress(")"))).setResultsName('parenthesis')
+                    | operator_quotes
             )
 
             operator_not = Forward()
             operator_not << (
-                Group(Suppress(Keyword('no', caseless=True)) + operator_not).setResultsName('not')
-                | operator_parenthesis
+                    Group(Suppress(Keyword('no', caseless=True)) + operator_not).setResultsName('not')
+                    | operator_parenthesis
             )
 
             operator_and = Forward()
             operator_and << (
-                Group(
-                    operator_not + Suppress(Keyword('and', caseless=True)) + operator_and
-                ).setResultsName('and')
-                | Group(operator_not + OneOrMore(~oneOf('and or') + operator_and)).setResultsName(
-                    'and'
-                )
-                | operator_not
+                    Group(
+                        operator_not + Suppress(Keyword('and', caseless=True)) + operator_and
+                    ).setResultsName('and')
+                    | Group(operator_not + OneOrMore(~oneOf('and or') + operator_and)).setResultsName(
+                'and'
+            )
+                    | operator_not
             )
 
             operator_or << (
-                Group(
-                    operator_and + Suppress(Keyword('or', caseless=True)) + operator_or
-                ).setResultsName('or')
-                | operator_and
+                    Group(
+                        operator_and + Suppress(Keyword('or', caseless=True)) + operator_or
+                    ).setResultsName('or')
+                    | operator_and
             )
 
             self._query_parser = operator_or.parseString(self.query)[0]
@@ -510,14 +510,14 @@ class LogParser(object):
         word = Word(printables)
 
         self._log_parser = (
-            date.setResultsName('timestamp')
-            + word.setResultsName('log_level')
-            + word.setResultsName('plugin')
-            + (
-                White(min=16).setParseAction(lambda s, l, t: [t[0].strip()]).setResultsName('task')
-                | (White(min=1).suppress() & word.setResultsName('task'))
-            )
-            + restOfLine.setResultsName('message')
+                date.setResultsName('timestamp')
+                + word.setResultsName('log_level')
+                + word.setResultsName('plugin')
+                + (
+                        White(min=16).setParseAction(lambda s, l, t: [t[0].strip()]).setResultsName('task')
+                        | (White(min=1).suppress() & word.setResultsName('task'))
+                )
+                + restOfLine.setResultsName('message')
         )
 
     def evaluate_and(self, argument):
@@ -566,8 +566,6 @@ class ServerCrashLogAPI(APIResource):
     def get(self, session):
         """Get Crash logs"""
         path = Path(self.manager.config_base)
-        crashes = [
-            {'name': file.name, 'content': file.open().readlines()}
-            for file in path.listdir(match='crash_report*.log')
-        ]
+        crashes = [{'name': file.name, 'content': file.open().readlines()} for file in path.iterdir() if
+                   file.match('crash_report*.log')]
         return jsonify(crashes)
