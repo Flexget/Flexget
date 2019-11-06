@@ -1,12 +1,10 @@
-import io
 import logging
-import posixpath
 import re
 import zlib
 from urllib import parse
 
 from jinja2 import Template
-
+from pathlib import Path
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
@@ -149,7 +147,7 @@ class InputHtml(object):
         if dump_name:
             log.verbose('Dumping: %s' % dump_name)
             data = soup.prettify()
-            with io.open(dump_name, 'w', encoding='utf-8') as f:
+            with open(dump_name, 'w', encoding='utf-8') as f:
                 f.write(data)
 
         return self.create_entries(url, soup, config)
@@ -164,7 +162,8 @@ class InputHtml(object):
                 return None
         return title or None
 
-    def _title_from_url(self, url):
+    @staticmethod
+    def _title_from_url(url):
         parts = parse.urlsplit(url)
         name = ''
         if parts.scheme == 'magnet':
@@ -172,7 +171,7 @@ class InputHtml(object):
             if match:
                 name = match.group(1)
         else:
-            name = posixpath.basename(parts.path)
+            name = Path(parts.path).name
         return parse.unquote_plus(name)
 
     def create_entries(self, page_url, soup, config):
