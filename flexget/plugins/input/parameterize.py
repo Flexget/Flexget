@@ -49,9 +49,9 @@ def _parameterize(element, entry):
         return dict((k, _parameterize(v, entry)) for k, v in element.items())
     if isinstance(element, list):
         return [_parameterize(v, entry) for v in element]
-    if isinstance(element, str):
+    if isinstance(element, str) and ('{{' in element or '{%' in element):
         try:
-            return render_from_entry(element, entry)
+            return render_from_entry(element, entry, native=True)
         except (RenderError, TypeError) as e:
             raise plugin.PluginError('Error parameterizing `%s`: %s' % (element, e), logger=log)
     return element
