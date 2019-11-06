@@ -16,8 +16,8 @@ log = logging.getLogger('sort_by_weight')
 
 ENTRY_WEIGHT_FIELD_NAME = 'sort_by_weight_sum'
 DEFAULT_STRIDE = (
-    10
-)  # its a design choice to allow 'similar' values to-be grouped under the same slot/weight
+    10  # its a design choice to allow 'similar' values to-be grouped under the same slot/weight
+)
 
 
 class PluginSortByWeight(object):

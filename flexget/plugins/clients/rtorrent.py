@@ -269,7 +269,7 @@ class RTorrent(object):
 
         # by default rtorrent won't allow calls over 512kb in size.
         xmlrpc_size = (
-                len(xmlrpc_client.dumps(tuple(params), 'raw_start')) + 71680
+            len(xmlrpc_client.dumps(tuple(params), 'raw_start')) + 71680
         )  # Add 70kb for buffer
         if xmlrpc_size > 524288:
             prev_size = self._server.network.xmlrpc.size_limit()
@@ -361,14 +361,14 @@ class RTorrentPluginBase(object):
         options = {}
 
         for opt_key in (
-                'path',
-                'message',
-                'priority',
-                'custom1',
-                'custom2',
-                'custom3',
-                'custom4',
-                'custom5',
+            'path',
+            'message',
+            'priority',
+            'custom1',
+            'custom2',
+            'custom3',
+            'custom4',
+            'custom5',
         ):
             # Values do not merge config with task
             # Task takes priority then config is used

@@ -31,8 +31,8 @@ def upgrade(ver, session):
                 p = pickle.loads(row['entry'])
                 session.execute(
                     table.update()
-                        .where(table.c.id == row['id'])
-                        .values(json=json.dumps(p, encode_datetime=True))
+                    .where(table.c.id == row['id'])
+                    .values(json=json.dumps(p, encode_datetime=True))
                 )
             except KeyError as e:
                 log.error('Unable error upgrading input_cache pickle object due to %s' % str(e))
@@ -66,8 +66,8 @@ def db_cleanup(manager, session):
     """Removes old input caches from plugins that are no longer configured."""
     result = (
         session.query(InputCache)
-            .filter(InputCache.added < datetime.now() - timedelta(days=7))
-            .delete()
+        .filter(InputCache.added < datetime.now() - timedelta(days=7))
+        .delete()
     )
     if result:
         log.verbose('Removed %s old input caches.' % result)
@@ -155,9 +155,9 @@ class cached(object):
         with Session() as session:
             db_cache = (
                 session.query(InputCache)
-                    .filter(InputCache.name == self.name)
-                    .filter(InputCache.hash == self.config_hash)
-                    .first()
+                .filter(InputCache.name == self.name)
+                .filter(InputCache.hash == self.config_hash)
+                .first()
             )
             if not db_cache:
                 db_cache = InputCache(name=self.name, hash=self.config_hash)
@@ -169,8 +169,8 @@ class cached(object):
         with Session() as session:
             db_cache = (
                 session.query(InputCache)
-                    .filter(InputCache.name == self.name)
-                    .filter(InputCache.hash == self.config_hash)
+                .filter(InputCache.name == self.name)
+                .filter(InputCache.hash == self.config_hash)
             )
             if not load_expired:
                 db_cache = db_cache.filter(InputCache.added > datetime.now() - self.persist)

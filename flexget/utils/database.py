@@ -123,9 +123,7 @@ def entry_synonym(name):
 
     def setter(self, entry):
         if isinstance(entry, Entry) or isinstance(entry, dict):
-            setattr(
-                self, name, json.dumps(only_builtins(dict(entry)), encode_datetime=True)
-            )
+            setattr(self, name, json.dumps(only_builtins(dict(entry)), encode_datetime=True))
         else:
             raise TypeError('%r is not of type Entry or dict.' % type(entry))
 

@@ -154,7 +154,7 @@ def merge_dict_from_to(d1, d2):
                         'Unknown type: %s value: %s in dictionary' % (type(v), repr(v))
                     )
             elif isinstance(v, (str, bool, int, float, type(None))) and isinstance(
-                    d2[k], (str, bool, int, float, type(None))
+                d2[k], (str, bool, int, float, type(None))
             ):
                 # Allow overriding of non-container types with other non-container types
                 pass
@@ -303,6 +303,7 @@ else:
         # See if we couldn't get the exit code or the exit code indicates that the
         # process is still running.
         return is_running or exit_code.value == STILL_ACTIVE
+
 
 _binOps = {
     ast.Add: operator.add,
@@ -608,4 +609,4 @@ def aggregate_inputs(task, inputs):
 def chunked(seq, limit=900):
     """Helper to divide our expired lists into sizes sqlite can handle in a query. (<1000)"""
     for i in range(0, len(seq), limit):
-        yield seq[i: i + limit]
+        yield seq[i : i + limit]

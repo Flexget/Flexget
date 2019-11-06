@@ -17,7 +17,7 @@ def assert_series_count_in_db(expected_count):
     session = Session()
     actual_series_count = session.query(Series).count()
     assert (
-            expected_count == actual_series_count
+        expected_count == actual_series_count
     ), "expecting %s series stored in db, got %s instead" % (expected_count, actual_series_count)
 
 

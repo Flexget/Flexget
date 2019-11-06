@@ -37,7 +37,7 @@ def upgrade(ver, session):
             # Remove any values that are not loadable.
             table = table_schema('simple_persistence', session)
             for row in session.execute(
-                    select([table.c.id, table.c.plugin, table.c.key, table.c.value])
+                select([table.c.id, table.c.plugin, table.c.key, table.c.value])
             ):
                 try:
                     pickle.loads(row['value'])
@@ -68,8 +68,8 @@ def upgrade(ver, session):
                 p = pickle.loads(row['value'])
                 session.execute(
                     table.update()
-                        .where(table.c.id == row['id'])
-                        .values(json=json.dumps(p, encode_datetime=True))
+                    .where(table.c.id == row['id'])
+                    .values(json=json.dumps(p, encode_datetime=True))
                 )
             except Exception as e:
                 failures += 1
@@ -181,9 +181,9 @@ class SimplePersistence(MutableMapping):
                 for key, value in cls.class_store[task][pluginname].items():
                     query = (
                         session.query(SimpleKeyValue)
-                            .filter(SimpleKeyValue.task == task)
-                            .filter(SimpleKeyValue.plugin == pluginname)
-                            .filter(SimpleKeyValue.key == key)
+                        .filter(SimpleKeyValue.task == task)
+                        .filter(SimpleKeyValue.plugin == pluginname)
+                        .filter(SimpleKeyValue.key == key)
                     )
                     if value == DELETE:
                         query.delete()

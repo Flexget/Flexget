@@ -103,8 +103,8 @@ class TestExistsMovie(object):
             tmpdir.join(test_file).write('')
         return (
             Template(self._config)
-                .render({'parser': request.param})
-                .replace('__tmp__', tmpdir.strpath)
+            .render({'parser': request.param})
+            .replace('__tmp__', tmpdir.strpath)
         )
 
     def test_existing_dirs(self, execute_task):

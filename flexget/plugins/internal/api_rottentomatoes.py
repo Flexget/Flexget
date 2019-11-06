@@ -259,13 +259,13 @@ class RottenTomatoesSearchResult(Base):
 @internet(log)
 @with_session
 def lookup_movie(
-        title=None,
-        year=None,
-        rottentomatoes_id=None,
-        smart_match=None,
-        only_cached=False,
-        session=None,
-        api_key=None,
+    title=None,
+    year=None,
+    rottentomatoes_id=None,
+    smart_match=None,
+    only_cached=False,
+    session=None,
+    api_key=None,
 ):
     """
     Do a lookup from Rotten Tomatoes for the movie matching the passed arguments.
@@ -309,8 +309,8 @@ def lookup_movie(
     if rottentomatoes_id:
         movie = (
             session.query(RottenTomatoesMovie)
-                .filter(RottenTomatoesMovie.id == rottentomatoes_id)
-                .first()
+            .filter(RottenTomatoesMovie.id == rottentomatoes_id)
+            .first()
         )
     if not movie and title:
         movie_filter = session.query(RottenTomatoesMovie).filter(
@@ -323,8 +323,8 @@ def lookup_movie(
             log.debug('No matches in movie cache found, checking search cache.')
             found = (
                 session.query(RottenTomatoesSearchResult)
-                    .filter(func.lower(RottenTomatoesSearchResult.search) == search_string)
-                    .first()
+                .filter(func.lower(RottenTomatoesSearchResult.search) == search_string)
+                .first()
             )
             if found and found.movie:
                 log.debug('Movie found in search cache.')
@@ -440,8 +440,8 @@ def lookup_movie(
 
                         movie = (
                             session.query(RottenTomatoesMovie)
-                                .filter(RottenTomatoesMovie.id == result['id'])
-                                .first()
+                            .filter(RottenTomatoesMovie.id == result['id'])
+                            .first()
                         )
 
                         if not movie:
@@ -507,8 +507,8 @@ def _set_movie_details(movie, session, movie_data=None, api_key=None):
             for name in genres:
                 genre = (
                     session.query(RottenTomatoesGenre)
-                        .filter(func.lower(RottenTomatoesGenre.name) == name.lower())
-                        .first()
+                    .filter(func.lower(RottenTomatoesGenre.name) == name.lower())
+                    .first()
                 )
                 if not genre:
                     genre = RottenTomatoesGenre(name)
@@ -526,8 +526,8 @@ def _set_movie_details(movie, session, movie_data=None, api_key=None):
             for res_actor in cast:
                 actor = (
                     session.query(RottenTomatoesActor)
-                        .filter(func.lower(RottenTomatoesActor.rt_id) == res_actor['id'])
-                        .first()
+                    .filter(func.lower(RottenTomatoesActor.rt_id) == res_actor['id'])
+                    .first()
                 )
                 if not actor:
                     actor = RottenTomatoesActor(res_actor['name'], res_actor['id'])
@@ -537,10 +537,10 @@ def _set_movie_details(movie, session, movie_data=None, api_key=None):
             for res_director in directors:
                 director = (
                     session.query(RottenTomatoesDirector)
-                        .filter(
+                    .filter(
                         func.lower(RottenTomatoesDirector.name) == res_director['name'].lower()
                     )
-                        .first()
+                    .first()
                 )
                 if not director:
                     director = RottenTomatoesDirector(res_director['name'])

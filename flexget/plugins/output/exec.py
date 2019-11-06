@@ -180,7 +180,7 @@ class PluginExec(object):
                             continue
                         # Run the command, fail entries with non-zero return code if configured to
                         if self.execute_cmd(
-                                cmd, allow_background, config['encoding']
+                            cmd, allow_background, config['encoding']
                         ) != 0 and config.get('fail_entries'):
                             entry.fail('exec return code was non-zero')
 

@@ -1487,7 +1487,7 @@ class TestBacklog(object):
         task = execute_task('backlog')
         assert task.entries and not task.accepted, 'no entries at the start'
         # simulate test going away from the task
-        del (manager.config['tasks']['backlog']['mock'])
+        del manager.config['tasks']['backlog']['mock']
         age_series(hours=12)
         task = execute_task('backlog')
         assert task.accepted, 'backlog is not injecting episodes'

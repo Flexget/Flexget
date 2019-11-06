@@ -83,9 +83,9 @@ class InputTail(object):
         with Session() as session:
             db_pos = (
                 session.query(TailPosition)
-                    .filter(TailPosition.task == task.name)
-                    .filter(TailPosition.filename == filename)
-                    .first()
+                .filter(TailPosition.task == task.name)
+                .filter(TailPosition.filename == filename)
+                .first()
             )
             if db_pos:
                 last_pos = db_pos.position

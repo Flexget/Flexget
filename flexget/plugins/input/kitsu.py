@@ -39,10 +39,7 @@ class KitsuAnime(object):
                 }
             ),
             'type': one_or_more(
-                {
-                    'type': 'string',
-                    'enum': ['ona', 'ova', 'tv', 'movie', 'music', 'special'],
-                }
+                {'type': 'string', 'enum': ['ona', 'ova', 'tv', 'movie', 'music', 'special'],}
             ),
             'latest': {'type': 'boolean', 'default': False},
             'status': {'type': 'string', 'enum': ['airing', 'finished']},
@@ -110,7 +107,7 @@ class KitsuAnime(object):
                     subType = anime['attributes']['subtype']
                     if subType is None or not subType.lower() in types:
                         continue
-                    
+
                 entry = Entry()
                 entry['title'] = anime['attributes']['canonicalTitle']
                 titles_en = anime['attributes']['titles'].get('en')

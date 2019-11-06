@@ -167,7 +167,7 @@ class TestMovieListAPI(object):
 
         returned_identifier = data[0]['movies_list_ids'][0]
         assert returned_identifier['id_name'], (
-                returned_identifier['id_value'] == identifier.items()[0]
+            returned_identifier['id_value'] == identifier.items()[0]
         )
 
         # Add movie to non-existent list
@@ -211,7 +211,7 @@ class TestMovieListAPI(object):
 
         returned_identifier = data['movies_list_ids'][0]
         assert returned_identifier['id_name'], (
-                returned_identifier['id_value'] == identifier.items()[0]
+            returned_identifier['id_value'] == identifier.items()[0]
         )
 
         identifiers = [{'trakt_movie_id': '12345'}]
@@ -226,7 +226,7 @@ class TestMovieListAPI(object):
 
         returned_identifier = data['movies_list_ids'][0]
         assert returned_identifier['id_name'], (
-                returned_identifier['id_value'] == identifiers[0].items()
+            returned_identifier['id_value'] == identifiers[0].items()
         )
 
         # PUT non-existent movie from list

@@ -94,13 +94,13 @@ class PluginDownload(object):
         )
 
     def get_temp_file(
-            self,
-            task,
-            entry,
-            require_path=False,
-            handle_magnets=False,
-            fail_html=True,
-            tmp_path=tempfile.gettempdir(),
+        self,
+        task,
+        entry,
+        require_path=False,
+        handle_magnets=False,
+        fail_html=True,
+        tmp_path=tempfile.gettempdir(),
     ):
         """
         Download entry content and store in temporary folder.
@@ -142,8 +142,8 @@ class PluginDownload(object):
             html_mimes = ['html', 'text/html']
             if entry.get('mime-type') in html_mimes and fail_html:
                 error = (
-                        'Unexpected html content received from `%s` - maybe a login page?'
-                        % entry['url']
+                    'Unexpected html content received from `%s` - maybe a login page?'
+                    % entry['url']
                 )
                 self.cleanup_temp_file(entry)
 
@@ -174,12 +174,12 @@ class PluginDownload(object):
             outfile.write(page)
 
     def get_temp_files(
-            self,
-            task,
-            require_path=False,
-            handle_magnets=False,
-            fail_html=True,
-            tmp_path=tempfile.gettempdir(),
+        self,
+        task,
+        require_path=False,
+        handle_magnets=False,
+        fail_html=True,
+        tmp_path=tempfile.gettempdir(),
     ):
         """Download all task content and store in temporary folder.
 
@@ -536,7 +536,7 @@ class PluginDownload(object):
                 os.remove(entry['file'])
             if os.path.exists(os.path.dirname(entry['file'])):
                 shutil.rmtree(os.path.dirname(entry['file']))
-            del (entry['file'])
+            del entry['file']
 
     def cleanup_temp_files(self, task):
         """Checks all entries for leftover temp files and deletes them."""

@@ -154,7 +154,7 @@ class Filesystem(object):
         return folder.rglob('*') if recursion else folder.iterdir()
 
     def get_entries_from_path(
-            self, path_list, match, recursion, test_mode, get_files, get_dirs, get_symlinks
+        self, path_list, match, recursion, test_mode, get_files, get_dirs, get_symlinks
     ):
         entries = []
 
@@ -171,21 +171,29 @@ class Filesystem(object):
                     path_object.exists()
                 except UnicodeError:
                     log.error(
-                        'File %s not decodable with filesystem encoding: %s', path_object, sys.getfilesystemencoding())
+                        'File %s not decodable with filesystem encoding: %s',
+                        path_object,
+                        sys.getfilesystemencoding(),
+                    )
                     continue
                 entry = None
                 object_depth = len(path_object.parts)
                 if object_depth <= max_depth:
                     if match(str(path_object)):
                         if (
-                                (path_object.is_dir() and get_dirs)
-                                or (path_object.is_symlink() and get_symlinks)
-                                or (path_object.is_file() and not path_object.is_symlink() and get_files)
+                            (path_object.is_dir() and get_dirs)
+                            or (path_object.is_symlink() and get_symlinks)
+                            or (
+                                path_object.is_file()
+                                and not path_object.is_symlink()
+                                and get_files
+                            )
                         ):
                             entry = self.create_entry(path_object, test_mode)
                         else:
                             log.debug(
-                                "Path object's %s type doesn't match requested object types.", path_object
+                                "Path object's %s type doesn't match requested object types.",
+                                path_object,
                             )
                         if entry and entry not in entries:
                             entries.append(entry)

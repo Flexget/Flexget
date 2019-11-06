@@ -101,7 +101,7 @@ def tokenize(text, match=re.compile(b'([idel])|(\d+):|(-?\d+)').match):
         i = m.end()
         if m.lastindex == 2:
             yield b's'
-            yield text[i: i + int(s)]
+            yield text[i : i + int(s)]
             i += int(s)
         else:
             yield s

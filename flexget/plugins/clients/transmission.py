@@ -90,10 +90,10 @@ class TransmissionBase(object):
                 if not best or tf['size'] > best[1]:
                     best = (tf['name'], tf['size'])
         if (
-                done
-                and best
-                and (100 * float(best[1]) / float(torrent.totalSize))
-                >= (config['main_file_ratio'] * 100)
+            done
+            and best
+            and (100 * float(best[1]) / float(torrent.totalSize))
+            >= (config['main_file_ratio'] * 100)
         ):
             vloc = ('%s/%s' % (torrent.downloadDir, best[0])).replace('/', os.sep)
         return done, vloc
@@ -110,13 +110,13 @@ class TransmissionBase(object):
 
         if torrent.seedIdleMode == 1:  # use torrent's own idle limit
             idle_limit_ok = (
-                    torrent.date_active + timedelta(minutes=torrent.seedIdleLimit) < datetime.now()
+                torrent.date_active + timedelta(minutes=torrent.seedIdleLimit) < datetime.now()
             )
         elif torrent.seedIdleMode == 0:  # use global rules
             if session.idle_seeding_limit_enabled:
                 idle_limit_ok = (
-                        torrent.date_active + timedelta(minutes=session.idle_seeding_limit)
-                        < datetime.now()
+                    torrent.date_active + timedelta(minutes=session.idle_seeding_limit)
+                    < datetime.now()
                 )
 
         return seed_limit_ok, idle_limit_ok
@@ -195,7 +195,7 @@ class PluginTransmissionInput(TransmissionBase):
         for torrent in self.client.get_torrents():
             seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
             if config['only_complete'] and not (
-                    seed_ratio_ok and idle_limit_ok and torrent.progress == 100
+                seed_ratio_ok and idle_limit_ok and torrent.progress == 100
             ):
                 continue
             entry = Entry(
@@ -238,7 +238,7 @@ class PluginTransmissionInput(TransmissionBase):
                 0: 'OK',
                 1: 'tracker_warning',
                 2: 'tracker_error',
-                3: 'local_error'
+                3: 'local_error',
             }
             entry['transmission_error_state'] = st_error_to_desc[torrent.error]
             # Built in done_date doesn't work when user adds an already completed file to transmission
@@ -370,7 +370,7 @@ class PluginTransmission(TransmissionBase):
             torrent_info = None
             for t in session_torrents:
                 if t.hashString.lower() == entry.get(
-                        'torrent_info_hash', ''
+                    'torrent_info_hash', ''
                 ).lower() or t.id == entry.get('transmission_id'):
                     torrent_info = t
                     log.debug(
@@ -429,20 +429,24 @@ class PluginTransmission(TransmissionBase):
             else:
                 # Torrent already loaded in transmission
                 if options['add'].get('download_dir'):
-                    log.verbose('Moving %s to "%s"', torrent_info.name, options['add']['download_dir'])
+                    log.verbose(
+                        'Moving %s to "%s"', torrent_info.name, options['add']['download_dir']
+                    )
                     # Move data even if current reported torrent location matches new location
                     # as transmission may fail to automatically move completed file to final
                     # location but continue reporting final location instead of real location.
                     # In such case this will kick transmission to really move data.
                     # If data is already located at new location then transmission just ignore
                     # this command.
-                    self.client.move_torrent_data(torrent_info.id, options['add']['download_dir'], 120)
+                    self.client.move_torrent_data(
+                        torrent_info.id, options['add']['download_dir'], 120
+                    )
 
             try:
                 total_size = torrent_info.totalSize
                 main_id = None
                 find_main_file = (
-                        options['post'].get('main_file_only') or 'content_filename' in options['post']
+                    options['post'].get('main_file_only') or 'content_filename' in options['post']
                 )
                 skip_files = options['post'].get('skip_files')
                 # We need to index the files if any of the following are defined
@@ -487,12 +491,12 @@ class PluginTransmission(TransmissionBase):
 
                         if 'include_files' in options['post']:
                             if any(
-                                    fnmatch(file_list[f]['name'], mask)
-                                    for mask in options['post']['include_files']
+                                fnmatch(file_list[f]['name'], mask)
+                                for mask in options['post']['include_files']
                             ):
                                 dl_list.append(f)
                             elif options['post'].get('include_subs') and any(
-                                    fnmatch(file_list[f]['name'], mask) for mask in ext_list
+                                fnmatch(file_list[f]['name'], mask) for mask in ext_list
                             ):
                                 dl_list.append(f)
 
@@ -577,7 +581,7 @@ class PluginTransmission(TransmissionBase):
                             len(file_list),
                         )
                     elif (
-                            not options['post'].get('main_file_only') or main_id is None
+                        not options['post'].get('main_file_only') or main_id is None
                     ) and skip_files:
                         # If no main file and we want to skip files
 
@@ -639,23 +643,23 @@ class PluginTransmission(TransmissionBase):
         opt_dic = {}
 
         for opt_key in (
-                'path',
-                'add_paused',
-                'honor_limits',
-                'bandwidth_priority',
-                'max_connections',
-                'max_up_speed',
-                'max_down_speed',
-                'ratio',
-                'main_file_only',
-                'main_file_ratio',
-                'magnetization_timeout',
-                'include_subs',
-                'content_filename',
-                'include_files',
-                'skip_files',
-                'rename_like_files',
-                'queue_position',
+            'path',
+            'add_paused',
+            'honor_limits',
+            'bandwidth_priority',
+            'max_connections',
+            'max_up_speed',
+            'max_down_speed',
+            'ratio',
+            'main_file_only',
+            'main_file_ratio',
+            'magnetization_timeout',
+            'include_subs',
+            'content_filename',
+            'include_files',
+            'skip_files',
+            'rename_like_files',
+            'queue_position',
         ):
             # Values do not merge config with task
             # Task takes priority then config is used
@@ -779,7 +783,7 @@ class PluginTransmissionClean(TransmissionBase):
 
     schema = {
         "deprecated": "The clean_transmission plugin is deprecated. Configure a new task using the from_transmission "
-                      "plugin as well as the transmission plugin using the remove or purge action.",
+        "plugin as well as the transmission plugin using the remove or purge action.",
         "anyOf": [
             {"type": "boolean"},
             {
@@ -854,7 +858,7 @@ class PluginTransmissionClean(TransmissionBase):
                     continue
             if config.get('directories'):
                 if not any(
-                        re.search(d, torrent.downloadDir, re.IGNORECASE) for d in config['directories']
+                    re.search(d, torrent.downloadDir, re.IGNORECASE) for d in config['directories']
                 ):
                     continue
             if task.options.test:

@@ -17,7 +17,7 @@ ANIME_FORMAT = ['tv', 'tv_short', 'movie', 'special', 'ova', 'ona', 'all']
 
 TRAILER_SOURCE = {
     'youtube': 'https://www.youtube.com/embed/',
-    'dailymotion': 'https://www.dailymotion.com/embed/video/'
+    'dailymotion': 'https://www.dailymotion.com/embed/video/',
 }
 
 
@@ -56,7 +56,7 @@ class AniList(object):
                     ),
                     'format': one_or_more(
                         {'type': 'string', 'enum': ANIME_FORMAT}, unique_items=True
-                    )
+                    ),
                 },
                 'required': ['username'],
                 'additionalProperties': False,
@@ -70,7 +70,9 @@ class AniList(object):
         if isinstance(config, str):
             config = {'username': config}
         selected_list_status = config['status'] if 'status' in config else ['current', 'planning']
-        selected_release_status = config['release_status'] if 'release_status' in config else ['all']
+        selected_release_status = (
+            config['release_status'] if 'release_status' in config else ['all']
+        )
         selected_formats = config['format'] if 'format' in config else ['all']
 
         if not isinstance(selected_list_status, list):
@@ -86,14 +88,18 @@ class AniList(object):
         log.debug('selected_release_status: %s' % selected_release_status)
         log.debug('selected_formats: %s' % selected_formats)
 
-        req_query = ('fragment aniList on MediaList{ media{ status, title{ romaji, english }, synonyms, siteUrl, '
-                     'idMal, format, episodes, trailer{ site, id }, coverImage{ large }, bannerImage, genres, '
-                     'tags{ name }, externalLinks{ site, url }}} query ($user: String){')
+        req_query = (
+            'fragment aniList on MediaList{ media{ status, title{ romaji, english }, synonyms, siteUrl, '
+            'idMal, format, episodes, trailer{ site, id }, coverImage{ large }, bannerImage, genres, '
+            'tags{ name }, externalLinks{ site, url }}} query ($user: String){'
+        )
         req_variables = {'user': config['username']}
 
         for s in selected_list_status:
-            req_query += ('%s: Page {mediaList(userName: $user, type: ANIME, status: %s) {...aniList}}' % (
-                s.capitalize(), s.upper()))
+            req_query += (
+                '%s: Page {mediaList(userName: $user, type: ANIME, status: %s) {...aniList}}'
+                % (s.capitalize(), s.upper())
+            )
         req_query += '}'
 
         try:
@@ -113,12 +119,11 @@ class AniList(object):
             for anime in list_json[list_status]['mediaList']:
                 anime = anime['media']
                 has_selected_release_status = (
-                        anime['status'].lower() in selected_release_status
-                        or 'all' in selected_release_status
+                    anime['status'].lower() in selected_release_status
+                    or 'all' in selected_release_status
                 )
                 has_selected_type = (
-                        anime['format'].lower() in selected_formats
-                        or 'all' in selected_formats
+                    anime['format'].lower() in selected_formats or 'all' in selected_formats
                 )
                 if has_selected_type and has_selected_release_status:
                     entries.append(
@@ -131,14 +136,17 @@ class AniList(object):
                             al_idMal=anime['idMal'],
                             al_format=anime['format'],
                             al_episodes=anime['episodes'],
-                            al_trailer=(TRAILER_SOURCE[anime['trailer']['site']]
-                                        + anime['trailer']['id'] if anime['trailer'] else ''),
+                            al_trailer=(
+                                TRAILER_SOURCE[anime['trailer']['site']] + anime['trailer']['id']
+                                if anime['trailer']
+                                else ''
+                            ),
                             al_cover=anime['coverImage']['large'],
                             al_banner=anime['bannerImage'],
                             al_genres=anime['genres'],
                             al_tags=[t['name'] for t in anime['tags']],
                             al_title=anime['title'],
-                            al_links=anime['externalLinks']
+                            al_links=anime['externalLinks'],
                         )
                     )
         return entries

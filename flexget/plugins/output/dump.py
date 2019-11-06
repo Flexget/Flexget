@@ -21,11 +21,11 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
     def sort_key(field):
         # Sort certain fields above the rest
         if field == 'title':
-            return 0,
+            return (0,)
         if field == 'url':
-            return 1,
+            return (1,)
         if field == 'original_url':
-            return 2,
+            return (2,)
         return 3, field
 
     for entry in entries:

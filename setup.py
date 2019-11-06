@@ -22,7 +22,7 @@ setup(
     name='FlexGet',
     version=__version__,
     description='FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) '
-                'from different sources like RSS-feeds, html-pages, various sites and more.',
+    'from different sources like RSS-feeds, html-pages, various sites and more.',
     long_description=long_description,
     long_description_content_type='text/x-rst',
     author='Marko Koivusalo',

@@ -96,9 +96,7 @@ class BlurayMovie(Base):
             search_results = response['items']
             countries = bluray_request('countries.json.php', **country_params) or {}
 
-            search_results = sorted(
-                search_results, key=lambda k: extract_release_date(k)
-            )
+            search_results = sorted(search_results, key=lambda k: extract_release_date(k))
         except requests.RequestException as e:
             raise LookupError('Error searching for {} on blu-ray.com: {}'.format(title_year, e))
 

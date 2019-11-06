@@ -56,11 +56,7 @@ class FilterArchives(object):
 
         for entry in task.entries:
             archive_path = entry.get('location', '')
-
-            if utils.is_archive(archive_path):
-                entry.accept()
-            else:
-                entry.reject()
+            entry.accept() if utils.is_archive(str(archive_path)) else entry.reject()
 
 
 @event('plugin.register')

@@ -43,7 +43,7 @@ class QualityComponent(object):
             return False, ""
         else:
             # remove matching part from the text
-            text = text[: match.start()] + text[match.end():]
+            text = text[: match.start()] + text[match.end() :]
         return True, text
 
     def __hash__(self):

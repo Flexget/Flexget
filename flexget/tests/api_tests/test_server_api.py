@@ -87,9 +87,9 @@ class TestServerAPI(object):
         assert not errors
 
         assert (
-                data['raw_config']
-                == 'dGFza3M6CiAgdGVzdDoKICAgIHJzczoKICAgICAgdXJsOiBodHRwOi8vdGVzdC9yc3MKICAgIG1'
-                   'vY2s6CiAgICAgIC0gdGl0bGU6IGVudHJ5IDE='
+            data['raw_config']
+            == 'dGFza3M6CiAgdGVzdDoKICAgIHJzczoKICAgICAgdXJsOiBodHRwOi8vdGVzdC9yc3MKICAgIG1'
+            'vY2s6CiAgICAgIC0gdGl0bGU6IGVudHJ5IDE='
         )
 
     @pytest.mark.online

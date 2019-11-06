@@ -84,7 +84,7 @@ class TestInputRSS(object):
         e = task.find_entry(title='Zero sized enclosure')
         assert e, 'RSS entry missing: zero sized'
         assert (
-                'filename' not in e
+            'filename' not in e
         ), 'RSS entry with 0-sized enclosure should not have explicit filename'
 
         # messy enclosure

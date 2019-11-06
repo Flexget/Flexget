@@ -99,7 +99,7 @@ class FromDigest(object):
             'limit': {
                 'deprecated': 'The `limit` option of from_digest is deprecated. Use the `limit` plugin instead.',
                 'type': 'integer',
-                'default': -1
+                'default': -1,
             },
             'expire': {
                 'oneOf': [{'type': 'string', 'format': 'interval'}, {'type': 'boolean'}],

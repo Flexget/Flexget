@@ -176,7 +176,7 @@ class FilterExistsMovie(object):
                     movie = plugin.get('parsing', self).parse_movie(entry['title'])
                     entry[key_name] = movie.name
                     entry[key_year] = movie.year
-                    
+
                 if entry.get(key_year, eval_lazy=False):
                     key = "%s %s" % (entry[key_name], entry[key_year])
                 else:

@@ -112,5 +112,5 @@ class TestFileSize(object):
         task = execute_task('test_torrent')
         entry = task.find_entry('entries', title='test')
         assert (
-                'content_size' not in entry
+            'content_size' not in entry
         ), 'size of .torrent file should not be read as content_size'

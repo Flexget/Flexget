@@ -64,8 +64,8 @@ class TestURLRewriters(object):
         assert urlrewriter.url_rewritable(task, entry)
         urlrewriter.url_rewrite(task, entry)
         assert (
-                entry['url']
-                == 'http://cinemageddon.net/download.php?id=1234&name=cinemageddon%20download.torrent'
+            entry['url']
+            == 'http://cinemageddon.net/download.php?id=1234&name=cinemageddon%20download.torrent'
         )
 
 
