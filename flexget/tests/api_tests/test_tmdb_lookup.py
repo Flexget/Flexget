@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from flexget.api.app import base_message
+import pytest
 
+from flexget.api.app import base_message
 from flexget.components.tmdb.api import ObjectsContainer as oc
 from flexget.utils import json
 

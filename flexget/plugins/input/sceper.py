@@ -1,7 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from bs4 import NavigableString
 from requests import RequestException
@@ -17,7 +14,6 @@ try:
     from flexget.components.imdb.utils import extract_id
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='imdb')
-
 
 log = logging.getLogger('sceper')
 

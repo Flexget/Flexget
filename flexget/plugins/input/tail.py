@@ -1,10 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import io
+import logging
 import os
 import re
-import logging
 
 from sqlalchemy import Column, Integer, Unicode
 
@@ -87,16 +83,16 @@ class InputTail(object):
         with Session() as session:
             db_pos = (
                 session.query(TailPosition)
-                .filter(TailPosition.task == task.name)
-                .filter(TailPosition.filename == filename)
-                .first()
+                    .filter(TailPosition.task == task.name)
+                    .filter(TailPosition.filename == filename)
+                    .first()
             )
             if db_pos:
                 last_pos = db_pos.position
             else:
                 last_pos = 0
 
-            with io.open(filename, 'r', encoding=encoding, errors='replace') as file:
+            with open(filename, 'r', encoding=encoding, errors='replace') as file:
                 if task.options.tail_reset == filename or task.options.tail_reset == task.name:
                     if last_pos == 0:
                         log.info('Task %s tail position is already zero' % task.name)

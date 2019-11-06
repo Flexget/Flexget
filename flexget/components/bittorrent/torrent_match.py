@@ -134,7 +134,7 @@ class TorrentMatch(object):
                             and torrent_file.size == local_file.size
                         ):
                             # if the filename with ext is contained in 'location', we must grab its parent as path
-                            if os.path.basename(torrent_file.path) in local_entry['location']:
+                            if os.path.basename(torrent_file.path) in str(local_entry['location']):
                                 entry['path'] = os.path.dirname(local_entry['location'])
                             else:
                                 entry['path'] = local_entry['location']

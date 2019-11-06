@@ -176,11 +176,11 @@ class Filesystem(object):
                 entry = None
                 object_depth = len(path_object.parts)
                 if object_depth <= max_depth:
-                    if match(path_object):
+                    if match(str(path_object)):
                         if (
                                 (path_object.is_dir() and get_dirs)
-                                or (path_object.is_link() and get_symlinks)
-                                or (path_object.is_file() and not path_object.is_link() and get_files)
+                                or (path_object.is_symlink() and get_symlinks)
+                                or (path_object.is_file() and not path_object.is_symlink() and get_files)
                         ):
                             entry = self.create_entry(path_object, test_mode)
                         else:
