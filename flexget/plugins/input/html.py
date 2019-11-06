@@ -1,18 +1,17 @@
-from urllib.parse import urlparse as parse
-
+import io
 import logging
 import posixpath
-import zlib
 import re
-import io
+import zlib
+from urllib import parse
 
 from jinja2 import Template
 
 from flexget import plugin
-from flexget.event import event
 from flexget.entry import Entry
-from flexget.utils.soup import get_soup
+from flexget.event import event
 from flexget.utils.cached_input import cached
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('html')
 
