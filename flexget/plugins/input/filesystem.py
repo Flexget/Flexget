@@ -163,7 +163,7 @@ class Filesystem(object):
             log.verbose('Scanning folder %s. Recursion is set to %s.' % (folder, recursion))
             folder = Path(folder).expanduser()
             log.debug('Scanning %s' % folder)
-            base_depth = len(folder.splitall())
+            base_depth = len(folder.parts)
             max_depth = self.get_max_depth(recursion, base_depth)
             folder_objects = self.get_folder_objects(folder, recursion)
             for path_object in folder_objects:
@@ -177,13 +177,13 @@ class Filesystem(object):
                     )
                     continue
                 entry = None
-                object_depth = len(path_object.splitall())
+                object_depth = len(path_object.parts)
                 if object_depth <= max_depth:
                     if match(path_object):
                         if (
-                            (path_object.isdir() and get_dirs)
-                            or (path_object.islink() and get_symlinks)
-                            or (path_object.isfile() and not path_object.islink() and get_files)
+                            (path_object.is_dir() and get_dirs)
+                            or (path_object.is_link() and get_symlinks)
+                            or (path_object.is_file() and not path_object.is_link() and get_files)
                         ):
                             entry = self.create_entry(path_object, test_mode)
                         else:
