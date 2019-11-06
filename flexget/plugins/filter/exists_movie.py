@@ -90,7 +90,7 @@ class FilterExistsMovie(object):
 
             path_ids = {}
 
-            if not folder.isdir():
+            if not folder.is_dir():
                 log.critical('Path %s does not exist' % folder)
                 continue
 

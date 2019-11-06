@@ -106,27 +106,28 @@ class Filesystem(object):
 
         return config
 
-    def create_entry(self, filepath, test_mode):
+    def create_entry(self, filepath: Path, test_mode):
         """
         Creates a single entry using a filepath and a type (file/dir)
         """
-        filepath = filepath.abspath()
+        filepath = filepath.absolute()
         entry = Entry()
         entry['location'] = filepath
         entry['url'] = Path(filepath).absolute().as_uri()
         entry['filename'] = filepath.name
-        if filepath.isfile():
+        if filepath.is_file():
             entry['title'] = filepath.stem
         else:
             entry['title'] = filepath.name
+        file_stat = filepath.stat()
         try:
-            entry['timestamp'] = datetime.fromtimestamp(filepath.getmtime())
+            entry['timestamp'] = datetime.fromtimestamp(file_stat.st_mtime)
         except Exception as e:
             log.warning('Error setting timestamp for %s: %s' % (filepath, e))
             entry['timestamp'] = None
-        entry['accessed'] = datetime.fromtimestamp(filepath.getatime())
-        entry['modified'] = datetime.fromtimestamp(filepath.getmtime())
-        entry['created'] = datetime.fromtimestamp(filepath.getctime())
+        entry['accessed'] = datetime.fromtimestamp(file_stat.st_atime)
+        entry['modified'] = datetime.fromtimestamp(file_stat.st_mtime)
+        entry['created'] = datetime.fromtimestamp(file_stat.st_ctime)
         if entry.isvalid():
             if test_mode:
                 log.info("Test mode. Entry includes:")
@@ -148,48 +149,43 @@ class Filesystem(object):
         else:
             return base_depth + recursion
 
-    def get_folder_objects(self, folder, recursion):
-        if recursion is False:
-            return folder.listdir()
-        else:
-            return folder.walk(errors='ignore')
+    @staticmethod
+    def get_folder_objects(folder: Path, recursion: bool):
+        return folder.rglob('*.*') if recursion else folder.iterdir()
 
     def get_entries_from_path(
-        self, path_list, match, recursion, test_mode, get_files, get_dirs, get_symlinks
+            self, path_list, match, recursion, test_mode, get_files, get_dirs, get_symlinks
     ):
         entries = []
 
         for folder in path_list:
-            log.verbose('Scanning folder %s. Recursion is set to %s.' % (folder, recursion))
+            log.verbose('Scanning folder %s. Recursion is set to %s.', folder, recursion)
             folder = Path(folder).expanduser()
-            log.debug('Scanning %s' % folder)
+            log.debug('Scanning %s', folder)
             base_depth = len(folder.parts)
             max_depth = self.get_max_depth(recursion, base_depth)
             folder_objects = self.get_folder_objects(folder, recursion)
             for path_object in folder_objects:
-                log.debug('Checking if %s qualifies to be added as an entry.' % path_object)
+                log.debug('Checking if %s qualifies to be added as an entry.', path_object)
                 try:
                     path_object.exists()
                 except UnicodeError:
                     log.error(
-                        'File %s not decodable with filesystem encoding: %s'
-                        % (path_object, sys.getfilesystemencoding())
-                    )
+                        'File %s not decodable with filesystem encoding: %s', path_object, sys.getfilesystemencoding())
                     continue
                 entry = None
                 object_depth = len(path_object.parts)
                 if object_depth <= max_depth:
                     if match(path_object):
                         if (
-                            (path_object.is_dir() and get_dirs)
-                            or (path_object.is_link() and get_symlinks)
-                            or (path_object.is_file() and not path_object.is_link() and get_files)
+                                (path_object.is_dir() and get_dirs)
+                                or (path_object.is_link() and get_symlinks)
+                                or (path_object.is_file() and not path_object.is_link() and get_files)
                         ):
                             entry = self.create_entry(path_object, test_mode)
                         else:
                             log.debug(
-                                "Path object's %s type doesn't match requested object types."
-                                % path_object
+                                "Path object's %s type doesn't match requested object types.", path_object
                             )
                         if entry and entry not in entries:
                             entries.append(entry)
