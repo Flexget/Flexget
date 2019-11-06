@@ -12,7 +12,7 @@ log = logging.getLogger('regexp_parse')
 
 
 class RegexpParse(object):
-    """This plugin is designed to take input from a web resource or a file.
+    r"""This plugin is designed to take input from a web resource or a file.
     It then parses the text via regexps supplied in the config file.
 
     source: is a file or url to get the data from. You can specify a username:password
@@ -53,7 +53,7 @@ class RegexpParse(object):
             - {regexp: "magnet:.*?(?=])"}
         custom_field:
           regexps:
-            - {regexp: "custom regexps", flags: "comma seperated list of flags (see python regex docs)"}
+            - {regexp: "custom regexps", flags: "comma separated list of flags (see python regex docs)"}
           required: False
         custom_field2:
           regexps:
