@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import os
+import json
 import logging
 
 from flexget import plugin
@@ -32,16 +33,7 @@ class OutputJson(object):
         if not os.path.isabs(output):
             output = os.path.join(task.manager.config_base, output)
 
-        # create the template
-        try:
-            template = render_from_task(get_template(filename), task)
-            log.verbose('Writing output json to %s', output)
-            with open(output, 'wb') as f:
-                f.write(template.encode('utf-8'))
-        except RenderError as e:
-            log.error('Error while rendering task %s, Error: %s', task, e)
-            raise plugin.PluginError('There was an error rendering the specified template')
-
+        json.dump(output)
 
 @event('plugin.register')
 def register_plugin():
