@@ -1,0 +1,10 @@
+{ {% if task.accepted %}
+{% for entry in task.accepted -%}
+    "{{ entry.title }}": {
+{% for key in entry -%}
+        "{{ key }}": "{{ entry[key] }}"{% if not loop.last %},{% endif %}
+{% endfor -%}
+{% if loop.last %}}{% else %}},
+{% endif %}
+{%- endfor %}
+{% endif %}}
