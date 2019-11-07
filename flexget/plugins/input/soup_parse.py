@@ -132,7 +132,7 @@ class SoupParse(object):
                             'type': 'object',
                             'properties': {
                                 'element_name': {'type': 'string'},
-                                'attribute_name': {'type': 'string'}, # ADD LIMIT OF ONE PER 'SCOPE'?
+                                'attribute_name': {'type': 'string'},
                                 'attribute_value': {'type': 'string'},
                                 'start': {'type': 'integer', 'default': 1, 'minimum': 1},
                                 'end': {'type': 'integer', 'default': 31415, 'minimum': 1},
@@ -173,6 +173,7 @@ class SoupParse(object):
                     {'type': 'string', 'format': 'file'},
                 ]
             },
+            'encoding': {'type': 'string'},
             'sections': {'$ref': '#/definitions/scope_limiter'},
             'keys': {
                 'type': 'object',
@@ -180,7 +181,6 @@ class SoupParse(object):
                     'type': 'object',
                     'properties': {
                         'section': {'$ref': '#/definitions/scope_limiter'},
-                        'encoding': {'type': 'string'},
                         'location': {
                             'oneOf': [
                                 {'type': 'string', 'enum': ['text', 'url']},
@@ -367,7 +367,7 @@ class SoupParse(object):
                         tag = tag_list[0]
                     else:
                         log.warning("The specified 'section' for key: '" + str(key) + 
-                                    "' was not found inside of the its partent tag in section #" + 
+                                    "' was not found inside of the its parent tag in section #" + 
                                     str(sec_num) + ". Skipping to next key search.")
                         continue
                 else:
