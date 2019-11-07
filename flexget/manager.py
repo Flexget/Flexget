@@ -21,6 +21,10 @@ from sqlalchemy.exc import OperationalError  # noqa
 from sqlalchemy.ext.declarative import declarative_base  # noqa
 from sqlalchemy.orm import sessionmaker  # noqa
 
+# These need to be declared before we start importing from other flexget modules, since they might import them
+from flexget.utils.sqlalchemy_utils import ContextSession  # noqa
+from flexget.utils.tools import get_current_flexget_version, io_encoding, pid_exists  # noqa
+
 from flexget import config_schema, db_schema, logger, plugin  # noqa
 from flexget.event import fire_event  # noqa
 from flexget.ipc import IPCClient, IPCServer  # noqa
@@ -34,9 +38,6 @@ from flexget.options import (  # noqa
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
 from flexget.terminal import console  # noqa
-# These need to be declared before we start importing from other flexget modules, since they might import them
-from flexget.utils.sqlalchemy_utils import ContextSession  # noqa
-from flexget.utils.tools import get_current_flexget_version, io_encoding, pid_exists  # noqa
 
 Base = declarative_base()
 Session = sessionmaker(class_=ContextSession)

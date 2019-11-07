@@ -128,7 +128,17 @@ def autoformat(files):
     # black and isort config are in pyproject.toml
     subprocess.call(('black',) + files)
     subprocess.call(
-        ('isort', '--virtual-env', venv_path, '-rc', '--skip', 'flexget/__init__.py') + files
+        (
+            'isort',
+            '--virtual-env',
+            venv_path,
+            '-rc',
+            '--skip',
+            'flexget/__init__.py',
+            '--skip',
+            'flexget/manager.py',
+        )
+        + files
     )
 
 
