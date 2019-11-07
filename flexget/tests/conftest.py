@@ -14,12 +14,11 @@ import pytest
 import requests
 import yaml
 from vcr import VCR
-from vcr.stubs import VCRHTTPSConnection, VCRHTTPConnection
+from vcr.stubs import VCRHTTPConnection, VCRHTTPSConnection
 
 import flexget.logger
 from flexget.api import api_app
-from flexget.manager import Manager
-from flexget.manager import Session
+from flexget.manager import Manager, Session
 from flexget.plugin import load_plugins
 from flexget.task import Task, TaskAbort
 from flexget.webserver import User

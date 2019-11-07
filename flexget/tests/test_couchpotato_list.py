@@ -1,6 +1,5 @@
 import json
 import os
-
 from unittest import mock
 
 movie_list_file = os.path.join(

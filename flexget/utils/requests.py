@@ -1,9 +1,8 @@
 import logging
 import time
-
 # Allow some request objects to be imported from here instead of requests
 import warnings
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 from urllib.parse import urlparse
 from urllib.request import urlopen
 
@@ -11,7 +10,7 @@ import requests
 from requests import RequestException
 
 from flexget import __version__ as version
-from flexget.utils.tools import parse_timedelta, TimedDict, timedelta_total_seconds
+from flexget.utils.tools import TimedDict, parse_timedelta, timedelta_total_seconds
 
 # If we use just 'requests' here, we'll get the logger created by requests, rather than our own
 log = logging.getLogger('utils.requests')

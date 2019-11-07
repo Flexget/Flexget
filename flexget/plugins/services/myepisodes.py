@@ -2,13 +2,12 @@ import logging
 import re
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, DateTime, Integer, String
 
 from flexget import plugin
+from flexget.db_schema import versioned_base
 from flexget.event import event
 from flexget.utils import requests
-from flexget.db_schema import versioned_base
-
 
 log = logging.getLogger('myepisodes')
 Base = versioned_base('myepisodes', 0)

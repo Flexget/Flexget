@@ -5,7 +5,8 @@ from unittest.mock import patch
 import pytest
 
 from flexget import __version__
-from flexget.api.app import __version__ as __api_version__, base_message
+from flexget.api.app import __version__ as __api_version__
+from flexget.api.app import base_message
 from flexget.api.core.server import ObjectsContainer as OC
 from flexget.manager import Manager
 from flexget.tests.conftest import MockManager

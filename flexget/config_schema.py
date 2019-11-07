@@ -3,15 +3,15 @@ import os
 import re
 from collections import defaultdict
 from datetime import datetime
-from urllib.parse import urlparse, parse_qsl
+from urllib.parse import parse_qsl, urlparse
 
 import jsonschema
-from jsonschema.compat import str_types, int_types
+from jsonschema.compat import int_types, str_types
 
 from flexget.event import fire_event
 from flexget.utils import qualities, template
 from flexget.utils.template import get_template
-from flexget.utils.tools import parse_timedelta, parse_episode_identifier
+from flexget.utils.tools import parse_episode_identifier, parse_timedelta
 
 schema_paths = {}
 

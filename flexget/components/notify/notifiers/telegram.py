@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, String
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.plugin import PluginWarning, PluginError
+from flexget.plugin import PluginError, PluginWarning
 
 try:
     import telegram

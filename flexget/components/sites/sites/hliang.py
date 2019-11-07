@@ -2,8 +2,8 @@ import logging
 import re
 
 from flexget import plugin
-from flexget.event import event
 from flexget.components.sites.urlrewriting import UrlRewritingError
+from flexget.event import event
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('hliang')

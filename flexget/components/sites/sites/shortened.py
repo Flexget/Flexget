@@ -1,6 +1,5 @@
-from urllib.parse import urlparse
-
 import logging
+from urllib.parse import urlparse
 
 from flexget import plugin
 from flexget.event import event

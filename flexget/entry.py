@@ -4,7 +4,7 @@ import logging
 
 from flexget.plugin import PluginError
 from flexget.utils.lazy_dict import LazyDict, LazyLookup
-from flexget.utils.template import render_from_entry, FlexGetTemplate
+from flexget.utils.template import FlexGetTemplate, render_from_entry
 
 log = logging.getLogger('entry')
 

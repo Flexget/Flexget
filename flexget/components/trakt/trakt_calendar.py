@@ -1,7 +1,6 @@
 import datetime
 import logging
 
-
 from requests import RequestException
 
 from flexget import plugin

@@ -6,7 +6,6 @@ from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils.template import evaluate_expression
 
-
 log = logging.getLogger('sort_by')
 
 RE_ARTICLES = r'^(the|a|an)\s'

@@ -1,16 +1,18 @@
-import logging
 import io
+import logging
 import os
 import socket
+
+import requests
+
+from flexget import plugin
+from flexget.event import event
 
 try:
     import mechanicalsoup
 except ImportError:
     mechanicalsoup = None
-import requests
 
-from flexget import plugin
-from flexget.event import event
 
 log = logging.getLogger('formlogin')
 

@@ -1,18 +1,19 @@
 import sys
 from textwrap import wrap
 
-from colorclass import Windows, Color
-from flexget.logger import local_context
-from flexget.options import ArgumentParser
-from flexget.utils.tools import io_encoding
+from colorclass import Color, Windows
 from terminaltables import (
     AsciiTable,
-    SingleTable,
     DoubleTable,
     GithubFlavoredMarkdownTable,
     PorcelainTable,
+    SingleTable,
 )
 from terminaltables.terminal_io import terminal_size
+
+from flexget.logger import local_context
+from flexget.options import ArgumentParser
+from flexget.utils.tools import io_encoding
 
 # Enable terminal colors on windows.
 # pythonw (flexget-headless) does not have a sys.stdout, this command would crash in that case

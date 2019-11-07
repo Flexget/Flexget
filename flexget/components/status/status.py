@@ -5,6 +5,7 @@ from datetime import timedelta
 from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
+
 from . import db
 
 log = logging.getLogger('status')

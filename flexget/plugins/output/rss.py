@@ -1,16 +1,16 @@
 import base64
+import datetime
 import hashlib
 import io
 import logging
-import datetime
 import os
 
-from sqlalchemy import Column, Integer, String, DateTime, Unicode
+from sqlalchemy import Column, DateTime, Integer, String, Unicode
 
 from flexget import db_schema, plugin
 from flexget.event import event
-from flexget.utils.sqlalchemy_utils import table_columns, table_add_column
-from flexget.utils.template import render_from_entry, get_template, RenderError
+from flexget.utils.sqlalchemy_utils import table_add_column, table_columns
+from flexget.utils.template import RenderError, get_template, render_from_entry
 
 log = logging.getLogger('make_rss')
 Base = db_schema.versioned_base('make_rss', 0)

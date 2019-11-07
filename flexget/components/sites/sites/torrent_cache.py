@@ -1,6 +1,6 @@
 import logging
-import re
 import random
+import re
 
 from flexget import plugin
 from flexget.event import event

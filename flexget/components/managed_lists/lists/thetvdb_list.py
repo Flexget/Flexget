@@ -1,5 +1,4 @@
 import logging
-
 from collections import MutableSet
 
 from flexget import plugin

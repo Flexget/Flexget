@@ -1,5 +1,5 @@
-import logging
 import base64
+import logging
 import re
 
 from flexget import plugin

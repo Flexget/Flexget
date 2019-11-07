@@ -1,6 +1,5 @@
 import logging
 
-
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import plugin

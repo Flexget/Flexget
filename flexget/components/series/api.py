@@ -1,25 +1,24 @@
 import copy
-
 from math import ceil
 
-from flask import jsonify
-from flask import request
+from flask import jsonify, request
 from flask_restplus import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import plugin
-from flexget.api import api, APIClient, APIResource
+from flexget.api import APIClient, APIResource, api
 from flexget.api.app import (
-    NotFoundError,
-    Conflict,
     BadRequest,
+    Conflict,
+    NotFoundError,
     base_message_schema,
-    success_response,
     etag,
     pagination_headers,
+    success_response,
 )
 from flexget.event import fire_event
 from flexget.plugin import PluginError
+
 from . import db
 from .utils import normalize_series_name
 
@@ -29,7 +28,6 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='tvdb_lookup')
 
-from flexget import plugin
 
 try:
     # NOTE: Importing other plugins is discouraged!

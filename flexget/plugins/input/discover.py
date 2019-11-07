@@ -2,13 +2,12 @@ import datetime
 import logging
 import random
 
-from sqlalchemy import Column, Integer, DateTime, Unicode, Index
+from sqlalchemy import Column, DateTime, Index, Integer, Unicode
 
-from flexget import options, plugin
-from flexget import db_schema
+from flexget import db_schema, options, plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.utils.tools import parse_timedelta, multiply_timedelta, aggregate_inputs
+from flexget.utils.tools import aggregate_inputs, multiply_timedelta, parse_timedelta
 
 log = logging.getLogger('discover')
 Base = db_schema.versioned_base('discover', 0)

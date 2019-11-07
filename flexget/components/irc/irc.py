@@ -9,8 +9,7 @@ from urllib.parse import quote
 from uuid import uuid4
 from xml.etree.ElementTree import parse
 
-from flexget.config_schema import one_or_more
-from flexget.config_schema import register_config_key
+from flexget.config_schema import one_or_more, register_config_key
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import manager

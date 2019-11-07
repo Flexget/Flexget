@@ -1,5 +1,4 @@
 import logging
-
 from argparse import SUPPRESS
 
 from flexget import options, plugin

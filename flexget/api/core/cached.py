@@ -2,7 +2,7 @@ from flask.helpers import send_file
 from flask_restplus import inputs
 from requests import RequestException
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import APIError, BadRequest
 from flexget.utils.cache import cached_resource
 

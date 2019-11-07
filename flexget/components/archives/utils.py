@@ -6,10 +6,10 @@ archive extraction
 """
 
 
-import zipfile
+import logging
 import os
 import shutil
-import logging
+import zipfile
 
 try:
     import rarfile

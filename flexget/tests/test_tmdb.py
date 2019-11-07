@@ -1,7 +1,7 @@
 import pytest
 
-from flexget.manager import Session
 from flexget.components.tmdb.api_tmdb import TMDBSearchResult
+from flexget.manager import Session
 
 
 @pytest.mark.online

@@ -2,22 +2,14 @@ import copy
 import random
 import string
 import sys
-from argparse import ArgumentParser as ArgParser, _UNRECOGNIZED_ARGS_ATTR
-from argparse import (
-    _VersionAction,
-    Action,
-    ArgumentError,
-    Namespace,
-    PARSER,
-    REMAINDER,
-    SUPPRESS,
-    _SubParsersAction,
-)
+from argparse import _UNRECOGNIZED_ARGS_ATTR, PARSER, REMAINDER, SUPPRESS, Action, ArgumentError
+from argparse import ArgumentParser as ArgParser
+from argparse import Namespace, _SubParsersAction, _VersionAction
 
 import flexget
 from flexget.entry import Entry
 from flexget.event import fire_event
-from flexget.utils.tools import get_latest_flexget_version_number, get_current_flexget_version
+from flexget.utils.tools import get_current_flexget_version, get_latest_flexget_version_number
 
 _UNSET = object()
 
@@ -218,9 +210,7 @@ class NestedSubparserAction(_SubParsersAction):
                     setattr(namespace, dest, self.parent_defaults[parser_name][dest])
         if self.nested_namespaces:
             subnamespace = ScopedNamespace()
-            super().__call__(
-                parser, subnamespace, values, option_string
-            )
+            super().__call__(parser, subnamespace, values, option_string)
             # If dest is set, it should be set on the parent namespace, not subnamespace
             if self.dest is not SUPPRESS:
                 setattr(namespace, self.dest, parser_name)

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 
 import pytest
 
 from flexget.components.tvmaze.api_tvmaze import (
     APITVMaze,
+    TVMazeEpisodes,
     TVMazeLookup,
     TVMazeSeries,
-    TVMazeEpisodes,
 )
 from flexget.manager import Session
 

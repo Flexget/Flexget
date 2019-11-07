@@ -8,7 +8,7 @@ from sqlalchemy.orm import synonym
 
 from flexget.entry import Entry
 from flexget.manager import Session
-from flexget.utils import qualities, json
+from flexget.utils import json, qualities
 
 
 def with_session(*args, **kwargs):

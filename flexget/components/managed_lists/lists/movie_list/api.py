@@ -2,22 +2,22 @@ import copy
 import logging
 from math import ceil
 
-from flask import jsonify
-from flask import request
+from flask import jsonify, request
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import (
+    BadRequest,
     Conflict,
     NotFoundError,
     base_message_schema,
-    success_response,
-    BadRequest,
     etag,
     pagination_headers,
+    success_response,
 )
-from .movie_list import MovieListBase
+
 from . import db
+from .movie_list import MovieListBase
 
 log = logging.getLogger('movie_list')
 

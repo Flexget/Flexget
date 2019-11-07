@@ -1,7 +1,7 @@
 import json
 import logging
 from collections import MutableSet
-from urllib.parse import urlparse, quote
+from urllib.parse import quote, urlparse
 
 import requests
 from requests import RequestException

@@ -1,9 +1,9 @@
-import os
 import logging
+import os
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.template import render_from_task, get_template, RenderError
+from flexget.utils.template import RenderError, get_template, render_from_task
 
 PLUGIN_NAME = 'make_html'
 

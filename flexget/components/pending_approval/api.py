@@ -2,16 +2,17 @@ from math import ceil
 
 from flask import jsonify, request
 from flask_restplus import inputs
-from flexget.api import api, APIResource
+from sqlalchemy.orm.exc import NoResultFound
+
+from flexget.api import APIResource, api
 from flexget.api.app import (
-    base_message_schema,
-    success_response,
+    BadRequest,
     NotFoundError,
+    base_message_schema,
     etag,
     pagination_headers,
-    BadRequest,
+    success_response,
 )
-from sqlalchemy.orm.exc import NoResultFound
 
 from . import db
 

@@ -1,5 +1,5 @@
-import logging
 import csv
+import logging
 
 from requests import RequestException
 

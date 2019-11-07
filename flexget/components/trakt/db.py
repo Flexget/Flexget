@@ -3,17 +3,16 @@
 
 import logging
 import time
-
 from datetime import datetime, timedelta
+
 from dateutil.parser import parse as dateutil_parse
-from sqlalchemy import Table, Column, Integer, String, Unicode, Date, DateTime, Time, or_, and_
+from sqlalchemy import Column, Date, DateTime, Integer, String, Table, Time, Unicode, and_, or_
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
 
-from flexget import db_schema
-from flexget import plugin
-from flexget.terminal import console
+from flexget import db_schema, plugin
 from flexget.manager import Session
+from flexget.terminal import console
 from flexget.utils import requests
 from flexget.utils.database import json_synonym
 from flexget.utils.tools import split_title_year

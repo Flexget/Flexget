@@ -1,10 +1,11 @@
 import logging
 import re
 import zlib
+from pathlib import Path
 from urllib import parse
 
 from jinja2 import Template
-from pathlib import Path
+
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event

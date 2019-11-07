@@ -3,7 +3,7 @@ import hashlib
 import logging
 from datetime import datetime, timedelta
 
-from sqlalchemy import Column, Integer, String, DateTime, Index
+from sqlalchemy import Column, DateTime, Index, Integer, String
 
 from flexget import db_schema
 from flexget import logger as f_logger

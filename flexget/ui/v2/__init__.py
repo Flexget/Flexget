@@ -1,7 +1,7 @@
 import logging
 import os
 
-from flask import send_from_directory, Flask
+from flask import Flask, send_from_directory
 from flask_compress import Compress
 
 from flexget.webserver import register_app

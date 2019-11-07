@@ -4,24 +4,24 @@ from datetime import datetime, timedelta
 from functools import total_ordering
 
 from sqlalchemy import (
-    Column,
-    Integer,
-    Unicode,
-    String,
-    ForeignKey,
-    select,
-    func,
     Boolean,
+    Column,
     DateTime,
-    update,
+    ForeignKey,
     Index,
+    Integer,
+    String,
+    Unicode,
     and_,
     delete,
     desc,
+    func,
+    select,
+    update,
 )
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.ext.hybrid import hybrid_property, Comparator
-from sqlalchemy.orm import relation, backref
+from sqlalchemy.ext.hybrid import Comparator, hybrid_property
+from sqlalchemy.orm import backref, relation
 
 from flexget import db_schema, plugin
 from flexget.components.series.utils import normalize_series_name
@@ -29,12 +29,12 @@ from flexget.event import event, fire_event
 from flexget.manager import Session
 from flexget.utils.database import quality_property, with_session
 from flexget.utils.sqlalchemy_utils import (
-    table_exists,
-    drop_tables,
-    table_columns,
-    table_add_column,
-    table_schema,
     create_index,
+    drop_tables,
+    table_add_column,
+    table_columns,
+    table_exists,
+    table_schema,
 )
 from flexget.utils.tools import parse_episode_identifier
 

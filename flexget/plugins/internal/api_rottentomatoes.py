@@ -5,16 +5,15 @@ from datetime import datetime, timedelta
 from urllib.error import URLError
 from urllib.parse import quote_plus
 
-from sqlalchemy import Table, Column, Integer, String, DateTime, func, sql
+from sqlalchemy import Column, DateTime, Integer, String, Table, func, sql
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey, Index
 
-from flexget import db_schema
-from flexget import plugin
-from flexget.plugin import internet, PluginError
+from flexget import db_schema, plugin
+from flexget.plugin import PluginError, internet
 from flexget.utils import requests
 from flexget.utils.database import text_date_synonym, with_session
-from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
+from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
 log = logging.getLogger('api_rottentomatoes')
 Base = db_schema.versioned_base('api_rottentomatoes', 2)

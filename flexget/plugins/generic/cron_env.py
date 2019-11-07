@@ -1,8 +1,8 @@
 import logging
 import sys
 
-from flexget.utils.log import log_once
 from flexget.event import event
+from flexget.utils.log import log_once
 from flexget.utils.simple_persistence import SimplePersistence
 
 __author__ = 'paranoidi'

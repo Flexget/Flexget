@@ -3,9 +3,9 @@ from datetime import datetime, timedelta
 
 from sqlalchemy.exc import OperationalError
 
+from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.simple_persistence import SimplePersistence
-from flexget.event import event
 
 log = logging.getLogger('db_vacuum')
 VACUUM_INTERVAL = timedelta(weeks=24)  # 6 months

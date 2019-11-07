@@ -4,11 +4,10 @@ Miscellaneous SQLAlchemy helpers.
 import logging
 
 import sqlalchemy
-
-from sqlalchemy import ColumnDefault, Sequence, Index
-from sqlalchemy.types import TypeEngine
-from sqlalchemy.schema import Table, MetaData
+from sqlalchemy import ColumnDefault, Index, Sequence
 from sqlalchemy.exc import NoSuchTableError, OperationalError
+from sqlalchemy.schema import MetaData, Table
+from sqlalchemy.types import TypeEngine
 
 log = logging.getLogger('sql_utils')
 

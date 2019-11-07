@@ -1,8 +1,8 @@
 import logging
 
 from flexget import plugin
-from flexget.event import event
 from flexget.components.archives import utils
+from flexget.event import event
 
 log = logging.getLogger('archives')
 

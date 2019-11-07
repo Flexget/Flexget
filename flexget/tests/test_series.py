@@ -6,7 +6,7 @@ from jinja2 import Template
 from flexget.components.series import db
 from flexget.entry import Entry
 from flexget.logger import capture_output
-from flexget.manager import get_parser, Session
+from flexget.manager import Session, get_parser
 from flexget.task import TaskAbort
 
 

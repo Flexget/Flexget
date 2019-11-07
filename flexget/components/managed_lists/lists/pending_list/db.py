@@ -1,8 +1,7 @@
 import logging
-
 from datetime import datetime
 
-from sqlalchemy import Column, Unicode, Integer, DateTime, func, Boolean
+from sqlalchemy import Boolean, Column, DateTime, Integer, Unicode, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
 from sqlalchemy.sql.schema import ForeignKey

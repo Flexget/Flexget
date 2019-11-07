@@ -11,14 +11,14 @@ import pickle
 from collections import MutableMapping, defaultdict
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime, Unicode, select, Index
+from sqlalchemy import Column, DateTime, Index, Integer, String, Unicode, select
 
 from flexget import db_schema
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import json
 from flexget.utils.database import json_synonym
-from flexget.utils.sqlalchemy_utils import table_schema, create_index, table_add_column
+from flexget.utils.sqlalchemy_utils import create_index, table_add_column, table_schema
 
 log = logging.getLogger('util.simple_persistence')
 Base = db_schema.versioned_base('simple_persistence', 4)

@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import Index
 
 from flexget import plugin
-from flexget.components.backlog.db import log, BacklogEntry, get_entries, clear_entries
+from flexget.components.backlog.db import BacklogEntry, clear_entries, get_entries, log
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.database import with_session

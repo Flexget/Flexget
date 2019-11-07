@@ -1,7 +1,6 @@
 import logging
 import re
 
-
 from requests import RequestException
 
 from flexget import plugin

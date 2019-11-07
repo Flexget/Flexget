@@ -2,9 +2,9 @@ from datetime import timedelta
 
 import pytest
 
-from flexget.utils.cached_input import cached
 from flexget import plugin
 from flexget.entry import Entry
+from flexget.utils.cached_input import cached
 
 
 class InputPersist:

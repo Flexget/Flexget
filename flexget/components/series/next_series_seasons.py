@@ -1,7 +1,6 @@
 import logging
 import re
 
-
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event

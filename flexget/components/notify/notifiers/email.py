@@ -5,7 +5,7 @@ import socket
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
-from smtplib import SMTPAuthenticationError, SMTPServerDisconnected, SMTPSenderRefused
+from smtplib import SMTPAuthenticationError, SMTPSenderRefused, SMTPServerDisconnected
 
 from flexget import plugin
 from flexget.config_schema import one_or_more

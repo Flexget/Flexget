@@ -13,6 +13,7 @@ from flexget.event import event
 from flexget.utils import qualities
 from flexget.utils.parsers.generic import ParseWarning, default_ignore_prefixes, name_to_re
 from flexget.utils.tools import ReList
+
 from .parser_common import MovieParseResult, SeriesParseResult
 
 log = logging.getLogger('parser_guessit')

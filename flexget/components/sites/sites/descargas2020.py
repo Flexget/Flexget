@@ -1,17 +1,15 @@
 import logging
 import re
+import unicodedata
 
 from flexget import plugin
-from flexget.event import event
 from flexget.components.sites.urlrewriting import UrlRewritingError
+from flexget.components.sites.utils import normalize_unicode
+from flexget.entry import Entry
+from flexget.event import event
+from flexget.utils import requests
 from flexget.utils.requests import Session, TimedLimiter
 from flexget.utils.soup import get_soup
-from flexget.utils import requests
-
-from flexget.entry import Entry
-from flexget.components.sites.utils import normalize_unicode
-
-import unicodedata
 
 log = logging.getLogger('descargas2020')
 

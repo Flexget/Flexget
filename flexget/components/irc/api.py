@@ -1,12 +1,13 @@
 from flask import jsonify
 from flask_restplus import inputs
-from flexget.api import api, APIResource
+
+from flexget.api import APIResource, api
 from flexget.api.app import (
     BadRequest,
     NotFoundError,
-    success_response,
     base_message_schema,
     empty_response,
+    success_response,
 )
 
 irc_api = api.namespace('irc', description='View and manage IRC connections')

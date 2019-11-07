@@ -5,7 +5,7 @@ from colorclass.toggles import disable_all_colors
 from flexget import options
 from flexget.event import event
 from flexget.plugin import get_plugins
-from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console, colorize
+from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
 
 log = logging.getLogger('plugins')
 

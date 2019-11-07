@@ -1,5 +1,5 @@
-from flexget.manager import Session
 from flexget.components.variables.variables import Variables
+from flexget.manager import Session
 from flexget.utils import json
 
 

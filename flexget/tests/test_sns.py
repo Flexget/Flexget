@@ -1,4 +1,4 @@
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
 from flexget.plugins.output import sns
 from flexget.task import Task

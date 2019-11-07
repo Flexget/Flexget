@@ -1,12 +1,12 @@
 import logging
 
+from requests.exceptions import RequestException
+
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
-from flexget.utils.requests import Session
 from flexget.plugin import PluginWarning
-
-from requests.exceptions import RequestException
+from flexget.utils.requests import Session
 
 plugin_name = 'ifttt'
 log = logging.getLogger(plugin_name)

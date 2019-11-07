@@ -3,8 +3,8 @@ from datetime import datetime
 
 from flexget.api.app import base_message
 from flexget.components.rejected.api import ObjectsContainer as OC
-from flexget.manager import Session
 from flexget.components.rejected.db import RememberEntry, RememberTask
+from flexget.manager import Session
 from flexget.utils import json
 from flexget.utils.tools import parse_timedelta
 

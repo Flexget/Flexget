@@ -2,8 +2,8 @@ import logging
 import os
 import xml.etree.ElementTree as ET
 
-
 from flexget import plugin
+from flexget.event import event
 
 try:
     # NOTE: Importing other plugins is discouraged!
@@ -11,7 +11,6 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='imdb')
 
-from flexget.event import event
 
 log = logging.getLogger('nfo_lookup')
 

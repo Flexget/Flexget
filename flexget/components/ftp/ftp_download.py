@@ -2,7 +2,7 @@ import ftplib
 import logging
 import os
 import time
-from urllib.parse import urlparse, unquote
+from urllib.parse import unquote, urlparse
 
 from flexget import plugin
 from flexget.event import event

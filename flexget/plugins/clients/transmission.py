@@ -2,10 +2,9 @@ import base64
 import logging
 import os
 import re
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 from fnmatch import fnmatch
-from netrc import netrc, NetrcParseError
+from netrc import NetrcParseError, netrc
 from time import sleep
 from urllib.parse import urlparse
 

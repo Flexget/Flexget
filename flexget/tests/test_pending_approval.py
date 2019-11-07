@@ -1,5 +1,5 @@
-from flexget.manager import Session
 from flexget.components.pending_approval.db import PendingEntry
+from flexget.manager import Session
 
 
 class TestPendingApproval:

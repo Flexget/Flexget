@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 
 from flexget import options
-from flexget.db_schema import reset_schema, plugin_schemas
+from flexget.db_schema import plugin_schemas, reset_schema
 from flexget.event import event
 from flexget.manager import Base, Session
 from flexget.terminal import console

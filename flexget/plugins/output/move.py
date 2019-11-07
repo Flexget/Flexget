@@ -1,13 +1,13 @@
+import logging
 import os
 import shutil
-import logging
 import time
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
-from flexget.utils.template import RenderError
+from flexget.event import event
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError
 
 
 def get_directory_size(directory):

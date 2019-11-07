@@ -2,12 +2,12 @@ import copy
 
 from flexget.api.app import base_message
 from flexget.components.managed_lists.lists.pending_list.api import ObjectsContainer as OC
+from flexget.components.managed_lists.lists.pending_list.db import (
+    PendingListEntry,
+    PendingListList,
+)
 from flexget.entry import Entry
 from flexget.manager import Session
-from flexget.components.managed_lists.lists.pending_list.db import (
-    PendingListList,
-    PendingListEntry,
-)
 from flexget.utils import json
 
 

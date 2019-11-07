@@ -1,18 +1,18 @@
 import logging
-from datetime import date, datetime, timedelta
 import time
+from datetime import date, datetime, timedelta
 
-from sqlalchemy import Table, Column, Integer, Float, Unicode, DateTime, Date, func
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation
 from dateutil.parser import parse as dateutil_parse
+from sqlalchemy import Column, Date, DateTime, Float, Integer, Table, Unicode, func
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import relation
+from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
-from flexget.utils.soup import get_soup
 from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.database import year_property
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('api_bluray')
 Base = db_schema.versioned_base('api_bluray', 0)

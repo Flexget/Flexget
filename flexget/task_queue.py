@@ -4,7 +4,7 @@ import sys
 import threading
 import time
 
-from sqlalchemy.exc import ProgrammingError, OperationalError
+from sqlalchemy.exc import OperationalError, ProgrammingError
 
 from flexget.task import TaskAbort
 

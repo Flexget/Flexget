@@ -1,11 +1,10 @@
+import logging
 from datetime import datetime, timedelta
 
-import logging
-
-from flexget.utils.tools import parse_timedelta
-from flexget.utils.qualities import Quality
 from flexget import plugin
 from flexget.event import event
+from flexget.utils.qualities import Quality
+from flexget.utils.tools import parse_timedelta
 
 __author__ = 'andy'
 

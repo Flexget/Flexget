@@ -1,5 +1,6 @@
 from flexget import plugin
 from flexget.event import event
+
 from . import series as plugin_series
 
 

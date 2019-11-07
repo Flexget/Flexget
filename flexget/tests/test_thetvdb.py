@@ -5,16 +5,16 @@ from datetime import datetime, timedelta
 import mock
 import pytest
 
-from flexget.manager import Session
 from flexget.components.thetvdb.api_tvdb import (
-    persist,
+    TVDBEpisode,
+    TVDBRequest,
     TVDBSearchResult,
+    find_series_id,
     lookup_series,
     mark_expired,
-    TVDBRequest,
-    TVDBEpisode,
-    find_series_id,
+    persist,
 )
+from flexget.manager import Session
 
 
 @mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')

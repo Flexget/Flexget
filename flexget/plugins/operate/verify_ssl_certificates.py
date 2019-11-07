@@ -1,4 +1,5 @@
 import logging
+
 from requests.packages import urllib3
 
 from flexget import plugin

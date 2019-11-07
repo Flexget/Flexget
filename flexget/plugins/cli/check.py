@@ -1,5 +1,6 @@
 import codecs
 import logging
+
 import yaml
 
 from flexget import options

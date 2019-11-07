@@ -1,11 +1,11 @@
 import logging
-
 from datetime import datetime, timedelta
 
 from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.tools import parse_timedelta
+
 from . import db
 
 SCHEMA_VER = 3

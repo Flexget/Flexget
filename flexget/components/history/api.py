@@ -2,10 +2,11 @@ import logging
 from math import ceil
 
 from flask import jsonify, request
-from sqlalchemy import desc, asc
+from sqlalchemy import asc, desc
 
-from flexget.api import api, APIResource
-from flexget.api.app import BadRequest, etag, pagination_headers, NotFoundError
+from flexget.api import APIResource, api
+from flexget.api.app import BadRequest, NotFoundError, etag, pagination_headers
+
 from . import db
 
 log = logging.getLogger('history')

@@ -1,8 +1,8 @@
 import logging
 
-
 from flexget import plugin
 from flexget.event import event
+
 from . import db
 
 log = logging.getLogger(__name__)

@@ -4,9 +4,10 @@ from math import ceil
 
 from flask import jsonify, request
 from flask_restplus import inputs
-from flexget.api.app import NotFoundError, etag, pagination_headers, api, APIResource
-from flexget.api.core.tasks import tasks_api
 from sqlalchemy.orm.exc import NoResultFound
+
+from flexget.api.app import APIResource, NotFoundError, api, etag, pagination_headers
+from flexget.api.core.tasks import tasks_api
 
 from . import db
 

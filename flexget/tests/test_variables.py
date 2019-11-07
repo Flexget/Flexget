@@ -1,8 +1,8 @@
 import pytest
 
+from flexget.components.variables.variables import Variables
 from flexget.event import fire_event
 from flexget.manager import Session
-from flexget.components.variables.variables import Variables
 
 
 @pytest.mark.usefixtures('tmpdir')

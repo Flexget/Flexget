@@ -3,7 +3,7 @@ import logging
 import pickle
 from datetime import datetime, timedelta
 
-from sqlalchemy import Column, Integer, String, DateTime, Unicode, select, ForeignKey
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Unicode, select
 from sqlalchemy.orm import relation
 
 from flexget import db_schema
@@ -12,8 +12,8 @@ from flexget.manager import Session
 from flexget.plugin import PluginError
 from flexget.utils import json
 from flexget.utils.database import entry_synonym
-from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
-from flexget.utils.tools import parse_timedelta, TimedDict, get_config_hash
+from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
+from flexget.utils.tools import TimedDict, get_config_hash, parse_timedelta
 
 log = logging.getLogger('input_cache')
 Base = db_schema.versioned_base('input_cache', 1)

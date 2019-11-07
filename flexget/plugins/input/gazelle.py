@@ -1,9 +1,9 @@
 import logging
 from datetime import datetime
 
-from sqlalchemy import Column, Unicode, String, DateTime
+from sqlalchemy import Column, DateTime, String, Unicode
 
-from flexget import plugin, db_schema
+from flexget import db_schema, plugin
 from flexget.components.sites.utils import normalize_unicode
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry

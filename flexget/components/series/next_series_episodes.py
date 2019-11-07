@@ -1,7 +1,6 @@
 import logging
 import re
 
-
 from sqlalchemy import desc
 
 from flexget import plugin

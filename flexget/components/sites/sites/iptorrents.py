@@ -4,7 +4,7 @@ from urllib.parse import quote_plus
 
 from flexget import plugin
 from flexget.components.sites.urlrewriting import UrlRewritingError
-from flexget.components.sites.utils import torrent_availability, normalize_unicode
+from flexget.components.sites.utils import normalize_unicode, torrent_availability
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event

@@ -5,7 +5,7 @@ from argparse import SUPPRESS
 from sqlalchemy.engine import Connection
 
 from flexget import options
-from flexget.event import event, add_event_handler, remove_event_handler
+from flexget.event import add_event_handler, event, remove_event_handler
 
 log = logging.getLogger('performance')
 

@@ -6,8 +6,8 @@ from flexget.components.trakt.api_trakt import ApiTrakt
 from flexget.components.trakt.db import (
     TraktActor,
     TraktMovieSearchResult,
-    TraktShowSearchResult,
     TraktShow,
+    TraktShowSearchResult,
 )
 from flexget.manager import Session
 

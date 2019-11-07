@@ -6,7 +6,7 @@ from sqlalchemy import Column, DateTime
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.utils.tools import get_latest_flexget_version_number, get_current_flexget_version
+from flexget.utils.tools import get_current_flexget_version, get_latest_flexget_version_number
 
 log = logging.getLogger('version_checker')
 Base = db_schema.versioned_base('version_checker', 0)

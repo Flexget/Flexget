@@ -6,7 +6,8 @@ from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from flexget.utils.requests import Session as RequestSession, TimedLimiter
+from flexget.utils.requests import Session as RequestSession
+from flexget.utils.requests import TimedLimiter
 
 plugin_name = 'join'
 log = logging.getLogger(plugin_name)

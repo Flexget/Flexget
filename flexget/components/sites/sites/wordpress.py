@@ -3,7 +3,7 @@ import re
 from urllib.parse import urlencode
 
 from requests import Request, RequestException
-from requests.utils import dict_from_cookiejar, cookiejar_from_dict
+from requests.utils import cookiejar_from_dict, dict_from_cookiejar
 
 from flexget import plugin
 from flexget.event import event

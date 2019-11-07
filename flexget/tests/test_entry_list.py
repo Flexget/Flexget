@@ -1,4 +1,4 @@
-from flexget.components.managed_lists.lists.entry_list.db import EntryListList, EntryListEntry
+from flexget.components.managed_lists.lists.entry_list.db import EntryListEntry, EntryListList
 from flexget.entry import Entry
 from flexget.manager import Session
 

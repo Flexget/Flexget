@@ -5,7 +5,7 @@ import sys
 
 import pytest
 
-from flexget.entry import EntryUnicodeError, Entry
+from flexget.entry import Entry, EntryUnicodeError
 
 
 class TestDisableBuiltins:

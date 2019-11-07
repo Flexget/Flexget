@@ -3,6 +3,7 @@ import io
 import os
 
 import requests
+
 from flexget.utils.tools import log
 
 

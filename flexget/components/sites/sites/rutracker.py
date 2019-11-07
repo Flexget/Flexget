@@ -3,21 +3,21 @@
 
 import json
 import logging
-from time import sleep
-from datetime import datetime, timedelta
-
-from sqlalchemy import Column, Unicode, Integer, DateTime
-from sqlalchemy.types import TypeDecorator, VARCHAR
-
 import re
-from flexget import plugin
-from flexget.event import event
-from flexget.db_schema import versioned_base
-from flexget.plugin import PluginError
-from flexget.manager import Session
+from datetime import datetime, timedelta
+from time import sleep
+
 from requests.auth import AuthBase
-from requests.utils import dict_from_cookiejar
 from requests.exceptions import RequestException
+from requests.utils import dict_from_cookiejar
+from sqlalchemy import Column, DateTime, Integer, Unicode
+from sqlalchemy.types import VARCHAR, TypeDecorator
+
+from flexget import plugin
+from flexget.db_schema import versioned_base
+from flexget.event import event
+from flexget.manager import Session
+from flexget.plugin import PluginError
 
 __author__ = 'asm0dey'
 

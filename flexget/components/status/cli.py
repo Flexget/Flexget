@@ -1,5 +1,4 @@
 import datetime
-
 from datetime import timedelta
 
 from colorclass.toggles import disable_all_colors
@@ -9,7 +8,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, TerminalTableError, table_parser, colorize, console
+from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
+
 from . import db
 
 

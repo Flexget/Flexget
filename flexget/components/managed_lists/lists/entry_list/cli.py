@@ -1,12 +1,11 @@
 from argparse import ArgumentParser, ArgumentTypeError
 
-
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
+from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
 
 from . import db
 

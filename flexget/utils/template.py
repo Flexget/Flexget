@@ -4,16 +4,16 @@ import os
 import os.path
 import re
 from copy import copy
-from datetime import datetime, date, time
+from datetime import date, datetime, time
 
 import jinja2.filters
 from dateutil import parser as dateutil_parse
 from jinja2 import (
-    Environment,
-    StrictUndefined,
     ChoiceLoader,
+    Environment,
     FileSystemLoader,
     PackageLoader,
+    StrictUndefined,
     Template,
     TemplateNotFound,
     TemplateSyntaxError,

@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 
 from requests import Session
 from requests.exceptions import RequestException
@@ -7,7 +7,6 @@ from requests.exceptions import RequestException
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.template import RenderError
-
 
 log = logging.getLogger('qbittorrent')
 

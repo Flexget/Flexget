@@ -9,8 +9,8 @@ from flexget.db_schema import with_session
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.tools import split_title_year
-from . import db
 
+from . import db
 
 try:
     # NOTE: Importing other plugins is discouraged!

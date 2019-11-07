@@ -1,11 +1,10 @@
 import logging
-
 from collections import defaultdict
 
-from flexget.event import event
 from flexget import plugin
-from . import seen as plugin_seen
+from flexget.event import event
 
+from . import seen as plugin_seen
 
 log = logging.getLogger(__name__)
 

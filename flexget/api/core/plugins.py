@@ -4,9 +4,9 @@ from math import ceil
 from flask import jsonify, request
 from flask_restplus import inputs
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import BadRequest, NotFoundError, etag, pagination_headers
-from flexget.plugin import get_plugins, get_plugin_by_name, DependencyError
+from flexget.plugin import DependencyError, get_plugin_by_name, get_plugins
 
 log = logging.getLogger('plugins')
 

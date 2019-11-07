@@ -1,12 +1,14 @@
 import logging
 import xml.etree.ElementTree as ET
 
+from requests.exceptions import RequestException
+
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from flexget.utils.requests import Session as RequestSession, TimedLimiter
-from requests.exceptions import RequestException
+from flexget.utils.requests import Session as RequestSession
+from flexget.utils.requests import TimedLimiter
 
 plugin_name = 'prowl'
 log = logging.getLogger(plugin_name)

@@ -1,6 +1,6 @@
 """Input plugin for www.betaseries.com"""
-from hashlib import md5
 import logging
+from hashlib import md5
 
 from flexget import plugin
 from flexget.entry import Entry

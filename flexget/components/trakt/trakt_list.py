@@ -1,6 +1,5 @@
 import logging
 import math
-
 from collections import MutableSet
 
 from flexget import plugin
@@ -12,7 +11,6 @@ from flexget.utils.requests import RequestException, TimedLimiter
 from flexget.utils.tools import split_title_year
 
 from . import db
-
 
 log = logging.getLogger('trakt_list')
 IMMUTABLE_LISTS = ['trending', 'popular']

@@ -7,7 +7,7 @@ import threading
 from http.client import BadStatusLine
 from random import randrange
 from urllib.error import URLError
-from urllib.parse import urlparse, urlsplit, urlunsplit, quote
+from urllib.parse import quote, urlparse, urlsplit, urlunsplit
 
 from requests import RequestException
 

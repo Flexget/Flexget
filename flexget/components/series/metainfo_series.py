@@ -1,11 +1,9 @@
 import logging
 
-
+from flexget import plugin
 from flexget.event import event
 
 from . import series as plugin_series
-
-from flexget import plugin
 
 try:
     # NOTE: Importing other plugins is discouraged!

@@ -1,5 +1,4 @@
 import logging
-
 from functools import partial
 
 from flexget import plugin

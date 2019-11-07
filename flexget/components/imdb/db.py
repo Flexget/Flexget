@@ -1,8 +1,7 @@
 import logging
-
 from datetime import datetime, timedelta
 
-from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime
+from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Table, Unicode
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey, Index
 

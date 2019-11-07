@@ -2,7 +2,7 @@ import logging
 import re
 
 from flexget import plugin
-from flexget.components.imdb.utils import is_valid_imdb_title_id, extract_id
+from flexget.components.imdb.utils import extract_id, is_valid_imdb_title_id
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event

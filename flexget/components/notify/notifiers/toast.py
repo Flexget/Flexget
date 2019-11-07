@@ -1,10 +1,10 @@
 import logging
-import sys
 import os
+import sys
 
 from flexget import plugin
 from flexget.event import event
-from flexget.plugin import PluginWarning, DependencyError
+from flexget.plugin import DependencyError, PluginWarning
 
 plugin_name = 'toast'
 

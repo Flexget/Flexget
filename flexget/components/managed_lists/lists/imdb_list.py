@@ -6,17 +6,18 @@ from datetime import datetime
 
 from requests.exceptions import RequestException
 from requests.utils import cookiejar_from_dict
-from sqlalchemy import Column, Unicode, String
+from sqlalchemy import Column, String, Unicode
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
 
-from flexget import plugin, db_schema
+from flexget import db_schema, plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import PluginError
 from flexget.utils.database import json_synonym
-from flexget.utils.requests import Session as RequestSession, TimedLimiter
+from flexget.utils.requests import Session as RequestSession
+from flexget.utils.requests import TimedLimiter
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('imdb_list')

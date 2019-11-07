@@ -4,7 +4,7 @@ from time import time
 
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.orm.query import Query
-from sqlalchemy.sql.expression import Executable, ClauseElement, _literal_as_text
+from sqlalchemy.sql.expression import ClauseElement, Executable, _literal_as_text
 
 from flexget import manager, options
 from flexget.event import event

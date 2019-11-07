@@ -5,13 +5,13 @@ import time
 from collections import namedtuple
 from functools import partial
 from itertools import groupby
-from urllib.parse import urljoin, urlparse, quote, unquote
+from urllib.parse import quote, unquote, urljoin, urlparse
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.template import render_from_entry, RenderError
+from flexget.utils.template import RenderError, render_from_entry
 
 log = logging.getLogger('sftp')
 

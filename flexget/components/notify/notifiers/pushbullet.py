@@ -1,13 +1,15 @@
-import logging
 import base64
 import datetime
+import logging
+
+from requests.exceptions import RequestException
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 from flexget.plugin import PluginWarning
-from flexget.utils.requests import Session as RequestSession, TimedLimiter
-from requests.exceptions import RequestException
+from flexget.utils.requests import Session as RequestSession
+from flexget.utils.requests import TimedLimiter
 
 plugin_name = 'pushbullet'
 log = logging.getLogger(plugin_name)

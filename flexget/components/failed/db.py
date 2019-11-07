@@ -1,8 +1,7 @@
 import logging
-
 from datetime import datetime, timedelta
 
-from sqlalchemy import Column, Integer, String, Unicode, DateTime
+from sqlalchemy import Column, DateTime, Integer, String, Unicode
 from sqlalchemy.schema import Index
 
 from flexget import db_schema

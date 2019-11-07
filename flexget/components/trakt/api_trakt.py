@@ -3,7 +3,6 @@
 
 import logging
 
-
 from dateutil.parser import parse as dateutil_parse
 
 from flexget import plugin

@@ -1,12 +1,13 @@
 import logging
 import xml.etree.ElementTree as ET
+
 import requests
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from requests.exceptions import RequestException
 
 plugin_name = 'notifymyandroid'
 log = logging.getLogger(plugin_name)

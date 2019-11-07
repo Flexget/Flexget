@@ -4,12 +4,12 @@ import sys
 
 import pytest
 
-from flexget.manager import Session
 from flexget.components.managed_lists.lists.subtitle_list import (
     SubtitleListFile,
     SubtitleListLanguage,
     normalize_path,
 )
+from flexget.manager import Session
 
 try:
     import subliminal

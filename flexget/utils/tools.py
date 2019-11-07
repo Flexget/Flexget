@@ -10,7 +10,7 @@ import queue
 import re
 import sys
 from collections import MutableMapping, defaultdict
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 from html.entities import name2codepoint
 from pprint import pformat
 from urllib import request

@@ -1,9 +1,9 @@
 import logging
+from collections import OrderedDict
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.requests import Session
-from collections import OrderedDict
 
 log = logging.getLogger('cfscraper')
 

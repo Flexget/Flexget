@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from sqlalchemy import Column, String, Unicode, DateTime, Integer
+from sqlalchemy import Column, DateTime, Integer, String, Unicode
 
 from flexget import db_schema, plugin
 from flexget.db_schema import Session
@@ -9,7 +9,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import qualities
 from flexget.utils.database import quality_property
-from flexget.utils.tools import parse_timedelta, group_entries
+from flexget.utils.tools import group_entries, parse_timedelta
 
 log = logging.getLogger('upgrade')
 

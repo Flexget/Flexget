@@ -1,13 +1,13 @@
 import logging
 import re
 
-from flexget import plugin
-from flexget.event import event
-from flexget.components.sites.urlrewriting import UrlRewritingError
-from flexget.utils.soup import get_soup
-from flexget.components.sites.utils import normalize_unicode
-
 from requests.exceptions import RequestException
+
+from flexget import plugin
+from flexget.components.sites.urlrewriting import UrlRewritingError
+from flexget.components.sites.utils import normalize_unicode
+from flexget.event import event
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('rlsbb')
 

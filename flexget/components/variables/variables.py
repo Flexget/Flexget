@@ -4,12 +4,10 @@ import os
 from datetime import datetime
 
 import yaml
-
 from jinja2 import TemplateError
 from jinja2.nativetypes import NativeEnvironment
-
 from sqlalchemy import Column
-from sqlalchemy.sql.sqltypes import Unicode, DateTime, Integer
+from sqlalchemy.sql.sqltypes import DateTime, Integer, Unicode
 
 from flexget import db_schema
 from flexget.config_schema import register_config_key

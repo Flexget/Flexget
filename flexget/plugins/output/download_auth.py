@@ -1,5 +1,5 @@
-import re
 import logging
+import re
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 

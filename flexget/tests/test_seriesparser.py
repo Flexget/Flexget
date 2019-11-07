@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from flexget.components.parsing.parsers.parser_internal import ParserInternal
 from flexget.components.parsing.parsers.parser_guessit import ParserGuessit
+from flexget.components.parsing.parsers.parser_internal import ParserInternal
 
 
 class TestSeriesParser:

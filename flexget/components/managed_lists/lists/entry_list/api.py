@@ -5,14 +5,14 @@ from math import ceil
 from flask import jsonify, request
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import (
+    Conflict,
     NotFoundError,
     base_message_schema,
-    success_response,
     etag,
     pagination_headers,
-    Conflict,
+    success_response,
 )
 
 from . import db

@@ -5,15 +5,15 @@ from dateutil import parser
 from requests.exceptions import RequestException
 from sqlalchemy import (
     Column,
-    Integer,
-    Float,
     DateTime,
-    String,
-    Unicode,
+    Float,
     ForeignKey,
+    Integer,
+    String,
     Table,
-    or_,
+    Unicode,
     and_,
+    or_,
 )
 from sqlalchemy.orm import relation
 from sqlalchemy.orm.exc import MultipleResultsFound
@@ -21,7 +21,7 @@ from sqlalchemy.orm.exc import MultipleResultsFound
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.utils import requests
-from flexget.utils.database import with_session, json_synonym
+from flexget.utils.database import json_synonym, with_session
 from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('api_tvmaze')

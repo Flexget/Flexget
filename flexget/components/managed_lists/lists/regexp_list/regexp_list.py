@@ -1,12 +1,12 @@
 import logging
 import re
-
 from collections import MutableSet
 
 from flexget import plugin
 from flexget.db_schema import with_session
 from flexget.event import event
 from flexget.manager import Session
+
 from . import db
 
 log = logging.getLogger('regexp_list')

@@ -4,10 +4,10 @@ import re
 import socket
 from io import BytesIO
 from time import sleep
-from urllib.parse import urlparse, urljoin, urlsplit
+from urllib.parse import urljoin, urlparse, urlsplit
 from xmlrpc import client as xmlrpc_client
 
-from requests.auth import HTTPDigestAuth, HTTPBasicAuth
+from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 
 from flexget import plugin
 from flexget.config_schema import one_or_more

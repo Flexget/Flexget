@@ -6,7 +6,7 @@ import feedparser
 import requests
 
 from flexget import plugin
-from flexget.components.sites.utils import torrent_availability, normalize_unicode
+from flexget.components.sites.utils import normalize_unicode, torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
 

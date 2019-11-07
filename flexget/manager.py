@@ -21,26 +21,26 @@ from sqlalchemy.exc import OperationalError  # noqa
 from sqlalchemy.ext.declarative import declarative_base  # noqa
 from sqlalchemy.orm import sessionmaker  # noqa
 
+from flexget import config_schema, db_schema, logger, plugin  # noqa
+from flexget.event import fire_event  # noqa
+from flexget.ipc import IPCClient, IPCServer  # noqa
+from flexget.options import (  # noqa
+    CoreArgumentParser,
+    ParserError,
+    get_parser,
+    manager_parser,
+    unicode_argv,
+)
+from flexget.task import Task  # noqa
+from flexget.task_queue import TaskQueue  # noqa
+from flexget.terminal import console  # noqa
 # These need to be declared before we start importing from other flexget modules, since they might import them
 from flexget.utils.sqlalchemy_utils import ContextSession  # noqa
+from flexget.utils.tools import get_current_flexget_version, io_encoding, pid_exists  # noqa
 
 Base = declarative_base()
 Session = sessionmaker(class_=ContextSession)
 
-from flexget import config_schema, db_schema, logger, plugin  # noqa
-from flexget.event import fire_event  # noqa
-from flexget.ipc import IPCClient, IPCServer  # noqa
-from flexget.options import (
-    CoreArgumentParser,
-    get_parser,
-    manager_parser,
-    ParserError,
-    unicode_argv,
-)  # noqa
-from flexget.task import Task  # noqa
-from flexget.task_queue import TaskQueue  # noqa
-from flexget.utils.tools import pid_exists, get_current_flexget_version, io_encoding  # noqa
-from flexget.terminal import console  # noqa
 
 log = logging.getLogger('manager')
 

@@ -3,14 +3,13 @@ import logging
 import os
 import struct
 
-
 import pytz
 import tzlocal
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
-from flexget.config_schema import register_config_key, format_checker, register_schema
+from flexget.config_schema import format_checker, register_config_key, register_schema
 from flexget.event import event
 from flexget.manager import manager
 from flexget.utils import json

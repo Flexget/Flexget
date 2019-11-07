@@ -3,7 +3,7 @@ import os
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.template import render_from_entry, RenderError
+from flexget.utils.template import RenderError, render_from_entry
 
 log = logging.getLogger('symlink')
 

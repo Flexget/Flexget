@@ -2,9 +2,9 @@ import logging
 import re
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils.tools import ReList
-from flexget.config_schema import one_or_more
 
 log = logging.getLogger('regex_extract')
 

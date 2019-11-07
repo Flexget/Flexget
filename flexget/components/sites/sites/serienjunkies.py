@@ -1,12 +1,12 @@
 # coding=utf-8
 
 
-import re
 import logging
+import re
 
 from flexget import plugin
-from flexget.event import event
 from flexget.components.sites.urlrewriting import UrlRewritingError
+from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 

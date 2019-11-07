@@ -3,11 +3,11 @@ import collections
 import contextlib
 import logging
 import logging.handlers
+import os
 import sys
 import threading
 import uuid
 import warnings
-import os
 
 from flexget import __version__
 from flexget.utils.tools import io_encoding

@@ -1,10 +1,8 @@
 import base64
-import re
-import sys
-
 import logging
 import os
-
+import re
+import sys
 import time
 
 from flexget import plugin

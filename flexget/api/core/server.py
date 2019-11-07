@@ -14,32 +14,33 @@ import cherrypy
 import yaml
 from flask import Response, jsonify, request
 from pyparsing import (
-    Word,
-    Keyword,
-    Group,
-    Forward,
-    Suppress,
-    OneOrMore,
-    oneOf,
-    White,
-    restOfLine,
-    ParseException,
     Combine,
+    Forward,
+    Group,
+    Keyword,
+    OneOrMore,
+    ParseException,
+    Suppress,
+    White,
+    Word,
+    alphanums,
+    nums,
+    oneOf,
+    printables,
+    restOfLine,
 )
-from pyparsing import nums, alphanums, printables
 from yaml.error import YAMLError
 
 from flexget._version import __version__
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
+from flexget.api.app import APIError, BadRequest
+from flexget.api.app import __version__ as __api_version__
 from flexget.api.app import (
-    __version__ as __api_version__,
-    APIError,
-    BadRequest,
     base_message,
-    success_response,
     base_message_schema,
     empty_response,
     etag,
+    success_response,
 )
 from flexget.utils.tools import get_latest_flexget_version_number
 

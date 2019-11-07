@@ -3,8 +3,9 @@ import copy
 from flask import jsonify
 from flask_restplus import inputs
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import NotFoundError, etag
+
 from . import db
 from .api_trakt import ApiTrakt
 

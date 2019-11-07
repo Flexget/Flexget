@@ -2,7 +2,7 @@ import inspect
 
 from flexget import options
 from flexget.event import event
-from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
+from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
 from flexget.utils.template import get_filters
 
 

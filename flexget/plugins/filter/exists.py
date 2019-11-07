@@ -1,11 +1,10 @@
 import logging
 import platform
-
 from pathlib import Path
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 
 log = logging.getLogger('exists')
 

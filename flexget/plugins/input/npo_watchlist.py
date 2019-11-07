@@ -1,14 +1,15 @@
 import logging
 import re
 import unicodedata
-from datetime import datetime, date, timedelta
+from datetime import date, datetime, timedelta
 
 from requests.exceptions import HTTPError, RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.requests import Session as RequestSession, TimedLimiter
+from flexget.utils.requests import Session as RequestSession
+from flexget.utils.requests import TimedLimiter
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('search_npo')

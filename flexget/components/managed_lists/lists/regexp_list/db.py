@@ -3,14 +3,14 @@ import re
 from collections import MutableSet
 from datetime import datetime
 
-from sqlalchemy import Column, Unicode, Integer, ForeignKey, DateTime, func, and_
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, Unicode, and_, func
 from sqlalchemy.orm import relationship
 
 from flexget import plugin
-from flexget.manager import Session
 from flexget.db_schema import versioned_base, with_session
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.manager import Session
 
 log = logging.getLogger('regexp_list')
 Base = versioned_base('regexp_list', 1)
