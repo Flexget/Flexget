@@ -25,6 +25,9 @@ from sqlalchemy.orm import sessionmaker  # noqa
 from flexget.utils.sqlalchemy_utils import ContextSession  # noqa
 from flexget.utils.tools import get_current_flexget_version, io_encoding, pid_exists  # noqa
 
+Base = declarative_base()
+Session = sessionmaker(class_=ContextSession)
+
 from flexget import config_schema, db_schema, logger, plugin  # noqa
 from flexget.event import fire_event  # noqa
 from flexget.ipc import IPCClient, IPCServer  # noqa
@@ -38,10 +41,6 @@ from flexget.options import (  # noqa
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
 from flexget.terminal import console  # noqa
-
-Base = declarative_base()
-Session = sessionmaker(class_=ContextSession)
-
 
 log = logging.getLogger('manager')
 
@@ -155,8 +154,8 @@ class Manager:
         log.debug('flexget detected io encoding: %s', io_encoding)
         log.debug('os.path.supports_unicode_filenames: %s' % os.path.supports_unicode_filenames)
         if (
-            codecs.lookup(sys.getfilesystemencoding()).name == 'ascii'
-            and not os.path.supports_unicode_filenames
+                codecs.lookup(sys.getfilesystemencoding()).name == 'ascii'
+                and not os.path.supports_unicode_filenames
         ):
             log.warning(
                 'Your locale declares ascii as the filesystem encoding. Any plugins reading filenames from '
@@ -272,7 +271,7 @@ class Manager:
         return self._has_lock
 
     def execute(
-        self, options=None, output=None, loglevel=None, priority=1, suppress_warnings=None
+            self, options=None, output=None, loglevel=None, priority=1, suppress_warnings=None
     ):
         """
         Run all (can be limited with options) tasks from the config.
@@ -673,9 +672,9 @@ class Manager:
                 # Not very good practice but we get several kind of exceptions here, I'm not even sure all of them
                 # At least: ReaderError, YmlScannerError (or something like that)
                 if (
-                    hasattr(e, 'problem')
-                    and hasattr(e, 'context_mark')
-                    and hasattr(e, 'problem_mark')
+                        hasattr(e, 'problem')
+                        and hasattr(e, 'context_mark')
+                        and hasattr(e, 'problem_mark')
                 ):
                     lines = 0
                     if e.problem is not None:
@@ -1011,8 +1010,8 @@ class Manager:
         :param bool force: Run the cleanup no matter whether the interval has been met.
         """
         expired = (
-            self.persist.get('last_cleanup', datetime(1900, 1, 1))
-            < datetime.now() - DB_CLEANUP_INTERVAL
+                self.persist.get('last_cleanup', datetime(1900, 1, 1))
+                < datetime.now() - DB_CLEANUP_INTERVAL
         )
         if force or expired:
             log.info('Running database cleanup.')
