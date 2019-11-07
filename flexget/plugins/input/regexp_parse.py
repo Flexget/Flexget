@@ -110,6 +110,7 @@ class RegexpParse(object):
                     {'type': 'string', 'format': 'file'},
                 ]
             },
+            'encoding': {'type': 'string'},
             'sections': {'$ref': '#/definitions/regex_list'},
             'keys': {
                 'type': 'object',
