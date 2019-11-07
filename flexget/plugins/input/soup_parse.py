@@ -249,19 +249,19 @@ class SoupParse(object):
                 if (eval(tag_search_terms[scope_num][2]) >= eval(tag_search_terms[scope_num][3]) or
                     eval(tag_search_terms[scope_num][2]) >= len(new_tag_list)):
                     log.warning(
-                        f"The specified start ({eval(tag_search_terms[scope_num][2]) + 1}) for scope_limit "
-                        f"#{scope_num + 1} is the same as or after the specified end "
-                        f"({eval(tag_search_terms[scope_num][3])}) or actual end ({len(new_tag_list)}) for match "
-                        f"#{x+1}. The start will be set to the beginning, by default."
+                        ("The specified start (%s) for scope_limit #%s is the same as or after the specified end (%s)"
+                         " or actual end (%s) for match #%s. The start will be set to the beginning, by default.") % (
+                            str(eval(search_terms[scope_num][2]) + 1), str(scope_num + 1),
+                            str(eval(search_terms[scope_num][3])), str(len(result_set)), str(x + 1))
                     )
                     start = "0"
                 else:
                     start = tag_search_terms[scope_num][2]
                 if eval(tag_search_terms[scope_num][3]) > len(new_tag_list):
                     log.warning(
-                        f"The specified end ({eval(tag_search_terms[scope_num][3])}) for scope{scope_num + 1} "
-                        f"is after the actual end ({len(new_tag_list)}) for match #{x+1}. The end will be set to the "
-                        f"actual end, by default."
+                        ("The specified end (%s) for scope_limit #%s is after the actual end (%s) for match #%s. The "
+                         "end will be set to the actual end, by default.") % (
+                          str(eval(search_terms[scope_num][3])), str(scope_num + 1), str(len(result_set)), str(x + 1))
                     )
                     end = str(len(new_tag_list))
                 else:
@@ -284,16 +284,19 @@ class SoupParse(object):
         tag_search_terms = []
         for limit in scope_limits:
             if isinstance(limit, str):
-                el_name = re.compile(f"^{limit}$")
+                el_name = re.compile("^" + limit + "$")
                 att_dict = {}
                 start = "0"
-                end = f"len(new_tag_list)"
+                end = "len(new_tag_list)"
             else:
                 el_name = limit.get('element_name')
                 att_name = limit.get('attribute_name')
                 att_val = limit.get('attribute_value')
                 start = str(limit.get('start') - 1)
                 end = limit.get('end')
+                if not el_name:
+                    el_name = '.*'
+                el_name = re.compile("^" + el_name "$")
                 if not att_name and not att_val:
                     att_dict = {}
                 else:
@@ -301,10 +304,9 @@ class SoupParse(object):
                         att_val = '.*'
                     att_dict = {att_name: re.compile("^" + att_val + "$")}
                 if end == 31415:
-                    end = f"len(new_tag_list)"
+                    end = "len(new_tag_list)"
                 else:
                     end = str(end)
-                el_name = re.compile(f"^{el_name}$")
             tag_search_terms.append([el_name, att_dict, start, end])
         return tag_search_terms
             
