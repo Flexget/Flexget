@@ -296,7 +296,7 @@ class SoupParse(object):
                 end = limit.get('end')
                 if not el_name:
                     el_name = '.*'
-                el_name = re.compile("^" + el_name "$")
+                el_name = re.compile("^" + el_name + "$")
                 if not att_name and not att_val:
                     att_dict = {}
                 else:
