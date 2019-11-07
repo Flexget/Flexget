@@ -24,7 +24,7 @@ log = logging.getLogger('movie_list')
 movie_list_api = api.namespace('movie_list', description='Movie List operations')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     input_movie_list_id_object = {
         'type': 'array',
         'items': {'type': 'object', 'minProperties': 1, 'additionalProperties': True},

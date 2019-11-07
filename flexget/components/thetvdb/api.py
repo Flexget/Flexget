@@ -8,7 +8,7 @@ from flexget.components.thetvdb.api_tvdb import lookup_series, lookup_episode, s
 tvdb_api = api.namespace('tvdb', description='TheTVDB Shows')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     tvdb_series_object = {
         'type': 'object',
         'properties': {

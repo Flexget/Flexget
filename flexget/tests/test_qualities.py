@@ -6,7 +6,7 @@ from flexget.components.parsing.parsers.parser_internal import ParserInternal
 from flexget.utils.qualities import Quality
 
 
-class TestQualityModule(object):
+class TestQualityModule:
     def test_get(self):
         assert not Quality(), 'unknown quality is not false'
         assert Quality('foobar') == Quality(), 'unknown not returned'
@@ -17,7 +17,7 @@ class TestQualityModule(object):
             assert got_val == '720p', got_val
 
 
-class TestQualityParser(object):
+class TestQualityParser:
     @pytest.fixture(
         scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'], autouse=True
     )
@@ -117,7 +117,7 @@ class TestQualityParser(object):
         )
 
 
-class TestQualityInternalParser(object):
+class TestQualityInternalParser:
     @pytest.mark.parametrize(
         "test_quality",
         [
@@ -139,7 +139,7 @@ class TestQualityInternalParser(object):
         )
 
 
-class TestFilterQuality(object):
+class TestFilterQuality:
     _config = """
         templates:
           global:
@@ -228,7 +228,7 @@ class TestFilterQuality(object):
         assert str(entry['quality']) == '1080p hdtv dd+5.1'
 
 
-class TestQualityAudio(object):
+class TestQualityAudio:
     config = """
         tasks:
           test_dd_audio_channels:

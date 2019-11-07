@@ -48,7 +48,7 @@ def normalize_name(name):
     return name
 
 
-class MovieParseResult(object):
+class MovieParseResult:
     def __init__(
         self,
         data=None,
@@ -110,7 +110,7 @@ class MovieParseResult(object):
         )
 
 
-class SeriesParseResult(object):
+class SeriesParseResult:
     def __init__(
         self,
         data=None,

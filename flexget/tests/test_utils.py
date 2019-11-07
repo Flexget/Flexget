@@ -12,7 +12,7 @@ def compare_floats(float1, float2):
     return math.fabs(float1 - float2) <= eps
 
 
-class TestJson(object):
+class TestJson:
     def test_json_encode_dt(self):
         date_str = '2016-03-11T17:12:17Z'
         dt = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
@@ -41,7 +41,7 @@ class TestJson(object):
         assert decoded_dt == {'date': dt}
 
 
-class TestParseFilesize(object):
+class TestParseFilesize:
     def test_parse_filesize_no_space(self):
         size = '200KB'
         expected = 200 * 1000 / 1024 ** 2
@@ -82,7 +82,7 @@ class TestParseFilesize(object):
         assert parse_filesize(size) == 1234567
 
 
-class TestSplitYearTitle(object):
+class TestSplitYearTitle:
     @pytest.mark.parametrize(
         'title, expected_title, expected_year',
         [

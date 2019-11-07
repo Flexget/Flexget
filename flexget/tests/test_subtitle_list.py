@@ -17,7 +17,7 @@ except ImportError:
     subliminal = babelfish = None
 
 
-class TestSubtitleList(object):
+class TestSubtitleList:
     config = """
          templates:
            global:

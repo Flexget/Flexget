@@ -9,7 +9,7 @@ from . import db
 log = logging.getLogger('set_series_begin')
 
 
-class SetSeriesBegin(object):
+class SetSeriesBegin:
     """
     Set the first episode for series. Uses series_name and series_id.
 

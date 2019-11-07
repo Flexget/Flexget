@@ -32,7 +32,7 @@ class GazelleSession(Base):
     expires = Column(DateTime)
 
 
-class InputGazelle(object):
+class InputGazelle:
     """A generic plugin that searches a Gazelle-based website
 
     Limited functionality but should work for almost all of them.
@@ -324,7 +324,7 @@ class InputGazelleMusic(InputGazelle):
 
     def __init__(self):
         """Set up the majority of parameters that these sites support"""
-        super(InputGazelleMusic, self).__init__()
+        super().__init__()
 
         self.aliases.update(
             {
@@ -389,7 +389,7 @@ class InputGazelleMusic(InputGazelle):
 
         Extends the super's schema
         """
-        schema = super(InputGazelleMusic, self).schema
+        schema = super().schema
         schema['properties'].update(
             {
                 'artist': {'type': 'string'},
@@ -448,7 +448,7 @@ class InputRedacted(InputGazelleMusic):
 
     def __init__(self):
         """Set up custom base_url and parameters"""
-        super(InputRedacted, self).__init__()
+        super().__init__()
         self.base_url = "https://redacted.ch"
 
         self.params['encoding'].remove("q8.x (VBR)")
@@ -462,7 +462,7 @@ class InputNotWhat(InputGazelleMusic):
 
     def __init__(self):
         """Set up custom base_url and parameters"""
-        super(InputNotWhat, self).__init__()
+        super().__init__()
         self.base_url = "https://notwhat.cd"
 
         self.params['media'].extend(['Blu-ray', 'Unknown'])

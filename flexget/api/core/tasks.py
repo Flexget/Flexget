@@ -31,7 +31,7 @@ from flexget.utils.lazy_dict import LazyLookup
 tasks_api = api.namespace('tasks', description='Manage Tasks')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     tasks_list_object = {
         'oneOf': [
             {'type': 'array', 'items': {'$ref': '#/definitions/tasks.task'}},

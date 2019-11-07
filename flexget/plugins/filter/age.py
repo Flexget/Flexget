@@ -10,7 +10,7 @@ from flexget.utils.tools import parse_timedelta
 log = logging.getLogger('age')
 
 
-class Age(object):
+class Age:
     """
         Rejects/accepts entries based on date in specified entry field
 

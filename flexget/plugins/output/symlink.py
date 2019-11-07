@@ -8,7 +8,7 @@ from flexget.utils.template import render_from_entry, RenderError
 log = logging.getLogger('symlink')
 
 
-class Symlink(object):
+class Symlink:
 
     schema = {
         'oneOf': [

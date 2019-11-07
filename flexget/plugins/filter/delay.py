@@ -66,7 +66,7 @@ def upgrade(ver, session):
     return ver
 
 
-class FilterDelay(object):
+class FilterDelay:
     """
         Add delay to a task. This is useful for de-prioritizing expensive / bad-quality tasks.
 

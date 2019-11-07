@@ -11,7 +11,7 @@ from .api_trakt import ApiTrakt
 trakt_api = api.namespace('trakt', description='Trakt lookup endpoint')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     translation_object = {
         'type': 'object',
         'patternProperties': {

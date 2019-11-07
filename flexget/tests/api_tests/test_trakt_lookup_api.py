@@ -7,7 +7,7 @@ from flexget.utils import json
 
 
 @pytest.mark.online
-class TestTraktSeriesLookupAPI(object):
+class TestTraktSeriesLookupAPI:
     config = 'tasks: {}'
 
     def test_trakt_series_lookup_no_params(self, api_client, schema_match):
@@ -198,7 +198,7 @@ class TestTraktSeriesLookupAPI(object):
 
 
 @pytest.mark.online
-class TestTraktMovieLookupAPI(object):
+class TestTraktMovieLookupAPI:
     config = 'tasks: {}'
 
     def test_trakt_movies_lookup_no_params(self, api_client, schema_match):

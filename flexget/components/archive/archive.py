@@ -11,7 +11,7 @@ from . import db
 log = logging.getLogger('archive')
 
 
-class Archive(object):
+class Archive:
     """
     Archives all new items into database where they can be later searched and injected.
     Stores the entries in the state as they are at the exit phase, this way task cleanup for title
@@ -87,7 +87,7 @@ class Archive(object):
             self.on_task_learn(task, config)
 
 
-class UrlrewriteArchive(object):
+class UrlrewriteArchive:
     """
     Provides capability to rewrite urls from archive or make searches with discover.
     """

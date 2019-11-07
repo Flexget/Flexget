@@ -6,7 +6,7 @@ schema_api = api.namespace(
 )
 
 
-class ObjectContainer(object):
+class ObjectContainer:
     format_checker_input = {
         'type': 'object',
         'properties': {

@@ -6,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('accept_all')
 
 
-class FilterAcceptAll(object):
+class FilterAcceptAll:
     """
         Just accepts all entries.
 

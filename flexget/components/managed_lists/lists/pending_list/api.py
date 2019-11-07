@@ -22,7 +22,7 @@ log = logging.getLogger('pending_list')
 pending_list_api = api.namespace('pending_list', description='Pending List operations')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     pending_list_base_object = {
         'type': 'object',
         'properties': {

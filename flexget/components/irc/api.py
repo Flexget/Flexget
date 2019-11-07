@@ -17,7 +17,7 @@ irc_parser.add_argument(
 )
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     connection_object = {
         'type': 'object',
         'properties': {

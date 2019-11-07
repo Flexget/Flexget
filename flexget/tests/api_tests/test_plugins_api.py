@@ -3,7 +3,7 @@ from flexget.api.core.plugins import ObjectsContainer as OC
 from flexget.utils import json
 
 
-class TestPluginsAPI(object):
+class TestPluginsAPI:
     config = 'tasks: {}'
 
     def test_plugins_api(self, api_client, schema_match):

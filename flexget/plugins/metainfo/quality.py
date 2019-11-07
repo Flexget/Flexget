@@ -7,7 +7,7 @@ from flexget.utils import qualities
 log = logging.getLogger('metainfo_quality')
 
 
-class MetainfoQuality(object):
+class MetainfoQuality:
     """
     Utility:
 

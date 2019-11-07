@@ -41,7 +41,7 @@ schema = {
 }
 
 
-class VersionChecker(object):
+class VersionChecker:
     """
     A plugin that checks whether user is running the latest flexget version and place a log warning if not.
     Checks via interval to avoid hammering, default is 1 day.

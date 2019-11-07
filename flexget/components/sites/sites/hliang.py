@@ -9,7 +9,7 @@ from flexget.utils.soup import get_soup
 log = logging.getLogger('hliang')
 
 
-class UrlRewriteHliang(object):
+class UrlRewriteHliang:
     """Hliang urlrewriter."""
 
     # urlrewriter API

@@ -11,7 +11,7 @@ log = logging.getLogger('animeindex')
 # http://tracker.anime-index.org/download.php?id=b8327fdf9003e87446c8b3601951a9a65526abb2&f=[DeadFish]%20Yowamushi%20Pedal:%20Grande%20Road%20-%2002%20[720p][AAC].mp4.torrent
 
 
-class UrlRewriteAnimeIndex(object):
+class UrlRewriteAnimeIndex:
     """AnimeIndex urlrewriter."""
 
     def url_rewritable(self, task, entry):

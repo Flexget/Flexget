@@ -21,7 +21,7 @@ persist = SimplePersistence('api_tvdb')
 SEARCH_RESULT_EXPIRATION_DAYS = 3
 
 
-class TVDBRequest(object):
+class TVDBRequest:
     API_KEY = '4D297D8CFDE0E105'
     BASE_URL = 'https://api.thetvdb.com/'
     BANNER_URL = 'http://thetvdb.com/banners/'

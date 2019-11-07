@@ -7,7 +7,7 @@ except ImportError:
 
 
 @pytest.mark.chdir
-class TestArchiveFilter(object):
+class TestArchiveFilter:
     config = """
         tasks:
             test_archives:

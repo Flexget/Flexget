@@ -15,7 +15,7 @@ from flexget.utils import requests
 log = logging.getLogger('plex')
 
 
-class InputPlex(object):
+class InputPlex:
     """
     Uses a plex media server (www.plexapp.com) tv section as an input.
 

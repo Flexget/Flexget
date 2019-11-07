@@ -8,7 +8,7 @@ log = logging.getLogger('change')
 found_deprecated = False
 
 
-class ChangeWarn(object):
+class ChangeWarn:
     """
         Gives warning if user has deprecated / changed configuration in the root level.
 

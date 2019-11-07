@@ -305,7 +305,7 @@ class MockManager(Manager):
     def __init__(self, config_text, config_name, db_uri=None):
         self.config_text = config_text
         self._db_uri = db_uri or 'sqlite:///:memory:'
-        super(MockManager, self).__init__(['execute'])
+        super().__init__(['execute'])
         self.config_name = config_name
         self.database_uri = self._db_uri
         log.debug('database_uri: %s' % self.database_uri)
@@ -343,7 +343,7 @@ class MockManager(Manager):
         raise CrashReport('Crash report created during unit test, check log for traceback.')
 
 
-class APIClient(object):
+class APIClient:
     def __init__(self, api_key):
         self.api_key = api_key
         self.client = api_app.test_client()

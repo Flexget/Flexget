@@ -10,7 +10,7 @@ from flexget.utils.database import with_session
 from flexget.utils.tools import parse_timedelta
 
 
-class InputBacklog(object):
+class InputBacklog:
     """
     Keeps task history for given amount of time.
 

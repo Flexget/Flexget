@@ -10,7 +10,7 @@ from flexget.utils.requests import RequestException
 log = logging.getLogger('kitsu')
 
 
-class KitsuAnime(object):
+class KitsuAnime:
     """
     Creates an entry for each item in your kitsu.io list.
 

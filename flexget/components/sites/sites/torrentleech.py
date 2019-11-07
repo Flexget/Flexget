@@ -37,7 +37,7 @@ CATEGORIES = {
 }
 
 
-class UrlRewriteTorrentleech(object):
+class UrlRewriteTorrentleech:
     """
         Torrentleech urlrewriter and search plugin.
 

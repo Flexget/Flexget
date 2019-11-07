@@ -10,7 +10,7 @@ from . import db
 log = logging.getLogger('status')
 
 
-class Status(object):
+class Status:
     """Track health status of tasks"""
 
     schema = {'type': 'boolean'}

@@ -8,7 +8,7 @@ import pytest
 from flexget.entry import EntryUnicodeError, Entry
 
 
-class TestDisableBuiltins(object):
+class TestDisableBuiltins:
     """
         Quick a hack, test disable functionality by checking if seen filtering (builtin) is working
     """
@@ -47,7 +47,7 @@ class TestDisableBuiltins(object):
 
 
 @pytest.mark.online
-class TestInputHtml(object):
+class TestInputHtml:
     config = """
         tasks:
           test:
@@ -59,7 +59,7 @@ class TestInputHtml(object):
         assert task.entries, 'did not produce entries'
 
 
-class TestPriority(object):
+class TestPriority:
     config = """
         tasks:
           test:
@@ -96,7 +96,7 @@ class TestPriority(object):
         assert task.rejected, 'quality plugin should have rejected Smoke as hdtv'
 
 
-class TestImmortal(object):
+class TestImmortal:
     config = """
         tasks:
           test:
@@ -115,7 +115,7 @@ class TestImmortal(object):
 
 
 @pytest.mark.online
-class TestDownload(object):
+class TestDownload:
     config = """
         tasks:
           test:
@@ -146,21 +146,21 @@ class TestDownload(object):
         ), 'download file mode not honoring umask'
 
 
-class TestEntryUnicodeError(object):
+class TestEntryUnicodeError:
     def test_encoding(self):
         e = Entry('title', 'url')
         with pytest.raises(EntryUnicodeError):
             e['invalid'] = b'\x8e'
 
 
-class TestEntryStringCoercion(object):
+class TestEntryStringCoercion:
     def test_coercion(self):
         e = Entry('title', 'url')
         e['test'] = str("test")
         assert type(e['test']) == str  # pylint: disable=unidiomatic-typecheck
 
 
-class TestFilterRequireField(object):
+class TestFilterRequireField:
     config = """
         tasks:
           test:
@@ -193,7 +193,7 @@ class TestFilterRequireField(object):
         ), 'Entry2 should have been rejected'
 
 
-class TestHtmlUtils(object):
+class TestHtmlUtils:
     def test_decode_html(self):
         """utils decode_html"""
         from flexget.utils.tools import decode_html
@@ -211,7 +211,7 @@ class TestHtmlUtils(object):
         assert encode_html('<3') == '&lt;3'
 
 
-class TestSetPlugin(object):
+class TestSetPlugin:
     config = """
         templates:
           global:

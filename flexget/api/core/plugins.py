@@ -13,7 +13,7 @@ log = logging.getLogger('plugins')
 plugins_api = api.namespace('plugins', description='Get Flexget plugins')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     phase_object = {
         'type': 'object',
         'properties': {'phase': {'type': 'string'}, 'priority': {'type': 'integer'}},

@@ -415,7 +415,7 @@ class ImdbEntrySet(MutableSet):
         return None
 
 
-class ImdbList(object):
+class ImdbList:
     schema = ImdbEntrySet.schema
 
     @staticmethod

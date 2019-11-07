@@ -13,7 +13,7 @@ log = logging.getLogger('betaseries_list')
 API_URL_PREFIX = 'https://api.betaseries.com/'
 
 
-class BetaSeriesList(object):
+class BetaSeriesList:
     """
     Emits an entry for each serie followed by one or more BetaSeries account.
     See https://www.betaseries.com/

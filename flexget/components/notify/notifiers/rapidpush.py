@@ -17,7 +17,7 @@ requests = RequestSession(max_retries=3)
 requests.add_domain_limiter(TimedLimiter('rapidpush.net', '5 seconds'))
 
 
-class RapidpushNotifier(object):
+class RapidpushNotifier:
     """
     Example::
 

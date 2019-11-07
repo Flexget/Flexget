@@ -7,7 +7,7 @@ from flexget.utils import qualities
 log = logging.getLogger('reorder_quality')
 
 
-class ReorderQuality(object):
+class ReorderQuality:
     """
         Allows modifying quality priorities from default ordering.
 

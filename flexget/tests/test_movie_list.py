@@ -1,4 +1,4 @@
-class TestListInterface(object):
+class TestListInterface:
     config = """
         templates:
           global:
@@ -255,7 +255,7 @@ class TestListInterface(object):
         assert len(task.accepted) == 1
 
 
-class TestMovieListStripYearInterface(object):
+class TestMovieListStripYearInterface:
     config = """
         templates:
           global:

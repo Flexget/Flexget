@@ -1,4 +1,4 @@
-class TestDigest(object):
+class TestDigest:
     config = """
         tasks:
           digest 1:

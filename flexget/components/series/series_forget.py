@@ -9,7 +9,7 @@ from . import db
 log = logging.getLogger('series_forget')
 
 
-class OutputSeriesRemove(object):
+class OutputSeriesRemove:
     schema = {'type': 'boolean'}
 
     def on_task_output(self, task, config):

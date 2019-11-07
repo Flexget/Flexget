@@ -2,7 +2,7 @@ import pytest
 from jinja2 import Template
 
 
-class TestProperMovies(object):
+class TestProperMovies:
     _config = """
         templates:
           global:

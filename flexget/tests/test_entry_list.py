@@ -3,7 +3,7 @@ from flexget.entry import Entry
 from flexget.manager import Session
 
 
-class TestEntryListSearch(object):
+class TestEntryListSearch:
     config = """
             tasks:
               entry_list_discover:
@@ -64,7 +64,7 @@ class TestEntryListSearch(object):
         assert task.find_entry('accepted', title='foo.s01e01.720p.hdtv-flexget')
 
 
-class TestEntryListQuality(object):
+class TestEntryListQuality:
     config = """
         templates:
           global:

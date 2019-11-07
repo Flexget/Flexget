@@ -21,7 +21,7 @@ except ImportError:
 log = logging.getLogger('movie_list')
 
 
-class MovieListBase(object):
+class MovieListBase:
     """
     Class that contains helper methods for movie list as well as plugins that use it,
     such as API and CLI.
@@ -166,7 +166,7 @@ class MovieList(MutableSet):
         return match.to_entry() if match else None
 
 
-class PluginMovieList(object):
+class PluginMovieList:
     """Remove all accepted elements from your trakt.tv watchlist/library/seen or custom list."""
 
     schema = {

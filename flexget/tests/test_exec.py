@@ -4,7 +4,7 @@ import sys
 import pytest
 
 
-class TestExec(object):
+class TestExec:
     __tmp__ = True
     config = (
         """

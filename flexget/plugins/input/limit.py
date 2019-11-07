@@ -7,7 +7,7 @@ from flexget.event import event
 log = logging.getLogger('limit')
 
 
-class PluginLimit(object):
+class PluginLimit:
     """
     Limits the number of entries an input plugin can produce.
     """

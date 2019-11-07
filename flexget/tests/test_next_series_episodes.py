@@ -4,7 +4,7 @@ from jinja2 import Template
 from flexget.entry import Entry
 
 
-class TestNextSeriesEpisodes(object):
+class TestNextSeriesEpisodes:
     _config = """
         templates:
           global:
@@ -240,7 +240,7 @@ class TestNextSeriesEpisodes(object):
         assert not task.find_entry(title='Test Series 8 S02E01')
 
 
-class TestNextSeriesEpisodesSeasonPack(object):
+class TestNextSeriesEpisodesSeasonPack:
     _config = """
         templates:
           global:

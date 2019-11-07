@@ -65,7 +65,7 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
             console('')
 
 
-class OutputDump(object):
+class OutputDump:
     """
     Outputs all entries to console
     """

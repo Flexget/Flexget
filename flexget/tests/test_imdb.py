@@ -12,7 +12,7 @@ import pytest
 
 
 @pytest.mark.online
-class TestImdb(object):
+class TestImdb:
     config = """
         tasks:
           test:
@@ -314,7 +314,7 @@ class TestImdb(object):
 
 
 @pytest.mark.online
-class TestImdbLookup(object):
+class TestImdbLookup:
     config = """
         tasks:
           identifier:

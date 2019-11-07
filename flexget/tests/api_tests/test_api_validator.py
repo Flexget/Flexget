@@ -1,7 +1,7 @@
 import json
 
 
-class TestValidator(object):
+class TestValidator:
     config = '{tasks: {}}'
 
     def test_invalid_payload(self, api_client):

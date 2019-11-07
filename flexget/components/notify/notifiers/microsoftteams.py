@@ -13,7 +13,7 @@ plugin_name = 'ms_teams'
 log = logging.getLogger(plugin_name)
 
 
-class MsTeamsNotifier(object):
+class MsTeamsNotifier:
     """
     Example::
 

@@ -2,7 +2,7 @@ from flexget.api.app import base_message
 from flexget.utils import json
 
 
-class TestFormatChecker(object):
+class TestFormatChecker:
     config = 'tasks: {}'
 
     def test_quality(self, api_client, schema_match):

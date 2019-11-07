@@ -7,7 +7,7 @@ from flexget.event import event
 log = logging.getLogger('path_by_ext')
 
 
-class PluginPathByExt(object):
+class PluginPathByExt:
     """
         Allows specifying path based on content-type
 

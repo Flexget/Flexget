@@ -9,7 +9,7 @@ from flexget.terminal import console
 log = logging.getLogger('dump_config')
 
 
-class OutputDumpConfig(object):
+class OutputDumpConfig:
     """
         Dumps task config in STDOUT in yaml at exit or abort event.
     """

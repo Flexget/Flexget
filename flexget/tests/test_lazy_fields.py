@@ -2,7 +2,7 @@ from flexget.entry import Entry
 from flexget.plugin import PluginError
 
 
-class TestLazyFields(object):
+class TestLazyFields:
     def test_lazy_queue(self):
         """Tests behavior when multiple plugins register lazy lookups for the same field"""
 

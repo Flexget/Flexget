@@ -22,7 +22,7 @@ log = logging.getLogger('entry_list')
 entry_list_api = api.namespace('entry_list', description='Entry List operations')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     entry_list_base_object = {
         'type': 'object',
         'properties': {

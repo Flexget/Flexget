@@ -263,7 +263,7 @@ class TraktMovieTranslation(Base):
     movie_id = Column(Integer, ForeignKey('trakt_movies.id'))
 
     def __init__(self, translation, session):
-        super(TraktMovieTranslation, self).__init__()
+        super().__init__()
         self.update(translation, session)
 
     def update(self, translation, session):
@@ -281,7 +281,7 @@ class TraktShowTranslation(Base):
     show_id = Column(Integer, ForeignKey('trakt_shows.id'))
 
     def __init__(self, translation, session):
-        super(TraktShowTranslation, self).__init__()
+        super().__init__()
         self.update(translation, session)
 
     def update(self, translation, session):
@@ -354,7 +354,7 @@ class TraktActor(Base):
     homepage = Column(Unicode)
 
     def __init__(self, actor, session):
-        super(TraktActor, self).__init__()
+        super().__init__()
         self.update(actor, session)
 
     def update(self, actor, session):
@@ -465,7 +465,7 @@ class TraktEpisode(Base):
     series_id = Column(Integer, ForeignKey('trakt_shows.id'), nullable=False)
 
     def __init__(self, trakt_episode, session):
-        super(TraktEpisode, self).__init__()
+        super().__init__()
         self.update(trakt_episode, session)
 
     def update(self, trakt_episode, session):
@@ -514,7 +514,7 @@ class TraktSeason(Base):
     series_id = Column(Integer, ForeignKey('trakt_shows.id'), nullable=False)
 
     def __init__(self, trakt_season, session):
-        super(TraktSeason, self).__init__()
+        super().__init__()
         self.update(trakt_season, session)
 
     def update(self, trakt_season, session):
@@ -620,7 +620,7 @@ class TraktShow(Base):
         }
 
     def __init__(self, trakt_show, session):
-        super(TraktShow, self).__init__()
+        super().__init__()
         self.update(trakt_show, session)
 
     def update(self, trakt_show, session):
@@ -796,7 +796,7 @@ class TraktMovie(Base):
     _actors = relation(TraktActor, secondary=movie_actors_table)
 
     def __init__(self, trakt_movie, session):
-        super(TraktMovie, self).__init__()
+        super().__init__()
         self.update(trakt_movie, session)
 
     def to_dict(self):
@@ -912,7 +912,7 @@ class TraktMovieSearchResult(Base):
             self.movie = movie
 
 
-class TraktMovieIds(object):
+class TraktMovieIds:
     """Simple class that holds a variety of possible IDs that Trakt utilize in their API, eg. imdb id, trakt id"""
 
     def __init__(self, trakt_id=None, trakt_slug=None, tmdb_id=None, imdb_id=None, **kwargs):
@@ -937,7 +937,7 @@ class TraktMovieIds(object):
         return any([self.trakt_id, self.trakt_slug, self.tmdb_id, self.imdb_id])
 
 
-class TraktShowIds(object):
+class TraktShowIds:
     """Simple class that holds a variety of possible IDs that Trakt utilize in their API, eg. imdb id, trakt id"""
 
     def __init__(

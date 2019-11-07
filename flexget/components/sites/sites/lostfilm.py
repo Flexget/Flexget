@@ -31,7 +31,7 @@ quality_map = {
 LOSTFILM_URL = 'http://lostfilm.tv/rss.xml'
 
 
-class LostFilm(object):
+class LostFilm:
     """
     Change new lostfilm's rss links
 

@@ -13,7 +13,7 @@ __author__ = 'deksan'
 log = logging.getLogger('newznab')
 
 
-class Newznab(object):
+class Newznab:
     """
     Newznab search plugin
     Provide a url or your website + apikey and a category

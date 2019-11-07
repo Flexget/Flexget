@@ -32,7 +32,7 @@ class EntryTimeFrame(Base):
         return '<Timeframe(id=%s,added=%s,quality=%s)>' % (self.id, self.added, self.quality)
 
 
-class FilterTimeFrame(object):
+class FilterTimeFrame:
     schema = {
         'type': 'object',
         'properties': {

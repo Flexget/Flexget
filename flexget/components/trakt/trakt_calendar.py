@@ -14,7 +14,7 @@ from . import db
 log = logging.getLogger('trakt_calendar')
 
 
-class TraktCalendar(object):
+class TraktCalendar:
     schema = {
         'type': 'object',
         'properties': {

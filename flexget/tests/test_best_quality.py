@@ -1,4 +1,4 @@
-class TestBestQuality(object):
+class TestBestQuality:
     config = """
         tasks:
           best_accept:

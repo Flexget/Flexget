@@ -17,7 +17,7 @@ with open(qualities_profiles_file, "r") as data:
     qualities_response = json.load(data)
 
 
-class TestCouchpotato(object):
+class TestCouchpotato:
     config = """
         tasks:
           couch:
@@ -43,7 +43,7 @@ class TestCouchpotato(object):
             )
 
 
-class TestCouchpotatoWithQuality(object):
+class TestCouchpotatoWithQuality:
     expected_qualities = {
         'American Ultra': ['720p', '1080p'],
         'Anomalisa': ['720p', '1080p'],

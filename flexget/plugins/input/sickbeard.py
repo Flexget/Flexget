@@ -10,7 +10,7 @@ from flexget.event import event
 log = logging.getLogger('sickbeard')
 
 
-class Sickbeard(object):
+class Sickbeard:
     """
     This plugin returns ALL of the shows monitored by Sickbeard.
     This includes both ongoing and ended.

@@ -7,7 +7,7 @@ import sys
 from git import Repo
 
 
-class MDChangeSet(object):
+class MDChangeSet:
     """Represents a markdown change-set for a single version."""
 
     CATEGORIES = [

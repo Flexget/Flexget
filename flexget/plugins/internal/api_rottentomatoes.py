@@ -90,7 +90,7 @@ Base.register_table(directors_table)
 
 
 # TODO: get rid of
-class RottenTomatoesContainer(object):
+class RottenTomatoesContainer:
     """Base class for RottenTomatoes objects"""
 
     def __init__(self, init_dict=None):

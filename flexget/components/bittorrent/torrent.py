@@ -8,7 +8,7 @@ from flexget.utils.bittorrent import Torrent, is_torrent_file
 log = logging.getLogger('modif_torrent')
 
 
-class TorrentFilename(object):
+class TorrentFilename:
     """
         Makes sure that entries containing torrent-file have .torrent
         extension. This is enabled always by default (builtins).

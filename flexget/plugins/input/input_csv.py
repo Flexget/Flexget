@@ -11,7 +11,7 @@ from flexget.utils.cached_input import cached
 log = logging.getLogger('csv')
 
 
-class InputCSV(object):
+class InputCSV:
     """
     Adds support for CSV format. Configuration may seem a bit complex,
     but this has advantage of being universal solution regardless of CSV

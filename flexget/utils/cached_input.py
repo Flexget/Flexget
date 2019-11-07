@@ -73,7 +73,7 @@ def db_cleanup(manager, session):
         log.verbose('Removed %s old input caches.' % result)
 
 
-class cached(object):
+class cached:
     """
     Implements transparent caching decorator @cached for inputs.
 
@@ -183,7 +183,7 @@ class cached(object):
                 return entries
 
 
-class IterableCache(object):
+class IterableCache:
     """
     Can cache any iterable (including generators) without immediately evaluating all entries.
     If `finished_hook` is supplied, it will be called the first time the iterable is run to the end.

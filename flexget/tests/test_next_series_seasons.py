@@ -4,7 +4,7 @@ from flexget.entry import Entry
 
 
 # TODO Add more standard tests
-class TestNextSeriesSeasonSeasonsPack(object):
+class TestNextSeriesSeasonSeasonsPack:
     _config = """
         templates:
           global:

@@ -15,7 +15,7 @@ MIRRORS = [
 ]
 
 
-class TorrentCache(object):
+class TorrentCache:
     """Adds urls to torrent cache sites to the urls list."""
 
     def infohash_urls(self, info_hash):

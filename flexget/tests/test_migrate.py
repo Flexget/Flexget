@@ -3,7 +3,7 @@ import pytest
 from .conftest import MockManager
 
 
-class TestMigrate(object):
+class TestMigrate:
     config = """
         tasks:
           test:

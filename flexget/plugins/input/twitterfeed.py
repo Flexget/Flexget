@@ -15,7 +15,7 @@ CHUNK_SIZE = 200
 MAX_TWEETS = 1000
 
 
-class TwitterFeed(object):
+class TwitterFeed:
     """Parses a twitter feed
 
     Example::

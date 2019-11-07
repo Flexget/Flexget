@@ -56,7 +56,7 @@ CATEGORIES = {
 BASE_URL = 'https://iptorrents.com'
 
 
-class UrlRewriteIPTorrents(object):
+class UrlRewriteIPTorrents:
     """
         IpTorrents urlrewriter and search plugin.
 

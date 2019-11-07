@@ -144,7 +144,7 @@ class TheTVDBSet(MutableSet):
         return True
 
 
-class TheTVDBList(object):
+class TheTVDBList:
     schema = TheTVDBSet.schema
 
     def get_list(self, config):

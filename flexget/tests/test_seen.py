@@ -1,4 +1,4 @@
-class TestFilterSeen(object):
+class TestFilterSeen:
     config = """
         templates:
           global:
@@ -61,7 +61,7 @@ class TestFilterSeen(object):
         assert len(task.rejected) == 1, 'Seen plugin should have rejected on second run'
 
 
-class TestSeenLocal(object):
+class TestSeenLocal:
     config = """
       templates:
         global:
@@ -114,7 +114,7 @@ class TestSeenLocal(object):
         assert task.find_entry('rejected', title='item 2'), 'item 2 should be seen'
 
 
-class TestFilterSeenMovies(object):
+class TestFilterSeenMovies:
     config = """
         tasks:
           test_1:

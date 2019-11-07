@@ -9,7 +9,7 @@ from flexget.utils import requests
 log = logging.getLogger('nnm-club')
 
 
-class UrlRewriteNnmClub(object):
+class UrlRewriteNnmClub:
     """Nnm-club.me urlrewriter."""
 
     def url_rewritable(self, task, entry):

@@ -44,7 +44,7 @@ CATEGORIES = {
 }
 
 
-class SearchRarBG(object):
+class SearchRarBG:
     """
         RarBG search plugin. Implements https://torrentapi.org/apidocs_v2.txt
 

@@ -9,7 +9,7 @@ log = logging.getLogger('rtorrent_magnet')
 pat = re.compile('xt=urn:btih:([^&/]+)')
 
 
-class PluginRtorrentMagnet(object):
+class PluginRtorrentMagnet:
     """
     Process Magnet URI's into rtorrent compatible torrent files
 

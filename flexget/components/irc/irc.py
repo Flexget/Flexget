@@ -861,7 +861,7 @@ class IRCConnection(SimpleIRCBot):
         self.quit()
 
 
-class IRCConnectionManager(object):
+class IRCConnectionManager:
     def __init__(self, config):
         self.config = config
         self.shutdown_event = threading.Event()

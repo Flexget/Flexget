@@ -12,7 +12,7 @@ from flexget.event import event
 log = logging.getLogger('filesystem')
 
 
-class Filesystem(object):
+class Filesystem:
     """
     Uses local path content as an input. Can use recursion if configured.
     Recursion is False by default. Can be configured to true or get integer that will specify max depth in relation to

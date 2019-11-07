@@ -8,7 +8,7 @@ from flexget.event import event
 log = logging.getLogger('medusa')
 
 
-class Medusa(object):
+class Medusa:
     schema = {
         'type': 'object',
         'properties': {

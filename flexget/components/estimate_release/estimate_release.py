@@ -6,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('est_released')
 
 
-class EstimateRelease(object):
+class EstimateRelease:
     """
     Front-end for estimator plugins that estimate release times
     for various things (series, movies).

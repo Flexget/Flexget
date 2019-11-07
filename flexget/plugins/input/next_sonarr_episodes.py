@@ -11,7 +11,7 @@ from flexget.event import event
 log = logging.getLogger('next_sonarr_episodes')
 
 
-class NextSonarrEpisodes(object):
+class NextSonarrEpisodes:
     """
     This plugin return the 1st missing episode of every show configures in Sonarr.
     This can be used with the discover plugin or set_series_begin plugin to

@@ -153,7 +153,7 @@ class FlexGetTemplate(Template):
     """Adds lazy lookup support when rendering templates."""
 
     def new_context(self, vars=None, shared=False, locals=None):
-        context = super(FlexGetTemplate, self).new_context(vars, shared, locals)
+        context = super().new_context(vars, shared, locals)
         context.parent = LazyDict(context.parent)
         return context
 

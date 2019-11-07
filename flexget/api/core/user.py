@@ -8,7 +8,7 @@ from flexget.webserver import change_password, generate_token, WeakPassword
 user_api = api.namespace('user', description='Manage user login credentials')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     user_password_input = {
         'type': 'object',
         'properties': {'password': {'type': 'string'}},

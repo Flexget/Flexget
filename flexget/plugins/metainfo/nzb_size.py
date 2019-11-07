@@ -10,7 +10,7 @@ log = logging.getLogger('nzb_size')
 mimetypes.add_type('application/x-nzb', '.nzb')
 
 
-class NzbSize(object):
+class NzbSize:
     """
     Provides entry size information when dealing with nzb files
     """

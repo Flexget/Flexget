@@ -54,7 +54,7 @@ class FilterSeenMovies(plugin_seen.FilterSeen):
                     )
                     entry.reject('missing movie (imdb, tmdb or trakt) id, strict')
         # call super
-        super(FilterSeenMovies, self).on_task_filter(task, config.get('scope', True))
+        super().on_task_filter(task, config.get('scope', True))
         # check that two copies of a movie have not been accepted this run
         accepted_ids = defaultdict(set)
         for entry in task.accepted:
@@ -70,7 +70,7 @@ class FilterSeenMovies(plugin_seen.FilterSeen):
         if not isinstance(config, dict):
             config = {'matching': config}
         # call super
-        super(FilterSeenMovies, self).on_task_learn(task, config.get('scope', True))
+        super().on_task_learn(task, config.get('scope', True))
 
 
 @event('plugin.register')

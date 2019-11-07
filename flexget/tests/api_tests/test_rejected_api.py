@@ -28,7 +28,7 @@ def add_rejected_entry(entry):
         )
 
 
-class TestRejectedAPI(object):
+class TestRejectedAPI:
     config = "{'tasks': {}}"
 
     entry = dict(
@@ -156,7 +156,7 @@ class TestRejectedAPI(object):
         assert not errors
 
 
-class TestRejectedPagination(object):
+class TestRejectedPagination:
     config = 'tasks: {}'
 
     def test_rejected_pagination(self, api_client, link_headers):

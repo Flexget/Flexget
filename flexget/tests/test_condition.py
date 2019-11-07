@@ -1,4 +1,4 @@
-class TestCondition(object):
+class TestCondition:
     config = """
         templates:
           global:
@@ -64,7 +64,7 @@ class TestCondition(object):
         assert len(task.accepted) == 1
 
 
-class TestQualityCondition(object):
+class TestQualityCondition:
     config = """
         templates:
           global:

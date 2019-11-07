@@ -8,7 +8,7 @@ from flexget.utils.log import log_once
 log = logging.getLogger('content_size')
 
 
-class FilterContentSize(object):
+class FilterContentSize:
     schema = {
         'type': 'object',
         'properties': {

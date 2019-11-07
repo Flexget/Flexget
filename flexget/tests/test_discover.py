@@ -4,7 +4,7 @@ from flexget import plugin
 from flexget.entry import Entry
 
 
-class SearchPlugin(object):
+class SearchPlugin:
     """
     Fake search plugin. Result differs depending on config value:
       `'fail'`: raises a PluginError
@@ -25,7 +25,7 @@ class SearchPlugin(object):
 plugin.register(SearchPlugin, 'test_search', interfaces=['search'], api_ver=2)
 
 
-class EstRelease(object):
+class EstRelease:
     """Fake release estimate plugin. Just returns 'est_release' entry field."""
 
     def estimate(self, entry):
@@ -35,7 +35,7 @@ class EstRelease(object):
 plugin.register(EstRelease, 'test_release', interfaces=['estimate_release'], api_ver=2)
 
 
-class TestDiscover(object):
+class TestDiscover:
     config = """
         tasks:
           test_interval:
@@ -126,7 +126,7 @@ class TestDiscover(object):
         )
 
 
-class TestEmitSeriesInDiscover(object):
+class TestEmitSeriesInDiscover:
     config = """
         tasks:
           inject_series:

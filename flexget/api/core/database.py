@@ -7,7 +7,7 @@ from flexget.db_schema import reset_schema, plugin_schemas
 db_api = api.namespace('database', description='Manage Flexget DB')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     plugin_list = {'type': 'array', 'items': {'type': 'string'}}
 
     database_input_object = {

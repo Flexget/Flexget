@@ -6,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('disable_phases')
 
 
-class PluginDisablePhases(object):
+class PluginDisablePhases:
     """Disables phases from task execution.
 
     Mainly meant for advanced users and development.

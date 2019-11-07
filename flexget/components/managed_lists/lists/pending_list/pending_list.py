@@ -118,7 +118,7 @@ class PendingListSet(MutableSet):
             return Entry(match.entry) if match else None
 
 
-class PendingList(object):
+class PendingList:
     schema = {'type': 'string'}
 
     @staticmethod

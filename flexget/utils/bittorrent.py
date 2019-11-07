@@ -194,7 +194,7 @@ def bencode(data):
     raise TypeError('Unknown type for bencode: ' + str(type(data)))
 
 
-class Torrent(object):
+class Torrent:
     """Represents a torrent"""
 
     # string type used for keys, if this ever changes, stuff like "x in y"

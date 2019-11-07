@@ -6,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('manual')
 
 
-class ManualTask(object):
+class ManualTask:
     """Only execute task when specified with --tasks"""
 
     schema = {'type': 'boolean'}

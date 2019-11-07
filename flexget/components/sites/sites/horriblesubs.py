@@ -11,7 +11,7 @@ from flexget.utils.soup import get_soup
 log = logging.getLogger('horriblesubs')
 
 
-class HorribleSubs(object):
+class HorribleSubs:
     """
     Give latest horriblesubs releases
     """

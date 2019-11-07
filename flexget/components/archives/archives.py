@@ -7,7 +7,7 @@ from flexget.components.archives import utils
 log = logging.getLogger('archives')
 
 
-class FilterArchives(object):
+class FilterArchives:
     """
     Accepts entries that are valid Zip or RAR archives
 

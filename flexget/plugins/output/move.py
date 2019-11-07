@@ -45,7 +45,7 @@ def get_siblings(ext, main_file_no_ext, main_file_ext, abs_path):
     return siblings
 
 
-class BaseFileOps(object):
+class BaseFileOps:
     # Defined by subclasses
     log = None
     along = {

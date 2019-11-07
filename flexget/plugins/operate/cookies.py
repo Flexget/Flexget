@@ -8,7 +8,7 @@ from flexget.utils.tools import TimedDict
 log = logging.getLogger('cookies')
 
 
-class PluginCookies(object):
+class PluginCookies:
     """
     Adds cookie to all requests (rss, resolvers, download). Anything
     that uses urllib2 to be exact.

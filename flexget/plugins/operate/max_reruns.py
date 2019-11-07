@@ -7,7 +7,7 @@ from flexget.task import Task
 log = logging.getLogger('max_reruns')
 
 
-class MaxReRuns(object):
+class MaxReRuns:
     """Overrides the maximum amount of re-runs allowed by a task."""
 
     schema = {'type': 'integer'}

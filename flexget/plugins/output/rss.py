@@ -47,7 +47,7 @@ class RSSEntry(Base):
     enc_type = Column(String)
 
 
-class OutputRSS(object):
+class OutputRSS:
     """
     Write RSS containing succeeded (downloaded) entries.
 

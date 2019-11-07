@@ -9,7 +9,7 @@ except ImportError:
 
 
 @pytest.mark.usefixtures('tmpdir')
-class TestExtract(object):
+class TestExtract:
     config = """
         templates:
             global:

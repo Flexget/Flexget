@@ -16,7 +16,7 @@ plugin_name = 'email'
 log = logging.getLogger(plugin_name)
 
 
-class EmailNotifier(object):
+class EmailNotifier:
     """
     Send an e-mail with the list of all succeeded (downloaded) entries.
 

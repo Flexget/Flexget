@@ -17,7 +17,7 @@ log = logging.getLogger('subtitles')
 # http://trac.opensubtitles.org/projects/opensubtitles/wiki/XMLRPC
 
 
-class Subtitles(object):
+class Subtitles:
     """
     Fetch subtitles from opensubtitles.org
     """

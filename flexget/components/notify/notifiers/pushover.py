@@ -17,7 +17,7 @@ requests = RequestSession(max_retries=3)
 requests.add_domain_limiter(TimedLimiter('pushover.net', '5 seconds'))
 
 
-class PushoverNotifier(object):
+class PushoverNotifier:
     """
     Example::
 

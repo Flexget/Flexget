@@ -8,7 +8,7 @@ from flexget import plugin
 tmdb_api = api.namespace('tmdb', description='TMDB lookup endpoint')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     poster_object = {
         'type': 'object',
         'properties': {

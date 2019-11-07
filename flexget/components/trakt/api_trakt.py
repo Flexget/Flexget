@@ -19,7 +19,7 @@ USER_CACHE_DURATION = '15 minutes'  # cache duration for sync data eg. history, 
 
 class TraktUserCache(TimedDict):
     def __init__(self, cache_time):
-        super(TraktUserCache, self).__init__(cache_time=cache_time)
+        super().__init__(cache_time=cache_time)
         self.updaters = {
             'collection': self._update_collection_cache,
             'watched': self._update_watched_cache,
@@ -123,7 +123,7 @@ class TraktUserCache(TimedDict):
 user_cache = TraktUserCache(cache_time=USER_CACHE_DURATION)
 
 
-class ApiTrakt(object):
+class ApiTrakt:
     def __init__(self, username=None, account=None):
         self.account = account
         self.username = db.get_username(username, account)

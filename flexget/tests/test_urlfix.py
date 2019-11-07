@@ -1,4 +1,4 @@
-class TestUrlfix(object):
+class TestUrlfix:
     config = """
         tasks:
           test:

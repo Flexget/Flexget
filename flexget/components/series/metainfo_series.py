@@ -16,7 +16,7 @@ except ImportError:
 log = logging.getLogger('metainfo_series')
 
 
-class MetainfoSeries(object):
+class MetainfoSeries:
     """
     Check if entry appears to be a series, and populate series info if so.
     """

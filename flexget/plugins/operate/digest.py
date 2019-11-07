@@ -51,7 +51,7 @@ class DigestEntry(Base):
     entry = entry_synonym('_json')
 
 
-class OutputDigest(object):
+class OutputDigest:
     schema = {
         'oneOf': [
             {'type': 'string'},
@@ -88,7 +88,7 @@ class OutputDigest(object):
                 session.add(DigestEntry(list=config['list'], entry=entry))
 
 
-class FromDigest(object):
+class FromDigest:
     schema = {
         'type': 'object',
         'properties': {

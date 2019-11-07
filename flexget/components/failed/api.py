@@ -19,7 +19,7 @@ log = logging.getLogger('failed_api')
 retry_failed_api = api.namespace('failed', description='View and manage failed entries')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     retry_failed_entry_object = {
         'type': 'object',
         'properties': {

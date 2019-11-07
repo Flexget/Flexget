@@ -6,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('rerun')
 
 
-class Rerun(object):
+class Rerun:
     """
     Force a task to rerun for debugging purposes.
     Configured value will set max_rerun value and enables a lock

@@ -20,7 +20,7 @@ from flexget.utils.template import RenderError
 log = logging.getLogger('rtorrent')
 
 
-class _Method(object):
+class _Method:
     # some magic to bind an XML-RPC method to an RPC server.
     # supports "nested" methods (e.g. examples.getStateName)
 
@@ -160,7 +160,7 @@ def create_proxy(url):
     return xmlrpc_client.ServerProxy(url)
 
 
-class RTorrent(object):
+class RTorrent:
     """ rTorrent API client """
 
     default_fields = (
@@ -354,7 +354,7 @@ class RTorrent(object):
         self.start(info_hash)
 
 
-class RTorrentPluginBase(object):
+class RTorrentPluginBase:
     priority_map = {'high': 3, 'medium': 2, 'low': 1, 'off': 0}
 
     def _build_options(self, config, entry, entry_first=True):

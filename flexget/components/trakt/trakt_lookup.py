@@ -35,7 +35,7 @@ def is_movie(entry):
     return bool(entry.get('movie_name'))
 
 
-class TraktLazyLookup(object):
+class TraktLazyLookup:
     def __init__(self, field_map, lookup_function):
         self.field_map = field_map
         self.lookup_function = lookup_function
@@ -52,7 +52,7 @@ class TraktLazyLookup(object):
         return entry
 
 
-class TraktUserDataLookup(object):
+class TraktUserDataLookup:
     def __init__(self, field_name, data_type, media_type, lookup_function):
         self.field_name = field_name
         self.lookup_function = lookup_function
@@ -72,7 +72,7 @@ class TraktUserDataLookup(object):
         return entry
 
 
-class PluginTraktLookup(object):
+class PluginTraktLookup:
     """Retrieves trakt information for entries. Uses series_name,
     series_season, series_episode from series plugin.
 

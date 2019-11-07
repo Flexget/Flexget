@@ -9,7 +9,7 @@ from flexget.manager import Session
 
 
 @pytest.mark.online
-class TestTraktList(object):
+class TestTraktList:
     """
     Credentials for test account are:
        username: flexget_list_test

@@ -36,7 +36,7 @@ class DependencyError(Exception):
     """
 
     def __init__(self, issued_by=None, missing=None, message=None, silent=False):
-        super(DependencyError, self).__init__()
+        super().__init__()
         self.issued_by = issued_by
         self.missing = missing
         self._message = message
@@ -67,7 +67,7 @@ class DependencyError(Exception):
 
 class RegisterException(Exception):
     def __init__(self, value):
-        super(RegisterException, self).__init__()
+        super().__init__()
         self.value = value
 
     def __str__(self):
@@ -76,7 +76,7 @@ class RegisterException(Exception):
 
 class PluginWarning(Warning):
     def __init__(self, value, logger=log, **kwargs):
-        super(PluginWarning, self).__init__()
+        super().__init__()
         self.value = value
         self.log = logger
         self.kwargs = kwargs
@@ -87,7 +87,7 @@ class PluginWarning(Warning):
 
 class PluginError(Exception):
     def __init__(self, value, logger=log, **kwargs):
-        super(PluginError, self).__init__()
+        super().__init__()
         # Value is expected to be a string
         if not isinstance(value, str):
             value = str(value)
@@ -100,7 +100,7 @@ class PluginError(Exception):
 
 
 # TODO: move to utils or somewhere more appropriate
-class internet(object):
+class internet:
     """@internet decorator for plugin phase methods.
 
     Catches all internet related exceptions and raises PluginError with relevant message.

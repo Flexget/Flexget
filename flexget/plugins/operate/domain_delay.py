@@ -7,7 +7,7 @@ from flexget.utils.requests import TimedLimiter
 log = logging.getLogger('domain_delay')
 
 
-class DomainDelay(object):
+class DomainDelay:
     """
     Sets a minimum interval between requests to specific domains.
 

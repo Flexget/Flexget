@@ -10,7 +10,7 @@ plugin_name = 'xmpp'
 log = logging.getLogger(plugin_name)
 
 
-class XMPPNotifier(object):
+class XMPPNotifier:
     """
     Sends messages via XMPP. The sleekxmpp library is required to be installed.
     Install it with: `pip install sleekxmpp`

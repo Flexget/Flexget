@@ -1,4 +1,4 @@
-class TestOnlyNew(object):
+class TestOnlyNew:
     config = """
         tasks:
           test:

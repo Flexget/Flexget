@@ -3,7 +3,7 @@ import pytest
 import yaml
 
 
-class TestInputRSS(object):
+class TestInputRSS:
     config = """
         tasks:
           _:
@@ -178,7 +178,7 @@ class TestInputRSS(object):
         ), 'RSS entry missing: multiple content tags'
 
 
-class TestEscapeInputRSS(object):
+class TestEscapeInputRSS:
     config = """
         tasks:
           test:
@@ -219,7 +219,7 @@ class TestEscapeInputRSS(object):
 
 @pytest.mark.xfail(reason="silverorange changed some stuff")
 @pytest.mark.online
-class TestRssOnline(object):
+class TestRssOnline:
     config = """
         tasks:
           normal:

@@ -6,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('priv_torrents')
 
 
-class FilterPrivateTorrents(object):
+class FilterPrivateTorrents:
     """How to handle private torrents.
 
     private_torrents: yes|no

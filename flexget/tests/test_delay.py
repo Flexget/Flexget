@@ -4,7 +4,7 @@ from flexget.manager import Session
 from flexget.plugins.filter.delay import DelayedEntry
 
 
-class TestDelay(object):
+class TestDelay:
     config = """
         tasks:
           test:

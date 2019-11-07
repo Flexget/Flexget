@@ -12,7 +12,7 @@ from requests.exceptions import RequestException
 log = logging.getLogger('rmz')
 
 
-class UrlRewriteRmz(object):
+class UrlRewriteRmz:
     """
     rmz.cr (rapidmoviez.com) urlrewriter
     Version 0.1

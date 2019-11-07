@@ -1,4 +1,4 @@
-class TestManipulate(object):
+class TestManipulate:
     config = """
         tasks:
 

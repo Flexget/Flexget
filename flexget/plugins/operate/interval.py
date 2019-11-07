@@ -8,7 +8,7 @@ from flexget.event import event
 log = logging.getLogger('interval')
 
 
-class PluginInterval(object):
+class PluginInterval:
     """
         Allows specifying minimum interval for task execution.
 

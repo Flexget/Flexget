@@ -1,4 +1,4 @@
-class TestNotifyAbort(object):
+class TestNotifyAbort:
     config = """
         tasks:
           test_abort:

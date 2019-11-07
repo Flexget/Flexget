@@ -168,7 +168,7 @@ def get_tracker_seeds(url, info_hash):
         return 0
 
 
-class TorrentAlive(object):
+class TorrentAlive:
     schema = {
         'oneOf': [
             {'type': 'boolean'},

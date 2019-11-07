@@ -3,7 +3,7 @@ import requests
 
 
 @pytest.mark.online
-class TestCachedAPI(object):
+class TestCachedAPI:
     config = 'tasks: {}'
 
     def test_cached_api(self, api_client):

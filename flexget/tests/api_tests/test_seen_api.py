@@ -7,7 +7,7 @@ from flexget.manager import Session
 from flexget.utils import json
 
 
-class TestSeenAPI(object):
+class TestSeenAPI:
     config = "{'tasks': {}}"
 
     def add_seen_entries(self):
@@ -181,7 +181,7 @@ class TestSeenAPI(object):
         assert not errors
 
 
-class TestSeenPagination(object):
+class TestSeenPagination:
     config = 'tasks: {}'
 
     def test_seen_pagination(self, api_client, link_headers):

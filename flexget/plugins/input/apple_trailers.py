@@ -13,7 +13,7 @@ from flexget.utils.requests import RequestException
 log = logging.getLogger('apple_trailers')
 
 
-class AppleTrailers(object):
+class AppleTrailers:
     """
         Adds support for Apple.com movie trailers.
 

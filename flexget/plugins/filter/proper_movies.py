@@ -46,7 +46,7 @@ Index(
 )
 
 
-class FilterProperMovies(object):
+class FilterProperMovies:
     """
         Automatically download proper movies.
 

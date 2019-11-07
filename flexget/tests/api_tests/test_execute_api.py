@@ -4,7 +4,7 @@ from flexget.api.app import base_message
 from flexget.api.core.tasks import ObjectsContainer as OC
 
 
-class TestExecuteAPI(object):
+class TestExecuteAPI:
     @staticmethod
     def get_task_queue(manager):
         """ Used to execute task queue"""
@@ -186,7 +186,7 @@ class TestExecuteAPI(object):
         assert len(task.accepted) == 1
 
 
-class TestExecuteMultipleTasks(object):
+class TestExecuteMultipleTasks:
     config = """
         tasks:
           test_task1:

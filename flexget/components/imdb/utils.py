@@ -70,7 +70,7 @@ def make_url(imdb_id):
     return u'https://www.imdb.com/title/%s/' % imdb_id
 
 
-class ImdbSearch(object):
+class ImdbSearch:
     def __init__(self):
         # de-prioritize aka matches a bit
         self.aka_weight = 0.95
@@ -191,7 +191,7 @@ class ImdbSearch(object):
             movie = {}
             additional = re.findall(r'\((.*?)\)', result_text.text)
             if len(additional) > 0:
-                if re.match('^\d{4}$', additional[-1]):
+                if re.match(r'^\d{4}$', additional[-1]):
                     movie['year'] = str_to_int(additional[-1])
                 elif len(additional) > 1:
                     movie['year'] = str_to_int(additional[-2])
@@ -245,7 +245,7 @@ class ImdbSearch(object):
         return movies
 
 
-class ImdbParser(object):
+class ImdbParser:
     """Quick-hack to parse relevant imdb details"""
 
     def __init__(self):

@@ -1,4 +1,4 @@
-class TestDuplicates(object):
+class TestDuplicates:
     config = """
         tasks:
           duplicates_accept:

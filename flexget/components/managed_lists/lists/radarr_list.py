@@ -16,7 +16,7 @@ log = logging.getLogger('radarr')
 
 class RadarrRequestError(Exception):
     def __init__(self, value, logger=log, **kwargs):
-        super(RadarrRequestError, self).__init__()
+        super().__init__()
         # Value is expected to be a string
         value = str(value)
         self.value = value
@@ -28,8 +28,7 @@ class RadarrRequestError(Exception):
 
 
 class RadarrMovieAlreadyExistsError(Exception):
-    def __init__(self):
-        super(RadarrMovieAlreadyExistsError, self).__init__()
+    pass
 
 
 def spec_exception_from_response_ex(radarr_request_ex):
@@ -540,7 +539,7 @@ class RadarrSet(MutableSet):
                 log.error("Radarr search term lookup failed: %s", ex)
 
 
-class RadarrList(object):
+class RadarrList:
     """ List plugin for Radarr that also works as an input plugin """
 
     schema = {

@@ -12,7 +12,7 @@ def all_builtins():
     return (p for p in plugin.plugins.values() if p.builtin)
 
 
-class DisablePlugin(object):
+class DisablePlugin:
     """
     Allows disabling built-ins, or plugins referenced by template/include plugin.
 

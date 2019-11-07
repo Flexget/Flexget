@@ -15,7 +15,7 @@ from flexget.event import event
 log = logging.getLogger('formlogin')
 
 
-class FormLogin(object):
+class FormLogin:
     """
     Login on form
     """

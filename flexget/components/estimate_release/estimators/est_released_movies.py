@@ -7,7 +7,7 @@ from flexget.event import event
 log = logging.getLogger('est_movies')
 
 
-class EstimatesReleasedMovies(object):
+class EstimatesReleasedMovies:
     @plugin.priority(0)
     def estimate(self, entry):
         if 'tmdb_released' in entry:

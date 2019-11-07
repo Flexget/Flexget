@@ -1,7 +1,7 @@
 from pathlib import Path
 
 
-class TestFilesystem(object):
+class TestFilesystem:
     base = "filesystem_test_dir/"
     test1 = base + '/Test1'
     test2 = base + '/Test2'

@@ -8,7 +8,7 @@ from flexget.manager import Session
 from flexget.utils import json
 
 
-class TestEntryListAPI(object):
+class TestEntryListAPI:
     config = 'tasks: {}'
 
     def test_entry_list_list(self, api_client, schema_match):
@@ -259,7 +259,7 @@ class TestEntryListAPI(object):
         assert not errors
 
 
-class TestEntryListPagination(object):
+class TestEntryListPagination:
     config = 'tasks: {}'
 
     def test_entry_list_pagination(self, api_client, link_headers):

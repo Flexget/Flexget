@@ -1,4 +1,4 @@
-class TestInputs(object):
+class TestInputs:
     config = """
         tasks:
           test_inputs:

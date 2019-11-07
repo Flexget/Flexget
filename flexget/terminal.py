@@ -28,7 +28,7 @@ def terminal_info():
     return {'size': terminal_size(), 'isatty': sys.stdout.isatty()}
 
 
-class TerminalTable(object):
+class TerminalTable:
     """
     A data table suited for CLI output, created via its sent parameters. For example::
 

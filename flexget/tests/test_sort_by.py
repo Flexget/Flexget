@@ -1,7 +1,7 @@
 import pytest
 
 
-class TestSortBy(object):
+class TestSortBy:
     config = """
         tasks:
           test_title:

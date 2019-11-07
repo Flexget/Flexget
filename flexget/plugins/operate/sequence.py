@@ -7,7 +7,7 @@ from flexget.event import event
 log = logging.getLogger('sequence')
 
 
-class PluginSequence(object):
+class PluginSequence:
     """ Allows the same plugin to be configured multiple times in a task.
 
     Example:

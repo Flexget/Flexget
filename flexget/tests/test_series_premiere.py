@@ -8,7 +8,7 @@ def config(request):
     return Template(request.cls.config).render({'parser': request.param})
 
 
-class TestSeriesPremiere(object):
+class TestSeriesPremiere:
     config = """
         templates:
           global:

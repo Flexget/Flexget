@@ -8,7 +8,7 @@ from flexget.components.tvmaze.api_tvmaze import APITVMaze
 tvmaze_api = api.namespace('tvmaze', description='TVMaze Shows')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     actor_object = {
         'type': 'object',
         'properties': {

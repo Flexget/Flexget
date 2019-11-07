@@ -3,7 +3,7 @@ from flexget.components.variables.variables import Variables
 from flexget.utils import json
 
 
-class TestVariablesAPI(object):
+class TestVariablesAPI:
     config = 'tasks: {}'
 
     variables_dict = {'test_variable_db': True}

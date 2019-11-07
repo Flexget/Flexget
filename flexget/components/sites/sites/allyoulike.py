@@ -22,7 +22,7 @@ except ImportError:
 log = logging.getLogger('rlsbb')
 
 
-class UrlRewriteAllyoulike(object):
+class UrlRewriteAllyoulike:
     """
     allyoulike.com urlrewriter
     Version 0.1

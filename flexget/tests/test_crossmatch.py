@@ -1,4 +1,4 @@
-class TestCrossmatch(object):
+class TestCrossmatch:
     config = """
         tasks:
           test_title:

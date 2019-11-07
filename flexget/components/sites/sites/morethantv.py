@@ -102,7 +102,7 @@ class MoreThanTVCookie(Base):
     expires = Column(DateTime)
 
 
-class SearchMoreThanTV(object):
+class SearchMoreThanTV:
     """
         MorethanTV search plugin.
     """

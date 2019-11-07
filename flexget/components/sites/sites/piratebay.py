@@ -35,7 +35,7 @@ SORT = {
 }
 
 
-class UrlRewritePirateBay(object):
+class UrlRewritePirateBay:
     """PirateBay urlrewriter."""
 
     schema = {

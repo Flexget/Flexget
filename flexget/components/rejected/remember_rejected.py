@@ -14,7 +14,7 @@ from . import db
 log = logging.getLogger('remember_rej')
 
 
-class FilterRememberRejected(object):
+class FilterRememberRejected:
     """Internal.
     Rejects entries which have been rejected in the past.
 

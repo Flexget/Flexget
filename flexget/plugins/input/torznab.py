@@ -12,7 +12,7 @@ from flexget.utils.requests import RequestException
 log = logging.getLogger('torznab')
 
 
-class Torznab(object):
+class Torznab:
     """Torznab search plugin
 
     Handles searching for tv shows and movies, with fallback to simple query strings if these are not available.

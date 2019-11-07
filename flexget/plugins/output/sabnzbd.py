@@ -9,7 +9,7 @@ from flexget.event import event
 log = logging.getLogger('sabnzbd')
 
 
-class OutputSabnzbd(object):
+class OutputSabnzbd:
     """
     Example::
 

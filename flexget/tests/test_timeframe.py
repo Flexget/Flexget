@@ -11,7 +11,7 @@ def age_timeframe(**kwargs):
         )
 
 
-class TestTimeFrame(object):
+class TestTimeFrame:
     config = """
         templates:
           global:
@@ -86,7 +86,7 @@ class TestTimeFrame(object):
             assert query[0].status == 'accepted', 'Should be accepted.'
 
 
-class TestTimeFrameActions(object):
+class TestTimeFrameActions:
     config = """
         templates:
           global:

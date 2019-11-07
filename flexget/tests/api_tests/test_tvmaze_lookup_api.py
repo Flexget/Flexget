@@ -7,7 +7,7 @@ from flexget.utils import json
 
 
 @pytest.mark.online
-class TestTVMAzeSeriesLookupAPI(object):
+class TestTVMAzeSeriesLookupAPI:
     config = 'tasks: {}'
 
     def test_tvmaze_series_lookup_by_name(self, api_client, schema_match):

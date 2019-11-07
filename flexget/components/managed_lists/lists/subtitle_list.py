@@ -324,7 +324,7 @@ class SubtitleList(MutableSet):
         return match.to_entry() if match else None
 
 
-class PluginSubtitleList(object):
+class PluginSubtitleList:
     """Subtitle list"""
 
     schema = SubtitleList.schema

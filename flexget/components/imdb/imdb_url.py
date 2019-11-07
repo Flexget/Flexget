@@ -8,7 +8,7 @@ from flexget.components.imdb.utils import extract_id, make_url
 log = logging.getLogger('metainfo_imdb_url')
 
 
-class MetainfoImdbUrl(object):
+class MetainfoImdbUrl:
     """
         Scan entry information for imdb url.
     """

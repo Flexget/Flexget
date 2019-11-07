@@ -7,7 +7,7 @@ from flexget.entry import Entry
 
 
 @pytest.mark.online
-class TestTheTVDBList(object):
+class TestTheTVDBList:
     config = """
       tasks: {}
     """

@@ -18,7 +18,7 @@ requests = RequestSession(max_retries=3)
 requests.add_domain_limiter(TimedLimiter('pushbullet.com', '5 seconds'))
 
 
-class PushbulletNotifier(object):
+class PushbulletNotifier:
     """
     Example::
 

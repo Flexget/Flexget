@@ -15,7 +15,7 @@ log = logging.getLogger('myepisodes_list')
 URL = 'http://www.myepisodes.com/'
 
 
-class MyEpisodesList(object):
+class MyEpisodesList:
     """Creates an entry for each item in your myepisodes.com show list.
 
     Syntax:

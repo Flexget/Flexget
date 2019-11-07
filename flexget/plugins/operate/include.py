@@ -13,7 +13,7 @@ plugin_name = 'include'
 log = logging.getLogger(plugin_name)
 
 
-class PluginInclude(object):
+class PluginInclude:
     """
     Include configuration from another yaml file.
 

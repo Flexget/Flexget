@@ -12,7 +12,7 @@ from flexget.event import event
 log = logging.getLogger('couchpotato_list')
 
 
-class CouchPotatoBase(object):
+class CouchPotatoBase:
     @staticmethod
     def movie_list_request(base_url, port, api_key):
         parsedurl = urlparse(base_url)
@@ -282,7 +282,7 @@ class CouchPotatoSet(MutableSet):
         return self._find_entry(entry)
 
 
-class CouchPotatoList(object):
+class CouchPotatoList:
     schema = CouchPotatoSet.schema
 
     @staticmethod

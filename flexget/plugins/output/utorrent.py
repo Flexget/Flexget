@@ -10,7 +10,7 @@ from flexget.utils.template import RenderError
 log = getLogger('utorrent')
 
 
-class PluginUtorrent(object):
+class PluginUtorrent:
     """
     Parse task content or url for hoster links and adds them to utorrent.
 

@@ -18,7 +18,7 @@ from . import db
 seen_api = api.namespace('seen', description='Managed Flexget seen entries and fields')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     seen_field_object = {
         'type': 'object',
         'properties': {

@@ -15,7 +15,7 @@ plugin_name = "cronitor"
 log = logging.getLogger(plugin_name)
 
 
-class Cronitor(object):
+class Cronitor:
     """
     Example::
       cronitor: ABC123

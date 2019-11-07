@@ -13,7 +13,7 @@ log = logging.getLogger('history')
 history_api = api.namespace('history', description='Entry History')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     base_history_object = {
         'type': 'object',
         'properties': {

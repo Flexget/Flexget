@@ -26,7 +26,7 @@ VIA_SCHEMA = {
 }
 
 
-class Notify(object):
+class Notify:
     schema = {
         'type': 'object',
         'properties': {

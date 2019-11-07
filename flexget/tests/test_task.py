@@ -1,4 +1,4 @@
-class TestTemplate(object):
+class TestTemplate:
     config = """
         templates:
           test_series:

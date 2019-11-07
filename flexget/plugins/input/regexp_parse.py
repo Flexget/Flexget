@@ -11,7 +11,7 @@ from flexget.utils.cached_input import cached
 log = logging.getLogger('regexp_parse')
 
 
-class RegexpParse(object):
+class RegexpParse:
     r"""This plugin is designed to take input from a web resource or a file.
     It then parses the text via regexps supplied in the config file.
 

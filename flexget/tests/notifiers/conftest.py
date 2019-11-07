@@ -5,7 +5,7 @@ from flexget.event import event
 from flexget.plugin import get_plugin_by_name
 
 
-class DebugNotification(object):
+class DebugNotification:
     schema = {'type': 'object'}
 
     def __init__(self):

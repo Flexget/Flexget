@@ -28,7 +28,7 @@ TITLE_TYPE_MAP = {
 }
 
 
-class ImdbWatchlist(object):
+class ImdbWatchlist:
     """"Creates an entry for each movie in your imdb list."""
 
     schema = {

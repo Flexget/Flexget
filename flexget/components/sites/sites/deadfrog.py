@@ -9,7 +9,7 @@ from flexget.utils.soup import get_soup
 log = logging.getLogger('deadfrog')
 
 
-class UrlRewriteDeadFrog(object):
+class UrlRewriteDeadFrog:
     """DeadFrog urlrewriter."""
 
     # urlrewriter API

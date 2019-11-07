@@ -58,7 +58,7 @@ def get_secret(session=None):
 
 class WeakPassword(Exception):
     def __init__(self, value, logger=log, **kwargs):
-        super(WeakPassword, self).__init__()
+        super().__init__()
         # Value is expected to be a string
         if not isinstance(value, str):
             value = str(value)

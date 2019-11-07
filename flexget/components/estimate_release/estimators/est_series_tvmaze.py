@@ -7,7 +7,7 @@ from flexget.utils.tools import split_title_year
 log = logging.getLogger('est_series_tvmaze')
 
 
-class EstimatesSeriesTVMaze(object):
+class EstimatesSeriesTVMaze:
     @plugin.priority(2)
     def estimate(self, entry):
         if not all(field in entry for field in ['series_name', 'series_season']):

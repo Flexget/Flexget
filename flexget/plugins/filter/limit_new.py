@@ -6,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('limit_new')
 
 
-class FilterLimitNew(object):
+class FilterLimitNew:
     """
     Limit number of new items.
 

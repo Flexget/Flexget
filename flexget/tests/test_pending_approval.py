@@ -2,7 +2,7 @@ from flexget.manager import Session
 from flexget.components.pending_approval.db import PendingEntry
 
 
-class TestPendingApproval(object):
+class TestPendingApproval:
     config = """
         tasks:
           test:

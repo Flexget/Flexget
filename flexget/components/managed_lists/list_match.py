@@ -7,7 +7,7 @@ from flexget.plugin import PluginError
 log = logging.getLogger('list_match')
 
 
-class ListMatch(object):
+class ListMatch:
     schema = {
         'type': 'object',
         'properties': {

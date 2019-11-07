@@ -7,7 +7,7 @@ from flexget.utils.tools import aggregate_inputs
 log = logging.getLogger('crossmatch')
 
 
-class CrossMatch(object):
+class CrossMatch:
     """
     Perform action based on item on current task and other inputs.
 

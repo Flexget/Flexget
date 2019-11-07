@@ -5,7 +5,7 @@ from flexget.components.tmdb.api_tmdb import TMDBSearchResult
 
 
 @pytest.mark.online
-class TestTmdbLookup(object):
+class TestTmdbLookup:
     config = """
         tasks:
           test:
@@ -27,7 +27,7 @@ class TestTmdbLookup(object):
 
 
 @pytest.mark.online
-class TestTmdbUnicodeLookup(object):
+class TestTmdbUnicodeLookup:
     config = """
         templates:
           global:

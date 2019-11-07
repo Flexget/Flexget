@@ -8,7 +8,7 @@ from flexget.event import event
 log = logging.getLogger('subtitles')
 
 
-class PluginPeriscope(object):
+class PluginPeriscope:
     """
     Search and download subtitles using Periscope by Patrick Dessalle
     (http://code.google.com/p/periscope/).

@@ -17,7 +17,7 @@ DEFAULT_STRIDE = (
 )
 
 
-class PluginSortByWeight(object):
+class PluginSortByWeight:
     """
     Sort task entries based on multiple fields using a sort weight per field.
     Result per entry is stored in 'sort_by_weight_sum'.

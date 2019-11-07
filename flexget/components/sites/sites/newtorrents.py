@@ -13,7 +13,7 @@ from flexget.utils.soup import get_soup
 log = logging.getLogger('newtorrents')
 
 
-class NewTorrents(object):
+class NewTorrents:
     """NewTorrents urlrewriter and search plugin."""
 
     def __init__(self):

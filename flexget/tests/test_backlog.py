@@ -1,4 +1,4 @@
-class TestBacklog(object):
+class TestBacklog:
     config = """
         tasks:
           test:

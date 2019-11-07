@@ -6,7 +6,7 @@ from flexget.components.variables.variables import Variables
 
 
 @pytest.mark.usefixtures('tmpdir')
-class TestVariablesFromFile(object):
+class TestVariablesFromFile:
     config = """
         variables: __tmp__/variables.yml
         tasks:
@@ -67,7 +67,7 @@ class TestVariablesFromConfig:
         assert len(task.accepted) == 2
 
 
-class TestVariablesFromDB(object):
+class TestVariablesFromDB:
     config = """
         variables: yes
         tasks:

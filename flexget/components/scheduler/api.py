@@ -21,7 +21,7 @@ from flexget.api.app import (
 schedule_api = api.namespace('schedules', description='Task Scheduler')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     # SwaggerUI does not yet support anyOf or oneOf
     schedule_object = copy.deepcopy(schedule_schema)
     schedule_object['properties']['id'] = {'type': 'integer'}

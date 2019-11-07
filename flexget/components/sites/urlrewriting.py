@@ -14,7 +14,7 @@ class UrlRewritingError(Exception):
         return repr(self.value)
 
 
-class PluginUrlRewriting(object):
+class PluginUrlRewriting:
     """
     Provides URL rewriting framework
     """
@@ -89,7 +89,7 @@ class PluginUrlRewriting(object):
                     )
 
 
-class DisableUrlRewriter(object):
+class DisableUrlRewriter:
     """Disable certain urlrewriters."""
 
     schema = {'type': 'array', 'items': {'type': 'string'}}

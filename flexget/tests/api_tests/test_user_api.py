@@ -3,7 +3,7 @@ from flexget.api.core.user import ObjectsContainer as OC
 from flexget.utils import json
 
 
-class TestUserAPI(object):
+class TestUserAPI:
     config = 'tasks: {}'
 
     def test_change_password(self, execute_task, api_client, schema_match):

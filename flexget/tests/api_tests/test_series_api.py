@@ -20,7 +20,7 @@ from flexget.components.series.db import (
 from flexget.utils import json
 
 
-class TestSeriesRootAPI(object):
+class TestSeriesRootAPI:
     config = """
         tasks: {}
     """
@@ -287,7 +287,7 @@ class TestSeriesRootAPI(object):
         assert not errors
 
 
-class TestSeriesSearchAPI(object):
+class TestSeriesSearchAPI:
     config = """
         tasks: {}
     """
@@ -330,7 +330,7 @@ class TestSeriesSearchAPI(object):
         assert len(data) == 0
 
 
-class TestSeriesSingleAPI(object):
+class TestSeriesSingleAPI:
     config = """
         tasks: {}
     """
@@ -434,7 +434,7 @@ class TestSeriesSingleAPI(object):
         assert not errors
 
 
-class TestSeriesSeasonsAPI(object):
+class TestSeriesSeasonsAPI:
     config = """
         tasks: {}
     """
@@ -504,7 +504,7 @@ class TestSeriesSeasonsAPI(object):
         assert len(data) == 0
 
 
-class TestSeriesSeasonAPI(object):
+class TestSeriesSeasonAPI:
     config = """
         tasks: {}
     """
@@ -608,7 +608,7 @@ class TestSeriesSeasonAPI(object):
         assert not errors
 
 
-class TestSeriesSeasonReleasesAPI(object):
+class TestSeriesSeasonReleasesAPI:
     config = """
         tasks: {}
     """
@@ -819,7 +819,7 @@ class TestSeriesSeasonReleasesAPI(object):
         assert not errors
 
 
-class TestSeriesEpisodesAPI(object):
+class TestSeriesEpisodesAPI:
     config = """
         tasks: {}
     """
@@ -891,7 +891,7 @@ class TestSeriesEpisodesAPI(object):
         assert len(data) == 0
 
 
-class TestSeriesEpisodeAPI(object):
+class TestSeriesEpisodeAPI:
     config = """
         tasks: {}
     """
@@ -1007,7 +1007,7 @@ class TestSeriesEpisodeAPI(object):
         assert not errors
 
 
-class TestSeriesEpisodeReleasesAPI(object):
+class TestSeriesEpisodeReleasesAPI:
     config = """
         tasks: {}
     """
@@ -1285,7 +1285,7 @@ class TestSeriesEpisodeReleasesAPI(object):
         assert not errors
 
 
-class TestSeriesEpisodeReleaseAPI(object):
+class TestSeriesEpisodeReleaseAPI:
     config = """
         tasks: {}
     """
@@ -1617,7 +1617,7 @@ class TestSeriesEpisodeReleaseAPI(object):
         assert not errors
 
 
-class TestSeriesForgetFlag(object):
+class TestSeriesForgetFlag:
     config = """
             tasks:
               series_data:
@@ -1766,7 +1766,7 @@ class TestSeriesForgetFlag(object):
             assert len(seen) == 3
 
 
-class TestSeriesPagination(object):
+class TestSeriesPagination:
     config = 'tasks: {}'
 
     def test_series_pagination(self, api_client, link_headers):

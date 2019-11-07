@@ -5,7 +5,7 @@ import re
 log = logging.getLogger('utils.qualities')
 
 
-class QualityComponent(object):
+class QualityComponent:
     """"""
 
     def __init__(self, type, value, name, regexp=None, modifier=None, defaults=None):
@@ -194,7 +194,7 @@ def all_components():
     return iter(_registry.values())
 
 
-class Quality(object):
+class Quality:
     """Parses and stores the quality of an entry in the four component categories."""
 
     def __init__(self, text=''):
@@ -340,7 +340,7 @@ def get(quality_name):
     return result
 
 
-class RequirementComponent(object):
+class RequirementComponent:
     """Represents requirements for a given component type. Can evaluate whether a given QualityComponent
     meets those requirements."""
 
@@ -420,7 +420,7 @@ class RequirementComponent(object):
         )
 
 
-class Requirements(object):
+class Requirements:
     """Represents requirements for allowable qualities. Can determine whether a given Quality passes requirements."""
 
     def __init__(self, req=''):

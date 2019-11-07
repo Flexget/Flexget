@@ -3,7 +3,7 @@ import pytest
 from flexget.task import TaskAbort
 
 
-class TestAbortIfExists(object):
+class TestAbortIfExists:
     config = """
         templates:
           global:

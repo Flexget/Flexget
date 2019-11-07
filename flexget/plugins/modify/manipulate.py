@@ -7,7 +7,7 @@ from flexget.event import event
 log = logging.getLogger('manipulate')
 
 
-class Manipulate(object):
+class Manipulate:
     """
     Usage:
 

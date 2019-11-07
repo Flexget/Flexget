@@ -191,7 +191,7 @@ class BluraySearchResult(Base):
             self.movie = movie
 
 
-class ApiBluray(object):
+class ApiBluray:
     """Does lookups to Blu-ray.com and provides movie information. Caches lookups."""
 
     @staticmethod

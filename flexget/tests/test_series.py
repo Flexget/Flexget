@@ -31,7 +31,7 @@ def config(request):
     return newconfig
 
 
-class TestQuality(object):
+class TestQuality:
     config = """
         templates:
           global:
@@ -186,7 +186,7 @@ class TestQuality(object):
         assert len(task.accepted) == 1, 'should not have accepted 720p entry'
 
 
-class TestDatabase(object):
+class TestDatabase:
     config = """
         templates:
           global:
@@ -239,7 +239,7 @@ class TestDatabase(object):
         assert not task.accepted, 'doppelgangers accepted'
 
 
-class TestFilterSeries(object):
+class TestFilterSeries:
     config = """
         templates:
           global:
@@ -409,7 +409,7 @@ class TestFilterSeries(object):
         assert task.accepted[0] == entries[0], 'first entry should have been accepted'
 
 
-class TestEpisodeAdvancement(object):
+class TestEpisodeAdvancement:
     config = """
         templates:
           global:
@@ -606,7 +606,7 @@ class TestEpisodeAdvancement(object):
         assert entry not in task.accepted, 'Should have been too far in the past'
 
 
-class TestFilterSeriesPriority(object):
+class TestFilterSeriesPriority:
     config = """
         templates:
           global:
@@ -635,7 +635,7 @@ class TestFilterSeriesPriority(object):
         ), 'foobar hdtv s01e01 is not accepted'
 
 
-class TestPropers(object):
+class TestPropers:
     config = """
         templates:
           global:
@@ -853,7 +853,7 @@ class TestPropers(object):
         assert task.accepted, 'proper ep should have been accepted'
 
 
-class TestSimilarNames(object):
+class TestSimilarNames:
     # hmm, not very good way to test this .. seriesparser should be tested alone?
 
     config = """
@@ -898,7 +898,7 @@ class TestSimilarNames(object):
         assert task.find_entry('accepted', title='Foo.2.2')['series_name'] == 'Foo 2'
 
 
-class TestDuplicates(object):
+class TestDuplicates:
     config = """
         templates:
           global:
@@ -975,7 +975,7 @@ class TestDuplicates(object):
             assert task.find_entry('rejected', title=item), '%s should have been rejected' % item
 
 
-class TestQualities(object):
+class TestQualities:
     config = """
         templates:
           global:
@@ -1126,7 +1126,7 @@ class TestQualities(object):
         assert task.find_entry('accepted', title='Food.S06E11.720p'), 'Should upgrade to `target`'
 
 
-class TestIdioticNumbering(object):
+class TestIdioticNumbering:
     config = """
         templates:
           global:
@@ -1156,7 +1156,7 @@ class TestIdioticNumbering(object):
         assert entry['series_episode'] == 2, 'episode not detected'
 
 
-class TestNormalization(object):
+class TestNormalization:
     config = """
         templates:
           global:
@@ -1200,7 +1200,7 @@ class TestNormalization(object):
         assert task.find_entry('rejected', title='Foo bar & co 2012.s01e01.sdtv.b')
 
 
-class TestMixedNumbering(object):
+class TestMixedNumbering:
     config = """
         templates:
           global:
@@ -1228,7 +1228,7 @@ class TestMixedNumbering(object):
         assert task.find_entry('rejected', title='FooBar.0307.PDTV-FlexGet')
 
 
-class TestExact(object):
+class TestExact:
     config = """
         templates:
           global:
@@ -1279,7 +1279,7 @@ class TestExact(object):
         assert not task.find_entry('accepted', title='date show b 04.02.2011 hdtv')
 
 
-class TestTimeframe(object):
+class TestTimeframe:
     config = """
         templates:
           global:
@@ -1468,7 +1468,7 @@ class TestTimeframe(object):
         assert task.accepted, 'Timeframe should have passed'
 
 
-class TestBacklog(object):
+class TestBacklog:
     config = """
         templates:
           global:
@@ -1493,7 +1493,7 @@ class TestBacklog(object):
         assert task.accepted, 'backlog is not injecting episodes'
 
 
-class TestManipulate(object):
+class TestManipulate:
     """Tests that it's possible to manipulate entries before they're parsed by series plugin"""
 
     config = """
@@ -1527,7 +1527,7 @@ class TestManipulate(object):
         assert task.accepted, 'manipulate failed to pre-clean title'
 
 
-class TestFromGroup(object):
+class TestFromGroup:
     config = """
         templates:
           global:
@@ -1558,7 +1558,7 @@ class TestFromGroup(object):
         )
 
 
-class TestBegin(object):
+class TestBegin:
     config = """
         templates:
           global:
@@ -1702,7 +1702,7 @@ class TestBegin(object):
         assert task.accepted, 'Episode should have been accepted'
 
 
-class TestSeriesPremiere(object):
+class TestSeriesPremiere:
     config = """
         templates:
           global:
@@ -1732,7 +1732,7 @@ class TestSeriesPremiere(object):
         # TODO: Add more tests, test interaction with series plugin and series_exists
 
 
-class TestImportSeries(object):
+class TestImportSeries:
     config = """
         templates:
           global:
@@ -1779,7 +1779,7 @@ class TestImportSeries(object):
         assert entry['series_name'] == 'the show', 'entry series should be set to the main name'
 
 
-class TestIDTypes(object):
+class TestIDTypes:
     config = """
         templates:
           global:
@@ -1812,7 +1812,7 @@ class TestIDTypes(object):
             assert entry['series_id_type'] in entry['series_name']
 
 
-class TestCaseChange(object):
+class TestCaseChange:
     config = """
         templates:
           global:
@@ -1840,7 +1840,7 @@ class TestCaseChange(object):
         assert task.find_entry('rejected', title='thEshoW s02e04 other', series_name='THESHOW')
 
 
-class TestInvalidSeries(object):
+class TestInvalidSeries:
     config = """
         templates:
           global:
@@ -1861,7 +1861,7 @@ class TestInvalidSeries(object):
         assert not task.aborted, 'Task should not have aborted'
 
 
-class TestDoubleEps(object):
+class TestDoubleEps:
     config = """
         templates:
           global:
@@ -1890,7 +1890,7 @@ class TestDoubleEps(object):
         assert not task.find_entry('accepted', title='double S01E03')
 
 
-class TestAutoLockin(object):
+class TestAutoLockin:
     config = """
         templates:
           global:
@@ -1944,7 +1944,7 @@ class TestAutoLockin(object):
         assert len(task.accepted) == 2, 'Specials should not have caused episode type lock-in'
 
 
-class TestReruns(object):
+class TestReruns:
     config = """
         templates:
           global:
@@ -1968,7 +1968,7 @@ class TestReruns(object):
         )
 
 
-class TestSpecials(object):
+class TestSpecials:
     config = """
         templates:
           global:
@@ -2060,7 +2060,7 @@ class TestSpecials(object):
         assert entry.accepted, 'Entry which should not have been accepted was.'
 
 
-class TestAlternateNames(object):
+class TestAlternateNames:
     config = """
         templates:
           global:
@@ -2138,7 +2138,7 @@ class TestAlternateNames(object):
             ), 'The alternate name in the database should be the new one, Good Show.'
 
 
-class TestCLI(object):
+class TestCLI:
     config = """
         templates:
           global:
@@ -2168,7 +2168,7 @@ class TestCLI(object):
         )
 
 
-class TestSeriesRemove(object):
+class TestSeriesRemove:
     config = """
         templates:
           global:
@@ -2204,7 +2204,7 @@ class TestSeriesRemove(object):
         assert task.accepted[0] != first_rls, 'same release accepted on second run'
 
 
-class TestSeriesSeasonPack(object):
+class TestSeriesSeasonPack:
     _config = """
       templates:
         global:
@@ -2477,7 +2477,7 @@ class TestSeriesSeasonPack(object):
         assert task.find_entry('accepted', title='bro.s02.720p.HDTV-Flexget')
 
 
-class TestSeriesDDAudio(object):
+class TestSeriesDDAudio:
     _config = """
       templates:
         global:

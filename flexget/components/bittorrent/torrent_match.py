@@ -8,7 +8,7 @@ from flexget.utils.tools import aggregate_inputs
 log = logging.getLogger('torrent_match')
 
 
-class TorrentMatchFile(object):
+class TorrentMatchFile:
     def __init__(self, path, size):
         self.path = path
         self.size = size
@@ -17,7 +17,7 @@ class TorrentMatchFile(object):
         return "%s(path=%s, size=%s)" % (self.__class__.__name__, str(self.path), self.size)
 
 
-class TorrentMatch(object):
+class TorrentMatch:
     """Plugin that attempts to match .torrents to local files"""
 
     schema = {
@@ -147,7 +147,7 @@ class TorrentMatch(object):
                     candidate_files = []
                     # Find candidate files ie. files whose path contains the torrent name
                     for local_file in local_files:
-                        if entry['torrent'].name in local_file.path:
+                        if entry['torrent'].name in str(local_file.path):
                             # we need to find the path that contains the torrent name since it's multi-file
                             if not path:
                                 # attempt to extract path from the absolute file path

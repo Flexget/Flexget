@@ -48,7 +48,7 @@ log = logging.getLogger('api.server')
 server_api = api.namespace('server', description='Manage Daemon')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     yaml_error_response = copy.deepcopy(base_message)
     yaml_error_response['properties']['column'] = {'type': 'integer'}
     yaml_error_response['properties']['line'] = {'type': 'integer'}
@@ -428,7 +428,7 @@ class ServerLogAPI(APIResource):
         return Response(follow(args['lines'], args['search']), mimetype='text/event-stream')
 
 
-class LogParser(object):
+class LogParser:
     """
     Filter log file.
 

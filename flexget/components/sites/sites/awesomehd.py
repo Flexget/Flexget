@@ -13,7 +13,7 @@ from dateutil.parser import parse as dateutil_parse
 log = logging.getLogger('awesomehd')
 
 
-class SearchAwesomeHD(object):
+class SearchAwesomeHD:
     """
         AwesomeHD search plugin.
     """

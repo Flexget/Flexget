@@ -21,7 +21,7 @@ except ImportError:
 log = logging.getLogger('rlslog')
 
 
-class RlsLog(object):
+class RlsLog:
     """
     Adds support for rlslog.net as a feed.
     """

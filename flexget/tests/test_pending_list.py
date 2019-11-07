@@ -2,7 +2,7 @@ from flexget.components.managed_lists.lists.pending_list.db import PendingListLi
 from flexget.manager import Session
 
 
-class TestListInterface(object):
+class TestListInterface:
     config = """
         templates:
           global:

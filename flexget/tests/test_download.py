@@ -8,7 +8,7 @@ from jinja2 import Template
 # TODO more checks: fail_html, etc.
 @pytest.mark.online
 @pytest.mark.usefixtures('tmpdir')
-class TestDownload(object):
+class TestDownload:
     _config = """
         tasks:
           path_and_temp:
@@ -78,7 +78,7 @@ class TestDownload(object):
     reason='TODO: These are really just config validation tests, and I have config validation turned off'
     ' at the moment for unit tests due to some problems'
 )
-class TestDownloadTemp(object):
+class TestDownloadTemp:
     config = """
         tasks:
           temp_wrong_permission:
@@ -138,7 +138,7 @@ class TestDownloadTemp(object):
 
 @pytest.mark.online
 @pytest.mark.usefixtures('tmpdir')
-class TestDownloadAuth(object):
+class TestDownloadAuth:
     config = """
         templates:
           download:

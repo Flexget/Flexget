@@ -21,7 +21,7 @@ def assert_series_count_in_db(expected_count):
     ), "expecting %s series stored in db, got %s instead" % (expected_count, actual_series_count)
 
 
-class TestConfigureSeriesBetaSeriesList(object):
+class TestConfigureSeriesBetaSeriesList:
     config = """
         tasks:
           test_no_members:

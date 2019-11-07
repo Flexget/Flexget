@@ -19,7 +19,7 @@ from flexget.components.thetvdb.api_tvdb import (
 
 @mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')
 @pytest.mark.online
-class TestTVDBLookup(object):
+class TestTVDBLookup:
     config = """
         templates:
           global:
@@ -190,7 +190,7 @@ class TestTVDBLookup(object):
 
 
 @pytest.mark.online
-class TestTVDBExpire(object):
+class TestTVDBExpire:
     config = """
         templates:
           global:
@@ -289,7 +289,7 @@ class TestTVDBExpire(object):
 
 @mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')
 @pytest.mark.online
-class TestTVDBList(object):
+class TestTVDBList:
     """
         Tests thetvdb list plugin with a test user at thetvdb.
         Test user info:
@@ -348,7 +348,7 @@ class TestTVDBList(object):
 
 @mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')
 @pytest.mark.online
-class TestTVDBFavorites(object):
+class TestTVDBFavorites:
     """
         Tests thetvdb list plugin with a test user at thetvdb.
         Test user info:
@@ -407,7 +407,7 @@ class TestTVDBFavorites(object):
 
 @mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')
 @pytest.mark.online
-class TestTheTVDBLanguages(object):
+class TestTheTVDBLanguages:
     config = """
             templates:
               global:

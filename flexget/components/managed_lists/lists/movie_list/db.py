@@ -20,7 +20,7 @@ log = logging.getLogger('movie_list')
 Base = versioned_base('movie_list', 0)
 
 
-class MovieListBase(object):
+class MovieListBase:
     """
     Class that contains helper methods for movie list as well as plugins that use it,
     such as API and CLI.

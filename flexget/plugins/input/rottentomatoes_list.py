@@ -14,7 +14,7 @@ except ImportError:
 log = logging.getLogger('rottentomatoes_list')
 
 
-class RottenTomatoesList(object):
+class RottenTomatoesList:
     """
     Emits an entry for each movie in a Rotten Tomatoes list.
 

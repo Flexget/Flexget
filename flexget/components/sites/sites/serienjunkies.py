@@ -32,7 +32,7 @@ DEFAULT_LANGUAGE = 'dual'
 DEFAULT_HOSTER = 'ul'
 
 
-class UrlRewriteSerienjunkies(object):
+class UrlRewriteSerienjunkies:
     """
     Serienjunkies urlrewriter
     Version 1.0.2

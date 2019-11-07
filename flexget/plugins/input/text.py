@@ -11,7 +11,7 @@ from flexget.utils.cached_input import cached
 log = logging.getLogger('text')
 
 
-class Text(object):
+class Text:
     """
     Parse any text for entries using regular expression.
 

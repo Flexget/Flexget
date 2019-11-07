@@ -16,7 +16,7 @@ log = logging.getLogger('search_btn')
 ORIGINS = ['None', 'Scene', 'P2P', 'User', 'Mixed', 'Internal']
 
 
-class SearchBTN(object):
+class SearchBTN:
     schema = {
         'oneOf': [
             {'type': 'string'},

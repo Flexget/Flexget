@@ -1,7 +1,7 @@
 from flexget import plugin
 
 
-class TestInterfaces(object):
+class TestInterfaces:
     """Test that any plugins declaring certain interfaces at least superficially comply with those interfaces."""
 
     @staticmethod

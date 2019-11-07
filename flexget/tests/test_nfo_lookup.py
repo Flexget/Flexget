@@ -3,7 +3,7 @@ import pytest
 
 
 @pytest.mark.online
-class TestNfoLookupWithMovies(object):
+class TestNfoLookupWithMovies:
     base = "nfo_lookup_test_dir/"
     config = """
         tasks:

@@ -12,7 +12,7 @@ log = logging.getLogger('metanfo_csize')
 SIZE_RE = re.compile(r'Size[^\d]{0,7}(\d*\.?\d+).{0,5}(MB|GB)', re.IGNORECASE)
 
 
-class MetainfoContentSize(object):
+class MetainfoContentSize:
     """
     Utility:
 

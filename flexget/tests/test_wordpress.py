@@ -15,7 +15,7 @@ def _mock_session_response(mock_, monkeypatch):
     monkeypatch.setattr('requests.Session.send', mocked_send)
 
 
-class TestWordPress(object):
+class TestWordPress:
     config = """
         tasks:
           test:

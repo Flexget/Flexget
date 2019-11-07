@@ -63,7 +63,7 @@ class FileListCookie(Base):
     expires = Column(DateTime)
 
 
-class SearchFileList(object):
+class SearchFileList:
     """
         FileList.ro search plugin.
     """

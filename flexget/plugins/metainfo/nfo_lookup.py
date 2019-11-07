@@ -16,7 +16,7 @@ from flexget.event import event
 log = logging.getLogger('nfo_lookup')
 
 
-class NfoLookup(object):
+class NfoLookup:
     """
     Retrieves information from a local '.nfo' info file.
 
@@ -132,7 +132,7 @@ class BadXmlFile(Exception):
     pass
 
 
-class NfoReader(object):
+class NfoReader:
     """
     Class in charge of parsing the '.nfo' file and getting a dictionary of fields.
 

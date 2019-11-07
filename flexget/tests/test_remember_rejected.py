@@ -3,7 +3,7 @@ from flexget.event import event
 from flexget.utils.tools import parse_timedelta
 
 
-class RejectRememberPlugin(object):
+class RejectRememberPlugin:
     def on_task_filter(self, task, config):
         for entry in task.all_entries:
             if isinstance(config, str):
@@ -17,7 +17,7 @@ def register_plugin():
     plugin.register(RejectRememberPlugin, 'test_remember_reject', api_ver=2, debug=True)
 
 
-class TestRememberRejected(object):
+class TestRememberRejected:
     config = """
         tasks:
           test:

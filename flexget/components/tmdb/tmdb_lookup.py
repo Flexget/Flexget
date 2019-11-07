@@ -17,7 +17,7 @@ except ImportError:
 log = logging.getLogger('tmdb_lookup')
 
 
-class PluginTmdbLookup(object):
+class PluginTmdbLookup:
     """Retrieves tmdb information for entries.
 
     Example:

@@ -8,7 +8,7 @@ from collections import OrderedDict
 log = logging.getLogger('cfscraper')
 
 
-class CFScraper(object):
+class CFScraper:
     """
     Plugin that enables scraping of cloudflare protected sites.
 

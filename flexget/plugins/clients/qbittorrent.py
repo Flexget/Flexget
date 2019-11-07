@@ -12,7 +12,7 @@ from flexget.utils.template import RenderError
 log = logging.getLogger('qbittorrent')
 
 
-class OutputQBitTorrent(object):
+class OutputQBitTorrent:
     """
     Example:
 

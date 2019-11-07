@@ -8,7 +8,7 @@ from . import db
 log = logging.getLogger(__name__)
 
 
-class FilterSeen(object):
+class FilterSeen:
     """
     Remembers previously downloaded content and rejects them in
     subsequent executions. Without this plugin FlexGet would

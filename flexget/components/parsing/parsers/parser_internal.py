@@ -19,7 +19,7 @@ except AttributeError:
     preferred_clock = time.clock
 
 
-class ParserInternal(object):
+class ParserInternal:
 
     # movie_parser API
 

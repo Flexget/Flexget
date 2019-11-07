@@ -20,7 +20,7 @@ DEFAULT_TEMPLATE_VALUE = json.dumps(
 )
 
 
-class SNSNotification(object):
+class SNSNotification:
     """
     Emits SNS notifications of entries
 
@@ -71,7 +71,7 @@ class SNSNotification(object):
         sender.send_notifications(task)
 
 
-class SNSNotificationEmitter(object):
+class SNSNotificationEmitter:
     def __init__(self, config):
         self.config = config
         import boto3

@@ -10,7 +10,7 @@ from flexget.event import event
 log = logging.getLogger('regexp')
 
 
-class FilterRegexp(object):
+class FilterRegexp:
     """
         All possible forms.
 

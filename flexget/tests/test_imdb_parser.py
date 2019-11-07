@@ -4,7 +4,7 @@ from flexget.components.imdb.utils import ImdbParser
 
 
 @pytest.mark.online
-class TestImdbParser(object):
+class TestImdbParser:
     def test_parsed_data(self):
         parser = ImdbParser()
         parser.parse('tt0114814')

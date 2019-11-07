@@ -1,7 +1,7 @@
 from flexget.utils.simple_persistence import SimplePersistence
 
 
-class TestSimplePersistence(object):
+class TestSimplePersistence:
     config = """
         tasks:
           test:

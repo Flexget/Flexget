@@ -8,7 +8,7 @@ from flexget.event import event
 log = logging.getLogger('magnet_btih')
 
 
-class MagnetBtih(object):
+class MagnetBtih:
     """Sets torrent_info_hash from magnet url."""
 
     schema = {'type': 'boolean'}

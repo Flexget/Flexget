@@ -18,7 +18,7 @@ except ImportError:
 log = logging.getLogger('sceper')
 
 
-class InputSceper(object):
+class InputSceper:
     """
     Uses sceper.ws category url as input.
 

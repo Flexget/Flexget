@@ -9,7 +9,7 @@ from flexget.utils.log import log_once
 log = logging.getLogger('bluray_lookup')
 
 
-class PluginBlurayLookup(object):
+class PluginBlurayLookup:
     """Retrieves bluray information for entries.
 
     Example:

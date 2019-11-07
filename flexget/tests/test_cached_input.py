@@ -7,7 +7,7 @@ from flexget import plugin
 from flexget.entry import Entry
 
 
-class InputPersist(object):
+class InputPersist:
     """Fake input plugin to test db cache. Only emits an entry the first time it is run."""
 
     hasrun = False
@@ -25,7 +25,7 @@ plugin.register(InputPersist, 'test_input', api_ver=2)
 
 @pytest.mark.filecopy('rss.xml', '__tmp__/cached.xml')
 @pytest.mark.usefixtures('tmpdir')
-class TestInputCache(object):
+class TestInputCache:
     config = """
         tasks:
           test_memory:

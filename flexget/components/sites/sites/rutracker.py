@@ -129,7 +129,7 @@ class RutrackerAuth(AuthBase):
         return r
 
 
-class RutrackerUrlrewrite(object):
+class RutrackerUrlrewrite:
     """Usage:
 
     rutracker_auth:

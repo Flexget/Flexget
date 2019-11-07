@@ -7,7 +7,7 @@ from flexget.event import event
 log = logging.getLogger(__name__.rsplit('.')[-1])
 
 
-class Generate(object):
+class Generate:
     """Generates n number of random entries. Used for debugging purposes."""
 
     schema = {'type': 'integer'}

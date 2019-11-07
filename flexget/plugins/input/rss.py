@@ -28,7 +28,7 @@ def fp_field_name(name):
     return name.replace(':', '_').lower()
 
 
-class InputRSS(object):
+class InputRSS:
     """
     Parses RSS feed.
 

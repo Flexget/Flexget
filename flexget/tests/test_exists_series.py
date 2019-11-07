@@ -3,7 +3,7 @@ import os
 import pytest
 
 
-class TestExistsSeries(object):
+class TestExistsSeries:
     _config = """
         templates:
           global:

@@ -10,7 +10,7 @@ from flexget.config_schema import one_or_more
 log = logging.getLogger('exists')
 
 
-class FilterExists(object):
+class FilterExists:
     """
         Reject entries that already exist in given path.
 

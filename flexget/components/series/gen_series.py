@@ -11,7 +11,7 @@ log = logging.getLogger('gen_series')
 PER_RUN = 50
 
 
-class GenSeries(object):
+class GenSeries:
     """
     Purely for debugging purposes. Not great quality :)
 

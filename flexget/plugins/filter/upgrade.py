@@ -33,7 +33,7 @@ class EntryUpgrade(Base):
         return '<Upgrade(id=%s,added=%s,quality=%s)>' % (self.id, self.added, self.quality)
 
 
-class FilterUpgrade(object):
+class FilterUpgrade:
     schema = {
         'type': 'object',
         'properties': {

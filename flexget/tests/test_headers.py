@@ -2,7 +2,7 @@ import pytest
 
 
 @pytest.mark.online
-class TestHeaders(object):
+class TestHeaders:
     config = """
         tasks:
           test_headers:

@@ -10,7 +10,7 @@ from flexget.utils.template import RenderError
 log = logging.getLogger('aria2')
 
 
-class OutputAria2(object):
+class OutputAria2:
     """
     Simple Aria2 output
 

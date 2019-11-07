@@ -7,7 +7,7 @@ from flexget.config_schema import one_or_more
 log = logging.getLogger('unique')
 
 
-class Unique(object):
+class Unique:
     """
     Take action on entries with duplicate fields, except for the first item
 

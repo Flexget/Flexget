@@ -1,4 +1,4 @@
-class TestLimitNew(object):
+class TestLimitNew:
     config = """
         tasks:
           test:

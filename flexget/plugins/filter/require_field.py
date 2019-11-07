@@ -7,7 +7,7 @@ from flexget.event import event
 log = logging.getLogger('require_field')
 
 
-class FilterRequireField(object):
+class FilterRequireField:
     """
     Rejects entries without defined field.
 

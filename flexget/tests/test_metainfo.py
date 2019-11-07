@@ -1,7 +1,7 @@
 import pytest
 
 
-class TestMetainfo(object):
+class TestMetainfo:
     config = """
         tasks:
           test_content_size:
@@ -19,7 +19,7 @@ class TestMetainfo(object):
         assert task.find_entry(content_size=1024), 'Content size 1024 MB absent'
 
 
-class TestMetainfoImdb(object):
+class TestMetainfoImdb:
     config = """
         tasks:
           test:
@@ -48,7 +48,7 @@ class TestMetainfoImdb(object):
         ), 'Failed to ignore multiple imdb urls in test 4'
 
 
-class TestMetainfoQuality(object):
+class TestMetainfoQuality:
     config = """
         tasks:
           test:
@@ -80,7 +80,7 @@ class TestMetainfoQuality(object):
         )
 
 
-class TestMetainfoSeries(object):
+class TestMetainfoSeries:
     _config = """
         templates:
           global:
@@ -181,7 +181,7 @@ class TestMetainfoSeries(object):
             assert 'series_parser' not in entry, error
 
 
-class TestMetainfoMovie(object):
+class TestMetainfoMovie:
     config = """
         templates:
           global:

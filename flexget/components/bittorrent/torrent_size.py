@@ -6,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('torrent_size')
 
 
-class TorrentSize(object):
+class TorrentSize:
     """
     Provides file size information when dealing with torrents
     """

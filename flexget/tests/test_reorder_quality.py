@@ -3,7 +3,7 @@ import pytest
 from flexget.task import TaskAbort
 
 
-class TestQualityPriority(object):
+class TestQualityPriority:
     config = """
         tasks:
           test_reorder_quality:

@@ -7,7 +7,7 @@ from . import db
 log = logging.getLogger('history')
 
 
-class PluginHistory(object):
+class PluginHistory:
     """Records all accepted entries for later lookup"""
 
     schema = {'type': 'boolean'}

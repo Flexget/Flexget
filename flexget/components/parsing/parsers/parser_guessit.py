@@ -59,7 +59,7 @@ except AttributeError:
     preferred_clock = time.clock
 
 
-class ParserGuessit(object):
+class ParserGuessit:
     SOURCE_MAP = {
         'Camera': 'cam',
         'HD Camera': 'cam',

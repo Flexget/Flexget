@@ -6,7 +6,7 @@ import pytest
 from flexget.utils.bittorrent import Torrent
 
 
-class TestInfoHash(object):
+class TestInfoHash:
     config = """
         tasks:
           test:
@@ -46,7 +46,7 @@ class TestInfoHash(object):
 
 
 @pytest.mark.usefixtures('tmpdir')
-class TestSeenInfoHash(object):
+class TestSeenInfoHash:
     config = """
         tasks:
           test:
@@ -85,7 +85,7 @@ class TestSeenInfoHash(object):
 
 
 @pytest.mark.usefixtures('tmpdir')
-class TestModifyTrackers(object):
+class TestModifyTrackers:
     config = """
         templates:
           global:
@@ -156,7 +156,7 @@ class TestModifyTrackers(object):
         ), 'ubuntu tracker should have been added'
 
 
-class TestPrivateTorrents(object):
+class TestPrivateTorrents:
     config = """
         tasks:
           test:
@@ -174,7 +174,7 @@ class TestPrivateTorrents(object):
 
 
 @pytest.mark.usefixtures('tmpdir')
-class TestTorrentScrub(object):
+class TestTorrentScrub:
     config = """
         tasks:
           test_all:
@@ -284,7 +284,7 @@ class TestTorrentScrub(object):
 
 
 @pytest.mark.usefixtures('tmpdir')
-class TestTorrentAlive(object):
+class TestTorrentAlive:
     config = """
         templates:
           global:
@@ -332,7 +332,7 @@ class TestTorrentAlive(object):
         assert get_udp_seeds('udp://127.0.0.1:65536/announce', 'HASH') == 0
 
 
-class TestRtorrentMagnet(object):
+class TestRtorrentMagnet:
     __tmp__ = True
     config = """
         tasks:

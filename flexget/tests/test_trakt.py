@@ -15,7 +15,7 @@ lookup_series = ApiTrakt.lookup_series
 
 
 @pytest.mark.online
-class TestTraktShowLookup(object):
+class TestTraktShowLookup:
     config = """
         templates:
           global:
@@ -220,7 +220,7 @@ class TestTraktShowLookup(object):
 
 
 @pytest.mark.online
-class TestTraktList(object):
+class TestTraktList:
     config = """
         tasks:
           test_trakt_movies:
@@ -241,7 +241,7 @@ class TestTraktList(object):
 
 
 @pytest.mark.online
-class TestTraktWatchedAndCollected(object):
+class TestTraktWatchedAndCollected:
     config = """
         tasks:
           test_trakt_watched:
@@ -388,7 +388,7 @@ class TestTraktWatchedAndCollected(object):
 
 
 @pytest.mark.online
-class TestTraktMovieLookup(object):
+class TestTraktMovieLookup:
     config = """
         templates:
           global:
@@ -523,7 +523,7 @@ class TestTraktMovieLookup(object):
 
 
 @pytest.mark.online
-class TestTraktUnicodeLookup(object):
+class TestTraktUnicodeLookup:
     config = """
         templates:
           global:
@@ -553,7 +553,7 @@ class TestTraktUnicodeLookup(object):
 
 
 @pytest.mark.online
-class TestTraktRatingsLookup(object):
+class TestTraktRatingsLookup:
     config = """
             templates:
               global:

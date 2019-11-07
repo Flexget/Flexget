@@ -28,7 +28,7 @@ except ImportError:
 log = logging.getLogger('transmission')
 
 
-class TransmissionBase(object):
+class TransmissionBase:
     def __init__(self):
         self.client = None
         self.opener = None

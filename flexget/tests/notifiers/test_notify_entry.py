@@ -1,4 +1,4 @@
-class TestNotifyEntry(object):
+class TestNotifyEntry:
     config = """
         tasks:
           test_basic_notify:

@@ -12,7 +12,7 @@ plugin_name = 'discord'
 log = logging.getLogger(plugin_name)
 
 
-class DiscordNotifier(object):
+class DiscordNotifier:
     """
     Example::
 

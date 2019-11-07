@@ -1,4 +1,4 @@
-class TestUniques(object):
+class TestUniques:
     config = """
         templates:
           global:

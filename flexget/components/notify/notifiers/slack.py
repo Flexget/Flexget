@@ -13,7 +13,7 @@ plugin_name = 'slack'
 log = logging.getLogger(plugin_name)
 
 
-class SlackNotifier(object):
+class SlackNotifier:
     """
     Example:
 

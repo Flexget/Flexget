@@ -6,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('redirect_url')
 
 
-class UrlRewriteRedirect(object):
+class UrlRewriteRedirect:
     """Rewrites urls which actually redirect somewhere else."""
 
     def __init__(self):

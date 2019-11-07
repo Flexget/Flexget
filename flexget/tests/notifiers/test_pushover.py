@@ -5,7 +5,7 @@ from flexget.plugin import PluginWarning
 
 
 @pytest.mark.online
-class TestPushoverNotifier(object):
+class TestPushoverNotifier:
     config = "{tasks:{}}"
 
     def test_minimal_pushover_config(self, execute_task):

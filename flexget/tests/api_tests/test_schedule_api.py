@@ -6,7 +6,7 @@ from flexget.manager import Manager
 from flexget.utils import json
 
 
-class TestEmptyScheduledAPI(object):
+class TestEmptyScheduledAPI:
     config = 'tasks: {}'
 
     def test_empty_schedules_get(self, api_client, schema_match):
@@ -35,7 +35,7 @@ class TestEmptyScheduledAPI(object):
         assert data == payload
 
 
-class TestScheduledAPI(object):
+class TestScheduledAPI:
     schedule = {'tasks': ['test1'], 'interval': {'minutes': 15}}
 
     config = """
@@ -167,7 +167,7 @@ class TestScheduledAPI(object):
         assert mocked_save_config.called
 
 
-class TestPositiveBooleanSchedule(object):
+class TestPositiveBooleanSchedule:
     config = """
         schedules: yes
         tasks:
@@ -277,7 +277,7 @@ class TestPositiveBooleanSchedule(object):
         assert not errors
 
 
-class TestNegativeBooleanSchedule(object):
+class TestNegativeBooleanSchedule:
     config = """
         schedules: no
         tasks:

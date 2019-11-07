@@ -15,7 +15,7 @@ except ImportError:
 log = logging.getLogger('thetvdb_lookup')
 
 
-class PluginThetvdbLookup(object):
+class PluginThetvdbLookup:
     """Retrieves TheTVDB information for entries. Uses series_name,
     series_season, series_episode from series plugin.
 

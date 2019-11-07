@@ -2,7 +2,7 @@ import pytest
 
 
 @pytest.mark.online
-class TestInputSites(object):
+class TestInputSites:
     config = (
         """
         templates:

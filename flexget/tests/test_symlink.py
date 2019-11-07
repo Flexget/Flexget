@@ -15,7 +15,7 @@ def is_hard_link(file1, file2):
 
 
 @pytest.mark.skipif(os.name == 'nt', reason='symlinks do not work on windows')
-class TestSymlink(object):
+class TestSymlink:
     _config = """
         templates:
           global:

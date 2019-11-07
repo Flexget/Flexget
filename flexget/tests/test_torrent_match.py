@@ -1,4 +1,4 @@
-class TestTorrentMatch(object):
+class TestTorrentMatch:
     config = """
         tasks:
           test_multi_torrent_empty_name:

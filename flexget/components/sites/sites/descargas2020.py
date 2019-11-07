@@ -22,7 +22,7 @@ REWRITABLE_REGEX = re.compile(
 NONREWRITABLE_REGEX = re.compile(r'(.*/descargar-torrent/|.*\.torrent$)')
 
 
-class UrlRewriteDescargas2020(object):
+class UrlRewriteDescargas2020:
     """Descargas2020 urlrewriter and search."""
 
     schema = {'type': 'boolean', 'default': False}

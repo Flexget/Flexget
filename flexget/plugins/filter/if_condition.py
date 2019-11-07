@@ -13,7 +13,7 @@ from flexget.utils.template import evaluate_expression
 log = logging.getLogger('if')
 
 
-class FilterIf(object):
+class FilterIf:
     """Can run actions on entries that satisfy a given condition.
 
     Actions include accept, reject, and fail, as well as the ability to run other filter plugins on the entries."""

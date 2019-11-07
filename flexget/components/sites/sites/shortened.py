@@ -8,7 +8,7 @@ from flexget.event import event
 log = logging.getLogger('shortened')
 
 
-class UrlRewriteShortened(object):
+class UrlRewriteShortened:
     """Shortened url rewriter."""
 
     def url_rewritable(self, task, entry):

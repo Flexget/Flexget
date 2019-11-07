@@ -27,7 +27,7 @@ def clean_symbols(text):
     return result
 
 
-class Limetorrents(object):
+class Limetorrents:
     """
         Limetorrents search plugin.
     """

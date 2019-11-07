@@ -9,7 +9,7 @@ from flexget.config_schema import one_or_more
 log = logging.getLogger('regex_extract')
 
 
-class RegexExtract(object):
+class RegexExtract:
     """
     Updates an entry with the values of regex matched named groups
 

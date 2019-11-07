@@ -14,7 +14,7 @@ log = logging.getLogger('eztv')
 EZTV_MIRRORS = [('http', 'eztv.ch'), ('https', 'eztv-proxy.net'), ('http', 'eztv.come.in')]
 
 
-class UrlRewriteEztv(object):
+class UrlRewriteEztv:
     """Eztv url rewriter."""
 
     def url_rewritable(self, task, entry):

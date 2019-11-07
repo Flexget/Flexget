@@ -10,7 +10,7 @@ log = logging.getLogger('best_quality')
 entry_actions = {'accept': Entry.accept, 'reject': Entry.reject}
 
 
-class FilterBestQuality(object):
+class FilterBestQuality:
     schema = {
         'type': 'object',
         'properties': {

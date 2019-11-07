@@ -1,4 +1,4 @@
-class TestNotifyTask(object):
+class TestNotifyTask:
     config = """
         tasks:
           test_accepted:

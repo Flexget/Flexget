@@ -9,7 +9,7 @@ plugin_name = 'template'
 log = logging.getLogger(plugin_name)
 
 
-class PluginTemplate(object):
+class PluginTemplate:
     """
     Appyly templates with preconfigured plugins to a task config.
 

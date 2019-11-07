@@ -2,7 +2,7 @@ import pytest
 
 
 @pytest.mark.online
-class TestRottenTomatoesLookup(object):
+class TestRottenTomatoesLookup:
     config = """
         tasks:
           test:

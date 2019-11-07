@@ -12,7 +12,7 @@ from flexget.utils.template import RenderError
 log = getLogger('pyload')
 
 
-class PyloadApi(object):
+class PyloadApi:
     def __init__(self, requests, url):
         self.requests = requests
         self.url = url
@@ -45,7 +45,7 @@ class PyloadApi(object):
             raise
 
 
-class PluginPyLoad(object):
+class PluginPyLoad:
     """
     Parse task content or url for hoster links and adds them to pyLoad.
 

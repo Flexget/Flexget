@@ -6,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('p_priority')
 
 
-class PluginPriority(object):
+class PluginPriority:
     """
         Allows modifying plugin priorities from default values.
 

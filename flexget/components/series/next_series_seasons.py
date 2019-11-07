@@ -16,7 +16,7 @@ MAX_SEASON_DIFF_WITHOUT_BEGIN = 15
 MAX_SEASON_DIFF_WITH_BEGIN = 30
 
 
-class NextSeriesSeasons(object):
+class NextSeriesSeasons:
     """
     Emit next season number from all series configured in this task.
 

@@ -17,7 +17,7 @@ def mock_os_disk_stats(folder):
 
 
 @mock.patch('flexget.plugins.modify.path_by_space.os_disk_stats', side_effect=mock_os_disk_stats)
-class TestPathSelect(object):
+class TestPathSelect:
     config = """
         tasks:
           test_most_free:

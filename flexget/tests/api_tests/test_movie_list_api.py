@@ -12,7 +12,7 @@ from flexget.manager import Session
 from flexget.utils import json
 
 
-class TestMovieListAPI(object):
+class TestMovieListAPI:
     config = 'tasks: {}'
 
     def test_movie_list_list(self, api_client, schema_match):
@@ -263,7 +263,7 @@ class TestMovieListAPI(object):
         assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
 
 
-class TestMovieListUseCases(object):
+class TestMovieListUseCases:
     config = 'tasks: {}'
 
     def test_adding_same_movie(self, api_client, schema_match):
@@ -323,7 +323,7 @@ class TestMovieListUseCases(object):
         assert data == identifiers
 
 
-class TestMovieListPagination(object):
+class TestMovieListPagination:
     config = 'tasks: {}'
 
     def test_movie_list_pagination(self, api_client, link_headers):

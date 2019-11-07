@@ -1,7 +1,7 @@
 import pytest
 
 
-class TestCookies(object):
+class TestCookies:
     config = """
         tasks:
           test_cookies:

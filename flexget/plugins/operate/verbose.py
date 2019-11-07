@@ -8,7 +8,7 @@ from flexget.utils.log import log_once
 log = logging.getLogger('verbose')
 
 
-class Verbose(object):
+class Verbose:
     """
     Verbose entry accept, reject and failure
     """

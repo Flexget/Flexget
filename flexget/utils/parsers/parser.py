@@ -1,7 +1,7 @@
 import re
 
 
-class TitleParser(object):
+class TitleParser:
     propers = ['proper', 'repack', 'rerip', 'real', 'final']
 
     specials = ['special', 'bonus', 'extra', 'omake', 'ova']

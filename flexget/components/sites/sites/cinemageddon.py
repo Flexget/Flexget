@@ -7,7 +7,7 @@ from flexget.event import event
 log = logging.getLogger('cinemageddon')
 
 
-class UrlRewriteCinemageddon(object):
+class UrlRewriteCinemageddon:
     """Cinemageddon urlrewriter."""
 
     def url_rewritable(self, task, entry):

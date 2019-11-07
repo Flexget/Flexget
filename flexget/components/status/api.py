@@ -15,7 +15,7 @@ log = logging.getLogger('status_api')
 status_api = api.namespace('status', description='View and manage task execution status')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     task_status_execution_schema = {
         'type': 'object',
         'properties': {

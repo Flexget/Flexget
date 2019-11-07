@@ -20,7 +20,7 @@ def get_rt_url(movie):
             return link.url
 
 
-class PluginRottenTomatoesLookup(object):
+class PluginRottenTomatoesLookup:
     """
     Retrieves Rotten Tomatoes information for entries.
 

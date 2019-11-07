@@ -11,7 +11,7 @@ from flexget.components.managed_lists.lists.pending_list.db import (
 from flexget.utils import json
 
 
-class TestPendingListAPI(object):
+class TestPendingListAPI:
     config = 'tasks: {}'
 
     def test_pending_list_list(self, api_client, schema_match):
@@ -298,7 +298,7 @@ class TestPendingListAPI(object):
         assert not data
 
 
-class TestPendingListPagination(object):
+class TestPendingListPagination:
     config = 'tasks: {}'
 
     def test_pending_list_pagination(self, api_client, link_headers):

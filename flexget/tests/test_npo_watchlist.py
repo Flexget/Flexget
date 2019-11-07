@@ -3,7 +3,7 @@ import pytest
 
 
 @pytest.mark.online
-class TestNpoWatchlistInfo(object):
+class TestNpoWatchlistInfo:
     config = """
         tasks:
           test:
@@ -68,7 +68,7 @@ class TestNpoWatchlistInfo(object):
 
 
 @pytest.mark.online
-class TestNpoWatchlistPremium(object):
+class TestNpoWatchlistPremium:
     config = """
         tasks:
           test:
@@ -93,7 +93,7 @@ class TestNpoWatchlistPremium(object):
 
 
 @pytest.mark.online
-class TestNpoWatchlistLanguageTheTVDBLookup(object):
+class TestNpoWatchlistLanguageTheTVDBLookup:
     config = """
         tasks:
           test:

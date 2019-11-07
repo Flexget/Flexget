@@ -35,7 +35,7 @@ class Entry(LazyDict):
     """
 
     def __init__(self, *args, **kwargs):
-        super(Entry, self).__init__()
+        super().__init__()
         self.traces = []
         self.snapshots = {}
         self._state = 'undecided'
@@ -208,7 +208,7 @@ class Entry(LazyDict):
         except Exception as e:
             log.debug('trying to debug key `%s` value threw exception: %s' % (key, e))
 
-        super(Entry, self).__setitem__(key, value)
+        super().__setitem__(key, value)
 
     def safe_str(self):
         return '%s | %s' % (self['title'], self['url'])

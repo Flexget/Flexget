@@ -14,7 +14,7 @@ except ImportError:
 log = logging.getLogger('torrent_scrub')
 
 
-class TorrentScrub(object):
+class TorrentScrub:
     """ Scrubs torrents from unwanted keys.
 
         Example:

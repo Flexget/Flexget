@@ -11,7 +11,7 @@ plugin_name = 'toast'
 log = logging.getLogger(plugin_name)
 
 
-class NotifyToast(object):
+class NotifyToast:
     """
     Sends messages via local notification system. You must have a notification system like dbus for Linux.
     Preliminary support for Windows notifications. Not heavily tested yet.

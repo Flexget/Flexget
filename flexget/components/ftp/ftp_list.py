@@ -19,7 +19,7 @@ except ImportError:
 log = logging.getLogger('ftp_list')
 
 
-class FTPList(object):
+class FTPList:
     def __init__(self):
         self.username = None
         self.password = None

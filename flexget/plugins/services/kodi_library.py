@@ -10,7 +10,7 @@ log = logging.getLogger('kodi_library')
 JSON_URI = '/jsonrpc'
 
 
-class KodiLibrary(object):
+class KodiLibrary:
     schema = {
         'type': 'object',
         'properties': {

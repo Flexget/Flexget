@@ -16,7 +16,7 @@ except ImportError:
 log = logging.getLogger('exists_series')
 
 
-class FilterExistsSeries(object):
+class FilterExistsSeries:
     """
     Intelligent series aware exists rejecting.
 

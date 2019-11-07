@@ -2,7 +2,7 @@ import pytest
 
 
 @pytest.mark.online
-class TestMyEpisodes(object):
+class TestMyEpisodes:
     """Uses test account at MyEpisodes, username and password are 'flexget'"""
 
     config = """

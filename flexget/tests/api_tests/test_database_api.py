@@ -6,7 +6,7 @@ from flexget.api.app import base_message
 from flexget.api.core.database import ObjectsContainer as OC
 
 
-class TestDatabaseAPI(object):
+class TestDatabaseAPI:
     config = 'tasks: {}'
 
     @pytest.mark.parametrize(

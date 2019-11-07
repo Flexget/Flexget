@@ -15,17 +15,17 @@ class EscapingEntry(Entry):
     """Helper class, same as a Entry, but returns all string value with quotes escaped."""
 
     def __init__(self, entry):
-        super(EscapingEntry, self).__init__(entry)
+        super().__init__(entry)
 
     def __getitem__(self, key):
-        value = super(EscapingEntry, self).__getitem__(key)
+        value = super().__getitem__(key)
         # TODO: May need to be different depending on OS
         if isinstance(value, str):
             value = value.replace('"', '\\"')
         return value
 
 
-class PluginExec(object):
+class PluginExec:
     """
     Execute commands
 

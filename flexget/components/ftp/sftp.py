@@ -124,7 +124,7 @@ def dependency_check():
         )
 
 
-class SftpList(object):
+class SftpList:
     """
     Generate entries from SFTP. This plugin requires the pysftp Python module and its dependencies.
 
@@ -281,7 +281,7 @@ class SftpList(object):
         return entries
 
 
-class SftpDownload(object):
+class SftpDownload:
     """
     Download files from a SFTP server. This plugin requires the pysftp Python module and its
     dependencies.
@@ -483,7 +483,7 @@ class SftpDownload(object):
                 sftp.close()
 
 
-class SftpUpload(object):
+class SftpUpload:
     """
     Upload files to a SFTP server. This plugin requires the pysftp Python module and its
     dependencies.

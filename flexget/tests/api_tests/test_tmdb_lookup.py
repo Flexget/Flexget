@@ -7,7 +7,7 @@ from flexget.utils import json
 
 
 @pytest.mark.online
-class TestTMDBMovieLookupAPI(object):
+class TestTMDBMovieLookupAPI:
     config = 'tasks: {}'
 
     def test_tmdb_movies_lookup_by_title(self, api_client, schema_match):

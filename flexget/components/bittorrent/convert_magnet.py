@@ -10,7 +10,7 @@ from flexget.utils.pathscrub import pathscrub
 log = logging.getLogger('convert_magnet')
 
 
-class ConvertMagnet(object):
+class ConvertMagnet:
     """Convert magnet only entries to a torrent file"""
 
     schema = {

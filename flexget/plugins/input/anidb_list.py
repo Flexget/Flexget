@@ -13,7 +13,7 @@ log = logging.getLogger('anidb_list')
 USER_ID_RE = r'^\d{1,6}$'
 
 
-class AnidbList(object):
+class AnidbList:
     """"Creates an entry for each movie or series in your AniDB wishlist."""
 
     anidb_url = 'http://anidb.net/perl-bin/'

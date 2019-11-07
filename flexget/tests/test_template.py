@@ -1,4 +1,4 @@
-class TestTemplate(object):
+class TestTemplate:
     config = """
         templates:
           global:
@@ -55,7 +55,7 @@ class TestTemplate(object):
         assert len(task.entries) == 2, 'Should only have been 2 entries created'
 
 
-class TestTemplateMerge(object):
+class TestTemplateMerge:
     config = """
         templates:
           movies:
@@ -85,7 +85,7 @@ class TestTemplateMerge(object):
         assert 'comedy' in task.config['imdb']['reject_genres'], 'list merge failed'
 
 
-class TestTemplateRerun(object):
+class TestTemplateRerun:
     config = """
         templates:
           a:
@@ -102,7 +102,7 @@ class TestTemplateRerun(object):
         assert len(task.config['series']) == 1
 
 
-class TestTemplateChange(object):
+class TestTemplateChange:
     config = """
         templates:
           a:

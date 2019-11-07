@@ -10,7 +10,7 @@ log = logging.getLogger('set')
 UNSET = object()
 
 
-class ModifySet(object):
+class ModifySet:
     """Allows adding information to a task entry for use later.
 
     Example:

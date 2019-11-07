@@ -8,7 +8,7 @@ from flexget.components.sites.urlrewriting import UrlRewritingError
 log = logging.getLogger('urlrewrite')
 
 
-class UrlRewrite(object):
+class UrlRewrite:
     """
     Generic configurable urlrewriter.
 

@@ -1,4 +1,4 @@
-class TestRegexpList(object):
+class TestRegexpList:
     config = r"""
         tasks:
           regexp_list_add:

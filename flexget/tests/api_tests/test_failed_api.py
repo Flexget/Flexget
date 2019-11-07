@@ -7,7 +7,7 @@ from flexget.manager import Session
 from flexget.utils import json
 
 
-class TestRetryFailedAPI(object):
+class TestRetryFailedAPI:
     config = "{'tasks': {}}"
 
     def test_retry_failed_all(self, api_client, schema_match):
@@ -112,7 +112,7 @@ class TestRetryFailedAPI(object):
         assert not errors
 
 
-class TestFailedPaginationAPI(object):
+class TestFailedPaginationAPI:
     config = 'tasks: {}'
 
     def add_failed_entries(self):

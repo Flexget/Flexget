@@ -80,7 +80,7 @@ def use_task_logging(func):
     return wrapper
 
 
-class EntryIterator(object):
+class EntryIterator:
     """An iterator over a subset of entries to emulate old task.accepted/rejected/failed/entries properties."""
 
     def __init__(self, entries, states):
@@ -155,7 +155,7 @@ class TaskAbort(Exception):
 
 
 @total_ordering
-class Task(object):
+class Task:
     """
     Represents one task in the configuration.
 

@@ -6,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('anirena')
 
 
-class UrlRewriteAniRena(object):
+class UrlRewriteAniRena:
     """AniRena urlrewriter."""
 
     def url_rewritable(self, task, entry):

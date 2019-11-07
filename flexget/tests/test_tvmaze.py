@@ -15,7 +15,7 @@ lookup_series = APITVMaze.series_lookup
 
 
 @pytest.mark.online
-class TestTVMazeShowLookup(object):
+class TestTVMazeShowLookup:
     config = """
         templates:
           global:
@@ -470,7 +470,7 @@ class TestTVMazeShowLookup(object):
 
 
 @pytest.mark.online
-class TestTVMazeUnicodeLookup(object):
+class TestTVMazeUnicodeLookup:
     config = """
         templates:
           global:
@@ -499,7 +499,7 @@ class TestTVMazeUnicodeLookup(object):
 
 
 @pytest.mark.online
-class TestTVMazeSeasonLookup(object):
+class TestTVMazeSeasonLookup:
     config = """
         templates:
           global:

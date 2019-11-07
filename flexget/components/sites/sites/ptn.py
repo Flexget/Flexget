@@ -52,7 +52,7 @@ default_search_params = {
 }
 
 
-class SearchPTN(object):
+class SearchPTN:
     schema = {
         'type': 'object',
         'properties': {

@@ -11,7 +11,7 @@ from flexget.utils.tools import parse_filesize
 log = logging.getLogger('yts')
 
 
-class UrlRewriteYTS(object):
+class UrlRewriteYTS:
     """YTS search"""
 
     schema = {'type': 'boolean'}

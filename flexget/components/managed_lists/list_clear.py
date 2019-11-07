@@ -7,7 +7,7 @@ from flexget.plugin import PluginError
 log = logging.getLogger('list_clear')
 
 
-class ListClear(object):
+class ListClear:
     schema = {
         'type': 'object',
         'properties': {

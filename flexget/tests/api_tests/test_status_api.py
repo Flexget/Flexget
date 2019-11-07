@@ -7,7 +7,7 @@ from flexget.manager import Session
 from flexget.utils import json
 
 
-class TestStatusAPI(object):
+class TestStatusAPI:
     config = "{'tasks': {}}"
 
     def test_status_get_all(self, api_client, schema_match):
@@ -104,7 +104,7 @@ class TestStatusAPI(object):
         assert len(data) == 1
 
 
-class TestTaskStatusPagination(object):
+class TestTaskStatusPagination:
     config = "'tasks': {}"
 
     def test_status_tasks_pagination(self, api_client, link_headers):

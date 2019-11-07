@@ -21,7 +21,7 @@ REPUTATIONS = {  # Maps reputation name to feed address
 }
 
 
-class Torrentz(object):
+class Torrentz:
     """Torrentz search and urlrewriter"""
 
     schema = {

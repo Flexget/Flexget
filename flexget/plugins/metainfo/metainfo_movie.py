@@ -13,7 +13,7 @@ except ImportError:
 log = logging.getLogger('metainfo_movie')
 
 
-class MetainfoMovie(object):
+class MetainfoMovie:
     """
     Check if entry appears to be a movie, and populate movie info if so.
     """

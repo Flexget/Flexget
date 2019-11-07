@@ -7,7 +7,7 @@ from flexget.utils.log import log_once
 log = logging.getLogger('urlfix')
 
 
-class UrlFix(object):
+class UrlFix:
     """
     Automatically fix broken urls.
     """

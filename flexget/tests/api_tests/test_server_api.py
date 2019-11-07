@@ -12,7 +12,7 @@ from flexget.tests.conftest import MockManager
 from flexget.utils.tools import get_latest_flexget_version_number
 
 
-class TestServerAPI(object):
+class TestServerAPI:
     config = """
         tasks:
           test:

@@ -5,7 +5,7 @@ import flexget.utils.qualities as qualities
 from flexget.task import TaskAbort
 
 
-class TestAssumeQuality(object):
+class TestAssumeQuality:
     _config = """
         templates:
           global:

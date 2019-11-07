@@ -18,7 +18,7 @@ from . import db
 pending_api = api.namespace('pending', description='View and manage pending entries')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     pending_entry_object = {
         'type': 'object',
         'properties': {

@@ -1,4 +1,4 @@
-class TestRegexExtract(object):
+class TestRegexExtract:
     config = """
         tasks:
 

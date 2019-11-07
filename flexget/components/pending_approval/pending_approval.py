@@ -9,7 +9,7 @@ from . import db
 log = logging.getLogger('pending_approval')
 
 
-class PendingApproval(object):
+class PendingApproval:
     schema = {
         'type': 'boolean',
         'deprecated': 'pending_approval is deprecated, switch to using pending_list',

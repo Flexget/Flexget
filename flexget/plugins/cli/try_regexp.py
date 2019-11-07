@@ -8,7 +8,7 @@ from flexget.terminal import console
 log = logging.getLogger('try_regexp')
 
 
-class PluginTryRegexp(object):
+class PluginTryRegexp:
     """
         This plugin allows user to test regexps for a task.
     """

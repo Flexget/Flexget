@@ -1,4 +1,4 @@
-class TestListInterface(object):
+class TestListInterface:
     config = """
         templates:
           global:

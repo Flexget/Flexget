@@ -3,7 +3,7 @@ from flexget.entry import Entry
 from flexget.event import event
 
 
-class ExternalPlugin(object):
+class ExternalPlugin:
     schema = {'type': 'boolean'}
 
     def on_task_input(self, task, config):

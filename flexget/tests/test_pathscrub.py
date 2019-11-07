@@ -3,7 +3,7 @@ import pytest
 from flexget.utils.pathscrub import pathscrub
 
 
-class TestPathscrub(object):
+class TestPathscrub:
     def test_windows_filenames(self):
         # Windows filename tests
         # 'None' indicates there should be no changes after path scrub

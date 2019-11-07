@@ -13,7 +13,7 @@ from . import db
 log = logging.getLogger('next_trakt_episodes')
 
 
-class NextTraktEpisodes(object):
+class NextTraktEpisodes:
     """
     Creates an entry for the latest or the next item in your watched or collected
     episodes in your trakt account.

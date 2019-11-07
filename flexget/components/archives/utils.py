@@ -91,7 +91,7 @@ def makepath(path):
         os.makedirs(path)
 
 
-class Archive(object):
+class Archive:
     """
     Base archive class. Assumes an interface similar to
     zipfile.ZipFile or rarfile.RarFile
@@ -161,7 +161,7 @@ class RarArchive(Archive):
             raise NeedRarFile('Python module rarfile needed to handle RAR archives')
 
         try:
-            super(RarArchive, self).__init__(rarfile.RarFile, path)
+            super().__init__(rarfile.RarFile, path)
         except rarfile.BadRarFile as error:
             raise BadArchive(error)
         except rarfile.NeedFirstVolume as error:
@@ -176,7 +176,7 @@ class RarArchive(Archive):
     def open(self, member):
         """Returns file-like object from where the data of a member file can be read."""
         try:
-            return super(RarArchive, self).open(member)
+            return super().open(member)
         except rarfile.Error as error:
             raise ArchiveError(error)
 
@@ -188,19 +188,19 @@ class ZipArchive(Archive):
 
     def __init__(self, path):
         try:
-            super(ZipArchive, self).__init__(zipfile.ZipFile, path)
+            super().__init__(zipfile.ZipFile, path)
         except zipfile.BadZipfile as error:
             raise BadArchive(error)
 
     def open(self, member):
         """Returns file-like object from where the data of a member file can be read."""
         try:
-            return super(ZipArchive, self).open(member)
+            return super().open(member)
         except zipfile.BadZipfile as error:
             raise ArchiveError(error)
 
 
-class ArchiveInfo(object):
+class ArchiveInfo:
     """Wrapper class for  archive info objects"""
 
     def __init__(self, info):

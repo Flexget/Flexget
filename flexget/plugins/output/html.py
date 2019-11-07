@@ -10,7 +10,7 @@ PLUGIN_NAME = 'make_html'
 log = logging.getLogger(PLUGIN_NAME)
 
 
-class OutputHtml(object):
+class OutputHtml:
     schema = {
         'type': 'object',
         'properties': {'template': {'type': 'string'}, 'file': {'type': 'string'}},

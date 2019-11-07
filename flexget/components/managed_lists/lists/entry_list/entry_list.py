@@ -12,7 +12,7 @@ from . import db
 log = logging.getLogger(__name__)
 
 
-class EntryList(object):
+class EntryList:
     schema = {'type': 'string'}
 
     @staticmethod

@@ -48,7 +48,7 @@ manager = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
 
 
-class Manager(object):
+class Manager:
     """Manager class for FlexGet
 
     Fires events:

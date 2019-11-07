@@ -11,7 +11,7 @@ from flexget.task import TaskAbort
 log = logging.getLogger('task_queue')
 
 
-class TaskQueue(object):
+class TaskQueue:
     """
     Task processing thread.
     Only executes one task at a time, if more are requested they are queued up and run in turn.

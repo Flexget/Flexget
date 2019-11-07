@@ -2,7 +2,7 @@ from flexget.manager import Session
 from flexget.plugins.filter.upgrade import EntryUpgrade
 
 
-class TestUpgrade(object):
+class TestUpgrade:
     config = """
         tasks:
           first_download:
@@ -63,7 +63,7 @@ class TestUpgrade(object):
         assert entry, 'Movie.BRRip.x264.720p should have been rejected'
 
 
-class TestUpgradeTarget(object):
+class TestUpgradeTarget:
     config = """
         tasks:
           existing_download_480p:
@@ -131,7 +131,7 @@ class TestUpgradeTarget(object):
         assert entry, 'Movie.720p.WEB-DL.X264.AC3 should have been undecided'
 
 
-class TestUpgradeTimeFrame(object):
+class TestUpgradeTimeFrame:
     config = """
         tasks:
           existing_download_480p:
@@ -167,7 +167,7 @@ class TestUpgradeTimeFrame(object):
         assert entry, 'Movie.HDRip.XviD.AC3 should have been accepted'
 
 
-class TestUpgradePropers(object):
+class TestUpgradePropers:
     config = """
         templates:
           global:

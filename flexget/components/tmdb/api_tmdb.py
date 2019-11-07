@@ -274,7 +274,7 @@ class TMDBSearchResult(Base):
             self.movie = movie
 
 
-class ApiTmdb(object):
+class ApiTmdb:
     """Does lookups to TMDb and provides movie information. Caches lookups."""
 
     @staticmethod

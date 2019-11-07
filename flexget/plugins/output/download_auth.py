@@ -11,7 +11,7 @@ PLUGIN_NAME = 'download_auth'
 log = logging.getLogger(PLUGIN_NAME)
 
 
-class DownloadAuth(object):
+class DownloadAuth:
     host_schema = {
         'additionalProperties': {
             'type': 'object',

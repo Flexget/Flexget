@@ -36,7 +36,7 @@ SORT_BY = {
 }
 
 
-class Letterboxd(object):
+class Letterboxd:
     schema = {
         'type': 'object',
         'properties': {

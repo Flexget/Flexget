@@ -12,7 +12,7 @@ from requests.exceptions import RequestException
 log = logging.getLogger('rlsbb')
 
 
-class UrlRewriteRlsbb(object):
+class UrlRewriteRlsbb:
     """
     rlsbb.ru urlrewriter
     Version 0.1

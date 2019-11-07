@@ -8,7 +8,7 @@ from flexget.event import event
 log = logging.getLogger('assume_quality')
 
 
-class AssumeQuality(object):
+class AssumeQuality:
     """
     Applies quality components to entries that match specified quality requirements.
     When a quality is applied, any components which are unknown in the entry are filled from the applied quality.

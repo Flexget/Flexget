@@ -6,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('inputs')
 
 
-class PluginInputs(object):
+class PluginInputs:
     """
     Allows the same input plugin to be configured multiple times in a task.
 

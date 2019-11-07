@@ -2,7 +2,7 @@ from flexget.components.managed_lists.lists.movie_list.api import ObjectsContain
 from flexget.utils import json
 
 
-class TestETAG(object):
+class TestETAG:
     config = 'tasks: {}'
 
     def test_etag(self, api_client, schema_match):

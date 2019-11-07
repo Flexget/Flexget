@@ -7,7 +7,7 @@ from flexget.components.imdb.utils import ImdbSearch
 imdb_api = api.namespace('imdb', description='IMDB lookup endpoint')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     movie_object = {
         'type': 'object',
         'properties': {

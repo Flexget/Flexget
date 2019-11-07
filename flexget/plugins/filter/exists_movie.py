@@ -10,7 +10,7 @@ from flexget.utils.tools import TimedDict
 log = logging.getLogger('exists_movie')
 
 
-class FilterExistsMovie(object):
+class FilterExistsMovie:
     """
     Reject existing movies.
 

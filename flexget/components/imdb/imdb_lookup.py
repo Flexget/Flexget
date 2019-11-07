@@ -13,7 +13,7 @@ from . import db
 log = logging.getLogger('imdb_lookup')
 
 
-class ImdbLookup(object):
+class ImdbLookup:
     """
     Retrieves imdb information for entries.
     Also provides imdb lookup functionality to all other imdb related plugins.

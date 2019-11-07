@@ -9,7 +9,7 @@ from flexget.utils.database import Session
 log = logging.getLogger('est_movies_bluray')
 
 
-class EstimatesMoviesBluray(object):
+class EstimatesMoviesBluray:
     @plugin.priority(2)
     def estimate(self, entry):
         if 'movie_name' not in entry:

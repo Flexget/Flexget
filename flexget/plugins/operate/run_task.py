@@ -8,7 +8,7 @@ from flexget.event import event
 log = logging.getLogger('run_task')
 
 
-class RunTask(object):
+class RunTask:
     schema = {
         'type': 'object',
         'properties': {

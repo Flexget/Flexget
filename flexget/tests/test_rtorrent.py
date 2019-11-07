@@ -22,7 +22,7 @@ def compare_binary(obj1, obj2):
     return True
 
 
-class Matcher(object):
+class Matcher:
     def __init__(self, compare, some_obj):
         self.compare = compare
         self.some_obj = some_obj
@@ -32,7 +32,7 @@ class Matcher(object):
 
 
 @mock.patch('flexget.plugins.clients.rtorrent.xmlrpc_client.ServerProxy')
-class TestRTorrentClient(object):
+class TestRTorrentClient:
     def test_load(self, mocked_proxy):
         mocked_proxy = mocked_proxy()
         mocked_proxy.execute.throw.return_value = 0
@@ -220,7 +220,7 @@ class TestRTorrentClient(object):
 
 
 @mock.patch('flexget.plugins.clients.rtorrent.RTorrent')
-class TestRTorrentOutputPlugin(object):
+class TestRTorrentOutputPlugin:
     config = (
         """
         tasks:
@@ -364,7 +364,7 @@ class TestRTorrentOutputPlugin(object):
 
 
 @mock.patch('flexget.plugins.clients.rtorrent.RTorrent')
-class TestRTorrentInputPlugin(object):
+class TestRTorrentInputPlugin:
     config = """
         tasks:
           test_input:

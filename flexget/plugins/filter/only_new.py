@@ -6,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('only_new')
 
 
-class FilterOnlyNew(object):
+class FilterOnlyNew:
     """Causes input plugins to only emit entries that haven't been seen on previous runs."""
 
     schema = {'type': 'boolean'}

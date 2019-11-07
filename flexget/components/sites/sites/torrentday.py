@@ -42,7 +42,7 @@ CATEGORIES = {
 }
 
 
-class UrlRewriteTorrentday(object):
+class UrlRewriteTorrentday:
     """
         Torrentday urlrewriter and search plugin.
 

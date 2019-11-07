@@ -5,7 +5,7 @@ from flexget.components.parsing.parsers.parser_internal import ParserInternal
 from flexget.components.parsing.parsers.parser_guessit import ParserGuessit
 
 
-class TestSeriesParser(object):
+class TestSeriesParser:
     @pytest.fixture(
         scope='class', params=(ParserInternal, ParserGuessit), ids=['internal', 'guessit']
     )

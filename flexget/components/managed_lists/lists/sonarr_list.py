@@ -249,7 +249,7 @@ class SonarrSet(MutableSet):
         return self._find_entry(entry)
 
 
-class SonarrList(object):
+class SonarrList:
     schema = SonarrSet.schema
 
     @staticmethod

@@ -57,7 +57,7 @@ def series_details(show, begin=False, latest=False):
     return series_dict
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     episode_release_object = {
         'type': 'object',
         'properties': {

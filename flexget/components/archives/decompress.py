@@ -91,7 +91,7 @@ def is_match(info, pattern):
     return is_match
 
 
-class Decompress(object):
+class Decompress:
     r"""
     Extracts files from Zip or RAR archives. By default this plugin will extract to the same
     directory as the source archive, preserving directory structure from the archive.

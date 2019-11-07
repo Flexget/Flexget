@@ -31,7 +31,7 @@ def rejected_entry_to_dict(entry):
     }
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     rejected_entry_object = {
         'type': 'object',
         'properties': {

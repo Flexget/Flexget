@@ -82,7 +82,7 @@ def render_config(config, template_renderer, notifier_name, _path=''):
         return config
 
 
-class NotificationFramework(object):
+class NotificationFramework:
     def send_notification(self, title, message, notifiers, template_renderer=None):
         """
         Send a notification out to the given `notifiers` with a given `title` and `message`.

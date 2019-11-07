@@ -2,7 +2,7 @@ import pytest
 
 
 @pytest.mark.online
-class TestRadarrListActions(object):
+class TestRadarrListActions:
     config = """
         templates:
           global:

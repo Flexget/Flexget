@@ -41,7 +41,7 @@ class DTDecoder(json.JSONDecoder):
                 except (ValueError, TypeError):
                     pass
 
-        return super(DTDecoder, self).decode(obj, **kwargs)
+        return super().decode(obj, **kwargs)
 
 
 def _datetime_encoder(obj):

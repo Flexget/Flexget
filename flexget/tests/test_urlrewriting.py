@@ -1,7 +1,7 @@
 from flexget.plugin import get_plugin_by_name
 
 
-class TestURLRewriters(object):
+class TestURLRewriters:
     """
         Bad example, does things manually, you should use task.find_entry to check existance
     """
@@ -69,7 +69,7 @@ class TestURLRewriters(object):
         )
 
 
-class TestRegexpurlrewriter(object):
+class TestRegexpurlrewriter:
     # TODO: this test is broken?
 
     config = """

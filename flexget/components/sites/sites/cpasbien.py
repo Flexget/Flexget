@@ -15,7 +15,7 @@ log = logging.getLogger('search_cpasbien')
 session = requests.Session()
 
 
-class SearchCPASBIEN(object):
+class SearchCPASBIEN:
     schema = {
         'type': 'object',
         'properties': {
