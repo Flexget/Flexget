@@ -29,7 +29,7 @@ class Subtask(object):
             '{}>{}'.format(task.name, subtask_name),
             config=subtask_config,
             # TODO: Do we want to pass all options through? Things like inject don't make sense, but perhaps others do.
-            options=task.options,
+            options=None,
             output=task.output,
             loglevel=task.loglevel,
             priority=task.priority,
