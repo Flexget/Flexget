@@ -1,10 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import hashlib
 import logging
 import os
 import struct
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
 
 import pytz
 import tzlocal

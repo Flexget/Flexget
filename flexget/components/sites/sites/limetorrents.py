@@ -1,7 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import re
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
 
 import logging
 from unicodedata import normalize

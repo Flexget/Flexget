@@ -1,7 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import copy
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
 from math import ceil
 
 from flask import jsonify

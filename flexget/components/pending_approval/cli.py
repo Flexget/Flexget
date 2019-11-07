@@ -1,8 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import sys
 from argparse import ArgumentTypeError, ArgumentParser
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
 
 from colorclass.toggles import disable_all_colors
 from sqlalchemy.orm.exc import NoResultFound

@@ -1,5 +1,3 @@
-from builtins import *
-
 import logging
 
 from flexget import plugin

@@ -182,7 +182,7 @@ def pytest_configure(config):
         'markers',
         'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.'
         'online: mark a test that goes online. VCR will automatically be used.'
-        'chdir: change current working dir'
+        'chdir: change current working dir',
     )
 
 

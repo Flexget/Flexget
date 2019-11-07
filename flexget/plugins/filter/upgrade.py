@@ -1,15 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from datetime import datetime
-from sqlalchemy import Column, String, Unicode, DateTime, Integer
 import logging
+from datetime import datetime
+
+from sqlalchemy import Column, String, Unicode, DateTime, Integer
 
 from flexget import db_schema, plugin
-from flexget.entry import Entry
-from flexget.utils.database import quality_property
 from flexget.db_schema import Session
+from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import qualities
+from flexget.utils.database import quality_property
 from flexget.utils.tools import parse_timedelta, group_entries
 
 log = logging.getLogger('upgrade')

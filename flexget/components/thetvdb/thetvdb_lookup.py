@@ -1,7 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
 from functools import partial
 
 from flexget import plugin

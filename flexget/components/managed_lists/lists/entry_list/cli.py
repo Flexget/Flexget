@@ -1,7 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-
 from argparse import ArgumentParser, ArgumentTypeError
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
 
 from sqlalchemy.orm.exc import NoResultFound
 

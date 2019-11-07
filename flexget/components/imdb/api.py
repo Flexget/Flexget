@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
 from flask import jsonify
 
 from flexget.api import api, APIResource

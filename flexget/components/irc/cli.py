@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from argparse import ArgumentParser
 
 from colorclass.toggles import disable_all_colors

@@ -1,8 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import re
 from argparse import ArgumentParser, ArgumentTypeError
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
 
 from flexget import options
 from flexget.event import event

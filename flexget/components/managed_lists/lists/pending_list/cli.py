@@ -1,7 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-
 from argparse import ArgumentParser, ArgumentTypeError
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 from functools import partial
 
 from colorclass.toggles import disable_all_colors

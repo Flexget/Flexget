@@ -1,7 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import datetime
-from builtins import *  # noqa
+
 from datetime import timedelta
 
 from colorclass.toggles import disable_all_colors

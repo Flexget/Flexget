@@ -1,11 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import argparse
 import itertools
 import logging
 import sys
 import time
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
 from collections import defaultdict
 from copy import copy
 from datetime import datetime

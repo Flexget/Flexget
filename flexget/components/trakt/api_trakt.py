@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import, print_function
+
 
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
 
 from dateutil.parser import parse as dateutil_parse
 
