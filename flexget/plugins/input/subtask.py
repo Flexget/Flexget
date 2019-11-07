@@ -22,14 +22,11 @@ class Subtask(object):
     def on_task_input(self, task, config):
         subtask_name = config
         subtask_config = task.manager.config['tasks'].get(subtask_name, {})
-        # TODO: This seen disabling is super hacky, is there a better way?
-        if 'seen' not in subtask_config:
-            if isinstance(subtask_config.get('disable'), str):
-                subtask_config['disable'] = [subtask_config['disable']]
-            subtask_config.setdefault('disable', []).append('seen')
+        # TODO: This seen disabling is sorta hacky, is there a better way?
+        subtask_config.setdefault('seen', False)
         input_task = Task(
             task.manager,
-            '{}.{}'.format(task.name, subtask_name),
+            '{}>{}'.format(task.name, subtask_name),
             config=subtask_config,
             # TODO: Do we want to pass all options through? Things like inject don't make sense, but perhaps others do.
             options=task.options,
