@@ -1548,6 +1548,19 @@ class TestFromGroup(object):
               - {title: 'Test :: h264 10-bit | Softsubs (Ignore) | Episode 3'}
             series:
               - test: {from_group: [Name, FlexGet]}
+          test_merge:
+            mock:
+              - {title: 'Test.15.HDTV-Ignored'}
+              - {title: 'Test.15.HDTV-FlexGet'}
+              - {title: 'TestMerge.13.HDTV-Ignored'}
+              - {title: 'TestMerge.13.HDTV-FlexGet'}
+              - {title: 'TestMerge.14.HDTV-Name'}
+            series:
+              settings:
+                testgroup: {from_group: [Name]}
+              testgroup:
+                - test: {from_group: FlexGet}
+                - testmerge: {from_group: [FlexGet]}
     """
 
     def test_from_group(self, execute_task):
@@ -1559,6 +1572,11 @@ class TestFromGroup(object):
         assert task.find_entry(
             'accepted', title='Test :: h264 10-bit | Softsubs (FlexGet) | Episode 3'
         )
+        # Test interaction with setting group. Merge if both are lists, override if different types
+        task = execute_task('test_merge')
+        assert task.find_entry('accepted', title='Test.15.HDTV-FlexGet')
+        assert task.find_entry('accepted', title='TestMerge.13.HDTV-FlexGet')
+        assert task.find_entry('accepted', title='TestMerge.14.HDTV-Name')
 
 
 class TestBegin(object):
