@@ -1,23 +1,21 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import
-
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 
 import pytest
 
-from flexget.manager import Session
 from flexget.components.tvmaze.api_tvmaze import (
     APITVMaze,
+    TVMazeEpisodes,
     TVMazeLookup,
     TVMazeSeries,
-    TVMazeEpisodes,
 )
+from flexget.manager import Session
 
 lookup_series = APITVMaze.series_lookup
 
 
 @pytest.mark.online
-class TestTVMazeShowLookup(object):
+class TestTVMazeShowLookup:
     config = """
         templates:
           global:
@@ -472,7 +470,7 @@ class TestTVMazeShowLookup(object):
 
 
 @pytest.mark.online
-class TestTVMazeUnicodeLookup(object):
+class TestTVMazeUnicodeLookup:
     config = """
         templates:
           global:
@@ -501,7 +499,7 @@ class TestTVMazeUnicodeLookup(object):
 
 
 @pytest.mark.online
-class TestTVMazeSeasonLookup(object):
+class TestTVMazeSeasonLookup:
     config = """
         templates:
           global:

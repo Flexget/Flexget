@@ -1,24 +1,23 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import json
 import logging
 import os
 import re
 from collections import deque
-from functools import wraps, partial
+from functools import partial, wraps
 
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, jsonify, make_response, request
 from flask_compress import Compress
 from flask_cors import CORS
-from flask_restplus import Api as RestPlusAPI, Resource
+from flask_restplus import Api as RestPlusAPI
+from flask_restplus import Resource
 from jsonschema import RefResolutionError
 from werkzeug.http import generate_etag
 
 from flexget import manager
-from flexget.config_schema import process_config, format_checker
+from flexget.config_schema import format_checker, process_config
 from flexget.utils.database import with_session
 from flexget.webserver import User
+
 from . import __path__
 
 __version__ = '1.5.0'
@@ -26,7 +25,7 @@ __version__ = '1.5.0'
 log = logging.getLogger('api')
 
 
-class APIClient(object):
+class APIClient:
     """
     This is an client which can be used as a more pythonic interface to the rest api.
 
@@ -53,7 +52,7 @@ class APIClient(object):
         return result
 
 
-class APIEndpoint(object):
+class APIEndpoint:
     def __init__(self, endpoint, caller):
         self.endpoint = endpoint
         self.caller = caller
@@ -86,7 +85,7 @@ class APIResource(Resource):
 
     def __init__(self, api, *args, **kwargs):
         self.manager = manager.manager
-        super(APIResource, self).__init__(api, *args, **kwargs)
+        super().__init__(api, *args, **kwargs)
 
 
 class API(RestPlusAPI):
@@ -305,7 +304,7 @@ class ValidationError(APIError):
         payload = {
             'validation_errors': [self._verror_to_dict(error) for error in validation_errors]
         }
-        super(ValidationError, self).__init__(message, payload=payload)
+        super().__init__(message, payload=payload)
 
     def _verror_to_dict(self, error):
         error_dict = {}

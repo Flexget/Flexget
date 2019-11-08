@@ -1,20 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import queue
 import sys
 import threading
 import time
 
-from sqlalchemy.exc import ProgrammingError, OperationalError
+from sqlalchemy.exc import OperationalError, ProgrammingError
 
 from flexget.task import TaskAbort
 
 log = logging.getLogger('task_queue')
 
 
-class TaskQueue(object):
+class TaskQueue:
     """
     Task processing thread.
     Only executes one task at a time, if more are requested they are queued up and run in turn.

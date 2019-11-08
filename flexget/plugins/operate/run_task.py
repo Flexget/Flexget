@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
 import logging
 
@@ -11,7 +8,7 @@ from flexget.event import event
 log = logging.getLogger('run_task')
 
 
-class RunTask(object):
+class RunTask:
     schema = {
         'type': 'object',
         'properties': {

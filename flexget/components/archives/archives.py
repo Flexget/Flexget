@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
-from flexget.event import event
 from flexget.components.archives import utils
+from flexget.event import event
 
 log = logging.getLogger('archives')
 
 
-class FilterArchives(object):
+class FilterArchives:
     """
     Accepts entries that are valid Zip or RAR archives
 
@@ -56,11 +53,7 @@ class FilterArchives(object):
 
         for entry in task.entries:
             archive_path = entry.get('location', '')
-
-            if utils.is_archive(archive_path):
-                entry.accept()
-            else:
-                entry.reject()
+            entry.accept() if utils.is_archive(str(archive_path)) else entry.reject()
 
 
 @event('plugin.register')

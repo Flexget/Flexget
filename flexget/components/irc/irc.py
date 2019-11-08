@@ -1,23 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import, with_statement
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-from future.moves.urllib.parse import quote
-
+import io
+import logging
 import os
 import re
 import threading
-import logging
-from xml.etree.ElementTree import parse
-import io
-from uuid import uuid4
 import time
 from datetime import datetime, timedelta
+from urllib.parse import quote
+from uuid import uuid4
+from xml.etree.ElementTree import parse
 
+from flexget.config_schema import one_or_more, register_config_key
 from flexget.entry import Entry
-from flexget.config_schema import register_config_key
 from flexget.event import event
 from flexget.manager import manager
-from flexget.config_schema import one_or_more
 from flexget.utils import requests
 from flexget.utils.tools import get_config_hash
 
@@ -39,7 +34,7 @@ URL_MATCHER = re.compile(
 
 channel_pattern = {
     'type': 'string',
-    'pattern': '^([#&][^\x07\x2C\s]{0,200})',
+    'pattern': r'^([#&][^\x07\x2C\s]{0,200})',
     'error_pattern': 'channel name must start with # or & and contain no commas and whitespace',
 }
 schema = {
@@ -87,13 +82,16 @@ schema = {
                 },
                 'allOf': [
                     {
-                        'anyOf': [{'required': ['server', 'channels']}, {'required': ['tracker_file']}],
+                        'anyOf': [
+                            {'required': ['server', 'channels']},
+                            {'required': ['tracker_file']},
+                        ],
                         'error': 'Must specify a tracker file or server and channel(s)',
                     },
                     {
                         'anyOf': [{'required': ['task']}, {'required': ['task_re']}],
                         'error': 'Must specify a task',
-                    }
+                    },
                 ],
                 'required': ['port'],
                 'additionalProperties': {'type': 'string'},
@@ -128,7 +126,7 @@ def irc_prefix(var):
     :param var: Variable to prefix
     :return: Prefixed variable
     """
-    if isinstance(var, basestring):
+    if isinstance(var, str):
         return 'irc_%s' % var.lower()
 
 
@@ -138,7 +136,7 @@ def strip_whitespace(value):
     :param value:
     :return: stripped string or value
     """
-    if isinstance(value, basestring):
+    if isinstance(value, str):
         return value.strip()
     return value
 
@@ -260,8 +258,8 @@ class IRCConnection(SimpleIRCBot):
         self.entry_queue = []
         self.line_cache = {}
         self.processing_message = (
-            False
-        )  # if set to True, it means there's a message processing queued
+            False  # if set to True, it means there's a message processing queued
+        )
         self.thread = create_thread(self.connection_name, self)
 
     @classmethod
@@ -399,7 +397,7 @@ class IRCConnection(SimpleIRCBot):
         tasks = self.config.get('task')
         tasks_re = self.config.get('task_re')
         if tasks:
-            if isinstance(tasks, basestring):
+            if isinstance(tasks, str):
                 tasks = [tasks]
             log.debug(
                 'Injecting %d entries into tasks %s', len(self.entry_queue), ', '.join(tasks)
@@ -862,7 +860,7 @@ class IRCConnection(SimpleIRCBot):
         self.quit()
 
 
-class IRCConnectionManager(object):
+class IRCConnectionManager:
     def __init__(self, config):
         self.config = config
         self.shutdown_event = threading.Event()

@@ -1,13 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime, timedelta
 
 from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.tools import parse_timedelta
+
 from . import db
 
 SCHEMA_VER = 3
@@ -16,7 +14,7 @@ FAIL_LIMIT = 100
 log = logging.getLogger('failed')
 
 
-class PluginFailed(object):
+class PluginFailed:
     """
     Records entry failures and stores them for trying again after a certain interval.
     Rejects them after they have failed too many times.

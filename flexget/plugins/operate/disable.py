@@ -1,11 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 
 log = logging.getLogger('disable')
 
@@ -15,7 +12,7 @@ def all_builtins():
     return (p for p in plugin.plugins.values() if p.builtin)
 
 
-class DisablePlugin(object):
+class DisablePlugin:
     """
     Allows disabling built-ins, or plugins referenced by template/include plugin.
 
@@ -54,7 +51,7 @@ class DisablePlugin(object):
             # Disable plugins explicitly included in config.
             if p in task.config:
                 disabled.append(p)
-                del (task.config[p])
+                del task.config[p]
             # Disable built-in plugins.
             if p in plugin.plugins and plugin.plugins[p].builtin:
                 plugin.plugins[p].builtin = False

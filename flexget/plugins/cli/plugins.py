@@ -1,13 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from colorclass.toggles import disable_all_colors
+
 from flexget import options
 from flexget.event import event
 from flexget.plugin import get_plugins
-from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console, colorize
+from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
 
 log = logging.getLogger('plugins')
 

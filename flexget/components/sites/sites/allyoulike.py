@@ -1,14 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
 import re
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from requests.exceptions import RequestException
 
 from flexget import plugin
-from flexget.event import event
 from flexget.components.sites.utils import normalize_unicode
+from flexget.event import event
 from flexget.utils.soup import get_soup
 
 try:
@@ -24,7 +21,7 @@ except ImportError:
 log = logging.getLogger('rlsbb')
 
 
-class UrlRewriteAllyoulike(object):
+class UrlRewriteAllyoulike:
     """
     allyoulike.com urlrewriter
     Version 0.1

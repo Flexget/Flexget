@@ -1,28 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import sys
 import copy
 import random
 import string
-from argparse import ArgumentParser as ArgParser, _UNRECOGNIZED_ARGS_ATTR
-from argparse import (
-    _VersionAction,
-    Action,
-    ArgumentError,
-    Namespace,
-    PARSER,
-    REMAINDER,
-    SUPPRESS,
-    _SubParsersAction,
-)
+import sys
+from argparse import _UNRECOGNIZED_ARGS_ATTR, PARSER, REMAINDER, SUPPRESS, Action, ArgumentError
+from argparse import ArgumentParser as ArgParser
+from argparse import Namespace, _SubParsersAction, _VersionAction
 
 import flexget
-
 from flexget.entry import Entry
 from flexget.event import fire_event
-from flexget.utils import requests
-from flexget.utils.tools import get_latest_flexget_version_number, get_current_flexget_version
+from flexget.utils.tools import get_current_flexget_version, get_latest_flexget_version_number
 
 _UNSET = object()
 
@@ -150,7 +137,7 @@ class ParseExtrasAction(Action):
         if help is None:
             help = 'arguments for the `%s` command are allowed here' % parser.prog
         self._parser = parser
-        super(ParseExtrasAction, self).__init__(
+        super().__init__(
             option_strings=option_strings,
             dest=SUPPRESS,
             help=help,
@@ -167,7 +154,7 @@ class ParseExtrasAction(Action):
 
 class ScopedNamespace(Namespace):
     def __init__(self, **kwargs):
-        super(ScopedNamespace, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.__parent__ = None
 
     def __getattr__(self, key):
@@ -208,12 +195,12 @@ class NestedSubparserAction(_SubParsersAction):
     def __init__(self, *args, **kwargs):
         self.nested_namespaces = kwargs.pop('nested_namespaces', False)
         self.parent_defaults = {}
-        super(NestedSubparserAction, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def add_parser(self, name, parent_defaults=None, **kwargs):
         if parent_defaults:
             self.parent_defaults[name] = parent_defaults
-        return super(NestedSubparserAction, self).add_parser(name, **kwargs)
+        return super().add_parser(name, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
         parser_name = values[0]
@@ -223,9 +210,7 @@ class NestedSubparserAction(_SubParsersAction):
                     setattr(namespace, dest, self.parent_defaults[parser_name][dest])
         if self.nested_namespaces:
             subnamespace = ScopedNamespace()
-            super(NestedSubparserAction, self).__call__(
-                parser, subnamespace, values, option_string
-            )
+            super().__call__(parser, subnamespace, values, option_string)
             # If dest is set, it should be set on the parent namespace, not subnamespace
             if self.dest is not SUPPRESS:
                 setattr(namespace, self.dest, parser_name)
@@ -237,7 +222,7 @@ class NestedSubparserAction(_SubParsersAction):
                 getattr(subnamespace, _UNRECOGNIZED_ARGS_ATTR)
             )
         else:
-            super(NestedSubparserAction, self).__call__(parser, namespace, values, option_string)
+            super().__call__(parser, namespace, values, option_string)
 
 
 class ParserError(Exception):
@@ -273,9 +258,7 @@ class ArgumentParser(ArgParser):
     - If the `file` argument is given to `parse_args`, output will be printed there instead of sys.stdout or stderr
     """
 
-    file = (
-        None
-    )  # This is created as a class attribute so that we can set it for parser and all subparsers at once
+    file = None  # This is created as a class attribute so that we can set it for parser and all subparsers at once
 
     def __init__(self, **kwargs):
         """
@@ -309,13 +292,13 @@ class ArgumentParser(ArgParser):
                 kwargs['nargs'] = '*'
             else:
                 kwargs['nargs'] = '+'
-        return super(ArgumentParser, self).add_argument(*args, **kwargs)
+        return super().add_argument(*args, **kwargs)
 
     def _print_message(self, message, file=None):
         """If a file argument was passed to `parse_args` make sure output goes there."""
         if self.file:
             file = self.file
-        super(ArgumentParser, self)._print_message(message, file)
+        super()._print_message(message, file)
 
     def set_post_defaults(self, **kwargs):
         """Like set_defaults method, but these defaults will be defined after parsing instead of before."""
@@ -338,11 +321,11 @@ class ArgumentParser(ArgParser):
         """
         ArgumentParser.file = file
         try:
-            return super(ArgumentParser, self).parse_args(args, namespace)
+            return super().parse_args(args, namespace)
         except ParserError as e:
             if raise_errors:
                 raise
-            super(ArgumentParser, e.parser).error(e.message)
+            super().error(e.message)
         finally:
             ArgumentParser.file = None
 
@@ -352,7 +335,7 @@ class ArgumentParser(ArgParser):
             args = unicode_argv()[1:]
         if namespace is None:
             namespace = ScopedNamespace()
-        namespace, args = super(ArgumentParser, self).parse_known_args(args, namespace)
+        namespace, args = super().parse_known_args(args, namespace)
 
         # add any post defaults that aren't present
         for dest in self.post_defaults:
@@ -368,7 +351,7 @@ class ArgumentParser(ArgParser):
         """
         # Set the parser class so subparsers don't end up being an instance of a subclass, like CoreArgumentParser
         kwargs.setdefault('parser_class', ArgumentParser)
-        self.subparsers = super(ArgumentParser, self).add_subparsers(**kwargs)
+        self.subparsers = super().add_subparsers(**kwargs)
         return self.subparsers
 
     def add_subparser(self, name, **kwargs):
@@ -400,7 +383,7 @@ class ArgumentParser(ArgParser):
                 matches = [x for x in self.subparsers.choices if x.startswith(subcommand)]
                 if len(matches) == 1:
                     arg_strings[0] = matches[0]
-        return super(ArgumentParser, self)._get_values(action, arg_strings)
+        return super()._get_values(action, arg_strings)
 
     def _debug_tb_callback(self, *dummy):
         import cgitb
@@ -486,7 +469,7 @@ class CoreArgumentParser(ArgumentParser):
     def __init__(self, **kwargs):
         kwargs.setdefault('parents', [manager_parser])
         kwargs.setdefault('prog', 'flexget')
-        super(CoreArgumentParser, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.add_subparsers(
             title='commands', metavar='<command>', dest='cli_command', nested_namespaces=True
         )
@@ -554,10 +537,10 @@ class CoreArgumentParser(ArgumentParser):
     def add_subparsers(self, **kwargs):
         # The subparsers should not be CoreArgumentParsers
         kwargs.setdefault('parser_class', ArgumentParser)
-        return super(CoreArgumentParser, self).add_subparsers(**kwargs)
+        return super().add_subparsers(**kwargs)
 
     def parse_args(self, *args, **kwargs):
-        result = super(CoreArgumentParser, self).parse_args(*args, **kwargs)
+        result = super().parse_args(*args, **kwargs)
         # Make sure we always have execute parser settings even when other commands called
         if not result.cli_command == 'execute':
             exec_options = get_parser('execute').parse_args([])

@@ -1,19 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from requests import RequestException
 
 from flexget import plugin
+from flexget.components.sites.utils import normalize_scene
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.components.sites.utils import normalize_scene
 
 log = logging.getLogger('argenteam')
 
 
-class SearchArgenteam(object):
+class SearchArgenteam:
     """ Argenteam
     Search plugin which gives results from www.argenteam.net, latin american (Argentina) web.
 

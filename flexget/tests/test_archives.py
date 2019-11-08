@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
 try:
@@ -10,7 +7,7 @@ except ImportError:
 
 
 @pytest.mark.chdir
-class TestArchiveFilter(object):
+class TestArchiveFilter:
     config = """
         tasks:
             test_archives:

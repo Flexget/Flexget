@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
 from flexget.components.imdb.api import ObjectsContainer as OC
@@ -8,7 +5,7 @@ from flexget.utils import json
 
 
 @pytest.mark.online
-class TestIMDBLookupAPI(object):
+class TestIMDBLookupAPI:
     config = 'tasks: {}'
 
     def test_imdb_search(self, api_client, schema_match):

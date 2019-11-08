@@ -1,33 +1,30 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
 import logging
 from math import ceil
 
-from flask import jsonify
-from flask import request
+from flask import jsonify, request
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import (
+    BadRequest,
     Conflict,
     NotFoundError,
     base_message_schema,
-    success_response,
-    BadRequest,
     etag,
     pagination_headers,
+    success_response,
 )
-from .movie_list import MovieListBase
+
 from . import db
+from .movie_list import MovieListBase
 
 log = logging.getLogger('movie_list')
 
 movie_list_api = api.namespace('movie_list', description='Movie List operations')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     input_movie_list_id_object = {
         'type': 'array',
         'items': {'type': 'object', 'minProperties': 1, 'additionalProperties': True},

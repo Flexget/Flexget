@@ -1,20 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 from math import ceil
 
 from flask import jsonify, request
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import (
-    base_message_schema,
-    success_response,
     NotFoundError,
+    base_message_schema,
     etag,
     pagination_headers,
+    success_response,
 )
+
 from . import db
 
 log = logging.getLogger('failed_api')
@@ -22,7 +20,7 @@ log = logging.getLogger('failed_api')
 retry_failed_api = api.namespace('failed', description='View and manage failed entries')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     retry_failed_entry_object = {
         'type': 'object',
         'properties': {

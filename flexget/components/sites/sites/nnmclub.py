@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from bs4 import BeautifulSoup
@@ -12,7 +9,7 @@ from flexget.utils import requests
 log = logging.getLogger('nnm-club')
 
 
-class UrlRewriteNnmClub(object):
+class UrlRewriteNnmClub:
     """Nnm-club.me urlrewriter."""
 
     def url_rewritable(self, task, entry):

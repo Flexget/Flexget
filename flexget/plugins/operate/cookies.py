@@ -1,9 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-
-import logging
 import http.cookiejar
+import logging
 
 from flexget import plugin
 from flexget.event import event
@@ -12,7 +8,7 @@ from flexget.utils.tools import TimedDict
 log = logging.getLogger('cookies')
 
 
-class PluginCookies(object):
+class PluginCookies:
     """
     Adds cookie to all requests (rss, resolvers, download). Anything
     that uses urllib2 to be exact.
@@ -43,7 +39,7 @@ class PluginCookies(object):
     }
 
     def prepare_config(self, config):
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = {'file': config}
         if config['file'].endswith('.txt'):
             config.setdefault('type', 'mozilla')
@@ -94,7 +90,7 @@ class PluginCookies(object):
         log.debug('fetching all cookies')
 
         def notabs(val):
-            if isinstance(val, basestring):
+            if isinstance(val, str):
                 return val.replace('\t', '')
             return val
 
@@ -128,7 +124,7 @@ class PluginCookies(object):
 
                     i = 0
                     for val in item:
-                        if isinstance(val, basestring):
+                        if isinstance(val, str):
                             log.debug('item[%s]: %s' % (i, to_hex(val)))
                         else:
                             log.debug('item[%s]: %s' % (i, val))

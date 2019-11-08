@@ -1,13 +1,10 @@
 """Torrenting utils, mostly for handling bencoding and torrent files."""
 # Torrent decoding is a short fragment from effbot.org. Site copyright says:
 # Test scripts and other short code fragments can be considered as being in the public domain.
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import binascii
 import functools
-import re
 import logging
+import re
 
 log = logging.getLogger('torrent')
 
@@ -96,7 +93,7 @@ def is_torrent_file(metafilepath):
     return bool(magic_marker)
 
 
-def tokenize(text, match=re.compile(b'([idel])|(\d+):|(-?\d+)').match):
+def tokenize(text, match=re.compile(br'([idel])|(\d+):|(-?\d+)').match):
     i = 0
     while i < len(text):
         m = match(text, i)
@@ -197,7 +194,7 @@ def bencode(data):
     raise TypeError('Unknown type for bencode: ' + str(type(data)))
 
 
-class Torrent(object):
+class Torrent:
     """Represents a torrent"""
 
     # string type used for keys, if this ever changes, stuff like "x in y"

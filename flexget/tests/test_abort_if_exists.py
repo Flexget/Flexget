@@ -1,12 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
 from flexget.task import TaskAbort
 
 
-class TestAbortIfExists(object):
+class TestAbortIfExists:
     config = """
         templates:
           global:
@@ -27,7 +24,7 @@ class TestAbortIfExists(object):
 
     def test_abort(self, execute_task):
         with pytest.raises(TaskAbort):
-            task = execute_task('test_abort')
+            execute_task('test_abort')
 
     def test_not_abort(self, execute_task):
         task = execute_task('test_not_abort')

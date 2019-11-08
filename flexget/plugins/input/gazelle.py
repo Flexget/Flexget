@@ -1,10 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-from datetime import datetime
 import logging
+from datetime import datetime
 
-from flexget import plugin, db_schema
+from sqlalchemy import Column, DateTime, String, Unicode
+
+from flexget import db_schema, plugin
+from flexget.components.sites.utils import normalize_unicode
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
@@ -12,13 +12,9 @@ from flexget.manager import Session
 from flexget.plugin import PluginError
 from flexget.utils.database import json_synonym
 from flexget.utils.requests import TokenBucketLimiter
-from flexget.components.sites.utils import normalize_unicode
 from flexget.utils.tools import parse_filesize
 
-from sqlalchemy import Column, Unicode, String, DateTime
-
-
-DETECT_2FA = ("Authenticator Code", "TOTP code")
+DETECT_2FA = "Authenticator Code", "TOTP code"
 log = logging.getLogger('gazelle')
 Base = db_schema.versioned_base('gazelle_session', 0)
 
@@ -36,7 +32,7 @@ class GazelleSession(Base):
     expires = Column(DateTime)
 
 
-class InputGazelle(object):
+class InputGazelle:
     """A generic plugin that searches a Gazelle-based website
 
     Limited functionality but should work for almost all of them.
@@ -328,7 +324,7 @@ class InputGazelleMusic(InputGazelle):
 
     def __init__(self):
         """Set up the majority of parameters that these sites support"""
-        super(InputGazelleMusic, self).__init__()
+        super().__init__()
 
         self.aliases.update(
             {
@@ -393,7 +389,7 @@ class InputGazelleMusic(InputGazelle):
 
         Extends the super's schema
         """
-        schema = super(InputGazelleMusic, self).schema
+        schema = super().schema
         schema['properties'].update(
             {
                 'artist': {'type': 'string'},
@@ -452,7 +448,7 @@ class InputRedacted(InputGazelleMusic):
 
     def __init__(self):
         """Set up custom base_url and parameters"""
-        super(InputRedacted, self).__init__()
+        super().__init__()
         self.base_url = "https://redacted.ch"
 
         self.params['encoding'].remove("q8.x (VBR)")
@@ -466,7 +462,7 @@ class InputNotWhat(InputGazelleMusic):
 
     def __init__(self):
         """Set up custom base_url and parameters"""
-        super(InputNotWhat, self).__init__()
+        super().__init__()
         self.base_url = "https://notwhat.cd"
 
         self.params['media'].extend(['Blu-ray', 'Unknown'])

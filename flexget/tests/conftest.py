@@ -1,35 +1,27 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+import itertools
+import logging
+import os
+import re
+import shutil
+import sys
+from contextlib import contextmanager
+from http import client
+from pathlib import Path
 
 import jsonschema
-from future.utils import PY2
-from future.backports.http import client as backport_client
-
-import re
-import os
-import sys
-import yaml
-import logging
-import shutil
-import requests
-
-import itertools
-
-from contextlib import contextmanager
-
 import mock
 import pytest
-from path import Path
+import requests
+import yaml
 from vcr import VCR
-from vcr.stubs import VCRHTTPSConnection, VCRHTTPConnection
+from vcr.stubs import VCRHTTPConnection, VCRHTTPSConnection
 
 import flexget.logger
-from flexget.manager import Manager
+from flexget.api import api_app
+from flexget.manager import Manager, Session
 from flexget.plugin import load_plugins
 from flexget.task import Task, TaskAbort
 from flexget.webserver import User
-from flexget.manager import Session
-from flexget.api import api_app
 
 log = logging.getLogger('tests')
 
@@ -40,8 +32,8 @@ vcr = VCR(
     cassette_library_dir=VCR_CASSETTE_DIR,
     record_mode=VCR_RECORD_MODE,
     custom_patches=(
-        (backport_client, 'HTTPSConnection', VCRHTTPSConnection),
-        (backport_client, 'HTTPConnection', VCRHTTPConnection),
+        (client, 'HTTPSConnection', VCRHTTPSConnection),
+        (client, 'HTTPConnection', VCRHTTPConnection),
     ),
 )
 
@@ -188,7 +180,8 @@ def pytest_configure(config):
     config.addinivalue_line(
         'markers',
         'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.'
-        'online: mark a test that goes online. VCR will automatically be used.',
+        'online: mark a test that goes online. VCR will automatically be used.'
+        'chdir: change current working dir',
     )
 
 
@@ -218,8 +211,8 @@ def filecopy(request):
             dst = Path(dst)
             for f in itertools.chain(*(Path().glob(src) for src in sources)):
                 dest_path = dst
-                if dest_path.isdir():
-                    dest_path = dest_path / f.basename()
+                if dest_path.is_dir():
+                    dest_path = dest_path / f.name
                 log.debug('copying %s to %s', f, dest_path)
                 if not os.path.isdir(os.path.dirname(dest_path)):
                     os.makedirs(os.path.dirname(dest_path))
@@ -235,7 +228,7 @@ def filecopy(request):
                 if os.path.isdir(f):
                     shutil.rmtree(f)
                 else:
-                    f.remove()
+                    f.unlink()
             except OSError as e:
                 print("couldn't remove %s: %s" % (f, e))
 
@@ -244,7 +237,7 @@ def filecopy(request):
 def no_requests(monkeypatch):
     online_funcs = [
         'requests.sessions.Session.request',
-        'future.backports.http.client.HTTPConnection.request',
+        'http.client.HTTPConnection.request',
     ]
 
     # Don't monkey patch HTTPSConnection if ssl not installed as it won't exist in backports
@@ -252,16 +245,13 @@ def no_requests(monkeypatch):
         import ssl  # noqa
         from ssl import SSLContext  # noqa
 
-        online_funcs.append('future.backports.http.client.HTTPSConnection.request')
+        online_funcs.append('http.client.HTTPSConnection.request')
     except ImportError:
         pass
 
-    if PY2:
-        online_funcs.extend(['httplib.HTTPConnection.request', 'httplib.HTTPSConnection.request'])
-    else:
-        online_funcs.extend(
-            ['http.client.HTTPConnection.request', 'http.client.HTTPSConnection.request']
-        )
+    online_funcs.extend(
+        ['http.client.HTTPConnection.request', 'http.client.HTTPSConnection.request']
+    )
 
     for func in online_funcs:
         monkeypatch.setattr(
@@ -314,7 +304,7 @@ class MockManager(Manager):
     def __init__(self, config_text, config_name, db_uri=None):
         self.config_text = config_text
         self._db_uri = db_uri or 'sqlite:///:memory:'
-        super(MockManager, self).__init__(['execute'])
+        super().__init__(['execute'])
         self.config_name = config_name
         self.database_uri = self._db_uri
         log.debug('database_uri: %s' % self.database_uri)
@@ -352,7 +342,7 @@ class MockManager(Manager):
         raise CrashReport('Crash report created during unit test, check log for traceback.')
 
 
-class APIClient(object):
+class APIClient:
     def __init__(self, api_key):
         self.api_key = api_key
         self.client = api_app.test_client()

@@ -1,28 +1,25 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import argparse
 import itertools
 import logging
 import sys
 import time
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from collections import defaultdict
 from copy import copy
 from datetime import datetime
 
 from sqlalchemy import not_
-from sqlalchemy.orm import object_session, joinedload
+from sqlalchemy.orm import joinedload, object_session
 
-from flexget import options
-from flexget import plugin
-from .utils import normalize_series_name
+from flexget import options, plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.utils.log import log_once
-from flexget.utils.tools import parse_timedelta, get_config_as_array, chunked, merge_dict_from_to
+from flexget.utils.tools import chunked, get_config_as_array, merge_dict_from_to, parse_timedelta
+
 from . import db
+from .utils import normalize_series_name
 
 try:
     # NOTE: Importing other plugins is discouraged!
@@ -128,7 +125,7 @@ def populate_entry_fields(entry, parser, config):
             plugin.get('set', 'series').modify(entry, config.get('set'))
 
 
-class FilterSeriesBase(object):
+class FilterSeriesBase:
     """
     Class that contains helper methods for both filter.series as well as plugins that configure it,
     such as all_series, series_premiere and configure_series.

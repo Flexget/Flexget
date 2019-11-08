@@ -1,26 +1,23 @@
 """Contains miscellaneous helpers"""
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib import request
-from future.utils import PY2
-
-import logging
 import ast
 import copy
 import hashlib
 import locale
+import logging
 import operator
 import os
+import queue
 import re
 import sys
 from collections import MutableMapping, defaultdict
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
+from html.entities import name2codepoint
 from pprint import pformat
+from urllib import request
+
+import requests
 
 import flexget
-import queue
-import requests
-from html.entities import name2codepoint
 
 log = logging.getLogger('utils')
 
@@ -34,20 +31,6 @@ def str_to_int(string):
         return int(string.replace(',', ''))
     except ValueError:
         return None
-
-
-if PY2:
-
-    def native_str_to_text(string, **kwargs):
-        if 'encoding' not in kwargs:
-            kwargs['encoding'] = 'ascii'
-        return string.decode(**kwargs)
-
-
-else:
-
-    def native_str_to_text(string, **kwargs):
-        return string
 
 
 def convert_bytes(bytes):

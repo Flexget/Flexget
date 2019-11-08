@@ -1,11 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-from flexget.components.parsing import plugin_parsing
 from flexget import plugin
+from flexget.components.parsing import plugin_parsing
 
 
-class TestParsingAPI(object):
+class TestParsingAPI:
     def test_all_types_handled(self):
         declared_types = set(plugin_parsing.PARSER_TYPES)
         method_handlers = set(
@@ -25,7 +22,7 @@ class TestParsingAPI(object):
                 )
 
 
-class TestTaskParsing(object):
+class TestTaskParsing:
     config = """
         tasks:
           explicit_parser:

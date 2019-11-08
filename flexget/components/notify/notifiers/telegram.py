@@ -1,7 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import native_str
-
 from distutils.version import LooseVersion
 
 from sqlalchemy import Column, Integer, String
@@ -9,7 +5,7 @@ from sqlalchemy import Column, Integer, String
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.plugin import PluginWarning, PluginError
+from flexget.plugin import PluginError, PluginWarning
 
 try:
     import telegram
@@ -63,7 +59,7 @@ class ChatIdEntry(ChatIdsBase):
         return ' '.join(x)
 
 
-class TelegramNotifier(object):
+class TelegramNotifier:
     """Send a message to one or more Telegram users or groups upon accepting a download.
 
 
@@ -263,8 +259,7 @@ class TelegramNotifier(object):
                     'password': self._socks_proxy_password,
                 }
             request = telegram.utils.request.Request(
-                proxy_url=self._socks_proxy_url,
-                urllib3_proxy_kwargs=urllib3_proxy_kwargs
+                proxy_url=self._socks_proxy_url, urllib3_proxy_kwargs=urllib3_proxy_kwargs
             )
 
         return request
@@ -287,7 +282,7 @@ class TelegramNotifier(object):
             raise plugin.PluginWarning('missing python-telegram-bot pkg')
         elif not hasattr(telegram, str('__version__')):
             raise plugin.PluginWarning('invalid or old python-telegram-bot pkg')
-        elif LooseVersion(telegram.__version__) < native_str(_MIN_TELEGRAM_VER):
+        elif LooseVersion(telegram.__version__) < _MIN_TELEGRAM_VER:
             raise plugin.PluginWarning(
                 'old python-telegram-bot ({0})'.format(telegram.__version__)
             )

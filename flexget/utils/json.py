@@ -4,9 +4,6 @@ Plugins can just import the methods from this module.
 
 Also allows date and datetime objects to be encoded/decoded.
 """
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import datetime
 
 from flexget.plugin import DependencyError
@@ -44,7 +41,7 @@ class DTDecoder(json.JSONDecoder):
                 except (ValueError, TypeError):
                     pass
 
-        return super(DTDecoder, self).decode(obj, **kwargs)
+        return super().decode(obj, **kwargs)
 
 
 def _datetime_encoder(obj):

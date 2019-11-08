@@ -1,15 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import, print_function
-
-# This needs to remain before the builtins import!
-native_int = int
-
-from builtins import *  # noqa  pylint: disable=unused-import, redefined-builtin
-
 import atexit  # noqa
 import codecs  # noqa
 import copy  # noqa
 import errno  # noqa
 import fnmatch  # noqa
+import hashlib  # noqa
+import io  # noqa
 import logging  # noqa
 import os  # noqa
 import shutil  # noqa
@@ -17,10 +12,8 @@ import signal  # noqa
 import sys  # noqa
 import threading  # noqa
 import traceback  # noqa
-import hashlib  # noqa
 from contextlib import contextmanager  # noqa
 from datetime import datetime, timedelta  # noqa
-import io  # noqa
 
 import sqlalchemy  # noqa
 import yaml  # noqa
@@ -30,6 +23,7 @@ from sqlalchemy.orm import sessionmaker  # noqa
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
 from flexget.utils.sqlalchemy_utils import ContextSession  # noqa
+from flexget.utils.tools import get_current_flexget_version, io_encoding, pid_exists  # noqa
 
 Base = declarative_base()
 Session = sessionmaker(class_=ContextSession)
@@ -37,16 +31,15 @@ Session = sessionmaker(class_=ContextSession)
 from flexget import config_schema, db_schema, logger, plugin  # noqa
 from flexget.event import fire_event  # noqa
 from flexget.ipc import IPCClient, IPCServer  # noqa
-from flexget.options import (
+from flexget.options import (  # noqa
     CoreArgumentParser,
+    ParserError,
     get_parser,
     manager_parser,
-    ParserError,
     unicode_argv,
-)  # noqa
+)
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
-from flexget.utils.tools import pid_exists, get_current_flexget_version, io_encoding  # noqa
 from flexget.terminal import console  # noqa
 
 log = logging.getLogger('manager')
@@ -55,7 +48,7 @@ manager = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
 
 
-class Manager(object):
+class Manager:
     """Manager class for FlexGet
 
     Fires events:
@@ -161,8 +154,8 @@ class Manager(object):
         log.debug('flexget detected io encoding: %s', io_encoding)
         log.debug('os.path.supports_unicode_filenames: %s' % os.path.supports_unicode_filenames)
         if (
-            codecs.lookup(sys.getfilesystemencoding()).name == 'ascii'
-            and not os.path.supports_unicode_filenames
+                codecs.lookup(sys.getfilesystemencoding()).name == 'ascii'
+                and not os.path.supports_unicode_filenames
         ):
             log.warning(
                 'Your locale declares ascii as the filesystem encoding. Any plugins reading filenames from '
@@ -278,7 +271,7 @@ class Manager(object):
         return self._has_lock
 
     def execute(
-        self, options=None, output=None, loglevel=None, priority=1, suppress_warnings=None
+            self, options=None, output=None, loglevel=None, priority=1, suppress_warnings=None
     ):
         """
         Run all (can be limited with options) tasks from the config.
@@ -679,9 +672,9 @@ class Manager(object):
                 # Not very good practice but we get several kind of exceptions here, I'm not even sure all of them
                 # At least: ReaderError, YmlScannerError (or something like that)
                 if (
-                    hasattr(e, 'problem')
-                    and hasattr(e, 'context_mark')
-                    and hasattr(e, 'problem_mark')
+                        hasattr(e, 'problem')
+                        and hasattr(e, 'context_mark')
+                        and hasattr(e, 'problem_mark')
                 ):
                     lines = 0
                     if e.problem is not None:
@@ -869,7 +862,7 @@ class Manager(object):
                 result[key.strip().lower()] = value.strip()
             for key in result:
                 if result[key].isdigit():
-                    result[key] = native_int(result[key])
+                    result[key] = int(result[key])
             result.setdefault('pid', None)
             if not result['pid']:
                 log.error('Invalid lock file. Make sure FlexGet is not running, then delete it.')
@@ -1017,8 +1010,8 @@ class Manager(object):
         :param bool force: Run the cleanup no matter whether the interval has been met.
         """
         expired = (
-            self.persist.get('last_cleanup', datetime(1900, 1, 1))
-            < datetime.now() - DB_CLEANUP_INTERVAL
+                self.persist.get('last_cleanup', datetime(1900, 1, 1))
+                < datetime.now() - DB_CLEANUP_INTERVAL
         )
         if force or expired:
             log.info('Running database cleanup.')

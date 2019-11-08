@@ -1,20 +1,16 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
+import re
+import unicodedata
+from datetime import date, datetime, timedelta
+
+from requests.exceptions import HTTPError, RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.requests import Session as RequestSession, TimedLimiter
+from flexget.utils.requests import Session as RequestSession
+from flexget.utils.requests import TimedLimiter
 from flexget.utils.soup import get_soup
-from requests.exceptions import HTTPError, RequestException
-
-from datetime import datetime, date, timedelta
-
-import unicodedata
-import re
 
 log = logging.getLogger('search_npo')
 
@@ -22,7 +18,7 @@ requests = RequestSession(max_retries=3)
 requests.add_domain_limiter(TimedLimiter('npostart.nl', '8 seconds'))
 
 
-class NPOWatchlist(object):
+class NPOWatchlist:
     """
     Produces entries for every episode on the user's npostart.nl watchlist (Dutch public television).
     Entries can be downloaded using http://arp242.net/code/download-npo

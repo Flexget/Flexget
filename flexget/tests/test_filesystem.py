@@ -1,10 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-from path import Path
+from pathlib import Path
 
 
-class TestFilesystem(object):
+class TestFilesystem:
     base = "filesystem_test_dir/"
     test1 = base + '/Test1'
     test2 = base + '/Test2'
@@ -128,7 +125,8 @@ class TestFilesystem(object):
         'dir8',
     ]
 
-    def assert_check(self, task, task_name, test_type, filenames):
+    @staticmethod
+    def assert_check(task, task_name, test_type, filenames):
         for file in filenames:
             file = Path(file)
             if test_type == 'positive':

@@ -1,19 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import copy
 
 from flask import jsonify
 from flask_restplus import inputs
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import NotFoundError, etag
+
 from . import db
 from .api_trakt import ApiTrakt
 
 trakt_api = api.namespace('trakt', description='Trakt lookup endpoint')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     translation_object = {
         'type': 'object',
         'patternProperties': {

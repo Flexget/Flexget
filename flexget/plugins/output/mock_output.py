@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
@@ -9,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('mock_output')
 
 
-class MockOutput(object):
+class MockOutput:
     """
     Debugging plugin which records a copy of all accepted entries into a list stored in `mock_output` attribute
     of the task.

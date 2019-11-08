@@ -1,11 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flexget.entry import Entry
 from flexget.plugin import PluginError
 
 
-class TestLazyFields(object):
+class TestLazyFields:
     def test_lazy_queue(self):
         """Tests behavior when multiple plugins register lazy lookups for the same field"""
 

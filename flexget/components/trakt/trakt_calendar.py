@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import datetime
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from requests import RequestException
 
@@ -16,7 +13,7 @@ from . import db
 log = logging.getLogger('trakt_calendar')
 
 
-class TraktCalendar(object):
+class TraktCalendar:
     schema = {
         'type': 'object',
         'properties': {

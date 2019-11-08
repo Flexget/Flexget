@@ -1,17 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import re
 import logging
+import re
 
 from flexget import plugin
-from flexget.event import event
 from flexget.components.sites.urlrewriting import UrlRewritingError
+from flexget.event import event
 
 log = logging.getLogger('urlrewrite')
 
 
-class UrlRewrite(object):
+class UrlRewrite:
     """
     Generic configurable urlrewriter.
 

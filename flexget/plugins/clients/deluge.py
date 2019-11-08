@@ -1,13 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import base64
-import re
-import sys
-
 import logging
 import os
-
+import re
+import sys
 import time
 
 from flexget import plugin
@@ -19,7 +14,7 @@ from flexget.utils.template import RenderError
 log = logging.getLogger('deluge')
 
 
-class DelugePlugin(object):
+class DelugePlugin:
     """Base class for deluge plugins, contains settings and methods for connecting to a deluge daemon."""
 
     def on_task_start(self, task, config):
@@ -131,7 +126,7 @@ class InputDeluge(DelugePlugin):
 
     def on_task_start(self, task, config):
         config = self.prepare_config(config)
-        super(InputDeluge, self).on_task_start(task, config)
+        super().on_task_start(task, config)
 
     def prepare_config(self, config):
         if isinstance(config, bool):
@@ -142,7 +137,7 @@ class InputDeluge(DelugePlugin):
                 filter['label'] = filter['label'].lower()
             if 'state' in filter:
                 filter['state'] = filter['state'].capitalize()
-        super(InputDeluge, self).prepare_config(config)
+        super().prepare_config(config)
         return config
 
     def on_task_input(self, task, config):
@@ -236,7 +231,7 @@ class OutputDeluge(DelugePlugin):
     def prepare_config(self, config):
         if isinstance(config, bool):
             config = {'enabled': config}
-        super(OutputDeluge, self).prepare_config(config)
+        super().prepare_config(config)
         config.setdefault('enabled', True)
         config.setdefault('action', 'add')
         config.setdefault('path', '')

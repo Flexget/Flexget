@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
@@ -17,7 +14,7 @@ class UrlRewritingError(Exception):
         return repr(self.value)
 
 
-class PluginUrlRewriting(object):
+class PluginUrlRewriting:
     """
     Provides URL rewriting framework
     """
@@ -92,7 +89,7 @@ class PluginUrlRewriting(object):
                     )
 
 
-class DisableUrlRewriter(object):
+class DisableUrlRewriter:
     """Disable certain urlrewriters."""
 
     schema = {'type': 'array', 'items': {'type': 'string'}}

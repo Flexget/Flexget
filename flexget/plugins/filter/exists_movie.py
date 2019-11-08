@@ -1,10 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import re
-
-from path import Path
+from pathlib import Path
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -14,7 +10,7 @@ from flexget.utils.tools import TimedDict
 log = logging.getLogger('exists_movie')
 
 
-class FilterExistsMovie(object):
+class FilterExistsMovie:
     """
     Reject existing movies.
 
@@ -47,8 +43,8 @@ class FilterExistsMovie(object):
         ]
     }
 
-    dir_pattern = re.compile('\b(cd.\d|subs?|samples?)\b', re.IGNORECASE)
-    file_pattern = re.compile('\.(avi|mkv|mp4|mpg|webm)$', re.IGNORECASE)
+    dir_pattern = re.compile(r'\b(cd.\d|subs?|samples?)\b', re.IGNORECASE)
+    file_pattern = re.compile(r'\.(avi|mkv|mp4|mpg|webm)$', re.IGNORECASE)
 
     def __init__(self):
         self.cache = TimedDict(cache_time='1 hour')
@@ -94,7 +90,7 @@ class FilterExistsMovie(object):
 
             path_ids = {}
 
-            if not folder.isdir():
+            if not folder.is_dir():
                 log.critical('Path %s does not exist' % folder)
                 continue
 
@@ -106,18 +102,17 @@ class FilterExistsMovie(object):
 
             # scan through
             items = []
-            if config.get('type') == 'dirs':
-                for d in folder.walkdirs(errors='ignore'):
-                    if self.dir_pattern.search(d.name):
+            for p in folder.iterdir():
+                if config.get('type') == 'dirs' and p.is_dir():
+                    if self.dir_pattern.search(p.name):
                         continue
-                    log.debug('detected dir with name %s, adding to check list' % d.name)
-                    items.append(d.name)
-            elif config.get('type') == 'files':
-                for f in folder.walkfiles(errors='ignore'):
-                    if not self.file_pattern.search(f.name):
+                    log.debug('detected dir with name %s, adding to check list' % p.name)
+                    items.append(p.name)
+                elif config.get('type') == 'files' and p.is_file():
+                    if not self.file_pattern.search(p.name):
                         continue
-                    log.debug('detected file with name %s, adding to check list' % f.name)
-                    items.append(f.name)
+                    log.debug('detected file with name %s, adding to check list' % p.name)
+                    items.append(p.name)
 
             if not items:
                 log.verbose(
@@ -181,7 +176,7 @@ class FilterExistsMovie(object):
                     movie = plugin.get('parsing', self).parse_movie(entry['title'])
                     entry[key_name] = movie.name
                     entry[key_year] = movie.year
-                    
+
                 if entry.get(key_year, eval_lazy=False):
                     key = "%s %s" % (entry[key_name], entry[key_year])
                 else:

@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
@@ -10,7 +7,7 @@ from flexget.utils.log import log_once
 log = logging.getLogger('urlfix')
 
 
-class UrlFix(object):
+class UrlFix:
     """
     Automatically fix broken urls.
     """

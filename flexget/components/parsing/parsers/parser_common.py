@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import re
 from string import capwords
@@ -51,7 +48,7 @@ def normalize_name(name):
     return name
 
 
-class MovieParseResult(object):
+class MovieParseResult:
     def __init__(
         self,
         data=None,
@@ -113,7 +110,7 @@ class MovieParseResult(object):
         )
 
 
-class SeriesParseResult(object):
+class SeriesParseResult:
     def __init__(
         self,
         data=None,

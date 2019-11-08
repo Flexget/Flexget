@@ -1,14 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import os
-import fnmatch
 
-from flask import send_from_directory, Flask
-
-from flexget.webserver import register_app, register_home
+from flask import Flask, send_from_directory
 from flask_compress import Compress
+
+from flexget.webserver import register_app
 
 log = logging.getLogger('webui')
 

@@ -1,32 +1,29 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 from datetime import datetime, timedelta
 
-from flexget.manager import Session
+from dateutil.parser import parse as dateutil_parse
 from sqlalchemy import (
-    Table,
+    Boolean,
     Column,
+    Date,
+    DateTime,
+    Float,
     Integer,
     String,
-    Float,
+    Table,
     Unicode,
-    Boolean,
-    DateTime,
-    Date,
     func,
     or_,
 )
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
-from dateutil.parser import parse as dateutil_parse
+from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
 from flexget.event import event
+from flexget.manager import Session
 from flexget.utils import requests
-from flexget.utils.database import year_property, with_session, json_synonym
+from flexget.utils.database import json_synonym, with_session, year_property
 
 log = logging.getLogger('api_tmdb')
 Base = db_schema.versioned_base('api_tmdb', 6)
@@ -277,7 +274,7 @@ class TMDBSearchResult(Base):
             self.movie = movie
 
 
-class ApiTmdb(object):
+class ApiTmdb:
     """Does lookups to TMDb and provides movie information. Caches lookups."""
 
     @staticmethod

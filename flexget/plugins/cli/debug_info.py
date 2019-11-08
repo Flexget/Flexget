@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import sys
 
 from path import Path
@@ -23,4 +20,6 @@ def print_debug_info(manager, options):
 
 @event('options.register')
 def register_parser_arguments():
-    options.register_command('debug-info', print_debug_info, help='display useful info for debugging')
+    options.register_command(
+        'debug-info', print_debug_info, help='display useful info for debugging'
+    )

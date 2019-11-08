@@ -1,15 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-
-import re
 import copy
 import logging
+import re
 
 log = logging.getLogger('utils.qualities')
 
 
-class QualityComponent(object):
+class QualityComponent:
     """"""
 
     def __init__(self, type, value, name, regexp=None, modifier=None, defaults=None):
@@ -57,7 +53,7 @@ class QualityComponent(object):
         return bool(self.value)
 
     def __eq__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             other = _registry.get(other)
         if not isinstance(other, QualityComponent):
             raise TypeError('Cannot compare %r and %r' % (self, other))
@@ -70,7 +66,7 @@ class QualityComponent(object):
         return not self.__eq__(other)
 
     def __lt__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             other = _registry.get(other)
         if not isinstance(other, QualityComponent):
             raise TypeError('Cannot compare %r and %r' % (self, other))
@@ -198,7 +194,7 @@ def all_components():
     return iter(_registry.values())
 
 
-class Quality(object):
+class Quality:
     """Parses and stores the quality of an entry in the four component categories."""
 
     def __init__(self, text=''):
@@ -268,7 +264,7 @@ class Quality(object):
         return [modifier] + self.components
 
     def __contains__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             other = Quality(other)
         if not other or not self:
             return False
@@ -282,7 +278,7 @@ class Quality(object):
         return any(self._comparator)
 
     def __eq__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             other = Quality(other)
         if not isinstance(other, Quality):
             if other is None:
@@ -294,7 +290,7 @@ class Quality(object):
         return not self.__eq__(other)
 
     def __lt__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             other = Quality(other)
         if not isinstance(other, Quality):
             raise TypeError('Cannot compare %r and %r' % (self, other))
@@ -344,7 +340,7 @@ def get(quality_name):
     return result
 
 
-class RequirementComponent(object):
+class RequirementComponent:
     """Represents requirements for a given component type. Can evaluate whether a given QualityComponent
     meets those requirements."""
 
@@ -424,7 +420,7 @@ class RequirementComponent(object):
         )
 
 
-class Requirements(object):
+class Requirements:
     """Represents requirements for allowable qualities. Can determine whether a given Quality passes requirements."""
 
     def __init__(self, req=''):
@@ -479,7 +475,7 @@ class Requirements(object):
         :rtype: bool
         :returns: True if given quality passes all component requirements.
         """
-        if isinstance(qual, basestring):
+        if isinstance(qual, str):
             qual = Quality(qual)
         for r_component, q_component in zip(self.components, qual.components):
             if not r_component.allows(q_component, loose=loose):
@@ -487,7 +483,7 @@ class Requirements(object):
         return True
 
     def __eq__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             other = Requirements(other)
         return self.components == other.components
 

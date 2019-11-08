@@ -1,18 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import pickle
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, Unicode, DateTime, Index, select
+from sqlalchemy import Column, DateTime, Index, Integer, String, Unicode, select
 
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.utils import json
 from flexget.utils.database import entry_synonym
+from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 from flexget.utils.tools import parse_timedelta
-from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
 log = logging.getLogger('delay')
 Base = db_schema.versioned_base('delay', 2)
@@ -69,7 +66,7 @@ def upgrade(ver, session):
     return ver
 
 
-class FilterDelay(object):
+class FilterDelay:
     """
         Add delay to a task. This is useful for de-prioritizing expensive / bad-quality tasks.
 

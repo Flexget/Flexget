@@ -1,24 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-from future.moves.urllib.parse import quote_plus
-from future.moves.urllib.error import URLError
-
-import time
-import logging
 import difflib
+import logging
+import time
 from datetime import datetime, timedelta
+from urllib.error import URLError
+from urllib.parse import quote_plus
 
-from sqlalchemy import Table, Column, Integer, String, DateTime, func, sql
-from sqlalchemy.schema import ForeignKey, Index
+from sqlalchemy import Column, DateTime, Integer, String, Table, func, sql
 from sqlalchemy.orm import relation
+from sqlalchemy.schema import ForeignKey, Index
 
-from flexget import db_schema
-from flexget.plugin import internet, PluginError
+from flexget import db_schema, plugin
+from flexget.plugin import PluginError, internet
 from flexget.utils import requests
 from flexget.utils.database import text_date_synonym, with_session
-from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
-from flexget import plugin
+from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
 log = logging.getLogger('api_rottentomatoes')
 Base = db_schema.versioned_base('api_rottentomatoes', 2)
@@ -94,7 +89,7 @@ Base.register_table(directors_table)
 
 
 # TODO: get rid of
-class RottenTomatoesContainer(object):
+class RottenTomatoesContainer:
     """Base class for RottenTomatoes objects"""
 
     def __init__(self, init_dict=None):
@@ -104,7 +99,7 @@ class RottenTomatoesContainer(object):
     def update_from_dict(self, update_dict):
         """Populates any simple (string or number) attributes from a dict"""
         for col in self.__table__.columns:
-            if isinstance(update_dict.get(col.name), (basestring, int, float)):
+            if isinstance(update_dict.get(col.name), (str, int, float)):
                 setattr(self, col.name, update_dict[col.name])
 
 
@@ -574,9 +569,9 @@ def movies_info(id, api_key=None):
 
 
 def lists(list_type, list_name, limit=20, page_limit=20, page=None, api_key=None):
-    if isinstance(list_type, basestring):
+    if isinstance(list_type, str):
         list_type = list_type.replace(' ', '_')
-    if isinstance(list_name, basestring):
+    if isinstance(list_name, str):
         list_name = list_name.replace(' ', '_')
 
     if not api_key:
@@ -596,7 +591,7 @@ def lists(list_type, list_name, limit=20, page_limit=20, page=None, api_key=None
 
 
 def movies_search(q, page_limit=None, page=None, api_key=None):
-    if isinstance(q, basestring):
+    if isinstance(q, str):
         q = quote_plus(q.encode('latin-1', errors='ignore'))
 
     if not api_key:

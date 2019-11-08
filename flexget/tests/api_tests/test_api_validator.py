@@ -1,10 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import json
 
 
-class TestValidator(object):
+class TestValidator:
     config = '{tasks: {}}'
 
     def test_invalid_payload(self, api_client):

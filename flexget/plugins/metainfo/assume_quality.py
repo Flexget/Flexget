@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 from collections import namedtuple
 
@@ -11,7 +8,7 @@ from flexget.event import event
 log = logging.getLogger('assume_quality')
 
 
-class AssumeQuality(object):
+class AssumeQuality:
     """
     Applies quality components to entries that match specified quality requirements.
     When a quality is applied, any components which are unknown in the entry are filled from the applied quality.

@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 from jinja2 import Template
 
@@ -11,7 +8,7 @@ def config(request):
     return Template(request.cls.config).render({'parser': request.param})
 
 
-class TestSeriesPremiere(object):
+class TestSeriesPremiere:
     config = """
         templates:
           global:

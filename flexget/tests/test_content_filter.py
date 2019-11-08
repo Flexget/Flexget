@@ -1,12 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
 
 @pytest.mark.usefixtures('tmpdir')
 @pytest.mark.filecopy('test.torrent', '__tmp__/')
-class TestContentFilter(object):
+class TestContentFilter:
     config = """
         tasks:
           test_reject1:

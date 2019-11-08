@@ -1,20 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import random
 import string
 
 from flexget import plugin
-from flexget.event import event
 from flexget.entry import Entry
+from flexget.event import event
 
 log = logging.getLogger('gen_series')
 
 PER_RUN = 50
 
 
-class GenSeries(object):
+class GenSeries:
     """
     Purely for debugging purposes. Not great quality :)
 
