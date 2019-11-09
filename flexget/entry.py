@@ -1,11 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.utils import PY2, native_str, text_type
+from past.builtins import basestring, long, unicode
 
 import copy
 import functools
 import logging
+from collections import Mapping
 
+from flexget.utils import qualities, json
 from flexget.plugin import PluginError
 from flexget.utils.lazy_dict import LazyDict, LazyLookup
 from flexget.utils.template import render_from_entry, FlexGetTemplate
@@ -240,6 +243,55 @@ class Entry(LazyDict):
         if not isinstance(self['title'], str):
             return False
         return True
+
+    def serialize(self):
+        """Use json to serialize python objects for file output."""
+
+        def only_builtins(item):
+            datetime_types = (date, datetime)
+            supported_types = (str, unicode, int, float, long, bool, datetime)
+            # dict, list, tuple and set are also supported, but handled separately
+
+            if isinstance(item, supported_types):
+                return item
+            elif isinstance(item, Mapping):
+                result = {}
+                for key, value in item.items():
+                    try:
+                        result[key] = only_builtins(value)
+                    except TypeError:
+                        continue
+                return result
+            elif isinstance(item, (list, tuple, set)):
+                result = []
+                for value in item:
+                    try:
+                        result.append(only_builtins(value))
+                    except ValueError:
+                        continue
+                if isinstance(item, list):
+                    return result
+                elif isinstance(item, tuple):
+                    return tuple(result)
+                else:
+                    return set(result)
+            elif isinstance(item, qualities.Quality):
+                return item.name
+            else:
+                for s_type in supported_types:
+                    if isinstance(item, s_type):
+                        return s_type(item)
+
+            # If item isn't a subclass of a builtin python type, raise ValueError.
+            raise TypeError('%r is not of type Entry.' % type(item))
+
+        def builder(self):
+            entry_dict = {}
+            for item in self:
+                entry_dict[item] = only_builtins(self[item])
+            return entry_dict
+
+        return builder(self)
 
     def take_snapshot(self, name):
         """
