@@ -75,13 +75,13 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-          - py3.5-deps-{{ checksum "dev-requirements.txt" }}
-          - py3.5-deps- # fallback to using the latest cache if no exact match is found
+          - py3.6-deps-{{ checksum "dev-requirements.txt" }}
+          - py3.6-deps- # fallback to using the latest cache if no exact match is found
       - run: *install_deps
       - save_cache:
           paths:
             - ./venv
-          key: py3.5-deps-{{ checksum "dev-requirements.txt" }}
+          key: py3.6-deps-{{ checksum "dev-requirements.txt" }}
       - run:
           name: Do Release
           command: |
