@@ -9,6 +9,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import datetime
 
+from flexget.utils import qualities
 from flexget.plugin import DependencyError
 
 try:
@@ -75,7 +76,15 @@ def _datetime_decoder(dict_):
 
     return dict_
 
-
+def _entry_encoder(obj):
+    if isinstance(obj, datetime.datetime):
+        return obj.strftime(ISO8601_FMT)
+    elif isinstance(obj, datetime.date):
+        return obj.strftime(DATE_FMT)
+    elif isinstance(obj, qualities.Quality):
+        return obj.name
+    raise TypeError
+                         
 def _empty_unicode_decoder(dict_):
     for key, value in dict_.items():
         # The built-in `json` library will `unicode` strings, except for empty strings. patch this for
@@ -95,6 +104,8 @@ def dumps(*args, **kwargs):
 def dump(*args, **kwargs):
     if kwargs.pop('encode_datetime', False):
         kwargs['default'] = _datetime_encoder
+    elif kwargs.pop('encode_entry', False):
+        kwargs['default'] = _entry_encoder
     return json.dump(*args, **kwargs)
 
 
