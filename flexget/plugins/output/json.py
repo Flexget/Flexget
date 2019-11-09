@@ -27,13 +27,13 @@ class OutputJson(object):
         # Output to config directory if absolute path has not been specified
         if not os.path.isabs(output):
             output = os.path.join(task.manager.config_base, output)
+
         entries = {}
         for entry in task.accepted:
-            entry_dict = entry.serialize()
-            entries[entry['title']] = entry_dict
-
+            entry_dict = dict(entry)
+            entries[entry_dict['title']] = entry_dict
         with open(output, 'w') as output_file:
-            json.dump(entries, output_file, encode_datetime=True)
+            json.dump(entries, output_file, encode_entry=True)
 
 
 @event('plugin.register')
