@@ -248,7 +248,6 @@ class Entry(LazyDict):
         """Use json to serialize python objects for file output."""
 
         def only_builtins(item):
-            datetime_types = (date, datetime)
             supported_types = (str, unicode, int, float, long, bool, datetime)
             # dict, list, tuple and set are also supported, but handled separately
 
