@@ -8,7 +8,7 @@ import functools
 import logging
 from collections import Mapping
 
-from flexget.utils import qualities, json
+from flexget.utils import qualities
 from flexget.plugin import PluginError
 from flexget.utils.lazy_dict import LazyDict, LazyLookup
 from flexget.utils.template import render_from_entry, FlexGetTemplate
@@ -245,7 +245,7 @@ class Entry(LazyDict):
         return True
 
     def serialize(self):
-        """Use json to serialize python objects for file output."""
+        """Serialize Entry objects for file output."""
 
         def only_builtins(item):
             supported_types = (str, unicode, int, float, long, bool, datetime)
