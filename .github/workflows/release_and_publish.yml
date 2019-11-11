@@ -1,0 +1,27 @@
+name: Build and publish a release
+
+on: repository_dispatch
+
+jobs:
+  build-and-publish:
+    name: Build and publish Python 🐍 distributions 📦 to PyPI and TestPyPI
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Set up pip cache
+      uses: actions/cache@v1
+      with:
+        path: pip_cache
+        # Not sure why the '**/' is needed for hashFiles
+        key: ${{ runner.OS }}-python${{ matrix.python-version }}-${{ hashFiles('**/*requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.OS }}-python${{ matrix.python-version }}-
+    - name: Publish distribution 📦 to Test PyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.test_pypi_token }}
+        repository_url: https://test.pypi.org/legacy/
