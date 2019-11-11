@@ -7,7 +7,6 @@ from flexget import plugin, plugins
 from flexget.event import event, fire_event
 
 
-@pytest.mark.chdir
 class TestPluginApi:
     """
     Contains plugin api related tests

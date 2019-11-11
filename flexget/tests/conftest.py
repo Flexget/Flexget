@@ -179,9 +179,10 @@ def pytest_configure(config):
     # register the filecopy marker
     config.addinivalue_line(
         'markers',
-        'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.'
-        'online: mark a test that goes online. VCR will automatically be used.'
-        'chdir: change current working dir',
+        'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.',
+    )
+    config.addinivalue_line(
+        'markers', 'online: mark a test that goes online. VCR will automatically be used.'
     )
 
 
@@ -235,10 +236,7 @@ def filecopy(request):
 
 @pytest.fixture()
 def no_requests(monkeypatch):
-    online_funcs = [
-        'requests.sessions.Session.request',
-        'http.client.HTTPConnection.request',
-    ]
+    online_funcs = ['requests.sessions.Session.request', 'http.client.HTTPConnection.request']
 
     # Don't monkey patch HTTPSConnection if ssl not installed as it won't exist in backports
     try:
