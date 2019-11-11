@@ -33,11 +33,13 @@ class Json(object):
     Example::
 
       json:
-        file: entries.json
+        files: entries.json
         encoding: utf8
         entry:
-          title: 'name'
-          url: "web_address"
+          - title: name
+          - url: 'web_.*'
+          - get_remnants
+          
     """
     
 
