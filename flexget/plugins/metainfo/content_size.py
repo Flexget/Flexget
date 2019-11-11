@@ -61,11 +61,15 @@ class MetainfoContentSize:
                     location = Path(location)
                 if location.suffix in ('.nzb', '.torrent'):
                     continue
-                if location.is_file():
-                    amount = os.path.getsize(entry['location'])
-                    amount = int(amount / (1024 * 1024))
-                    log.trace('setting content size to %s' % amount)
-                    entry['content_size'] = amount
+                try:
+                    if location.is_file():
+                        amount = os.path.getsize(entry['location'])
+                        amount = int(amount / (1024 * 1024))
+                        log.trace('setting content size to %s' % amount)
+                        entry['content_size'] = amount
+                        continue
+                except OSError as e:
+                    # is_file can throw OSError for invalid paths (at least on windows)
                     continue
 
         if count:

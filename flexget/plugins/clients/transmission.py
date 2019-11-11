@@ -678,7 +678,7 @@ class PluginTransmission(TransmissionBase):
             else:
                 # Transmission doesn't like it when paths end in a separator
                 path = path.rstrip('\\/')
-                add['download_dir'] = str(pathscrub(path), 'utf-8')
+                add['download_dir'] = pathscrub(path)
         # make sure we add it paused, will modify status after adding
         add['paused'] = True
 
