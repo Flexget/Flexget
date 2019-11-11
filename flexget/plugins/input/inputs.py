@@ -3,6 +3,8 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
+from random import shuffle
+
 from flexget import plugin
 from flexget.event import event
 
@@ -38,13 +40,14 @@ class PluginInputs(object):
     def on_task_input(self, task, config):
         entry_titles = set()
         entry_urls = set()
+        shuffle(config)
         for item in config:
             for input_name, input_config in item.items():
                 input = plugin.get_plugin_by_name(input_name)
                 method = input.phase_handlers['input']
                 try:
                     result = method(task, input_config)
-                except plugin.PluginError as e:
+                except plugin.PluginError as e: 
                     log.warning('Error during input plugin %s: %s' % (input_name, e))
                     continue
                 if not result:
