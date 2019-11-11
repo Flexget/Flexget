@@ -4,6 +4,7 @@ import hashlib
 import logging
 import os
 import struct
+from random import randint
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytz
