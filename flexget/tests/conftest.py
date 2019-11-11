@@ -7,9 +7,9 @@ import sys
 from contextlib import contextmanager
 from http import client
 from pathlib import Path
+from unittest import mock
 
 import jsonschema
-import mock
 import pytest
 import requests
 import yaml
