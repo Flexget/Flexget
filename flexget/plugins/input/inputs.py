@@ -47,7 +47,7 @@ class PluginInputs(object):
                 method = input.phase_handlers['input']
                 try:
                     result = method(task, input_config)
-                except plugin.PluginError as e: 
+                except plugin.PluginError as e:
                     log.warning('Error during input plugin %s: %s' % (input_name, e))
                     continue
                 if not result:
