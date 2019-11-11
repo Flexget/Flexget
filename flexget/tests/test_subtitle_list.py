@@ -17,13 +17,15 @@ except ImportError:
     subliminal = babelfish = None
 
 
+@pytest.mark.usefixtures('tmpdir')
+@pytest.mark.filecopy(['movie.mkv', 'series.mkv'], '__tmp__')
 class TestSubtitleList:
     config = """
          templates:
            global:
              mock:
-               - {title: 'Movie', location: 'movie.mkv'}
-               - {title: 'Series', location: 'series.mkv'}
+               - {title: 'Movie', location: '__tmp__/movie.mkv'}
+               - {title: 'Series', location: '__tmp__/series.mkv'}
              accept_all: yes
              seen: local
 
