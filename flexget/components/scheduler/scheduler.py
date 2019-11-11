@@ -185,7 +185,16 @@ def setup_jobs(manager):
         if 'interval' in job_config:
             trigger, trigger_args = 'interval', job_config['interval']
         else:
-            trigger, trigger_args = 'cron', job_config['schedule']
+            schedule = job_config['schedule']
+            for unit, val in schedule.items():
+                if 'randint' in str(val):
+                    try:
+                        new_val = eval(val)
+                    except (TypeError, NameError, ValueError) as e:
+                        log.warning('The value assigned to %s: %s is not valid. Defaulting to 1: %s' %(unit, val, e))
+                        new_val = 1
+                    schedule[unit] = new_val
+            trigger, trigger_args = 'cron', schedule]
         tasks = job_config['tasks']
         if not isinstance(tasks, list):
             tasks = [tasks]
