@@ -195,7 +195,7 @@ def setup_jobs(manager):
                         log.warning('The value assigned to %s: %s is not valid. Defaulting to 1: %s' %(unit, val, e))
                         new_val = 1
                     schedule[unit] = new_val
-            trigger, trigger_args = 'cron', schedule]
+            trigger, trigger_args = 'cron', schedule
         tasks = job_config['tasks']
         if not isinstance(tasks, list):
             tasks = [tasks]
