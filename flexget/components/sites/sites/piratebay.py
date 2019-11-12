@@ -164,7 +164,8 @@ class UrlRewritePirateBay(object):
                     href = self.url + href
                 entry['url'] = href
                 row = link.parent.parent.parent
-                if row.find_all('a', attrs={'class': 'detDesc'})[0].contents[0] == "piratebay ":
+                description = row.find_all('a', attrs={'class': 'detDesc'})
+                if description and description[0].contents[0] == "piratebay ":
                     log.debug('Advertisement entry. Skipping.')
                     continue
                 tds = row.find_all('td')
