@@ -27,8 +27,7 @@ jobs:
       uses: actions/cache@v1
       with:
         path: pip_cache
-        # Not sure why the '**/' is needed for hashFiles
-        key: ${{ runner.OS }}-python${{ matrix.python-version }}-${{ hashFiles('**/*requirements*.txt') }}
+        key: ${{ runner.OS }}-python${{ matrix.python-version }}-${{ hashFiles('*requirements*.txt') }}
         restore-keys: |
           ${{ runner.OS }}-python${{ matrix.python-version }}-
     # Can we cache the apt-get stuff somehow?
@@ -49,4 +48,4 @@ jobs:
         pip --cache-dir pip_cache install -r requirements.txt
     - name: Test with pytest
       run: |
-        pytest -n 4
+        pytest -n auto
