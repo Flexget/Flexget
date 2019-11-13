@@ -19,10 +19,6 @@ jobs:
       fail-fast: false
     steps:
     - uses: actions/checkout@v1
-    - name: ls
-      run: |
-        pwd
-        ls
     - name: Set up pip cache
       uses: actions/cache@v1
       with:
