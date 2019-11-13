@@ -1,12 +1,18 @@
 name: Build and publish a release
 
-on: repository_dispatch
+on:
+  schedule:
+    - cron:  '0 2 * * *'
 
 jobs:
   build-and-publish:
     name: Build and publish Python 🐍 distributions 📦 to PyPI and TestPyPI
     runs-on: ubuntu-18.04
     steps:
+    - name: Setup Git User
+      run: |
+        git config user.email ${{ secrets.git_email }}
+        git config user.name ${{ secrets.git_user }}
     - uses: actions/checkout@master
     - name: Set up Python 3.7
       uses: actions/setup-python@v1
@@ -19,6 +25,12 @@ jobs:
         key: ${{ runner.OS }}-python${{ matrix.python-version }}-${{ hashFiles('*requirements*.txt') }}
         restore-keys: |
           ${{ runner.OS }}-python${{ matrix.python-version }}-
+    - name: Run release script
+      env:
+        TWINE_USERNAME: "@token"
+        TWINE_PASSWORD: ${{ secrets.test_pypi_token }}
+      run: |
+        release.sh
     - name: Publish distribution 📦 to Test PyPI
       uses: pypa/gh-action-pypi-publish@master
       with:
