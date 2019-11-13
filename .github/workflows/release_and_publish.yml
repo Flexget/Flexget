@@ -16,8 +16,7 @@ jobs:
       uses: actions/cache@v1
       with:
         path: pip_cache
-        # Not sure why the '**/' is needed for hashFiles
-        key: ${{ runner.OS }}-python${{ matrix.python-version }}-${{ hashFiles('**/*requirements*.txt') }}
+        key: ${{ runner.OS }}-python${{ matrix.python-version }}-${{ hashFiles('*requirements*.txt') }}
         restore-keys: |
           ${{ runner.OS }}-python${{ matrix.python-version }}-
     - name: Publish distribution 📦 to Test PyPI
