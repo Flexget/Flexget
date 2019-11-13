@@ -6,6 +6,7 @@ on:
 
 jobs:
   build-and-publish:
+    # TODO: We need to check tests pass first
     name: Build and publish Python 🐍 distributions 📦 to PyPI and TestPyPI
     runs-on: ubuntu-18.04
     steps:
