@@ -40,10 +40,10 @@ interval_schema = {
         'hours': {'type': 'number'},
         'days': {'type': 'number'},
         'weeks': {'type': 'number'},
+        'jitter': {'type': 'integer'},
     },
-    # Only allow one unit to be specified
-    'maxProperties': 1,
-    'error_maxProperties': 'Interval must be specified as one of %s' % ', '.join(UNITS),
+    'anyOf':[{'required': [unit]} for unit in UNITS],
+    'error_anyOf': 'Interval must be specified as one or more of %s' % ', '.join(UNITS),
     'additionalProperties': False,
 }
 
@@ -58,6 +58,7 @@ cron_schema = {
         'day_of_week': {'type': ['integer', 'string']},
         'hour': {'type': ['integer', 'string']},
         'minute': {'type': ['integer', 'string']},
+        'jitter': {'type': 'integer'},
     },
     'additionalProperties': False,
 }
