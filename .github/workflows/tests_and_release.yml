@@ -61,11 +61,11 @@ jobs:
     env:
       PYTHON_VERSION: "3.7"
     steps:
+    - uses: actions/checkout@master
     - name: Setup Git User
       run: |
         git config user.email ${{ secrets.git_email }}
         git config user.name ${{ secrets.git_user }}
-    - uses: actions/checkout@master
     - name: Set up Python ${{ env.PYTHON_VERSION }}
       uses: actions/setup-python@v1
       with:
