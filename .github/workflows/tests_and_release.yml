@@ -82,4 +82,6 @@ jobs:
         TWINE_USERNAME: "@token"
         TWINE_PASSWORD: ${{ secrets.test_pypi_token }}
       run: |
-        release.sh
+        pwd
+        ls
+        ./release.sh
