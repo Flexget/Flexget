@@ -38,12 +38,13 @@ class FilterExists:
             folder = Path(folder).expanduser()
             if not folder.exists():
                 raise plugin.PluginWarning('Path %s does not exist' % folder, log)
-            for p in folder.walk(errors='ignore'):
-                key = p.name
-                # windows file system is not case sensitive
-                if platform.system() == 'Windows':
-                    key = key.lower()
-                filenames[key] = p
+            for p in folder.rglob('*'):
+                if p.is_file():
+                    key = p.name
+                    # windows file system is not case sensitive
+                    if platform.system() == 'Windows':
+                        key = key.lower()
+                    filenames[key] = p
         for entry in task.accepted:
             # priority is: filename, location (filename only), title
             name = Path(entry.get('filename', entry.get('location', entry['title']))).name
