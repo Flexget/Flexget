@@ -160,7 +160,12 @@ class UrlRewritePirateBay:
                 if href.startswith('/'):  # relative link?
                     href = self.url + href
                 entry['url'] = href
-                tds = link.parent.parent.parent.find_all('td')
+                row = link.parent.parent.parent
+                description = row.find_all('a', attrs={'class': 'detDesc'})
+                if description and description[0].contents[0] == "piratebay ":
+                    log.debug('Advertisement entry. Skipping.')
+                    continue
+                tds = row.find_all('td')
                 entry['torrent_seeds'] = int(tds[-2].contents[0])
                 entry['torrent_leeches'] = int(tds[-1].contents[0])
                 entry['torrent_availability'] = torrent_availability(
