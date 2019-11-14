@@ -8,10 +8,11 @@ on:
     branches:
     - "*"
   schedule:
-  - cron:  '38 15 * * *'
+  - cron:  '41 15 * * *'
 
 jobs:
   debug:
+    runs-on: ubuntu-latest
     steps:
     - run: |
         echo ${{github.event_name}}
