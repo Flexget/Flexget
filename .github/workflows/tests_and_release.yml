@@ -1,4 +1,4 @@
-name: Run tests
+name: Run tests and publish releases
 
 on:
   push:
@@ -7,9 +7,16 @@ on:
   pull_request:
     branches:
     - "*"
+  schedule:
+  - cron:  '38 15 * * *'
 
 jobs:
-  build:
+  debug:
+    steps:
+    - run: |
+        echo ${{github.event_name}}
+        echo ${{github.event}}
+  tests:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       max-parallel: 4
@@ -45,3 +52,36 @@ jobs:
     - name: Test with pytest
       run: |
         pytest -n auto
+  build-and-publish:
+    if: github.event_name == 'schedule'
+    needs: tests
+    name: Build and publish Python 🐍 distributions 📦 to PyPI
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Setup Git User
+      run: |
+        git config user.email ${{ secrets.git_email }}
+        git config user.name ${{ secrets.git_user }}
+    - uses: actions/checkout@master
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Set up pip cache
+      uses: actions/cache@v1
+      with:
+        path: pip_cache
+        key: ${{ runner.OS }}-python${{ matrix.python-version }}-${{ hashFiles('*requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.OS }}-python${{ matrix.python-version }}-
+    - name: Run release script
+      env:
+        TWINE_USERNAME: "@token"
+        TWINE_PASSWORD: ${{ secrets.test_pypi_token }}
+      run: |
+        release.sh
+    - name: Publish distribution 📦 to Test PyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.test_pypi_token }}
+        repository_url: https://test.pypi.org/legacy/
