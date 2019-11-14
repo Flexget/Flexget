@@ -1,10 +1,19 @@
 #!/bin/bash
 
+# This should only be run on develop branch. Builds and releases to pypi.
+# Also updates version numbers, creates a release tag, then pushes the new develop and release branches to github.
+
 # Exit if any command fails
 set -e
 
 # Show commands executing
 set -x
+
+# Error if running on a branch other than develop
+#if [ $(git rev-parse HEAD) != $(git rev-parse develop) ]; then
+#  echo "Release script should be run from develop branch."
+#  exit 1
+#fi
 
 # Only run if there are new commits
 if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
@@ -29,6 +38,7 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
   python dev_tools.py bump_version dev
   git add flexget/_version.py
   git commit -m "Prepare v`python dev_tools.py version`"
+  git branch -f develop HEAD
 
   # master branch should be at the release we tagged
   git branch -f master ${VERSION}
