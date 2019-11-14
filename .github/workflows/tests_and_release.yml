@@ -82,7 +82,7 @@ jobs:
         pip --cache-dir pip_cache install -r dev-requirements.txt
     - name: Run release script
       env:
-        TWINE_USERNAME: "@token"
+        TWINE_USERNAME: "__token__"
         TWINE_PASSWORD: ${{ secrets.test_pypi_token }}
       run: |
         ./release.sh
