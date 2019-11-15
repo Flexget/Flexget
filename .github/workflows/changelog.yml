@@ -36,6 +36,8 @@ jobs:
         pip --cache-dir pip_cache install -r dev-requirements.txt
     - name: Update the Changelog
       run: |
+        pwd
+        ls
         python update-changelog.py wiki/ChangeLog.md
         cd wiki
         git add ChangeLog.md
