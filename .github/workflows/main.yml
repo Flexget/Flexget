@@ -1,4 +1,4 @@
-name: Run tests and publish releases
+name: Main Workflow
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
     branches:
     - "*"
   schedule:
-  - cron:  '41 15 * * *'
+  - cron:  '0 3 * * *'
 
 jobs:
   debug:
@@ -18,9 +18,9 @@ jobs:
         echo ${{github.event_name}}
         echo ${{github.event}}
   tests:
+    name: Run Tests
     runs-on: ${{ matrix.operating-system }}
     strategy:
-      max-parallel: 4
       matrix:
         python-version: [3.6, 3.7]
         operating-system: [ubuntu-latest] # Get linux working before windows. windows-latest
@@ -53,10 +53,10 @@ jobs:
     - name: Test with pytest
       run: |
         pytest -n auto
-  build-and-publish:
-    #if: github.event_name == 'schedule'
+  release:
+    name: Build and release to PyPI
+    if: github.event_name == 'schedule'
     needs: tests
-    name: Build and publish Python 🐍 distributions 📦 to PyPI
     runs-on: ubuntu-18.04
     env:
       PYTHON_VERSION: "3.7"
@@ -83,6 +83,6 @@ jobs:
     - name: Run release script
       env:
         TWINE_USERNAME: "__token__"
-        TWINE_PASSWORD: ${{ secrets.test_pypi_token }}
+        TWINE_PASSWORD: ${{ secrets.pypi_token }}
       run: |
         ./release.sh

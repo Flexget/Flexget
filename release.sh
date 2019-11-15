@@ -10,10 +10,10 @@ set -e
 set -x
 
 # Error if running on a branch other than develop
-#if [ $(git rev-parse HEAD) != $(git rev-parse develop) ]; then
-#  echo "Release script should be run from develop branch."
-#  exit 1
-#fi
+if [ $(git rev-parse HEAD) != $(git rev-parse develop) ]; then
+  echo "Release script should be run from develop branch."
+  exit 1
+fi
 
 # Only run if there are new commits
 if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
@@ -27,7 +27,7 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
 
   # Build and upload to pypi.
   python setup.py sdist bdist_wheel --universal
-  twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+  twine upload dist/*
 
   # Commit and tag released version
   git add flexget/_version.py
@@ -43,7 +43,7 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
   # master branch should be at the release we tagged
   git branch -f master ${VERSION}
   # If either of the new branches are not fast forwards, the push will be rejected
-  git push origin master:test_master develop:test_develop
+  git push origin master develop
   # Make sure our branches push before pushing tag
   #git push --tags
 else
