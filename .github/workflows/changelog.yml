@@ -20,7 +20,7 @@ jobs:
     - uses: actions/checkout@v1.1.0
       with:
         repository: Flexget/wiki
-        token: ${{ secret.flexgetbot_pat }}
+        token: ${{ secrets.flexgetbot_pat }}
         # TODO: just for testing
         ref: mergetest
     - name: Setup Git User
