@@ -17,9 +17,10 @@ jobs:
       PYTHON_VERSION: 3.7
     steps:
     - uses: actions/checkout@v1
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v1.1.0
       with:
         repository: Flexget/wiki
+        token: ${{ secret.flexgetbot_pat }}
         # TODO: just for testing
         ref: mergetest
     - name: Setup Git User
