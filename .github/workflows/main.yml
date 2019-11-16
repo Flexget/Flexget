@@ -16,14 +16,13 @@ jobs:
     steps:
     - run: |
         echo ${{github.event_name}}
-        echo ${{github.event}}
   tests:
     name: Run Tests
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
         python-version: [3.6, 3.7]
-        operating-system: [ubuntu-latest] # Get linux working before windows. windows-latest
+        operating-system: [ubuntu-latest, windows-latest] # Get linux working before windows. windows-latest
       fail-fast: false
     steps:
     - uses: actions/checkout@v1
