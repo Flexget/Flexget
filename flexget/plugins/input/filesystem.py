@@ -112,7 +112,7 @@ class Filesystem:
         """
         filepath = filepath.absolute()
         entry = Entry()
-        entry['location'] = filepath
+        entry['location'] = str(filepath)
         entry['url'] = Path(filepath).absolute().as_uri()
         entry['filename'] = filepath.name
         if filepath.is_file():
