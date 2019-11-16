@@ -45,7 +45,7 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
   # If either of the new branches are not fast forwards, the push will be rejected
   git push origin master develop
   # Make sure our branches push before pushing tag
-  #git push --tags
+  git push --tags
 else
   echo "No commits, skipping release"
 fi
