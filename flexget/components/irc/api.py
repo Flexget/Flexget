@@ -25,7 +25,7 @@ class ObjectsContainer:
             'alive': {'type': 'boolean'},
             'channels': {
                 'type': 'array',
-                'items': {'type': 'object', 'patternProperties': {'\w': {'type': 'integer'}}},
+                'items': {'type': 'object', 'patternProperties': {r'\w': {'type': 'integer'}}},
             },
             'connected_channels': {'type': 'array', 'items': {'type': 'string'}},
             'port': {'type': 'integer'},
@@ -33,7 +33,7 @@ class ObjectsContainer:
         },
     }
 
-    connection = {'type': 'object', 'patternProperties': {'\w': connection_object}}
+    connection = {'type': 'object', 'patternProperties': {r'\w': connection_object}}
 
     return_response = {'type': 'array', 'items': connection}
 

@@ -2,7 +2,7 @@ import pytest
 
 
 class TestSortBy:
-    config = """
+    config = r"""
         tasks:
           test_title:
             sort_by: title

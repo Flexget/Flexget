@@ -1,5 +1,5 @@
 class TestRegexExtract:
-    config = """
+    config = r"""
         tasks:
 
           test_1:

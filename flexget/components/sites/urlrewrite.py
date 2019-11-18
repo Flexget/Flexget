@@ -9,7 +9,7 @@ log = logging.getLogger('urlrewrite')
 
 
 class UrlRewrite:
-    """
+    r"""
     Generic configurable urlrewriter.
 
     Example::

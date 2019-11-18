@@ -29,7 +29,7 @@ class QualityComponent:
         # compile regexp
         if regexp is None:
             regexp = re.escape(name)
-        self.regexp = re.compile('(?<![^\W_])(' + regexp + ')(?![^\W_])', re.IGNORECASE)
+        self.regexp = re.compile(r'(?<![^\W_])(' + regexp + r')(?![^\W_])', re.IGNORECASE)
 
     def matches(self, text):
         """Test if quality matches to text.
@@ -131,20 +131,20 @@ _sources = [
     QualityComponent('source', 30, 'ts', '(?:hd)?ts|telesync', modifier=-6),
     QualityComponent('source', 40, 'tc', 'tc|telecine', modifier=-5),
     QualityComponent('source', 50, 'r5', 'r[2-8c]', modifier=-4),
-    QualityComponent('source', 60, 'hdrip', 'hd[\W_]?rip', modifier=-3),
-    QualityComponent('source', 70, 'ppvrip', 'ppv[\W_]?rip', modifier=-2),
+    QualityComponent('source', 60, 'hdrip', r'hd[\W_]?rip', modifier=-3),
+    QualityComponent('source', 70, 'ppvrip', r'ppv[\W_]?rip', modifier=-2),
     QualityComponent('source', 80, 'preair', modifier=-1),
-    QualityComponent('source', 90, 'tvrip', 'tv[\W_]?rip'),
-    QualityComponent('source', 100, 'dsr', 'dsr|ds[\W_]?rip'),
-    QualityComponent('source', 110, 'sdtv', '(?:[sp]dtv|dvb)(?:[\W_]?rip)?'),
-    QualityComponent('source', 120, 'dvdscr', '(?:(?:dvd|web)[\W_]?)?scr(?:eener)?', modifier=0),
+    QualityComponent('source', 90, 'tvrip', r'tv[\W_]?rip'),
+    QualityComponent('source', 100, 'dsr', r'dsr|ds[\W_]?rip'),
+    QualityComponent('source', 110, 'sdtv', r'(?:[sp]dtv|dvb)(?:[\W_]?rip)?'),
+    QualityComponent('source', 120, 'dvdscr', r'(?:(?:dvd|web)[\W_]?)?scr(?:eener)?', modifier=0),
     QualityComponent('source', 130, 'bdscr', 'bdscr(?:eener)?'),
-    QualityComponent('source', 140, 'webrip', 'web[\W_]?rip'),
-    QualityComponent('source', 150, 'hdtv', 'a?hdtv(?:[\W_]?rip)?'),
-    QualityComponent('source', 160, 'webdl', 'web(?:[\W_]?(dl|hd))?'),
-    QualityComponent('source', 170, 'dvdrip', 'dvd(?:[\W_]?rip)?'),
+    QualityComponent('source', 140, 'webrip', r'web[\W_]?rip'),
+    QualityComponent('source', 150, 'hdtv', r'a?hdtv(?:[\W_]?rip)?'),
+    QualityComponent('source', 160, 'webdl', r'web(?:[\W_]?(dl|hd))?'),
+    QualityComponent('source', 170, 'dvdrip', r'dvd(?:[\W_]?rip)?'),
     QualityComponent('source', 175, 'remux'),
-    QualityComponent('source', 180, 'bluray', '(?:b[dr][\W_]?rip|blu[\W_]?ray(?:[\W_]?rip)?)'),
+    QualityComponent('source', 180, 'bluray', r'(?:b[dr][\W_]?rip|blu[\W_]?ray(?:[\W_]?rip)?)'),
 ]
 _codecs = [
     QualityComponent('codec', 10, 'divx'),
@@ -154,7 +154,7 @@ _codecs = [
     QualityComponent('codec', 40, 'h265', '[hx].?265|hevc'),
     QualityComponent('codec', 50, '10bit', '10.?bit|hi10p'),
 ]
-channels = '(?:(?:[^\w+]?[1-7][\W_]?(?:0|1|ch)))'
+channels = r'(?:(?:[^\w+]?[1-7][\W_]?(?:0|1|ch)))'
 _audios = [
     QualityComponent('audio', 10, 'mp3'),
     # TODO: No idea what order these should go in or if we need different regexps
@@ -164,7 +164,7 @@ _audios = [
     QualityComponent('audio', 45, 'dd+5.1', 'dd[p+]%s' % channels),
     QualityComponent('audio', 50, 'flac', 'flac%s?' % channels),
     # The DTSs are a bit backwards, but the more specific one needs to be parsed first
-    QualityComponent('audio', 60, 'dtshd', 'dts[\W_]?hd(?:[\W_]?ma)?%s?' % channels),
+    QualityComponent('audio', 60, 'dtshd', r'dts[\W_]?hd(?:[\W_]?ma)?%s?' % channels),
     QualityComponent('audio', 70, 'dts'),
     QualityComponent('audio', 80, 'truehd', 'truehd%s?' % channels),
 ]

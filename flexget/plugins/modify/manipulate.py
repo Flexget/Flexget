@@ -8,7 +8,7 @@ log = logging.getLogger('manipulate')
 
 
 class Manipulate:
-    """
+    r"""
     Usage:
 
       manipulate:

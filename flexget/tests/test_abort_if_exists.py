@@ -4,7 +4,7 @@ from flexget.task import TaskAbort
 
 
 class TestAbortIfExists:
-    config = """
+    config = r"""
         templates:
           global:
             disable: [seen]

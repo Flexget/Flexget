@@ -13,7 +13,7 @@ log = logging.getLogger('rmz')
 
 
 class UrlRewriteRmz:
-    """
+    r"""
     rmz.cr (rapidmoviez.com) urlrewriter
     Version 0.1
 

@@ -134,7 +134,7 @@ class SearchPTN:
             # html5parser doesn't work properly for some reason
             soup = get_soup(r.text, parser='html.parser')
             for movie in soup.select('.torrentstd'):
-                imdb_id = movie.find('a', href=re.compile('.*imdb\.com/title/tt'))
+                imdb_id = movie.find('a', href=re.compile(r'.*imdb\.com/title/tt'))
                 if imdb_id:
                     imdb_id = extract_id(imdb_id['href'])
                 if imdb_id and 'imdb_id' in entry and imdb_id != entry['imdb_id']:

@@ -72,7 +72,7 @@ class TestURLRewriters:
 class TestRegexpurlrewriter:
     # TODO: this test is broken?
 
-    config = """
+    config = r"""
         tasks:
           test:
             mock:

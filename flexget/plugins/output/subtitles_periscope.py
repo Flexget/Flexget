@@ -9,7 +9,7 @@ log = logging.getLogger('subtitles')
 
 
 class PluginPeriscope:
-    """
+    r"""
     Search and download subtitles using Periscope by Patrick Dessalle
     (http://code.google.com/p/periscope/).
 

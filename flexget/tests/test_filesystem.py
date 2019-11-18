@@ -7,7 +7,7 @@ class TestFilesystem:
     test2 = base + '/Test2'
     test3 = base + '/Test3'
 
-    config = f"""
+    config = fr"""
         tasks:
           string:
             filesystem: {test1}

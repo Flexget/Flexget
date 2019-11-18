@@ -33,7 +33,7 @@ class UrlRewriteDeadFrog:
             soup = get_soup(page.text)
         except Exception as e:
             raise UrlRewritingError(e)
-        down_link = soup.find('a', attrs={'href': re.compile("download/\d+/.*\.torrent")})
+        down_link = soup.find('a', attrs={'href': re.compile(r"download/\d+/.*\.torrent")})
         if not down_link:
             raise UrlRewritingError('Unable to locate download link from url %s' % url)
         return 'http://www.deadfrog.us/' + down_link.get('href')

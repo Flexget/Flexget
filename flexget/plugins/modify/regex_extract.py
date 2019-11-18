@@ -10,7 +10,7 @@ log = logging.getLogger('regex_extract')
 
 
 class RegexExtract:
-    """
+    r"""
     Updates an entry with the values of regex matched named groups
 
     Usage:
