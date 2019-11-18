@@ -4,7 +4,7 @@ from datetime import datetime
 import pytest
 
 from flexget.utils import json
-from flexget.utils.tools import parse_filesize, split_title_year
+from flexget.utils.tools import parse_filesize, split_title_year, merge_dict_from_to
 
 
 def compare_floats(float1, float2):
@@ -106,3 +106,52 @@ class TestSplitYearTitle:
     )
     def test_split_year_title(self, title, expected_title, expected_year):
         assert split_title_year(title) == (expected_title, expected_year)
+
+class TestDictMerge(object):
+    def test_merge_dict_to_dict_list(self):
+        d1 = {'setting': {'parameter': ['item_1']}}
+        d2 = {'setting': {'parameter': ['item_2']}}
+        merge_dict_from_to(d1, d2)
+        assert d2 == {'setting': {'parameter': ['item_2', 'item_1']}}
+
+    def test_merge_dict_to_dict_override(self):
+        d1 = {'setting': {'parameter': ['item_1']}}
+        d2 = {'setting': {'parameter': 2}}
+        merge_dict_from_to(d1, d2)
+        assert d2 == {'setting': {'parameter': 2}}
+
+    def test_merge_dict_to_dict_add(self):
+        d1 = {'setting': {'parameter_1': ['item_1']}}
+        d2 = {'setting': {'parameter_2': 'item_2'}}
+        merge_dict_from_to(d1, d2)
+        assert d2 == {'setting': {'parameter_1': ['item_1'], 'parameter_2': 'item_2'}}
+
+    def test_merge_dict_to_dict_str(self):
+        d1 = {'setting': {'parameter': 'item_1'}}
+        d2 = {'setting': {'parameter': 'item_2'}}
+        merge_dict_from_to(d1, d2)
+        assert d2 == {'setting': {'parameter': 'item_2'}}
+
+    def test_merge_list_to_list(self):
+        d1 = {'setting': ['item_1']}
+        d2 = {'setting': ['item_2']}
+        merge_dict_from_to(d1, d2)
+        assert d2 == {'setting': ['item_2', 'item_1']}
+
+    def test_merge_list_to_str(self):
+        d1 = {'setting': ['list']}
+        d2 = {'setting': 'string'}
+        merge_dict_from_to(d1, d2)
+        assert d2 == {'setting': 'string'}
+
+    def test_merge_str_to_list(self):
+        d1 = {'setting': 'string'}
+        d2 = {'setting': ['list']}
+        merge_dict_from_to(d1, d2)
+        assert d2 == {'setting': ['list']}
+
+    def test_merge_str_to_str(self):
+        d1 = {'setting': 'string_1'}
+        d2 = {'setting': 'string_2'}
+        merge_dict_from_to(d1, d2)
+        assert d2 == {'setting': 'string_2'}
