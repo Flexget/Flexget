@@ -1,7 +1,7 @@
 FlexGet
 =======
-.. image:: https://circleci.com/gh/Flexget/Flexget/tree/develop.svg?style=svg
-    :target: https://circleci.com/gh/Flexget/Flexget/tree/develop
+.. image:: https://github.com/Flexget/Flexget/workflows/Main%20Workflow/badge.svg?branch=develop
+    :target: https://github.com/Flexget/Flexget/actions?query=workflow%3A%22Main+Workflow%22+branch%3Adevelop
 
 .. image:: https://img.shields.io/pypi/v/Flexget.svg
     :target: https://pypi.python.org/pypi/Flexget
