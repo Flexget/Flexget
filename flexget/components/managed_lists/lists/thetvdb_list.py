@@ -63,20 +63,20 @@ class TheTVDBSet(MutableSet):
                     account_id=self.config['account_id'],
                     api_key=self.config['api_key'],
                 ).get('user/favorites')
-                series_ids = [int(f_id) for f_id in req['favorites'] if f_id != '']
+                series_names = [f_id for f_id in req['favorites'] if f_id != '']
             except RequestException as e:
                 raise PluginError('Error retrieving favorites from thetvdb: %s' % str(e))
             self._items = []
-            for series_id in series_ids:
+            for series_name in series_names:
                 # Lookup the series name from the id
                 try:
                     series = plugin_api_tvdb.lookup_series(
-                        tvdb_id=series_id, language=self.config.get('language')
+                        name=series_name, language=self.config.get('language')
                     )
                 except LookupError as e:
-                    log.error('Error looking up %s from thetvdb: %s' % (series_id, e.args[0]))
+                    log.error('Error looking up %s from thetvdb: %s' % (series_name, e.args[0]))
                 else:
-                    series_name = series.name
+                    series_name = series.name       # Adjust series name to the one returned after searching
                     if self.config.get('strip_dates'):
                         # Remove year from end of series name if present
                         series_name, _ = split_title_year(series_name)
