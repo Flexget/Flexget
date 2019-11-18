@@ -71,6 +71,7 @@ class SearchArgenteam:
                 log.error('Argenteam request failed: %s', e)
                 return
 
+            log.debug('%s releases found.', len(response['releases']))
             for release in response['releases']:
                 for torrent in release['torrents']:
                     if (
@@ -92,7 +93,7 @@ class SearchArgenteam:
                         e['url'] = torrent['uri']
 
                         # Save aRGENTeaM subtitle URL for this release
-                        if 'subtitles' in release:
+                        if 'subtitles' in release and len(release['subtitles']) > 0:
                             e['argenteam_subtitle'] = release['subtitles'][0]['uri']
                             log.debug('Argenteam subtitle found: %s', e['argenteam_subtitle'])
 
