@@ -74,7 +74,7 @@ class SearchArgenteam(object):
                 log.error('Argenteam request failed: %s', e)
                 return
 
-            log.info('%s releases found.', len(response['releases']))
+            log.debug('%s releases found.', len(response['releases']))
             for release in response['releases']:
                 for torrent in release['torrents']:
                     if (
