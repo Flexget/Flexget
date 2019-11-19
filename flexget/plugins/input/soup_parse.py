@@ -6,6 +6,7 @@ import codecs
 import re
 import logging
 import os
+import zlib
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -44,6 +45,11 @@ class SoupParse(object):
       regexps: a list of dicts that hold regexps. The key is set to the first string that matches
       any of the regexps listed. The regexps are evaluated in the order they are supplied so if a
       string matches the first regexp none of the others in the list will be used.
+      
+      default_value: a string that will be used as the default value for all keys have no matching info.
+      It can contain references to other keys that are listed above it. If default value is used here and
+      in a key, the default_value under the key will take precedence. Reference other key by enclosing in 
+      double curly braces.
 
       required: a boolean that when set to true will only allow entries that contain this key
       onto the next stage. 'url' and 'title' are always required no matter what you do (part of flexget)
@@ -57,6 +63,7 @@ class SoupParse(object):
 
     soup_parse:
       source: http://username:password@ezrss.it/feed/
+      default_value: foofighters
       sections:
         - body
         - element_name: section
@@ -83,6 +90,7 @@ class SoupParse(object):
             - regexp: '[SMTWF].*?ET'
             - regexp: '[SMTWF].*?\d\d\d\d'
         custom_field1:
+        default_value: 'www.coolsite.com/page/{{title}}/info'
           section:
             - element_name: span
               attribute_name: class
@@ -174,12 +182,14 @@ class SoupParse(object):
                 ]
             },
             'encoding': {'type': 'string'},
+            'default_value': {'type': 'string'},
             'sections': {'$ref': '#/definitions/scope_limiter'},
             'keys': {
                 'type': 'object',
                 'additionalProperties': {
                     'type': 'object',
                     'properties': {
+                        'default_value': {'type': 'string'},
                         'section': {'$ref': '#/definitions/scope_limiter'},
                         'location': {
                             'oneOf': [
@@ -239,45 +249,41 @@ class SoupParse(object):
         return entry.isvalid()
 
     def _get_master_tag_list(self, element_tag_list, scope_num, tag_search_terms):
-        if scope_num + 1 < len(tag_search_terms):
-            temp_list = []
-            for x in range(len(element_tag_list[scope_num])):
-                new_tag_list = (
-                    element_tag_list[scope_num][x].find_all(tag_search_terms[scope_num][0], 
-                                                            tag_search_terms[scope_num][1])
+        
+        temp_list = []
+        for x in range(len(element_tag_list[scope_num])):
+            new_tag_list = (
+                element_tag_list[scope_num][x].find_all(tag_search_terms[scope_num][0], 
+                                                        tag_search_terms[scope_num][1])
+            )
+            if (eval(tag_search_terms[scope_num][2]) >= eval(tag_search_terms[scope_num][3]) or
+                eval(tag_search_terms[scope_num][2]) >= len(new_tag_list)):
+                log.warning(
+                    ("The specified start (%s) for scope_limit #%s is the same as or after the specified end (%s)"
+                        " or actual end (%s) for match #%s. The start will be set to the beginning, by default.") % (
+                        str(eval(tag_search_terms[scope_num][2]) + 1), str(scope_num + 1),
+                        str(eval(tag_search_terms[scope_num][3])), str(len(new_tag_list)), str(x + 1))
                 )
-                if (eval(tag_search_terms[scope_num][2]) >= eval(tag_search_terms[scope_num][3]) or
-                    eval(tag_search_terms[scope_num][2]) >= len(new_tag_list)):
-                    log.warning(
-                        ("The specified start (%s) for scope_limit #%s is the same as or after the specified end (%s)"
-                         " or actual end (%s) for match #%s. The start will be set to the beginning, by default.") % (
-                            str(eval(search_terms[scope_num][2]) + 1), str(scope_num + 1),
-                            str(eval(search_terms[scope_num][3])), str(len(result_set)), str(x + 1))
-                    )
-                    start = "0"
-                else:
-                    start = tag_search_terms[scope_num][2]
-                if eval(tag_search_terms[scope_num][3]) > len(new_tag_list):
-                    log.warning(
-                        ("The specified end (%s) for scope_limit #%s is after the actual end (%s) for match #%s. The "
-                         "end will be set to the actual end, by default.") % (
-                          str(eval(search_terms[scope_num][3])), str(scope_num + 1), str(len(result_set)), str(x + 1))
-                    )
-                    end = str(len(new_tag_list))
-                else:
-                    end = tag_search_terms[scope_num][3]
-                for y in range(eval(start), eval(end)):
-                    temp_list.append(new_tag_list[y])
+                start = "0"
+            else:
+                start = tag_search_terms[scope_num][2]
+            if eval(tag_search_terms[scope_num][3]) > len(new_tag_list):
+                log.warning(
+                    ("The specified end (%s) for scope_limit #%s is after the actual end (%s) for match #%s. The "
+                        "end will be set to the actual end, by default.") % (
+                        str(eval(tag_search_terms[scope_num][3])), str(scope_num + 1), str(len(new_tag_list)), str(x + 1))
+                )
+                end = str(len(new_tag_list))
+            else:
+                end = tag_search_terms[scope_num][3]
+            for y in range(eval(start), eval(end)):
+                temp_list.append(new_tag_list[y])
+        
+        if scope_num + 1 < len(tag_search_terms):
             element_tag_list.append(temp_list)
             return self._get_master_tag_list(element_tag_list, scope_num + 1, tag_search_terms)
         else:
-            master_tag_list = []
-            for x in range(len(element_tag_list[scope_num])):
-                tmp_list = element_tag_list[scope_num][x].find_all(
-                    tag_search_terms[scope_num][0], tag_search_terms[scope_num][1]) 
-                for y in range(len(tmp_list)):
-                    master_tag_list.append(tmp_list[y])
-            return master_tag_list
+            return temp_list
 
     def _tag_limiter(self, config, scope_limits):
 
@@ -315,27 +321,10 @@ class SoupParse(object):
     def on_task_input(self, task, config):
         url = config['source']
         encoding = config.get('encoding')
-
-        # if it's a file open it and read into content (assume utf-8 encoding)
-        if os.path.isfile(os.path.expanduser(url)):
-            soup = get_soup(codecs.open(url, 'r', encoding=encoding or 'utf-8').read())
-        # else use requests to get the data
-        else:
-            resp = task.requests.get(url)
-            if encoding:
-                resp.encoding = encoding
-            soup = get_soup(resp.content)
-
-        scope_limits = config.get('sections')
-        if scope_limits:
-            tag_search_terms = self._tag_limiter(config, scope_limits)
-            sections = self._get_master_tag_list([[soup]], 0, tag_search_terms)
-        else:
-            sections = [soup]
-
+        
         # holds all the regex in a dict for the field they are trying to fill
         key_to_regexps = {}
-
+        
         # put every key in keys into the key_to_regexps list
         for key, value in config['keys'].items():
             if 'regexps' in value:
@@ -346,13 +335,68 @@ class SoupParse(object):
             if 'required' in value and value['required']:
                 self.required.append(key)
 
-        entries = []
+        # if it's a file open it and read into content (assume utf-8 encoding)
+        if os.path.isfile(os.path.expanduser(url)):
+            soup = get_soup(codecs.open(url, 'r', encoding=encoding or 'utf-8').read())
+        # else use requests to get the data
+        else:
+            log.verbose('Requesting: %s' % url)
+            page = task.requests.get(url)
+            log.verbose('Response: %s (%s)' % (page.status_code, page.reason))
+            if encoding:
+                page.encoding = encoding
+            soup = get_soup(page.content)
+        scope_limits = config.get('sections')
+        if scope_limits:
+            tag_search_terms = self._tag_limiter(config, scope_limits)
+            sections = self._get_master_tag_list([[soup]], 0, tag_search_terms)
+        else:
+            sections = [soup]
+
+        return self.create_entries(url, sections, key_to_regexps, config)
+
+    def get_def_val(self, default, entry):
+        if re.search(r'.*{{.*?}}.*', default):
+            def_key = re.sub(r'.*?{{(.*?)}}.*', r'\1', default)
+            try:
+                def_var = entry[def_key]
+                default = re.sub(r'{{.*?}}', def_var, default)
+                return default
+            except KeyError:
+                log.warning('Could not substitute default value. Key "%s" does not exist in this entry.' % def_key)
+                return False
+        else:
+            return default
+            
+    def create_entries(self, url, sections, key_to_regexps, config):
+        
+        def title_exists(title):
+            """Helper method. Return True if title is already added to entries"""
+            for entry in queue:
+                if entry['title'] == title:
+                    return True
+        def not_found(default):
+            if default:
+                log.warning("Applying default value.")
+                return default
+            else:
+                log.warning("Skipping to next key search.")
+                return False            
+            
+                
+        queue = []
         sec_num = 0
         for section in sections:
             sec_num += 1
             entry = Entry()
             
             for key, value in config['keys'].items():
+                if 'default_value' in value:
+                    default = self.get_def_val(value['default_value'], entry)
+                elif 'default_value' in config.keys():
+                    default = self.get_def_val(config['default_value'], entry)
+                else:
+                    default = False
                 if 'section' in value:
                     scope_limits = value['section']
                 else:
@@ -366,22 +410,32 @@ class SoupParse(object):
                     tag_search_terms = self._tag_limiter(config, scope_limits)
                     tag_list = self._get_master_tag_list([[section]], 0, tag_search_terms)
                     if tag_list:
-                        tag = tag_list[0]
+                        tag = tag_list
                     else:
                         log.warning("The specified 'section' for key: '" + str(key) + 
                                     "' was not found inside of the its parent tag in section #" + 
-                                    str(sec_num) + ". Skipping to next key search.")
-                        continue
+                                    str(sec_num))
+                        default = not_found(default)
+                        if not default:
+                            continue
+                        tag = [get_soup('<a href="' + default + '">' + default + '</a>', 'html.parser').find('a')]
                 else:
                     # If the scope isn't limited, get the 'text' or 'url' from the main sections.
                     tag = section
                 if isinstance(location_info, str):
                     if location_info == 'text':
-                        new_section = tag.text.strip()
+                        new_section = tag[0].text.strip()
                     else:
-                        new_section = tag['href']
-                        if not new_section.startswith('http://') or not new_section.startswith('https://'):
-                            new_section = parse.urljoin(url, new_section)
+                        try:
+                            new_section = tag[0].find('a')['href']
+                            if not new_section.startswith('http://') or not new_section.startswith('https://'):
+                                new_section = parse.urljoin(url, new_section)
+                        except (KeyError, TypeError) as e:
+                            log.warning("No url was found for key: '" + str(key) + "' in section #" +str(sec_num) + ".")
+                            new_section = not_found(default)
+                            if not new_section:
+                                continue
+
                 else:
                     location = next(iter(location_info))
                     loc = location_info[location]
@@ -389,30 +443,45 @@ class SoupParse(object):
                         loc = loc - 1
                     new_section = ''
                     if location == 'text':
-                        contents_list = tag.find_all(text=True)
+                        contents_list = [t.text.strip() for t in tag if t.text.strip()]
                         if contents_list:
-                            new_section_list = [t for t in contents_list if t.strip()]
-                            if len(new_section_list) > loc:
-                                new_section_list = new_section_list[loc]
+                            if len(contents_list) > loc:
+                                new_section = contents_list[loc]
                             else:
                                 log.warning("The specified text location for key: '" + str(key) + 
-                                            "' was out of range in section #" + str(sec_num) + 
-                                            ". Skipping to next key search.")
+                                            "' was out of range in section #" + str(sec_num)                                            )
+                                new_section = not_found(default)
+                                if not new_section:
+                                    continue
+
                         else:
                             log.warning("There was no text found at any location for key: '" + str(key) + 
-                                        "' in section #" + str(sec_num) + ". Skipping to next key search.")
+                                        "' in section #")
+                            new_section = not_found(default)
+                            if not new_section:
+                                continue
                     else:
-                        contents_list = tag.find_all('a')
+                        contents_list = []
+                        for t in tag:
+                            contents_list.extend(t.find_all('a'))
                         if contents_list:
                             if len(contents_list) > loc:
                                 new_section = contents_list[loc]['href']
                             else:
                                 log.warning("The specified url location for key: '" + str(key) + 
-                                            "' was out of range in section #" + str(sec_num) + 
-                                            ". Skipping to next key search.")
+                                            "' was out of range in section #" + str(sec_num)
+                                            )
+                                new_section = not_found(default)
+                                if not new_section:
+                                    continue
+
                         else:
                             log.warning("There were no urls found at any location for key: '" + str(key) + 
-                                        "' in section #" + str(sec_num) + ". Skipping to next key search.")
+                                        "' in section #" + str(sec_num)
+                                        )
+                            new_section = not_found(default)
+                            if not new_section:
+                                continue
 
                 regexps = key_to_regexps[key]
                 for regexp in regexps:
@@ -421,12 +490,23 @@ class SoupParse(object):
                         break
                     m = regexp.search(new_section)
                     if m:
-                        entry[key] = m.group(0)
+                        value = m.group(0)
+                        if key == 'title':
+                            if title_exists(value):
+                                # title link should be unique, add CRC32 to end if it's not
+                                hash = zlib.crc32(url.encode("utf-8"))
+                                crc32 = '%08X' % (hash & 0xFFFFFFFF)
+                                value = '%s [%s]' % (value, crc32)
+                                # truly duplicate, title + url crc already exists in queue
+                                if title_exists(value):
+                                    continue
+                                log.debug('uniqued title to %s' % value)
+                        entry[key] = value
                         break
             if self.isvalid(entry):
-                entries.append(entry)
+                queue.append(entry)
 
-        return entries
+        return queue
 
 
 @event('plugin.register')
