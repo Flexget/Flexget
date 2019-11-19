@@ -54,7 +54,7 @@ CATEGORIES = {
     'ebook': 'filter_cat[27]',
     'audiobook': 'filter_cat[28]',
     'music': 'filter_cat[29]',
-    'misc': 'filter_cat[30]'
+    'misc': 'filter_cat[30]',
 }
 
 LEECHSTATUS = {'normal': 0, 'freeleech': 1, 'neutral leech': 2, 'either': 3}
