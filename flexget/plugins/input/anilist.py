@@ -40,7 +40,6 @@ class AniList(object):
         - <all|tv|tv_short|movie|special|ova|ona>
         - <tv|tv_short|movie|special|ova|ona>
         ...
-      title_only: <boolean>
     """
 
     schema = {
@@ -58,8 +57,7 @@ class AniList(object):
                     ),
                     'format': one_or_more(
                         {'type': 'string', 'enum': ANIME_FORMAT}, unique_items=True
-                    ),
-                    'title_only': {'type': 'boolean'}
+                    )
                 },
                 'required': ['username'],
                 'additionalProperties': False,
@@ -74,7 +72,6 @@ class AniList(object):
         selected_list_status = config['status'] if 'status' in config else ['current', 'planning']
         selected_release_status = config['release_status'] if 'release_status' in config else ['all']
         selected_formats = config['format'] if 'format' in config else ['all']
-        lightweight = config.get('title_only', False)
 
         if not isinstance(selected_list_status, list):
             selected_list_status = [selected_list_status]
@@ -85,15 +82,15 @@ class AniList(object):
         if not isinstance(selected_formats, list):
             selected_formats = [selected_formats]
 
-        log.debug('selected_list_status: %s' % selected_list_status)
-        log.debug('selected_release_status: %s' % selected_release_status)
-        log.debug('selected_formats: %s' % selected_formats)
+        log.debug('Selected List Status: %s' % selected_list_status)
+        log.debug('Selected Release Status: %s' % selected_release_status)
+        log.debug('Selected Formats: %s' % selected_formats)
 
         req_variables = {'user': config['username']}
         req_chunk = 1
         req_fields = ('status, title{ romaji, english }, synonyms, siteUrl, idMal, format, episodes, '
                     'trailer{ site, id }, coverImage{ large }, bannerImage, genres, tags{ name }, '
-                    'externalLinks{ site, url }' if not lightweight else 'status, format, title{ romaji, english }')
+                    'externalLinks{ site, url }')
         while req_chunk:
             req_query = ('query ($user: String){collection: MediaListCollection(userName: $user, type: ANIME, '
                         'perChunk: 500, chunk: %s, status_in: [%s]){ hasNextChunk, statuses: lists { list: entries { '
@@ -125,21 +122,20 @@ class AniList(object):
                             entry = Entry()
                             entry['title'] = anime['title']['romaji']
                             entry['al_title'] = anime['title']
-                            if not lightweight:
-                                entry['alternate_name'] = [anime['title']['english']] + anime['synonyms']
-                                entry['url'] = anime['siteUrl']
-                                entry['al_release_status'] = anime['status'].capitalize()
-                                entry['al_list_status'] = list_status
-                                entry['al_idMal'] = anime['idMal']
-                                entry['al_format'] = anime['format']
-                                entry['al_episodes'] = anime['episodes']
-                                entry['al_trailer'] = (TRAILER_SOURCE[anime['trailer']['site']]
-                                    + anime['trailer']['id'] if anime['trailer'] else '')
-                                entry['al_cover'] = anime['coverImage']['large']
-                                entry['al_banner'] = anime['bannerImage']
-                                entry['al_genres'] = anime['genres']
-                                entry['al_tags'] = [t['name'] for t in anime['tags']]
-                                entry['al_links'] = anime['externalLinks']
+                            entry['al_format'] = anime['format']
+                            entry['al_release_status'] = anime['status'].capitalize()
+                            entry['al_list_status'] = list_status
+                            entry['alternate_name'] = [anime['title']['english']] + anime['synonyms']
+                            entry['url'] = anime['siteUrl']
+                            entry['al_idMal'] = anime['idMal']
+                            entry['al_episodes'] = anime['episodes']
+                            entry['al_trailer'] = (TRAILER_SOURCE[anime['trailer']['site']]
+                                + anime['trailer']['id'] if anime['trailer'] else '')
+                            entry['al_cover'] = anime['coverImage']['large']
+                            entry['al_banner'] = anime['bannerImage']
+                            entry['al_genres'] = anime['genres']
+                            entry['al_tags'] = [t['name'] for t in anime['tags']]
+                            entry['al_links'] = anime['externalLinks']
                             if entry.isvalid():
                                 yield entry
                 req_chunk = req_chunk + 1 if list_response['collection']['hasNextChunk'] else False
