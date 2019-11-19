@@ -1,30 +1,27 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
 
-from flask import request, jsonify
+from flask import jsonify, request
 
+from flexget.api import APIResource, api
+from flexget.api.app import (
+    APIError,
+    Conflict,
+    NotFoundError,
+    base_message_schema,
+    etag,
+    success_response,
+)
 from flexget.components.scheduler.scheduler import (
+    DEFAULT_SCHEDULES,
     schedule_schema,
     scheduler,
     scheduler_job_map,
-    DEFAULT_SCHEDULES,
-)
-from flexget.api import api, APIResource
-from flexget.api.app import (
-    NotFoundError,
-    APIError,
-    base_message_schema,
-    success_response,
-    etag,
-    Conflict,
 )
 
 schedule_api = api.namespace('schedules', description='Task Scheduler')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     # SwaggerUI does not yet support anyOf or oneOf
     schedule_object = copy.deepcopy(schedule_schema)
     schedule_object['properties']['id'] = {'type': 'integer'}

@@ -2,12 +2,12 @@ import logging
 import pickle
 from datetime import datetime
 
-from sqlalchemy import Index, Unicode, select, Column, Integer, String, DateTime
+from sqlalchemy import Column, DateTime, Index, Integer, String, Unicode, select
 
 from flexget import db_schema
 from flexget.utils import json
 from flexget.utils.database import entry_synonym, with_session
-from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
+from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
 log = logging.getLogger('backlog.db')
 Base = db_schema.versioned_base('backlog', 2)

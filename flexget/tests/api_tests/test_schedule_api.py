@@ -1,14 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from unittest.mock import patch
 
 from flexget.api.app import base_message
 from flexget.components.scheduler.api import ObjectsContainer as OC
 from flexget.manager import Manager
 from flexget.utils import json
-from mock import patch
 
 
-class TestEmptyScheduledAPI(object):
+class TestEmptyScheduledAPI:
     config = 'tasks: {}'
 
     def test_empty_schedules_get(self, api_client, schema_match):
@@ -37,7 +35,7 @@ class TestEmptyScheduledAPI(object):
         assert data == payload
 
 
-class TestScheduledAPI(object):
+class TestScheduledAPI:
     schedule = {'tasks': ['test1'], 'interval': {'minutes': 15}}
 
     config = """
@@ -169,7 +167,7 @@ class TestScheduledAPI(object):
         assert mocked_save_config.called
 
 
-class TestPositiveBooleanSchedule(object):
+class TestPositiveBooleanSchedule:
     config = """
         schedules: yes
         tasks:
@@ -279,7 +277,7 @@ class TestPositiveBooleanSchedule(object):
         assert not errors
 
 
-class TestNegativeBooleanSchedule(object):
+class TestNegativeBooleanSchedule:
     config = """
         schedules: no
         tasks:

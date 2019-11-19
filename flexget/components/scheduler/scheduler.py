@@ -1,10 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import hashlib
 import logging
 import os
 import struct
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytz
 import tzlocal
@@ -12,7 +9,7 @@ from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
-from flexget.config_schema import register_config_key, format_checker, register_schema
+from flexget.config_schema import format_checker, register_config_key, register_schema
 from flexget.event import event
 from flexget.manager import manager
 from flexget.utils import json
@@ -43,10 +40,10 @@ interval_schema = {
         'hours': {'type': 'number'},
         'days': {'type': 'number'},
         'weeks': {'type': 'number'},
+        'jitter': {'type': 'integer'},
     },
-    # Only allow one unit to be specified
-    'maxProperties': 1,
-    'error_maxProperties': 'Interval must be specified as one of %s' % ', '.join(UNITS),
+    'anyOf':[{'required': [unit]} for unit in UNITS],
+    'error_anyOf': 'Interval must be specified as one or more of %s' % ', '.join(UNITS),
     'additionalProperties': False,
 }
 
@@ -61,6 +58,7 @@ cron_schema = {
         'day_of_week': {'type': ['integer', 'string']},
         'hour': {'type': ['integer', 'string']},
         'minute': {'type': ['integer', 'string']},
+        'jitter': {'type': 'integer'},
     },
     'additionalProperties': False,
 }

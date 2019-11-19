@@ -1,26 +1,21 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib import parse
-
-
 import logging
-import posixpath
-import zlib
 import re
-import io
+import zlib
+from pathlib import Path
+from urllib import parse
 
 from jinja2 import Template
 
 from flexget import plugin
-from flexget.event import event
 from flexget.entry import Entry
-from flexget.utils.soup import get_soup
+from flexget.event import event
 from flexget.utils.cached_input import cached
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('html')
 
 
-class InputHtml(object):
+class InputHtml:
     """
     Parses urls from html page. Usefull on sites which have direct download
     links of any type (mp3, jpg, torrent, ...).
@@ -153,7 +148,7 @@ class InputHtml(object):
         if dump_name:
             log.verbose('Dumping: %s' % dump_name)
             data = soup.prettify()
-            with io.open(dump_name, 'w', encoding='utf-8') as f:
+            with open(dump_name, 'w', encoding='utf-8') as f:
                 f.write(data)
 
         return self.create_entries(url, soup, config)
@@ -168,15 +163,16 @@ class InputHtml(object):
                 return None
         return title or None
 
-    def _title_from_url(self, url):
+    @staticmethod
+    def _title_from_url(url):
         parts = parse.urlsplit(url)
         name = ''
         if parts.scheme == 'magnet':
-            match = re.search('(?:&dn(?:\.\d)?=)(.+?)(?:&)', parts.query)
+            match = re.search(r'(?:&dn(?:\.\d)?=)(.+?)(?:&)', parts.query)
             if match:
                 name = match.group(1)
         else:
-            name = posixpath.basename(parts.path)
+            name = Path(parts.path).name
         return parse.unquote_plus(name)
 
     def create_entries(self, page_url, soup, config):

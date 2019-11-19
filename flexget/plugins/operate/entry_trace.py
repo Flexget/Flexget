@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
@@ -16,7 +13,7 @@ def on_entry_action(entry, act=None, task=None, reason=None, **kwargs):
         entry['reason'] = reason
 
 
-class EntryOperations(object):
+class EntryOperations:
     """
     Records accept, reject and fail metainfo into entries.
 

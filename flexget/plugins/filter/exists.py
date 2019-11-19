@@ -1,19 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import platform
-
-from path import Path
+from pathlib import Path
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 
 log = logging.getLogger('exists')
 
 
-class FilterExists(object):
+class FilterExists:
     """
         Reject entries that already exist in given path.
 
@@ -42,12 +38,13 @@ class FilterExists(object):
             folder = Path(folder).expanduser()
             if not folder.exists():
                 raise plugin.PluginWarning('Path %s does not exist' % folder, log)
-            for p in folder.walk(errors='ignore'):
-                key = p.name
-                # windows file system is not case sensitive
-                if platform.system() == 'Windows':
-                    key = key.lower()
-                filenames[key] = p
+            for p in folder.rglob('*'):
+                if p.is_file():
+                    key = p.name
+                    # windows file system is not case sensitive
+                    if platform.system() == 'Windows':
+                        key = key.lower()
+                    filenames[key] = p
         for entry in task.accepted:
             # priority is: filename, location (filename only), title
             name = Path(entry.get('filename', entry.get('location', entry['title']))).name

@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import quote_plus
-
 import logging
 import re
+from urllib.parse import quote_plus
 
 from flexget import plugin
+from flexget.components.sites.utils import normalize_unicode
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
-from flexget.components.sites.utils import normalize_unicode
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('search_cpasbien')
@@ -18,7 +15,7 @@ log = logging.getLogger('search_cpasbien')
 session = requests.Session()
 
 
-class SearchCPASBIEN(object):
+class SearchCPASBIEN:
     schema = {
         'type': 'object',
         'properties': {

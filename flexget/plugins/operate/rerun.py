@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
@@ -9,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('rerun')
 
 
-class Rerun(object):
+class Rerun:
     """
     Force a task to rerun for debugging purposes.
     Configured value will set max_rerun value and enables a lock

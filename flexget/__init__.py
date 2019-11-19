@@ -1,15 +1,13 @@
 #!/usr/bin/python
-from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-from ._version import __version__  # noqa
-
 import logging
 import os
 import sys
 
+# __version__ import need to be first in order to avoid circular import within logger
+from ._version import __version__  # noqa
 from flexget import logger
 from flexget.manager import Manager
+
 
 log = logging.getLogger('main')
 

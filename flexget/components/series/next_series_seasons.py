@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
 import re
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -18,7 +15,7 @@ MAX_SEASON_DIFF_WITHOUT_BEGIN = 15
 MAX_SEASON_DIFF_WITH_BEGIN = 30
 
 
-class NextSeriesSeasons(object):
+class NextSeriesSeasons:
     """
     Emit next season number from all series configured in this task.
 

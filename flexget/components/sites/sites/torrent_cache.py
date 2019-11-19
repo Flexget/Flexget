@@ -1,9 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
-import re
 import random
+import re
 
 from flexget import plugin
 from flexget.event import event
@@ -18,7 +15,7 @@ MIRRORS = [
 ]
 
 
-class TorrentCache(object):
+class TorrentCache:
     """Adds urls to torrent cache sites to the urls list."""
 
     def infohash_urls(self, info_hash):

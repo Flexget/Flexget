@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import re
 
@@ -14,7 +11,7 @@ from flexget.utils.soup import get_soup
 log = logging.getLogger('horriblesubs')
 
 
-class HorribleSubs(object):
+class HorribleSubs:
     """
     Give latest horriblesubs releases
     """

@@ -1,19 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urlparse
-
 import logging
+from urllib.parse import urlparse
 
 from requests import RequestException
 
 from flexget import plugin
-from flexget.event import event
 from flexget.entry import Entry
+from flexget.event import event
 
 log = logging.getLogger('sickbeard')
 
 
-class Sickbeard(object):
+class Sickbeard:
     """
     This plugin returns ALL of the shows monitored by Sickbeard.
     This includes both ongoing and ended.

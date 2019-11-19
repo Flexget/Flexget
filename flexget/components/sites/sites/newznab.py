@@ -1,23 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.utils import old_div
-from future.moves.urllib.parse import urlencode, quote
-
 import logging
+from urllib.parse import quote, urlencode
+
+import feedparser
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.requests import RequestException
 
-import feedparser
-
 __author__ = 'deksan'
 
 log = logging.getLogger('newznab')
 
 
-class Newznab(object):
+class Newznab:
     """
     Newznab search plugin
     Provide a url or your website + apikey and a category
@@ -81,7 +77,7 @@ class Newznab(object):
             new_entry['url'] = new_entry['link']
             if rss_entry.enclosures:
                 size = int(rss_entry.enclosures[0]['length'])  # B
-                new_entry['content_size'] = old_div(size, 2 ** 20)  # MB
+                new_entry['content_size'] = size / (2 ** 20)  # MB
             entries.append(new_entry)
         return entries
 

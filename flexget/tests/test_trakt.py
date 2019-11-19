@@ -1,25 +1,21 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
-from flexget.manager import Session
 from flexget.components.trakt.api import ObjectsContainer as OC
-
+from flexget.components.trakt.api_trakt import ApiTrakt
 from flexget.components.trakt.db import (
     TraktActor,
     TraktMovieSearchResult,
-    TraktShowSearchResult,
     TraktShow,
+    TraktShowSearchResult,
 )
-from flexget.components.trakt.api_trakt import ApiTrakt
+from flexget.manager import Session
 
 lookup_series = ApiTrakt.lookup_series
 
 
 @pytest.mark.online
-class TestTraktShowLookup(object):
+class TestTraktShowLookup:
     config = """
         templates:
           global:
@@ -224,7 +220,7 @@ class TestTraktShowLookup(object):
 
 
 @pytest.mark.online
-class TestTraktList(object):
+class TestTraktList:
     config = """
         tasks:
           test_trakt_movies:
@@ -245,7 +241,7 @@ class TestTraktList(object):
 
 
 @pytest.mark.online
-class TestTraktWatchedAndCollected(object):
+class TestTraktWatchedAndCollected:
     config = """
         tasks:
           test_trakt_watched:
@@ -392,7 +388,7 @@ class TestTraktWatchedAndCollected(object):
 
 
 @pytest.mark.online
-class TestTraktMovieLookup(object):
+class TestTraktMovieLookup:
     config = """
         templates:
           global:
@@ -527,7 +523,7 @@ class TestTraktMovieLookup(object):
 
 
 @pytest.mark.online
-class TestTraktUnicodeLookup(object):
+class TestTraktUnicodeLookup:
     config = """
         templates:
           global:
@@ -557,7 +553,7 @@ class TestTraktUnicodeLookup(object):
 
 
 @pytest.mark.online
-class TestTraktRatingsLookup(object):
+class TestTraktRatingsLookup:
     config = """
             templates:
               global:

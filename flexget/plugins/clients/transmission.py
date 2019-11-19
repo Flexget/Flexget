@@ -1,26 +1,20 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urlparse
-from future.utils import text_to_native_str
-
-import os
-import logging
 import base64
+import logging
+import os
 import re
-from datetime import datetime
-from datetime import timedelta
-from netrc import netrc, NetrcParseError
+from datetime import datetime, timedelta
+from fnmatch import fnmatch
+from netrc import NetrcParseError, netrc
 from time import sleep
+from urllib.parse import urlparse
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError
 from flexget.utils.tools import parse_timedelta
-
-from flexget.config_schema import one_or_more
-from fnmatch import fnmatch
 
 try:
     import transmissionrpc
@@ -33,7 +27,7 @@ except ImportError:
 log = logging.getLogger('transmission')
 
 
-class TransmissionBase(object):
+class TransmissionBase:
     def __init__(self):
         self.client = None
         self.opener = None
@@ -155,7 +149,6 @@ class TransmissionBase(object):
 
 
 class PluginTransmissionInput(TransmissionBase):
-
     schema = {
         'anyOf': [
             {'type': 'boolean'},
@@ -244,7 +237,7 @@ class PluginTransmissionInput(TransmissionBase):
                 0: 'OK',
                 1: 'tracker_warning',
                 2: 'tracker_error',
-                3: 'local_error'
+                3: 'local_error',
             }
             entry['transmission_error_state'] = st_error_to_desc[torrent.error]
             # Built in done_date doesn't work when user adds an already completed file to transmission
@@ -435,14 +428,18 @@ class PluginTransmission(TransmissionBase):
             else:
                 # Torrent already loaded in transmission
                 if options['add'].get('download_dir'):
-                    log.verbose('Moving %s to "%s"', torrent_info.name, options['add']['download_dir'])
+                    log.verbose(
+                        'Moving %s to "%s"', torrent_info.name, options['add']['download_dir']
+                    )
                     # Move data even if current reported torrent location matches new location
                     # as transmission may fail to automatically move completed file to final
                     # location but continue reporting final location instead of real location.
                     # In such case this will kick transmission to really move data.
                     # If data is already located at new location then transmission just ignore
                     # this command.
-                    self.client.move_torrent_data(torrent_info.id, options['add']['download_dir'], 120)
+                    self.client.move_torrent_data(
+                        torrent_info.id, options['add']['download_dir'], 120
+                    )
 
             try:
                 total_size = torrent_info.totalSize
@@ -681,7 +678,7 @@ class PluginTransmission(TransmissionBase):
             else:
                 # Transmission doesn't like it when paths end in a separator
                 path = path.rstrip('\\/')
-                add['download_dir'] = text_to_native_str(pathscrub(path), 'utf-8')
+                add['download_dir'] = pathscrub(path)
         # make sure we add it paused, will modify status after adding
         add['paused'] = True
 

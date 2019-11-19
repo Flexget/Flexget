@@ -1,13 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import  # noqa
-
-from .app import api_app, api, APIResource, APIClient  # noqa
-from .core import (
+from .app import APIClient, APIResource, api, api_app  # noqa
+from .core import (  # noqa
     authentication,
     cached,
     database,
+    format_checker,
     plugins,
     server,
     tasks,
     user,
-    format_checker,
-)  # noqa
+)

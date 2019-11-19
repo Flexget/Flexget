@@ -1,16 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.xmlrpc.client import ServerProxy
-
-import re
 import difflib
-import os.path
 import logging
+import os.path
+import re
+from xmlrpc.client import ServerProxy
 
 from flexget import plugin
 from flexget.event import event
 
 log = logging.getLogger('subtitles')
+
 
 # movie hash, won't work here though
 # http://trac.opensubtitles.org/projects/opensubtitles/wiki/HashSourceCodes#Python
@@ -19,7 +17,7 @@ log = logging.getLogger('subtitles')
 # http://trac.opensubtitles.org/projects/opensubtitles/wiki/XMLRPC
 
 
-class Subtitles(object):
+class Subtitles:
     """
     Fetch subtitles from opensubtitles.org
     """

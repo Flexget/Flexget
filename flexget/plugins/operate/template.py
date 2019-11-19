@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import options, plugin
@@ -12,7 +9,7 @@ plugin_name = 'template'
 log = logging.getLogger(plugin_name)
 
 
-class PluginTemplate(object):
+class PluginTemplate:
     """
     Appyly templates with preconfigured plugins to a task config.
 

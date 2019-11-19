@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import re
 
@@ -16,7 +13,7 @@ from flexget.utils.requests import RequestException
 log = logging.getLogger('apple_trailers')
 
 
-class AppleTrailers(object):
+class AppleTrailers:
     """
         Adds support for Apple.com movie trailers.
 
@@ -89,8 +86,8 @@ class AppleTrailers(object):
         if rss.get('bozo_exception', False):
             raise plugin.PluginError('Got bozo_exception (bad feed)')
 
-        filmid_regex = re.compile('(FilmId\s*\=\s*\')(\d+)(?=\')')
-        studio_regex = re.compile('(?:[0-9]*\s*)(.+)')
+        filmid_regex = re.compile(r'(FilmId\s*\=\s*\')(\d+)(?=\')')
+        studio_regex = re.compile(r'(?:[0-9]*\s*)(.+)')
         # use the following dict to save json object in case multiple trailers have been released for the same movie
         # no need to do multiple requests for the same thing!
         trailers = {}

@@ -1,17 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urlencode
-
 import logging
+from urllib.parse import urlencode
+
+from requests import RequestException
 
 from flexget import plugin
 from flexget.event import event
-from requests import RequestException
 
 log = logging.getLogger('sabnzbd')
 
 
-class OutputSabnzbd(object):
+class OutputSabnzbd:
     """
     Example::
 

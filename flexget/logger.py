@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import codecs
 import collections
 import contextlib
 import logging
 import logging.handlers
+import os
 import sys
 import threading
 import uuid
 import warnings
-import os
 
 from flexget import __version__
 from flexget.utils.tools import io_encoding

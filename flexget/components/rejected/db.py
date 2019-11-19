@@ -1,15 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime, timedelta
 
-from sqlalchemy import Column, Integer, String, Unicode, DateTime, ForeignKey, Index
+from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, Unicode
 from sqlalchemy.orm import relation
 
 from flexget import db_schema
 from flexget.event import event
-from flexget.utils.sqlalchemy_utils import table_columns, table_add_column
+from flexget.utils.sqlalchemy_utils import table_add_column, table_columns
 
 log = logging.getLogger('remember_rej')
 Base = db_schema.versioned_base('remember_rejected', 3)

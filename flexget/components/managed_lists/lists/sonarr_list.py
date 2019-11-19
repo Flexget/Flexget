@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
-from collections import MutableSet
+from collections.abc import MutableSet
 
 from requests import RequestException
 
@@ -252,7 +249,7 @@ class SonarrSet(MutableSet):
         return self._find_entry(entry)
 
 
-class SonarrList(object):
+class SonarrList:
     schema = SonarrSet.schema
 
     @staticmethod

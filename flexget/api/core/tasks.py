@@ -1,40 +1,36 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import argparse
 import cgi
 import copy
 from datetime import datetime, timedelta
 from json import JSONEncoder
+from queue import Empty, Queue
 
-from flask import jsonify, Response, request
+from flask import Response, jsonify, request
 from flask_restplus import inputs
-from queue import Queue, Empty
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import (
     APIError,
-    NotFoundError,
-    Conflict,
     BadRequest,
-    success_response,
+    Conflict,
+    NotFoundError,
     base_message_schema,
     etag,
+    success_response,
 )
 from flexget.config_schema import process_config
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.options import get_parser
 from flexget.task import task_phases
-from flexget.utils import json
-from flexget.utils import requests
+from flexget.utils import json, requests
 from flexget.utils.lazy_dict import LazyLookup
 
 # Tasks API
 tasks_api = api.namespace('tasks', description='Manage Tasks')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     tasks_list_object = {
         'oneOf': [
             {'type': 'array', 'items': {'$ref': '#/definitions/tasks.task'}},

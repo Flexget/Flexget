@@ -1,19 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import datetime
 import logging
 import re
 
 from requests.exceptions import TooManyRedirects
-from sqlalchemy import Column, Unicode, DateTime
+from sqlalchemy import Column, DateTime, Unicode
 
-from flexget import plugin, db_schema
+from flexget import db_schema, plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.database import json_synonym
-from flexget.utils.requests import Session as RequestSession, TimedLimiter, RequestException
+from flexget.utils.requests import RequestException
+from flexget.utils.requests import Session as RequestSession
+from flexget.utils.requests import TimedLimiter
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
@@ -63,7 +63,7 @@ class AlphaRatioCookie(Base):
     expires = Column(DateTime)
 
 
-class SearchAlphaRatio(object):
+class SearchAlphaRatio:
     """
         AlphaRatio search plugin.
     """
@@ -267,18 +267,18 @@ class SearchAlphaRatio(object):
                 group_info = result.find('td', attrs={'class': 'big_info'}).find(
                     'div', attrs={'class': 'group_info'}
                 )
-                title = group_info.find('a', href=re.compile('torrents.php\?id=\d+')).text
+                title = group_info.find('a', href=re.compile(r'torrents.php\?id=\d+')).text
                 url = (
                     self.base_url
                     + group_info.find(
-                        'a', href=re.compile('torrents.php\?action=download(?!usetoken)')
+                        'a', href=re.compile(r'torrents.php\?action=download(?!usetoken)')
                     )['href']
                 )
 
                 torrent_info = result.findAll('td')
                 size_col = torrent_info[size_idx].text
                 log.debug('AlphaRatio size: %s', size_col)
-                size = re.search('(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', size_col)
+                size = re.search(r'(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', size_col)
                 torrent_tags = ', '.join(
                     [tag.text for tag in group_info.findAll('div', attrs={'class': 'tags'})]
                 )

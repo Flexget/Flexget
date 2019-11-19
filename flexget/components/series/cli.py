@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import argparse
 import os
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import timedelta
 
 from colorclass.toggles import disable_all_colors
@@ -11,7 +8,7 @@ import flexget.components.series.utils
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, TerminalTableError, table_parser, colorize, console
+from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
 
 from . import db
 

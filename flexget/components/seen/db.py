@@ -10,26 +10,25 @@ forget (string)
 import logging
 from datetime import datetime
 
-from sqlalchemy import or_
 from sqlalchemy import (
-    select,
-    update,
-    Index,
     Boolean,
     Column,
-    Integer,
-    Unicode,
     DateTime,
     ForeignKey,
+    Index,
+    Integer,
+    Unicode,
+    or_,
+    select,
+    update,
 )
 from sqlalchemy.orm import relation
 
-from flexget import db_schema
-from flexget import plugin
+from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.database import with_session
-from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
+from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
 try:
     # NOTE: Importing other plugins is discouraged!

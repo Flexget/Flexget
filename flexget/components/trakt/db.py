@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
 
 import logging
 import time
-
 from datetime import datetime, timedelta
+
 from dateutil.parser import parse as dateutil_parse
-from sqlalchemy import Table, Column, Integer, String, Unicode, Date, DateTime, Time, or_, and_
+from sqlalchemy import Column, Date, DateTime, Integer, String, Table, Time, Unicode, and_, or_
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
 
-from flexget import db_schema
-from flexget import plugin
-from flexget.terminal import console
+from flexget import db_schema, plugin
 from flexget.manager import Session
+from flexget.terminal import console
 from flexget.utils import requests
 from flexget.utils.database import json_synonym
 from flexget.utils.tools import split_title_year
@@ -264,7 +262,7 @@ class TraktMovieTranslation(Base):
     movie_id = Column(Integer, ForeignKey('trakt_movies.id'))
 
     def __init__(self, translation, session):
-        super(TraktMovieTranslation, self).__init__()
+        super().__init__()
         self.update(translation, session)
 
     def update(self, translation, session):
@@ -282,7 +280,7 @@ class TraktShowTranslation(Base):
     show_id = Column(Integer, ForeignKey('trakt_shows.id'))
 
     def __init__(self, translation, session):
-        super(TraktShowTranslation, self).__init__()
+        super().__init__()
         self.update(translation, session)
 
     def update(self, translation, session):
@@ -355,7 +353,7 @@ class TraktActor(Base):
     homepage = Column(Unicode)
 
     def __init__(self, actor, session):
-        super(TraktActor, self).__init__()
+        super().__init__()
         self.update(actor, session)
 
     def update(self, actor, session):
@@ -466,7 +464,7 @@ class TraktEpisode(Base):
     series_id = Column(Integer, ForeignKey('trakt_shows.id'), nullable=False)
 
     def __init__(self, trakt_episode, session):
-        super(TraktEpisode, self).__init__()
+        super().__init__()
         self.update(trakt_episode, session)
 
     def update(self, trakt_episode, session):
@@ -515,7 +513,7 @@ class TraktSeason(Base):
     series_id = Column(Integer, ForeignKey('trakt_shows.id'), nullable=False)
 
     def __init__(self, trakt_season, session):
-        super(TraktSeason, self).__init__()
+        super().__init__()
         self.update(trakt_season, session)
 
     def update(self, trakt_season, session):
@@ -621,7 +619,7 @@ class TraktShow(Base):
         }
 
     def __init__(self, trakt_show, session):
-        super(TraktShow, self).__init__()
+        super().__init__()
         self.update(trakt_show, session)
 
     def update(self, trakt_show, session):
@@ -797,7 +795,7 @@ class TraktMovie(Base):
     _actors = relation(TraktActor, secondary=movie_actors_table)
 
     def __init__(self, trakt_movie, session):
-        super(TraktMovie, self).__init__()
+        super().__init__()
         self.update(trakt_movie, session)
 
     def to_dict(self):
@@ -913,7 +911,7 @@ class TraktMovieSearchResult(Base):
             self.movie = movie
 
 
-class TraktMovieIds(object):
+class TraktMovieIds:
     """Simple class that holds a variety of possible IDs that Trakt utilize in their API, eg. imdb id, trakt id"""
 
     def __init__(self, trakt_id=None, trakt_slug=None, tmdb_id=None, imdb_id=None, **kwargs):
@@ -938,7 +936,7 @@ class TraktMovieIds(object):
         return any([self.trakt_id, self.trakt_slug, self.tmdb_id, self.imdb_id])
 
 
-class TraktShowIds(object):
+class TraktShowIds:
     """Simple class that holds a variety of possible IDs that Trakt utilize in their API, eg. imdb id, trakt id"""
 
     def __init__(

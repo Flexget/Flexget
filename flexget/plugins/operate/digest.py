@@ -1,21 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import pickle
 from datetime import datetime
 
-from sqlalchemy import Column, Unicode, Integer, DateTime, select
+from sqlalchemy import Column, DateTime, Integer, Unicode, select
 
-from flexget import plugin, db_schema
+from flexget import db_schema, plugin
 from flexget.config_schema import one_or_more
 from flexget.db_schema import versioned_base
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import json
 from flexget.utils.database import entry_synonym
+from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 from flexget.utils.tools import parse_timedelta
-from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
 log = logging.getLogger('digest')
 Base = versioned_base('digest', 1)
@@ -54,7 +51,7 @@ class DigestEntry(Base):
     entry = entry_synonym('_json')
 
 
-class OutputDigest(object):
+class OutputDigest:
     schema = {
         'oneOf': [
             {'type': 'string'},
@@ -91,7 +88,7 @@ class OutputDigest(object):
                 session.add(DigestEntry(list=config['list'], entry=entry))
 
 
-class FromDigest(object):
+class FromDigest:
     schema = {
         'type': 'object',
         'properties': {
@@ -99,7 +96,7 @@ class FromDigest(object):
             'limit': {
                 'deprecated': 'The `limit` option of from_digest is deprecated. Use the `limit` plugin instead.',
                 'type': 'integer',
-                'default': -1
+                'default': -1,
             },
             'expire': {
                 'oneOf': [{'type': 'string', 'format': 'interval'}, {'type': 'boolean'}],

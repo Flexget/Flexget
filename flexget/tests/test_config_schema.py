@@ -1,7 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from datetime import timedelta
+
 import jsonschema
 
 from flexget import config_schema
@@ -13,7 +11,7 @@ def iter_registered_schemas():
         yield path, schema
 
 
-class TestSchemaValidator(object):
+class TestSchemaValidator:
     def test_registered_schemas_are_valid(self):
         for path, schema in iter_registered_schemas():
             try:
@@ -150,7 +148,7 @@ class TestSchemaValidator(object):
         assert config["p"] == "foo"
 
 
-class TestSchemaFormats(object):
+class TestSchemaFormats:
     def _test_format(self, format, items, invalid=False):
         failures = []
         for item in items:
@@ -209,7 +207,7 @@ class TestSchemaFormats(object):
         assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
 
 
-class TestFormatParsers(object):
+class TestFormatParsers:
     def _test_parser(self, parser, items):
         failures = []
         for item in items:

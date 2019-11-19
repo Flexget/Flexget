@@ -1,7 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from functools import partial
 
 from flexget import plugin
@@ -17,7 +14,7 @@ except ImportError:
 log = logging.getLogger('thetvdb_lookup')
 
 
-class PluginThetvdbLookup(object):
+class PluginThetvdbLookup:
     """Retrieves TheTVDB information for entries. Uses series_name,
     series_season, series_episode from series plugin.
 

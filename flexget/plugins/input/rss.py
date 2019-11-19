@@ -1,18 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import tobytes
-from future.moves.urllib.parse import urlparse, urlsplit
-
 import hashlib
-import os
-import logging
-import xml.sax
-import posixpath
 import http.client
+import logging
+import os
+import posixpath
+import xml.sax
 from datetime import datetime
+from urllib.parse import urlparse, urlsplit
 
 import dateutil.parser
-
 import feedparser
 from requests import RequestException
 
@@ -21,8 +16,8 @@ from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
-from flexget.utils.tools import decode_html
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.tools import decode_html
 
 log = logging.getLogger('rss')
 feedparser.registerDateHandler(lambda date_string: dateutil.parser.parse(date_string).timetuple())
@@ -33,7 +28,7 @@ def fp_field_name(name):
     return name.replace(':', '_').lower()
 
 
-class InputRSS(object):
+class InputRSS:
     """
     Parses RSS feed.
 
@@ -166,7 +161,7 @@ class InputRSS(object):
             log.critical('Received empty page - no content')
             return
         else:
-            data = tobytes(data)
+            data = bytes(data)  # ahem, dunno about this?
 
         ext = 'xml'
         if b'<html>' in data.lower():

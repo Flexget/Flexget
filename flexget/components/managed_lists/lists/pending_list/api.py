@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-
 import copy
 import logging
 from math import ceil
@@ -8,16 +5,17 @@ from math import ceil
 from flask import jsonify, request
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import (
+    BadRequest,
+    Conflict,
     NotFoundError,
     base_message_schema,
-    success_response,
     etag,
     pagination_headers,
-    Conflict,
-    BadRequest,
+    success_response,
 )
+
 from . import db
 
 log = logging.getLogger('pending_list')
@@ -25,7 +23,7 @@ log = logging.getLogger('pending_list')
 pending_list_api = api.namespace('pending_list', description='Pending List operations')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     pending_list_base_object = {
         'type': 'object',
         'properties': {

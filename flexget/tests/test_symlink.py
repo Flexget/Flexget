@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import os
 import stat
 
@@ -18,7 +15,7 @@ def is_hard_link(file1, file2):
 
 
 @pytest.mark.skipif(os.name == 'nt', reason='symlinks do not work on windows')
-class TestSymlink(object):
+class TestSymlink:
     _config = """
         templates:
           global:

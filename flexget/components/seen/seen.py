@@ -1,16 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import plugin
 from flexget.event import event
+
 from . import db
 
 log = logging.getLogger(__name__)
 
 
-class FilterSeen(object):
+class FilterSeen:
     """
     Remembers previously downloaded content and rejects them in
     subsequent executions. Without this plugin FlexGet would

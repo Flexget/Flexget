@@ -1,57 +1,55 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-import copy
-
 import base64
-
-import os
+import binascii
+import copy
 import json
-import sys
 import logging
+import os
+import sys
 import threading
 import traceback
+from pathlib import Path
 from time import sleep
-from path import Path
-import binascii
+
 import cherrypy
 import yaml
 from flask import Response, jsonify, request
-from flexget.utils.tools import get_latest_flexget_version_number
 from pyparsing import (
-    Word,
-    Keyword,
-    Group,
-    Forward,
-    Suppress,
-    OneOrMore,
-    oneOf,
-    White,
-    restOfLine,
-    ParseException,
     Combine,
+    Forward,
+    Group,
+    Keyword,
+    OneOrMore,
+    ParseException,
+    Suppress,
+    White,
+    Word,
+    alphanums,
+    nums,
+    oneOf,
+    printables,
+    restOfLine,
 )
-from pyparsing import nums, alphanums, printables
 from yaml.error import YAMLError
 
 from flexget._version import __version__
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
+from flexget.api.app import APIError, BadRequest
+from flexget.api.app import __version__ as __api_version__
 from flexget.api.app import (
-    __version__ as __api_version__,
-    APIError,
-    BadRequest,
     base_message,
-    success_response,
     base_message_schema,
     empty_response,
     etag,
+    success_response,
 )
+from flexget.utils.tools import get_latest_flexget_version_number
 
 log = logging.getLogger('api.server')
 
 server_api = api.namespace('server', description='Manage Daemon')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     yaml_error_response = copy.deepcopy(base_message)
     yaml_error_response['properties']['column'] = {'type': 'integer'}
     yaml_error_response['properties']['line'] = {'type': 'integer'}
@@ -431,7 +429,7 @@ class ServerLogAPI(APIResource):
         return Response(follow(args['lines'], args['search']), mimetype='text/event-stream')
 
 
-class LogParser(object):
+class LogParser:
     """
     Filter log file.
 
@@ -571,6 +569,7 @@ class ServerCrashLogAPI(APIResource):
         path = Path(self.manager.config_base)
         crashes = [
             {'name': file.name, 'content': file.open().readlines()}
-            for file in path.listdir(match='crash_report*.log')
+            for file in path.iterdir()
+            if file.match('crash_report*.log')
         ]
         return jsonify(crashes)

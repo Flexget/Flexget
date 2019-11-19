@@ -1,8 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+import os.path
 
 import pytest
-import os.path
 
 try:
     import rarfile
@@ -11,7 +9,7 @@ except ImportError:
 
 
 @pytest.mark.usefixtures('tmpdir')
-class TestExtract(object):
+class TestExtract:
     config = """
         templates:
             global:

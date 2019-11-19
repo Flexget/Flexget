@@ -1,8 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
-
 from argparse import SUPPRESS
 
 from flexget import options, plugin
@@ -12,7 +8,7 @@ from flexget.terminal import console
 log = logging.getLogger('dump_config')
 
 
-class OutputDumpConfig(object):
+class OutputDumpConfig:
     """
         Dumps task config in STDOUT in yaml at exit or abort event.
     """

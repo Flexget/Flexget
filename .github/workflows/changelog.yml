@@ -1,0 +1,43 @@
+name: Changelog Update
+
+on:
+  push:
+    branches:
+    - develop
+
+jobs:
+  update-changelog:
+    name: Update Changelog
+    runs-on: ubuntu-latest
+    env:
+      PYTHON_VERSION: 3.7
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/checkout@v1.1.0
+      with:
+        repository: Flexget/wiki
+        token: ${{ secrets.flexgetbot_pat }}
+        ref: master
+    - name: Setup Git User
+      run: |
+        git config --global user.email ${{ secrets.git_email }}
+        git config --global user.name ${{ secrets.git_user }}
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    - name: Install dev dependencies
+      run: |
+        pip --cache-dir pip_cache install -r dev-requirements.txt
+    - name: Update the Changelog
+      run: |
+        set -x
+        python update-changelog.py ../wiki/ChangeLog.md
+        cd ../wiki
+        git add ChangeLog.md
+        if ! git diff --cached --exit-code; then
+            git commit -m "Automated ChangeLog update"
+            git branch -f master
+            git push origin master
+        fi
+

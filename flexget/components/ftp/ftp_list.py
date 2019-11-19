@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import ftplib
 import logging
 
@@ -21,7 +19,7 @@ except ImportError:
 log = logging.getLogger('ftp_list')
 
 
-class FTPList(object):
+class FTPList:
     def __init__(self):
         self.username = None
         self.password = None
