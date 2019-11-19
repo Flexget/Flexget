@@ -121,7 +121,7 @@ if __name__ == '__main__':
             if commit.hexsha in tags:
                 modified = True
                 # Tag changeset with release date and version and create new current changeset
-                version = tags[commit.hexsha].tag
+                version = tags[commit.hexsha].tag.lstrip('v')
                 release_date = datetime.datetime.fromtimestamp(
                     tags[commit.hexsha].tagged_date
                 ).strftime('%Y-%m-%d')
