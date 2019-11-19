@@ -11,11 +11,6 @@ on:
   - cron:  '0 3 * * *'
 
 jobs:
-  debug:
-    runs-on: ubuntu-latest
-    steps:
-    - run: |
-        echo ${{github.event_name}}
   tests:
     name: Run Tests
     runs-on: ${{ matrix.operating-system }}
