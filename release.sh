@@ -10,7 +10,7 @@ set -e
 set -x
 
 # Error if running on a branch other than develop
-if [ $(git rev-parse HEAD) != $(git rev-parse develop) ]; then
+if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/develop)" ]; then
   echo "Release script should be run from develop branch."
   exit 1
 fi
