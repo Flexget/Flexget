@@ -1,6 +1,6 @@
 import logging
 import math
-from collections import MutableSet
+from collections.abc import MutableSet
 
 from flexget import plugin
 from flexget.entry import Entry

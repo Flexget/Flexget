@@ -1,6 +1,6 @@
 import logging
 import re
-from collections import MutableSet
+from collections.abc import MutableSet
 
 from flexget import plugin
 from flexget.db_schema import with_session

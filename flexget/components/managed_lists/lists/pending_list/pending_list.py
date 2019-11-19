@@ -1,5 +1,5 @@
 import logging
-from collections import MutableSet
+from collections.abc import MutableSet
 
 from sqlalchemy import or_
 from sqlalchemy.sql.elements import and_

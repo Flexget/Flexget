@@ -8,7 +8,8 @@ can replace underlying mechanism in single point (and provide transparent switch
 """
 import logging
 import pickle
-from collections import MutableMapping, defaultdict
+from collections import defaultdict
+from collections.abc import MutableMapping
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, Index, Integer, String, Unicode, select

@@ -1,6 +1,6 @@
 import json
 import logging
-from collections import MutableSet
+from collections.abc import MutableSet
 from urllib.parse import quote, urlparse
 
 import requests

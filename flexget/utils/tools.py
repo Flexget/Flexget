@@ -9,7 +9,8 @@ import os
 import queue
 import re
 import sys
-from collections import MutableMapping, defaultdict
+from collections import defaultdict
+from collections.abc import MutableMapping
 from datetime import datetime, timedelta
 from html.entities import name2codepoint
 from pprint import pformat

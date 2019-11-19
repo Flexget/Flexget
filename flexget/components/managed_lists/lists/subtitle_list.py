@@ -1,6 +1,6 @@
 import logging
 import os
-from collections import MutableSet
+from collections.abc import MutableSet
 from datetime import date, datetime, time
 
 from babelfish import Language

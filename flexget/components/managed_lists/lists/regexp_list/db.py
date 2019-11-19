@@ -1,6 +1,6 @@
 import logging
 import re
-from collections import MutableSet
+from collections.abc import MutableSet
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, Unicode, and_, func

@@ -1,5 +1,5 @@
 import functools
-from collections import Mapping
+from collections.abc import Mapping
 from datetime import datetime
 
 from sqlalchemy import extract, func

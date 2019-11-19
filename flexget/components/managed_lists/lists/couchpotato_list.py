@@ -1,5 +1,5 @@
 import logging
-from collections import MutableSet
+from collections.abc import MutableSet
 from urllib.parse import urlparse
 
 import requests

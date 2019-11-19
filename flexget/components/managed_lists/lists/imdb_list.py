@@ -1,7 +1,7 @@
 import csv
 import logging
 import re
-from collections import MutableSet
+from collections.abc import MutableSet
 from datetime import datetime
 
 from requests.exceptions import RequestException

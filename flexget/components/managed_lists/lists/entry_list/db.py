@@ -1,6 +1,6 @@
 import logging
 import pickle
-from collections import MutableSet
+from collections.abc import MutableSet
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, Unicode, func, or_, select

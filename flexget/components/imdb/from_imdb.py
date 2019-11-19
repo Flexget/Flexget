@@ -1,5 +1,5 @@
-import collections
 import logging
+from collections.abc import Iterable
 
 from jsonschema.compat import str_types
 
@@ -216,7 +216,7 @@ class FromIMDB:
         Gets a list of lists and returns a flat list
         """
         for el in _list:
-            if isinstance(el, collections.Iterable) and not isinstance(el, str):
+            if isinstance(el, Iterable) and not isinstance(el, str):
                 for sub in self.flatten_list(el):
                     yield sub
             else:
