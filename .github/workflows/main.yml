@@ -55,7 +55,9 @@ jobs:
     env:
       PYTHON_VERSION: "3.7"
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1.1.0
+      with:
+        token: ${{ secrets.flexgetbot_pat }}
     - name: Setup Git User
       run: |
         git config user.email ${{ secrets.git_email }}
