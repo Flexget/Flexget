@@ -1,10 +1,12 @@
 import copy
+import functools
 import logging
 import re
 
 log = logging.getLogger('utils.qualities')
 
 
+@functools.total_ordering
 class QualityComponent:
     """"""
 
@@ -62,9 +64,6 @@ class QualityComponent:
         else:
             raise TypeError('Cannot compare %s and %s' % (self.type, other.type))
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
     def __lt__(self, other):
         if isinstance(other, str):
             other = _registry.get(other)
@@ -74,15 +73,6 @@ class QualityComponent:
             return self.value < other.value
         else:
             raise TypeError('Cannot compare %s and %s' % (self.type, other.type))
-
-    def __ge__(self, other):
-        return not self.__lt__(other)
-
-    def __le__(self, other):
-        return self.__lt__(other) or self.__eq__(other)
-
-    def __gt__(self, other):
-        return not self.__le__(other)
 
     def __add__(self, other):
         if not isinstance(other, int):
@@ -194,6 +184,7 @@ def all_components():
     return iter(_registry.values())
 
 
+@functools.total_ordering
 class Quality:
     """Parses and stores the quality of an entry in the four component categories."""
 
@@ -286,24 +277,12 @@ class Quality:
             raise TypeError('Cannot compare %r and %r' % (self, other))
         return self._comparator == other._comparator
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
     def __lt__(self, other):
         if isinstance(other, str):
             other = Quality(other)
         if not isinstance(other, Quality):
             raise TypeError('Cannot compare %r and %r' % (self, other))
         return self._comparator < other._comparator
-
-    def __ge__(self, other):
-        return not self.__lt__(other)
-
-    def __le__(self, other):
-        return self.__lt__(other) or self.__eq__(other)
-
-    def __gt__(self, other):
-        return not self.__le__(other)
 
     def __repr__(self):
         return '<Quality(resolution=%s,source=%s,codec=%s,audio=%s)>' % (
