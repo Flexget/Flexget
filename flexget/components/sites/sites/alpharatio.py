@@ -46,7 +46,7 @@ CATEGORIES = {
     'gamesxbox': 'filter_cat[19]',
     'gamesps': 'filter_cat[20]',
     'gamesnin': 'filter_cat[21]',
-    'appswindows': 'filter_cat[22]'
+    'appswindows': 'filter_cat[22]',
     'appsmac': 'filter_cat[23]',
     'appslinux': 'filter_cat[24]',
     'appsmobile': 'filter_cat[25]',
