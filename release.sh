@@ -32,7 +32,7 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
   # Commit and tag released version
   git add flexget/_version.py
   git commit -m "v${VERSION}"
-  git tag -a -f "v${VERSION}" -m "${VERSION} release"
+  git tag -a -f "v${VERSION}" -m "v${VERSION} release"
 
   # Bump to new dev version, then commit again
   python dev_tools.py bump_version dev
@@ -41,7 +41,7 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
   git branch -f develop HEAD
 
   # master branch should be at the release we tagged
-  git branch -f master ${VERSION}
+  git branch -f master v${VERSION}
   # If either of the new branches are not fast forwards, the push will be rejected
   git push origin master develop
   # Make sure our branches push before pushing tag
