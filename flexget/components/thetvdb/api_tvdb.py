@@ -346,7 +346,7 @@ class TVDBEpisode(Base):
         self.absolute_number = episode['absoluteNumber']
         self.name = episode['episodeName']
         self.overview = episode['overview']
-        self.director = episode['director']
+        self.director = ', '.join(episode['directors'])
         self._image = episode['filename']
         self.rating = episode['siteRating']
         self.first_aired = episode['firstAired']
