@@ -1,9 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urlparse
-
 import logging
-from collections import MutableSet
+from collections.abc import MutableSet
+from urllib.parse import urlparse
 
 import requests
 from requests import RequestException
@@ -15,7 +12,7 @@ from flexget.event import event
 log = logging.getLogger('couchpotato_list')
 
 
-class CouchPotatoBase(object):
+class CouchPotatoBase:
     @staticmethod
     def movie_list_request(base_url, port, api_key):
         parsedurl = urlparse(base_url)
@@ -285,7 +282,7 @@ class CouchPotatoSet(MutableSet):
         return self._find_entry(entry)
 
 
-class CouchPotatoList(object):
+class CouchPotatoList:
     schema = CouchPotatoSet.schema
 
     @staticmethod

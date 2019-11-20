@@ -1,15 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import quote
-
 import logging
+from urllib.parse import quote
 
 import feedparser
 
 from flexget import plugin
+from flexget.components.sites.utils import normalize_unicode, torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.components.sites.utils import normalize_unicode, torrent_availability
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('nyaa')
@@ -49,7 +46,7 @@ CATEGORIES = {
 FILTERS = ['all', 'filter remakes', 'trusted only']
 
 
-class UrlRewriteNyaa(object):
+class UrlRewriteNyaa:
     """Nyaa urlrewriter and search plugin."""
 
     schema = {

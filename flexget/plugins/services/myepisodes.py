@@ -1,17 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import re
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, DateTime, Integer, String
 
 from flexget import plugin
+from flexget.db_schema import versioned_base
 from flexget.event import event
 from flexget.utils import requests
-from flexget.db_schema import versioned_base
-
 
 log = logging.getLogger('myepisodes')
 Base = versioned_base('myepisodes', 0)
@@ -37,7 +33,7 @@ class MyEpisodesInfo(Base):
         )
 
 
-class MyEpisodes(object):
+class MyEpisodes:
     """
     Marks a series episode as acquired in your myepisodes.com account.
 

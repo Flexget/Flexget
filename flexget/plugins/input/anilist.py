@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
@@ -20,8 +17,10 @@ ANIME_FORMAT = ['tv', 'tv_short', 'movie', 'special', 'ova', 'ona', 'all']
 
 TRAILER_SOURCE = {
     'youtube': 'https://www.youtube.com/embed/',
-    'dailymotion': 'https://www.dailymotion.com/embed/video/'
-    }
+    'dailymotion': 'https://www.dailymotion.com/embed/video/',
+}
+
+
 class AniList(object):
     """" Creates entries for series and movies from your AniList list
 
@@ -57,7 +56,7 @@ class AniList(object):
                     ),
                     'format': one_or_more(
                         {'type': 'string', 'enum': ANIME_FORMAT}, unique_items=True
-                    )
+                    ),
                 },
                 'required': ['username'],
                 'additionalProperties': False,
@@ -70,7 +69,9 @@ class AniList(object):
         if isinstance(config, str):
             config = {'username': config}
         selected_list_status = config['status'] if 'status' in config else ['current', 'planning']
-        selected_release_status = config['release_status'] if 'release_status' in config else ['all']
+        selected_release_status = (
+            config['release_status'] if 'release_status' in config else ['all']
+        )
         selected_formats = config['format'] if 'format' in config else ['all']
 
         if not isinstance(selected_list_status, list):
@@ -88,18 +89,23 @@ class AniList(object):
 
         req_variables = {'user': config['username']}
         req_chunk = 1
-        req_fields = ('status, title{ romaji, english }, synonyms, siteUrl, idMal, format, episodes, '
-                    'trailer{ site, id }, coverImage{ large }, bannerImage, genres, tags{ name }, '
-                    'externalLinks{ site, url }')
+        req_fields = (
+            'status, title{ romaji, english }, synonyms, siteUrl, idMal, format, episodes, '
+            'trailer{ site, id }, coverImage{ large }, bannerImage, genres, tags{ name }, '
+            'externalLinks{ site, url }'
+        )
         while req_chunk:
-            req_query = ('query ($user: String){collection: MediaListCollection(userName: $user, type: ANIME, '
-                        'perChunk: 500, chunk: %s, status_in: [%s]){ hasNextChunk, statuses: lists { list: entries { '
-                        'anime: media { %s }}}}}' % (req_chunk, ', '.join([s.upper() for s in selected_list_status]), 
-                        req_fields))
+            req_query = (
+                'query ($user: String){collection: MediaListCollection(userName: $user, type: ANIME, '
+                'perChunk: 500, chunk: %s, status_in: [%s]){ hasNextChunk, statuses: lists { list: entries { '
+                'anime: media { %s }}}}}'
+                % (req_chunk, ', '.join([s.upper() for s in selected_list_status]), req_fields)
+            )
 
             try:
                 list_response = task.requests.post(
-                    'https://graphql.anilist.co', json={'query': req_query, 'variables': req_variables}
+                    'https://graphql.anilist.co',
+                    json={'query': req_query, 'variables': req_variables},
                 )
             except RequestException as e:
                 raise plugin.PluginError('Error reading list - {url}'.format(url=e))
@@ -125,12 +131,17 @@ class AniList(object):
                             entry['al_format'] = anime['format']
                             entry['al_release_status'] = anime['status'].capitalize()
                             entry['al_list_status'] = list_status
-                            entry['alternate_name'] = [anime['title']['english']] + anime['synonyms']
+                            entry['alternate_name'] = [anime['title']['english']] + anime[
+                                'synonyms'
+                            ]
                             entry['url'] = anime['siteUrl']
                             entry['al_idMal'] = anime['idMal']
                             entry['al_episodes'] = anime['episodes']
-                            entry['al_trailer'] = (TRAILER_SOURCE[anime['trailer']['site']]
-                                + anime['trailer']['id'] if anime['trailer'] else '')
+                            entry['al_trailer'] = (
+                                TRAILER_SOURCE[anime['trailer']['site']] + anime['trailer']['id']
+                                if anime['trailer']
+                                else ''
+                            )
                             entry['al_cover'] = anime['coverImage']['large']
                             entry['al_banner'] = anime['bannerImage']
                             entry['al_genres'] = anime['genres']

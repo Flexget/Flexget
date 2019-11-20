@@ -1,15 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
+from flexget.components.sites.utils import normalize_scene
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.config_schema import one_or_more
-from flexget.utils.requests import Session, TimedLimiter, RequestException
-from flexget.components.sites.utils import normalize_scene
 from flexget.plugin import PluginError
+from flexget.utils.requests import RequestException, Session, TimedLimiter
 
 log = logging.getLogger('rarbg')
 
@@ -47,7 +44,7 @@ CATEGORIES = {
 }
 
 
-class SearchRarBG(object):
+class SearchRarBG:
     """
         RarBG search plugin. Implements https://torrentapi.org/apidocs_v2.txt
 

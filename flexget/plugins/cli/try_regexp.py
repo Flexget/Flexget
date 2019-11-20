@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import re
 
@@ -11,7 +8,7 @@ from flexget.terminal import console
 log = logging.getLogger('try_regexp')
 
 
-class PluginTryRegexp(object):
+class PluginTryRegexp:
     """
         This plugin allows user to test regexps for a task.
     """

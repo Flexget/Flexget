@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import json
+import logging
 
 from flexget import plugin
 from flexget.event import event
@@ -13,7 +10,7 @@ log = logging.getLogger('kodi_library')
 JSON_URI = '/jsonrpc'
 
 
-class KodiLibrary(object):
+class KodiLibrary:
     schema = {
         'type': 'object',
         'properties': {

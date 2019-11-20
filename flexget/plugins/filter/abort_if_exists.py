@@ -1,4 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
 
@@ -8,7 +7,7 @@ from flexget.event import event
 log = logging.getLogger('abort_if_exists')
 
 
-class PluginAbortIfExists(object):
+class PluginAbortIfExists:
     """Aborts a task if an entry field matches the regexp"""
 
     schema = {

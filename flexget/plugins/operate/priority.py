@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
@@ -13,7 +10,7 @@ log = logging.getLogger('priority')
 # Currently the manager reads this value directly out of the config when the 'execute' command is run, and this plugin
 # does nothing but make the config key valid.
 # In daemon mode, schedules should be made which run tasks in the proper order instead of using this.
-class TaskPriority(object):
+class TaskPriority:
     """Set task priorities"""
 
     schema = {'type': 'integer'}

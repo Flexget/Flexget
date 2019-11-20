@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from collections import MutableSet
+from collections.abc import MutableSet
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -146,7 +143,7 @@ class TheTVDBSet(MutableSet):
         return True
 
 
-class TheTVDBList(object):
+class TheTVDBList:
     schema = TheTVDBSet.schema
 
     def get_list(self, config):

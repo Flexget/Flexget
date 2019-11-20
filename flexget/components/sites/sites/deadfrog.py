@@ -1,18 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import re
 
 from flexget import plugin
-from flexget.event import event
 from flexget.components.sites.urlrewriting import UrlRewritingError
+from flexget.event import event
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('deadfrog')
 
 
-class UrlRewriteDeadFrog(object):
+class UrlRewriteDeadFrog:
     """DeadFrog urlrewriter."""
 
     # urlrewriter API
@@ -36,7 +33,7 @@ class UrlRewriteDeadFrog(object):
             soup = get_soup(page.text)
         except Exception as e:
             raise UrlRewritingError(e)
-        down_link = soup.find('a', attrs={'href': re.compile("download/\d+/.*\.torrent")})
+        down_link = soup.find('a', attrs={'href': re.compile(r"download/\d+/.*\.torrent")})
         if not down_link:
             raise UrlRewritingError('Unable to locate download link from url %s' % url)
         return 'http://www.deadfrog.us/' + down_link.get('href')

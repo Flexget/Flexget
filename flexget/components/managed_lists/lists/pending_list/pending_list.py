@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from collections import MutableSet
+from collections.abc import MutableSet
 
 from sqlalchemy import or_
 from sqlalchemy.sql.elements import and_
@@ -11,6 +8,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
+
 from . import db
 
 plugin_name = 'pending_list'
@@ -120,7 +118,7 @@ class PendingListSet(MutableSet):
             return Entry(match.entry) if match else None
 
 
-class PendingList(object):
+class PendingList:
     schema = {'type': 'string'}
 
     @staticmethod

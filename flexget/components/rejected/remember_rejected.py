@@ -1,7 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime, timedelta
 
 from sqlalchemy import and_
@@ -16,7 +13,7 @@ from . import db
 log = logging.getLogger('remember_rej')
 
 
-class FilterRememberRejected(object):
+class FilterRememberRejected:
     """Internal.
     Rejects entries which have been rejected in the past.
 

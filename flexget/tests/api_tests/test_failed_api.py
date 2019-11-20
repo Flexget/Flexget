@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
 
 from flexget.api.app import base_message
 from flexget.components.failed.api import ObjectsContainer as OC
-from flexget.manager import Session
 from flexget.components.failed.db import FailedEntry
+from flexget.manager import Session
 from flexget.utils import json
 
 
-class TestRetryFailedAPI(object):
+class TestRetryFailedAPI:
     config = "{'tasks': {}}"
 
     def test_retry_failed_all(self, api_client, schema_match):
@@ -115,7 +112,7 @@ class TestRetryFailedAPI(object):
         assert not errors
 
 
-class TestFailedPaginationAPI(object):
+class TestFailedPaginationAPI:
     config = 'tasks: {}'
 
     def add_failed_entries(self):

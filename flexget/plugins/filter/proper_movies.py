@@ -1,15 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, Unicode, DateTime
+from sqlalchemy import Column, DateTime, Integer, String, Unicode
 from sqlalchemy.schema import Index
 from sqlalchemy.sql.expression import desc
 
 from flexget import plugin
-from flexget.event import fire_event, event
+from flexget.event import event, fire_event
 from flexget.manager import Base
 from flexget.utils.log import log_once
 from flexget.utils.tools import parse_timedelta
@@ -49,7 +46,7 @@ Index(
 )
 
 
-class FilterProperMovies(object):
+class FilterProperMovies:
     """
         Automatically download proper movies.
 

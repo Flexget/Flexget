@@ -1,12 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flexget.api.app import base_message
 from flexget.api.core.user import ObjectsContainer as OC
 from flexget.utils import json
 
 
-class TestUserAPI(object):
+class TestUserAPI:
     config = 'tasks: {}'
 
     def test_change_password(self, execute_task, api_client, schema_match):

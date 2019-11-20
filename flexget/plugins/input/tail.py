@@ -1,10 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import io
+import logging
 import os
 import re
-import logging
 
 from sqlalchemy import Column, Integer, Unicode
 
@@ -26,7 +22,7 @@ class TailPosition(Base):
     position = Column(Integer)
 
 
-class InputTail(object):
+class InputTail:
     """
     Parse any text for entries using regular expression.
 
@@ -96,7 +92,7 @@ class InputTail(object):
             else:
                 last_pos = 0
 
-            with io.open(filename, 'r', encoding=encoding, errors='replace') as file:
+            with open(filename, 'r', encoding=encoding, errors='replace') as file:
                 if task.options.tail_reset == filename or task.options.tail_reset == task.name:
                     if last_pos == 0:
                         log.info('Task %s tail position is already zero' % task.name)

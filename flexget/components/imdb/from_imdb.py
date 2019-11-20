@@ -1,22 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-
-import collections
 import logging
+from collections.abc import Iterable
 
 from jsonschema.compat import str_types
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
 from flexget.entry import Entry
+from flexget.event import event
 from flexget.utils.cached_input import cached
 
 log = logging.getLogger('from_imdb')
 
 
-class FromIMDB(object):
+class FromIMDB:
     """
     This plugin enables generating entries based on an entity, an entity being a person, character or company.
     It's based on IMDBpy which is required (pip install imdbpy). The basic config required just an IMDB ID of the
@@ -220,7 +216,7 @@ class FromIMDB(object):
         Gets a list of lists and returns a flat list
         """
         for el in _list:
-            if isinstance(el, collections.Iterable) and not isinstance(el, basestring):
+            if isinstance(el, Iterable) and not isinstance(el, str):
                 for sub in self.flatten_list(el):
                     yield sub
             else:

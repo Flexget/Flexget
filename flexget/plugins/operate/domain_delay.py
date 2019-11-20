@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
@@ -10,7 +7,7 @@ from flexget.utils.requests import TimedLimiter
 log = logging.getLogger('domain_delay')
 
 
-class DomainDelay(object):
+class DomainDelay:
     """
     Sets a minimum interval between requests to specific domains.
 

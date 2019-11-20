@@ -1,30 +1,26 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.xmlrpc import client as xmlrpc_client
-from future.moves.urllib.parse import urlparse, urljoin, urlsplit
-from future.utils import native_str
-
 import logging
 import os
-import socket
 import re
+import socket
 from io import BytesIO
 from time import sleep
+from urllib.parse import urljoin, urlparse, urlsplit
+from xmlrpc import client as xmlrpc_client
 
-from flexget.utils.template import RenderError
-from flexget.utils.pathscrub import pathscrub
+from requests.auth import HTTPBasicAuth, HTTPDigestAuth
+
 from flexget import plugin
-from flexget.event import event
-from flexget.entry import Entry
 from flexget.config_schema import one_or_more
+from flexget.entry import Entry
+from flexget.event import event
 from flexget.utils.bittorrent import Torrent, is_torrent_file
-
-from requests.auth import HTTPDigestAuth, HTTPBasicAuth
+from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError
 
 log = logging.getLogger('rtorrent')
 
 
-class _Method(object):
+class _Method:
     # some magic to bind an XML-RPC method to an RPC server.
     # supports "nested" methods (e.g. examples.getStateName)
 
@@ -164,7 +160,7 @@ def create_proxy(url):
     return xmlrpc_client.ServerProxy(url)
 
 
-class RTorrent(object):
+class RTorrent:
     """ rTorrent API client """
 
     default_fields = (
@@ -240,7 +236,7 @@ class RTorrent(object):
         if reverse:
             for field in ['up.total', 'down.total', 'down.rate']:
                 if field in fields:
-                    fields[fields.index(field)] = native_str(field.replace('.', '_'))
+                    fields[fields.index(field)] = field.replace('.', '_')
             return fields
 
         for required_field in self.required_fields:
@@ -249,7 +245,7 @@ class RTorrent(object):
 
         for field in ['up_total', 'down_total', 'down_rate']:
             if field in fields:
-                fields[fields.index(field)] = native_str(field.replace('_', '.'))
+                fields[fields.index(field)] = field.replace('_', '.')
 
         return fields
 
@@ -264,7 +260,7 @@ class RTorrent(object):
         for key, val in fields.items():
             # Values must be escaped if within params
             # TODO: What are the escaping requirements? re.escape works differently on python 3.7+
-            params.append('d.%s.set=%s' % (key, re.escape(native_str(val))))
+            params.append('d.%s.set=%s' % (key, re.escape(str(val))))
 
         if mkdir and 'directory' in fields:
             result = self._server.execute.throw('', 'mkdir', '-p', fields['directory'])
@@ -295,7 +291,6 @@ class RTorrent(object):
 
     def torrent(self, info_hash, fields=None):
         """ Get the details of a torrent """
-        info_hash = native_str(info_hash)
         if not fields:
             fields = list(self.default_fields)
 
@@ -329,22 +324,21 @@ class RTorrent(object):
 
         for key, val in fields.items():
             method_name = 'd.%s.set' % key
-            getattr(multi_call, method_name)(native_str(info_hash), native_str(val))
+            getattr(multi_call, method_name)(info_hash, val)
 
         return multi_call()[0]
 
     def delete(self, info_hash):
-        return self._server.d.erase(native_str(info_hash))
+        return self._server.d.erase(info_hash)
 
     def stop(self, info_hash):
         self._server.d.stop(info_hash)
-        return self._server.d.close(native_str(info_hash))
+        return self._server.d.close(info_hash)
 
     def start(self, info_hash):
-        return self._server.d.start(native_str(info_hash))
+        return self._server.d.start(info_hash)
 
     def move(self, info_hash, dst_path):
-        info_hash = native_str(info_hash)
         self.stop(info_hash)
 
         torrent = self.torrent(info_hash, fields=['base_path'])
@@ -360,7 +354,7 @@ class RTorrent(object):
         self.start(info_hash)
 
 
-class RTorrentPluginBase(object):
+class RTorrentPluginBase:
     priority_map = {'high': 3, 'medium': 2, 'low': 1, 'off': 0}
 
     def _build_options(self, config, entry, entry_first=True):

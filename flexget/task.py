@@ -1,13 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
+import inspect
 import itertools
 import logging
-import threading
 import random
 import string
-from functools import wraps, total_ordering
+import threading
+from functools import total_ordering, wraps
 
 from sqlalchemy import Column, Integer, String, Unicode
 
@@ -16,21 +14,21 @@ from flexget.entry import EntryUnicodeError
 from flexget.event import event, fire_event
 from flexget.logger import capture_output
 from flexget.manager import Session
-from flexget.plugin import plugins as all_plugins
 from flexget.plugin import (
     DependencyError,
+    PluginError,
+    PluginWarning,
     get_plugins,
     phase_methods,
     plugin_schemas,
-    PluginError,
-    PluginWarning,
-    task_phases,
 )
+from flexget.plugin import plugins as all_plugins
+from flexget.plugin import task_phases
 from flexget.utils import requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimpleTaskPersistence
-from flexget.utils.tools import get_config_hash, MergeException, merge_dict_from_to
-from flexget.utils.template import render_from_task, FlexGetTemplate
+from flexget.utils.template import FlexGetTemplate, render_from_task
+from flexget.utils.tools import MergeException, get_config_hash, merge_dict_from_to
 
 log = logging.getLogger('task')
 Base = db_schema.versioned_base('feed', 0)
@@ -82,7 +80,7 @@ def use_task_logging(func):
     return wrapper
 
 
-class EntryIterator(object):
+class EntryIterator:
     """An iterator over a subset of entries to emulate old task.accepted/rejected/failed/entries properties."""
 
     def __init__(self, entries, states):
@@ -157,7 +155,7 @@ class TaskAbort(Exception):
 
 
 @total_ordering
-class Task(object):
+class Task:
     """
     Represents one task in the configuration.
 
@@ -519,7 +517,11 @@ class Task(object):
         # log.trace('Running %s method %s' % (keyword, method))
         # call the plugin
         try:
-            return method(*args, **kwargs)
+            result = method(*args, **kwargs)
+            # We exhaust any generator inputs here to make sure we catch exceptions properly.
+            if inspect.isgenerator(result):
+                result = list(result)
+            return result
         except TaskAbort:
             raise
         except PluginWarning as warn:

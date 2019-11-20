@@ -1,18 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import re
 import logging
+import re
 
 from flexget import plugin
-from flexget.event import event
 from flexget.components.sites.urlrewriting import UrlRewritingError
+from flexget.event import event
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('FTDB')
 
 
-class UrlRewriteFTDB(object):
+class UrlRewriteFTDB:
     """FTDB RSS url_rewrite"""
 
     def url_rewritable(self, task, entry):

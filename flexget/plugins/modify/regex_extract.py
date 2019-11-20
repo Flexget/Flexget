@@ -1,19 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import re
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils.tools import ReList
-from flexget.config_schema import one_or_more
 
 log = logging.getLogger('regex_extract')
 
 
-class RegexExtract(object):
-    """
+class RegexExtract:
+    r"""
     Updates an entry with the values of regex matched named groups
 
     Usage:

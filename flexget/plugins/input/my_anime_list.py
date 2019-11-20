@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
@@ -19,7 +16,7 @@ AIRING_STATUS = {'airing': 1, 'finished': 2, 'planned': 3, 'all': 6}
 ANIME_TYPE = ['all', 'tv', 'ova', 'movie', 'special', 'ona', 'music', 'unknown']
 
 
-class MyAnimeList(object):
+class MyAnimeList:
     """" Creates entries for series and movies from MyAnimeList list
 
     Syntax:

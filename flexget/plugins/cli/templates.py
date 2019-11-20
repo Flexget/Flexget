@@ -1,12 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa
-
-import io
-
-from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 from flexget import options
 from flexget.event import event
-from flexget.utils.template import list_templates, get_template
+from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
+from flexget.utils.template import get_template, list_templates
 
 
 def list_file_templates(manager, options):
@@ -26,7 +21,7 @@ def list_file_templates(manager, options):
         name = template_name.replace('.template', '').split('/')
         if len(name) == 2:
             name = name[1]
-        with io.open(template.filename) as contents:
+        with open(template.filename) as contents:
             table_data.append([name, plugin, template.filename, contents.read()])
 
     try:

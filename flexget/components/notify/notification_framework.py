@@ -20,8 +20,6 @@ describes the config format for the plugin.
 
 """
 
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -84,7 +82,7 @@ def render_config(config, template_renderer, notifier_name, _path=''):
         return config
 
 
-class NotificationFramework(object):
+class NotificationFramework:
     def send_notification(self, title, message, notifiers, template_renderer=None):
         """
         Send a notification out to the given `notifiers` with a given `title` and `message`.

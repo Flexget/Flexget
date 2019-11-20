@@ -186,7 +186,7 @@ After creating the base class, the plugin class itself need to be created.
 
 .. code-block:: python
 
-    class EntryList(object):
+    class EntryList:
         schema = {'type': 'string'}
 
         @staticmethod

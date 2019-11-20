@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import collections
 import logging
 import os
@@ -22,8 +19,8 @@ except ImportError:
 AUTHENTICATION_SCHEMA = dict((provider, {'type': 'object'}) for provider in PROVIDERS)
 
 
-class PluginSubliminal(object):
-    """
+class PluginSubliminal:
+    r"""
     Search and download subtitles using Subliminal by Antoine Bertin
     (https://pypi.python.org/pypi/subliminal).
 

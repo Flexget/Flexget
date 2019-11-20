@@ -1,13 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import json
 import logging
-from builtins import *
-from collections import MutableSet
+from collections.abc import MutableSet
+from urllib.parse import quote, urlparse
 
 import requests
-from future.moves.urllib.parse import urlparse, quote
-from future.utils import python_2_unicode_compatible
 from requests import RequestException
 
 from flexget import plugin
@@ -18,10 +14,9 @@ from flexget.utils.qualities import Requirements
 log = logging.getLogger('radarr')
 
 
-@python_2_unicode_compatible
 class RadarrRequestError(Exception):
     def __init__(self, value, logger=log, **kwargs):
-        super(RadarrRequestError, self).__init__()
+        super().__init__()
         # Value is expected to be a string
         value = str(value)
         self.value = value
@@ -33,8 +28,7 @@ class RadarrRequestError(Exception):
 
 
 class RadarrMovieAlreadyExistsError(Exception):
-    def __init__(self):
-        super(RadarrMovieAlreadyExistsError, self).__init__()
+    pass
 
 
 def spec_exception_from_response_ex(radarr_request_ex):
@@ -545,7 +539,7 @@ class RadarrSet(MutableSet):
                 log.error("Radarr search term lookup failed: %s", ex)
 
 
-class RadarrList(object):
+class RadarrList:
     """ List plugin for Radarr that also works as an input plugin """
 
     schema = {

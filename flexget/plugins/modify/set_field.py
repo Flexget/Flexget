@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 from functools import partial
 
@@ -13,7 +10,7 @@ log = logging.getLogger('set')
 UNSET = object()
 
 
-class ModifySet(object):
+class ModifySet:
     """Allows adding information to a task entry for use later.
 
     Example:

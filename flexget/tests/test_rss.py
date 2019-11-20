@@ -1,12 +1,9 @@
 # coding=utf-8
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 import yaml
 
 
-class TestInputRSS(object):
+class TestInputRSS:
     config = """
         tasks:
           _:
@@ -181,7 +178,7 @@ class TestInputRSS(object):
         ), 'RSS entry missing: multiple content tags'
 
 
-class TestEscapeInputRSS(object):
+class TestEscapeInputRSS:
     config = """
         tasks:
           test:
@@ -222,7 +219,7 @@ class TestEscapeInputRSS(object):
 
 @pytest.mark.xfail(reason="silverorange changed some stuff")
 @pytest.mark.online
-class TestRssOnline(object):
+class TestRssOnline:
     config = """
         tasks:
           normal:

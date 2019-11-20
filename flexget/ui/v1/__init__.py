@@ -1,14 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
+import fnmatch
 import logging
 import os
-import fnmatch
 
-from flask import send_from_directory, Flask
+from flask import Flask, send_from_directory
+from flask_compress import Compress
 
 from flexget.webserver import register_app, register_home
-from flask_compress import Compress
 
 log = logging.getLogger('webui')
 
@@ -57,10 +54,6 @@ def _find(path, f):
         for filename in fnmatch.filter(file_names, f):
             matches.append(os.path.join(root_dir, filename))
     return matches
-
-
-def _strip_trailing_sep(path):
-    return path.rstrip('\\/')
 
 
 def register_web_ui(mgr):

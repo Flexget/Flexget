@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -33,7 +31,7 @@ quality_map = {
 LOSTFILM_URL = 'http://lostfilm.tv/rss.xml'
 
 
-class LostFilm(object):
+class LostFilm:
     """
     Change new lostfilm's rss links
 

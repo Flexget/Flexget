@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 from datetime import datetime
 
@@ -9,7 +6,7 @@ from sqlalchemy import Column, DateTime
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.utils.tools import get_latest_flexget_version_number, get_current_flexget_version
+from flexget.utils.tools import get_current_flexget_version, get_latest_flexget_version_number
 
 log = logging.getLogger('version_checker')
 Base = db_schema.versioned_base('version_checker', 0)
@@ -44,7 +41,7 @@ schema = {
 }
 
 
-class VersionChecker(object):
+class VersionChecker:
     """
     A plugin that checks whether user is running the latest flexget version and place a log warning if not.
     Checks via interval to avoid hammering, default is 1 day.

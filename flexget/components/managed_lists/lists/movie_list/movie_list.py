@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from collections import MutableSet
+from collections.abc import MutableSet
 
 from sqlalchemy import func
 from sqlalchemy.sql.elements import and_
@@ -12,8 +9,8 @@ from flexget.db_schema import with_session
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.tools import split_title_year
-from . import db
 
+from . import db
 
 try:
     # NOTE: Importing other plugins is discouraged!
@@ -24,7 +21,7 @@ except ImportError:
 log = logging.getLogger('movie_list')
 
 
-class MovieListBase(object):
+class MovieListBase:
     """
     Class that contains helper methods for movie list as well as plugins that use it,
     such as API and CLI.
@@ -169,7 +166,7 @@ class MovieList(MutableSet):
         return match.to_entry() if match else None
 
 
-class PluginMovieList(object):
+class PluginMovieList:
     """Remove all accepted elements from your trakt.tv watchlist/library/seen or custom list."""
 
     schema = {

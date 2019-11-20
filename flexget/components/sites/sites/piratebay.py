@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import quote, urlparse
-
-import re
 import logging
+import re
+from urllib.parse import quote, urlparse
 
 from flexget import plugin
+from flexget.components.sites.urlrewriting import UrlRewritingError
+from flexget.components.sites.utils import normalize_unicode, torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.components.sites.urlrewriting import UrlRewritingError
 from flexget.utils.soup import get_soup
-from flexget.components.sites.utils import torrent_availability, normalize_unicode
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('piratebay')
@@ -38,7 +35,7 @@ SORT = {
 }
 
 
-class UrlRewritePirateBay(object):
+class UrlRewritePirateBay:
     """PirateBay urlrewriter."""
 
     schema = {
@@ -163,7 +160,12 @@ class UrlRewritePirateBay(object):
                 if href.startswith('/'):  # relative link?
                     href = self.url + href
                 entry['url'] = href
-                tds = link.parent.parent.parent.find_all('td')
+                row = link.parent.parent.parent
+                description = row.find_all('a', attrs={'class': 'detDesc'})
+                if description and description[0].contents[0] == "piratebay ":
+                    log.debug('Advertisement entry. Skipping.')
+                    continue
+                tds = row.find_all('td')
                 entry['torrent_seeds'] = int(tds[-2].contents[0])
                 entry['torrent_leeches'] = int(tds[-1].contents[0])
                 entry['torrent_availability'] = torrent_availability(

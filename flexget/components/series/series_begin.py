@@ -1,7 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import plugin
 from flexget.event import event
@@ -11,7 +8,7 @@ from . import db
 log = logging.getLogger('set_series_begin')
 
 
-class SetSeriesBegin(object):
+class SetSeriesBegin:
     """
     Set the first episode for series. Uses series_name and series_id.
 

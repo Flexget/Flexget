@@ -1,12 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *
-
 import logging
 import socket
+
+from requests.exceptions import RequestException
+
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from requests.exceptions import RequestException
 from flexget.utils.requests import Session as RequestSession
 
 requests = RequestSession(max_retries=3)
@@ -16,7 +15,7 @@ plugin_name = "cronitor"
 log = logging.getLogger(plugin_name)
 
 
-class Cronitor(object):
+class Cronitor:
     """
     Example::
       cronitor: ABC123

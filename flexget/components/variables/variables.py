@@ -1,18 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import codecs
 import logging
 import os
 from datetime import datetime
 
 import yaml
-
 from jinja2 import TemplateError
 from jinja2.nativetypes import NativeEnvironment
-
 from sqlalchemy import Column
-from sqlalchemy.sql.sqltypes import Unicode, DateTime, Integer
+from sqlalchemy.sql.sqltypes import DateTime, Integer, Unicode
 
 from flexget import db_schema
 from flexget.config_schema import register_config_key
@@ -96,7 +91,7 @@ def process_variables(config, manager):
 
 def _process(element, environment):
     if isinstance(element, dict):
-        for k, v in element.items():
+        for k, v in list(element.items()):
             new_key = _process(k, environment)
             if new_key:
                 element[new_key] = element.pop(k)

@@ -1,18 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
-import sys
 import os
+import sys
 
 from flexget import plugin
 from flexget.event import event
-from flexget.plugin import PluginWarning, DependencyError
+from flexget.plugin import DependencyError, PluginWarning
 
 plugin_name = 'toast'
 
 log = logging.getLogger(plugin_name)
 
 
-class NotifyToast(object):
+class NotifyToast:
     """
     Sends messages via local notification system. You must have a notification system like dbus for Linux.
     Preliminary support for Windows notifications. Not heavily tested yet.

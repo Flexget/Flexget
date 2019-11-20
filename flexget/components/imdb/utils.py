@@ -1,18 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import difflib
 import json
 import logging
-import re
 import random
+import re
 
 from bs4.element import Tag
 
-from flexget.utils.soup import get_soup
-from flexget.utils.requests import Session, TimedLimiter
-from flexget.utils.tools import str_to_int
 from flexget import plugin
+from flexget.utils.requests import Session, TimedLimiter
+from flexget.utils.soup import get_soup
+from flexget.utils.tools import str_to_int
 
 log = logging.getLogger('imdb.utils')
 # IMDb delivers a version of the page which is unparsable to unknown (and some known) user agents, such as requests'
@@ -73,7 +70,7 @@ def make_url(imdb_id):
     return u'https://www.imdb.com/title/%s/' % imdb_id
 
 
-class ImdbSearch(object):
+class ImdbSearch:
     def __init__(self):
         # de-prioritize aka matches a bit
         self.aka_weight = 0.95
@@ -194,7 +191,7 @@ class ImdbSearch(object):
             movie = {}
             additional = re.findall(r'\((.*?)\)', result_text.text)
             if len(additional) > 0:
-                if re.match('^\d{4}$', additional[-1]):
+                if re.match(r'^\d{4}$', additional[-1]):
                     movie['year'] = str_to_int(additional[-1])
                 elif len(additional) > 1:
                     movie['year'] = str_to_int(additional[-2])
@@ -248,7 +245,7 @@ class ImdbSearch(object):
         return movies
 
 
-class ImdbParser(object):
+class ImdbParser:
     """Quick-hack to parse relevant imdb details"""
 
     def __init__(self):

@@ -1,13 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import parse_qs, urlparse
-
-import re
 import logging
+import re
+from urllib.parse import parse_qs, urlparse
 
 from flexget import plugin
-from flexget.event import event
 from flexget.components.sites.urlrewriting import UrlRewritingError
+from flexget.event import event
 from flexget.utils.requests import Session, TimedLimiter
 from flexget.utils.soup import get_soup
 
@@ -18,7 +15,7 @@ requests.headers.update({'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windo
 requests.add_domain_limiter(TimedLimiter('imdb.com', '2 seconds'))
 
 
-class UrlRewriteGoogleCse(object):
+class UrlRewriteGoogleCse:
     """Google custom query urlrewriter."""
 
     # urlrewriter API
@@ -53,7 +50,7 @@ class UrlRewriteGoogleCse(object):
             raise UrlRewritingError(e)
 
 
-class UrlRewriteGoogle(object):
+class UrlRewriteGoogle:
     # urlrewriter API
 
     def url_rewritable(self, task, entry):

@@ -1,12 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import inspect
 
 from flexget import options
 from flexget.event import event
+from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
 from flexget.utils.template import get_filters
-from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 
 
 def do_cli(manager, options):

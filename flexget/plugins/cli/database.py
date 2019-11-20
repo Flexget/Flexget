@@ -1,13 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from argparse import ArgumentParser
 
 from flexget import options
-from flexget.db_schema import reset_schema, plugin_schemas
+from flexget.db_schema import plugin_schemas, reset_schema
 from flexget.event import event
-from flexget.terminal import console
 from flexget.manager import Base, Session
+from flexget.terminal import console
 
 
 def do_cli(manager, options):

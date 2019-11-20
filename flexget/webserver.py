@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import hashlib
 import logging
 import random
@@ -61,7 +58,7 @@ def get_secret(session=None):
 
 class WeakPassword(Exception):
     def __init__(self, value, logger=log, **kwargs):
-        super(WeakPassword, self).__init__()
+        super().__init__()
         # Value is expected to be a string
         if not isinstance(value, str):
             value = str(value)

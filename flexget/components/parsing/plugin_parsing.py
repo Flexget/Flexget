@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
@@ -36,7 +33,7 @@ def init_parsers(manager):
         )
 
 
-class PluginParsing(object):
+class PluginParsing:
     """Provides parsing framework"""
 
     @property

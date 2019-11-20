@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 from difflib import SequenceMatcher
 
@@ -10,7 +7,7 @@ from flexget.event import event
 log = logging.getLogger('urlrewrite_search')
 
 
-class PluginSearch(object):
+class PluginSearch:
     """
     Search entry from sites. Accepts list of known search plugins, list is in priority order.
     Once hit has been found no more searches are performed. Should be used only when

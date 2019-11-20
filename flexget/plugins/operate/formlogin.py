@@ -1,24 +1,23 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import io
+import logging
 import os
 import socket
 
-try:
-    import mechanicalsoup
-except ImportError:
-    mechanicalsoup = None
 import requests
 
 from flexget import plugin
 from flexget.event import event
 
+try:
+    import mechanicalsoup
+except ImportError:
+    mechanicalsoup = None
+
+
 log = logging.getLogger('formlogin')
 
 
-class FormLogin(object):
+class FormLogin:
     """
     Login on form
     """

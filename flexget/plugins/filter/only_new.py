@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
@@ -9,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('only_new')
 
 
-class FilterOnlyNew(object):
+class FilterOnlyNew:
     """Causes input plugins to only emit entries that haven't been seen on previous runs."""
 
     schema = {'type': 'boolean'}

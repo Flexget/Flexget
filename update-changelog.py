@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import collections
 import datetime
 import io
@@ -9,8 +7,8 @@ import sys
 from git import Repo
 
 
-class MDChangeSet(object):
-    """Represets a markdown changeset for a single version."""
+class MDChangeSet:
+    """Represents a markdown change-set for a single version."""
 
     CATEGORIES = [
         ('### Added\n', ['add', 'added', 'feature']),
@@ -123,7 +121,7 @@ if __name__ == '__main__':
             if commit.hexsha in tags:
                 modified = True
                 # Tag changeset with release date and version and create new current changeset
-                version = tags[commit.hexsha].tag
+                version = tags[commit.hexsha].tag.lstrip('v')
                 release_date = datetime.datetime.fromtimestamp(
                     tags[commit.hexsha].tagged_date
                 ).strftime('%Y-%m-%d')

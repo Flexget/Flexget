@@ -1,15 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
+from flexget.api import api_app
 from flexget.config_schema import register_config_key
 from flexget.event import event
-from flexget.api import api_app
-from flexget.utils.tools import get_config_hash
-from flexget.webserver import get_secret, register_app, setup_server
 from flexget.ui.v1 import register_web_ui as register_web_ui_v1
 from flexget.ui.v2 import register_web_ui as register_web_ui_v2
+from flexget.utils.tools import get_config_hash
+from flexget.webserver import get_secret, register_app, setup_server
 
 log = logging.getLogger("web_server_daemon")
 config_hash = ''

@@ -1,15 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import text_to_native_str
-
 import logging
 import subprocess
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.config_schema import one_or_more
-from flexget.utils.template import render_from_entry, render_from_task, RenderError
+from flexget.utils.template import RenderError, render_from_entry, render_from_task
 from flexget.utils.tools import io_encoding
 
 log = logging.getLogger('exec')
@@ -19,17 +15,17 @@ class EscapingEntry(Entry):
     """Helper class, same as a Entry, but returns all string value with quotes escaped."""
 
     def __init__(self, entry):
-        super(EscapingEntry, self).__init__(entry)
+        super().__init__(entry)
 
     def __getitem__(self, key):
-        value = super(EscapingEntry, self).__getitem__(key)
+        value = super().__getitem__(key)
         # TODO: May need to be different depending on OS
         if isinstance(value, str):
             value = value.replace('"', '\\"')
         return value
 
 
-class PluginExec(object):
+class PluginExec:
     """
     Execute commands
 
@@ -106,7 +102,7 @@ class PluginExec(object):
     def execute_cmd(self, cmd, allow_background, encoding):
         log.verbose('Executing: %s', cmd)
         p = subprocess.Popen(
-            text_to_native_str(cmd, encoding=io_encoding),
+            cmd,
             shell=True,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,

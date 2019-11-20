@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import os
 
@@ -25,7 +22,7 @@ def get_free_space(folder):
         return (stats.f_bavail * stats.f_frsize) / (1024 * 1024)
 
 
-class PluginFreeSpace(object):
+class PluginFreeSpace:
     """Aborts a task if an entry is accepted and there is less than a certain amount of space free on a drive."""
 
     schema = {

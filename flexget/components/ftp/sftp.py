@@ -1,20 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urljoin, urlparse, quote, unquote
-
 import logging
 import os
 import posixpath
 import time
-from functools import partial
 from collections import namedtuple
+from functools import partial
 from itertools import groupby
+from urllib.parse import quote, unquote, urljoin, urlparse
 
 from flexget import plugin
-from flexget.event import event
-from flexget.entry import Entry
 from flexget.config_schema import one_or_more
-from flexget.utils.template import render_from_entry, RenderError
+from flexget.entry import Entry
+from flexget.event import event
+from flexget.utils.template import RenderError, render_from_entry
 
 log = logging.getLogger('sftp')
 
@@ -127,7 +124,7 @@ def dependency_check():
         )
 
 
-class SftpList(object):
+class SftpList:
     """
     Generate entries from SFTP. This plugin requires the pysftp Python module and its dependencies.
 
@@ -284,7 +281,7 @@ class SftpList(object):
         return entries
 
 
-class SftpDownload(object):
+class SftpDownload:
     """
     Download files from a SFTP server. This plugin requires the pysftp Python module and its
     dependencies.
@@ -486,7 +483,7 @@ class SftpDownload(object):
                 sftp.close()
 
 
-class SftpUpload(object):
+class SftpUpload:
     """
     Upload files to a SFTP server. This plugin requires the pysftp Python module and its
     dependencies.

@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import os
 
@@ -11,7 +8,7 @@ from flexget.utils.bittorrent import Torrent, is_torrent_file
 log = logging.getLogger('modif_torrent')
 
 
-class TorrentFilename(object):
+class TorrentFilename:
     """
         Makes sure that entries containing torrent-file have .torrent
         extension. This is enabled always by default (builtins).
@@ -112,7 +109,7 @@ class TorrentFilename(object):
         if os.path.exists(entry['file']):
             log.debug('removing temp file %s from %s' % (entry['file'], entry['title']))
             os.remove(entry['file'])
-        del (entry['file'])
+        del entry['file']
 
 
 @event('plugin.register')

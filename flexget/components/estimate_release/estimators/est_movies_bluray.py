@@ -1,18 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import datetime
+import logging
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.database import Session
 
-
 log = logging.getLogger('est_movies_bluray')
 
 
-class EstimatesMoviesBluray(object):
+class EstimatesMoviesBluray:
     @plugin.priority(2)
     def estimate(self, entry):
         if 'movie_name' not in entry:

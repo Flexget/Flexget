@@ -1,23 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves import builtins
-
-import logging
 import datetime
+import logging
 from copy import copy
 
 from jinja2 import UndefinedError
 
 from flexget import plugin
+from flexget.entry import Entry
 from flexget.event import event
 from flexget.task import Task
-from flexget.entry import Entry
 from flexget.utils.template import evaluate_expression
 
 log = logging.getLogger('if')
 
 
-class FilterIf(object):
+class FilterIf:
     """Can run actions on entries that satisfy a given condition.
 
     Actions include accept, reject, and fail, as well as the ability to run other filter plugins on the entries."""

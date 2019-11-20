@@ -1,13 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
+from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
-from flexget.entry import Entry
-
 
 try:
     from filmweb.filmweb import Filmweb as FilmwebAPI
@@ -25,7 +21,7 @@ def translate_type(type):
     return {'shows': 'serial', 'movies': 'film'}[type]
 
 
-class FilmwebWatchlist(object):
+class FilmwebWatchlist:
     """"Creates an entry for each movie in your Filmweb list."""
 
     schema = {

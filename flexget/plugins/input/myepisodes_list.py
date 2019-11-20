@@ -1,9 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import re
 from itertools import chain
+
+from requests import RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -11,14 +10,12 @@ from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.utils.soup import get_soup
 
-from requests import RequestException
-
 log = logging.getLogger('myepisodes_list')
 
 URL = 'http://www.myepisodes.com/'
 
 
-class MyEpisodesList(object):
+class MyEpisodesList:
     """Creates an entry for each item in your myepisodes.com show list.
 
     Syntax:

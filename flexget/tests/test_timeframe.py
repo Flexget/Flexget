@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import datetime
 
 from flexget.manager import Session
@@ -13,7 +11,7 @@ def age_timeframe(**kwargs):
         )
 
 
-class TestTimeFrame(object):
+class TestTimeFrame:
     config = """
         templates:
           global:
@@ -68,7 +66,7 @@ class TestTimeFrame(object):
         age_timeframe(hours=1)
 
         # simulate movie going away from the task/feed
-        del (manager.config['tasks']['reached_and_backlog']['mock'])
+        del manager.config['tasks']['reached_and_backlog']['mock']
 
         task = execute_task('reached_and_backlog')
         entry = task.find_entry('accepted', title='Movie.BRRip.x264.720p')
@@ -88,7 +86,7 @@ class TestTimeFrame(object):
             assert query[0].status == 'accepted', 'Should be accepted.'
 
 
-class TestTimeFrameActions(object):
+class TestTimeFrameActions:
     config = """
         templates:
           global:
