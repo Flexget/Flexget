@@ -32,7 +32,7 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
   # Commit and tag released version
   git add flexget/_version.py
   git commit -m "v${VERSION}"
-  git tag -a -f "${VERSION}" -m "${VERSION} release"
+  git tag -a -f "v${VERSION}" -m "${VERSION} release"
 
   # Bump to new dev version, then commit again
   python dev_tools.py bump_version dev
