@@ -1,7 +1,3 @@
-from __future__ import absolute_import, division, unicode_literals
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import native
-
 import logging
 import re
 import sys
@@ -10,7 +6,6 @@ import time
 from guessit.api import GuessItApi, GuessitException
 from guessit.rules import rebulk_builder
 from rebulk import Rebulk
-from rebulk.match import MatchesDict
 from rebulk.pattern import RePattern
 
 from flexget import plugin
@@ -65,7 +60,7 @@ except AttributeError:
     preferred_clock = time.clock
 
 
-class ParserGuessit(object):
+class ParserGuessit:
     SOURCE_MAP = {
         'Camera': 'cam',
         'HD Camera': 'cam',
@@ -226,7 +221,7 @@ class ParserGuessit(object):
 
         # NOTE: Guessit expects str on PY3 and unicode on PY2 hence the use of future.utils.native
         try:
-            guess_result = guessit_api.guessit(native(data), options=guessit_options)
+            guess_result = guessit_api.guessit(data, options=guessit_options)
         except GuessitException:
             log.warning('Parsing %s with guessit failed. Most likely a unicode error.', data)
             return SeriesParseResult(data=data, valid=False)

@@ -1,12 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flexget import plugin
 from flexget.event import event
 
-from . import series as plugin_series
 from . import db
+from . import series as plugin_series
 
 
 class FilterSeriesPremiere(plugin_series.FilterSeriesBase):

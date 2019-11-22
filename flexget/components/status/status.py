@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import datetime
 import logging
 from datetime import timedelta
@@ -7,12 +5,13 @@ from datetime import timedelta
 from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
+
 from . import db
 
 log = logging.getLogger('status')
 
 
-class Status(object):
+class Status:
     """Track health status of tasks"""
 
     schema = {'type': 'boolean'}

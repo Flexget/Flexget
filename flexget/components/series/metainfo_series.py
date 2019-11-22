@@ -1,13 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+from flexget import plugin
 from flexget.event import event
 
 from . import series as plugin_series
-
-from flexget import plugin
 
 try:
     # NOTE: Importing other plugins is discouraged!
@@ -18,7 +14,7 @@ except ImportError:
 log = logging.getLogger('metainfo_series')
 
 
-class MetainfoSeries(object):
+class MetainfoSeries:
     """
     Check if entry appears to be a series, and populate series info if so.
     """

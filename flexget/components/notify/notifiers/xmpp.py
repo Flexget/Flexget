@@ -1,11 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 from flexget.plugin import DependencyError, PluginWarning
 
 plugin_name = 'xmpp'
@@ -13,7 +10,7 @@ plugin_name = 'xmpp'
 log = logging.getLogger(plugin_name)
 
 
-class XMPPNotifier(object):
+class XMPPNotifier:
     """
     Sends messages via XMPP. The sleekxmpp library is required to be installed.
     Install it with: `pip install sleekxmpp`

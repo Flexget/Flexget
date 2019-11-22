@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
@@ -9,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('spy_headers')
 
 
-class PluginSpyHeaders(object):
+class PluginSpyHeaders:
     """
         Logs all headers sent in http requests. Useful for resolving issues.
 

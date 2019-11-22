@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import time
 
@@ -10,7 +7,7 @@ from flexget.event import event
 log = logging.getLogger('sleep')
 
 
-class PluginSleep(object):
+class PluginSleep:
     """
     Causes a pause in execution to occur at the beginning of the specified phase of a task.
     The point at which the pause occurs can be adjusted using the `plugin_priority` plugin.

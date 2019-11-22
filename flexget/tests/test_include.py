@@ -1,10 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import pytest
 from jinja2 import Template
 
 
-class TestInclude(object):
+class TestInclude:
     _config = """
         tasks:
           include_test:
@@ -41,7 +39,7 @@ class TestInclude(object):
         assert task.find_entry(title='baz')
 
 
-class TestIncludeChange(object):
+class TestIncludeChange:
     _config = """
         tasks:
           include_test:

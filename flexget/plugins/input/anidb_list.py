@@ -1,22 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import re
 
 from requests import RequestException
 
 from flexget import plugin
+from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
-from flexget.entry import Entry
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('anidb_list')
 USER_ID_RE = r'^\d{1,6}$'
 
 
-class AnidbList(object):
+class AnidbList:
     """"Creates an entry for each movie or series in your AniDB wishlist."""
 
     anidb_url = 'http://anidb.net/perl-bin/'

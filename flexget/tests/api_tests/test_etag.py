@@ -1,11 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from flexget.components.managed_lists.lists.movie_list.api import ObjectsContainer as OC
 from flexget.utils import json
 
 
-class TestETAG(object):
+class TestETAG:
     config = 'tasks: {}'
 
     def test_etag(self, api_client, schema_match):

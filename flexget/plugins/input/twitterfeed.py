@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import re
 
@@ -18,7 +15,7 @@ CHUNK_SIZE = 200
 MAX_TWEETS = 1000
 
 
-class TwitterFeed(object):
+class TwitterFeed:
     """Parses a twitter feed
 
     Example::

@@ -1,15 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
+from flexget.components.variables.variables import Variables
 from flexget.event import fire_event
 from flexget.manager import Session
-from flexget.components.variables.variables import Variables
 
 
 @pytest.mark.usefixtures('tmpdir')
-class TestVariablesFromFile(object):
+class TestVariablesFromFile:
     config = """
         variables: __tmp__/variables.yml
         tasks:
@@ -70,7 +67,7 @@ class TestVariablesFromConfig:
         assert len(task.accepted) == 2
 
 
-class TestVariablesFromDB(object):
+class TestVariablesFromDB:
     config = """
         variables: yes
         tasks:

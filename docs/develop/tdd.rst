@@ -12,7 +12,7 @@ Write new test case called ``tests/test_hello.py``.
 
 .. testcode::
 
-   class TestHello(object):
+   class TestHello:
 
        config = """
            tasks:
@@ -43,13 +43,11 @@ Within this file we will add our plugin.
 
 .. testcode::
 
-   from __future__ import unicode_literals, division, absolute_import
-
    from flexget import plugin
    from flexget.event import event
 
 
-   class Hello(object):
+   class Hello:
        pass
 
    @event('plugin.register')
@@ -70,7 +68,7 @@ Let's supplement the testsuite with the test.
 
 .. testcode::
 
-   class TestHello(object):
+   class TestHello:
 
        config = """
            tasks:
@@ -96,13 +94,11 @@ Continue by implementing the test case.
 
 .. testcode::
 
-   from __future__ import unicode_literals, division, absolute_import
-
    from flexget import plugin
    from flexget.event import event
 
 
-   class Hello(object):
+   class Hello:
        def on_task_filter(self, task, config):
            for entry in task.entries:
                entry['hello'] = True

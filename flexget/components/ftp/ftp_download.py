@@ -1,11 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urlparse, unquote
-
+import ftplib
 import logging
 import os
-import ftplib
 import time
+from urllib.parse import unquote, urlparse
 
 from flexget import plugin
 from flexget.event import event
@@ -15,7 +12,7 @@ from flexget.utils.template import RenderError
 log = logging.getLogger('ftp')
 
 
-class OutputFtp(object):
+class OutputFtp:
     """
         Ftp Download plugin
 

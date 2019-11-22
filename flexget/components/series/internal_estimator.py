@@ -1,7 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import timedelta
 
 from sqlalchemy import desc, func
@@ -16,7 +13,7 @@ from . import db
 log = logging.getLogger('est_series_internal')
 
 
-class EstimatesSeriesInternal(object):
+class EstimatesSeriesInternal:
     @plugin.priority(0)  # Should always be last priority
     def estimate(self, entry):
         if not all(field in entry for field in ['series_name', 'series_season', 'series_episode']):

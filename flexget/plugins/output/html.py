@@ -1,19 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import os
 import logging
+import os
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.template import render_from_task, get_template, RenderError
+from flexget.utils.template import RenderError, get_template, render_from_task
 
 PLUGIN_NAME = 'make_html'
 
 log = logging.getLogger(PLUGIN_NAME)
 
 
-class OutputHtml(object):
+class OutputHtml:
     schema = {
         'type': 'object',
         'properties': {'template': {'type': 'string'}, 'file': {'type': 'string'}},

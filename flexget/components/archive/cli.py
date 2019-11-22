@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
 import re
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from collections import defaultdict
 from datetime import datetime
 
@@ -12,7 +9,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.options import ParseExtrasAction, get_parser
-from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
+from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
 from flexget.utils.tools import strip_html
 
 log = logging.getLogger('archive_cli')

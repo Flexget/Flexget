@@ -1,8 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import unquote
-
 import hashlib
 import io
 import logging
@@ -14,19 +9,20 @@ import sys
 import tempfile
 from cgi import parse_header
 from http.client import BadStatusLine
+from urllib.parse import unquote
 
 from requests import RequestException
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.utils.tools import decode_html, native_str_to_text
-from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError
+from flexget.utils.tools import decode_html
 
 log = logging.getLogger('download')
 
 
-class PluginDownload(object):
+class PluginDownload:
     """
     Downloads content from entry url and writes it into a file.
 
@@ -361,16 +357,6 @@ class PluginDownload(object):
         filename = parse_header(response.headers['content-disposition'])[1].get('filename')
 
         if filename:
-            # try to decode to unicode, specs allow latin1, some may do utf-8 anyway
-            try:
-                filename = native_str_to_text(filename, encoding='latin1')
-                log.debug('filename header latin1 decoded')
-            except UnicodeError:
-                try:
-                    filename = native_str_to_text(filename, encoding='utf-8')
-                    log.debug('filename header UTF-8 decoded')
-                except UnicodeError:
-                    pass
             filename = decode_html(filename)
             log.debug('Found filename from headers: %s', filename)
             if 'filename' in entry:
@@ -550,7 +536,7 @@ class PluginDownload(object):
                 os.remove(entry['file'])
             if os.path.exists(os.path.dirname(entry['file'])):
                 shutil.rmtree(os.path.dirname(entry['file']))
-            del (entry['file'])
+            del entry['file']
 
     def cleanup_temp_files(self, task):
         """Checks all entries for leftover temp files and deletes them."""

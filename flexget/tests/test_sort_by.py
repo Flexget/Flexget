@@ -1,11 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
 
-class TestSortBy(object):
-    config = """
+class TestSortBy:
+    config = r"""
         tasks:
           test_title:
             sort_by: title

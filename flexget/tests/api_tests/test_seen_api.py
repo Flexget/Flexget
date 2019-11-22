@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
 
 from flexget.api.app import base_message
 from flexget.components.seen.api import ObjectsContainer as OC
-from flexget.manager import Session
 from flexget.components.seen.db import SeenEntry, SeenField
+from flexget.manager import Session
 from flexget.utils import json
 
 
-class TestSeenAPI(object):
+class TestSeenAPI:
     config = "{'tasks': {}}"
 
     def add_seen_entries(self):
@@ -184,7 +181,7 @@ class TestSeenAPI(object):
         assert not errors
 
 
-class TestSeenPagination(object):
+class TestSeenPagination:
     config = 'tasks: {}'
 
     def test_seen_pagination(self, api_client, link_headers):

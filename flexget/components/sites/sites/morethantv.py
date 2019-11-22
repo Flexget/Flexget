@@ -1,22 +1,20 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import datetime
+import logging
 import re
 
-from sqlalchemy import Column, Unicode, DateTime
 from requests.exceptions import TooManyRedirects
+from sqlalchemy import Column, DateTime, Unicode
 
-from flexget import plugin, db_schema
+from flexget import db_schema, plugin
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.requests import TimedLimiter, RequestException
 from flexget.manager import Session
 from flexget.utils.database import json_synonym
+from flexget.utils.requests import RequestException
 from flexget.utils.requests import Session as RequestSession
+from flexget.utils.requests import TimedLimiter
 from flexget.utils.soup import get_soup
-from flexget.config_schema import one_or_more
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('morethantv')
@@ -105,7 +103,7 @@ class MoreThanTVCookie(Base):
     expires = Column(DateTime)
 
 
-class SearchMoreThanTV(object):
+class SearchMoreThanTV:
     """
         MorethanTV search plugin.
     """
@@ -284,7 +282,7 @@ class SearchMoreThanTV(object):
                 title = group_info.find('a', href=re.compile(r'torrents.php\?id=\d+')).text
                 url = (
                     self.base_url
-                    + group_info.find('a', href=re.compile('torrents.php\?action=download'))[
+                    + group_info.find('a', href=re.compile(r'torrents.php\?action=download'))[
                         'href'
                     ]
                 )

@@ -1,9 +1,9 @@
 import logging
 import pickle
-from collections import MutableSet
+from collections.abc import MutableSet
 from datetime import datetime
 
-from sqlalchemy import Unicode, select, Column, Integer, DateTime, ForeignKey, or_, func
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, Unicode, func, or_, select
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
 
@@ -13,7 +13,7 @@ from flexget.entry import Entry
 from flexget.manager import Session
 from flexget.utils import json
 from flexget.utils.database import entry_synonym, with_session
-from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
+from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
 log = logging.getLogger('entry_list.db')
 Base = versioned_base('entry_list', 1)

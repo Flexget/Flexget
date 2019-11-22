@@ -1,15 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import argparse
-import functools
-import logging
-
-from flexget import options
-from flexget.event import event
-
-log = logging.getLogger('cli_config')
-
 """
 Allows specifying yml configuration values from commandline parameters.
 
@@ -28,6 +16,14 @@ Commandline example::
   --cli-config url=http://some.url/ path=~/downloads
 
 """
+import argparse
+import functools
+import logging
+
+from flexget import options
+from flexget.event import event
+
+log = logging.getLogger('cli_config')
 
 
 def replace_in_item(replaces, item):

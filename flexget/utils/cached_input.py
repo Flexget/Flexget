@@ -1,21 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import copy
 import logging
 import pickle
 from datetime import datetime, timedelta
 
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Unicode, select
+from sqlalchemy.orm import relation
+
 from flexget import db_schema
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import PluginError
 from flexget.utils import json
 from flexget.utils.database import entry_synonym
-from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
-from flexget.utils.tools import parse_timedelta, TimedDict, get_config_hash
-from sqlalchemy import Column, Integer, String, DateTime, Unicode, select, ForeignKey
-from sqlalchemy.orm import relation
+from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
+from flexget.utils.tools import TimedDict, get_config_hash, parse_timedelta
 
 log = logging.getLogger('input_cache')
 Base = db_schema.versioned_base('input_cache', 1)
@@ -75,7 +73,7 @@ def db_cleanup(manager, session):
         log.verbose('Removed %s old input caches.' % result)
 
 
-class cached(object):
+class cached:
     """
     Implements transparent caching decorator @cached for inputs.
 
@@ -157,9 +155,9 @@ class cached(object):
         with Session() as session:
             db_cache = (
                 session.query(InputCache)
-                    .filter(InputCache.name == self.name)
-                    .filter(InputCache.hash == self.config_hash)
-                    .first()
+                .filter(InputCache.name == self.name)
+                .filter(InputCache.hash == self.config_hash)
+                .first()
             )
             if not db_cache:
                 db_cache = InputCache(name=self.name, hash=self.config_hash)
@@ -171,8 +169,8 @@ class cached(object):
         with Session() as session:
             db_cache = (
                 session.query(InputCache)
-                    .filter(InputCache.name == self.name)
-                    .filter(InputCache.hash == self.config_hash)
+                .filter(InputCache.name == self.name)
+                .filter(InputCache.hash == self.config_hash)
             )
             if not load_expired:
                 db_cache = db_cache.filter(InputCache.added > datetime.now() - self.persist)
@@ -185,11 +183,12 @@ class cached(object):
                 return entries
 
 
-class IterableCache(object):
+class IterableCache:
     """
     Can cache any iterable (including generators) without immediately evaluating all entries.
     If `finished_hook` is supplied, it will be called the first time the iterable is run to the end.
     """
+
     def __init__(self, iterable, finished_hook=None):
         self.iterable = iter(iterable)
         self.cache = []

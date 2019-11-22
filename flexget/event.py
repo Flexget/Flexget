@@ -1,9 +1,6 @@
 """
 Provides small event framework
 """
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 log = logging.getLogger('event')
@@ -11,7 +8,7 @@ log = logging.getLogger('event')
 _events = {}
 
 
-class Event(object):
+class Event:
     """Represents one registered event."""
 
     def __init__(self, name, func, priority=128):

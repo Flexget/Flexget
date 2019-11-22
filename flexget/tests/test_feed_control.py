@@ -1,10 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
 
-class TestOnlyTask(object):
+class TestOnlyTask:
     """
         Test --task option
     """
@@ -32,7 +29,7 @@ class TestOnlyTask(object):
         assert not task.find_entry(title='nodownload'), 'task should not have been executed'
 
 
-class TestManualAutomatic(object):
+class TestManualAutomatic:
     """
         Test manual download tasks
     """
@@ -51,7 +48,7 @@ class TestManualAutomatic(object):
         assert not task.find_entry(title='nodownload'), 'Manual tasks downloaded on automatic run'
 
 
-class TestManualOnlytask(object):
+class TestManualOnlytask:
     """
         Test manual download tasks
     """

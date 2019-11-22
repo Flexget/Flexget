@@ -1,16 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-
 from flask import jsonify
 from flask_restplus import inputs
 
-from flexget.api import api, APIResource
-from flexget.api.app import etag, BadRequest, NotFoundError
 from flexget import plugin
+from flexget.api import APIResource, api
+from flexget.api.app import BadRequest, NotFoundError, etag
 
 tmdb_api = api.namespace('tmdb', description='TMDB lookup endpoint')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     poster_object = {
         'type': 'object',
         'properties': {

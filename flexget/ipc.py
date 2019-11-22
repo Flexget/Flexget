@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import random
 import string
@@ -13,8 +10,8 @@ from terminaltables.terminal_io import terminal_size
 
 from flexget import terminal
 from flexget.logger import capture_output
-from flexget.terminal import console
 from flexget.options import get_parser
+from flexget.terminal import console
 
 log = logging.getLogger('ipc')
 
@@ -27,7 +24,7 @@ AUTH_ERROR = b'authentication error'
 AUTH_SUCCESS = b'authentication success'
 
 
-class RemoteStream(object):
+class RemoteStream:
     """
     Used as a filelike to stream text to remote client. If client disconnects while this is in use, an error will be
     logged, but no exception raised.
@@ -63,7 +60,7 @@ class DaemonService(rpyc.Service):
 
     def on_connect(self, conn):
         self._conn = conn
-        super(DaemonService, self).on_connect(conn)
+        super().on_connect(conn)
 
     def exposed_version(self):
         return IPC_VERSION
@@ -109,7 +106,7 @@ class ClientService(rpyc.Service):
         if IPC_VERSION != daemon_version:
             self._conn.close()
             raise ValueError('Daemon is different version than client.')
-        super(ClientService, self).on_connect(conn)
+        super().on_connect(conn)
 
     def exposed_version(self):
         return IPC_VERSION
@@ -123,7 +120,7 @@ class ClientService(rpyc.Service):
 
 class IPCServer(threading.Thread):
     def __init__(self, manager, port=None):
-        super(IPCServer, self).__init__(name='ipc_server')
+        super().__init__(name='ipc_server')
         self.daemon = True
         self.manager = manager
         self.host = '127.0.0.1'
@@ -165,7 +162,7 @@ class IPCServer(threading.Thread):
             self.server.close()
 
 
-class IPCClient(object):
+class IPCClient:
     def __init__(self, port, password):
         channel = rpyc.Channel(rpyc.SocketStream.connect('127.0.0.1', port))
         channel.send(password.encode('utf-8'))

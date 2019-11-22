@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import io
 import logging
 import os
@@ -16,7 +13,7 @@ plugin_name = 'include'
 log = logging.getLogger(plugin_name)
 
 
-class PluginInclude(object):
+class PluginInclude:
     """
     Include configuration from another yaml file.
 

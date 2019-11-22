@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import options, plugin
@@ -11,7 +8,7 @@ from flexget.utils.log import log_once
 log = logging.getLogger('verbose')
 
 
-class Verbose(object):
+class Verbose:
     """
     Verbose entry accept, reject and failure
     """

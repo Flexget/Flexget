@@ -1,17 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from flask import jsonify
 from flask_restplus import inputs
 
-from flexget.api import api, APIResource
-from flexget.api.app import NotFoundError, BadRequest, etag
-from flexget.components.thetvdb.api_tvdb import lookup_series, lookup_episode, search_for_series
+from flexget.api import APIResource, api
+from flexget.api.app import BadRequest, NotFoundError, etag
+from flexget.components.thetvdb.api_tvdb import lookup_episode, lookup_series, search_for_series
 
 tvdb_api = api.namespace('tvdb', description='TheTVDB Shows')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     tvdb_series_object = {
         'type': 'object',
         'properties': {

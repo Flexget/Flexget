@@ -1,10 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import codecs
-import re
 import logging
 import os
+import re
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -14,8 +11,8 @@ from flexget.utils.cached_input import cached
 log = logging.getLogger('regexp_parse')
 
 
-class RegexpParse(object):
-    """This plugin is designed to take input from a web resource or a file.
+class RegexpParse:
+    r"""This plugin is designed to take input from a web resource or a file.
     It then parses the text via regexps supplied in the config file.
 
     source: is a file or url to get the data from. You can specify a username:password
@@ -56,7 +53,7 @@ class RegexpParse(object):
             - {regexp: "magnet:.*?(?=])"}
         custom_field:
           regexps:
-            - {regexp: "custom regexps", flags: "comma seperated list of flags (see python regex docs)"}
+            - {regexp: "custom regexps", flags: "comma separated list of flags (see python regex docs)"}
           required: False
         custom_field2:
           regexps:
@@ -110,6 +107,7 @@ class RegexpParse(object):
                     {'type': 'string', 'format': 'file'},
                 ]
             },
+            'encoding': {'type': 'string'},
             'sections': {'$ref': '#/definitions/regex_list'},
             'keys': {
                 'type': 'object',

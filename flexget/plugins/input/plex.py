@@ -1,10 +1,7 @@
 """Plugin for plex media server (www.plexapp.com)."""
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import re
 import logging
 import os
+import re
 from datetime import datetime
 from os.path import basename
 from socket import gethostbyname
@@ -18,7 +15,7 @@ from flexget.utils import requests
 log = logging.getLogger('plex')
 
 
-class InputPlex(object):
+class InputPlex:
     """
     Uses a plex media server (www.plexapp.com) tv section as an input.
 

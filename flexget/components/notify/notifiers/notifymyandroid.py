@@ -1,15 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import xml.etree.ElementTree as ET
+
 import requests
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from requests.exceptions import RequestException
 
 plugin_name = 'notifymyandroid'
 log = logging.getLogger(plugin_name)
@@ -17,7 +15,7 @@ log = logging.getLogger(plugin_name)
 NOTIFYMYANDROID_URL = 'https://www.notifymyandroid.com/publicapi/notify'
 
 
-class NotifyMyAndroidNotifier(object):
+class NotifyMyAndroidNotifier:
     """
     Example::
 

@@ -1,18 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-
 from argparse import ArgumentParser, ArgumentTypeError
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget import options
-from flexget import plugin
+from flexget import options, plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
-from flexget.plugin import PluginError, DependencyError
-from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
+from flexget.plugin import DependencyError, PluginError
+from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
 from flexget.utils.tools import split_title_year
+
 from . import db
 from .movie_list import MovieListBase
 

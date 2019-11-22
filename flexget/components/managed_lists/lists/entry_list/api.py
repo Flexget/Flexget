@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
 import logging
 from math import ceil
@@ -8,14 +5,14 @@ from math import ceil
 from flask import jsonify, request
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import (
+    Conflict,
     NotFoundError,
     base_message_schema,
-    success_response,
     etag,
     pagination_headers,
-    Conflict,
+    success_response,
 )
 
 from . import db
@@ -25,7 +22,7 @@ log = logging.getLogger('entry_list')
 entry_list_api = api.namespace('entry_list', description='Entry List operations')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     entry_list_base_object = {
         'type': 'object',
         'properties': {

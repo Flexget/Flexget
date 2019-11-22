@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
@@ -39,7 +36,7 @@ SORT_BY = {
 }
 
 
-class Letterboxd(object):
+class Letterboxd:
     schema = {
         'type': 'object',
         'properties': {
@@ -48,7 +45,7 @@ class Letterboxd(object):
             'sort_by': {'type': 'string', 'enum': list(SORT_BY.keys()), 'default': 'default'},
             'max_results': {
                 'type': 'integer',
-                'deprecated': '`limit` plugin should be used instead of letterboxd `max_results` option'
+                'deprecated': '`limit` plugin should be used instead of letterboxd `max_results` option',
             },
         },
         'required': ['username', 'list'],

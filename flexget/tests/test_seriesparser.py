@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
-from flexget.components.parsing.parsers.parser_internal import ParserInternal
 from flexget.components.parsing.parsers.parser_guessit import ParserGuessit
+from flexget.components.parsing.parsers.parser_internal import ParserInternal
 
 
-class TestSeriesParser(object):
+class TestSeriesParser:
     @pytest.fixture(
         scope='class', params=(ParserInternal, ParserGuessit), ids=['internal', 'guessit']
     )
@@ -642,7 +639,7 @@ class TestSeriesParser(object):
         assert not s.proper, 'detected proper'
 
     def test_episode_with_season_pack_match_is_not_season_pack(self, parse):
-        """SeriesParser: Github issue #1986, s\d{1} parses as invalid season"""
+        r"""SeriesParser: Github issue #1986, s\d{1} parses as invalid season"""
         s = parse(name='The Show', data='The.Show.S01E01.eps3.0.some.title.720p.x264-NOGRP')
         assert s.valid
         assert not s.season_pack

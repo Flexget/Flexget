@@ -1,20 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import quote
-
 import logging
+from urllib.parse import quote
 
 from flexget import plugin
+from flexget.components.sites.utils import normalize_unicode, torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests
-from flexget.components.sites.utils import torrent_availability, normalize_unicode
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('yts')
 
 
-class UrlRewriteYTS(object):
+class UrlRewriteYTS:
     """YTS search"""
 
     schema = {'type': 'boolean'}

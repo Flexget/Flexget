@@ -1,21 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import quote
-
 from logging import getLogger
+from urllib.parse import quote
 
 from requests.exceptions import RequestException
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils import json
-from flexget.config_schema import one_or_more
 from flexget.utils.template import RenderError
 
 log = getLogger('pyload')
 
 
-class PyloadApi(object):
+class PyloadApi:
     def __init__(self, requests, url):
         self.requests = requests
         self.url = url
@@ -48,7 +45,7 @@ class PyloadApi(object):
             raise
 
 
-class PluginPyLoad(object):
+class PluginPyLoad:
     """
     Parse task content or url for hoster links and adds them to pyLoad.
 

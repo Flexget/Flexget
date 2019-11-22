@@ -1,21 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import sys
 from textwrap import wrap
 
-from colorclass import Windows, Color
-from flexget.logger import local_context
-from flexget.options import ArgumentParser
-from flexget.utils.tools import io_encoding
+from colorclass import Color, Windows
 from terminaltables import (
     AsciiTable,
-    SingleTable,
     DoubleTable,
     GithubFlavoredMarkdownTable,
     PorcelainTable,
+    SingleTable,
 )
 from terminaltables.terminal_io import terminal_size
+
+from flexget.logger import local_context
+from flexget.options import ArgumentParser
+from flexget.utils.tools import io_encoding
 
 # Enable terminal colors on windows.
 # pythonw (flexget-headless) does not have a sys.stdout, this command would crash in that case
@@ -31,7 +29,7 @@ def terminal_info():
     return {'size': terminal_size(), 'isatty': sys.stdout.isatty()}
 
 
-class TerminalTable(object):
+class TerminalTable:
     """
     A data table suited for CLI output, created via its sent parameters. For example::
 

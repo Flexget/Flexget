@@ -1,7 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import plugin
 from flexget.event import event
@@ -15,7 +12,7 @@ except ImportError:
 log = logging.getLogger('metainfo_movie')
 
 
-class MetainfoMovie(object):
+class MetainfoMovie:
     """
     Check if entry appears to be a movie, and populate movie info if so.
     """

@@ -1,19 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 from datetime import datetime, timedelta
 
-from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime, Text
+from sqlalchemy import Boolean, Column, DateTime, Float, Integer, Table, Text, Unicode
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
 from flexget.utils import requests
-from flexget.utils.tools import split_title_year, chunked
-from flexget.utils.database import with_session, text_date_synonym, json_synonym, Session
+from flexget.utils.database import Session, json_synonym, text_date_synonym, with_session
 from flexget.utils.simple_persistence import SimplePersistence
+from flexget.utils.tools import chunked, split_title_year
 
 log = logging.getLogger('api_tvdb')
 Base = db_schema.versioned_base('api_tvdb', 7)
@@ -24,7 +21,7 @@ persist = SimplePersistence('api_tvdb')
 SEARCH_RESULT_EXPIRATION_DAYS = 3
 
 
-class TVDBRequest(object):
+class TVDBRequest:
     API_KEY = '4D297D8CFDE0E105'
     BASE_URL = 'https://api.thetvdb.com/'
     BANNER_URL = 'http://thetvdb.com/banners/'
@@ -214,7 +211,10 @@ class TVDBSeries(Base):
         if self.first_aired is None:
             log.debug('Falling back to getting first episode aired date for series %s', self.name)
             try:
-                episode = TVDBRequest().get('series/%s/episodes/query?airedSeason=1&airedEpisode=1' % self.id, language=language)
+                episode = TVDBRequest().get(
+                    'series/%s/episodes/query?airedSeason=1&airedEpisode=1' % self.id,
+                    language=language,
+                )
                 self.first_aired = episode[0]['firstAired']
             except requests.RequestException as e:
                 log.error('Failed to get first episode for series %s' % self.name)
@@ -346,7 +346,7 @@ class TVDBEpisode(Base):
         self.absolute_number = episode['absoluteNumber']
         self.name = episode['episodeName']
         self.overview = episode['overview']
-        self.director = episode['director']
+        self.director = ', '.join(episode['directors'])
         self._image = episode['filename']
         self.rating = episode['siteRating']
         self.first_aired = episode['firstAired']

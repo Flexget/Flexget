@@ -1,9 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
 import re
 import time
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from requests import RequestException
 
@@ -24,7 +21,7 @@ except ImportError:
 log = logging.getLogger('rlslog')
 
 
-class RlsLog(object):
+class RlsLog:
     """
     Adds support for rlslog.net as a feed.
     """

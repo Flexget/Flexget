@@ -1,14 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import os
 import re
 
 from flexget import plugin
-from flexget.event import event
-from flexget.utils.template import render_from_entry, RenderError
 from flexget.components.archives import utils as archiveutil
+from flexget.event import event
+from flexget.utils.template import RenderError, render_from_entry
 
 log = logging.getLogger('decompress')
 
@@ -70,9 +67,7 @@ def extract_info(info, archive, to, keep_dirs):
     except archiveutil.FileAlreadyExists as error:
         log.warning('File already exists: %s' % destination)
     except archiveutil.ArchiveError as error:
-        log.error(
-            'Failed to extract file: %s from %s (%s)' % (info.filename, archive.path, error)
-        )
+        log.error('Failed to extract file: %s from %s (%s)' % (info.filename, archive.path, error))
 
 
 def get_destination_path(info, to, keep_dirs):
@@ -96,7 +91,7 @@ def is_match(info, pattern):
     return is_match
 
 
-class Decompress(object):
+class Decompress:
     r"""
     Extracts files from Zip or RAR archives. By default this plugin will extract to the same
     directory as the source archive, preserving directory structure from the archive.

@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
+import logging
 import os
 import shutil
-import logging
 import time
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
-from flexget.utils.template import RenderError
+from flexget.event import event
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError
 
 
 def get_directory_size(directory):
@@ -48,7 +45,7 @@ def get_siblings(ext, main_file_no_ext, main_file_ext, abs_path):
     return siblings
 
 
-class BaseFileOps(object):
+class BaseFileOps:
     # Defined by subclasses
     log = None
     along = {
@@ -296,9 +293,7 @@ class TransformingOps(BaseFileOps):
             if not src_isdir and dst_ext != src_ext:
                 self.log.verbose('Adding extension `%s` to dst `%s`', src_ext, dst)
                 dst += src_ext
-                dst_file += (
-                    dst_ext
-                )  # this is used for sibling files. dst_ext turns out not to be an extension!
+                dst_file += dst_ext  # this is used for sibling files. dst_ext turns out not to be an extension!
 
         funct_name = 'move' if self.move else 'copy'
         funct_done = 'moved' if self.move else 'copied'

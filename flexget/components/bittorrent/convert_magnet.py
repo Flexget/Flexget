@@ -1,18 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+import logging
 import os
 import time
-import logging
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.tools import parse_timedelta
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('convert_magnet')
 
 
-class ConvertMagnet(object):
+class ConvertMagnet:
     """Convert magnet only entries to a torrent file"""
 
     schema = {

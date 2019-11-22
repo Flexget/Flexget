@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
 import re
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from requests import RequestException
 
@@ -15,7 +12,7 @@ from . import db
 log = logging.getLogger('next_trakt_episodes')
 
 
-class NextTraktEpisodes(object):
+class NextTraktEpisodes:
     """
     Creates an entry for the latest or the next item in your watched or collected
     episodes in your trakt account.

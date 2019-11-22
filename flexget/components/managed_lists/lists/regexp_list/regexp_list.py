@@ -1,14 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
 import re
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from collections import MutableSet
+from collections.abc import MutableSet
 
 from flexget import plugin
 from flexget.db_schema import with_session
 from flexget.event import event
 from flexget.manager import Session
+
 from . import db
 
 log = logging.getLogger('regexp_list')
@@ -98,7 +96,7 @@ class RegexpList(MutableSet):
         return match.to_entry() if match else None
 
 
-class PluginRegexpList(object):
+class PluginRegexpList:
     """Subtitle list"""
 
     schema = RegexpList.schema

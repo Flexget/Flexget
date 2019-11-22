@@ -2,12 +2,12 @@ import logging
 import re
 from datetime import datetime
 
-from sqlalchemy import Table, Column, Integer, ForeignKey, Index, Unicode, DateTime
+from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, Table, Unicode
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import db_schema
-from flexget.utils.sqlalchemy_utils import table_schema, get_index_by_name
+from flexget.utils.sqlalchemy_utils import get_index_by_name, table_schema
 
 log = logging.getLogger('archive.db')
 

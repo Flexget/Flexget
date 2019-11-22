@@ -1,13 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import base64
-import re
-import sys
-
 import logging
 import os
-
+import re
+import sys
 import time
 
 from flexget import plugin
@@ -19,7 +14,7 @@ from flexget.utils.template import RenderError
 log = logging.getLogger('deluge')
 
 
-class DelugePlugin(object):
+class DelugePlugin:
     """Base class for deluge plugins, contains settings and methods for connecting to a deluge daemon."""
 
     def on_task_start(self, task, config):
@@ -131,7 +126,7 @@ class InputDeluge(DelugePlugin):
 
     def on_task_start(self, task, config):
         config = self.prepare_config(config)
-        super(InputDeluge, self).on_task_start(task, config)
+        super().on_task_start(task, config)
 
     def prepare_config(self, config):
         if isinstance(config, bool):
@@ -142,7 +137,7 @@ class InputDeluge(DelugePlugin):
                 filter['label'] = filter['label'].lower()
             if 'state' in filter:
                 filter['state'] = filter['state'].capitalize()
-        super(InputDeluge, self).prepare_config(config)
+        super().prepare_config(config)
         return config
 
     def on_task_input(self, task, config):
@@ -236,7 +231,7 @@ class OutputDeluge(DelugePlugin):
     def prepare_config(self, config):
         if isinstance(config, bool):
             config = {'enabled': config}
-        super(OutputDeluge, self).prepare_config(config)
+        super().prepare_config(config)
         config.setdefault('enabled', True)
         config.setdefault('action', 'add')
         config.setdefault('path', '')
@@ -490,9 +485,10 @@ class OutputDeluge(DelugePlugin):
         entry['deluge_id'] = torrent_id
 
         if opts.get('move_completed_path'):
-            client.call('core.set_torrent_move_completed', torrent_id, True)
             client.call(
-                'core.set_torrent_move_completed_path', torrent_id, opts['move_completed_path']
+                'core.set_torrent_options',
+                [torrent_id],
+                {'move_completed': True, 'move_completed_path': opts['move_completed_path']},
             )
             log.debug('%s move on complete set to %s', entry['title'], opts['move_completed_path'])
         if opts.get('label'):
@@ -630,7 +626,11 @@ class OutputDeluge(DelugePlugin):
                         1 if f == main_file or f == sub_file and keep_subs else 0
                         for f in status['files']
                     ]
-                    client.call('core.set_torrent_file_priorities', torrent_id, file_priorities)
+                    client.call(
+                        'core.set_torrent_options',
+                        [torrent_id],
+                        {'file_priorities': file_priorities},
+                    )
 
                     if opts.get('hide_sparse_files'):
                         # hide the other sparse files that are not supposed to download but are created anyway

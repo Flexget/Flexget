@@ -1,10 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import json
 import os
-
-import mock
+from unittest import mock
 
 movie_list_file = os.path.join(
     os.path.dirname(__file__), 'couchpotato_movie_list_test_response.json'
@@ -20,7 +16,7 @@ with open(qualities_profiles_file, "r") as data:
     qualities_response = json.load(data)
 
 
-class TestCouchpotato(object):
+class TestCouchpotato:
     config = """
         tasks:
           couch:
@@ -46,7 +42,7 @@ class TestCouchpotato(object):
             )
 
 
-class TestCouchpotatoWithQuality(object):
+class TestCouchpotatoWithQuality:
     expected_qualities = {
         'American Ultra': ['720p', '1080p'],
         'Anomalisa': ['720p', '1080p'],

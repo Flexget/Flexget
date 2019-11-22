@@ -1,13 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
-from collections import MutableMapping
+from collections.abc import MutableMapping
 
 log = logging.getLogger('lazy_lookup')
 
 
-class LazyLookup(object):
+class LazyLookup:
     """
     This class stores the information to do a lazy lookup for a LazyDict. An instance is stored as a placeholder value
     for any key that can be lazily looked up. There should be one instance of this class per LazyDict.

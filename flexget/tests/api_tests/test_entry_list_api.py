@@ -1,17 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
 
 from flexget.api.app import base_message
 from flexget.components.managed_lists.lists.entry_list.api import ObjectsContainer as OC
+from flexget.components.managed_lists.lists.entry_list.db import EntryListEntry, EntryListList
 from flexget.entry import Entry
 from flexget.manager import Session
-from flexget.components.managed_lists.lists.entry_list.db import EntryListList, EntryListEntry
 from flexget.utils import json
 
 
-class TestEntryListAPI(object):
+class TestEntryListAPI:
     config = 'tasks: {}'
 
     def test_entry_list_list(self, api_client, schema_match):
@@ -262,7 +259,7 @@ class TestEntryListAPI(object):
         assert not errors
 
 
-class TestEntryListPagination(object):
+class TestEntryListPagination:
     config = 'tasks: {}'
 
     def test_entry_list_pagination(self, api_client, link_headers):

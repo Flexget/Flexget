@@ -1,7 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-
-import re
 import logging
+import re
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 
@@ -13,7 +11,7 @@ PLUGIN_NAME = 'download_auth'
 log = logging.getLogger(PLUGIN_NAME)
 
 
-class DownloadAuth(object):
+class DownloadAuth:
     host_schema = {
         'additionalProperties': {
             'type': 'object',

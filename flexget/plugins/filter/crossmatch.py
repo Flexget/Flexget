@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
@@ -10,7 +7,7 @@ from flexget.utils.tools import aggregate_inputs
 log = logging.getLogger('crossmatch')
 
 
-class CrossMatch(object):
+class CrossMatch:
     """
     Perform action based on item on current task and other inputs.
 
@@ -34,7 +31,7 @@ class CrossMatch(object):
             'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}},
             'exact': {'type': 'boolean', 'default': True},
             'all_fields': {'type': 'boolean', 'default': False},
-            'case_sensitive': {'type': 'boolean', 'default': True}
+            'case_sensitive': {'type': 'boolean', 'default': True},
         },
         'required': ['fields', 'action', 'from'],
         'additionalProperties': False,
@@ -52,7 +49,13 @@ class CrossMatch(object):
         for entry in task.entries:
             for generated_entry in match_entries:
                 log.trace('checking if %s matches %s', entry['title'], generated_entry['title'])
-                common = self.entry_intersects(entry, generated_entry, fields, config.get('exact'), config.get('case_sensitive'))
+                common = self.entry_intersects(
+                    entry,
+                    generated_entry,
+                    fields,
+                    config.get('exact'),
+                    config.get('case_sensitive'),
+                )
                 if common and (not all_fields or len(common) == len(fields)):
                     msg = 'intersects with %s on field(s) %s' % (
                         generated_entry['title'],

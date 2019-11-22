@@ -1,16 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urlparse, urlsplit, urlunsplit, quote
-from future.moves.urllib.error import URLError
-
+import binascii
 import itertools
 import logging
-import threading
 import socket
 import struct
-import binascii
-from random import randrange
+import threading
 from http.client import BadStatusLine
+from random import randrange
+from urllib.error import URLError
+from urllib.parse import quote, urlparse, urlsplit, urlunsplit
+
 from requests import RequestException
 
 from flexget import plugin
@@ -170,7 +168,7 @@ def get_tracker_seeds(url, info_hash):
         return 0
 
 
-class TorrentAlive(object):
+class TorrentAlive:
     schema = {
         'oneOf': [
             {'type': 'boolean'},

@@ -1,15 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-
-import re
 import copy
+import functools
 import logging
+import re
 
 log = logging.getLogger('utils.qualities')
 
 
-class QualityComponent(object):
+@functools.total_ordering
+class QualityComponent:
     """"""
 
     def __init__(self, type, value, name, regexp=None, modifier=None, defaults=None):
@@ -33,7 +31,7 @@ class QualityComponent(object):
         # compile regexp
         if regexp is None:
             regexp = re.escape(name)
-        self.regexp = re.compile('(?<![^\W_])(' + regexp + ')(?![^\W_])', re.IGNORECASE)
+        self.regexp = re.compile(r'(?<![^\W_])(' + regexp + r')(?![^\W_])', re.IGNORECASE)
 
     def matches(self, text):
         """Test if quality matches to text.
@@ -57,7 +55,7 @@ class QualityComponent(object):
         return bool(self.value)
 
     def __eq__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             other = _registry.get(other)
         if not isinstance(other, QualityComponent):
             raise TypeError('Cannot compare %r and %r' % (self, other))
@@ -66,11 +64,8 @@ class QualityComponent(object):
         else:
             raise TypeError('Cannot compare %s and %s' % (self.type, other.type))
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
     def __lt__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             other = _registry.get(other)
         if not isinstance(other, QualityComponent):
             raise TypeError('Cannot compare %r and %r' % (self, other))
@@ -78,15 +73,6 @@ class QualityComponent(object):
             return self.value < other.value
         else:
             raise TypeError('Cannot compare %s and %s' % (self.type, other.type))
-
-    def __ge__(self, other):
-        return not self.__lt__(other)
-
-    def __le__(self, other):
-        return self.__lt__(other) or self.__eq__(other)
-
-    def __gt__(self, other):
-        return not self.__le__(other)
 
     def __add__(self, other):
         if not isinstance(other, int):
@@ -135,20 +121,20 @@ _sources = [
     QualityComponent('source', 30, 'ts', '(?:hd)?ts|telesync', modifier=-6),
     QualityComponent('source', 40, 'tc', 'tc|telecine', modifier=-5),
     QualityComponent('source', 50, 'r5', 'r[2-8c]', modifier=-4),
-    QualityComponent('source', 60, 'hdrip', 'hd[\W_]?rip', modifier=-3),
-    QualityComponent('source', 70, 'ppvrip', 'ppv[\W_]?rip', modifier=-2),
+    QualityComponent('source', 60, 'hdrip', r'hd[\W_]?rip', modifier=-3),
+    QualityComponent('source', 70, 'ppvrip', r'ppv[\W_]?rip', modifier=-2),
     QualityComponent('source', 80, 'preair', modifier=-1),
-    QualityComponent('source', 90, 'tvrip', 'tv[\W_]?rip'),
-    QualityComponent('source', 100, 'dsr', 'dsr|ds[\W_]?rip'),
-    QualityComponent('source', 110, 'sdtv', '(?:[sp]dtv|dvb)(?:[\W_]?rip)?'),
-    QualityComponent('source', 120, 'dvdscr', '(?:(?:dvd|web)[\W_]?)?scr(?:eener)?', modifier=0),
+    QualityComponent('source', 90, 'tvrip', r'tv[\W_]?rip'),
+    QualityComponent('source', 100, 'dsr', r'dsr|ds[\W_]?rip'),
+    QualityComponent('source', 110, 'sdtv', r'(?:[sp]dtv|dvb)(?:[\W_]?rip)?'),
+    QualityComponent('source', 120, 'dvdscr', r'(?:(?:dvd|web)[\W_]?)?scr(?:eener)?', modifier=0),
     QualityComponent('source', 130, 'bdscr', 'bdscr(?:eener)?'),
-    QualityComponent('source', 140, 'webrip', 'web[\W_]?rip'),
-    QualityComponent('source', 150, 'hdtv', 'a?hdtv(?:[\W_]?rip)?'),
-    QualityComponent('source', 160, 'webdl', 'web(?:[\W_]?(dl|hd))?'),
-    QualityComponent('source', 170, 'dvdrip', 'dvd(?:[\W_]?rip)?'),
+    QualityComponent('source', 140, 'webrip', r'web[\W_]?rip'),
+    QualityComponent('source', 150, 'hdtv', r'a?hdtv(?:[\W_]?rip)?'),
+    QualityComponent('source', 160, 'webdl', r'web(?:[\W_]?(dl|hd))?'),
+    QualityComponent('source', 170, 'dvdrip', r'dvd(?:[\W_]?rip)?'),
     QualityComponent('source', 175, 'remux'),
-    QualityComponent('source', 180, 'bluray', '(?:b[dr][\W_]?rip|blu[\W_]?ray(?:[\W_]?rip)?)'),
+    QualityComponent('source', 180, 'bluray', r'(?:b[dr][\W_]?rip|blu[\W_]?ray(?:[\W_]?rip)?)'),
 ]
 _codecs = [
     QualityComponent('codec', 10, 'divx'),
@@ -158,7 +144,7 @@ _codecs = [
     QualityComponent('codec', 40, 'h265', '[hx].?265|hevc'),
     QualityComponent('codec', 50, '10bit', '10.?bit|hi10p'),
 ]
-channels = '(?:(?:[^\w+]?[1-7][\W_]?(?:0|1|ch)))'
+channels = r'(?:(?:[^\w+]?[1-7][\W_]?(?:0|1|ch)))'
 _audios = [
     QualityComponent('audio', 10, 'mp3'),
     # TODO: No idea what order these should go in or if we need different regexps
@@ -168,7 +154,7 @@ _audios = [
     QualityComponent('audio', 45, 'dd+5.1', 'dd[p+]%s' % channels),
     QualityComponent('audio', 50, 'flac', 'flac%s?' % channels),
     # The DTSs are a bit backwards, but the more specific one needs to be parsed first
-    QualityComponent('audio', 60, 'dtshd', 'dts[\W_]?hd(?:[\W_]?ma)?%s?' % channels),
+    QualityComponent('audio', 60, 'dtshd', r'dts[\W_]?hd(?:[\W_]?ma)?%s?' % channels),
     QualityComponent('audio', 70, 'dts'),
     QualityComponent('audio', 80, 'truehd', 'truehd%s?' % channels),
 ]
@@ -198,7 +184,8 @@ def all_components():
     return iter(_registry.values())
 
 
-class Quality(object):
+@functools.total_ordering
+class Quality:
     """Parses and stores the quality of an entry in the four component categories."""
 
     def __init__(self, text=''):
@@ -268,7 +255,7 @@ class Quality(object):
         return [modifier] + self.components
 
     def __contains__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             other = Quality(other)
         if not other or not self:
             return False
@@ -282,7 +269,7 @@ class Quality(object):
         return any(self._comparator)
 
     def __eq__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             other = Quality(other)
         if not isinstance(other, Quality):
             if other is None:
@@ -290,24 +277,12 @@ class Quality(object):
             raise TypeError('Cannot compare %r and %r' % (self, other))
         return self._comparator == other._comparator
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
     def __lt__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             other = Quality(other)
         if not isinstance(other, Quality):
             raise TypeError('Cannot compare %r and %r' % (self, other))
         return self._comparator < other._comparator
-
-    def __ge__(self, other):
-        return not self.__lt__(other)
-
-    def __le__(self, other):
-        return self.__lt__(other) or self.__eq__(other)
-
-    def __gt__(self, other):
-        return not self.__le__(other)
 
     def __repr__(self):
         return '<Quality(resolution=%s,source=%s,codec=%s,audio=%s)>' % (
@@ -344,7 +319,7 @@ def get(quality_name):
     return result
 
 
-class RequirementComponent(object):
+class RequirementComponent:
     """Represents requirements for a given component type. Can evaluate whether a given QualityComponent
     meets those requirements."""
 
@@ -424,7 +399,7 @@ class RequirementComponent(object):
         )
 
 
-class Requirements(object):
+class Requirements:
     """Represents requirements for allowable qualities. Can determine whether a given Quality passes requirements."""
 
     def __init__(self, req=''):
@@ -479,7 +454,7 @@ class Requirements(object):
         :rtype: bool
         :returns: True if given quality passes all component requirements.
         """
-        if isinstance(qual, basestring):
+        if isinstance(qual, str):
             qual = Quality(qual)
         for r_component, q_component in zip(self.components, qual.components):
             if not r_component.allows(q_component, loose=loose):
@@ -487,7 +462,7 @@ class Requirements(object):
         return True
 
     def __eq__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             other = Requirements(other)
         return self.components == other.components
 
