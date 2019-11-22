@@ -253,6 +253,9 @@ def is_path(instance):
 def is_url(instance):
     if not isinstance(instance, str_types):
         return True
+    # Allow looser validation if this appears to start with jinja
+    if instance.startswith('{{') or instance.startswith('{%'):
+        return True
     regexp = (
         '('
         + '|'.join(['ftp', 'http', 'https', 'file', 'udp', 'socks5h?'])

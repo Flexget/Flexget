@@ -15,8 +15,7 @@ class Parameterize(object):
     schema = {
         'type': 'object',
         'properties': {
-            # TODO: This should really be input plugin validation, but some format validators don't deal well with Jinja
-            'plugin': {'type': 'object'},
+            'plugin': {'$ref': '/schema/plugins?phase=input'},
             'using': {'$ref': '/schema/plugins?phase=input'},
         },
     }
