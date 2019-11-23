@@ -36,7 +36,10 @@ class MetainfoContentSize:
                 )
                 continue
             # Try to parse size from description
-            match = SIZE_RE.search(entry.get('description', ''))
+            match = False
+            description = entry.get('description', '')
+            if isinstance(description, str):
+                match = SIZE_RE.search(description)
             if match:
                 try:
                     amount = float(match.group(1).replace(',', '.'))
