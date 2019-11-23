@@ -30,6 +30,11 @@ class SoupParse(object):
     matching html tag in the data will be a valid section. All keys specified below must be found in each 
     respective section.
 
+    default_value: a string that will be used as the default value for all keys have no matching info.
+    It can contain references to other keys that are listed above it (will not work if that key hasn't been
+    found yet). If default_value is used here AND in a key, the default_value under the key will take precedence.
+    Reference another key by enclosing it in double curly braces.
+
     keys: hold the keys that will be set in the entries.
 
     key:
@@ -37,24 +42,21 @@ class SoupParse(object):
       the search will begin in each of the already found sections. If 'section' is absent from the key, 
       the location specified below will be applied to the section from the 'sections' area of the config.
       
+      default_value: Identical to 'default_value' above. This value will be used, even if a different value is
+      specified in the above area of the config.
+      
       location: Takes a string (either 'text' or 'url') or a dict that contains a key named 'text' or 'url' with 
       an integer as the value. This is used when there are multiple 'text' or 'url' keys in the html tag. 
       It allows you to spcify which match to choose. If the string 'text' or 'url' is used, it defaults to 
-      the first match. If 'location' is absent from the key, it defaults to the first 'text' match.
+      the first match. If 'location' is absent from the key, it defaults to the first 'text' match. If all text
+      matches are wanted (for processing with regepxp), use '0' here.
 
       regexps: a list of dicts that hold regexps. The key is set to the first string that matches
       any of the regexps listed. The regexps are evaluated in the order they are supplied so if a
       string matches the first regexp none of the others in the list will be used.
-      
-      default_value: a string that will be used as the default value for all keys have no matching info.
-      It can contain references to other keys that are listed above it. If default value is used here and
-      in a key, the default_value under the key will take precedence. Reference other key by enclosing in 
-      double curly braces.
 
       required: a boolean that when set to true will only allow entries that contain this key
       onto the next stage. 'url' and 'title' are always required no matter what you do (part of flexget)
-
-      #TODO: consider adding a set field that will allow you to set the field if no regexps match
 
       #TODO: consider a mode field that allows a growing list for a field instead of just setting to
             # first match
@@ -63,7 +65,7 @@ class SoupParse(object):
 
     soup_parse:
       source: http://username:password@ezrss.it/feed/
-      default_value: foofighters
+      default_value: 'fighters of foo'
       sections:
         - body
         - element_name: section
@@ -90,7 +92,7 @@ class SoupParse(object):
             - regexp: '[SMTWF].*?ET'
             - regexp: '[SMTWF].*?\d\d\d\d'
         custom_field1:
-        default_value: 'www.coolsite.com/page/{{title}}/info'
+          default_value: 'www.coolsite.com/page/{{title}}/info'
           section:
             - element_name: span
               attribute_name: class
@@ -99,7 +101,7 @@ class SoupParse(object):
             - regexp: '(?<=stuff_before).*?(?=stuff_after)'
               flags: 'DOTALL,IGNORECASE'
           location:
-            text: 2
+            url: 1
         custom_field2:
           regexps:
             - regexp: 'first custom regexp'
@@ -197,8 +199,8 @@ class SoupParse(object):
                                 {
                                     'type': 'object',
                                     'properties': {
-                                        'text': {'type': 'integer', 'minimum': 1},
-                                        'url': {'type': 'integer', 'minimum': 1},
+                                        'text': {'type': 'integer', 'minimum': 0},
+                                        'url': {'type': 'integer', 'minimum': 0},
                                     },
                                     'additionalProperties': False,
                                     'oneOf': [
@@ -256,8 +258,8 @@ class SoupParse(object):
                 element_tag_list[scope_num][x].find_all(tag_search_terms[scope_num][0], 
                                                         tag_search_terms[scope_num][1])
             )
-            if (eval(tag_search_terms[scope_num][2]) >= eval(tag_search_terms[scope_num][3]) or
-                eval(tag_search_terms[scope_num][2]) >= len(new_tag_list)):
+            if (eval(tag_search_terms[scope_num][2]) >= eval(tag_search_terms[scope_num][3])
+                    or eval(tag_search_terms[scope_num][2]) >= len(new_tag_list)):
                 log.warning(
                     ("The specified start (%s) for scope_limit #%s is the same as or after the specified end (%s)"
                         " or actual end (%s) for match #%s. The start will be set to the beginning, by default.") % (
@@ -359,7 +361,7 @@ class SoupParse(object):
         if re.search(r'.*{{.*?}}.*', default):
             def_key = re.sub(r'.*?{{(.*?)}}.*', r'\1', default)
             try:
-                def_var = entry[def_key]
+                def_var = entry[def_key.strip()]
                 default = re.sub(r'{{.*?}}', def_var, default)
                 return default
             except KeyError:
@@ -375,15 +377,15 @@ class SoupParse(object):
             for entry in queue:
                 if entry['title'] == title:
                     return True
+                
         def not_found(default):
             if default:
                 log.warning("Applying default value.")
                 return default
             else:
                 log.warning("Skipping to next key search.")
-                return False            
-            
-                
+                return False
+
         queue = []
         sec_num = 0
         for section in sections:
@@ -407,21 +409,21 @@ class SoupParse(object):
                     # If no location is specified, assume the wanted value is in the first 'text' area of the tag.
                     location_info = 'text'
                 if scope_limits:
+                    log.verbose('Limiting scope for key: %s' % key)
                     tag_search_terms = self._tag_limiter(config, scope_limits)
                     tag_list = self._get_master_tag_list([[section]], 0, tag_search_terms)
                     if tag_list:
                         tag = tag_list
                     else:
-                        log.warning("The specified 'section' for key: '" + str(key) + 
-                                    "' was not found inside of the its parent tag in section #" + 
-                                    str(sec_num))
+                        log.warning('The specified "section" for key: "%s" was not found inside of its parent tag in 
+                                    section #%s' % (key, str(sec_num)))
                         default = not_found(default)
                         if not default:
                             continue
                         tag = [get_soup('<a href="' + default + '">' + default + '</a>', 'html.parser').find('a')]
                 else:
                     # If the scope isn't limited, get the 'text' or 'url' from the main sections.
-                    tag = section
+                    tag = [section]
                 if isinstance(location_info, str):
                     if location_info == 'text':
                         new_section = tag[0].text.strip()
@@ -430,8 +432,8 @@ class SoupParse(object):
                             new_section = tag[0].find('a')['href']
                             if not new_section.startswith('http://') or not new_section.startswith('https://'):
                                 new_section = parse.urljoin(url, new_section)
-                        except (KeyError, TypeError) as e:
-                            log.warning("No url was found for key: '" + str(key) + "' in section #" +str(sec_num) + ".")
+                        except (KeyError, TypeError):
+                            log.warning('No url was found for key: "%s" in section #%s' % (key, str(sec_num)))
                             new_section = not_found(default)
                             if not new_section:
                                 continue
@@ -443,20 +445,24 @@ class SoupParse(object):
                         loc = loc - 1
                     new_section = ''
                     if location == 'text':
-                        contents_list = [t.text.strip() for t in tag if t.text.strip()]
+                        contents_list = []
+                        for t in tag:
+                            contents_list.extend([x.strip() for x in t.find_all(text=True) if x.strip()])
                         if contents_list:
-                            if len(contents_list) > loc:
+                            if loc == -1:
+                                new_section = '\n'.join(contents_list)
+                            elif len(contents_list) > loc:
                                 new_section = contents_list[loc]
                             else:
-                                log.warning("The specified text location for key: '" + str(key) + 
-                                            "' was out of range in section #" + str(sec_num)                                            )
+                                log.warning('The specified text location for key: "%s" was out of range in section 
+                                            #%s' % (key, str(sec_num)))
                                 new_section = not_found(default)
                                 if not new_section:
                                     continue
 
                         else:
-                            log.warning("There was no text found at any location for key: '" + str(key) + 
-                                        "' in section #")
+                            log.warning('There was no text found at any location for key: "%s" in section #%s' 
+                                        % (key, str(sec_num)))
                             new_section = not_found(default)
                             if not new_section:
                                 continue
@@ -468,17 +474,15 @@ class SoupParse(object):
                             if len(contents_list) > loc:
                                 new_section = contents_list[loc]['href']
                             else:
-                                log.warning("The specified url location for key: '" + str(key) + 
-                                            "' was out of range in section #" + str(sec_num)
-                                            )
+                                log.warning('The specified url location for key: "%s" was out of range in section #%s'
+                                            % (key, str(sec_num)))
                                 new_section = not_found(default)
                                 if not new_section:
                                     continue
 
                         else:
-                            log.warning("There were no urls found at any location for key: '" + str(key) + 
-                                        "' in section #" + str(sec_num)
-                                        )
+                            log.warning('There were no urls found at any location for key: "%s" in section #%s' 
+                                        % (key, str(sec_num)))
                             new_section = not_found(default)
                             if not new_section:
                                 continue
@@ -503,6 +507,9 @@ class SoupParse(object):
                                 log.debug('uniqued title to %s' % value)
                         entry[key] = value
                         break
+                else:
+                    if default:
+                        entry[key] = default
             if self.isvalid(entry):
                 queue.append(entry)
 
