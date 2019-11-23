@@ -3,6 +3,7 @@ import os
 
 from flexget import plugin
 from flexget.event import event
+from flexget.utils.pathscrub import pathscrub
 from flexget.utils.template import RenderError, render_from_entry
 
 log = logging.getLogger('symlink')
@@ -17,6 +18,7 @@ class Symlink:
                 'type': 'object',
                 'properties': {
                     'to': {'type': 'string', 'format': 'path'},
+                    'rename': {'type': 'string'},
                     'existing': {'type': 'string', 'enum': ['ignore', 'fail']},
                     'link_type': {'type': 'string', 'enum': ['soft', 'hard']},
                 },
@@ -26,6 +28,8 @@ class Symlink:
             {'title': 'specify path', 'type': 'string', 'format': 'path'},
         ]
     }
+
+    destination_field = 'link_to'
 
     def prepare_config(self, config):
         if not isinstance(config, dict):
@@ -47,14 +51,41 @@ class Symlink:
                 entry.fail('Does not have location field for symlinking')
                 continue
             lnkfrom = entry['location']
-            name = os.path.basename(lnkfrom)
-            lnkto = os.path.join(config['to'], name)
+            lnkfrom_path, lnkfrom_name = os.path.split(lnkfrom)
+            
+            # get the proper path and name in order of: entry, config, above split
+            lnkto_path = entry.get(self.destination_field, config.get('to', lnkfrom_path))
+            if config.get('rename'):
+                lnkto_name = config['rename']
+            elif entry.get('filename') and entry['filename'] != lnkfrom_name:
+                # entry specifies different filename than what was split from the path
+                # since some inputs fill in filename it must be different in order to be used
+                lnkto_name = entry['filename']
+            else:
+                lnkto_name = lnkfrom_name
+
             try:
-                lnkto = render_from_entry(lnkto, entry)
-            except RenderError as error:
-                log.error('Could not render path: %s', lnkto)
-                entry.fail(str(error))
-                return
+                lnkto_path = entry.render(lnkto_path)
+            except RenderError as err:
+                raise plugin.PluginError(
+                    'Path value replacement `%s` failed: %s' % (lnkto_path, err.args[0])
+                )
+            try:
+                lnkto_name = entry.render(lnkto_name)
+            except RenderError as err:
+                raise plugin.PluginError(
+                    'Filename value replacement `%s` failed: %s' % (lnkto_name, err.args[0])
+                )
+
+            # Clean invalid characters with pathscrub plugin
+            lnkto_path = pathscrub(os.path.expanduser(lnkto_path))
+            lnkto_name = pathscrub(lnkto_name, filename=True)
+
+            # Join path and filename
+            lnkto = os.path.join(lnkto_path, lnkto_name)
+            if lnkto == entry['location']:
+                raise plugin.PluginWarning('source and destination are the same.')
+
             # Hardlinks for dirs will not be failed here
             if os.path.exists(lnkto) and (
                 config['link_type'] == 'soft' or os.path.isfile(lnkfrom)
