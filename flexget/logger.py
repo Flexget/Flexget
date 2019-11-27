@@ -207,6 +207,7 @@ def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
             filename,
             maxBytes=int(os.environ.get(ENV_MAXBYTES, 1000 * 1024)),
             backupCount=int(os.environ.get(ENV_MAXCOUNT, 9)),
+            encoding='utf-8'
         )
         file_handler.setFormatter(formatter)
         file_handler.setLevel(level)
