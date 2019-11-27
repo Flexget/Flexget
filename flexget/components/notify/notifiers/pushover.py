@@ -111,12 +111,15 @@ class PushoverNotifier:
             except RequestException as e:
                 if e.response is not None:
                     if e.response.status_code == 429:
-                        reset_time = datetime.datetime.fromtimestamp(
-                            int(e.response.headers['X-Limit-App-Reset'])
-                        ).strftime('%Y-%m-%d %H:%M:%S')
-                        error_message = (
-                            'Monthly pushover message limit reached. Next reset: %s' % reset_time
-                        )
+                        app_reset = e.response.headers.get('X-Limit-App-Reset')
+                        if app_reset:
+                            reset_time = datetime.datetime.fromtimestamp(int(app_reset)).strftime(
+                                '%Y-%m-%d %H:%M:%S'
+                            )
+                            error_message = (
+                                f'Monthly pushover message limit reached. Next reset: {reset_time}'
+                            )
+
                     else:
                         error_message = e.response.json()['errors'][0]
                 else:
