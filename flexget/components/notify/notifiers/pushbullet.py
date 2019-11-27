@@ -112,13 +112,12 @@ class PushbulletNotifier:
         except RequestException as e:
             if e.response is not None:
                 if e.response.status_code == 429:
-                    reset_time = datetime.datetime.fromtimestamp(
-                        int(e.response.headers['X-Ratelimit-Reset'])
-                    ).strftime('%Y-%m-%d %H:%M:%S')
-                    message = (
-                        'Monthly Pushbullet database operations limit reached. Next reset: %s'
-                        % reset_time
-                    )
+                    reset_time = e.response.headers.get('X-Ratelimit-Reset')
+                    if reset_time:
+                        reset_time = datetime.datetime.fromtimestamp(int(reset_time)).strftime(
+                            '%Y-%m-%d %H:%M:%S'
+                        )
+                        message = f'Monthly Pushbullet database operations limit reached. Next reset: {reset_time}'
                 else:
                     message = e.response.json()['error']['message']
             else:
