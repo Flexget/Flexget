@@ -3,10 +3,10 @@ import os
 
 from flexget import plugin
 from flexget.event import event
+from flexget.utils.pathscrub import pathscrub
 from flexget.utils.template import RenderError, render_from_entry
 
 log = logging.getLogger('symlink')
-
 
 class Symlink:
 
@@ -17,6 +17,7 @@ class Symlink:
                 'type': 'object',
                 'properties': {
                     'to': {'type': 'string', 'format': 'path'},
+                    'rename': {'type': 'string'},
                     'existing': {'type': 'string', 'enum': ['ignore', 'fail']},
                     'link_type': {'type': 'string', 'enum': ['soft', 'hard']},
                 },
@@ -26,6 +27,7 @@ class Symlink:
             {'title': 'specify path', 'type': 'string', 'format': 'path'},
         ]
     }
+
 
     def prepare_config(self, config):
         if not isinstance(config, dict):
@@ -46,37 +48,64 @@ class Symlink:
             if 'location' not in entry:
                 entry.fail('Does not have location field for symlinking')
                 continue
-            lnkfrom = entry['location']
-            name = os.path.basename(lnkfrom)
-            lnkto = os.path.join(config['to'], name)
+            linkfrom = entry['location']
+            linkfrom_path, linkfrom_name = os.path.split(linkfrom)
+            
+            # get the proper path and name in order of: entry, config, above split
+            linkto_path = entry.get('link_to', config.get('to', linkfrom_path))
+            if config.get('rename'):
+                linkto_name = config['rename']
+            elif entry.get('filename') and entry['filename'] != linkfrom_name:
+                # entry specifies different filename than what was split from the path
+                # since some inputs fill in filename it must be different in order to be used
+                linkto_name = entry['filename']
+            else:
+                linkto_name = linkfrom_name
+
             try:
-                lnkto = render_from_entry(lnkto, entry)
-            except RenderError as error:
-                log.error('Could not render path: %s', lnkto)
-                entry.fail(str(error))
-                return
+                linkto_path = entry.render(linkto_path)
+            except RenderError as err:
+                raise plugin.PluginError(
+                    'Path value replacement `%s` failed: %s' % (linkto_path, err.args[0])
+                )
+            try:
+                linkto_name = entry.render(linkto_name)
+            except RenderError as err:
+                raise plugin.PluginError(
+                    'Filename value replacement `%s` failed: %s' % (linkto_name, err.args[0])
+                )
+
+            # Clean invalid characters with pathscrub plugin
+            linkto_path = pathscrub(os.path.expanduser(linkto_path))
+            linkto_name = pathscrub(linkto_name, filename=True)
+
+            # Join path and filename
+            linkto = os.path.join(linkto_path, linkto_name)
+            if linkto == entry['location']:
+                raise plugin.PluginWarning('source and destination are the same.')
+
             # Hardlinks for dirs will not be failed here
-            if os.path.exists(lnkto) and (
-                config['link_type'] == 'soft' or os.path.isfile(lnkfrom)
+            if os.path.exists(linkto) and (
+                config['link_type'] == 'soft' or os.path.isfile(linkfrom)
             ):
-                msg = 'Symlink destination %s already exists' % lnkto
+                msg = 'Symlink destination %s already exists' % linkto
                 if existing == 'ignore':
                     log.verbose(msg)
                 else:
                     entry.fail(msg)
                 continue
-            log.verbose('%slink `%s` to `%s`', config['link_type'], lnkfrom, lnkto)
+            log.verbose('%slink `%s` to `%s`', config['link_type'], linkfrom, linkto)
             try:
                 if config['link_type'] == 'soft':
-                    os.symlink(lnkfrom, lnkto)
+                    os.symlink(linkfrom, linkto)
                 else:
-                    if os.path.isdir(lnkfrom):
-                        self.hard_link_dir(lnkfrom, lnkto, existing)
+                    if os.path.isdir(linkfrom):
+                        self.hard_link_dir(linkfrom, linkto, existing)
                     else:
-                        dirname = os.path.dirname(lnkto)
+                        dirname = os.path.dirname(linkto)
                         if not os.path.exists(dirname):
                             os.makedirs(dirname)
-                        os.link(lnkfrom, lnkto)
+                        os.link(linkfrom, linkto)
             except OSError as e:
                 entry.fail('Failed to create %slink, %s' % (config['link_type'], e))
 
