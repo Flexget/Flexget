@@ -14,7 +14,7 @@ from flexget.event import event
 log = logging.getLogger('json')
 
 
-class Json(object):
+class Json:
     """
     Parse a json file for entries using regular expression.
 
@@ -22,23 +22,25 @@ class Json(object):
 
       files: <path to JSON file(s)>
       encoding: <JSON encoding>
+      get_remnants: <True/False>
       entry:
         - <field>: <corresponding JSON key>
         - <field>
-        - get_remnants
 
     Note: each entry must have at least two fields, 'title' and 'url'. If not specified in the config, 
-    this plugin asssumes that keys named 'title' and 'url' exist within the JSON.
+    this plugin asssumes that keys named 'title' and 'url' exist within the JSON. 'get_remnants' will map
+    all keys in the json file to fields in the entry (provided they have not been manually mapped already).
+    'encoding' defaults to 'utf-8', and 'get_remnants' defaults to 'False', if unspecified. 
 
     Example::
 
       json:
         files: entries.json
         encoding: utf8
+        get_remnants: True
         entry:
           - title: name
           - url: 'web_.*'
-          - get_remnants
           
     """
     
@@ -47,6 +49,7 @@ class Json(object):
         'properties': {
             'files': {'type': 'string'},
             'encoding': {'type': 'string', 'default': 'utf-8'},
+            'get_remnants': {'type': 'boolean', 'default': False},
             'entry': {
                 'type': 'array',
                 'items': {
@@ -79,16 +82,14 @@ class Json(object):
             raise plugin.PluginError('The "files" key is missing "json" in the config file.')
         json_encoding = config['encoding']
         entry_config = config.get('entry')
+        get_remnants = config.get('get_remnants')
         
         fields = {}
-        get_remnants = False
+        
         if config.get('entry'):
             for required_field in config.get('entry'):
                 if isinstance(required_field, str):
-                    if required_field == 'get_remnants':
-                        get_remnants = True
-                    else:
-                        fields[required_field] = re.compile(f"^{required_field}$")
+                    fields[required_field] = re.compile(f"^{required_field}$")
                 else:
                     value = next(iter(required_field))
                     fields[value] = re.compile(f"^{required_field[value]}$")
