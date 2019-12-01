@@ -1,17 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-
-import re
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
+import re
 from unicodedata import normalize
 
 from flexget import plugin
+from flexget.components.sites.utils import torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
-from flexget.components.sites.utils import torrent_availability
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('limetorrents')
@@ -29,7 +25,7 @@ def clean_symbols(text):
     return result
 
 
-class Limetorrents(object):
+class Limetorrents:
     """
         Limetorrents search plugin.
     """

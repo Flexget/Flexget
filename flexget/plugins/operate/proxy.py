@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import os
 
@@ -12,7 +9,7 @@ log = logging.getLogger('proxy')
 PROTOCOLS = ['http', 'https', 'ftp', 'socks5', 'socks5h']
 
 
-class Proxy(object):
+class Proxy:
     """Adds a proxy to the requests session."""
 
     schema = {

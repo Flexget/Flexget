@@ -1,10 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
 
-from flask import request, jsonify
+from flask import jsonify, request
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import empty_response, etag
 from flexget.components.variables.variables import variables_from_db, variables_to_db
 

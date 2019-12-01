@@ -1,13 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from collections import defaultdict
 
-from flexget.event import event
 from flexget import plugin
-from . import seen as plugin_seen
+from flexget.event import event
 
+from . import seen as plugin_seen
 
 log = logging.getLogger(__name__)
 
@@ -56,7 +53,7 @@ class FilterSeenMovies(plugin_seen.FilterSeen):
                     )
                     entry.reject('missing movie (imdb, tmdb or trakt) id, strict')
         # call super
-        super(FilterSeenMovies, self).on_task_filter(task, config.get('scope', True))
+        super().on_task_filter(task, config.get('scope', True))
         # check that two copies of a movie have not been accepted this run
         accepted_ids = defaultdict(set)
         for entry in task.accepted:
@@ -72,7 +69,7 @@ class FilterSeenMovies(plugin_seen.FilterSeen):
         if not isinstance(config, dict):
             config = {'matching': config}
         # call super
-        super(FilterSeenMovies, self).on_task_learn(task, config.get('scope', True))
+        super().on_task_learn(task, config.get('scope', True))
 
 
 @event('plugin.register')

@@ -5,9 +5,6 @@
   We have normalizers in way too many places as is ...
 
 """
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import re
 from unicodedata import normalize
 
@@ -30,9 +27,7 @@ def normalize_scene(text):
     #     abcdefghijklmnopqrstuvwxyz
     #     0123456789-._()
     text = normalize('NFKD', text).encode('ASCII', 'ignore').decode()
-    return re.sub(
-        r'[^a-zA-Z0-9 \-._()]', '', text.replace('...', '')
-    )
+    return re.sub(r'[^a-zA-Z0-9 \-._()]', '', text.replace('...', ''))
 
 
 def torrent_availability(seeds, leeches):

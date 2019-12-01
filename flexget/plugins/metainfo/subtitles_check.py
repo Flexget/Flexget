@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import os
 import logging
+import os
 import tempfile
 
 from flexget import plugin
@@ -11,7 +8,7 @@ from flexget.event import event
 log = logging.getLogger('check_subtitles')
 
 
-class MetainfoSubs(object):
+class MetainfoSubs:
     """
     Set 'subtitles' field for entries, if they are local video files with subs.
     The field is a list of language codes (3-letter ISO-639-3) for each subtitles

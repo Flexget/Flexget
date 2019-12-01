@@ -1,11 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
 
 @pytest.mark.online
-class TestMyEpisodes(object):
+class TestMyEpisodes:
     """Uses test account at MyEpisodes, username and password are 'flexget'"""
 
     config = """

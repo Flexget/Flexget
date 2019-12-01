@@ -1,11 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
 import os
 import xml.etree.ElementTree as ET
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import plugin
+from flexget.event import event
 
 try:
     # NOTE: Importing other plugins is discouraged!
@@ -13,12 +11,11 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='imdb')
 
-from flexget.event import event
 
 log = logging.getLogger('nfo_lookup')
 
 
-class NfoLookup(object):
+class NfoLookup:
     """
     Retrieves information from a local '.nfo' info file.
 
@@ -134,7 +131,7 @@ class BadXmlFile(Exception):
     pass
 
 
-class NfoReader(object):
+class NfoReader:
     """
     Class in charge of parsing the '.nfo' file and getting a dictionary of fields.
 

@@ -1,17 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
+
 from . import db
 
 log = logging.getLogger('pending_approval')
 
 
-class PendingApproval(object):
+class PendingApproval:
     schema = {
         'type': 'boolean',
         'deprecated': 'pending_approval is deprecated, switch to using pending_list',

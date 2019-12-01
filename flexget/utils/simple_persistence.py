@@ -6,23 +6,20 @@ Avoid using this module on your own or in plugins, this was originally made for 
 You can safely use task.simple_persistence and manager.persist, if we implement something better we
 can replace underlying mechanism in single point (and provide transparent switch).
 """
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.types.newstr import newstr
-
 import logging
 import pickle
-from collections import MutableMapping, defaultdict
+from collections import defaultdict
+from collections.abc import MutableMapping
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime, Unicode, select, Index
+from sqlalchemy import Column, DateTime, Index, Integer, String, Unicode, select
 
 from flexget import db_schema
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import json
 from flexget.utils.database import json_synonym
-from flexget.utils.sqlalchemy_utils import table_schema, create_index, table_add_column
+from flexget.utils.sqlalchemy_utils import create_index, table_add_column, table_schema
 
 log = logging.getLogger('util.simple_persistence')
 Base = db_schema.versioned_base('simple_persistence', 4)
@@ -193,7 +190,7 @@ class SimplePersistence(MutableMapping):
                         query.delete()
                     else:
                         updated = query.update(
-                            {'value': newstr(json.dumps(value, encode_datetime=True))},
+                            {'value': json.dumps(value, encode_datetime=True)},
                             synchronize_session=False,
                         )
                         if not updated:

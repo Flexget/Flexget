@@ -1,16 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import json
-
-from mock import patch
+from unittest.mock import patch
 
 from flexget.api.app import base_message
 from flexget.api.core.tasks import ObjectsContainer as OC
 from flexget.manager import Manager
 
 
-class TestTaskAPI(object):
+class TestTaskAPI:
     config = """
         tasks:
           test:
@@ -196,7 +192,7 @@ class TestTaskAPI(object):
         assert not errors
 
 
-class TestTaskQueue(object):
+class TestTaskQueue:
     config = """
             tasks:
               test_task:
@@ -252,7 +248,7 @@ class TestTaskQueue(object):
         assert data == []
 
 
-class TestDisabledTasks(object):
+class TestDisabledTasks:
     config = """
         tasks:
           live_task:

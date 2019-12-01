@@ -1,12 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-from flexget.manager import Session
 from flexget.components.variables.variables import Variables
+from flexget.manager import Session
 from flexget.utils import json
 
 
-class TestVariablesAPI(object):
+class TestVariablesAPI:
     config = 'tasks: {}'
 
     variables_dict = {'test_variable_db': True}

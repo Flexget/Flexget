@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, Unicode, DateTime
+from sqlalchemy import Column, DateTime, Integer, String, Unicode
 
 from flexget.manager import Base
 

@@ -1,19 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
 import re
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
+
 from . import db
 
 log = logging.getLogger('archive')
 
 
-class Archive(object):
+class Archive:
     """
     Archives all new items into database where they can be later searched and injected.
     Stores the entries in the state as they are at the exit phase, this way task cleanup for title
@@ -89,7 +87,7 @@ class Archive(object):
             self.on_task_learn(task, config)
 
 
-class UrlrewriteArchive(object):
+class UrlrewriteArchive:
     """
     Provides capability to rewrite urls from archive or make searches with discover.
     """

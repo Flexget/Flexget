@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import codecs
 import collections
 import contextlib
 import logging
 import logging.handlers
+import os
 import sys
 import threading
 import uuid
 import warnings
-import os
 
 from flexget import __version__
 from flexget.utils.tools import io_encoding
@@ -210,6 +207,7 @@ def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
             filename,
             maxBytes=int(os.environ.get(ENV_MAXBYTES, 1000 * 1024)),
             backupCount=int(os.environ.get(ENV_MAXCOUNT, 9)),
+            encoding='utf-8'
         )
         file_handler.setFormatter(formatter)
         file_handler.setLevel(level)

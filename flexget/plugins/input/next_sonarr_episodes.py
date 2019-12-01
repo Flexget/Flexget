@@ -1,20 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urlparse
-
 import logging
 import math
+from urllib.parse import urlparse
 
 from requests import RequestException
 
 from flexget import plugin
-from flexget.event import event
 from flexget.entry import Entry
+from flexget.event import event
 
 log = logging.getLogger('next_sonarr_episodes')
 
 
-class NextSonarrEpisodes(object):
+class NextSonarrEpisodes:
     """
     This plugin return the 1st missing episode of every show configures in Sonarr.
     This can be used with the discover plugin or set_series_begin plugin to

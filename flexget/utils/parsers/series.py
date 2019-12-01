@@ -1,7 +1,3 @@
-from __future__ import absolute_import, division, unicode_literals
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import cmp
-
 import logging
 import re
 from datetime import datetime, timedelta
@@ -689,13 +685,3 @@ class SeriesParser(TitleParser):
                 valid,
             )
         )
-
-    def __cmp__(self, other):
-        """Compares quality of parsers, if quality is equal, compares proper_count."""
-        return cmp(
-            (self.quality, self.episodes, self.proper_count),
-            (other.quality, other.episodes, other.proper_count),
-        )
-
-    def __eq__(self, other):
-        return self is other

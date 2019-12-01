@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import fileinput
 import io
 import os
@@ -129,7 +127,19 @@ def autoformat(files):
 
     # black and isort config are in pyproject.toml
     subprocess.call(('black',) + files)
-    subprocess.call(('isort', '--virtual-env', venv_path, '-rc') + files)
+    subprocess.call(
+        (
+            'isort',
+            '--virtual-env',
+            venv_path,
+            '-rc',
+            '--skip',
+            'flexget/__init__.py',
+            '--skip',
+            'flexget/manager.py',
+        )
+        + files
+    )
 
 
 if __name__ == '__main__':

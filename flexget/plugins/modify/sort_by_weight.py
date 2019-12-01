@@ -1,14 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
+import logging
 from datetime import datetime, timedelta
 
-import logging
-
-from flexget.utils.tools import parse_timedelta
-from flexget.utils.qualities import Quality
 from flexget import plugin
 from flexget.event import event
+from flexget.utils.qualities import Quality
+from flexget.utils.tools import parse_timedelta
 
 __author__ = 'andy'
 
@@ -16,11 +12,11 @@ log = logging.getLogger('sort_by_weight')
 
 ENTRY_WEIGHT_FIELD_NAME = 'sort_by_weight_sum'
 DEFAULT_STRIDE = (
-    10
-)  # its a design choice to allow 'similar' values to-be grouped under the same slot/weight
+    10  # its a design choice to allow 'similar' values to-be grouped under the same slot/weight
+)
 
 
-class PluginSortByWeight(object):
+class PluginSortByWeight:
     """
     Sort task entries based on multiple fields using a sort weight per field.
     Result per entry is stored in 'sort_by_weight_sum'.

@@ -1,23 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 from datetime import datetime, timedelta
 
 from dateutil import parser
-from future.utils import native
 from requests.exceptions import RequestException
 from sqlalchemy import (
     Column,
-    Integer,
-    Float,
     DateTime,
-    String,
-    Unicode,
+    Float,
     ForeignKey,
+    Integer,
+    String,
     Table,
-    or_,
+    Unicode,
     and_,
+    or_,
 )
 from sqlalchemy.orm import relation
 from sqlalchemy.orm.exc import MultipleResultsFound
@@ -25,7 +21,7 @@ from sqlalchemy.orm.exc import MultipleResultsFound
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.utils import requests
-from flexget.utils.database import with_session, json_synonym
+from flexget.utils.database import json_synonym, with_session
 from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('api_tvmaze')
@@ -438,12 +434,12 @@ def prepare_lookup_for_tvmaze(**lookup_params):
         'trakt_series_tvrage_id'
     )
     prepared_params['imdb_id'] = lookup_params.get('imdb_id')
-    prepared_params['show_name'] = native(title) if title else None
+    prepared_params['show_name'] = title or None
 
     return prepared_params
 
 
-class APITVMaze(object):
+class APITVMaze:
     @staticmethod
     @with_session
     def series_lookup(session=None, only_cached=False, **lookup_params):

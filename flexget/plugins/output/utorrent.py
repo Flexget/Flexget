@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import os
 from logging import getLogger
 
@@ -13,7 +10,7 @@ from flexget.utils.template import RenderError
 log = getLogger('utorrent')
 
 
-class PluginUtorrent(object):
+class PluginUtorrent:
     """
     Parse task content or url for hoster links and adds them to utorrent.
 

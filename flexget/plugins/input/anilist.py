@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import plugin
@@ -20,8 +17,10 @@ ANIME_FORMAT = ['tv', 'tv_short', 'movie', 'special', 'ova', 'ona', 'all']
 
 TRAILER_SOURCE = {
     'youtube': 'https://www.youtube.com/embed/',
-    'dailymotion': 'https://www.dailymotion.com/embed/video/'
-    }
+    'dailymotion': 'https://www.dailymotion.com/embed/video/',
+}
+
+
 class AniList(object):
     """" Creates entries for series and movies from your AniList list
 
@@ -57,7 +56,7 @@ class AniList(object):
                     ),
                     'format': one_or_more(
                         {'type': 'string', 'enum': ANIME_FORMAT}, unique_items=True
-                    )
+                    ),
                 },
                 'required': ['username'],
                 'additionalProperties': False,
@@ -67,11 +66,12 @@ class AniList(object):
 
     @cached('anilist', persist='2 hours')
     def on_task_input(self, task, config):
-        entries = []
         if isinstance(config, str):
             config = {'username': config}
         selected_list_status = config['status'] if 'status' in config else ['current', 'planning']
-        selected_release_status = config['release_status'] if 'release_status' in config else ['all']
+        selected_release_status = (
+            config['release_status'] if 'release_status' in config else ['all']
+        )
         selected_formats = config['format'] if 'format' in config else ['all']
 
         if not isinstance(selected_list_status, list):
@@ -83,66 +83,76 @@ class AniList(object):
         if not isinstance(selected_formats, list):
             selected_formats = [selected_formats]
 
-        log.debug('selected_list_status: %s' % selected_list_status)
-        log.debug('selected_release_status: %s' % selected_release_status)
-        log.debug('selected_formats: %s' % selected_formats)
+        log.debug('Selected List Status: %s' % selected_list_status)
+        log.debug('Selected Release Status: %s' % selected_release_status)
+        log.debug('Selected Formats: %s' % selected_formats)
 
-        req_query = ('fragment aniList on MediaList{ media{ status, title{ romaji, english }, synonyms, siteUrl, '
-                    'idMal, format, episodes, trailer{ site, id }, coverImage{ large }, bannerImage, genres, '
-                    'tags{ name }, externalLinks{ site, url }}} query ($user: String){')
         req_variables = {'user': config['username']}
-
-        for s in selected_list_status:
-            req_query += ('%s: Page {mediaList(userName: $user, type: ANIME, status: %s) {...aniList}}' % (
-                s.capitalize(), s.upper()))
-        req_query += '}'
-
-        try:
-            list_response = task.requests.post(
-                'https://graphql.anilist.co', json={'query': req_query, 'variables': req_variables}
+        req_chunk = 1
+        req_fields = (
+            'status, title{ romaji, english }, synonyms, siteUrl, idMal, format, episodes, '
+            'trailer{ site, id }, coverImage{ large }, bannerImage, genres, tags{ name }, '
+            'externalLinks{ site, url }'
+        )
+        while req_chunk:
+            req_query = (
+                'query ($user: String){collection: MediaListCollection(userName: $user, type: ANIME, '
+                'perChunk: 500, chunk: %s, status_in: [%s]){ hasNextChunk, statuses: lists { list: entries { '
+                'anime: media { %s }}}}}'
+                % (req_chunk, ', '.join([s.upper() for s in selected_list_status]), req_fields)
             )
-        except RequestException as e:
-            raise plugin.PluginError('Error reading list - {url}'.format(url=e))
 
-        try:
-            list_json = list_response.json()['data']
-        except ValueError:
-            raise plugin.PluginError('Invalid JSON response')
+            try:
+                list_response = task.requests.post(
+                    'https://graphql.anilist.co',
+                    json={'query': req_query, 'variables': req_variables},
+                )
+            except RequestException as e:
+                raise plugin.PluginError('Error reading list - {url}'.format(url=e))
 
-        log.debug('JSON output: %s' % list_json)
-        for list_status in list_json:
-            for anime in list_json[list_status]['mediaList']:
-                anime = anime['media']
-                has_selected_release_status = (
-                    anime['status'].lower() in selected_release_status
-                    or 'all' in selected_release_status
-                )
-                has_selected_type = (
-                    anime['format'].lower() in selected_formats
-                    or 'all' in selected_formats
-                )
-                if has_selected_type and has_selected_release_status:
-                    entries.append(
-                        Entry(
-                            title = anime['title']['romaji'],
-                            alternate_name = [anime['title']['english']] + anime['synonyms'],
-                            url = anime['siteUrl'],
-                            al_release_status = anime['status'].capitalize(),
-                            al_list_status = list_status,
-                            al_idMal = anime['idMal'],
-                            al_format = anime['format'],
-                            al_episodes = anime['episodes'],
-                            al_trailer = (TRAILER_SOURCE[anime['trailer']['site']]
-                                + anime['trailer']['id'] if anime['trailer'] else ''),
-                            al_cover = anime['coverImage']['large'],
-                            al_banner = anime['bannerImage'],
-                            al_genres = anime['genres'],
-                            al_tags = [t['name'] for t in anime['tags']],
-                            al_title = anime['title'],
-                            al_links = anime['externalLinks']
+            try:
+                list_response = list_response.json()['data']
+                log.debug('JSON output: %s' % list_response)
+                for list_status in list_response['collection']['statuses']:
+                    for anime in list_status['list']:
+                        anime = anime['anime']
+                        has_selected_release_status = (
+                            anime['status'].lower() in selected_release_status
+                            or 'all' in selected_release_status
                         )
-                    )
-        return entries
+                        has_selected_type = (
+                            anime['format'].lower() in selected_formats
+                            or 'all' in selected_formats
+                        )
+                        if has_selected_type and has_selected_release_status:
+                            entry = Entry()
+                            entry['title'] = anime['title']['romaji']
+                            entry['al_title'] = anime['title']
+                            entry['al_format'] = anime['format']
+                            entry['al_release_status'] = anime['status'].capitalize()
+                            entry['al_list_status'] = list_status
+                            entry['alternate_name'] = [anime['title']['english']] + anime[
+                                'synonyms'
+                            ]
+                            entry['url'] = anime['siteUrl']
+                            entry['al_idMal'] = anime['idMal']
+                            entry['al_episodes'] = anime['episodes']
+                            entry['al_trailer'] = (
+                                TRAILER_SOURCE[anime['trailer']['site']] + anime['trailer']['id']
+                                if anime['trailer']
+                                else ''
+                            )
+                            entry['al_cover'] = anime['coverImage']['large']
+                            entry['al_banner'] = anime['bannerImage']
+                            entry['al_genres'] = anime['genres']
+                            entry['al_tags'] = [t['name'] for t in anime['tags']]
+                            entry['al_links'] = anime['externalLinks']
+                            if entry.isvalid():
+                                yield entry
+                req_chunk = req_chunk + 1 if list_response['collection']['hasNextChunk'] else False
+
+            except ValueError:
+                raise plugin.PluginError('Invalid JSON response')
 
 
 @event('plugin.register')

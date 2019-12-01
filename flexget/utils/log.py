@@ -1,18 +1,15 @@
 """Logging utilities"""
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import hashlib
+import logging
 from datetime import datetime, timedelta
 
-from sqlalchemy import Column, Integer, String, DateTime, Index
+from sqlalchemy import Column, DateTime, Index, Integer, String
 
-from flexget.utils.database import with_session
 from flexget import db_schema
 from flexget import logger as f_logger
-from flexget.utils.sqlalchemy_utils import table_schema
 from flexget.event import event
+from flexget.utils.database import with_session
+from flexget.utils.sqlalchemy_utils import table_schema
 
 log = logging.getLogger('util.log')
 Base = db_schema.versioned_base('log_once', 0)

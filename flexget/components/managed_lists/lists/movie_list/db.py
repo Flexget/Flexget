@@ -1,10 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime
 
-from sqlalchemy import Column, Unicode, Integer, ForeignKey, func, DateTime
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, Unicode, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
 
@@ -22,7 +19,7 @@ log = logging.getLogger('movie_list')
 Base = versioned_base('movie_list', 0)
 
 
-class MovieListBase(object):
+class MovieListBase:
     """
     Class that contains helper methods for movie list as well as plugins that use it,
     such as API and CLI.

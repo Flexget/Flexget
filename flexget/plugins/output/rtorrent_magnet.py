@@ -1,9 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
-import re
 import os
+import re
 
 from flexget import plugin
 from flexget.event import event
@@ -12,7 +9,7 @@ log = logging.getLogger('rtorrent_magnet')
 pat = re.compile('xt=urn:btih:([^&/]+)')
 
 
-class PluginRtorrentMagnet(object):
+class PluginRtorrentMagnet:
     """
     Process Magnet URI's into rtorrent compatible torrent files
 

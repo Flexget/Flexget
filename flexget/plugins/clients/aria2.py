@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import os
 import xmlrpc.client
@@ -13,7 +10,7 @@ from flexget.utils.template import RenderError
 log = logging.getLogger('aria2')
 
 
-class OutputAria2(object):
+class OutputAria2:
     """
     Simple Aria2 output
 

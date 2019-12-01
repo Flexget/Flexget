@@ -1,8 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-
-class TestCondition(object):
+class TestCondition:
     config = """
         templates:
           global:
@@ -68,7 +64,7 @@ class TestCondition(object):
         assert len(task.accepted) == 1
 
 
-class TestQualityCondition(object):
+class TestQualityCondition:
     config = """
         templates:
           global:

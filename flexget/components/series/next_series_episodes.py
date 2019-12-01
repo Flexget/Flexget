@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
 import re
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from sqlalchemy import desc
 
@@ -16,7 +13,7 @@ from . import db
 log = logging.getLogger('next_series_episodes')
 
 
-class NextSeriesEpisodes(object):
+class NextSeriesEpisodes:
     """
     Emit next episode number from all series configured in this task.
 

@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import os
 import glob
+import os
 
 import pytest
 
@@ -10,8 +7,7 @@ from flexget import plugin, plugins
 from flexget.event import event, fire_event
 
 
-@pytest.mark.chdir
-class TestPluginApi(object):
+class TestPluginApi:
     """
     Contains plugin api related tests
     """
@@ -43,13 +39,13 @@ class TestPluginApi(object):
         # assert len(plugin.plugins) >= len(plugin_modules) - 1, "Less plugins than plugin modules"
 
     def test_register_by_class(self, execute_task):
-        class TestPlugin(object):
+        class TestPlugin:
             pass
 
-        class Oneword(object):
+        class Oneword:
             pass
 
-        class TestHTML(object):
+        class TestHTML:
             pass
 
         assert 'test_plugin' not in plugin.plugins
@@ -67,7 +63,7 @@ class TestPluginApi(object):
         assert 'test_html' in plugin.plugins
 
 
-class TestExternalPluginLoading(object):
+class TestExternalPluginLoading:
     _config = """
         tasks:
           ext_plugin:

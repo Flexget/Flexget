@@ -1,15 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import datetime
 import logging
+
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from flexget.utils.requests import Session as RequestSession, TimedLimiter
-from requests.exceptions import RequestException
+from flexget.utils.requests import Session as RequestSession
+from flexget.utils.requests import TimedLimiter
 
 plugin_name = 'pushover'
 log = logging.getLogger(plugin_name)
@@ -20,7 +19,7 @@ requests = RequestSession(max_retries=3)
 requests.add_domain_limiter(TimedLimiter('pushover.net', '5 seconds'))
 
 
-class PushoverNotifier(object):
+class PushoverNotifier:
     """
     Example::
 
@@ -112,12 +111,15 @@ class PushoverNotifier(object):
             except RequestException as e:
                 if e.response is not None:
                     if e.response.status_code == 429:
-                        reset_time = datetime.datetime.fromtimestamp(
-                            int(e.response.headers['X-Limit-App-Reset'])
-                        ).strftime('%Y-%m-%d %H:%M:%S')
-                        error_message = (
-                            'Monthly pushover message limit reached. Next reset: %s' % reset_time
-                        )
+                        app_reset = e.response.headers.get('X-Limit-App-Reset')
+                        if app_reset:
+                            reset_time = datetime.datetime.fromtimestamp(int(app_reset)).strftime(
+                                '%Y-%m-%d %H:%M:%S'
+                            )
+                            error_message = (
+                                f'Monthly pushover message limit reached. Next reset: {reset_time}'
+                            )
+
                     else:
                         error_message = e.response.json()['errors'][0]
                 else:

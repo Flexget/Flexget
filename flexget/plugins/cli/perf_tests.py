@@ -1,12 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
 from flexget import options
 from flexget.event import event
-from flexget.terminal import console
 from flexget.manager import Session
+from flexget.terminal import console
 
 log = logging.getLogger('perftests')
 
@@ -29,7 +26,7 @@ def imdb_query(session):
     import time
 
     # NOTE: importing other plugins directly is discouraged
-    from flexget.components.imdb.utils_lookup import Movie
+    from flexget.components.imdb.db import Movie
     from flexget.plugins.cli.performance import log_query_count
     from sqlalchemy.sql.expression import select
     from progressbar import ProgressBar, Percentage, Bar, ETA

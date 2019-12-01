@@ -1,15 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import text_to_native_str
-
+import getpass
 import logging
 import smtplib
 import socket
-import getpass
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
-from smtplib import SMTPAuthenticationError, SMTPServerDisconnected, SMTPSenderRefused
+from smtplib import SMTPAuthenticationError, SMTPSenderRefused, SMTPServerDisconnected
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -20,7 +16,7 @@ plugin_name = 'email'
 log = logging.getLogger(plugin_name)
 
 
-class EmailNotifier(object):
+class EmailNotifier:
     """
     Send an e-mail with the list of all succeeded (downloaded) entries.
 
@@ -125,9 +121,7 @@ class EmailNotifier(object):
             if self.username:
                 # Forcing to use `str` type
                 log.debug('logging in to smtp server using username: %s', self.username)
-                self.mail_server.login(
-                    text_to_native_str(self.username), text_to_native_str(self.password)
-                )
+                self.mail_server.login(self.username, self.password)
         except (IOError, SMTPAuthenticationError) as e:
             raise PluginWarning(str(e))
 

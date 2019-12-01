@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import mimetypes
 
@@ -13,7 +10,7 @@ log = logging.getLogger('nzb_size')
 mimetypes.add_type('application/x-nzb', '.nzb')
 
 
-class NzbSize(object):
+class NzbSize:
     """
     Provides entry size information when dealing with nzb files
     """

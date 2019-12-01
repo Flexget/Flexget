@@ -1,14 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import hashlib
 import io
 import os
 
 import requests
+
 from flexget.utils.tools import log
 
 
+# TODO refactor this to use lru_cache
 def cached_resource(url, base_dir, force=False, max_size=250, directory='cached_resources'):
     """
     Caches a remote resource to local filesystem. Return a tuple of local file name and mime type, use primarily

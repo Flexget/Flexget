@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import sys
 
@@ -11,7 +8,7 @@ log = logging.getLogger('change')
 found_deprecated = False
 
 
-class ChangeWarn(object):
+class ChangeWarn:
     """
         Gives warning if user has deprecated / changed configuration in the root level.
 

@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import re
 
@@ -10,7 +7,7 @@ from flexget.event import event
 log = logging.getLogger('modify_torrents')
 
 
-class AddTrackers(object):
+class AddTrackers:
     """
         Adds tracker URL to torrent files.
 
@@ -36,7 +33,7 @@ class AddTrackers(object):
                 entry['url'] += ''.join(['&tr=' + url for url in config])
 
 
-class RemoveTrackers(object):
+class RemoveTrackers:
     """
         Removes trackers from torrent files using regexp matching.
 
@@ -70,7 +67,7 @@ class RemoveTrackers(object):
                     entry['url'] = re.sub(tr_search, '', entry['url'], re.IGNORECASE | re.UNICODE)
 
 
-class ModifyTrackers(object):
+class ModifyTrackers:
     """
     Modify tracker URL to torrent files.
 

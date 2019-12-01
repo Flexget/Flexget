@@ -1,16 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import base64
 import datetime
+import logging
+
+from requests.exceptions import RequestException
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 from flexget.plugin import PluginWarning
-from flexget.utils.requests import Session as RequestSession, TimedLimiter
-from requests.exceptions import RequestException
+from flexget.utils.requests import Session as RequestSession
+from flexget.utils.requests import TimedLimiter
 
 plugin_name = 'pushbullet'
 log = logging.getLogger(plugin_name)
@@ -21,7 +20,7 @@ requests = RequestSession(max_retries=3)
 requests.add_domain_limiter(TimedLimiter('pushbullet.com', '5 seconds'))
 
 
-class PushbulletNotifier(object):
+class PushbulletNotifier:
     """
     Example::
 
@@ -113,13 +112,12 @@ class PushbulletNotifier(object):
         except RequestException as e:
             if e.response is not None:
                 if e.response.status_code == 429:
-                    reset_time = datetime.datetime.fromtimestamp(
-                        int(e.response.headers['X-Ratelimit-Reset'])
-                    ).strftime('%Y-%m-%d %H:%M:%S')
-                    message = (
-                        'Monthly Pushbullet database operations limit reached. Next reset: %s'
-                        % reset_time
-                    )
+                    reset_time = e.response.headers.get('X-Ratelimit-Reset')
+                    if reset_time:
+                        reset_time = datetime.datetime.fromtimestamp(int(reset_time)).strftime(
+                            '%Y-%m-%d %H:%M:%S'
+                        )
+                        message = f'Monthly Pushbullet database operations limit reached. Next reset: {reset_time}'
                 else:
                     message = e.response.json()['error']['message']
             else:

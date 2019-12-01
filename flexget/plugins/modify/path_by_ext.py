@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import mimetypes
 
@@ -10,7 +7,7 @@ from flexget.event import event
 log = logging.getLogger('path_by_ext')
 
 
-class PluginPathByExt(object):
+class PluginPathByExt:
     """
         Allows specifying path based on content-type
 

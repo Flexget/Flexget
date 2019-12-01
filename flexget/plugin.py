@@ -1,23 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.error import HTTPError, URLError
-from future.utils import python_2_unicode_compatible
-
 import logging
 import os
 import re
 import time
-import pkg_resources
 from functools import total_ordering
 from http.client import BadStatusLine
 from importlib import import_module
+from pathlib import Path
+from urllib.error import HTTPError, URLError
 
-from path import Path
+import pkg_resources
 from requests import RequestException
 
-from flexget import plugins as plugins_pkg
 from flexget import components as components_pkg
 from flexget import config_schema
+from flexget import plugins as plugins_pkg
 from flexget.event import add_event_handler as add_phase_handler
 from flexget.event import fire_event, remove_event_handlers
 
@@ -28,7 +24,6 @@ PRIORITY_LAST = -255
 PRIORITY_FIRST = 255
 
 
-@python_2_unicode_compatible
 class DependencyError(Exception):
     """Plugin depends on other plugin, but it cannot be loaded.
 
@@ -41,7 +36,7 @@ class DependencyError(Exception):
     """
 
     def __init__(self, issued_by=None, missing=None, message=None, silent=False):
-        super(DependencyError, self).__init__()
+        super().__init__()
         self.issued_by = issued_by
         self.missing = missing
         self._message = message
@@ -72,17 +67,16 @@ class DependencyError(Exception):
 
 class RegisterException(Exception):
     def __init__(self, value):
-        super(RegisterException, self).__init__()
+        super().__init__()
         self.value = value
 
     def __str__(self):
         return repr(self.value)
 
 
-@python_2_unicode_compatible
 class PluginWarning(Warning):
     def __init__(self, value, logger=log, **kwargs):
-        super(PluginWarning, self).__init__()
+        super().__init__()
         self.value = value
         self.log = logger
         self.kwargs = kwargs
@@ -91,10 +85,9 @@ class PluginWarning(Warning):
         return self.value
 
 
-@python_2_unicode_compatible
 class PluginError(Exception):
     def __init__(self, value, logger=log, **kwargs):
-        super(PluginError, self).__init__()
+        super().__init__()
         # Value is expected to be a string
         if not isinstance(value, str):
             value = str(value)
@@ -107,7 +100,7 @@ class PluginError(Exception):
 
 
 # TODO: move to utils or somewhere more appropriate
-class internet(object):
+class internet:
     """@internet decorator for plugin phase methods.
 
     Catches all internet related exceptions and raises PluginError with relevant message.
@@ -384,10 +377,6 @@ class PluginInfo(dict):
 register = PluginInfo
 
 
-def _strip_trailing_sep(path):
-    return path.rstrip("\\/")
-
-
 def _get_standard_plugins_path():
     """
     :returns: List of directories where traditional plugins should be tried to load from.
@@ -466,14 +455,14 @@ def _load_plugins_from_dirs(dirs):
     log.debug('Trying to load plugins from: %s', dirs)
     dirs = [Path(d) for d in dirs if os.path.isdir(d)]
     # add all dirs to plugins_pkg load path so that imports work properly from any of the plugin dirs
-    plugins_pkg.__path__ = list(map(_strip_trailing_sep, dirs))
+    plugins_pkg.__path__ = [str(d) for d in dirs]
     for plugins_dir in dirs:
-        for plugin_path in plugins_dir.walkfiles('*.py'):
+        for plugin_path in plugins_dir.glob('**/*.py'):
             if plugin_path.name == '__init__.py':
                 continue
             # Split the relative path from the plugins dir to current file's parent dir to find subpackage names
             plugin_subpackages = [
-                _f for _f in plugin_path.relpath(plugins_dir).parent.splitall() if _f
+                _f for _f in plugin_path.relative_to(plugins_dir).parent.parts if _f
             ]
             module_name = '.'.join(
                 [plugins_pkg.__name__] + plugin_subpackages + [plugin_path.stem]
@@ -490,12 +479,12 @@ def _load_components_from_dirs(dirs):
     log.debug('Trying to load components from: %s', dirs)
     dirs = [Path(d) for d in dirs if os.path.isdir(d)]
     for component_dir in dirs:
-        for component_path in component_dir.walkfiles('*.py'):
+        for component_path in component_dir.glob('**/*.py'):
             if component_path.name == '__init__.py':
                 continue
             # Split the relative path from the plugins dir to current file's parent dir to find subpackage names
             plugin_subpackages = [
-                _f for _f in component_path.relpath(component_dir).parent.splitall() if _f
+                _f for _f in component_path.relative_to(component_dir).parent.parts if _f
             ]
             package_name = '.'.join(
                 [components_pkg.__name__] + plugin_subpackages + [component_path.stem]

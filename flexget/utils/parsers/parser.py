@@ -1,10 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import re
 
 
-class TitleParser(object):
+class TitleParser:
     propers = ['proper', 'repack', 'rerip', 'real', 'final']
 
     specials = ['special', 'bonus', 'extra', 'omake', 'ova']

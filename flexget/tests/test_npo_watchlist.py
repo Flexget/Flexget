@@ -1,17 +1,9 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import PY3
-
-import mock
 import pytest
-
-from flexget.manager import Session
-from flexget.plugins.input.npo_watchlist import NPOWatchlist
 
 
 @pytest.mark.online
-class TestNpoWatchlistInfo(object):
+class TestNpoWatchlistInfo:
     config = """
         tasks:
           test:
@@ -76,7 +68,7 @@ class TestNpoWatchlistInfo(object):
 
 
 @pytest.mark.online
-class TestNpoWatchlistPremium(object):
+class TestNpoWatchlistPremium:
     config = """
         tasks:
           test:
@@ -101,7 +93,7 @@ class TestNpoWatchlistPremium(object):
 
 
 @pytest.mark.online
-class TestNpoWatchlistLanguageTheTVDBLookup(object):
+class TestNpoWatchlistLanguageTheTVDBLookup:
     config = """
         tasks:
           test:

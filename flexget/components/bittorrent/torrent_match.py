@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import os
 
@@ -11,7 +8,7 @@ from flexget.utils.tools import aggregate_inputs
 log = logging.getLogger('torrent_match')
 
 
-class TorrentMatchFile(object):
+class TorrentMatchFile:
     def __init__(self, path, size):
         self.path = path
         self.size = size
@@ -20,7 +17,7 @@ class TorrentMatchFile(object):
         return "%s(path=%s, size=%s)" % (self.__class__.__name__, str(self.path), self.size)
 
 
-class TorrentMatch(object):
+class TorrentMatch:
     """Plugin that attempts to match .torrents to local files"""
 
     schema = {
@@ -130,11 +127,11 @@ class TorrentMatch(object):
                     torrent_file = torrent_files[0]
                     for local_file in local_files:
                         if (
-                            torrent_file.path in local_file.path
+                            torrent_file.path in str(local_file.path)
                             and torrent_file.size == local_file.size
                         ):
                             # if the filename with ext is contained in 'location', we must grab its parent as path
-                            if os.path.basename(torrent_file.path) in local_entry['location']:
+                            if os.path.basename(torrent_file.path) in str(local_entry['location']):
                                 entry['path'] = os.path.dirname(local_entry['location'])
                             else:
                                 entry['path'] = local_entry['location']
@@ -150,7 +147,7 @@ class TorrentMatch(object):
                     candidate_files = []
                     # Find candidate files ie. files whose path contains the torrent name
                     for local_file in local_files:
-                        if entry['torrent'].name in local_file.path:
+                        if entry['torrent'].name in str(local_file.path):
                             # we need to find the path that contains the torrent name since it's multi-file
                             if not path:
                                 # attempt to extract path from the absolute file path

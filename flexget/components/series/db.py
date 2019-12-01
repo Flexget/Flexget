@@ -1,30 +1,27 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import re
 from datetime import datetime, timedelta
 from functools import total_ordering
 
 from sqlalchemy import (
-    Column,
-    Integer,
-    Unicode,
-    String,
-    ForeignKey,
-    select,
-    func,
     Boolean,
+    Column,
     DateTime,
-    update,
+    ForeignKey,
     Index,
+    Integer,
+    String,
+    Unicode,
     and_,
     delete,
     desc,
+    func,
+    select,
+    update,
 )
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.ext.hybrid import hybrid_property, Comparator
-from sqlalchemy.orm import relation, backref
+from sqlalchemy.ext.hybrid import Comparator, hybrid_property
+from sqlalchemy.orm import backref, relation
 
 from flexget import db_schema, plugin
 from flexget.components.series.utils import normalize_series_name
@@ -32,12 +29,12 @@ from flexget.event import event, fire_event
 from flexget.manager import Session
 from flexget.utils.database import quality_property, with_session
 from flexget.utils.sqlalchemy_utils import (
-    table_exists,
-    drop_tables,
-    table_columns,
-    table_add_column,
-    table_schema,
     create_index,
+    drop_tables,
+    table_add_column,
+    table_columns,
+    table_exists,
+    table_schema,
 )
 from flexget.utils.tools import parse_episode_identifier
 
@@ -1254,8 +1251,8 @@ def remove_series_entity(name, identifier, forget=False):
         def remove_entity(entity):
             if not series.begin:
                 series.identified_by = (
-                    ''
-                )  # reset identified_by flag so that it will be recalculated
+                    ''  # reset identified_by flag so that it will be recalculated
+                )
             session.delete(entity)
             log.debug('Entity `%s` from series `%s` removed from database.', identifier, name)
             return [release.title for release in entity.downloaded_releases]

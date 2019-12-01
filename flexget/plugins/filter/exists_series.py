@@ -1,9 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-from path import Path
+from pathlib import Path
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -20,7 +16,7 @@ except ImportError:
 log = logging.getLogger('exists_series')
 
 
-class FilterExistsSeries(object):
+class FilterExistsSeries:
     """
     Intelligent series aware exists rejecting.
 
@@ -88,11 +84,11 @@ class FilterExistsSeries(object):
             series_parser = accepted_series[series][0]['series_parser']
             for folder in paths:
                 folder = Path(folder).expanduser()
-                if not folder.isdir():
+                if not folder.is_dir():
                     log.warning('Directory %s does not exist', folder)
                     continue
 
-                for filename in folder.walk(errors='ignore'):
+                for filename in folder.iterdir():
                     # run parser on filename data
                     try:
                         disk_parser = plugin.get('parsing', self).parse_series(

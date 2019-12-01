@@ -1,21 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
-from datetime import date, datetime, timedelta
 import time
+from datetime import date, datetime, timedelta
 
-from sqlalchemy import Table, Column, Integer, Float, Unicode, DateTime, Date, func
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation
 from dateutil.parser import parse as dateutil_parse
+from sqlalchemy import Column, Date, DateTime, Float, Integer, Table, Unicode, func
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import relation
+from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
-from flexget.utils.soup import get_soup
 from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.database import year_property
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('api_bluray')
 Base = db_schema.versioned_base('api_bluray', 0)
@@ -96,9 +93,7 @@ class BlurayMovie(Base):
             search_results = response['items']
             countries = bluray_request('countries.json.php', **country_params) or {}
 
-            search_results = sorted(
-                search_results, key=lambda k: extract_release_date(k)
-            )
+            search_results = sorted(search_results, key=lambda k: extract_release_date(k))
         except requests.RequestException as e:
             raise LookupError('Error searching for {} on blu-ray.com: {}'.format(title_year, e))
 
@@ -196,7 +191,7 @@ class BluraySearchResult(Base):
             self.movie = movie
 
 
-class ApiBluray(object):
+class ApiBluray:
     """Does lookups to Blu-ray.com and provides movie information. Caches lookups."""
 
     @staticmethod

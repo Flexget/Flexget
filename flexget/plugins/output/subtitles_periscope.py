@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 import os
 import tempfile
@@ -11,8 +8,8 @@ from flexget.event import event
 log = logging.getLogger('subtitles')
 
 
-class PluginPeriscope(object):
-    """
+class PluginPeriscope:
+    r"""
     Search and download subtitles using Periscope by Patrick Dessalle
     (http://code.google.com/p/periscope/).
 

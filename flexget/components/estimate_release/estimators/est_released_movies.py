@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-from datetime import datetime
 import logging
+from datetime import datetime
 
 from flexget import plugin
 from flexget.event import event
@@ -10,7 +7,7 @@ from flexget.event import event
 log = logging.getLogger('est_movies')
 
 
-class EstimatesReleasedMovies(object):
+class EstimatesReleasedMovies:
     @plugin.priority(0)
     def estimate(self, entry):
         if 'tmdb_released' in entry:

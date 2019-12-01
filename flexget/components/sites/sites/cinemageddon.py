@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import quote
-
 import logging
+from urllib.parse import quote
 
 from flexget import plugin
 from flexget.event import event
@@ -10,7 +7,7 @@ from flexget.event import event
 log = logging.getLogger('cinemageddon')
 
 
-class UrlRewriteCinemageddon(object):
+class UrlRewriteCinemageddon:
     """Cinemageddon urlrewriter."""
 
     def url_rewritable(self, task, entry):
