@@ -1,6 +1,4 @@
 """Plugin for json file."""
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import dateutil.parser as parser
 
 import re
@@ -76,6 +74,9 @@ class Json(object):
 
     def on_task_input(self, task, config):
         files = os.path.expanduser(config['files'])
+        json_test = re.search(r'.*json', files)
+        if not json_test:
+            raise plugin.PluginError('The "files" key is missing "json" in the config file.')
         json_encoding = config['encoding']
         entry_config = config.get('entry')
         
@@ -87,10 +88,10 @@ class Json(object):
                     if required_field == 'get_remnants':
                         get_remnants = True
                     else:
-                        fields[required_field] = re.compile('^' + required_field + '$')
+                        fields[required_field] = re.compile(f"^{required_field}$")
                 else:
-                    fields[next(iter(required_field))] = re.compile(
-                        "^" + required_field[next(iter(required_field))] + "$")
+                    value = next(iter(required_field))
+                    fields[value] = re.compile(f"^{required_field[value]}$")
                         
             if 'title' not in fields.keys():
                 fields['title'] = re.compile("^title$")
