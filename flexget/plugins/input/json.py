@@ -1,13 +1,12 @@
 """Plugin for json file."""
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+import dateutil.parser as parser
 
 import re
 import os
 import logging
-
 import glob
-import path
 
 from flexget import plugin
 from flexget.utils import json
@@ -21,11 +20,14 @@ class Json(object):
     """
     Parse a json file for entries using regular expression.
 
-    Example:: 
+    :: 
 
-      file: <path to JSON file>
+      files: <path to JSON file(s)>
+      encoding: <JSON encoding>
       entry:
-        <field>: <corresponding JSON key>
+        - <field>: <corresponding JSON key>
+        - <field>
+        - get_remnants
 
     Note: each entry must have at least two fields, 'title' and 'url'. If not specified in the config, 
     this plugin asssumes that keys named 'title' and 'url' exist within the JSON.
@@ -42,7 +44,6 @@ class Json(object):
           
     """
     
-
     schema = {
         'type': 'object',
         'properties': {
@@ -67,6 +68,11 @@ class Json(object):
         'additionalProperties': False,
     }
                     
+    def dt(val):
+        try:
+            return parser.parse(val)
+        except (ValueError, OverflowError):
+            return val
 
     def on_task_input(self, task, config):
         files = os.path.expanduser(config['files'])
@@ -81,9 +87,10 @@ class Json(object):
                     if required_field == 'get_remnants':
                         get_remnants = True
                     else:
-                        fields[required_field] = required_field
+                        fields[required_field] = re.compile('^' + required_field + '$')
                 else:
-                    fields[next(iter(required_field))] = re.compile("^" + required_field[next(iter(required_field))] + "$")
+                    fields[next(iter(required_field))] = re.compile(
+                        "^" + required_field[next(iter(required_field))] + "$")
                         
             if 'title' not in fields.keys():
                 fields['title'] = re.compile("^title$")
@@ -95,22 +102,23 @@ class Json(object):
         
         list_of_files = glob.glob(files)
         if not list_of_files:
-            log.warning('No JSON file(s) found in the path specified in the config file.')
+            raise plugin.PluginError('No JSON file(s) found in the path specified in the config file.')
         for filename in list_of_files:
             with open(filename, encoding=json_encoding) as json_file:
                 json_dict = json.load(json_file)
             for entry_title in json_dict:
                 all_entry_fields = json_dict[entry_title]
                 for entry_field in all_entry_fields:
+                    # Only de-serialize datetime strings to datetime objects, below using 'dt' method.
                     if not entry_config:
-                        entry[entry_field] = all_entry_fields[entry_field] # de-serialize here?
+                        entry[entry_field] = dt(all_entry_fields[entry_field]) 
                     else:
                         for key in fields:
                             match = re.search(fields[key], entry_field)
                             if match:
-                                entry[key] = all_entry_fields[match.group(0)] # de-serialize here?
+                                entry[key] = dt(all_entry_fields[match.group(0)])
                         if entry_field not in fields.keys() and get_remnants:
-                            entry[entry_field] = all_entry_fields[entry_field] # de-serialize here?
+                            entry[entry_field] = dt(all_entry_fields[entry_field])
 
                 if not entry.isvalid():
                     log.info(
@@ -119,8 +127,8 @@ class Json(object):
                 else:
                     entries.append(entry)
                     log.debug('Added entry %s' % entry)
-                    # start new entry
-                    entry = Entry()
+                # start new entry
+                entry = Entry()
         return entries
 
 
