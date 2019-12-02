@@ -50,7 +50,7 @@ class Newznab:
         if 'url' not in config:
             if 'apikey' in config and 'website' in config:
                 if config['category'] == 'all':
-		    config['category'] = 'search'
+                    config['category'] = 'search'
                 params = {'t': config['category'], 'apikey': config['apikey'], 'extended': 1}
                 config['url'] = config['website'] + '/api?' + urlencode(params)
 
@@ -128,7 +128,6 @@ class Newznab:
         return self.fill_entries_for_url(url, task)
 
     def do_search_all(self, arg_entry, task, config=None):
-        entries = []
         log.info('Searching for %s' % arg_entry['title'])
         url = config['url'] + '&q=%s' % arg_entry['title']
         return self.fill_entries_for_url(url, task)
