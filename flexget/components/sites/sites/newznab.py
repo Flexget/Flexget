@@ -26,13 +26,13 @@ class Newznab:
           apikey: xxxxxxxxxxxxxxxxxxxxxxxxxx
           category: movie
 
-    Category is any of: movie, tvsearch, music, book, other
+    Category is any of: movie, tvsearch, music, book, all
     """
 
     schema = {
         'type': 'object',
         'properties': {
-            'category': {'type': 'string', 'enum': ['movie', 'tvsearch', 'tv', 'music', 'book','other']},
+            'category': {'type': 'string', 'enum': ['movie', 'tvsearch', 'tv', 'music', 'book', 'all']},
             'url': {'type': 'string', 'format': 'url'},
             'website': {'type': 'string', 'format': 'url'},
             'apikey': {'type': 'string'},
@@ -49,6 +49,8 @@ class Newznab:
 
         if 'url' not in config:
             if 'apikey' in config and 'website' in config:
+                if config['category'] == 'all':
+		    config['category'] = 'search'
                 params = {'t': config['category'], 'apikey': config['apikey'], 'extended': 1}
                 config['url'] = config['website'] + '/api?' + urlencode(params)
 
@@ -87,8 +89,8 @@ class Newznab:
             return self.do_search_movie(entry, task, config)
         elif config['category'] == 'tvsearch':
             return self.do_search_tvsearch(entry, task, config)
-        elif config['category'] == 'other':
-            return self.do_search_other(entry, task, config)
+        elif config['category'] == 'search':
+            return self.do_search_all(entry, task, config)
         else:
             entries = []
             log.warning("Not done yet...")
@@ -125,7 +127,7 @@ class Newznab:
         url = config['url'] + '&imdbid=' + imdb_id
         return self.fill_entries_for_url(url, task)
 
-    def do_search_other(self, arg_entry, task, config=None):
+    def do_search_all(self, arg_entry, task, config=None):
         entries = []
         log.info('Searching for %s' % arg_entry['title'])
         url = config['url'] + '&q=%s' % arg_entry['title']
