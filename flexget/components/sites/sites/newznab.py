@@ -26,13 +26,13 @@ class Newznab:
           apikey: xxxxxxxxxxxxxxxxxxxxxxxxxx
           category: movie
 
-    Category is any of: movie, tvsearch, music, book
+    Category is any of: movie, tvsearch, music, book, other
     """
 
     schema = {
         'type': 'object',
         'properties': {
-            'category': {'type': 'string', 'enum': ['movie', 'tvsearch', 'tv', 'music', 'book']},
+            'category': {'type': 'string', 'enum': ['movie', 'tvsearch', 'tv', 'music', 'book','other']},
             'url': {'type': 'string', 'format': 'url'},
             'website': {'type': 'string', 'format': 'url'},
             'apikey': {'type': 'string'},
@@ -87,6 +87,8 @@ class Newznab:
             return self.do_search_movie(entry, task, config)
         elif config['category'] == 'tvsearch':
             return self.do_search_tvsearch(entry, task, config)
+        elif config['category'] == 'other':
+            return self.do_search_other(entry, task, config)
         else:
             entries = []
             log.warning("Not done yet...")
@@ -121,6 +123,12 @@ class Newznab:
 
         imdb_id = arg_entry['imdb_id'].replace('tt', '')
         url = config['url'] + '&imdbid=' + imdb_id
+        return self.fill_entries_for_url(url, task)
+
+    def do_search_other(self, arg_entry, task, config=None):
+        entries = []
+        log.info('Searching for %s' % arg_entry['title'])
+        url = config['url'] + '&q=%s' % arg_entry['title']
         return self.fill_entries_for_url(url, task)
 
 
