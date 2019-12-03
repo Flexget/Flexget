@@ -305,10 +305,11 @@ class Entry(LazyDict):
                 val = self[key]
                 result[key] = {
                     'serializer': self[key].serializer_name(),
+                    'version': self[key].serialization_version,
                     'value': self[key].serialize(),
                 }
             elif isinstance(self[key], (str, int, float, datetime.date, dict, list)):
-                result[key] = {'serializer': 'builtin', 'value': self[key]}
+                result[key] = {'serializer': 'builtin', 'value': self[key], 'version': 1}
         return json.dumps(result)
 
     @classmethod
@@ -320,7 +321,7 @@ class Entry(LazyDict):
             if value['serializer'] == 'builtin':
                 result[key] = value['value']
             else:
-                result[key] = registry[value['serializer']].deserialize(value['value'])
+                result[key] = registry[value['serializer']].deserialize(value['value'], value['version'])
         return result
 
     def __eq__(self, other):
@@ -341,7 +342,12 @@ class Serializable(ABC):
         pass
 
     @abstractclassmethod
-    def deserialize(cls, data):
+    def deserialize(cls, data, version):
+        pass
+
+    @property
+    @abstractmethod
+    def serialization_version(self):
         pass
 
     @classmethod

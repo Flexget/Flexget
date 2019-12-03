@@ -255,8 +255,12 @@ class Quality(Serializable):
         return str(self)
 
     @classmethod
-    def deserialize(cls, data):
+    def deserialize(cls, data, version):
         return cls(data)
+
+    @property
+    def serialization_version(self):
+        return 1
 
     @property
     def _comparator(self):
