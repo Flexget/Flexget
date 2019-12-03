@@ -3,6 +3,8 @@ import functools
 import logging
 import re
 
+from flexget.entry import Serializable
+
 log = logging.getLogger('utils.qualities')
 
 
@@ -185,7 +187,7 @@ def all_components():
 
 
 @functools.total_ordering
-class Quality:
+class Quality(Serializable):
     """Parses and stores the quality of an entry in the four component categories."""
 
     def __init__(self, text=''):
@@ -248,6 +250,13 @@ class Quality:
     @property
     def components(self):
         return [self.resolution, self.source, self.codec, self.audio]
+
+    def serialize(self):
+        return str(self)
+
+    @classmethod
+    def deserialize(cls, data):
+        return cls(data)
 
     @property
     def _comparator(self):

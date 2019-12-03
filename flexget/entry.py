@@ -1,8 +1,11 @@
 import copy
+import datetime
 import functools
 import logging
+from abc import ABC, abstractmethod, abstractclassmethod
 
 from flexget.plugin import PluginError
+from flexget.utils import json
 from flexget.utils.lazy_dict import LazyDict, LazyLookup
 from flexget.utils.template import FlexGetTemplate, render_from_entry
 
@@ -291,6 +294,35 @@ class Entry(LazyDict):
         log.trace('rendering: %s', template)
         return render_from_entry(template, self, native=native)
 
+    def serialize(self):
+        result = {}
+        for key in self:
+            # TODO: Handle lazy fields
+            self.get(key)
+            if self.is_lazy(key):
+                continue
+            if isinstance(self[key], Serializable):
+                val = self[key]
+                result[key] = {
+                    'serializer': self[key].serializer_name(),
+                    'value': self[key].serialize(),
+                }
+            elif isinstance(self[key], (str, int, float, datetime.date, dict, list)):
+                result[key] = {'serializer': 'builtin', 'value': self[key]}
+        return json.dumps(result)
+
+    @classmethod
+    def deserialize(cls, data):
+        raw = json.loads(data)
+        result = cls()
+        registry = serializer_registry()
+        for key, value in raw.items():
+            if value['serializer'] == 'builtin':
+                result[key] = value['value']
+            else:
+                result[key] = registry[value['serializer']].deserialize(value['value'])
+        return result
+
     def __eq__(self, other):
         return self.get('original_title') == other.get('original_title') and self.get(
             'original_url'
@@ -301,3 +333,21 @@ class Entry(LazyDict):
 
     def __repr__(self):
         return '<Entry(title=%s,state=%s)>' % (self['title'], self._state)
+
+
+class Serializable(ABC):
+    @abstractmethod
+    def serialize(self):
+        pass
+
+    @abstractclassmethod
+    def deserialize(cls, data):
+        pass
+
+    @classmethod
+    def serializer_name(cls):
+        return cls.__module__ + '.' + cls.__name__
+
+
+def serializer_registry():
+    return {c.serializer_name(): c for c in Serializable.__subclasses__()}
