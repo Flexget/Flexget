@@ -259,10 +259,6 @@ class Quality(Serializable):
         return cls(data)
 
     @property
-    def serialization_version(self):
-        return 1
-
-    @property
     def _comparator(self):
         modifier = sum(c.modifier for c in self.components if c.modifier)
         return [modifier] + self.components

@@ -305,11 +305,14 @@ class Entry(LazyDict):
                 val = self[key]
                 result[key] = {
                     'serializer': self[key].serializer_name(),
-                    'version': self[key].serialization_version,
+                    'version': self[key].serializer_version(),
                     'value': self[key].serialize(),
                 }
             elif isinstance(self[key], (str, int, float, datetime.date, dict, list)):
                 result[key] = {'serializer': 'builtin', 'value': self[key], 'version': 1}
+            else:
+                # TODO: Uh oh, not-serializable. What to do here?
+                pass
         return json.dumps(result)
 
     @classmethod
@@ -345,14 +348,13 @@ class Serializable(ABC):
     def deserialize(cls, data, version):
         pass
 
-    @property
-    @abstractmethod
-    def serialization_version(self):
-        pass
-
     @classmethod
     def serializer_name(cls):
-        return cls.__module__ + '.' + cls.__name__
+        return cls.__name__
+
+    @classmethod
+    def serializer_version(self):
+        return 1
 
 
 def serializer_registry():
