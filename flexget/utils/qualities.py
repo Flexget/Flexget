@@ -3,7 +3,7 @@ import functools
 import logging
 import re
 
-from flexget.entry import Serializable
+from flexget.utils.serialization import Serializable
 
 log = logging.getLogger('utils.qualities')
 
@@ -251,11 +251,11 @@ class Quality(Serializable):
     def components(self):
         return [self.resolution, self.source, self.codec, self.audio]
 
-    def serialize(self):
+    def _serialize(self):
         return str(self)
 
     @classmethod
-    def deserialize(cls, data, version):
+    def _deserialize(cls, data, version):
         return cls(data)
 
     @property

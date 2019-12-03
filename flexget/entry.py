@@ -5,8 +5,8 @@ import logging
 from abc import ABC, abstractmethod, abstractclassmethod
 
 from flexget.plugin import PluginError
-from flexget.utils import json
 from flexget.utils.lazy_dict import LazyDict, LazyLookup
+from flexget.utils.serialization import BuiltinSerializer, Serializable
 from flexget.utils.template import FlexGetTemplate, render_from_entry
 
 log = logging.getLogger('entry')
@@ -23,7 +23,7 @@ class EntryUnicodeError(Exception):
         return 'Entry strings must be unicode: %s (%r)' % (self.key, self.value)
 
 
-class Entry(LazyDict):
+class Entry(LazyDict, Serializable):
     """
     Represents one item in task. Must have `url` and *title* fields.
 
@@ -294,7 +294,7 @@ class Entry(LazyDict):
         log.trace('rendering: %s', template)
         return render_from_entry(template, self, native=native)
 
-    def serialize(self):
+    def _serialize(self):
         result = {}
         for key in self:
             # TODO: Handle lazy fields
@@ -302,29 +302,19 @@ class Entry(LazyDict):
             if self.is_lazy(key):
                 continue
             if isinstance(self[key], Serializable):
-                val = self[key]
-                result[key] = {
-                    'serializer': self[key].serializer_name(),
-                    'version': self[key].serializer_version(),
-                    'value': self[key].serialize(),
-                }
+                result[key] = self[key].serialize()
             elif isinstance(self[key], (str, int, float, datetime.date, dict, list)):
-                result[key] = {'serializer': 'builtin', 'value': self[key], 'version': 1}
+                result[key] = BuiltinSerializer.serialize(self[key])
             else:
                 # TODO: Uh oh, not-serializable. What to do here?
                 pass
-        return json.dumps(result)
+        return result
 
     @classmethod
-    def deserialize(cls, data):
-        raw = json.loads(data)
+    def _deserialize(cls, data, version):
         result = cls()
-        registry = serializer_registry()
-        for key, value in raw.items():
-            if value['serializer'] == 'builtin':
-                result[key] = value['value']
-            else:
-                result[key] = registry[value['serializer']].deserialize(value['value'], value['version'])
+        for key, value in data.items():
+            result[key] = Serializable.deserialize(value)
         return result
 
     def __eq__(self, other):
@@ -337,25 +327,3 @@ class Entry(LazyDict):
 
     def __repr__(self):
         return '<Entry(title=%s,state=%s)>' % (self['title'], self._state)
-
-
-class Serializable(ABC):
-    @abstractmethod
-    def serialize(self):
-        pass
-
-    @abstractclassmethod
-    def deserialize(cls, data, version):
-        pass
-
-    @classmethod
-    def serializer_name(cls):
-        return cls.__name__
-
-    @classmethod
-    def serializer_version(self):
-        return 1
-
-
-def serializer_registry():
-    return {c.serializer_name(): c for c in Serializable.__subclasses__()}
