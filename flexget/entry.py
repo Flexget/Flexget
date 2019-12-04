@@ -2,9 +2,9 @@ import copy
 import datetime
 import functools
 import logging
-from abc import ABC, abstractmethod, abstractclassmethod
+import types
 
-from flexget.plugin import PluginError
+from flexget.plugin import PluginError, get_plugin_by_name
 from flexget.utils.lazy_dict import LazyDict, LazyLookup
 from flexget.utils.serialization import BuiltinSerializer, Serializable
 from flexget.utils.template import FlexGetTemplate, render_from_entry
@@ -309,6 +309,10 @@ class Entry(LazyDict, Serializable):
                 raise TypeError('%r is not serializable', self[key])
         return result
 
+    def add_lazy_fields(self, lazy_func_name):
+        func = lazy_func_registry[lazy_func_name]
+        self.register_lazy_func(func.function, func.fields)
+
     @classmethod
     def _deserialize(cls, data, version):
         result = cls()
@@ -326,3 +330,30 @@ class Entry(LazyDict, Serializable):
 
     def __repr__(self):
         return '<Entry(title=%s,state=%s)>' % (self['title'], self._state)
+
+
+lazy_func_registry = {}
+
+
+class LazyFunc:
+    def __init__(self, lazy_func_name, fields, plugin=None):
+        self.name = lazy_func_name
+        self.fields = fields
+        self.plugin = plugin
+        self._func = None
+
+    def __call__(self, func):
+        self._func = func
+        lazy_func_registry[self.name] = self
+        return func
+
+    @property
+    def function(self):
+        if self.plugin:
+            # Bind the function to the plugin instance
+            p = get_plugin_by_name(self.plugin).instance
+            return types.MethodType(self._func, p)
+        return self._func
+
+
+register_lazy_func = LazyFunc
