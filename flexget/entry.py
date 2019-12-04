@@ -306,8 +306,7 @@ class Entry(LazyDict, Serializable):
             elif isinstance(self[key], (str, int, float, datetime.date, dict, list)):
                 result[key] = BuiltinSerializer.serialize(self[key])
             else:
-                # TODO: Uh oh, not-serializable. What to do here?
-                pass
+                raise TypeError('%r is not serializable', self[key])
         return result
 
     @classmethod

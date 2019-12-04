@@ -1,9 +1,17 @@
-from abc import ABC, abstractmethod, abstractclassmethod
+from abc import ABC, abstractmethod
 
 from flexget.utils import json
 
 
 class Serializable(ABC):
+    _registry = None
+
+    @staticmethod
+    def registry():
+        if Serializable._registry is None:
+            Serializable._registry = {c.serializer_name(): c for c in Serializable.__subclasses__()}
+        return Serializable._registry
+
     @abstractmethod
     def _serialize(self):
         """Return a plain python datatype which is json serializable."""
@@ -16,26 +24,28 @@ class Serializable(ABC):
             'value': self._serialize(),
         }
 
-    @abstractclassmethod
+    @classmethod
+    @abstractmethod
     def _deserialize(cls, data, version):
         """Returns an instance of this class, recreated from the serialized form."""
         pass
 
     @classmethod
     def deserialize(cls, data):
-        registry = serializer_registry()
-        return registry[data['serializer']]._deserialize(data['value'], data['version'])
+        return cls.registry()[data['serializer']]._deserialize(
+            data['value'], data['version']
+        )
 
     @classmethod
     def serializer_name(cls):
         return cls.__name__
 
     @classmethod
-    def serializer_version(self):
+    def serializer_version(cls):
         return 1
 
     def dumps(self):
-        return json.dumps(self.sereialize())
+        return json.dumps(self.serialize())
 
     @classmethod
     def loads(cls, data):
@@ -61,7 +71,3 @@ class BuiltinSerializer(Serializable):
     @classmethod
     def _deserialize(cls, data, version):
         return data
-
-
-def serializer_registry():
-    return {c.serializer_name(): c for c in Serializable.__subclasses__()}
