@@ -4,7 +4,7 @@ import functools
 import logging
 import types
 
-from flexget.plugin import PluginError, get_plugin_by_name
+from flexget import plugin
 from flexget.utils.lazy_dict import LazyDict, LazyLookup
 from flexget.utils.serialization import BuiltinSerializer, Serializable
 from flexget.utils.template import FlexGetTemplate, render_from_entry
@@ -197,13 +197,13 @@ class Entry(LazyDict, Serializable):
         # url and original_url handling
         if key == 'url':
             if not isinstance(value, (str, LazyLookup)):
-                raise PluginError('Tried to set %r url to %r' % (self.get('title'), value))
+                raise plugin.PluginError('Tried to set %r url to %r' % (self.get('title'), value))
             self.setdefault('original_url', value)
 
         # title handling
         if key == 'title':
             if not isinstance(value, (str, LazyLookup)):
-                raise PluginError('Tried to set title to %r' % value)
+                raise plugin.PluginError('Tried to set title to %r' % value)
             self.setdefault('original_title', value)
 
         try:
@@ -310,8 +310,17 @@ class Entry(LazyDict, Serializable):
         return result
 
     def add_lazy_fields(self, lazy_func_name):
+        """
+        Add lazy fields to an entry.
+        `lazy_func_name` should be a name previously registered with the `register_lazy_func` decorator.
+        """
         func = lazy_func_registry[lazy_func_name]
-        self.register_lazy_func(func.function, func.fields)
+        super().register_lazy_func(func.function, func.fields)
+
+    def register_lazy_func(self, func, keys):
+        # TODO: This should not be called on entries directly, `add_lazy_fields` should be used instead.
+        # Add some enforcement on this once we convert plugins
+        super().register_lazy_func(func, keys)
 
     @classmethod
     def _deserialize(cls, data, version):
@@ -349,10 +358,15 @@ class LazyFunc:
 
     @property
     def function(self):
-        if self.plugin:
-            # Bind the function to the plugin instance
-            p = get_plugin_by_name(self.plugin).instance
-            return types.MethodType(self._func, p)
+        if '.' in self._func.__qualname__:
+            # This is a method of a plugin class, bind the function to the plugin instance
+            plugin_class_name = self._func.__qualname__.split('.')[0]
+            for p in plugin.plugins.values():
+                if p.plugin_class.__name__ == plugin_class_name:
+                    return types.MethodType(self._func, p.instance)
+            raise Exception(
+                f'lazy lookups must be functions, or methods of a registered plugin class. {self._func!r} is not'
+            )
         return self._func
 
 
