@@ -1,6 +1,11 @@
+import datetime
 from abc import ABC, abstractmethod
 
 from flexget.utils import json
+
+
+DATE_FMT = '%Y-%m-%d'
+ISO8601_FMT = '%Y-%m-%dT%H:%M:%SZ'
 
 
 class Serializable(ABC):
@@ -71,3 +76,45 @@ class BuiltinSerializer(Serializable):
     @classmethod
     def _deserialize(cls, data, version):
         return data
+
+
+class DateSerializer(Serializable):
+    @classmethod
+    def serializer_name(cls):
+        return 'date'
+
+    def _serialize(self):
+        pass
+
+    @classmethod
+    def serialize(cls, value):
+        return {
+            'serializer': cls.serializer_name(),
+            'version': cls.serializer_version(),
+            'value': value.strftime(DATE_FMT),
+        }
+
+    @classmethod
+    def _deserialize(cls, data, version):
+        return datetime.datetime.strptime(data, DATE_FMT).date()
+
+
+class DateTimeSerializer(Serializable):
+    @classmethod
+    def serializer_name(cls):
+        return 'datetime'
+
+    def _serialize(self):
+        pass
+
+    @classmethod
+    def serialize(cls, value):
+        return {
+            'serializer': cls.serializer_name(),
+            'version': cls.serializer_version(),
+            'value': value.strftime(ISO8601_FMT),
+        }
+
+    @classmethod
+    def _deserialize(cls, data, version):
+        return datetime.datetime.strptime(data, ISO8601_FMT)
