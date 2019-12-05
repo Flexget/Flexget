@@ -101,7 +101,7 @@ def register_web_server(manager):
     if web_server_config.get('web_ui'):
         if web_server_config.get('run_v2'):
             log.info('Registering WebUI v2')
-            register_web_ui_v2(manager)
+            register_web_ui_v2(web_server_config)
 
         log.info('Registering WebUI v1')
         register_web_ui_v1(manager)
