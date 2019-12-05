@@ -8,6 +8,23 @@ DATE_FMT = '%Y-%m-%d'
 ISO8601_FMT = '%Y-%m-%dT%H:%M:%SZ'
 
 
+def serialize(value):
+    """
+    Convert an object to JSON serializable format.
+
+    """
+    if isinstance(value, Serializable):
+        return value.serialize()
+    if isinstance(value, datetime.datetime):
+        return DateTimeSerializer.serialize(value)
+    if isinstance(value, datetime.date):
+        return DateSerializer.serialize(value)
+    elif isinstance(value, (str, int, float, dict, list)):
+        return BuiltinSerializer.serialize(value)
+    else:
+        raise TypeError('%r is not serializable', value)
+
+
 class Serializable(ABC):
     _registry = None
 
@@ -67,6 +84,10 @@ class BuiltinSerializer(Serializable):
 
     @classmethod
     def serialize(cls, value):
+        if isinstance(value, list):
+            value = [serialize(i) for i in value]
+        elif isinstance(value, dict):
+            value = {k: serialize(v) for k, v in value.items()}
         return {
             'serializer': cls.serializer_name(),
             'version': cls.serializer_version(),
@@ -75,6 +96,10 @@ class BuiltinSerializer(Serializable):
 
     @classmethod
     def _deserialize(cls, data, version):
+        if isinstance(data, list):
+            return [cls.deserialize(i) for i in data]
+        if isinstance(data, dict):
+            return {k: cls.deserialize(v) for k, v in data.items()}
         return data
 
 

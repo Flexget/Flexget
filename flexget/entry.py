@@ -6,7 +6,7 @@ import types
 
 from flexget import plugin
 from flexget.utils.lazy_dict import LazyDict, LazyLookup
-from flexget.utils.serialization import BuiltinSerializer, DateSerializer, DateTimeSerializer, Serializable
+from flexget.utils.serialization import BuiltinSerializer, DateSerializer, DateTimeSerializer, Serializable, serialize
 from flexget.utils.template import FlexGetTemplate, render_from_entry
 
 log = logging.getLogger('entry')
@@ -301,16 +301,7 @@ class Entry(LazyDict, Serializable):
             self.get(key)
             if self.is_lazy(key):
                 continue
-            if isinstance(self[key], Serializable):
-                result[key] = self[key].serialize()
-            elif isinstance(self[key], datetime.datetime):
-                result[key] = DateTimeSerializer.serialize(self[key])
-            elif isinstance(self[key], datetime.date):
-                result[key] = DateSerializer.serialize(self[key])
-            elif isinstance(self[key], (str, int, float, datetime.date, dict, list)):
-                result[key] = BuiltinSerializer.serialize(self[key])
-            else:
-                raise TypeError('%r is not serializable', self[key])
+            result[key] = serialize(self[key])
         return result
 
     def add_lazy_fields(self, lazy_func_name):
