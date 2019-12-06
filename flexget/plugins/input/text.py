@@ -1,7 +1,7 @@
 """Plugin for text file or URL feeds via regex."""
-from __future__ import unicode_literals, division, absolute_import
-import re
 import logging
+import re
+from pathlib import Path
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -11,8 +11,7 @@ from flexget.utils.cached_input import cached
 log = logging.getLogger('text')
 
 
-class Text(object):
-
+class Text:
     """
     Parse any text for entries using regular expression.
 
@@ -36,35 +35,34 @@ class Text(object):
         format:
           url: http://www.nbc.com%(url)s
     """
+
     schema = {
         'type': 'object',
         'properties': {
             'url': {
                 'oneOf': [
                     {'type': 'string', 'format': 'url'},
-                    {'type': 'string', 'format': 'file'}
+                    {'type': 'string', 'format': 'file'},
                 ]
             },
+            'encoding': {'type': 'string'},
             'entry': {
                 'type': 'object',
                 'properties': {
                     'url': {'type': 'string', 'format': 'regex'},
-                    'title': {'type': 'string', 'format': 'regex'}
+                    'title': {'type': 'string', 'format': 'regex'},
                 },
                 'additionalProperties': {'type': 'string', 'format': 'regex'},
-                'required': ['url', 'title']
+                'required': ['url', 'title'],
             },
-            'format': {
-                'type': 'object',
-                'additionalProperties': {'type': 'string'}
-            }
+            'format': {'type': 'object', 'additionalProperties': {'type': 'string'}},
         },
         'required': ['entry', 'url'],
-        'additonalProperties': False
+        'additonalProperties': False,
     }
 
     def format_entry(self, entry, d):
-        for k, v in d.iteritems():
+        for k, v in d.items():
             entry[k] = v % entry
 
     @cached('text')
@@ -72,9 +70,9 @@ class Text(object):
     def on_task_input(self, task, config):
         url = config['url']
         if '://' in url:
-            lines = task.requests.get(url).iter_lines()
+            lines = task.requests.get(url).text.split('\n')
         else:
-            lines = open(url, 'rb').readlines()
+            lines = Path(url).read_text(encoding=config.get('encoding', 'utf-8')).splitlines()
 
         entry_config = config.get('entry')
         format_config = config.get('format', {})
@@ -86,19 +84,25 @@ class Text(object):
 
         # now parse text
         for line in lines:
-            for field, regexp in entry_config.iteritems():
-                #log.debug('search field: %s regexp: %s' % (field, regexp))
+            for field, regexp in entry_config.items():
+                # log.debug('search field: %s regexp: %s' % (field, regexp))
                 match = re.search(regexp, line)
                 if match:
                     # check if used field detected, in such case start with new entry
                     if field in used:
                         if entry.isvalid():
-                            log.info('Found field %s again before entry was completed. \
-                                      Adding current incomplete, but valid entry and moving to next.' % field)
+                            log.info(
+                                'Found field %s again before entry was completed. \
+                                      Adding current incomplete, but valid entry and moving to next.'
+                                % field
+                            )
                             self.format_entry(entry, format_config)
                             entries.append(entry)
                         else:
-                            log.info('Invalid data, entry field %s is already found once. Ignoring entry.' % field)
+                            log.info(
+                                'Invalid data, entry field %s is already found once. Ignoring entry.'
+                                % field
+                            )
                         # start new entry
                         entry = Entry()
                         used = {}
@@ -108,7 +112,9 @@ class Text(object):
                         entry[field] = match.group(1)
                     except IndexError:
                         log.error('regex for field `%s` must contain a capture group' % field)
-                        raise plugin.PluginError('Your text plugin config contains errors, please correct them.')
+                        raise plugin.PluginError(
+                            'Your text plugin config contains errors, please correct them.'
+                        )
                     used[field] = True
                     log.debug('found field: %s value: %s' % (field, entry[field]))
 
@@ -116,7 +122,9 @@ class Text(object):
                 if len(used) == len(entry_config):
                     # check that entry has atleast title and url
                     if not entry.isvalid():
-                        log.info('Invalid data, constructed entry is missing mandatory fields (title or url)')
+                        log.info(
+                            'Invalid data, constructed entry is missing mandatory fields (title or url)'
+                        )
                     else:
                         self.format_entry(entry, format_config)
                         entries.append(entry)

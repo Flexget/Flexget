@@ -1,20 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-import os
-import re
 import logging
-
-from path import path
+import re
+from pathlib import Path
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
-from flexget.plugin import get_plugin_by_name
+from flexget.event import event
 from flexget.utils.tools import TimedDict
 
 log = logging.getLogger('exists_movie')
 
 
-class FilterExistsMovie(object):
+class FilterExistsMovie:
     """
     Reject existing movies.
 
@@ -34,18 +30,21 @@ class FilterExistsMovie(object):
                 'type': 'object',
                 'properties': {
                     'path': one_or_more({'type': 'string', 'format': 'path'}),
-                    'allow_different_qualities': {'enum': ['better', True, False], 'default': False},
+                    'allow_different_qualities': {
+                        'enum': ['better', True, False],
+                        'default': False,
+                    },
                     'type': {'enum': ['files', 'dirs'], 'default': 'dirs'},
-                    'lookup': {'enum': ['imdb', False], 'default': False}
+                    'lookup': {'enum': ['imdb', False], 'default': False},
                 },
                 'required': ['path'],
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ]
     }
 
-    dir_pattern = re.compile('\b(cd.\d|subs?|samples?)\b',re.IGNORECASE)
-    file_pattern = re.compile('\.(avi|mkv|mp4|mpg|webm)$',re.IGNORECASE)
+    dir_pattern = re.compile(r'\b(cd.\d|subs?|samples?)\b', re.IGNORECASE)
+    file_pattern = re.compile(r'\.(avi|mkv|mp4|mpg|webm)$', re.IGNORECASE)
 
     def __init__(self):
         self.cache = TimedDict(cache_time='1 hour')
@@ -53,13 +52,13 @@ class FilterExistsMovie(object):
     def prepare_config(self, config):
         # if config is not a dict, assign value to 'path' key
         if not isinstance(config, dict):
-            config = { 'path': config }
+            config = {'path': config}
 
         if not config.get('type'):
             config['type'] = 'dirs'
 
         # if only a single path is passed turn it into a 1 element list
-        if isinstance(config['path'], basestring):
+        if isinstance(config['path'], str):
             config['path'] = [config['path']]
         return config
 
@@ -70,7 +69,7 @@ class FilterExistsMovie(object):
             return
 
         config = self.prepare_config(config)
-        imdb_lookup = plugin.get_plugin_by_name('imdb_lookup').instance
+        imdb_lookup = plugin.get('imdb_lookup', self)
 
         incompatible_files = 0
         incompatible_entries = 0
@@ -81,48 +80,59 @@ class FilterExistsMovie(object):
         qualities = {}
 
         for folder in config['path']:
-            folder = path(folder).expanduser()
+            folder = Path(folder).expanduser()
             # see if this path has already been scanned
-            if folder in self.cache:
+            cached_qualities = self.cache.get(folder, None)
+            if cached_qualities:
                 log.verbose('Using cached scan for %s ...' % folder)
-                qualities.update(self.cache[folder])
+                qualities.update(cached_qualities)
                 continue
 
             path_ids = {}
 
-            if not folder.isdir():
+            if not folder.is_dir():
                 log.critical('Path %s does not exist' % folder)
                 continue
 
             log.verbose('Scanning path %s ...' % folder)
 
             # Help debugging by removing a lot of noise
-            #logging.getLogger('movieparser').setLevel(logging.WARNING)
-            #logging.getLogger('imdb_lookup').setLevel(logging.WARNING)
+            # logging.getLogger('movieparser').setLevel(logging.WARNING)
+            # logging.getLogger('imdb_lookup').setLevel(logging.WARNING)
 
             # scan through
             items = []
-            if config.get('type') == 'dirs':
-                for d in folder.walkdirs(errors='ignore'):
-                    if self.dir_pattern.search(d.name):
+            for p in folder.iterdir():
+                if config.get('type') == 'dirs' and p.is_dir():
+                    if self.dir_pattern.search(p.name):
                         continue
-                    items.append(d.name)
-            elif config.get('type') == 'files':
-                for f in folder.walkfiles(errors='ignore'):
-                    if not self.file_pattern.search(f.name):
+                    log.debug('detected dir with name %s, adding to check list' % p.name)
+                    items.append(p.name)
+                elif config.get('type') == 'files' and p.is_file():
+                    if not self.file_pattern.search(p.name):
                         continue
-                    items.append(f.name)
+                    log.debug('detected file with name %s, adding to check list' % p.name)
+                    items.append(p.name)
+
+            if not items:
+                log.verbose(
+                    'No items with type %s were found in %s' % (config.get('type'), folder)
+                )
+                continue
 
             for item in items:
                 count_files += 1
 
-                movie = get_plugin_by_name('parsing').instance.parse_movie(item)
+                movie = plugin.get('parsing', self).parse_movie(item)
 
                 if config.get('lookup') == 'imdb':
                     try:
-                        imdb_id = imdb_lookup.imdb_id_lookup(movie_title=movie.name,
-                                                            raw_title=item,
-                                                            session=task.session)
+                        imdb_id = imdb_lookup.imdb_id_lookup(
+                            movie_title=movie.name,
+                            movie_year=movie.year,
+                            raw_title=item,
+                            session=task.session,
+                        )
                         if imdb_id in path_ids:
                             log.trace('duplicate %s' % item)
                             continue
@@ -133,8 +143,11 @@ class FilterExistsMovie(object):
                         log.trace('%s lookup failed (%s)' % (item, e.value))
                         incompatible_files += 1
                 else:
-                    path_ids[movie.name] = movie.quality
-                    log.trace('adding: %s' % movie.name)
+                    movie_id = movie.name
+                    if movie.name is not None and movie.year is not None:
+                        movie_id = "%s %s" % (movie.name, movie.year)
+                    path_ids[movie_id] = movie.quality
+                    log.trace('adding: %s' % movie_id)
 
             # store to cache and extend to found list
             self.cache[folder] = path_ids
@@ -145,42 +158,53 @@ class FilterExistsMovie(object):
         # do actual filtering
         for entry in task.accepted:
             count_entries += 1
+            log.debug('trying to parse entry %s' % entry['title'])
             if config.get('lookup') == 'imdb':
-                key = 'imdb_id'
-                if not entry.get('imdb_id', eval_lazy=False):
+                key_imdb = 'imdb_id'
+                if not entry.get(key_imdb, eval_lazy=False):
                     try:
                         imdb_lookup.lookup(entry)
                     except plugin.PluginError as e:
                         log.trace('entry %s imdb failed (%s)' % (entry['title'], e.value))
                         incompatible_entries += 1
                         continue
+                key = entry[key_imdb]
             else:
-                key = 'movie_name'
-                if not entry.get('movie_name', eval_lazy=False):
-                    movie = get_plugin_by_name('parsing').instance.parse_movie(entry['title'])
-                    entry['movie_name'] = movie.name
+                key_name = 'movie_name'
+                key_year = 'movie_year'
+                if not entry.get(key_name, eval_lazy=False):
+                    movie = plugin.get('parsing', self).parse_movie(entry['title'])
+                    entry[key_name] = movie.name
+                    entry[key_year] = movie.year
 
+                if entry.get(key_year, eval_lazy=False):
+                    key = "%s %s" % (entry[key_name], entry[key_year])
+                else:
+                    key = entry[key_name]
 
             # actual filtering
-            if entry[key] in qualities:
+            if key in qualities:
                 if config.get('allow_different_qualities') == 'better':
-                    if entry['quality'] > qualities[entry[key]]:
+                    if entry['quality'] > qualities[key]:
                         log.trace('better quality')
                         continue
                 elif config.get('allow_different_qualities'):
-                    if entry['quality'] != qualities[entry[key]]:
+                    if entry['quality'] != qualities[key]:
                         log.trace('wrong quality')
                         continue
 
                 entry.reject('movie exists')
 
         if incompatible_files or incompatible_entries:
-            log.verbose('There were some incompatible items. %s of %s entries '
-                        'and %s of %s directories could not be verified.' %
-                (incompatible_entries, count_entries, incompatible_files, count_files))
+            log.verbose(
+                'There were some incompatible items. %s of %s entries '
+                'and %s of %s directories could not be verified.'
+                % (incompatible_entries, count_entries, incompatible_files, count_files)
+            )
 
         log.debug('-- Finished filtering entries -------------------------------')
 
+
 @event('plugin.register')
 def register_plugin():
-    plugin.register(FilterExistsMovie, 'exists_movie', groups=['exists'], api_ver=2)
+    plugin.register(FilterExistsMovie, 'exists_movie', interfaces=['task'], api_ver=2)

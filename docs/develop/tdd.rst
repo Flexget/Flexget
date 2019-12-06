@@ -12,11 +12,9 @@ Write new test case called ``tests/test_hello.py``.
 
 .. testcode::
 
-   from tests import FlexGetBase
+   class TestHello:
 
-   class TestHello(FlexGetBase):
-
-       __yaml__ = """
+       config = """
            tasks:
              test:
                mock:                 # let's use this plugin to create test data
@@ -24,13 +22,14 @@ Write new test case called ``tests/test_hello.py``.
                hello: yes            # our plugin, no relevant configuration yet ...
        """
 
-       def test_feature(self):
+       # The flexget test framework provides the execute_task fixture, which is a function to run tasks
+       def test_feature(self, execute_task):
          # run the task
-         self.execute_task('test')
+         execute_task('test')
 
-Try running the test with nosetests::
+Try running the test with py.test::
 
-  nosetests test_hello
+  py.test tests/test_hello.py
 
 It should complain that the plugin hello does not exists, that's because we
 haven't yet created it. Let's do that next.
@@ -44,13 +43,11 @@ Within this file we will add our plugin.
 
 .. testcode::
 
-   from __future__ import unicode_literals, division, absolute_import
-
    from flexget import plugin
    from flexget.event import event
 
 
-   class Hello(object):
+   class Hello:
        pass
 
    @event('plugin.register')
@@ -71,11 +68,9 @@ Let's supplement the testsuite with the test.
 
 .. testcode::
 
-   from tests import FlexGetBase
+   class TestHello:
 
-   class TestHello(FlexGetBase):
-
-       __yaml__ = """
+       config = """
            tasks:
              test:
                mock:                 # let's use this plugin to create test data
@@ -83,11 +78,11 @@ Let's supplement the testsuite with the test.
                hello: yes            # our plugin, no relevant configuration yet ...
        """
 
-       def test_feature(self):
+       def test_feature(self, execute_task):
          # run the task
-         self.execute_task('test')
-         for entry in self.task.entries:
-             self.assertEqual(entry.get('hello'), True)
+         task = execute_task('test')
+         for entry in task.entries:
+             assert entry.get('hello') == True
 
 This should fail as we do not currently have such functionality in the plugin.
 
@@ -99,13 +94,11 @@ Continue by implementing the test case.
 
 .. testcode::
 
-   from __future__ import unicode_literals, division, absolute_import
-
    from flexget import plugin
    from flexget.event import event
 
 
-   class Hello(object):
+   class Hello:
        def on_task_filter(self, task, config):
            for entry in task.entries:
                entry['hello'] = True

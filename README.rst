@@ -1,24 +1,62 @@
 FlexGet
 =======
+.. image:: https://github.com/Flexget/Flexget/workflows/Main%20Workflow/badge.svg?branch=develop&event=schedule
+    :target: https://github.com/Flexget/Flexget/actions?query=workflow%3A%22Main+Workflow%22+branch%3Adevelop+event%3Aschedule
+
+.. image:: https://img.shields.io/pypi/v/Flexget.svg
+    :target: https://pypi.python.org/pypi/Flexget
+
+.. image:: https://api.codacy.com/project/badge/Grade/86bb847efe984c12948bdeccabcbccad
+    :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Grade
+
+.. image:: https://api.codacy.com/project/badge/Coverage/86bb847efe984c12948bdeccabcbccad
+    :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Coverage
+
+.. image:: https://img.shields.io/gitter/room/nwjs/nw.js.svg
+    :target: https://gitter.im/Flexget/Flexget
+
+.. image:: http://isitmaintained.com/badge/resolution/Flexget/Flexget.svg
+    :target: http://isitmaintained.com/project/Flexget/Flexget
 
 `FlexGet`_ is a multipurpose automation tool for content like torrents, nzbs,
 podcasts, comics, series, movies, etc. It can use different kinds of sources
 like RSS-feeds, html pages, csv files, search engines and there are even
 plugins for sites that do not provide any kind of useful feeds.
 
+Example
+=======
+Flexget uses a `YAML`_ based configuration file.
+The following example will look in the RSS feed in the link, will match any item that match the series names and download it::
+
+    tasks:
+      tv_task:
+        rss: http://example.com/torrents.xml
+        series:
+        - some series
+        - another series
+        download: /tvshows
+
 There are numerous plugins that allow utilizing FlexGet in interesting ways
 and more are being added continuously.
 
 FlexGet is extremely useful in conjunction with applications which have watch
 directory support or provide interface for external utilities like FlexGet.
+To get a sense of the many things that can be done with FlexGet you can take a look in our `cookbook`_.
 
-.. _FlexGet: http://flexget.com
+.. _FlexGet: https://flexget.com
 
-.. image:: https://api.travis-ci.org/Flexget/Flexget.png?branch=master
-    :target: https://travis-ci.org/Flexget/Flexget
+.. _YAML: http://www.yaml.org/
 
-.. image:: https://pypip.in/d/FlexGet/badge.png
-    :target: https://crate.io/packages/FlexGet
+.. _cookbook: https://flexget.com/Cookbook
+
+
+**ChangeLog:** https://flexget.com/ChangeLog
+
+**Help:** https://discuss.flexget.com/
+
+**Chat:** https://flexget.com/Chat
+
+**Bugs:** https://github.com/Flexget/Flexget/issues
 
 Install
 -------
@@ -29,69 +67,49 @@ FlexGet is installable via pip with the command::
 
 For more detailed instructions see the `installation guide`_.
 
-.. _installation guide: http://flexget.com/wiki/Install
+.. _installation guide: https://flexget.com/Install
 
+Feature requests
+----------------
+.. image:: http://feathub.com/Flexget/Flexget?format=svg
+   :target: http://feathub.com/Flexget/Flexget
 
 How to use GIT checkout
 -----------------------
 
-Check that you have Python 2.6 - 2.7 available with command ``python -V``.
+Check that you have Python 3.6 or newer available with command ``python -V``.
 
-In some environments newer (or older, if your distro is on python 3,) python
-might be available under another name like 'python26' or 'python2.7' in which
-case you need to use that one instead of plain 'python'.
+In some environments newer python might be available under another name like 
+'python3.6' or 'python3' in which case you need to use that one instead of
+plain 'python'.
 
 To start using FlexGet from this directory:
 
-Prerequisites for bootstrap.py:
- - Either put the wheels for `setuptools`_ and `pip`_ in the directory bootstrap.py resides.
- - Or install (a recent version of) the `virtualenv`_ package to your system.
+First, install (a recent version of) the `virtualenv`_ package to your system.
 
-.. _setuptools: https://pypi.python.org/pypi/setuptools
-.. _pip: https://pypi.python.org/pypi/pip
 .. _virtualenv: https://pypi.python.org/pypi/virtualenv
 
-After the prerequisites for bootstrap.py are finished, run the following commands::
+Now, in your checkout directory, run::
 
-    python bootstrap.py
+    virtualenv .
 
-This will initialize python virtualenv and install all required dependencies
-in it.
+This will initialize python virtualenv. This doesn't need to be directly in
+your checkout directory, but these instructions assume that's where it is.
 
-If you need deluge or transmission libraries from system wide python use::
+Next we need to install dependencies and FlexGet itself, this can be done simply::
 
-    python bootstrap.py --system-site-packages
+    bin/pip install -e .
+
+This does an editable (`-e`) development install of the current directory (`.`).
 
 After that FlexGet is usable via ``<checkout directory>/bin/flexget``. Verify
 installation by running::
 
     bin/flexget -V
 
-You may also place the configuration files in ``~/.flexget`` (Unix, Mac OS X)
-or ``C:\Documents and Setting\<username>\flexget`` (Windows).
+You may place the config file in your checkout directory, or in ``~/.flexget``
+(Unix, Mac OS X) or ``C:\Documents and Setting\<username>\flexget`` (Windows).
 
 If you don't want to use virtualenv there's ``flexget_vanilla.py`` file which
-can be used to run FlexGet without bootstrapping, note that you will need to
+can be used to run FlexGet without virtualenv, note that you will need to
 install all required dependencies yourself.
-
-Custom Virtualenv
------------------
-
-If you want to hack on flexget, but don't want to use paver bootstrap because
-you want to keep your virtualenv outside the repo. You can setup your own virtualenv
-and easily install flexget with in that virtualenv.
-
-    # Create virtualenv and source active it.
-    pip install paver
-
-    pip install -e . # with in the repo.
-
-This will install all the flexget dependencies. Now ``flexget`` should work just fine.
-
-Happy Hacking.
-
-
-.. image:: https://d2weczhvl823v0.cloudfront.net/Flexget/flexget/trend.png
-   :alt: Bitdeli badge
-   :target: https://bitdeli.com/free
-

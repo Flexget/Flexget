@@ -1,0 +1,48 @@
+<div>
+  <div>
+      <md-progress-linear md-mode="determinate" value="{{ vm.streamProgress }}"></md-progress-linear>
+  </div>
+  <span class="md-subhead" ng-if="vm.running[0]">{{ vm.running[0].name }} ({{ vm.running[0].current_phase }})</span>
+  <md-tabs md-selected="selectedIndex" md-border-bottom md-dynamic-height flex>
+      <md-tab ng-repeat="task in vm.streamTasks" flex>
+          <md-tab-label>
+              <span>{{ task.name }}</span>
+          </md-tab-label>
+          <md-tab-body>
+              <div layout="row" layout-align="space-around center">
+                  <div ng-hide="task.status == 'complete'" class="text-center">
+                      <div ng-if="task.status == 'pending'" class="md-display-2">Pending</div>
+                      <div ng-if="task.status == 'running'">
+                          <div class="md-display-2">{{ task.phase | executePhaseFilter }}</div>
+                          <div>
+                              <small>({{ task.plugin }})</small>
+                          </div>
+                      </div>
+                  </div>
+                  <div ng-if="task.status == 'complete'">
+                    <md-subheader class="md-no-sticky text-center">
+                        <span>Accepted: {{ task.accepted }}</span>
+                        <span>Rejected: {{ task.rejected }}</span>
+                        <span>Failed: {{ task.failed }}</span>
+                        <span>Undecided: {{ task.undecided }}</span>
+                    </md-subheader>
+                    <md-list>
+                        <md-list-item class="md-2-line" ng-repeat="entry in task.entries">
+                            <md-icon class="fa fa-lg" ng-class="{ 'fa-check-circle': entry.accepted_by, 'fa-question-circle': !entry.accepted_by }"></md-icon>
+                            <div class="md-list-item-text">
+                                <h3>{{ entry.title }}</h3>
+                                <p>{{ entry.accepted_by }}</p>
+                            </div>
+                        </md-list-item>
+                    </md-list>  
+                  </div>
+              </div>
+          </md-tab-body>
+      </md-tab>
+  </md-tabs>
+  <div layout="row" layout-align="space-around center">
+      <div></div>
+      <md-button class="md-raised md-primary" ng-click="vm.clear()">Clear</md-button>
+      <div></div>
+  </div>
+</div>

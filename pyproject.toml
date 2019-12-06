@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+
+[tool.black]
+line-length = 99
+skip-string-normalization = true
+target-version = ['py27', 'py34', 'py35', 'py36', 'py37']
+# Only include files in /flexget/, or directly in project root
+include = '^/(flexget/.*)?[^/]*\.pyi?$'
+exclude = '''
+(
+  /(
+      \.git
+    | \.venv
+    | \.idea
+    | dist
+    | flexget/ui
+  )/
+)
+'''
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+line_length = 99
+not_skip = ['__init__.py']
+not_known_standard_library = ['builtins']
+known_future_library = ['future', 'past' , 'builtins']
+known_first_party = ['flexget']
+default_section = 'THIRDPARTY'

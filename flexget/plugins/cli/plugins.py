@@ -1,41 +1,60 @@
-from __future__ import unicode_literals, division, absolute_import, print_function
 import logging
+
+from colorclass.toggles import disable_all_colors
 
 from flexget import options
 from flexget.event import event
-from flexget.logger import console
 from flexget.plugin import get_plugins
+from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
 
 log = logging.getLogger('plugins')
 
 
-@event('manager.subcommand.plugins')
 def plugins_summary(manager, options):
-    console('-' * 79)
-    console('%-20s%-30s%s' % ('Name', 'Roles (priority)', 'Info'))
-    console('-' * 79)
-
-    # print the list
-    for plugin in sorted(get_plugins(phase=options.phase, group=options.group)):
-        # do not include test classes, unless in debug mode
-        if plugin.get('debug_plugin', False) and not options.debug:
+    if options.table_type == 'porcelain':
+        disable_all_colors()
+    header = ['Keyword', 'Interfaces', 'Phases', 'Flags']
+    table_data = [header]
+    for plugin in sorted(get_plugins(phase=options.phase, interface=options.interface)):
+        if options.builtins and not plugin.builtin:
             continue
+
         flags = []
         if plugin.instance.__doc__:
-            flags.append('--doc')
+            flags.append('doc')
         if plugin.builtin:
             flags.append('builtin')
         if plugin.debug:
-            flags.append('debug')
-        handlers = plugin.phase_handlers
-        roles = ', '.join('%s(%s)' % (phase, handlers[phase].priority) for phase in handlers)
-        console('%-20s%-30s%s' % (plugin.name, roles, ', '.join(flags)))
+            if not options.debug:
+                continue
+            flags.append('developers')
 
-    console('-' * 79)
+        handlers = plugin.phase_handlers
+        roles = []
+        for phase in handlers:
+            priority = handlers[phase].priority
+            roles.append('{0}({1})'.format(phase, priority))
+
+        name = colorize('green', plugin.name) if 'builtin' in flags else plugin.name
+        table_data.append([name, ', '.join(plugin.interfaces), ', '.join(roles), ', '.join(flags)])
+
+    try:
+        table = TerminalTable(options.table_type, table_data, wrap_columns=[1, 2])
+        console(table.output)
+    except TerminalTableError as e:
+        console('ERROR: %s' % str(e))
+        return
+    console(colorize('green', ' Built-in plugins'))
 
 
 @event('options.register')
 def register_parser_arguments():
-    plugins_subparser = options.register_command('plugins', plugins_summary, help='print registered plugin summaries')
-    plugins_subparser.add_argument('--group', help='show plugins belonging to this group')
-    plugins_subparser.add_argument('--phase', help='show plugins that act on this phase')
+    parser = options.register_command(
+        'plugins',
+        plugins_summary,
+        help='Print registered plugin summaries',
+        parents=[table_parser],
+    )
+    parser.add_argument('--interface', help='Show plugins belonging to this interface')
+    parser.add_argument('--phase', help='Show plugins that act on this phase')
+    parser.add_argument('--builtins', action='store_true', help='Show just builtin plugins')

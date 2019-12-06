@@ -1,4 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
 import mimetypes
 
@@ -8,7 +7,7 @@ from flexget.event import event
 log = logging.getLogger('path_by_ext')
 
 
-class PluginPathByExt(object):
+class PluginPathByExt:
     """
         Allows specifying path based on content-type
 
@@ -43,7 +42,7 @@ class PluginPathByExt(object):
                     log.debug('Unknown mimetype %s' % entry['mime-type'])
             else:
                 # try to find from url
-                for ext, path in config.iteritems():
+                for ext, path in config.items():
                     if entry['url'].endswith('.' + ext):
                         callback(entry, path)
 

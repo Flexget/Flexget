@@ -1,5 +1,4 @@
 """Plugin for mocking task data."""
-from __future__ import unicode_literals, division, absolute_import
 import logging
 
 from flexget import plugin
@@ -9,7 +8,7 @@ from flexget.event import event
 log = logging.getLogger('mock')
 
 
-class Mock(object):
+class Mock:
     """
     Allows adding mock input entries.
 
@@ -26,12 +25,9 @@ class Mock(object):
         'type': 'array',
         'items': {
             'type': 'object',
-            'properties': {
-                'title': {'type': 'string'},
-                'url': {'type': 'string'}
-            },
-            'required': ['title']
-        }
+            'properties': {'title': {'type': 'string'}, 'url': {'type': 'string'}},
+            'required': ['title'],
+        },
     }
 
     def on_task_input(self, task, config):
@@ -39,8 +35,8 @@ class Mock(object):
         for line in config:
             entry = Entry(line)
             # no url specified, add random one based on title (ie. test)
-            if not 'url' in entry:
-                entry['url'] = 'http://localhost/mock/%s' % hash(entry['title'])
+            if 'url' not in entry:
+                entry['url'] = 'mock://localhost/mock/%s' % hash(entry['title'])
             entries.append(entry)
         return entries
 

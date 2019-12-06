@@ -1,0 +1,96 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: ['2']
+      method: GET
+      uri: https://api.trakt.tv/sync/history/movies
+    response:
+      body: {string: '[{"id":4115573597,"watched_at":"2018-12-29T07:12:39.000Z","action":"watch","type":"movie","movie":{"title":"Mortal
+          Engines","year":2018,"ids":{"trakt":285120,"slug":"mortal-engines-2018","imdb":"tt1571234","tmdb":428078}}},{"id":4115573377,"watched_at":"2018-12-29T07:12:38.000Z","action":"watch","type":"movie","movie":{"title":"The
+          Mule","year":2018,"ids":{"trakt":351319,"slug":"the-mule-2018","imdb":"tt7959026","tmdb":504172}}},{"id":4115573567,"watched_at":"2018-12-29T07:12:34.000Z","action":"watch","type":"movie","movie":{"title":"Justice
+          League","year":2017,"ids":{"trakt":94232,"slug":"justice-league-2017","imdb":"tt0974015","tmdb":141052}}},{"id":4115573305,"watched_at":"2018-12-29T07:12:31.000Z","action":"watch","type":"movie","movie":{"title":"Deadpool
+          2","year":2018,"ids":{"trakt":226108,"slug":"deadpool-2-2018","imdb":"tt5463162","tmdb":383498}}},{"id":4115573353,"watched_at":"2018-12-29T07:12:28.000Z","action":"watch","type":"movie","movie":{"title":"Spider-Man:
+          Into the Spider-Verse","year":2018,"ids":{"trakt":205404,"slug":"spider-man-into-the-spider-verse-2018","imdb":"tt4633694","tmdb":324857}}},{"id":4115573278,"watched_at":"2018-12-29T07:12:25.000Z","action":"watch","type":"movie","movie":{"title":"Replicas","year":2018,"ids":{"trakt":237986,"slug":"replicas-2018","imdb":"tt4154916","tmdb":300681}}},{"id":4115573322,"watched_at":"2018-12-29T07:12:24.000Z","action":"watch","type":"movie","movie":{"title":"Peppermint","year":2018,"ids":{"trakt":305444,"slug":"peppermint-2018","imdb":"tt6850820","tmdb":458594}}},{"id":4115573258,"watched_at":"2018-12-29T07:12:23.000Z","action":"watch","type":"movie","movie":{"title":"The
+          Meg","year":2018,"ids":{"trakt":224015,"slug":"the-meg-2018","imdb":"tt4779682","tmdb":345940}}},{"id":4115573615,"watched_at":"2018-12-29T07:12:18.000Z","action":"watch","type":"movie","movie":{"title":"Halloween","year":2018,"ids":{"trakt":269236,"slug":"halloween-2018","imdb":"tt1502407","tmdb":424139}}},{"id":4115573084,"watched_at":"2018-12-29T07:12:18.000Z","action":"watch","type":"movie","movie":{"title":"The
+          House with a Clock in Its Walls","year":2018,"ids":{"trakt":311024,"slug":"the-house-with-a-clock-in-its-walls-2018","imdb":"tt2119543","tmdb":463821}}}]'}
+      headers:
+        CF-RAY: [490a76956aee3d2b-CPH]
+        Cache-Control: ['max-age=0, private, must-revalidate']
+        Cf-Railgun: [direct (starting new WAN connection)]
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Sat, 29 Dec 2018 07:13:18 GMT']
+        Etag: [W/"90766a37b74e3fb93b4196acbf80a3f4"]
+        Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        Last-Modified: ['Sat, 29 Dec 2018 07:12:18 GMT']
+        Server: [cloudflare]
+        Set-Cookie: ['__cfduid=dc2a1f0e4fb8937cdf37e68b866cb7c211546067597; expires=Sun,
+            29-Dec-19 07:13:17 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Pagination-Item-Count: ['25']
+        X-Pagination-Limit: ['10']
+        X-Pagination-Page: ['1']
+        X-Pagination-Page-Count: ['3']
+        X-Request-Id: [215b19ce-5537-4e67-baf8-eed4621107a4]
+        X-Runtime: ['0.036239']
+        X-Xss-Protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Authorization: [Bearer c78844ac92c43cf81662d6a132d9412220023c5c962e1a80e519472e502e45c9]
+        Content-Type: [application/json]
+        Cookie: [__cfduid=dc2a1f0e4fb8937cdf37e68b866cb7c211546067597]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: ['2']
+      method: GET
+      uri: https://api.trakt.tv/sync/history/movies?page=1&limit=1000
+    response:
+      body: {string: '[{"id":4115573597,"watched_at":"2018-12-29T07:12:39.000Z","action":"watch","type":"movie","movie":{"title":"Mortal
+          Engines","year":2018,"ids":{"trakt":285120,"slug":"mortal-engines-2018","imdb":"tt1571234","tmdb":428078}}},{"id":4115573377,"watched_at":"2018-12-29T07:12:38.000Z","action":"watch","type":"movie","movie":{"title":"The
+          Mule","year":2018,"ids":{"trakt":351319,"slug":"the-mule-2018","imdb":"tt7959026","tmdb":504172}}},{"id":4115573567,"watched_at":"2018-12-29T07:12:34.000Z","action":"watch","type":"movie","movie":{"title":"Justice
+          League","year":2017,"ids":{"trakt":94232,"slug":"justice-league-2017","imdb":"tt0974015","tmdb":141052}}},{"id":4115573305,"watched_at":"2018-12-29T07:12:31.000Z","action":"watch","type":"movie","movie":{"title":"Deadpool
+          2","year":2018,"ids":{"trakt":226108,"slug":"deadpool-2-2018","imdb":"tt5463162","tmdb":383498}}},{"id":4115573353,"watched_at":"2018-12-29T07:12:28.000Z","action":"watch","type":"movie","movie":{"title":"Spider-Man:
+          Into the Spider-Verse","year":2018,"ids":{"trakt":205404,"slug":"spider-man-into-the-spider-verse-2018","imdb":"tt4633694","tmdb":324857}}},{"id":4115573278,"watched_at":"2018-12-29T07:12:25.000Z","action":"watch","type":"movie","movie":{"title":"Replicas","year":2018,"ids":{"trakt":237986,"slug":"replicas-2018","imdb":"tt4154916","tmdb":300681}}},{"id":4115573322,"watched_at":"2018-12-29T07:12:24.000Z","action":"watch","type":"movie","movie":{"title":"Peppermint","year":2018,"ids":{"trakt":305444,"slug":"peppermint-2018","imdb":"tt6850820","tmdb":458594}}},{"id":4115573258,"watched_at":"2018-12-29T07:12:23.000Z","action":"watch","type":"movie","movie":{"title":"The
+          Meg","year":2018,"ids":{"trakt":224015,"slug":"the-meg-2018","imdb":"tt4779682","tmdb":345940}}},{"id":4115573615,"watched_at":"2018-12-29T07:12:18.000Z","action":"watch","type":"movie","movie":{"title":"Halloween","year":2018,"ids":{"trakt":269236,"slug":"halloween-2018","imdb":"tt1502407","tmdb":424139}}},{"id":4115573084,"watched_at":"2018-12-29T07:12:18.000Z","action":"watch","type":"movie","movie":{"title":"The
+          House with a Clock in Its Walls","year":2018,"ids":{"trakt":311024,"slug":"the-house-with-a-clock-in-its-walls-2018","imdb":"tt2119543","tmdb":463821}}},{"id":4115573116,"watched_at":"2018-12-29T07:12:14.000Z","action":"watch","type":"movie","movie":{"title":"Hunter
+          Killer","year":2018,"ids":{"trakt":292679,"slug":"hunter-killer-2018","imdb":"tt1846589","tmdb":399402}}},{"id":4115573029,"watched_at":"2018-12-29T07:12:13.000Z","action":"watch","type":"movie","movie":{"title":"BlacKkKlansman","year":2018,"ids":{"trakt":334724,"slug":"blackkklansman-2018","imdb":"tt7349662","tmdb":487558}}},{"id":4115573103,"watched_at":"2018-12-29T07:12:11.000Z","action":"watch","type":"movie","movie":{"title":"Crazy
+          Rich Asians","year":2018,"ids":{"trakt":301543,"slug":"crazy-rich-asians-2018","imdb":"tt3104988","tmdb":455207}}},{"id":4115572820,"watched_at":"2018-12-29T07:12:11.000Z","action":"watch","type":"movie","movie":{"title":"Incredibles
+          2","year":2018,"ids":{"trakt":159626,"slug":"incredibles-2-2018","imdb":"tt3606756","tmdb":260513}}},{"id":4115572866,"watched_at":"2018-12-29T07:12:04.000Z","action":"watch","type":"movie","movie":{"title":"Bumblebee","year":2018,"ids":{"trakt":269568,"slug":"bumblebee-2018","imdb":"tt4701182","tmdb":424783}}},{"id":4115572781,"watched_at":"2018-12-29T07:12:02.000Z","action":"watch","type":"movie","movie":{"title":"Night
+          School","year":2018,"ids":{"trakt":300756,"slug":"night-school-2018","imdb":"tt6781982","tmdb":454293}}},{"id":4115572795,"watched_at":"2018-12-29T07:11:57.000Z","action":"watch","type":"movie","movie":{"title":"Avengers:
+          Infinity War","year":2018,"ids":{"trakt":191797,"slug":"avengers-infinity-war-2018","imdb":"tt4154756","tmdb":299536}}},{"id":4115572517,"watched_at":"2018-12-29T07:11:57.000Z","action":"watch","type":"movie","movie":{"title":"Bad
+          Times at the El Royale","year":2018,"ids":{"trakt":292712,"slug":"bad-times-at-the-el-royale-2018","imdb":"tt6628394","tmdb":446021}}},{"id":4115572262,"watched_at":"2018-12-29T07:11:55.000Z","action":"watch","type":"movie","movie":{"title":"A
+          Simple Favor","year":2018,"ids":{"trakt":331407,"slug":"a-simple-favor-2018","imdb":"tt7040874","tmdb":484247}}},{"id":4115572765,"watched_at":"2018-12-29T07:11:53.000Z","action":"watch","type":"movie","movie":{"title":"Mission:
+          Impossible - Fallout","year":2018,"ids":{"trakt":222160,"slug":"mission-impossible-fallout-2018","imdb":"tt4912910","tmdb":353081}}},{"id":4115572227,"watched_at":"2018-12-29T07:11:46.000Z","action":"watch","type":"movie","movie":{"title":"Fantastic
+          Beasts: The Crimes of Grindelwald","year":2018,"ids":{"trakt":219417,"slug":"fantastic-beasts-the-crimes-of-grindelwald-2018","imdb":"tt4123430","tmdb":338952}}},{"id":4115572215,"watched_at":"2018-12-29T07:11:44.000Z","action":"watch","type":"movie","movie":{"title":"Venom","year":2018,"ids":{"trakt":216715,"slug":"venom-2018","imdb":"tt1270797","tmdb":335983}}},{"id":4115572162,"watched_at":"2018-12-29T07:11:42.000Z","action":"watch","type":"movie","movie":{"title":"Aquaman","year":2018,"ids":{"trakt":193968,"slug":"aquaman-2018","imdb":"tt1477834","tmdb":297802}}},{"id":4115572139,"watched_at":"2018-12-29T07:11:39.000Z","action":"watch","type":"movie","movie":{"title":"Bird
+          Box","year":2018,"ids":{"trakt":250049,"slug":"bird-box-2018","imdb":"tt2737304","tmdb":405774}}},{"id":4115572803,"watched_at":"2018-12-29T07:11:37.000Z","action":"watch","type":"movie","movie":{"title":"White
+          Boy Rick","year":2018,"ids":{"trakt":284950,"slug":"white-boy-rick-2018","imdb":"tt4537896","tmdb":438808}}}]'}
+      headers:
+        CF-RAY: [490a769ecfc33d2b-CPH]
+        Cache-Control: ['max-age=0, private, must-revalidate']
+        Cf-Railgun: [4f8eb99602 99.99 0.182912 0030 57da]
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Sat, 29 Dec 2018 07:13:19 GMT']
+        Etag: [W/"9efac828568a8403d33fda6a176347c3"]
+        Expect-CT: ['max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"']
+        Last-Modified: ['Sat, 29 Dec 2018 07:12:18 GMT']
+        Server: [cloudflare]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Pagination-Item-Count: ['25']
+        X-Pagination-Limit: ['1000']
+        X-Pagination-Page: ['1']
+        X-Pagination-Page-Count: ['1']
+        X-Request-Id: [cd490960-464c-458c-852b-c007379978be]
+        X-Runtime: ['0.060364']
+        X-Xss-Protection: [1; mode=block]
+      status: {code: 200, message: OK}
+version: 1

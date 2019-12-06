@@ -1,4 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
 
 from flexget import plugin
@@ -7,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('disable_phases')
 
 
-class PluginDisablePhases(object):
+class PluginDisablePhases:
     """Disables phases from task execution.
 
     Mainly meant for advanced users and development.
@@ -23,7 +22,8 @@ class PluginDisablePhases(object):
         return {'type': 'array', 'items': {'type': 'string', 'enum': plugin.task_phases}}
 
     def on_task_start(self, task, config):
-        map(task.disable_phase, config)
+        list(map(task.disable_phase, config))
+
 
 @event('plugin.register')
 def register_plugin():

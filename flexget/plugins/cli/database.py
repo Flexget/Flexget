@@ -1,10 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
+from argparse import ArgumentParser
 
 from flexget import options
-from flexget.db_schema import reset_schema, plugin_schemas
+from flexget.db_schema import plugin_schemas, reset_schema
 from flexget.event import event
-from flexget.logger import console
 from flexget.manager import Base, Session
+from flexget.terminal import console
 
 
 def do_cli(manager, options):
@@ -42,40 +42,40 @@ def reset(manager):
 
 
 def reset_plugin(options):
-    plugin = options.reset_plugin
-    if not plugin:
-        console('%-20s Ver Tables' % 'Name')
-        console('-' * 79)
-        for k, v in sorted(plugin_schemas.iteritems()):
-            tables = ''
-            line_len = 0
-            for name in v['tables']:
-                if line_len + len(name) + 2 >= 53:
-                    tables += '\n'
-                    tables += ' ' * 25
-                    line_len = len(name) + 2
-                else:
-                    line_len += len(name) + 2
-                tables += name + ', '
-            tables = tables.rstrip(', ')
-            console('%-20s %s   %s' % (k, v['version'], tables))
-    else:
-        try:
-            reset_schema(plugin)
-            console('The database for `%s` has been reset.' % plugin)
-        except ValueError as e:
-            console('Unable to reset %s: %s' % (plugin, e.message))
+    plugin = options.plugin_name[0]
+    try:
+        reset_schema(plugin)
+        console('The database for `%s` has been reset.' % plugin)
+    except ValueError as e:
+        console('Unable to reset %s: %s' % (plugin, e.message))
 
 
 @event('options.register')
 def register_parser_arguments():
-    parser = options.register_command('database', do_cli, help='utilities to manage the FlexGet database')
+    plugins_parser = ArgumentParser(add_help=False)
+    plugins_parser.add_argument(
+        'plugin_name', help="Name of plugin to reset", nargs=1, choices=list(plugin_schemas)
+    )
+
+    parser = options.register_command(
+        'database', do_cli, help='Utilities to manage the FlexGet database'
+    )
     subparsers = parser.add_subparsers(title='Actions', metavar='<action>', dest='db_action')
-    subparsers.add_parser('cleanup', help='make all plugins clean un-needed data from the database')
-    subparsers.add_parser('vacuum', help='running vacuum can increase performance and decrease database size')
-    reset_parser = subparsers.add_parser('reset', add_help=False, help='reset the entire database (DANGEROUS!)')
-    reset_parser.add_argument('--sure', action='store_true', required=True,
-                              help='you must use this flag to indicate you REALLY want to do this')
-    reset_plugin_parser = subparsers.add_parser('reset-plugin', help='reset the database for a specific plugin')
-    reset_plugin_parser.add_argument('reset_plugin', metavar='<plugin>', nargs='?',
-                                 help='name of plugin to reset (if omitted, known plugins will be listed)')
+    subparsers.add_parser(
+        'cleanup', help='Make all plugins clean un-needed data from the database'
+    )
+    subparsers.add_parser(
+        'vacuum', help='Running vacuum can increase performance and decrease database size'
+    )
+    reset_parser = subparsers.add_parser(
+        'reset', add_help=False, help='Reset the entire database (DANGEROUS!)'
+    )
+    reset_parser.add_argument(
+        '--sure',
+        action='store_true',
+        required=True,
+        help='You must use this flag to indicate you REALLY want to do this',
+    )
+    subparsers.add_parser(
+        'reset-plugin', help='Reset the database for a specific plugin', parents=[plugins_parser]
+    )

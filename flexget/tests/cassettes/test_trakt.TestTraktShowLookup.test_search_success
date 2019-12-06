@@ -1,0 +1,74 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/search?type=show&query=11-22-63
+  response:
+    body: {string: '[{"type":"show","score":12.295875,"show":{"title":"11.22.63","overview":"Jake
+        Epping, a recently divorced English teacher from Maine, is presented with
+        the chance to travel back in time to Dallas, Texas in 1960 by his longtime
+        friend Al Templeton. He is convinced into going and attempts to prevent the
+        assassination of JFK in November 1963. However, he becomes attached to the
+        life he makes in the past and this could be his mission''s undoing.","year":2016,"status":"ended","images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":102771,"slug":"11-22-63","tvdb":301824,"imdb":"tt2879552","tmdb":64464,"tvrage":45210}}}]'}
+    headers:
+      CF-Cache-Status: [MISS]
+      CF-RAY: [312a166edf283cd7-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 11:38:14 GMT']
+      ETag: [W/"0faccfac9528de024734459a630d55f9"]
+      Expires: ['Sat, 17 Dec 2016 19:38:14 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=df3f3300213ef5b57b42ae2db6c63b3901481974694; expires=Sun,
+          17-Dec-17 11:38:14 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Pagination-Item-Count: ['1']
+      X-Pagination-Limit: ['10']
+      X-Pagination-Page: ['1']
+      X-Pagination-Page-Count: ['1']
+      X-Request-Id: [27b18551-89e9-4c9a-a682-fddf11833b34]
+      X-Runtime: ['0.012354']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      Cookie: [__cfduid=df3f3300213ef5b57b42ae2db6c63b3901481974694]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/102771?extended=full
+  response:
+    body: {string: '{"title":"11.22.63","year":2016,"ids":{"trakt":102771,"slug":"11-22-63","tvdb":301824,"imdb":"tt2879552","tmdb":64464,"tvrage":45210},"overview":"Jake
+        Epping, a recently divorced English teacher from Maine, is presented with
+        the chance to travel back in time to Dallas, Texas in 1960 by his longtime
+        friend Al Templeton. He is convinced into going and attempts to prevent the
+        assassination of JFK in November 1963. However, he becomes attached to the
+        life he makes in the past and this could be his mission''s undoing.","first_aired":"2016-02-15T08:00:00.000Z","airs":{"day":"Monday","time":"00:01","timezone":"America/New_York"},"runtime":50,"certification":"TV-MA","network":"Hulu","country":"us","trailer":null,"homepage":"http://www.hulu.com/112263","status":"ended","rating":8.17718,"votes":1902,"updated_at":"2016-12-07T10:48:57.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fr","he","hu","it","it","nl","pl","pt","ru","tr","uk"],"genres":["science-fiction","drama","fantasy"],"aired_episodes":8}'}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [312a166faf3b3cd7-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 11:38:14 GMT']
+      ETag: [W/"0956eecbabbc538df24b2e269621722a"]
+      Expires: ['Sat, 17 Dec 2016 19:38:14 GMT']
+      Last-Modified: ['Wed, 07 Dec 2016 10:48:57 GMT']
+      Server: [cloudflare-nginx]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [fb9201a6-e03a-4125-806e-1fc06f9d4a7d]
+      X-Runtime: ['0.010213']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1

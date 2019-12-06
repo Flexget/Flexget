@@ -1,11 +1,10 @@
-from __future__ import absolute_import, division, unicode_literals
-
 import copy
 import functools
 import logging
 
 from flexget.plugin import PluginError
-from flexget.utils.template import render_from_entry
+from flexget.utils.lazy_dict import LazyDict, LazyLookup
+from flexget.utils.template import FlexGetTemplate, render_from_entry
 
 log = logging.getLogger('entry')
 
@@ -18,42 +17,10 @@ class EntryUnicodeError(Exception):
         self.value = value
 
     def __str__(self):
-        return 'Field %s is not unicode-compatible (%r)' % (self.key, self.value)
+        return 'Entry strings must be unicode: %s (%r)' % (self.key, self.value)
 
 
-class LazyField(object):
-    """
-    LazyField is a type of :class:`Entry` field which is evaluated only
-    when it's value is requested. This way FlexGet can avoid doing heavy
-    lookups from the internet or database for details that may not be needed
-    ever.
-
-    Stores callback function(s) to which populates :class:`Entry` fields.
-    Callback is ran when it's called or to get a string representation."""
-
-    def __init__(self, entry, field, func):
-        self.entry = entry
-        self.field = field
-        self.funcs = [func]
-
-    def __call__(self):
-        # Return a result from the first lookup function which succeeds
-        for func in self.funcs[:]:
-            result = func(self.entry, self.field)
-            if result is not None:
-                return result
-
-    def __str__(self):
-        return str(self())
-
-    def __repr__(self):
-        return '<LazyField(field=%s)>' % self.field
-
-    def __unicode__(self):
-        return unicode(self())
-
-
-class Entry(dict):
+class Entry(LazyDict):
     """
     Represents one item in task. Must have `url` and *title* fields.
 
@@ -68,6 +35,7 @@ class Entry(dict):
     """
 
     def __init__(self, *args, **kwargs):
+        super().__init__()
         self.traces = []
         self.snapshots = {}
         self._state = 'undecided'
@@ -193,6 +161,10 @@ class Entry(dict):
         self.run_hooks('complete', **kwargs)
 
     @property
+    def state(self):
+        return self._state
+
+    @property
     def accepted(self):
         return self._state == 'accepted'
 
@@ -209,125 +181,34 @@ class Entry(dict):
         return self._state == 'undecided'
 
     def __setitem__(self, key, value):
-        # Enforce unicode compatibility. Check for all subclasses of basestring, so that NavigableStrings are also cast
-        if isinstance(value, basestring) and not type(value) == unicode:
-            try:
-                value = unicode(value)
-            except UnicodeDecodeError:
-                raise EntryUnicodeError(key, value)
+        # Enforce unicode compatibility.
+        if isinstance(value, bytes):
+            raise EntryUnicodeError(key, value)
+        # Coerce any enriched strings (such as those returned by BeautifulSoup) to plain strings to avoid serialization
+        # troubles.
+        elif (
+            isinstance(value, str) and type(value) != str
+        ):  # pylint: disable=unidiomatic-typecheck
+            value = str(value)
 
         # url and original_url handling
         if key == 'url':
-            if not isinstance(value, (basestring, LazyField)):
+            if not isinstance(value, (str, LazyLookup)):
                 raise PluginError('Tried to set %r url to %r' % (self.get('title'), value))
             self.setdefault('original_url', value)
 
         # title handling
         if key == 'title':
-            if not isinstance(value, (basestring, LazyField)):
+            if not isinstance(value, (str, LazyLookup)):
                 raise PluginError('Tried to set title to %r' % value)
+            self.setdefault('original_title', value)
 
         try:
             log.trace('ENTRY SET: %s = %r' % (key, value))
         except Exception as e:
             log.debug('trying to debug key `%s` value threw exception: %s' % (key, e))
 
-        dict.__setitem__(self, key, value)
-
-    def update(self, *args, **kwargs):
-        """Overridden so our __setitem__ is not avoided."""
-        if args:
-            if len(args) > 1:
-                raise TypeError("update expected at most 1 arguments, got %d" % len(args))
-            other = dict(args[0])
-            for key in other:
-                self[key] = other[key]
-        for key in kwargs:
-            self[key] = kwargs[key]
-
-    def setdefault(self, key, value=None):
-        """Overridden so our __setitem__ is not avoided."""
-        if key not in self:
-            self[key] = value
-        return self[key]
-
-    def __getitem__(self, key):
-        """Supports lazy loading of fields. If a stored value is a :class:`LazyField`, call it, return the result."""
-        result = dict.__getitem__(self, key)
-        if isinstance(result, LazyField):
-            log.trace('evaluating lazy field %s' % key)
-            return result()
-        else:
-            return result
-
-    def get(self, key, default=None, eval_lazy=True, lazy=None):
-        """
-        Overridden so that our __getitem__ gets used for :class:`LazyFields`
-
-        :param string key: Name of the key
-        :param object default: Value to be returned if key does not exists
-        :param bool eval_lazy: Allow evaluating LazyFields or not
-        :param bool lazy: Provided for backwards compatibility
-        :return: Value or given *default*
-        """
-        if lazy is not None:
-            log.warning('deprecated lazy kwarg used')
-            eval_lazy = lazy
-        if not eval_lazy and self.is_lazy(key):
-            return default
-        try:
-            return self[key]
-        except KeyError:
-            return default
-
-    def __contains__(self, key):
-        """Will cause lazy field lookup to occur and will return false if a field exists but is None."""
-        return self.get(key) is not None
-
-    def register_lazy_fields(self, fields, func):
-        """Register a list of fields to be lazily loaded by callback func.
-
-        :param list fields:
-          List of field names that are registered as lazy fields
-        :param func:
-          Callback function which is called when lazy field needs to be evaluated.
-          Function call will get params (entry, field).
-          See :class:`LazyField` class for more details.
-        """
-        for field in fields:
-            if self.is_lazy(field):
-                # If the field is already a lazy field, append this function to it's list of functions
-                dict.get(self, field).funcs.append(func)
-            elif self.get(field, eval_lazy=False) is None:
-                # If it is not a lazy field, and isn't already populated, make it a lazy field
-                self[field] = LazyField(self, field, func)
-
-    def unregister_lazy_fields(self, fields, func):
-        """
-        :param list fields: List of field names to unregister.
-          If given field is not lazy loading, value is set to None
-        :param function func: Function to be removed from registered.
-        :return: Number of removed functions
-        :rtype: int
-        """
-        removed = 0
-        for field in fields:
-            if self.is_lazy(field):
-                lazy_funcs = dict.get(self, field).funcs
-                if func in lazy_funcs:
-                    removed += 1
-                    lazy_funcs.remove(func)
-                if not lazy_funcs:
-                    self[field] = None
-        return removed
-
-    def is_lazy(self, field):
-        """
-        :param string field: Name of the field to check
-        :return: True if field is lazy loading.
-        :rtype: bool
-        """
-        return isinstance(dict.get(self, field), LazyField)
+        super().__setitem__(key, value)
 
     def safe_str(self):
         return '%s | %s' % (self['title'], self['url'])
@@ -339,13 +220,13 @@ class Entry(dict):
         :return: True if entry is valid. Return False if this cannot be used.
         :rtype: bool
         """
-        if not 'title' in self:
+        if 'title' not in self:
             return False
-        if not 'url' in self:
+        if 'url' not in self:
             return False
-        if not isinstance(self['url'], basestring):
+        if not isinstance(self['url'], str):
             return False
-        if not isinstance(self['title'], basestring):
+        if not isinstance(self['title'], str):
             return False
         return True
 
@@ -355,11 +236,14 @@ class Entry(dict):
         :param string name: Snapshot name
         """
         snapshot = {}
-        for field, value in self.iteritems():
+        for field, value in self.items():
             try:
                 snapshot[field] = copy.deepcopy(value)
             except TypeError:
-                log.warning('Unable to take `%s` snapshot for field `%s` in `%s`' % (name, field, self['title']))
+                log.warning(
+                    'Unable to take `%s` snapshot for field `%s` in `%s`'
+                    % (name, field, self['title'])
+                )
         if snapshot:
             if name in self.snapshots:
                 log.warning('Snapshot `%s` is being overwritten for `%s`' % (name, self['title']))
@@ -380,8 +264,8 @@ class Entry(dict):
           Ignore any None values, do not record it to the Entry
         """
         func = dict.get if isinstance(source_item, dict) else getattr
-        for field, value in field_map.iteritems():
-            if isinstance(value, basestring):
+        for field, value in field_map.items():
+            if isinstance(value, str):
                 v = functools.reduce(func, value.split('.'), source_item)
             else:
                 v = value(source_item)
@@ -389,25 +273,31 @@ class Entry(dict):
                 continue
             self[field] = v
 
-    def render(self, template):
+    def render(self, template, native=False):
         """
         Renders a template string based on fields in the entry.
 
-        :param string template: A template string that uses jinja2 or python string replacement format.
+        :param template: A template string or FlexGetTemplate that uses jinja2 or python string replacement format.
+        :param native: If True, and the rendering result can be all native python types, not just strings.
         :return: The result of the rendering.
         :rtype: string
         :raises RenderError: If there is a problem.
         """
-        if not isinstance(template, basestring):
-            raise ValueError('Trying to render non string template, got %s' % repr(template))
-        log.trace('rendering: %s' % template)
-        return render_from_entry(template, self)
+        if not isinstance(template, (str, FlexGetTemplate)):
+            raise ValueError(
+                'Trying to render non string template or unrecognized template format, got %s'
+                % repr(template)
+            )
+        log.trace('rendering: %s', template)
+        return render_from_entry(template, self, native=native)
 
     def __eq__(self, other):
-        return self.get('title') == other.get('title') and self.get('original_url') == other.get('original_url')
+        return self.get('original_title') == other.get('original_title') and self.get(
+            'original_url'
+        ) == other.get('original_url')
 
     def __hash__(self):
-        return hash(self.get('title', '') + self.get('original_url', ''))
+        return hash(self.get('original_title', '') + self.get('original_url', ''))
 
     def __repr__(self):
         return '<Entry(title=%s,state=%s)>' % (self['title'], self._state)

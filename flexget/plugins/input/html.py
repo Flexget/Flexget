@@ -1,60 +1,74 @@
-from __future__ import unicode_literals, division, absolute_import
-import urlparse
 import logging
-import urllib
-import zlib
 import re
+import zlib
+from pathlib import Path
+from urllib import parse
+
 from jinja2 import Template
 
 from flexget import plugin
-from flexget.event import event
 from flexget.entry import Entry
-from flexget.utils.soup import get_soup
+from flexget.event import event
 from flexget.utils.cached_input import cached
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('html')
 
 
-class InputHtml(object):
+class InputHtml:
     """
-        Parses urls from html page. Usefull on sites which have direct download
-        links of any type (mp3, jpg, torrent, ...).
+    Parses urls from html page. Usefull on sites which have direct download
+    links of any type (mp3, jpg, torrent, ...).
 
-        Many anime-fansubbers do not provide RSS-feed, this works well in many cases.
+    Many anime-fansubbers do not provide RSS-feed, this works well in many cases.
 
-        Configuration expects url parameter.
+    Configuration expects url parameter.
 
-        Note: This returns ALL links on url so you need to configure filters
-        to match only to desired content.
+    Note: This returns ALL links on url so you need to configure filters
+    to match only to desired content.
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('text')
-        advanced = root.accept('dict')
-        advanced.accept('url', key='url', required=True)
-        advanced.accept('text', key='username')
-        advanced.accept('text', key='password')
-        advanced.accept('text', key='dump')
-        advanced.accept('text', key='title_from')
-        regexps = advanced.accept('list', key='links_re')
-        regexps.accept('regexp')
-        advanced.accept('boolean', key='increment')
-        increment = advanced.accept('dict', key='increment')
-        increment.accept('integer', key='from')
-        increment.accept('integer', key='to')
-        increment.accept('text', key='name')
-        increment.accept('integer', key='step')
-        increment.accept('boolean', key='stop_when_empty')
-        increment.accept('integer', key='entries_count')
-        return root
+    schema = {
+        'oneOf': [
+            {'type': 'string'},
+            {
+                'type': 'object',
+                'properties': {
+                    'url': {'type': 'string', 'format': 'url'},
+                    'username': {'type': 'string'},
+                    'password': {'type': 'string'},
+                    'dump': {'type': 'string'},
+                    'title_from': {'type': 'string'},
+                    'allow_empty_links': {'type': 'boolean'},
+                    'links_re': {'type': 'array', 'items': {'type': 'string', 'format': 'regex'}},
+                    'increment': {
+                        'oneOf': [
+                            {'type': 'boolean'},
+                            {
+                                'type': 'object',
+                                'properties': {
+                                    'from': {'type': 'integer'},
+                                    'to': {'type': 'integer'},
+                                    'name': {'type': 'string'},
+                                    'step': {'type': 'integer'},
+                                    'stop_when_empty': {'type': 'boolean'},
+                                    'entries_count': {'type': 'integer'},
+                                },
+                                'additionalProperties': False,
+                            },
+                        ]
+                    },
+                },
+                'required': ['url'],
+                'additionalProperties': False,
+            },
+        ]
+    }
 
     def build_config(self, config):
-
         def get_auth_from_url():
             """Moves basic authentication from url to username and password fields"""
-            parts = list(urlparse.urlsplit(config['url']))
+            parts = list(parse.urlsplit(config['url']))
             split = parts[1].split('@')
             if len(split) > 1:
                 auth = split[0].split(':')
@@ -63,9 +77,9 @@ class InputHtml(object):
                 else:
                     log.warning('Invalid basic authentication in url: %s' % config['url'])
                 parts[1] = split[1]
-                config['url'] = urlparse.urlunsplit(parts)
+                config['url'] = parse.urlunsplit(parts)
 
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = {'url': config}
         get_auth_from_url()
         return config
@@ -77,7 +91,10 @@ class InputHtml(object):
 
         auth = None
         if config.get('username') and config.get('password'):
-            log.debug('Basic auth enabled. User: %s Password: %s' % (config['username'], config['password']))
+            log.debug(
+                'Basic auth enabled. User: %s Password: %s'
+                % (config['username'], config['password'])
+            )
             auth = (config['username'], config['password'])
 
         increment = config.get('increment')
@@ -119,7 +136,7 @@ class InputHtml(object):
                 current += step
             return entries
         else:
-            return self._request_url(task, config, base_url, auth)
+            return self._request_url(task, config, base_url, auth, dump_name=config.get('dump'))
 
     def _request_url(self, task, config, url, auth, dump_name=None):
         log.verbose('Requesting: %s' % url)
@@ -131,7 +148,7 @@ class InputHtml(object):
         if dump_name:
             log.verbose('Dumping: %s' % dump_name)
             data = soup.prettify()
-            with open(dump_name, 'w') as f:
+            with open(dump_name, 'w', encoding='utf-8') as f:
                 f.write(data)
 
         return self.create_entries(url, soup, config)
@@ -146,10 +163,17 @@ class InputHtml(object):
                 return None
         return title or None
 
-    def _title_from_url(self, url):
-        parts = urllib.splitquery(url[url.rfind('/') + 1:])
-        title = urllib.unquote_plus(parts[0])
-        return title
+    @staticmethod
+    def _title_from_url(url):
+        parts = parse.urlsplit(url)
+        name = ''
+        if parts.scheme == 'magnet':
+            match = re.search(r'(?:&dn(?:\.\d)?=)(.+?)(?:&)', parts.query)
+            if match:
+                name = match.group(1)
+        else:
+            name = Path(parts.path).name
+        return parse.unquote_plus(name)
 
     def create_entries(self, page_url, soup, config):
 
@@ -168,19 +192,19 @@ class InputHtml(object):
             if not link.has_attr('href'):
                 continue
             # no content in the link
-            if not link.contents:
+            if not link.contents and not config.get('allow_empty_links', False):
                 continue
 
             url = link['href']
-            log_link = url
-            log_link = log_link.replace('\n', '')
-            log_link = log_link.replace('\r', '')
-
             # fix broken urls
             if url.startswith('//'):
                 url = 'http:' + url
             elif not url.startswith('http://') or not url.startswith('https://'):
-                url = urlparse.urljoin(page_url, url)
+                url = parse.urljoin(page_url, url)
+
+            log_link = url
+            log_link = log_link.replace('\n', '')
+            log_link = log_link.replace('\r', '')
 
             # get only links matching regexp
             regexps = config.get('links_re', None)
@@ -190,6 +214,7 @@ class InputHtml(object):
                     if re.search(regexp, url):
                         accept = True
                 if not accept:
+                    log.debug('url does not match any "links_re": %s' % url)
                     continue
 
             title_from = config.get('title_from', 'auto')
@@ -222,8 +247,11 @@ class InputHtml(object):
                         for ext in ('.html', '.php'):
                             if from_url.endswith(ext):
                                 switch_to = 'title'
-                        log.info('Link names seem to be useless, auto-configuring \'title_from: %s\'. '
-                                 'This may not work well, you might need to configure it yourself.' % switch_to)
+                        log.info(
+                            'Link names seem to be useless, auto-configuring \'title_from: %s\'. '
+                            'This may not work well, you might need to configure it yourself.'
+                            % switch_to
+                        )
                         config['title_from'] = switch_to
                         # start from the beginning  ...
                         return self.create_entries(page_url, soup, config)
@@ -246,7 +274,7 @@ class InputHtml(object):
             # in case the title contains xxxxxxx.torrent - foooo.torrent clean it a bit (get up to first .torrent)
             # TODO: hack
             if title.lower().find('.torrent') > 0:
-                title = title[:title.lower().find('.torrent')]
+                title = title[: title.lower().find('.torrent')]
 
             if title_exists(title):
                 # title link should be unique, add CRC32 to end if it's not

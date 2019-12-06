@@ -1,0 +1,47 @@
+<div layout="column" layout-fill>
+	<md-toolbar layout="row" class="movie-tabsbar">
+		<div class="md-toolbar-items" flex layout-fill>
+			<md-tabs flex md-selected="vm.selectedlist">
+				<md-tab ng-repeat="list in vm.lists" flex>
+					<md-tab-label layout-fill>
+						<section layout="row" layout-align="center center" layout-fill>
+							{{ ::list.name }}
+							<md-icon md-font-icon="fa-trash-o" class="fa tab-icon fa-lg" ng-click="vm.deleteList($event, list)"></md-icon>
+						</section>
+					</md-tab-label>
+				</md-tab>
+				<md-tab flex>
+					<md-tab-label layout-fill>
+						<section ng-click="vm.newList($event)">
+							<md-icon md-font-icon="fa-plus-circle" class="fa tab-icon-plus fa-lg"></md-icon>
+						</section>
+					</md-tab-label>
+				</md-tab>
+			</md-tabs>
+		</div>
+		<div>
+			<md-input-container class="add-movie-input">
+				<label>Add a movie</label>
+				<input type="text" 
+					class="search-menu"
+					ng-model="vm.searchtext"
+					ng-change="vm.searchMovies()"
+					input-clear>
+			</md-input-container>
+		</div>
+	</md-toolbar>
+
+	<md-content flex ng-if="vm.lists">
+		<md-tabs md-dynamic-height md-border-bottom class="movie-tabs" md-selected="vm.selectedlist">
+			<movie-list ng-repeat="list in vm.lists" 
+				list="::list"
+				tab-index="$index"
+                link-header="vm.linkHeader"
+                current-page="vm.currentPage">
+			</movie-list>
+		</md-tabs>
+	</md-content>
+
+    <fg-pagination load-data="vm.loadMovies(page)" link-header="vm.linkHeader" current-page="vm.currentPage"></fg-pagination>
+	<!-- TODO: Add screen that allows users to create their first list -->
+</div>

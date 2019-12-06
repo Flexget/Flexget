@@ -1,4 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
 
 from flexget import plugin
@@ -7,8 +6,7 @@ from flexget.event import event
 log = logging.getLogger('p_priority')
 
 
-class PluginPriority(object):
-
+class PluginPriority:
     """
         Allows modifying plugin priorities from default values.
 
@@ -27,13 +25,13 @@ class PluginPriority(object):
     def on_task_start(self, task, config):
         self.priorities = {}
         names = []
-        for name, priority in config.iteritems():
+        for name, priority in config.items():
             names.append(name)
             originals = self.priorities.setdefault(name, {})
-            for phase, event in plugin.plugins[name].phase_handlers.iteritems():
-                originals[phase] = event.priority
-                log.debug('stored %s original value %s' % (phase, event.priority))
-                event.priority = priority
+            for phase, phase_event in plugin.plugins[name].phase_handlers.items():
+                originals[phase] = phase_event.priority
+                log.debug('stored %s original value %s' % (phase, phase_event.priority))
+                phase_event.priority = priority
                 log.debug('set %s new value %s' % (phase, priority))
         log.debug('Changed priority for: %s' % ', '.join(names))
 
@@ -42,15 +40,16 @@ class PluginPriority(object):
             log.debug('nothing changed, aborting restore')
             return
         names = []
-        for name in config.keys():
+        for name in list(config.keys()):
             names.append(name)
             originals = self.priorities[name]
-            for phase, priority in originals.iteritems():
+            for phase, priority in originals.items():
                 plugin.plugins[name].phase_handlers[phase].priority = priority
         log.debug('Restored priority for: %s' % ', '.join(names))
         self.priorities = {}
 
     on_task_abort = on_task_exit
+
 
 @event('plugin.register')
 def register_plugin():

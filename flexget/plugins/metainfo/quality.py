@@ -1,4 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
 
 from flexget import plugin
@@ -8,7 +7,7 @@ from flexget.utils import qualities
 log = logging.getLogger('metainfo_quality')
 
 
-class MetainfoQuality(object):
+class MetainfoQuality:
     """
     Utility:
 
@@ -23,16 +22,21 @@ class MetainfoQuality(object):
         if config is False:
             return
         for entry in task.entries:
-            entry.register_lazy_fields(['quality'], self.lazy_loader)
-
-    def lazy_loader(self, entry, field):
-        self.get_quality(entry)
-        return entry.get(field)
+            if isinstance(entry.get('quality', eval_lazy=False), str):
+                log.debug(
+                    'Quality is already set to %s for %s, but has not been instantiated properly.'
+                    % (entry['quality'], entry['title'])
+                )
+                entry['quality'] = qualities.Quality(entry.get('quality', eval_lazy=False))
+            else:
+                entry.register_lazy_func(self.get_quality, ['quality'])
 
     def get_quality(self, entry):
         if entry.get('quality', eval_lazy=False):
-            log.debug('Quality is already set to %s for %s, skipping quality detection.' %
-                      (entry['quality'], entry['title']))
+            log.debug(
+                'Quality is already set to %s for %s, skipping quality detection.'
+                % (entry['quality'], entry['title'])
+            )
             return
         entry['quality'] = qualities.Quality(entry['title'])
         if entry['quality']:

@@ -1,0 +1,1639 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/profile
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA+2cXW/aSBSG7/0rLK6LNpCv7t4lgBrUlFaQtlpFuXBgoFaMnR3s0mi1/31tY8B2
+          Z4zD7Owc6HsRJTBjPE/OnJnDo5HvLdv+O/6x7YbvzFnjD7tx5b803qzeGkdhMJ3Gb666xO+4k/hV
+          ++TN+vX6omsv4s5L8+ztyXNj07gIIj5Omx/T5m0LZ4vAi0I38JNWHl/2ads4Dybu1GU8afIDnzXS
+          hn+yMT1zNmWcs8mdM1skXdaDdUM2T964zz5nPea46a/I8dzwJQeyhdmwFHg++09+sPQbhcYtTyRq
+          LkIJu4jRcnhpL8fzgiVLBjd1vAWzSj1qgrXPhGRfPw7ffxr2B3cytmXAn56564fa6UIe7Q13LoTr
+          XH2QYY2dOWmgCyHQXe+2N/pz0JFRhcxjixd/TBrtUorW6Q96VWhjNx4ZZbTfhWjD3rv+x8HVrQxt
+          8n1SRVVcD39i4mwWd3Q8nVxvhVzdL91RZ6iHajHmjPnx3/qoWkKoUffui3QOflcg0j33ZCHSEx/d
+          NKcynKamCcfZPPqhkUicQl97193bYp1Uolqyx4lHOFDigklUAJbASkUgPTLx+pCRnV9eqJDFl5sj
+          E1eCN/HC17xsywO2Y/WLLzWHJK7/VtlVxbQ7u4xiiavAbApWcdWYgkbBxIVSOgVbJxWLxo45mFxr
+          Dkq8Z60mYSXV7lloFkxcsWfTsJKsxjw0HDPx/jVMqgHdaLpLjpZ4+UizrN262DvLkmvNRaxVVUlV
+          Yu1OM8Nk4lUxy7NKtBqT0SzbqbiaWuWZZjTdedYWf/e6Hja7/dH7/bl26oxHPnEXTzpnpGR1dJbN
+          G+kXy+rVYycUd5bfJq8yoenvh1W/xjTgcyfs/KSq12MfBDmHlPXO3PH9g5W7Y9bWl3vkVYfyP054
+          I+nN6oWtQOg5/ixyZulNmD/z3MW3jfROg2ZlH1ky+aN1xCDyIfJ10kHk54Ag8gVoEPkCJoj8fasU
+          IRREPgkamiJfZQOGyS+BweSbIqNq8lXSi7LKV+Gi7fJVyOjKfBUq2jZfhYy6zleKGnWfrwJHWOgr
+          YdE2+kpo1JW+Uq5Rd/pKmo221FealLD6h2f125bY6t9088WjTO1vNo7KwrO+2S8UnDD7v4rZV6Ij
+          qfaViIi7fSU24nJfiY2y3VcCo6v3leoVIZVRv68UJVmQzAl+JRwY/v/T8CuFirbiV0Kj7fhV0KhK
+          fhzXL2PRVvxHeVwfhh+GH4Yfht8cGgy/HjYYfhj+3NiP3/CfWlLDn9/WZIp/s+dX7/f1HX9xL4Tk
+          h+SvQQfJD8lPgw2SH5Ifkh+SH5Ifkh+S3wQTZcuPk/yH5fnxWJ7Ds/x4LI+40oXjt1+ZZ6bR4Pj1
+          sMHxw/Hnxn78jv/MEjv+z17InW3cZI5/m6uVeVrf8RfzU5abkPyvXXYg+W1IfiJskPxlNkh+ARYk
+          PyS/jAeSn1qoIPn3QoPk/6+ZIPlLYJD8RqhoW34c5j9Qz3+kh/nx/P1D1Px4/r64YoTkf8XyAcmv
+          W/KfW7KD/HbTTkrH3+qc58cjeyD6TdNB9EP002CD6Ifoh+iH6Ifoh+iH6N+XCY/sKWPR1vxH+cge
+          HOU/PMePo/ziMpeu4cdRfjEadcd/1Ef5Ifkh+Y9E8l9YyRUP/wJPfAQfMo8AAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:32 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/movie
+    response:
+      body:
+        string: !!binary |
+          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
+          7wQh+n9dPj/6+B9CRNzrnxoAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:32 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        Content-Length: ['0']
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: DELETE
+      uri: http://127.0.0.1:7878/api/movie/1
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA6uuBQBDv6ajAgAAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:32 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/profile
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA+2cXW/aSBSG7/0rLK6LNpCv7t4lgBrUlFaQtlpFuXBgoFaMnR3s0mi1/31tY8B2
+          Z4zD7Owc6HsRJTBjPE/OnJnDo5HvLdv+O/6x7YbvzFnjD7tx5b803qzeGkdhMJ3Gb666xO+4k/hV
+          ++TN+vX6omsv4s5L8+ztyXNj07gIIj5Omx/T5m0LZ4vAi0I38JNWHl/2ads4Dybu1GU8afIDnzXS
+          hn+yMT1zNmWcs8mdM1skXdaDdUM2T964zz5nPea46a/I8dzwJQeyhdmwFHg++09+sPQbhcYtTyRq
+          LkIJu4jRcnhpL8fzgiVLBjd1vAWzSj1qgrXPhGRfPw7ffxr2B3cytmXAn56564fa6UIe7Q13LoTr
+          XH2QYY2dOWmgCyHQXe+2N/pz0JFRhcxjixd/TBrtUorW6Q96VWhjNx4ZZbTfhWjD3rv+x8HVrQxt
+          8n1SRVVcD39i4mwWd3Q8nVxvhVzdL91RZ6iHajHmjPnx3/qoWkKoUffui3QOflcg0j33ZCHSEx/d
+          NKcynKamCcfZPPqhkUicQl97193bYp1Uolqyx4lHOFDigklUAJbASkUgPTLx+pCRnV9eqJDFl5sj
+          E1eCN/HC17xsywO2Y/WLLzWHJK7/VtlVxbQ7u4xiiavAbApWcdWYgkbBxIVSOgVbJxWLxo45mFxr
+          Dkq8Z60mYSXV7lloFkxcsWfTsJKsxjw0HDPx/jVMqgHdaLpLjpZ4+UizrN262DvLkmvNRaxVVUlV
+          Yu1OM8Nk4lUxy7NKtBqT0SzbqbiaWuWZZjTdedYWf/e6Hja7/dH7/bl26oxHPnEXTzpnpGR1dJbN
+          G+kXy+rVYycUd5bfJq8yoenvh1W/xjTgcyfs/KSq12MfBDmHlPXO3PH9g5W7Y9bWl3vkVYfyP054
+          I+nN6oWtQOg5/ixyZulNmD/z3MW3jfROg2ZlH1ky+aN1xCDyIfJ10kHk54Ag8gVoEPkCJoj8fasU
+          IRREPgkamiJfZQOGyS+BweSbIqNq8lXSi7LKV+Gi7fJVyOjKfBUq2jZfhYy6zleKGnWfrwJHWOgr
+          YdE2+kpo1JW+Uq5Rd/pKmo221FealLD6h2f125bY6t9088WjTO1vNo7KwrO+2S8UnDD7v4rZV6Ij
+          qfaViIi7fSU24nJfiY2y3VcCo6v3leoVIZVRv68UJVmQzAl+JRwY/v/T8CuFirbiV0Kj7fhV0KhK
+          fhzXL2PRVvxHeVwfhh+GH4Yfht8cGgy/HjYYfhj+3NiP3/CfWlLDn9/WZIp/s+dX7/f1HX9xL4Tk
+          h+SvQQfJD8lPgw2SH5Ifkh+SH5Ifkh+S3wQTZcuPk/yH5fnxWJ7Ds/x4LI+40oXjt1+ZZ6bR4Pj1
+          sMHxw/Hnxn78jv/MEjv+z17InW3cZI5/m6uVeVrf8RfzU5abkPyvXXYg+W1IfiJskPxlNkh+ARYk
+          PyS/jAeSn1qoIPn3QoPk/6+ZIPlLYJD8RqhoW34c5j9Qz3+kh/nx/P1D1Px4/r64YoTkf8XyAcmv
+          W/KfW7KD/HbTTkrH3+qc58cjeyD6TdNB9EP002CD6Ifoh+iH6Ifoh+iH6N+XCY/sKWPR1vxH+cge
+          HOU/PMePo/ziMpeu4cdRfjEadcd/1Ef5Ifkh+Y9E8l9YyRUP/wJPfAQfMo8AAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:32 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/movie
+    response:
+      body:
+        string: !!binary |
+          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
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:32 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        Content-Length: ['0']
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: DELETE
+      uri: http://127.0.0.1:7878/api/movie/2
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA6uuBQBDv6ajAgAAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:32 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/profile
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA+2cXW/aSBSG7/0rLK6LNpCv7t4lgBrUlFaQtlpFuXBgoFaMnR3s0mi1/31tY8B2
+          Z4zD7Owc6HsRJTBjPE/OnJnDo5HvLdv+O/6x7YbvzFnjD7tx5b803qzeGkdhMJ3Gb666xO+4k/hV
+          ++TN+vX6omsv4s5L8+ztyXNj07gIIj5Omx/T5m0LZ4vAi0I38JNWHl/2ads4Dybu1GU8afIDnzXS
+          hn+yMT1zNmWcs8mdM1skXdaDdUM2T964zz5nPea46a/I8dzwJQeyhdmwFHg++09+sPQbhcYtTyRq
+          LkIJu4jRcnhpL8fzgiVLBjd1vAWzSj1qgrXPhGRfPw7ffxr2B3cytmXAn56564fa6UIe7Q13LoTr
+          XH2QYY2dOWmgCyHQXe+2N/pz0JFRhcxjixd/TBrtUorW6Q96VWhjNx4ZZbTfhWjD3rv+x8HVrQxt
+          8n1SRVVcD39i4mwWd3Q8nVxvhVzdL91RZ6iHajHmjPnx3/qoWkKoUffui3QOflcg0j33ZCHSEx/d
+          NKcynKamCcfZPPqhkUicQl97193bYp1Uolqyx4lHOFDigklUAJbASkUgPTLx+pCRnV9eqJDFl5sj
+          E1eCN/HC17xsywO2Y/WLLzWHJK7/VtlVxbQ7u4xiiavAbApWcdWYgkbBxIVSOgVbJxWLxo45mFxr
+          Dkq8Z60mYSXV7lloFkxcsWfTsJKsxjw0HDPx/jVMqgHdaLpLjpZ4+UizrN262DvLkmvNRaxVVUlV
+          Yu1OM8Nk4lUxy7NKtBqT0SzbqbiaWuWZZjTdedYWf/e6Hja7/dH7/bl26oxHPnEXTzpnpGR1dJbN
+          G+kXy+rVYycUd5bfJq8yoenvh1W/xjTgcyfs/KSq12MfBDmHlPXO3PH9g5W7Y9bWl3vkVYfyP054
+          I+nN6oWtQOg5/ixyZulNmD/z3MW3jfROg2ZlH1ky+aN1xCDyIfJ10kHk54Ag8gVoEPkCJoj8fasU
+          IRREPgkamiJfZQOGyS+BweSbIqNq8lXSi7LKV+Gi7fJVyOjKfBUq2jZfhYy6zleKGnWfrwJHWOgr
+          YdE2+kpo1JW+Uq5Rd/pKmo221FealLD6h2f125bY6t9088WjTO1vNo7KwrO+2S8UnDD7v4rZV6Ij
+          qfaViIi7fSU24nJfiY2y3VcCo6v3leoVIZVRv68UJVmQzAl+JRwY/v/T8CuFirbiV0Kj7fhV0KhK
+          fhzXL2PRVvxHeVwfhh+GH4Yfht8cGgy/HjYYfhj+3NiP3/CfWlLDn9/WZIp/s+dX7/f1HX9xL4Tk
+          h+SvQQfJD8lPgw2SH5Ifkh+SH5Ifkh+S3wQTZcuPk/yH5fnxWJ7Ds/x4LI+40oXjt1+ZZ6bR4Pj1
+          sMHxw/Hnxn78jv/MEjv+z17InW3cZI5/m6uVeVrf8RfzU5abkPyvXXYg+W1IfiJskPxlNkh+ARYk
+          PyS/jAeSn1qoIPn3QoPk/6+ZIPlLYJD8RqhoW34c5j9Qz3+kh/nx/P1D1Px4/r64YoTkf8XyAcmv
+          W/KfW7KD/HbTTkrH3+qc58cjeyD6TdNB9EP002CD6Ifoh+iH6Ifoh+iH6N+XCY/sKWPR1vxH+cge
+          HOU/PMePo/ziMpeu4cdRfjEadcd/1Ef5Ifkh+Y9E8l9YyRUP/wJPfAQfMo8AAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:32 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/movie
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA8VVXa/bNgx9v79C8FMHXCd2Pu7NzVuRbViBdiuaAENX9IGxGZutLHn6iOEN/e+V
+          5MjXabsNA1oUSBCbPKR4xEPmzQ1jf7svY4khwzHZsmQvudyyp2xvQLHfQWn3JFWf3A444AaVAENn
+          PPgQ7WLeBFdMFWBaWlXgoW9DTtOUx0uC4G3kmfBZ6VzLiXUs4RcQzJcxDRkSDjGrzXKdTXxnaUId
+          n9p20grziZ2DqCxU4RwUFSddT48hf8Dm8v7h9isTe7zT9LsSfPjmBLfsFZZsZ9vvRfE+Ugy/by/q
+          1VhIUYLqXyOo/WM5WfRLZQ6RjHYdYtoz6nzL9HQMNP2Fv4kfSb+fRhsw1pNIFHIEjWWEyzMqd3Gd
+          9x1qJW1VM2AaFaFm8sRcSSQqhrqAFkpnKxFb1pGpSTigc79nIEr3ICp04ZoVihoSwJkVJapOKl7e
+          sjg4rEE0mtWkWUNVbXp2ssYqZIVsiUvDdjV2RygKCFlRFP6W0ZE0NTIhHVPyh1TQHDkq9tyhJNsB
+          V6Q1gZhFXiR2JLCBQHqR5Zs0W6f56rBYbrPMff6IwLbuNRXAXw0X8wh/8PCAncKpce39h9VS+MuM
+          +myldnVPu28V9475CywJdh47X84H2OxdWyX/Iv2rzCcQoMx/Zh5gV5mvFNfhUZMJGWtjWr2dz7uu
+          m3lZeVXNCtnMT8QbPdePCyEpZSe4dErw4jwB13hx9E63zuTv7mKpQf9MQbBXOGkP9ogHBc6ngsaT
+          dy9/et2q/kW70KOMjS1JeudzW4D2hYwdA1MHuqZp50FUn/0nsCfZDyNcSRc9TFM+SeFCBvZ+OKiI
+          8EYKcikCP6NsLNtJmhrbPD27suFInEwfttARRmXoizNQnoSeJHeD8Cs0+D+qVk72FCLy5fpi46DN
+          M3GS+14UF50+pNkizZyss+3qbrvKZ3m+XuebUa6FE7W42huxv1dLg9wyHVphzPL+fnO3WkWXia7p
+          Yhz26p7bKqZNIfWZU586DbnTISDmqVCoYXCiAA1UV+9QDqr6Aq9stl5s8oflyEu5lokQHqdk3NPL
+          PFvfjkbg1lO/m93dTIYr+dOCb+HLL2gjLOnljR+Xtx8B1upZ4IcIAAA=
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:32 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        Content-Length: ['0']
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: DELETE
+      uri: http://127.0.0.1:7878/api/movie/3
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA6uuBQBDv6ajAgAAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:32 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/profile
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA+2cXW/aSBSG7/0rLK6LNpCv7t4lgBrUlFaQtlpFuXBgoFaMnR3s0mi1/31tY8B2
+          Z4zD7Owc6HsRJTBjPE/OnJnDo5HvLdv+O/6x7YbvzFnjD7tx5b803qzeGkdhMJ3Gb666xO+4k/hV
+          ++TN+vX6omsv4s5L8+ztyXNj07gIIj5Omx/T5m0LZ4vAi0I38JNWHl/2ads4Dybu1GU8afIDnzXS
+          hn+yMT1zNmWcs8mdM1skXdaDdUM2T964zz5nPea46a/I8dzwJQeyhdmwFHg++09+sPQbhcYtTyRq
+          LkIJu4jRcnhpL8fzgiVLBjd1vAWzSj1qgrXPhGRfPw7ffxr2B3cytmXAn56564fa6UIe7Q13LoTr
+          XH2QYY2dOWmgCyHQXe+2N/pz0JFRhcxjixd/TBrtUorW6Q96VWhjNx4ZZbTfhWjD3rv+x8HVrQxt
+          8n1SRVVcD39i4mwWd3Q8nVxvhVzdL91RZ6iHajHmjPnx3/qoWkKoUffui3QOflcg0j33ZCHSEx/d
+          NKcynKamCcfZPPqhkUicQl97193bYp1Uolqyx4lHOFDigklUAJbASkUgPTLx+pCRnV9eqJDFl5sj
+          E1eCN/HC17xsywO2Y/WLLzWHJK7/VtlVxbQ7u4xiiavAbApWcdWYgkbBxIVSOgVbJxWLxo45mFxr
+          Dkq8Z60mYSXV7lloFkxcsWfTsJKsxjw0HDPx/jVMqgHdaLpLjpZ4+UizrN262DvLkmvNRaxVVUlV
+          Yu1OM8Nk4lUxy7NKtBqT0SzbqbiaWuWZZjTdedYWf/e6Hja7/dH7/bl26oxHPnEXTzpnpGR1dJbN
+          G+kXy+rVYycUd5bfJq8yoenvh1W/xjTgcyfs/KSq12MfBDmHlPXO3PH9g5W7Y9bWl3vkVYfyP054
+          I+nN6oWtQOg5/ixyZulNmD/z3MW3jfROg2ZlH1ky+aN1xCDyIfJ10kHk54Ag8gVoEPkCJoj8fasU
+          IRREPgkamiJfZQOGyS+BweSbIqNq8lXSi7LKV+Gi7fJVyOjKfBUq2jZfhYy6zleKGnWfrwJHWOgr
+          YdE2+kpo1JW+Uq5Rd/pKmo221FealLD6h2f125bY6t9088WjTO1vNo7KwrO+2S8UnDD7v4rZV6Ij
+          qfaViIi7fSU24nJfiY2y3VcCo6v3leoVIZVRv68UJVmQzAl+JRwY/v/T8CuFirbiV0Kj7fhV0KhK
+          fhzXL2PRVvxHeVwfhh+GH4Yfht8cGgy/HjYYfhj+3NiP3/CfWlLDn9/WZIp/s+dX7/f1HX9xL4Tk
+          h+SvQQfJD8lPgw2SH5Ifkh+SH5Ifkh+S3wQTZcuPk/yH5fnxWJ7Ds/x4LI+40oXjt1+ZZ6bR4Pj1
+          sMHxw/Hnxn78jv/MEjv+z17InW3cZI5/m6uVeVrf8RfzU5abkPyvXXYg+W1IfiJskPxlNkh+ARYk
+          PyS/jAeSn1qoIPn3QoPk/6+ZIPlLYJD8RqhoW34c5j9Qz3+kh/nx/P1D1Px4/r64YoTkf8XyAcmv
+          W/KfW7KD/HbTTkrH3+qc58cjeyD6TdNB9EP002CD6Ifoh+iH6Ifoh+iH6N+XCY/sKWPR1vxH+cge
+          HOU/PMePo/ziMpeu4cdRfjEadcd/1Ef5Ifkh+Y9E8l9YyRUP/wJPfAQfMo8AAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:32 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/movie
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4uOBQApu0wNAgAAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:32 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/movie/lookup/imdb?imdbId=tt1690953
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA11S227bMAx971cIfq5jN12DJW/Bgm7DrkXSAe2wB8ZmbDWypFGSDa/Iv0+XrMkK
+          CAJ0SB5S5/D5grHMciswW7BshUbzCrYC2Rdk0+wyREFYJAmW97gJicZn/vwVQwYrJWug8QGB1spR
+          hR9rHy5TVJHd/KOuT9TdC7Xhf/CbXHGzPxVZsC60yAgFgsE6paoeqec4hMh7cowbRliR4xZrth2Z
+          bZEtpeX5Dy4EcMk+IzQOmVWsRaFZjSDYwG3LgGk1IO2cYBIHZpxGYhXxjksQk9SNy3dcYgdxkGl5
+          dZ2Xs3x6synLRTyPx7QOmqSHfzH2HG+PV2Hazajjz7UyXsBYEIOORIBba/WiKCLFxHb1dqKoKWyh
+          C0W8CbMU+zt6GB/vPuyH/X0z/STuV2M/dk/z26WePOkmi4wHfyc3ajVIoaDGYMEOhMEIj94bD4Rf
+          xHcL5pZHU045mtTOY2fmabDt2nuRzBsldLxKn+6U5FbRqy5ePd65btkDF7DlgtsxVNotHKUyx1Ds
+          bMmlsp0SNdJX6GKflErO+xiBNEoQJ042v35zM7t82di1cM3/q5V3mE/zmJaoGpR0vrAWmrMX1Emr
+          rCzLqzye1w6T33sZa5K5Wa9sJJy9TaMECIQL084mcw8cYt1vB0GC7+e6Xhz+AgExaD5uAwAA
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:33 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/rootfolder
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4vmUlCoBmIFBaWCxJIMJSsFJf2S3AJ9JR2IYFpRampwQWJyKlDGxMjYyMDExMzM
+          zMICKl2SX5KYA5e3NDC2NDQxsjQ0MoDKZ6YAxQ2B7FquWACTeGpRawAAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:33 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: '{"title": "Despicable Me 2", "qualityProfileId": 1, "titleSlug": "despicable-me-2-93456",
+        "images": [{"coverType": "poster", "url": "http://image.tmdb.org/t/p/original/kQrYyZQHkwkUg2KlUDyvymj9FAp.jpg"}],
+        "tmdbId": 93456, "rootFolderPath": "/tmp/", "monitored": true}'
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        Content-Length: ['266']
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: POST
+      uri: http://127.0.0.1:7878/api/movie
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4VSTU/DMAy98yuqnkCirOs60HZDICQOA6TtAoiD13jFkI+SpENj2n8nH9BtgMQl
+          Suz37PfsrA+SJLVkOabjJL1E01AFc47JBJMiPfZZ4Ba1BEtLnHmgccjHp5AyWCnJQK/uEfRUtbrC
+          a+bSecwqbWffpdm2tOhKG/rAW3lJ5nVLsmBb3yK1c4goElDHru6VJOtwunillqhnqybUb5RxMgMh
+          JFvNfbg3QUZw4ZG9shdBJy9NnQbcxp3RCVPvkitg6OUvgBsM4ZXz1Ul7BnNFwc0W0IB9Dn2saHo/
+          xpcc5kfRQaPVwjHDbPodb+qsBu3eM1URKpQkq3TQYXUbuwiSJFpxvgTiMCdOdrU/IfOVCuo62kJx
+          hvoGBP4vUbfSUgBGsxVHkH9sT+DX7qxg82BoNCiHp8fdP5rytt6nZAKzIguwSK1R6t1vZKHeeQGL
+          W0iLvD/K8iLLy1mRj4ej8WBw0i9HZ/nwIdZ5a8GP4u7XdMlfy4PNJ4QiHFDeAgAA
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:33 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 201, message: Created}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/movie/lookup/imdb?imdbId=tt2752772
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA11STY/TMBC976+wcuGybdKwi0pvFStg0aqAWoEWxGFaTxNTxw72uCW76n/HHhdt
+          VSlyNO/NvPl8vhKiIEUai5kolsooT+hEXVwnAnQ0DJDa4yr5+Oj08xdTHjfWSHDDI4Jb2uA2eC8j
+          XWXWOlr9V/UXql494Wdzp/zuxZ+AQlIvHGoEjzK72j26vcJDYuZisME0orPURjEwUqQ/HZQR3hof
+          iT0KZcgKEC440KK1waOgFuhVpMHtUIqtdUIiUDvOKZR5pwx2wNnranI7qqajydtVVc34+3Fy66DJ
+          /UdLiGd+I75JJa6GnjvtbeqTA5gMTie4JepnZckSY+rkemxdU1LZl9apRhnQ5Rw/Pdr68PDt4c2i
+          333823+/7+nD+utdtRj/7puCFY/xzdOX9mC0BYlp5FvQHhke4i4ikLpguwX/XvESXnx6Z7cRO1tW
+          H4exjAvgFuRgoFOb3HRnjSLrLrJ0cZ9d6OZ7UBrWSisaUiSt4TQqf6I4M7mQw7ZWS3QL6DhPdnXB
+          kGIgl5KGw5XV09c3N7kJvs6lDs35LY3qUXbJOg0ad36dBM2ZBTIPqqiqajLi73K9Lh654Zi82WJv
+          iQUn1W19fYJAh1Tq7XgagSPH/QmQ+v9yPtSr4z9Yad5nVgMAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:33 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/rootfolder
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4vmUlCoBmIFBaWCxJIMJSsFJf2S3AJ9JR2IYFpRampwQWJyKlDGxMjYyMDExMzI
+          1NIIKl2SX5KYA5e3NDC2NDQxsjQ0MoDKZ6YAxQ2B7FquWAC46k6OawAAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:33 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: '{"title": "Sinister 2", "qualityProfileId": 1, "titleSlug": "sinister-2-283445",
+        "images": [{"coverType": "poster", "url": "http://image.tmdb.org/t/p/original/AeJYo2wLVL6NpkHxpWIptGbQD0N.jpg"}],
+        "tmdbId": 283445, "rootFolderPath": "/tmp/", "monitored": true}'
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        Content-Length: ['258']
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: POST
+      uri: http://127.0.0.1:7878/api/movie
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA31SyU7DMBC99yuinEBqmjRtgPaGQEgcWKTkAojDNHZTg5fgpShU/Xe8lLRQiYvl
+          mXnzZt6zN4MoijXRFMfzKC4JJ0pjGeXx0BWA2oCDJmtcOYyyoJdXX1K4FhyB7J4wyFIYWeNbZMtZ
+          qAqpqx9W9YdVkS/8wK+Jet/jNWjj2GO9gIAiDJow0EZRtPGnzddijWXVtZ66FY7YN/iikdSl0zuM
+          CFw5ZFqkATR6a5vY47b2DCKQ+ORUAMJu8yVQhX26s5L61VagbogXsge0oFd+jmZtujctOslOw/Kt
+          FEvb5B0Z9y2lVRkcsRdSBygTnGgh/QpamjCAWU5m2OUaCIUFoUR3v81Ru5JfrG9bCoqwvAeG/91O
+          Gq6JxwSJNcXAj55r91qaoYXXkV9MptNi2H+YkprmEJ/kSYCEvgZzefhhNDQHEaBgepxn41mS5Uk2
+          rfJsXszmk8nobFYU5+PnwPNhwMl/PHKUuGsx2H4Dqo+Gt8MCAAA=
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:33 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 201, message: Created}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/movie/lookup/imdb?imdbId=tt2554274
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA11T204cMQx95yused7LLBWX8kahSLwAKiuhtuqDZ+KZCeQyTTy7GhBSv6Yf1i+p
+          k9mWFVIUKbbPsX3svBwAFKzZUHEGxUXQNnoHd4RPxSy50DAFh6w3tE5RUcK+/8iuSLV3CsP4lTDc
+          +yHUdK3EXU5eH3j9j7fe8fb/eaN+plt3qePTG4KRh8RfBDKEkdQU6jcUNpq2yXPtgDsCbKQqi9yB
+          bwChQavNCBywJTXOAB1g7HXQrgUcuPMBdAT2wUFFvCVyYIQVGnF0FKDutFGd9wqaoMkpIVA5D5Pt
+          pSotpedEdoySWPshgh84akVhAeswpkTsgWKNPWVk2/nIMaFSgh4jzyCKXeqIW+oZcItjwiB0QpdA
+          yFAFkqYozqAyRCr++fU71xLIkq0oxMUkiXYX2pHFrNZhuTqar8r56sO6LM/y+bYLsyJInpi8AF7y
+          LfY6Sboe+zyb3qeeMiA7h2CSuWPuz5bLTLFgq6qFD+2Sl/3SB91qh2bZXzyePpNd3Vye314q3nT4
+          8eHq86dj/fBl8di3RWZ8lXvaF+W3znhUlJakQRMpm0fZHjGkLvK7w3il89q8xfTBN2LbW69edLqX
+          0eQW1OhkA+qpaeudllG/y2K103aw5xvUBittNI8JyRXupIo7V87MYZhgjTcy4xu0Oc8UGgbHOhum
+          UpI4uTJpoTydmsg/6t4M7d72z9P2z6egiaklF/Z/FGO790I1SVWUZbma5/N+wEF202XMNNti4zkT
+          Hp6cHM52JjRDKvZ4cSSG14z7OWBS4G5f1oPXv9fFINMMBAAA
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:34 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/rootfolder
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4vmUlCoBmIFBaWCxJIMJSsFJf2S3AJ9JR2IYFpRampwQWJyKlDGxMjYyMDEwMDc
+          0tgMKl2SX5KYA5e3NDC2NDQxsjQ0MoDKZ6YAxQ2B7FquWACfR/nBawAAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:34 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: '{"title": "Crimson Peak", "qualityProfileId": 1, "titleSlug": "crimson-peak-201085",
+        "images": [{"coverType": "poster", "url": "http://image.tmdb.org/t/p/original/pCj8zem1NDAODdtvha9WFEB6iWR.jpg"}],
+        "tmdbId": 201085, "rootFolderPath": "/tmp/", "monitored": true}'
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        Content-Length: ['262']
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: POST
+      uri: http://127.0.0.1:7878/api/movie
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4VSy07DMBC89yuinEBqmjR9qO0NFSFxACo1F0ActombLvUj2E5RqPh3/ChpgAMX
+          y/bOzM6sfewFQahRUxIugnApkSnBgxWBfdi3JaCaSA4aDySzKGVgzy+upEgueAGyeSQg16KWObkt
+          TDnxVSF19q2bn3SrVlfhB3ng16j2Z4YGXVv9UG/Ao5BB6VuaUxAc3Wruc3EgMmsqJ14JZTw6givW
+          ktrr+I4UCEuLjKexBw1eqzJ0uE+z+hiFeOdUQEGs9y1QRdx1Y0K11nagbtBFOQMq0DvXR7Mq7g4u
+          uEguvf1Kiq2huakMW9La5HTGbWDMPZQJjlpIZ0LL2rdgyJHV7OoASGGDFHXzczzqVHLWWtpW0ILI
+          e2DkH3+y5hodysfMKQH++9HOb6ZZsXFZ0mSYzCb99uusaV12GJGlRB7kmSXhsvt1NJSdExR++KGh
+          zKMkjZJxliaLyXwxGg/S8WQ6Gz15nbca7BBWf+aKdjvtfX4B+rGmJ88CAAA=
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:34 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 201, message: Created}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/movie/lookup/imdb?imdbId=tt1431045
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA11T204bMRB95ytG+5zLElRub6goEi+0IlFRQH2YrCe7A157sb0JW8S/d2yHkiJZ
+          ljyXM+fMjN+OAIrAQVNxCcU1oeqs1cUomlEHcgYDb2kZI7yEPP5OLk+VNQrdsCJ0C9u7im6UuMvs
+          tS4sPzDVf5ie/9APc83++TM6YOgjduFIE3pSOdRuyW2ZdofEIJDWHkJDYB3XbMAH6wawG9hY15KD
+          RUcVo4a5FU4ebEcuKYDQO0MKJKYiI8zhHhXBPWtvzQh2jQXciF5YE5safL9+oipIQhAHOFv3BPQq
+          aNySCcIAAwjbrdRouIUdhwawqkSB1JO0hlBHoM7uyPkRoLJdyMxTX4FqCx+yJnAl5FVGadiDoR3g
+          mjUHlgJolHCQdj+PIOzYR3xPxlPU3fStdaN/UPI2UkfZnUnFWjRJnJFB6QEU+eDsEAlKGc0bmuRu
+          s/nOhlpMg5iVx6fjcjYuL5ZleZnOwz6sxTovgrwA3tIt9ipOazl0aeSdFYouJSRn73Q0NyF0l9Np
+          gpiEVq0n1tXTMO2meZaop2x+vZzM716q1c2dnmk85wd+Xq1e57d3k6euLhLiu9x5DaNKbWWOcfc2
+          qD0l8yBaxRBVpHeDfs5pGz9jOmc3YjvY2g5Ds5BdzFs7GGy5yqJba1jW7EuVlg23fXu1RdZ5VkPM
+          DGvct8rvXalycH1O21ityN1im+rkUCcz42TIVGJzErPZxcnp6d4WP9RC9/XhpxrngIxSk3GHnzRg
+          ffBCldtUlGV5PE7n63DjTzEpJ8+12NqQAI/Pzy5mo70NdR+Znk2+ieE9Jb70GOX/POzp0ftfSPCU
+          DlwEAAA=
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/rootfolder
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4vmUlCoBmIFBaWCxJIMJSsFJf2S3AJ9JR2IYFpRampwQWJyKlDGxMjYyMDQwMzI
+          0tAIKl2SX5KYA5e3NDC2NDQBSRtA5TNTgOKGQHYtVywAVPHTHWsAAAA=
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: '{"title": "Deadpool", "qualityProfileId": 1, "titleSlug": "deadpool-293660",
+        "images": [{"coverType": "poster", "url": "http://image.tmdb.org/t/p/original/inVq3FRqcYIRl2la8iZikYYxFNR.jpg"}],
+        "tmdbId": 293660, "rootFolderPath": "/tmp/", "monitored": true}'
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        Content-Length: ['254']
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: POST
+      uri: http://127.0.0.1:7878/api/movie
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA32SyU7DMBCG732KKCeQaJOmTbcbokLiwCI1F0AcpvE0NXgJtlMUKt4dL3QTgotl
+          z3wz/v+xt50oig01DONZFM8RSC0liy9cGJhBJcDQDRaO0BZ5fvEpjaUUBFT7iKAWslEl3hCbTkNW
+          KlPsepKTnpp+4r2YU/12oA2YxvWOzRICRTlU4Tp7iqKtX228lBtURVv7xrXUVp8v8MlGMRdObpFQ
+          uHJkMk4C1Hutq9hzX3YNFoj8EEwCQad7BUyjD7fW0F7aGvQ19TYOQA1m7e8xvE52A4vO0vMgvVZy
+          ZUv8NPr7goX16EU7s7QMKJeCGqm8AKOa0J5TQXnDLzdAGSwpo6Y9HY3+SXlZ+7KVZATVHXD8R5tq
+          hKGeCPZKhiD+eCjDydKbyKaD0Sjw/p8sWFMd490AhKoKhTr+JwaqoxOQMO04S/vTbpp102GRpbN8
+          OhvkveEkn+TDp9DnvQHn/OHXMKnbjjtf3+dcrwu4AgAA
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 201, message: Created}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/profile
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA+2cXW/aSBSG7/0rLK6LNpCv7t4lgBrUlFaQtlpFuXBgoFaMnR3s0mi1/31tY8B2
+          Z4zD7Owc6HsRJTBjPE/OnJnDo5HvLdv+O/6x7YbvzFnjD7tx5b803qzeGkdhMJ3Gb666xO+4k/hV
+          ++TN+vX6omsv4s5L8+ztyXNj07gIIj5Omx/T5m0LZ4vAi0I38JNWHl/2ads4Dybu1GU8afIDnzXS
+          hn+yMT1zNmWcs8mdM1skXdaDdUM2T964zz5nPea46a/I8dzwJQeyhdmwFHg++09+sPQbhcYtTyRq
+          LkIJu4jRcnhpL8fzgiVLBjd1vAWzSj1qgrXPhGRfPw7ffxr2B3cytmXAn56564fa6UIe7Q13LoTr
+          XH2QYY2dOWmgCyHQXe+2N/pz0JFRhcxjixd/TBrtUorW6Q96VWhjNx4ZZbTfhWjD3rv+x8HVrQxt
+          8n1SRVVcD39i4mwWd3Q8nVxvhVzdL91RZ6iHajHmjPnx3/qoWkKoUffui3QOflcg0j33ZCHSEx/d
+          NKcynKamCcfZPPqhkUicQl97193bYp1Uolqyx4lHOFDigklUAJbASkUgPTLx+pCRnV9eqJDFl5sj
+          E1eCN/HC17xsywO2Y/WLLzWHJK7/VtlVxbQ7u4xiiavAbApWcdWYgkbBxIVSOgVbJxWLxo45mFxr
+          Dkq8Z60mYSXV7lloFkxcsWfTsJKsxjw0HDPx/jVMqgHdaLpLjpZ4+UizrN262DvLkmvNRaxVVUlV
+          Yu1OM8Nk4lUxy7NKtBqT0SzbqbiaWuWZZjTdedYWf/e6Hja7/dH7/bl26oxHPnEXTzpnpGR1dJbN
+          G+kXy+rVYycUd5bfJq8yoenvh1W/xjTgcyfs/KSq12MfBDmHlPXO3PH9g5W7Y9bWl3vkVYfyP054
+          I+nN6oWtQOg5/ixyZulNmD/z3MW3jfROg2ZlH1ky+aN1xCDyIfJ10kHk54Ag8gVoEPkCJoj8fasU
+          IRREPgkamiJfZQOGyS+BweSbIqNq8lXSi7LKV+Gi7fJVyOjKfBUq2jZfhYy6zleKGnWfrwJHWOgr
+          YdE2+kpo1JW+Uq5Rd/pKmo221FealLD6h2f125bY6t9088WjTO1vNo7KwrO+2S8UnDD7v4rZV6Ij
+          qfaViIi7fSU24nJfiY2y3VcCo6v3leoVIZVRv68UJVmQzAl+JRwY/v/T8CuFirbiV0Kj7fhV0KhK
+          fhzXL2PRVvxHeVwfhh+GH4Yfht8cGgy/HjYYfhj+3NiP3/CfWlLDn9/WZIp/s+dX7/f1HX9xL4Tk
+          h+SvQQfJD8lPgw2SH5Ifkh+SH5Ifkh+S3wQTZcuPk/yH5fnxWJ7Ds/x4LI+40oXjt1+ZZ6bR4Pj1
+          sMHxw/Hnxn78jv/MEjv+z17InW3cZI5/m6uVeVrf8RfzU5abkPyvXXYg+W1IfiJskPxlNkh+ARYk
+          PyS/jAeSn1qoIPn3QoPk/6+ZIPlLYJD8RqhoW34c5j9Qz3+kh/nx/P1D1Px4/r64YoTkf8XyAcmv
+          W/KfW7KD/HbTTkrH3+qc58cjeyD6TdNB9EP002CD6Ifoh+iH6Ifoh+iH6N+XCY/sKWPR1vxH+cge
+          HOU/PMePo/ziMpeu4cdRfjEadcd/1Ef5Ifkh+Y9E8l9YyRUP/wJPfAQfMo8AAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/movie
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA81XUY/iNhB+319h8dJW2kAS4iTs24ptT1Td691BK92dTpVJDHHXsVPbgdLq/vvZ
+          JoawBLHbcu1KIBTPjO2Z+b5vwscrAP7WXwB6iiiKezegd4dlRTI0pxjcYxD2rrd2RBUWDCmywjPj
+          KrXvx0+NUeKMsxyJzXuMxJTXIsOTXDv4zs6FmrkD8v0BZesASf7CP7M7Ih/agQqp2hzVE5hiJHHu
+          3PkKixXBa2N7JWpAJBA4EzVROAfzDVAFBrdMEe9XQikiDPyE0bLGQHFQYFqBHCMK1kQVAIGKr7FY
+          1BQwvAayrrAAmSAlYYj23XmEjQnDJbKXCf1g6PmxF0azcHjj+/rzwTlWxUbq9Oi77YV37kGgI2bW
+          t+1OSrTcFtM+u35YW2aSnG0qu0nFpe5AE2bNtaDGMLjHOUFj4zuIBlu3/u/Vstd4fr4+s/MCMSTU
+          2Z23bgc7218HgjWeS119E1goVd0MBuv1ur/vdon7GS8HLvGcrxnlKMcGKAtEJW4MG40hvWSK1qwU
+          SP5ALHgO/Hg9q+d4JpC2CYu33ozO2avp/Y9v5293uFJ1TrgxTiitTVMV4Qx8z3SZlAZGiZna9Q6p
+          wiauymrwiAjgW/+7nZ/gC32oPTNoxU41XG0BDG5J5txLzojiwmaqRO0S0HchZV3ernQCaE4oURsT
+          q+ZoBw7ZGG3yrdAFpzkWr1GJn3JdUWsiWNdR2ixRJNWELfh0w7IGoiPPDz1fI9q/gaOb4bCfJmkQ
+          wh1SM41n1sHiEod7MOfzbSOUCuKRP4JDZ1LONBpGMHaLZrcprZeHO3ol9kLPOrrwJWbiUHMUWh48
+          o3wLpc5UgmiU+PtUhO4Os+GOE70VV3b/OIXJ9W4R0dpkG/dHVy0q9f6okenWmw4YEPMQXTW+j8V1
+          qltu+HlGV48JK62oOsaaYrb5WnIthfYasLV6fOpk0o6Se6EO02EUtWNdOfxHa2OusfRonSK2rLWK
+          maMwW1Iii/YxtiKB36kZzxoc8qh4/2Jm3AKtH2wJSq4nhQCI5cD8qrUeFZIzqQ0rDAjT8wIBUQs9
+          LQpeSz1ACqS+0WYkHvSkWXBhRokqTg4K6PmpF6THg+Kyyg+/mvLDf6j8rl0WnM+Vfvhs6V+Miz9/
+          e//hl9t3/rH0zxB7AGMtzqIyrwOiU/D35HzpWt9905bMJ0+W+agfRsMEnpJ518ROiQ8TGCZJeCTx
+          bTU51Hi3nZb3rdOF9D0eQZgET9H3wIfhkb7DfvosfYen9H2sXxu1eoA3GD1c/s05a3avWrufkcA2
+          wC6qN3GX3hyowjmWu8t2U/yAme2yvnRunrrrnp1+J9Oa5rZ7uyeUH/hpJ6GaKM+EeVu3i1DKyAKM
+          0+GOUucoEZ+ixB1GecU5/Rp/JA93/r+okPyXVHDlfOk06LrnOQo8buge/6NhHPtd+Hch3tblItiH
+          /SiFKYyejP3EYP/q0xdhV8QCThEAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/profile
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA+2cXW/aSBSG7/0rLK6LNpCv7t4lgBrUlFaQtlpFuXBgoFaMnR3s0mi1/31tY8B2
+          Z4zD7Owc6HsRJTBjPE/OnJnDo5HvLdv+O/6x7YbvzFnjD7tx5b803qzeGkdhMJ3Gb666xO+4k/hV
+          ++TN+vX6omsv4s5L8+ztyXNj07gIIj5Omx/T5m0LZ4vAi0I38JNWHl/2ads4Dybu1GU8afIDnzXS
+          hn+yMT1zNmWcs8mdM1skXdaDdUM2T964zz5nPea46a/I8dzwJQeyhdmwFHg++09+sPQbhcYtTyRq
+          LkIJu4jRcnhpL8fzgiVLBjd1vAWzSj1qgrXPhGRfPw7ffxr2B3cytmXAn56564fa6UIe7Q13LoTr
+          XH2QYY2dOWmgCyHQXe+2N/pz0JFRhcxjixd/TBrtUorW6Q96VWhjNx4ZZbTfhWjD3rv+x8HVrQxt
+          8n1SRVVcD39i4mwWd3Q8nVxvhVzdL91RZ6iHajHmjPnx3/qoWkKoUffui3QOflcg0j33ZCHSEx/d
+          NKcynKamCcfZPPqhkUicQl97193bYp1Uolqyx4lHOFDigklUAJbASkUgPTLx+pCRnV9eqJDFl5sj
+          E1eCN/HC17xsywO2Y/WLLzWHJK7/VtlVxbQ7u4xiiavAbApWcdWYgkbBxIVSOgVbJxWLxo45mFxr
+          Dkq8Z60mYSXV7lloFkxcsWfTsJKsxjw0HDPx/jVMqgHdaLpLjpZ4+UizrN262DvLkmvNRaxVVUlV
+          Yu1OM8Nk4lUxy7NKtBqT0SzbqbiaWuWZZjTdedYWf/e6Hja7/dH7/bl26oxHPnEXTzpnpGR1dJbN
+          G+kXy+rVYycUd5bfJq8yoenvh1W/xjTgcyfs/KSq12MfBDmHlPXO3PH9g5W7Y9bWl3vkVYfyP054
+          I+nN6oWtQOg5/ixyZulNmD/z3MW3jfROg2ZlH1ky+aN1xCDyIfJ10kHk54Ag8gVoEPkCJoj8fasU
+          IRREPgkamiJfZQOGyS+BweSbIqNq8lXSi7LKV+Gi7fJVyOjKfBUq2jZfhYy6zleKGnWfrwJHWOgr
+          YdE2+kpo1JW+Uq5Rd/pKmo221FealLD6h2f125bY6t9088WjTO1vNo7KwrO+2S8UnDD7v4rZV6Ij
+          qfaViIi7fSU24nJfiY2y3VcCo6v3leoVIZVRv68UJVmQzAl+JRwY/v/T8CuFirbiV0Kj7fhV0KhK
+          fhzXL2PRVvxHeVwfhh+GH4Yfht8cGgy/HjYYfhj+3NiP3/CfWlLDn9/WZIp/s+dX7/f1HX9xL4Tk
+          h+SvQQfJD8lPgw2SH5Ifkh+SH5Ifkh+S3wQTZcuPk/yH5fnxWJ7Ds/x4LI+40oXjt1+ZZ6bR4Pj1
+          sMHxw/Hnxn78jv/MEjv+z17InW3cZI5/m6uVeVrf8RfzU5abkPyvXXYg+W1IfiJskPxlNkh+ARYk
+          PyS/jAeSn1qoIPn3QoPk/6+ZIPlLYJD8RqhoW34c5j9Qz3+kh/nx/P1D1Px4/r64YoTkf8XyAcmv
+          W/KfW7KD/HbTTkrH3+qc58cjeyD6TdNB9EP002CD6Ifoh+iH6Ifoh+iH6N+XCY/sKWPR1vxH+cge
+          HOU/PMePo/ziMpeu4cdRfjEadcd/1Ef5Ifkh+Y9E8l9YyRUP/wJPfAQfMo8AAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/movie
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA81XUY/iNhB+319h8dJW2kAS4iTs24ptT1Td691BK92dTpVJDHHXsVPbgdLq/vvZ
+          JoawBLHbcu1KIBTPjO2Z+b5vwscrAP7WXwB6iiiKezegd4dlRTI0pxjcYxD2rrd2RBUWDCmywjPj
+          KrXvx0+NUeKMsxyJzXuMxJTXIsOTXDv4zs6FmrkD8v0BZesASf7CP7M7Ih/agQqp2hzVE5hiJHHu
+          3PkKixXBa2N7JWpAJBA4EzVROAfzDVAFBrdMEe9XQikiDPyE0bLGQHFQYFqBHCMK1kQVAIGKr7FY
+          1BQwvAayrrAAmSAlYYj23XmEjQnDJbKXCf1g6PmxF0azcHjj+/rzwTlWxUbq9Oi77YV37kGgI2bW
+          t+1OSrTcFtM+u35YW2aSnG0qu0nFpe5AE2bNtaDGMLjHOUFj4zuIBlu3/u/Vstd4fr4+s/MCMSTU
+          2Z23bgc7218HgjWeS119E1goVd0MBuv1ur/vdon7GS8HLvGcrxnlKMcGKAtEJW4MG40hvWSK1qwU
+          SP5ALHgO/Hg9q+d4JpC2CYu33ozO2avp/Y9v5293uFJ1TrgxTiitTVMV4Qx8z3SZlAZGiZna9Q6p
+          wiauymrwiAjgW/+7nZ/gC32oPTNoxU41XG0BDG5J5txLzojiwmaqRO0S0HchZV3ernQCaE4oURsT
+          q+ZoBw7ZGG3yrdAFpzkWr1GJn3JdUWsiWNdR2ixRJNWELfh0w7IGoiPPDz1fI9q/gaOb4bCfJmkQ
+          wh1SM41n1sHiEod7MOfzbSOUCuKRP4JDZ1LONBpGMHaLZrcprZeHO3ol9kLPOrrwJWbiUHMUWh48
+          o3wLpc5UgmiU+PtUhO4Os+GOE70VV3b/OIXJ9W4R0dpkG/dHVy0q9f6okenWmw4YEPMQXTW+j8V1
+          qltu+HlGV48JK62oOsaaYrb5WnIthfYasLV6fOpk0o6Se6EO02EUtWNdOfxHa2OusfRonSK2rLWK
+          maMwW1Iii/YxtiKB36kZzxoc8qh4/2Jm3AKtH2wJSq4nhQCI5cD8qrUeFZIzqQ0rDAjT8wIBUQs9
+          LQpeSz1ACqS+0WYkHvSkWXBhRokqTg4K6PmpF6THg+Kyyg+/mvLDf6j8rl0WnM+Vfvhs6V+Miz9/
+          e//hl9t3/rH0zxB7AGMtzqIyrwOiU/D35HzpWt9905bMJ0+W+agfRsMEnpJ518ROiQ8TGCZJeCTx
+          bTU51Hi3nZb3rdOF9D0eQZgET9H3wIfhkb7DfvosfYen9H2sXxu1eoA3GD1c/s05a3avWrufkcA2
+          wC6qN3GX3hyowjmWu8t2U/yAme2yvnRunrrrnp1+J9Oa5rZ7uyeUH/hpJ6GaKM+EeVu3i1DKyAKM
+          0+GOUucoEZ+ixB1GecU5/Rp/JA93/r+okPyXVHDlfOk06LrnOQo8buge/6NhHPtd+Hch3tblItiH
+          /SiFKYyejP3EYP/q0xdhV8QCThEAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        Content-Length: ['0']
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: DELETE
+      uri: http://127.0.0.1:7878/api/movie/5
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA6uuBQBDv6ajAgAAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/profile
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA+2cXW/aSBSG7/0rLK6LNpCv7t4lgBrUlFaQtlpFuXBgoFaMnR3s0mi1/31tY8B2
+          Z4zD7Owc6HsRJTBjPE/OnJnDo5HvLdv+O/6x7YbvzFnjD7tx5b803qzeGkdhMJ3Gb666xO+4k/hV
+          ++TN+vX6omsv4s5L8+ztyXNj07gIIj5Omx/T5m0LZ4vAi0I38JNWHl/2ads4Dybu1GU8afIDnzXS
+          hn+yMT1zNmWcs8mdM1skXdaDdUM2T964zz5nPea46a/I8dzwJQeyhdmwFHg++09+sPQbhcYtTyRq
+          LkIJu4jRcnhpL8fzgiVLBjd1vAWzSj1qgrXPhGRfPw7ffxr2B3cytmXAn56564fa6UIe7Q13LoTr
+          XH2QYY2dOWmgCyHQXe+2N/pz0JFRhcxjixd/TBrtUorW6Q96VWhjNx4ZZbTfhWjD3rv+x8HVrQxt
+          8n1SRVVcD39i4mwWd3Q8nVxvhVzdL91RZ6iHajHmjPnx3/qoWkKoUffui3QOflcg0j33ZCHSEx/d
+          NKcynKamCcfZPPqhkUicQl97193bYp1Uolqyx4lHOFDigklUAJbASkUgPTLx+pCRnV9eqJDFl5sj
+          E1eCN/HC17xsywO2Y/WLLzWHJK7/VtlVxbQ7u4xiiavAbApWcdWYgkbBxIVSOgVbJxWLxo45mFxr
+          Dkq8Z60mYSXV7lloFkxcsWfTsJKsxjw0HDPx/jVMqgHdaLpLjpZ4+UizrN262DvLkmvNRaxVVUlV
+          Yu1OM8Nk4lUxy7NKtBqT0SzbqbiaWuWZZjTdedYWf/e6Hja7/dH7/bl26oxHPnEXTzpnpGR1dJbN
+          G+kXy+rVYycUd5bfJq8yoenvh1W/xjTgcyfs/KSq12MfBDmHlPXO3PH9g5W7Y9bWl3vkVYfyP054
+          I+nN6oWtQOg5/ixyZulNmD/z3MW3jfROg2ZlH1ky+aN1xCDyIfJ10kHk54Ag8gVoEPkCJoj8fasU
+          IRREPgkamiJfZQOGyS+BweSbIqNq8lXSi7LKV+Gi7fJVyOjKfBUq2jZfhYy6zleKGnWfrwJHWOgr
+          YdE2+kpo1JW+Uq5Rd/pKmo221FealLD6h2f125bY6t9088WjTO1vNo7KwrO+2S8UnDD7v4rZV6Ij
+          qfaViIi7fSU24nJfiY2y3VcCo6v3leoVIZVRv68UJVmQzAl+JRwY/v/T8CuFirbiV0Kj7fhV0KhK
+          fhzXL2PRVvxHeVwfhh+GH4Yfht8cGgy/HjYYfhj+3NiP3/CfWlLDn9/WZIp/s+dX7/f1HX9xL4Tk
+          h+SvQQfJD8lPgw2SH5Ifkh+SH5Ifkh+S3wQTZcuPk/yH5fnxWJ7Ds/x4LI+40oXjt1+ZZ6bR4Pj1
+          sMHxw/Hnxn78jv/MEjv+z17InW3cZI5/m6uVeVrf8RfzU5abkPyvXXYg+W1IfiJskPxlNkh+ARYk
+          PyS/jAeSn1qoIPn3QoPk/6+ZIPlLYJD8RqhoW34c5j9Qz3+kh/nx/P1D1Px4/r64YoTkf8XyAcmv
+          W/KfW7KD/HbTTkrH3+qc58cjeyD6TdNB9EP002CD6Ifoh+iH6Ifoh+iH6N+XCY/sKWPR1vxH+cge
+          HOU/PMePo/ziMpeu4cdRfjEadcd/1Ef5Ifkh+Y9E8l9YyRUP/wJPfAQfMo8AAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/movie
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA81W227bRhB991cs9NQCokRSoi5+C+w0cFHnUgsFkiAPS3IobrPcZfYigikK9Gv6
+          Yf2Szq5IXRwZtlsbCCBB4M6Z286ZQ308I+QP/BIyMMxwGJyTwSXommU05UCugcSD4dZOuQElqGEb
+          WDmoRuzHT51RQyZFTlX7Hqi6kVZlcJUjIOztUplVnyDfJ6gOEmj2Fd6IS6Y/HzoaaqxLNVDAgWrI
+          e7jcgNowaJztlbKEaaIgU5YZyEnaElMCeSEMC35jnFMmyC9A1xaIkaQEXpMcKCcNMyWhpJYNqMJy
+          IqAh2tagSKZYxQTloz4fExdMQEV9MXEYTYJwFsTTVTw5D0P8fOiBddlqbI//ui14B48i9Fh57CGc
+          VXS9vUz/3M/D2zLX5KqtfZBaapxA5+bNVnFnGF9DzuiFw46n4y1s9Hu9HnTIP4f3RC6ooMrcG3kL
+          O4rsf3sSNJBqvH3nWBpTn4/HTdOM9tOuYJTJatw3nstGcElzcEQpKNfQGVrkEB65S+tOSqp/Yp48
+          RzhpVzaFlaJoU55vgxVPxaub65/fpe92vDI2Z9IZrzi3bqiGSUFeCrwmg8SoQJjd7KgpfeOmqse3
+          FoH8EP64wylZYFKfMzrwvUG6+gtwvGVZD6+kYEYq36lRtm8Aa2GVrV5ssAGaMs5M63xNSnfk0J3R
+          N3/gWkieg3pNK3hIucriInjoctEdcarNlSjkTSuyjqLLIIyDEBkdnifL88lktJgvojjZMTVDPosT
+          W1xBvCdznm4HYUw0W4bLZNKbTG9aTqbJrD900W64XR9HDCoI4sADe/c1CHWsOYauj55pvqXSyVai
+          6XIe7ltROB3h3fudGGyk8fFni2Q+3B1Sbl23s9Hy7GCVBl8sddN6e4IGzD1MzzrsbXG9QFnRyL63
+          QD8/vbJmXfT6IPr/kNUr4VWUFlhfhewmskCxLGjFOOqrQt3K2yGhglAcnMILJdSaUiqnxUh3QVIw
+          DYAgHKOSAg2lU9aS8byUMieFYiByDJD7PAaq2myX0yeqWqdkTFpNpDWaIeFHZKValwhVHHRGa/Ce
+          6xJFTzsvl6BGag+JxnOsQzdQG0Ib2jofSkoM55yoIakCbAr0kCDlINf//PW3r0Uho6sUlL5T+5Mg
+          CoMofqj2zzwbl8+t/bNn0/7Zf9T+jo+OjpVEVj1W/5NH67/8Yj+w4s3rxcv1t/p/Ka1Tx0uqgLyX
+          luD65jZzhNMnXwCHy/q9q/9dte6lP4qWD9b+ZBSHySSK79D+g7meUv44SabxfPqN8mOecNHP9Ej6
+          u4CBixhsYU8i/NNRjO+QxeQhwh/P55MTwp88Svhndwn/JdC8lpI/x9/p48j3CP4hv55Ufuan5OdI
+          JO7b+L7Y0+t+67/ZtunvfS1P1blfyfDkdt0e6H5/lpPZLDy1P71LsIU8ye4ko+kiWSTT3e7cx/25
+          4/7Zp38BePEjrVQOAAA=
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/profile
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA+2cXW/aSBSG7/0rLK6LNpCv7t4lgBrUlFaQtlpFuXBgoFaMnR3s0mi1/31tY8B2
+          Z4zD7Owc6HsRJTBjPE/OnJnDo5HvLdv+O/6x7YbvzFnjD7tx5b803qzeGkdhMJ3Gb666xO+4k/hV
+          ++TN+vX6omsv4s5L8+ztyXNj07gIIj5Omx/T5m0LZ4vAi0I38JNWHl/2ads4Dybu1GU8afIDnzXS
+          hn+yMT1zNmWcs8mdM1skXdaDdUM2T964zz5nPea46a/I8dzwJQeyhdmwFHg++09+sPQbhcYtTyRq
+          LkIJu4jRcnhpL8fzgiVLBjd1vAWzSj1qgrXPhGRfPw7ffxr2B3cytmXAn56564fa6UIe7Q13LoTr
+          XH2QYY2dOWmgCyHQXe+2N/pz0JFRhcxjixd/TBrtUorW6Q96VWhjNx4ZZbTfhWjD3rv+x8HVrQxt
+          8n1SRVVcD39i4mwWd3Q8nVxvhVzdL91RZ6iHajHmjPnx3/qoWkKoUffui3QOflcg0j33ZCHSEx/d
+          NKcynKamCcfZPPqhkUicQl97193bYp1Uolqyx4lHOFDigklUAJbASkUgPTLx+pCRnV9eqJDFl5sj
+          E1eCN/HC17xsywO2Y/WLLzWHJK7/VtlVxbQ7u4xiiavAbApWcdWYgkbBxIVSOgVbJxWLxo45mFxr
+          Dkq8Z60mYSXV7lloFkxcsWfTsJKsxjw0HDPx/jVMqgHdaLpLjpZ4+UizrN262DvLkmvNRaxVVUlV
+          Yu1OM8Nk4lUxy7NKtBqT0SzbqbiaWuWZZjTdedYWf/e6Hja7/dH7/bl26oxHPnEXTzpnpGR1dJbN
+          G+kXy+rVYycUd5bfJq8yoenvh1W/xjTgcyfs/KSq12MfBDmHlPXO3PH9g5W7Y9bWl3vkVYfyP054
+          I+nN6oWtQOg5/ixyZulNmD/z3MW3jfROg2ZlH1ky+aN1xCDyIfJ10kHk54Ag8gVoEPkCJoj8fasU
+          IRREPgkamiJfZQOGyS+BweSbIqNq8lXSi7LKV+Gi7fJVyOjKfBUq2jZfhYy6zleKGnWfrwJHWOgr
+          YdE2+kpo1JW+Uq5Rd/pKmo221FealLD6h2f125bY6t9088WjTO1vNo7KwrO+2S8UnDD7v4rZV6Ij
+          qfaViIi7fSU24nJfiY2y3VcCo6v3leoVIZVRv68UJVmQzAl+JRwY/v/T8CuFirbiV0Kj7fhV0KhK
+          fhzXL2PRVvxHeVwfhh+GH4Yfht8cGgy/HjYYfhj+3NiP3/CfWlLDn9/WZIp/s+dX7/f1HX9xL4Tk
+          h+SvQQfJD8lPgw2SH5Ifkh+SH5Ifkh+S3wQTZcuPk/yH5fnxWJ7Ds/x4LI+40oXjt1+ZZ6bR4Pj1
+          sMHxw/Hnxn78jv/MEjv+z17InW3cZI5/m6uVeVrf8RfzU5abkPyvXXYg+W1IfiJskPxlNkh+ARYk
+          PyS/jAeSn1qoIPn3QoPk/6+ZIPlLYJD8RqhoW34c5j9Qz3+kh/nx/P1D1Px4/r64YoTkf8XyAcmv
+          W/KfW7KD/HbTTkrH3+qc58cjeyD6TdNB9EP002CD6Ifoh+iH6Ifoh+iH6N+XCY/sKWPR1vxH+cge
+          HOU/PMePo/ziMpeu4cdRfjEadcd/1Ef5Ifkh+Y9E8l9YyRUP/wJPfAQfMo8AAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/movie
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA81W227bRhB991cs9NQCokRSoi5+C+w0cFHnUgsFkiAPS3IobrPcZfYigikK9Gv6
+          Yf2Szq5IXRwZtlsbCCBB4M6Z286ZQ308I+QP/BIyMMxwGJyTwSXommU05UCugcSD4dZOuQElqGEb
+          WDmoRuzHT51RQyZFTlX7Hqi6kVZlcJUjIOztUplVnyDfJ6gOEmj2Fd6IS6Y/HzoaaqxLNVDAgWrI
+          e7jcgNowaJztlbKEaaIgU5YZyEnaElMCeSEMC35jnFMmyC9A1xaIkaQEXpMcKCcNMyWhpJYNqMJy
+          IqAh2tagSKZYxQTloz4fExdMQEV9MXEYTYJwFsTTVTw5D0P8fOiBddlqbI//ui14B48i9Fh57CGc
+          VXS9vUz/3M/D2zLX5KqtfZBaapxA5+bNVnFnGF9DzuiFw46n4y1s9Hu9HnTIP4f3RC6ooMrcG3kL
+          O4rsf3sSNJBqvH3nWBpTn4/HTdOM9tOuYJTJatw3nstGcElzcEQpKNfQGVrkEB65S+tOSqp/Yp48
+          RzhpVzaFlaJoU55vgxVPxaub65/fpe92vDI2Z9IZrzi3bqiGSUFeCrwmg8SoQJjd7KgpfeOmqse3
+          FoH8EP64wylZYFKfMzrwvUG6+gtwvGVZD6+kYEYq36lRtm8Aa2GVrV5ssAGaMs5M63xNSnfk0J3R
+          N3/gWkieg3pNK3hIucriInjoctEdcarNlSjkTSuyjqLLIIyDEBkdnifL88lktJgvojjZMTVDPosT
+          W1xBvCdznm4HYUw0W4bLZNKbTG9aTqbJrD900W64XR9HDCoI4sADe/c1CHWsOYauj55pvqXSyVai
+          6XIe7ltROB3h3fudGGyk8fFni2Q+3B1Sbl23s9Hy7GCVBl8sddN6e4IGzD1MzzrsbXG9QFnRyL63
+          QD8/vbJmXfT6IPr/kNUr4VWUFlhfhewmskCxLGjFOOqrQt3K2yGhglAcnMILJdSaUiqnxUh3QVIw
+          DYAgHKOSAg2lU9aS8byUMieFYiByDJD7PAaq2myX0yeqWqdkTFpNpDWaIeFHZKValwhVHHRGa/Ce
+          6xJFTzsvl6BGag+JxnOsQzdQG0Ib2jofSkoM55yoIakCbAr0kCDlINf//PW3r0Uho6sUlL5T+5Mg
+          CoMofqj2zzwbl8+t/bNn0/7Zf9T+jo+OjpVEVj1W/5NH67/8Yj+w4s3rxcv1t/p/Ka1Tx0uqgLyX
+          luD65jZzhNMnXwCHy/q9q/9dte6lP4qWD9b+ZBSHySSK79D+g7meUv44SabxfPqN8mOecNHP9Ej6
+          u4CBixhsYU8i/NNRjO+QxeQhwh/P55MTwp88Svhndwn/JdC8lpI/x9/p48j3CP4hv55Ufuan5OdI
+          JO7b+L7Y0+t+67/ZtunvfS1P1blfyfDkdt0e6H5/lpPZLDy1P71LsIU8ye4ko+kiWSTT3e7cx/25
+          4/7Zp38BePEjrVQOAAA=
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/profile
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA+2cXW/aSBSG7/0rLK6LNpCv7t4lgBrUlFaQtlpFuXBgoFaMnR3s0mi1/31tY8B2
+          Z4zD7Owc6HsRJTBjPE/OnJnDo5HvLdv+O/6x7YbvzFnjD7tx5b803qzeGkdhMJ3Gb666xO+4k/hV
+          ++TN+vX6omsv4s5L8+ztyXNj07gIIj5Omx/T5m0LZ4vAi0I38JNWHl/2ads4Dybu1GU8afIDnzXS
+          hn+yMT1zNmWcs8mdM1skXdaDdUM2T964zz5nPea46a/I8dzwJQeyhdmwFHg++09+sPQbhcYtTyRq
+          LkIJu4jRcnhpL8fzgiVLBjd1vAWzSj1qgrXPhGRfPw7ffxr2B3cytmXAn56564fa6UIe7Q13LoTr
+          XH2QYY2dOWmgCyHQXe+2N/pz0JFRhcxjixd/TBrtUorW6Q96VWhjNx4ZZbTfhWjD3rv+x8HVrQxt
+          8n1SRVVcD39i4mwWd3Q8nVxvhVzdL91RZ6iHajHmjPnx3/qoWkKoUffui3QOflcg0j33ZCHSEx/d
+          NKcynKamCcfZPPqhkUicQl97193bYp1Uolqyx4lHOFDigklUAJbASkUgPTLx+pCRnV9eqJDFl5sj
+          E1eCN/HC17xsywO2Y/WLLzWHJK7/VtlVxbQ7u4xiiavAbApWcdWYgkbBxIVSOgVbJxWLxo45mFxr
+          Dkq8Z60mYSXV7lloFkxcsWfTsJKsxjw0HDPx/jVMqgHdaLpLjpZ4+UizrN262DvLkmvNRaxVVUlV
+          Yu1OM8Nk4lUxy7NKtBqT0SzbqbiaWuWZZjTdedYWf/e6Hja7/dH7/bl26oxHPnEXTzpnpGR1dJbN
+          G+kXy+rVYycUd5bfJq8yoenvh1W/xjTgcyfs/KSq12MfBDmHlPXO3PH9g5W7Y9bWl3vkVYfyP054
+          I+nN6oWtQOg5/ixyZulNmD/z3MW3jfROg2ZlH1ky+aN1xCDyIfJ10kHk54Ag8gVoEPkCJoj8fasU
+          IRREPgkamiJfZQOGyS+BweSbIqNq8lXSi7LKV+Gi7fJVyOjKfBUq2jZfhYy6zleKGnWfrwJHWOgr
+          YdE2+kpo1JW+Uq5Rd/pKmo221FealLD6h2f125bY6t9088WjTO1vNo7KwrO+2S8UnDD7v4rZV6Ij
+          qfaViIi7fSU24nJfiY2y3VcCo6v3leoVIZVRv68UJVmQzAl+JRwY/v/T8CuFirbiV0Kj7fhV0KhK
+          fhzXL2PRVvxHeVwfhh+GH4Yfht8cGgy/HjYYfhj+3NiP3/CfWlLDn9/WZIp/s+dX7/f1HX9xL4Tk
+          h+SvQQfJD8lPgw2SH5Ifkh+SH5Ifkh+S3wQTZcuPk/yH5fnxWJ7Ds/x4LI+40oXjt1+ZZ6bR4Pj1
+          sMHxw/Hnxn78jv/MEjv+z17InW3cZI5/m6uVeVrf8RfzU5abkPyvXXYg+W1IfiJskPxlNkh+ARYk
+          PyS/jAeSn1qoIPn3QoPk/6+ZIPlLYJD8RqhoW34c5j9Qz3+kh/nx/P1D1Px4/r64YoTkf8XyAcmv
+          W/KfW7KD/HbTTkrH3+qc58cjeyD6TdNB9EP002CD6Ifoh+iH6Ifoh+iH6N+XCY/sKWPR1vxH+cge
+          HOU/PMePo/ziMpeu4cdRfjEadcd/1Ef5Ifkh+Y9E8l9YyRUP/wJPfAQfMo8AAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/movie
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA81W227bRhB991cs9NQCokRSoi5+C+w0cFHnUgsFkiAPS3IobrPcZfYigikK9Gv6
+          Yf2Szq5IXRwZtlsbCCBB4M6Z286ZQ308I+QP/BIyMMxwGJyTwSXommU05UCugcSD4dZOuQElqGEb
+          WDmoRuzHT51RQyZFTlX7Hqi6kVZlcJUjIOztUplVnyDfJ6gOEmj2Fd6IS6Y/HzoaaqxLNVDAgWrI
+          e7jcgNowaJztlbKEaaIgU5YZyEnaElMCeSEMC35jnFMmyC9A1xaIkaQEXpMcKCcNMyWhpJYNqMJy
+          IqAh2tagSKZYxQTloz4fExdMQEV9MXEYTYJwFsTTVTw5D0P8fOiBddlqbI//ui14B48i9Fh57CGc
+          VXS9vUz/3M/D2zLX5KqtfZBaapxA5+bNVnFnGF9DzuiFw46n4y1s9Hu9HnTIP4f3RC6ooMrcG3kL
+          O4rsf3sSNJBqvH3nWBpTn4/HTdOM9tOuYJTJatw3nstGcElzcEQpKNfQGVrkEB65S+tOSqp/Yp48
+          RzhpVzaFlaJoU55vgxVPxaub65/fpe92vDI2Z9IZrzi3bqiGSUFeCrwmg8SoQJjd7KgpfeOmqse3
+          FoH8EP64wylZYFKfMzrwvUG6+gtwvGVZD6+kYEYq36lRtm8Aa2GVrV5ssAGaMs5M63xNSnfk0J3R
+          N3/gWkieg3pNK3hIucriInjoctEdcarNlSjkTSuyjqLLIIyDEBkdnifL88lktJgvojjZMTVDPosT
+          W1xBvCdznm4HYUw0W4bLZNKbTG9aTqbJrD900W64XR9HDCoI4sADe/c1CHWsOYauj55pvqXSyVai
+          6XIe7ltROB3h3fudGGyk8fFni2Q+3B1Sbl23s9Hy7GCVBl8sddN6e4IGzD1MzzrsbXG9QFnRyL63
+          QD8/vbJmXfT6IPr/kNUr4VWUFlhfhewmskCxLGjFOOqrQt3K2yGhglAcnMILJdSaUiqnxUh3QVIw
+          DYAgHKOSAg2lU9aS8byUMieFYiByDJD7PAaq2myX0yeqWqdkTFpNpDWaIeFHZKValwhVHHRGa/Ce
+          6xJFTzsvl6BGag+JxnOsQzdQG0Ib2jofSkoM55yoIakCbAr0kCDlINf//PW3r0Uho6sUlL5T+5Mg
+          CoMofqj2zzwbl8+t/bNn0/7Zf9T+jo+OjpVEVj1W/5NH67/8Yj+w4s3rxcv1t/p/Ka1Tx0uqgLyX
+          luD65jZzhNMnXwCHy/q9q/9dte6lP4qWD9b+ZBSHySSK79D+g7meUv44SabxfPqN8mOecNHP9Ej6
+          u4CBixhsYU8i/NNRjO+QxeQhwh/P55MTwp88Svhndwn/JdC8lpI/x9/p48j3CP4hv55Ufuan5OdI
+          JO7b+L7Y0+t+67/ZtunvfS1P1blfyfDkdt0e6H5/lpPZLDy1P71LsIU8ye4ko+kiWSTT3e7cx/25
+          4/7Zp38BePEjrVQOAAA=
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        Content-Length: ['0']
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: DELETE
+      uri: http://127.0.0.1:7878/api/movie/4
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA6uuBQBDv6ajAgAAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/profile
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA+2cXW/aSBSG7/0rLK6LNpCv7t4lgBrUlFaQtlpFuXBgoFaMnR3s0mi1/31tY8B2
+          Z4zD7Owc6HsRJTBjPE/OnJnDo5HvLdv+O/6x7YbvzFnjD7tx5b803qzeGkdhMJ3Gb666xO+4k/hV
+          ++TN+vX6omsv4s5L8+ztyXNj07gIIj5Omx/T5m0LZ4vAi0I38JNWHl/2ads4Dybu1GU8afIDnzXS
+          hn+yMT1zNmWcs8mdM1skXdaDdUM2T964zz5nPea46a/I8dzwJQeyhdmwFHg++09+sPQbhcYtTyRq
+          LkIJu4jRcnhpL8fzgiVLBjd1vAWzSj1qgrXPhGRfPw7ffxr2B3cytmXAn56564fa6UIe7Q13LoTr
+          XH2QYY2dOWmgCyHQXe+2N/pz0JFRhcxjixd/TBrtUorW6Q96VWhjNx4ZZbTfhWjD3rv+x8HVrQxt
+          8n1SRVVcD39i4mwWd3Q8nVxvhVzdL91RZ6iHajHmjPnx3/qoWkKoUffui3QOflcg0j33ZCHSEx/d
+          NKcynKamCcfZPPqhkUicQl97193bYp1Uolqyx4lHOFDigklUAJbASkUgPTLx+pCRnV9eqJDFl5sj
+          E1eCN/HC17xsywO2Y/WLLzWHJK7/VtlVxbQ7u4xiiavAbApWcdWYgkbBxIVSOgVbJxWLxo45mFxr
+          Dkq8Z60mYSXV7lloFkxcsWfTsJKsxjw0HDPx/jVMqgHdaLpLjpZ4+UizrN262DvLkmvNRaxVVUlV
+          Yu1OM8Nk4lUxy7NKtBqT0SzbqbiaWuWZZjTdedYWf/e6Hja7/dH7/bl26oxHPnEXTzpnpGR1dJbN
+          G+kXy+rVYycUd5bfJq8yoenvh1W/xjTgcyfs/KSq12MfBDmHlPXO3PH9g5W7Y9bWl3vkVYfyP054
+          I+nN6oWtQOg5/ixyZulNmD/z3MW3jfROg2ZlH1ky+aN1xCDyIfJ10kHk54Ag8gVoEPkCJoj8fasU
+          IRREPgkamiJfZQOGyS+BweSbIqNq8lXSi7LKV+Gi7fJVyOjKfBUq2jZfhYy6zleKGnWfrwJHWOgr
+          YdE2+kpo1JW+Uq5Rd/pKmo221FealLD6h2f125bY6t9088WjTO1vNo7KwrO+2S8UnDD7v4rZV6Ij
+          qfaViIi7fSU24nJfiY2y3VcCo6v3leoVIZVRv68UJVmQzAl+JRwY/v/T8CuFirbiV0Kj7fhV0KhK
+          fhzXL2PRVvxHeVwfhh+GH4Yfht8cGgy/HjYYfhj+3NiP3/CfWlLDn9/WZIp/s+dX7/f1HX9xL4Tk
+          h+SvQQfJD8lPgw2SH5Ifkh+SH5Ifkh+S3wQTZcuPk/yH5fnxWJ7Ds/x4LI+40oXjt1+ZZ6bR4Pj1
+          sMHxw/Hnxn78jv/MEjv+z17InW3cZI5/m6uVeVrf8RfzU5abkPyvXXYg+W1IfiJskPxlNkh+ARYk
+          PyS/jAeSn1qoIPn3QoPk/6+ZIPlLYJD8RqhoW34c5j9Qz3+kh/nx/P1D1Px4/r64YoTkf8XyAcmv
+          W/KfW7KD/HbTTkrH3+qc58cjeyD6TdNB9EP002CD6Ifoh+iH6Ifoh+iH6N+XCY/sKWPR1vxH+cge
+          HOU/PMePo/ziMpeu4cdRfjEadcd/1Ef5Ifkh+Y9E8l9YyRUP/wJPfAQfMo8AAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/movie
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA81Uy47bNhTdz1cQXjWALcuy5dcumEmAWTQZdLRJgiyuxCuLiUQqfFhQiwL9mn5Y
+          v6QkLTrywIA3swgwxkC8577PuV/uCPnL/giZaKZrnOzJ5F6yRglOnhC+T6YnI9QaJQfNjpg5nLLA
+          L18Ho8JCcAqy/4Qgn4WRBT5SC4iDXUidhejFEL0dRVfsT/zIH5j6PvbSoI3LM5FYIyikAS6OKI8M
+          O2d75ERXSKC09TWgKyJKAqSEhtU90RIOSPspAU5AtUwyfiBgdCUkYYpoITnJUXeInNQ2KimtoUJJ
+          iorVtBKCklIy5NQGoD6Pxqa1dTHbgE/U9MomZsIoIoxWjKKMSCZ7l0gLgqqAFr3noRJKK+flErSg
+          9JQo+27rUB22mkAHvfMBUtlwzgk0ySXaplBNSV4jUvXfP//6WiQ22OQoVRSGwvg949iAn1gSL9LZ
+          Ip4tkixZ7uPY/n0OwLbqFSug/uM01QG+nsXJLN5lHjuGs8bO0K/bfwe6eFvhNpH1rQ/SCjeKwc2b
+          jaydYf47Ugb3Djtfz0+w6Ft7mAzIv6c3IpfAQeqbkU+wi8j+f6Bph7li2kestG7383nXddHAR0fH
+          RlhWRYVo5qF5KjpeC6Do6FxCrXAw9Jbp9snNeXipQL1nnuIXOGEyk2MmwdqkV8VE/DCfWfnxw/bd
+          4SwAbSgTzvggjN00eQCJ5JMw5EkKagpHOHVeoGWE71437XwsVvJb/OYMkqK0KX3Gxcjx2bLXj8DJ
+          ixUB3gjOrBx8n1qaUH7DOGtM8/Zoy4ec1Uz3zlfncKaHGoy+9ZFrKWorhg/Q4M1apeGaedxisRve
+          aiuQR16K554XA0V3nqKrLIn36W6/TKMkTpeL5MzUwvKZv7wz4zPDGpqfVqB1kqarZLMKJh1MNk+8
+          DTv1J/G5NodRwJmLODvBgvcBubw8iRoOF99ATxy60scqSlbpers89yHtYrh3D4KYHIX28ZPNZjk9
+          P0JtXKvrKL0b6Wjyw4Bb1NMVBjD3sb4bsC8P/wMCbYWoX//o0xeRbxz8Mb9e9fxsrp2fiyNxS/Gh
+          2Otyv5BmGOevLstrdf6UZHxVXS8X+lM/u+V6HV/TT3CZnSCvop00Wm3Tbbo6a+cW9zeO+3df/weQ
+          2k0e9wgAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        Content-Length: ['0']
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: DELETE
+      uri: http://127.0.0.1:7878/api/movie/6
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA6uuBQBDv6ajAgAAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/profile
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA+2cXW/aSBSG7/0rLK6LNpCv7t4lgBrUlFaQtlpFuXBgoFaMnR3s0mi1/31tY8B2
+          Z4zD7Owc6HsRJTBjPE/OnJnDo5HvLdv+O/6x7YbvzFnjD7tx5b803qzeGkdhMJ3Gb666xO+4k/hV
+          ++TN+vX6omsv4s5L8+ztyXNj07gIIj5Omx/T5m0LZ4vAi0I38JNWHl/2ads4Dybu1GU8afIDnzXS
+          hn+yMT1zNmWcs8mdM1skXdaDdUM2T964zz5nPea46a/I8dzwJQeyhdmwFHg++09+sPQbhcYtTyRq
+          LkIJu4jRcnhpL8fzgiVLBjd1vAWzSj1qgrXPhGRfPw7ffxr2B3cytmXAn56564fa6UIe7Q13LoTr
+          XH2QYY2dOWmgCyHQXe+2N/pz0JFRhcxjixd/TBrtUorW6Q96VWhjNx4ZZbTfhWjD3rv+x8HVrQxt
+          8n1SRVVcD39i4mwWd3Q8nVxvhVzdL91RZ6iHajHmjPnx3/qoWkKoUffui3QOflcg0j33ZCHSEx/d
+          NKcynKamCcfZPPqhkUicQl97193bYp1Uolqyx4lHOFDigklUAJbASkUgPTLx+pCRnV9eqJDFl5sj
+          E1eCN/HC17xsywO2Y/WLLzWHJK7/VtlVxbQ7u4xiiavAbApWcdWYgkbBxIVSOgVbJxWLxo45mFxr
+          Dkq8Z60mYSXV7lloFkxcsWfTsJKsxjw0HDPx/jVMqgHdaLpLjpZ4+UizrN262DvLkmvNRaxVVUlV
+          Yu1OM8Nk4lUxy7NKtBqT0SzbqbiaWuWZZjTdedYWf/e6Hja7/dH7/bl26oxHPnEXTzpnpGR1dJbN
+          G+kXy+rVYycUd5bfJq8yoenvh1W/xjTgcyfs/KSq12MfBDmHlPXO3PH9g5W7Y9bWl3vkVYfyP054
+          I+nN6oWtQOg5/ixyZulNmD/z3MW3jfROg2ZlH1ky+aN1xCDyIfJ10kHk54Ag8gVoEPkCJoj8fasU
+          IRREPgkamiJfZQOGyS+BweSbIqNq8lXSi7LKV+Gi7fJVyOjKfBUq2jZfhYy6zleKGnWfrwJHWOgr
+          YdE2+kpo1JW+Uq5Rd/pKmo221FealLD6h2f125bY6t9088WjTO1vNo7KwrO+2S8UnDD7v4rZV6Ij
+          qfaViIi7fSU24nJfiY2y3VcCo6v3leoVIZVRv68UJVmQzAl+JRwY/v/T8CuFirbiV0Kj7fhV0KhK
+          fhzXL2PRVvxHeVwfhh+GH4Yfht8cGgy/HjYYfhj+3NiP3/CfWlLDn9/WZIp/s+dX7/f1HX9xL4Tk
+          h+SvQQfJD8lPgw2SH5Ifkh+SH5Ifkh+S3wQTZcuPk/yH5fnxWJ7Ds/x4LI+40oXjt1+ZZ6bR4Pj1
+          sMHxw/Hnxn78jv/MEjv+z17InW3cZI5/m6uVeVrf8RfzU5abkPyvXXYg+W1IfiJskPxlNkh+ARYk
+          PyS/jAeSn1qoIPn3QoPk/6+ZIPlLYJD8RqhoW34c5j9Qz3+kh/nx/P1D1Px4/r64YoTkf8XyAcmv
+          W/KfW7KD/HbTTkrH3+qc58cjeyD6TdNB9EP002CD6Ifoh+iH6Ifoh+iH6N+XCY/sKWPR1vxH+cge
+          HOU/PMePo/ziMpeu4cdRfjEadcd/1Ef5Ifkh+Y9E8l9YyRUP/wJPfAQfMo8AAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/movie
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA31Sy07DMBC89yuinECiTZo2fd0QFRIHHlJ7gaqHbeymBj+Csy4KiH8ndmIprYBD
+          FK1mZndm15teEHzVXxCEyJDTcBGESwqkUIqHVw0AHKmWgOxI15ZT1qTNtgVLmilJQFfPFPRKGZ3R
+          O1ITYo8rjWvfmZx1LtknfZRLVr51FQho7IwQd+CZTEDeDHa1N+2wTB2pXleFG1GosnbbyhxsNLdA
+          dE8JgxvLjaZRQxu8FnnYMr/d38ci6kNyBYTaLHvgJW2Bqo7ZMXuA8pa5cF1SAXhwM1EUkV9ncBFf
+          +jiFVvta5jY17IhWdXYXwy6BZZ4ulGSotDOD2vgxgkkmjLg+AuOwY5xhdb62sgWdxY50rzih+gEE
+          /denNhKZ4/jAGacg/zwoCrJzoZL5aDLxGveyVtzkXUm/oXhlTqU+fVkI+UkNpLlGmMTDeT9O+vF4
+          ncSLdL4YpYPxLJ2l4xff7d2A3cbTL2tmtpj27MG3P173ykP+AgAA
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        Content-Length: ['0']
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: DELETE
+      uri: http://127.0.0.1:7878/api/movie/7
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA6uuBQBDv6ajAgAAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:35 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/profile
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA+2cXW/aSBSG7/0rLK6LNpCv7t4lgBrUlFaQtlpFuXBgoFaMnR3s0mi1/31tY8B2
+          Z4zD7Owc6HsRJTBjPE/OnJnDo5HvLdv+O/6x7YbvzFnjD7tx5b803qzeGkdhMJ3Gb666xO+4k/hV
+          ++TN+vX6omsv4s5L8+ztyXNj07gIIj5Omx/T5m0LZ4vAi0I38JNWHl/2ads4Dybu1GU8afIDnzXS
+          hn+yMT1zNmWcs8mdM1skXdaDdUM2T964zz5nPea46a/I8dzwJQeyhdmwFHg++09+sPQbhcYtTyRq
+          LkIJu4jRcnhpL8fzgiVLBjd1vAWzSj1qgrXPhGRfPw7ffxr2B3cytmXAn56564fa6UIe7Q13LoTr
+          XH2QYY2dOWmgCyHQXe+2N/pz0JFRhcxjixd/TBrtUorW6Q96VWhjNx4ZZbTfhWjD3rv+x8HVrQxt
+          8n1SRVVcD39i4mwWd3Q8nVxvhVzdL91RZ6iHajHmjPnx3/qoWkKoUffui3QOflcg0j33ZCHSEx/d
+          NKcynKamCcfZPPqhkUicQl97193bYp1Uolqyx4lHOFDigklUAJbASkUgPTLx+pCRnV9eqJDFl5sj
+          E1eCN/HC17xsywO2Y/WLLzWHJK7/VtlVxbQ7u4xiiavAbApWcdWYgkbBxIVSOgVbJxWLxo45mFxr
+          Dkq8Z60mYSXV7lloFkxcsWfTsJKsxjw0HDPx/jVMqgHdaLpLjpZ4+UizrN262DvLkmvNRaxVVUlV
+          Yu1OM8Nk4lUxy7NKtBqT0SzbqbiaWuWZZjTdedYWf/e6Hja7/dH7/bl26oxHPnEXTzpnpGR1dJbN
+          G+kXy+rVYycUd5bfJq8yoenvh1W/xjTgcyfs/KSq12MfBDmHlPXO3PH9g5W7Y9bWl3vkVYfyP054
+          I+nN6oWtQOg5/ixyZulNmD/z3MW3jfROg2ZlH1ky+aN1xCDyIfJ10kHk54Ag8gVoEPkCJoj8fasU
+          IRREPgkamiJfZQOGyS+BweSbIqNq8lXSi7LKV+Gi7fJVyOjKfBUq2jZfhYy6zleKGnWfrwJHWOgr
+          YdE2+kpo1JW+Uq5Rd/pKmo221FealLD6h2f125bY6t9088WjTO1vNo7KwrO+2S8UnDD7v4rZV6Ij
+          qfaViIi7fSU24nJfiY2y3VcCo6v3leoVIZVRv68UJVmQzAl+JRwY/v/T8CuFirbiV0Kj7fhV0KhK
+          fhzXL2PRVvxHeVwfhh+GH4Yfht8cGgy/HjYYfhj+3NiP3/CfWlLDn9/WZIp/s+dX7/f1HX9xL4Tk
+          h+SvQQfJD8lPgw2SH5Ifkh+SH5Ifkh+S3wQTZcuPk/yH5fnxWJ7Ds/x4LI+40oXjt1+ZZ6bR4Pj1
+          sMHxw/Hnxn78jv/MEjv+z17InW3cZI5/m6uVeVrf8RfzU5abkPyvXXYg+W1IfiJskPxlNkh+ARYk
+          PyS/jAeSn1qoIPn3QoPk/6+ZIPlLYJD8RqhoW34c5j9Qz3+kh/nx/P1D1Px4/r64YoTkf8XyAcmv
+          W/KfW7KD/HbTTkrH3+qc58cjeyD6TdNB9EP002CD6Ifoh+iH6Ifoh+iH6N+XCY/sKWPR1vxH+cge
+          HOU/PMePo/ziMpeu4cdRfjEadcd/1Ef5Ifkh+Y9E8l9YyRUP/wJPfAQfMo8AAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:36 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.20.1]
+        X-Api-Key: [d2bcc5ec0c894b9587b6fbc3ff6ec11e]
+      method: GET
+      uri: http://127.0.0.1:7878/api/movie
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4uOBQApu0wNAgAAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['no-cache, no-store, must-revalidate']
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Mon, 04 Feb 2019 20:59:36 GMT']
+        Expires: ['0']
+        Keep-Alive: ['timeout=15,max=100']
+        Pragma: [no-cache]
+        Server: [Mono-HTTPAPI/1.0]
+        X-ApplicationVersion: [0.2.0.1293]
+      status: {code: 200, message: OK}
+version: 1

@@ -1,0 +1,260 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/search?type=show&query=House
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":61.689377,\"show\":{\"title\":\"House\",\"overview\":\"Go
+        deeper into the medical mysteries of House, TV's most compelling drama. Hugh
+        Laurie stars as the brilliant but sarcastic Dr. Gregory House, a maverick
+        physician who is devoid of bedside manner. While his behavior can border on
+        antisocial, Dr. House thrives on the challenge of solving the medical puzzles
+        that other doctors give up on. Together with his hand-picked team of young
+        medical experts, he'll do whatever it takes in the race against the clock
+        to solve the case.\",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\":49.852543,\"show\":{\"title\":\"House
+        vs. House\",\"overview\":\"House vs. House is a new home makeover competition
+        series where amateur and experienced renovation teams compete for the chance
+        to win $10,000 by proving they can create the better DIY projects in their
+        home. From painting and decorating, to one-of-a-kind, imaginative projects,
+        each episode features two teams will go head-to-head in grueling challenges.
+        Tanya McQueen, a DIY design expert, and David Brian Sanders, an architect
+        and designer, will determine which team completes the most impressive transformation
+        and award the cash prize.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\":\"house-vs-house\",\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Full
+        House\",\"overview\":\"Full House is an American sitcom created by Jeff Franklin
+        for ABC. The show chronicles a widowed father, who enlists his best friend
+        and his brother-in-law to help raise his three daughters. It aired from September
+        22, 1987, to May 23, 1995, broadcasting eight seasons and 192 episodes.\",\"year\":1987,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":4289,\"slug\":\"full-house-1987\",\"tvdb\":70500,\"imdb\":\"tt0092359\",\"tmdb\":4313,\"tvrage\":3622}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"House
+        Hunters\",\"overview\":\"House Hunters takes viewers behind the scenes as
+        individuals, couples and families learn what to look for and decide whether
+        or not a home is meant for them. Focusing on the emotional experience of finding
+        and purchasing a new home, each episode follows a prospective buyer and real
+        estate agent through the home-buying process, from start to finish.\",\"year\":1999,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":6441,\"slug\":\"house-hunters\",\"tvdb\":73182,\"imdb\":\"tt0369117\",\"tmdb\":6480,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Fuller
+        House\",\"overview\":\"Recently widowed D.J. Tanner-Fuller gets help from
+        her sister Stephanie and best friend Kimmy when the women move in with their
+        families to help D.J. raise her children in this spin-off series.\",\"year\":2016,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":102424,\"slug\":\"fuller-house\",\"tvdb\":301236,\"imdb\":\"tt3986586\",\"tmdb\":63623,\"tvrage\":48701}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Alpha
+        House\",\"overview\":\"Alpha House follows four senators who live together
+        in a rented house in Washington DC.Re-election battles, looming indictments,
+        parties, their Party... these senators need a drink. And a new housemate.\",\"year\":2013,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":60285,\"slug\":\"alpha-house\",\"tvdb\":269008,\"imdb\":\"tt3012160\",\"tmdb\":60719,\"tvrage\":34454}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Playing
+        House\",\"overview\":\"A single-camera buddy comedy about what happens when
+        two best friends come back together, just when they need each other most.Inspired
+        by the ultra-close friendship between the series' creators and stars, \\\"Playing
+        House\\\" centers on mother to-be Maggie who asks her single and career-driven
+        best friend Emma to return home from her job overseas to attend her baby shower,
+        having no idea what\u2019s truly in store.\",\"year\":2014,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":73385,\"slug\":\"playing-house\",\"tvdb\":269898,\"imdb\":\"tt2750182\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"House
+        Husbands\",\"overview\":\"House Husbands centres around four families with
+        one thing in common, the husbands stay home to raise the children.\",\"year\":2012,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":43830,\"slug\":\"house-husbands\",\"tvdb\":262026,\"imdb\":\"tt2402807\",\"tmdb\":44072,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Bleak
+        House\",\"overview\":\"In this star-studded adaptation of a literary classic,
+        acclaimed writer Andrew Davies turns his talents to one of Charles Dickens'
+        most brilliant novels \u2014 arguably the greatest-ever depiction of Victorian
+        London. Fresh and imaginative, yet faithful to the original, this thrilling
+        fast-paced adaptation is shot with a contemporary edge. At its heart is the
+        story of the icily beautiful Lady Dedlock, who nurses a dark secret, and the
+        merciless lawyer Tulkinghorn, who seeks to uncover it. The generous John Jarndyce,
+        struggling with his own past, and his two young wards Richard and Ada, are
+        all caught up, like Lady Dedlock, in the infamous case of Jarndyce vs. Jarndyce,
+        which will make one of them rich beyond imagination if it can ever be brought
+        to a conclusion. As Tulkinghorn digs deeper into Lady Dedlock's past, he unearths
+        a secret that will change their lives forever, and which is almost as astounding
+        as the final outcome of the Jarndyce case.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":2474,\"slug\":\"bleak-house\",\"tvdb\":73558,\"imdb\":\"tt0442632\",\"tmdb\":2489,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Full
+        House\",\"overview\":\"Han Ji Eun is a naive writer who got swindled out of
+        everything she owned including her house by her best friends. Stranded in
+        China, She managed to borrow money from an actor Lee Young Jae to return to
+        Korea. On her return, she found out that her house was bought by Lee Young
+        Jae. In an attempt to get her possessions back, she entered in a contract
+        marriage with Young Jae for one year. In spite of losing all, Ji Eun manages
+        to be cheerful and takes things in strike and the business relationship between
+        the two becomes personal as they start to rely and care for each other. \",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":3482,\"slug\":\"full-house\",\"tvdb\":84928,\"imdb\":\"tt0464625\",\"tmdb\":3504,\"tvrage\":null}}}]"}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [312a167bcba33d07-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 11:38:16 GMT']
+      ETag: [W/"bd88943cc0ddc14f3315697ac3a632ef"]
+      Expires: ['Sat, 17 Dec 2016 19:38:16 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d4b923f26f908952a37ed705bde9fbd821481974696; expires=Sun,
+          17-Dec-17 11:38:16 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Pagination-Item-Count: ['1737']
+      X-Pagination-Limit: ['10']
+      X-Pagination-Page: ['1']
+      X-Pagination-Page-Count: ['174']
+      X-Request-Id: [736fd637-8769-45e7-bd06-fab2e44bbc94]
+      X-Runtime: ['0.018501']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      Cookie: [__cfduid=d4b923f26f908952a37ed705bde9fbd821481974696]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/1399?extended=full
+  response:
+    body: {string: '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Go
+        deeper into the medical mysteries of House, TV''s most compelling drama. Hugh
+        Laurie stars as the brilliant but sarcastic Dr. Gregory House, a maverick
+        physician who is devoid of bedside manner. While his behavior can border on
+        antisocial, Dr. House thrives on the challenge of solving the medical puzzles
+        that other doctors give up on. Together with his hand-picked team of young
+        medical experts, he''ll do whatever it takes in the race against the clock
+        to solve the case.","first_aired":"2004-11-16T08:00:00.000Z","airs":{"day":null,"time":null,"timezone":"America/New_York"},"runtime":44,"certification":"TV-14","network":"FOX
+        (US)","country":"us","trailer":null,"homepage":"http://www.fox.com/house/index.htm","status":"ended","rating":8.78719,"votes":17579,"updated_at":"2016-12-14T09:35:37.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fr","he","hu","it","ko","lt","nl","pl","pt","ro","ru","sk","sr","tr","uk","zh"],"genres":["comedy","drama","mystery"],"aired_episodes":176}'}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [312a167bfba73d07-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 11:38:16 GMT']
+      ETag: [W/"6cabdad3b0db0c728ee72f8827a38aa5"]
+      Expires: ['Sat, 17 Dec 2016 19:38:16 GMT']
+      Last-Modified: ['Wed, 14 Dec 2016 09:35:37 GMT']
+      Server: [cloudflare-nginx]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [33446abf-9aaa-4f6d-a5bc-f192b686fdcf]
+      X-Runtime: ['0.013575']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/1399/people?extended=full
+  response:
+    body: {string: "{\"cast\":[{\"character\":\"Dr. Gregory House\",\"person\":{\"name\":\"Hugh
+        Laurie\",\"ids\":{\"trakt\":297390,\"slug\":\"hugh-laurie\",\"imdb\":\"nm0491402\",\"tmdb\":41419,\"tvrage\":30836},\"biography\":\"James
+        Hugh Calum Laurie better known as Hugh Laurie, is an English actor, voice
+        artist, comedian, writer, musician, recording artist, and director. He first
+        became known as one half of the Fry and Laurie double act, along with his
+        friend and comedy partner Stephen Fry, whom he joined in the cast of Blackadder
+        and Jeeves and Wooster from 1987 until 1999. Since 2004, he has played the
+        lead as Dr. Gregory House, the protagonist of House, for which he received
+        two Golden Globe awards and several Emmy nominations. As of August 2010, he
+        is the highest paid actor in a drama series on US television.\\n\\nDescription
+        above from the Wikipedia article Hugh Laurie, licensed under CC-BY-SA, full
+        list of contributors on Wikipedia.\",\"birthday\":\"1959-06-11\",\"death\":null,\"birthplace\":\"Oxford,
+        Oxfordshire, England UK\",\"homepage\":\"http://hughlaurieblues.com/\"}},{\"character\":\"Dr.
+        Eric Foreman\",\"person\":{\"name\":\"Omar Epps\",\"ids\":{\"trakt\":412476,\"slug\":\"omar-epps\",\"imdb\":\"nm0004898\",\"tmdb\":4987,\"tvrage\":null},\"biography\":\"Omar
+        Hashim Epps (born July 20, 1973) is an American actor, singer, songwriter,
+        and record producer. His film roles include Juice, Major League II, Higher
+        Learning, Scream 2, The Wood, In Too Deep, and Love and Basketball. Epps'
+        television work includes the role of Dr. Dennis Gant on the US medical drama
+        series ER, and since 2004 Dr. Eric Foreman on the Fox medical drama series
+        House which earned him a NAACP Image Award in 2007 and 2008 for Outstanding
+        Supporting Actor in a Drama Series.\",\"birthday\":\"1973-07-20\",\"death\":null,\"birthplace\":\"Brooklyn,
+        New York, USA\",\"homepage\":\"\"}},{\"character\":\"Dr. James Wilson\",\"person\":{\"name\":\"Robert
+        Sean Leonard\",\"ids\":{\"trakt\":411888,\"slug\":\"robert-sean-leonard\",\"imdb\":\"nm0000494\",\"tmdb\":2692,\"tvrage\":31687},\"biography\":\"\u200BFrom
+        Wikipedia, the free encyclopedia\\n\\nRobert Sean Leonard (born February 28,
+        1969) is an award-winning American actor, who has regularly starred in Broadway
+        and off-Broadway productions. Since 2004 he has played the role of Dr. James
+        Wilson on the TV series House. He played Neil Perry in the 1989 movie Dead
+        Poets Society.\\n\\nDescription above from the Wikipedia article Robert Sean
+        Leonard, licensed under CC-BY-SA, full list of contributors on Wikipedia.\",\"birthday\":\"1969-02-28\",\"death\":null,\"birthplace\":\"Westwood,
+        New Jersey, USA\",\"homepage\":\"\"}},{\"character\":\"Dr. Allison Cameron\",\"person\":{\"name\":\"Jennifer
+        Morrison\",\"ids\":{\"trakt\":414513,\"slug\":\"jennifer-morrison\",\"imdb\":\"nm0607185\",\"tmdb\":41421,\"tvrage\":28684},\"biography\":\"Jennifer
+        Marie Morrison (born April 12, 1979, height 5' 5\xBC\\\" (1,66 m)) is an American
+        actress, model and film producer. She is best known for her role as Dr. Allison
+        Cameron in House, whom she played for over five years, and also as Zoey Pierson
+        in the sixth season of How I Met Your Mother.\\n\\nJennifer Morrison was born
+        in Chicago, Illinois, and raised in Arlington Heights, Illinois. She is the
+        eldest of three children with a sister, Julia, and a brother, Daniel. Her
+        father, David L. Morrison, is a retired music teacher who was named teacher
+        of the year by the Illinois State Board of Education in 2003. Morrison's mother,
+        Judy Morrison, is also a retired teacher.\\n\\nMorrison attended South Middle
+        School then graduated from Prospect High School in 1997 where her parents
+        worked. She played clarinet in the school's marching band, sang in the choir
+        and was a cheerleader with the school's pep squad. She attended Loyola University
+        Chicago where she majored in Theatre and minored in English, graduating in
+        2000. She studied with the Steppenwolf Theatre Company before moving to Los
+        Angeles to pursue a career in film and television.\\n\\nMorrison started dating
+        her House co-star Jesse Spencer in July 2004. Spencer proposed to Morrison
+        on December 23, 2006, at the Eiffel Tower and the two had planned to marry
+        later in 2007. In August 2007, Morrison and Spencer called off their engagement.\\n\\nDescription
+        above from the Wikipedia article Jennifer Morrison, licensed under CC-BY-SA,
+        full list of contributors on Wikipedia.\",\"birthday\":\"1979-04-12\",\"death\":null,\"birthplace\":\"Chicago
+        - Illinois - USA\",\"homepage\":\"\"}},{\"character\":\"Dr. Robert Chase\",\"person\":{\"name\":\"Jesse
+        Spencer\",\"ids\":{\"trakt\":429766,\"slug\":\"jesse-spencer-5ede7178-b889-4092-bdc8-08a1e57de572\",\"imdb\":\"nm0817980\",\"tmdb\":41422,\"tvrage\":31685},\"biography\":\"\u200BFrom
+        Wikipedia, the free encyclopedia. \_\\n\\nJesse Gordon Spencer (born 12 February
+        1979) is an Australian actor and musician. He is best known for his current
+        portrayal of Dr. Robert Chase on the medical drama House and for playing Billy
+        Kennedy in the Australian soap-opera Neighbours.\",\"birthday\":\"1979-02-12\",\"death\":null,\"birthplace\":\"Melbourne
+        - Victoria - Australia\",\"homepage\":\"\"}},{\"character\":\"\u041A\u0440\u0438\u0441
+        \u0422\u0430\u0443\u0431\",\"person\":{\"name\":\"Peter Jacobson\",\"ids\":{\"trakt\":418546,\"slug\":\"peter-jacobson\",\"imdb\":\"nm0414907\",\"tmdb\":31514,\"tvrage\":4259},\"biography\":\"From
+        Wikipedia, the free encyclopedia\\n\\nPeter S. Jacobson (born March 24, 1965)
+        is an American film and television actor.\",\"birthday\":\"1965-03-24\",\"death\":null,\"birthplace\":\"Chicago
+        - Illinois - USA\",\"homepage\":\"\"}},{\"character\":\"Thirteen\",\"person\":{\"name\":\"Olivia
+        Wilde\",\"ids\":{\"trakt\":421662,\"slug\":\"olivia-wilde\",\"imdb\":\"nm1312575\",\"tmdb\":59315,\"tvrage\":51856},\"biography\":\"Olivia
+        Wilde (born Olivia Jane Cockburn; March 10, 1984) is an American actress and
+        model. She began acting in the early 2000s, and has since appeared in a number
+        of film and television parts, including roles in the serial-drama The O.C.
+        and The Black Donnellys. She portrays Dr. Remy \\\"Thirteen\\\" Hadley in
+        the TV drama House, and in 2010 starred as Quorra in Tron: Legacy.\\n\\nDescription
+        above from the Wikipedia article Olivia Wilde, licensed under CC-BY-SA, full
+        list of contributors on Wikipedia.\",\"birthday\":\"1984-03-10\",\"death\":null,\"birthplace\":\"New
+        York City, New York, USA\",\"homepage\":\"\"}}],\"crew\":{\"production\":[{\"job\":\"Casting\",\"person\":{\"name\":\"Amy
+        Lippens\",\"ids\":{\"trakt\":1995,\"slug\":\"amy-lippens\",\"imdb\":\"nm0513591\",\"tmdb\":2151,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Executive
+        Producer\",\"person\":{\"name\":\"Paul Attanasio\",\"ids\":{\"trakt\":2009,\"slug\":\"paul-attanasio\",\"imdb\":\"nm0001921\",\"tmdb\":45543,\"tvrage\":71428},\"biography\":null,\"birthday\":\"1959-11-14\",\"death\":null,\"birthplace\":\"\",\"homepage\":null}},{\"job\":\"Co-Executive
+        Producer\",\"person\":{\"name\":\"Gerrit van der Meer\",\"ids\":{\"trakt\":9787,\"slug\":\"gerrit-van-der-meer\",\"imdb\":\"nm0576182\",\"tmdb\":12256,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Unit
+        Production Manager\",\"person\":{\"name\":\"Gerrit van der Meer\",\"ids\":{\"trakt\":9787,\"slug\":\"gerrit-van-der-meer\",\"imdb\":\"nm0576182\",\"tmdb\":12256,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Executive
+        Producer\",\"person\":{\"name\":\"Garrett Lerner\",\"ids\":{\"trakt\":106206,\"slug\":\"garrett-lerner\",\"imdb\":\"nm1068424\",\"tmdb\":114407,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":\"\",\"homepage\":null}},{\"job\":\"Executive
+        Producer\",\"person\":{\"name\":\"Peter Blake\",\"ids\":{\"trakt\":399346,\"slug\":\"peter-blake-5cd380a9-d696-46d4-84cc-b862c5b2e6b3\",\"imdb\":\"nm0086694\",\"tmdb\":1223964,\"tvrage\":null},\"biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":\"\"}},{\"job\":\"Executive
+        Producer\",\"person\":{\"name\":\"Thomas L. Moran\",\"ids\":{\"trakt\":399347,\"slug\":\"thomas-l-moran\",\"imdb\":\"nm0602981\",\"tmdb\":1223966,\"tvrage\":31719},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Executive
+        Producer\",\"person\":{\"name\":\"Russel Friend\",\"ids\":{\"trakt\":399348,\"slug\":\"russel-friend\",\"imdb\":\"nm1068423\",\"tmdb\":1213567,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Producer\",\"person\":{\"name\":\"Marcy
+        G. Kaplan\",\"ids\":{\"trakt\":399357,\"slug\":\"marcy-g-kaplan\",\"imdb\":\"nm0438309\",\"tmdb\":1224008,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Executive
+        Producer\",\"person\":{\"name\":\"Bryan Singer\",\"ids\":{\"trakt\":413922,\"slug\":\"bryan-singer\",\"imdb\":\"nm0001741\",\"tmdb\":9032,\"tvrage\":31688},\"biography\":\"Bryan
+        Singer (born September 17, 1965) is an American film director and film producer.
+        Singer won critical acclaim for his work on The Usual Suspects, and is especially
+        well-known among fans of the science fiction and comic book genres for his
+        work on the first two X-Men films and Superman Returns.\\n\\nDescription above
+        from the Wikipedia article Bryan Singer, licensed under CC-BY-SA, full list
+        of contributors on Wikipedia.\",\"birthday\":\"1965-09-17\",\"death\":null,\"birthplace\":\"New
+        York City, New York, USA\",\"homepage\":\"\"}},{\"job\":\"Executive Producer\",\"person\":{\"name\":\"David
+        Shore\",\"ids\":{\"trakt\":434876,\"slug\":\"david-shore\",\"imdb\":\"nm0794914\",\"tmdb\":169061,\"tvrage\":17176},\"biography\":null,\"birthday\":\"1959-07-03\",\"death\":null,\"birthplace\":null,\"homepage\":\"\"}},{\"job\":\"Executive
+        Producer\",\"person\":{\"name\":\"Katie Jacobs\",\"ids\":{\"trakt\":436235,\"slug\":\"katie-jacobs\",\"imdb\":\"nm0414498\",\"tmdb\":41424,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":\"\",\"homepage\":null}}],\"directing\":[{\"job\":\"Script
+        Supervisor\",\"person\":{\"name\":\"Ira Hurvitz\",\"ids\":{\"trakt\":572489,\"slug\":\"ira-hurvitz\",\"imdb\":\"nm0403779\",\"tmdb\":1533790,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Script
+        Coordinator\",\"person\":{\"name\":\"Dustin Paddock\",\"ids\":{\"trakt\":618367,\"slug\":\"dustin-paddock\",\"imdb\":null,\"tmdb\":1223981,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}}],\"sound\":[{\"job\":\"Original
+        Music Composer\",\"person\":{\"name\":\"Jon Ehrlich\",\"ids\":{\"trakt\":580789,\"slug\":\"jon-ehrlich\",\"imdb\":\"nm0251363\",\"tmdb\":1493983,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Original
+        Music Composer\",\"person\":{\"name\":\"Jason Derlatka\",\"ids\":{\"trakt\":618364,\"slug\":\"jason-derlatka\",\"imdb\":\"nm1628706\",\"tmdb\":1604953,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":\"\"}}],\"costume
+        & make-up\":[{\"job\":\"Costume Design\",\"person\":{\"name\":\"Cathy Crandall\",\"ids\":{\"trakt\":618365,\"slug\":\"cathy-crandall\",\"imdb\":\"nm0186285\",\"tmdb\":1604955,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}}],\"visual
+        effects\":[{\"job\":\"Visual Effects Supervisor\",\"person\":{\"name\":\"Elan
+        Soltes\",\"ids\":{\"trakt\":618366,\"slug\":\"elan-soltes\",\"imdb\":null,\"tmdb\":1488571,\"tvrage\":null},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}}]}}"}
+    headers:
+      CF-Cache-Status: [MISS]
+      CF-RAY: [312a167c8e173d49-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 11:38:16 GMT']
+      ETag: [W/"7fcc137b45389ea34735f87179f82163"]
+      Expires: ['Sat, 17 Dec 2016 19:38:16 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d704c28dcce197c9f9bb900c078457ec71481974696; expires=Sun,
+          17-Dec-17 11:38:16 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [2f3cd843-4bb0-4004-b8ef-f003f193ce50]
+      X-Runtime: ['0.075454']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1

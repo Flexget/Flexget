@@ -1,0 +1,5 @@
+<movie>
+  <title>A Bela e a Fera</title>
+  <!-- Valid IMDB IDs have 7 digits preceded by tt (for titles) -->
+  <id>tt1234</id>
+</movie>

@@ -1,0 +1,25 @@
+<md-sidenav layout="column" class="nav-menu md-sidenav-left md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')" flex>
+    <md-content layout="column" flex>
+        <md-list>
+            <md-list-item ng-repeat="item in ::vm.navItems">
+                <md-button ui-sref="{{ ::item.name }}" ng-click="vm.close()" flex>
+                    <md-icon class="fa fa-{{ ::item.settings.icon }}"></md-icon>{{ ::item.settings.caption }}
+				</md-button>
+            </md-list-item>
+        </md-list>
+        <span flex></span>
+
+        <div class="version-info" ng-if="!vm.isSmallMenu() && vm.versions">
+            <h3>Version info</h3>
+            <span>
+                Flexget: {{ vm.versions.flexget_version }}&nbsp;
+                <a ng-if="::vm.hasUpdate()" href="http://flexget.com/ChangeLog" target="_blank">
+                    <md-tooltip  md-direction="top">New version available ({{ vm.versions.latest_version }})</md-tooltip>
+                    <md-icon class="fa fa-lg fa-question-circle-o"></md-icon>
+                </a>
+            </span
+            ></br>
+            <span>API: {{ vm.versions.api_version }}</span>
+        </div>
+    </md-content>
+</md-sidenav>

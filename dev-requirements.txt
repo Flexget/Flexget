@@ -1,0 +1,19 @@
+sphinx==1.6.3
+click==6.7
+pylint
+coverage==4.4.1
+flake8
+vcrpy~=1.11.1  # requests 2.16.3 doesn't work with vcrpy <1.11.1
+virtualenv==15.1.0
+boto3
+wheel==0.31.0
+pytest~=5.1.2
+pytest-xdist~=1.29.0
+pytest-runner
+pytest-cov==2.5.1
+gitpython==3.0.5
+codacy-coverage>=1.2.18
+pip-tools==3.2.0
+twine==1.11.0
+isort[pyproject]>=4.3.20
+black>=18.9b0

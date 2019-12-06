@@ -9,6 +9,30 @@ flexget Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`api` Module
+-----------------
+
+.. automodule:: flexget.api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`config_schema` Module
+--------------------
+
+.. automodule:: flexget.config_schema
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`db_schema` Module
+--------------------
+
+.. automodule:: flexget.db_schema
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`entry` Module
 -------------------
 
@@ -25,10 +49,10 @@ flexget Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`task` Module
+:mod:`ipc` Module
 ------------------
 
-.. automodule:: flexget.task
+.. automodule:: flexget.ipc
     :members:
     :undoc-members:
     :show-inheritance:
@@ -65,18 +89,26 @@ flexget Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`db_schema` Module
---------------------
+:mod:`task` Module
+------------------
 
-.. automodule:: flexget.db_schema
+.. automodule:: flexget.task
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`config_schema` Module
---------------------
+:mod:`task_queue` Module
+------------------
 
-.. automodule:: flexget.config_schema
+.. automodule:: flexget.task_queue
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`webserver` Module
+------------------
+
+.. automodule:: flexget.webserver
     :members:
     :undoc-members:
     :show-inheritance:

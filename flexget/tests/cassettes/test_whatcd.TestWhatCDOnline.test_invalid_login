@@ -1,0 +1,56 @@
+interactions:
+  - request:
+      body: username=invalid&password=invalid&keeplogged=1
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        Content-Length: ['46']
+        Content-Type: [application/x-www-form-urlencoded]
+        User-Agent: [FlexGet/1.2.464.dev (www.flexget.com)]
+      method: POST
+      uri: https://ssl.what.cd/login.php
+    response:
+      body:
+        string: !!binary |
+          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
+          AAA=
+      headers:
+        cache-control: ['no-cache, must-revalidate, post-check=0, pre-check=0']
+        cf-ray: [27dc15ff8cd819c2-SYD]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [text/html; charset=utf-8]
+        date: ['Thu, 03 Mar 2016 09:33:17 GMT']
+        pragma: [no-cache]
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=de1a8b43978a7fb49438efef98fa727991456997596; expires=Fri,
+            03-Mar-17 09:33:16 GMT; path=/; domain=.what.cd; HttpOnly', 'keeplogged=deleted;
+            expires=Thu, 01-Jan-1970 00:00:01 GMT; Max-Age=0; path=/']
+        strict-transport-security: [max-age=15768000]
+        x-frame-options: [SAMEORIGIN]
+      status: {code: 200, message: OK}
+version: 1

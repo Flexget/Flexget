@@ -1,11 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
 import codecs
 import logging
+
 import yaml
 
 from flexget import options
 from flexget.event import event
-from flexget.logger import console
+from flexget.terminal import console
 
 log = logging.getLogger('check')
 
@@ -69,21 +69,23 @@ def pre_check_config(config_path):
         if list_open:
             if line.strip().endswith(']'):
                 list_open = False
-#                    print 'closed list at line %s' % line
+                # print 'closed list at line %s' % line
             continue
         else:
             list_open = line.strip().endswith(': [') or line.strip().endswith(':[')
             if list_open:
-#                    print 'list open at line %s' % line
+                # print 'list open at line %s' % line
                 continue
 
-#            print '#%i: %s' % (line_num, line)
-#            print 'indentation: %s, prev_ind: %s, prev_mapping: %s, prev_list: %s, cur_list: %s' % \
-#                  (indentation, prev_indentation, prev_mapping, prev_list, cur_list)
+                # print '#%i: %s' % (line_num, line)
+                # print 'indentation: %s, prev_ind: %s, prev_mapping: %s, prev_list: %s, cur_list: %s' % \
+                #        (indentation, prev_indentation, prev_mapping, prev_list, cur_list)
 
         if ':\t' in line:
-            log.critical('Line %s has TAB character after : character. '
-                         'DO NOT use tab key when editing config!' % line_num)
+            log.critical(
+                'Line %s has TAB character after : character. '
+                'DO NOT use tab key when editing config!' % line_num
+            )
         elif '\t' in line:
             log.warning('Line %s has tabs, use only spaces!' % line_num)
         if isodd(indentation):
@@ -98,14 +100,20 @@ def pre_check_config(config_path):
             log.warning('Config line %s is not indented enough' % line_num)
         if prev_mapping and cur_list:
             # list after opening mapping
-            if indentation < prev_indentation or indentation > prev_indentation + 2 + (2 * prev_list):
-                log.warning('Config line %s containing list element is indented incorrectly' % line_num)
+            if indentation < prev_indentation or indentation > prev_indentation + 2 + (
+                2 * prev_list
+            ):
+                log.warning(
+                    'Config line %s containing list element is indented incorrectly' % line_num
+                )
         elif prev_mapping and indentation <= prev_indentation:
             # after opening a map, indentation doesn't increase
-            log.warning('Config line %s is indented incorrectly (previous line ends with \':\')' % line_num)
+            log.warning(
+                'Config line %s is indented incorrectly (previous line ends with \':\')' % line_num
+            )
 
         # notify if user is trying to set same key multiple times in a task (a common mistake)
-        for level in duplicates.iterkeys():
+        for level in duplicates.keys():
             # when indentation goes down, delete everything indented more than that
             if indentation < level:
                 duplicates[level] = {}
@@ -113,8 +121,10 @@ def pre_check_config(config_path):
             name = line.split(':', 1)[0].strip()
             ns = duplicates.setdefault(indentation, {})
             if name in ns:
-                log.warning('Trying to set value for `%s` in line %s, but it is already defined in line %s!' %
-                    (name, line_num, ns[name]))
+                log.warning(
+                    'Trying to set value for `%s` in line %s, but it is already defined in line %s!'
+                    % (name, line_num, ns[name])
+                )
             ns[name] = line_num
 
         prev_indentation = indentation
@@ -138,7 +148,7 @@ def check(manager, options):
         pre_check_config(manager.config_path)
         with codecs.open(manager.config_path, 'r', encoding='utf-8') as config_file:
             try:
-                config = yaml.load(config_file)
+                config = yaml.safe_load(config_file)
             except yaml.error.YAMLError as e:
                 log.critical('Config file is invalid YAML:')
                 for line in str(e).split('\n'):

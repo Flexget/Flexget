@@ -1,8 +1,6 @@
 """
 Provides small event framework
 """
-from __future__ import absolute_import, division, unicode_literals
-
 import logging
 
 log = logging.getLogger('event')
@@ -10,7 +8,7 @@ log = logging.getLogger('event')
 _events = {}
 
 
-class Event(object):
+class Event:
     """Represents one registered event."""
 
     def __init__(self, name, func, priority=128):
@@ -31,9 +29,16 @@ class Event(object):
         return self.priority > other.priority
 
     def __str__(self):
-        return '<Event(name=%s,func=%s,priority=%s)>' % (self.name, self.func.__name__, self.priority)
+        return '<Event(name=%s,func=%s,priority=%s)>' % (
+            self.name,
+            self.func.__name__,
+            self.priority,
+        )
 
     __repr__ = __str__
+
+    def __hash__(self):
+        return hash((self.name, self.func, self.priority))
 
 
 def event(name, priority=128):
@@ -51,7 +56,7 @@ def get_events(name):
     :param String name: event name
     :return: List of :class:`Event` for *name* ordered by priority
     """
-    if not name in _events:
+    if name not in _events:
         raise KeyError('No such event %s' % name)
     _events[name].sort(reverse=True)
     return _events[name]
@@ -69,7 +74,10 @@ def add_event_handler(name, func, priority=128):
     events = _events.setdefault(name, [])
     for event in events:
         if event.func == func:
-            raise ValueError('%s has already been registered as event listener under name %s' % (func.__name__, name))
+            raise ValueError(
+                '%s has already been registered as event listener under name %s'
+                % (func.__name__, name)
+            )
     log.trace('registered function %s to event %s' % (func.__name__, name))
     event = Event(name, func, priority)
     events.append(event)
@@ -97,10 +105,9 @@ def fire_event(name, *args, **kwargs):
     :param args: List of arguments passed to handler function
     :param kwargs: Key Value arguments passed to handler function
     """
-    if not name in _events:
-        return
-    for event in get_events(name):
-        result = event(*args, **kwargs)
-        if result is not None:
-            args = (result,) + args[1:]
+    if name in _events:
+        for event in get_events(name):
+            result = event(*args, **kwargs)
+            if result is not None:
+                args = (result,) + args[1:]
     return args and args[0]

@@ -1,0 +1,88 @@
+name: Main Workflow
+
+on:
+  push:
+    branches:
+    - develop
+  pull_request:
+    branches:
+    - "*"
+  schedule:
+  - cron:  '00 15 * * *'
+
+jobs:
+  tests:
+    name: Run Tests
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+        operating-system: [ubuntu-latest] # TODO: Fix a couple tests and enable windows. windows-latest
+      fail-fast: false
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up pip cache
+      # TODO: Remove this 'if' when supported: https://github.com/actions/cache/issues/63
+      if: github.event_name == 'push' || github.event_name == 'pull_request'
+      uses: actions/cache@v1
+      with:
+        path: pip_cache
+        key: ${{ runner.OS }}-python${{ matrix.python-version }}-${{ hashFiles('*requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.OS }}-python${{ matrix.python-version }}-
+    # Can we cache the apt-get stuff somehow?
+    - name: Install unrar  # used by some flexget tests
+      if: matrix.operating-system == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -qy unrar
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip --cache-dir pip_cache install -r dev-requirements-extras.txt
+        pip --cache-dir pip_cache install -r dev-requirements.txt
+        pip --cache-dir pip_cache install -r requirements.txt
+    - name: Test with pytest
+      run: |
+        pytest -n auto
+  release:
+    name: Build and release to PyPI
+    if: github.event_name == 'schedule'
+    needs: tests
+    runs-on: ubuntu-18.04
+    env:
+      PYTHON_VERSION: "3.7"
+    steps:
+    - uses: actions/checkout@v1.1.0
+      with:
+        token: ${{ secrets.flexgetbot_pat }}
+    - name: Setup Git User
+      run: |
+        git config user.email ${{ secrets.git_email }}
+        git config user.name ${{ secrets.git_user }}
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    - name: Set up pip cache
+      # TODO: Remove this 'if' when supported: https://github.com/actions/cache/issues/63
+      if: github.event_name == 'push' || github.event_name == 'pull_request'
+      uses: actions/cache@v1
+      with:
+        path: pip_cache
+        key: ${{ runner.OS }}-python${{ env.PYTHON_VERSION }}-${{ hashFiles('*requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.OS }}-python${{ env.PYTHON_VERSION }}-
+    - name: Install dev dependencies
+      run: |
+        pip --cache-dir pip_cache install -r dev-requirements.txt
+    - name: Run release script
+      env:
+        TWINE_USERNAME: "__token__"
+        TWINE_PASSWORD: ${{ secrets.pypi_token }}
+      run: |
+        ./release.sh

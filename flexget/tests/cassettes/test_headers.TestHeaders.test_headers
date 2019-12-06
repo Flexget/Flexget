@@ -1,0 +1,24 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        Cookie: [title=blah; url=other]
+        User-Agent: [FlexGet/1.2.464.dev (www.flexget.com)]
+      method: GET
+      uri: http://httpbin.org/cookies
+    response:
+      body: {string: "{\n  \"cookies\": {\n    \"title\": \"blah\", \n    \"url\"\
+          : \"other\"\n  }\n}\n"}
+      headers:
+        access-control-allow-credentials: ['true']
+        access-control-allow-origin: ['*']
+        connection: [keep-alive]
+        content-length: ['64']
+        content-type: [application/json]
+        date: ['Thu, 03 Mar 2016 09:32:41 GMT']
+        server: [nginx]
+      status: {code: 200, message: OK}
+version: 1

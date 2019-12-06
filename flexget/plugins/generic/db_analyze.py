@@ -1,5 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
+
 from flexget.event import event
 
 log = logging.getLogger('db_analyze')

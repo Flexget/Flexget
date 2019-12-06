@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>FlexGet Manager</title>
+    <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+    <link rel="shortcut icon" href="favicon.ico"/>
+
+    <!-- build:css(.) styles/splash.css -->
+    <link href="bower_components/please-wait/build/please-wait.css" rel="stylesheet">
+    <!-- endbuild -->
+    <!-- build:js(.) scripts/splash.js -->
+    <script type="text/javascript" src="bower_components/please-wait/build/please-wait.js"></script>
+    <!-- endbuild -->
+
+    <!-- build:css(.) styles/vendor.css -->
+    <!-- bower:css -->
+    <!-- endbower -->
+    <!-- endbuild -->
+
+    <!-- build:css({.tmp/serve,src}) styles/app.css -->
+    <!-- inject:css -->
+    <!-- css files will be automatically insert here -->
+    <!-- endinject -->
+    <!-- endbuild -->
+    <style>
+        .pg-loading-screen .pg-loading-center-middle {
+            vertical-align: top;
+        }
+
+        .pg-loading-screen .spinner {
+            width: 50px;
+            height: 40px;
+            text-align: center;
+            font-size: 10px;
+            margin: 0 auto;
+        }
+
+        .pg-loading-screen .spinner > div {
+            margin: 0 3px 0 0;
+            background-color: #F6A52F;
+            height: 100%;
+            width: 6px;
+            display: inline-block;
+            -webkit-animation: sk-stretchdelay 1.2s infinite ease-in-out;
+            animation: sk-stretchdelay 1.2s infinite ease-in-out;
+        }
+
+        .pg-loading-screen .spinner .rect2 {
+            -webkit-animation-delay: -1.1s;
+            animation-delay: -1.1s;
+        }
+
+        .pg-loading-screen .spinner .rect3 {
+            -webkit-animation-delay: -1.0s;
+            animation-delay: -1.0s;
+        }
+
+        .pg-loading-screen .spinner .rect4 {
+            -webkit-animation-delay: -0.9s;
+            animation-delay: -0.9s;
+        }
+
+        .pg-loading-screen .spinner .rect5 {
+            -webkit-animation-delay: -0.8s;
+            animation-delay: -0.8s;
+        }
+
+        @-webkit-keyframes sk-stretchdelay {
+            0%, 40%, 100% {
+                -webkit-transform: scaleY(0.4)
+            }
+            20% {
+                -webkit-transform: scaleY(1.0)
+            }
+        }
+
+        @keyframes sk-stretchdelay {
+            0%, 40%, 100% {
+                transform: scaleY(0.4);
+                -webkit-transform: scaleY(0.4);
+            }
+            20% {
+                transform: scaleY(1.0);
+                -webkit-transform: scaleY(1.0);
+            }
+        }
+    </style>
+
+</head>
+<body>
+
+<!-- app content -->
+<div ui-view layout="column" flex layout-fill></div>
+
+<!-- build:js(.) scripts/vendor.js -->
+<!-- bower:js -->
+<!-- endbower -->
+
+<!-- enqueue all translations for calendar (remove if you dont need multilanguage) -->
+<!-- endbuild -->
+
+<!-- build:js({.tmp/serve,.tmp/partials,src}) scripts/app.js -->
+<script src="app.loading.js"></script>
+<script src="app.utils.js"></script>
+<script src="app.module.js"></script>
+<!-- inject:js -->
+<!-- js files will be automatically insert here -->
+<!-- endinject -->
+
+<!-- inject:partials -->
+<!-- angular templates will be automatically converted in js and inserted here -->
+<!-- endinject -->
+<!-- endbuild -->
+</body>
+</html>

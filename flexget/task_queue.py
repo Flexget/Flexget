@@ -1,26 +1,28 @@
-from __future__ import absolute_import, division, unicode_literals
-
 import logging
-import Queue
+import queue
+import sys
 import threading
 import time
 
-from sqlalchemy.exc import ProgrammingError, OperationalError
+from sqlalchemy.exc import OperationalError, ProgrammingError
 
 from flexget.task import TaskAbort
 
 log = logging.getLogger('task_queue')
 
 
-class TaskQueue(object):
+class TaskQueue:
     """
     Task processing thread.
     Only executes one task at a time, if more are requested they are queued up and run in turn.
     """
+
     def __init__(self):
-        self.run_queue = Queue.PriorityQueue()
+        self.run_queue = queue.PriorityQueue()
         self._shutdown_now = False
         self._shutdown_when_finished = False
+
+        self.current_task = None
 
         # We don't override `threading.Thread` because debugging this seems unsafe with pydevd.
         # Overriding __len__(self) seems to cause a debugger deadlock.
@@ -34,26 +36,31 @@ class TaskQueue(object):
         while not self._shutdown_now:
             # Grab the first job from the run queue and do it
             try:
-                task = self.run_queue.get(timeout=0.5)
-            except Queue.Empty:
+                self.current_task = self.run_queue.get(timeout=0.5)
+            except queue.Empty:
                 if self._shutdown_when_finished:
                     self._shutdown_now = True
                 continue
             try:
-                task.execute()
+                self.current_task.execute()
             except TaskAbort as e:
-                log.debug('task %s aborted: %r' % (task.name, e))
+                log.debug('task %s aborted: %r' % (self.current_task.name, e))
             except (ProgrammingError, OperationalError):
                 log.critical('Database error while running a task. Attempting to recover.')
-                task.manager.crash_report()
+                self.current_task.manager.crash_report()
             except Exception:
                 log.critical('BUG: Unhandled exception during task queue run loop.')
-                task.manager.crash_report()
+                self.current_task.manager.crash_report()
             finally:
                 self.run_queue.task_done()
+                self.current_task = None
+
         remaining_jobs = self.run_queue.qsize()
         if remaining_jobs:
-            log.warning('task queue shut down with %s tasks remaining in the queue to run.' % remaining_jobs)
+            log.warning(
+                'task queue shut down with %s tasks remaining in the queue to run.'
+                % remaining_jobs
+            )
         else:
             log.debug('task queue shut down')
 
@@ -77,8 +84,10 @@ class TaskQueue(object):
         if finish_queue:
             self._shutdown_when_finished = True
             if self.run_queue.qsize():
-                log.verbose('There are %s tasks to execute. Shutdown will commence when they have completed.' %
-                            self.run_queue.qsize())
+                log.verbose(
+                    'There are %s tasks to execute. Shutdown will commence when they have completed.'
+                    % self.run_queue.qsize()
+                )
         else:
             self._shutdown_now = True
 
@@ -87,6 +96,12 @@ class TaskQueue(object):
         Waits for the thread to exit.
         Allows abortion of task queue with ctrl-c
         """
+        if sys.version_info >= (3, 4):
+            # Due to python bug, Thread.is_alive doesn't seem to work properly under our conditions on python 3.4+
+            # http://bugs.python.org/issue26793
+            # TODO: Is it important to have the clean abortion? Do we need to find a better way?
+            self._thread.join()
+            return
         try:
             while self._thread.is_alive():
                 time.sleep(0.5)

@@ -1,17 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
 import ntpath
-import sys
 import re
+import sys
 
 os_mode = None  # Can be 'windows', 'mac', 'linux' or None. None will auto-detect os.
 # Replacement order is important, don't use dicts to store
 platform_replaces = {
     'windows': [
         ['[:*?"<>| ]+', ' '],  # Turn illegal characters into a space
-        [r'[\.\s]+([/\\]|$)', r'\1']],  # Dots cannot end file or directory names
-    'mac': [
-        ['[: ]+', ' ']],  # Only colon is illegal here
-    'linux': []}  # No illegal chars
+        [r'[\.\s]+([/\\]|$)', r'\1'],
+    ],  # Dots cannot end file or directory names
+    'mac': [['[: ]+', ' ']],  # Only colon is illegal here
+    'linux': [],
+}  # No illegal chars
 
 
 def pathscrub(dirty_path, os=None, filename=False):
@@ -53,5 +53,7 @@ def pathscrub(dirty_path, os=None, filename=False):
     path = path.strip()
     # If we stripped everything from a filename, complain
     if filename and dirty_path and not path:
-        raise ValueError('Nothing was left after stripping invalid characters from path `%s`!' % dirty_path)
+        raise ValueError(
+            'Nothing was left after stripping invalid characters from path `%s`!' % dirty_path
+        )
     return drive + path

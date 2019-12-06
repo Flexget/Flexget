@@ -1,8 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
 import inspect
 import logging
-from threading import Lock
 import time
+from threading import Lock
 
 import sqlalchemy
 
@@ -12,7 +11,9 @@ from flexget.manager import Session
 
 log = logging.getLogger('debug_db_sess')
 
-open_transactions_lock = Lock()  # multiple threads may call events, be safe by getting lock when using
+open_transactions_lock = (
+    Lock()
+)  # multiple threads may call events, be safe by getting lock when using
 open_transactions = {}
 
 
@@ -33,12 +34,20 @@ def find_caller(stack):
 def after_begin(session, transaction, connection):
     caller_info = find_caller(inspect.stack()[1:])
     with open_transactions_lock:
-        if any(info[1] is not connection.connection for info in open_transactions.itervalues()):
-            log.warning('Sessions from 2 threads! Transaction 0x%08X opened %s Already open one(s): %s',
-                        id(transaction), caller_info, open_transactions)
+        if any(info[1] is not connection.connection for info in open_transactions.values()):
+            log.warning(
+                'Sessions from 2 threads! Transaction 0x%08X opened %s Already open one(s): %s',
+                id(transaction),
+                caller_info,
+                open_transactions,
+            )
         elif open_transactions:
-            log.debug('Transaction 0x%08X opened %s Already open one(s): %s',
-                      id(transaction), caller_info, open_transactions)
+            log.debug(
+                'Transaction 0x%08X opened %s Already open one(s): %s',
+                id(transaction),
+                caller_info,
+                open_transactions,
+            )
         else:
             log.debug('Transaction 0x%08X opened %s', id(transaction), caller_info)
         # Store information about this transaction
@@ -49,9 +58,22 @@ def after_flush(session, flush_context):
     if session.new or session.deleted or session.dirty:
         caller_info = find_caller(inspect.stack()[1:])
         with open_transactions_lock:
-            tid = next(id(t) for t in session.transaction._iterate_parents() if t in open_transactions)
-            log.debug('Transaction 0x%08X writing %s new: %s deleted: %s dirty: %s',
-                      tid, caller_info, tuple(session.new), tuple(session.deleted), tuple(session.dirty))
+            # Dirty hack to support SQLAlchemy 1.1 without breaking backwards compatibility
+            # _iterate_parents was renamed to _iterate_self_and_parents in 1.1
+            try:
+                _iterate_parents = session.transaction._iterate_parents
+            except AttributeError:
+                _iterate_parents = session.transaction._iterate_self_and_parents
+
+            tid = next(id(t) for t in _iterate_parents() if t in open_transactions)
+            log.debug(
+                'Transaction 0x%08X writing %s new: %s deleted: %s dirty: %s',
+                tid,
+                caller_info,
+                tuple(session.new),
+                tuple(session.deleted),
+                tuple(session.dirty),
+            )
 
 
 def after_end(session, transaction):
@@ -61,8 +83,15 @@ def after_end(session, transaction):
             # Transaction was created but a connection was never opened for it
             return
         open_time = time.time() - open_transactions[transaction][0]
-        msg = 'Transaction 0x%08X closed %s (open time %s)' % (id(transaction), caller_info, open_time)
-        log.warning(msg) if open_time > 2 else log.debug(msg)
+        msg = 'Transaction 0x%08X closed %s (open time %s)' % (
+            id(transaction),
+            caller_info,
+            open_time,
+        )
+        if open_time > 2:
+            log.warning(msg)
+        else:
+            log.debug(msg)
         del open_transactions[transaction]
 
 
@@ -76,5 +105,8 @@ def debug_warnings(manager):
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser().add_argument('--debug-db-sessions', action='store_true',
-                                      help='debug session starts and ends, for finding problems with db locks')
+    options.get_parser().add_argument(
+        '--debug-db-sessions',
+        action='store_true',
+        help='debug session starts and ends, for finding problems with db locks',
+    )

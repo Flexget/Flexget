@@ -1,21 +1,22 @@
-from __future__ import unicode_literals, division, absolute_import
-import copy
 import logging
-
-from path import path
+from pathlib import Path
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 from flexget.utils.log import log_once
 from flexget.utils.template import RenderError
-from flexget.plugins.parsers import ParseWarning
-from flexget.plugin import get_plugin_by_name
+
+try:
+    # NOTE: Importing other plugins is discouraged!
+    from flexget.components.parsing import parsers as plugin_parsers
+except ImportError:
+    raise plugin.DependencyError(issued_by=__name__, missing='parsers')
 
 log = logging.getLogger('exists_series')
 
 
-class FilterExistsSeries(object):
+class FilterExistsSeries:
     """
     Intelligent series aware exists rejecting.
 
@@ -31,11 +32,14 @@ class FilterExistsSeries(object):
                 'type': 'object',
                 'properties': {
                     'path': one_or_more({'type': 'string', 'format': 'path'}),
-                    'allow_different_qualities': {'enum': ['better', True, False], 'default': False}
+                    'allow_different_qualities': {
+                        'enum': ['better', True, False],
+                        'default': False,
+                    },
                 },
                 'required': ['path'],
-                'additionalProperties': False
-            }
+                'additionalProperties': False,
+            },
         ]
     }
 
@@ -44,7 +48,7 @@ class FilterExistsSeries(object):
         if not isinstance(config, dict):
             config = {'path': config}
         # if only a single path is passed turn it into a 1 element list
-        if isinstance(config['path'], basestring):
+        if isinstance(config['path'], str):
             config['path'] = [config['path']]
         return config
 
@@ -68,7 +72,9 @@ class FilterExistsSeries(object):
                 else:
                     log.debug('entry %s series_parser invalid', entry['title'])
         if not accepted_series:
-            log.warning('No accepted entries have series information. exists_series cannot filter them')
+            log.warning(
+                'No accepted entries have series information. exists_series cannot filter them'
+            )
             return
 
         # scan through
@@ -77,16 +83,18 @@ class FilterExistsSeries(object):
             # make new parser from parser in entry
             series_parser = accepted_series[series][0]['series_parser']
             for folder in paths:
-                folder = path(folder).expanduser()
-                if not folder.isdir():
+                folder = Path(folder).expanduser()
+                if not folder.is_dir():
                     log.warning('Directory %s does not exist', folder)
                     continue
 
-                for filename in folder.walk(errors='ignore'):
+                for filename in folder.iterdir():
                     # run parser on filename data
                     try:
-                        disk_parser = get_plugin_by_name('parsing').instance.parse_series(data=filename.name, name=series_parser.name)
-                    except ParseWarning as pw:
+                        disk_parser = plugin.get('parsing', self).parse_series(
+                            data=filename.name, name=series_parser.name
+                        )
+                    except plugin_parsers.ParseWarning as pw:
                         disk_parser = pw.parsed
                         log_once(pw.value, logger=log)
                     if disk_parser.valid:
@@ -96,7 +104,9 @@ class FilterExistsSeries(object):
                         log.debug('disk_parser.proper_count = %s', disk_parser.proper_count)
 
                         for entry in accepted_series[series]:
-                            log.debug('series_parser.identifier = %s', entry['series_parser'].identifier)
+                            log.debug(
+                                'series_parser.identifier = %s', entry['series_parser'].identifier
+                            )
                             if disk_parser.identifier != entry['series_parser'].identifier:
                                 log.trace('wrong identifier')
                                 continue
@@ -109,14 +119,18 @@ class FilterExistsSeries(object):
                                 if disk_parser.quality != entry['series_parser'].quality:
                                     log.trace('wrong quality')
                                     continue
-                            log.debug('entry parser.proper_count = %s', entry['series_parser'].proper_count)
+                            log.debug(
+                                'entry parser.proper_count = %s',
+                                entry['series_parser'].proper_count,
+                            )
                             if disk_parser.proper_count >= entry['series_parser'].proper_count:
-                                entry.reject('proper already exists')
+                                entry.reject('episode already exists')
                                 continue
                             else:
                                 log.trace('new one is better proper, allowing')
                                 continue
 
+
 @event('plugin.register')
 def register_plugin():
-    plugin.register(FilterExistsSeries, 'exists_series', groups=['exists'], api_ver=2)
+    plugin.register(FilterExistsSeries, 'exists_series', interfaces=['task'], api_ver=2)

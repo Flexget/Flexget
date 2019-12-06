@@ -1,4 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
 from collections import namedtuple
 
@@ -9,7 +8,7 @@ from flexget.event import event
 log = logging.getLogger('assume_quality')
 
 
-class AssumeQuality(object):
+class AssumeQuality:
     """
     Applies quality components to entries that match specified quality requirements.
     When a quality is applied, any components which are unknown in the entry are filled from the applied quality.
@@ -31,10 +30,11 @@ class AssumeQuality(object):
         'oneOf': [
             {'title': 'simple config', 'type': 'string', 'format': 'quality'},
             {
-                'title': 'advanced config', 'type': 'object',
-                #Can't validate dict keys, so allow any
-                'additionalProperties': {'type': 'string', 'format': 'quality'}
-            }
+                'title': 'advanced config',
+                'type': 'object',
+                # Can't validate dict keys, so allow any
+                'additionalProperties': {'type': 'string', 'format': 'quality'},
+            },
         ]
     }
 
@@ -49,7 +49,7 @@ class AssumeQuality(object):
                 p += 4
             if component.none_of:
                 p += len(component.none_of)
-            #Still a long way from perfect, but probably good enough.
+                # Still a long way from perfect, but probably good enough.
         return p
 
     def assume(self, entry, quality):
@@ -71,23 +71,32 @@ class AssumeQuality(object):
         log.debug('Quality updated: %s', entry.get('quality'))
 
     def on_task_start(self, task, config):
-        if isinstance(config, basestring): config = {'any': config}
+        if isinstance(config, str):
+            config = {'any': config}
         assume = namedtuple('assume', ['target', 'quality'])
         self.assumptions = []
-        for target, quality in config.items():
+        for target, quality in list(config.items()):
             log.verbose('New assumption: %s is %s' % (target, quality))
             try:
                 target = qualities.Requirements(target)
             except ValueError:
-                raise plugin.PluginError('%s is not a valid quality. Forgetting assumption.' % target)
+                raise plugin.PluginError(
+                    '%s is not a valid quality. Forgetting assumption.' % target
+                )
             try:
                 quality = qualities.get(quality)
             except ValueError:
-                raise plugin.PluginError('%s is not a valid quality. Forgetting assumption.' % quality)
+                raise plugin.PluginError(
+                    '%s is not a valid quality. Forgetting assumption.' % quality
+                )
             self.assumptions.append(assume(target, quality))
-        self.assumptions.sort(key=lambda assumption: self.precision(assumption.target), reverse=True)
+        self.assumptions.sort(
+            key=lambda assumption: self.precision(assumption.target), reverse=True
+        )
         for assumption in self.assumptions:
-            log.debug('Target %s - Priority %s' % (assumption.target, self.precision(assumption.target)))
+            log.debug(
+                'Target %s - Priority %s' % (assumption.target, self.precision(assumption.target))
+            )
 
     @plugin.priority(100)  # run after other plugins which fill quality (series, quality)
     def on_task_metainfo(self, task, config):

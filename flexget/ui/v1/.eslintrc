@@ -1,0 +1,74 @@
+{
+	"extends": "eslint:recommended",
+	"globals": {
+		"angular": true,
+		"registerPlugin": true,
+		"ace": true,
+		"oboe": true
+	},
+	"plugins": [
+		"angular"
+	],
+	"rules": {
+   		"angular/module-getter": 2,
+		"angular/module-setter": 2,
+		"angular/no-private-call": 2,
+
+		"angular/component-limit": 1,
+		"angular/controller-as-route": 2,
+		"angular/controller-as-vm": [2, "vm"],
+		"angular/controller-as": 2,
+		"angular/deferred": 1,
+		"angular/di-unused": 2,
+		"angular/directive-restrict": 0,
+		"angular/empty-controller": 1,
+		"angular/no-controller": 1,
+		"angular/no-inline-template": 1,
+		"angular/no-run-logic": 1,
+		"angular/no-services": [2, ["$http", "$resource"]],
+		"angular/on-watch": 2,
+		"angular/prefer-component": 2,
+
+		"angular/no-cookiestore": 2,
+		"angular/no-directive-replace": 2,
+		"angular/no-http-callback": 2,
+
+		"angular/component-name": 1,
+		"angular/controller-name": [1, "/[A-Z].*Controller$/"],
+		"angular/directive-name": 1,
+		"angular/file-name": 0,
+		"angular/filter-name": 1,
+		"angular/module-name": 1,
+		"angular/service-name": 1,
+
+		"angular/di-order": [1, false],
+		"angular/di": 2,
+		"angular/dumb-inject": 1,
+		"angular/function-type": [2, "named"],
+		"angular/module-dependency-order": 1,
+		"angular/no-service-method": 2,
+		"angular/one-dependency-per-line": 0,
+		"angular/rest-service": 1,
+		"angular/watchers-execution": 1,
+
+		"angular/angularelement": 1,
+		"angular/definedundefined": 2,
+		"angular/document-service": 2,
+		"angular/foreach": 1,
+		"angular/interval-service": 2,
+		"angular/json-functions": 2,
+		"angular/log": 2,
+		"angular/no-angular-mock": 1,
+		"angular/no-jquery-angularelement": 2,
+		"angular/timeout-service": 2,
+		"angular/typecheck-array": 2,
+		"angular/typecheck-date": 2,
+		"angular/typecheck-function": 2,
+   		"angular/typecheck-number": 2,
+		"angular/typecheck-object": 2,
+   		"angular/typecheck-string": 2,
+		"angular/window-service": 2,
+   
+   		"no-use-before-define": 0
+	}
+}

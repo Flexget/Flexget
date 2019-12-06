@@ -1,15 +1,17 @@
-from __future__ import absolute_import, division, unicode_literals
-
 import logging
 import random
 import string
+import sys
 import threading
 
 import rpyc
 from rpyc.utils.server import ThreadedServer
+from terminaltables.terminal_io import terminal_size
 
-from flexget.logger import console, capture_output
-from flexget.options import get_parser, ParserError
+from flexget import terminal
+from flexget.logger import capture_output
+from flexget.options import get_parser
+from flexget.terminal import console
 
 log = logging.getLogger('ipc')
 
@@ -17,44 +19,48 @@ log = logging.getLogger('ipc')
 rpyc.core.protocol.DEFAULT_CONFIG['safe_attrs'].update(['items'])
 rpyc.core.protocol.DEFAULT_CONFIG['allow_pickle'] = True
 
-IPC_VERSION = 3
-AUTH_ERROR = 'authentication error'
-AUTH_SUCCESS = 'authentication success'
+IPC_VERSION = 4
+AUTH_ERROR = b'authentication error'
+AUTH_SUCCESS = b'authentication success'
 
 
-class RemoteStream(object):
+class RemoteStream:
     """
     Used as a filelike to stream text to remote client. If client disconnects while this is in use, an error will be
     logged, but no exception raised.
     """
+
     def __init__(self, writer):
         """
         :param writer: A function which writes a line of text to remote client.
         """
-        self.buffer = None
+        self.buffer = ''
         self.writer = writer
 
-    def write(self, data):
-        if not self.writer:
+    def write(self, text):
+        self.buffer += text
+        if '\n' in self.buffer:
+            self.flush()
+
+    def flush(self):
+        if self.buffer is None or self.writer is None:
             return
-        # This relies on all data up to a newline being either unicode or str, not mixed
-        if not self.buffer:
-            self.buffer = data
-        else:
-            self.buffer += data
-        newline = b'\n' if isinstance(self.buffer, str) else '\n'
-        while newline in self.buffer:
-            line, self.buffer = self.buffer.split(newline, 1)
-            try:
-                self.writer(line)
-            except EOFError:
-                self.writer = None
-                log.error('Client ended connection while still streaming output.')
+        try:
+            self.writer(self.buffer, end='')
+        except EOFError:
+            self.writer = None
+            log.error('Client ended connection while still streaming output.')
+        finally:
+            self.buffer = ''
 
 
 class DaemonService(rpyc.Service):
     # This will be populated when the server is started
     manager = None
+
+    def on_connect(self, conn):
+        self._conn = conn
+        super().on_connect(conn)
 
     def exposed_version(self):
         return IPC_VERSION
@@ -70,11 +76,19 @@ class DaemonService(rpyc.Service):
                 # TODO: Not sure how to properly propagate the exit code back to client
                 log.debug('Parsing cli args caused system exit with status %s.' % e.code)
             return
-        if not options.cron:
-            with capture_output(self.client_out_stream, loglevel=options.loglevel):
+        # Saving original terminal size to restore after monkeypatch
+        original_terminal_info = terminal.terminal_info
+        # Monkeypatching terminal_size so it'll work using IPC
+        terminal.terminal_info = self._conn.root.terminal_info
+        try:
+            if not options.cron:
+                with capture_output(self.client_out_stream, loglevel=options.loglevel):
+                    self.manager.handle_cli(options)
+            else:
                 self.manager.handle_cli(options)
-        else:
-            self.manager.handle_cli(options)
+        finally:
+            # Restoring original terminal_size value
+            terminal.terminal_info = original_terminal_info
 
     def client_console(self, text):
         self._conn.root.console(text)
@@ -85,33 +99,40 @@ class DaemonService(rpyc.Service):
 
 
 class ClientService(rpyc.Service):
-    def on_connect(self):
+    def on_connect(self, conn):
+        self._conn = conn
         """Make sure the client version matches our own."""
         daemon_version = self._conn.root.version()
         if IPC_VERSION != daemon_version:
             self._conn.close()
             raise ValueError('Daemon is different version than client.')
+        super().on_connect(conn)
 
     def exposed_version(self):
         return IPC_VERSION
 
-    def exposed_console(self, text):
-        console(text)
+    def exposed_console(self, text, *args, **kwargs):
+        console(text, *args, **kwargs)
+
+    def exposed_terminal_info(self):
+        return {'size': terminal_size(), 'isatty': sys.stdout.isatty()}
 
 
 class IPCServer(threading.Thread):
     def __init__(self, manager, port=None):
-        super(IPCServer, self).__init__(name='ipc_server')
+        super().__init__(name='ipc_server')
         self.daemon = True
         self.manager = manager
         self.host = '127.0.0.1'
         self.port = port or 0
-        self.password = ''.join(random.choice(string.ascii_letters + string.digits) for x in range(15))
+        self.password = ''.join(
+            random.choice(string.ascii_letters + string.digits) for x in range(15)
+        )
         self.server = None
 
     def authenticator(self, sock):
         channel = rpyc.Channel(rpyc.SocketStream(sock))
-        password = channel.recv()
+        password = channel.recv().decode('utf-8')
         if password != self.password:
             channel.send(AUTH_ERROR)
             raise rpyc.utils.authenticators.AuthenticationError('Invalid password from client.')
@@ -125,7 +146,11 @@ class IPCServer(threading.Thread):
             rpyc_logger.setLevel(logging.WARNING)
         DaemonService.manager = self.manager
         self.server = ThreadedServer(
-            DaemonService, hostname=self.host, port=self.port, authenticator=self.authenticator, logger=rpyc_logger
+            DaemonService,
+            hostname=self.host,
+            port=self.port,
+            authenticator=self.authenticator,
+            logger=rpyc_logger,
         )
         # If we just chose an open port, write save the chosen one
         self.port = self.server.listener.getsockname()[1]
@@ -137,15 +162,17 @@ class IPCServer(threading.Thread):
             self.server.close()
 
 
-class IPCClient(object):
+class IPCClient:
     def __init__(self, port, password):
         channel = rpyc.Channel(rpyc.SocketStream.connect('127.0.0.1', port))
-        channel.send(password)
+        channel.send(password.encode('utf-8'))
         response = channel.recv()
         if response == AUTH_ERROR:
             # TODO: What to raise here. I guess we create a custom error
             raise ValueError('Invalid password for daemon')
-        self.conn = rpyc.utils.factory.connect_channel(channel, service=ClientService)
+        self.conn = rpyc.utils.factory.connect_channel(
+            channel, service=ClientService, config={'sync_request_timeout': None}
+        )
 
     def close(self):
         self.conn.close()

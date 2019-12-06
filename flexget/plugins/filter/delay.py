@@ -1,53 +1,72 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
+import pickle
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Unicode, DateTime, PickleType, Index
+
+from sqlalchemy import Column, DateTime, Index, Integer, String, Unicode, select
 
 from flexget import db_schema, plugin
 from flexget.event import event
-from flexget.entry import Entry
-from flexget.utils.database import safe_pickle_synonym
+from flexget.utils import json
+from flexget.utils.database import entry_synonym
+from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('delay')
-Base = db_schema.versioned_base('delay', 1)
+Base = db_schema.versioned_base('delay', 2)
 
 
 class DelayedEntry(Base):
-
     __tablename__ = 'delay'
 
     id = Column(Integer, primary_key=True)
     task = Column('feed', String)
     title = Column(Unicode)
     expire = Column(DateTime)
-    _entry = Column('entry', PickleType)
-    entry = safe_pickle_synonym('_entry')
+    _json = Column('json', Unicode)
+    entry = entry_synonym('_json')
 
     def __repr__(self):
         return '<DelayedEntry(title=%s)>' % self.title
 
+
 Index('delay_feed_title', DelayedEntry.task, DelayedEntry.title)
+
+
 # TODO: index "expire, task"
 
 
 @db_schema.upgrade('delay')
 def upgrade(ver, session):
     if ver is None:
-        log.info('Fixing delay table from erroneous data ...')
-        # TODO: Using the DelayedEntry object here is no good.
-        all = session.query(DelayedEntry).all()
-        for de in all:
-            for key, value in de.entry.iteritems():
-                if not isinstance(value, (basestring, bool, int, float, list, dict)):
-                    log.warning('Removing `%s` with erroneous data' % de.title)
-                    session.delete(de)
-                    break
+        # Upgrade to version 0 was a failed attempt at cleaning bad entries from our table, better attempt in ver 1
         ver = 1
+    if ver == 1:
+        table = table_schema('delay', session)
+        table_add_column(table, 'json', Unicode, session)
+        # Make sure we get the new schema with the added column
+        table = table_schema('delay', session)
+        failures = 0
+        for row in session.execute(select([table.c.id, table.c.entry])):
+            try:
+                p = pickle.loads(row['entry'])
+                session.execute(
+                    table.update()
+                    .where(table.c.id == row['id'])
+                    .values(json=json.dumps(p, encode_datetime=True))
+                )
+            except (KeyError, ImportError):
+                failures += 1
+        if failures > 0:
+            log.error(
+                'Error upgrading %s pickle objects. Some delay information has been lost.'
+                % failures
+            )
+        ver = 2
+
     return ver
 
 
-class FilterDelay(object):
+class FilterDelay:
     """
         Add delay to a task. This is useful for de-prioritizing expensive / bad-quality tasks.
 
@@ -79,9 +98,12 @@ class FilterDelay(object):
         for entry in task.entries:
             log.debug('Delaying %s' % entry['title'])
             # check if already in queue
-            if not task.session.query(DelayedEntry).\
-                filter(DelayedEntry.title == entry['title']).\
-                    filter(DelayedEntry.task == task.name).first():
+            if (
+                not task.session.query(DelayedEntry)
+                .filter(DelayedEntry.title == entry['title'])
+                .filter(DelayedEntry.task == task.name)
+                .first()
+            ):
                 delay_entry = DelayedEntry()
                 delay_entry.title = entry['title']
                 delay_entry.entry = entry
@@ -93,10 +115,12 @@ class FilterDelay(object):
         task.all_entries[:] = []
 
         # Generate the list of entries whose delay has passed
-        passed_delay = task.session.query(DelayedEntry).\
-            filter(datetime.now() > DelayedEntry.expire).\
-            filter(DelayedEntry.task == task.name)
-        delayed_entries = [Entry(item.entry) for item in passed_delay.all()]
+        passed_delay = (
+            task.session.query(DelayedEntry)
+            .filter(datetime.now() > DelayedEntry.expire)
+            .filter(DelayedEntry.task == task.name)
+        )
+        delayed_entries = [item.entry for item in passed_delay.all()]
         for entry in delayed_entries:
             entry['passed_delay'] = True
             log.debug('Releasing %s' % entry['title'])

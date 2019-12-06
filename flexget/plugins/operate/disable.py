@@ -1,19 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 
 log = logging.getLogger('disable')
 
 
 def all_builtins():
     """Helper function to return an iterator over all builtin plugins."""
-    return (p for p in plugin.plugins.itervalues() if p.builtin)
+    return (p for p in plugin.plugins.values() if p.builtin)
 
 
-class DisablePlugin(object):
+class DisablePlugin:
     """
     Allows disabling built-ins, or plugins referenced by template/include plugin.
 
@@ -45,14 +44,14 @@ class DisablePlugin(object):
         self.disabled_builtins = []
         disabled = []
 
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = [config]
 
         for p in config:
             # Disable plugins explicitly included in config.
             if p in task.config:
                 disabled.append(p)
-                del(task.config[p])
+                del task.config[p]
             # Disable built-in plugins.
             if p in plugin.plugins and plugin.plugins[p].builtin:
                 plugin.plugins[p].builtin = False
@@ -69,7 +68,7 @@ class DisablePlugin(object):
         if disabled:
             log.debug('Disabled plugin(s): %s' % ', '.join(disabled))
 
-    @plugin.priority(-255)
+    @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_exit(self, task, config):
         if not self.disabled_builtins:
             return

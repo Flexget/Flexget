@@ -1,0 +1,44 @@
+<div layout="row" layout-align="center center">
+  <md-card flex flex-gt-sm="50" flex-gt-md="40" class="task-search">
+      <md-card-header>
+          <md-card-header-text flex>
+              <span class="md-title">{{ vm.running.length }} Tasks in Queue</span>
+              <span class="md-subhead" ng-if="vm.running[0]">{{ vm.running[0].name }} ({{ vm.running[0].current_phase }})</span>
+          </md-card-header-text>
+          <md-menu>
+              <md-button class="md-icon-button" ng-click="$mdOpenMenu()" aria-label="open menu">
+                  <md-icon md-font-icon="fa fa-ellipsis-v"></md-icon>
+              </md-button>
+              <md-menu-content width="3">
+                  <md-menu-item ng-repeat="option in vm.options">
+                      <md-button class="tooltip-fix" ng-click="option.value = !option.value" md-prevent-menu-close="true">
+						<md-tooltip>{{ option.help }}</md-tooltip>
+                          <md-icon ng-class="option.value ? 'fa fa-check' : 'fa fa-ban'"></md-icon>
+                          {{ option.display }}
+                      </md-button>
+                  </md-menu-item>
+              </md-menu-content>
+          </md-menu>
+      </md-card-header>
+	  <md-card-content>
+          <md-chips ng-model="vm.selectedTasks"
+		  	md-autocomplete-snap
+		  	md-require-match="true">
+			  <md-autocomplete
+			  	md-selected-item="vm.selectedTask"
+				md-search-text="vm.searchTerm"
+				md-items="task in vm.searchTask()"
+				placeholder="Enter task(s) to execute"
+				md-item-text="task">
+				<span ng-hightlight-text="vm.searchTerm">{{ task }}</span>
+			  </md-autocomplete>
+          </md-chips>
+          <div flex></div>
+          <div layout="row" layout-align="center center">
+              <div flex="100" flex-gt-md="50" layout="column">
+                  <md-button class="md-raised md-primary" ng-click="vm.startExecute()" ng-disabled="vm.selectedTasks.length == 0">Execute</md-button>
+              </div>
+          </div>
+      </md-card-content>
+  </md-card>
+</div>

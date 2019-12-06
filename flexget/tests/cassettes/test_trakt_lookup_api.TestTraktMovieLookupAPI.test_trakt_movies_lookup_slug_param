@@ -1,0 +1,44 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/movies/the-matrix-reloaded-2003?extended=full
+  response:
+    body: {string: '{"title":"The Matrix Reloaded","year":2003,"ids":{"trakt":482,"slug":"the-matrix-reloaded-2003","imdb":"tt0234215","tmdb":604},"tagline":"Free
+        your mind.","overview":"Six months after the events depicted in The Matrix,
+        Neo has proved to be a good omen for the free humans, as more and more humans
+        are being freed from the matrix and brought to Zion, the one and only stronghold
+        of the Resistance.  Neo himself has discovered his superpowers including super
+        speed, ability to see the codes of the things inside the matrix and a certain
+        degree of pre-cognition. But a nasty piece of news hits the human resistance:
+        250,000 machine sentinels are digging to Zion and would reach them in 72 hours.
+        As Zion prepares for the ultimate war, Neo, Morpheus and Trinity are advised
+        by the Oracle to find the Keymaker who would help them reach the Source.  Meanwhile
+        Neo''s recurrent dreams depicting Trinity''s death have got him worried and
+        as if it was not enough, Agent Smith has somehow escaped deletion, has become
+        more powerful than before and has fixed Neo as his next target.","released":"2003-05-15","runtime":138,"trailer":"http://youtube.com/watch?v=zsgrsiZoymA","homepage":"http://whatisthematrix.warnerbros.com/","rating":7.52289,"votes":9872,"updated_at":"2016-10-26T08:59:22.000Z","language":"en","available_translations":["bg","ca","cs","da","de","el","en","es","fa","fi","fr","he","hu","it","ja","ko","nl","pl","pt","ro","ru","sk","sv","th","tr","uk","zh"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R"}'}
+    headers:
+      CF-Cache-Status: [MISS]
+      CF-RAY: [312a5a70be0c3ccb-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 12:24:40 GMT']
+      ETag: [W/"0c217c653f171c9625cf9ee28f4fc05e"]
+      Expires: ['Sat, 17 Dec 2016 20:24:40 GMT']
+      Last-Modified: ['Wed, 26 Oct 2016 08:59:22 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=dd489414d6d33a620a5d6acdf17684d161481977479; expires=Sun,
+          17-Dec-17 12:24:39 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [cd4a2fab-b1d3-42e0-bc69-a1ac5a79a2ab]
+      X-Runtime: ['0.010987']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1

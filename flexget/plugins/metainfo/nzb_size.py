@@ -1,5 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
+import mimetypes
 
 from flexget import plugin
 from flexget.event import event
@@ -7,12 +7,10 @@ from flexget.event import event
 log = logging.getLogger('nzb_size')
 
 # a bit hacky, add nzb as a known mimetype
-import mimetypes
 mimetypes.add_type('application/x-nzb', '.nzb')
 
 
-class NzbSize(object):
-
+class NzbSize:
     """
     Provides entry size information when dealing with nzb files
     """
@@ -30,21 +28,26 @@ class NzbSize(object):
             raise plugin.DependencyError(issued_by='nzb_size', missing='lib pynzb')
 
         for entry in task.accepted:
-            if entry.get('mime-type', None) in [u'text/nzb', u'application/x-nzb'] or \
-                    entry.get('filename', '').endswith('.nzb'):
+            if (
+                entry.get('mime-type') in ['text/nzb', 'application/x-nzb']
+                or entry.get('filename')
+                and entry['filename'].endswith('.nzb')
+            ):
 
                 if 'file' not in entry:
-                    log.warning('`%s` does not have a `file` that could be used to get size information' %
-                                entry['title'])
+                    log.warning(
+                        '`%s` does not have a `file` that could be used to get size information'
+                        % entry['title']
+                    )
                     continue
 
                 filename = entry['file']
                 log.debug('reading %s' % filename)
-                xmldata = file(filename).read()
+                xmldata = open(filename).read()
 
                 try:
                     nzbfiles = nzb_parser.parse(xmldata)
-                except:
+                except Exception:
                     log.debug('%s is not a valid nzb' % entry['title'])
                     continue
 

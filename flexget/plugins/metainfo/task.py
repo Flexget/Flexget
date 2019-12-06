@@ -1,4 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
 
 from flexget import plugin
@@ -7,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('metainfo_task')
 
 
-class MetainfoTask(object):
+class MetainfoTask:
     """
     Set 'task' field for entries.
     """
@@ -20,7 +19,7 @@ class MetainfoTask(object):
             return
 
         for entry in task.entries:
-            entry.setdefault('task', task.name)
+            entry['task'] = task.name
 
 
 @event('plugin.register')

@@ -1,0 +1,119 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/2.10.34.dev (www.flexget.com)']
+      method: GET
+      uri: https://github.com/Flexget/Flexget/raw/develop/README.MD
+    response:
+      body: {string: !!python/unicode '<html><body>You are being <a href="https://raw.githubusercontent.com/Flexget/Flexget/develop/README.MD">redirected</a>.</body></html>'}
+      headers:
+        access-control-allow-origin: ['https://render.githubusercontent.com']
+        age: ['0']
+        cache-control: [no-cache]
+        content-length: ['133']
+        content-security-policy: ['default-src ''none''; base-uri ''self''; block-all-mixed-content;
+            child-src render.githubusercontent.com; connect-src ''self'' uploads.github.com
+            status.github.com collector.githubapp.com api.github.com www.google-analytics.com
+            github-cloud.s3.amazonaws.com wss://live.github.com; font-src assets-cdn.github.com;
+            form-action ''self'' github.com gist.github.com; frame-ancestors ''none'';
+            img-src ''self'' data: assets-cdn.github.com identicons.github.com collector.githubapp.com
+            github-cloud.s3.amazonaws.com *.githubusercontent.com; media-src ''none'';
+            script-src assets-cdn.github.com; style-src ''unsafe-inline'' assets-cdn.github.com']
+        content-type: [text/html; charset=utf-8]
+        date: ['Wed, 19 Apr 2017 15:41:01 GMT']
+        location: ['https://raw.githubusercontent.com/Flexget/Flexget/develop/README.MD']
+        public-key-pins: [max-age=5184000; pin-sha256="WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18=";
+            pin-sha256="RRM1dGqnDFsCJXBTHky16vi1obOlCgFFn/yOhI/y+ho="; pin-sha256="k2v657xBsOVe1PQRwOsHsw3bsGT2VzIqz5K+59sNQws=";
+            pin-sha256="K87oWBWM9UZfyddvDfoxL+8lpNyoUB2ptGtn0fv6G2Q="; pin-sha256="IQBnNBEiFuhj+8x6X8XLgh01V9Ic5/V3IRQLNFFc7v4=";
+            pin-sha256="iie1VXtL7HzAMF+/PVPR9xzT80kQxdZeJ+zduCB3uj0="; pin-sha256="LvRiGEjRqfzurezaWuj8Wie2gyHMrW5Q06LspMnox7A=";
+            includeSubDomains]
+        server: [GitHub.com]
+        status: [302 Found]
+        strict-transport-security: [max-age=31536000; includeSubdomains; preload]
+        vary: ['X-PJAX, Accept-Encoding']
+        x-content-type-options: [nosniff]
+        x-frame-options: [deny]
+        x-github-request-id: ['DC8B:1DE4:AFFE93:1036902:58F7850D']
+        x-ratelimit-limit: ['100']
+        x-ratelimit-remaining: ['100']
+        x-runtime: ['0.047838']
+        x-served-by: [75d72dcf27484631bfac6100aeeba60c]
+        x-ua-compatible: ['IE=Edge,chrome=1']
+        x-xss-protection: [1; mode=block]
+      status: {code: 302, message: Found}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/2.10.34.dev (www.flexget.com)']
+      method: GET
+      uri: https://raw.githubusercontent.com/Flexget/Flexget/develop/README.MD
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA9VX247cNhJ911cwMLCeNqbV6xs86M3ESJyNM0Aui7XXu8F4YbGlkppuidSSVLc7
+          D/n2nCIptWY8cRZ5y0OPJLJYrDp16pBzT3zT0oeX5LPs+rNrb+Veuf+ebb3v3Xq1kr3K49iyVLmx
+          zYqtG/LjM+9183xjpS63l510nuzitPqTKxe8X3/s1cledU3utorayuXKrHhytZ92cvtm5psn8/7o
+          t0YH78F47royB90aWblP+6+6P7pBaSpZHkVjZUU3EYszeHSr3pr3VPrVRlYNrV6y7eriIV1IevKo
+          fPb0yZOqfHJx8fTxw78+2jzcPKsvLqqnsyAOh8Pcm+z72zA+H3z3zpnBlnTZKL8dNmz5F9n1f+OZ
+          jio1dJeWarJWttN4abQn7S9veTvN40WqRl9+xYG/C4HPsy7Nnqxs/t/EXyTzP2PuY+whfWwDjv8m
+          peL0yhoErA/vHf7k790tZkWjXHV3toRyyndSaY8fVZxQXMmbfTSV4LXkTDt4ZfRH/Xna+m4HY50+
+          CiW7TsJwCrxOPrFuIZQTUnRD61U/2N44EnLwppMchfDGtKI2ViSsRat2hFFr8eHOhf55486z3lQl
+          NAPf8KhKPB1ZRXh2Zh+e5MtcXHlRSi0GbFGpGsVkhzulKydMLWL9XRZ2+OerV8uaqMLSre9a0aNu
+          7N7tRa1aCjtIW24F6QYQIAVdCb+FSyHxoz3prG8HzLkQPvCCkd9KLyojtPECeO1VBXN9DDFwCIis
+          HpAvb5xn2b174u8fwKGWsizBySaM1/VPX37/3VQOZvhRdm3Ql4XYSEcVI1arZrARSI46z15vCeG0
+          rTko3QiKzsVBta1ojdkJpTkJzj4EMX63Su/Ooxnqgqw5aGTUxYziWDR0nGdEX2jZJWRGDcWi9Tor
+          ioKjzbx0O7fOhPD7d/zOr0JY59YiJZYiDAQbi55/wFI2jLvERUuUr6M0lEYkYEZF5oNjHGux8nu3
+          NQfHwWSMS6qcHjqyZnBirF7IUDJkAo3Rqp8ZucRoxgdNgLXO8/BBHl3G+XYmudsQj8uqigWB1QDn
+          7TGPFQ0+HArhLXXUHkcGwC+s3w+6DMU7QJMEdKtVZaimE4etAuRbuUf1GP2sUhbdZ+xRuKHvjfUC
+          rBs5FmKsZUmBi9iNrJZtzMdzpQLnU0BgiRFMNQnkNHoFxOTadlx0v0U+CRTupQ1ayWiKEY4ZHc0Q
+          Jr2EVzkxC/0lIPtmt8HvTjGAvMdZqEb24MGLrdQNfWea9YMH4k7z0YCtv6W2nxtWypWDc/l8QfLq
+          RzvuHdqUGMlrS6RNRbmGeD3HkNbUust7aTnD+bu6y+6/Gho3D+N0nty2hoq6AcTkPr/SzoNk2Q1a
+          qDgoN+jRvZKiV30EmssBh6hIhXYKzOa5ZC9SyBiHO8Qd2FgRxLoNPe28HcrII0cUvF2PewW+NYOa
+          X0XmCKZAFyHqb9EU3gRBfXn1WpRbKndmAAwv+C2yhMkQePqPcAUSj/JnYiUe548ZUU0HNKjcI7KQ
+          ZcguZSaKeGkSyzcF2uVKxxYnvVfW6I6lIK1Pdp1qtp4ZefI36Ir9JyFgPYpUz5JvBFNwHOnzccE8
+          jb2FA4VC8JqFMGUZMmK+M1wkg2hD53EKivvRxX2Eiv4BSJbFei4WtTUsmCjs1Kwo3jfKOn8+1e5M
+          CszxwYTLguNimHoRS4S8/SBbAPA7l8uT4QIHV7nD2cUJHLkB3RGBdwgy+8EceNs4PJbuFNq5sIMe
+          2XXyKLD0R4uF9QmciqCVxDjioq5dB15z4K3CfT4cBCHzuDNKDEFKFQOkd+ywXEbTJR+ay5SA441f
+          M3jhGFIawiWhxpOvk4NcBLvKkNP3/VQ/lqqQHGRW6ew3097gE3g7utkpEs3aRQbcZ/3lA0NxmyKu
+          HyCp4kDTVmMxK+oJDNSlSufg1NzeUVufRzbMddQpnHfHEZSN0qt5Yy9pQoGzg0uBq6kPVD8rllQs
+          sOWeWtNze0zLkoCXQzhAT7liTV4s4PHLGnoWyT2Tn8FNylMUn38M1Rcrji+JQ1Hk4g0O2vqY3ZCS
+          zZF5pNEH86RGUV2+ybKfQKNOHnHg8gEVpY1vLuHK8kmCgnCYLopfVvkURXb2L60+nIvvZSl+fCX+
+          swjtXbxYv/3alENUDa7EK/J8ZL/9HBy0LAxfvJ18iLN/40KGywFjcxWJjuqASwcJ/JIWzBgbLn5g
+          RVEkH+/2UoOmEq0JdyGRoCpZqvXgIlEAzYQ4ax8nePJ7zhdFOsloYH7i2IgyX02gGP8bAEt1k3CM
+          G9Msn58wSZMAxg4lz7L0ciuuyTmQmsU4lrCKi3hmiR5Y7sVqC21encCcKrLm/2H89InmthBBA31u
+          RxZk2a8ZPwOdPBAAAA==
+      headers:
+        accept-ranges: [bytes]
+        access-control-allow-origin: ['*']
+        cache-control: [max-age=300]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-length: ['1780']
+        content-security-policy: [default-src 'none'; style-src 'unsafe-inline']
+        content-type: [text/plain; charset=utf-8]
+        date: ['Wed, 19 Apr 2017 15:41:02 GMT']
+        etag: ['"0f9e7995f9800516376ee3606fd67bf250b896a4"']
+        expires: ['Wed, 19 Apr 2017 15:46:02 GMT']
+        source-age: ['0']
+        strict-transport-security: [max-age=31536000]
+        vary: ['Authorization,Accept-Encoding']
+        via: [1.1 varnish]
+        x-cache: [MISS]
+        x-cache-hits: ['0']
+        x-content-type-options: [nosniff]
+        x-fastly-request-id: [29d38e7d887ff422ffba607ee7e6f7985b12d895]
+        x-frame-options: [deny]
+        x-geo-block-list: ['']
+        x-github-request-id: ['9E38:41D3:4905DE:4BF6F1:58F7850E']
+        x-served-by: [cache-iad2624-IAD]
+        x-timer: ['S1492616463.904429,VS0,VE37']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+version: 1

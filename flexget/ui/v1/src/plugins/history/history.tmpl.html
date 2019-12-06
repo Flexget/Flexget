@@ -1,0 +1,36 @@
+<div layout="column" flex>
+    <md-toolbar class="md-warn md-hue-3">
+        <div class="md-toolbar-tools operation-toolbar">
+            <md-input-container md-no-float>
+                <input ng-model="vm.searchTerm" ng-change="vm.getHistory()" ng-model-options="{ debounce: 1000 }" placeholder="Search for task">
+                <md-icon class="fa fa-lg fa-question-circle">
+                    <md-tooltip md-direction="top">Filtering happens on exact task name!</md-tooltip>
+                </md-icon>
+            </md-input-container>
+            <span flex></span>
+            <md-input-container>
+                <md-select ng-model="vm.sortOption" ng-change="vm.getHistory()">
+                    <md-option ng-value="option" ng-repeat="option in vm.sortOptions | orderBy: 'toString()'">{{ option }}</md-option>
+                </md-select>
+            </md-input-container>
+            <md-button class="md-icon-button" aria-label="Order" ng-click="vm.changeOrder()">
+                <md-icon md-font-icon="fa-chevron-down" class="fa fa-lg" ng-if="vm.order === 'desc'"></md-icon>
+                <md-icon md-font-icon="fa-chevron-up" class="fa fa-lg" ng-if="vm.order === 'asc'"></md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <md-content flex>
+        <section ng-repeat="(key, value) in vm.entries | groupBy: 'time | limitTo : 10'">
+            <md-subheader class="md-primary">{{ key }}</md-subheader>
+            <md-list layout-padding>
+                <md-list-item class="md-2-line" ng-repeat="entry in value">
+                    <div class="md-list-item-text">
+                        <h3>{{ entry.title }}</h3>
+                        <p>{{ entry.task }}</p>
+                    </div>
+                </md-list-item>
+            </md-list>
+        </section>
+    </md-content>
+    <fg-pagination load-data="vm.getHistory(page)" link-header="vm.linkHeader" current-page="vm.currentPage"></fg-pagination>
+</div>

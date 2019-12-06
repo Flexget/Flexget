@@ -1,13 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
 
 from flexget import plugin
 from flexget.event import event
+from flexget.utils.tools import aggregate_inputs
 
 log = logging.getLogger('crossmatch')
 
 
-class CrossMatch(object):
+class CrossMatch:
     """
     Perform action based on item on current task and other inputs.
 
@@ -19,6 +19,8 @@ class CrossMatch(object):
         fields:
           - title
         action: reject
+        exact: yes
+        case_sensitive: yes
     """
 
     schema = {
@@ -26,54 +28,48 @@ class CrossMatch(object):
         'properties': {
             'fields': {'type': 'array', 'items': {'type': 'string'}},
             'action': {'enum': ['accept', 'reject']},
-            'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}}
+            'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}},
+            'exact': {'type': 'boolean', 'default': True},
+            'all_fields': {'type': 'boolean', 'default': False},
+            'case_sensitive': {'type': 'boolean', 'default': True},
         },
         'required': ['fields', 'action', 'from'],
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def on_task_filter(self, task, config):
 
         fields = config['fields']
         action = config['action']
+        all_fields = config['all_fields']
 
-        match_entries = []
-
-        # TODO: xxx
-        # we probably want to have common "run and combine inputs" function sometime soon .. this code is in
-        # few places already (discover, inputs, ...)
-        # code written so that this can be done easily ...
-        for item in config['from']:
-            for input_name, input_config in item.iteritems():
-                input = plugin.get_plugin_by_name(input_name)
-                if input.api_ver == 1:
-                    raise plugin.PluginError('Plugin %s does not support API v2' % input_name)
-                method = input.phase_handlers['input']
-                try:
-                    result = method(task, input_config)
-                except plugin.PluginError as e:
-                    log.warning('Error during input plugin %s: %s' % (input_name, e))
-                    continue
-                if result:
-                    match_entries.extend(result)
-                else:
-                    log.warning('Input %s did not return anything' % input_name)
-                    continue
+        match_entries = aggregate_inputs(task, config['from'])
 
         # perform action on intersecting entries
         for entry in task.entries:
             for generated_entry in match_entries:
-                log.trace('checking if %s matches %s' % (entry['title'], generated_entry['title']))
-                common = self.entry_intersects(entry, generated_entry, fields)
-                if common:
-                    msg = 'intersects with %s on field(s) %s' % \
-                          (generated_entry['title'], ', '.join(common))
+                log.trace('checking if %s matches %s', entry['title'], generated_entry['title'])
+                common = self.entry_intersects(
+                    entry,
+                    generated_entry,
+                    fields,
+                    config.get('exact'),
+                    config.get('case_sensitive'),
+                )
+                if common and (not all_fields or len(common) == len(fields)):
+                    msg = 'intersects with %s on field(s) %s' % (
+                        generated_entry['title'],
+                        ', '.join(common),
+                    )
+                    for key in generated_entry:
+                        if key not in entry:
+                            entry[key] = generated_entry[key]
                     if action == 'reject':
                         entry.reject(msg)
                     if action == 'accept':
                         entry.accept(msg)
 
-    def entry_intersects(self, e1, e2, fields=None):
+    def entry_intersects(self, e1, e2, fields=None, exact=True, case_sensitive=True):
         """
         :param e1: First :class:`flexget.entry.Entry`
         :param e2: Second :class:`flexget.entry.Entry`
@@ -87,17 +83,29 @@ class CrossMatch(object):
         common_fields = []
 
         for field in fields:
-            # TODO: simplify if seems to work (useless debug)
-            log.trace('checking field %s' % field)
-            v1 = e1.get(field, object())
-            v2 = e2.get(field, object())
-            log.trace('v1: %r' % v1)
-            log.trace('v2: %r' % v2)
+            # Doesn't really make sense to match if field is not in both entries
+            if field not in e1 or field not in e2:
+                log.trace('field %s is not in both entries', field)
+                continue
 
-            if v1 == v2:
-                common_fields.append(field)
+            if not case_sensitive and isinstance(e1[field], str):
+                v1 = e1[field].lower()
             else:
-                log.trace('not matching')
+                v1 = e1[field]
+            if not case_sensitive and isinstance(e1[field], str):
+                v2 = e2[field].lower()
+            else:
+                v2 = e2[field]
+
+            try:
+                if v1 == v2 or not exact and (v2 in v1 or v1 in v2):
+                    common_fields.append(field)
+                else:
+                    log.trace('not matching')
+            except TypeError as e:
+                # argument of type <type> is not iterable
+                log.trace('error matching fields: %s', str(e))
+
         return common_fields
 
 

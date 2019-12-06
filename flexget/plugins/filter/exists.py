@@ -1,18 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
 import platform
-
-from path import path
+from pathlib import Path
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 
 log = logging.getLogger('exists')
 
 
-class FilterExists(object):
-
+class FilterExists:
     """
         Reject entries that already exist in given path.
 
@@ -25,7 +22,7 @@ class FilterExists(object):
 
     def prepare_config(self, config):
         # If only a single path is passed turn it into a 1 element list
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = [config]
         return config
 
@@ -38,23 +35,25 @@ class FilterExists(object):
         config = self.prepare_config(config)
         filenames = {}
         for folder in config:
-            folder = path(folder).expanduser()
+            folder = Path(folder).expanduser()
             if not folder.exists():
                 raise plugin.PluginWarning('Path %s does not exist' % folder, log)
-            for p in folder.walk(errors='ignore'):
-                key = p.name
-                # windows file system is not case sensitive
-                if platform.system() == 'Windows':
-                    key = key.lower()
-                filenames[key] = p
+            for p in folder.rglob('*'):
+                if p.is_file():
+                    key = p.name
+                    # windows file system is not case sensitive
+                    if platform.system() == 'Windows':
+                        key = key.lower()
+                    filenames[key] = p
         for entry in task.accepted:
             # priority is: filename, location (filename only), title
-            name = path(entry.get('filename', entry.get('location', entry['title']))).name
+            name = Path(entry.get('filename', entry.get('location', entry['title']))).name
             if platform.system() == 'Windows':
                 name = name.lower()
             if name in filenames:
                 log.debug('Found %s in %s' % (name, filenames[name]))
                 entry.reject('exists in %s' % filenames[name])
+
 
 @event('plugin.register')
 def register_plugin():

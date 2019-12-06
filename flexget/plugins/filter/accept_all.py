@@ -1,4 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
 
 from flexget import plugin
@@ -7,7 +6,7 @@ from flexget.event import event
 log = logging.getLogger('accept_all')
 
 
-class FilterAcceptAll(object):
+class FilterAcceptAll:
     """
         Just accepts all entries.
 
@@ -22,6 +21,7 @@ class FilterAcceptAll(object):
         if config:
             for entry in task.entries:
                 entry.accept()
+
 
 @event('plugin.register')
 def register_plugin():

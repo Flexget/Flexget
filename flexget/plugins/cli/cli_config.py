@@ -1,14 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-import argparse
-import functools
-import logging
-
-from flexget import options
-from flexget.event import event
-
-log = logging.getLogger('cli_config')
-
-
 """
 Allows specifying yml configuration values from commandline parameters.
 
@@ -27,21 +16,29 @@ Commandline example::
   --cli-config url=http://some.url/ path=~/downloads
 
 """
+import argparse
+import functools
+import logging
+
+from flexget import options
+from flexget.event import event
+
+log = logging.getLogger('cli_config')
 
 
 def replace_in_item(replaces, item):
     replace = functools.partial(replace_in_item, replaces)
-    if isinstance(item, basestring):
+    if isinstance(item, str):
         # Do replacement in text objects
-        for key, val in replaces.iteritems():
+        for key, val in replaces.items():
             item = item.replace('$%s' % key, val)
         return item
     elif isinstance(item, list):
         # Make a new list with replacements done on each item
-        return map(replace, item)
+        return list(map(replace, item))
     elif isinstance(item, dict):
         # Make a new dict with replacements done on keys and values
-        return dict(map(replace, kv_pair) for kv_pair in item.iteritems())
+        return dict(list(map(replace, kv_pair)) for kv_pair in item.items())
     else:
         # We don't know how to do replacements on this item, just return it
         return item
@@ -62,5 +59,10 @@ def key_value_pair(text):
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('--cli-config', nargs='+', type=key_value_pair, metavar='VARIABLE=VALUE',
-                                               help='configuration parameters through commandline')
+    options.get_parser('execute').add_argument(
+        '--cli-config',
+        nargs='+',
+        type=key_value_pair,
+        metavar='VARIABLE=VALUE',
+        help='configuration parameters through commandline',
+    )

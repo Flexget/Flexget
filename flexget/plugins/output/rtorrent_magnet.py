@@ -1,7 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
-import re
 import os
+import re
 
 from flexget import plugin
 from flexget.event import event
@@ -10,7 +9,7 @@ log = logging.getLogger('rtorrent_magnet')
 pat = re.compile('xt=urn:btih:([^&/]+)')
 
 
-class PluginRtorrentMagnet(object):
+class PluginRtorrentMagnet:
     """
     Process Magnet URI's into rtorrent compatible torrent files
 
@@ -50,7 +49,10 @@ class PluginRtorrentMagnet(object):
 
         for entry in task.accepted:
             if 'output' in entry:
-                log.debug('Ignoring, %s already has an output file: %s' % (entry['title'], entry['output']))
+                log.debug(
+                    'Ignoring, %s already has an output file: %s'
+                    % (entry['title'], entry['output'])
+                )
                 continue
 
             for url in entry.get('urls', [entry['url']]):

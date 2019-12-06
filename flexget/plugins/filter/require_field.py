@@ -1,4 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
 
 from flexget import plugin
@@ -8,7 +7,7 @@ from flexget.event import event
 log = logging.getLogger('require_field')
 
 
-class FilterRequireField(object):
+class FilterRequireField:
     """
     Rejects entries without defined field.
 
@@ -21,12 +20,15 @@ class FilterRequireField(object):
 
     @plugin.priority(32)
     def on_task_filter(self, task, config):
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = [config]
         for entry in task.entries:
             for field in config:
-                if not entry.get(field):
+                if field not in entry:
                     entry.reject('Required field %s is not present' % field)
+                    break
+                if entry[field] is None:
+                    entry.reject('Required field %s is `None`' % field)
                     break
 
 

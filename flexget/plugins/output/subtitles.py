@@ -1,46 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from xmlrpclib import ServerProxy
-import re
 import difflib
-import os.path
 import logging
+import os.path
+import re
+from xmlrpc.client import ServerProxy
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.tools import urlopener
-
-"""
-
-DRAFT
-
-class SubtitleQueue(Base):
-
-    __tablename__ = 'subtitle_queue'
-
-    id = Column(Integer, primary_key=True)
-    task = Column(String)
-    imdb_id = Column(String)
-    added = Column(DateTime)
-
-    def __init__(self, task, imdb_id):
-        self.task = task
-        self.imdb_id = imdb_id
-        self.added = datetime.now()
-
-    def __str__(self):
-        return '<SubtitleQueue(%s=%s)>' % (self.task, self.imdb_id)
-
-TODO:
-
- * add new option, retry: [n] days
- * add everything into queue using above class
- * consume queue (look up by task name), configuration is available from task
- * remove successful downloads
- * remove queue items that are part retry: n days
-
-"""
 
 log = logging.getLogger('subtitles')
+
 
 # movie hash, won't work here though
 # http://trac.opensubtitles.org/projects/opensubtitles/wiki/HashSourceCodes#Python
@@ -49,7 +17,7 @@ log = logging.getLogger('subtitles')
 # http://trac.opensubtitles.org/projects/opensubtitles/wiki/XMLRPC
 
 
-class Subtitles(object):
+class Subtitles:
     """
     Fetch subtitles from opensubtitles.org
     """
@@ -60,9 +28,9 @@ class Subtitles(object):
             'languages': {'type': 'array', 'items': {'type': 'string'}, 'default': ['eng']},
             'min_sub_rating': {'type': 'number', 'default': 0.0},
             'match_limit': {'type': 'number', 'default': 0.8},
-            'output': {'type': 'string', 'format': 'path'}
+            'output': {'type': 'string', 'format': 'path'},
         },
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def prepare_config(self, config, task):
@@ -85,7 +53,7 @@ class Subtitles(object):
         try:
             s = ServerProxy("http://api.opensubtitles.org/xml-rpc")
             res = s.LogIn("", "", "en", "FlexGet")
-        except:
+        except Exception:
             log.warning('Error connecting to opensubtitles.org')
             return
 
@@ -99,7 +67,9 @@ class Subtitles(object):
         # configuration
         languages = config['languages']
         min_sub_rating = config['min_sub_rating']
-        match_limit = config['match_limit'] # no need to change this, but it should be configurable
+        match_limit = config[
+            'match_limit'
+        ]  # no need to change this, but it should be configurable
 
         # loop through the entries
         for entry in entries:
@@ -122,8 +92,11 @@ class Subtitles(object):
             # filter bad subs
             subtitles = [x for x in subtitles if x['SubBad'] == '0']
             # some quality required (0.0 == not reviewed)
-            subtitles = [x for x in subtitles if
-                         float(x['SubRating']) >= min_sub_rating or float(x['SubRating']) == 0.0]
+            subtitles = [
+                x
+                for x in subtitles
+                if float(x['SubRating']) >= min_sub_rating or float(x['SubRating']) == 0.0
+            ]
 
             filtered_subs = []
 
@@ -136,7 +109,7 @@ class Subtitles(object):
 
                     def seqmatch(subfile):
                         s = difflib.SequenceMatcher(lambda x: x in " ._", entry['title'], subfile)
-                        #print "matching: ", entry['title'], subfile, s.ratio()
+                        # print "matching: ", entry['title'], subfile, s.ratio()
                         return s.ratio() > match_limit
 
                     # filter only those that have matching release names
@@ -150,13 +123,18 @@ class Subtitles(object):
 
             # download
             for sub in filtered_subs:
-                log.debug('SUBS FOUND: ', sub['MovieReleaseName'], sub['SubRating'], sub['SubLanguageID'])
+                log.debug(
+                    'SUBS FOUND: %s %s %s'
+                    % (sub['MovieReleaseName'], sub['SubRating'], sub['SubLanguageID'])
+                )
 
-                f = urlopener(sub['ZipDownloadLink'], log)
-                subfilename = re.match('^attachment; filename="(.*)"$', f.info()['content-disposition']).group(1)
+                f = task.requests.get(sub['ZipDownloadLink'])
+                subfilename = re.match(
+                    '^attachment; filename="(.*)"$', f.headers['content-disposition']
+                ).group(1)
                 outfile = os.path.join(config['output'], subfilename)
-                fp = file(outfile, 'w')
-                fp.write(f.read())
+                fp = open(outfile, 'w')
+                fp.write(f.raw)
                 fp.close()
                 f.close()
 

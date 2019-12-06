@@ -1,3 +1,4 @@
+*~
 *.pyc
 *.swo
 *.swp
@@ -12,8 +13,7 @@ include/
 lib/
 local
 .idea/
-config.yml
-db-config.sqlite
+*.iml
 flexget.log
 flexget.log.*
 received/
@@ -21,7 +21,6 @@ share/
 dist/
 build/
 *.sqlite
-*.yml
 paver-minilib.zip
 man/
 distribute-*.tar.gz
@@ -32,3 +31,13 @@ pip-*.tar.gz
 *.noseids
 .coverage
 tests/cover/
+.tmp
+coverage/
+cherrypy
+pip-selfcheck.json
+.config-lock
+.cache/
+/*.yml
+cached_resources/
+pyvenv.cfg
+.pytest_cache

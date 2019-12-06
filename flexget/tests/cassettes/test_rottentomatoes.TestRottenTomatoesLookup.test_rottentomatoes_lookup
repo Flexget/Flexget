@@ -1,0 +1,107 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/1.3.0.dev (www.flexget.com)']
+      method: GET
+      uri: http://api.rottentomatoes.com/api/public/v1.0/movies.json?q=toy+story&apikey=rh8chjzp8vu6gnpwj88736uv
+    response:
+      body: {string: !!python/unicode '{"error":"Account Inactive"}'}
+      headers:
+        connection: [keep-alive]
+        content-length: ['28']
+        content-type: [text/javascript]
+        date: ['Mon, 14 Mar 2016 12:22:08 GMT']
+        server: [Mashery Proxy]
+        x-error-detail-header: [Account Inactive]
+        x-mashery-error-code: [ERR_403_DEVELOPER_INACTIVE]
+        x-mashery-responder: [prod-j-worker-us-east-1e-120.mashery.com]
+      status: {code: 403, message: Forbidden}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/1.3.0.dev (www.flexget.com)']
+      method: GET
+      uri: http://api.rottentomatoes.com/api/public/v1.0/movies.json?q=the+matrix&apikey=rh8chjzp8vu6gnpwj88736uv
+    response:
+      body: {string: !!python/unicode '{"error":"Account Inactive"}'}
+      headers:
+        connection: [keep-alive]
+        content-length: ['28']
+        content-type: [text/javascript]
+        date: ['Mon, 14 Mar 2016 12:22:09 GMT']
+        server: [Mashery Proxy]
+        x-error-detail-header: [Account Inactive]
+        x-mashery-error-code: [ERR_403_DEVELOPER_INACTIVE]
+        x-mashery-responder: [prod-j-worker-us-east-1d-104.mashery.com]
+      status: {code: 403, message: Forbidden}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/1.3.0.dev (www.flexget.com)']
+      method: GET
+      uri: http://api.rottentomatoes.com/api/public/v1.0/movies.json?q=star+wars%3A+episode+i+-+the+phantom+menace&apikey=rh8chjzp8vu6gnpwj88736uv
+    response:
+      body: {string: !!python/unicode '{"error":"Account Inactive"}'}
+      headers:
+        connection: [keep-alive]
+        content-length: ['28']
+        content-type: [text/javascript]
+        date: ['Mon, 14 Mar 2016 12:22:09 GMT']
+        server: [Mashery Proxy]
+        x-error-detail-header: [Account Inactive]
+        x-mashery-error-code: [ERR_403_DEVELOPER_INACTIVE]
+        x-mashery-responder: [prod-j-worker-us-east-1d-107.mashery.com]
+      status: {code: 403, message: Forbidden}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/1.3.0.dev (www.flexget.com)']
+      method: GET
+      uri: http://api.rottentomatoes.com/api/public/v1.0/movies.json?q=rush+hour+1998&apikey=rh8chjzp8vu6gnpwj88736uv
+    response:
+      body: {string: !!python/unicode '{"error":"Account Inactive"}'}
+      headers:
+        connection: [keep-alive]
+        content-length: ['28']
+        content-type: [text/javascript]
+        date: ['Mon, 14 Mar 2016 12:22:10 GMT']
+        server: [Mashery Proxy]
+        x-error-detail-header: [Account Inactive]
+        x-mashery-error-code: [ERR_403_DEVELOPER_INACTIVE]
+        x-mashery-responder: [prod-j-worker-us-east-1b-112.mashery.com]
+      status: {code: 403, message: Forbidden}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/1.3.0.dev (www.flexget.com)']
+      method: GET
+      uri: http://api.rottentomatoes.com/api/public/v1.0/movies.json?q=up&apikey=rh8chjzp8vu6gnpwj88736uv
+    response:
+      body: {string: !!python/unicode '{"error":"Account Inactive"}'}
+      headers:
+        connection: [keep-alive]
+        content-length: ['28']
+        content-type: [text/javascript]
+        date: ['Mon, 14 Mar 2016 12:22:11 GMT']
+        server: [Mashery Proxy]
+        x-error-detail-header: [Account Inactive]
+        x-mashery-error-code: [ERR_403_DEVELOPER_INACTIVE]
+        x-mashery-responder: [prod-j-worker-us-east-1b-109.mashery.com]
+      status: {code: 403, message: Forbidden}
+version: 1

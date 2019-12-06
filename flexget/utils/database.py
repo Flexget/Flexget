@@ -1,13 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
 import functools
+from collections.abc import Mapping
 from datetime import datetime
 
 from sqlalchemy import extract, func
-from sqlalchemy.orm import synonym
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
+from sqlalchemy.orm import synonym
 
+from flexget.entry import Entry
 from flexget.manager import Session
-from flexget.utils import qualities
+from flexget.utils import json, qualities
 
 
 def with_session(*args, **kwargs):
@@ -27,6 +28,7 @@ def with_session(*args, **kwargs):
             with _Session() as session:
                 kwargs['session'] = session
                 return func(*args, **kwargs)
+
         return wrapper
 
     if len(args) == 1 and not kwargs and callable(args[0]):
@@ -40,7 +42,6 @@ def with_session(*args, **kwargs):
         return decorator
 
 
-
 def pipe_list_synonym(name):
     """Converts pipe separated text into a list"""
 
@@ -50,7 +51,7 @@ def pipe_list_synonym(name):
             return attr.strip('|').split('|')
 
     def setter(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             setattr(self, name, value)
         else:
             setattr(self, name, '|'.join(value))
@@ -65,7 +66,7 @@ def text_date_synonym(name):
         return getattr(self, name)
 
     def setter(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             try:
                 setattr(self, name, datetime.strptime(value, '%Y-%m-%d'))
             except ValueError:
@@ -77,26 +78,18 @@ def text_date_synonym(name):
     return synonym(name, descriptor=property(getter, setter))
 
 
-def safe_pickle_synonym(name):
-    """Used to store Entry instances into a PickleType column in the database.
-
-    In order to ensure everything can be loaded after code changes, makes sure no custom python classes are pickled.
-    """
+def entry_synonym(name):
+    """Use json to serialize python objects for db storage."""
 
     def only_builtins(item):
-        """Casts all subclasses of builtin types to their builtin python type. Works recursively on iterables.
-
-        Raises ValueError if passed an object that doesn't subclass a builtin type.
-        """
-
-        supported_types = [str, unicode, int, float, long, bool, datetime]
+        supported_types = str, int, float, bool, datetime
         # dict, list, tuple and set are also supported, but handled separately
 
-        if type(item) in supported_types:
+        if isinstance(item, supported_types):
             return item
-        elif isinstance(item, dict):
+        elif isinstance(item, Mapping):
             result = {}
-            for key, value in item.iteritems():
+            for key, value in item.items():
                 try:
                     result[key] = only_builtins(value)
                 except TypeError:
@@ -115,19 +108,36 @@ def safe_pickle_synonym(name):
                 return tuple(result)
             else:
                 return set(result)
+        elif isinstance(item, qualities.Quality):
+            return item.name
         else:
             for s_type in supported_types:
                 if isinstance(item, s_type):
                     return s_type(item)
 
         # If item isn't a subclass of a builtin python type, raise ValueError.
-        raise TypeError('%r is not a subclass of a builtin python type.' % type(item))
+        raise TypeError('%r is not of type Entry.' % type(item))
 
     def getter(self):
-        return getattr(self, name)
+        return Entry(json.loads(getattr(self, name), decode_datetime=True))
 
     def setter(self, entry):
-        setattr(self, name, only_builtins(entry))
+        if isinstance(entry, Entry) or isinstance(entry, dict):
+            setattr(self, name, json.dumps(only_builtins(dict(entry)), encode_datetime=True))
+        else:
+            raise TypeError('%r is not of type Entry or dict.' % type(entry))
+
+    return synonym(name, descriptor=property(getter, setter))
+
+
+def json_synonym(name):
+    """Use json to serialize python objects for db storage."""
+
+    def getter(self):
+        return json.loads(getattr(self, name), decode_datetime=True)
+
+    def setter(self, entry):
+        setattr(self, name, json.dumps(entry, encode_datetime=True))
 
     return synonym(name, descriptor=property(getter, setter))
 
@@ -142,7 +152,7 @@ class CaseInsensitiveWord(Comparator):
             self.word = word
 
     def lower(self):
-        if isinstance(self.word, basestring):
+        if isinstance(self.word, str):
             return self.word.lower()
         else:
             return func.lower(self.word)
@@ -164,12 +174,11 @@ class CaseInsensitiveWord(Comparator):
 
 
 def quality_property(text_attr):
-
     def getter(self):
         return qualities.Quality(getattr(self, text_attr))
 
     def setter(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             setattr(self, text_attr, value)
         else:
             setattr(self, text_attr, value.name)
@@ -184,17 +193,16 @@ def quality_property(text_attr):
         return QualComparator(getattr(self, text_attr))
 
     prop = hybrid_property(getter, setter)
-    prop.comparator(comparator)
+    prop = prop.comparator(comparator)
     return prop
 
 
 def quality_requirement_property(text_attr):
-
     def getter(self):
         return qualities.Requirements(getattr(self, text_attr))
 
     def setter(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             setattr(self, text_attr, value)
         else:
             setattr(self, text_attr, value.text)
@@ -204,7 +212,6 @@ def quality_requirement_property(text_attr):
 
 
 def ignore_case_property(text_attr):
-
     def getter(self):
         return CaseInsensitiveWord(getattr(self, text_attr))
 
@@ -215,7 +222,6 @@ def ignore_case_property(text_attr):
 
 
 def year_property(date_attr):
-
     def getter(self):
         date = getattr(self, date_attr)
         return date and date.year

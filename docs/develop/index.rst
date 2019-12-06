@@ -23,8 +23,8 @@ Core
 * jsonschema
 * Some smaller misc libraries
 
-WebUI
-~~~~~
+HTTPServer
+~~~~~~~~~~
 
 * Flask
 * Jinja2
@@ -35,12 +35,11 @@ CherryPy is only used for WSGI server.
 How do I get started?
 ---------------------
 
-Set up development environment, which is basically just two steps.
+Set up development environment, which is basically just three steps:
 
-#. `GIT clone`_ our repository.
-#. - Either the wheel package of `setuptools`_ and `pip`_ need to be in the directory with bootstrap.py
-   - Or `virtualenv`_ package needs to be installed.
-#. Run ``bootstrap.py`` with Python 2.6.x - 2.7.x.
+#. Git clone `our repository`_.
+#. Create a virtual environment in your clone dir (``python3 -m venv <venv-dir>``).
+#. Run ``<venv-dir>/bin/pip install -e .`` from your checkout directory.
 
 For easier collaboration we recommend forking us on github and sending pull
 request. Once we see any semi-serious input from a developer we will grant
@@ -48,14 +47,11 @@ write permissions to our central repository. You can also request this earlier
 if you wish.
 
 If you are new to Git there are several interactive tutorials you can try to get
-you started including `tryGit`_ and `LearnGitBranching`_.
+you started including `try Git`_ and `Learn Git Branching`_.
 
-.. _setuptools: https://pypi.python.org/pypi/setuptools
-.. _pip: https://pypi.python.org/pypi/pip
-.. _virtualenv: https://pypi.python.org/pypi/virtualenv
-.. _GIT clone: https://github.com/Flexget/Flexget
-.. _tryGit: http://try.github.io
-.. _LearnGitBranching: http://pcottle.github.io/learnGitBranching/
+.. _our repository: https://github.com/Flexget/Flexget
+.. _try Git: http://try.github.io
+.. _Learn Git Branching: http://pcottle.github.io/learnGitBranching/
 
 Environment
 -----------
@@ -64,20 +60,16 @@ Once you have bootstrapped the environment you have fully functional FlexGet in
 a `virtual environment`_ in your clone directory. You can easily add or modify
 existing plugins in here and it will not mess your other FlexGet instances in
 any way. The commands in the documentation expect the virtual environment to be
-activated. If you don't activate it you must run commands explicitly from under
-environment ``bin`` directory or ``scripts`` in windows. E.g. ``flexget`` would
-be ``bin/flexget`` (at project root) in unactivated `virtual environment`_.
+activated. If you don't activate it you must run commands explicitly from the
+environment's ``bin`` directory or ``scripts`` in windows. E.g. ``flexget`` would
+be ``bin/flexget`` relative to the root of the unactivated `virtual environment`_.
 
-How to activate virtualenv under linux::
+How to activate virtual environment under linux::
 
   source bin/activate
 
-FlexGet project uses `paver`_ to provide development related utilities and tasks.
-Run ``paver --help`` to see what commands are available. Some of these will
-be mentioned later.
 
-.. _virtual environment: https://pypi.python.org/pypi/virtualenv
-.. _paver: http://paver.github.io/paver/
+.. _virtual environment: https://docs.python.org/3/library/venv.html
 
 Code quality
 ------------
@@ -87,38 +79,30 @@ Unit tests
 
 There are currently over 250 unit tests ensuring that existing functionality
 is not accidentally broken. Unit tests can be invoked with the installation
-of additionnal requirments:
+of additional requirements::
 
-  pip install jenkins-requirements.txt
+  pip install -r dev-requirements.txt
 
-Easiest way to run tests is trough paver::
+We use the `py.test`_ framework for testing. Easiest way to run tests is just::
 
-  paver test
+  py.test
 
-By default no online tests are executed, these can be enabled with ``--online``
-argument. There are other ways to run the tests as well, more specifically
-we use `nose`_ framework.
+Run single test file via py.test::
 
-Run single test file via nose::
-
-  nosetests test_file
+  py.test -v test_file.py
 
 Run single test suite (class)::
 
-  nosetests test_file:class
+  py.test -v test_file.py::TestClass
 
 Run single test case from suite::
 
-  nosetests test_file:class.case
+  py.test test_file.py::TestClass::test_method
 
 Live example::
 
-  nosetests test_seriesparser:TestSeriesParser.test_basic
+  py.test tests/test_seriesparser.py::TestSeriesParser::test_basic
 
-.. NOTE::
-
-   Don't use .py extension or include path with these. Configuration file ``setup.cfg`` defines
-   needed parameters for Nose.
 
 Project has `Jenkins CI server`_ which polls master branch and makes runs tests
 and makes new build if they pass.
@@ -138,9 +122,9 @@ instead.
 
 To run PEP8 checker::
 
-  paver pep8
+  flake8
 
 We do have some violations in our codebase, but new code should not add any.
 
-.. _nose: https://nose.readthedocs.org/
+.. _py.test: https://pytest.org/latest/
 .. _Python PEP8: http://www.python.org/dev/peps/pep-0008/

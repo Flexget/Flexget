@@ -1,13 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-import os
-
-__author__ = 'paranoidi'
-
 import logging
+import os
 import sys
 
 from flexget.event import event
 from flexget.utils.simple_persistence import SimplePersistence
+
+__author__ = 'paranoidi'
 
 log = logging.getLogger('welcome')
 
@@ -31,12 +29,15 @@ def welcome_message(manager):
     count -= 1
     scheduler = 'scheduler' if sys.platform.startswith('win') else 'crontab'
     if not count:
-        log.info('FlexGet has been successfully started from %s (--cron). '
-                 'I hope you have %s under control now. This message will not be repeated again.' %
-                 (scheduler, scheduler))
+        log.info(
+            'FlexGet has been successfully started from %s (--cron). '
+            'I hope you have %s under control now. This message will not be repeated again.'
+            % (scheduler, scheduler)
+        )
     else:
-        log.info('%sFlexGet has been successfully started from %s (--cron). '
-                 'This message will be repeated %i times for your set up verification conveniences.' %
-                 ('Congratulations! ' if count == 4 else '',
-                  scheduler, count))
+        log.info(
+            '%sFlexGet has been successfully started from %s (--cron). '
+            'This message will be repeated %i times for your set up verification conveniences.'
+            % ('Congratulations! ' if count == 4 else '', scheduler, count)
+        )
     persistence['count'] = count

@@ -1,16 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
-import posixpath
 from fnmatch import fnmatch
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 
 log = logging.getLogger('content_filter')
 
 
-class FilterContentFilter(object):
+class FilterContentFilter:
     """
     Rejects entries based on the filenames in the content. Torrent files only right now.
 
@@ -30,15 +28,15 @@ class FilterContentFilter(object):
             'require_all': one_or_more({'type': 'string'}),
             'reject': one_or_more({'type': 'string'}),
             'require_mainfile': {'type': 'boolean', 'default': False},
-            'strict': {'type': 'boolean', 'default': False}
+            'strict': {'type': 'boolean', 'default': False},
         },
-        'additionalProperties': False
+        'additionalProperties': False,
     }
 
     def prepare_config(self, config):
         for key in ['require', 'require_all', 'reject']:
             if key in config:
-                if isinstance(config[key], basestring):
+                if isinstance(config[key], str):
                     config[key] = [config[key]]
         return config
 
@@ -66,13 +64,21 @@ class FilterContentFilter(object):
             # download plugin has already printed a downloading message.
             if config.get('require'):
                 if not matching_mask(files, config['require']):
-                    log.info('Entry %s does not have any of the required filetypes, rejecting' % entry['title'])
+                    log.info(
+                        'Entry %s does not have any of the required filetypes, rejecting'
+                        % entry['title']
+                    )
                     entry.reject('does not have any of the required filetypes', remember=True)
                     return True
             if config.get('require_all'):
                 # Make sure each mask matches at least one of the contained files
-                if not all(any(fnmatch(file, mask) for file in files) for mask in config['require_all']):
-                    log.info('Entry %s does not have all of the required filetypes, rejecting' % entry['title'])
+                if not all(
+                    any(fnmatch(file, mask) for file in files) for mask in config['require_all']
+                ):
+                    log.info(
+                        'Entry %s does not have all of the required filetypes, rejecting'
+                        % entry['title']
+                    )
                     entry.reject('does not have all of the required filetypes', remember=True)
                     return True
             if config.get('reject'):
@@ -86,7 +92,7 @@ class FilterContentFilter(object):
                 for f in entry['torrent'].get_filelist():
                     if not best or f['size'] > best:
                         best = f['size']
-                if (100*float(best)/float(entry['torrent'].size)) < 90:
+                if (100 * float(best) / float(entry['torrent'].size)) < 90:
                     log.info('Entry %s does not have a main file, rejecting' % (entry['title']))
                     entry.reject('does not have a main file', remember=True)
                     return True
@@ -94,16 +100,20 @@ class FilterContentFilter(object):
     @plugin.priority(150)
     def on_task_modify(self, task, config):
         if task.options.test or task.options.learn:
-            log.info('Plugin is partially disabled with --test and --learn because content filename information may not be available')
-            #return
+            log.info(
+                'Plugin is partially disabled with --test and --learn '
+                'because content filename information may not be available'
+            )
+            # return
 
         config = self.prepare_config(config)
         for entry in task.accepted:
             if self.process_entry(task, entry, config):
-                task.rerun()
-            elif not 'content_files' in entry and config.get('strict'):
+                task.rerun(plugin='content_filter')
+            elif 'content_files' not in entry and config.get('strict'):
                 entry.reject('no content files parsed for entry', remember=True)
-                task.rerun()
+                task.rerun(plugin='content_filter')
+
 
 @event('plugin.register')
 def register_plugin():

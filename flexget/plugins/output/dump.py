@@ -1,9 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.logger import console
+from flexget.terminal import console
 
 log = logging.getLogger('dump')
 
@@ -18,15 +17,16 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
     :param bool trace: Display trace information.
     :param bool title_only: Display only title field
     """
+
     def sort_key(field):
         # Sort certain fields above the rest
         if field == 'title':
-            return 0
+            return (0,)
         if field == 'url':
-            return 1
+            return (1,)
         if field == 'original_url':
-            return 2
-        return field
+            return (2,)
+        return 3, field
 
     for entry in entries:
         for field in sorted(entry, key=sort_key):
@@ -35,14 +35,17 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
             if entry.is_lazy(field) and not eval_lazy:
                 value = '<LazyField - value will be determined when it is accessed>'
             else:
-                value = entry[field]
-            if isinstance(value, basestring):
+                try:
+                    value = entry[field]
+                except KeyError:
+                    value = '<LazyField - lazy lookup failed>'
+            if isinstance(value, str):
                 try:
                     console('%-17s: %s' % (field, value.replace('\r', '').replace('\n', '')))
                 except Exception:
                     console('%-17s: %r (warning: unable to print)' % (field, value))
             elif isinstance(value, list):
-                console('%-17s: %s' % (field, '[%s]' % ', '.join(unicode(v) for v in value)))
+                console('%-17s: %s' % (field, '[%s]' % ', '.join(str(v) for v in value)))
             elif isinstance(value, (int, float, dict)):
                 console('%-17s: %s' % (field, value))
             elif value is None:
@@ -62,7 +65,7 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
             console('')
 
 
-class OutputDump(object):
+class OutputDump:
     """
     Outputs all entries to console
     """
@@ -116,6 +119,14 @@ def register_plugin():
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('--dump', nargs='*', choices=['eval', 'trace', 'accepted', 'rejected',
-        'undecided', 'title'], dest='dump_entries', help='display all entries in task with fields they contain, '
-        'use `--dump eval` to evaluate all lazy fields. Specify an entry state/states to only dump matching entries.')
+    options.get_parser('execute').add_argument(
+        '--dump',
+        nargs='*',
+        choices=['eval', 'trace', 'accepted', 'rejected', 'undecided', 'title'],
+        dest='dump_entries',
+        help=(
+            'display all entries in task with fields they contain, '
+            'use `--dump eval` to evaluate all lazy fields. Specify an entry '
+            'state/states to only dump matching entries.'
+        ),
+    )

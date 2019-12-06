@@ -1,0 +1,24 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        Cookie: [url=aoeu; title=blah]
+        User-Agent: [FlexGet/1.2.464.dev (www.flexget.com)]
+      method: GET
+      uri: http://httpbin.org/cookies
+    response:
+      body: {string: "{\n  \"cookies\": {\n    \"title\": \"blah\", \n    \"url\"\
+          : \"aoeu\"\n  }\n}\n"}
+      headers:
+        access-control-allow-credentials: ['true']
+        access-control-allow-origin: ['*']
+        connection: [keep-alive]
+        content-length: ['63']
+        content-type: [application/json]
+        date: ['Thu, 03 Mar 2016 09:31:27 GMT']
+        server: [nginx]
+      status: {code: 200, message: OK}
+version: 1

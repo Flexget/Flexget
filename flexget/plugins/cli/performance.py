@@ -1,13 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
 import logging
 import time
-
 from argparse import SUPPRESS
 
-from flexget import options
-from flexget.event import event, add_event_handler, remove_event_handler
-
 from sqlalchemy.engine import Connection
+
+from flexget import options
+from flexget.event import add_event_handler, event, remove_event_handler
 
 log = logging.getLogger('performance')
 
@@ -72,9 +70,9 @@ def cleanup(manager, options):
         return
 
     # Print summary
-    for name, data in performance.iteritems():
+    for name, data in performance.items():
         log.info('Performance results for task %s:' % name)
-        for keyword, results in data.iteritems():
+        for keyword, results in data.items():
             took = results['took']
             queries = results['queries']
             if took > 0.1 or queries > 10:
@@ -87,9 +85,8 @@ def cleanup(manager, options):
     remove_event_handler('task.execute.after_plugin', after_plugin)
 
 
-
-
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('--debug-perf', action='store_true', dest='debug_perf', default=False,
-                                               help=SUPPRESS)
+    options.get_parser('execute').add_argument(
+        '--debug-perf', action='store_true', dest='debug_perf', default=False, help=SUPPRESS
+    )

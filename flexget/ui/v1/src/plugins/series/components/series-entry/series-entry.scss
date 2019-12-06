@@ -1,0 +1,29 @@
+.series-entry {
+    display: flex;
+    position: relative;
+    align-self: stretch;
+}
+
+
+.rating {
+    float: right;
+    md-icon {
+        color: gold;
+    }
+}
+
+.series-image {
+    margin-right: 10px;
+    .md-media-lg {
+        height: 100%;
+    }
+}
+
+.second-subhead {
+    padding-top: 0 !important;
+    padding-bottom: 12px;
+}
+
+.card-menu {
+    padding: 0 0 0 6px;
+}
