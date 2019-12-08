@@ -128,8 +128,8 @@ class Newznab:
         return self.fill_entries_for_url(url, task)
 
     def do_search_all(self, arg_entry, task, config=None):
-        log.info('Searching for %s' % arg_entry['title'])
-        url = config['url'] + '&q=%s' % arg_entry['title']
+        log.info('Searching for %s', arg_entry['title'])
+        url = f"{config['url']}&q={arg_entry['title']}"
         return self.fill_entries_for_url(url, task)
 
 
