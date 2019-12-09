@@ -145,7 +145,11 @@ class InputDeluge(DelugePlugin):
         config = self.prepare_config(config)
         # Reset the entries list
         client = self.setup_client(config)
-        client.connect()
+
+        try:
+            client.connect()
+        except ConnectionError as exc:
+            raise plugin.PluginError(f'Error connecting to deluge daemon: {exc}') from exc
 
         entries = self.generate_entries(client, config)
         client.disconnect()
@@ -293,7 +297,10 @@ class OutputDeluge(DelugePlugin):
         if not config['enabled'] or not (task.accepted or task.options.test):
             return
 
-        client.connect()
+        try:
+            client.connect()
+        except ConnectionError as exc:
+            raise plugin.PluginError(f'Error connecting to deluge daemon: {exc}') from exc
 
         if task.options.test:
             log.debug('Test connection to deluge daemon successful.')
