@@ -86,30 +86,28 @@ class TestTVDBLookup:
         assert entry['tvdb_air_time'] == ''
         assert entry['tvdb_airs_day_of_week'] == ''
         assert re.match(
-            'http://thetvdb.com/banners/graphical/73255-g[0-9]+.jpg', entry['tvdb_banner']
+            'https://artworks.thetvdb.com/banners/graphical/73255-g[0-9]+.jpg', entry['tvdb_banner']
         )
-        assert 'http://thetvdb.com/banners/posters/73255-1.jpg' in entry['tvdb_posters']
+        assert 'https://artworks.thetvdb.com/banners/posters/73255-1.jpg' in entry['tvdb_posters']
         assert entry['tvdb_content_rating'] == 'TV-14'
         assert entry['tvdb_episode'] == 2
         assert entry['tvdb_first_air_date'] == datetime(2004, 11, 16, 0, 0)
-        assert entry['tvdb_network'] == 'FOX (US)'
-        assert entry['tvdb_genres'] == ['Drama', 'Mystery']
+        assert entry['tvdb_network'] == 'FOX'
+        assert entry['tvdb_genres'] == ['Drama', 'Suspense']
         assert 'Jesse Spencer' in entry['tvdb_actors']
         assert (
             entry['tvdb_overview']
-            == 'Go deeper into the medical mysteries of House, TV\'s most compelling '
-            'drama. Hugh Laurie stars as the brilliant but sarcastic Dr. Gregory'
-            ' House, a maverick physician who is devoid of bedside manner. While'
-            ' his behavior can border on antisocial, Dr. House thrives on the'
-            ' challenge of solving the medical puzzles that other doctors give up on.'
-            ' Together with his hand-picked team of young medical experts, he\'ll'
-            ' do whatever it takes in the race against the clock to solve the case.'
+            == 'Dr. Gregory House is a maverick physician who is devoid of bedside manner. '
+            'While his behavior can border on antisocial, Dr. House thrives on the challenge '
+            'of solving the medical puzzles that other doctors give up on. Together with his '
+            'hand-picked team of young medical experts, he\'ll do whatever it takes in the '
+            'race against the clock to solve the case.'
         )
 
         assert entry['tvdb_ep_air_date'] == datetime(2004, 11, 23, 0, 0)
         assert entry['tvdb_ep_directors'] == 'Peter O\'Fallon'
         assert entry['tvdb_ep_id'] == 'S01E02'
-        assert entry['tvdb_ep_image'] == 'http://thetvdb.com/banners/episodes/73255/110995.jpg'
+        assert entry['tvdb_ep_image'] == 'https://artworks.thetvdb.com/banners/episodes/73255/110995.jpg'
         assert entry['tvdb_ep_name'] == 'Paternity'
         assert (
             entry['tvdb_ep_overview']
