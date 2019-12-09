@@ -24,7 +24,7 @@ SEARCH_RESULT_EXPIRATION_DAYS = 3
 class TVDBRequest:
     API_KEY = '4D297D8CFDE0E105'
     BASE_URL = 'https://api.thetvdb.com/'
-    BANNER_URL = 'http://thetvdb.com/banners/'
+    BANNER_URL = 'https://artworks.thetvdb.com/banners/'
 
     def __init__(self, username=None, account_id=None, api_key=None):
         self.username = username
@@ -257,10 +257,12 @@ class TVDBSeries(Base):
         if not self._posters:
             log.debug('Getting top 5 posters for series %s', self.name)
             try:
+                poster_main = TVDBRequest().get('series/%s' % self.id).get('poster')
                 poster_query = TVDBRequest().get(
                     'series/%s/images/query' % self.id, keyType='poster'
                 )
-                self.posters_list = (
+                self.posters_list = [poster_main] if poster_main else []
+                self.posters_list += (
                     [p['fileName'] for p in poster_query[:5]] if poster_query else []
                 )
             except requests.RequestException as e:
@@ -269,7 +271,7 @@ class TVDBSeries(Base):
                 else:
                     raise LookupError('Error updating posters from tvdb: %s' % e)
 
-        return [TVDBRequest.BANNER_URL + p for p in self.posters_list]
+        return [TVDBRequest.BANNER_URL + p for p in self.posters_list[:5]]
 
     def to_dict(self):
         return {
