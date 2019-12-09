@@ -39,11 +39,11 @@ class DelugePlugin:
             auth = self.get_localhost_auth(config.get('config_path'))
             if auth and auth[0]:
                 config['username'], config['password'] = auth
-            else:
-                raise plugin.PluginError(
-                    'Unable to get local authentication info for Deluge. You may need to '
-                    'specify an username and password from your Deluge auth file.'
-                )
+        if not config.get('username') or not config.get('password'):
+            raise plugin.PluginError(
+                'Unable to get authentication info for Deluge. You may need to '
+                'specify an username and password from your Deluge auth file.'
+            )
 
         return DelugeRPCClient(
             config['host'],
