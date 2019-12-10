@@ -65,7 +65,7 @@ class TVDBRequest:
         url = TVDBRequest.BASE_URL + endpoint
         language = params.pop('language', 'en')
         headers = {
-            'Authorization': 'Bearer %s' % self.get_auth_token(),
+            'Authorization': f'Bearer {self.get_auth_token()}',
             'Accept-Language': language,
         }
         data = params.pop('data', None)
@@ -75,7 +75,7 @@ class TVDBRequest:
         )
         if result.status_code == 401:
             log.debug('Auth token expired, refreshing')
-            headers['Authorization'] = 'Bearer %s' % self.get_auth_token(refresh=True)
+            headers['Authorization'] = f'Bearer {self.get_auth_token(refresh=True)}'
             result = requests.request(
                 method, url, params=params, headers=headers, raise_status=False, json=data
             )
@@ -87,7 +87,7 @@ class TVDBRequest:
             # a hack to make sure it doesn't raise exception on a simple invalidLanguage. This is because tvdb
             # has a tendency to contain bad data and randomly return this error for no reason
             if len(result['errors']) > 1 or 'invalidLanguage' not in result['errors']:
-                raise LookupError('Error processing request on tvdb: %s' % result['errors'])
+                raise LookupError(f'Error processing request on tvdb: {result["errors"]}')
 
         return result
 
@@ -185,9 +185,9 @@ class TVDBSeries(Base):
         self.id = tvdb_id
 
         try:
-            series = TVDBRequest().get('series/%s' % self.id, language=language)
+            series = TVDBRequest().get(f'series/{self.id}', language=language)
         except requests.RequestException as e:
-            raise LookupError('Error updating data from tvdb: %s' % e)
+            raise LookupError(f'Error updating data from tvdb: {e}')
 
         self.language = language or 'en'
         self.last_updated = series['lastUpdated']
@@ -212,19 +212,19 @@ class TVDBSeries(Base):
             log.debug('Falling back to getting first episode aired date for series %s', self.name)
             try:
                 episode = TVDBRequest().get(
-                    'series/%s/episodes/query?airedSeason=1&airedEpisode=1' % self.id,
+                    f'series/{self.id}/episodes/query?airedSeason=1&airedEpisode=1',
                     language=language,
                 )
                 self.first_aired = episode[0]['firstAired']
-            except requests.RequestException as e:
-                log.error('Failed to get first episode for series %s' % self.name)
+            except requests.RequestException:
+                log.error('Failed to get first episode for series %s', self.name)
 
         # Actors and Posters are lazy populated
         self._actors = None
         self._posters = None
 
     def __repr__(self):
-        return '<TVDBSeries name=%s,tvdb_id=%s>' % (self.name, self.id)
+        return f'<TVDBSeries name={self.name},tvdb_id={self.id}>'
 
     @property
     def banner(self):
@@ -243,13 +243,13 @@ class TVDBSeries(Base):
         if not self._actors:
             log.debug('Looking up actors for series %s', self.name)
             try:
-                actors_query = TVDBRequest().get('series/%s/actors' % self.id)
+                actors_query = TVDBRequest().get(f'series/{self.id}/actors')
                 self.actors_list = [a['name'] for a in actors_query] if actors_query else []
             except requests.RequestException as e:
                 if None is not e.response and e.response.status_code == 404:
                     self.actors_list = []
                 else:
-                    raise LookupError('Error updating actors from tvdb: %s' % e)
+                    raise LookupError(f'Error updating actors from tvdb: {e}')
 
         return self.actors_list
 
@@ -257,9 +257,9 @@ class TVDBSeries(Base):
         if not self._posters:
             log.debug('Getting top 5 posters for series %s', self.name)
             try:
-                poster_main = TVDBRequest().get('series/%s' % self.id).get('poster')
+                poster_main = TVDBRequest().get(f'series/{self.id}').get('poster')
                 poster_query = TVDBRequest().get(
-                    'series/%s/images/query' % self.id, keyType='poster'
+                    f'series/{self.id}/images/query', keyType='poster'
                 )
                 self.posters_list = [poster_main] if poster_main else []
                 self.posters_list += (
@@ -269,7 +269,7 @@ class TVDBSeries(Base):
                 if None is not e.response and e.response.status_code == 404:
                     self.posters_list = []
                 else:
-                    raise LookupError('Error updating posters from tvdb: %s' % e)
+                    raise LookupError(f'Error updating posters from tvdb: {e}')
 
         return [TVDBRequest.BANNER_URL + p for p in self.posters_list[:5]]
 
@@ -337,9 +337,9 @@ class TVDBEpisode(Base):
         self.id = ep_id
         self.expired = False
         try:
-            episode = TVDBRequest().get('episodes/%s' % self.id, language=language)
+            episode = TVDBRequest().get(f'episodes/{self.id}', language=language)
         except requests.RequestException as e:
-            raise LookupError('Error updating data from tvdb: %s' % e)
+            raise LookupError(f'Error updating data from tvdb: {e}')
 
         self.id = episode['id']
         self.last_updated = episode['lastUpdated']
@@ -354,10 +354,9 @@ class TVDBEpisode(Base):
         self.first_aired = episode['firstAired']
 
     def __repr__(self):
-        return '<TVDBEpisode series=%s,season=%s,episode=%s>' % (
-            self.series.name,
-            self.season_number,
-            self.episode_number,
+        return (
+            f'<TVDBEpisode series={self.series.name},season={self.season_number},'
+            f'episode={self.episode_number}>'
         )
 
     def to_dict(self):
@@ -470,12 +469,12 @@ def find_series_id(name, language=None):
     try:
         series = TVDBRequest().get('search/series', name=name, language=language)
     except requests.RequestException as e:
-        raise LookupError('Unable to get search results for %s: %s' % (name, e))
+        raise LookupError(f'Unable to get search results for {name}: {e}')
 
     name = name.lower()
 
     if not series:
-        raise LookupError('No results found for %s' % name)
+        raise LookupError(f'No results found for {name}')
 
     # Cleanup results for sorting
     for s in series:
@@ -549,7 +548,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None, lang
     series = None
 
     def id_str():
-        return '<name=%s,tvdb_id=%s>' % (name, tvdb_id)
+        return f'<name={name},tvdb_id={tvdb_id}>'
 
     if tvdb_id:
         series = session.query(TVDBSeries).filter(TVDBSeries.id == tvdb_id).first()
@@ -575,7 +574,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None, lang
             log.debug('Series %s information restored from cache.', id_str())
     else:
         if only_cached:
-            raise LookupError('Series %s not found from cache' % id_str())
+            raise LookupError(f'Series {id_str()} not found from cache')
         # There was no series found in the cache, do a lookup from tvdb
         log.debug('Series %s not found in cache, looking up from tvdb.', id_str())
         if tvdb_id:
@@ -590,7 +589,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None, lang
             _update_search_strings(series, session, search=name)
 
     if not series:
-        raise LookupError('No results found from tvdb for %s' % id_str())
+        raise LookupError(f'No results found from tvdb for {id_str()}')
     if not series.name:
         raise LookupError('Tvdb result for series does not have a title.')
 
@@ -635,7 +634,7 @@ def lookup_episode(
     series = lookup_series(name=name, tvdb_id=tvdb_id, only_cached=only_cached, session=session)
 
     if not series:
-        raise LookupError('Series %s (%s) not found from' % (name, tvdb_id))
+        raise LookupError(f'Series {name} ({tvdb_id}) not found from')
 
     ep_description = series.name
     query_params = {}
@@ -644,22 +643,22 @@ def lookup_episode(
     if absolute_number is not None:
         episode = episode.filter(TVDBEpisode.absolute_number == absolute_number)
         query_params['absoluteNumber'] = absolute_number
-        ep_description = '%s absNo: %s' % (ep_description, absolute_number)
+        ep_description = f'{ep_description} absNo: {absolute_number}'
 
     if season_number is not None:
         episode = episode.filter(TVDBEpisode.season_number == season_number)
         query_params['airedSeason'] = season_number
-        ep_description = '%s s%s' % (ep_description, season_number)
+        ep_description = f'{ep_description} s{season_number}'
 
     if episode_number is not None:
         episode = episode.filter(TVDBEpisode.episode_number == episode_number)
         query_params['airedEpisode'] = episode_number
-        ep_description = '%s e%s' % (ep_description, episode_number)
+        ep_description = f'{ep_description} e{episode_number}'
 
     if first_aired is not None:
         episode = episode.filter(TVDBEpisode.first_aired == first_aired)
         query_params['firstAired'] = datetime.strftime(first_aired, '%Y-%m-%d')
-        ep_description = '%s e%s' % (ep_description, first_aired)
+        ep_description = f'{ep_description} e{first_aired}'
 
     episode = episode.first()
 
@@ -675,12 +674,12 @@ def lookup_episode(
             log.debug('Using episode info for %s from cache.', ep_description)
     else:
         if only_cached:
-            raise LookupError('Episode %s not found from cache' % ep_description)
+            raise LookupError(f'Episode {ep_description} not found from cache')
         # There was no episode found in the cache, do a lookup from tvdb
         log.debug('Episode %s not found in cache, looking up from tvdb.', ep_description)
         try:
             results = TVDBRequest().get(
-                'series/%s/episodes/query' % series.id, language=language, **query_params
+                f'series/{series.id}/episodes/query', language=language, **query_params
             )
             if results:
                 # Check if this episode id is already in our db
@@ -692,11 +691,11 @@ def lookup_episode(
                     episode = session.merge(updated_episode)
 
         except requests.RequestException as e:
-            raise LookupError('Error looking up episode from TVDb (%s)' % e)
+            raise LookupError(f'Error looking up episode from TVDb ({e})')
     if episode:
         return episode
     else:
-        raise LookupError('No results found for %s' % ep_description)
+        raise LookupError(f'No results found for {ep_description}')
 
 
 @with_session
@@ -704,8 +703,8 @@ def search_for_series(
     search_name=None, imdb_id=None, zap2it_id=None, force_search=None, session=None, language=None
 ):
     """
-    Search IMDB using a an identifier, return a list of cached search results. One if `search_name`, `imdb_id` or
-    `zap2it_id` is required.
+    Search IMDB using a an identifier, return a list of cached search results.
+    One of `search_name`, `imdb_id` or `zap2it_id` is required.
     :param search_name: Name of search to use
     :param imdb_id: Search via IMDB ID
     :param zap2it_id: Search via zap2it ID
@@ -715,13 +714,13 @@ def search_for_series(
     """
     if imdb_id:
         lookup_term = imdb_id
-        lookup_url = 'search/series?imdbId=%s' % imdb_id
+        lookup_url = f'search/series?imdbId={imdb_id}'
     elif zap2it_id:
         lookup_term = zap2it_id
-        lookup_url = 'search/series?zap2itId=%s' % zap2it_id
+        lookup_url = f'search/series?zap2itId={zap2it_id}'
     elif search_name:
         lookup_term = search_name
-        lookup_url = 'search/series?name=%s' % search_name
+        lookup_url = f'search/series?name={search_name}'
     else:
         raise LookupError('not enough parameters for lookup')
     series_search_results = []
@@ -738,7 +737,7 @@ def search_for_series(
             log.debug('trying to fetch TVDB search results from TVDB')
             fetched_results = TVDBRequest().get(lookup_url, language=language)
         except requests.RequestException as e:
-            raise LookupError('Error searching series from TVDb (%s)' % e)
+            raise LookupError(f'Error searching series from TVDb ({e})')
         series_search_results = [
             session.merge(TVDBSeriesSearchResult(series, lookup_term))
             for series in fetched_results
