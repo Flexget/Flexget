@@ -24,7 +24,7 @@ SEARCH_RESULT_EXPIRATION_DAYS = 3
 class TVDBRequest:
     API_KEY = '4D297D8CFDE0E105'
     BASE_URL = 'https://api.thetvdb.com/'
-    BANNER_URL = 'https://artworks.thetvdb.com/banners/'
+    BANNER_URL = 'http://thetvdb.com/banners/'
 
     def __init__(self, username=None, account_id=None, api_key=None):
         self.username = username

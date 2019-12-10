@@ -86,9 +86,9 @@ class TestTVDBLookup:
         assert entry['tvdb_air_time'] == ''
         assert entry['tvdb_airs_day_of_week'] == ''
         assert re.match(
-            'https://artworks.thetvdb.com/banners/graphical/73255-g[0-9]+.jpg', entry['tvdb_banner']
+            'http://thetvdb.com/banners/graphical/73255-g[0-9]+.jpg', entry['tvdb_banner']
         )
-        assert 'https://artworks.thetvdb.com/banners/posters/73255-1.jpg' in entry['tvdb_posters']
+        assert 'http://thetvdb.com/banners/posters/73255-1.jpg' in entry['tvdb_posters']
         assert entry['tvdb_content_rating'] == 'TV-14'
         assert entry['tvdb_episode'] == 2
         assert entry['tvdb_first_air_date'] == datetime(2004, 11, 16, 0, 0)
@@ -107,7 +107,7 @@ class TestTVDBLookup:
         assert entry['tvdb_ep_air_date'] == datetime(2004, 11, 23, 0, 0)
         assert entry['tvdb_ep_directors'] == 'Peter O\'Fallon'
         assert entry['tvdb_ep_id'] == 'S01E02'
-        assert entry['tvdb_ep_image'] == 'https://artworks.thetvdb.com/banners/episodes/73255/110995.jpg'
+        assert entry['tvdb_ep_image'] == 'http://thetvdb.com/banners/episodes/73255/110995.jpg'
         assert entry['tvdb_ep_name'] == 'Paternity'
         assert (
             entry['tvdb_ep_overview']
