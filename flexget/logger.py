@@ -9,6 +9,8 @@ import threading
 import uuid
 import warnings
 
+from loguru import logger
+
 from flexget import __version__
 from flexget.utils.tools import io_encoding
 
@@ -19,6 +21,8 @@ VERBOSE = 15
 # environment variables to modify rotating log parameters from defaults of 1 MB and 9 files
 ENV_MAXBYTES = 'FLEXGET_LOG_MAXBYTES'
 ENV_MAXCOUNT = 'FLEXGET_LOG_MAXCOUNT'
+
+LOG_FORMAT = '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> <level>{level: <8}</level> <cyan>{extra[name]: <13}</cyan> {extra[task]: <15} <level>{message}</level>'
 
 # Stores `task`, logging `session_id`, and redirected `output` stream in a thread local context
 local_context = threading.local()
@@ -44,7 +48,8 @@ def task_logging(task):
     old_task = getattr(local_context, 'task', '')
     local_context.task = task
     try:
-        yield
+        with logger.contextualize(task=task):
+            yield
     finally:
         local_context.task = old_task
 
@@ -68,7 +73,6 @@ def capture_output(stream, loglevel=None):
     old_output = getattr(local_context, 'output', None)
     old_loglevel = getattr(local_context, 'loglevel', None)
     streamhandler = logging.StreamHandler(stream)
-    streamhandler.setFormatter(FlexGetFormatter())
     streamhandler.addFilter(SessionFilter(local_context.session_id))
     if loglevel is not None:
         loglevel = get_level_no(loglevel)
@@ -133,30 +137,47 @@ class FlexGetLogger(logging.Logger):
         self.log(VERBOSE, msg, *args, **kwargs)
 
 
-class FlexGetFormatter(logging.Formatter):
-    """Custom formatter that can handle both regular log records and those created by FlexGetLogger"""
+def record_patcher(record):
+    if 'name' not in record['extra']:
+        name = record['name']
+        if name.startswith('flexget'):
+            name = name.split('.')[-1]
+        record['extra']['name'] = name
 
-    flexget_fmt = '%(asctime)-15s %(levelname)-8s %(name)-13s %(task)-15s %(message)s'
 
-    def __init__(self):
-        logging.Formatter.__init__(self, self.flexget_fmt, '%Y-%m-%d %H:%M')
+class InterceptHandler(logging.Handler):
+    def emit(self, record):
+        # Get corresponding Loguru level if it exists
+        try:
+            level = logger.level(record.levelname).name
+        except ValueError:
+            level = record.levelno
 
-    def format(self, record):
-        if not hasattr(record, 'task'):
-            record.task = ''
-        return logging.Formatter.format(self, record)
+        # Find caller from where originated the logged message
+        frame, depth = logging.currentframe(), 2
+        while frame.f_code.co_filename == logging.__file__:
+            frame = frame.f_back
+            depth += 1
+
+        logger.bind(name=record.name).opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
 
 _logging_configured = False
-_buff_handler = None
+_startup_buffer = []
+_startup_buffer_id = None
 _logging_started = False
 # Stores the last 50 debug messages
 debug_buffer = RollingBuffer(maxlen=50)
 
 
+def log_saver(message):
+    _startup_buffer.append(message.record)
+
+
 def initialize(unit_test=False):
     """Prepare logging.
     """
+    logger.remove()
     global _logging_configured, _logging_started, _buff_handler
 
     if _logging_configured:
@@ -167,6 +188,15 @@ def initialize(unit_test=False):
     warnings.simplefilter('once', append=True)
     logging.addLevelName(TRACE, 'TRACE')
     logging.addLevelName(VERBOSE, 'VERBOSE')
+
+    logger.level('VERBOSE', no=VERBOSE, color='<bold>', icon='👄')
+
+    def verbose(_, message, *args, **kwargs):
+        logger.opt(depth=1).log('verbose', message, *args, **kwargs)
+
+    logger.__class__.verbose = verbose
+    logger.configure(extra={'task': '', 'session_id': None}, patcher=record_patcher)
+
     _logging_configured = True
 
     # with unit test we want pytest to add the handlers
@@ -175,16 +205,14 @@ def initialize(unit_test=False):
         return
 
     # Store any log messages in a buffer until we `start` function is run
-    logger = logging.getLogger()
-    _buff_handler = logging.handlers.BufferingHandler(1000 * 1000)
-    logger.addHandler(_buff_handler)
-    logger.setLevel(logging.NOTSET)
+    global _startup_buffer_id
+    _startup_buffer_id = logger.add(log_saver, level='DEBUG', format=LOG_FORMAT)
 
     # Add a handler that sores the last 50 debug lines to `debug_buffer` for use in crash reports
-    crash_handler = logging.StreamHandler(debug_buffer)
-    crash_handler.setLevel(logging.DEBUG)
-    crash_handler.setFormatter(FlexGetFormatter())
-    logger.addHandler(crash_handler)
+    logger.add(debug_buffer, level='DEBUG', format=LOG_FORMAT)
+
+    std_logger = logging.getLogger()
+    std_logger.addHandler(InterceptHandler())
 
 
 def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
@@ -197,42 +225,34 @@ def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
         return
 
     # root logger
-    logger = logging.getLogger()
+    std_logger = logging.getLogger()
     level = get_level_no(level)
-    logger.setLevel(level)
+    std_logger.setLevel(level)
 
-    formatter = FlexGetFormatter()
     if to_file:
-        file_handler = logging.handlers.RotatingFileHandler(
+        logger.add(
             filename,
-            maxBytes=int(os.environ.get(ENV_MAXBYTES, 1000 * 1024)),
-            backupCount=int(os.environ.get(ENV_MAXCOUNT, 9)),
-            encoding='utf-8'
+            rotation=int(os.environ.get(ENV_MAXBYTES, 1000 * 1024)),
+            retention=int(os.environ.get(ENV_MAXCOUNT, 9)),
+            encoding='utf-8',
+            format=LOG_FORMAT,
         )
-        file_handler.setFormatter(formatter)
-        file_handler.setLevel(level)
-        logger.addHandler(file_handler)
 
     # without --cron we log to console
     if to_console:
         # Make sure we don't send any characters that the current terminal doesn't support printing
-        stdout = sys.stdout
-        if hasattr(stdout, 'buffer'):
-            # On python 3, we need to get the buffer directly to support writing bytes
-            stdout = stdout.buffer
-        safe_stdout = codecs.getwriter(io_encoding)(stdout, 'replace')
-        console_handler = logging.StreamHandler(safe_stdout)
-        console_handler.setFormatter(formatter)
-        console_handler.setLevel(level)
-        logger.addHandler(console_handler)
+        safe_stdout = codecs.getwriter(io_encoding)(sys.stdout.buffer, 'replace')
+        logger.add(safe_stdout, format=LOG_FORMAT, colorize=True)
 
     # flush what we have stored from the plugin initialization
-    logger.removeHandler(_buff_handler)
-    if _buff_handler:
-        for record in _buff_handler.buffer:
-            if logger.isEnabledFor(record.levelno):
-                logger.handle(record)
-        _buff_handler.flush()
+    global _startup_buffer, _startup_buffer_id
+    if _startup_buffer_id:
+        for record in _startup_buffer:
+            level, message = record['level'], record['message']
+            logger.patch(lambda r: r.update(record)).log(level, message)
+        logger.remove(_startup_buffer_id)
+        _startup_buffer = []
+        _startup_buffer_id = None
     _logging_started = True
 
 
