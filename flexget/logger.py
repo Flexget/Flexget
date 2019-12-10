@@ -22,7 +22,8 @@ VERBOSE = 15
 ENV_MAXBYTES = 'FLEXGET_LOG_MAXBYTES'
 ENV_MAXCOUNT = 'FLEXGET_LOG_MAXCOUNT'
 
-LOG_FORMAT = '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> <level>{level: <8}</level> <cyan>{extra[name]: <13}</cyan> {extra[task]: <15} <level>{message}</level>'
+LOG_FORMAT = ('<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> <level>{level: <8}</level> '
+              '<cyan>{extra[name]: <13}</cyan> {extra[task]: <15} <level>{message}</level>')
 
 # Stores `task`, logging `session_id`, and redirected `output` stream in a thread local context
 local_context = threading.local()
@@ -159,7 +160,9 @@ class InterceptHandler(logging.Handler):
             frame = frame.f_back
             depth += 1
 
-        logger.bind(name=record.name).opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
+        logger.bind(name=record.name).opt(depth=depth, exception=record.exc_info).log(
+            level, record.getMessage()
+        )
 
 
 _logging_configured = False
@@ -192,7 +195,7 @@ def initialize(unit_test=False):
     logger.level('VERBOSE', no=VERBOSE, color='<bold>', icon='👄')
 
     def verbose(_, message, *args, **kwargs):
-        logger.opt(depth=1).log('verbose', message, *args, **kwargs)
+        logger.opt(depth=1).log('VERBOSE', message, *args, **kwargs)
 
     logger.__class__.verbose = verbose
     logger.configure(extra={'task': '', 'session_id': None}, patcher=record_patcher)
@@ -209,7 +212,7 @@ def initialize(unit_test=False):
     _startup_buffer_id = logger.add(log_saver, level='DEBUG', format=LOG_FORMAT)
 
     # Add a handler that sores the last 50 debug lines to `debug_buffer` for use in crash reports
-    logger.add(debug_buffer, level='DEBUG', format=LOG_FORMAT)
+    logger.add(debug_buffer, level='DEBUG', format=LOG_FORMAT, backtrace=True, diagnose=True)
 
     std_logger = logging.getLogger()
     std_logger.addHandler(InterceptHandler())
