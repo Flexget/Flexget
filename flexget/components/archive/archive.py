@@ -108,7 +108,7 @@ class UrlrewriteArchive:
         try:
             for query in entry.get('search_strings', [entry['title']]):
                 # clean some characters out of the string for better results
-                query = re.sub(r'[ \(\)]+', ' ', query).strip()
+                query = re.sub(r'[ \(\)\:]+', ' ', query).strip()
                 log.debug('looking for `%s` config: %s' % (query, config))
                 for archive_entry in db.search(session, query, tags=tag_names, desc=True):
                     log.debug('rewrite search result: %s' % archive_entry)
