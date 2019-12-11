@@ -76,14 +76,16 @@ class OutputQBitTorrent:
             response = self.session.request('get', url)
             if response.status_code != 404:
                 self.api_url_login = '/api/v2/auth/login'
-                self.api_url_add = '/api/v2/torrents/add'
+                self.api_url_upload = '/api/v2/torrents/add'
+                self.api_url_download = '/api/v2/torrents/add'
                 return response         
             
             url = self.url + "/version/api"
             response = self.session.request('get', url)
             if response.status_code != 404:
                 self.api_url_login = '/login'
-                self.api_url_add = '/command/upload'
+                self.api_url_upload = '/command/upload'
+                self.api_url_download = '/command/download'
                 return response         
             
             msg = (
@@ -128,7 +130,7 @@ class OutputQBitTorrent:
             multipart_data['torrents'] = f
             self._request(
                 'post',
-                self.url + self.api_url_add,
+                self.url + self.api_url_upload,
                 msg_on_fail='Failed to add file to qBittorrent',
                 files=multipart_data,
                 verify=verify_cert,
@@ -142,7 +144,7 @@ class OutputQBitTorrent:
         multipart_data = {k: (None, v) for k, v in data.items()}
         self._request(
             'post',
-            self.url + self.api_url_add,
+            self.url + self.api_url_download,
             msg_on_fail='Failed to add file to qBittorrent',
             files=multipart_data,
             verify=verify_cert,
