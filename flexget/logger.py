@@ -22,8 +22,10 @@ VERBOSE = 15
 ENV_MAXBYTES = 'FLEXGET_LOG_MAXBYTES'
 ENV_MAXCOUNT = 'FLEXGET_LOG_MAXCOUNT'
 
-LOG_FORMAT = ('<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> <level>{level: <8}</level> '
-              '<cyan>{extra[name]: <13}</cyan> {extra[task]: <15} <level>{message}</level>')
+LOG_FORMAT = (
+    '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> <level>{level: <8}</level> '
+    '<cyan>{extra[name]: <13}</cyan> {extra[task]: <15} <level>{message}</level>'
+)
 
 # Stores `task`, logging `session_id`, and redirected `output` stream in a thread local context
 local_context = threading.local()
@@ -43,18 +45,6 @@ def get_level_no(level):
     return level
 
 
-@contextlib.contextmanager
-def task_logging(task):
-    """Context manager which adds task information to log messages."""
-    old_task = getattr(local_context, 'task', '')
-    local_context.task = task
-    try:
-        with logger.contextualize(task=task):
-            yield
-    finally:
-        local_context.task = old_task
-
-
 class SessionFilter(logging.Filter):
     def __init__(self, session_id):
         self.session_id = session_id
@@ -64,35 +54,33 @@ class SessionFilter(logging.Filter):
 
 
 @contextlib.contextmanager
-def capture_output(stream, loglevel=None):
-    """Context manager which captures all log and console output to given `stream` while in scope."""
-    root_logger = logging.getLogger()
-    old_level = root_logger.getEffectiveLevel()
-    old_id = getattr(local_context, 'session_id', None)
-    # Keep using current, or create one if none already set
-    local_context.session_id = old_id or uuid.uuid4()
-    old_output = getattr(local_context, 'output', None)
-    old_loglevel = getattr(local_context, 'loglevel', None)
-    streamhandler = logging.StreamHandler(stream)
-    streamhandler.addFilter(SessionFilter(local_context.session_id))
-    if loglevel is not None:
-        loglevel = get_level_no(loglevel)
-        streamhandler.setLevel(loglevel)
-        # If requested loglevel is lower than the root logger is filtering for, we need to turn it down.
-        # All existing handlers should have their desired level set and not be affected.
-        if not root_logger.isEnabledFor(loglevel):
-            root_logger.setLevel(loglevel)
-    local_context.output = stream
-    local_context.loglevel = loglevel
-    root_logger.addHandler(streamhandler)
+def capture_logs(*args, **kwargs):
+    """Takes the same arguments as `logger.add`, but this sync will only log messages contained in context."""
+    old_id = get_log_session_id()
+    session_id = local_context.session_id = old_id or uuid.uuid4()
+    existing_filter = kwargs.pop('filter', None)
+    kwargs.setdefault('format', LOG_FORMAT)
+
+    def filter_func(record):
+        if record['extra'].get('session_id') != session_id:
+            return False
+        if existing_filter:
+            return existing_filter(record)
+        return True
+
+    kwargs['filter'] = filter_func
+
+    log_sink = logger.add(*args, **kwargs)
     try:
-        yield
+        with logger.contextualize(session_id=session_id):
+            yield
     finally:
-        root_logger.removeHandler(streamhandler)
-        root_logger.setLevel(old_level)
         local_context.session_id = old_id
-        local_context.output = old_output
-        local_context.loglevel = old_loglevel
+        logger.remove(log_sink)
+
+
+def get_log_session_id():
+    return getattr(local_context, 'session_id', None)
 
 
 def get_capture_stream():
@@ -113,21 +101,7 @@ class RollingBuffer(collections.deque):
 
 
 class FlexGetLogger(logging.Logger):
-    """Custom logger that adds trace and verbose logging methods, and contextual information to log records."""
-
-    def makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra, *exargs):
-        extra = extra or {}
-        extra.update(
-            task=getattr(local_context, 'task', ''),
-            session_id=getattr(local_context, 'session_id', ''),
-        )
-        # Replace newlines in log messages with \n
-        if isinstance(msg, str):
-            msg = msg.replace('\n', '\\n')
-
-        return logging.Logger.makeRecord(
-            self, name, level, fn, lno, msg, args, exc_info, func, extra, *exargs
-        )
+    """Custom logger that adds trace and verbose logging methods."""
 
     def trace(self, msg, *args, **kwargs):
         """Log at TRACE level (more detailed than DEBUG)."""
@@ -170,7 +144,7 @@ _startup_buffer = []
 _startup_buffer_id = None
 _logging_started = False
 # Stores the last 50 debug messages
-debug_buffer = RollingBuffer(maxlen=50)
+debug_buffer = RollingBuffer(maxlen=150)
 
 
 def log_saver(message):
@@ -211,20 +185,23 @@ def initialize(unit_test=False):
     global _startup_buffer_id
     _startup_buffer_id = logger.add(log_saver, level='DEBUG', format=LOG_FORMAT)
 
-    # Add a handler that sores the last 50 debug lines to `debug_buffer` for use in crash reports
+    # Add a handler that sores the last 150 debug lines to `debug_buffer` for use in crash reports
     logger.add(debug_buffer, level='DEBUG', format=LOG_FORMAT, backtrace=True, diagnose=True)
 
     std_logger = logging.getLogger()
     std_logger.addHandler(InterceptHandler())
 
 
-def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
+def start(filename=None, level='INFO', to_console=True, to_file=True):
     """After initialization, start file logging.
     """
     global _logging_started
 
     assert _logging_configured
     if _logging_started:
+        return
+
+    if level == 'NONE':
         return
 
     # root logger
@@ -235,6 +212,7 @@ def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
     if to_file:
         logger.add(
             filename,
+            level=level,
             rotation=int(os.environ.get(ENV_MAXBYTES, 1000 * 1024)),
             retention=int(os.environ.get(ENV_MAXCOUNT, 9)),
             encoding='utf-8',
@@ -245,15 +223,15 @@ def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
     if to_console:
         # Make sure we don't send any characters that the current terminal doesn't support printing
         safe_stdout = codecs.getwriter(io_encoding)(sys.stdout.buffer, 'replace')
-        logger.add(safe_stdout, format=LOG_FORMAT, colorize=True)
+        logger.add(safe_stdout, level=level, format=LOG_FORMAT, colorize=True)
 
     # flush what we have stored from the plugin initialization
     global _startup_buffer, _startup_buffer_id
     if _startup_buffer_id:
-        for record in _startup_buffer:
-            level, message = record['level'], record['message']
-            logger.patch(lambda r: r.update(record)).log(level, message)
         logger.remove(_startup_buffer_id)
+        for record in _startup_buffer:
+            level, message = record['level'].name, record['message']
+            logger.patch(lambda r: r.update(record)).log(level, message)
         _startup_buffer = []
         _startup_buffer_id = None
     _logging_started = True

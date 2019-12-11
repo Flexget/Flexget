@@ -40,7 +40,7 @@ from flexget.options import (  # noqa
 )
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
-from flexget.terminal import console  # noqa
+from flexget.terminal import console, get_console_output  # noqa
 
 log = logging.getLogger('manager')
 
@@ -142,7 +142,7 @@ class Manager:
         try:
             self._init_config(create=False)
         except:
-            logger.start(level=self.options.loglevel.upper(), to_file=False)
+            logger.start(level=self.options.loglevel, to_file=False)
             raise
         else:
             self._init_logging()
@@ -154,8 +154,8 @@ class Manager:
         log.debug('flexget detected io encoding: %s', io_encoding)
         log.debug('os.path.supports_unicode_filenames: %s' % os.path.supports_unicode_filenames)
         if (
-                codecs.lookup(sys.getfilesystemencoding()).name == 'ascii'
-                and not os.path.supports_unicode_filenames
+            codecs.lookup(sys.getfilesystemencoding()).name == 'ascii'
+            and not os.path.supports_unicode_filenames
         ):
             log.warning(
                 'Your locale declares ascii as the filesystem encoding. Any plugins reading filenames from '
@@ -270,15 +270,11 @@ class Manager:
     def has_lock(self):
         return self._has_lock
 
-    def execute(
-            self, options=None, output=None, loglevel=None, priority=1, suppress_warnings=None
-    ):
+    def execute(self, options=None, priority=1, suppress_warnings=None):
         """
         Run all (can be limited with options) tasks from the config.
 
         :param options: Either an :class:`argparse.Namespace` instance, or a dict, containing options for execution
-        :param output: If a file-like object is specified here, log messages and stdout from the execution will be
-            written to it.
         :param priority: If there are other executions waiting to be run, they will be run in priority order,
             lowest first.
         :param suppress_warnings: Allows suppressing log warning about missing plugin in key phases
@@ -316,8 +312,6 @@ class Manager:
                     if not matches:
                         msg = '`%s` does not match any tasks' % arg
                         log.error(msg)
-                        if output:
-                            output.write(msg)
                         continue
                     task_names.extend(m for m in matches if m not in task_names)
                 # Set the option as a list of matching task names so plugins can use it easily
@@ -333,8 +327,8 @@ class Manager:
                 self,
                 task_name,
                 options=options,
-                output=output,
-                loglevel=loglevel,
+                output=get_console_output(),
+                session_id=logger.get_log_session_id(),
                 priority=priority,
                 suppress_warnings=suppress_warnings,
             )
@@ -446,9 +440,7 @@ class Manager:
                 self.task_queue.start()
             if len(self.task_queue):
                 log.verbose('There is a task already running, execution queued.')
-            finished_events = self.execute(
-                options, output=logger.get_capture_stream(), loglevel=logger.get_capture_loglevel()
-            )
+            finished_events = self.execute(options)
             if not options.cron:
                 # Wait until execution of all tasks has finished
                 for _, _, event in finished_events:
@@ -672,9 +664,9 @@ class Manager:
                 # Not very good practice but we get several kind of exceptions here, I'm not even sure all of them
                 # At least: ReaderError, YmlScannerError (or something like that)
                 if (
-                        hasattr(e, 'problem')
-                        and hasattr(e, 'context_mark')
-                        and hasattr(e, 'problem_mark')
+                    hasattr(e, 'problem')
+                    and hasattr(e, 'context_mark')
+                    and hasattr(e, 'problem_mark')
                 ):
                     lines = 0
                     if e.problem is not None:
@@ -1010,8 +1002,8 @@ class Manager:
         :param bool force: Run the cleanup no matter whether the interval has been met.
         """
         expired = (
-                self.persist.get('last_cleanup', datetime(1900, 1, 1))
-                < datetime.now() - DB_CLEANUP_INTERVAL
+            self.persist.get('last_cleanup', datetime(1900, 1, 1))
+            < datetime.now() - DB_CLEANUP_INTERVAL
         )
         if force or expired:
             log.info('Running database cleanup.')

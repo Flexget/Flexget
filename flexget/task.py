@@ -1,3 +1,4 @@
+import contextlib
 import copy
 import inspect
 import itertools
@@ -7,12 +8,12 @@ import string
 import threading
 from functools import total_ordering, wraps
 
+from loguru import logger
 from sqlalchemy import Column, Integer, String, Unicode
 
 from flexget import config_schema, db_schema
 from flexget.entry import EntryUnicodeError
 from flexget.event import event, fire_event
-from flexget.logger import capture_output
 from flexget.manager import Session
 from flexget.plugin import (
     DependencyError,
@@ -24,6 +25,7 @@ from flexget.plugin import (
 )
 from flexget.plugin import plugins as all_plugins
 from flexget.plugin import task_phases
+from flexget.terminal import capture_console
 from flexget.utils import requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimpleTaskPersistence
@@ -67,15 +69,15 @@ def config_changed(task=None, session=None):
 def use_task_logging(func):
     @wraps(func)
     def wrapper(self, *args, **kw):
-        # Set the task name in the logger and capture output
-        from flexget import logger
-
-        with logger.task_logging(self.name):
-            if self.output:
-                with capture_output(self.output, loglevel=self.loglevel):
-                    return func(self, *args, **kw)
-            else:
-                return func(self, *args, **kw)
+        # Set the appropriate logger context while running task
+        cms = [logger.contextualize(task=self.name, task_id=self.id, session_id=self.session_id)]
+        # Capture console output if configured to do so
+        if self.output:
+            cms.append(capture_console(self.output))
+        with contextlib.ExitStack() as stack:
+            for cm in cms:
+                stack.enter_context(cm)
+            return func(self, *args, **kw)
 
     return wrapper
 
@@ -199,7 +201,7 @@ class Task:
         config=None,
         options=None,
         output=None,
-        loglevel=None,
+        session_id=None,
         priority=None,
         suppress_warnings=None,
     ):
@@ -208,8 +210,8 @@ class Task:
         :param string name: Name of the task.
         :param dict config: Task configuration.
         :param options: dict or argparse namespace with options for this task
-        :param output: A filelike that all logs and stdout will be sent to for this task.
-        :param loglevel: Custom loglevel, only log messages at this level will be sent to `output`
+        :param output: A filelike that all console output will be sent to for this task.
+        :param session_id: Session id that will be attached to all log messages for filtering
         :param priority: If multiple tasks are waiting to run, the task with the lowest priority will be run first.
             The default is 0, if the cron option is set though, the default is lowered to 10.
         :param suppress_warnings: Allows suppressing log warning about missing plugin in key phases
@@ -233,7 +235,7 @@ class Task:
             setattr(options, 'allow_manual', False)
         self.options = options
         self.output = output
-        self.loglevel = loglevel
+        self.session_id = session_id
         self.suppress_warnings = suppress_warnings or []
         if priority is None:
             self.priority = 10 if self.options.cron else 0
@@ -686,8 +688,8 @@ class Task:
           of running input phase.
         """
 
+        self.finished_event.clear()
         try:
-            self.finished_event.clear()
             if self.options.cron:
                 self.manager.db_cleanup()
             fire_event('task.execute.started', self)

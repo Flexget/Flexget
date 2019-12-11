@@ -1,3 +1,4 @@
+import contextlib
 import sys
 from textwrap import wrap
 
@@ -266,6 +267,20 @@ def colorize(color, text, auto=True):
     if not terminal_info()['isatty']:
         return text
     return Color.colorize(color, text, auto)
+
+
+@contextlib.contextmanager
+def capture_console(filelike):
+    old_output = get_console_output()
+    local_context.output = filelike
+    try:
+        yield
+    finally:
+        local_context.output = old_output
+
+
+def get_console_output():
+    return getattr(local_context, 'output', None)
 
 
 def console(text, *args, **kwargs):

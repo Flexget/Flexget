@@ -1,3 +1,4 @@
+import contextlib
 import logging
 import random
 import string
@@ -5,15 +6,16 @@ import sys
 import threading
 
 import rpyc
+from loguru import logger
 from rpyc.utils.server import ThreadedServer
 from terminaltables.terminal_io import terminal_size
 
 from flexget import terminal
-from flexget.logger import capture_output
+from flexget.logger import capture_logs
 from flexget.options import get_parser
-from flexget.terminal import console
+from flexget.terminal import console, capture_console
 
-log = logging.getLogger('ipc')
+log = logger.bind(name='ipc')
 
 # Allow some attributes from dict interface to be called over the wire
 rpyc.core.protocol.DEFAULT_CONFIG['safe_attrs'].update(['items'])
@@ -67,24 +69,29 @@ class DaemonService(rpyc.Service):
 
     def exposed_handle_cli(self, args):
         args = rpyc.utils.classic.obtain(args)
-        log.verbose('Running command `%s` for client.' % ' '.join(args))
+        log.verbose('Running command `{}` for client.', ' '.join(args))
         parser = get_parser()
         try:
             options = parser.parse_args(args, file=self.client_out_stream)
         except SystemExit as e:
             if e.code:
                 # TODO: Not sure how to properly propagate the exit code back to client
-                log.debug('Parsing cli args caused system exit with status %s.' % e.code)
+                log.debug('Parsing cli args caused system exit with status {}.', e.code)
             return
         # Saving original terminal size to restore after monkeypatch
         original_terminal_info = terminal.terminal_info
         # Monkeypatching terminal_size so it'll work using IPC
         terminal.terminal_info = self._conn.root.terminal_info
+        context_managers = []
+        # Don't capture any output when used with --cron
+        if not options.cron:
+            context_managers.append(capture_console(self.client_out_stream))
+            if options.loglevel != 'NONE':
+                context_managers.append(capture_logs(self.client_log_sink, level=options.loglevel))
         try:
-            if not options.cron:
-                with capture_output(self.client_out_stream, loglevel=options.loglevel):
-                    self.manager.handle_cli(options)
-            else:
+            with contextlib.ExitStack() as stack:
+                for cm in context_managers:
+                    stack.enter_context(cm)
                 self.manager.handle_cli(options)
         finally:
             # Restoring original terminal_size value
@@ -96,6 +103,9 @@ class DaemonService(rpyc.Service):
     @property
     def client_out_stream(self):
         return RemoteStream(self._conn.root.console)
+
+    def client_log_sink(self, message):
+        return self._conn.root.log_sink(message)
 
 
 class ClientService(rpyc.Service):
@@ -116,6 +126,12 @@ class ClientService(rpyc.Service):
 
     def exposed_terminal_info(self):
         return {'size': terminal_size(), 'isatty': sys.stdout.isatty()}
+
+    def exposed_log_sink(self, message):
+        message = rpyc.classic.obtain(message)
+        record = message.record
+        level, message = record['level'].name, record['message']
+        logger.patch(lambda r: r.update(record)).log(level, message)
 
 
 class IPCServer(threading.Thread):
@@ -142,7 +158,7 @@ class IPCServer(threading.Thread):
     def run(self):
         # Make the rpyc logger a bit quieter when we aren't in debugging.
         rpyc_logger = logging.getLogger('ipc.rpyc')
-        if logging.getLogger().getEffectiveLevel() > logging.DEBUG:
+        if self.manager.options.loglevel.upper():
             rpyc_logger.setLevel(logging.WARNING)
         DaemonService.manager = self.manager
         self.server = ThreadedServer(

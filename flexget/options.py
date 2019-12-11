@@ -91,7 +91,7 @@ class VersionAction(_VersionAction):
 class DebugAction(Action):
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, True)
-        namespace.loglevel = 'debug'
+        namespace.loglevel = 'DEBUG'
 
 
 class DebugTraceAction(Action):
@@ -106,7 +106,7 @@ class CronAction(Action):
         setattr(namespace, self.dest, True)
         # Only set loglevel if it has not already explicitly been set
         if not hasattr(namespace, 'loglevel'):
-            namespace.loglevel = 'info'
+            namespace.loglevel = 'INFO'
 
 
 # This makes the old --inject form forwards compatible
@@ -425,9 +425,10 @@ manager_parser.add_argument(
     '-L',
     metavar='LEVEL',
     help='Set the verbosity of the logger. Levels: %(choices)s',
-    choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'],
+    choices=['NONE', 'CRITICAL', 'ERROR', 'WARNING', 'INFO', 'VERBOSE', 'DEBUG', 'TRACE'],
+    type=str.upper,
 )
-manager_parser.set_post_defaults(loglevel='verbose')
+manager_parser.set_post_defaults(loglevel='VERBOSE')
 # This option is already handled above.
 manager_parser.add_argument(
     '--bugreport',
@@ -512,7 +513,7 @@ class CoreArgumentParser(ArgumentParser):
         # The parser for the daemon command
         daemon_parser = self.add_subparser(
             'daemon',
-            parent_defaults={'loglevel': 'info'},
+            parent_defaults={'loglevel': 'INFO'},
             help='run continuously, executing tasks according to schedules defined ' 'in config',
         )
         daemon_parser.add_subparsers(title='actions', metavar='<action>', dest='action')
