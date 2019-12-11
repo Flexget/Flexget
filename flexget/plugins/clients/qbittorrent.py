@@ -47,6 +47,7 @@ class OutputQBitTorrent:
                     'maxdownspeed': {'type': 'integer'},
                     'fail_html': {'type': 'boolean'},
                     'add_paused': {'type': 'boolean'},
+                    'download_in_sequential_order': {'type': 'boolean'},
                 },
                 'additionalProperties': False,
             },
@@ -181,6 +182,10 @@ class OutputQBitTorrent:
             add_paused = entry.get('add_paused', config.get('add_paused'))
             if add_paused:
                 form_data['paused'] = 'true'
+                
+            download_in_sequential_order = entry.get('download_in_sequential_order', config.get('download_in_sequential_order'))
+            if download_in_sequential_order:
+                form_data['sequentialDownload'] = 'true'
 
             maxupspeed = entry.get('maxupspeed', config.get('maxupspeed'))
             if maxupspeed:
