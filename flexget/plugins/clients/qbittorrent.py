@@ -56,14 +56,41 @@ class OutputQBitTorrent:
     def _request(self, method, url, msg_on_fail=None, **kwargs):
         try:
             response = self.session.request(method, url, **kwargs)
-            if response == 'Fails.':
+            if response.text == "Ok.":
+                return response       
+            else:
                 msg = (
                     'Failure. URL: {}, data: {}'.format(url, kwargs)
                     if not msg_on_fail
                     else msg_on_fail
                 )
-            else:
-                return response
+        except RequestException as e:
+            msg = str(e)
+        raise plugin.PluginError(
+            'Error when trying to send request to qBittorrent: {}'.format(msg)
+        )
+        
+    def check_api_version(self, msg_on_fail):
+        try:
+            url = self.url + "/api/v2/app/webapiVersion"
+            response = self.session.request('get', url)
+            if response.status_code != 404:
+                self.api_url_login = '/api/v2/auth/login'
+                self.api_url_add = '/api/v2/torrents/add'
+                return response         
+            
+            url = self.url + "/version/api"
+            response = self.session.request('get', url)
+            if response.status_code != 404:
+                self.api_url_login = '/login'
+                self.api_url_add = '/command/upload'
+                return response         
+            
+            msg = (
+                'Failure. URL: {}'.format(url)
+                if not msg_on_fail
+                else msg_on_fail
+            )
         except RequestException as e:
             msg = str(e)
         raise plugin.PluginError(
@@ -80,11 +107,12 @@ class OutputQBitTorrent:
         self.url = '{}://{}:{}'.format(
             'https' if config['use_ssl'] else 'http', config['host'], config['port']
         )
+        self.check_api_version('Check API version failed.')
         if config.get('username') and config.get('password'):
             data = {'username': config['username'], 'password': config['password']}
             self._request(
                 'post',
-                self.url + '/login',
+                self.url + self.api_url_login,
                 data=data,
                 msg_on_fail='Authentication failed.',
                 verify=config['verify_cert'],
@@ -100,7 +128,7 @@ class OutputQBitTorrent:
             multipart_data['torrents'] = f
             self._request(
                 'post',
-                self.url + '/command/upload',
+                self.url + self.api_url_add,
                 msg_on_fail='Failed to add file to qBittorrent',
                 files=multipart_data,
                 verify=verify_cert,
@@ -114,7 +142,7 @@ class OutputQBitTorrent:
         multipart_data = {k: (None, v) for k, v in data.items()}
         self._request(
             'post',
-            self.url + '/command/download',
+            self.url + self.api_url_add,
             msg_on_fail='Failed to add file to qBittorrent',
             files=multipart_data,
             verify=verify_cert,
