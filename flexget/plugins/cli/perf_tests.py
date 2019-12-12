@@ -1,11 +1,11 @@
-import logging
+from loguru import logger
 
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
 from flexget.terminal import console
 
-log = logging.getLogger('perftests')
+log = logger.bind(name='perftests')
 
 TESTS = ['imdb_query']
 
@@ -38,7 +38,7 @@ def imdb_query(session):
     # query so that we avoid loading whole object (maybe cached?)
     for _, url in session.execute(select([Movie.id, Movie.url])):
         imdb_urls.append(url)
-    log.info('Got %i urls from database' % len(imdb_urls))
+    log.info('Got {} urls from database', len(imdb_urls))
     if not imdb_urls:
         log.info('so .. aborting')
         return
