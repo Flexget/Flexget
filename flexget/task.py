@@ -2,7 +2,6 @@ import contextlib
 import copy
 import inspect
 import itertools
-import logging
 import random
 import string
 import threading
@@ -32,7 +31,7 @@ from flexget.utils.simple_persistence import SimpleTaskPersistence
 from flexget.utils.template import FlexGetTemplate, render_from_task
 from flexget.utils.tools import MergeException, get_config_hash, merge_dict_from_to
 
-log = logging.getLogger('task')
+log = logger.bind(name='task')
 Base = db_schema.versioned_base('feed', 0)
 
 
@@ -59,7 +58,7 @@ def config_changed(task=None, session=None):
 
     :param task: Name of the task. If `None`, will be set for all tasks.
     """
-    log.debug('Marking config for %s as changed.' % (task or 'all tasks'))
+    log.debug('Marking config for {} as changed.', (task or 'all tasks'))
     task_hash = session.query(TaskConfigHash)
     if task:
         task_hash = task_hash.filter(TaskConfigHash.task == task)
@@ -287,7 +286,7 @@ class Task:
         if not self._reruns_locked:
             self._max_reruns = value
         else:
-            log.debug('max_reruns is locked, %s tried to modify it', self.current_plugin)
+            log.debug('max_reruns is locked, {} tried to modify it', self.current_plugin)
 
     def lock_reruns(self):
         """Prevent modification of max_reruns property"""
@@ -383,7 +382,7 @@ class Task:
         if phase not in task_phases:
             raise ValueError('%s is not a valid phase' % phase)
         if phase not in self.disabled_phases:
-            log.debug('Disabling %s phase' % phase)
+            log.debug('Disabling {} phase', phase)
             self.disabled_phases.append(phase)
 
     def abort(self, reason='Unknown', silent=False, traceback=None):
@@ -393,9 +392,9 @@ class Task:
         self.silent_abort = silent
         self.traceback = traceback
         if not self.silent_abort:
-            log.warning('Aborting task (plugin: %s)' % self.current_plugin)
+            log.warning('Aborting task (plugin: {})', self.current_plugin)
         else:
-            log.debug('Aborting task (plugin: %s)' % self.current_plugin)
+            log.debug('Aborting task (plugin: {})', self.current_plugin)
         raise TaskAbort(reason, silent=silent)
 
     def find_entry(self, category='entries', **values):
@@ -461,8 +460,8 @@ class Task:
                             )
                         else:
                             log.warning(
-                                'Task doesn\'t have any %s plugins, you should add (at least) one!'
-                                % phase
+                                'Task doesn\'t have any {} plugins, you should add (at least) one!',
+                                phase,
                             )
 
         for plugin in self.plugins(phase):
@@ -559,7 +558,7 @@ class Task:
             self.abort(msg)
         except Exception as e:
             msg = 'BUG: Unhandled error in plugin %s: %s' % (keyword, e)
-            log.critical(msg)
+            log.opt(exception=True).critical(msg)
             traceback = self.manager.crash_report()
             self.abort(msg, traceback=traceback)
 
@@ -622,10 +621,10 @@ class Task:
     def _execute(self):
         """Executes the task without rerunning."""
         if not self.enabled:
-            log.debug('Not running disabled task %s' % self.name)
+            log.debug('Not running disabled task {}', self.name)
             return
 
-        log.debug('executing %s' % self.name)
+        log.debug('executing {}', self.name)
 
         # Handle keyword args
         if self.options.learn:
@@ -648,14 +647,14 @@ class Task:
                         for plugin in self.plugins(phase):
                             if plugin.name in self.config:
                                 log.info(
-                                    'Plugin %s is not executed in %s phase because the phase is disabled '
+                                    'Plugin {} is not executed in {} phase because the phase is disabled '
                                     '(e.g. --test, --inject)',
                                     plugin.name,
                                     phase,
                                 )
                     continue
                 if phase in ('start', 'prepare') and self.is_rerun:
-                    log.debug('skipping phase %s during rerun', phase)
+                    log.debug('skipping phase {} during rerun', phase)
                 elif phase == 'exit' and self._rerun and self._rerun_count < self.max_reruns:
                     log.debug('not running task_exit yet because task will rerun')
                 else:
@@ -668,7 +667,7 @@ class Task:
             try:
                 self.__run_task_phase('abort')
             except TaskAbort as e:
-                log.exception('abort handlers aborted: %s' % e)
+                log.exception('abort handlers aborted: {}', e)
             raise
         else:
             for entry in self.all_entries:
@@ -710,8 +709,8 @@ class Task:
                     continue
                 elif self._rerun:
                     log.info(
-                        'Task has been re-run %s times already, stopping for now'
-                        % self._rerun_count
+                        'Task has been re-run {} times already, stopping for now',
+                        self._rerun_count,
                     )
                 break
             fire_event('task.execute.completed', self)
@@ -750,7 +749,7 @@ class Task:
                 'Trying to render non string template or unrecognized template format, got %s'
                 % repr(template)
             )
-        log.trace('rendering: %s', template)
+        log.trace('rendering: {}', template)
         return render_from_task(template, self)
 
 

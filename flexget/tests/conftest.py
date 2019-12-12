@@ -13,6 +13,8 @@ import jsonschema
 import pytest
 import requests
 import yaml
+from _pytest.logging import caplog as _caplog
+from loguru import logger
 from vcr import VCR
 from vcr.stubs import VCRHTTPConnection, VCRHTTPSConnection
 
@@ -23,7 +25,7 @@ from flexget.plugin import load_plugins
 from flexget.task import Task, TaskAbort
 from flexget.webserver import User
 
-log = logging.getLogger('tests')
+log = logger.bind(name='tests')
 
 VCR_CASSETTE_DIR = os.path.join(os.path.dirname(__file__), 'cassettes')
 VCR_RECORD_MODE = os.environ.get('VCR_RECORD_MODE', 'once')
@@ -172,6 +174,21 @@ def link_headers(manager):
     return headers
 
 
+# @pytest.fixture
+def caplog(_caplog):
+    """
+    Override caplog so that we can send loguru messages to logging for compatibility.
+    """
+
+    class PropagateHandler(logging.Handler):
+        def emit(self, record):
+            logging.getLogger(record.name).handle(record)
+
+    handler_id = logger.add(PropagateHandler(), format="{message}")
+    yield _caplog
+    logger.remove(handler_id)
+
+
 # --- End Public Fixtures ---
 
 
@@ -292,7 +309,9 @@ def setup_loglevel(pytestconfig, caplog):
 
 
 class CrashReport(Exception):
-    pass
+    def __init__(self, message, crash_log):
+        self.message = message
+        self.crash_log = crash_log
 
 
 class MockManager(Manager):
@@ -336,7 +355,10 @@ class MockManager(Manager):
     def crash_report(self):
         # We don't want to silently swallow crash reports during unit tests
         log.error('Crash Report Traceback:', exc_info=True)
-        raise CrashReport('Crash report created during unit test, check log for traceback.')
+        raise CrashReport(
+            'Crash report created during unit test, check log for traceback.',
+            flexget.logger.debug_buffer,
+        )
 
 
 class APIClient:
