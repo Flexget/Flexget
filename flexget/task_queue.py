@@ -1,14 +1,14 @@
-import logging
 import queue
 import sys
 import threading
 import time
 
+from loguru import logger
 from sqlalchemy.exc import OperationalError, ProgrammingError
 
 from flexget.task import TaskAbort
 
-log = logging.getLogger('task_queue')
+log = logger.bind(name='task_queue')
 
 
 class TaskQueue:
@@ -44,7 +44,7 @@ class TaskQueue:
             try:
                 self.current_task.execute()
             except TaskAbort as e:
-                log.debug('task %s aborted: %r' % (self.current_task.name, e))
+                log.debug('task {} aborted: {!r}', self.current_task.name, e)
             except (ProgrammingError, OperationalError):
                 log.critical('Database error while running a task. Attempting to recover.')
                 self.current_task.manager.crash_report()
@@ -58,8 +58,7 @@ class TaskQueue:
         remaining_jobs = self.run_queue.qsize()
         if remaining_jobs:
             log.warning(
-                'task queue shut down with %s tasks remaining in the queue to run.'
-                % remaining_jobs
+                'task queue shut down with {} tasks remaining in the queue to run.', remaining_jobs
             )
         else:
             log.debug('task queue shut down')
@@ -85,8 +84,8 @@ class TaskQueue:
             self._shutdown_when_finished = True
             if self.run_queue.qsize():
                 log.verbose(
-                    'There are %s tasks to execute. Shutdown will commence when they have completed.'
-                    % self.run_queue.qsize()
+                    'There are {} tasks to execute. Shutdown will commence when they have completed.',
+                    self.run_queue.qsize(),
                 )
         else:
             self._shutdown_now = True

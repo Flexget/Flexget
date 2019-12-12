@@ -1,5 +1,4 @@
 import contextlib
-import logging
 import random
 import string
 import sys
@@ -13,7 +12,7 @@ from terminaltables.terminal_io import terminal_size
 from flexget import terminal
 from flexget.logger import capture_logs
 from flexget.options import get_parser
-from flexget.terminal import console, capture_console
+from flexget.terminal import capture_console, console
 
 log = logger.bind(name='ipc')
 
@@ -69,14 +68,14 @@ class DaemonService(rpyc.Service):
 
     def exposed_handle_cli(self, args):
         args = rpyc.utils.classic.obtain(args)
-        log.verbose('Running command `{}` for client.', ' '.join(args))
+        log.verbose('Running command `{{}}` for client.', ' '.join(args))
         parser = get_parser()
         try:
             options = parser.parse_args(args, file=self.client_out_stream)
         except SystemExit as e:
             if e.code:
                 # TODO: Not sure how to properly propagate the exit code back to client
-                log.debug('Parsing cli args caused system exit with status {}.', e.code)
+                log.debug('Parsing cli args caused system exit with status {{}}.', e.code)
             return
         # Saving original terminal size to restore after monkeypatch
         original_terminal_info = terminal.terminal_info

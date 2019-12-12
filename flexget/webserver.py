@@ -1,5 +1,4 @@
 import hashlib
-import logging
 import random
 import socket
 import threading
@@ -8,13 +7,14 @@ import cherrypy
 import zxcvbn
 from flask import Flask, abort, redirect
 from flask_login import UserMixin
+from loguru import logger
 from sqlalchemy import Column, Integer, Unicode
 from werkzeug.security import generate_password_hash
 
 from flexget.manager import Base
 from flexget.utils.database import with_session
 
-log = logging.getLogger('web_server')
+log = logger.bind(name='web_server')
 
 _home = None
 _app_register = {}
@@ -208,7 +208,7 @@ class WebServer(threading.Thread):
         protocol = 'https' if self.ssl_certificate and self.ssl_private_key else 'http'
 
         log.info(
-            'Web interface available at %s://%s:%s%s', protocol, host, self.port, self.base_url
+            'Web interface available at {}://{}:{}{}', protocol, host, self.port, self.base_url
         )
 
         # Start the CherryPy WSGI web server

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-import logging
 import os
 import sys
 
@@ -7,9 +6,6 @@ import sys
 from ._version import __version__  # noqa
 from flexget import logger
 from flexget.manager import Manager
-
-
-log = logging.getLogger('main')
 
 
 def main(args=None):

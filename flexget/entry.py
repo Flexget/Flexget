@@ -1,12 +1,13 @@
 import copy
 import functools
-import logging
+
+from loguru import logger
 
 from flexget.plugin import PluginError
 from flexget.utils.lazy_dict import LazyDict, LazyLookup
 from flexget.utils.template import FlexGetTemplate, render_from_entry
 
-log = logging.getLogger('entry')
+log = logger.bind(name='entry')
 
 
 class EntryUnicodeError(Exception):
@@ -127,7 +128,7 @@ class Entry(LazyDict):
 
     def accept(self, reason=None, **kwargs):
         if self.rejected:
-            log.debug('tried to accept rejected %r' % self)
+            log.debug('tried to accept rejected {!r}', self)
         elif not self.accepted:
             self._state = 'accepted'
             self.trace(reason, operation='accept')
@@ -138,7 +139,7 @@ class Entry(LazyDict):
         # ignore rejections on immortal entries
         if self.get('immortal'):
             reason_str = '(%s)' % reason if reason else ''
-            log.info('Tried to reject immortal %s %s' % (self['title'], reason_str))
+            log.info('Tried to reject immortal {} {}', self['title'], reason_str)
             self.trace('Tried to reject immortal %s' % reason_str)
             return
         if not self.rejected:
@@ -148,11 +149,11 @@ class Entry(LazyDict):
             self.run_hooks('reject', reason=reason, **kwargs)
 
     def fail(self, reason=None, **kwargs):
-        log.debug('Marking entry \'%s\' as failed' % self['title'])
+        log.debug("Marking entry '{}' as failed", self['title'])
         if not self.failed:
             self._state = 'failed'
             self.trace(reason, operation='fail')
-            log.error('Failed %s (%s)' % (self['title'], reason))
+            log.error('Failed {} ({})', self['title'], reason)
             # Run entry on_fail hooks
             self.run_hooks('fail', reason=reason, **kwargs)
 
@@ -204,9 +205,9 @@ class Entry(LazyDict):
             self.setdefault('original_title', value)
 
         try:
-            log.trace('ENTRY SET: %s = %r' % (key, value))
+            log.trace('ENTRY SET: {} = {!r}', key, value)
         except Exception as e:
-            log.debug('trying to debug key `%s` value threw exception: %s' % (key, e))
+            log.debug('trying to debug key `{}` value threw exception: {}', key, e)
 
         super().__setitem__(key, value)
 
@@ -241,12 +242,14 @@ class Entry(LazyDict):
                 snapshot[field] = copy.deepcopy(value)
             except TypeError:
                 log.warning(
-                    'Unable to take `%s` snapshot for field `%s` in `%s`'
-                    % (name, field, self['title'])
+                    'Unable to take `{}` snapshot for field `{}` in `{}`',
+                    name,
+                    field,
+                    self['title'],
                 )
         if snapshot:
             if name in self.snapshots:
-                log.warning('Snapshot `%s` is being overwritten for `%s`' % (name, self['title']))
+                log.warning('Snapshot `{}` is being overwritten for `{}`', name, self['title'])
             self.snapshots[name] = snapshot
 
     def update_using_map(self, field_map, source_item, ignore_none=False):
@@ -288,7 +291,7 @@ class Entry(LazyDict):
                 'Trying to render non string template or unrecognized template format, got %s'
                 % repr(template)
             )
-        log.trace('rendering: %s', template)
+        log.trace('rendering: {}', template)
         return render_from_entry(template, self, native=native)
 
     def __eq__(self, other):
