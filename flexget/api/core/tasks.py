@@ -472,7 +472,10 @@ class TaskExecutionAPI(APIResource):
                 entries.append(entry)
             options['inject'] = entries
 
-        with capture_console(output), capture_logs(output, level=loglevel):
+        if output:
+            with capture_console(output), capture_logs(output, level=loglevel):
+                executed_tasks = self.manager.execute(options=options)
+        else:
             executed_tasks = self.manager.execute(options=options)
 
         tasks_queued = []
