@@ -18,7 +18,6 @@ class Subtask(object):
 
     schema = {'type': 'string'}
 
-    @cached('subtask')
     def on_task_input(self, task, config):
         subtask_name = config
         subtask_config = task.manager.config['tasks'].get(subtask_name, {})
