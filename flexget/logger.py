@@ -31,28 +31,6 @@ LOG_FORMAT = (
 local_context = threading.local()
 
 
-def get_level_no(level):
-    if not isinstance(level, int):
-        # Cannot use getLevelName here as in 3.4.0 it returns a string.
-        level = level.upper()
-        if level == 'TRACE':
-            level = TRACE
-        elif level == 'VERBOSE':
-            level = VERBOSE
-        else:
-            level = getattr(logging, level)
-
-    return level
-
-
-class SessionFilter(logging.Filter):
-    def __init__(self, session_id):
-        self.session_id = session_id
-
-    def filter(self, record):
-        return getattr(record, 'session_id', None) == self.session_id
-
-
 @contextlib.contextmanager
 def capture_logs(*args, **kwargs):
     """Takes the same arguments as `logger.add`, but this sync will only log messages contained in context."""
@@ -81,23 +59,6 @@ def capture_logs(*args, **kwargs):
 
 def get_log_session_id():
     return getattr(local_context, 'session_id', None)
-
-
-def get_capture_stream():
-    """If output is currently being redirected to a stream, returns that stream."""
-    return getattr(local_context, 'output', None)
-
-
-def get_capture_loglevel():
-    """If output is currently being redirected to a stream, returns declared loglevel for that stream."""
-    return getattr(local_context, 'loglevel', None)
-
-
-class RollingBuffer(collections.deque):
-    """File-like that keeps a certain number of lines of text in memory."""
-
-    def write(self, line):
-        self.append(line)
 
 
 class FlexGetLogger(logging.Logger):
@@ -143,12 +104,8 @@ _logging_configured = False
 _startup_buffer = []
 _startup_buffer_id = None
 _logging_started = False
-# Stores the last 50 debug messages
-debug_buffer = RollingBuffer(maxlen=150)
-
-
-def log_saver(message):
-    _startup_buffer.append(message.record)
+# Stores the last 100 debug messages
+debug_buffer = collections.deque(maxlen=100)
 
 
 def initialize(unit_test=False):
@@ -183,10 +140,18 @@ def initialize(unit_test=False):
 
     # Store any log messages in a buffer until we `start` function is run
     global _startup_buffer_id
-    _startup_buffer_id = logger.add(log_saver, level='DEBUG', format=LOG_FORMAT)
+    _startup_buffer_id = logger.add(
+        lambda message: _startup_buffer.append(message.record), level='DEBUG', format=LOG_FORMAT
+    )
 
-    # Add a handler that sores the last 150 debug lines to `debug_buffer` for use in crash reports
-    logger.add(debug_buffer, level='DEBUG', format=LOG_FORMAT, backtrace=True, diagnose=True)
+    # Add a handler that sores the last 100 debug lines to `debug_buffer` for use in crash reports
+    logger.add(
+        lambda message: debug_buffer.append(message),
+        level='DEBUG',
+        format=LOG_FORMAT,
+        backtrace=True,
+        diagnose=True,
+    )
 
     std_logger = logging.getLogger()
     std_logger.addHandler(InterceptHandler())
@@ -206,7 +171,7 @@ def start(filename=None, level='INFO', to_console=True, to_file=True):
 
     # root logger
     std_logger = logging.getLogger()
-    level = get_level_no(level)
+    level = logging.getLevelName(level)
     std_logger.setLevel(level)
 
     if to_file:
