@@ -6,7 +6,7 @@ import types
 
 from flexget import plugin
 from flexget.utils.lazy_dict import LazyDict, LazyLookup
-from flexget.utils.serialization import BuiltinSerializer, DateSerializer, DateTimeSerializer, Serializable, serialize
+from flexget.utils.serialization import Serializable, serialize, deserialize
 from flexget.utils.template import FlexGetTemplate, render_from_entry
 
 log = logging.getLogger('entry')
@@ -321,7 +321,7 @@ class Entry(LazyDict, Serializable):
     def _deserialize(cls, data, version):
         result = cls()
         for key, value in data.items():
-            result[key] = Serializable.deserialize(value)
+            result[key] = deserialize(value)
         return result
 
     def __eq__(self, other):

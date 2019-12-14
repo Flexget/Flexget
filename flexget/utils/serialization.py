@@ -11,35 +11,40 @@ ISO8601_FMT = '%Y-%m-%dT%H:%M:%SZ'
 def serialize(value):
     """
     Convert an object to JSON serializable format.
-
     """
     if isinstance(value, Serializable):
         return value.serialize()
+    if isinstance(value, list):
+        return [serialize(v) for v in value]
+    if isinstance(value, dict):
+        return {k: serialize(v) for k, v in value.items()}
     if isinstance(value, datetime.datetime):
         return DateTimeSerializer.serialize(value)
     if isinstance(value, datetime.date):
         return DateSerializer.serialize(value)
-    elif isinstance(value, (str, int, float, dict, list)):
-        return BuiltinSerializer.serialize(value)
-    else:
-        raise TypeError('%r is not serializable', value)
+    if isinstance(value, (str, int, float)):
+        return value
+    raise TypeError('%r is not serializable', value)
+
+
+def deserialize(value):
+    if isinstance(value, dict):
+        if all(key in value for key in ('serializer', 'version', 'value')):
+            return _registry()[value['serializer']].deserialize(value)
+        return {k: deserialize(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [deserialize(v) for v in value]
+    return value
 
 
 class Serializable(ABC):
-    _registry = None
-
-    @staticmethod
-    def registry():
-        if Serializable._registry is None:
-            Serializable._registry = {c.serializer_name(): c for c in Serializable.__subclasses__()}
-        return Serializable._registry
-
     @abstractmethod
     def _serialize(self):
-        """Return a plain python datatype which is json serializable."""
+        """This method should be implemented to return a plain python datatype which is json serializable."""
         pass
 
     def serialize(self):
+        """Returns a json serializable form of this class, with all information needed to deserialize."""
         return {
             'serializer': self.serializer_name(),
             'version': self.serializer_version(),
@@ -54,9 +59,7 @@ class Serializable(ABC):
 
     @classmethod
     def deserialize(cls, data):
-        return cls.registry()[data['serializer']]._deserialize(
-            data['value'], data['version']
-        )
+        return cls._deserialize(data['value'], data['version'])
 
     @classmethod
     def serializer_name(cls):
@@ -72,35 +75,6 @@ class Serializable(ABC):
     @classmethod
     def loads(cls, data):
         return cls.deserialize(json.loads(data))
-
-
-class BuiltinSerializer(Serializable):
-    @classmethod
-    def serializer_name(cls):
-        return 'builtin'
-
-    def _serialize(self):
-        pass
-
-    @classmethod
-    def serialize(cls, value):
-        if isinstance(value, list):
-            value = [serialize(i) for i in value]
-        elif isinstance(value, dict):
-            value = {k: serialize(v) for k, v in value.items()}
-        return {
-            'serializer': cls.serializer_name(),
-            'version': cls.serializer_version(),
-            'value': value,
-        }
-
-    @classmethod
-    def _deserialize(cls, data, version):
-        if isinstance(data, list):
-            return [cls.deserialize(i) for i in data]
-        if isinstance(data, dict):
-            return {k: cls.deserialize(v) for k, v in data.items()}
-        return data
 
 
 class DateSerializer(Serializable):
@@ -143,3 +117,13 @@ class DateTimeSerializer(Serializable):
     @classmethod
     def _deserialize(cls, data, version):
         return datetime.datetime.strptime(data, ISO8601_FMT)
+
+
+_registry_cache = None
+
+
+def _registry():
+    global _registry_cache
+    if _registry_cache is None:
+        _registry_cache = {c.serializer_name(): c for c in Serializable.__subclasses__()}
+    return _registry_cache
