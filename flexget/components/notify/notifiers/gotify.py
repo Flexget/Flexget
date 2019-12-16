@@ -67,7 +67,7 @@ class GotifyNotifier(object):
         requests = RequestSession(max_retries=3)
         notification = {'title': title, 'message': body, 'priority': priority}
         if url:
-            notification['url'] = url + '?token=' + token
+            notification['url'] = url
         if destination:
             notification[destination_type] = destination
 
