@@ -4,6 +4,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import logging
 import base64
 import datetime
+import re
 
 from flexget import plugin
 from flexget.event import event
@@ -16,6 +17,12 @@ plugin_name = 'gotify'
 log = logging.getLogger(plugin_name)
 
 requests = RequestSession(max_retries=3)
+
+gotify_url_pattern = {
+    'type': 'string',
+    'pattern': r'^http(s?)\:\/\/.*\/message$',
+    'error_pattern': 'Gotify URL must begin with http(s) and end with `/message`',
+}
 
 class GotifyNotifier(object):
     """
@@ -33,7 +40,7 @@ class GotifyNotifier(object):
     schema = {
         'type': 'object',
         'properties': {
-            'url': {'type': 'string', 'format': 'url'},
+            'url': one_or_more(gotify_url_pattern),
             'token': {'type': 'string'},
             'priority': {'type': 'integer', 'default': 4},  
         },  
