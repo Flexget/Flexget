@@ -4,6 +4,11 @@ from flexget import entry
 from flexget.utils import qualities
 
 
+@entry.register_lazy_func('lazy function', ['lazyfield'])
+def lazy_func(entry):
+    entry['lazyfield'] = 'value a'
+
+
 class TestSerialization:
     def test_entry_serialization(self):
         entry1 = entry.Entry({
@@ -19,8 +24,12 @@ class TestSerialization:
             'nestedlist': [qualities.Quality('1080p')],
             'nesteddict': {'a': datetime.date(1999, 9, 9)},
         })
+        entry1.add_lazy_fields('lazy function')
+        assert entry1.is_lazy('lazyfield')
         serialized = entry1.dumps()
         print(serialized)
         entry2 = entry.Entry.loads(serialized)
         # Use the underlying dict, so we compare all fields
-        assert entry1.store == entry2.store
+        assert entry2.is_lazy('lazyfield')
+        assert dict(entry1) == dict(entry2)
+        assert entry2['lazyfield'] == 'value a'

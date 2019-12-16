@@ -44,6 +44,7 @@ class Entry(LazyDict, Serializable):
         self._state = 'undecided'
         self._hooks = {'accept': [], 'reject': [], 'fail': [], 'complete': []}
         self.task = None
+        self.lazy_lookups = []
 
         if len(args) == 2:
             kwargs['title'] = args[0]
@@ -295,13 +296,20 @@ class Entry(LazyDict, Serializable):
         return render_from_entry(template, self, native=native)
 
     def _serialize(self):
-        result = {}
+        fields = {}
         for key in self:
-            # TODO: Handle lazy fields
-            self.get(key)
             if self.is_lazy(key):
                 continue
-            result[key] = serialize(self[key])
+            fields[key] = serialize(self[key])
+        return {'fields': fields, 'lazy_lookups': self.lazy_lookups}
+
+    @classmethod
+    def _deserialize(cls, data, version):
+        result = cls()
+        for key, value in data['fields'].items():
+            result[key] = deserialize(value)
+        for lazy_lookup in data['lazy_lookups']:
+            result.add_lazy_fields(lazy_lookup)
         return result
 
     def add_lazy_fields(self, lazy_func_name):
@@ -311,18 +319,12 @@ class Entry(LazyDict, Serializable):
         """
         func = lazy_func_registry[lazy_func_name]
         super().register_lazy_func(func.function, func.fields)
+        self.lazy_lookups.append(lazy_func_name)
 
     def register_lazy_func(self, func, keys):
         # TODO: This should not be called on entries directly, `add_lazy_fields` should be used instead.
         # Add some enforcement on this once we convert plugins
         super().register_lazy_func(func, keys)
-
-    @classmethod
-    def _deserialize(cls, data, version):
-        result = cls()
-        for key, value in data.items():
-            result[key] = deserialize(value)
-        return result
 
     def __eq__(self, other):
         return self.get('original_title') == other.get('original_title') and self.get(
