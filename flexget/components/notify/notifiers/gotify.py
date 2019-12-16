@@ -31,21 +31,27 @@ class GotifyNotifier(object):
     Configuration parameters are also supported from entries (eg. through set).
     """
     schema = {
-          'type': 'object',
-          'properties': {
-                'oneOf': [
-                    {'url': {'type': 'string', 'format': 'url'}},
-                    {'token': {'type': 'string'}},
-                    {'priority': {'type': 'integer', 'default': 4}},
-                ],  
-            },
-          'required': [
-              'token',
-              'url',
-          ],
-        'error_oneOf': 'One (and only one) of `url` or `priority` are allowed.',
+        'type': 'object',
+        'properties': {
+            'url': {'type': 'string', 'format': 'url'},
+            'token': {'type': 'string'},
+            'priority': {'type': 'integer', 'default': 4},  
+        },  
+        'required': [
+            'token',
+            'url',
+        ],
+        'anyOf': [
+         {
+             'oneOf': [{'required': ['url']}],
+             'oneOf': [{'required': ['token']}],
+             'oneOf': [{'required': ['priority']}],
+             },
+        ],
+        'error_oneOf': 'One (and only one) of `url`, `token` or `priority` are allowed.',
         'additionalProperties': False,
-      }
+    }
+
 
     def notify(self, title, message, config):
         """
