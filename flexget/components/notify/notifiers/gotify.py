@@ -45,13 +45,6 @@ class GotifyNotifier(object):
             'token',
             'url',
         ],
-        'anyOf': [
-         {
-             'oneOf': [{'required': ['url']}],
-             'oneOf': [{'required': ['token']}],
-             'oneOf': [{'required': ['priority']}],
-             },
-        ],
         'error_oneOf': 'One (and only one) of `url`, `token` or `priority` are allowed.',
         'additionalProperties': False,
     }
