@@ -45,7 +45,6 @@ class GotifyNotifier(object):
             'token',
             'url',
         ],
-        'error_oneOf': 'One (and only one) of `url`, `token` or `priority` are allowed.',
         'additionalProperties': False,
     }
 
