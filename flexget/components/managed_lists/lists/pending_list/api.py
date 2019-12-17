@@ -285,7 +285,7 @@ class PendingListEntriesBatchAPI(APIResource):
     @api.response(201, model=pending_lists_entries_return_schema)
     @api.response(204)
     @api.validate(model=pending_list_batch_schema)
-    @api.doc(description='Approve, rejct, or remove multiple entries')
+    @api.doc(description='Approve, reject, or remove multiple entries')
     def post(self, list_id, session=None):
         """Perform operations on multiple entries"""
         data = request.json
