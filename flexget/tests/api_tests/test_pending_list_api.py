@@ -167,6 +167,82 @@ class TestPendingListAPI:
         errors = schema_match(OC.pending_list_entry_base_object, data)
         assert not errors
 
+    def test_pending_list_entries_batch(self, api_client, schema_match):
+        payload = {'name': 'test_list'}
+
+        # Create list
+        api_client.json_post('/pending_list/', data=json.dumps(payload))
+
+        # Add 3 entries to list
+        for i in range(3):
+            payload = {'title': 'title %d' % i, 'original_url': 'http://%dtest.com' % i}
+            rsp = api_client.json_post('/pending_list/1/entries/', data=json.dumps(payload))
+            assert rsp.status_code == 201
+
+        payload = {'operation': 'approve', 'ids': [1, 2, 3]}
+
+        # Approve several entries
+        rsp = api_client.json_post('/pending_list/1/entries/batch/', data=json.dumps(payload))
+        assert rsp.status_code == 201
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.pending_lists_entries_return_object, data)
+        assert not errors
+        assert len(data) == 3
+
+        for item in data:
+            assert item.get('approved')
+
+        # get entries is correct
+        rsp = api_client.get('/pending_list/1/entries/')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.pending_lists_entries_return_object, data)
+        assert not errors
+        assert len(data) == 3
+
+        for item in data:
+            assert item.get('approved')
+
+        payload['operation'] = 'reject'
+
+        # reject several entries
+        rsp = api_client.json_post('pending_list/1/entries/batch', data=json.dumps(payload))
+        assert rsp.status_code == 201
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.pending_lists_entries_return_object, data)
+        assert not errors
+        assert len(data) == 3
+
+        for item in data:
+            assert not item.get('approved')
+
+        rsp = api_client.get('/pending_list/1/entries/')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.pending_lists_entries_return_object, data)
+        assert not errors
+        assert len(data) == 3
+
+        for item in data:
+            assert not item.get('approved')
+
+        payload['operation'] = 'remove'
+
+        rsp = api_client.json_post('pending_list/1/entries/batch', data=json.dumps(payload))
+        assert rsp.status_code == 204
+
+        rsp = api_client.get('/pending_list/1/entries/')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.pending_lists_entries_return_object, data)
+        assert not errors
+        assert len(data) == 0
+
     def test_pending_list_entry(self, api_client, schema_match):
         payload = {'name': 'test_list'}
 

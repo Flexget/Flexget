@@ -114,6 +114,7 @@ def get_entries_by_list_id(
     descending=False,
     approved=False,
     filter=None,
+    entry_ids=None,
     session=None,
 ):
     log.debug('querying entries from pending list with id %d', list_id)
@@ -122,6 +123,8 @@ def get_entries_by_list_id(
         query = query.filter(func.lower(PendingListEntry.title).contains(filter.lower()))
     if approved:
         query = query.filter(PendingListEntry.approved is approved)
+    if entry_ids:
+        query = query.filter(PendingListEntry.id.in_(entry_ids))
     if descending:
         query = query.order_by(getattr(PendingListEntry, order_by).desc())
     else:

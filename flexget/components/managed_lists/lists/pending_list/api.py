@@ -32,6 +32,7 @@ class ObjectsContainer:
             'added_on': {'type': 'string'},
         },
     }
+
     pending_list_input_object = copy.deepcopy(pending_list_base_object)
     del pending_list_input_object['properties']['id']
     del pending_list_input_object['properties']['added_on']
@@ -69,6 +70,16 @@ class ObjectsContainer:
         'additionalProperties': False,
     }
 
+    batch_object = {
+        'type': 'object',
+        'properties': {
+            'operation': {'type': 'string', 'enum': ['approve', 'reject', 'remove']},
+            'ids': {'type': 'array', 'items': {'type': 'integer'}},
+        },
+        'required': ['operation', 'ids'],
+        'additionalProperties': False,
+    }
+
     pending_lists_entries_return_object = {
         'type': 'array',
         'items': pending_list_entry_base_object,
@@ -86,6 +97,9 @@ pending_list_return_lists_schema = api.schema_model(
 )
 pending_list_operation_schema = api.schema_model(
     'pending_list.operation_schema', ObjectsContainer.operation_object
+)
+pending_list_batch_schema = api.schema_model(
+    'pending_List.batch_object', ObjectsContainer.batch_object
 )
 
 list_parser = api.parser()
@@ -261,6 +275,41 @@ class PendingListEntriesAPI(APIResource):
         session.commit()
         response = jsonify(entry_object.to_dict())
         response.status_code = 201
+        return response
+
+
+@pending_list_api.route('/<int:list_id>/entries/batch')
+@api.doc(params={'list_id': 'ID of the list'})
+@api.response(NotFoundError)
+class PendingListEntriesBatchAPI(APIResource):
+    @api.response(201, model=pending_lists_entries_return_schema)
+    @api.response(204)
+    @api.validate(model=pending_list_batch_schema)
+    @api.doc(description='Approve, rejct, or remove multiple entries')
+    def post(self, list_id, session=None):
+        """Perform operations on multiple entries"""
+        data = request.json
+        entry_ids = data.get('ids')
+        operation = data.get('operation')
+        try:
+            entries = db.get_entries_by_list_id(list_id, entry_ids=entry_ids, session=session)
+        except NoResultFound:
+            raise NotFoundError('could not find entries in list %d' % list_id)
+
+        response = None
+        if operation == 'remove':
+            for entry in entries:
+                session.delete(entry)
+            response = jsonify([])
+            response.status_code = 204
+        else:
+            approved = operation == 'approve'
+            for entry in entries:
+                entry.approved = approved
+            response = jsonify([entry.to_dict() for entry in entries])
+            response.status_code = 201
+
+        session.commit()
         return response
 
 
