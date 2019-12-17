@@ -32,6 +32,7 @@ class ObjectsContainer:
             'added_on': {'type': 'string'},
         },
     }
+
     pending_list_input_object = copy.deepcopy(pending_list_base_object)
     del pending_list_input_object['properties']['id']
     del pending_list_input_object['properties']['added_on']
@@ -69,6 +70,30 @@ class ObjectsContainer:
         'additionalProperties': False,
     }
 
+    batch_ids = {
+        'type': 'array',
+        'items': {'type': 'integer'},
+        'uniqueItems': True,
+        'minItems': 1,
+    }
+
+    batch_operation_object = {
+        'type': 'object',
+        'properties': {
+            'operation': {'type': 'string', 'enum': ['approve', 'reject']},
+            'ids': batch_ids,
+        },
+        'required': ['operation', 'ids'],
+        'additionalProperties': False,
+    }
+
+    batch_remove_object = {
+        'type': 'object',
+        'properties': {'ids': batch_ids},
+        'required': ['ids'],
+        'additionalProperties': False,
+    }
+
     pending_lists_entries_return_object = {
         'type': 'array',
         'items': pending_list_entry_base_object,
@@ -86,6 +111,13 @@ pending_list_return_lists_schema = api.schema_model(
 )
 pending_list_operation_schema = api.schema_model(
     'pending_list.operation_schema', ObjectsContainer.operation_object
+)
+pending_list_batch_operation_schema = api.schema_model(
+    'pending_list.batch_operation_object', ObjectsContainer.batch_operation_object
+)
+
+pending_list_batch_remove_schema = api.schema_model(
+    'pending_list.batch_remove_object', ObjectsContainer.batch_remove_object
 )
 
 list_parser = api.parser()
@@ -261,6 +293,53 @@ class PendingListEntriesAPI(APIResource):
         session.commit()
         response = jsonify(entry_object.to_dict())
         response.status_code = 201
+        return response
+
+
+@pending_list_api.route('/<int:list_id>/entries/batch')
+@api.doc(params={'list_id': 'ID of the list'})
+@api.response(NotFoundError)
+class PendingListEntriesBatchAPI(APIResource):
+    @api.response(201, model=pending_lists_entries_return_schema)
+    @api.validate(model=pending_list_batch_operation_schema)
+    @api.doc(description='Approve and reject multiple entries')
+    def put(self, list_id, session=None):
+        """Perform operations on multiple entries"""
+        data = request.json
+        entry_ids = data.get('ids')
+        operation = data.get('operation')
+        try:
+            entries = db.get_entries_by_list_id(list_id, entry_ids=entry_ids, session=session)
+        except NoResultFound:
+            raise NotFoundError(f'could not find entries in list {list_id}')
+
+        approved = operation == 'approve'
+        for entry in entries:
+            entry.approved = approved
+        response = jsonify([entry.to_dict() for entry in entries])
+        response.status_code = 201
+
+        session.commit()
+        return response
+
+    @api.response(204)
+    @api.validate(model=pending_list_batch_remove_schema)
+    @api.doc(description='Remove multiple entries')
+    def delete(self, list_id, session=None):
+        """Remove multiple entries"""
+        data = request.json
+        entry_ids = data.get('ids')
+        try:
+            entries = db.get_entries_by_list_id(list_id, entry_ids=entry_ids, session=session)
+        except NoResultFound:
+            raise NotFoundError(f'could not find entries in list {list_id}')
+
+        for entry in entries:
+            session.delete(entry)
+        session.commit()
+        response = jsonify([])
+        response.status_code = 204
+
         return response
 
 
