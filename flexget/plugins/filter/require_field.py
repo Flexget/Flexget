@@ -1,10 +1,10 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 
-log = logging.getLogger('require_field')
+logger = logger.bind(name='require_field')
 
 
 class FilterRequireField:

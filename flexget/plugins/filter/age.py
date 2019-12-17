@@ -1,13 +1,13 @@
-import logging
 from datetime import datetime
 
 from dateutil.parser import parse as dateutil_parse
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.tools import parse_timedelta
 
-log = logging.getLogger('age')
+logger = logger.bind(name='age')
 
 
 class Age:
@@ -50,13 +50,13 @@ class Age:
                 try:
                     field_date = dateutil_parse(entry[field])
                 except ValueError:
-                    log.warning(
-                        'Entry %s ignored: %s is not a valid date', entry['title'], field_value
+                    logger.warning(
+                        'Entry {} ignored: {} is not a valid date', entry['title'], field_value
                     )
                     continue
             else:
-                log.warning(
-                    'Entry %s ignored: %s is not a valid date', entry['title'], field_value
+                logger.warning(
+                    'Entry {} ignored: {} is not a valid date', entry['title'], field_value
                 )
                 continue
 
@@ -68,8 +68,8 @@ class Age:
                     entry.accept(info_string)
                 else:
                     entry.reject(info_string)
-                log.debug(
-                    'Entry %s was %sed because date in field `%s` is older than %s',
+                logger.debug(
+                    'Entry {} was {}ed because date in field `{}` is older than {}',
                     entry['title'],
                     config['action'],
                     field,

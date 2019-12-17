@@ -1,11 +1,12 @@
-import logging
 from fnmatch import fnmatch
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 
-log = logging.getLogger('content_filter')
+logger = logger.bind(name='content_filter')
 
 
 class FilterContentFilter:
@@ -50,7 +51,7 @@ class FilterContentFilter:
         """
         if 'content_files' in entry:
             files = entry['content_files']
-            log.debug('%s files: %s' % (entry['title'], files))
+            logger.debug('{} files: {}', entry['title'], files)
 
             def matching_mask(files, masks):
                 """Returns matching mask if any files match any of the masks, false otherwise"""
@@ -64,9 +65,9 @@ class FilterContentFilter:
             # download plugin has already printed a downloading message.
             if config.get('require'):
                 if not matching_mask(files, config['require']):
-                    log.info(
-                        'Entry %s does not have any of the required filetypes, rejecting'
-                        % entry['title']
+                    logger.info(
+                        'Entry {} does not have any of the required filetypes, rejecting',
+                        entry['title'],
                     )
                     entry.reject('does not have any of the required filetypes', remember=True)
                     return True
@@ -75,16 +76,16 @@ class FilterContentFilter:
                 if not all(
                     any(fnmatch(file, mask) for file in files) for mask in config['require_all']
                 ):
-                    log.info(
-                        'Entry %s does not have all of the required filetypes, rejecting'
-                        % entry['title']
+                    logger.info(
+                        'Entry {} does not have all of the required filetypes, rejecting',
+                        entry['title'],
                     )
                     entry.reject('does not have all of the required filetypes', remember=True)
                     return True
             if config.get('reject'):
                 mask = matching_mask(files, config['reject'])
                 if mask:
-                    log.info('Entry %s has banned file %s, rejecting' % (entry['title'], mask))
+                    logger.info('Entry {} has banned file {}, rejecting', entry['title'], mask)
                     entry.reject('has banned file %s' % mask, remember=True)
                     return True
             if config.get('require_mainfile') and len(files) > 1:
@@ -93,14 +94,14 @@ class FilterContentFilter:
                     if not best or f['size'] > best:
                         best = f['size']
                 if (100 * float(best) / float(entry['torrent'].size)) < 90:
-                    log.info('Entry %s does not have a main file, rejecting' % (entry['title']))
+                    logger.info('Entry {} does not have a main file, rejecting', entry['title'])
                     entry.reject('does not have a main file', remember=True)
                     return True
 
     @plugin.priority(150)
     def on_task_modify(self, task, config):
         if task.options.test or task.options.learn:
-            log.info(
+            logger.info(
                 'Plugin is partially disabled with --test and --learn '
                 'because content filename information may not be available'
             )

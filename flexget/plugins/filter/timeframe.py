@@ -1,6 +1,6 @@
-import logging
 from datetime import datetime
 
+from loguru import logger
 from sqlalchemy import Column, DateTime, Integer, String, Unicode
 
 from flexget import db_schema, plugin
@@ -11,7 +11,7 @@ from flexget.utils import qualities
 from flexget.utils.database import quality_property
 from flexget.utils.tools import group_entries, parse_timedelta
 
-log = logging.getLogger('timeframe')
+logger = logger.bind(name='timeframe')
 
 Base = db_schema.versioned_base('upgrade', 0)
 
@@ -98,8 +98,8 @@ class FilterTimeFrame:
                     session.add(id_timeframe)
 
                 if id_timeframe.status == 'accepted':
-                    log.debug(
-                        'Previously accepted %s with %s skipping', identifier, id_timeframe.title
+                    logger.debug(
+                        'Previously accepted {} with {} skipping', identifier, id_timeframe.title
                     )
                     continue
 
@@ -107,7 +107,7 @@ class FilterTimeFrame:
                 entries.sort(key=lambda e: (e['quality'], e.get('proper_count', 0)), reverse=True)
                 best_entry = entries[0]
 
-                log.debug('Current best for identifier %s is %s', identifier, best_entry['title'])
+                logger.debug('Current best for identifier {} is {}', identifier, best_entry['title'])
 
                 id_timeframe.title = best_entry['title']
                 id_timeframe.quality = best_entry['quality']
@@ -120,9 +120,10 @@ class FilterTimeFrame:
                     target_requirement.allows(best_entry['quality'])
                     or best_entry['quality'] >= target_quality
                 ):
-                    log.debug(
-                        'timeframe reach target quality %s or higher for %s'
-                        % (target_quality, identifier)
+                    logger.debug(
+                        'timeframe reach target quality {} or higher for {}',
+                        target_quality,
+                        identifier,
                     )
                     if action_on_reached:
                         action_on_reached(best_entry, 'timeframe reached target quality or higher')
@@ -131,8 +132,8 @@ class FilterTimeFrame:
                 # Check if passed wait time
                 expires = id_timeframe.first_seen + parse_timedelta(config['wait'])
                 if expires <= datetime.now():
-                    log.debug(
-                        'timeframe expired, releasing quality restriction for %s' % identifier
+                    logger.debug(
+                        'timeframe expired, releasing quality restriction for {}', identifier
                     )
                     if action_on_reached:
                         action_on_reached(best_entry, 'timeframe wait expired')
@@ -147,8 +148,8 @@ class FilterTimeFrame:
                 hours += diff.days * 24
                 minutes, _ = divmod(remainder, 60)
 
-                log.info(
-                    '`%s`: timeframe waiting for %02dh:%02dmin. Currently best is `%s`.',
+                logger.info(
+                    '`{}`: timeframe waiting for {:02d}h:{:02d}min. Currently best is `{}`.',
                     identifier,
                     hours,
                     minutes,
