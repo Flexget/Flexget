@@ -20,7 +20,7 @@ from flexget.webserver import User
 
 from . import __path__
 
-__version__ = '1.5.0'
+__version__ = '1.6.0'
 
 log = logging.getLogger('api')
 
