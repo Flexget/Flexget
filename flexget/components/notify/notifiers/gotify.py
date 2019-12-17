@@ -89,10 +89,7 @@ class GotifyNotifier(object):
                     message = 'Invalid Gotify access token'
                 elif e.response.status_code == 404:
                     url_format = 'https://push.example.com/message'
-                    message = f"{
-                        'Invalid Gotify URL, please verify that the URL matches the format: %s'
-                        % url_format
-                    }"
+                    message = f"{Invalid Gotify URL, please verify that the URL matches the format: {url_format}"
                 else:
                   message = e.response.json()['error']['message']
             else:
