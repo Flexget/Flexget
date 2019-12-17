@@ -34,7 +34,7 @@ class LazyLookup:
             try:
                 func(self.store)
             except PluginError as e:
-                e.log.info(e)
+                e.logger.info(e)
             except Exception as e:
                 log.error('Unhandled error in lazy lookup plugin: %s', e)
                 from flexget.manager import manager

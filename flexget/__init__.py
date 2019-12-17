@@ -4,7 +4,7 @@ import sys
 
 # __version__ import need to be first in order to avoid circular import within logger
 from ._version import __version__  # noqa
-from flexget import logger
+from flexget import log
 from flexget.manager import Manager
 
 
@@ -12,7 +12,7 @@ def main(args=None):
     """Main entry point for Command Line Interface"""
 
     try:
-        logger.initialize()
+        log.initialize()
 
         try:
             manager = Manager(args)

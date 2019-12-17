@@ -21,7 +21,7 @@ from flexget.api.app import (
 from flexget.config_schema import process_config
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.logger import capture_logs
+from flexget.log import capture_logs
 from flexget.options import get_parser
 from flexget.task import task_phases
 from flexget.terminal import capture_console

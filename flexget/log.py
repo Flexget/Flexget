@@ -24,10 +24,10 @@ ENV_MAXCOUNT = 'FLEXGET_LOG_MAXCOUNT'
 
 LOG_FORMAT = (
     '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> <level>{level: <8}</level> '
-    '<cyan>{extra[name]: <13}</cyan> {extra[task]: <15} <level>{message}</level>'
+    '<cyan>{name: <13}</cyan> {extra[task]: <15} <level>{message}</level>'
 )
 
-# Stores `task`, logging `session_id`, and redirected `output` stream in a thread local context
+# Stores current `session_id` to keep track of originating thread for log calls
 local_context = threading.local()
 
 
@@ -74,11 +74,10 @@ class FlexGetLogger(logging.Logger):
 
 
 def record_patcher(record):
-    if 'name' not in record['extra']:
-        name = record['name']
-        if name.startswith('flexget'):
-            name = name.split('.')[-1]
-        record['extra']['name'] = name
+    # If a custom name was bound to the logger, move it from extra directly into the record
+    name = record['extra'].pop('name', None)
+    if name:
+        record['name'] = name
 
 
 class InterceptHandler(logging.Handler):
@@ -111,6 +110,7 @@ debug_buffer = collections.deque(maxlen=100)
 def initialize(unit_test=False):
     """Prepare logging.
     """
+    # Remove default loguru sinks
     logger.remove()
     global _logging_configured, _logging_started, _buff_handler
 

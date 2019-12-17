@@ -11,11 +11,11 @@ from rpyc.utils.server import ThreadedServer
 from terminaltables.terminal_io import terminal_size
 
 from flexget import terminal
-from flexget.logger import capture_logs
+from flexget.log import capture_logs
 from flexget.options import get_parser
 from flexget.terminal import capture_console, console
 
-log = logger.bind(name='ipc')
+logger = logger.bind(name='ipc')
 
 # Allow some attributes from dict interface to be called over the wire
 rpyc.core.protocol.DEFAULT_CONFIG['safe_attrs'].update(['items'])
@@ -51,7 +51,7 @@ class RemoteStream:
             self.writer(self.buffer, end='')
         except EOFError:
             self.writer = None
-            log.error('Client ended connection while still streaming output.')
+            logger.error('Client ended connection while still streaming output.')
         finally:
             self.buffer = ''
 
@@ -69,14 +69,14 @@ class DaemonService(rpyc.Service):
 
     def exposed_handle_cli(self, args):
         args = rpyc.utils.classic.obtain(args)
-        log.verbose('Running command `{{}}` for client.', ' '.join(args))
+        logger.verbose('Running command `{{}}` for client.', ' '.join(args))
         parser = get_parser()
         try:
             options = parser.parse_args(args, file=self.client_out_stream)
         except SystemExit as e:
             if e.code:
                 # TODO: Not sure how to properly propagate the exit code back to client
-                log.debug('Parsing cli args caused system exit with status {{}}.', e.code)
+                logger.debug('Parsing cli args caused system exit with status {{}}.', e.code)
             return
         # Saving original terminal size to restore after monkeypatch
         original_terminal_info = terminal.terminal_info

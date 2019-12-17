@@ -11,7 +11,7 @@ from flexget.utils.database import with_session
 from flexget.utils.sqlalchemy_utils import table_schema
 from flexget.utils.tools import get_current_flexget_version
 
-log = logger.bind(name='schema')
+logger = logger.bind(name='schema')
 
 # Stores a mapping of {plugin: {'version': version, 'tables': ['table_names'])}
 plugin_schemas = {}
@@ -32,15 +32,15 @@ def set_flexget_db_version(manager=None):
     with Session() as session:
         db_version = session.query(FlexgetVersion).first()
         if not db_version:
-            log.debug('entering flexget version {} to db', get_current_flexget_version())
+            logger.debug('entering flexget version {} to db', get_current_flexget_version())
             session.add(FlexgetVersion())
         elif db_version.version != get_current_flexget_version():
-            log.debug('updating flexget version {} in db', get_current_flexget_version())
+            logger.debug('updating flexget version {} in db', get_current_flexget_version())
             db_version.version = get_current_flexget_version()
             db_version.created = datetime.now()
             session.commit()
         else:
-            log.debug('current flexget version already exist in db {}', db_version.version)
+            logger.debug('current flexget version already exist in db {}', db_version.version)
 
 
 def get_flexget_db_version():
@@ -69,7 +69,7 @@ class PluginSchema(Base):
 def get_version(plugin, session=None):
     schema = session.query(PluginSchema).filter(PluginSchema.plugin == plugin).first()
     if not schema:
-        log.debug('No schema version stored for {}', plugin)
+        logger.debug('No schema version stored for {}', plugin)
         return None
     else:
         return schema.version
@@ -89,14 +89,14 @@ def set_version(plugin, version, session=None):
         )
     schema = session.query(PluginSchema).filter(PluginSchema.plugin == plugin).first()
     if not schema:
-        log.debug('Initializing plugin %s schema version to %i' % (plugin, version))
+        logger.debug('Initializing plugin {} schema version to {}', plugin, version)
         schema = PluginSchema(plugin, version)
         session.add(schema)
     else:
         if version < schema.version:
-            raise ValueError('Tried to set plugin %s schema version to lower value' % plugin)
+            raise ValueError('Tried to set plugin {} schema version to lower value', plugin)
         if version != schema.version:
-            log.debug('Updating plugin %s schema version to %i' % (plugin, version))
+            logger.debug('Updating plugin {} schema version to {}', plugin, version)
             schema.version = version
     session.commit()
 
@@ -151,24 +151,24 @@ def upgrade(plugin):
                 try:
                     new_ver = upgrade_func(current_ver, session)
                 except UpgradeImpossible:
-                    log.info(
+                    logger.info(
                         'Plugin {} database is not upgradable. Flushing data and regenerating.',
                         plugin,
                     )
                     reset_schema(plugin, session=session)
                     manager.db_upgraded = True
                 except Exception as e:
-                    log.exception('Failed to upgrade database for plugin {}: {}', plugin, e)
+                    logger.exception('Failed to upgrade database for plugin {}: {}', plugin, e)
                     session.rollback()
                     manager.shutdown(finish_queue=False)
                 else:
                     current_ver = -1 if current_ver is None else current_ver
                     if new_ver > current_ver:
-                        log.info('Plugin `{}` schema upgraded successfully', plugin)
+                        logger.info('Plugin `{}` schema upgraded successfully', plugin)
                         set_version(plugin, new_ver, session=session)
                         manager.db_upgraded = True
                     elif new_ver < current_ver:
-                        log.critical(
+                        logger.critical(
                             'A lower schema version was returned ({}) from plugin '
                             '{} upgrade function than passed in ({})',
                             new_ver,
