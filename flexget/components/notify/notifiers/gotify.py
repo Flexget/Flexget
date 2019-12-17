@@ -76,11 +76,6 @@ class GotifyNotifier(object):
             notification[destination_type] = destination
 
         # Make the request
-        headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'User-Agent': 'Flexget',
-        }
         try:
             response = requests.post(url, headers=headers, json=notification)
         except RequestException as e:
