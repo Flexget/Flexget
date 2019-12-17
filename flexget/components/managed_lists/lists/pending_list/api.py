@@ -74,7 +74,12 @@ class ObjectsContainer:
         'type': 'object',
         'properties': {
             'operation': {'type': 'string', 'enum': ['approve', 'reject', 'remove']},
-            'ids': {'type': 'array', 'items': {'type': 'integer'}},
+            'ids': {
+                'type': 'array',
+                'items': {'type': 'integer'},
+                'uniqueItems': True,
+                'minItems': 1,
+            },
         },
         'required': ['operation', 'ids'],
         'additionalProperties': False,
@@ -99,7 +104,7 @@ pending_list_operation_schema = api.schema_model(
     'pending_list.operation_schema', ObjectsContainer.operation_object
 )
 pending_list_batch_schema = api.schema_model(
-    'pending_List.batch_object', ObjectsContainer.batch_object
+    'pending_list.batch_object', ObjectsContainer.batch_object
 )
 
 list_parser = api.parser()
@@ -294,7 +299,7 @@ class PendingListEntriesBatchAPI(APIResource):
         try:
             entries = db.get_entries_by_list_id(list_id, entry_ids=entry_ids, session=session)
         except NoResultFound:
-            raise NotFoundError('could not find entries in list %d' % list_id)
+            raise NotFoundError(f'could not find entries in list {list_id}')
 
         response = None
         if operation == 'remove':

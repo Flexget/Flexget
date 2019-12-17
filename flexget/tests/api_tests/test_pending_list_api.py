@@ -175,7 +175,7 @@ class TestPendingListAPI:
 
         # Add 3 entries to list
         for i in range(3):
-            payload = {'title': 'title %d' % i, 'original_url': 'http://%dtest.com' % i}
+            payload = {'title': f'title {i}', 'original_url': f'http://{i}test.com'}
             rsp = api_client.json_post('/pending_list/1/entries/', data=json.dumps(payload))
             assert rsp.status_code == 201
 
@@ -241,7 +241,7 @@ class TestPendingListAPI:
 
         errors = schema_match(OC.pending_lists_entries_return_object, data)
         assert not errors
-        assert len(data) == 0
+        assert not data
 
     def test_pending_list_entry(self, api_client, schema_match):
         payload = {'name': 'test_list'}
