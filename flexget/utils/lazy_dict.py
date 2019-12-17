@@ -1,7 +1,8 @@
-import logging
 from collections.abc import MutableMapping
 
-log = logging.getLogger('lazy_lookup')
+from loguru import logger
+
+logger = logger.bind(name='lazy_lookup')
 
 
 class LazyLookup:
@@ -36,13 +37,13 @@ class LazyLookup:
             except PluginError as e:
                 e.logger.info(e)
             except Exception as e:
-                log.error('Unhandled error in lazy lookup plugin: %s', e)
+                logger.error('Unhandled error in lazy lookup plugin: {}', e)
                 from flexget.manager import manager
 
                 if manager:
                     manager.crash_report()
                 else:
-                    log.debug('Traceback', exc_info=True)
+                    logger.opt(exception=True).debug('Traceback')
         return self.store[key]
 
     def __repr__(self):

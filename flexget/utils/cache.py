@@ -3,8 +3,9 @@ import io
 import os
 
 import requests
+from loguru import logger
 
-from flexget.utils.tools import log
+logger = logger.bind(name='utils.cache')
 
 
 # TODO refactor this to use lru_cache
@@ -25,7 +26,7 @@ def cached_resource(url, base_dir, force=False, max_size=250, directory='cached_
     directory = os.path.dirname(file_path)
 
     if not os.path.exists(file_path) or force:
-        log.debug('caching %s', url)
+        logger.debug('caching {}', url)
         response = requests.get(url)
         response.raise_for_status()
         mime_type = response.headers.get('content-type')
@@ -37,8 +38,8 @@ def cached_resource(url, base_dir, force=False, max_size=250, directory='cached_
         size = dir_size(directory) / (1024 * 1024.0)
         if not force:
             while size >= max_size:
-                log.debug(
-                    'directory %s size is over the allowed limit of %s, trimming', size, max_size
+                logger.debug(
+                    'directory {} size is over the allowed limit of {}, trimming', size, max_size
                 )
                 trim_dir(directory)
                 size = dir_size(directory) / (1024 * 1024.0)
@@ -74,5 +75,5 @@ def trim_dir(directory):
 
     files = sorted(os.listdir(directory), key=access_time)
     file_name = os.path.join(directory, files[0])
-    log.debug('removing least accessed file: %s', file_name)
+    logger.debug('removing least accessed file: {}', file_name)
     os.remove(file_name)
