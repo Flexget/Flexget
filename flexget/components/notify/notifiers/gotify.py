@@ -63,7 +63,7 @@ class GotifyNotifier(object):
         """
         priority = config.get('priority')      
         token = config.get('token')
-        url = config.get('url') + '?token=' + token
+        url = f"{config.get('url') + '?token=' + token}"
         self.send_push(token, title, message, priority, url)
 
     def send_push(self, token, title, body, priority, url=None, destination=None, destination_type=None):
@@ -89,10 +89,10 @@ class GotifyNotifier(object):
                     message = 'Invalid Gotify access token'
                 elif e.response.status_code == 404:
                     url_format = 'https://push.example.com/message'
-                    message = (
+                    message = f"{
                         'Invalid Gotify URL, please verify that the URL matches the format: %s'
                         % url_format
-                    )
+                    }"
                 else:
                   message = e.response.json()['error']['message']
             else:
