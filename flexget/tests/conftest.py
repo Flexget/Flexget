@@ -174,17 +174,24 @@ def link_headers(manager):
     return headers
 
 
-@pytest.fixture
-def caplog(_caplog):
+@pytest.fixture(autouse=True)
+def caplog(pytestconfig, _caplog):
     """
     Override caplog so that we can send loguru messages to logging for compatibility.
     """
+    # set logging level according to pytest verbosity
+    level = logger.level('DEBUG')
+    if pytestconfig.getoption('verbose') == 1:
+        level = logger.level('TRACE')
+    elif pytestconfig.getoption('quiet', None) == 1:
+        level = logger.level('INFO')
 
     class PropagateHandler(logging.Handler):
         def emit(self, record):
             logging.getLogger(record.name).handle(record)
 
-    handler_id = logger.add(PropagateHandler(), level='TRACE', format="{message}", catch=False)
+    handler_id = logger.add(PropagateHandler(), level=level.no, format="{message}", catch=False)
+    _caplog.set_level(level.no)
     yield _caplog
     logger.remove(handler_id)
 
@@ -294,17 +301,6 @@ def chdir(pytestconfig, request):
     """
     if 'chdir' in request.fixturenames:
         os.chdir(os.path.dirname(request.module.__file__))
-
-
-@pytest.fixture(autouse=True)
-def setup_loglevel(pytestconfig, caplog):
-    # set logging level according to pytest verbosity
-    level = logger.level('DEBUG')
-    if pytestconfig.getoption('verbose') == 1:
-        level = logger.level('TRACE')
-    elif pytestconfig.getoption('quiet', None) == 1:
-        level = logger.level('INFO')
-    caplog.set_level(level.no)
 
 
 class CrashReport(Exception):
