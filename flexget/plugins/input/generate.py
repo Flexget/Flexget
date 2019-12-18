@@ -1,10 +1,10 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 
-log = logging.getLogger(__name__.rsplit('.')[-1])
+logger = logger.bind(name='generate')
 
 
 class Generate:

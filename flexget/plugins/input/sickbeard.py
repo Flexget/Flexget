@@ -1,13 +1,13 @@
-import logging
 from urllib.parse import urlparse
 
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 
-log = logging.getLogger('sickbeard')
+logger = logger.bind(name='sickbeard')
 
 
 class Sickbeard:
@@ -101,7 +101,7 @@ class Sickbeard:
             )
         entries = []
         for _, show in list(json['data'].items()):
-            log.debug('processing show: {}'.format(show))
+            logger.debug('processing show: {}'.format(show))
             fg_qualities = ''  # Initializes the quality parameter
             if show['paused'] and config.get('only_monitored'):
                 continue
@@ -115,9 +115,9 @@ class Sickbeard:
                     show['tvdbid'],
                 )
                 show_json = task.requests.get(show_url).json()
-                log.debug('processing show data: %s', show_json['data'])
+                logger.debug('processing show data: {}', show_json['data'])
                 if 'quality_details' not in show_json['data']:
-                    log.error('Corrupt data returned, skipping: %s', show_json['data'])
+                    logger.error('Corrupt data returned, skipping: {}', show_json['data'])
                     continue
                 fg_qualities = self.quality_requirement_builder(
                     show_json['data']['quality_details']['initial']
@@ -138,13 +138,13 @@ class Sickbeard:
             if entry.isvalid():
                 entries.append(entry)
             else:
-                log.error('Invalid entry created? %s' % entry)
+                logger.error('Invalid entry created? {}', entry)
                 continue
             # Test mode logging
             if task.options.test:
-                log.info("Test mode. Entry includes:")
+                logger.info("Test mode. Entry includes:")
                 for key, value in list(entry.items()):
-                    log.info('     {}: {}'.format(key.capitalize(), value))
+                    logger.info('     {}: {}', key.capitalize(), value)
 
         return entries
 

@@ -1,6 +1,6 @@
 import csv
-import logging
 
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
@@ -8,7 +8,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
 
-log = logging.getLogger('csv')
+logger = logger.bind(name='csv')
 
 
 class InputCSV:

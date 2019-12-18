@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -11,7 +11,7 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='api_rottentomatoes')
 
-log = logging.getLogger('rottentomatoes_list')
+logger = logger.bind(name='rottentomatoes_list')
 
 
 class RottenTomatoesList:
@@ -77,9 +77,10 @@ class RottenTomatoesList:
                             )
                         )
                 else:
-                    log.critical(
-                        'Failed to fetch Rotten tomatoes %s list: %s. List doesn\'t exist?'
-                        % (l_type, l_name)
+                    logger.critical(
+                        "Failed to fetch Rotten tomatoes {} list: {}. List doesn't exist?",
+                        l_type,
+                        l_name,
                     )
         return entries
 
