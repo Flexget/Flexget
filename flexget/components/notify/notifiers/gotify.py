@@ -37,7 +37,7 @@ class GotifyNotifier(object):
     schema = {
         'type': 'object',
         'properties': {
-            'url': one_or_more(gotify_url_pattern),
+            'url': gotify_url_pattern,
             'token': {'type': 'string'},
             'priority': {'type': 'integer', 'default': 4},  
         },  
@@ -48,28 +48,21 @@ class GotifyNotifier(object):
         'additionalProperties': False,
     }
 
-
     def notify(self, title, message, config):
         """
         Send a Gotify notification
         """
-        priority = config.get('priority')      
-        token = config.get('token')
-        url = f"{config.get('url') + '?token=' + token}"
-        self.send_push(token, title, message, priority, url)
-
-    def send_push(self, token, title, body, priority, url=None, destination=None, destination_type=None):
-
+        url = config['url']
+        params = {'token': config['token']}
+        
+        if config['priority']:
+          priority = config['priority']
+        
         requests = RequestSession(max_retries=3)
-        notification = {'title': title, 'message': body, 'priority': priority}
-        if url:
-            notification['url'] = url
-        if destination:
-            notification[destination_type] = destination
-
+        notification = {'title': title, 'message': message, 'priority': priority}
         # Make the request
         try:
-            response = requests.post(url, headers=headers, json=notification)
+            response = requests.post(url, params=params, json=notification)
         except RequestException as e:
             if e.response is not None:
                 if e.response.status_code == 401 or e.response.status_code == 403:
