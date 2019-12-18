@@ -1,7 +1,7 @@
-import logging
 import re
 from datetime import datetime
 
+from loguru import logger
 from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, Table, Unicode
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
@@ -9,7 +9,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from flexget import db_schema
 from flexget.utils.sqlalchemy_utils import get_index_by_name, table_schema
 
-log = logging.getLogger('archive.db')
+logger = logger.bind(name='archive.db')
 
 SCHEMA_VER = 0
 
@@ -96,26 +96,26 @@ def upgrade(ver, session):
         aet = table_schema('archive_entry', session)
         old_index = get_index_by_name(aet, 'archive_feed_title')
         if old_index is not None:
-            log.info('Dropping legacy index (may take a while) ...')
+            logger.info('Dropping legacy index (may take a while) ...')
             old_index.drop()
             # create new index by title, url
         new_index = get_index_by_name(
             Base.metadata.tables['archive_entry'], 'ix_archive_title_url'
         )
         if new_index:
-            log.info('Creating new index (may take a while) ...')
+            logger.info('Creating new index (may take a while) ...')
             new_index.create(bind=session.connection())
         else:
             # maybe removed from the model by later migrations?
-            log.error('Unable to create index `ix_archive_title_url`, removed from the model?')
+            logger.error('Unable to create index `ix_archive_title_url`, removed from the model?')
             # TODO: nag about this ?
         # This is safe as long as we don't delete the model completely :)
         # But generally never use Declarative Models in migrate!
         if session.query(ArchiveEntry).first():
-            log.critical('----------------------------------------------')
-            log.critical('You should run `--archive consolidate` ')
-            log.critical('one time when you have time, it may take hours')
-            log.critical('----------------------------------------------')
+            logger.critical('----------------------------------------------')
+            logger.critical('You should run `--archive consolidate` ')
+            logger.critical('one time when you have time, it may take hours')
+            logger.critical('----------------------------------------------')
         ver = 0
     return ver
 
@@ -174,4 +174,4 @@ def search(session, text, tags=None, sources=None, desc=False):
         if find_re.match(a.title):
             yield a
         else:
-            log.trace('title %s is too wide match' % a.title)
+            logger.trace('title {} is too wide match', a.title)
