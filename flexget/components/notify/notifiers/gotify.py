@@ -9,6 +9,7 @@ from flexget.config_schema import one_or_more
 from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
+from http import HTTPStatus
 
 plugin_name = 'gotify'
 log = logging.getLogger(plugin_name)
@@ -64,7 +65,7 @@ class GotifyNotifier(object):
             response = requests.post(url, params=params, json=notification)
         except RequestException as e:
             if e.response is not None:
-                if e.response.status_code == 401 or e.response.status_code == 403:
+                if e.response.code in (HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN):
                     message = 'Invalid Gotify access token'
                 else:
                   message = e.response.json()['error']['message']
