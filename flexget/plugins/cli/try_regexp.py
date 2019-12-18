@@ -6,7 +6,7 @@ from flexget import options, plugin
 from flexget.event import event
 from flexget.terminal import console
 
-log = logger.bind(name='try_regexp')
+logger = logger.bind(name='try_regexp')
 
 
 class PluginTryRegexp:

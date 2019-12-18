@@ -6,7 +6,7 @@ from flexget.event import event
 from flexget.plugin import get_plugins
 from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
 
-log = logger.bind(name='plugins')
+logger = logger.bind(name='plugins')
 
 
 def plugins_summary(manager, options):

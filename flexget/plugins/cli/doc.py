@@ -7,7 +7,7 @@ from flexget.event import event
 from flexget.plugin import plugins
 from flexget.terminal import console
 
-log = logger.bind(name='doc')
+logger = logger.bind(name='doc')
 
 
 def trim(docstring):

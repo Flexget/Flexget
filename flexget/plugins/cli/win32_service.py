@@ -10,7 +10,7 @@ from flexget import options
 from flexget.event import event
 from flexget.terminal import console
 
-log = logger.bind(name='win32_service')
+logger = logger.bind(name='win32_service')
 
 try:
     import servicemanager

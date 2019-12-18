@@ -9,7 +9,7 @@ from sqlalchemy.sql.expression import ClauseElement, Executable, _literal_as_tex
 from flexget import manager, options
 from flexget.event import event
 
-log = logger.bind(name='explain_sql')
+logger = logger.bind(name='explain_sql')
 
 
 class Explain(Executable, ClauseElement):
@@ -25,12 +25,12 @@ def explain(element, compiler, **kw):
 
 class ExplainQuery(Query):
     def __iter__(self):
-        log.info('Query:\n\t{}', str(self).replace('\n', '\n\t'))
+        logger.info('Query:\n\t{}', str(self).replace('\n', '\n\t'))
         explain = self.session.execute(Explain(self)).fetchall()
         text = '\n\t'.join('|'.join(str(x) for x in line) for line in explain)
         before = time()
         result = Query.__iter__(self)
-        log.info('Query Time: {:0.3f} Explain Query Plan: {}', time() - before, text)
+        logger.info('Query Time: {:0.3f} Explain Query Plan: {}', time() - before, text)
         return result
 
 

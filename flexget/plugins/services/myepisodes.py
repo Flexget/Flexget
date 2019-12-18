@@ -9,7 +9,7 @@ from flexget.db_schema import versioned_base
 from flexget.event import event
 from flexget.utils import requests
 
-log = logger.bind(name='myepisodes')
+logger = logger.bind(name='myepisodes')
 Base = versioned_base('myepisodes', 0)
 
 
@@ -102,11 +102,11 @@ class MyEpisodes:
             self.http_session = self._login(config)
 
         except plugin.PluginWarning as w:
-            log.warning(w)
+            logger.warning(w)
             return
 
         except plugin.PluginError as e:
-            log.error(e)
+            logger.error(e)
             return
 
         for entry in task.accepted:
@@ -117,7 +117,7 @@ class MyEpisodes:
                 self._mark_episode_acquired(entry)
 
             except plugin.PluginWarning as w:
-                log.warning(w)
+                logger.warning(w)
 
     def _validate_entry(self, entry):
         """
@@ -133,7 +133,7 @@ class MyEpisodes:
             raise plugin.PluginWarning(
                 'Can\'t mark entry `%s` in myepisodes without series_season, series_episode and series_name '
                 'fields' % entry['title'],
-                log,
+                logger,
             )
 
     def _lookup_myepisodes_id(self, entry):
@@ -158,7 +158,7 @@ class MyEpisodes:
             return myepisodes_id
 
         raise plugin.PluginWarning(
-            'Unable to determine the myepisodes id for: `%s`' % entry['title'], log
+            'Unable to determine the myepisodes id for: `%s`' % entry['title'], logger
         )
 
     def _retrieve_id_from_database(self, entry):
@@ -219,7 +219,7 @@ class MyEpisodes:
                 )
                 search_value = series.name
             except LookupError:
-                log.warning(
+                logger.warning(
                     'Unable to lookup series `{}` from tvdb, using raw name.', entry['series_name']
                 )
 
@@ -238,7 +238,7 @@ class MyEpisodes:
             .first()
         )
         if db_item:
-            log.info(
+            logger.info(
                 'Changing name to `{}` for series with myepisodes_id {}',
                 series_name.lower(),
                 myepisodes_id,
@@ -269,7 +269,7 @@ class MyEpisodes:
         payload = {super_secret_code: "true"}
 
         if self.test_mode:
-            log.info(
+            logger.info(
                 'Would mark {} of `{}` as acquired.', entry['series_id'], entry['series_name']
             )
             return
@@ -283,7 +283,7 @@ class MyEpisodes:
                 % (entry['series_id'], entry['series_name'])
             )
 
-        log.info('Marked {} of `{}` as acquired.', entry['series_id'], entry['series_name'])
+        logger.info('Marked {} of `{}` as acquired.', entry['series_id'], entry['series_name'])
 
     def _login(self, config):
         """Authenicate with the myepisodes service and return a requests session
@@ -314,7 +314,7 @@ class MyEpisodes:
                         'Login to myepisodes.com failed, please see if the site is down and verify '
                         'your credentials.'
                     ),
-                    log,
+                    logger,
                 )
         except requests.RequestException as e:
             raise plugin.PluginError('Error logging in to myepisodes: %s' % e)
