@@ -152,7 +152,7 @@ def cli_search(options):
     search_term = ' '.join(options.keywords)
     tags = options.tags
     sources = options.sources
-    query = re.sub(r'[ \(\)]+', ' ', search_term).strip()
+    query = re.sub(r'[ \(\)\:]+', ' ', search_term).strip()
 
     table_data = []
     with Session() as session:

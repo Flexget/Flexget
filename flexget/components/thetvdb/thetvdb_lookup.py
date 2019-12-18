@@ -71,12 +71,11 @@ class PluginThetvdbLookup:
         'tvdb_language': 'language',
         'tvdb_airs_day_of_week': 'airs_dayofweek',
         'imdb_url': lambda series: series.imdb_id
-        and 'http://www.imdb.com/title/%s' % series.imdb_id,
+        and f'http://www.imdb.com/title/{series.imdb_id}',
         'imdb_id': 'imdb_id',
         'zap2it_id': 'zap2it_id',
         'tvdb_id': 'id',
-        'tvdb_url': lambda series: 'http://thetvdb.com/index.php?tab=series&id=%s'
-        % str(series.id),
+        'tvdb_url': lambda series: f'http://thetvdb.com/index.php?tab=series&id={str(series.id)}',
     }
 
     series_actor_map = {'tvdb_actors': 'actors'}
@@ -93,7 +92,7 @@ class PluginThetvdbLookup:
         'tvdb_absolute_number': 'absolute_number',
         'tvdb_season': 'season_number',
         'tvdb_episode': 'episode_number',
-        'tvdb_ep_id': lambda ep: 'S%02dE%02d' % (ep.season_number, ep.episode_number),
+        'tvdb_ep_id': lambda ep: f'S{ep.season_number:02d}E{ep.episode_number:02d}',
     }
 
     schema = {
@@ -140,8 +139,8 @@ class PluginThetvdbLookup:
                 episode_offset = 0
             if season_offset != 0 or episode_offset != 0:
                 log.debug(
-                    'Using offset for tvdb lookup: season: %s, episode: %s'
-                    % (season_offset, episode_offset)
+                    f'Using offset for tvdb lookup: season: {season_offset}, '
+                    f'episode: {episode_offset}'
                 )
 
             lookupargs = {

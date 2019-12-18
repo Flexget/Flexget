@@ -401,6 +401,12 @@ class APIClient:
 
         return self.client.delete(*args, **kwargs)
 
+    def json_delete(self, *args, **kwargs):
+        self._append_header('Content-Type', 'application/json', kwargs)
+        if kwargs.get('auth', True):
+            self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
+        return self.client.delete(*args, **kwargs)
+
     def head(self, *args, **kwargs):
         if kwargs.get('auth', True):
             self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
