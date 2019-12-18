@@ -1,5 +1,6 @@
-import logging
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.components.imdb.utils import extract_id, is_valid_imdb_title_id
@@ -11,7 +12,7 @@ from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 
-log = logging.getLogger('imdb_watchlist')
+logger = logger.bind(name='imdb_watchlist')
 USER_ID_RE = r'^ur\d{7,9}$'
 CUSTOM_LIST_RE = r'^ls\d{7,10}$'
 USER_LISTS = ['watchlist', 'ratings', 'checkins']
@@ -78,7 +79,7 @@ class ImdbWatchlist:
         config = self.prepare_config(config)
 
         # Create movie entries by parsing imdb list page(s) html using beautifulsoup
-        log.verbose('Retrieving imdb list: %s', config['list'])
+        logger.verbose('Retrieving imdb list: {}', config['list'])
 
         headers = {'Accept-Language': config.get('force_language')}
         params = {'view': 'detail', 'page': 1}
@@ -100,7 +101,7 @@ class ImdbWatchlist:
         return entries
 
     def fetch_page(self, task, url, params, headers):
-        log.debug('Requesting: %s %s', url, headers)
+        logger.debug('Requesting: {} {}', url, headers)
         try:
             page = task.requests.get(url, params=params, headers=headers)
         except RequestException as e:
@@ -128,7 +129,7 @@ class ImdbWatchlist:
         if 'list' in json_vars and 'items' in json_vars['list']:
             total_item_count = len(json_vars['list']['items'])
         if not total_item_count:
-            log.verbose('No movies were found in imdb list: %s', config['list'])
+            logger.verbose('No movies were found in imdb list: {}', config['list'])
             return
         imdb_ids = []
         for item in json_vars['list']['items']:
@@ -144,9 +145,9 @@ class ImdbWatchlist:
                 + ' Either the list is empty or the imdb parser of the imdb_watchlist plugin is broken.'
                 + ' Original error: %s.' % str(e)
             )
-        log.verbose('imdb list contains %d items', len(json_data))
-        log.debug(
-            'First entry (imdb id: %s) looks like this: %s', imdb_ids[0], json_data[imdb_ids[0]]
+        logger.verbose('imdb list contains {} items', len(json_data))
+        logger.debug(
+            'First entry (imdb id: {}) looks like this: {}', imdb_ids[0], json_data[imdb_ids[0]]
         )
         entries = []
         for imdb_id in imdb_ids:
@@ -157,7 +158,7 @@ class ImdbWatchlist:
                 and 'href' in json_data[imdb_id]['title']['primary']
                 and 'title' in json_data[imdb_id]['title']['primary']
             ):
-                log.debug('no title or link found for item %s, skipping', imdb_id)
+                logger.debug('no title or link found for item {}, skipping', imdb_id)
                 continue
             if 'type' in json_data[imdb_id]['title']:
                 entry['imdb_type'] = json_data[imdb_id]['title']['type']
@@ -179,7 +180,7 @@ class ImdbWatchlist:
         try:
             item_text = soup.find('div', class_='lister-total-num-results').string.split()
             total_item_count = int(item_text[0].replace(',', ''))
-            log.verbose('imdb list contains %d items', total_item_count)
+            logger.verbose('imdb list contains {} items', total_item_count)
         except AttributeError:
             total_item_count = 0
         except (ValueError, TypeError) as e:
@@ -190,7 +191,7 @@ class ImdbWatchlist:
             )
 
         if not total_item_count:
-            log.verbose('No movies were found in imdb list: %s', config['list'])
+            logger.verbose('No movies were found in imdb list: {}', config['list'])
             return
 
         entries = []
@@ -206,15 +207,15 @@ class ImdbWatchlist:
 
             items = soup.find_all('div', class_='lister-item')
             if not items:
-                log.debug('no items found on page: %s, aborting.', url)
+                logger.debug('no items found on page: {}, aborting.', url)
                 break
-            log.debug('%d items found on page %d', len(items), page_no)
+            logger.debug('{} items found on page {}', len(items), page_no)
 
             for item in items:
                 items_processed += 1
                 a = item.find('h3', class_='lister-item-header').find('a')
                 if not a:
-                    log.debug('no title link found for row, skipping')
+                    logger.debug('no title link found for row, skipping')
                     continue
 
                 link = ('http://www.imdb.com' + a.get('href')).rstrip('/')

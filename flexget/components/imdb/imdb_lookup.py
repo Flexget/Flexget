@@ -222,7 +222,7 @@ class ImdbLookup:
         except UnicodeDecodeError:
             logger.error(
                 'Unable to determine encoding for {}. Installing chardet library may help.',
-                entry['imdb_url']
+                entry['imdb_url'],
             )
             # store cache so this will not be tried again
             movie = db.Movie()
