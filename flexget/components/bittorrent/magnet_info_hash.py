@@ -1,11 +1,12 @@
 import base64
-import logging
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('magnet_btih')
+logger = logger.bind(name='magnet_btih')
 
 
 class MagnetBtih:
