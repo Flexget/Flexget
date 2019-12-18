@@ -64,7 +64,7 @@ class GotifyNotifier(object):
             response = requests.post(url, params=params, json=notification)
         except RequestException as e:
             if e.response is not None:
-                if e.response.code in (HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN):
+                if e.response.status_code in (HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN):
                     message = 'Invalid Gotify access token'
                 else:
                   message = e.response.json()['error']['message']
