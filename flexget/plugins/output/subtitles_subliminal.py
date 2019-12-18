@@ -132,7 +132,7 @@ class PluginSubliminal:
             pass
 
         # Let subliminal be more verbose if our logger is set to DEBUG
-        if logger.isEnabledFor(logging.DEBUG):
+        if logger.level(task.manager.options.loglevel).no <= logger.level('DEBUG').no:
             logging.getLogger("subliminal").setLevel(logging.INFO)
         else:
             logging.getLogger("subliminal").setLevel(logging.CRITICAL)
