@@ -58,7 +58,6 @@ class GotifyNotifier(object):
         if config['priority']:
           priority = config['priority']
         
-        requests = RequestSession(max_retries=3)
         notification = {'title': title, 'message': message, 'priority': priority}
         # Make the request
         try:
