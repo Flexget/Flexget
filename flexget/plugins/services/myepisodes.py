@@ -1,7 +1,7 @@
-import logging
 import re
 from datetime import datetime
 
+from loguru import logger
 from sqlalchemy import Column, DateTime, Integer, String
 
 from flexget import plugin
@@ -9,7 +9,7 @@ from flexget.db_schema import versioned_base
 from flexget.event import event
 from flexget.utils import requests
 
-log = logging.getLogger('myepisodes')
+log = logger.bind(name='myepisodes')
 Base = versioned_base('myepisodes', 0)
 
 
@@ -220,7 +220,7 @@ class MyEpisodes:
                 search_value = series.name
             except LookupError:
                 log.warning(
-                    'Unable to lookup series `%s` from tvdb, using raw name.', entry['series_name']
+                    'Unable to lookup series `{}` from tvdb, using raw name.', entry['series_name']
                 )
 
         return search_value
@@ -239,7 +239,7 @@ class MyEpisodes:
         )
         if db_item:
             log.info(
-                'Changing name to `%s` for series with myepisodes_id %s',
+                'Changing name to `{}` for series with myepisodes_id {}',
                 series_name.lower(),
                 myepisodes_id,
             )
@@ -270,7 +270,7 @@ class MyEpisodes:
 
         if self.test_mode:
             log.info(
-                'Would mark %s of `%s` as acquired.', entry['series_id'], entry['series_name']
+                'Would mark {} of `{}` as acquired.', entry['series_id'], entry['series_name']
             )
             return
 
@@ -283,7 +283,7 @@ class MyEpisodes:
                 % (entry['series_id'], entry['series_name'])
             )
 
-        log.info('Marked %s of `%s` as acquired.', entry['series_id'], entry['series_name'])
+        log.info('Marked {} of `{}` as acquired.', entry['series_id'], entry['series_name'])
 
     def _login(self, config):
         """Authenicate with the myepisodes service and return a requests session
