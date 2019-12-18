@@ -1,6 +1,6 @@
-import logging
 from datetime import datetime, timedelta
 
+from loguru import logger
 from sqlalchemy import Column, DateTime, Integer, String, Unicode
 from sqlalchemy.schema import Index
 
@@ -11,7 +11,7 @@ from flexget.utils.sqlalchemy_utils import table_add_column
 SCHEMA_VER = 3
 FAIL_LIMIT = 100
 
-log = logging.getLogger('failed.db')
+logger = logger.bind(name='failed.db')
 Base = db_schema.versioned_base('failed', SCHEMA_VER)
 
 
