@@ -10,17 +10,12 @@ from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 from http import HTTPStatus
+from urllib.parse import urljoin
 
 plugin_name = 'gotify'
 log = logging.getLogger(plugin_name)
 
 requests = RequestSession(max_retries=3)
-
-gotify_url_pattern = {
-    'type': 'string',
-    'pattern': r'^http(s?)\:\/\/.*\/message$',
-    'error_pattern': 'Gotify URL must begin with http(s) and end with `/message`',
-}
 
 class GotifyNotifier(object):
     """
@@ -38,7 +33,7 @@ class GotifyNotifier(object):
     schema = {
         'type': 'object',
         'properties': {
-            'url': gotify_url_pattern,
+            'url': {'format': 'url'},
             'token': {'type': 'string'},
             'priority': {'type': 'integer', 'default': 4},  
         },  
@@ -53,7 +48,9 @@ class GotifyNotifier(object):
         """
         Send a Gotify notification
         """
-        url = config['url']
+        base_url = config['url']
+        api_endpoint = '/message'
+        url = urljoin(base_url, api_endpoint)
         params = {'token': config['token']}
         
         priority = config['priority']
