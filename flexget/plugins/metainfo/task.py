@@ -1,9 +1,9 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('metainfo_task')
+logger = logger.bind(name='metainfo_task')
 
 
 class MetainfoTask:
