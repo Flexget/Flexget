@@ -1,9 +1,9 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('priority')
+logger = logger.bind(name='priority')
 
 
 # TODO: 1.2 figure out replacement for this
