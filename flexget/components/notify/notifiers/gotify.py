@@ -56,8 +56,7 @@ class GotifyNotifier(object):
         url = config['url']
         params = {'token': config['token']}
         
-        if config['priority']:
-          priority = config['priority']
+        priority = config['priority']
         
         notification = {'title': title, 'message': message, 'priority': priority}
         # Make the request
