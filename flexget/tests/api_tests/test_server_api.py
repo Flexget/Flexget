@@ -32,27 +32,27 @@ class TestServerAPI:
         assert not errors
         assert data['pid'] == os.getpid()
 
-    @patch.object(MockManager, 'load_config')
-    def test_reload(self, mocked_load_config, api_client, schema_match):
-        payload = {'operation': 'reload'}
-        rsp = api_client.json_post('/server/manage/', data=json.dumps(payload))
-        assert rsp.status_code == 200
-        data = json.loads(rsp.get_data(as_text=True))
+    def test_reload(self, api_client, schema_match):
+        with patch.object(MockManager, 'load_config') as mocked_load_config:
+            payload = {'operation': 'reload'}
+            rsp = api_client.json_post('/server/manage/', data=json.dumps(payload))
+            assert rsp.status_code == 200
+            data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(base_message, data)
-        assert not errors
-        assert mocked_load_config.called
+            errors = schema_match(base_message, data)
+            assert not errors
+            assert mocked_load_config.called
 
-    @patch.object(Manager, 'shutdown')
-    def test_shutdown(self, mocked_shutdown, api_client, schema_match):
-        payload = {'operation': 'shutdown'}
-        rsp = api_client.json_post('/server/manage/', data=json.dumps(payload))
-        assert rsp.status_code == 200
-        data = json.loads(rsp.get_data(as_text=True))
+    def test_shutdown(self, api_client, schema_match):
+        with patch.object(MockManager, 'shutdown') as mocked_shutdown:
+            payload = {'operation': 'shutdown'}
+            rsp = api_client.json_post('/server/manage/', data=json.dumps(payload))
+            assert rsp.status_code == 200
+            data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(base_message, data)
-        assert not errors
-        assert mocked_shutdown.called
+            errors = schema_match(base_message, data)
+            assert not errors
+            assert mocked_shutdown.called
 
     def test_get_config(self, api_client, schema_match):
         rsp = api_client.get('/server/config/')
