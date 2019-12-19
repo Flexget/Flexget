@@ -1,6 +1,7 @@
-import logging
 import re
 from unicodedata import normalize
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.components.sites.utils import torrent_availability
@@ -10,7 +11,7 @@ from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
-log = logging.getLogger('limetorrents')
+logger = logger.bind(name='limetorrents')
 
 
 def clean_symbols(text):
@@ -60,7 +61,7 @@ class Limetorrents:
     base_url = 'https://www.limetorrents.cc/'
     errors = False
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def search(self, task, entry, config):
         """
             Search for entries on Limetorrents
@@ -87,17 +88,17 @@ class Limetorrents:
             query = 'search/{0}/{1}/{2}'.format(
                 category, cleaned_search_string.encode('utf8'), order_by
             )
-            log.debug(
-                'Using search: %s; category: %s; ordering: %s',
+            logger.debug(
+                'Using search: {}; category: {}; ordering: {}',
                 cleaned_search_string,
                 category,
                 order_by or 'default',
             )
             try:
                 page = task.requests.get(self.base_url + query)
-                log.debug('requesting: %s', page.url)
+                logger.debug('requesting: {}', page.url)
             except RequestException as e:
-                log.error('Limetorrents request failed: %s', e)
+                logger.error('Limetorrents request failed: {}', e)
                 continue
 
             soup = get_soup(page.content)

@@ -1,9 +1,9 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger("archetorrent")
+logger = logger.bind(name="archetorrent")
 
 
 class UrlRewriteArchetorrent:
@@ -17,12 +17,12 @@ class UrlRewriteArchetorrent:
     # urlrewriter API
     def url_rewrite(self, task, entry):
         if 'url' not in entry:
-            log.error("Didn't actually get a URL...")
+            logger.error("Didn't actually get a URL...")
         else:
-            log.debug("Got the URL: %s" % entry['url'])
+            logger.debug('Got the URL: {}', entry['url'])
             entry['url'] = entry['url'].replace('torrents-details', 'download')
             entry['url'] = entry['url'].replace('&hit=1', '')
-            log.debug("New URL: %s" % entry['url'])
+            logger.debug('New URL: {}', entry['url'])
 
 
 @event('plugin.register')

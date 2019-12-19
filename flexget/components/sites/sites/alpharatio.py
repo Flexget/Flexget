@@ -1,7 +1,7 @@
 import datetime
-import logging
 import re
 
+from loguru import logger
 from requests.exceptions import TooManyRedirects
 from sqlalchemy import Column, DateTime, Unicode
 
@@ -17,7 +17,7 @@ from flexget.utils.requests import TimedLimiter
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
-log = logging.getLogger('alpharatio')
+logger = logger.bind(name='alpharatio')
 Base = db_schema.versioned_base('alpharatio', 0)
 
 requests = RequestSession()
@@ -122,7 +122,7 @@ class SearchAlphaRatio:
                 invalid_cookie = True
         except TooManyRedirects:
             # Apparently it endlessly redirects if the cookie is invalid?
-            log.debug('MoreThanTV request failed: Too many redirects. Invalid cookie?')
+            logger.debug('MoreThanTV request failed: Too many redirects. Invalid cookie?')
             invalid_cookie = True
 
         if invalid_cookie:
@@ -159,12 +159,12 @@ class SearchAlphaRatio:
                     and saved_cookie.expires
                     and saved_cookie.expires >= datetime.datetime.now()
                 ):
-                    log.debug('Found valid login cookie')
+                    logger.debug('Found valid login cookie')
                     return saved_cookie.cookie
 
         url = self.base_url + 'login.php'
         try:
-            log.debug('Attempting to retrieve AlphaRatio cookie')
+            logger.debug('Attempting to retrieve AlphaRatio cookie')
             response = requests.post(
                 url,
                 data={
@@ -190,7 +190,7 @@ class SearchAlphaRatio:
                     expires = c.expires
             if expires:
                 expires = datetime.datetime.fromtimestamp(expires)
-            log.debug('Saving or updating AlphaRatio cookie in db')
+            logger.debug('Saving or updating AlphaRatio cookie in db')
             cookie = AlphaRatioCookie(
                 username=username, cookie=dict(requests.cookies), expires=expires
             )
@@ -210,7 +210,7 @@ class SearchAlphaRatio:
             'AlphaRatio layout has changed, unable to parse correctly. Please open a Github issue'
         )
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def search(self, task, entry, config):
         """
             Search for entries on AlphaRatio
@@ -245,14 +245,14 @@ class SearchAlphaRatio:
 
         for search_string in entry.get('search_strings', [entry['title']]):
             params['searchstr'] = search_string
-            log.debug('Using search params: %s', params)
+            logger.debug('Using search params: {}', params)
             try:
                 page = self.get(
                     self.base_url + 'torrents.php', params, config['username'], config['password']
                 )
-                log.debug('requesting: %s', page.url)
+                logger.debug('requesting: {}', page.url)
             except RequestException as e:
-                log.error('AlphaRatio request failed: %s', e)
+                logger.error('AlphaRatio request failed: {}', e)
                 continue
 
             soup = get_soup(page.content)
@@ -260,7 +260,7 @@ class SearchAlphaRatio:
             # extract the column indices
             header_soup = soup.find('tr', attrs={'class': 'colhead'})
             if not header_soup:
-                log.debug('no search results found for \'%s\'', search_string)
+                logger.debug("no search results found for '{}'", search_string)
                 continue
             header_soup = header_soup.findAll('td')
 
@@ -283,7 +283,7 @@ class SearchAlphaRatio:
 
                 torrent_info = result.findAll('td')
                 size_col = torrent_info[size_idx].text
-                log.debug('AlphaRatio size: %s', size_col)
+                logger.debug('AlphaRatio size: {}', size_col)
                 size = re.search(r'(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', size_col)
                 torrent_tags = ', '.join(
                     [tag.text for tag in group_info.findAll('div', attrs={'class': 'tags'})]
@@ -295,8 +295,8 @@ class SearchAlphaRatio:
                 e['url'] = url
                 e['torrent_tags'] = torrent_tags
                 if not size:
-                    log.error(
-                        'No size found! Please create a Github issue. Size received: %s', size_col
+                    logger.error(
+                        'No size found! Please create a Github issue. Size received: {}', size_col
                     )
                 else:
                     e['content_size'] = parse_filesize(size.group(0))

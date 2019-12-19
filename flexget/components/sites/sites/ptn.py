@@ -1,5 +1,6 @@
-import logging
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.components.imdb.utils import extract_id
@@ -10,7 +11,7 @@ from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
-log = logging.getLogger('search_ptn')
+logger = logger.bind(name='search_ptn')
 
 session = requests.Session()
 
@@ -107,12 +108,12 @@ class SearchPTN:
                     'https://piratethenet.org/takelogin.php', data=login_params, verify=False
                 )
             except requests.RequestException as e:
-                log.error('Error while logging in to PtN: %s', e)
+                logger.error('Error while logging in to PtN: {}', e)
                 raise plugin.PluginError('Could not log in to PtN')
 
             passkey = re.search(r'passkey=([\d\w]+)"', r.text)
             if not passkey:
-                log.error("It doesn't look like PtN login worked properly.")
+                logger.error("It doesn't look like PtN login worked properly.")
                 raise plugin.PluginError('PTN cookie info invalid')
 
         search_params = default_search_params.copy()
@@ -129,7 +130,7 @@ class SearchPTN:
             try:
                 r = session.get('http://piratethenet.org/torrentsutils.php', params=search_params)
             except requests.RequestException as e:
-                log.error('Error searching ptn: %s' % e)
+                logger.error('Error searching ptn: {}', e)
                 continue
             # html5parser doesn't work properly for some reason
             soup = get_soup(r.text, parser='html.parser')
