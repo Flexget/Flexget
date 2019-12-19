@@ -106,7 +106,7 @@ class MovieParser(TitleParser):
         abs_cut = len(' '.join(parts[:cut_part]))
 
         logger.debug(
-            'after parts check, cut data would be: `{}` abs_cut: {:i}', data[:abs_cut], abs_cut
+            'after parts check, cut data would be: `{}` abs_cut: {}', data[:abs_cut], abs_cut
         )
 
         # parse quality
