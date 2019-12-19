@@ -14,8 +14,6 @@ from loguru import logger
 from flexget import __version__
 from flexget.utils.tools import io_encoding
 
-# A level more detailed than DEBUG
-TRACE = 5
 # A level more detailed than INFO
 VERBOSE = 15
 # environment variables to modify rotating log parameters from defaults of 1 MB and 9 files
@@ -61,18 +59,6 @@ def get_log_session_id():
     return getattr(local_context, 'session_id', None)
 
 
-class FlexGetLogger(logging.Logger):
-    """Custom logger that adds trace and verbose logging methods."""
-
-    def trace(self, msg, *args, **kwargs):
-        """Log at TRACE level (more detailed than DEBUG)."""
-        self.log(TRACE, msg, *args, **kwargs)
-
-    def verbose(self, msg, *args, **kwargs):
-        """Log at VERBOSE level (displayed when FlexGet is run interactively.)"""
-        self.log(VERBOSE, msg, *args, **kwargs)
-
-
 def record_patcher(record):
     # If a custom name was bound to the logger, move it from extra directly into the record
     name = record['extra'].pop('name', None)
@@ -81,6 +67,7 @@ def record_patcher(record):
 
 
 class InterceptHandler(logging.Handler):
+    """Catch any stdlib log messages from our deps and propagate to loguru."""
     def emit(self, record):
         # Get corresponding Loguru level if it exists
         try:
@@ -120,8 +107,6 @@ def initialize(unit_test=False):
     if 'dev' in __version__:
         warnings.filterwarnings('always', category=DeprecationWarning, module='flexget.*')
     warnings.simplefilter('once', append=True)
-    logging.addLevelName(TRACE, 'TRACE')
-    logging.addLevelName(VERBOSE, 'VERBOSE')
 
     logger.level('VERBOSE', no=VERBOSE, color='<bold>', icon='👄')
 
@@ -200,7 +185,3 @@ def start(filename=None, level='INFO', to_console=True, to_file=True):
         _startup_buffer = []
         _startup_buffer_id = None
     _logging_started = True
-
-
-# Set our custom logger class as default
-logging.setLoggerClass(FlexGetLogger)
