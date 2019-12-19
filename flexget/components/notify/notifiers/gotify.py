@@ -1,16 +1,15 @@
 import logging
-import base64
-import datetime
-import re
+
+from http import HTTPStatus
+from requests.exceptions import RequestException
+from urllib.parse import urljoin
 
 from flexget import plugin
 from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
-from requests.exceptions import RequestException
-from http import HTTPStatus
-from urllib.parse import urljoin
+
 
 plugin_name = 'gotify'
 log = logging.getLogger(plugin_name)
