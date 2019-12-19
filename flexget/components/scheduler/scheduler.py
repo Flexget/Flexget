@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import os
 import struct
 
@@ -112,7 +113,7 @@ def run_job(tasks):
 def setup_scheduler(manager):
     """Configure and start apscheduler"""
     global scheduler
-    if logging.getLogger().getEffectiveLevel() > logging.DEBUG:
+    if logger.level(manager.options.loglevel).no > logger.level('DEBUG').no:
         logging.getLogger('apscheduler').setLevel(logging.WARNING)
     # Since APScheduler runs in a separate thread, slower devices can sometimes get a DB lock, so use a separate db
     # for the jobs to avoid this
