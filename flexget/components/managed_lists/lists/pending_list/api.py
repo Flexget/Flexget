@@ -1,8 +1,8 @@
 import copy
-import logging
 from math import ceil
 
 from flask import jsonify, request
+from loguru import logger
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import APIResource, api
@@ -18,7 +18,7 @@ from flexget.api.app import (
 
 from . import db
 
-log = logging.getLogger('pending_list')
+logger = logger.bind(name='pending_list')
 
 pending_list_api = api.namespace('pending_list', description='Pending List operations')
 
@@ -70,12 +70,7 @@ class ObjectsContainer:
         'additionalProperties': False,
     }
 
-    batch_ids = {
-        'type': 'array',
-        'items': {'type': 'integer'},
-        'uniqueItems': True,
-        'minItems': 1,
-    }
+    batch_ids = {'type': 'array', 'items': {'type': 'integer'}, 'uniqueItems': True, 'minItems': 1}
 
     batch_operation_object = {
         'type': 'object',
@@ -248,7 +243,7 @@ class PendingListEntriesAPI(APIResource):
         if not total_items:
             return jsonify([])
 
-        log.debug('pending lists entries count is %d', total_items)
+        logger.debug('pending lists entries count is {}', total_items)
         entries = [entry.to_dict() for entry in db.get_entries_by_list_id(**kwargs)]
 
         # Total number of pages
@@ -365,7 +360,7 @@ class PendingListEntryAPI(APIResource):
             entry = db.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
             raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
-        log.debug('deleting movie %d', entry.id)
+        logger.debug('deleting movie {}', entry.id)
         session.delete(entry)
         return success_response('successfully deleted entry %d' % entry.id)
 
