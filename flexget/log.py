@@ -154,10 +154,8 @@ def start(filename=None, level='INFO', to_console=True, to_file=True):
     if level == 'NONE':
         return
 
-    # root logger
-    std_logger = logging.getLogger()
-    level = logging.getLevelName(level)
-    std_logger.setLevel(level)
+    # Make sure stdlib logger is set so that dependency logging gets propagated
+    logging.getLogger().setLevel(logger.level(level).no)
 
     if to_file:
         logger.add(
