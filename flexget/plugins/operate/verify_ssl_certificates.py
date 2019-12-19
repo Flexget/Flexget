@@ -1,11 +1,10 @@
-import logging
-
+from loguru import logger
 from requests.packages import urllib3
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('verify_ssl')
+logger = logger.bind(name='verify_ssl')
 
 
 class VerifySSLCertificates:

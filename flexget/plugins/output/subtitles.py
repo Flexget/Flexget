@@ -1,13 +1,14 @@
 import difflib
-import logging
 import os.path
 import re
 from xmlrpc.client import ServerProxy
 
+from loguru import logger
+
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('subtitles')
+logger = logger.bind(name='subtitles')
 
 
 # movie hash, won't work here though
@@ -54,7 +55,7 @@ class Subtitles:
             s = ServerProxy("http://api.opensubtitles.org/xml-rpc")
             res = s.LogIn("", "", "en", "FlexGet")
         except Exception:
-            log.warning('Error connecting to opensubtitles.org')
+            logger.warning('Error connecting to opensubtitles.org')
             return
 
         if res['status'] != '200 OK':
@@ -75,7 +76,7 @@ class Subtitles:
         for entry in entries:
             imdbid = entry.get('imdb_id')
             if not imdbid:
-                log.debug('no match for %s' % entry['title'])
+                logger.debug('no match for {}', entry['title'])
                 continue
 
             query = []
@@ -123,9 +124,11 @@ class Subtitles:
 
             # download
             for sub in filtered_subs:
-                log.debug(
-                    'SUBS FOUND: %s %s %s'
-                    % (sub['MovieReleaseName'], sub['SubRating'], sub['SubLanguageID'])
+                logger.debug(
+                    'SUBS FOUND: {} {} {}',
+                    sub['MovieReleaseName'],
+                    sub['SubRating'],
+                    sub['SubLanguageID'],
                 )
 
                 f = task.requests.get(sub['ZipDownloadLink'])

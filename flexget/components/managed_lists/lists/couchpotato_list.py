@@ -1,22 +1,22 @@
-import logging
 from collections.abc import MutableSet
 from urllib.parse import urlparse
 
 import requests
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 
-log = logging.getLogger('couchpotato_list')
+logger = logger.bind(name='couchpotato_list')
 
 
 class CouchPotatoBase:
     @staticmethod
     def movie_list_request(base_url, port, api_key):
         parsedurl = urlparse(base_url)
-        log.debug('Received movie list request')
+        logger.debug('Received movie list request')
         return '%s://%s:%s%s/api/%s/movie.list?status=active' % (
             parsedurl.scheme,
             parsedurl.netloc,
@@ -28,7 +28,7 @@ class CouchPotatoBase:
     @staticmethod
     def profile_list_request(base_url, port, api_key):
         parsedurl = urlparse(base_url)
-        log.debug('Received profile list request')
+        logger.debug('Received profile list request')
         return '%s://%s:%s%s/api/%s/profile.list' % (
             parsedurl.scheme,
             parsedurl.netloc,
@@ -40,7 +40,7 @@ class CouchPotatoBase:
     @staticmethod
     def movie_add_request(base_url, port, api_key):
         parsedurl = urlparse(base_url)
-        log.debug('Received movie add request')
+        logger.debug('Received movie add request')
         return '%s://%s:%s%s/api/%s/movie.add' % (
             parsedurl.scheme,
             parsedurl.netloc,
@@ -52,7 +52,7 @@ class CouchPotatoBase:
     @staticmethod
     def movie_delete_request(base_url, port, api_key):
         parsedurl = urlparse(base_url)
-        log.debug('Received movie delete request')
+        logger.debug('Received movie delete request')
         return '%s://%s:%s%s/api/%s/movie.delete?delete_from=wanted' % (
             parsedurl.scheme,
             parsedurl.netloc,
@@ -126,19 +126,19 @@ class CouchPotatoBase:
         )
 
         quality_requirement = (res_string + ' ' + source_string).rstrip()
-        log.debug('quality requirement is %s', quality_requirement)
+        logger.debug('quality requirement is {}', quality_requirement)
         return quality_requirement
 
     @staticmethod
     def list_entries(config, test_mode=None):
-        log.verbose('Connecting to CouchPotato to retrieve movie list.')
+        logger.verbose('Connecting to CouchPotato to retrieve movie list.')
         active_movies_url = CouchPotatoBase.build_url(
             config.get('base_url'), 'active', config.get('port'), config.get('api_key')
         )
         active_movies_json = CouchPotatoBase.get_json(active_movies_url)
         # Gets profile and quality lists if include_data is TRUE
         if config.get('include_data'):
-            log.verbose('Connecting to CouchPotato to retrieve profile data.')
+            logger.verbose('Connecting to CouchPotato to retrieve profile data.')
             profile_url = CouchPotatoBase.build_url(
                 config.get('base_url'), 'profiles', config.get('port'), config.get('api_key')
             )
@@ -148,10 +148,10 @@ class CouchPotatoBase:
         for movie in active_movies_json['movies']:
             # Related to #1444, corrupt data from CP
             if not all([movie.get('status'), movie.get('title'), movie.get('info')]):
-                log.warning('corrupt movie data received, skipping')
+                logger.warning('corrupt movie data received, skipping')
                 continue
             quality_req = ''
-            log.debug('movie data: %s', movie)
+            logger.debug('movie data: {}', movie)
             if movie['status'] == 'active':
                 if config.get('include_data') and profile_json:
                     for profile in profile_json['list']:
@@ -168,25 +168,25 @@ class CouchPotatoBase:
                     couchpotato_id=movie.get('_id'),
                 )
                 if entry.isvalid():
-                    log.debug('returning entry %s', entry)
+                    logger.debug('returning entry {}', entry)
                     entries.append(entry)
                 else:
-                    log.error('Invalid entry created? %s', entry)
+                    logger.error('Invalid entry created? {}', entry)
                     continue
                 # Test mode logging
                 if entry and test_mode:
-                    log.info("Test mode. Entry includes:")
+                    logger.info("Test mode. Entry includes:")
                     for key, value in entry.items():
-                        log.info('     %s: %s', key.capitalize(), value)
+                        logger.info('     {}: {}', key.capitalize(), value)
 
         return entries
 
     @staticmethod
     def add_movie(config, entry, test_mode=None):
         if not entry.get('imdb_id'):
-            log.error('Cannot add movie to couchpotato without an imdb ID: %s', entry)
+            logger.error('Cannot add movie to couchpotato without an imdb ID: {}', entry)
             return
-        log.verbose('Connection to CouchPotato to add a movie to list.')
+        logger.verbose('Connection to CouchPotato to add a movie to list.')
         add_movie_url = CouchPotatoBase.build_url(
             config.get('base_url'), 'add', config.get('port'), config.get('api_key')
         )
@@ -198,7 +198,7 @@ class CouchPotatoBase:
 
     @staticmethod
     def remove_movie(config, movie_id, test_mode=None):
-        log.verbose('Deleting movie from Couchpotato')
+        logger.verbose('Deleting movie from Couchpotato')
         delete_movie_url = CouchPotatoBase.build_url(
             config.get('base_url'), 'delete', config.get('port'), config.get('api_key')
         )
@@ -253,18 +253,18 @@ class CouchPotatoSet(MutableSet):
         if not self._find_entry(entry):
             self._movies = None
             movie = CouchPotatoBase.add_movie(self.config, entry)
-            log.verbose(
-                'Successfully added movie %s to CouchPotato', movie['info']['original_title']
+            logger.verbose(
+                'Successfully added movie {} to CouchPotato', movie['info']['original_title']
             )
         else:
-            log.debug('entry %s already exists in couchpotato list', entry)
+            logger.debug('entry {} already exists in couchpotato list', entry)
 
     def discard(self, entry):
         for movie in self.movies:
             title = entry.get('movie_name') or entry.get('title')
             if movie.get('title').lower() == title.lower():
                 movie_id = movie.get('couchpotato_id')
-                log.verbose('Trying to remove movie %s from CouchPotato', title)
+                logger.verbose('Trying to remove movie {} from CouchPotato', title)
                 CouchPotatoBase.remove_movie(self.config, movie_id)
                 self._movies = None
 

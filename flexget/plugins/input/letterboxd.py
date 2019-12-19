@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -7,7 +7,7 @@ from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException, Session, TimedLimiter
 from flexget.utils.soup import get_soup
 
-log = logging.getLogger('letterboxd')
+logger = logger.bind(name='letterboxd')
 
 requests = Session(max_retries=5)
 requests.add_domain_limiter(TimedLimiter('letterboxd.com', '1 seconds'))
@@ -107,7 +107,7 @@ class Letterboxd:
         rcount = 0
         next_page = ''
 
-        log.verbose('Looking for films in Letterboxd list: %s' % url)
+        logger.verbose('Looking for films in Letterboxd list: {}', url)
 
         while next_page is not None and rcount < max_results:
             try:

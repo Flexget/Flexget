@@ -1,10 +1,11 @@
-import logging
 import mimetypes
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('nzb_size')
+logger = logger.bind(name='nzb_size')
 
 # a bit hacky, add nzb as a known mimetype
 mimetypes.add_type('application/x-nzb', '.nzb')
@@ -35,20 +36,20 @@ class NzbSize:
             ):
 
                 if 'file' not in entry:
-                    log.warning(
-                        '`%s` does not have a `file` that could be used to get size information'
-                        % entry['title']
+                    logger.warning(
+                        '`{}` does not have a `file` that could be used to get size information',
+                        entry['title'],
                     )
                     continue
 
                 filename = entry['file']
-                log.debug('reading %s' % filename)
+                logger.debug('reading {}', filename)
                 xmldata = open(filename).read()
 
                 try:
                     nzbfiles = nzb_parser.parse(xmldata)
                 except Exception:
-                    log.debug('%s is not a valid nzb' % entry['title'])
+                    logger.debug('{} is not a valid nzb', entry['title'])
                     continue
 
                 size = 0
@@ -57,10 +58,10 @@ class NzbSize:
                         size += segment.bytes
 
                 size_mb = size / 1024 / 1024
-                log.debug('%s content size: %s MB' % (entry['title'], size_mb))
+                logger.debug('{} content size: {} MB', entry['title'], size_mb)
                 entry['content_size'] = size_mb
             else:
-                log.trace('%s does not seem to be nzb' % entry['title'])
+                logger.trace('{} does not seem to be nzb', entry['title'])
 
 
 @event('plugin.register')

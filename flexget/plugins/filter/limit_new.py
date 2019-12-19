@@ -1,9 +1,9 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('limit_new')
+logger = logger.bind(name='limit_new')
 
 
 class FilterLimitNew:
@@ -26,20 +26,20 @@ class FilterLimitNew:
     @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_filter(self, task, config):
         if task.options.learn:
-            log.info('Plugin limit_new is disabled with --learn')
+            logger.info('Plugin limit_new is disabled with --learn')
             return
 
         amount = config
         for index, entry in enumerate(task.accepted):
             if index < amount:
-                log.verbose('Allowed %s (%s)' % (entry['title'], entry['url']))
+                logger.verbose('Allowed {} ({})', entry['title'], entry['url'])
             else:
                 entry.reject('limit exceeded')
                 # Also save this in backlog so that it can be accepted next time.
                 plugin.get('backlog', self).add_backlog(task, entry)
 
-        log.debug(
-            'Rejected: %s Allowed: %s' % (len(task.accepted[amount:]), len(task.accepted[:amount]))
+        logger.debug(
+            'Rejected: {} Allowed: {}', len(task.accepted[amount:]), len(task.accepted[:amount])
         )
 
 

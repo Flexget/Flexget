@@ -1,10 +1,10 @@
-import logging
+from loguru import logger
 
 from flexget import options, plugin
 from flexget.event import event
 from flexget.terminal import console
 
-log = logging.getLogger('dump')
+logger = logger.bind(name='dump')
 
 
 def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):

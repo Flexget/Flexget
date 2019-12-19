@@ -21,8 +21,10 @@ from flexget.api.app import (
 from flexget.config_schema import process_config
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.log import capture_logs
 from flexget.options import get_parser
 from flexget.task import task_phases
+from flexget.terminal import capture_console
 from flexget.utils import json, requests
 from flexget.utils.lazy_dict import LazyLookup
 
@@ -470,7 +472,11 @@ class TaskExecutionAPI(APIResource):
                 entries.append(entry)
             options['inject'] = entries
 
-        executed_tasks = self.manager.execute(options=options, output=output, loglevel=loglevel)
+        if output:
+            with capture_console(output), capture_logs(output, level=loglevel):
+                executed_tasks = self.manager.execute(options=options)
+        else:
+            executed_tasks = self.manager.execute(options=options)
 
         tasks_queued = []
 

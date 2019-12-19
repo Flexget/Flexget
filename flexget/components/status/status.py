@@ -1,6 +1,7 @@
 import datetime
-import logging
 from datetime import timedelta
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
@@ -8,7 +9,7 @@ from flexget.manager import Session
 
 from . import db
 
-log = logging.getLogger('status')
+logger = logger.bind(name='status')
 
 
 class Status:
@@ -23,7 +24,7 @@ class Status:
         with Session() as session:
             st = session.query(db.StatusTask).filter(db.StatusTask.name == task.name).first()
             if not st:
-                log.debug('Adding new task %s', task.name)
+                logger.debug('Adding new task {}', task.name)
                 st = db.StatusTask()
                 st.name = task.name
                 session.add(st)
@@ -60,7 +61,7 @@ def db_cleanup(manager, session):
     # Purge all status data for non existing tasks
     for status_task in session.query(db.StatusTask).all():
         if status_task.name not in manager.config['tasks']:
-            log.verbose('Purging obsolete status data for task %s', status_task.name)
+            logger.verbose('Purging obsolete status data for task {}', status_task.name)
             session.delete(status_task)
 
     # Purge task executions older than 1 year
@@ -70,7 +71,7 @@ def db_cleanup(manager, session):
         .delete()
     )
     if result:
-        log.verbose('Removed %s task executions from history older than 1 year', result)
+        logger.verbose('Removed {} task executions from history older than 1 year', result)
 
 
 @event('plugin.register')

@@ -1,6 +1,6 @@
 import datetime
-import logging
 
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
@@ -10,7 +10,7 @@ from flexget.utils.cached_input import cached
 
 from . import db
 
-log = logging.getLogger('trakt_calendar')
+logger = logger.bind(name='trakt_calendar')
 
 
 class TraktCalendar:
@@ -86,8 +86,8 @@ class TraktCalendar:
     @cached('trakt_calendar', persist='2 hours')
     def on_task_input(self, task, config):
         start_date = datetime.datetime.now().date() + datetime.timedelta(days=config['start_day'])
-        log.debug(
-            'Start date for calendar: %s, end date: %s',
+        logger.debug(
+            'Start date for calendar: {}, end date: {}',
             start_date,
             start_date + datetime.timedelta(days=config['days']),
         )
@@ -104,7 +104,7 @@ class TraktCalendar:
             results = (
                 db.get_session(config.get('account')).get(url, params={'extended': 'full'}).json()
             )
-            log.debug('Found %s calendar entries', len(results))
+            logger.debug('Found {} calendar entries', len(results))
         except RequestException as e:
             raise plugin.PluginError('Error while fetching calendar: {0}'.format(e))
 

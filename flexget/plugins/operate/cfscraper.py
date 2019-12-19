@@ -1,11 +1,12 @@
-import logging
 from collections import OrderedDict
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.requests import Session
 
-log = logging.getLogger('cfscraper')
+logger = logger.bind(name='cfscraper')
 
 
 class CFScraper:
@@ -23,7 +24,7 @@ class CFScraper:
         try:
             import cloudscraper
         except ImportError as e:
-            log.debug('Error importing cloudscraper: %s' % e)
+            logger.debug('Error importing cloudscraper: {}', e)
             raise plugin.DependencyError(
                 'cfscraper', 'cloudscraper', 'cloudscraper module required. ImportError: %s' % e
             )

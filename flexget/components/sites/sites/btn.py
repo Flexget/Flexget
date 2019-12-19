@@ -1,5 +1,6 @@
-import logging
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.components.sites.utils import torrent_availability
@@ -9,7 +10,7 @@ from flexget.event import event
 from flexget.utils import json, requests
 from flexget.utils.requests import TokenBucketLimiter
 
-log = logging.getLogger('search_btn')
+logger = logger.bind(name='search_btn')
 
 
 ORIGINS = ['None', 'Scene', 'P2P', 'User', 'Mixed', 'Internal']
@@ -91,22 +92,22 @@ class SearchBTN:
                     headers={'Content-type': 'application/json'},
                 )
             except requests.RequestException as e:
-                log.error('Error searching btn: %s' % e)
+                logger.error('Error searching btn: {}', e)
                 continue
             try:
                 content = r.json()
             except ValueError as e:
                 raise plugin.PluginError('Error searching btn. Maybe it\'s down?. %s' % str(e))
             if not content or not content['result']:
-                log.debug('No results from btn')
+                logger.debug('No results from btn')
                 if content and content.get('error'):
                     if content['error'].get('code') == -32002:
-                        log.error('btn api call limit exceeded, throttling connection rate')
+                        logger.error('btn api call limit exceeded, throttling connection rate')
                         self.request_limiter.tokens = -1
                     else:
-                        log.error(
-                            'Error searching btn: %s'
-                            % content['error'].get('message', content['error'])
+                        logger.error(
+                            'Error searching btn: {}',
+                            content['error'].get('message', content['error']),
                         )
                 continue
             if 'torrents' in content['result']:

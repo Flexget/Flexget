@@ -1,12 +1,13 @@
-import logging
 import sys
+
+from loguru import logger
 
 from flexget import options
 from flexget.event import event
 from flexget.plugin import plugins
 from flexget.terminal import console
 
-log = logging.getLogger('doc')
+logger = logger.bind(name='doc')
 
 
 def trim(docstring):

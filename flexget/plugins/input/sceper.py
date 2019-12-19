@@ -1,6 +1,5 @@
-import logging
-
 from bs4 import NavigableString
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
@@ -15,7 +14,7 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='imdb')
 
-log = logging.getLogger('sceper')
+logger = logger.bind(name='sceper')
 
 
 class InputSceper:
@@ -43,11 +42,11 @@ class InputSceper:
             release = {}
             title = entry.find('h2')
             if not title:
-                log.debug('No h2 entrytitle')
+                logger.debug('No h2 entrytitle')
                 continue
             release['title'] = title.a.contents[0].strip()
 
-            log.debug('Processing title %s' % (release['title']))
+            logger.debug('Processing title {}', release['title'])
 
             for link in entry.find_all('a'):
                 # no content in the link
@@ -63,10 +62,10 @@ class InputSceper:
                     link_href = link['href']
                 else:
                     continue
-                log.debug('found link %s -> %s' % (link_name, link_href))
+                logger.debug('found link {} -> {}', link_name, link_href)
                 # handle imdb link
                 if link_name.lower() == 'imdb':
-                    log.debug('found imdb link %s' % link_href)
+                    logger.debug('found imdb link {}', link_href)
                     release['imdb_id'] = extract_id(link_href)
 
                 # test if entry with this url would be rewritable by known plugins (ie. downloadable)
@@ -76,9 +75,9 @@ class InputSceper:
                 urlrewriting = plugin.get('urlrewriting', self)
                 if urlrewriting.url_rewritable(task, temp):
                     release['url'] = link_href
-                    log.trace('--> accepting %s (resolvable)' % link_href)
+                    logger.trace('--> accepting {} (resolvable)', link_href)
                 else:
-                    log.trace('<-- ignoring %s (non-resolvable)' % link_href)
+                    logger.trace('<-- ignoring {} (non-resolvable)', link_href)
 
             # reject if no torrent link
             if 'url' not in release:
@@ -87,7 +86,7 @@ class InputSceper:
                 log_once(
                     '%s skipped due to missing or unsupported (unresolvable) download link'
                     % (release['title']),
-                    log,
+                    logger,
                 )
             else:
                 releases.append(release)
@@ -95,7 +94,7 @@ class InputSceper:
         return releases
 
     @cached('sceper')
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def on_task_input(self, task, config):
         releases = self.parse_site(config, task)
         return [Entry(release) for release in releases]

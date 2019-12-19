@@ -6,7 +6,6 @@ beautifulsoup4>=4.5
 html5lib>=0.11
 PyRSS2Gen
 pynzb
-#PY3 progressbar
 rpyc~=4.0
 jinja2~=2.10
 # There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
@@ -18,6 +17,7 @@ rebulk>=2.0.0
 apscheduler>=3.2.0
 terminaltables>=3.1.0
 colorclass>=2.2.0
+loguru>=0.4.0
 # WebUI Requirements
 cherrypy>=18.0.0
 flask>=0.7

@@ -1,14 +1,15 @@
 import codecs
-import logging
 import os
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
 
-log = logging.getLogger('regexp_parse')
+logger = logger.bind(name='regexp_parse')
 
 
 class RegexpParse:
@@ -156,7 +157,7 @@ class RegexpParse:
         return entry.isvalid()
 
     @cached('regexp_parse')
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def on_task_input(self, task, config):
         url = config['source']
         encoding = config.get('encoding')

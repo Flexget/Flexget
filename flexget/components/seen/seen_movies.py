@@ -1,12 +1,13 @@
-import logging
 from collections import defaultdict
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
 from . import seen as plugin_seen
 
-log = logging.getLogger(__name__)
+logger = logger.bind(name='seen_movies')
 
 
 class FilterSeenMovies(plugin_seen.FilterSeen):
@@ -47,9 +48,9 @@ class FilterSeenMovies(plugin_seen.FilterSeen):
         if config.get('matching') == 'strict':
             for entry in task.entries:
                 if not any(field in entry for field in self.fields):
-                    log.info(
-                        'Rejecting %s because of missing movie (imdb, tmdb or trakt) id'
-                        % entry['title']
+                    logger.info(
+                        'Rejecting {} because of missing movie (imdb, tmdb or trakt) id',
+                        entry['title'],
                     )
                     entry.reject('missing movie (imdb, tmdb or trakt) id, strict')
         # call super

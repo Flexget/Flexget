@@ -18,12 +18,13 @@ Commandline example::
 """
 import argparse
 import functools
-import logging
+
+from loguru import logger
 
 from flexget import options
 from flexget.event import event
 
-log = logging.getLogger('cli_config')
+logger = logger.bind(name='cli_config')
 
 
 def replace_in_item(replaces, item):

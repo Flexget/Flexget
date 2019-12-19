@@ -6,17 +6,18 @@ archive extraction
 """
 
 
-import logging
 import os
 import shutil
 import zipfile
+
+from loguru import logger
 
 try:
     import rarfile
 except ImportError:
     rarfile = None
 
-log = logging.getLogger('archive')
+logger = logger.bind(name='archive')
 
 
 class ArchiveError(Exception):
@@ -70,10 +71,10 @@ def rarfile_set_tool_path(config):
 
     if unrar_tool:
         if not rarfile:
-            log.error('rar_tool specified with no rarfile module installed.')
+            logger.error('rar_tool specified with no rarfile module installed.')
         else:
             rarfile.UNRAR_TOOL = unrar_tool
-            log.debug('Set RarFile.unrar_tool to: %s', unrar_tool)
+            logger.debug('Set RarFile.unrar_tool to: {}', unrar_tool)
 
 
 def rarfile_set_path_sep(separator):
@@ -87,7 +88,7 @@ def rarfile_set_path_sep(separator):
 def makepath(path):
     """Make directories as needed"""
     if not os.path.exists(path):
-        log.debug('Creating path: %s', path)
+        logger.debug('Creating path: {}', path)
         os.makedirs(path)
 
 
@@ -114,7 +115,7 @@ class Archive:
         try:
             for volume in volumes:
                 os.remove(volume)
-                log.verbose('Deleted archive: %s', volume)
+                logger.verbose('Deleted archive: {}', volume)
         except (IOError, os.error) as error:
             raise FSError(error)
 
@@ -131,7 +132,7 @@ class Archive:
                 archive_info = ArchiveInfo(info)
                 infolist.append(archive_info)
             except ValueError as e:
-                log.debug(e)
+                logger.debug(e)
 
         return infolist
 
@@ -148,7 +149,7 @@ class Archive:
         except (IOError, os.error) as error:
             raise FSError(error)
 
-        log.verbose('Extracted: %s', member)
+        logger.verbose('Extracted: {}', member)
 
 
 class RarArchive(Archive):
@@ -226,14 +227,14 @@ class ArchiveInfo:
         if os.path.exists(destination):
             raise FileAlreadyExists('File already exists: %s' % destination)
 
-        log.debug('Creating path: %s', dest_dir)
+        logger.debug('Creating path: {}', dest_dir)
         makepath(dest_dir)
 
         try:
             archive.extract_file(self.info, destination)
         except Exception as error:
             if os.path.exists(destination):
-                log.debug('Cleaning up partially extracted file: %s', destination)
+                logger.debug('Cleaning up partially extracted file: {}', destination)
                 os.remove(destination)
 
             raise error
@@ -251,13 +252,13 @@ def open_archive(archive_path):
 
     if zipfile.is_zipfile(archive_path):
         archive = ZipArchive(archive_path)
-        log.debug('Successfully opened ZIP: %s', archive_path)
+        logger.debug('Successfully opened ZIP: {}', archive_path)
     elif rarfile and rarfile.is_rarfile(archive_path):
         archive = RarArchive(archive_path)
-        log.debug('Successfully opened RAR: %s', archive_path)
+        logger.debug('Successfully opened RAR: {}', archive_path)
     else:
         if not rarfile:
-            log.warning('Rarfile module not installed; unable to handle RAR archives.')
+            logger.warning('Rarfile module not installed; unable to handle RAR archives.')
 
     return archive
 
@@ -275,6 +276,6 @@ def is_archive(path):
             archive.close()
             return True
     except (IOError, ArchiveError) as error:
-        log.debug('Failed to open file as archive: %s (%s)', path, error)
+        logger.debug('Failed to open file as archive: {} ({})', path, error)
 
     return False

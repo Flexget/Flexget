@@ -1,10 +1,11 @@
-import logging
 from urllib.parse import quote
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('animeindex')
+logger = logger.bind(name='animeindex')
 
 
 # http://tracker.anime-index.org/index.php?page=torrent-details&id=b8327fdf9003e87446c8b3601951a9a65526abb2

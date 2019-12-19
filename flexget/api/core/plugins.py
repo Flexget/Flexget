@@ -1,14 +1,14 @@
-import logging
 from math import ceil
 
 from flask import jsonify, request
 from flask_restplus import inputs
+from loguru import logger
 
 from flexget.api import APIResource, api
 from flexget.api.app import BadRequest, NotFoundError, etag, pagination_headers
 from flexget.plugin import DependencyError, get_plugin_by_name, get_plugins
 
-log = logging.getLogger('plugins')
+logger = logger.bind(name='plugins')
 
 plugins_api = api.namespace('plugins', description='Get Flexget plugins')
 

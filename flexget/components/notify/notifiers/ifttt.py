@@ -1,5 +1,4 @@
-import logging
-
+from loguru import logger
 from requests.exceptions import RequestException
 
 from flexget import plugin
@@ -9,7 +8,7 @@ from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session
 
 plugin_name = 'ifttt'
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 
 class IFTTTNotifier:
@@ -68,9 +67,9 @@ class IFTTTNotifier:
             url = self.url_template.format(config['event'], key)
             try:
                 self.session.post(url, json=notification_body)
-                log.info("Sent notification to key: %s", key)
+                logger.info('Sent notification to key: {}', key)
             except RequestException as e:
-                log.error("Error sending notification to key %s: %s", key, e)
+                logger.error('Error sending notification to key {}: {}', key, e)
                 errors = True
         if errors:
             raise PluginWarning("Failed to send notifications")

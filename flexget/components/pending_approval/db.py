@@ -1,13 +1,13 @@
-import logging
 from datetime import datetime, timedelta
 
+from loguru import logger
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, Unicode
 
 from flexget import db_schema
 from flexget.event import event
 from flexget.utils.database import entry_synonym
 
-log = logging.getLogger('pending_approval')
+logger = logger.bind(name='pending_approval')
 Base = db_schema.versioned_base('pending_approval', 0)
 
 
@@ -55,13 +55,13 @@ def db_cleanup(manager, session):
         .delete()
     )
     if deleted:
-        log.info('Purged %i pending entries older than 1 year', deleted)
+        logger.info('Purged {} pending entries older than 1 year', deleted)
 
 
 def list_pending_entries(
     session, task_name=None, approved=None, start=None, stop=None, sort_by='added', descending=True
 ):
-    log.debug('querying pending entries')
+    logger.debug('querying pending entries')
     query = session.query(PendingEntry)
     if task_name:
         query = query.filter(PendingEntry.task_name == task_name)

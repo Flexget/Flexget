@@ -1,6 +1,6 @@
-import logging
 from datetime import datetime, timedelta
 
+from loguru import logger
 from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, Unicode
 from sqlalchemy.orm import relation
 
@@ -8,7 +8,7 @@ from flexget import db_schema
 from flexget.event import event
 from flexget.utils.sqlalchemy_utils import table_add_column, table_columns
 
-log = logging.getLogger('remember_rej')
+logger = logger.bind(name='remember_rej')
 Base = db_schema.versioned_base('remember_rejected', 3)
 
 
@@ -20,17 +20,17 @@ def upgrade(ver, session):
             raise db_schema.UpgradeImpossible
         ver = 0
     if ver == 0:
-        log.info('Adding reason column to remember_rejected_entry table.')
+        logger.info('Adding reason column to remember_rejected_entry table.')
         table_add_column('remember_rejected_entry', 'reason', String, session)
         ver = 1
     if ver == 1:
-        log.info('Adding `added` column to remember_rejected_entry table.')
+        logger.info('Adding `added` column to remember_rejected_entry table.')
         table_add_column(
             'remember_rejected_entry', 'added', DateTime, session, default=datetime.now
         )
         ver = 2
     if ver == 2:
-        log.info('Adding expires column to remember_rejected_entry table.')
+        logger.info('Adding expires column to remember_rejected_entry table.')
         table_add_column('remember_rejected_entry', 'expires', DateTime, session)
         ver = 3
     return ver
@@ -71,7 +71,7 @@ def db_cleanup(manager, session):
         .delete()
     )
     if result:
-        log.verbose('Removed %d entries from remember rejected table.' % result)
+        logger.verbose('Removed {} entries from remember rejected table.', result)
 
 
 def get_rejected(session, count=None, start=None, stop=None, sort_by=None, descending=None):

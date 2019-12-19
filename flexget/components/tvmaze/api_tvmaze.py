@@ -1,7 +1,7 @@
-import logging
 from datetime import datetime, timedelta
 
 from dateutil import parser
+from loguru import logger
 from requests.exceptions import RequestException
 from sqlalchemy import (
     Column,
@@ -24,7 +24,7 @@ from flexget.utils import requests
 from flexget.utils.database import json_synonym, with_session
 from flexget.utils.tools import split_title_year
 
-log = logging.getLogger('api_tvmaze')
+logger = logger.bind(name='api_tvmaze')
 
 DB_VERSION = 7
 Base = db_schema.versioned_base('tvmaze', DB_VERSION)
@@ -196,7 +196,7 @@ class TVMazeSeries(Base):
     @property
     def expired(self):
         if not self.last_update:
-            log.debug('no last update attribute, series set for update')
+            logger.debug('no last update attribute, series set for update')
             return True
         time_dif = datetime.now() - self.last_update
         expiration = time_dif.days > UPDATE_INTERVAL
@@ -316,13 +316,13 @@ class TVMazeEpisodes(Base):
     @property
     def expired(self):
         if not self.last_update:
-            log.debug('no last update attribute, episode set for update')
+            logger.debug('no last update attribute, episode set for update')
             return True
         time_dif = datetime.now() - self.last_update
         expiration = time_dif.days > UPDATE_INTERVAL
         if expiration:
-            log.debug(
-                'episode %s, season %s for series %s is expired.',
+            logger.debug(
+                'episode {}, season {} for series {} is expired.',
                 self.number,
                 self.season_number,
                 self.series_id,
@@ -336,10 +336,10 @@ def get_db_genres(genres, session):
         db_genre = session.query(TVMazeGenre).filter(TVMazeGenre.name == genre).first()
         if not db_genre:
             db_genre = TVMazeGenre(name=genre)
-            log.trace('adding genre %s to db', genre)
+            logger.trace('adding genre {} to db', genre)
             session.add(db_genre)
         else:
-            log.trace('genre %s found in db, returning', db_genre.name)
+            logger.trace('genre {} found in db, returning', db_genre.name)
         db_genres.append(db_genre)
     return db_genres
 
@@ -351,7 +351,7 @@ def search_params_for_series(**lookup_params):
         'tvrage_id': lookup_params.get('tvrage_id'),
         'name': lookup_params.get('title') or lookup_params.get('series_name'),
     }
-    log.debug('returning search params for series lookup: {0}'.format(search_params))
+    logger.debug('returning search params for series lookup: {}', search_params)
     return search_params
 
 
@@ -368,10 +368,10 @@ def from_cache(session=None, search_params=None, cache_type=None):
     if not any(search_params.values()):
         raise LookupError('No parameters sent for cache lookup')
     else:
-        log.debug(
-            'searching db {0} for the values {1}'.format(
-                cache_type.__tablename__, list(search_params.items())
-            )
+        logger.debug(
+            'searching db {} for the values {}',
+            cache_type.__tablename__,
+            list(search_params.items()),
         )
         result = (
             session.query(cache_type)
@@ -385,21 +385,17 @@ def from_cache(session=None, search_params=None, cache_type=None):
 
 @with_session
 def from_lookup(session=None, title=None):
-    log.debug('searching lookup table using title {0}'.format(title))
+    logger.debug('searching lookup table using title {}', title)
     return session.query(TVMazeLookup).filter(TVMazeLookup.search_name == title.lower()).first()
 
 
 @with_session
 def add_to_lookup(session=None, title=None, series=None):
-    log.debug(
-        'trying to add search title {0} to series {1} in lookup table'.format(title, series.name)
-    )
+    logger.debug('trying to add search title {} to series {} in lookup table', title, series.name)
     exist = session.query(TVMazeLookup).filter(TVMazeLookup.search_name == title.lower()).first()
     if exist:
-        log.debug(
-            'title {0} already exist for series {1}, no need to save lookup'.format(
-                title, series.name
-            )
+        logger.debug(
+            'title {} already exist for series {}, no need to save lookup', title, series.name
         )
         return
     session.add(TVMazeLookup(search_name=title, series=series))
@@ -455,27 +451,26 @@ class APITVMaze:
             or lookup_params.get('title')
         )
         if not series and title:
-            log.debug(
-                'did not find exact match for series {0} in cache, looking in search table'.format(
-                    search_params['name']
-                )
+            logger.debug(
+                'did not find exact match for series {} in cache, looking in search table',
+                search_params['name'],
             )
             search = from_lookup(session=session, title=title)
             if search and search.series:
                 series = search.series
-                log.debug('found series {0} from search table'.format(series.name))
+                logger.debug('found series {} from search table', series.name)
 
         if only_cached:
             if series:  # If force_cache is True, return series even if it expired
-                log.debug('forcing cache for series {0}'.format(series.name))
+                logger.debug('forcing cache for series {}', series.name)
                 return series
             raise LookupError('Series %s not found from cache' % lookup_params)
         if series and not series.expired:
-            log.debug('returning series {0} from cache'.format(series.name))
+            logger.debug('returning series {} from cache', series.name)
             return series
 
         prepared_params = prepare_lookup_for_tvmaze(**lookup_params)
-        log.debug('trying to fetch series {0} from tvmaze'.format(title))
+        logger.debug('trying to fetch series {} from tvmaze', title)
         tvmaze_show = get_show(**prepared_params)
 
         # See if series already exist in cache
@@ -483,13 +478,11 @@ class APITVMaze:
             session.query(TVMazeSeries).filter(TVMazeSeries.tvmaze_id == tvmaze_show['id']).first()
         )
         if series:
-            log.debug(
-                'series {0} is already in cache, checking for expiration'.format(series.name)
-            )
+            logger.debug('series {} is already in cache, checking for expiration', series.name)
             if series.expired:
                 series.update(tvmaze_show, session)
         else:
-            log.debug('creating new series {0} in tvmaze_series db'.format(tvmaze_show['name']))
+            logger.debug('creating new series {} in tvmaze_series db', tvmaze_show['name'])
             series = TVMazeSeries(tvmaze_show, session)
             session.add(series)
 
@@ -498,13 +491,15 @@ class APITVMaze:
             if series and title.lower() == series.name.lower():
                 return series
             elif series and not search:
-                log.debug(
-                    'mismatch between search title {0} and series title {1}. '
-                    'saving in lookup table'.format(title, series.name)
+                logger.debug(
+                    'mismatch between search title {} and series title {}. '
+                    'saving in lookup table',
+                    title,
+                    series.name,
                 )
                 add_to_lookup(session=session, title=title, series=series)
             elif series and search:
-                log.debug('Updating search result in db')
+                logger.debug('Updating search result in db')
                 search.series = series
         return series
 
@@ -528,7 +523,7 @@ class APITVMaze:
             )
         session.flush()
         # See if season already exists in cache
-        log.debug('searching for season %s of show %s in cache', season_number, series.name)
+        logger.debug('searching for season {} of show {} in cache', season_number, series.name)
         season = (
             session.query(TVMazeSeason)
             .filter(TVMazeSeason.series_id == series.tvmaze_id)
@@ -539,11 +534,11 @@ class APITVMaze:
         # Logic for cache only mode
         if only_cached:
             if season:
-                log.debug('forcing cache for season % of show %s', season_number, series.name)
+                logger.debug('forcing cache for season {} of show {}', season_number, series.name)
                 return season
 
         if season and not series.expired:
-            log.debug('returning season %s of show %s', season_number, series.name)
+            logger.debug('returning season {} of show {}', season_number, series.name)
             return season
 
         # If no season has been found try refreshing the series seasons
@@ -589,7 +584,7 @@ class APITVMaze:
             )
 
         # See if episode already exists in cache
-        log.debug('searching for episode of show %s in cache', series.name)
+        logger.debug('searching for episode of show {} in cache', series.name)
         episode = (
             session.query(TVMazeEpisodes)
             .filter(
@@ -605,17 +600,21 @@ class APITVMaze:
         # Logic for cache only mode
         if only_cached:
             if episode:
-                log.debug(
-                    'forcing cache for episode id {3}, number{0}, season {1} for show {2}'.format(
-                        episode.number, episode.season_number, series.name, episode.tvmaze_id
-                    )
+                logger.debug(
+                    'forcing cache for episode id {3}, number{0}, season {1} for show {2}',
+                    episode.number,
+                    episode.season_number,
+                    series.name,
+                    episode.tvmaze_id,
                 )
                 return episode
         if episode and not episode.expired:
-            log.debug(
-                'found episode id {3}, number {0}, season {1} for show {2} in cache'.format(
-                    episode.number, episode.season_number, series.name, episode.tvmaze_id
-                )
+            logger.debug(
+                'found episode id {3}, number {0}, season {1} for show {2} in cache',
+                episode.number,
+                episode.season_number,
+                series.name,
+                episode.tvmaze_id,
             )
 
             return episode
@@ -626,10 +625,11 @@ class APITVMaze:
             tvmaze_episode = get_episode(series.tvmaze_id, date=episode_date)[0]
         else:
             # TODO will this match all series_id types?
-            log.debug(
-                'fetching episode {0} season {1} for series_id {2} for tvmaze'.format(
-                    episode_number, season_number, series.tvmaze_id
-                )
+            logger.debug(
+                'fetching episode {0} season {1} for series_id {2} for tvmaze',
+                episode_number,
+                season_number,
+                series.tvmaze_id,
             )
             tvmaze_episode = get_episode(
                 series.tvmaze_id, season=season_number, number=episode_number
@@ -654,7 +654,7 @@ class APITVMaze:
             # TVMaze must have fucked up and now we have to clean up that mess. Delete any row for this season
             # that hasn't been updated in the last hour. Can't trust any of the cached data, but deleting new data
             # might have some unintended consequences.
-            log.warning(
+            logger.warning(
                 'Episode lookup in cache returned multiple results. Deleting the cached data.'
             )
             deleted_rows = (
@@ -668,16 +668,14 @@ class APITVMaze:
                 .filter(TVMazeEpisodes.last_update <= datetime.now() - timedelta(hours=1))
                 .delete()
             )
-            log.debug('Deleted %s rows', deleted_rows)
+            logger.debug('Deleted {} rows', deleted_rows)
             episode = None
 
         if episode:
-            log.debug(
-                'found expired episode {0} in cache, refreshing data.'.format(episode.tvmaze_id)
-            )
+            logger.debug('found expired episode {} in cache, refreshing data.', episode.tvmaze_id)
             episode.update(tvmaze_episode)
         else:
-            log.debug('creating new episode for show {0}'.format(series.name))
+            logger.debug('creating new episode for show {}', series.name)
             episode = TVMazeEpisodes(tvmaze_episode, series.tvmaze_id)
             session.add(episode)
 
@@ -729,7 +727,7 @@ def tvmaze_lookup(lookup_url, **kwargs):
     :return: A JSON reply from the API
     """
     url = BASE_URL + lookup_url
-    log.debug('querying tvmaze API with the following URL: %s', url)
+    logger.debug('querying tvmaze API with the following URL: {}', url)
     try:
         result = requests.get(url, **kwargs).json()
     except RequestException as e:

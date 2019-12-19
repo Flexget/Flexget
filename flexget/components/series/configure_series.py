@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import process_config
@@ -7,7 +7,7 @@ from flexget.plugin import PluginError
 
 from . import series as plugin_series
 
-log = logging.getLogger('configure_series')
+logger = logger.bind(name='configure_series')
 
 
 class ConfigureSeries(plugin_series.FilterSeriesBase):
@@ -52,10 +52,10 @@ class ConfigureSeries(plugin_series.FilterSeriesBase):
             try:
                 result = method(task, input_config)
             except PluginError as e:
-                log.warning('Error during input plugin %s: %s' % (input_name, e))
+                logger.warning('Error during input plugin {}: {}', input_name, e)
                 continue
             if not result:
-                log.warning('Input %s did not return anything' % input_name)
+                logger.warning('Input {} did not return anything', input_name)
                 continue
 
             for entry in result:
@@ -70,15 +70,17 @@ class ConfigureSeries(plugin_series.FilterSeriesBase):
                             entry['configure_series_' + key], schema, set_defaults=False
                         )
                         if errors:
-                            log.debug(
-                                'not setting series option %s for %s. errors: %s'
-                                % (key, entry['title'], errors)
+                            logger.debug(
+                                'not setting series option {} for {}. errors: {}',
+                                key,
+                                entry['title'],
+                                errors,
                             )
                         else:
                             s[key] = entry['configure_series_' + key]
 
         if not series:
-            log.info('Did not get any series to generate series configuration')
+            logger.info('Did not get any series to generate series configuration')
             return
 
         # Make a series config with the found series

@@ -1,11 +1,12 @@
-import logging
 import os
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.tools import aggregate_inputs
 
-log = logging.getLogger('torrent_match')
+logger = logger.bind(name='torrent_match')
 
 
 class TorrentMatchFile:
@@ -45,7 +46,7 @@ class TorrentMatch:
         for entry in entries:
             location = entry.get('location')
             if not location or not os.path.exists(location):
-                log.warning('%s is not a local file. Skipping.', entry['title'])
+                logger.warning('{} is not a local file. Skipping.', entry['title'])
                 entry.reject('not a local file')
                 continue
 
@@ -99,7 +100,7 @@ class TorrentMatch:
         matched_entries = set()
         for entry in task.accepted:
             if 'torrent' not in entry:
-                log.debug('Skipping entry %s as it is not a torrent file', entry['title'])
+                logger.debug('Skipping entry {} as it is not a torrent file', entry['title'])
                 continue
 
             # Find all files and file sizes in the .torrent.
@@ -114,8 +115,8 @@ class TorrentMatch:
 
             # Iterate over the files/dirs from the  what  plugins
             for local_entry in local_entries:
-                log.debug(
-                    "Checking local entry %s against %s", local_entry['title'], entry['title']
+                logger.debug(
+                    'Checking local entry {} against {}', local_entry['title'], entry['title']
                 )
 
                 local_files = local_entry['files']
@@ -135,7 +136,7 @@ class TorrentMatch:
                                 entry['path'] = os.path.dirname(local_entry['location'])
                             else:
                                 entry['path'] = local_entry['location']
-                            log.debug('Path for %s set to %s', entry['title'], entry['path'])
+                            logger.debug('Path for {} set to {}', entry['title'], entry['path'])
                             matched_entries.add(entry)
                             break
                 else:
@@ -158,7 +159,7 @@ class TorrentMatch:
 
                             candidate_files.append(local_file)
 
-                    log.debug('Path for %s will be set to %s', entry['title'], path)
+                    logger.debug('Path for {} will be set to {}', entry['title'], path)
 
                     for torrent_file in torrent_files:
                         for candidate in candidate_files:
@@ -166,15 +167,15 @@ class TorrentMatch:
                                 torrent_file.path in candidate.path
                                 and torrent_file.size == candidate.size
                             ):
-                                log.debug(
-                                    'Path %s matched local file path %s',
+                                logger.debug(
+                                    'Path {} matched local file path {}',
                                     torrent_file.path,
                                     candidate.path,
                                 )
                                 matches += 1
                                 break
                         else:
-                            log.debug('No local paths matched %s', torrent_file.path)
+                            logger.debug('No local paths matched {}', torrent_file.path)
                             missing_size += torrent_file.size
                         total_size += torrent_file.size
 
@@ -185,7 +186,7 @@ class TorrentMatch:
                         # set the path of the torrent entry
                         entry['path'] = path
 
-                        log.debug('Torrent %s matched path %s', entry['title'], entry['path'])
+                        logger.debug('Torrent {} matched path {}', entry['title'], entry['path'])
                         # TODO keep searching for even better matches?
                         break
 

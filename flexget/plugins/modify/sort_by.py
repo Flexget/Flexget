@@ -1,12 +1,13 @@
-import logging
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils.template import evaluate_expression
 
-log = logging.getLogger('sort_by')
+logger = logger.bind(name='sort_by')
 
 RE_ARTICLES = r'^(the|a|an)\s'
 
@@ -65,7 +66,7 @@ class PluginSortBy:
                 reverse = item.get('reverse', False)
                 ignore_articles = item.get('ignore_articles', False)
 
-            log.debug('sorting entries by: %s', item)
+            logger.debug('sorting entries by: {}', item)
 
             if not field:
                 if reverse:
