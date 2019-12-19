@@ -1,11 +1,11 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
 from . import db
 
-log = logging.getLogger('series_forget')
+logger = logger.bind(name='series_forget')
 
 
 class OutputSeriesRemove:
@@ -18,14 +18,14 @@ class OutputSeriesRemove:
             if 'series_name' in entry and 'series_id' in entry:
                 try:
                     db.remove_series_entity(entry['series_name'], entry['series_id'])
-                    log.info(
-                        'Removed episode `%s` from series `%s` download history.'
-                        % (entry['series_id'], entry['series_name'])
+                    logger.info(
+                        'Removed episode `{}` from series `{}` download history.',
+                        entry['series_id'],
+                        entry['series_name'],
                     )
                 except ValueError:
-                    log.debug(
-                        'Series (%s) or id (%s) unknown.'
-                        % (entry['series_name'], entry['series_id'])
+                    logger.debug(
+                        'Series ({}) or id ({}) unknown.', entry['series_name'], entry['series_id']
                     )
 
 

@@ -1,6 +1,6 @@
-import logging
 from datetime import timedelta
 
+from loguru import logger
 from sqlalchemy import desc, func
 
 from flexget import plugin
@@ -10,7 +10,7 @@ from flexget.utils.tools import multiply_timedelta
 
 from . import db
 
-log = logging.getLogger('est_series_internal')
+logger = logger.bind(name='est_series_internal')
 
 
 class EstimatesSeriesInternal:

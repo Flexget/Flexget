@@ -116,7 +116,9 @@ def populate_entry_fields(entry, parser, config):
     if config:
         # set custom download path
         if 'path' in config:
-            logger.debug('setting custom path for `{}` to `{}`', entry['title'], config.get('path'))
+            logger.debug(
+                'setting custom path for `{}` to `{}`', entry['title'], config.get('path')
+            )
             # Just add this to the 'set' dictionary, so that string replacement is done cleanly
             config.setdefault('set', {}).update(path=config['path'])
 
@@ -599,7 +601,9 @@ class FilterSeries(FilterSeriesBase):
                 continue
             parsed.field = 'title'
 
-            logger.debug('`{}` detected as `{}`, field: `{}`', entry['title'], parsed, parsed.field)
+            logger.debug(
+                '`{}` detected as `{}`, field: `{}`', entry['title'], parsed, parsed.field
+            )
             populate_entry_fields(entry, parsed, config)
 
     def process_series(self, task, series_entries, config):
