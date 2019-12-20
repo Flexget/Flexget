@@ -5,10 +5,10 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.task import Task
 
-logger = logger.bind(name='subtask')
+logger = logger.bind(name='from_task')
 
 
-class Subtask(object):
+class FromTask(object):
     """An input plugin which returns accepted entries from another task."""
 
     schema = {'type': 'string'}
@@ -37,4 +37,4 @@ class Subtask(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Subtask, 'subtask', api_ver=2)
+    plugin.register(FromTask, 'from_task', api_ver=2)
