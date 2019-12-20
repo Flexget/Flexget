@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.log import log_once
 
-log = logging.getLogger('imdb')
+logger = logger.bind(name='imdb')
 
 
-class FilterImdb(object):
+class FilterImdb:
     """
     This plugin allows filtering based on IMDB score, votes and genres etc.
 
@@ -120,9 +117,10 @@ class FilterImdb(object):
                 lookup(entry)
             except plugin.PluginError as e:
                 # logs skip message once trough log_once (info) and then only when ran from cmd line (w/o --cron)
-                msg = 'Skipping %s because of an error: %s' % (entry['title'], e.value)
-                if not log_once(msg, logger=log):
-                    log.verbose(msg)
+                log_once(
+                    'Skipping %s because of an error: %s' % (entry['title'], e.value),
+                    logger=logger,
+                )
                 continue
 
             # for key, value in entry.iteritems():
@@ -199,7 +197,9 @@ class FilterImdb(object):
                 accepted = config['accept_actors']
                 for actor_id, actor_name in entry.get('imdb_actors', {}).items():
                     if actor_id in accepted or actor_name in accepted:
-                        log.debug('Accepting because of accept_actors %s' % actor_name or actor_id)
+                        logger.debug(
+                            'Accepting because of accept_actors {}', actor_name or actor_id
+                        )
                         force_accept = True
                         break
 
@@ -215,9 +215,9 @@ class FilterImdb(object):
                 accepted = config['accept_directors']
                 for director_id, director_name in entry.get('imdb_directors', {}).items():
                     if director_id in accepted or director_name in accepted:
-                        log.debug(
-                            'Accepting because of accept_directors %s' % director_name
-                            or director_id
+                        logger.debug(
+                            'Accepting because of accept_directors {}',
+                            director_name or director_id,
                         )
                         force_accept = True
                         break
@@ -234,8 +234,8 @@ class FilterImdb(object):
                 accepted = config['accept_writers']
                 for writer_id, writer_name in entry.get('imdb_writers', {}).items():
                     if writer_id in accepted or writer_name in accepted:
-                        log.debug(
-                            'Accepting because of accept_writers %s' % writer_name or writer_id
+                        logger.debug(
+                            'Accepting because of accept_writers {}', writer_name or writer_id
                         )
                         force_accept = True
                         break
@@ -256,14 +256,14 @@ class FilterImdb(object):
                     ', '.join(reasons),
                 )
                 if task.options.debug:
-                    log.debug(msg)
+                    logger.debug(msg)
                 else:
                     if task.options.cron:
-                        log_once(msg, log)
+                        log_once(msg, logger)
                     else:
-                        log.info(msg)
+                        logger.info(msg)
             else:
-                log.debug('Accepting %s' % (entry['title']))
+                logger.debug('Accepting {}', entry['title'])
                 entry.accept()
 
 

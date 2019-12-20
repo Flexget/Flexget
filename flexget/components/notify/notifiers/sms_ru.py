@@ -1,17 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import hashlib
+
+from loguru import logger
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from flexget.utils.requests import Session as RequestSession, TimedLimiter
-from requests.exceptions import RequestException
+from flexget.utils.requests import Session as RequestSession
+from flexget.utils.requests import TimedLimiter
 
 plugin_name = 'sms_ru'
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 SMS_SEND_URL = 'http://sms.ru/sms/send'
 SMS_TOKEN_URL = 'http://sms.ru/auth/get_token'
@@ -20,7 +19,7 @@ requests = RequestSession(max_retries=3)
 requests.add_domain_limiter(TimedLimiter('sms.ru', '5 seconds'))
 
 
-class SMSRuNotifier(object):
+class SMSRuNotifier:
     """
     Sends SMS notification through sms.ru http api sms/send.
     Phone number is a login assigned to sms.ru account.

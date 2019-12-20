@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginError
 
-log = logging.getLogger('list_add')
+logger = logger.bind(name='list_add')
 
 
-class ListAdd(object):
+class ListAdd:
     schema = {
         'type': 'array',
         'items': {
@@ -40,20 +37,19 @@ class ListAdd(object):
     @plugin.priority(0)
     def on_task_output(self, task, config):
         if not len(task.accepted) > 0:
-            log.debug('no accepted entries, nothing to add')
+            logger.debug('no accepted entries, nothing to add')
             return
 
         for item in config:
             for plugin_name, plugin_config in item.items():
                 thelist = plugin.get(plugin_name, self).get_list(plugin_config)
                 if task.manager.options.test and thelist.online:
-                    log.info(
-                        '`%s` is marked as an online plugin, would add accepted items outside of --test mode. '
-                        'Skipping',
+                    logger.info(
+                        '`{}` is marked as an online plugin, would add accepted items outside of --test mode. Skipping',
                         plugin_name,
                     )
                     continue
-                log.verbose('adding accepted entries into %s - %s', plugin_name, plugin_config)
+                logger.verbose('adding accepted entries into {} - {}', plugin_name, plugin_config)
                 thelist |= task.accepted
 
 

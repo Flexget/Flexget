@@ -1,10 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-
-import logging
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from datetime import datetime
 
-from sqlalchemy import Column, Unicode, Integer, DateTime, func, Boolean
+from loguru import logger
+from sqlalchemy import Boolean, Column, DateTime, Integer, Unicode, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
 from sqlalchemy.sql.schema import ForeignKey
@@ -14,7 +11,7 @@ from flexget.db_schema import versioned_base
 from flexget.utils.database import entry_synonym, with_session
 
 plugin_name = 'pending_list'
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 Base = versioned_base(plugin_name, 0)
 
 
@@ -76,17 +73,17 @@ class PendingListEntry(Base):
 
 @with_session
 def get_pending_lists(name=None, session=None):
-    log.debug('retrieving pending lists')
+    logger.debug('retrieving pending lists')
     query = session.query(PendingListList)
     if name:
-        log.debug('searching for pending lists with name %s', name)
+        logger.debug('searching for pending lists with name {}', name)
         query = query.filter(PendingListList.name.contains(name))
     return query.all()
 
 
 @with_session
 def get_list_by_exact_name(name, session=None):
-    log.debug('returning pending list with name %s', name)
+    logger.debug('returning pending list with name {}', name)
     return (
         session.query(PendingListList)
         .filter(func.lower(PendingListList.name) == name.lower())
@@ -96,7 +93,7 @@ def get_list_by_exact_name(name, session=None):
 
 @with_session
 def get_list_by_id(list_id, session=None):
-    log.debug('returning pending list with id %d', list_id)
+    logger.debug('returning pending list with id {}', list_id)
     return session.query(PendingListList).filter(PendingListList.id == list_id).one()
 
 
@@ -104,7 +101,7 @@ def get_list_by_id(list_id, session=None):
 def delete_list_by_id(list_id, session=None):
     entry_list = get_list_by_id(list_id=list_id, session=session)
     if entry_list:
-        log.debug('deleting pending list with id %d', list_id)
+        logger.debug('deleting pending list with id {}', list_id)
         session.delete(entry_list)
 
 
@@ -117,14 +114,17 @@ def get_entries_by_list_id(
     descending=False,
     approved=False,
     filter=None,
+    entry_ids=None,
     session=None,
 ):
-    log.debug('querying entries from pending list with id %d', list_id)
+    logger.debug('querying entries from pending list with id {}', list_id)
     query = session.query(PendingListEntry).filter(PendingListEntry.list_id == list_id)
     if filter:
         query = query.filter(func.lower(PendingListEntry.title).contains(filter.lower()))
     if approved:
         query = query.filter(PendingListEntry.approved is approved)
+    if entry_ids:
+        query = query.filter(PendingListEntry.id.in_(entry_ids))
     if descending:
         query = query.order_by(getattr(PendingListEntry, order_by).desc())
     else:
@@ -136,7 +136,7 @@ def get_entries_by_list_id(
 def get_entry_by_title(list_id, title, session=None):
     entry_list = get_list_by_id(list_id=list_id, session=session)
     if entry_list:
-        log.debug('fetching entry with title `%s` from list id %d', title, list_id)
+        logger.debug('fetching entry with title `{}` from list id {}', title, list_id)
         return (
             session.query(PendingListEntry)
             .filter(and_(PendingListEntry.title == title, PendingListEntry.list_id == list_id))
@@ -146,7 +146,7 @@ def get_entry_by_title(list_id, title, session=None):
 
 @with_session
 def get_entry_by_id(list_id, entry_id, session=None):
-    log.debug('fetching entry with id %d from list id %d', entry_id, list_id)
+    logger.debug('fetching entry with id {} from list id {}', entry_id, list_id)
     return (
         session.query(PendingListEntry)
         .filter(and_(PendingListEntry.id == entry_id, PendingListEntry.list_id == list_id))

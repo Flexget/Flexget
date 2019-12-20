@@ -1,17 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from collections import OrderedDict
 
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.requests import Session
-from collections import OrderedDict
 
-log = logging.getLogger('cfscraper')
+logger = logger.bind(name='cfscraper')
 
 
-class CFScraper(object):
+class CFScraper:
     """
     Plugin that enables scraping of cloudflare protected sites.
 
@@ -26,7 +24,7 @@ class CFScraper(object):
         try:
             import cloudscraper
         except ImportError as e:
-            log.debug('Error importing cloudscraper: %s' % e)
+            logger.debug('Error importing cloudscraper: {}', e)
             raise plugin.DependencyError(
                 'cfscraper', 'cloudscraper', 'cloudscraper module required. ImportError: %s' % e
             )
@@ -37,17 +35,15 @@ class CFScraper(object):
             """
 
         if config is True:
-            task.requests.headers = (
-                OrderedDict(
-                    [
-                        ('User-Agent', task.requests.headers['User-Agent']),
-                        ('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'),
-                        ('Accept-Language', 'en-US,en;q=0.5'),
-                        ('Accept-Encoding', 'gzip, deflate'),
-                        ('Connection',  'close'),
-                        ('Upgrade-Insecure-Requests', '1')
-                    ]
-                )
+            task.requests.headers = OrderedDict(
+                [
+                    ('User-Agent', task.requests.headers['User-Agent']),
+                    ('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'),
+                    ('Accept-Language', 'en-US,en;q=0.5'),
+                    ('Accept-Encoding', 'gzip, deflate'),
+                    ('Connection', 'close'),
+                    ('Upgrade-Insecure-Requests', '1'),
+                ]
             )
             task.requests = CFScrapeWrapper.create_scraper(task.requests)
 

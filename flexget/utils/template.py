@@ -1,35 +1,30 @@
-from __future__ import unicode_literals, division, absolute_import
-from future.utils import text_to_native_str
-from flexget.utils.tools import native_str_to_text
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
-import os
-import re
 import locale
+import os
 import os.path
+import re
 from copy import copy
-from datetime import datetime, date, time
+from datetime import date, datetime, time
 
 import jinja2.filters
+from dateutil import parser as dateutil_parse
 from jinja2 import (
-    Environment,
-    StrictUndefined,
     ChoiceLoader,
+    Environment,
     FileSystemLoader,
     PackageLoader,
+    StrictUndefined,
     Template,
     TemplateNotFound,
     TemplateSyntaxError,
 )
 from jinja2.nativetypes import NativeTemplate
-from dateutil import parser as dateutil_parse
+from loguru import logger
 
 from flexget.event import event
 from flexget.utils.lazy_dict import LazyDict
 from flexget.utils.pathscrub import pathscrub
 
-log = logging.getLogger('utils.template')
+logger = logger.bind(name='utils.template')
 
 # The environment will be created after the manager has started
 environment = None
@@ -86,9 +81,7 @@ def filter_formatdate(val, format):
     encoding = locale.getpreferredencoding()
     if not isinstance(val, (datetime, date, time)):
         return val
-    return native_str_to_text(
-        val.strftime(text_to_native_str(format, encoding=encoding)), encoding=encoding
-    )
+    return val.strftime(format)
 
 
 def filter_parsedate(val):
@@ -160,13 +153,14 @@ class FlexGetTemplate(Template):
     """Adds lazy lookup support when rendering templates."""
 
     def new_context(self, vars=None, shared=False, locals=None):
-        context = super(FlexGetTemplate, self).new_context(vars, shared, locals)
+        context = super().new_context(vars, shared, locals)
         context.parent = LazyDict(context.parent)
         return context
 
 
 class FlexGetNativeTemplate(FlexGetTemplate, NativeTemplate):
     """Lazy lookup support and native python return types."""
+
     pass
 
 
@@ -254,7 +248,7 @@ def render(template, context, native=False):
         result = template.render(context)
     except Exception as e:
         error = RenderError('(%s) %s' % (type(e).__name__, e))
-        log.debug('Error during rendering: %s', error)
+        logger.debug('Error during rendering: {}', error)
         raise error
 
     return result

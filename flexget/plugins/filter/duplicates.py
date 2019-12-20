@@ -1,13 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('duplicates')
+logger = logger.bind(name='duplicates')
 
 
-class Duplicates(object):
+class Duplicates:
     """
     Take action on entries with duplicate field values
 

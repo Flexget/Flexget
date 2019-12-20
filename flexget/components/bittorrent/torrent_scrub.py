@@ -1,7 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-
-import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
@@ -13,10 +10,10 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='torrent')
 
-log = logging.getLogger('torrent_scrub')
+logger = logger.bind(name='torrent_scrub')
 
 
-class TorrentScrub(object):
+class TorrentScrub:
     """ Scrubs torrents from unwanted keys.
 
         Example:
@@ -51,7 +48,7 @@ class TorrentScrub(object):
         else:
             mode = str(config).lower()
             if mode in ("off", "false"):
-                log.debug("Plugin configured, but disabled")
+                logger.debug("Plugin configured, but disabled")
                 return
 
         for entry in task.entries:
@@ -66,7 +63,7 @@ class TorrentScrub(object):
 
             if mode in ("on", "all", "true"):
                 modified = bittorrent.clean_meta(
-                    metainfo, including_info=(mode == "all"), logger=log.debug
+                    metainfo, including_info=(mode == "all"), logger=logger.debug
                 )
             elif mode in ("resume", "rtorrent"):
                 if mode == "resume":
@@ -74,7 +71,7 @@ class TorrentScrub(object):
 
                 for key in self.RT_KEYS:
                     if key in metainfo:
-                        log.debug("Removing key '%s'..." % (key,))
+                        logger.debug("Removing key '{}'...", key)
                         del metainfo[key]
                         modified.add(key)
             elif mode == "fields":
@@ -91,10 +88,10 @@ class TorrentScrub(object):
                         except KeyError:
                             # Key not found in this entry
                             field = None
-                        log.trace((key, field))
+                        logger.trace((key, field))
 
                     if field and key in field:
-                        log.debug("Removing key '%s'..." % (fieldname,))
+                        logger.debug("Removing key '{}'...", fieldname)
                         del field[key]
                         modified.add(fieldname)
             else:
@@ -104,18 +101,19 @@ class TorrentScrub(object):
             if modified:
                 entry["torrent"].content = metainfo
                 entry["torrent"].modified = True
-                log.info(
-                    (
-                        ("Key %s was" if len(modified) == 1 else "Keys %s were")
-                        + " scrubbed from torrent '%s'!"
-                    )
-                    % (", ".join(sorted(modified)), entry['title'])
+                logger.info(
+                    ('Key {} was' if len(modified) == 1 else 'Keys {} were')
+                    + " scrubbed from torrent '{}'!",
+                    ', '.join(sorted(modified)),
+                    entry['title'],
                 )
                 new_infohash = entry["torrent"].info_hash
                 if infohash != new_infohash:
-                    log.warning(
-                        "Info hash changed from #%s to #%s in '%s'"
-                        % (infohash, new_infohash, entry['filename'])
+                    logger.warning(
+                        "Info hash changed from #{} to #{} in '{}'",
+                        infohash,
+                        new_infohash,
+                        entry['filename'],
                     )
 
 

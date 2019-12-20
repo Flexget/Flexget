@@ -1,24 +1,21 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.request import urlopen
-from future.moves.urllib.parse import urlparse
-from future.utils import text_to_native_str
-
-import time
 import logging
-from datetime import timedelta, datetime
-
-import requests
+import time
 
 # Allow some request objects to be imported from here instead of requests
 import warnings
+from datetime import datetime, timedelta
+from urllib.parse import urlparse
+from urllib.request import urlopen
+
+import requests
+from loguru import logger
 from requests import RequestException
 
 from flexget import __version__ as version
-from flexget.utils.tools import parse_timedelta, TimedDict, timedelta_total_seconds
+from flexget.utils.tools import TimedDict, parse_timedelta, timedelta_total_seconds
 
 # If we use just 'requests' here, we'll get the logger created by requests, rather than our own
-log = logging.getLogger('utils.requests')
+logger = logger.bind(name='utils.requests')
 
 # Don't emit info level urllib3 log messages or below
 logging.getLogger('requests.packages.urllib3').setLevel(logging.WARNING)
@@ -56,7 +53,7 @@ def set_unresponsive(url):
     unresponsive_hosts[host] = True
 
 
-class DomainLimiter(object):
+class DomainLimiter:
     def __init__(self, domain):
         self.domain = domain
 
@@ -82,7 +79,7 @@ class TokenBucketLimiter(DomainLimiter):
         :param rate: Amount of time to accrue 1 token. Either `timedelta` or interval string.
         :param bool wait: If true, will wait for a token to be available. If false, errors when token is not available.
         """
-        super(TokenBucketLimiter, self).__init__(domain)
+        super().__init__(domain)
         self.max_tokens = tokens
         self.rate = parse_timedelta(rate)
         self.wait = wait
@@ -120,9 +117,9 @@ class TokenBucketLimiter(DomainLimiter):
             wait = timedelta_total_seconds(self.rate) * (1 - self.tokens)
             # Don't spam console if wait is low
             if wait < 4:
-                level = log.debug
+                level = logger.debug
             else:
-                level = log.verbose
+                level = logger.verbose
             level('Waiting %.2f seconds until next request to %s', wait, self.domain)
             # Sleep until it is time for the next request
             time.sleep(wait)
@@ -133,7 +130,7 @@ class TimedLimiter(TokenBucketLimiter):
     """Enforces a minimum interval between requests to a given domain."""
 
     def __init__(self, domain, interval):
-        super(TimedLimiter, self).__init__(domain, 1, interval)
+        super().__init__(domain, 1, interval)
 
 
 def _wrap_urlopen(url, timeout=None):
@@ -145,10 +142,10 @@ def _wrap_urlopen(url, timeout=None):
 
     """
     try:
-        raw = urlopen(text_to_native_str(url, encoding='utf-8'), timeout=timeout)
+        raw = urlopen(url, timeout=timeout)
     except IOError as e:
         msg = 'Error getting %s: %s' % (url, e)
-        log.error(msg)
+        logger.error(msg)
         raise RequestException(msg)
     resp = requests.Response()
     resp.raw = raw
@@ -181,7 +178,7 @@ class Session(requests.Session):
 
     def __init__(self, timeout=30, max_retries=1, *args, **kwargs):
         """Set some defaults for our session if not explicitly defined."""
-        super(Session, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.timeout = timeout
         self.stream = True
         self.adapters['http://'].max_retries = max_retries
@@ -244,12 +241,12 @@ class Session(requests.Session):
 
         # If we do not have an adapter for this url, pass it off to urllib
         if not any(url.startswith(adapter) for adapter in self.adapters):
-            log.debug('No adaptor, passing off to urllib')
+            logger.debug('No adaptor, passing off to urllib')
             return _wrap_urlopen(url, timeout=kwargs['timeout'])
 
         try:
-            log.debug('%sing URL %s with args %s and kwargs %s', method.upper(), url, args, kwargs)
-            result = super(Session, self).request(method, url, *args, **kwargs)
+            logger.debug('{}ing URL {} with args {} and kwargs {}', method.upper(), url, args, kwargs)
+            result = super().request(method, url, *args, **kwargs)
         except requests.Timeout:
             # Mark this site in known unresponsive list
             set_unresponsive(url)

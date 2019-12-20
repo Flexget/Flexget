@@ -1,17 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from flexget.utils.requests import Session as RequestSession, TimedLimiter
-from requests.exceptions import RequestException
+from flexget.utils.requests import Session as RequestSession
+from flexget.utils.requests import TimedLimiter
 
 plugin_name = 'pushsafer'
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 PUSHSAFER_URL = 'https://www.pushsafer.com/api'
 
@@ -19,7 +17,7 @@ requests = RequestSession(max_retries=3)
 requests.add_domain_limiter(TimedLimiter('pushsafer.com', '5 seconds'))
 
 
-class PushsaferNotifier(object):
+class PushsaferNotifier:
     """
     Example::
 

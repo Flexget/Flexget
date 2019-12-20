@@ -1,15 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('torrent_size')
+logger = logger.bind(name='torrent_size')
 
 
-class TorrentSize(object):
+class TorrentSize:
     """
     Provides file size information when dealing with torrents
     """
@@ -19,7 +16,7 @@ class TorrentSize(object):
         for entry in task.entries:
             if 'torrent' in entry:
                 size = entry['torrent'].size / 1024 / 1024
-                log.debug('%s size: %s MB' % (entry['title'], size))
+                logger.debug('{} size: {} MB', entry['title'], size)
                 entry['content_size'] = size
 
 

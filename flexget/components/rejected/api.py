@@ -1,23 +1,21 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from math import ceil
 
 from flask import jsonify, request
-from math import ceil
+from loguru import logger
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import (
-    base_message_schema,
-    success_response,
-    etag,
     NotFoundError,
+    base_message_schema,
+    etag,
     pagination_headers,
+    success_response,
 )
+
 from . import db
 
-log = logging.getLogger('rejected')
+logger = logger.bind(name='rejected')
 
 rejected_api = api.namespace('rejected', description='View and manage remembered rejected entries')
 
@@ -34,7 +32,7 @@ def rejected_entry_to_dict(entry):
     }
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     rejected_entry_object = {
         'type': 'object',
         'properties': {

@@ -1,17 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-import logging
+from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
 from flexget.entry import Entry
+from flexget.event import event
 from flexget.utils.tools import group_entries
 
-log = logging.getLogger('best_quality')
+logger = logger.bind(name='best_quality')
 
 entry_actions = {'accept': Entry.accept, 'reject': Entry.reject}
 
 
-class FilterBestQuality(object):
+class FilterBestQuality:
     schema = {
         'type': 'object',
         'properties': {

@@ -1,22 +1,20 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 from math import ceil
 
 from flask import jsonify, request
-from sqlalchemy import desc, asc
+from loguru import logger
+from sqlalchemy import asc, desc
 
-from flexget.api import api, APIResource
-from flexget.api.app import BadRequest, etag, pagination_headers, NotFoundError
+from flexget.api import APIResource, api
+from flexget.api.app import BadRequest, NotFoundError, etag, pagination_headers
+
 from . import db
 
-log = logging.getLogger('history')
+logger = logger.bind(name='history')
 
 history_api = api.namespace('history', description='Entry History')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     base_history_object = {
         'type': 'object',
         'properties': {

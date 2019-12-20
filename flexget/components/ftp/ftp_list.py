@@ -1,7 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import ftplib
-import logging
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -18,10 +17,10 @@ try:
 except ImportError:
     imported = False
 
-log = logging.getLogger('ftp_list')
+logger = logger.bind(name='ftp_list')
 
 
-class FTPList(object):
+class FTPList:
     def __init__(self):
         self.username = None
         self.password = None
@@ -73,23 +72,23 @@ class FTPList(object):
         )
         entry['filename'] = title
 
-        log.debug('adding entry %s', entry)
+        logger.debug('adding entry {}', entry)
         if entry.isvalid():
             return entry
         else:
-            log.warning('tried to return an illegal entry: %s', entry)
+            logger.warning('tried to return an illegal entry: {}', entry)
 
     def get_content(self, path, recursion, recursion_depth, content_types):
         content_list = []
         with self.FTP as ftp:
             if not ftp.path.isdir(path):
-                log.warning('Directory %s is not a valid dir, skipping', path)
+                logger.warning('Directory {} is not a valid dir, skipping', path)
                 return []
             if recursion:
                 for base, dirs, files in ftp.walk(path):
                     current_depth = base.count('/')
                     if current_depth > recursion_depth != -1:
-                        log.debug('recursion depth limit of %s reached, continuing', current_depth)
+                        logger.debug('recursion depth limit of {} reached, continuing', current_depth)
                         continue
                     if 'files' in content_types or 'symlinks' in content_types:
                         for _file in files:
@@ -100,8 +99,8 @@ class FTPList(object):
                                 or ftp.path.islink(path)
                                 and 'symlinks' in content_types
                             ):
-                                log.debug(
-                                    'type match successful for file %s, trying to create entry',
+                                logger.debug(
+                                    'type match successful for file {}, trying to create entry',
                                     _file,
                                 )
                                 content_list.append(content)
@@ -114,8 +113,8 @@ class FTPList(object):
                                 or ftp.path.islink(path)
                                 and 'symlinks' in content_types
                             ):
-                                log.debug(
-                                    'type match successful for dir %s, trying to create entry',
+                                logger.debug(
+                                    'type match successful for dir {}, trying to create entry',
                                     _dir,
                                 )
                                 content_list.append(content)
@@ -127,8 +126,8 @@ class FTPList(object):
                         or ('dirs' in content_types and ftp.path.isdir(content))
                         or ('symlinks' in content_types and ftp.path.islink(content))
                     ):
-                        log.debug(
-                            'type match successful for object %s, trying to create entry', content
+                        logger.debug(
+                            'type match successful for object {}, trying to create entry', content
                         )
                         content_list.append(content)
         return content_list
@@ -151,8 +150,8 @@ class FTPList(object):
         base_class = ftplib.FTP_TLS if config.get('ssl') else ftplib.FTP
         session_factory = ftputil.session.session_factory(port=self.port, base_class=base_class)
         try:
-            log.verbose(
-                'trying to establish connection to FTP: %s:<HIDDEN>@%s:%s',
+            logger.verbose(
+                'trying to establish connection to FTP: {}:<HIDDEN>@{}:{}',
                 self.username,
                 self.host,
                 self.port,

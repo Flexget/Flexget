@@ -1,17 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import os
-import logging
 import tempfile
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('check_subtitles')
+logger = logger.bind(name='check_subtitles')
 
 
-class MetainfoSubs(object):
+class MetainfoSubs:
     """
     Set 'subtitles' field for entries, if they are local video files with subs.
     The field is a list of language codes (3-letter ISO-639-3) for each subtitles
@@ -26,7 +24,7 @@ class MetainfoSubs(object):
         try:
             import subliminal
         except ImportError as e:
-            log.debug('Error importing Subliminal: %s' % e)
+            logger.debug('Error importing Subliminal: {}', e)
             raise plugin.DependencyError(
                 'subliminal', 'subliminal', 'Subliminal module required. ImportError: %s' % e
             )
@@ -75,9 +73,9 @@ class MetainfoSubs(object):
                 # convert to human-readable strings
                 subtitles = [str(l) for l in subtitles]
                 entry['subtitles'] = subtitles
-                log.debug('Found subtitles %s for %s', '/'.join(subtitles), entry['title'])
+                logger.debug('Found subtitles {} for {}', '/'.join(subtitles), entry['title'])
         except Exception as e:
-            log.error('Error checking local subtitles for %s: %s', entry['title'], e)
+            logger.error('Error checking local subtitles for {}: {}', entry['title'], e)
 
 
 @event('plugin.register')

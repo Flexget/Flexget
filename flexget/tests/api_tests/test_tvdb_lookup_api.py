@@ -1,16 +1,12 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
-from flexget.api.app import base_message
 
+from flexget.api.app import base_message
 from flexget.components.thetvdb.api import ObjectsContainer as OC
 from flexget.utils import json
 
 
 @pytest.mark.online
-class TestTVDBSeriesLookupAPI(object):
+class TestTVDBSeriesLookupAPI:
     config = 'tasks: {}'
 
     def test_tvdb_series_lookup(self, api_client, schema_match):
@@ -62,7 +58,7 @@ class TestTVDBSeriesLookupAPI(object):
 
 
 @pytest.mark.online
-class TestTVDBSeriesActorsLookupAPI(object):
+class TestTVDBSeriesActorsLookupAPI:
     config = 'tasks: {}'
 
     def test_tvdb_series_lookup_with_actors(self, api_client, schema_match):
@@ -87,7 +83,7 @@ class TestTVDBSeriesActorsLookupAPI(object):
 
 
 @pytest.mark.online
-class TestTVDBEpisodeLookupAPI(object):
+class TestTVDBEpisodeLookupAPI:
     config = 'tasks: {}'
 
     def test_tvdb_episode_lookup_season_and_ep_number(self, api_client, schema_match):
@@ -114,7 +110,7 @@ class TestTVDBEpisodeLookupAPI(object):
 
 
 @pytest.mark.online
-class TestTVDBEpisodeABSLookupAPI(object):
+class TestTVDBEpisodeABSLookupAPI:
     config = 'tasks: {}'
 
     def test_tvdb_episode_lookup_by_absolute_number(self, api_client, schema_match):
@@ -138,7 +134,7 @@ class TestTVDBEpisodeABSLookupAPI(object):
 
 
 @pytest.mark.online
-class TestTVDBEpisodeAirDateLookupAPI(object):
+class TestTVDBEpisodeAirDateLookupAPI:
     config = 'tasks: {}'
 
     def test_tvdb_episode_lookup_by_air_date(self, api_client, schema_match):
@@ -162,7 +158,7 @@ class TestTVDBEpisodeAirDateLookupAPI(object):
 
 
 @pytest.mark.online
-class TestTVDSearchNameLookupAPI(object):
+class TestTVDSearchNameLookupAPI:
     config = 'tasks: {}'
 
     def test_tvdb_search_results_by_name(self, api_client, schema_match):
@@ -181,7 +177,7 @@ class TestTVDSearchNameLookupAPI(object):
 
 
 @pytest.mark.online
-class TestTVDSearchIMDBLookupAPI(object):
+class TestTVDSearchIMDBLookupAPI:
     config = 'tasks: {}'
 
     def test_tvdb_search_results_by_imdb_id(self, api_client, schema_match):
@@ -199,7 +195,7 @@ class TestTVDSearchIMDBLookupAPI(object):
 
 
 @pytest.mark.online
-class TestTVDSearchZAP2ITLookupAPI(object):
+class TestTVDSearchZAP2ITLookupAPI:
     config = 'tasks: {}'
 
     def test_tvdb_search_results_by_zap2it_id(self, api_client, schema_match):
@@ -217,7 +213,7 @@ class TestTVDSearchZAP2ITLookupAPI(object):
 
 
 @pytest.mark.online
-class TestTVDSearchAPIErrors(object):
+class TestTVDSearchAPIErrors:
     config = 'tasks: {}'
 
     def test_tvdb_search_bad_request(self, api_client, schema_match):
@@ -238,7 +234,7 @@ class TestTVDSearchAPIErrors(object):
 
 
 @pytest.mark.online
-class TestTVDBLanguages(object):
+class TestTVDBLanguages:
     config = 'tasks: {}'
 
     def test_series_lookup_with_language(self, api_client, schema_match):

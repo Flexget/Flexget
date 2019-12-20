@@ -1,20 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import quote
+from urllib.parse import quote
 
-import logging
+from loguru import logger
 
 from flexget import plugin
+from flexget.components.sites.utils import normalize_unicode, torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests
-from flexget.components.sites.utils import torrent_availability, normalize_unicode
 from flexget.utils.tools import parse_filesize
 
-log = logging.getLogger('yts')
+logger = logger.bind(name='yts')
 
 
-class UrlRewriteYTS(object):
+class UrlRewriteYTS:
     """YTS search"""
 
     schema = {'type': 'boolean'}
@@ -29,14 +27,14 @@ class UrlRewriteYTS(object):
                 quote(search_string.encode('utf-8'))
             )
 
-            log.debug('requesting: %s' % url)
+            logger.debug('requesting: {}', url)
 
             try:
                 result = requests.get(url)
                 try:
                     data = result.json()
                 except ValueError:
-                    log.debug('Could not decode json from response: %s', result.text)
+                    logger.debug('Could not decode json from response: {}', result.text)
                     raise plugin.PluginError('Error getting result from yts.')
             except requests.RequestException as e:
                 raise plugin.PluginError('Could not retrieve query from yts (%s)' % e.args[0])
@@ -65,9 +63,9 @@ class UrlRewriteYTS(object):
                             if entry.isvalid():
                                 entries.add(entry)
             except Exception:
-                log.debug('invalid return structure from YTS')
+                logger.debug('invalid return structure from YTS')
 
-        log.debug('Search got %d results' % len(entries))
+        logger.debug('Search got {} results', len(entries))
         return entries
 
 

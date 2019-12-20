@@ -1,13 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from collections.abc import MutableMapping
 
-import logging
-from collections import MutableMapping
+from loguru import logger
 
-log = logging.getLogger('lazy_lookup')
+logger = logger.bind(name='lazy_lookup')
 
 
-class LazyLookup(object):
+class LazyLookup:
     """
     This class stores the information to do a lazy lookup for a LazyDict. An instance is stored as a placeholder value
     for any key that can be lazily looked up. There should be one instance of this class per LazyDict.
@@ -37,15 +35,15 @@ class LazyLookup(object):
             try:
                 func(self.store)
             except PluginError as e:
-                e.log.info(e)
+                e.logger.info(e)
             except Exception as e:
-                log.error('Unhandled error in lazy lookup plugin: %s', e)
+                logger.error('Unhandled error in lazy lookup plugin: {}', e)
                 from flexget.manager import manager
 
                 if manager:
                     manager.crash_report()
                 else:
-                    log.debug('Traceback', exc_info=True)
+                    logger.opt(exception=True).debug('Traceback')
         return self.store[key]
 
     def __repr__(self):

@@ -1,15 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
-
 import itertools
+
+from loguru import logger
+
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils.template import get_template
 
-log = logging.getLogger('notify_entry')
+logger = logger.bind(name='notify_entry')
 
 ENTRY_CONTAINERS = ['entries', 'accepted', 'rejected', 'failed', 'undecided']
 
@@ -29,7 +27,7 @@ VIA_SCHEMA = {
 }
 
 
-class Notify(object):
+class Notify:
     schema = {
         'type': 'object',
         'properties': {
@@ -103,11 +101,11 @@ class Notify(object):
         try:
             send_notification(*args, **kwargs)
         except plugin.PluginError as e:
-            log.error(e)
+            logger.error(e)
         except plugin.PluginWarning as e:
-            log.warning(e)
+            logger.warning(e)
         except Exception as e:
-            log.exception(e)
+            logger.exception(e)
 
     @plugin.priority(0)
     def on_task_output(self, task, config):
@@ -117,7 +115,7 @@ class Notify(object):
                 itertools.chain(*(getattr(task, what) for what in config['entries']['what']))
             )
             if not entries:
-                log.debug('No entries to notify about.')
+                logger.debug('No entries to notify about.')
             else:
                 # If a file template is defined, it overrides message
                 if config['entries'].get('template'):
@@ -138,7 +136,7 @@ class Notify(object):
                     )
         if 'task' in config:
             if not (task.accepted or task.failed) and not config['task']['always_send']:
-                log.verbose('No accepted or failed entries, not sending a notification.')
+                logger.verbose('No accepted or failed entries, not sending a notification.')
                 return
             if config['task'].get('message'):
                 template = config['task']['message']
@@ -160,7 +158,7 @@ class Notify(object):
         if 'abort' in config:
             if task.silent_abort:
                 return
-            log.debug('sending abort notification')
+            logger.debug('sending abort notification')
             self.send_notification(
                 config['abort']['title'],
                 config['abort']['message'],

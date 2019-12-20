@@ -1,17 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import os
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.template import render_from_entry, RenderError
+from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError, render_from_entry
 
-log = logging.getLogger('symlink')
+logger = logger.bind(name='symlink')
 
 
-class Symlink(object):
+class Symlink:
 
     schema = {
         'oneOf': [
@@ -20,6 +19,7 @@ class Symlink(object):
                 'type': 'object',
                 'properties': {
                     'to': {'type': 'string', 'format': 'path'},
+                    'rename': {'type': 'string'},
                     'existing': {'type': 'string', 'enum': ['ignore', 'fail']},
                     'link_type': {'type': 'string', 'enum': ['soft', 'hard']},
                 },
@@ -49,37 +49,64 @@ class Symlink(object):
             if 'location' not in entry:
                 entry.fail('Does not have location field for symlinking')
                 continue
-            lnkfrom = entry['location']
-            name = os.path.basename(lnkfrom)
-            lnkto = os.path.join(config['to'], name)
+            linkfrom = entry['location']
+            linkfrom_path, linkfrom_name = os.path.split(linkfrom)
+
+            # get the proper path and name in order of: entry, config, above split
+            linkto_path = entry.get('link_to', config.get('to', linkfrom_path))
+            if config.get('rename'):
+                linkto_name = config['rename']
+            elif entry.get('filename') and entry['filename'] != linkfrom_name:
+                # entry specifies different filename than what was split from the path
+                # since some inputs fill in filename it must be different in order to be used
+                linkto_name = entry['filename']
+            else:
+                linkto_name = linkfrom_name
+
             try:
-                lnkto = render_from_entry(lnkto, entry)
-            except RenderError as error:
-                log.error('Could not render path: %s', lnkto)
-                entry.fail(str(error))
-                return
+                linkto_path = entry.render(linkto_path)
+            except RenderError as err:
+                raise plugin.PluginError(
+                    'Path value replacement `%s` failed: %s' % (linkto_path, err.args[0])
+                )
+            try:
+                linkto_name = entry.render(linkto_name)
+            except RenderError as err:
+                raise plugin.PluginError(
+                    'Filename value replacement `%s` failed: %s' % (linkto_name, err.args[0])
+                )
+
+            # Clean invalid characters with pathscrub plugin
+            linkto_path = pathscrub(os.path.expanduser(linkto_path))
+            linkto_name = pathscrub(linkto_name, filename=True)
+
+            # Join path and filename
+            linkto = os.path.join(linkto_path, linkto_name)
+            if linkto == entry['location']:
+                raise plugin.PluginWarning('source and destination are the same.')
+
             # Hardlinks for dirs will not be failed here
-            if os.path.exists(lnkto) and (
-                config['link_type'] == 'soft' or os.path.isfile(lnkfrom)
+            if os.path.exists(linkto) and (
+                config['link_type'] == 'soft' or os.path.isfile(linkfrom)
             ):
-                msg = 'Symlink destination %s already exists' % lnkto
+                msg = 'Symlink destination %s already exists' % linkto
                 if existing == 'ignore':
-                    log.verbose(msg)
+                    logger.verbose(msg)
                 else:
                     entry.fail(msg)
                 continue
-            log.verbose('%slink `%s` to `%s`', config['link_type'], lnkfrom, lnkto)
+            logger.verbose('{}link `{}` to `{}`', config['link_type'], linkfrom, linkto)
             try:
                 if config['link_type'] == 'soft':
-                    os.symlink(lnkfrom, lnkto)
+                    os.symlink(linkfrom, linkto)
                 else:
-                    if os.path.isdir(lnkfrom):
-                        self.hard_link_dir(lnkfrom, lnkto, existing)
+                    if os.path.isdir(linkfrom):
+                        self.hard_link_dir(linkfrom, linkto, existing)
                     else:
-                        dirname = os.path.dirname(lnkto)
+                        dirname = os.path.dirname(linkto)
                         if not os.path.exists(dirname):
                             os.makedirs(dirname)
-                        os.link(lnkfrom, lnkto)
+                        os.link(linkfrom, linkto)
             except OSError as e:
                 entry.fail('Failed to create %slink, %s' % (config['link_type'], e))
 
@@ -89,7 +116,7 @@ class Symlink(object):
                 os.makedirs(destination)
             except OSError as e:
                 # Raised when it already exists, but are there other cases?
-                log.debug('Failed to create destination dir %s: %s', destination, e)
+                logger.debug('Failed to create destination dir {}: {}', destination, e)
         # 'recursively' traverse and hard link
         working_dir = os.getcwd()
         os.chdir(path)  # change working dir to make dir joins easier
@@ -100,15 +127,15 @@ class Symlink(object):
                     os.mkdir(d)
                 except OSError as e:
                     # Raised when it already exists, but are there other cases?
-                    log.debug('Failed to create subdir %s: %s', d, e)
+                    logger.debug('Failed to create subdir {}: {}', d, e)
             for f in files:
                 src_file = os.path.join(root, f)
                 dst_file = os.path.join(dst_dir, f)
-                log.debug('Hardlinking %s to %s', src_file, dst_file)
+                logger.debug('Hardlinking {} to {}', src_file, dst_file)
                 try:
                     os.link(src_file, dst_file)
                 except OSError as e:
-                    log.debug('Failed to create hardlink for file %s: %s', f, e)
+                    logger.debug('Failed to create hardlink for file {}: {}', f, e)
                     if existing == 'fail':
                         raise  # reraise to fail the entry in the calling function
 
@@ -118,6 +145,6 @@ class Symlink(object):
 @event('plugin.register')
 def register_plugin():
     if os.name == 'nt':
-        log.trace('Symlinks not supported on Windows. Skipping Symlink plugin register.')
+        logger.trace('Symlinks not supported on Windows. Skipping Symlink plugin register.')
         return
     plugin.register(Symlink, 'symlink', api_ver=2)

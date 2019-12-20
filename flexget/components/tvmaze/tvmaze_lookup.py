@@ -1,17 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-
-import logging
-
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
 
-log = logging.getLogger('tvmaze_lookup')
+logger = logger.bind(name='tvmaze_lookup')
 
 
-class PluginTVMazeLookup(object):
+class PluginTVMazeLookup:
     """Retrieves tvmaze information for entries. Uses series_name,
     series_season, series_episode from series plugin.
 
@@ -140,7 +136,7 @@ class PluginTVMazeLookup(object):
             try:
                 series = series_lookup(**lookupargs)
             except LookupError as e:
-                log.debug(e)
+                logger.debug(e)
             else:
                 entry.update_using_map(self.series_map, series)
         return entry
@@ -160,7 +156,7 @@ class PluginTVMazeLookup(object):
             try:
                 season = season_lookup(**lookupargs)
             except LookupError as e:
-                log.debug(e)
+                logger.debug(e)
             else:
                 entry.update_using_map(self.season_map, season)
         return entry
@@ -183,7 +179,7 @@ class PluginTVMazeLookup(object):
             try:
                 episode = episode_lookup(**lookupargs)
             except LookupError as e:
-                log.debug(e)
+                logger.debug(e)
             else:
                 entry.update_using_map(self.episode_map, episode)
         return entry

@@ -1,25 +1,21 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from flexget.utils.template import get_template
-
-from future.moves.urllib.parse import urlparse, parse_qsl
-
 import os
 import re
-import logging
 from collections import defaultdict
 from datetime import datetime
+from urllib.parse import parse_qsl, urlparse
 
 import jsonschema
-from jsonschema.compat import str_types, int_types
+from jsonschema.compat import int_types, str_types
+from loguru import logger
 
 from flexget.event import fire_event
 from flexget.utils import qualities, template
-from flexget.utils.tools import parse_timedelta, parse_episode_identifier
+from flexget.utils.template import get_template
+from flexget.utils.tools import parse_episode_identifier, parse_timedelta
 
 schema_paths = {}
 
-log = logging.getLogger('config_schema')
+logger = logger.bind(name='config_schema')
 
 
 # TODO: Rethink how config key and schema registration work
@@ -171,7 +167,7 @@ def parse_size(size_input):
 class RefResolver(jsonschema.RefResolver):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('handlers', {'': resolve_ref})
-        super(RefResolver, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 format_checker = jsonschema.FormatChecker(('email',))
@@ -260,7 +256,7 @@ def is_url(instance):
     regexp = (
         '('
         + '|'.join(['ftp', 'http', 'https', 'file', 'udp', 'socks5h?'])
-        + '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
+        + r'):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
     )
     return re.match(regexp, instance)
 
@@ -402,7 +398,7 @@ def validate_oneOf(validator, oneOf, instance, schema):
 
 def validate_deprecated(validator, message, instance, schema):
     """Not really a validator, just warns if deprecated section of config is being used."""
-    log.warning(message)
+    logger.warning(message)
 
 
 validators = {'anyOf': validate_anyOf, 'oneOf': validate_oneOf, 'deprecated': validate_deprecated}

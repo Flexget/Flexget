@@ -1,15 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('rerun')
+logger = logger.bind(name='rerun')
 
 
-class Rerun(object):
+class Rerun:
     """
     Force a task to rerun for debugging purposes.
     Configured value will set max_rerun value and enables a lock
@@ -19,7 +16,7 @@ class Rerun(object):
     schema = {'type': ['integer']}
 
     def on_task_start(self, task, config):
-        log.debug('Setting max_reruns from %s -> %s', task.max_reruns, config)
+        logger.debug('Setting max_reruns from {} -> {}', task.max_reruns, config)
         task.max_reruns = int(config)
         task.lock_reruns()
 

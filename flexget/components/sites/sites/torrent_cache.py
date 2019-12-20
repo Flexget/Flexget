@@ -1,14 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
-import re
 import random
+import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('torrent_cache')
+logger = logger.bind(name='torrent_cache')
 
 MIRRORS = [
     'https://thetorrent.org/',
@@ -18,7 +16,7 @@ MIRRORS = [
 ]
 
 
-class TorrentCache(object):
+class TorrentCache:
     """Adds urls to torrent cache sites to the urls list."""
 
     def infohash_urls(self, info_hash):

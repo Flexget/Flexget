@@ -1,31 +1,28 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
-import logging
 from math import ceil
 
 from flask import jsonify, request
+from loguru import logger
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import (
+    Conflict,
     NotFoundError,
     base_message_schema,
-    success_response,
     etag,
     pagination_headers,
-    Conflict,
+    success_response,
 )
 
 from . import db
 
-log = logging.getLogger('entry_list')
+logger = logger.bind(name='entry_list')
 
 entry_list_api = api.namespace('entry_list', description='Entry List operations')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     entry_list_base_object = {
         'type': 'object',
         'properties': {
@@ -193,7 +190,7 @@ class EntryListEntriesAPI(APIResource):
         if not total_items:
             return jsonify([])
 
-        log.debug('entry lists entries count is %d', total_items)
+        logger.debug('entry lists entries count is {}', total_items)
         entries = [entry.to_dict() for entry in db.get_entries_by_list_id(**kwargs)]
 
         # Total number of pages
@@ -261,7 +258,7 @@ class EntryListEntryAPI(APIResource):
             entry = db.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
             raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
-        log.debug('deleting movie %d', entry.id)
+        logger.debug('deleting movie {}', entry.id)
         session.delete(entry)
         return success_response('successfully deleted entry %d' % entry.id)
 

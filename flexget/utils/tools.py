@@ -1,28 +1,26 @@
 """Contains miscellaneous helpers"""
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib import request
-from future.utils import PY2
-
-import logging
 import ast
 import copy
 import hashlib
 import locale
 import operator
 import os
+import queue
 import re
 import sys
-from collections import MutableMapping, defaultdict
-from datetime import timedelta, datetime
+from collections import defaultdict
+from collections.abc import MutableMapping
+from datetime import datetime, timedelta
+from html.entities import name2codepoint
 from pprint import pformat
+from urllib import request
+
+import requests
+from loguru import logger
 
 import flexget
-import queue
-import requests
-from html.entities import name2codepoint
 
-log = logging.getLogger('utils')
+logger = logger.bind(name='utils')
 
 
 def str_to_boolean(string):
@@ -34,20 +32,6 @@ def str_to_int(string):
         return int(string.replace(',', ''))
     except ValueError:
         return None
-
-
-if PY2:
-
-    def native_str_to_text(string, **kwargs):
-        if 'encoding' not in kwargs:
-            kwargs['encoding'] = 'ascii'
-        return string.decode(**kwargs)
-
-
-else:
-
-    def native_str_to_text(string, **kwargs):
-        return string
 
 
 def convert_bytes(bytes):
@@ -170,8 +154,8 @@ def merge_dict_from_to(d1, d2):
                     raise Exception(
                         'Unknown type: %s value: %s in dictionary' % (type(v), repr(v))
                     )
-            elif isinstance(v, (str, bool, int, float, type(None))) and isinstance(
-                d2[k], (str, bool, int, float, type(None))
+            elif isinstance(v, (str, bool, int, float, list, type(None))) and isinstance(
+                d2[k], (str, bool, int, float, list, type(None))
             ):
                 # Allow overriding of non-container types with other non-container types
                 pass
@@ -473,7 +457,7 @@ def parse_filesize(text_size, si=True):
     prefix_order = {'': 0, 'k': 1, 'm': 2, 'g': 3, 't': 4, 'p': 5}
 
     parsed_size = re.match(
-        '(\d+(?:[.,\s]\d+)*)(?:\s*)((?:[ptgmk]i?)?b)', text_size.strip().lower(), flags=re.UNICODE
+        r'(\d+(?:[.,\s]\d+)*)(?:\s*)((?:[ptgmk]i?)?b)', text_size.strip().lower(), flags=re.UNICODE
     )
     if not parsed_size:
         raise ValueError('%s does not look like a file size' % text_size)
@@ -586,29 +570,29 @@ def aggregate_inputs(task, inputs):
             try:
                 result = method(task, input_config)
             except plugin.PluginError as e:
-                log.warning('Error during input plugin %s: %s', input_name, e)
+                logger.warning('Error during input plugin {}: {}', input_name, e)
                 continue
 
             if not result:
-                log.warning('Input %s did not return anything', input_name)
+                logger.warning('Input {} did not return anything', input_name)
                 continue
 
             for entry in result:
                 urls = ([entry['url']] if entry.get('url') else []) + entry.get('urls', [])
 
                 if any(url in entry_urls for url in urls):
-                    log.debug('URL for `%s` already in entry list, skipping.', entry['title'])
+                    logger.debug('URL for `{}` already in entry list, skipping.', entry['title'])
                     continue
 
                 if entry['title'] in entry_titles:
-                    log.debug(
-                        'Ignored duplicate title `%s`', entry['title']
+                    logger.debug(
+                        'Ignored duplicate title `{}`', entry['title']
                     )  # TODO: should combine?
                     continue
 
                 if entry.get('location') and entry['location'] in entry_locations:
-                    log.debug(
-                        'Ignored duplicate location `%s`', entry['location']
+                    logger.debug(
+                        'Ignored duplicate location `{}`', entry['location']
                     )  # TODO: should combine?
                     continue
 

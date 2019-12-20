@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import, print_function
 
-import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
@@ -16,7 +15,7 @@ lookup_series = plugin_api_trakt.ApiTrakt.lookup_series
 lookup_movie = plugin_api_trakt.ApiTrakt.lookup_movie
 
 
-log = logging.getLogger('trakt_lookup')
+logger = logger.bind(name='trakt_lookup')
 
 
 def is_show(entry):
@@ -35,7 +34,7 @@ def is_movie(entry):
     return bool(entry.get('movie_name'))
 
 
-class TraktLazyLookup(object):
+class TraktLazyLookup:
     def __init__(self, field_map, lookup_function):
         self.field_map = field_map
         self.lookup_function = lookup_function
@@ -45,14 +44,14 @@ class TraktLazyLookup(object):
             try:
                 result = self.lookup_function(entry, session)
             except LookupError as e:
-                log.debug(e)
+                logger.debug(e)
             else:
                 entry.update_using_map(self.field_map, result)
 
         return entry
 
 
-class TraktUserDataLookup(object):
+class TraktUserDataLookup:
     def __init__(self, field_name, data_type, media_type, lookup_function):
         self.field_name = field_name
         self.lookup_function = lookup_function
@@ -65,14 +64,14 @@ class TraktUserDataLookup(object):
                 data_type=self.data_type, media_type=self.media_type, entry=entry
             )
         except LookupError as e:
-            log.debug(e)
+            logger.debug(e)
         else:
             entry[self.field_name] = result
 
         return entry
 
 
-class PluginTraktLookup(object):
+class PluginTraktLookup:
     """Retrieves trakt information for entries. Uses series_name,
     series_season, series_episode from series plugin.
 
@@ -312,7 +311,7 @@ class PluginTraktLookup(object):
             try:
                 trakt_media = self.getter_map[media_type](entry, session)
             except LookupError as e:
-                log.debug(e)
+                logger.debug(e)
             else:
                 entry.update_using_map(mapping, trakt_media)
         return entry
@@ -330,7 +329,7 @@ class PluginTraktLookup(object):
             try:
                 return user_data_lookup(lookup(entry, session), entry['title'])
             except LookupError as e:
-                log.debug(e)
+                logger.debug(e)
 
     # Run after series and metainfo series
     @plugin.priority(110)

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import os
+
 import pytest
 
 from flexget.manager import Manager
@@ -10,7 +8,7 @@ from flexget.manager import Manager
 config_utf8 = os.path.join(os.path.dirname(__file__), 'config_utf8.yml')
 
 
-class TestConfig(object):
+class TestConfig:
     config = 'tasks: {}'
 
     @pytest.fixture

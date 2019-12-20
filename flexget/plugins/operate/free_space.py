@@ -1,13 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import os
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('free_space')
+logger = logger.bind(name='free_space')
 
 
 def get_free_space(folder):
@@ -25,7 +23,7 @@ def get_free_space(folder):
         return (stats.f_bavail * stats.f_frsize) / (1024 * 1024)
 
 
-class PluginFreeSpace(object):
+class PluginFreeSpace:
     """Aborts a task if an entry is accepted and there is less than a certain amount of space free on a drive."""
 
     schema = {
@@ -57,14 +55,13 @@ class PluginFreeSpace(object):
         # Only bother aborting if there were accepted entries this run.
         if task.accepted:
             if get_free_space(config['path']) < config['space']:
-                log.error(
-                    'Less than %d MB of free space in %s aborting task.'
-                    % (config['space'], config['path'])
+                logger.error(
+                    'Less than {} MB of free space in {} aborting task.',
+                    config['space'],
+                    config['path'],
                 )
                 # backlog plugin will save and restore the task content, if available
-                task.abort(
-                    'Less than %d MB of free space in %s' % (config['space'], config['path'])
-                )
+                task.abort('Less than {} MB of free space in {}', config['space'], config['path'])
 
 
 @event('plugin.register')

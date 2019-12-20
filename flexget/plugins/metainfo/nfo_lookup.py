@@ -1,11 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-
-import logging
 import os
 import xml.etree.ElementTree as ET
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
+from loguru import logger
 
 from flexget import plugin
+from flexget.event import event
 
 try:
     # NOTE: Importing other plugins is discouraged!
@@ -13,12 +12,11 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='imdb')
 
-from flexget.event import event
 
-log = logging.getLogger('nfo_lookup')
+logger = logger.bind(name='nfo_lookup')
 
 
-class NfoLookup(object):
+class NfoLookup:
     """
     Retrieves information from a local '.nfo' info file.
 
@@ -59,14 +57,14 @@ class NfoLookup(object):
 
             # If there is no 'filename' field there is also no nfo file
             if filename is None or location is None:
-                log.warning("Entry %s didn't come from the filesystem plugin", entry.get('title'))
+                logger.warning("Entry {} didn't come from the filesystem plugin", entry.get('title'))
                 continue
             else:
                 # This will be None if there is no nfo file
                 nfo_filename = self.get_nfo_filename(entry)
                 if nfo_filename is None:
-                    log.warning(
-                        "Entry %s has no corresponding %s file",
+                    logger.warning(
+                        'Entry {} has no corresponding {} file',
                         entry.get('title'),
                         self.nfo_file_extension,
                     )
@@ -79,8 +77,8 @@ class NfoLookup(object):
     def lookup(self, entry, nfo_filename):
         # If there is already data from a previous parse then we don't need to do anything
         if entry.get('nfo_id') is not None:
-            log.warning(
-                "Entry %s was already parsed by nfo_lookup and it will be skipped. ",
+            logger.warning(
+                'Entry {} was already parsed by nfo_lookup and it will be skipped. ',
                 entry.get('title'),
             )
             return
@@ -94,7 +92,7 @@ class NfoLookup(object):
             nfo_reader = NfoReader(nfo_filename)
             fields = nfo_reader.get_fields_from_nfo_file()
         except BadXmlFile:
-            log.warning("Invalid '.nfo' file for entry %s", entry.get('title'))
+            logger.warning("Invalid '.nfo' file for entry {}", entry.get('title'))
             return
 
         entry.update(fields)
@@ -105,8 +103,8 @@ class NfoLookup(object):
             if is_valid_imdb_title_id(entry.get('nfo_id', '')):
                 entry.update({'imdb_id': fields['nfo_id']})
             else:
-                log.warning(
-                    "ID found in nfo file for entry '%s', but it was not a valid IMDB ID",
+                logger.warning(
+                    "ID found in nfo file for entry '{}', but it was not a valid IMDB ID",
                     entry.get('title'),
                 )
 
@@ -134,7 +132,7 @@ class BadXmlFile(Exception):
     pass
 
 
-class NfoReader(object):
+class NfoReader:
     """
     Class in charge of parsing the '.nfo' file and getting a dictionary of fields.
 

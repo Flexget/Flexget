@@ -1,17 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import os
 import random
 from collections import namedtuple
 
-from flexget import plugin
-from flexget.event import event
-from flexget.config_schema import parse_size, parse_percent
-from flexget.config_schema import one_or_more
+from loguru import logger
 
-log = logging.getLogger('path_by_space')
+from flexget import plugin
+from flexget.config_schema import one_or_more, parse_percent, parse_size
+from flexget.event import event
+
+logger = logger.bind(name='path_by_space')
 
 disk_stats_tuple = namedtuple(
     'disk_stats',
@@ -92,7 +89,7 @@ selector_map = {
 }
 
 
-class PluginPathBySpace(object):
+class PluginPathBySpace:
     """Allows setting a field to a folder based on it's space
 
     Path will be selected at random if multiple paths match the within
@@ -139,7 +136,7 @@ class PluginPathBySpace(object):
         path = selector(config['paths'], within=within)
 
         if path:
-            log.debug('Path %s selected due to (%s)' % (path, config['select']))
+            logger.debug('Path {} selected due to ({})', path, config['select'])
 
             for entry in task.all_entries:
                 entry[config['to_field']] = path

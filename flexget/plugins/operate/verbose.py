@@ -1,17 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.task import log as task_log
+from flexget.task import logger as task_loger
 from flexget.utils.log import log_once
 
-log = logging.getLogger('verbose')
+logger = logger.bind(name='verbose')
 
 
-class Verbose(object):
+class Verbose:
     """
     Verbose entry accept, reject and failure
     """
@@ -31,7 +28,7 @@ class Verbose(object):
         if reason:
             msg += ' because %s' % reason[0].lower() + reason[1:]
 
-        task_log.verbose(msg)
+        task_loger.verbose(msg)
 
     def on_task_exit(self, task, config):
         if task.options.silent:
@@ -43,12 +40,12 @@ class Verbose(object):
                 if entry in task.accepted:
                     continue
                 undecided = True
-                log.verbose('UNDECIDED: `%s`' % entry['title'])
+                logger.verbose('UNDECIDED: `{}`', entry['title'])
             if undecided:
                 log_once(
                     'Undecided entries have not been accepted or rejected. If you expected these to reach output,'
                     ' you must set up filter plugin(s) to accept them.',
-                    logger=log,
+                    logger=logger,
                 )
 
 

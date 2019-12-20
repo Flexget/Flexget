@@ -1,35 +1,32 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import text_to_native_str
-
-import logging
 import subprocess
 
+from loguru import logger
+
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.config_schema import one_or_more
-from flexget.utils.template import render_from_entry, render_from_task, RenderError
+from flexget.utils.template import RenderError, render_from_entry, render_from_task
 from flexget.utils.tools import io_encoding
 
-log = logging.getLogger('exec')
+logger = logger.bind(name='exec')
 
 
 class EscapingEntry(Entry):
     """Helper class, same as a Entry, but returns all string value with quotes escaped."""
 
     def __init__(self, entry):
-        super(EscapingEntry, self).__init__(entry)
+        super().__init__(entry)
 
     def __getitem__(self, key):
-        value = super(EscapingEntry, self).__getitem__(key)
+        value = super().__getitem__(key)
         # TODO: May need to be different depending on OS
         if isinstance(value, str):
             value = value.replace('"', '\\"')
         return value
 
 
-class PluginExec(object):
+class PluginExec:
     """
     Execute commands
 
@@ -104,9 +101,9 @@ class PluginExec(object):
         return config
 
     def execute_cmd(self, cmd, allow_background, encoding):
-        log.verbose('Executing: %s', cmd)
+        logger.verbose('Executing: {}', cmd)
         p = subprocess.Popen(
-            text_to_native_str(cmd, encoding=io_encoding),
+            cmd,
             shell=True,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
@@ -119,13 +116,13 @@ class PluginExec(object):
             r.close()
             w.close()
             if response:
-                log.info('Stdout: %s', response.rstrip())  # rstrip to get rid of newlines
+                logger.info('Stdout: {}', response.rstrip())  # rstrip to get rid of newlines
         return p.wait()
 
     def execute(self, task, phase_name, config):
         config = self.prepare_config(config)
         if phase_name not in config:
-            log.debug('phase %s not configured' % phase_name)
+            logger.debug('phase {} not configured', phase_name)
             return
 
         name_map = {
@@ -141,9 +138,11 @@ class PluginExec(object):
             if operation not in config[phase_name]:
                 continue
 
-            log.debug(
-                'running phase_name: %s operation: %s entries: %s'
-                % (phase_name, operation, len(entries))
+            logger.debug(
+                'running phase_name: {} operation: {} entries: {}',
+                phase_name,
+                operation,
+                len(entries),
             )
 
             for entry in entries:
@@ -153,7 +152,7 @@ class PluginExec(object):
                     try:
                         cmd = render_from_entry(cmd, entrydict)
                     except RenderError as e:
-                        log.error('Could not set exec command for %s: %s' % (entry['title'], e))
+                        logger.error('Could not set exec command for {}: {}', entry['title'], e)
                         # fail the entry if configured to do so
                         if config.get('fail_entries'):
                             entry.fail(
@@ -162,20 +161,16 @@ class PluginExec(object):
                             )
                         continue
 
-                    log.debug(
-                        'phase_name: %s operation: %s cmd: %s' % (phase_name, operation, cmd)
-                    )
+                    logger.debug('phase_name: {} operation: {} cmd: {}', phase_name, operation, cmd)
                     if task.options.test:
-                        log.info('Would execute: %s' % cmd)
+                        logger.info('Would execute: {}', cmd)
                     else:
                         # Make sure the command can be encoded into appropriate encoding, don't actually encode yet,
                         # so logging continues to work.
                         try:
                             cmd.encode(config['encoding'])
                         except UnicodeEncodeError:
-                            log.error(
-                                'Unable to encode cmd `%s` to %s' % (cmd, config['encoding'])
-                            )
+                            logger.error('Unable to encode cmd `{}` to {}', cmd, config['encoding'])
                             if config.get('fail_entries'):
                                 entry.fail(
                                     'cmd `%s` could not be encoded to %s.'
@@ -194,11 +189,11 @@ class PluginExec(object):
                 try:
                     cmd = render_from_task(cmd, task)
                 except RenderError as e:
-                    log.error('Error rendering `%s`: %s' % (cmd, e))
+                    logger.error('Error rendering `{}`: {}', cmd, e)
                 else:
-                    log.debug('phase cmd: %s' % cmd)
+                    logger.debug('phase cmd: {}', cmd)
                     if task.options.test:
-                        log.info('Would execute: %s' % cmd)
+                        logger.info('Would execute: {}', cmd)
                     else:
                         self.execute_cmd(cmd, allow_background, config['encoding'])
 

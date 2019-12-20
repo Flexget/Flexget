@@ -1,23 +1,20 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urlparse, urlunparse
-
 import re
-import logging
+from urllib.parse import urlparse, urlunparse
 
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
-from flexget.event import event
 from flexget.components.sites.urlrewriting import UrlRewritingError
+from flexget.event import event
 from flexget.utils.soup import get_soup
 
-log = logging.getLogger('eztv')
+logger = logger.bind(name='eztv')
 
 EZTV_MIRRORS = [('http', 'eztv.ch'), ('https', 'eztv-proxy.net'), ('http', 'eztv.come.in')]
 
 
-class UrlRewriteEztv(object):
+class UrlRewriteEztv:
     """Eztv url rewriter."""
 
     def url_rewritable(self, task, entry):
@@ -32,21 +29,21 @@ class UrlRewriteEztv(object):
                 url = urlunparse((scheme, netloc, path, params, query, fragment))
                 page = task.requests.get(url).content
             except RequestException as e:
-                log.debug('Eztv mirror `%s` seems to be down', url)
+                logger.debug('Eztv mirror `{}` seems to be down', url)
                 continue
             break
 
         if not page:
             raise UrlRewritingError('No mirrors found for url %s' % entry['url'])
 
-        log.debug('Eztv mirror `%s` chosen', url)
+        logger.debug('Eztv mirror `{}` chosen', url)
         try:
             soup = get_soup(page)
             mirrors = soup.find_all('a', attrs={'class': re.compile(r'download_\d')})
         except Exception as e:
             raise UrlRewritingError(e)
 
-        log.debug('%d torrent mirrors found', len(mirrors))
+        logger.debug('{} torrent mirrors found', len(mirrors))
 
         if not mirrors:
             raise UrlRewritingError('Unable to locate download link from url %s' % url)

@@ -1,13 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from unittest.mock import Mock, patch
 
-from mock import patch, Mock
-
-from flexget.task import Task
 from flexget.plugins.output import sns
+from flexget.task import Task
 
 
-class TestNotifySNS(object):
+class TestNotifySNS:
     @patch('boto3.Session')
     def test_emitter_build_session_from_empty_config(self, Session):
         e = sns.SNSNotificationEmitter({'aws_region': 'test'})

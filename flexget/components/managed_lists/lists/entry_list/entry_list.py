@@ -1,8 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-
-import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
+from loguru import logger
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import plugin
@@ -11,10 +7,10 @@ from flexget.manager import Session
 
 from . import db
 
-log = logging.getLogger(__name__)
+logger = logger.bind(name=__name__)
 
 
-class EntryList(object):
+class EntryList:
     schema = {'type': 'string'}
 
     @staticmethod
@@ -30,11 +26,11 @@ class EntryList(object):
             try:
                 entry_list = db.get_list_by_exact_name(config, session=session)
             except NoResultFound:
-                log.warning('Entry list with name \'%s\' does not exist', config)
+                logger.warning("Entry list with name '{}' does not exist", config)
             else:
                 for search_string in entry.get('search_strings', [entry['title']]):
-                    log.debug(
-                        'searching for entry that matches %s in entry_list %s',
+                    logger.debug(
+                        'searching for entry that matches {} in entry_list {}',
                         search_string,
                         config,
                     )

@@ -1,17 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-
-import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
 from . import db
 
-log = logging.getLogger('set_series_begin')
+logger = logger.bind(name='set_series_begin')
 
 
-class SetSeriesBegin(object):
+class SetSeriesBegin:
     """
     Set the first episode for series. Uses series_name and series_id.
 
@@ -40,11 +37,11 @@ class SetSeriesBegin(object):
                 try:
                     db.set_series_begin(fshow, entry['series_id'])
                 except ValueError as e:
-                    log.error(
-                        'An error occurred trying to set begin for %s: %s', entry['series_name'], e
+                    logger.error(
+                        'An error occurred trying to set begin for {}: {}', entry['series_name'], e
                     )
-                log.info(
-                    'First episode for "%s" set to %s', entry['series_name'], entry['series_id']
+                logger.info(
+                    'First episode for "{}" set to {}', entry['series_name'], entry['series_id']
                 )
 
 

@@ -1,19 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import re
 
+from loguru import logger
+
 from flexget import plugin
+from flexget.components.imdb.utils import extract_id
+from flexget.components.sites.utils import torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests
-from flexget.components.imdb.utils import extract_id
 from flexget.utils.soup import get_soup
-from flexget.components.sites.utils import torrent_availability
 from flexget.utils.tools import parse_filesize
 
-log = logging.getLogger('search_ptn')
+logger = logger.bind(name='search_ptn')
 
 session = requests.Session()
 
@@ -55,7 +53,7 @@ default_search_params = {
 }
 
 
-class SearchPTN(object):
+class SearchPTN:
     schema = {
         'type': 'object',
         'properties': {
@@ -110,12 +108,12 @@ class SearchPTN(object):
                     'https://piratethenet.org/takelogin.php', data=login_params, verify=False
                 )
             except requests.RequestException as e:
-                log.error('Error while logging in to PtN: %s', e)
+                logger.error('Error while logging in to PtN: {}', e)
                 raise plugin.PluginError('Could not log in to PtN')
 
             passkey = re.search(r'passkey=([\d\w]+)"', r.text)
             if not passkey:
-                log.error("It doesn't look like PtN login worked properly.")
+                logger.error("It doesn't look like PtN login worked properly.")
                 raise plugin.PluginError('PTN cookie info invalid')
 
         search_params = default_search_params.copy()
@@ -132,12 +130,12 @@ class SearchPTN(object):
             try:
                 r = session.get('http://piratethenet.org/torrentsutils.php', params=search_params)
             except requests.RequestException as e:
-                log.error('Error searching ptn: %s' % e)
+                logger.error('Error searching ptn: {}', e)
                 continue
             # html5parser doesn't work properly for some reason
             soup = get_soup(r.text, parser='html.parser')
             for movie in soup.select('.torrentstd'):
-                imdb_id = movie.find('a', href=re.compile('.*imdb\.com/title/tt'))
+                imdb_id = movie.find('a', href=re.compile(r'.*imdb\.com/title/tt'))
                 if imdb_id:
                     imdb_id = extract_id(imdb_id['href'])
                 if imdb_id and 'imdb_id' in entry and imdb_id != entry['imdb_id']:

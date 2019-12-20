@@ -1,14 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-import logging
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('abort_if_exists')
+logger = logger.bind(name='abort_if_exists')
 
 
-class PluginAbortIfExists(object):
+class PluginAbortIfExists:
     """Aborts a task if an entry field matches the regexp"""
 
     schema = {
@@ -29,7 +29,7 @@ class PluginAbortIfExists(object):
         for entry in task.all_entries:
             # if pattern matches any entry
             if field not in entry:
-                log.debug('Field %s not found. Skipping.', field)
+                logger.debug('Field {} not found. Skipping.', field)
                 continue
             if abort_re.search(entry[field]):
                 task.abort('An entry contained %s in field %s. Abort!' % (config['regexp'], field))

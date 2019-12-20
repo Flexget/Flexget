@@ -1,8 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -11,10 +9,10 @@ from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 
-log = logging.getLogger('horriblesubs')
+logger = logger.bind(name='horriblesubs')
 
 
-class HorribleSubs(object):
+class HorribleSubs:
     """
     Give latest horriblesubs releases
     """
@@ -28,7 +26,7 @@ class HorribleSubs(object):
         try:
             soup = get_soup(requests.get(page_url).content)
         except RequestException as e:
-            log.error('HorribleSubs request failed: %s', e)
+            logger.error('HorribleSubs request failed: {}', e)
             return entries
         for div in soup.findAll('div', attrs={'class': 'rls-link'}):
             ttitle = '{0} [{1}]'.format(title, re.sub(r'.*-', '', div['id']))
@@ -40,7 +38,7 @@ class HorribleSubs(object):
                     or 'hs-xdcc-link' in url.parent.attrs['class']
                 ):
                     continue
-                log.debug('Found url `%s`', url)
+                logger.debug('Found url `{}`', url)
                 urls.append(url.attrs['href'])
             # move magnets to last, a bit hacky
             for url in urls[:]:
@@ -57,21 +55,21 @@ class HorribleSubs(object):
         try:
             soup = get_soup(requests.get(page_url).content)
         except RequestException as e:
-            log.error('HorribleSubs request failed: %s', e)
+            logger.error('HorribleSubs request failed: {}', e)
             return entries
 
         for li_label in soup.findAll('li'):
             title = '[HorribleSubs] {0}{1}'.format(
                 str(li_label.find('span').next_sibling), str(li_label.find('strong').text)
             )
-            log.debug('Found title `%s`', title)
+            logger.debug('Found title `{}`', title)
             url = li_label.find('a')['href']
             episode = re.sub(r'.*#', '', url)
             # Get show ID
             try:
                 soup = get_soup(requests.get('https://horriblesubs.info/{0}'.format(url)).content)
             except RequestException as e:
-                log.error('HorribleSubs request failed: %s', e)
+                logger.error('HorribleSubs request failed: {}', e)
                 return entries
             show_id = re.sub(r'[^0-9]', '', soup(text=re.compile('hs_showid'))[0])
             entries = HorribleSubs.horrible_get_downloads(
@@ -97,7 +95,7 @@ class HorribleSubs(object):
             return
         entries = []
         for search_string in entry.get('search_strings', [entry['title']]):
-            log.debug('Searching `%s`', search_string)
+            logger.debug('Searching `{}`', search_string)
             results = HorribleSubs.horrible_entries(
                 task.requests,
                 'https://horriblesubs.info/api.php?method=search&value={0}'.format(search_string),

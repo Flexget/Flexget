@@ -1,7 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import options, plugin
 from flexget.config_schema import register_config_key
@@ -9,10 +6,10 @@ from flexget.event import event
 from flexget.utils.tools import MergeException
 
 plugin_name = 'template'
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 
-class PluginTemplate(object):
+class PluginTemplate:
     """
     Appyly templates with preconfigured plugins to a task config.
 
@@ -87,12 +84,12 @@ class PluginTemplate(object):
                 if template == 'global':
                     continue
                 raise plugin.PluginError(
-                    'Unable to find template %s for task %s' % (template, task.name), log
+                    'Unable to find template %s for task %s' % (template, task.name), logger
                 )
             if toplevel_templates[template] is None:
-                log.warning('Template `%s` is empty. Nothing to merge.' % template)
+                logger.warning('Template `{}` is empty. Nothing to merge.', template)
                 continue
-            log.debug('Merging template %s into task %s' % (template, task.name))
+            logger.debug('Merging template {} into task {}', template, task.name)
 
             # We make a copy here because we need to remove
             template_config = toplevel_templates[template]
@@ -104,7 +101,7 @@ class PluginTemplate(object):
                     if nested_template not in config:
                         config.append(nested_template)
                     else:
-                        log.warning('Templates contain each other in a loop.')
+                        logger.warning('Templates contain each other in a loop.')
                 # Replace template_config with a copy without the template key, to avoid merging errors
                 template_config = dict(template_config)
                 del template_config['template']
@@ -118,7 +115,7 @@ class PluginTemplate(object):
                     % (template, task.name, exc.value)
                 )
 
-        log.trace('templates: %s', config)
+        logger.trace('templates: {}', config)
 
 
 @event('plugin.register')

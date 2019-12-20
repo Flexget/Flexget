@@ -1,17 +1,14 @@
 """
 Provides small event framework
 """
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from loguru import logger
 
-import logging
-
-log = logging.getLogger('event')
+logger = logger.bind(name='event')
 
 _events = {}
 
 
-class Event(object):
+class Event:
     """Represents one registered event."""
 
     def __init__(self, name, func, priority=128):
@@ -81,7 +78,7 @@ def add_event_handler(name, func, priority=128):
                 '%s has already been registered as event listener under name %s'
                 % (func.__name__, name)
             )
-    log.trace('registered function %s to event %s' % (func.__name__, name))
+    logger.trace('registered function {} to event {}', func.__name__, name)
     event = Event(name, func, priority)
     events.append(event)
     return event

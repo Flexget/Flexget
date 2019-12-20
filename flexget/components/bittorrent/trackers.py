@@ -1,16 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('modify_torrents')
+logger = logger.bind(name='modify_torrents')
 
 
-class AddTrackers(object):
+class AddTrackers:
     """
         Adds tracker URL to torrent files.
 
@@ -31,12 +29,12 @@ class AddTrackers(object):
                 for url in config:
                     if url not in entry['torrent'].trackers:
                         entry['torrent'].add_multitracker(url)
-                        log.info('Added %s tracker to %s' % (url, entry['title']))
+                        logger.info('Added {} tracker to {}', url, entry['title'])
             if entry['url'].startswith('magnet:'):
                 entry['url'] += ''.join(['&tr=' + url for url in config])
 
 
-class RemoveTrackers(object):
+class RemoveTrackers:
     """
         Removes trackers from torrent files using regexp matching.
 
@@ -57,12 +55,10 @@ class RemoveTrackers(object):
                 for tracker in entry['torrent'].trackers:
                     for regexp in config or []:
                         if re.search(regexp, tracker, re.IGNORECASE | re.UNICODE):
-                            log.debug(
-                                'remove_trackers removing %s because of %s' % (tracker, regexp)
-                            )
+                            logger.debug('remove_trackers removing {} because of {}', tracker, regexp)
                             # remove tracker
                             entry['torrent'].remove_multitracker(tracker)
-                            log.info('Removed %s' % tracker)
+                            logger.info('Removed {}', tracker)
             if entry['url'].startswith('magnet:'):
                 for regexp in config:
                     # Replace any tracker strings that match the regexp with nothing
@@ -70,7 +66,7 @@ class RemoveTrackers(object):
                     entry['url'] = re.sub(tr_search, '', entry['url'], re.IGNORECASE | re.UNICODE)
 
 
-class ModifyTrackers(object):
+class ModifyTrackers:
     """
     Modify tracker URL to torrent files.
 
@@ -111,7 +107,7 @@ class ModifyTrackers(object):
                                     replace.get('from'), replace.get('to')
                                 )
                                 torrent.add_multitracker(trackernew)
-                                log.info('Modify %s in %s' % (tracker, trackernew))
+                                logger.info('Modify {} in {}', tracker, trackernew)
 
 
 @event('plugin.register')

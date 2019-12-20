@@ -1,19 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from datetime import datetime
 
-from sqlalchemy import Index
+from loguru import logger
 
 from flexget import plugin
-from flexget.components.backlog.db import log, BacklogEntry, get_entries, clear_entries
+from flexget.components.backlog.db import BacklogEntry, clear_entries, get_entries
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.database import with_session
 from flexget.utils.tools import parse_timedelta
 
+logger = logger.bind(name='backlog')
 
-class InputBacklog(object):
+
+class InputBacklog:
     """
     Keeps task history for given amount of time.
 
@@ -55,7 +54,7 @@ class InputBacklog(object):
     def on_task_abort(self, task, config):
         """Remember all entries until next execution when task gets aborted."""
         if task.entries:
-            log.debug('Remembering all entries to backlog because of task abort.')
+            logger.debug('Remembering all entries to backlog because of task abort.')
             self.learn_backlog(task)
 
     @with_session
@@ -67,8 +66,8 @@ class InputBacklog(object):
         if not snapshot:
             if task.current_phase != 'input':
                 # Not having a snapshot is normal during input phase, don't display a warning
-                log.warning(
-                    'No input snapshot available for `%s`, using current state' % entry['title']
+                logger.warning(
+                    'No input snapshot available for `{}`, using current state', entry['title']
                 )
             snapshot = entry
         expire_time = datetime.now() + parse_timedelta(amount)
@@ -81,10 +80,10 @@ class InputBacklog(object):
         if backlog_entry:
             # If there is already a backlog entry for this, update the expiry time if necessary.
             if backlog_entry.expire < expire_time:
-                log.debug('Updating expiry time for %s' % entry['title'])
+                logger.debug('Updating expiry time for {}', entry['title'])
                 backlog_entry.expire = expire_time
         else:
-            log.debug('Saving %s' % entry['title'])
+            logger.debug('Saving {}', entry['title'])
             backlog_entry = BacklogEntry()
             backlog_entry.title = entry['title']
             backlog_entry.entry = snapshot
@@ -108,14 +107,14 @@ class InputBacklog(object):
             # this is already in the task
             if task.find_entry(title=entry['title'], url=entry['url']):
                 continue
-            log.debug('Restoring %s' % entry['title'])
+            logger.debug('Restoring {}', entry['title'])
             entries.append(entry)
         if entries:
-            log.verbose('Added %s entries from backlog' % len(entries))
+            logger.verbose('Added {} entries from backlog', len(entries))
 
         # purge expired
         purged = clear_entries(task=task.name, all=False, session=session)
-        log.debug('%s entries purged from backlog' % purged)
+        logger.debug('{} entries purged from backlog', purged)
 
         return entries
 

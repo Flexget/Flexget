@@ -1,18 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.utils.tools import split_title_year
 from flexget.utils.log import log_once
+from flexget.utils.tools import split_title_year
 
-log = logging.getLogger('bluray_lookup')
+logger = logger.bind(name='bluray_lookup')
 
 
-class PluginBlurayLookup(object):
+class PluginBlurayLookup:
     """Retrieves bluray information for entries.
 
     Example:
@@ -49,7 +46,7 @@ class PluginBlurayLookup(object):
                 movie = lookup(title=title, year=year, session=session)
                 entry.update_using_map(self.field_map, movie)
         except LookupError:
-            log_once('Bluray lookup failed for %s' % entry['title'], log, logging.WARN)
+            log_once('Bluray lookup failed for %s' % entry['title'], logger, 'WARNING')
 
     def lookup(self, entry):
         """

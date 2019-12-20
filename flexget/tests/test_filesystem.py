@@ -1,116 +1,70 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-from path import Path
+from pathlib import Path
 
 
-class TestFilesystem(object):
+class TestFilesystem:
     base = "filesystem_test_dir/"
     test1 = base + '/Test1'
     test2 = base + '/Test2'
     test3 = base + '/Test3'
 
-    config = (
-        """
+    config = fr"""
         tasks:
           string:
-            filesystem: """
-        + test1
-        + """
-
+            filesystem: {test1}
           list:
-           filesystem:
-             - """
-        + test1
-        + """
-             - """
-        + test2
-        + """
-
+            filesystem:
+              - {test1}
+              - {test2}
           object_string:
             filesystem:
-              path: """
-        + test1
-        + """
-
+              path: {test1}
           object_list:
             filesystem:
               path:
-                - """
-        + test1
-        + """
-                - """
-        + test2
-        + """
-
+                - {test1}
+                - {test2}
           file_mask:
             filesystem:
-              path: """
-        + test1
-        + """
+              path: {test1}
               mask: '*.mkv'
-
           regexp_test:
             filesystem:
-              path: """
-        + test1
-        + """
+              path: {test1}
               regexp: '.*\.(mkv)$'
-
           recursive_true:
             filesystem:
-              path: """
-        + test1
-        + """
+              path: {test1}
               recursive: yes
-
           recursive_2_levels:
             filesystem:
-              path: """
-        + test1
-        + """
+              path: {test1}
               recursive: 2
-
           retrieve_files:
             filesystem:
-              path: """
-        + test1
-        + """
+              path: {test1}
               retrieve: files
-
           retrieve_files_and_dirs:
             filesystem:
-              path: """
-        + test1
-        + """
+              path: {test1}
               retrieve:
                 - files
                 - dirs
-
           combine_1:
             filesystem:
-              path: """
-        + test1
-        + """
+              path: {test1}
               mask: '*.mkv'
               recursive: 2
-
           combine_2:
             filesystem:
-              path: """
-        + test1
-        + """
+              path: {test1}
               recursive: yes
               retrieve: dirs
           non_ascii:
             filesystem:
-              path: """
-        + test3
-        + """
+              path: {test3}
               recursive: yes
               retrieve: [files, dirs]
         """
-    )
 
     item_list = [
         'file1.mkv',
@@ -128,7 +82,8 @@ class TestFilesystem(object):
         'dir8',
     ]
 
-    def assert_check(self, task, task_name, test_type, filenames):
+    @staticmethod
+    def assert_check(task, task_name, test_type, filenames):
         for file in filenames:
             file = Path(file)
             if test_type == 'positive':

@@ -1,18 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-import logging
-import sys
 import os
+import sys
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
-from flexget.plugin import PluginWarning, DependencyError
+from flexget.plugin import DependencyError, PluginWarning
 
 plugin_name = 'toast'
 
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 
-class NotifyToast(object):
+class NotifyToast:
     """
     Sends messages via local notification system. You must have a notification system like dbus for Linux.
     Preliminary support for Windows notifications. Not heavily tested yet.
@@ -57,7 +57,7 @@ class NotifyToast(object):
         try:
             from pync import Notifier
         except ImportError as e:
-            log.debug('Error importing pync: %s', e)
+            logger.debug('Error importing pync: {}', e)
             raise DependencyError(plugin_name, 'pync', 'pync module required. ImportError: %s' % e)
 
         icon_path = None
@@ -66,7 +66,7 @@ class NotifyToast(object):
 
             icon_path = os.path.join(flexget.ui.__path__[0], 'src', 'favicon.ico')
         except Exception as e:
-            log.debug('Error trying to get flexget icon from webui folder: %s', e)
+            logger.debug('Error trying to get flexget icon from webui folder: {}', e)
 
         try:
             Notifier.notify(
@@ -85,7 +85,7 @@ class NotifyToast(object):
         try:
             from gi.repository import Notify
         except ImportError as e:
-            log.debug('Error importing Notify: %s', e)
+            logger.debug('Error importing Notify: {}', e)
             raise DependencyError(
                 plugin_name, 'gi.repository', 'Notify module required. ImportError: %s' % e
             )
@@ -171,7 +171,7 @@ class NotifyToast(object):
             icon_path = os.path.join(flexget.ui.__path__[0], 'src', 'favicon.ico')
             hicon = LoadImage(hinst, icon_path, IMAGE_ICON, 0, 0, icon_flags)
         except Exception as e:
-            log.debug('Error trying to get flexget icon from webui folder: %s', e)
+            logger.debug('Error trying to get flexget icon from webui folder: {}', e)
 
         # Taskbar icon
         flags = NIF_ICON | NIF_MESSAGE | NIF_TIP | NIF_INFO

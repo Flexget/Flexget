@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import os
 import stat
 
@@ -18,7 +15,7 @@ def is_hard_link(file1, file2):
 
 
 @pytest.mark.skipif(os.name == 'nt', reason='symlinks do not work on windows')
-class TestSymlink(object):
+class TestSymlink:
     _config = """
         templates:
           global:
@@ -30,6 +27,13 @@ class TestSymlink(object):
               - {title: 'test1.mkv', location: '{{tmpdir_1}}/test1.mkv'}
             symlink:
               to: '{{tmpdir_1}}/hardlink'
+              link_type: 'hard'
+          test_hardlink_rename:
+            mock:
+              - {title: 'test1.mkv', location: '{{tmpdir_1}}/test1.mkv'}
+            symlink:
+              to: '{{tmpdir_1}}/hardlink'
+              rename: 'rename.mkv'
               link_type: 'hard'
           test_hardlink_dir:
             mock:
@@ -49,6 +53,13 @@ class TestSymlink(object):
               - {title: 'test1', location: '{{tmpdir_1}}/test1'}
             symlink:
               to: '{{tmpdir_1}}/softlink'
+              link_type: 'soft'
+          test_softlink_rename:
+            mock:
+              - {title: 'test1.mkv', location: '{{tmpdir_1}}/test1.mkv'}
+            symlink:
+              to: '{{tmpdir_1}}/softlink'
+              rename: 'rename.mkv'
               link_type: 'soft'
           test_softlink_fail:
             mock:
@@ -71,6 +82,14 @@ class TestSymlink(object):
         tmpdir.join(dirname).join('test1.mkv').write('')
         execute_task('test_hardlink')
         hardlink = tmpdir.join(dirname).join('hardlink').join('test1.mkv')
+
+        assert os.path.exists(hardlink.strpath), '%s should exist' % hardlink.strpath
+        assert is_hard_link(tmpdir.join(dirname).join('test1.mkv').strpath, hardlink.strpath)
+
+    def test_hardlink_rename(self, execute_task, tmpdir):
+        tmpdir.join(dirname).join('test1.mkv').write('')
+        execute_task('test_hardlink_rename')
+        hardlink = tmpdir.join(dirname).join('hardlink').join('rename.mkv')
 
         assert os.path.exists(hardlink.strpath), '%s should exist' % hardlink.strpath
         assert is_hard_link(tmpdir.join(dirname).join('test1.mkv').strpath, hardlink.strpath)
@@ -105,6 +124,15 @@ class TestSymlink(object):
         assert os.path.exists(d.strpath), '%s should exist' % d.strpath
         assert os.path.islink(f.strpath), '%s should be a softlink' % f.strpath
         assert os.path.islink(d.strpath), '%s should be a softlink' % d.strpath
+
+    def test_softlink_rename(self, execute_task, tmpdir):
+        tmpdir.join(dirname).join('test1.mkv').write('')
+        execute_task('test_softlink_rename')
+
+        softlink = tmpdir.join(dirname).join('softlink')
+        f = softlink.join('rename.mkv')
+        assert os.path.exists(f.strpath), '%s should exist' % f.strpath
+        assert os.path.islink(f.strpath), '%s should be a softlink' % f.strpath
 
     def test_softlink_fail(self, execute_task, tmpdir):
         tmpdir.join(dirname).join('test1.mkv').write('')

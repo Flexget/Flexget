@@ -1,13 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import json
-import logging
-from builtins import *
-from collections import MutableSet
+from collections.abc import MutableSet
+from urllib.parse import quote, urlparse
 
 import requests
-from future.moves.urllib.parse import urlparse, quote
-from future.utils import python_2_unicode_compatible
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
@@ -15,17 +11,16 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.qualities import Requirements
 
-log = logging.getLogger('radarr')
+logger = logger.bind(name='radarr')
 
 
-@python_2_unicode_compatible
 class RadarrRequestError(Exception):
-    def __init__(self, value, logger=log, **kwargs):
-        super(RadarrRequestError, self).__init__()
+    def __init__(self, value, logger=logger, **kwargs):
+        super().__init__()
         # Value is expected to be a string
         value = str(value)
         self.value = value
-        self.log = logger
+        self.logger = logger
         self.kwargs = kwargs
 
     def __str__(self):
@@ -33,8 +28,7 @@ class RadarrRequestError(Exception):
 
 
 class RadarrMovieAlreadyExistsError(Exception):
-    def __init__(self):
-        super(RadarrMovieAlreadyExistsError, self).__init__()
+    pass
 
 
 def spec_exception_from_response_ex(radarr_request_ex):
@@ -92,11 +86,11 @@ def request_post_json(url, headers, data):
                     error_message = json_response[0]["errorMessage"]
             except ValueError:
                 # Raised by response.json() if JSON couln't be decoded
-                log.error("Radarr returned non-JSON error result: %s", response.content)
+                logger.error('Radarr returned non-JSON error result: {}', response.content)
 
             raise RadarrRequestError(
                 "Invalid response received from Radarr: %s" % response.content,
-                log,
+                logger,
                 status_code=response.status_code,
                 error_message=error_message,
             )
@@ -264,7 +258,9 @@ def radarr_quality_to_flexget_quality_req(radarr_quality):
     # QUALITIES_MAP has its keys in lower case
     radarr_quality = radarr_quality.lower()
     if not radarr_quality in QUALITIES_MAP:
-        log.warning("Did not find a suitible translation for Radarr quality '%s'", radarr_quality)
+        logger.warning(
+            "Did not find a suitible translation for Radarr quality '{}'", radarr_quality
+        )
         return None
 
     flexget_quality_req_string = QUALITIES_MAP[radarr_quality]
@@ -272,8 +268,8 @@ def radarr_quality_to_flexget_quality_req(radarr_quality):
     try:
         return Requirements(flexget_quality_req_string)
     except ValueError:
-        log.error(
-            "Failed to convert %s into a valid quality requirement", flexget_quality_req_string
+        logger.error(
+            'Failed to convert {} into a valid quality requirement', flexget_quality_req_string
         )
 
 
@@ -322,11 +318,11 @@ class RadarrSet(MutableSet):
         if matching_entry:
             movie_id = matching_entry["radarr_id"]
             self.service.delete_movie(movie_id)
-            log.verbose("Removed movie %s from Radarr", matching_entry["title"])
+            logger.verbose('Removed movie {} from Radarr', matching_entry['title'])
             # Clear the cache
             self._movie_entries = None
         else:
-            log.debug("Could not find any matching movie to remove for entry %s", entry)
+            logger.debug('Could not find any matching movie to remove for entry {}', entry)
 
     def __ior__(self, other):
         for entry in other:
@@ -364,17 +360,16 @@ class RadarrSet(MutableSet):
                     result["tmdbId"],
                     root_folder_path,
                 )
-                log.verbose("Added movie %ls to Radarr list", result["title"])
+                logger.verbose('Added movie {} to Radarr list', result['title'])
             except RadarrMovieAlreadyExistsError:
-                log.warning(
-                    "Could not add movie %ls because it already exists on Radarr", result["title"]
+                logger.warning(
+                    'Could not add movie {} because it already exists on Radarr', result['title']
                 )
             except RadarrRequestError as ex:
-                log.error("The movie add command raised exception: %s", ex)
+                logger.error('The movie add command raised exception: {}', ex)
         else:
-            log.verbose(
-                "The lookup for entry %s did not return any results."
-                "Can not add the movie in Radarr.",
+            logger.verbose(
+                'The lookup for entry {} did not return any results.Can not add the movie in Radarr.',
                 entry,
             )
 
@@ -515,7 +510,7 @@ class RadarrSet(MutableSet):
                 if result:
                     return result
             except RadarrRequestError as ex:
-                log.error("Radarr IMDB lookup failed: %s", ex)
+                logger.error('Radarr IMDB lookup failed: {}', ex)
 
         # If the entry has a TMDB id, use that for lookup
         if tmdb_id:
@@ -525,7 +520,7 @@ class RadarrSet(MutableSet):
                 if result:
                     return result
             except RadarrRequestError as ex:
-                log.error("Radarr TMDB lookup failed: %s", ex)
+                logger.error('Radarr TMDB lookup failed: {}', ex)
 
         # Could not lookup by id. Try to use the title.
         # However, we can only accept any results if it's
@@ -534,18 +529,18 @@ class RadarrSet(MutableSet):
             try:
                 results = self.service.lookup_by_term(title)
                 if len(results) > 1:
-                    log.debug(
-                        "Radarr lookup for '%s' returned %d results. Using the first result '%s'.",
+                    logger.debug(
+                        "Radarr lookup for '{}' returned {:d} results. Using the first result '{}'.",
                         title,
                         len(results),
-                        results[0]["title"],
+                        results[0]['title'],
                     )
                     return results[0]
             except RadarrRequestError as ex:
-                log.error("Radarr search term lookup failed: %s", ex)
+                logger.error('Radarr search term lookup failed: {}', ex)
 
 
-class RadarrList(object):
+class RadarrList:
     """ List plugin for Radarr that also works as an input plugin """
 
     schema = {

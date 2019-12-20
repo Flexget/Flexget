@@ -1,21 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import
-
-import logging
 import re
+
+from dateutil.parser import parse as dateutil_parse
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.requests import TimedLimiter, RequestException
+from flexget.utils.requests import RequestException, TimedLimiter
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
-from dateutil.parser import parse as dateutil_parse
-
-log = logging.getLogger('awesomehd')
+logger = logger.bind(name='awesomehd')
 
 
-class SearchAwesomeHD(object):
+class SearchAwesomeHD:
     """
         AwesomeHD search plugin.
     """
@@ -43,7 +41,7 @@ class SearchAwesomeHD(object):
 
         return config
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def search(self, task, entry, config):
         """
             Search for entries on AwesomeHD
@@ -52,7 +50,7 @@ class SearchAwesomeHD(object):
         try:
             import lxml  # noqa
         except ImportError as e:
-            log.debug('Error importing lxml: %s', e)
+            logger.debug('Error importing lxml: {}', e)
             raise plugin.DependencyError(
                 'awesomehd', 'lxml', 'lxml module required. ImportError: %s' % e
             )
@@ -67,7 +65,7 @@ class SearchAwesomeHD(object):
 
         # Can only search for imdb
         if not entry.get('imdb_id'):
-            log.debug('Skipping entry %s because of missing imdb id', entry['title'])
+            logger.debug('Skipping entry {} because of missing imdb id', entry['title'])
             return entries
 
         # Standard search params
@@ -82,16 +80,16 @@ class SearchAwesomeHD(object):
             response = task.requests.get(self.base_url + 'searchapi.php', params=params).content
 
         except RequestException as e:
-            log.error('Failed to search for imdb id %s: %s', entry['imdb_id'], e)
+            logger.error('Failed to search for imdb id {}: {}', entry['imdb_id'], e)
             return entries
 
         try:
             soup = get_soup(response, 'xml')
             if soup.find('error'):
-                log.error(soup.find('error').get_text())
+                logger.error(soup.find('error').get_text())
                 return entries
         except Exception as e:
-            log.error('Failed to parse xml result for imdb id %s: %s', entry['imdb_id'], e)
+            logger.error('Failed to parse xml result for imdb id {}: {}', entry['imdb_id'], e)
             return entries
 
         authkey = soup.find('authkey').get_text()
@@ -99,7 +97,7 @@ class SearchAwesomeHD(object):
         for result in soup.find_all('torrent'):
             # skip audio releases for now
             if not result.find('resolution').get_text():
-                log.debug('Skipping audio release')
+                logger.debug('Skipping audio release')
                 continue
 
             e = Entry()

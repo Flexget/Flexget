@@ -1,14 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import base64
+import os
 import re
 import sys
-
-import logging
-import os
-
 import time
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -16,10 +12,10 @@ from flexget.event import event
 from flexget.utils.pathscrub import pathscrub
 from flexget.utils.template import RenderError
 
-log = logging.getLogger('deluge')
+logger = logger.bind(name='deluge')
 
 
-class DelugePlugin(object):
+class DelugePlugin:
     """Base class for deluge plugins, contains settings and methods for connecting to a deluge daemon."""
 
     def on_task_start(self, task, config):
@@ -30,12 +26,12 @@ class DelugePlugin(object):
         try:
             from deluge_client import DelugeRPCClient
         except ImportError as e:
-            log.debug('Error importing deluge-client: %s' % e)
+            logger.debug('Error importing deluge-client: {}', e)
             raise plugin.DependencyError(
                 'deluge',
                 'deluge-client',
                 'deluge-client >=1.5 is required. `pip install deluge-client` to install.',
-                log,
+                logger,
             )
         config = self.prepare_config(config)
 
@@ -44,11 +40,11 @@ class DelugePlugin(object):
             auth = self.get_localhost_auth(config.get('config_path'))
             if auth and auth[0]:
                 config['username'], config['password'] = auth
-            else:
-                raise plugin.PluginError(
-                    'Unable to get local authentication info for Deluge. You may need to '
-                    'specify an username and password from your Deluge auth file.'
-                )
+        if not config.get('username') or not config.get('password'):
+            raise plugin.PluginError(
+                'Unable to get authentication info for Deluge. You may need to '
+                'specify an username and password from your Deluge auth file.'
+            )
 
         return DelugeRPCClient(
             config['host'],
@@ -131,7 +127,7 @@ class InputDeluge(DelugePlugin):
 
     def on_task_start(self, task, config):
         config = self.prepare_config(config)
-        super(InputDeluge, self).on_task_start(task, config)
+        super().on_task_start(task, config)
 
     def prepare_config(self, config):
         if isinstance(config, bool):
@@ -142,7 +138,7 @@ class InputDeluge(DelugePlugin):
                 filter['label'] = filter['label'].lower()
             if 'state' in filter:
                 filter['state'] = filter['state'].capitalize()
-        super(InputDeluge, self).prepare_config(config)
+        super().prepare_config(config)
         return config
 
     def on_task_input(self, task, config):
@@ -150,7 +146,11 @@ class InputDeluge(DelugePlugin):
         config = self.prepare_config(config)
         # Reset the entries list
         client = self.setup_client(config)
-        client.connect()
+
+        try:
+            client.connect()
+        except ConnectionError as exc:
+            raise plugin.PluginError(f'Error connecting to deluge daemon: {exc}') from exc
 
         entries = self.generate_entries(client, config)
         client.disconnect()
@@ -172,7 +172,7 @@ class InputDeluge(DelugePlugin):
                         torrent_path = '/' + torrent_path
                     entry['url'] = 'file://' + torrent_path
                 else:
-                    log.warning('Did not find torrent file at %s', torrent_path)
+                    logger.warning('Did not find torrent file at {}', torrent_path)
             for key, value in torrent_dict.items():
                 # All fields provided by deluge get placed under the deluge_ namespace
                 entry['deluge_' + key] = value
@@ -236,7 +236,7 @@ class OutputDeluge(DelugePlugin):
     def prepare_config(self, config):
         if isinstance(config, bool):
             config = {'enabled': config}
-        super(OutputDeluge, self).prepare_config(config)
+        super().prepare_config(config)
         config.setdefault('enabled', True)
         config.setdefault('action', 'add')
         config.setdefault('path', '')
@@ -298,10 +298,13 @@ class OutputDeluge(DelugePlugin):
         if not config['enabled'] or not (task.accepted or task.options.test):
             return
 
-        client.connect()
+        try:
+            client.connect()
+        except ConnectionError as exc:
+            raise plugin.PluginError(f'Error connecting to deluge daemon: {exc}') from exc
 
         if task.options.test:
-            log.debug('Test connection to deluge daemon successful.')
+            logger.debug('Test connection to deluge daemon successful.')
             client.disconnect()
             return
 
@@ -312,9 +315,9 @@ class OutputDeluge(DelugePlugin):
             if label and label.lower() != 'no label':
                 try:
                     label = self._format_label(entry.render(label))
-                    log.debug('Rendered label: %s', label)
+                    logger.debug('Rendered label: {}', label)
                 except RenderError as e:
-                    log.error('Error rendering label `%s`: %s', label, e)
+                    logger.error('Error rendering label `{}`: {}', label, e)
                     continue
                 labels.add(label)
         if labels:
@@ -325,16 +328,16 @@ class OutputDeluge(DelugePlugin):
             if not label_enabled:
                 available_plugins = client.call('core.get_available_plugins')
                 if 'Label' in available_plugins:
-                    log.debug('Enabling label plugin in deluge')
+                    logger.debug('Enabling label plugin in deluge')
                     label_enabled = client.call('core.enable_plugin', 'Label')
                 else:
-                    log.error('Label plugin is not installed in deluge')
+                    logger.error('Label plugin is not installed in deluge')
 
             if label_enabled:
                 d_labels = client.call('label.get_labels')
                 for label in labels:
                     if label not in d_labels:
-                        log.debug('Adding the label `%s` to deluge', label)
+                        logger.debug('Adding the label `{}` to deluge', label)
                         client.call('label.add', label)
 
         # add the torrents
@@ -347,7 +350,7 @@ class OutputDeluge(DelugePlugin):
                 if path:
                     add_opts['download_location'] = pathscrub(os.path.expanduser(path))
             except RenderError as e:
-                log.error('Could not set path for %s: %s', entry['title'], e)
+                logger.error('Could not set path for {}: {}', entry['title'], e)
             for fopt, dopt in self.options.items():
                 value = entry.get(fopt, config.get(fopt))
                 if value is not None:
@@ -369,7 +372,7 @@ class OutputDeluge(DelugePlugin):
                 label = entry.render(entry.get('label') or config['label'])
                 modify_opts['label'] = self._format_label(label)
             except RenderError as e:
-                log.error('Error setting label for `%s`: %s', entry['title'], e)
+                logger.error('Error setting label for `{}`: {}', entry['title'], e)
             try:
                 move_completed_path = entry.render(
                     entry.get('move_completed_path') or config['move_completed_path']
@@ -378,27 +381,27 @@ class OutputDeluge(DelugePlugin):
                     os.path.expanduser(move_completed_path)
                 )
             except RenderError as e:
-                log.error('Error setting move_completed_path for %s: %s', entry['title'], e)
+                logger.error('Error setting move_completed_path for {}: {}', entry['title'], e)
             try:
                 content_filename = entry.get('content_filename') or config.get(
                     'content_filename', ''
                 )
                 modify_opts['content_filename'] = pathscrub(entry.render(content_filename))
             except RenderError as e:
-                log.error('Error setting content_filename for %s: %s', entry['title'], e)
+                logger.error('Error setting content_filename for {}: {}', entry['title'], e)
 
             torrent_id = entry.get('deluge_id') or entry.get('torrent_info_hash')
             torrent_id = torrent_id and torrent_id.lower()
             if torrent_id in torrent_ids:
-                log.info('%s is already loaded in deluge, setting options', entry['title'])
+                logger.info('{} is already loaded in deluge, setting options', entry['title'])
                 # Entry has a deluge id, verify the torrent is still in the deluge session and apply options
                 # Since this is already loaded in deluge, we may also need to change the path
                 modify_opts['path'] = add_opts.pop('download_location', None)
                 client.call('core.set_torrent_options', [torrent_id], add_opts)
                 self._set_torrent_options(client, torrent_id, entry, modify_opts)
             elif config['action'] != 'add':
-                log.warning(
-                    'Cannot %s %s, because it is not loaded in deluge.',
+                logger.warning(
+                    'Cannot {} {}, because it is not loaded in deluge.',
                     config['action'],
                     entry['title'],
                 )
@@ -415,14 +418,14 @@ class OutputDeluge(DelugePlugin):
                     with open(entry['file'], 'rb') as f:
                         filedump = base64.encodestring(f.read())
 
-                log.verbose('Adding %s to deluge.', entry['title'])
+                logger.verbose('Adding {} to deluge.', entry['title'])
                 added_torrent = None
                 if magnet:
                     added_torrent = client.call('core.add_torrent_magnet', magnet, add_opts)
                     if config.get('magnetization_timeout'):
                         timeout = config['magnetization_timeout']
-                        log.verbose(
-                            'Waiting %d seconds for "%s" to magnetize', timeout, entry['title']
+                        logger.verbose(
+                            'Waiting {} seconds for "{}" to magnetize', timeout, entry['title']
                         )
                         for _ in range(timeout):
                             time.sleep(1)
@@ -431,15 +434,14 @@ class OutputDeluge(DelugePlugin):
                                     'core.get_torrent_status', torrent_id, ['files']
                                 )
                             except Exception as err:
-                                log.error('wait_for_metadata Error: %s', err)
+                                logger.error('wait_for_metadata Error: {}', err)
                                 break
                             if status.get('files'):
-                                log.info('"%s" magnetization successful', entry['title'])
+                                logger.info('"{}" magnetization successful', entry['title'])
                                 break
                         else:
-                            log.warning(
-                                '"%s" did not magnetize before the timeout elapsed, '
-                                'file list unavailable for processing.',
+                            logger.warning(
+                                '"{}" did not magnetize before the timeout elapsed, file list unavailable for processing.',
                                 entry['title'],
                             )
                 else:
@@ -448,22 +450,22 @@ class OutputDeluge(DelugePlugin):
                             'core.add_torrent_file', entry['title'], filedump, add_opts
                         )
                     except Exception as e:
-                        log.info('%s was not added to deluge! %s', entry['title'], e)
+                        logger.info('{} was not added to deluge! {}', entry['title'], e)
                         entry.fail('Could not be added to deluge')
                 if not added_torrent:
-                    log.error('There was an error adding %s to deluge.' % entry['title'])
+                    logger.error('There was an error adding {} to deluge.', entry['title'])
                 else:
-                    log.info('%s successfully added to deluge.', entry['title'])
+                    logger.info('{} successfully added to deluge.', entry['title'])
                     self._set_torrent_options(client, added_torrent, entry, modify_opts)
             if config['action'] in ('remove', 'purge'):
                 client.call('core.remove_torrent', torrent_id, config['action'] == 'purge')
-                log.info('%s removed from deluge.', entry['title'])
+                logger.info('{} removed from deluge.', entry['title'])
             elif config['action'] == 'pause':
                 client.call('core.pause_torrent', [torrent_id])
-                log.info('%s has been paused in deluge.', entry['title'])
+                logger.info('{} has been paused in deluge.', entry['title'])
             elif config['action'] == 'resume':
                 client.call('core.resume_torrent', [torrent_id])
-                log.info('%s has been resumed in deluge.', entry['title'])
+                logger.info('{} has been resumed in deluge.', entry['title'])
 
         client.disconnect()
 
@@ -490,20 +492,21 @@ class OutputDeluge(DelugePlugin):
         entry['deluge_id'] = torrent_id
 
         if opts.get('move_completed_path'):
-            client.call('core.set_torrent_move_completed', torrent_id, True)
             client.call(
-                'core.set_torrent_move_completed_path', torrent_id, opts['move_completed_path']
+                'core.set_torrent_options',
+                [torrent_id],
+                {'move_completed': True, 'move_completed_path': opts['move_completed_path']},
             )
-            log.debug('%s move on complete set to %s', entry['title'], opts['move_completed_path'])
+            logger.debug('{} move on complete set to {}', entry['title'], opts['move_completed_path'])
         if opts.get('label'):
             client.call('label.set_torrent', torrent_id, opts['label'])
         if opts.get('queue_to_top') is not None:
             if opts['queue_to_top']:
                 client.call('core.queue_top', [torrent_id])
-                log.debug('%s moved to top of queue', entry['title'])
+                logger.debug('{} moved to top of queue', entry['title'])
             else:
                 client.call('core.queue_bottom', [torrent_id])
-                log.debug('%s moved to bottom of queue', entry['title'])
+                logger.debug('{} moved to bottom of queue', entry['title'])
 
         status_keys = [
             'files',
@@ -522,8 +525,8 @@ class OutputDeluge(DelugePlugin):
             else:
                 # Deluge will unset the move completed option if we move the storage, forgo setting proper
                 # path, in favor of leaving proper final location.
-                log.debug(
-                    'Not moving storage for %s, as this will prevent move_completed_path.',
+                logger.debug(
+                    'Not moving storage for {}, as this will prevent move_completed_path.',
                     entry['title'],
                 )
         elif opts.get('path'):
@@ -532,7 +535,7 @@ class OutputDeluge(DelugePlugin):
         if move_now_path and os.path.normpath(move_now_path) != os.path.normpath(
             status['save_path']
         ):
-            log.debug('Moving storage for %s to %s', entry['title'], move_now_path)
+            logger.debug('Moving storage for {} to {}', entry['title'], move_now_path)
             client.call('core.move_storage', [torrent_id], move_now_path)
 
         big_file_name = ''
@@ -570,7 +573,7 @@ class OutputDeluge(DelugePlugin):
                         )
                         counter += 1
                 else:
-                    log.debug(
+                    logger.debug(
                         'Cannot ensure content_filename is unique when adding to a remote deluge daemon.'
                     )
                 return name
@@ -578,7 +581,7 @@ class OutputDeluge(DelugePlugin):
             def rename(file, new_name):
                 # Renames a file in torrent
                 client.call('core.rename_files', torrent_id, [(file['index'], new_name)])
-                log.debug('File %s in %s renamed to %s', file['path'], entry['title'], new_name)
+                logger.debug('File {} in {} renamed to {}', file['path'], entry['title'], new_name)
 
             if main_file is not None:
                 # proceed with renaming only if such a big file is found
@@ -630,7 +633,11 @@ class OutputDeluge(DelugePlugin):
                         1 if f == main_file or f == sub_file and keep_subs else 0
                         for f in status['files']
                     ]
-                    client.call('core.set_torrent_file_priorities', torrent_id, file_priorities)
+                    client.call(
+                        'core.set_torrent_options',
+                        [torrent_id],
+                        {'file_priorities': file_priorities},
+                    )
 
                     if opts.get('hide_sparse_files'):
                         # hide the other sparse files that are not supposed to download but are created anyway
@@ -650,8 +657,8 @@ class OutputDeluge(DelugePlugin):
                         ]
                         client.call('core.rename_files', torrent_id, rename_pairs)
             else:
-                log.warning(
-                    'No files in "%s" are > %d%% of content size, no files renamed.',
+                logger.warning(
+                    'No files in "{}" are > {:.0f}% of content size, no files renamed.',
                     entry['title'],
                     opts.get('main_file_ratio') * 100,
                 )
@@ -667,14 +674,13 @@ class OutputDeluge(DelugePlugin):
             else:
                 folder_structure = []
             if len(folder_structure) > 1:
-                log.verbose('Renaming Folder %s to %s', folder_structure[0], container_directory)
+                logger.verbose('Renaming Folder {} to {}', folder_structure[0], container_directory)
                 client.call(
                     'core.rename_folder', torrent_id, folder_structure[0], container_directory
                 )
             else:
-                log.debug(
-                    'container_directory specified however the torrent %s does not have a directory structure; '
-                    'skipping folder rename',
+                logger.debug(
+                    'container_directory specified however the torrent {} does not have a directory structure; skipping folder rename',
                     entry['title'],
                 )
 

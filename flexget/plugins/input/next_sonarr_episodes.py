@@ -1,20 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urlparse
-
-import logging
 import math
+from urllib.parse import urlparse
 
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
-from flexget.event import event
 from flexget.entry import Entry
+from flexget.event import event
 
-log = logging.getLogger('next_sonarr_episodes')
+logger = logger.bind(name='next_sonarr_episodes')
 
 
-class NextSonarrEpisodes(object):
+class NextSonarrEpisodes:
     """
     This plugin return the 1st missing episode of every show configures in Sonarr.
     This can be used with the discover plugin or set_series_begin plugin to
@@ -126,13 +123,13 @@ class NextSonarrEpisodes(object):
                     )
                     # Test mode logging
                     if entry and task.options.test:
-                        log.verbose("Test mode. Entry includes:")
+                        logger.verbose("Test mode. Entry includes:")
                         for key, value in list(entry.items()):
-                            log.verbose('     {}: {}'.format(key.capitalize(), value))
+                            logger.verbose('     {}: {}', key.capitalize(), value)
                     if entry.isvalid():
                         yield entry
                     else:
-                        log.error('Invalid entry created? {}'.format(entry))
+                        logger.error('Invalid entry created? {}', entry)
 
 
 @event('plugin.register')

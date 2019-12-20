@@ -1,15 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('inputs')
+logger = logger.bind(name='inputs')
 
 
-class PluginInputs(object):
+class PluginInputs:
     """
     Allows the same input plugin to be configured multiple times in a task.
 
@@ -45,22 +42,22 @@ class PluginInputs(object):
                 try:
                     result = method(task, input_config)
                 except plugin.PluginError as e:
-                    log.warning('Error during input plugin %s: %s' % (input_name, e))
+                    logger.warning('Error during input plugin {}: {}', input_name, e)
                     continue
                 if not result:
                     msg = 'Input %s did not return anything' % input_name
                     if getattr(task, 'no_entries_ok', False):
-                        log.verbose(msg)
+                        logger.verbose(msg)
                     else:
-                        log.warning(msg)
+                        logger.warning(msg)
                     continue
                 for entry in result:
                     if entry['title'] in entry_titles:
-                        log.debug('Title `%s` already in entry list, skipping.' % entry['title'])
+                        logger.debug('Title `{}` already in entry list, skipping.', entry['title'])
                         continue
                     urls = ([entry['url']] if entry.get('url') else []) + entry.get('urls', [])
                     if any(url in entry_urls for url in urls):
-                        log.debug('URL for `%s` already in entry list, skipping.' % entry['title'])
+                        logger.debug('URL for `{}` already in entry list, skipping.', entry['title'])
                         continue
                     yield entry
                     entry_titles.add(entry['title'])

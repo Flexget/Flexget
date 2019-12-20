@@ -1,10 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import mock
-
-
-class TestNotifyEntry(object):
+class TestNotifyEntry:
     config = """
         tasks:
           test_basic_notify:

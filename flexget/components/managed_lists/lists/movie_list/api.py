@@ -1,33 +1,30 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
-import logging
 from math import ceil
 
-from flask import jsonify
-from flask import request
+from flask import jsonify, request
+from loguru import logger
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import (
+    BadRequest,
     Conflict,
     NotFoundError,
     base_message_schema,
-    success_response,
-    BadRequest,
     etag,
     pagination_headers,
+    success_response,
 )
-from .movie_list import MovieListBase
-from . import db
 
-log = logging.getLogger('movie_list')
+from . import db
+from .movie_list import MovieListBase
+
+logger = logger.bind(name='movie_list')
 
 movie_list_api = api.namespace('movie_list', description='Movie List operations')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     input_movie_list_id_object = {
         'type': 'array',
         'items': {'type': 'object', 'minProperties': 1, 'additionalProperties': True},
@@ -295,7 +292,7 @@ class MovieListMovieAPI(APIResource):
             movie = db.get_movie_by_id(list_id=list_id, movie_id=movie_id, session=session)
         except NoResultFound:
             raise NotFoundError('could not find movie with id %d in list %d' % (movie_id, list_id))
-        log.debug('deleting movie %d', movie.id)
+        logger.debug('deleting movie {}', movie.id)
         session.delete(movie)
         return success_response('successfully deleted movie %d' % movie_id)
 
