@@ -32,7 +32,7 @@ class PluginDetails:
             'Summary - Accepted: {} (Rejected: {} Undecided: {} Failed: {})',
             len(task.accepted),
             len(task.rejected),
-            len(task.entries) - len(task.accepted),
+            len(task.undecided),
             len(task.failed),
         )
 

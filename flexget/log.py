@@ -110,8 +110,8 @@ def initialize(unit_test=False):
 
     logger.level('VERBOSE', no=VERBOSE, color='<bold>', icon='👄')
 
-    def verbose(_, message, *args, **kwargs):
-        logger.opt(depth=1).log('VERBOSE', message, *args, **kwargs)
+    def verbose(self, message, *args, **kwargs):
+        self.opt(depth=1).log('VERBOSE', message, *args, **kwargs)
 
     logger.__class__.verbose = verbose
     logger.configure(extra={'task': '', 'session_id': None}, patcher=record_patcher)
