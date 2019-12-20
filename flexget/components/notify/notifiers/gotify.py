@@ -1,5 +1,3 @@
-import logging
-
 from http import HTTPStatus
 from requests.exceptions import RequestException
 from urllib.parse import urljoin
@@ -9,9 +7,7 @@ from flexget.event import event
 from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 
-
 plugin_name = 'gotify'
-log = logging.getLogger(plugin_name)
 
 requests = RequestSession(max_retries=3)
 
