@@ -1,8 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-
-class TestSubtask(object):
+class TestFromTask(object):
     config = """
         tasks:
           subtask:
@@ -12,10 +8,10 @@ class TestSubtask(object):
             - title: subtask entry 1
             accept_all: yes
           main_task:
-            subtask: subtask
+            from_task: subtask
     """
 
-    def test_subtask(self, manager, execute_task):
+    def test_from_task(self, execute_task):
         task = execute_task('main_task')
         assert len(task.entries) == 2, 'Should have produced both subtask entries'
         assert len(task.accepted) == 0, 'Accepted status should not pass through from subtask'
