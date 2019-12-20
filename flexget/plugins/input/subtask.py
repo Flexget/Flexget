@@ -5,7 +5,6 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.task import Task
 
-
 logger = logger.bind(name='subtask')
 
 
@@ -26,9 +25,8 @@ class Subtask(object):
             # TODO: Do we want to pass all options through? Things like inject don't make sense, but perhaps others do.
             options=None,
             output=task.output,
-            loglevel=task.loglevel,
+            session_id=task.session_id,
             priority=task.priority,
-            suppress_warnings=task.suppress_warnings,
         )
         logger.verbose('Running task `%s` as subtask.', subtask_name)
         input_task.execute()
