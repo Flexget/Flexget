@@ -1,16 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.task import Task
-from flexget.utils.cached_input import cached
 
 
-log = logging.getLogger('subtask')
+logger = logger.bind(name='subtask')
 
 
 class Subtask(object):
@@ -34,9 +30,9 @@ class Subtask(object):
             priority=task.priority,
             suppress_warnings=task.suppress_warnings,
         )
-        log.verbose('Running task `%s` as subtask.', subtask_name)
+        logger.verbose('Running task `%s` as subtask.', subtask_name)
         input_task.execute()
-        log.verbose('Finished running subtask `%s`.', subtask_name)
+        logger.verbose('Finished running subtask `%s`.', subtask_name)
         # Create fresh entries to reset state and strip association to old task
         return [Entry(e) for e in input_task.accepted]
 
