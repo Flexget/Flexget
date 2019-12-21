@@ -125,6 +125,7 @@ class Manager:
         self.config_base = None
         self.config_name = None
         self.config_path = None
+        self.log_filename = None
         self.db_filename = None
         self.engine = None
         self.lockfile = None
@@ -215,6 +216,7 @@ class Manager:
         # If an absolute path is not specified, use the config directory.
         if not os.path.isabs(log_file):
             log_file = os.path.join(self.config_base, log_file)
+        self.log_filename = log_file
         flexget.log.start(log_file, self.options.loglevel, to_console=not self.options.cron)
 
     def initialize(self):
@@ -1053,8 +1055,9 @@ class Manager:
         debug messages as well as the crash traceback.
         """
         if not self.unit_test:
+            log_dir = os.path.dirname(self.log_filename)
             filename = os.path.join(
-                self.config_base, datetime.now().strftime('crash_report.%Y.%m.%d.%H%M%S%f.log')
+                log_dir, datetime.now().strftime('crash_report.%Y.%m.%d.%H%M%S%f.log')
             )
             with codecs.open(filename, 'w', encoding='utf-8') as outfile:
                 outfile.writelines(flexget.log.debug_buffer)
