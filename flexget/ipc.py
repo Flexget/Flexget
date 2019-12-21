@@ -158,7 +158,7 @@ class IPCServer(threading.Thread):
     def run(self):
         # Make the rpyc logger a bit quieter when we aren't in debugging.
         rpyc_logger = logging.getLogger('ipc.rpyc')
-        if logger.level(self.manager.options.loglevel).no < logger.level('DEBUG').no:
+        if logger.level(self.manager.options.loglevel).no > logger.level('DEBUG').no:
             rpyc_logger.setLevel(logging.WARNING)
         DaemonService.manager = self.manager
         self.server = ThreadedServer(
