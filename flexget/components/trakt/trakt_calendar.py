@@ -115,20 +115,23 @@ class TraktCalendar:
             if config['type'] == 'episodes':
                 e.update_using_map(self.episode_map, result['episode'])
 
-            e['title'] = e['trakt_series_name']
+            title = e['trakt_series_name']
             if not config['strip_dates']:
-                e['title'] = '{0} ({1})'.format(e['title'], e['trakt_series_year'])
+                title = '{0} ({1})'.format(title, e['trakt_series_year'])
 
-            e['url'] = e['trakt_series_url']
+            url = e['trakt_series_url']
 
             if config['type'] == 'episodes':
-                e['title'] = '{0} S{1:02d}E{2:02d}'.format(
-                    e['title'], e['trakt_season'], e['trakt_episode']
+                title = '{0} S{1:02d}E{2:02d}'.format(
+                    title, e['trakt_season'], e['trakt_episode']
                 )
 
-                e['url'] = '{0}/seasons/{1}/episodes/{2}'.format(
-                    e['url'], e['trakt_season'], e['trakt_episode']
+                url = '{0}/seasons/{1}/episodes/{2}'.format(
+                    url, e['trakt_season'], e['trakt_episode']
                 )
+
+            e['title'] = title
+            e['url'] = url
 
             entries.add(e)
 
