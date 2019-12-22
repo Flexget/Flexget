@@ -22,8 +22,8 @@ class FromTask(object):
             task.manager,
             '{}>{}'.format(task.name, subtask_name),
             config=subtask_config,
-            # TODO: Do we want to pass all options through? Things like inject don't make sense, but perhaps others do.
-            options=None,
+            # TODO: Do we want to pass other options through?
+            options={'allow_manual': True},
             output=task.output,
             session_id=task.session_id,
             priority=task.priority,
