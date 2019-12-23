@@ -31,7 +31,7 @@ class Verbose:
         if reason:
             msg = f'{msg} because {reason[0].lower() + reason[1:]}'
 
-        task_logger.verbose(msg)
+        task_logger.opt(ansi=True).verbose(msg)
 
     def on_task_exit(self, task, config):
         if task.options.silent:
