@@ -22,7 +22,7 @@ ENV_MAXCOUNT = 'FLEXGET_LOG_MAXCOUNT'
 
 LOG_FORMAT = (
     '<green>{time:YYYY-MM-DD HH:mm:ss}</green> <level>{level: <8}</level> '
-    '<cyan>{name: <13}</cyan> {extra[task]: <15} <level>{message}</level>'
+    '<cyan>{name: <13}</cyan> <bold>{extra[task]: <15}</bold> {message}'
 )
 
 # Stores current `session_id` to keep track of originating thread for log calls
