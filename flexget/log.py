@@ -21,7 +21,7 @@ ENV_MAXBYTES = 'FLEXGET_LOG_MAXBYTES'
 ENV_MAXCOUNT = 'FLEXGET_LOG_MAXCOUNT'
 
 LOG_FORMAT = (
-    '<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> <level>{level: <8}</level> '
+    '<green>{time:YYYY-MM-DD HH:mm:ss}</green> <level>{level: <8}</level> '
     '<cyan>{name: <13}</cyan> {extra[task]: <15} <level>{message}</level>'
 )
 
