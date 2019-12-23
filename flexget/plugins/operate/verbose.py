@@ -2,8 +2,9 @@ from loguru import logger
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.task import logger as task_loger
+from flexget.task import logger as task_logger
 from flexget.utils.log import log_once
+from flexget.log import color_entry_action
 
 logger = logger.bind(name='verbose')
 
@@ -23,12 +24,14 @@ class Verbose:
             entry.on_reject(self.verbose_details, task=task, act='rejected', reason='')
             entry.on_fail(self.verbose_details, task=task, act='failed', reason='')
 
-    def verbose_details(self, entry, task=None, act=None, reason=None, **kwargs):
-        msg = "%s: `%s` by %s plugin" % (act.upper(), entry['title'], task.current_plugin)
+    @staticmethod
+    def verbose_details(entry, task=None, act=None, reason=None, **kwargs):
+        entry_action = color_entry_action(act.upper())
+        msg = f"{entry_action}: `{entry['title']}` by {task.current_plugin} plugin"
         if reason:
-            msg += ' because %s' % reason[0].lower() + reason[1:]
+            msg = f'{msg} because {reason[0].lower() + reason[1:]}'
 
-        task_loger.verbose(msg)
+        task_logger.verbose(msg)
 
     def on_task_exit(self, task, config):
         if task.options.silent:

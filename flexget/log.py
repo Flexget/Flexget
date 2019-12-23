@@ -14,7 +14,7 @@ from loguru import logger
 
 from flexget import __version__
 from flexget.utils.tools import io_encoding
-
+from flexget.terminal import colorize
 # A level more detailed than INFO
 VERBOSE = 15
 # environment variables to modify rotating log parameters from defaults of 1 MB and 9 files
@@ -185,3 +185,14 @@ def start(filename=None, level='INFO', to_console=True, to_file=True):
         _startup_buffer = []
         _startup_buffer_id = None
     _logging_started = True
+
+
+def color_entry_action(entry_action: str) -> str:
+    color_map = {
+        'accepted': 'green',
+        'rejected': 'red',
+    }
+    if entry_action.lower() in color_map:
+        color = color_map[entry_action.lower()]
+        return colorize(color, entry_action)
+    return entry_action
