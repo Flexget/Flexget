@@ -608,11 +608,11 @@ class OutputDeluge(DelugePlugin):
 
                 # check for single file torrents so we dont add unnecessary folders
                 top_files_dir = "/"
-                if os.path.dirname(main_file['path']) is not ("" or "/"):
+                if os.path.dirname(main_file['path']) not in ("", "/"):
                     # check for top folder in user config
                     if (
                         opts.get('content_filename')
-                        and os.path.dirname(opts['content_filename']) is not ""
+                        and os.path.dirname(opts['content_filename']) != ""
                     ):
                         top_files_dir = os.path.dirname(opts['content_filename']) + "/"
                     else:
