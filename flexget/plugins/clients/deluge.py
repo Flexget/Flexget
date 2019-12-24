@@ -416,41 +416,48 @@ class OutputDeluge(DelugePlugin):
                         del entry['file']
                         return
                     with open(entry['file'], 'rb') as f:
-                        filedump = base64.encodestring(f.read())
+                        filedump = base64.encodebytes(f.read())
 
                 logger.verbose('Adding {} to deluge.', entry['title'])
                 added_torrent = None
                 if magnet:
-                    added_torrent = client.call('core.add_torrent_magnet', magnet, add_opts)
-                    if config.get('magnetization_timeout'):
-                        timeout = config['magnetization_timeout']
-                        logger.verbose(
-                            'Waiting {} seconds for "{}" to magnetize', timeout, entry['title']
-                        )
-                        for _ in range(timeout):
-                            time.sleep(1)
-                            try:
-                                status = client.call(
-                                    'core.get_torrent_status', torrent_id, ['files']
-                                )
-                            except Exception as err:
-                                logger.error('wait_for_metadata Error: {}', err)
-                                break
-                            if status.get('files'):
-                                logger.info('"{}" magnetization successful', entry['title'])
-                                break
-                        else:
-                            logger.warning(
-                                '"{}" did not magnetize before the timeout elapsed, file list unavailable for processing.',
-                                entry['title'],
+                    try:
+                        added_torrent = client.call('core.add_torrent_magnet', magnet, add_opts)
+                    except Exception as exc:
+                        logger.error('{} was not added to deluge! {}', entry['title'], exc)
+                        logger.opt(exception=True).debug('Error adding magnet:')
+                        entry.fail('Could not be added to deluge')
+                    else:
+                        if config.get('magnetization_timeout'):
+                            timeout = config['magnetization_timeout']
+                            logger.verbose(
+                                'Waiting {} seconds for "{}" to magnetize', timeout, entry['title']
                             )
+                            for _ in range(timeout):
+                                time.sleep(1)
+                                try:
+                                    status = client.call(
+                                        'core.get_torrent_status', added_torrent, ['files']
+                                    )
+                                except Exception as err:
+                                    logger.error('wait_for_metadata Error: {}', err)
+                                    break
+                                if status.get('files'):
+                                    logger.info('"{}" magnetization successful', entry['title'])
+                                    break
+                            else:
+                                logger.warning(
+                                    '"{}" did not magnetize before the timeout elapsed, '
+                                    'file list unavailable for processing.',
+                                    entry['title'],
+                                )
                 else:
                     try:
                         added_torrent = client.call(
                             'core.add_torrent_file', entry['title'], filedump, add_opts
                         )
                     except Exception as e:
-                        logger.info('{} was not added to deluge! {}', entry['title'], e)
+                        logger.error('{} was not added to deluge! {}', entry['title'], e)
                         entry.fail('Could not be added to deluge')
                 if not added_torrent:
                     logger.error('There was an error adding {} to deluge.', entry['title'])
@@ -497,7 +504,9 @@ class OutputDeluge(DelugePlugin):
                 [torrent_id],
                 {'move_completed': True, 'move_completed_path': opts['move_completed_path']},
             )
-            logger.debug('{} move on complete set to {}', entry['title'], opts['move_completed_path'])
+            logger.debug(
+                '{} move on complete set to {}', entry['title'], opts['move_completed_path']
+            )
         if opts.get('label'):
             client.call('label.set_torrent', torrent_id, opts['label'])
         if opts.get('queue_to_top') is not None:
@@ -674,7 +683,9 @@ class OutputDeluge(DelugePlugin):
             else:
                 folder_structure = []
             if len(folder_structure) > 1:
-                logger.verbose('Renaming Folder {} to {}', folder_structure[0], container_directory)
+                logger.verbose(
+                    'Renaming Folder {} to {}', folder_structure[0], container_directory
+                )
                 client.call(
                     'core.rename_folder', torrent_id, folder_structure[0], container_directory
                 )
