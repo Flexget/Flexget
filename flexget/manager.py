@@ -169,43 +169,12 @@ class Manager:
         """
         Initialize argument parsing
         """
-        if '--help' in args or '-h' in args:
-            # TODO: This is a bit hacky, but we can't call parse on real arguments when --help is used because it will
-            # cause a system exit before plugins are loaded and print incomplete help. This will get us a default
-            # options object and we'll parse the real args later, or send them to daemon. #2807
-            # TODO: this will cause command failure in case of config.yml does not
-            # exists and user runs "flexget -c some.yml --help"
-            options = CoreArgumentParser().parse_known_args(['execute'])[0]
-        else:
-            try:
-                options = CoreArgumentParser().parse_known_args(args)[0]
-            except ParserError:
-                try:
-                    # If a non-built-in command was used, we need to parse with a parser that
-                    # doesn't define the subparsers
-                    options = manager_parser.parse_known_args(args)[0]
-                except ParserError as e:
-                    manager_parser.print_help()
-                    print('\nError: %s' % e.message)
-                    sys.exit(1)
         try:
-            if options.cli_command is None:
-                # TODO: another hack ...
-                # simply running "flexget -c config.yml" fails, let's fix that
-                manager_parser.print_help()
-                print('\nCommand missing, eg. execute or daemon ...')
-                # TODO: oh dear ...
-                if '--help' in args or '-h' in args:
-                    print(
-                        'NOTE: The help may be incomplete due issues with argparse. Try without --help.'
-                    )
-                else:
-                    print(
-                        'NOTE: The help may be incomplete due issues with argparse. Try with --help.'
-                    )
-                sys.exit(1)
-        except AttributeError:
-            pass  # TODO: hack .. this is getting out of hand
+            options = manager_parser.parse_known_args(args, do_help=False)[0]
+        except ParserError as exc:
+            manager_parser.print_help()
+            print(f'\nError: {exc.message}')
+            sys.exit(1)
         return options
 
     def _init_logging(self):
@@ -233,8 +202,6 @@ class Manager:
         )
 
         # Reparse CLI options now that plugins are loaded
-        if not self.args:
-            self.args = ['--help']
         self.options = get_parser().parse_args(self.args)
 
         self.task_queue = TaskQueue()
