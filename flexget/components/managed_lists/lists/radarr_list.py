@@ -136,6 +136,19 @@ class RadarrAPIService:
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
+    def get_tags(self):
+        """ Gets all tags """
+        request_url = self.api_url + "tag"
+        headers = self._default_headers()
+        return request_get_json(request_url, headers)
+
+    def add_tag(self, label):
+        """ Adds a tag """
+        request_url = self.api_url + "tag"
+        headers = self._default_headers()
+        data = {"label": label}
+        return request_post_json(request_url, headers, json.dumps(data))
+
     def get_movies(self):
         """ Gets all movies """
         request_url = self.api_url + "movie"
@@ -178,6 +191,7 @@ class RadarrAPIService:
     def add_movie(
         self,
         title,
+        year,
         quality_profile_id,
         title_slug,
         images,
@@ -185,19 +199,23 @@ class RadarrAPIService:
         root_folder_path,
         monitored=True,
         add_options=None,
+        tags=()
     ):
         """ Adds a movie """
         request_url = self.api_url + "movie"
         headers = self._default_headers()
         data = {
             "title": title,
+            "year": year,
             "qualityProfileId": quality_profile_id,
             "titleSlug": title_slug,
             "images": images,
             "tmdbId": tmdb_id,
             "rootFolderPath": root_folder_path,
             "monitored": monitored,
+            "tags": tags
         }
+
         if add_options:
             data["addOptions"] = add_options
 
@@ -298,6 +316,12 @@ class RadarrSet(MutableSet):
         self.config = config
         self.service = RadarrAPIService(config["api_key"], config["base_url"], config["port"])
 
+        # all tags must be lowercase
+        self.config["tags"] = [t.lower() for t in self.config.get("tags", [])]
+
+        # cache tags
+        self._tags = None
+
         # Class member used for caching the items to avoid
         # unnecessary calls to the Radarr API.
         # We use the self.items property to access it.
@@ -347,18 +371,17 @@ class RadarrSet(MutableSet):
             root_folders = self.service.get_root_folders()
             root_folder_path = root_folders[0]["path"]
 
-            # TODO: should we let the user affect this one,
-            # or try to parse the 'quality' entry somehow?
-            quality_profile_id = 1
-
             try:
                 self.service.add_movie(
                     result["title"],
-                    quality_profile_id,
+                    result["year"],
+                    self.config["add_quality_id"],
                     result["titleSlug"],
                     result["images"],
                     result["tmdbId"],
                     root_folder_path,
+                    monitored=self.config.get('monitored', False),
+                    tags=self.tags
                 )
                 logger.verbose('Added movie {} to Radarr list', result['title'])
             except RadarrMovieAlreadyExistsError:
@@ -392,6 +415,27 @@ class RadarrSet(MutableSet):
         if self._movie_entries is None:
             self._movie_entries = self._get_movie_entries()
         return self._movie_entries
+
+    @property
+    def tags(self):
+        """ Property that returns tag by id """
+        tags = self.config.get("add_tags")
+        if not tags:
+            self._tags = []
+            return self._tags
+
+        tags_ids = []
+        if self._tags is None:
+            existing = {t["label"].lower(): t["id"] for t in self.service.get_tags()}
+            for tag in tags:
+                tag = tag.lower()
+                found = existing.get(tag)
+                if not found:
+                    logger.verbose('Adding missing tag %s to Radarr' % tag)
+                    found = self.service.add_tag(tag)["id"]
+                tags_ids.append(found)
+            self._tags = tags_ids
+        return self._tags
 
     @property
     def immutable(self):
@@ -552,6 +596,9 @@ class RadarrList:
             "only_monitored": {"type": "boolean", "default": True},
             "include_data": {"type": "boolean", "default": False},
             "only_use_cutoff_quality": {"type": "boolean", "default": False},
+            "add_monitored": {"type": "boolean", "default": True},
+            "add_quality_id": {"type": "integer", "default": 1},
+            "add_tags": {"type": "array", "items": {"type": "string"}},
         },
         "required": ["api_key", "base_url"],
         "additionalProperties": False,
