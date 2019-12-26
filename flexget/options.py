@@ -203,7 +203,10 @@ class NestedSubparserAction(_SubParsersAction):
     def __init__(self, *args, **kwargs):
         self.nested_namespaces = kwargs.pop('nested_namespaces', False)
         self.parent_defaults = {}
+        # Python < 3.7 doesn't support the 'required' argument for subparsers
+        required = kwargs.pop('required', True)
         super().__init__(*args, **kwargs)
+        self.required = required
 
     def add_parser(self, name, parent_defaults=None, **kwargs):
         if parent_defaults:
