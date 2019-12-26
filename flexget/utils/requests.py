@@ -117,10 +117,10 @@ class TokenBucketLimiter(DomainLimiter):
             wait = timedelta_total_seconds(self.rate) * (1 - self.tokens)
             # Don't spam console if wait is low
             if wait < 4:
-                level = logger.debug
+                level = 'DEBUG'
             else:
-                level = logger.verbose
-            level('Waiting %.2f seconds until next request to %s', wait, self.domain)
+                level = 'VERBOSE'
+            logger.log(level, 'Waiting {:.2f} seconds until next request to {}', wait, self.domain)
             # Sleep until it is time for the next request
             time.sleep(wait)
         self.tokens -= 1
