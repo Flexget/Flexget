@@ -1,6 +1,7 @@
 import codecs
 import collections
 import contextlib
+import functools
 import logging
 import logging.handlers
 import os
@@ -68,6 +69,7 @@ def record_patcher(record):
 
 class InterceptHandler(logging.Handler):
     """Catch any stdlib log messages from our deps and propagate to loguru."""
+
     def emit(self, record):
         # Get corresponding Loguru level if it exists
         try:
@@ -110,10 +112,7 @@ def initialize(unit_test=False):
 
     logger.level('VERBOSE', no=VERBOSE, color='<bold>', icon='👄')
 
-    def verbose(self, message, *args, **kwargs):
-        self.opt(depth=1).log('VERBOSE', message, *args, **kwargs)
-
-    logger.__class__.verbose = verbose
+    logger.__class__.verbose = functools.partialmethod(logger.__class__.log, 'VERBOSE')
     logger.configure(extra={'task': '', 'session_id': None}, patcher=record_patcher)
 
     _logging_configured = True
