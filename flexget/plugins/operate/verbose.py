@@ -1,10 +1,10 @@
 from loguru import logger
 
 from flexget import options, plugin
+from flexget.entry import EntryState
 from flexget.event import event
 from flexget.task import logger as task_logger
 from flexget.utils.log import log_once
-from flexget.log import color_entry_action
 
 logger = logger.bind(name='verbose')
 
@@ -20,14 +20,13 @@ class Verbose:
         if task.options.silent:
             return
         for entry in task.all_entries:
-            entry.on_accept(self.verbose_details, task=task, act='accepted', reason='')
-            entry.on_reject(self.verbose_details, task=task, act='rejected', reason='')
-            entry.on_fail(self.verbose_details, task=task, act='failed', reason='')
+            entry.on_accept(self.verbose_details, task=task, act=EntryState.ACCEPTED, reason='')
+            entry.on_reject(self.verbose_details, task=task, act=EntryState.REJECTED, reason='')
+            entry.on_fail(self.verbose_details, task=task, act=EntryState.FAILED, reason='')
 
     @staticmethod
-    def verbose_details(entry, task=None, act=None, reason=None, **kwargs):
-        entry_action = color_entry_action(act.upper())
-        msg = f"{entry_action}: `{entry['title']}` by {task.current_plugin} plugin"
+    def verbose_details(entry, task=None, act: EntryState = None, reason=None, **kwargs):
+        msg = f"{act.log_color}: `{entry['title']}` by {task.current_plugin} plugin"
         if reason:
             msg = f'{msg} because {reason[0].lower() + reason[1:]}'
 

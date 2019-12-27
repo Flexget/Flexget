@@ -1,5 +1,6 @@
 import copy
 import functools
+from enum import Enum
 
 from loguru import logger
 
@@ -8,6 +9,26 @@ from flexget.utils.lazy_dict import LazyDict, LazyLookup
 from flexget.utils.template import FlexGetTemplate, render_from_entry
 
 logger = logger.bind(name='entry')
+
+
+class EntryState(Enum):
+    ACCEPTED = 'accepted'
+    REJECTED = 'rejected'
+    FAILED = 'failed'
+    UNDECIDED = 'undecided'
+
+    @property
+    def color(self) -> str:
+        return {
+            self.ACCEPTED: 'g',
+            self.REJECTED: 'r',
+            self.FAILED: 'R',
+            self.UNDECIDED: 'd',
+        }[self]
+
+    @property
+    def log_color(self) -> str:
+        return f'<{self.color}>{self.value.upper()}</>'
 
 
 class EntryUnicodeError(Exception):
@@ -188,7 +209,7 @@ class Entry(LazyDict):
         # Coerce any enriched strings (such as those returned by BeautifulSoup) to plain strings to avoid serialization
         # troubles.
         elif (
-            isinstance(value, str) and type(value) != str
+                isinstance(value, str) and type(value) != str
         ):  # pylint: disable=unidiomatic-typecheck
             value = str(value)
 

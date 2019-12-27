@@ -185,14 +185,3 @@ def start(filename=None, level='INFO', to_console=True, to_file=True):
         _startup_buffer = []
         _startup_buffer_id = None
     _logging_started = True
-
-
-def color_entry_action(entry_action: str) -> str:
-    color_map = {
-        'accepted': 'green',
-        'rejected': 'red',
-    }
-    color = color_map.get(entry_action.lower())
-    if color:
-        return f'<{color}>{entry_action}</>'
-    return entry_action
