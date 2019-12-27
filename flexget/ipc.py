@@ -69,14 +69,14 @@ class DaemonService(rpyc.Service):
 
     def exposed_handle_cli(self, args):
         args = rpyc.utils.classic.obtain(args)
-        logger.verbose('Running command `{{}}` for client.', ' '.join(args))
+        logger.verbose('Running command `{}` for client.', ' '.join(args))
         parser = get_parser()
         try:
             options = parser.parse_args(args, file=self.client_out_stream)
         except SystemExit as e:
             if e.code:
                 # TODO: Not sure how to properly propagate the exit code back to client
-                logger.debug('Parsing cli args caused system exit with status {{}}.', e.code)
+                logger.debug('Parsing cli args caused system exit with status {}.', e.code)
             return
         # Saving original terminal size to restore after monkeypatch
         original_terminal_info = terminal.terminal_info
