@@ -19,12 +19,9 @@ class EntryState(Enum):
 
     @property
     def color(self) -> str:
-        return {
-            self.ACCEPTED: 'g',
-            self.REJECTED: 'r',
-            self.FAILED: 'R',
-            self.UNDECIDED: 'd',
-        }[self]
+        return {self.ACCEPTED: 'g', self.REJECTED: 'r', self.FAILED: 'R', self.UNDECIDED: 'd',}[
+            self
+        ]
 
     @property
     def log_color(self) -> str:
@@ -209,7 +206,7 @@ class Entry(LazyDict):
         # Coerce any enriched strings (such as those returned by BeautifulSoup) to plain strings to avoid serialization
         # troubles.
         elif (
-                isinstance(value, str) and type(value) != str
+            isinstance(value, str) and type(value) != str
         ):  # pylint: disable=unidiomatic-typecheck
             value = str(value)
 

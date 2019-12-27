@@ -107,7 +107,9 @@ class FilterTimeFrame:
                 entries.sort(key=lambda e: (e['quality'], e.get('proper_count', 0)), reverse=True)
                 best_entry = entries[0]
 
-                logger.debug('Current best for identifier {} is {}', identifier, best_entry['title'])
+                logger.debug(
+                    'Current best for identifier {} is {}', identifier, best_entry['title']
+                )
 
                 id_timeframe.title = best_entry['title']
                 id_timeframe.quality = best_entry['quality']

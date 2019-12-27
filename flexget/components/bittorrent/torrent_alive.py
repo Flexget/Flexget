@@ -216,7 +216,9 @@ class TorrentAlive:
         for entry in task.accepted:
             # If torrent_seeds is filled, we will have already filtered in filter phase
             if entry.get('torrent_seeds'):
-                logger.debug('Not checking trackers for seeds, as torrent_seeds is already filled.')
+                logger.debug(
+                    'Not checking trackers for seeds, as torrent_seeds is already filled.'
+                )
                 continue
             logger.debug('Checking for seeds for {}:', entry['title'])
             torrent = entry.get('torrent')

@@ -162,7 +162,9 @@ class Torznab:
             entry = Entry()
             enclosure = item.find("enclosure[@type='application/x-bittorrent']")
             if enclosure is None:
-                logger.warning("Item '{}' does not contain a bittorent enclosure.", item.title.string)
+                logger.warning(
+                    "Item '{}' does not contain a bittorent enclosure.", item.title.string
+                )
                 continue
             else:
                 entry['url'] = enclosure.attrib['url']

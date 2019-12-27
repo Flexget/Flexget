@@ -270,9 +270,7 @@ class InputGazelle:
             page += 1
 
         if page > self.max_pages:
-            logger.warning(
-                'Stopped after {} pages (out of {} total pages)', self.max_pages, pages
-            )
+            logger.warning('Stopped after {} pages (out of {} total pages)', self.max_pages, pages)
 
     def get_entries(self, search_results):
         """Generator that yields Entry objects from search results"""

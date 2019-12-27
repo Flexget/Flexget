@@ -122,9 +122,7 @@ class TraktCalendar:
             url = e['trakt_series_url']
 
             if config['type'] == 'episodes':
-                title = '{0} S{1:02d}E{2:02d}'.format(
-                    title, e['trakt_season'], e['trakt_episode']
-                )
+                title = '{0} S{1:02d}E{2:02d}'.format(title, e['trakt_season'], e['trakt_episode'])
 
                 url = '{0}/seasons/{1}/episodes/{2}'.format(
                     url, e['trakt_season'], e['trakt_episode']

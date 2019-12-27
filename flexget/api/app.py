@@ -137,7 +137,7 @@ class API(RestPlusAPI):
                             code_or_apierror.response_model,
                         )
                     },
-                    **kwargs
+                    **kwargs,
                 )
         except TypeError:
             # If first argument isn't a class this happens

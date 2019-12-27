@@ -567,7 +567,9 @@ class PluginTransmission(TransmissionBase):
                                     os.path.basename(str(pathscrub(filename + file_ext))),
                                 )
                             except TransmissionError:
-                                logger.error('content_filename only supported with transmission 2.8+')
+                                logger.error(
+                                    'content_filename only supported with transmission 2.8+'
+                                )
 
                     if options['post'].get('main_file_only') and main_id is not None:
                         # Set Unwanted Files

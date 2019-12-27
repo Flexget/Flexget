@@ -949,7 +949,7 @@ class TraktShowIds:
         imdb_id=None,
         tvdb_id=None,
         tvrage_id=None,
-        **kwargs
+        **kwargs,
     ):
         self.trakt_id = trakt_id
         self.trakt_slug = trakt_slug

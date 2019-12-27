@@ -116,7 +116,9 @@ class FilterExistsMovie:
                     items.append(p.name)
 
             if not items:
-                logger.verbose('No items with type {} were found in {}', config.get('type'), folder)
+                logger.verbose(
+                    'No items with type {} were found in {}', config.get('type'), folder
+                )
                 continue
 
             for item in items:

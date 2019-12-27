@@ -57,7 +57,9 @@ class NfoLookup:
 
             # If there is no 'filename' field there is also no nfo file
             if filename is None or location is None:
-                logger.warning("Entry {} didn't come from the filesystem plugin", entry.get('title'))
+                logger.warning(
+                    "Entry {} didn't come from the filesystem plugin", entry.get('title')
+                )
                 continue
             else:
                 # This will be None if there is no nfo file

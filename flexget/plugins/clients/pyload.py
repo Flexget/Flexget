@@ -31,7 +31,9 @@ class PyloadApi:
             return self.requests.get(self.url.rstrip("/") + "/" + method.strip("/"))
         except RequestException as e:
             if e.response and e.response.status_code == 500:
-                raise plugin.PluginError('Internal API Error: <%s> <%s>' % (method, self.url), logger)
+                raise plugin.PluginError(
+                    'Internal API Error: <%s> <%s>' % (method, self.url), logger
+                )
             raise
 
     def post(self, method, data):

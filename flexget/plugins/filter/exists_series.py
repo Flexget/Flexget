@@ -111,7 +111,9 @@ class FilterExistsSeries:
                             if disk_parser.identifier != entry['series_parser'].identifier:
                                 logger.trace('wrong identifier')
                                 continue
-                            logger.debug('series_parser.quality = {}', entry['series_parser'].quality)
+                            logger.debug(
+                                'series_parser.quality = {}', entry['series_parser'].quality
+                            )
                             if config.get('allow_different_qualities') == 'better':
                                 if entry['series_parser'].quality > disk_parser.quality:
                                     logger.trace('better quality')

@@ -119,7 +119,9 @@ class Discover:
                     plugin_name, plugin_config = item, None
                 search = plugin.get(plugin_name, self)
                 if not callable(getattr(search, 'search')):
-                    logger.critical('Search plugin {} does not implement search method', plugin_name)
+                    logger.critical(
+                        'Search plugin {} does not implement search method', plugin_name
+                    )
                     continue
                 logger.verbose(
                     'Searching for `{}` with plugin `{}` ({} of {})',
@@ -206,7 +208,9 @@ class Discover:
             else:
                 entry.reject('has not been released')
                 entry.complete()
-                logger.verbose("{} hasn't been released yet (Expected: {})", entry['title'], est_date)
+                logger.verbose(
+                    "{} hasn't been released yet (Expected: {})", entry['title'], est_date
+                )
         return result
 
     def interval_expired(self, config, task, entries):

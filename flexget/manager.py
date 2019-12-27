@@ -827,7 +827,9 @@ class Manager:
                     result[key] = int(result[key])
             result.setdefault('pid', None)
             if not result['pid']:
-                logger.error('Invalid lock file. Make sure FlexGet is not running, then delete it.')
+                logger.error(
+                    'Invalid lock file. Make sure FlexGet is not running, then delete it.'
+                )
             elif not pid_exists(result['pid']):
                 return None
             return result

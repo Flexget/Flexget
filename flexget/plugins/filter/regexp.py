@@ -226,7 +226,9 @@ class FilterRegexp:
                         entry['path'] = opts['path']
                     if opts.get('set'):
                         # invoke set plugin with given configuration
-                        logger.debug('adding set: info to entry:"{}" {}', entry['title'], opts['set'])
+                        logger.debug(
+                            'adding set: info to entry:"{}" {}', entry['title'], opts['set']
+                        )
                         plugin.get('set', self).modify(entry, opts['set'])
                     method(entry, matchtext)
                     matched.add(entry)

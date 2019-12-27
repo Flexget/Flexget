@@ -90,6 +90,7 @@ class VersionAction(_VersionAction):
 
 class HelpAction(Action):
     """Override the default help command so that we can conditionally disable it to prevent program exit."""
+
     def __call__(self, parser, namespace, values, option_string=None):
         if getattr(parser, 'do_help', True):
             parser.print_help()

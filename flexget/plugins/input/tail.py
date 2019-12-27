@@ -97,7 +97,9 @@ class InputTail:
                     if last_pos == 0:
                         logger.info('Task {} tail position is already zero', task.name)
                     else:
-                        logger.info('Task {} tail position ({}) reset to zero', task.name, last_pos)
+                        logger.info(
+                            'Task {} tail position ({}) reset to zero', task.name, last_pos
+                        )
                         last_pos = 0
 
                 if os.path.getsize(filename) < last_pos:

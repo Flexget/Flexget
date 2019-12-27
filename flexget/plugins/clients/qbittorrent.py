@@ -57,7 +57,7 @@ class OutputQBitTorrent:
         try:
             response = self.session.request(method, url, **kwargs)
             if response.text == "Ok.":
-                return response       
+                return response
             else:
                 msg = (
                     'Failure. URL: {}, data: {}'.format(url, kwargs)
@@ -69,7 +69,7 @@ class OutputQBitTorrent:
         raise plugin.PluginError(
             'Error when trying to send request to qBittorrent: {}'.format(msg)
         )
-        
+
     def check_api_version(self, msg_on_fail):
         try:
             url = self.url + "/api/v2/app/webapiVersion"
@@ -78,21 +78,17 @@ class OutputQBitTorrent:
                 self.api_url_login = '/api/v2/auth/login'
                 self.api_url_upload = '/api/v2/torrents/add'
                 self.api_url_download = '/api/v2/torrents/add'
-                return response         
-            
+                return response
+
             url = self.url + "/version/api"
             response = self.session.request('get', url)
             if response.status_code != 404:
                 self.api_url_login = '/login'
                 self.api_url_upload = '/command/upload'
                 self.api_url_download = '/command/download'
-                return response         
-            
-            msg = (
-                'Failure. URL: {}'.format(url)
-                if not msg_on_fail
-                else msg_on_fail
-            )
+                return response
+
+            msg = 'Failure. URL: {}'.format(url) if not msg_on_fail else msg_on_fail
         except RequestException as e:
             msg = str(e)
         raise plugin.PluginError(
