@@ -20,7 +20,7 @@ from flexget.webserver import User
 
 from . import __path__
 
-__version__ = '1.6.0'
+__version__ = '1.7.0'
 
 logger = logger.bind(name='api')
 
@@ -137,7 +137,7 @@ class API(RestPlusAPI):
                             code_or_apierror.response_model,
                         )
                     },
-                    **kwargs
+                    **kwargs,
                 )
         except TypeError:
             # If first argument isn't a class this happens
