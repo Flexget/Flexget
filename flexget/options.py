@@ -90,6 +90,7 @@ class VersionAction(_VersionAction):
 
 class HelpAction(Action):
     """Override the default help command so that we can conditionally disable it to prevent program exit."""
+
     def __call__(self, parser, namespace, values, option_string=None):
         if getattr(parser, 'do_help', True):
             parser.print_help()
@@ -546,7 +547,7 @@ class CoreArgumentParser(ArgumentParser):
         daemon_parser = self.add_subparser(
             'daemon',
             parent_defaults={'loglevel': 'INFO'},
-            help='run continuously, executing tasks according to schedules defined ' 'in config',
+            help='run continuously, executing tasks according to schedules defined in config',
         )
         daemon_parser.add_subparsers(title='actions', metavar='<action>', dest='action')
         start_parser = daemon_parser.add_subparser('start', help='start the daemon')
