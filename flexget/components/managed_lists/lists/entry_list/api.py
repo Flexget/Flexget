@@ -78,7 +78,7 @@ entry_list_return_lists_schema = api.schema_model(
     'entry_list_return_lists_schema', ObjectsContainer.entry_list_return_lists
 )
 entry_list_batch_remove_schema = api.schema_model(
-    'pending_list.batch_remove_object', ObjectsContainer.batch_remove_object
+    'entry_list.batch_remove_object', ObjectsContainer.batch_remove_object
 )
 
 entry_list_parser = api.parser()
@@ -300,7 +300,7 @@ class EntryListEntryAPI(APIResource):
 @entry_list_api.route('/<int:list_id>/entries/batch')
 @api.doc(params={'list_id': 'ID of the list'})
 @api.response(NotFoundError)
-class PendingListEntriesBatchAPI(APIResource):
+class EntryListEntriesBatchAPI(APIResource):
     @api.response(204)
     @api.validate(model=entry_list_batch_remove_schema)
     @api.doc(description='Remove multiple entries')
