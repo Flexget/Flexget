@@ -375,7 +375,7 @@ class RadarrSet(MutableSet):
                 self.service.add_movie(
                     result["title"],
                     result["year"],
-                    self.config["add_quality_id"],
+                    self.config.get("profile_id"),
                     result["titleSlug"],
                     result["images"],
                     result["tmdbId"],
@@ -596,9 +596,8 @@ class RadarrList:
             "only_monitored": {"type": "boolean", "default": True},
             "include_data": {"type": "boolean", "default": False},
             "only_use_cutoff_quality": {"type": "boolean", "default": False},
-            "add_monitored": {"type": "boolean", "default": True},
-            "add_quality_id": {"type": "integer", "default": 1},
-            "add_tags": {"type": "array", "items": {"type": "string"}},
+            "monitored": {"type": "boolean", "default": True},
+            "profile_id": {"type": "integer", "default": 1}
         },
         "required": ["api_key", "base_url"],
         "additionalProperties": False,
