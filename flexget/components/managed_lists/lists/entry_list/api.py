@@ -58,6 +58,15 @@ class ObjectsContainer:
 
     entry_lists_entries_return_object = {'type': 'array', 'items': entry_list_entry_base_object}
 
+    batch_ids = {'type': 'array', 'items': {'type': 'integer'}, 'uniqueItems': True, 'minItems': 1}
+
+    batch_remove_object = {
+        'type': 'object',
+        'properties': {'ids': batch_ids},
+        'required': ['ids'],
+        'additionalProperties': False,
+    }
+
 
 entry_list_object_schema = api.schema_model(
     'entry_list_object_schema', ObjectsContainer.entry_list_base_object
@@ -67,6 +76,9 @@ entry_list_input_object_schema = api.schema_model(
 )
 entry_list_return_lists_schema = api.schema_model(
     'entry_list_return_lists_schema', ObjectsContainer.entry_list_return_lists
+)
+entry_list_batch_remove_schema = api.schema_model(
+    'pending_list.batch_remove_object', ObjectsContainer.batch_remove_object
 )
 
 entry_list_parser = api.parser()
@@ -283,3 +295,28 @@ class EntryListEntryAPI(APIResource):
         resp = jsonify(entry.to_dict())
         resp.status_code = 201
         return resp
+
+
+@entry_list_api.route('/<int:list_id>/entries/batch')
+@api.doc(params={'list_id': 'ID of the list'})
+@api.response(NotFoundError)
+class PendingListEntriesBatchAPI(APIResource):
+    @api.response(204)
+    @api.validate(model=entry_list_batch_remove_schema)
+    @api.doc(description='Remove multiple entries')
+    def delete(self, list_id, session=None):
+        """Remove multiple entries"""
+        data = request.json
+        entry_ids = data.get('ids')
+        try:
+            entries = db.get_entries_by_list_id(list_id, entry_ids=entry_ids, session=session)
+        except NoResultFound:
+            raise NotFoundError(f'could not find entries in list {list_id}')
+
+        for entry in entries:
+            session.delete(entry)
+        session.commit()
+        response = jsonify([])
+        response.status_code = 204
+
+        return response

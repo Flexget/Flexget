@@ -258,6 +258,40 @@ class TestEntryListAPI:
         errors = schema_match(base_message, data)
         assert not errors
 
+    def test_entry_list_entries_batch_remove(self, api_client, schema_match):
+        payload = {'name': 'test_list'}
+
+        # Create list
+        api_client.json_post('/entry_list/', data=json.dumps(payload))
+
+        # Add 3 entries to list
+        for i in range(3):
+            payload = {'title': f'title {i}', 'original_url': f'http://{i}test.com'}
+            rsp = api_client.json_post('/entry_list/1/entries/', data=json.dumps(payload))
+            assert rsp.status_code == 201
+
+        # get entries is correct
+        rsp = api_client.get('/entry_list/1/entries/')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.entry_lists_entries_return_object, data)
+        assert not errors
+        assert len(data) == 3
+
+        payload = {'ids': [1, 2, 3]}
+
+        rsp = api_client.json_delete('entry_list/1/entries/batch', data=json.dumps(payload))
+        assert rsp.status_code == 204
+
+        rsp = api_client.get('/entry_list/1/entries/')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.entry_lists_entries_return_object, data)
+        assert not errors
+        assert not data
+
 
 class TestEntryListPagination:
     config = 'tasks: {}'
