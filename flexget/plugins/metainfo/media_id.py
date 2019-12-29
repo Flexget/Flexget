@@ -35,9 +35,9 @@ class MetainfoMediaId(object):
                 media_id = f'{media_id} {entry["series_year"]}'
 
             if entry.get('series_episode'):
-                media_id = f'{media_id} S{entry.get("series_season") or 0}E{entry["series_episode"]}'
+                media_id = f'{media_id} S{(entry.get("series_season") or 0):02}E{entry["series_episode"]:02}'
             elif entry.get('series_season'):
-                media_id = f'{media_id} S{entry["series_season"]}E0'
+                media_id = f'{media_id} S{entry["series_season"]:02}E00'
             elif entry.get('series_date'):
                 media_id = f'{media_id} {entry["series_date"]}'
             else:

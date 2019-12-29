@@ -130,21 +130,21 @@ class TestMetainfoSeries:
             series_season=1,
             series_episode=2,
             quality='hdtv xvid',
-            id='flexget s01e02',
+            media_id='flexget s01e02',
         ), 'Failed to parse series info'
         assert task.find_entry(
             series_name='Some Series',
             series_season=3,
             series_episode=14,
             quality='720p',
-            id='some series s03e14',
+            media_id='some series s03e14',
         ), 'Failed to parse series info'
         assert task.find_entry(
             series_name='Something',
             series_season=2,
             series_episode=1,
             quality='hdtv',
-            id='something s02e01',
+            media_id='something s02e01',
         ), 'Failed to parse series info'
         # Test unwanted prefixes get stripped from series name
         assert task.find_entry(
@@ -152,14 +152,14 @@ class TestMetainfoSeries:
             series_season=3,
             series_episode=15,
             quality='720p',
-            id='some series s03e15',
+            media_id='some series s03e15',
         ), 'Failed to parse series info'
         assert task.find_entry(
             series_name='Some Series',
             series_season=3,
             series_episode=16,
             quality='720p',
-            id='some series s03e16',
+            media_id='some series s03e16',
         ), 'Failed to parse series info'
         # Test episode title and parentheses are stripped from series name
         assert task.find_entry(
@@ -167,14 +167,14 @@ class TestMetainfoSeries:
             series_season=2,
             series_episode=9,
             quality='hdtv',
-            id='show-a us s02e09',
+            media_id='show-a us s02e09',
         ), 'Failed to parse series info'
         assert task.find_entry(
             series_name='Jack\'s Show',
             series_season=3,
             series_episode=1,
             quality='1080p',
-            id='jack\'s show s03e01',
+            media_id='jack\'s show s03e01',
         ), 'Failed to parse series info'
 
     def test_false_positives(self, execute_task):
