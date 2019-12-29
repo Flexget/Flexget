@@ -207,6 +207,7 @@ class TestNfoLookupWithMovies:
                     'title',
                     'original_title',
                     'filename',
+                    'media_id',
                     'nfo_id',
                     'task',
                     'url',
