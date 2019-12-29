@@ -224,9 +224,12 @@ class ApiTrakt:
         if movie and not movie.expired:
             return movie
         # Parse the movie for better results
-        title_parser = plugin.get('parsing', 'api_trakt').parse_movie(title)
-        y = year or title_parser.year
-        parsed_title = title_parser.name
+        parsed_title = None
+        y = year
+        if title:
+            title_parser = plugin.get('parsing', 'api_trakt').parse_movie(title)
+            y = year or title_parser.year
+            parsed_title = title_parser.name
         try:
             trakt_movie = db.get_trakt_data(
                 'movie', title=parsed_title, year=y, trakt_ids=trakt_movie_ids

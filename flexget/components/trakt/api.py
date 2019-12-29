@@ -1,6 +1,6 @@
 import copy
 
-from flask import jsonify
+from flask import jsonify, redirect
 from flask_restplus import inputs
 
 from flexget.api import APIResource, api
@@ -144,6 +144,7 @@ series_return_schema = api.schema_model(
 movie_return_schema = api.schema_model('movie_return_schema', ObjectsContainer.movie_return_object)
 
 lookup_parser = api.parser()
+lookup_parser.add_argument('title', help='Movie Name')
 lookup_parser.add_argument('year', type=int, help='Lookup year')
 lookup_parser.add_argument('trakt_id', type=int, help='Trakt ID')
 lookup_parser.add_argument('trakt_slug', help='Trakt slug')
@@ -159,20 +160,18 @@ lookup_parser.add_argument(
 )
 
 
-@trakt_api.route('/series/<string:title>/')
-@api.doc(params={'title': 'Series name'})
+@trakt_api.route('/series/')
 class TraktSeriesSearchApi(APIResource):
     @etag(cache_age=3600)
     @api.response(200, 'Successfully found show', series_return_schema)
     @api.response(NotFoundError)
     @api.doc(parser=lookup_parser)
-    def get(self, title, session=None):
+    def get(self, session=None):
         """Trakt series lookup"""
         args = lookup_parser.parse_args()
         include_actors = args.pop('include_actors')
         include_translations = args.pop('include_translations')
         kwargs = args
-        kwargs['title'] = title
         try:
             series = ApiTrakt.lookup_series(session=session, **kwargs)
         except LookupError as e:
@@ -185,20 +184,29 @@ class TraktSeriesSearchApi(APIResource):
         return jsonify(result)
 
 
-@trakt_api.route('/movies/<string:title>/')
-@api.doc(params={'title': 'Movie name'})
+@trakt_api.route('/series/<string:title>')
+@api.doc(params={'title': 'Series name'})
+class TraktSeriesWithTitleSearchApi(APIResource):
+    @api.doc(parser=lookup_parser)
+    @api.response(301)
+    def get(self, title, session=None):
+        kwargs = lookup_parser.parse_args()
+        kwargs['title'] = title
+        return redirect(api.url_for(TraktSeriesSearchApi, **kwargs), code=301)
+
+
+@trakt_api.route('/movies/')
 class TraktMovieSearchApi(APIResource):
     @etag(cache_age=3600)
     @api.response(200, 'Successfully found show', movie_return_schema)
     @api.response(NotFoundError)
     @api.doc(parser=lookup_parser)
-    def get(self, title, session=None):
+    def get(self, session=None):
         """Trakt movie lookup"""
         args = lookup_parser.parse_args()
         include_actors = args.pop('include_actors')
         include_translations = args.pop('include_translations')
         kwargs = args
-        kwargs['title'] = title
         try:
             movie = ApiTrakt.lookup_movie(session=session, **kwargs)
         except LookupError as e:
@@ -209,3 +217,14 @@ class TraktMovieSearchApi(APIResource):
         if include_translations:
             result['translations'] = db.get_translations_dict(movie.translations, 'movie')
         return jsonify(result)
+
+
+@trakt_api.route('/movies/<string:title>')
+@api.doc(params={'title': 'Movie name'})
+class TraktMovieWithTitleSearchApi(APIResource):
+    @api.doc(parser=lookup_parser)
+    @api.response(301)
+    def get(self, title, session=None):
+        kwargs = lookup_parser.parse_args()
+        kwargs['title'] = title
+        return redirect(api.url_for(TraktMovieSearchApi, **kwargs), code=301)
