@@ -62,7 +62,7 @@ class FilterTimeFrame:
             return
 
         identified_by = (
-            '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
+            '{{ media_id }}' if config['identified_by'] == 'auto' else config['identified_by']
         )
 
         grouped_entries = group_entries(task.accepted, identified_by)
@@ -164,7 +164,7 @@ class FilterTimeFrame:
             return
 
         identified_by = (
-            '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
+            '{{ media_id }}' if config['identified_by'] == 'auto' else config['identified_by']
         )
 
         grouped_entries = group_entries(task.accepted, identified_by)

@@ -34,7 +34,7 @@ class FilterBestQuality:
             return
 
         identified_by = (
-            '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
+            '{{ media_id }}' if config['identified_by'] == 'auto' else config['identified_by']
         )
 
         action_on_best = (

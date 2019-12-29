@@ -80,9 +80,6 @@ def populate_entry_fields(entry, parser, config):
     """
     entry['series_parser'] = copy(parser)
 
-    if parser.identifier:
-        entry['id'] = ('%s %s' % (parser.name, parser.identifier)).lower().strip()
-
     # add series, season and episode to entry
     entry['series_name'] = parser.name
     if 'quality' in entry and entry['quality'] != parser.quality:
