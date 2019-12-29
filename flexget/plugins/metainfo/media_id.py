@@ -25,11 +25,11 @@ class MetainfoMediaId(object):
     def get_media_id(entry):
         # Try to generate a media id based on available parser fields
         media_id = None
-        if bool(entry.get('movie_name')):
+        if entry.get('movie_name'):
             media_id = entry['movie_name']
             if entry.get('movie_year'):
                 media_id = f'{media_id} {entry["movie_year"]}'
-        elif bool(entry.get('series_name')):
+        elif entry.get('series_name'):
             media_id = entry['series_name']
             if entry.get('series_year'):
                 media_id = f'{media_id} {entry["series_year"]}'
