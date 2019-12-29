@@ -59,7 +59,7 @@ class ObjectsContainer:
             'added_on': {'type': 'string'},
             'year': {'type': ['integer', 'null']},
             'list_id': {'type': 'integer'},
-            'movie_list_ids': {'type': 'array', 'items': return_movie_list_id_object},
+            'movies_list_ids': {'type': 'array', 'items': return_movie_list_id_object},
         },
     }
 
