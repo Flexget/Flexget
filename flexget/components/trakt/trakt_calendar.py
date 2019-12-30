@@ -1,4 +1,5 @@
 import datetime
+import math
 
 from loguru import logger
 from requests import RequestException
@@ -11,6 +12,8 @@ from flexget.utils.cached_input import cached
 from . import db
 
 logger = logger.bind(name='trakt_calendar')
+
+max_number_of_days = 31
 
 
 class TraktCalendar:
@@ -86,54 +89,65 @@ class TraktCalendar:
     @cached('trakt_calendar', persist='2 hours')
     def on_task_input(self, task, config):
         start_date = datetime.datetime.now().date() + datetime.timedelta(days=config['start_day'])
-        logger.debug(
-            'Start date for calendar: {}, end date: {}',
-            start_date,
-            start_date + datetime.timedelta(days=config['days']),
-        )
 
-        url = db.get_api_url(
-            'calendars',
-            'my' if config.get('account') else 'all',
-            'shows',
-            start_date,
-            config['days'],
-        )
-
-        try:
-            results = (
-                db.get_session(config.get('account')).get(url, params={'extended': 'full'}).json()
-            )
-            logger.debug('Found {} calendar entries', len(results))
-        except RequestException as e:
-            raise plugin.PluginError('Error while fetching calendar: {0}'.format(e))
-
+        # The API limit is max_number_of_days days for a single all. Find the number of calls.
+        number_of_calls = math.ceil(config['days'] / max_number_of_days)
+        days = config['days']
         entries = set()
-        for result in results:
-            e = Entry()
-            e.update_using_map(self.series_map, result['show'])
-            if config['type'] == 'episodes':
-                e.update_using_map(self.episode_map, result['episode'])
 
-            title = e['trakt_series_name']
-            if not config['strip_dates']:
-                title = '{0} ({1})'.format(title, e['trakt_series_year'])
+        for _ in range(number_of_calls):
+            current_number_of_days = start_date + datetime.timedelta(days=min(days, max_number_of_days))
+            logger.debug(
+                'Start date for calendar: {}, end date: {}',
+                start_date,
+                current_number_of_days,
+            )
 
-            url = e['trakt_series_url']
+            url = db.get_api_url(
+                'calendars',
+                'my' if config.get('account') else 'all',
+                'shows',
+                start_date,
+                current_number_of_days,
+            )
 
-            if config['type'] == 'episodes':
-                title = '{0} S{1:02d}E{2:02d}'.format(
-                    title, e['trakt_season'], e['trakt_episode']
+            try:
+                results = (
+                    db.get_session(config.get('account')).get(url, params={'extended': 'full'}).json()
                 )
+                logger.debug('Found {} calendar entries', len(results))
+            except RequestException as e:
+                raise plugin.PluginError('Error while fetching calendar: {0}'.format(e))
 
-                url = '{0}/seasons/{1}/episodes/{2}'.format(
-                    url, e['trakt_season'], e['trakt_episode']
-                )
+            for result in results:
+                e = Entry()
+                e.update_using_map(self.series_map, result['show'])
+                if config['type'] == 'episodes':
+                    e.update_using_map(self.episode_map, result['episode'])
 
-            e['title'] = title
-            e['url'] = url
+                title = e['trakt_series_name']
+                if not config['strip_dates']:
+                    title = '{0} ({1})'.format(title, e['trakt_series_year'])
 
-            entries.add(e)
+                url = e['trakt_series_url']
+
+                if config['type'] == 'episodes':
+                    title = '{0} S{1:02d}E{2:02d}'.format(
+                        title, e['trakt_season'], e['trakt_episode']
+                    )
+
+                    url = '{0}/seasons/{1}/episodes/{2}'.format(
+                        url, e['trakt_season'], e['trakt_episode']
+                    )
+
+                e['title'] = title
+                e['url'] = url
+
+                entries.add(e)
+
+            # Increment for next run
+            days = days - max_number_of_days
+            start_date = start_date + datetime.timedelta(days=max_number_of_days + 1)
 
         return list(entries)
 
