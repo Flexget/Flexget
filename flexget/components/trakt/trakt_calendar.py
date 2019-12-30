@@ -90,7 +90,7 @@ class TraktCalendar:
     def on_task_input(self, task, config):
         start_date = datetime.datetime.now().date() + datetime.timedelta(days=config['start_day'])
 
-        # The API limit is max_number_of_days days for a single all. Find the number of calls.
+        # The API limit is max_number_of_days days for a single call. Find the number of calls.
         number_of_calls = math.ceil(config['days'] / max_number_of_days)
         days = config['days']
         entries = set()
