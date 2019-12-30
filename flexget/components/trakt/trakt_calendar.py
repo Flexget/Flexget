@@ -96,11 +96,11 @@ class TraktCalendar:
         entries = set()
 
         for _ in range(number_of_calls):
-            current_number_of_days = start_date + datetime.timedelta(days=min(days, max_number_of_days))
+            current_number_of_days = min(days, max_number_of_days)
             logger.debug(
                 'Start date for calendar: {}, end date: {}',
                 start_date,
-                current_number_of_days,
+                start_date + datetime.timedelta(days=current_number_of_days),
             )
 
             url = db.get_api_url(
