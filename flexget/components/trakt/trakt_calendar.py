@@ -89,26 +89,25 @@ class TraktCalendar:
     @cached('trakt_calendar', persist='2 hours')
     def on_task_input(self, task, config):
         start_date = datetime.datetime.now().date() + datetime.timedelta(days=config['start_day'])
-
-        # The API limit is max_number_of_days days for a single call. Find the number of calls.
-        number_of_calls = math.ceil(config['days'] / max_number_of_days)
-        days = config['days']
         entries = set()
 
-        for _ in range(number_of_calls):
-            current_number_of_days = min(days, max_number_of_days)
+        # The API limit is max_number_of_days days for a single call.
+        for start_day in range(0, config['days'], max_number_of_days):
+            current_start_date = start_date + datetime.timedelta(days=start_day)
+            number_of_days = min(config['days'] - start_day, max_number_of_days)
+
             logger.debug(
                 'Start date for calendar: {}, end date: {}',
-                start_date,
-                start_date + datetime.timedelta(days=current_number_of_days),
+                current_start_date,
+                current_start_date + datetime.timedelta(days=number_of_days),
             )
 
             url = db.get_api_url(
                 'calendars',
                 'my' if config.get('account') else 'all',
                 'shows',
-                start_date,
-                current_number_of_days,
+                current_start_date,
+                number_of_days,
             )
 
             try:
@@ -144,10 +143,6 @@ class TraktCalendar:
                 e['url'] = url
 
                 entries.add(e)
-
-            # Increment for next run
-            days = days - max_number_of_days
-            start_date = start_date + datetime.timedelta(days=max_number_of_days + 1)
 
         return list(entries)
 
