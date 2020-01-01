@@ -10,27 +10,27 @@ class TestUpgrade:
             upgrade:
               tracking: yes
             mock:
-              - {title: 'Movie.720p.WEB-DL.X264.AC3-GRP1', 'id': 'Movie'}
+              - {title: 'Movie.720p.WEB-DL.X264.AC3-GRP1', 'media_id': 'Movie'}
           tracking_only:
             upgrade:
               tracking: yes
             mock:
-              - {title: 'Movie.1080p WEB-DL X264 AC3', 'id': 'Movie'} 
+              - {title: 'Movie.1080p WEB-DL X264 AC3', 'media_id': 'Movie'} 
           upgrade_quality:
             upgrade:
               target: 1080p
             mock:
-              - {title: 'Movie.1080p WEB-DL X264 AC3', 'id': 'Movie'}
-              - {title: 'Movie.720p.WEB-DL.X264.AC3', 'id': 'Movie'}
-              - {title: 'Movie.BRRip.x264.720p', 'id': 'Movie'}
+              - {title: 'Movie.1080p WEB-DL X264 AC3', 'media_id': 'Movie'}
+              - {title: 'Movie.720p.WEB-DL.X264.AC3', 'media_id': 'Movie'}
+              - {title: 'Movie.BRRip.x264.720p', 'media_id': 'Movie'}
           reject_lower:
             upgrade:
               target: 1080p
               on_lower: reject
             mock:
-              - {title: 'Movie.1080p.BRRip.X264.AC3', 'id': 'Movie'}
-              - {title: 'Movie.1080p WEB-DL X264', 'id': 'Movie'}
-              - {title: 'Movie.BRRip.x264.720p', 'id': 'Movie'}
+              - {title: 'Movie.1080p.BRRip.X264.AC3', 'media_id': 'Movie'}
+              - {title: 'Movie.1080p WEB-DL X264', 'media_id': 'Movie'}
+              - {title: 'Movie.BRRip.x264.720p', 'media_id': 'Movie'}
     """
 
     def test_learn(self, execute_task):
@@ -38,7 +38,7 @@ class TestUpgrade:
         with Session() as session:
             query = session.query(EntryUpgrade).all()
             assert len(query) == 1, 'There should be one tracked entity present.'
-            assert query[0].id == 'movie', 'Should of tracked name `Movie`.'
+            assert query[0].id == 'movie', 'Should have tracked name `Movie`.'
 
     def test_tracking(self, execute_task):
         execute_task('first_download')

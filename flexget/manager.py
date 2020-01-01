@@ -170,11 +170,16 @@ class Manager:
         Initialize argument parsing
         """
         try:
-            options = manager_parser.parse_known_args(args, do_help=False)[0]
+            options = CoreArgumentParser().parse_known_args(args, do_help=False)[0]
         except ParserError as exc:
-            manager_parser.print_help()
-            print(f'\nError: {exc.message}')
-            sys.exit(1)
+            try:
+                # If a non-built-in command was used, we need to parse with a parser that
+                # doesn't define the subparsers
+                options = manager_parser.parse_known_args(args, do_help=False)[0]
+            except ParserError as e:
+                manager_parser.print_help()
+                print(f'\nError: {exc.message}')
+                sys.exit(1)
         return options
 
     def _init_logging(self):

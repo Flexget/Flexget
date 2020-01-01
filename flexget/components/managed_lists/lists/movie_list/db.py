@@ -121,9 +121,17 @@ class MovieListID(Base):
 
 @with_session
 def get_movies_by_list_id(
-    list_id, start=None, stop=None, order_by='added', descending=False, session=None
+    list_id,
+    start=None,
+    stop=None,
+    order_by='added',
+    descending=False,
+    movie_ids=None,
+    session=None,
 ):
     query = session.query(MovieListMovie).filter(MovieListMovie.list_id == list_id)
+    if movie_ids:
+        query = query.filter(MovieListMovie.id.in_(movie_ids))
     if descending:
         query = query.order_by(getattr(MovieListMovie, order_by).desc())
     else:
