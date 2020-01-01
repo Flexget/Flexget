@@ -162,6 +162,9 @@ class Filesystem:
         for folder in path_list:
             logger.verbose('Scanning folder {}. Recursion is set to {}.', folder, recursion)
             folder = Path(folder).expanduser()
+            if not folder.exists():
+                logger.error('{} does not exist (anymore.)', folder)
+                continue
             logger.debug('Scanning {}', folder)
             base_depth = len(folder.parts)
             max_depth = self.get_max_depth(recursion, base_depth)

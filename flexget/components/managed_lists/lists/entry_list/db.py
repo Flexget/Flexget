@@ -215,10 +215,18 @@ def delete_list_by_id(list_id, session=None):
 
 @with_session
 def get_entries_by_list_id(
-    list_id, start=None, stop=None, order_by='title', descending=False, session=None
+    list_id,
+    start=None,
+    stop=None,
+    order_by='title',
+    descending=False,
+    entry_ids=None,
+    session=None,
 ):
     logger.debug('querying entries from entry list with id {}', list_id)
     query = session.query(EntryListEntry).filter(EntryListEntry.list_id == list_id)
+    if entry_ids:
+        query = query.filter(EntryListEntry.id.in_(entry_ids))
     if descending:
         query = query.order_by(getattr(EntryListEntry, order_by).desc())
     else:

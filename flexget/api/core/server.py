@@ -19,6 +19,7 @@ from pyparsing import (
     Group,
     Keyword,
     OneOrMore,
+    Optional,
     ParseException,
     Suppress,
     White,
@@ -507,6 +508,7 @@ class LogParser:
             + time_cmpnt
             + ':'
             + time_cmpnt
+            + Optional(':' + time_cmpnt)
         )
         word = Word(printables)
 

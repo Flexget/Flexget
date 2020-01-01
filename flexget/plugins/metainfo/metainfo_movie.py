@@ -25,7 +25,7 @@ class MetainfoMovie:
             return
         for entry in task.entries:
             # If movie parser already parsed this, don't touch it.
-            if entry.get('id'):
+            if entry.get('movie_name'):
                 continue
             self.guess_entry(entry)
 

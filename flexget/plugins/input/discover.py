@@ -1,4 +1,5 @@
 import datetime
+import itertools
 import random
 
 from loguru import logger
@@ -132,15 +133,16 @@ class Discover:
                     if not search_results:
                         logger.debug('No results from {}', plugin_name)
                         continue
-                    logger.debug('Discovered {} entries from {}', len(search_results), plugin_name)
                     if config.get('limit'):
-                        search_results = search_results[: config['limit']]
+                        search_results = itertools.islice(search_results, config['limit'])
+                    # 'search_results' can be any iterable, make sure it's a list.
+                    search_results = list(search_results)
+                    logger.debug('Discovered {} entries from {}', len(search_results), plugin_name)
                     for e in search_results:
                         e['discovered_from'] = entry['title']
                         e['discovered_with'] = plugin_name
-                        # 'search_results' can be any iterable, make sure it's a list.
                         e.on_complete(
-                            self.entry_complete, query=entry, search_results=list(search_results)
+                            self.entry_complete, query=entry, search_results=search_results
                         )
 
                     entry_results.extend(search_results)
