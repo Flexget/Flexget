@@ -80,7 +80,9 @@ class FormLogin:
                 filename = os.path.join(received, '%s.formlogin.html' % task.name)
                 with io.open(filename, 'wb') as f:
                     f.write(response.content)
-                logger.critical('I have saved the login page content to {} for you to view', filename)
+                logger.critical(
+                    'I have saved the login page content to {} for you to view', filename
+                )
                 raise plugin.PluginError('Unable to find login fields', logger)
         except socket.timeout:
             raise plugin.PluginError('Timed out on url %s' % url)

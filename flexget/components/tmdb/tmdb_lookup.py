@@ -40,7 +40,6 @@ class PluginTmdbLookup:
         'tmdb_backdrops': lambda movie: [
             backdrop.url('original') for backdrop in movie.backdrops[:5]
         ],
-        'tmdb_overview': 'overview',
         'tmdb_runtime': 'runtime',
         'tmdb_tagline': 'tagline',
         'tmdb_budget': 'budget',

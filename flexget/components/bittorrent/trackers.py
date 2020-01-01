@@ -55,7 +55,9 @@ class RemoveTrackers:
                 for tracker in entry['torrent'].trackers:
                     for regexp in config or []:
                         if re.search(regexp, tracker, re.IGNORECASE | re.UNICODE):
-                            logger.debug('remove_trackers removing {} because of {}', tracker, regexp)
+                            logger.debug(
+                                'remove_trackers removing {} because of {}', tracker, regexp
+                            )
                             # remove tracker
                             entry['torrent'].remove_multitracker(tracker)
                             logger.info('Removed {}', tracker)

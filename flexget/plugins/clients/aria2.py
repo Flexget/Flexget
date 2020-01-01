@@ -69,7 +69,9 @@ class OutputAria2:
             )
         except:
             logger.opt(exception=True).debug('Unexpected error during aria2 connection')
-            raise plugin.PluginError('Unidentified error during connection to aria2 daemon', logger)
+            raise plugin.PluginError(
+                'Unidentified error during connection to aria2 daemon', logger
+            )
 
     def prepare_config(self, config):
         config.setdefault('server', 'localhost')

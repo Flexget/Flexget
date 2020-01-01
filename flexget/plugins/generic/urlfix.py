@@ -20,7 +20,9 @@ class UrlFix:
             return
         for entry in task.entries:
             if '&amp;' in entry['url']:
-                log_once('Corrected `%s` url (replaced &amp; with &)' % entry['title'], logger=logger)
+                log_once(
+                    'Corrected `%s` url (replaced &amp; with &)' % entry['title'], logger=logger
+                )
                 entry['url'] = entry['url'].replace('&amp;', '&')
 
 

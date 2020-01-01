@@ -597,7 +597,9 @@ class IRCConnection(SimpleIRCBot):
                             if value in values:
                                 fields[target_var] = new_value
                             else:
-                                logger.debug('No match found for value {} in {}', value, source_var)
+                                logger.debug(
+                                    'No match found for value {} in {}', value, source_var
+                                )
                         else:
                             logger.error(
                                 'Missing regex/value/newValue for setvarif command, ignoring'

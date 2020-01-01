@@ -88,7 +88,9 @@ class FTPList:
                 for base, dirs, files in ftp.walk(path):
                     current_depth = base.count('/')
                     if current_depth > recursion_depth != -1:
-                        logger.debug('recursion depth limit of {} reached, continuing', current_depth)
+                        logger.debug(
+                            'recursion depth limit of {} reached, continuing', current_depth
+                        )
                         continue
                     if 'files' in content_types or 'symlinks' in content_types:
                         for _file in files:

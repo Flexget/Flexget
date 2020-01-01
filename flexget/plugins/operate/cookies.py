@@ -114,7 +114,9 @@ class PluginCookies:
                         )
                     )
 
-                    logger.trace('Adding cookie for {}. key: {} value: {}', item[0], item[4], item[5])
+                    logger.trace(
+                        'Adding cookie for {}. key: {} value: {}', item[0], item[4], item[5]
+                    )
                     count += 1
                 except IOError:
 

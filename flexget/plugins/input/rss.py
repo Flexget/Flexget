@@ -299,7 +299,8 @@ class InputRSS:
                 )
             elif status == 500:
                 raise plugin.PluginError(
-                    'Internal server exception on task %s (%s)' % (task.name, config['url']), logger
+                    'Internal server exception on task %s (%s)' % (task.name, config['url']),
+                    logger,
                 )
             elif status != 200:
                 raise plugin.PluginError(
@@ -553,7 +554,9 @@ class InputRSS:
                     e['urls'].extend(url for url in enclosure_urls if url not in e['urls'])
 
             if not e.get('url'):
-                logger.debug('{} does not have link ({}) or enclosure', entry.title, config['link'])
+                logger.debug(
+                    '{} does not have link ({}) or enclosure', entry.title, config['link']
+                )
                 ignored += 1
                 continue
 
@@ -571,7 +574,9 @@ class InputRSS:
             if entry_id.strip():
                 task.simple_persistence['%s_last_entry' % url_hash] = entry_id
             else:
-                logger.debug('rss feed location saving skipped: no title information in first entry')
+                logger.debug(
+                    'rss feed location saving skipped: no title information in first entry'
+                )
 
         if ignored:
             if not config.get('silent'):

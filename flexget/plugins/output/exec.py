@@ -161,7 +161,9 @@ class PluginExec:
                             )
                         continue
 
-                    logger.debug('phase_name: {} operation: {} cmd: {}', phase_name, operation, cmd)
+                    logger.debug(
+                        'phase_name: {} operation: {} cmd: {}', phase_name, operation, cmd
+                    )
                     if task.options.test:
                         logger.info('Would execute: {}', cmd)
                     else:
@@ -170,7 +172,9 @@ class PluginExec:
                         try:
                             cmd.encode(config['encoding'])
                         except UnicodeEncodeError:
-                            logger.error('Unable to encode cmd `{}` to {}', cmd, config['encoding'])
+                            logger.error(
+                                'Unable to encode cmd `{}` to {}', cmd, config['encoding']
+                            )
                             if config.get('fail_entries'):
                                 entry.fail(
                                     'cmd `%s` could not be encoded to %s.'
