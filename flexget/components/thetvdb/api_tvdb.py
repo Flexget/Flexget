@@ -478,7 +478,7 @@ def find_series_id(name, language=None):
         if s['firstAired']:
             try:
                 s['firstAired'] = datetime.strptime(s['firstAired'], "%Y-%m-%d")
-            except:
+            except ValueError:
                 logger.debug('Invalid firstAired date "{}" when parsing series {} ', s['firstAired'], s['seriesName'])
                 s['firstAired'] = datetime(1970, 1, 1)
         else:
