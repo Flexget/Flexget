@@ -317,7 +317,7 @@ class RadarrSet(MutableSet):
         self.service = RadarrAPIService(config["api_key"], config["base_url"], config["port"])
 
         # all tags must be lowercase
-        self.config["tags"] = [t.lower() for t in self.config.get("tags", [])]
+        self.config_tags = [t.lower() for t in self.config.get("tags", [])]
 
         # cache tags
         self._tags = None
@@ -419,15 +419,14 @@ class RadarrSet(MutableSet):
     @property
     def tags(self):
         """ Property that returns tag by id """
-        tags = self.config.get("add_tags")
-        if not tags:
+        if not self.config_tags:
             self._tags = []
             return self._tags
 
         tags_ids = []
         if self._tags is None:
             existing = {t["label"].lower(): t["id"] for t in self.service.get_tags()}
-            for tag in tags:
+            for tag in self.config_tags:
                 tag = tag.lower()
                 found = existing.get(tag)
                 if not found:
@@ -597,7 +596,8 @@ class RadarrList:
             "include_data": {"type": "boolean", "default": False},
             "only_use_cutoff_quality": {"type": "boolean", "default": False},
             "monitored": {"type": "boolean", "default": True},
-            "profile_id": {"type": "integer", "default": 1}
+            "profile_id": {"type": "integer", "default": 1},
+            "tags": {"type": "array", "items": {'type': 'string'}},
         },
         "required": ["api_key", "base_url"],
         "additionalProperties": False,

@@ -44,11 +44,21 @@ class SonarrSet(MutableSet):
                 'enum': ['standard', 'daily', 'anime'],
                 'default': 'standard',
             },
-            'tags': {'type': 'array', 'items': {'type': 'integer'}, 'default': [0]},
+            "tags": {"type": "array", "items": {'type': 'string'}},
         },
         'required': ['api_key'],
         'additionalProperties': False,
     }
+
+    def __init__(self, config):
+        self.config = config
+        self._shows = None
+
+        # all tags must be lowercase
+        self.config_tags = [t.lower() for t in self.config.get("tags", [])]
+
+        # cache tags
+        self._tags = None
 
     def _sonarr_request(self, endpoint, term=None, method='get', data=None):
         base_url = self.config['base_url']
@@ -91,6 +101,26 @@ class SonarrSet(MutableSet):
         cutoff = self.translate_quality(quality_profile['cutoff']['name'])
 
         return allowed_qualities, cutoff
+
+    @property
+    def tags(self):
+        """ Property that returns tag by id """
+        if not self.config_tags:
+            self._tags = []
+            return self._tags
+
+        tags_ids = []
+        if self._tags is None:
+            existing = {t["label"].lower(): t["id"] for t in self._sonarr_request("tag")}
+            for tag in self.config_tags:
+                tag = tag.lower()
+                found = existing.get(tag)
+                if not found:
+                    logger.verbose('Adding missing tag %s to Sonarr' % tag)
+                    found = self._sonarr_request("tag", method="post", data={"label": tag})["id"]
+                tags_ids.append(found)
+            self._tags = tags_ids
+        return self._tags
 
     def list_entries(self, filters=True):
         shows = self._sonarr_request(SERIES_ENDPOINT)
@@ -171,7 +201,7 @@ class SonarrSet(MutableSet):
         show['seasonFolder'] = self.config.get('season_folder')
         show['monitored'] = self.config.get('monitored')
         show['seriesType'] = self.config.get('series_type')
-        show['tags'] = self.config.get('tags')
+        show['tags'] = self.tags
         show['rootFolderPath'] = root_path
         show['addOptions'] = {
             "ignoreEpisodesWithFiles": self.config.get('ignore_episodes_with_files'),
@@ -204,10 +234,6 @@ class SonarrSet(MutableSet):
     def _from_iterable(self, it):
         # TODO: is this the right answer? the returned object won't have our custom __contains__ logic
         return set(it)
-
-    def __init__(self, config):
-        self.config = config
-        self._shows = None
 
     def __iter__(self):
         return (entry for entry in self.shows())
