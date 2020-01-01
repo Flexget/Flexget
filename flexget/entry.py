@@ -19,12 +19,15 @@ class EntryState(Enum):
 
     @property
     def color(self) -> str:
-        return {self.ACCEPTED: 'g', self.REJECTED: 'r', self.FAILED: 'R', self.UNDECIDED: 'd',}[
-            self
-        ]
+        return {
+            self.ACCEPTED: 'green',
+            self.REJECTED: 'red',
+            self.FAILED: 'RED',
+            self.UNDECIDED: 'dim',
+        }[self]
 
     @property
-    def log_color(self) -> str:
+    def log_markup(self) -> str:
         return f'<{self.color}>{self.value.upper()}</>'
 
 

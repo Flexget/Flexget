@@ -26,7 +26,7 @@ class Verbose:
 
     @staticmethod
     def verbose_details(entry, task=None, act: EntryState = None, reason=None, **kwargs):
-        msg = f"{act.log_color}: `{entry['title']}` by {task.current_plugin} plugin"
+        msg = f"{act.log_markup}: `{entry['title']}` by {task.current_plugin} plugin"
         if reason:
             msg = f'{msg} because {reason[0].lower() + reason[1:]}'
 
