@@ -478,7 +478,11 @@ def find_series_id(name, language=None):
     # Cleanup results for sorting
     for s in series:
         if s['firstAired']:
-            s['firstAired'] = datetime.strptime(s['firstAired'], "%Y-%m-%d")
+            try:
+                s['firstAired'] = datetime.strptime(s['firstAired'], "%Y-%m-%d")
+            except ValueError:
+                logger.warning('Invalid firstAired date "{}" when parsing series {} ', s['firstAired'], s['seriesName'])
+                s['firstAired'] = datetime(1970, 1, 1)
         else:
             s['firstAired'] = datetime(1970, 1, 1)
 
