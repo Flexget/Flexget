@@ -1,6 +1,5 @@
 import logging
 import time
-
 # Allow some request objects to be imported from here instead of requests
 import warnings
 from datetime import datetime, timedelta
@@ -245,7 +244,9 @@ class Session(requests.Session):
             return _wrap_urlopen(url, timeout=kwargs['timeout'])
 
         try:
-            logger.debug('{}ing URL {} with args {} and kwargs {}', method.upper(), url, args, kwargs)
+            logger.debug(
+                '{}ing URL {} with args {} and kwargs {}', method.upper(), url, args, kwargs
+            )
             result = super().request(method, url, *args, **kwargs)
         except requests.Timeout:
             # Mark this site in known unresponsive list

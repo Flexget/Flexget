@@ -57,7 +57,9 @@ class PluginInputs:
                         continue
                     urls = ([entry['url']] if entry.get('url') else []) + entry.get('urls', [])
                     if any(url in entry_urls for url in urls):
-                        logger.debug('URL for `{}` already in entry list, skipping.', entry['title'])
+                        logger.debug(
+                            'URL for `{}` already in entry list, skipping.', entry['title']
+                        )
                         continue
                     yield entry
                     entry_titles.add(entry['title'])

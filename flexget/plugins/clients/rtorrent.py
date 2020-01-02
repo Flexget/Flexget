@@ -513,7 +513,9 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
     def delete_entry(self, client, entry):
         try:
             client.delete(entry['torrent_info_hash'])
-            logger.verbose('Deleted {} ({}) in rtorrent ', entry['title'], entry['torrent_info_hash'])
+            logger.verbose(
+                'Deleted {} ({}) in rtorrent ', entry['title'], entry['torrent_info_hash']
+            )
         except xmlrpc_client.Error as e:
             entry.fail('Failed to delete: %s' % str(e))
             return

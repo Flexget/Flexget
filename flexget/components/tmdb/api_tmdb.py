@@ -360,11 +360,15 @@ class ApiTmdb:
                     age_in_years = (datetime.now().date() - movie.released).days / 365
                     refresh_time += timedelta(days=age_in_years * 5)
             if movie.updated < datetime.now() - refresh_time and not only_cached:
-                logger.debug('Cache has expired for {}, attempting to refresh from TMDb.', movie.name)
+                logger.debug(
+                    'Cache has expired for {}, attempting to refresh from TMDb.', movie.name
+                )
                 try:
                     updated_movie = TMDBMovie(id=movie.id, language=language)
                 except LookupError:
-                    logger.error('Error refreshing movie details from TMDb, cached info being used.')
+                    logger.error(
+                        'Error refreshing movie details from TMDb, cached info being used.'
+                    )
                 else:
                     movie = session.merge(updated_movie)
             else:

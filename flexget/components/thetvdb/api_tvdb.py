@@ -206,7 +206,9 @@ class TVDBSeries(Base):
         self._genres = [TVDBGenre(id=name) for name in series['genre']] if series['genre'] else []
 
         if self.first_aired is None:
-            logger.debug('Falling back to getting first episode aired date for series {}', self.name)
+            logger.debug(
+                'Falling back to getting first episode aired date for series {}', self.name
+            )
             try:
                 episode = TVDBRequest().get(
                     f'series/{self.id}/episodes/query?airedSeason=1&airedEpisode=1',
@@ -479,7 +481,7 @@ def find_series_id(name, language=None):
             try:
                 s['firstAired'] = datetime.strptime(s['firstAired'], "%Y-%m-%d")
             except ValueError:
-                logger.debug('Invalid firstAired date "{}" when parsing series {} ', s['firstAired'], s['seriesName'])
+                logger.warning('Invalid firstAired date "{}" when parsing series {} ', s['firstAired'], s['seriesName'])
                 s['firstAired'] = datetime(1970, 1, 1)
         else:
             s['firstAired'] = datetime(1970, 1, 1)
@@ -570,7 +572,9 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None, lang
                 series = session.merge(updated_series)
                 _update_search_strings(series, session, search=name)
             except LookupError as e:
-                logger.warning('Error while updating from tvdb ({}), using cached data.', e.args[0])
+                logger.warning(
+                    'Error while updating from tvdb ({}), using cached data.', e.args[0]
+                )
         else:
             logger.debug('Series {} information restored from cache.', id_str())
     else:
@@ -785,6 +789,8 @@ def mark_expired(session):
             .filter(TVDBEpisode.series_id.in_(chunk))
             .update({'expired': True}, 'fetch')
         )
-        logger.debug('{} series and {} episodes marked as expired', series_updated, episodes_updated)
+        logger.debug(
+            '{} series and {} episodes marked as expired', series_updated, episodes_updated
+        )
 
     persist['last_check'] = new_last_check

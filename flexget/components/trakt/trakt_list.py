@@ -470,7 +470,7 @@ class TraktSet(MutableSet):
                 '{seasons} season(s).',
                 action,
                 self.config['list'],
-                **res[action]
+                **res[action],
             )
             for media_type, request in res['not_found'].items():
                 if request:

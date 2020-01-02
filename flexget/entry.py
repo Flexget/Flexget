@@ -1,5 +1,6 @@
 import copy
 import functools
+from enum import Enum
 
 from loguru import logger
 
@@ -8,6 +9,26 @@ from flexget.utils.lazy_dict import LazyDict, LazyLookup
 from flexget.utils.template import FlexGetTemplate, render_from_entry
 
 logger = logger.bind(name='entry')
+
+
+class EntryState(Enum):
+    ACCEPTED = 'accepted'
+    REJECTED = 'rejected'
+    FAILED = 'failed'
+    UNDECIDED = 'undecided'
+
+    @property
+    def color(self) -> str:
+        return {
+            self.ACCEPTED: 'green',
+            self.REJECTED: 'red',
+            self.FAILED: 'RED',
+            self.UNDECIDED: 'dim',
+        }[self]
+
+    @property
+    def log_markup(self) -> str:
+        return f'<{self.color}>{self.value.upper()}</>'
 
 
 class EntryUnicodeError(Exception):

@@ -97,7 +97,9 @@ class MyEpisodesList:
                 logger.debug('Invalid entry created? {}', entry)
 
         if not entries:
-            logger.warning("No shows found on myepisodes.com list. Maybe you need to add some first?")
+            logger.warning(
+                "No shows found on myepisodes.com list. Maybe you need to add some first?"
+            )
 
         return entries
 

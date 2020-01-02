@@ -22,9 +22,7 @@ class EstimatesMoviesBluray:
             logger.debug('Skipping Blu-ray.com lookup since movie year is {}', movie_year)
             return
 
-        logger.debug(
-            'Searching Blu-ray.com for release date of {} ({})', movie_name, movie_year
-        )
+        logger.debug('Searching Blu-ray.com for release date of {} ({})', movie_name, movie_year)
 
         release_date = None
         try:
