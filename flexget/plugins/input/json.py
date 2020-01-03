@@ -1,137 +1,78 @@
-"""Plugin for json file."""
-import dateutil.parser as parser
+"""Plugin for json files."""
+from loguru import logger
+from pathlib import Path
 
-import re
-import os
-import logging
-import glob
+import dateutil.parser as parser
 
 from flexget import plugin
 from flexget.utils import json
 from flexget.entry import Entry
 from flexget.event import event
 
-log = logging.getLogger('json')
+logger = logger.bind(name='json')
 
 
 class Json:
     """
-    Parse a json file for entries using regular expression.
+    Return entries from a json file.
 
-    :: 
+    ::
 
-      files: <path to JSON file(s)>
+      file: <path to JSON file>
       encoding: <JSON encoding>
-      get_remnants: <True/False>
-      entry:
-        - <field>: <corresponding JSON key>
-        - <field>
+      field_map:
+        - <entry field>: <corresponding JSON key>
 
-    Note: each entry must have at least two fields, 'title' and 'url'. If not specified in the config, 
-    this plugin asssumes that keys named 'title' and 'url' exist within the JSON. 'get_remnants' will map
-    all keys in the json file to fields in the entry (provided they have not been manually mapped already).
-    'encoding' defaults to 'utf-8', and 'get_remnants' defaults to 'False', if unspecified. 
+    Note: each entry must have at least two fields, 'title' and 'url'. If not specified in the config,
+    this plugin asssumes that keys named 'title' and 'url' exist within the JSON.
+    'encoding' defaults to 'utf-8'
 
     Example::
 
       json:
-        files: entries.json
-        encoding: utf8
-        get_remnants: True
-        entry:
+        file: entries.json
+        encoding: utf-8
+        field_map:
           - title: name
-          - url: 'web_.*'
-          
     """
-    
+
     schema = {
         'type': 'object',
         'properties': {
-            'files': {'type': 'string'},
-            'encoding': {'type': 'string', 'default': 'utf-8'},
-            'get_remnants': {'type': 'boolean', 'default': False},
-            'entry': {
-                'type': 'array',
-                'items': {
-                    'oneOf': [
-                        {'type': 'string'},
-                        {
-                            'type': 'object',
-                            'additionalProperties': {
-                                'type': 'string', 'format': 'regex'
-                            },
-                        },
-                    ]
-                },
-            },
+            'file': {'type': 'string', 'format': 'file'},
+            'encoding': {'type': 'string'},
+            'field_map': {
+                'type': 'object',
+                'additionalProperties': 'string',
+            }
         },
-        'required': ['files'],
+        'required': ['file'],
         'additionalProperties': False,
     }
-                    
-    def dt(val):
+
+    def ds_dt(val):
         try:
             return parser.parse(val)
         except (ValueError, OverflowError):
             return val
 
     def on_task_input(self, task, config):
-        files = os.path.expanduser(config['files'])
-        json_test = re.search(r'.*json', files)
-        if not json_test:
-            raise plugin.PluginError('The "files" key is missing "json" in the config file.')
-        json_encoding = config['encoding']
-        entry_config = config.get('entry')
-        get_remnants = config.get('get_remnants')
-        
-        fields = {}
-        
-        if config.get('entry'):
-            for required_field in config.get('entry'):
-                if isinstance(required_field, str):
-                    fields[required_field] = re.compile(f"^{required_field}$")
-                else:
-                    value = next(iter(required_field))
-                    fields[value] = re.compile(f"^{required_field[value]}$")
-                        
-            if 'title' not in fields.keys():
-                fields['title'] = re.compile("^title$")
-            if 'url' not in fields.keys():
-                fields['url'] = re.compile("^url$")
-
-        entries = []
-        entry = Entry()
-        
-        list_of_files = glob.glob(files)
-        if not list_of_files:
-            raise plugin.PluginError('No JSON file(s) found in the path specified in the config file.')
-        for filename in list_of_files:
-            with open(filename, encoding=json_encoding) as json_file:
-                json_dict = json.load(json_file)
-            for entry_title in json_dict:
-                all_entry_fields = json_dict[entry_title]
-                for entry_field in all_entry_fields:
-                    # Only de-serialize datetime strings to datetime objects, below using 'dt' method.
-                    if not entry_config:
-                        entry[entry_field] = dt(all_entry_fields[entry_field]) 
-                    else:
-                        for key in fields:
-                            match = re.search(fields[key], entry_field)
-                            if match:
-                                entry[key] = dt(all_entry_fields[match.group(0)])
-                        if entry_field not in fields.keys() and get_remnants:
-                            entry[entry_field] = dt(all_entry_fields[entry_field])
-
-                if not entry.isvalid():
-                    log.info(
-                        'Invalid data, constructed entry is missing mandatory fields (title or url)'
-                    )
-                else:
-                    entries.append(entry)
-                    log.debug('Added entry %s' % entry)
-                # start new entry
+        file = Path(config['file'])
+        field_map = config.get('field_map', {})
+        # Switch the field map to map from json to flexget fields
+        field_map = {v: k for k, v in field_map.items()}
+        with file.open(encoding=config.get('encoding', 'utf-8')) as data:
+            contents = json.load(data)
+            for item in contents:
                 entry = Entry()
-        return entries
+                for field, value in item.items():
+                    if field in field_map:
+                        entry[field_map[field]] = ds_dt(value)
+                    else:
+                        entry[field] = ds_dt(value)
+                if not entry.isvalid():
+                    logger.error('No title and url defined for entry, you may need to use field_map to map them.')
+                yield Entry(item)
 
 
 @event('plugin.register')
