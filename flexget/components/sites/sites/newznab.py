@@ -93,7 +93,7 @@ class Newznab:
             return self.do_search_all(entry, task, config)
         else:
             entries = []
-            logger.warning("Not done yet...")
+            logger.warning("Work in progress. Searching for the specified category is not supported yet...")
             return entries
 
     def do_search_tvsearch(self, arg_entry, task, config=None):
@@ -106,14 +106,10 @@ class Newznab:
         ):
             return []
         if arg_entry.get('tvrage_id'):
-            lookup = '&rid=%s' % arg_entry.get('tvrage_id')
+            lookup = f"&rid={arg_entry.get('tvrage_id')}"
         else:
-            lookup = '&q=%s' % quote(arg_entry['series_name'])
-        url = (
-            config['url']
-            + lookup
-            + '&season=%s&ep=%s' % (arg_entry['series_season'], arg_entry['series_episode'])
-        )
+            lookup = f"&q={quote(arg_entry['series_name'])}"
+        url = f"{config['url']}{lookup}&season={arg_entry['series_season']}&ep={arg_entry['series_episode']}"
         return self.fill_entries_for_url(url, task)
 
     def do_search_movie(self, arg_entry, task, config=None):
@@ -124,11 +120,11 @@ class Newznab:
             return entries
 
         imdb_id = arg_entry['imdb_id'].replace('tt', '')
-        url = config['url'] + '&imdbid=' + imdb_id
+        url = f"{config['url']}&imdbid={imdb_id}"
         return self.fill_entries_for_url(url, task)
 
     def do_search_all(self, arg_entry, task, config=None):
-        log.info('Searching for %s', arg_entry['title'])
+        logger.info('Searching for {}', arg_entry['title'])
         url = f"{config['url']}&q={arg_entry['title']}"
         return self.fill_entries_for_url(url, task)
 
