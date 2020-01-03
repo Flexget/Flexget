@@ -1,13 +1,14 @@
-import logging
 import os
 import xmlrpc.client
 from socket import error as socket_error
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.template import RenderError
 
-log = logging.getLogger('aria2')
+logger = logger.bind(name='aria2')
 
 
 class OutputAria2:
@@ -46,29 +47,31 @@ class OutputAria2:
         else:
             userpass = ''
         url = 'http://%s%s:%s/rpc' % (userpass, server, port)
-        log.debug('aria2 url: %s' % url)
-        log.info('Connecting to daemon at %s', url)
+        logger.debug('aria2 url: {}', url)
+        logger.info('Connecting to daemon at {}', url)
         try:
             return xmlrpc.client.ServerProxy(url).aria2
         except xmlrpc.client.ProtocolError as err:
             raise plugin.PluginError(
                 'Could not connect to aria2 at %s. Protocol error %s: %s'
                 % (url, err.errcode, err.errmsg),
-                log,
+                logger,
             )
         except xmlrpc.client.Fault as err:
             raise plugin.PluginError(
                 'XML-RPC fault: Unable to connect to aria2 daemon at %s: %s'
                 % (url, err.faultString),
-                log,
+                logger,
             )
         except socket_error as e:
             raise plugin.PluginError(
-                'Socket connection issue with aria2 daemon at %s: %s' % (url, e), log
+                'Socket connection issue with aria2 daemon at %s: %s' % (url, e), logger
             )
         except:
-            log.debug('Unexpected error during aria2 connection', exc_info=True)
-            raise plugin.PluginError('Unidentified error during connection to aria2 daemon', log)
+            logger.opt(exception=True).debug('Unexpected error during aria2 connection')
+            raise plugin.PluginError(
+                'Unidentified error during connection to aria2 daemon', logger
+            )
 
     def prepare_config(self, config):
         config.setdefault('server', 'localhost')
@@ -89,17 +92,17 @@ class OutputAria2:
         )
         for entry in task.accepted:
             if task.options.test:
-                log.verbose('Would add `%s` to aria2.', entry['title'])
+                logger.verbose('Would add `{}` to aria2.', entry['title'])
                 continue
             try:
                 self.add_entry(aria2, entry, config)
             except socket_error as se:
                 entry.fail('Unable to reach Aria2: %s' % se)
             except xmlrpc.client.Fault as err:
-                log.critical('Fault code %s message %s', err.faultCode, err.faultString)
+                logger.critical('Fault code {} message {}', err.faultCode, err.faultString)
                 entry.fail('Aria2 communication Fault')
             except Exception as e:
-                log.debug('Exception type %s', type(e), exc_info=True)
+                logger.opt(exception=True).debug('Exception type {}', type(e))
                 raise
 
     def add_entry(self, aria2, entry, config):

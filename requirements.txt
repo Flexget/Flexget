@@ -28,6 +28,7 @@ itsdangerous==0.24        # via flask
 jaraco.functools==2.0     # via cheroot
 jinja2==2.10.1
 jsonschema==2.6.0
+loguru==0.4.0
 markupsafe==1.0           # via jinja2
 more-itertools==7.2.0     # via cheroot, cherrypy, jaraco.functools
 plumbum==1.6.3            # via rpyc
@@ -52,6 +53,3 @@ webencodings==0.5.1       # via html5lib
 werkzeug==0.15.6          # via flask
 zc.lockfile==2.0          # via cherrypy
 zxcvbn-python==4.4.15
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools==41.6.0        # via apscheduler, html5lib, pynzb, zc.lockfile

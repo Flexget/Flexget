@@ -1,6 +1,6 @@
-import logging
 from collections.abc import MutableSet
 
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
@@ -8,7 +8,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests
 
-log = logging.getLogger('sonarr_list')
+logger = logger.bind(name='sonarr_list')
 
 SERIES_ENDPOINT = 'series'
 LOOKUP_ENDPOINT = 'series/lookup'
@@ -61,7 +61,7 @@ class SonarrSet(MutableSet):
         try:
             rsp = requests.request(method, url, headers=headers, json=data)
             data = rsp.json()
-            log.trace('sonarr response: %s', data)
+            logger.trace('sonarr response: {}', data)
             return data
         except RequestException as e:
             base_msg = 'Sonarr returned an error. {}'
@@ -138,25 +138,25 @@ class SonarrSet(MutableSet):
                 entry['configure_series_target'] = fg_cutoff
 
             if entry.isvalid():
-                log.debug('returning entry %s', entry)
+                logger.debug('returning entry {}', entry)
                 entries.append(entry)
             else:
-                log.error('Invalid entry created? %s' % entry)
+                logger.error('Invalid entry created? {}', entry)
                 continue
 
         return entries
 
     def add_show(self, entry):
-        log.debug('searching for show match for %s using Sonarr', entry)
+        logger.debug('searching for show match for {} using Sonarr', entry)
         term = 'tvdb:{}'.format(entry['tvdb_id']) if entry.get('tvdb_id') else entry['title']
         lookup_results = self._sonarr_request(LOOKUP_ENDPOINT, term=term)
         if not lookup_results:
-            log.debug('could not find series match to %s', entry)
+            logger.debug('could not find series match to {}', entry)
             return
         elif len(lookup_results) > 1:
-            log.debug('got multiple results for Sonarr, using first one')
+            logger.debug('got multiple results for Sonarr, using first one')
         show = lookup_results[0]
-        log.debug('using show %s', show)
+        logger.debug('using show {}', show)
 
         # Getting root folder
         if self.config.get('root_folder_path'):
@@ -179,12 +179,12 @@ class SonarrSet(MutableSet):
             "searchForMissingEpisodes": self.config.get('search_missing_episodes'),
         }
 
-        log.debug('adding show %s to sonarr', show)
+        logger.debug('adding show {} to sonarr', show)
         returned_show = self._sonarr_request(SERIES_ENDPOINT, method='post', data=show)
         return returned_show
 
     def remove_show(self, show):
-        log.debug('sending sonarr delete show request')
+        logger.debug('sending sonarr delete show request')
         self._sonarr_request(DELETE_ENDPOINT.format(show['sonarr_id']), method='delete')
 
     def shows(self, filters=True):
@@ -223,17 +223,17 @@ class SonarrSet(MutableSet):
             show = self.add_show(entry)
             if show:
                 self._shows = None
-                log.verbose('Successfully added show %s to Sonarr', show['title'])
+                logger.verbose('Successfully added show {} to Sonarr', show['title'])
         else:
-            log.debug('entry %s already exists in Sonarr list', entry)
+            logger.debug('entry {} already exists in Sonarr list', entry)
 
     def discard(self, entry):
         show = self._find_entry(entry, filters=False)
         if not show:
-            log.debug('Did not find matching show in Sonarr for %s, skipping', entry)
+            logger.debug('Did not find matching show in Sonarr for {}, skipping', entry)
             return
         self.remove_show(show)
-        log.verbose('removed show %s from Sonarr', show['title'])
+        logger.verbose('removed show {} from Sonarr', show['title'])
 
     @property
     def immutable(self):

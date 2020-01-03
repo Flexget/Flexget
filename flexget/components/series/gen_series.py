@@ -1,12 +1,13 @@
-import logging
 import random
 import string
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 
-log = logging.getLogger('gen_series')
+logger = logger.bind(name='gen_series')
 
 PER_RUN = 50
 
@@ -32,7 +33,7 @@ class GenSeries:
 
     @plugin.priority(200)
     def on_task_start(self, task, config):
-        log.info('Generating test data ...')
+        logger.info('Generating test data ...')
         series = []
         for num in range(config['series']):
             series.append('series %d name' % num)
@@ -53,7 +54,7 @@ class GenSeries:
                             ]
                         )
                         self.entries.append(entry)
-        log.info('Generated %d entries' % len(self.entries))
+        logger.info('Generated {} entries', len(self.entries))
 
         # configure series plugin, bad way but this is debug shit
         task.config['series'] = series
@@ -69,7 +70,7 @@ class GenSeries:
 
     def on_task_exit(self, task, config):
         if self.entries:
-            log.info('There are still %d left to be processed!' % len(self.entries))
+            logger.info('There are still {} left to be processed!', len(self.entries))
             # rerun ad infinitum, also commits session between them
             task._rerun = True
             task._rerun_count = 0

@@ -1,8 +1,8 @@
-import logging
 import re
 from datetime import datetime, timedelta
 from functools import total_ordering
 
+from loguru import logger
 from sqlalchemy import (
     Boolean,
     Column,
@@ -39,7 +39,7 @@ from flexget.utils.sqlalchemy_utils import (
 from flexget.utils.tools import parse_episode_identifier
 
 SCHEMA_VER = 14
-log = logging.getLogger('series.db')
+logger = logger.bind(name='series.db')
 Base = db_schema.versioned_base('series', SCHEMA_VER)
 
 
@@ -213,15 +213,15 @@ class Season(Base):
 
     def __lt__(self, other):
         if other is None:
-            log.trace('comparing %s to None', self)
+            logger.trace('comparing {} to None', self)
             return False
         if not isinstance(other, (Season, Episode)):
-            log.error('Cannot compare Season to %s', other)
+            logger.error('Cannot compare Season to {}', other)
             return NotImplemented
         if self.identified_by != 'ep':
-            log.error('Can only compare with an \'ep\' style identifier')
+            logger.error('Can only compare with an \'ep\' style identifier')
             return NotImplemented
-        log.trace('checking if %s is smaller than %s', self.season, other.season)
+        logger.trace('checking if {} is smaller than {}', self.season, other.season)
         return self.season < other.season
 
     def __hash__(self):
@@ -346,56 +346,56 @@ class Episode(Base):
 
     def __eq__(self, other):
         if other is None:
-            log.trace('comparing %s to None', self)
+            logger.trace('comparing {} to None', self)
             return False
         if isinstance(other, Season):
-            log.trace('comparing %s to Season', self)
+            logger.trace('comparing {} to Season', self)
             return False
         elif not isinstance(other, Episode):
-            log.error('Cannot compare Episode with %s', other)
+            logger.error('Cannot compare Episode with {}', other)
             return NotImplemented
         if self.identified_by != other.identified_by:
-            log.error(
-                'Cannot compare %s identifier with %s', self.identified_by, other.identified_by
+            logger.error(
+                'Cannot compare {} identifier with {}', self.identified_by, other.identified_by
             )
             return NotImplemented
-        log.trace('comparing %s with %s', self.identifier, other.identifier)
+        logger.trace('comparing {} with {}', self.identifier, other.identifier)
         return self.identifier == other.identifier
 
     def __lt__(self, other):
         if other is None:
-            log.trace('comparing %s to None', self)
+            logger.trace('comparing {} to None', self)
             return False
         elif isinstance(other, Episode):
             if self.identified_by is None or other.identified_by is None:
                 bad_ep = other if other.identified_by is None else self
-                log.error('cannot compare episode without an identifier type: %s', bad_ep)
+                logger.error('cannot compare episode without an identifier type: {}', bad_ep)
                 return False
             if self.identified_by != other.identified_by:
                 if self.identified_by == 'special':
-                    log.trace('Comparing special episode')
+                    logger.trace('Comparing special episode')
                     return False
-                log.error('cannot compare %s with %s', self.identified_by, other.identified_by)
+                logger.error('cannot compare {} with {}', self.identified_by, other.identified_by)
                 return NotImplemented
             if self.identified_by in ['ep', 'sequence']:
-                log.trace('comparing %s and %s', self, other)
+                logger.trace('comparing {} and {}', self, other)
                 return self.season < other.season or (
                     self.season == other.season and self.number < other.number
                 )
             elif self.identified_by == 'date':
-                log.trace('comparing %s and %s', self.identifier, other.identifier)
+                logger.trace('comparing {} and {}', self.identifier, other.identifier)
                 return self.identifier < other.identifier
             else:
-                log.error('cannot compare when identifier is %s', self.identified_by)
+                logger.error('cannot compare when identifier is {}', self.identified_by)
                 return NotImplemented
         elif isinstance(other, Season):
             if self.identified_by != 'ep':
-                log.error('cannot compare season when identifier is not \'ep\'')
+                logger.error('cannot compare season when identifier is not \'ep\'')
                 return NotImplemented
-            log.trace('comparing %s with %s', self.season, other.season)
+            logger.trace('comparing {} with {}', self.season, other.season)
             return self.season < other.season
         else:
-            log.error('can only compare with Episode or Season, not %s', other)
+            logger.error('can only compare with Episode or Season, not {}', other)
             return NotImplemented
 
     def __hash__(self):
@@ -566,7 +566,7 @@ Index('episode_series_identifier', Episode.series_id, Episode.identifier)
 def upgrade(ver, session):
     if ver is None:
         if table_exists('episode_qualities', session):
-            log.info(
+            logger.info(
                 'Series database format is too old to upgrade, dropping and recreating tables.'
             )
             # Drop the deprecated data
@@ -576,7 +576,7 @@ def upgrade(ver, session):
         # Upgrade episode_releases table to have a proper count and seed it with appropriate numbers
         columns = table_columns('episode_releases', session)
         if 'proper_count' not in columns:
-            log.info('Upgrading episode_releases table to have proper_count column')
+            logger.info('Upgrading episode_releases table to have proper_count column')
             table_add_column('episode_releases', 'proper_count', Integer, session)
             release_table = table_schema('episode_releases', session)
             for row in session.execute(select([release_table.c.id, release_table.c.title])):
@@ -593,7 +593,7 @@ def upgrade(ver, session):
                 )
         ver = 0
     if ver == 0:
-        log.info('Migrating first_seen column from series_episodes to episode_releases table.')
+        logger.info('Migrating first_seen column from series_episodes to episode_releases table.')
         # Create the column in episode_releases
         table_add_column('episode_releases', 'first_seen', DateTime, session)
         # Seed the first_seen value for all the past releases with the first_seen of their episode.
@@ -609,11 +609,11 @@ def upgrade(ver, session):
             )
         ver = 1
     if ver == 1:
-        log.info('Adding `identified_by` column to series table.')
+        logger.info('Adding `identified_by` column to series table.')
         table_add_column('series', 'identified_by', String, session)
         ver = 2
     if ver == 2:
-        log.info('Creating index on episode_releases table.')
+        logger.info('Creating index on episode_releases table.')
         create_index('episode_releases', session, 'episode_id')
         ver = 3
     if ver == 3:
@@ -621,9 +621,9 @@ def upgrade(ver, session):
         try:
             Index('ix_series_name').drop(bind=session.bind)
         except OperationalError:
-            log.debug('There was no ix_series_name index to remove.')
+            logger.debug('There was no ix_series_name index to remove.')
         # Add Series.name_lower column
-        log.info('Adding `name_lower` column to series table.')
+        logger.info('Adding `name_lower` column to series table.')
         table_add_column('series', 'name_lower', Unicode, session)
         series_table = table_schema('series', session)
         create_index('series', session, 'name_lower')
@@ -633,7 +633,7 @@ def upgrade(ver, session):
         )
         ver = 4
     if ver == 4:
-        log.info('Adding `identified_by` column to episodes table.')
+        logger.info('Adding `identified_by` column to episodes table.')
         table_add_column('series_episodes', 'identified_by', String, session)
         series_table = table_schema('series', session)
         # Clear out identified_by id series so that they can be auto detected again
@@ -641,7 +641,7 @@ def upgrade(ver, session):
             update(series_table, series_table.c.identified_by != 'ep', {'identified_by': None})
         )
         # Warn users about a possible config change needed.
-        log.warning(
+        logger.warning(
             'If you are using `identified_by: id` for the series plugin for a date-identified '
             'or abolute-numbered series, you will need to update your config. Two new identified_by modes have '
             'been added: `date` and `sequence`. In addition, if you are using `identified_by: auto`, it will'
@@ -697,7 +697,7 @@ def upgrade(ver, session):
         # Due to bad db cleanups there may be invalid entries in series_tasks table
         series_tasks = table_schema('series_tasks', session)
         series_table = table_schema('series', session)
-        log.verbose('Repairing series_tasks table data')
+        logger.verbose('Repairing series_tasks table data')
         session.execute(
             delete(series_tasks, ~series_tasks.c.series_id.in_(select([series_table.c.id])))
         )
@@ -717,7 +717,7 @@ def upgrade(ver, session):
         ver = 13
     if ver == 13:
         # New season_releases table, added by "create_all"
-        log.info('Adding season_releases table')
+        logger.info('Adding season_releases table')
         ver = 14
     return ver
 
@@ -732,7 +732,7 @@ def db_cleanup(manager, session):
         .delete(False)
     )
     if result:
-        log.verbose('Removed %d undownloaded episode releases.', result)
+        logger.verbose('Removed {} undownloaded episode releases.', result)
     # Clean up episodes without releases
     result = (
         session.query(Episode)
@@ -741,7 +741,7 @@ def db_cleanup(manager, session):
         .delete(False)
     )
     if result:
-        log.verbose('Removed %d episodes without releases.', result)
+        logger.verbose('Removed {} episodes without releases.', result)
     # Clean up series without episodes that aren't in any tasks
     result = (
         session.query(Series)
@@ -750,7 +750,7 @@ def db_cleanup(manager, session):
         .delete(False)
     )
     if result:
-        log.verbose('Removed %d series without episodes.', result)
+        logger.verbose('Removed {} series without episodes.', result)
 
 
 def set_alt_names(alt_names, db_series, session):
@@ -766,15 +766,15 @@ def set_alt_names(alt_names, db_series, session):
                     'Check your settings.' % (db_series.name, alt_name, db_series_alt.series.name)
                 )
             else:
-                log.debug(
-                    'alternate name `%s` already associated with series `%s`, no change needed',
+                logger.debug(
+                    'alternate name `{}` already associated with series `{}`, no change needed',
                     alt_name,
                     db_series.name,
                 )
                 db_alt_names.append(db_series_alt)
         else:
             db_alt_names.append(AlternateNames(alt_name))
-            log.debug('adding alternate name `%s` to series `%s`', alt_name, db_series.name)
+            logger.debug('adding alternate name `{}` to series `{}`', alt_name, db_series.name)
     db_series.alternate_names[:] = db_alt_names
 
 
@@ -885,8 +885,8 @@ def _add_alt_name(alt, db_series, series_name, session):
     elif db_series_alt:
         if not db_series_alt.series:
             # Not sure how this can happen
-            log.debug(
-                'Found an alternate name not attached to series. Re-attatching `%s` to `%s`.',
+            logger.debug(
+                'Found an alternate name not attached to series. Re-attatching `{}` to `{}`.',
                 alt,
                 series_name,
             )
@@ -898,10 +898,10 @@ def _add_alt_name(alt, db_series, series_name, session):
                 'Check your settings.' % (series_name, alt, db_series_alt.series.name)
             )
     else:
-        log.debug('adding alternate name `%s` for `%s` into db', alt, series_name)
+        logger.debug('adding alternate name `{}` for `{}` into db', alt, series_name)
         db_series_alt = AlternateNames(alt)
         db_series.alternate_names.append(db_series_alt)
-        log.debug('-> added %s', db_series_alt)
+        logger.debug('-> added {}', db_series_alt)
 
 
 @with_session
@@ -982,7 +982,7 @@ def auto_identified_by(series):
     type_totals.pop('special', None)
     if not type_totals:
         return 'auto'
-    log.debug('%s episode type totals: %r', series.name, type_totals)
+    logger.debug('{} episode type totals: {!r}', series.name, type_totals)
     # Find total number of parsed episodes
     total = sum(type_totals.values())
     # See which type has the most
@@ -990,17 +990,17 @@ def auto_identified_by(series):
 
     # Ep mode locks in faster than the rest. At 2 seen episodes.
     if type_totals.get('ep', 0) >= 2 and type_totals['ep'] > total / 3:
-        log.info('identified_by has locked in to type `ep` for %s', series.name)
+        logger.info('identified_by has locked in to type `ep` for {}', series.name)
         return 'ep'
     # If we have over 3 episodes all of the same type, lock in
     if len(type_totals) == 1 and total >= 3:
         return best
     # Otherwise wait until 5 episodes to lock in
     if total >= 5:
-        log.info('identified_by has locked in to type `%s` for %s', best, series.name)
+        logger.info('identified_by has locked in to type `{}` for {}', best, series.name)
         return best
-    log.verbose(
-        'identified by is currently on `auto` for %s. '
+    logger.verbose(
+        'identified by is currently on `auto` for {}. '
         'Multiple id types may be accepted until it locks in on the appropriate type.',
         series.name,
     )
@@ -1029,15 +1029,15 @@ def get_latest_season_pack_release(series, downloaded=True, season=None):
 
     latest_season_pack_release = releases.order_by(desc(Season.season)).first()
     if not latest_season_pack_release:
-        log.debug(
-            'no season packs found for series `%s` with parameters season: %s, downloaded: %s',
+        logger.debug(
+            'no season packs found for series `{}` with parameters season: {}, downloaded: {}',
             series.name,
             season,
             downloaded,
         )
         return
-    log.debug(
-        'latest season pack for series %s, with downloaded set to %s and season set to %s',
+    logger.debug(
+        'latest season pack for series {}, with downloaded set to {} and season set to {}',
         series,
         downloaded,
         season,
@@ -1081,15 +1081,15 @@ def get_latest_episode_release(series, downloaded=True, season=None):
         ).first()
 
     if not latest_episode_release:
-        log.debug(
-            'no episodes found for series `%s` with parameters season: %s, downloaded: %s',
+        logger.debug(
+            'no episodes found for series `{}` with parameters season: {}, downloaded: {}',
             series.name,
             season,
             downloaded,
         )
         return
-    log.debug(
-        'latest episode for series %s, with downloaded set to %s and season set to %s',
+    logger.debug(
+        'latest episode for series {}, with downloaded set to {} and season set to {}',
         series,
         downloaded,
         season,
@@ -1122,8 +1122,8 @@ def new_eps_after(series, since_ep, session):
     series_eps = session.query(Episode).join(Episode.series).filter(Series.id == series.id)
     if series.identified_by == 'ep':
         if since_ep.season is None or since_ep.number is None:
-            log.debug(
-                'new_eps_after for `%s` falling back to timestamp because latest dl in non-ep format',
+            logger.debug(
+                'new_eps_after for `{}` falling back to timestamp because latest dl in non-ep format',
                 series.name,
             )
             return series_eps.filter(Episode.first_seen > since_ep.first_seen).count(), 'eps'
@@ -1139,7 +1139,7 @@ def new_eps_after(series, since_ep, session):
     elif series.identified_by == 'id':
         count = series_eps.filter(Episode.first_seen > since_ep.first_seen).count()
     else:
-        log.debug('unsupported identified_by `%s`', series.identified_by)
+        logger.debug('unsupported identified_by `{}`', series.identified_by)
         count = 0
     return count, 'eps'
 
@@ -1227,7 +1227,7 @@ def remove_series(name, forget=False):
                             downloaded_releases.append(release.title)
                 session.delete(s)
             session.commit()
-            log.debug('Removed series `%s` from database.', name)
+            logger.debug('Removed series `{}` from database.', name)
         else:
             raise ValueError('Unknown series `%s`' % name)
     for downloaded_release in downloaded_releases:
@@ -1254,7 +1254,7 @@ def remove_series_entity(name, identifier, forget=False):
                     ''  # reset identified_by flag so that it will be recalculated
                 )
             session.delete(entity)
-            log.debug('Entity `%s` from series `%s` removed from database.', identifier, name)
+            logger.debug('Entity `{}` from series `{}` removed from database.', identifier, name)
             return [release.title for release in entity.downloaded_releases]
 
         name_to_parse = '{} {}'.format(series.name, identifier)
@@ -1303,7 +1303,7 @@ def delete_episode_release_by_id(release_id):
         if release:
             session.delete(release)
             session.commit()
-            log.debug('Deleted release ID `%s`', release_id)
+            logger.debug('Deleted release ID `{}`', release_id)
         else:
             raise ValueError('Unknown identifier `%s` for release' % release_id)
 
@@ -1314,7 +1314,7 @@ def delete_season_release_by_id(release_id):
         if release:
             session.delete(release)
             session.commit()
-            log.debug('Deleted release ID `%s`', release_id)
+            logger.debug('Deleted release ID `{}`', release_id)
         else:
             raise ValueError('Unknown identifier `%s` for release' % release_id)
 
@@ -1412,11 +1412,11 @@ def store_parser(session, parser, series=None, quality=None):
             .first()
         )
         if not series:
-            log.debug('adding series `%s` into db', parser.name)
+            logger.debug('adding series `{}` into db', parser.name)
             series = Series()
             series.name = parser.name
             session.add(series)
-            log.debug('-> added `%s`', series)
+            logger.debug('-> added `{}`', series)
 
     releases = []
     for ix, identifier in enumerate(parser.identifiers):
@@ -1430,13 +1430,13 @@ def store_parser(session, parser, series=None, quality=None):
                 .first()
             )
             if not season:
-                log.debug('adding season `%s` into series `%s`', identifier, parser.name)
+                logger.debug('adding season `{}` into series `{}`', identifier, parser.name)
                 season = Season()
                 season.identifier = identifier
                 season.identified_by = parser.id_type
                 season.season = parser.season
                 series.seasons.append(season)
-                log.debug('-> added season `%s`', season)
+                logger.debug('-> added season `{}`', season)
             session.flush()
 
             # Sets the filter_by, and filter_id for later releases query
@@ -1455,7 +1455,7 @@ def store_parser(session, parser, series=None, quality=None):
                 .first()
             )
             if not episode:
-                log.debug('adding episode `%s` into series `%s`', identifier, parser.name)
+                logger.debug('adding episode `{}` into series `{}`', identifier, parser.name)
                 episode = Episode()
                 episode.identifier = identifier
                 episode.identified_by = parser.id_type
@@ -1467,7 +1467,7 @@ def store_parser(session, parser, series=None, quality=None):
                     episode.season = 0
                     episode.number = parser.id + ix
                 series.episodes.append(episode)  # pylint:disable=E1103
-                log.debug('-> added `%s`', episode)
+                logger.debug('-> added `{}`', episode)
             session.flush()
 
             # Sets the filter_by, and filter_id for later releases query
@@ -1493,13 +1493,13 @@ def store_parser(session, parser, series=None, quality=None):
             .first()
         )
         if not release:
-            log.debug('adding release `%s`', parser)
+            logger.debug('adding release `{}`', parser)
             release = table()
             release.quality = quality
             release.proper_count = parser.proper_count
             release.title = parser.data
             entity.releases.append(release)  # pylint:disable=E1103
-            log.debug('-> added `%s`', release)
+            logger.debug('-> added `{}`', release)
         releases.append(release)
     session.flush()  # Make sure autonumber ids are populated
     return releases
@@ -1530,4 +1530,4 @@ def add_series_entity(session, series, identifier, quality=None):
     else:
         for release in added:
             release.downloaded = True
-        log.debug('Entity `%s` from series `%s` added to database.', identifier, series.name)
+        logger.debug('Entity `{}` from series `{}` added to database.', identifier, series.name)

@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
@@ -6,7 +6,7 @@ from flexget.manager import Session
 
 from . import db
 
-log = logging.getLogger('pending_approval')
+logger = logger.bind(name='pending_approval')
 
 
 class PendingApproval:
@@ -56,7 +56,7 @@ class PendingApproval:
                 if entry.get('approved'):
                     entry.accept('entry is marked as approved')
                 elif not self._item_query(entry, task, session):
-                    log.verbose('creating new pending entry %s', entry)
+                    logger.verbose('creating new pending entry {}', entry)
                     session.add(db.PendingEntry(task_name=task.name, entry=entry))
                     entry.reject('new unapproved entry, caching and waiting for approval')
 
@@ -69,7 +69,7 @@ class PendingApproval:
                 if entry.get('approved'):
                     db_entry = self._item_query(entry, task, session)
                     if db_entry and db_entry.approved:
-                        log.debug('deleting approved entry %s', db_entry)
+                        logger.debug('deleting approved entry {}', db_entry)
                         session.delete(db_entry)
 
 

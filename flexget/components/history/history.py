@@ -1,11 +1,11 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
 from . import db
 
-log = logging.getLogger('history')
+logger = logger.bind(name='history')
 
 
 class PluginHistory:

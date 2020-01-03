@@ -1,11 +1,12 @@
-import logging
 from urllib.parse import urlparse
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 
-log = logging.getLogger('medusa')
+logger = logger.bind(name='medusa')
 
 
 class Medusa:
@@ -82,20 +83,20 @@ class Medusa:
 
         entries = []
         for show in series:
-            log.debug('processing show: %s', show)
+            logger.debug('processing show: {}', show)
             if (
                 (show['config']['paused'] and config.get('only_monitored'))
                 or show['status'] == 'Ended'
                 and not config.get('include_ended')
             ):
-                log.debug('discarted show: %s', show)
+                logger.debug('discarted show: {}', show)
 
             entry = Entry(title=show['title'], url='', series_name=show['title'])
 
             if entry.isvalid():
                 entries.append(entry)
             else:
-                log.error('Invalid entry created? {}'.format(entry))
+                logger.error('Invalid entry created? {}'.format(entry))
 
         return entries
 

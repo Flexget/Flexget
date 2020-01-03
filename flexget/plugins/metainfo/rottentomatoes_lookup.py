@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
@@ -10,7 +10,7 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='api_rottentomatoes')
 
-log = logging.getLogger('rottentomatoes_lookup')
+logger = logger.bind(name='rottentomatoes_lookup')
 
 
 def get_rt_url(movie):
@@ -76,7 +76,7 @@ class PluginRottenTomatoesLookup:
         try:
             self.lookup(entry, key=self.key)
         except plugin.PluginError as e:
-            log_once(e.value.capitalize(), logger=log)
+            log_once(e.value.capitalize(), logger=logger)
 
     def lookup(self, entry, search_allowed=True, key=None):
         """
@@ -95,7 +95,7 @@ class PluginRottenTomatoesLookup:
             only_cached=(not search_allowed),
             api_key=key,
         )
-        log.debug(u'Got movie: %s' % movie)
+        logger.debug('Got movie: {}', movie)
         entry.update_using_map(self.field_map, movie)
 
         if not entry.get('imdb_id', eval_lazy=False):

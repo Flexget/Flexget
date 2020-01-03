@@ -1,9 +1,9 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('extension')
+logger = logger.bind(name='extension')
 
 
 class ModifyExtension:
@@ -23,9 +23,9 @@ class ModifyExtension:
             ext = ext[1:]
 
         for entry in task.entries:
-            log.debug('`%s` filename is `%s`' % (entry['title'], entry.get('filename', 'N/A')))
+            logger.debug('`{}` filename is `{}`', entry['title'], entry.get('filename', 'N/A'))
             entry['filename'] = '%s.%s' % (entry.get('filename', entry['title']), ext)
-            log.debug('filename is now `%s`' % entry['filename'])
+            logger.debug('filename is now `{}`', entry['filename'])
 
 
 @event('plugin.register')

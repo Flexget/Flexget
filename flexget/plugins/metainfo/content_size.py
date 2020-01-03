@@ -1,13 +1,14 @@
-import logging
 import math
 import os.path
 import re
 from pathlib import Path
 
+from loguru import logger
+
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('metanfo_csize')
+logger = logger.bind(name='metanfo_csize')
 
 SIZE_RE = re.compile(r'Size[^\d]{0,7}(\d*\.?\d+).{0,5}(MB|GB)', re.IGNORECASE)
 
@@ -31,8 +32,9 @@ class MetainfoContentSize:
         for entry in task.entries:
             if entry.get('content_size'):
                 # Don't override if already set
-                log.trace(
-                    'skipping content size check because it is already set for %r' % entry['title']
+                logger.trace(
+                    'skipping content size check because it is already set for {!r}',
+                    entry['title'],
                 )
                 continue
             # Try to parse size from description
@@ -44,16 +46,15 @@ class MetainfoContentSize:
                 try:
                     amount = float(match.group(1).replace(',', '.'))
                 except Exception:
-                    log.error(
-                        'BUG: Unable to convert %s into float (%s)'
-                        % (match.group(1), entry['title'])
+                    logger.error(
+                        'BUG: Unable to convert {} into float ({})', match.group(1), entry['title']
                     )
                     continue
                 unit = match.group(2).lower()
                 count += 1
                 if unit == 'gb':
                     amount = math.ceil(amount * 1024)
-                log.trace('setting content size to %s' % amount)
+                logger.trace('setting content size to {}', amount)
                 entry['content_size'] = int(amount)
                 continue
             # If this entry has a local file, (it was added by filesystem plugin) grab the size.
@@ -68,7 +69,7 @@ class MetainfoContentSize:
                     if location.is_file():
                         amount = os.path.getsize(entry['location'])
                         amount = int(amount / (1024 * 1024))
-                        log.trace('setting content size to %s' % amount)
+                        logger.trace('setting content size to {}', amount)
                         entry['content_size'] = amount
                         continue
                 except OSError as e:
@@ -76,7 +77,7 @@ class MetainfoContentSize:
                     continue
 
         if count:
-            log.debug('Found content size information from %s entries' % count)
+            logger.debug('Found content size information from {} entries', count)
 
 
 @event('plugin.register')

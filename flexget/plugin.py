@@ -1,4 +1,3 @@
-import logging
 import os
 import re
 import time
@@ -9,6 +8,7 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 
 import pkg_resources
+from loguru import logger
 from requests import RequestException
 
 from flexget import components as components_pkg
@@ -17,7 +17,7 @@ from flexget import plugins as plugins_pkg
 from flexget.event import add_event_handler as add_phase_handler
 from flexget.event import fire_event, remove_event_handlers
 
-log = logging.getLogger('plugin')
+logger = logger.bind(name='plugin')
 
 PRIORITY_DEFAULT = 128
 PRIORITY_LAST = -255
@@ -75,10 +75,10 @@ class RegisterException(Exception):
 
 
 class PluginWarning(Warning):
-    def __init__(self, value, logger=log, **kwargs):
+    def __init__(self, value, logger=logger, **kwargs):
         super().__init__()
         self.value = value
-        self.log = logger
+        self.logger = logger
         self.kwargs = kwargs
 
     def __str__(self):
@@ -86,13 +86,13 @@ class PluginWarning(Warning):
 
 
 class PluginError(Exception):
-    def __init__(self, value, logger=log, **kwargs):
+    def __init__(self, value, logger=logger, **kwargs):
         super().__init__()
         # Value is expected to be a string
         if not isinstance(value, str):
             value = str(value)
         self.value = value
-        self.log = logger
+        self.logger = logger
         self.kwargs = kwargs
 
     def __str__(self):
@@ -109,38 +109,42 @@ class internet:
 
     def __init__(self, logger=None):
         if logger:
-            self.log = logger
+            self.logger = logger
         else:
-            self.log = logging.getLogger('@internet')
+            self.logger = logger.bind(name='@internet')
 
     def __call__(self, func):
         def wrapped_func(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
             except RequestException as e:
-                log.debug('decorator caught RequestException. handled traceback:', exc_info=True)
+                logger.opt(exception=True).debug(
+                    'decorator caught RequestException. handled traceback:'
+                )
                 raise PluginError('RequestException: %s' % e)
             except HTTPError as e:
-                raise PluginError('HTTPError %s' % e.code, self.log)
+                raise PluginError('HTTPError %s' % e.code, self.logger)
             except URLError as e:
-                log.debug('decorator caught urlerror. handled traceback:', exc_info=True)
-                raise PluginError('URLError %s' % e.reason, self.log)
+                logger.opt(exception=True).debug('decorator caught urlerror. handled traceback:')
+                raise PluginError('URLError %s' % e.reason, self.logger)
             except BadStatusLine:
-                log.debug('decorator caught badstatusline. handled traceback:', exc_info=True)
-                raise PluginError('Got BadStatusLine', self.log)
+                logger.opt(exception=True).debug(
+                    'decorator caught badstatusline. handled traceback:'
+                )
+                raise PluginError('Got BadStatusLine', self.logger)
             except ValueError as e:
-                log.debug('decorator caught ValueError. handled traceback:', exc_info=True)
+                logger.opt(exception=True).debug('decorator caught ValueError. handled traceback:')
                 raise PluginError(e)
             except IOError as e:
-                log.debug('decorator caught ioerror. handled traceback:', exc_info=True)
+                logger.opt(exception=True).debug('decorator caught ioerror. handled traceback:')
                 if hasattr(e, 'reason'):
-                    raise PluginError('Failed to reach server. Reason: %s' % e.reason, self.log)
+                    raise PluginError('Failed to reach server. Reason: %s' % e.reason, self.logger)
                 elif hasattr(e, 'code'):
                     raise PluginError(
                         'The server couldn\'t fulfill the request. Error code: %s' % e.code,
-                        self.log,
+                        self.logger,
                     )
-                raise PluginError('IOError when connecting to server: %s' % e, self.log)
+                raise PluginError('IOError when connecting to server: %s' % e, self.logger)
 
         return wrapped_func
 
@@ -289,9 +293,8 @@ class PluginInfo(dict):
 
         if self.name in plugins:
             PluginInfo.dupe_counter += 1
-            log.critical(
-                'Error while registering plugin %s. '
-                'A plugin with the same name is already registered',
+            logger.critical(
+                'Error while registering plugin {}. A plugin with the same name is already registered',
                 self.name,
             )
         else:
@@ -304,8 +307,8 @@ class PluginInfo(dict):
         # Create plugin instance
         self.instance = self.plugin_class()
         self.instance.plugin_info = self  # give plugin easy access to its own info
-        self.instance.log = logging.getLogger(
-            getattr(self.instance, "LOGGER_NAME", None) or self.name
+        self.instance.logger = logger.bind(
+            name=getattr(self.instance, "LOGGER_NAME", None) or self.name
         )
         if hasattr(self.instance, 'schema'):
             self.schema = self.instance.schema
@@ -410,9 +413,8 @@ def _get_standard_components_path():
 def _check_phase_queue():
     if _new_phase_queue:
         for phase, args in _new_phase_queue.items():
-            log.error(
-                'Plugin %s requested new phase %s, but it could not be created at requested '
-                'point (before, after). Plugin is not working properly.',
+            logger.error(
+                'Plugin {} requested new phase {}, but it could not be created at requested point (before, after). Plugin is not working properly.',
                 args[0],
                 phase,
             )
@@ -430,21 +432,23 @@ def _import_plugin(module_name, plugin_path):
                 e.missing or 'N/A',
             )
         if not e.silent:
-            log.warning(msg)
+            logger.warning(msg)
         else:
-            log.debug(msg)
+            logger.debug(msg)
     except ImportError:
-        log.critical('Plugin `%s` failed to import dependencies', module_name, exc_info=True)
+        logger.opt(exception=True).critical(
+            'Plugin `{}` failed to import dependencies', module_name
+        )
     except ValueError as e:
         # Debugging #2755
-        log.error(
-            'ValueError attempting to import `%s` (from %s): %s', module_name, plugin_path, e
+        logger.error(
+            'ValueError attempting to import `{}` (from {}): {}', module_name, plugin_path, e
         )
     except Exception:
-        log.critical('Exception while loading plugin %s', module_name, exc_info=True)
+        logger.opt(exception=True).critical('Exception while loading plugin {}', module_name)
         raise
     else:
-        log.trace('Loaded module %s from %s', module_name, plugin_path)
+        logger.trace('Loaded module {} from {}', module_name, plugin_path)
 
 
 def _load_plugins_from_dirs(dirs):
@@ -452,7 +456,7 @@ def _load_plugins_from_dirs(dirs):
     :param list dirs: Directories from where plugins are loaded from
     """
 
-    log.debug('Trying to load plugins from: %s', dirs)
+    logger.debug('Trying to load plugins from: {}', dirs)
     dirs = [Path(d) for d in dirs if os.path.isdir(d)]
     # add all dirs to plugins_pkg load path so that imports work properly from any of the plugin dirs
     plugins_pkg.__path__ = [str(d) for d in dirs]
@@ -476,7 +480,7 @@ def _load_components_from_dirs(dirs):
     """
     :param list dirs: Directories where plugin components are loaded from
     """
-    log.debug('Trying to load components from: %s', dirs)
+    logger.debug('Trying to load components from: {}', dirs)
     dirs = [Path(d) for d in dirs if os.path.isdir(d)]
     for component_dir in dirs:
         for component_path in component_dir.glob('**/*.py'):
@@ -508,21 +512,21 @@ def _load_plugins_from_packages():
                     e.missing or 'N/A',
                 )
             if not e.silent:
-                log.warning(msg)
+                logger.warning(msg)
             else:
-                log.debug(msg)
+                logger.debug(msg)
         except ImportError:
-            log.critical(
-                'Plugin `%s` failed to import dependencies', entrypoint.module_name, exc_info=True
+            logger.opt(exception=True).critical(
+                'Plugin `{}` failed to import dependencies', entrypoint.module_name
             )
         except Exception:
-            log.critical(
-                'Exception while loading plugin %s', entrypoint.module_name, exc_info=True
+            logger.opt(exception=True).critical(
+                'Exception while loading plugin {}', entrypoint.module_name
             )
             raise
         else:
-            log.trace(
-                'Loaded packaged module %s from %s', entrypoint.module_name, plugin_module.__file__
+            logger.trace(
+                'Loaded packaged module {} from {}', entrypoint.module_name, plugin_module.__file__
             )
     _check_phase_queue()
 
@@ -559,8 +563,8 @@ def load_plugins(extra_plugins=None, extra_components=None):
         plugin.initialize()
     took = time.time() - start_time
     plugins_loaded = True
-    log.debug(
-        'Plugins took %.2f seconds to load. %s plugins in registry.', took, len(plugins.keys())
+    logger.debug(
+        'Plugins took {:.2f} seconds to load. {} plugins in registry.', took, len(plugins.keys())
     )
 
 

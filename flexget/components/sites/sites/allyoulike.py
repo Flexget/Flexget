@@ -1,6 +1,6 @@
-import logging
 import re
 
+from loguru import logger
 from requests.exceptions import RequestException
 
 from flexget import plugin
@@ -18,7 +18,7 @@ except ImportError:
     )
 
 
-log = logging.getLogger('rlsbb')
+logger = logger.bind(name='rlsbb')
 
 
 class UrlRewriteAllyoulike:
@@ -73,7 +73,7 @@ class UrlRewriteAllyoulike:
         except Exception as e:
             raise UrlRewritingError(str(e))
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     # urlrewriter API
     def url_rewrite(self, task, entry):
         soup = self._get_soup(task, entry['url'])
@@ -100,7 +100,7 @@ class UrlRewriteAllyoulike:
             raise UrlRewritingError('No useable links found at %s' % entry['url'])
 
         num_links = len(urls)
-        log.verbose('Found %d links at %s.', num_links, entry['url'])
+        logger.verbose('Found {} links at {}.', num_links, entry['url'])
         if num_links:
             entry['urls'] = urls
             entry['url'] = urls[0]

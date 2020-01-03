@@ -1,6 +1,7 @@
-import logging
 import re
 from urllib.parse import quote
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.components.sites.urlrewriting import UrlRewritingError
@@ -11,7 +12,7 @@ from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
-log = logging.getLogger('1337x')
+logger = logger.bind(name='1337x')
 
 
 class Site1337x:
@@ -55,14 +56,14 @@ class Site1337x:
 
         url = entry['url']
 
-        log.info('1337x rewriting download url: %s' % url)
+        logger.info('1337x rewriting download url: {}', url)
 
         try:
             page = task.requests.get(url)
-            log.debug('requesting: %s', page.url)
+            logger.debug('requesting: {}', page.url)
         except RequestException as e:
-            log.error('1337x request failed: %s', e)
-            raise UrlRewritingError('1337x request failed: %s', e)
+            logger.error('1337x request failed: {}', e)
+            raise UrlRewritingError('1337x request failed: %s' % e)
 
         soup = get_soup(page.content)
 
@@ -73,7 +74,7 @@ class Site1337x:
         entry.setdefault('urls', []).append(torrent_url)
         entry['urls'].append(magnet_url)
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def search(self, task, entry, config):
         """
             Search for entries on 1337x
@@ -96,14 +97,14 @@ class Site1337x:
             query = '{0}search/{1}{2}/1/'.format(
                 sort_order, quote(search_string.encode('utf8')), order_by
             )
-            log.debug(
-                'Using search params: %s; ordering by: %s', search_string, order_by or 'default'
+            logger.debug(
+                'Using search params: {}; ordering by: {}', search_string, order_by or 'default'
             )
             try:
                 page = task.requests.get(self.base_url + query)
-                log.debug('requesting: %s', page.url)
+                logger.debug('requesting: {}', page.url)
             except RequestException as e:
-                log.error('1337x request failed: %s', e)
+                logger.error('1337x request failed: {}', e)
                 continue
 
             soup = get_soup(page.content)

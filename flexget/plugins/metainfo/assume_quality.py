@@ -1,11 +1,12 @@
-import logging
 from collections import namedtuple
+
+from loguru import logger
 
 import flexget.utils.qualities as qualities
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('assume_quality')
+logger = logger.bind(name='assume_quality')
 
 
 class AssumeQuality:
@@ -54,21 +55,21 @@ class AssumeQuality:
 
     def assume(self, entry, quality):
         newquality = qualities.Quality()
-        log.debug('Current qualities: %s', entry.get('quality'))
+        logger.debug('Current qualities: {}', entry.get('quality'))
         for component in entry.get('quality').components:
             qualitycomponent = getattr(quality, component.type)
-            log.debug('\t%s: %s vs %s', component.type, component.name, qualitycomponent.name)
+            logger.debug('\t{}: {} vs {}', component.type, component.name, qualitycomponent.name)
             if component.name != 'unknown':
-                log.debug('\t%s: keeping %s', component.type, component.name)
+                logger.debug('\t{}: keeping {}', component.type, component.name)
                 setattr(newquality, component.type, component)
             elif qualitycomponent.name != 'unknown':
-                log.debug('\t%s: assuming %s', component.type, qualitycomponent.name)
+                logger.debug('\t{}: assuming {}', component.type, qualitycomponent.name)
                 setattr(newquality, component.type, qualitycomponent)
                 entry['assumed_quality'] = True
             elif component.name == 'unknown' and qualitycomponent.name == 'unknown':
-                log.debug('\t%s: got nothing', component.type)
+                logger.debug('\t{}: got nothing', component.type)
         entry['quality'] = newquality
-        log.debug('Quality updated: %s', entry.get('quality'))
+        logger.debug('Quality updated: {}', entry.get('quality'))
 
     def on_task_start(self, task, config):
         if isinstance(config, str):
@@ -76,7 +77,7 @@ class AssumeQuality:
         assume = namedtuple('assume', ['target', 'quality'])
         self.assumptions = []
         for target, quality in list(config.items()):
-            log.verbose('New assumption: %s is %s' % (target, quality))
+            logger.verbose('New assumption: {} is {}', target, quality)
             try:
                 target = qualities.Requirements(target)
             except ValueError:
@@ -94,20 +95,20 @@ class AssumeQuality:
             key=lambda assumption: self.precision(assumption.target), reverse=True
         )
         for assumption in self.assumptions:
-            log.debug(
-                'Target %s - Priority %s' % (assumption.target, self.precision(assumption.target))
+            logger.debug(
+                'Target {} - Priority {}', assumption.target, self.precision(assumption.target)
             )
 
     @plugin.priority(100)  # run after other plugins which fill quality (series, quality)
     def on_task_metainfo(self, task, config):
         for entry in task.entries:
-            log.verbose('%s' % entry.get('title'))
+            logger.verbose(entry.get('title'))
             for assumption in self.assumptions:
-                log.debug('Trying %s - %s' % (assumption.target, assumption.quality))
+                logger.debug('Trying {} - {}', assumption.target, assumption.quality)
                 if assumption.target.allows(entry.get('quality')):
-                    log.debug('Match: %s' % assumption.target)
+                    logger.debug('Match: {}', assumption.target)
                     self.assume(entry, assumption.quality)
-            log.verbose('New quality: %s', entry.get('quality'))
+            logger.verbose('New quality: {}', entry.get('quality'))
 
 
 @event('plugin.register')

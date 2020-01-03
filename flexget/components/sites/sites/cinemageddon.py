@@ -1,10 +1,11 @@
-import logging
 from urllib.parse import quote
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('cinemageddon')
+logger = logger.bind(name='cinemageddon')
 
 
 class UrlRewriteCinemageddon:

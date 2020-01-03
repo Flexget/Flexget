@@ -1,7 +1,7 @@
-import logging
 from datetime import datetime, timedelta
 
 from dateutil.parser import parse as dateutil_parse
+from loguru import logger
 from sqlalchemy import (
     Boolean,
     Column,
@@ -25,7 +25,7 @@ from flexget.manager import Session
 from flexget.utils import requests
 from flexget.utils.database import json_synonym, with_session, year_property
 
-log = logging.getLogger('api_tmdb')
+logger = logger.bind(name='api_tmdb')
 Base = db_schema.versioned_base('api_tmdb', 6)
 
 # This is a FlexGet API key
@@ -61,11 +61,11 @@ def get_tmdb_config():
     """Loads TMDB config and caches it in DB and memory"""
     global _tmdb_config
     if _tmdb_config is None:
-        log.debug('no tmdb configuration in memory, checking cache')
+        logger.debug('no tmdb configuration in memory, checking cache')
         with Session() as session:
             config = session.query(TMDBConfig).first()
             if not config or config.expired:
-                log.debug('no config cached or config expired, refreshing')
+                logger.debug('no config cached or config expired, refreshing')
                 config = session.merge(TMDBConfig())
             _tmdb_config = config.configuration
     return _tmdb_config
@@ -163,7 +163,7 @@ class TMDBMovie(Base):
         self.updated = datetime.now()
 
     def get_images(self):
-        log.debug('images for movie %s not found in DB, fetching from TMDB', self.name)
+        logger.debug('images for movie {} not found in DB, fetching from TMDB', self.name)
         try:
             images = tmdb_request('movie/{}/images'.format(self.id))
         except requests.RequestException as e:
@@ -324,7 +324,7 @@ class ApiTmdb:
             title, year, tmdb_id, imdb_id
         )
 
-        log.debug('Looking up TMDb information for %s', id_str)
+        logger.debug('Looking up TMDb information for {}', id_str)
         movie = None
         if imdb_id or tmdb_id:
             ors = []
@@ -360,20 +360,24 @@ class ApiTmdb:
                     age_in_years = (datetime.now().date() - movie.released).days / 365
                     refresh_time += timedelta(days=age_in_years * 5)
             if movie.updated < datetime.now() - refresh_time and not only_cached:
-                log.debug('Cache has expired for %s, attempting to refresh from TMDb.', movie.name)
+                logger.debug(
+                    'Cache has expired for {}, attempting to refresh from TMDb.', movie.name
+                )
                 try:
                     updated_movie = TMDBMovie(id=movie.id, language=language)
                 except LookupError:
-                    log.error('Error refreshing movie details from TMDb, cached info being used.')
+                    logger.error(
+                        'Error refreshing movie details from TMDb, cached info being used.'
+                    )
                 else:
                     movie = session.merge(updated_movie)
             else:
-                log.debug('Movie %s information restored from cache.', movie.name)
+                logger.debug('Movie {} information restored from cache.', movie.name)
         else:
             if only_cached:
                 raise LookupError('Movie %s not found from cache' % id_str)
             # There was no movie found in the cache, do a lookup from tmdb
-            log.verbose('Searching from TMDb %s', id_str)
+            logger.verbose('Searching from TMDb {}', id_str)
             if imdb_id and not tmdb_id:
                 try:
                     result = tmdb_request('find/{}'.format(imdb_id), external_source='imdb_id')

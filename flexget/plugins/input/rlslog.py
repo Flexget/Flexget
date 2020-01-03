@@ -1,7 +1,7 @@
-import logging
 import re
 import time
 
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
@@ -18,7 +18,7 @@ except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='imdb')
 
 
-log = logging.getLogger('rlslog')
+logger = logger.bind(name='rlslog')
 
 
 class RlsLog:
@@ -43,15 +43,15 @@ class RlsLog:
             release = {}
             h3 = entry.find('h3', attrs={'class': 'entrytitle'})
             if not h3:
-                log.debug('FAIL: No h3 entrytitle')
+                logger.debug('FAIL: No h3 entrytitle')
                 continue
             release['title'] = h3.a.contents[0].strip()
             entrybody = entry.find('div', attrs={'class': 'entrybody'})
             if not entrybody:
-                log.debug('FAIL: No entrybody')
+                logger.debug('FAIL: No entrybody')
                 continue
 
-            log.trace('Processing title %s' % (release['title']))
+            logger.trace('Processing title {}', release['title'])
 
             # find imdb url
             link_imdb = entrybody.find('a', text=re.compile(r'imdb', re.IGNORECASE))
@@ -67,13 +67,13 @@ class RlsLog:
             else:
                 log_once(
                     '%s skipped due to missing or unsupported download link' % (release['title']),
-                    log,
+                    logger,
                 )
 
         return releases
 
     @cached('rlslog')
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def on_task_input(self, task, config):
         url = config
         if url.endswith('feed/'):
@@ -91,9 +91,10 @@ class RlsLog:
                 if number == 1:
                     raise
                 else:
-                    log.verbose(
-                        'Error receiving content, retrying in 5s. Try [%s of 2]. Error: %s'
-                        % (number + 1, e)
+                    logger.verbose(
+                        'Error receiving content, retrying in 5s. Try [{} of 2]. Error: {}',
+                        number + 1,
+                        e,
                     )
                     time.sleep(5)
 

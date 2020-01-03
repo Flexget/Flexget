@@ -1,10 +1,10 @@
-import logging
 import re
 import zlib
 from pathlib import Path
 from urllib import parse
 
 from jinja2 import Template
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -12,7 +12,7 @@ from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.utils.soup import get_soup
 
-log = logging.getLogger('html')
+logger = logger.bind(name='html')
 
 
 class InputHtml:
@@ -75,7 +75,7 @@ class InputHtml:
                 if len(auth) == 2:
                     config['username'], config['password'] = auth[0], auth[1]
                 else:
-                    log.warning('Invalid basic authentication in url: %s' % config['url'])
+                    logger.warning('Invalid basic authentication in url: {}', config['url'])
                 parts[1] = split[1]
                 config['url'] = parse.urlunsplit(parts)
 
@@ -85,15 +85,14 @@ class InputHtml:
         return config
 
     @cached('html')
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def on_task_input(self, task, config):
         config = self.build_config(config)
 
         auth = None
         if config.get('username') and config.get('password'):
-            log.debug(
-                'Basic auth enabled. User: %s Password: %s'
-                % (config['username'], config['password'])
+            logger.debug(
+                'Basic auth enabled. User: {} Password: {}', config['username'], config['password']
             )
             auth = (config['username'], config['password'])
 
@@ -139,14 +138,14 @@ class InputHtml:
             return self._request_url(task, config, base_url, auth, dump_name=config.get('dump'))
 
     def _request_url(self, task, config, url, auth, dump_name=None):
-        log.verbose('Requesting: %s' % url)
+        logger.verbose('Requesting: {}', url)
         page = task.requests.get(url, auth=auth)
-        log.verbose('Response: %s (%s)' % (page.status_code, page.reason))
+        logger.verbose('Response: {} ({})', page.status_code, page.reason)
         soup = get_soup(page.content)
 
         # dump received content into a file
         if dump_name:
-            log.verbose('Dumping: %s' % dump_name)
+            logger.verbose('Dumping: {}', dump_name)
             data = soup.prettify()
             with open(dump_name, 'w', encoding='utf-8') as f:
                 f.write(data)
@@ -159,7 +158,7 @@ class InputHtml:
         if not title:
             title = link.next.string
             if title is None:
-                log.debug('longshot failed for %s' % log_link)
+                logger.debug('longshot failed for {}', log_link)
                 return None
         return title or None
 
@@ -214,19 +213,19 @@ class InputHtml:
                     if re.search(regexp, url):
                         accept = True
                 if not accept:
-                    log.debug('url does not match any "links_re": %s' % url)
+                    logger.debug('url does not match any "links_re": {}', url)
                     continue
 
             title_from = config.get('title_from', 'auto')
             if title_from == 'url':
                 title = self._title_from_url(url)
-                log.debug('title from url: %s' % title)
+                logger.debug('title from url: {}', title)
             elif title_from == 'title':
                 if not link.has_attr('title'):
-                    log.warning('Link `%s` doesn\'t have title attribute, ignored.' % log_link)
+                    logger.warning("Link `{}` doesn't have title attribute, ignored.", log_link)
                     continue
                 title = link['title']
-                log.debug('title from title: %s' % title)
+                logger.debug('title from title: {}', title)
             elif title_from == 'auto':
                 title = self._title_from_link(link, log_link)
                 if title is None:
@@ -236,7 +235,7 @@ class InputHtml:
                 if title_exists(title):
                     # ignore index links as a counter
                     if 'index' in title and len(title) < 10:
-                        log.debug('ignored index title %s' % title)
+                        logger.debug('ignored index title {}', title)
                         continue
                     duplicates.setdefault(title, 0)
                     duplicates[title] += 1
@@ -247,10 +246,9 @@ class InputHtml:
                         for ext in ('.html', '.php'):
                             if from_url.endswith(ext):
                                 switch_to = 'title'
-                        log.info(
-                            'Link names seem to be useless, auto-configuring \'title_from: %s\'. '
-                            'This may not work well, you might need to configure it yourself.'
-                            % switch_to
+                        logger.info(
+                            "Link names seem to be useless, auto-configuring 'title_from: {}'. This may not work well, you might need to configure it yourself.",
+                            switch_to,
                         )
                         config['title_from'] = switch_to
                         # start from the beginning  ...
@@ -260,12 +258,12 @@ class InputHtml:
                 title = self._title_from_link(link, log_link)
                 if title is None:
                     continue
-                log.debug('title from link: %s' % title)
+                logger.debug('title from link: {}', title)
             else:
                 raise plugin.PluginError('Unknown title_from value %s' % title_from)
 
             if not title:
-                log.warning('title could not be determined for link %s' % log_link)
+                logger.warning('title could not be determined for link {}', log_link)
                 continue
 
             # strip unicode white spaces
@@ -284,7 +282,7 @@ class InputHtml:
                 # truly duplicate, title + url crc already exists in queue
                 if title_exists(title):
                     continue
-                log.debug('uniqued title to %s' % title)
+                logger.debug('uniqued title to {}', title)
 
             entry = Entry()
             entry['url'] = url

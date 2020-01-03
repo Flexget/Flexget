@@ -1,6 +1,7 @@
-import logging
 import re
 from urllib.parse import quote_plus
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.components.sites.utils import normalize_unicode
@@ -10,7 +11,7 @@ from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
-log = logging.getLogger('search_cpasbien')
+logger = logger.bind(name='search_cpasbien')
 
 session = requests.Session()
 
@@ -41,7 +42,7 @@ class SearchCPASBIEN:
         'additionalProperties': False,
     }
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def search(self, task, entry, config):
         """CPASBIEN search plugin
 
@@ -91,18 +92,18 @@ class SearchCPASBIEN:
                 category_url_fragment = '%s' % config['category']
                 str_url = (base_url, 'recherche', category_url_fragment, query_url_fragment)
                 url = '/'.join(str_url)
-            log.debug('search url: %s' % url + '.html')
+            logger.debug('search url: {}', url + '.html')
             # GET URL
             f = task.requests.get(url + '.html').content
             soup = get_soup(f)
             if soup.findAll(text=re.compile(' 0 torrents')):
-                log.debug('search returned no results')
+                logger.debug('search returned no results')
             else:
                 nextpage = 0
                 while nextpage >= 0:
                     if nextpage > 0:
                         newurl = url + '/page-' + str(nextpage)
-                        log.debug('-----> NEXT PAGE : %s' % newurl)
+                        logger.debug('-----> NEXT PAGE : {}', newurl)
                         f1 = task.requests.get(newurl).content
                         soup = get_soup(f1)
                     for result in soup.findAll('div', attrs={'class': re.compile('ligne')}):
@@ -117,7 +118,7 @@ class SearchCPASBIEN:
                         str_url = (base_url, '/telechargement/', endlink[:-5], '.torrent')
                         entry['url'] = ''.join(str_url)
 
-                        log.debug('Title: %s | DL LINK: %s' % (entry['title'], entry['url']))
+                        logger.debug('Title: {} | DL LINK: {}', entry['title'], entry['url'])
 
                         entry['torrent_seeds'] = int(
                             result.find('span', attrs={'class': re.compile('seed')}).text
@@ -132,7 +133,7 @@ class SearchCPASBIEN:
                         if entry['torrent_seeds'] > 0:
                             entries.add(entry)
                         else:
-                            log.debug('0 SEED, not adding entry')
+                            logger.debug('0 SEED, not adding entry')
                     if soup.find(text=re.compile('Suiv')):
                         nextpage += 1
                     else:

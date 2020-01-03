@@ -1,12 +1,13 @@
-import logging
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.components.sites.urlrewriting import UrlRewritingError
 from flexget.event import event
 from flexget.utils.soup import get_soup
 
-log = logging.getLogger('FTDB')
+logger = logger.bind(name='FTDB')
 
 
 class UrlRewriteFTDB:
@@ -24,8 +25,8 @@ class UrlRewriteFTDB:
         page_url = page_url.replace('&rss=1', '')
 
         new_url = self.parse_download_page(page_url, task.requests)
-        log.debug('PAGE URL NEEDED : %s' % page_url)
-        log.debug('%s OLD is rewrited to NEW %s' % (old_url, new_url))
+        logger.debug('PAGE URL NEEDED : {}', page_url)
+        logger.debug('{} OLD is rewrited to NEW {}', old_url, new_url)
         entry['url'] = new_url
 
     def parse_download_page(self, page_url, requests):
@@ -49,7 +50,7 @@ class UrlRewriteFTDB:
                                         get the torrent'
                 )
         torrent_url = "http://www.frenchtorrentdb.com" + tag_a.get('href') + "&js=1"
-        log.debug('TORRENT URL is : %s' % torrent_url)
+        logger.debug('TORRENT URL is : {}', torrent_url)
         return torrent_url
 
 

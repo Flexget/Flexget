@@ -1,6 +1,6 @@
-import logging
 import re
 
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
@@ -9,7 +9,7 @@ from flexget.event import event
 
 from . import db
 
-log = logging.getLogger('next_trakt_episodes')
+logger = logger.bind(name='next_trakt_episodes')
 
 
 class NextTraktEpisodes:
@@ -66,13 +66,13 @@ class NextTraktEpisodes:
         except RequestException as e:
             raise plugin.PluginError('Unable to get trakt list `%s`: %s' % (config['list'], e))
         if not data:
-            log.warning('The list "%s" is empty.', config['list'])
+            logger.warning('The list "{}" is empty.', config['list'])
             return
         for item in data:
             if item.get('show'):
                 if not item['show']['title']:
                     # Seems we can get entries with a blank show title sometimes
-                    log.warning('Found trakt list show without series name.')
+                    logger.warning('Found trakt list show without series name.')
                     continue
                 ids = item['show']['ids']
                 trakt_id = ids['trakt']
@@ -98,7 +98,7 @@ class NextTraktEpisodes:
             try:
                 response = session.get(url)
                 if response.status_code == 204:
-                    log.debug('No %s episode for %s', config['position'], fields['series_name'])
+                    logger.debug('No {} episode for {}', config['position'], fields['series_name'])
                     continue
                 data = response.json()
             except RequestException as e:

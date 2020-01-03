@@ -1,5 +1,4 @@
 import getpass
-import logging
 import smtplib
 import socket
 from email.mime.multipart import MIMEMultipart
@@ -7,13 +6,15 @@ from email.mime.text import MIMEText
 from email.utils import formatdate
 from smtplib import SMTPAuthenticationError, SMTPSenderRefused, SMTPServerDisconnected
 
+from loguru import logger
+
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import PluginWarning
 
 plugin_name = 'email'
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 
 class EmailNotifier:
@@ -107,7 +108,7 @@ class EmailNotifier:
         self.username = config.get('smtp_username')
         self.password = config.get('smtp_password')
         try:
-            log.debug('connecting to smtp server %s:%s', self.host, self.port)
+            logger.debug('connecting to smtp server {}:{}', self.host, self.port)
             self.mail_server = smtplib.SMTP_SSL if self.ssl else smtplib.SMTP
             self.mail_server = self.mail_server(self.host, self.port)
             if self.tls:
@@ -120,7 +121,7 @@ class EmailNotifier:
         try:
             if self.username:
                 # Forcing to use `str` type
-                log.debug('logging in to smtp server using username: %s', self.username)
+                logger.debug('logging in to smtp server using username: {}', self.username)
                 self.mail_server.login(self.username, self.password)
         except (IOError, SMTPAuthenticationError) as e:
             raise PluginWarning(str(e))

@@ -1,9 +1,9 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('disable_phases')
+logger = logger.bind(name='disable_phases')
 
 
 class PluginDisablePhases:

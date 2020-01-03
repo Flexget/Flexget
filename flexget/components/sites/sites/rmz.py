@@ -1,6 +1,6 @@
-import logging
 import re
 
+from loguru import logger
 from requests.exceptions import RequestException
 
 from flexget import plugin
@@ -9,7 +9,7 @@ from flexget.components.sites.utils import normalize_unicode
 from flexget.event import event
 from flexget.utils.soup import get_soup
 
-log = logging.getLogger('rmz')
+logger = logger.bind(name='rmz')
 
 
 class UrlRewriteRmz:
@@ -57,7 +57,7 @@ class UrlRewriteRmz:
         rewritable_regex = r'^https?:\/\/(www.)?(rmz\.cr|rapidmoviez\.(com|eu))\/.*'
         return re.match(rewritable_regex, url) is not None
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     # urlrewriter API
     def url_rewrite(self, task, entry):
         try:
@@ -82,22 +82,22 @@ class UrlRewriteRmz:
             for regexp in regexps:
                 if re.search(regexp, urls[i]):
                     filtered_urls.append(urls[i])
-                    log.debug('Url: "%s" matched filehoster filter: %s', urls[i], regexp)
+                    logger.debug('Url: "{}" matched filehoster filter: {}', urls[i], regexp)
                     break
             else:
                 if regexps:
-                    log.debug(
-                        'Url: "%s" does not match any of the given filehoster filters: %s',
+                    logger.debug(
+                        'Url: "{}" does not match any of the given filehoster filters: {}',
                         urls[i],
                         str(regexps),
                     )
         if regexps:
-            log.debug('Using filehosters_re filters: %s', str(regexps))
+            logger.debug('Using filehosters_re filters: {}', str(regexps))
             urls = filtered_urls
         else:
-            log.debug('No filehoster filters configured, using all found links.')
+            logger.debug('No filehoster filters configured, using all found links.')
         num_links = len(urls)
-        log.verbose('Found %d links at %s.', num_links, entry['url'])
+        logger.verbose('Found {} links at {}.', num_links, entry['url'])
         if num_links:
             entry['urls'] = urls
             entry['url'] = urls[0]

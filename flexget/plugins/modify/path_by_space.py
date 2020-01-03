@@ -1,13 +1,14 @@
-import logging
 import os
 import random
 from collections import namedtuple
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more, parse_percent, parse_size
 from flexget.event import event
 
-log = logging.getLogger('path_by_space')
+logger = logger.bind(name='path_by_space')
 
 disk_stats_tuple = namedtuple(
     'disk_stats',
@@ -135,7 +136,7 @@ class PluginPathBySpace:
         path = selector(config['paths'], within=within)
 
         if path:
-            log.debug('Path %s selected due to (%s)' % (path, config['select']))
+            logger.debug('Path {} selected due to ({})', path, config['select'])
 
             for entry in task.all_entries:
                 entry[config['to_field']] = path

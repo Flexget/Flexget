@@ -1,7 +1,7 @@
-import logging
 import xml.etree.ElementTree as ET
 
 import requests
+from loguru import logger
 from requests.exceptions import RequestException
 
 from flexget import plugin
@@ -10,7 +10,7 @@ from flexget.event import event
 from flexget.plugin import PluginWarning
 
 plugin_name = 'notifymyandroid'
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 NOTIFYMYANDROID_URL = 'https://www.notifymyandroid.com/publicapi/notify'
 
@@ -79,9 +79,9 @@ class NotifyMyAndroidNotifier:
             raise PluginWarning(error.text)
         else:
             success = request_status.find('success').attrib
-            log.debug(
-                'notifymyandroid notification sent. Notifications remaining until next reset: %s. '
-                'Next reset will occur in %s minutes',
+            logger.debug(
+                'notifymyandroid notification sent. Notifications remaining until next reset: {}. '
+                'Next reset will occur in {} minutes',
                 success['remaining'],
                 success['resettimer'],
             )

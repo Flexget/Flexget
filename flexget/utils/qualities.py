@@ -1,9 +1,10 @@
 import copy
 import functools
-import logging
 import re
 
-log = logging.getLogger('utils.qualities')
+from loguru import logger
+
+logger = logger.bind(name='utils.qualities')
 
 
 @functools.total_ordering

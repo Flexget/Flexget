@@ -1,9 +1,9 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('entry_trace')
+logger = logger.bind(name='entry_trace')
 
 
 def on_entry_action(entry, act=None, task=None, reason=None, **kwargs):

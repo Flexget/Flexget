@@ -1,5 +1,6 @@
-import logging
 from functools import partial
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
@@ -13,7 +14,7 @@ except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='imdb')
 
 
-log = logging.getLogger('tmdb_lookup')
+logger = logger.bind(name='tmdb_lookup')
 
 
 class PluginTmdbLookup:
@@ -36,7 +37,9 @@ class PluginTmdbLookup:
         'tmdb_votes': 'votes',
         # Just grab the top 5 posters
         'tmdb_posters': lambda movie: [poster.url('original') for poster in movie.posters[:5]],
-        'tmdb_backdrops': lambda movie: [poster.url('original') for poster in movie.backdrops[:5]],
+        'tmdb_backdrops': lambda movie: [
+            backdrop.url('original') for backdrop in movie.backdrops[:5]
+        ],
         'tmdb_runtime': 'runtime',
         'tmdb_tagline': 'tagline',
         'tmdb_budget': 'budget',
@@ -72,7 +75,7 @@ class PluginTmdbLookup:
                 )
                 entry.update_using_map(self.field_map, movie)
         except LookupError:
-            log_once('TMDB lookup failed for %s' % entry['title'], log, logging.WARN)
+            log_once('TMDB lookup failed for %s' % entry['title'], logger, 'WARNING')
 
     def lookup(self, entry, language):
         """

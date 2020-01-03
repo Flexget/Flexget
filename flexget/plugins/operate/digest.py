@@ -1,7 +1,7 @@
-import logging
 import pickle
 from datetime import datetime
 
+from loguru import logger
 from sqlalchemy import Column, DateTime, Integer, Unicode, select
 
 from flexget import db_schema, plugin
@@ -14,7 +14,7 @@ from flexget.utils.database import entry_synonym
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 from flexget.utils.tools import parse_timedelta
 
-log = logging.getLogger('digest')
+logger = logger.bind(name='digest')
 Base = versioned_base('digest', 1)
 
 
@@ -36,7 +36,7 @@ def upgrade(ver, session):
                     .values(json=json.dumps(p, encode_datetime=True))
                 )
             except KeyError as e:
-                log.error('Unable error upgrading backlog pickle object due to %s' % str(e))
+                logger.error('Unable error upgrading backlog pickle object due to {}', str(e))
 
         ver = 1
     return ver

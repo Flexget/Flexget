@@ -1,5 +1,6 @@
-import logging
 from datetime import datetime, timedelta
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
@@ -11,7 +12,7 @@ from . import db
 SCHEMA_VER = 3
 FAIL_LIMIT = 100
 
-log = logging.getLogger('failed')
+logger = logger.bind(name='failed')
 
 
 class PluginFailed:
@@ -95,8 +96,8 @@ class PluginFailed:
                 item = db.FailedEntry(entry['title'], entry['original_url'], reason)
                 item.count = 0
             if item.count > FAIL_LIMIT:
-                log.error(
-                    'entry with title \'%s\' has failed over %s times', entry['title'], FAIL_LIMIT
+                logger.error(
+                    "entry with title '{}' has failed over {} times", entry['title'], FAIL_LIMIT
                 )
                 return
             retry_time = self.retry_time(item.count, config)
@@ -105,7 +106,7 @@ class PluginFailed:
             item.tof = datetime.now()
             item.reason = reason
             session.merge(item)
-            log.debug('Marking %s in failed list. Has failed %s times.', item.title, item.count)
+            logger.debug('Marking {} in failed list. Has failed {} times.', item.title, item.count)
             if item.count <= config['max_retries']:
                 plugin.get('backlog', self).add_backlog(
                     entry.task, entry, amount=retry_time, session=session

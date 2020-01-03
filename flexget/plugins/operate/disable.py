@@ -1,10 +1,10 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 
-log = logging.getLogger('disable')
+logger = logger.bind(name='disable')
 
 
 def all_builtins():
@@ -64,9 +64,9 @@ class DisablePlugin:
                 self.disabled_builtins.append(p.name)
 
         if self.disabled_builtins:
-            log.debug('Disabled built-in plugin(s): %s' % ', '.join(self.disabled_builtins))
+            logger.debug('Disabled built-in plugin(s): {}', ', '.join(self.disabled_builtins))
         if disabled:
-            log.debug('Disabled plugin(s): %s' % ', '.join(disabled))
+            logger.debug('Disabled plugin(s): {}', ', '.join(disabled))
 
     @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_exit(self, task, config):
@@ -75,7 +75,7 @@ class DisablePlugin:
 
         for name in self.disabled_builtins:
             plugin.plugins[name].builtin = True
-        log.debug('Re-enabled builtin plugin(s): %s' % ', '.join(self.disabled_builtins))
+        logger.debug('Re-enabled builtin plugin(s): {}', ', '.join(self.disabled_builtins))
         self.disabled_builtins = []
 
     on_task_abort = on_task_exit

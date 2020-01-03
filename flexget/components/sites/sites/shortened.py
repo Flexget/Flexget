@@ -1,10 +1,11 @@
-import logging
 from urllib.parse import urlparse
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('shortened')
+logger = logger.bind(name='shortened')
 
 
 class UrlRewriteShortened:

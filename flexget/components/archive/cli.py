@@ -1,7 +1,8 @@
-import logging
 import re
 from collections import defaultdict
 from datetime import datetime
+
+from loguru import logger
 
 import flexget.components.archive.db
 from flexget import options
@@ -12,7 +13,7 @@ from flexget.options import ParseExtrasAction, get_parser
 from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
 from flexget.utils.tools import strip_html
 
-log = logging.getLogger('archive_cli')
+logger = logger.bind(name='archive_cli')
 
 
 def do_cli(manager, options):
@@ -35,9 +36,9 @@ def consolidate():
 
     session = Session()
     try:
-        log.verbose('Checking archive size ...')
+        logger.verbose('Checking archive size ...')
         count = session.query(flexget.components.archive.db.ArchiveEntry).count()
-        log.verbose('Found %i items to migrate, this can be aborted with CTRL-C safely.' % count)
+        logger.verbose('Found {} items to migrate, this can be aborted with CTRL-C safely.', count)
 
         # consolidate old data
         from progressbar import ProgressBar, Percentage, Bar, ETA
@@ -59,9 +60,9 @@ def consolidate():
 
             # item already migrated
             if orig.sources:
-                log.info(
-                    'Database looks like it has already been consolidated, '
-                    'item %s has already sources ...' % orig.title
+                logger.info(
+                    'Database looks like it has already been consolidated, item {} has already sources ...',
+                    orig.title,
                 )
                 session.rollback()
                 return
@@ -82,16 +83,16 @@ def consolidate():
                 duplicates.append(dupe.id)
 
         if duplicates:
-            log.info('Consolidated %i items, removing duplicates ...' % len(duplicates))
+            logger.info('Consolidated {} items, removing duplicates ...', len(duplicates))
             for id in duplicates:
                 session.query(flexget.components.archive.db.ArchiveEntry).filter(
                     flexget.components.archive.db.ArchiveEntry.id == id
                 ).delete()
         session.commit()
-        log.info('Completed! This does NOT need to be ran again.')
+        logger.info('Completed! This does NOT need to be ran again.')
     except KeyboardInterrupt:
         session.rollback()
-        log.critical('Aborted, no changes saved')
+        logger.critical('Aborted, no changes saved')
     finally:
         session.close()
 
@@ -116,7 +117,7 @@ def tag_source(source_name, tag_names=None):
             .first()
         )
         if not source:
-            log.critical('Source `%s` does not exists' % source_name)
+            logger.critical('Source `{}` does not exists', source_name)
             srcs = ', '.join(
                 [
                     s.name
@@ -126,7 +127,7 @@ def tag_source(source_name, tag_names=None):
                 ]
             )
             if srcs:
-                log.info('Known sources: %s' % srcs)
+                logger.info('Known sources: {}', srcs)
             return
 
         # construct tags list
@@ -135,7 +136,7 @@ def tag_source(source_name, tag_names=None):
             tags.append(flexget.components.archive.db.get_tag(tag_name, session))
 
         # tag 'em
-        log.verbose('Please wait while adding tags %s ...' % (', '.join(tag_names)))
+        logger.verbose('Please wait while adding tags {} ...', ', '.join(tag_names))
         for a in (
             session.query(flexget.components.archive.db.ArchiveEntry)
             .filter(flexget.components.archive.db.ArchiveEntry.sources.any(name=source_name))
@@ -151,7 +152,7 @@ def cli_search(options):
     search_term = ' '.join(options.keywords)
     tags = options.tags
     sources = options.sources
-    query = re.sub(r'[ \(\)]+', ' ', search_term).strip()
+    query = re.sub(r'[ \(\)\:]+', ' ', search_term).strip()
 
     table_data = []
     with Session() as session:
@@ -184,7 +185,7 @@ def cli_search(options):
 
 
 def cli_inject(manager, options):
-    log.debug('Finding inject content')
+    logger.debug('Finding inject content')
     inject_entries = defaultdict(list)
     with Session() as session:
         for id in options.ids:
@@ -192,14 +193,15 @@ def cli_inject(manager, options):
 
             # not found
             if not archive_entry:
-                log.critical('There\'s no archived item with ID `%s`' % id)
+                logger.critical("There's no archived item with ID `{}`", id)
                 continue
 
             # find if there is no longer any task within sources
             if not any(source.name in manager.tasks for source in archive_entry.sources):
-                log.error(
-                    'None of sources (%s) exists anymore, cannot inject `%s` from archive!'
-                    % (', '.join([s.name for s in archive_entry.sources]), archive_entry.title)
+                logger.error(
+                    'None of sources ({}) exists anymore, cannot inject `{}` from archive!',
+                    ', '.join([s.name for s in archive_entry.sources]),
+                    archive_entry.title,
                 )
                 continue
 
@@ -207,7 +209,7 @@ def cli_inject(manager, options):
             if archive_entry.description:
                 inject_entry['description'] = archive_entry.description
             if options.immortal:
-                log.debug('Injecting as immortal')
+                logger.debug('Injecting as immortal')
                 inject_entry['immortal'] = True
             inject_entry['accepted_by'] = 'archive inject'
             inject_entry.accept('injected')
@@ -218,7 +220,7 @@ def cli_inject(manager, options):
 
     for task_name in inject_entries:
         for inject_entry in inject_entries[task_name]:
-            log.info('Injecting from archive `%s` into `%s`' % (inject_entry['title'], task_name))
+            logger.info('Injecting from archive `{}` into `{}`', inject_entry['title'], task_name)
 
     for index, task_name in enumerate(inject_entries):
         options.inject = inject_entries[task_name]

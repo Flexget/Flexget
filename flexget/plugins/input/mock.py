@@ -1,11 +1,11 @@
 """Plugin for mocking task data."""
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 
-log = logging.getLogger('mock')
+logger = logger.bind(name='mock')
 
 
 class Mock:

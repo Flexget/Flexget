@@ -9,6 +9,8 @@ class SearchPlugin:
     Fake search plugin. Result differs depending on config value:
       `'fail'`: raises a PluginError
       `False`: Returns an empty list
+      list of suffixes:
+        Returns a list of entries with the same title searched for, but with each of the suffixes appended
       otherwise: Just passes back the entry that was searched for
     """
 
@@ -19,6 +21,9 @@ class SearchPlugin:
             return []
         elif config == 'fail':
             raise plugin.PluginError('search plugin failure')
+        elif isinstance(config, list):
+            l = [{**entry, 'title': entry['title'] + suffix} for suffix in config]
+            return [Entry(e) for e in l]
         return [Entry(entry)]
 
 
@@ -81,6 +86,19 @@ class TestDiscover:
                 identified_by: ep
             mock_output: yes
             max_reruns: 3
+          test_next_series_episodes_with_multiple_results:
+            discover:
+              release_estimations: ignore
+              what:
+              - next_series_episodes:
+                  from_start: yes
+              from:
+              - test_search: [' a', ' b', ' c']
+            series:
+            - My Show:
+                identified_by: ep
+            mock_output: yes
+            max_reruns: 3
 
     """
 
@@ -124,6 +142,13 @@ class TestDiscover:
         assert len(task.mock_output) == 4, '4 episodes should have been accepted, not %s' % len(
             task.mock_output
         )
+
+    def test_next_series_episodes_multiple_results(self, execute_task):
+        # Makes sure the next episode is being searched for on reruns, even when there are multiple search
+        # results per episode.
+        task = execute_task('test_next_series_episodes_with_multiple_results')
+        assert len(task.mock_output) == 4, 'Should have kept rerunning and accepted 4 episodes'
+        assert task.find_entry(title='My Show S01E04 a')
 
 
 class TestEmitSeriesInDiscover:

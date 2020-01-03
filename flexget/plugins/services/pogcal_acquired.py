@@ -1,7 +1,7 @@
-import logging
 import re
 from datetime import datetime
 
+from loguru import logger
 from sqlalchemy import Column, Integer, Unicode
 
 from flexget import plugin
@@ -11,7 +11,7 @@ from flexget.utils import requests
 from flexget.utils.parsers.generic import name_to_re
 from flexget.utils.soup import get_soup
 
-log = logging.getLogger('pogcal_acquired')
+logger = logger.bind(name='pogcal_acquired')
 Base = versioned_base('pogcal_acquired', 0)
 session = requests.Session(max_retries=3)
 
@@ -44,30 +44,32 @@ class PogcalAcquired:
                 },
             )
         except requests.RequestException as e:
-            log.error('Error logging in to pog calendar: %s' % e)
+            logger.error('Error logging in to pog calendar: {}', e)
             return
         if 'logout' not in result.text:
-            log.error('Username/password for pogdesign calendar appear to be incorrect.')
+            logger.error('Username/password for pogdesign calendar appear to be incorrect.')
             return
         elif task.options.test:
-            log.verbose('Successfully logged in to pogdesign calendar.')
+            logger.verbose('Successfully logged in to pogdesign calendar.')
         for entry in task.accepted:
             if not entry.get('series_name') or not entry.get('series_id_type') == 'ep':
                 continue
             show_id = self.find_show_id(entry['series_name'], task.session)
             if not show_id:
-                log.debug('Could not find pogdesign calendar id for `%s`' % entry['series_name'])
+                logger.debug('Could not find pogdesign calendar id for `{}`', entry['series_name'])
                 continue
             if task.options.test:
-                log.verbose(
-                    'Would mark %s %s in pogdesign calenadar.'
-                    % (entry['series_name'], entry['series_id'])
+                logger.verbose(
+                    'Would mark {} {} in pogdesign calenadar.',
+                    entry['series_name'],
+                    entry['series_id'],
                 )
                 continue
             else:
-                log.verbose(
-                    'Marking %s %s in pogdesign calenadar.'
-                    % (entry['series_name'], entry['series_id'])
+                logger.verbose(
+                    'Marking {} {} in pogdesign calenadar.',
+                    entry['series_name'],
+                    entry['series_id'],
                 )
             shid = '%s-%s-%s/%s-%s' % (
                 show_id,
@@ -82,9 +84,11 @@ class PogcalAcquired:
                     data={'watched': 'adding', 'shid': shid},
                 )
             except requests.RequestException as e:
-                log.error(
-                    'Error marking %s %s in pogdesign calendar: %s'
-                    % (entry['series_name'], entry['series_id'], e)
+                logger.error(
+                    'Error marking {} {} in pogdesign calendar: {}',
+                    entry['series_name'],
+                    entry['series_id'],
+                    e,
                 )
 
     def find_show_id(self, show_name, db_sess):
@@ -96,7 +100,7 @@ class PogcalAcquired:
         try:
             page = session.get('http://www.pogdesign.co.uk/cat/showselect.php')
         except requests.RequestException as e:
-            log.error('Error looking up show show list from pogdesign calendar: %s' % e)
+            logger.error('Error looking up show show list from pogdesign calendar: {}', e)
             return
         # Try to find the show id from pogdesign show list
         show_re = name_to_re(show_name)
@@ -108,7 +112,7 @@ class PogcalAcquired:
             db_sess.add(PogcalShow(id=id, name=show_name))
             return id
         else:
-            log.verbose('Could not find pogdesign calendar id for show `%s`' % show_re)
+            logger.verbose('Could not find pogdesign calendar id for show `{}`', show_re)
 
 
 @event('plugin.register')

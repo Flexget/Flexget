@@ -1,15 +1,16 @@
 import argparse
-import logging
 import os
 import socket
 import sys
+
+from loguru import logger
 
 import flexget
 from flexget import options
 from flexget.event import event
 from flexget.terminal import console
 
-log = logging.getLogger('win32_service')
+logger = logger.bind(name='win32_service')
 
 try:
     import servicemanager

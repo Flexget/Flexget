@@ -1,7 +1,7 @@
-import logging
 import pickle
 from datetime import datetime
 
+from loguru import logger
 from sqlalchemy import Column, DateTime, Index, Integer, String, Unicode, select
 
 from flexget import db_schema
@@ -9,7 +9,7 @@ from flexget.utils import json
 from flexget.utils.database import entry_synonym, with_session
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
-log = logging.getLogger('backlog.db')
+logger = logger.bind(name='backlog.db')
 Base = db_schema.versioned_base('backlog', 2)
 
 
@@ -40,12 +40,12 @@ def upgrade(ver, session):
                 pickle.loads(item.entry)
         except (ImportError, TypeError):
             # If there were problems, we can drop the data.
-            log.info('Backlog table contains unloadable data, clearing old data.')
+            logger.info('Backlog table contains unloadable data, clearing old data.')
             session.execute(backlog_table.delete())
         ver = 0
     if ver == 0:
         backlog_table = table_schema('backlog', session)
-        log.info('Creating index on backlog table.')
+        logger.info('Creating index on backlog table.')
         Index('ix_backlog_feed_expire', backlog_table.c.feed, backlog_table.c.expire).create(
             bind=session.bind
         )
@@ -64,7 +64,7 @@ def upgrade(ver, session):
                     .values(json=json.dumps(p, encode_datetime=True))
                 )
             except KeyError as e:
-                log.error('Unable error upgrading backlog pickle object due to %s' % str(e))
+                logger.error('Unable error upgrading backlog pickle object due to {}', str(e))
 
         ver = 2
     return ver

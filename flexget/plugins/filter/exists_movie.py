@@ -1,13 +1,14 @@
-import logging
 import re
 from pathlib import Path
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils.tools import TimedDict
 
-log = logging.getLogger('exists_movie')
+logger = logger.bind(name='exists_movie')
 
 
 class FilterExistsMovie:
@@ -65,7 +66,7 @@ class FilterExistsMovie:
     @plugin.priority(-1)
     def on_task_filter(self, task, config):
         if not task.accepted:
-            log.debug('nothing accepted, aborting')
+            logger.debug('nothing accepted, aborting')
             return
 
         config = self.prepare_config(config)
@@ -84,17 +85,17 @@ class FilterExistsMovie:
             # see if this path has already been scanned
             cached_qualities = self.cache.get(folder, None)
             if cached_qualities:
-                log.verbose('Using cached scan for %s ...' % folder)
+                logger.verbose('Using cached scan for {} ...', folder)
                 qualities.update(cached_qualities)
                 continue
 
             path_ids = {}
 
             if not folder.is_dir():
-                log.critical('Path %s does not exist' % folder)
+                logger.critical('Path {} does not exist', folder)
                 continue
 
-            log.verbose('Scanning path %s ...' % folder)
+            logger.verbose('Scanning path {} ...', folder)
 
             # Help debugging by removing a lot of noise
             # logging.getLogger('movieparser').setLevel(logging.WARNING)
@@ -106,17 +107,17 @@ class FilterExistsMovie:
                 if config.get('type') == 'dirs' and p.is_dir():
                     if self.dir_pattern.search(p.name):
                         continue
-                    log.debug('detected dir with name %s, adding to check list' % p.name)
+                    logger.debug('detected dir with name {}, adding to check list', p.name)
                     items.append(p.name)
                 elif config.get('type') == 'files' and p.is_file():
                     if not self.file_pattern.search(p.name):
                         continue
-                    log.debug('detected file with name %s, adding to check list' % p.name)
+                    logger.debug('detected file with name {}, adding to check list', p.name)
                     items.append(p.name)
 
             if not items:
-                log.verbose(
-                    'No items with type %s were found in %s' % (config.get('type'), folder)
+                logger.verbose(
+                    'No items with type {} were found in {}', config.get('type'), folder
                 )
                 continue
 
@@ -134,38 +135,38 @@ class FilterExistsMovie:
                             session=task.session,
                         )
                         if imdb_id in path_ids:
-                            log.trace('duplicate %s' % item)
+                            logger.trace('duplicate {}', item)
                             continue
                         if imdb_id is not None:
-                            log.trace('adding: %s' % imdb_id)
+                            logger.trace('adding: {}', imdb_id)
                             path_ids[imdb_id] = movie.quality
                     except plugin.PluginError as e:
-                        log.trace('%s lookup failed (%s)' % (item, e.value))
+                        logger.trace('{} lookup failed ({})', item, e.value)
                         incompatible_files += 1
                 else:
                     movie_id = movie.name
                     if movie.name is not None and movie.year is not None:
                         movie_id = "%s %s" % (movie.name, movie.year)
                     path_ids[movie_id] = movie.quality
-                    log.trace('adding: %s' % movie_id)
+                    logger.trace('adding: {}', movie_id)
 
             # store to cache and extend to found list
             self.cache[folder] = path_ids
             qualities.update(path_ids)
 
-        log.debug('-- Start filtering entries ----------------------------------')
+        logger.debug('-- Start filtering entries ----------------------------------')
 
         # do actual filtering
         for entry in task.accepted:
             count_entries += 1
-            log.debug('trying to parse entry %s' % entry['title'])
+            logger.debug('trying to parse entry {}', entry['title'])
             if config.get('lookup') == 'imdb':
                 key_imdb = 'imdb_id'
                 if not entry.get(key_imdb, eval_lazy=False):
                     try:
                         imdb_lookup.lookup(entry)
                     except plugin.PluginError as e:
-                        log.trace('entry %s imdb failed (%s)' % (entry['title'], e.value))
+                        logger.trace('entry {} imdb failed ({})', entry['title'], e.value)
                         incompatible_entries += 1
                         continue
                 key = entry[key_imdb]
@@ -186,23 +187,25 @@ class FilterExistsMovie:
             if key in qualities:
                 if config.get('allow_different_qualities') == 'better':
                     if entry['quality'] > qualities[key]:
-                        log.trace('better quality')
+                        logger.trace('better quality')
                         continue
                 elif config.get('allow_different_qualities'):
                     if entry['quality'] != qualities[key]:
-                        log.trace('wrong quality')
+                        logger.trace('wrong quality')
                         continue
 
                 entry.reject('movie exists')
 
         if incompatible_files or incompatible_entries:
-            log.verbose(
-                'There were some incompatible items. %s of %s entries '
-                'and %s of %s directories could not be verified.'
-                % (incompatible_entries, count_entries, incompatible_files, count_files)
+            logger.verbose(
+                'There were some incompatible items. {} of {} entries and {} of {} directories could not be verified.',
+                incompatible_entries,
+                count_entries,
+                incompatible_files,
+                count_files,
             )
 
-        log.debug('-- Finished filtering entries -------------------------------')
+        logger.debug('-- Finished filtering entries -------------------------------')
 
 
 @event('plugin.register')

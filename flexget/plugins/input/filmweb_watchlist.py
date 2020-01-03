@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -14,7 +14,7 @@ except ImportError:
     pass
 
 
-log = logging.getLogger('filmweb_watchlist')
+logger = logger.bind(name='filmweb_watchlist')
 
 
 def translate_type(type):
@@ -45,22 +45,22 @@ class FilmwebWatchlist:
         try:
             from filmweb.filmweb import Filmweb as FilmwebAPI  # noqa
         except ImportError as e:
-            log.debug('Error importing pyfilmweb: %s' % e)
+            logger.debug('Error importing pyfilmweb: {}', e)
             raise plugin.DependencyError(
                 'filmweb_watchlist',
                 'pyfilmweb',
                 'pyfilmweb==0.1.1.1 module required. ImportError: %s' % e,
-                log,
+                logger,
             )
 
     @cached('filmweb_watchlist', persist='2 hours')
     def on_task_input(self, task, config):
         type = translate_type(config['type'])
 
-        log.verbose('Retrieving filmweb watch list for user: %s', config['login'])
+        logger.verbose('Retrieving filmweb watch list for user: {}', config['login'])
 
         fw = FilmwebAPI()
-        log.verbose('Logging as %s', config['login'])
+        logger.verbose('Logging as {}', config['login'])
 
         try:
             fw.login(str(config['login']), str(config['password']))
@@ -74,7 +74,7 @@ class FilmwebWatchlist:
         except RequestFailed as error:
             raise plugin.PluginError('Fetching watch list failed, reason %s' % str(error))
 
-        log.verbose('Filmweb list contains %s items', len(watch_list))
+        logger.verbose('Filmweb list contains {} items', len(watch_list))
 
         entries = []
         for item in watch_list:
@@ -94,7 +94,7 @@ class FilmwebWatchlist:
             entry['filmweb_type'] = item_info['type']
             entry['filmweb_id'] = item['film'].uid
 
-            log.debug('Created entry %s', entry)
+            logger.debug('Created entry {}', entry)
 
             entries.append(entry)
 

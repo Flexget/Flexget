@@ -1,11 +1,11 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils import qualities
 
-log = logging.getLogger('quality')
+logger = logger.bind(name='quality')
 
 
 class FilterQuality:
