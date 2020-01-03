@@ -43,8 +43,8 @@ class Json:
             'encoding': {'type': 'string'},
             'field_map': {
                 'type': 'object',
-                'additionalProperties': 'string',
-            }
+                'additionalProperties': {'type': 'string'}
+            },
         },
         'required': ['file'],
         'additionalProperties': False,
