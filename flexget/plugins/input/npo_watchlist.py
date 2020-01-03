@@ -1,8 +1,8 @@
-import logging
 import re
 import unicodedata
 from datetime import date, datetime, timedelta
 
+from loguru import logger
 from requests.exceptions import HTTPError, RequestException
 
 from flexget import plugin
@@ -12,7 +12,7 @@ from flexget.utils.requests import Session as RequestSession
 from flexget.utils.requests import TimedLimiter
 from flexget.utils.soup import get_soup
 
-log = logging.getLogger('search_npo')
+logger = logger.bind(name='search_npo')
 
 requests = RequestSession(max_retries=3)
 requests.add_domain_limiter(TimedLimiter('npostart.nl', '8 seconds'))
@@ -75,7 +75,7 @@ class NPOWatchlist:
     def _get_page(self, task, config, url):
         self._login(task, config)
         try:
-            log.debug('Fetching NPO profile page: %s', url)
+            logger.debug('Fetching NPO profile page: {}', url)
             page_response = requests.get(url)
             if page_response.url != url:
                 raise plugin.PluginError(
@@ -87,7 +87,7 @@ class NPOWatchlist:
 
     def _login(self, task, config):
         if 'isAuthenticatedUser' in requests.cookies:
-            log.debug('Already logged in')
+            logger.debug('Already logged in')
             return
 
         login_url = 'https://www.npostart.nl/login'
@@ -110,7 +110,7 @@ class NPOWatchlist:
 
             if 'isAuthenticatedUser' not in profile_response.cookies:
                 raise plugin.PluginError('Failed to login. Check username and password.')
-            log.debug('Succesfully logged in: %s', email)
+            logger.debug('Succesfully logged in: {}', email)
         except RequestException as e:
             raise plugin.PluginError('Request error: %s' % str(e))
 
@@ -125,7 +125,7 @@ class NPOWatchlist:
         entries = []
         try:
             profile = requests.get(profile_details_url + profileId).json()
-            log.info('Retrieving favorites for profile %s', profile['name'])
+            logger.info('Retrieving favorites for profile {}', profile['name'])
             for favourite in profile['favourites']:
                 if favourite['mediaType'] == 'series':
                     entries += self._get_series_episodes(task, config, favourite['mediaId'])
@@ -145,7 +145,7 @@ class NPOWatchlist:
         if not series_info:
             series_info = self._get_series_info(task, config, mediaId)
             if not series_info:  # if fetching series_info failed, return empty entries
-                log.error('Failed to fetch series information for %s, skipping series', mediaId)
+                logger.error('Failed to fetch series information for {}, skipping series', mediaId)
                 return entries
 
         headers = {
@@ -158,8 +158,8 @@ class NPOWatchlist:
                 page - 1
             )  # referer from prev page
 
-        log.debug(
-            'Retrieving episodes page %s for %s (%s)', page, series_info['npo_name'], mediaId
+        logger.debug(
+            'Retrieving episodes page {} for {} ({})', page, series_info['npo_name'], mediaId
         )
         try:
             episodes = requests.get(
@@ -171,7 +171,7 @@ class NPOWatchlist:
             if (
                 new_entries and episodes['nextLink']
             ):  # only fetch next page if we accepted any from current page
-                log.debug('NextLink for more episodes: %s', episodes['nextLink'])
+                logger.debug('NextLink for more episodes: {}', episodes['nextLink'])
                 entries += self._get_series_episodes(
                     task,
                     config,
@@ -180,19 +180,19 @@ class NPOWatchlist:
                     page=int(episodes['nextLink'].rsplit('page=')[1]),
                 )
         except RequestException as e:
-            log.error('Request error: %s' % str(e))  # if it fails, just go to next favourite
+            logger.error('Request error: {}', str(e))  # if it fails, just go to next favourite
 
         if not entries and page == 1:
-            log.verbose('No new episodes found for %s (%s)', series_info['npo_name'], mediaId)
+            logger.verbose('No new episodes found for {} ({})', series_info['npo_name'], mediaId)
         return entries
 
     def _get_series_info(self, task, config, mediaId):
         series_info_url = 'https://www.npostart.nl/{0}'
         series_info = None
-        log.verbose('Retrieving series info for %s', mediaId)
+        logger.verbose('Retrieving series info for {}', mediaId)
         try:
             response = requests.get(series_info_url.format(mediaId))
-            log.debug('Series info found at: %s', response.url)
+            logger.debug('Series info found at: {}', response.url)
             page = get_soup(response.content)
             series = page.find('section', class_='npo-header-episode-meta')
             if series:  # sometimes the NPO page does not return valid content
@@ -204,9 +204,9 @@ class NPOWatchlist:
                     'npo_language': 'nl',  # hard-code the language as if in NL, for lookup plugins
                     'npo_version': page.find('meta', attrs={'name': 'generator'})['content'],
                 }  # include NPO website version
-                log.debug('Parsed series info for: %s (%s)', series_info['npo_name'], mediaId)
+                logger.debug('Parsed series info for: {} ({})', series_info['npo_name'], mediaId)
         except RequestException as e:
-            log.error('Request error: %s' % str(e))
+            logger.error('Request error: {}', str(e))
         return series_info
 
     def _parse_tiles(self, task, config, tiles, series_info):
@@ -220,13 +220,13 @@ class NPOWatchlist:
                 for list_item in get_soup(tile).findAll('div', class_='npo-asset-tile-container'):
                     episode_id = list_item['data-id']
                     premium = 'npo-premium-content' in list_item['class']
-                    log.debug('Parsing episode: %s', episode_id)
+                    logger.debug('Parsing episode: {}', episode_id)
 
                     url = list_item.find('a')['href']
                     # Check if the URL found to the episode matches the expected pattern
                     if len(url.split('/')) != 6:
-                        log.verbose(
-                            'Skipping %s, the URL has an unexpected pattern: %s', episode_id, url
+                        logger.verbose(
+                            'Skipping {}, the URL has an unexpected pattern: {}', episode_id, url
                         )
                         continue  # something is wrong; skip this episode
 
@@ -243,14 +243,14 @@ class NPOWatchlist:
                     remove_url = list_item.find('div', class_='npo-asset-tile-delete')
 
                     if premium and not download_premium:
-                        log.debug('Skipping %s, no longer available without premium', title)
+                        logger.debug('Skipping {}, no longer available without premium', title)
                         continue
 
                     entry_date = url.split('/')[-2]
                     entry_date = self._parse_date(entry_date)
 
                     if max_age >= 0 and date.today() - entry_date > timedelta(days=max_age):
-                        log.debug('Skipping %s, aired on %s', title, entry_date)
+                        logger.debug('Skipping {}, aired on {}', title, entry_date)
                         continue
 
                     e = Entry(series_info)
@@ -279,7 +279,7 @@ class NPOWatchlist:
         account_profile_url = 'https://www.npostart.nl/account-profile'
 
         email = config.get('email')
-        log.verbose('Retrieving NPOStart profiles for account %s', email)
+        logger.verbose('Retrieving NPOStart profiles for account {}', email)
 
         profilejson = self._get_page(task, config, account_profile_url).json()
         if 'profileId' not in profilejson:
@@ -290,13 +290,13 @@ class NPOWatchlist:
 
     def entry_complete(self, e, task=None):
         if not e.accepted:
-            log.warning('Not removing %s entry %s', e.state, e['title'])
+            logger.warning('Not removing {} entry {}', e.state, e['title'])
         elif 'remove_url' not in e:
-            log.warning('No remove_url for %s, skipping', e['title'])
+            logger.warning('No remove_url for {}, skipping', e['title'])
         elif task.options.test:
-            log.info('Would remove from watchlist: %s', e['title'])
+            logger.info('Would remove from watchlist: {}', e['title'])
         else:
-            log.info('Removing from watchlist: %s', e['title'])
+            logger.info('Removing from watchlist: {}', e['title'])
 
             headers = {
                 'Origin': 'https://www.npostart.nl',
@@ -310,13 +310,13 @@ class NPOWatchlist:
                     e['remove_url'], headers=headers, cookies=requests.cookies
                 )
             except HTTPError as error:
-                log.error(
-                    'Failed to remove %s, got status %s', e['title'], error.response.status_code
+                logger.error(
+                    'Failed to remove {}, got status {}', e['title'], error.response.status_code
                 )
             else:
                 if delete_response.status_code != requests.codes.ok:
-                    log.warning(
-                        'Failed to remove %s, got status %s',
+                    logger.warning(
+                        'Failed to remove {}, got status {}',
                         e['title'],
                         delete_response.status_code,
                     )

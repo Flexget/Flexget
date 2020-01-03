@@ -88,10 +88,19 @@ class VersionAction(_VersionAction):
         parser.exit()
 
 
+class HelpAction(Action):
+    """Override the default help command so that we can conditionally disable it to prevent program exit."""
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        if getattr(parser, 'do_help', True):
+            parser.print_help()
+            parser.exit()
+
+
 class DebugAction(Action):
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, True)
-        namespace.loglevel = 'debug'
+        namespace.loglevel = 'DEBUG'
 
 
 class DebugTraceAction(Action):
@@ -106,7 +115,7 @@ class CronAction(Action):
         setattr(namespace, self.dest, True)
         # Only set loglevel if it has not already explicitly been set
         if not hasattr(namespace, 'loglevel'):
-            namespace.loglevel = 'info'
+            namespace.loglevel = 'INFO'
 
 
 # This makes the old --inject form forwards compatible
@@ -195,7 +204,10 @@ class NestedSubparserAction(_SubParsersAction):
     def __init__(self, *args, **kwargs):
         self.nested_namespaces = kwargs.pop('nested_namespaces', False)
         self.parent_defaults = {}
+        # Python < 3.7 doesn't support the 'required' argument for subparsers
+        required = kwargs.pop('required', True)
         super().__init__(*args, **kwargs)
+        self.required = required
 
     def add_parser(self, name, parent_defaults=None, **kwargs):
         if parent_defaults:
@@ -258,7 +270,9 @@ class ArgumentParser(ArgParser):
     - If the `file` argument is given to `parse_args`, output will be printed there instead of sys.stdout or stderr
     """
 
-    file = None  # This is created as a class attribute so that we can set it for parser and all subparsers at once
+    # These are created as a class attribute so that we can set it for parser and all subparsers at once
+    file = None
+    do_help = True
 
     def __init__(self, **kwargs):
         """
@@ -271,7 +285,19 @@ class ArgumentParser(ArgParser):
 
         self.subparsers = None
         self.raise_errors = None
+        add_help = kwargs.pop('add_help', True)
+        kwargs['add_help'] = False
         ArgParser.__init__(self, **kwargs)
+        if add_help:
+            self.add_argument(
+                '--help',
+                '-h',
+                action=HelpAction,
+                dest=SUPPRESS,
+                default=SUPPRESS,
+                nargs=0,
+                help='Show this help message and exit',
+            )
         # Overwrite _SubparserAction with our custom one
         self.register('action', 'parsers', NestedSubparserAction)
 
@@ -325,17 +351,23 @@ class ArgumentParser(ArgParser):
         except ParserError as e:
             if raise_errors:
                 raise
-            super().error(e.message)
+            super(ArgumentParser, e.parser).error(e.message)
         finally:
             ArgumentParser.file = None
 
-    def parse_known_args(self, args=None, namespace=None):
+    def parse_known_args(self, args=None, namespace=None, do_help=None):
         if args is None:
             # Decode all arguments to unicode before parsing
             args = unicode_argv()[1:]
         if namespace is None:
             namespace = ScopedNamespace()
-        namespace, args = super().parse_known_args(args, namespace)
+        old_do_help = ArgumentParser.do_help
+        if do_help is not None:
+            ArgumentParser.do_help = do_help
+        try:
+            namespace, args = super().parse_known_args(args, namespace)
+        finally:
+            ArgumentParser.do_help = old_do_help
 
         # add any post defaults that aren't present
         for dest in self.post_defaults:
@@ -351,6 +383,7 @@ class ArgumentParser(ArgParser):
         """
         # Set the parser class so subparsers don't end up being an instance of a subclass, like CoreArgumentParser
         kwargs.setdefault('parser_class', ArgumentParser)
+        kwargs.setdefault('required', True)
         self.subparsers = super().add_subparsers(**kwargs)
         return self.subparsers
 
@@ -425,9 +458,10 @@ manager_parser.add_argument(
     '-L',
     metavar='LEVEL',
     help='Set the verbosity of the logger. Levels: %(choices)s',
-    choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'],
+    choices=['NONE', 'CRITICAL', 'ERROR', 'WARNING', 'INFO', 'VERBOSE', 'DEBUG', 'TRACE'],
+    type=str.upper,
 )
-manager_parser.set_post_defaults(loglevel='verbose')
+manager_parser.set_post_defaults(loglevel='VERBOSE')
 # This option is already handled above.
 manager_parser.add_argument(
     '--bugreport',
@@ -512,8 +546,8 @@ class CoreArgumentParser(ArgumentParser):
         # The parser for the daemon command
         daemon_parser = self.add_subparser(
             'daemon',
-            parent_defaults={'loglevel': 'info'},
-            help='run continuously, executing tasks according to schedules defined ' 'in config',
+            parent_defaults={'loglevel': 'INFO'},
+            help='run continuously, executing tasks according to schedules defined in config',
         )
         daemon_parser.add_subparsers(title='actions', metavar='<action>', dest='action')
         start_parser = daemon_parser.add_subparser('start', help='start the daemon')

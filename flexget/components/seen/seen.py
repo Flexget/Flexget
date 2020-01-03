@@ -1,11 +1,11 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
 from . import db
 
-log = logging.getLogger(__name__)
+logger = logger.bind(name='seen')
 
 
 class FilterSeen:
@@ -62,7 +62,7 @@ class FilterSeen:
         """Filter entries already accepted on previous runs."""
         config = self.prepare_config(config)
         if config is False:
-            log.debug('%s is disabled' % self.keyword)
+            logger.debug('{} is disabled', self.keyword)
             return
 
         fields = config.get('fields')
@@ -77,15 +77,17 @@ class FilterSeen:
                 if entry[field] not in values and entry[field]:
                     values.append(str(entry[field]))
             if values:
-                log.trace('querying for: %s' % ', '.join(values))
+                logger.trace('querying for: {}', ', '.join(values))
                 # check if SeenField.value is any of the values
                 found = db.search_by_field_values(
                     field_value_list=values, task_name=task.name, local=local, session=task.session
                 )
                 if found:
-                    log.debug(
-                        "Rejecting '%s' '%s' because of seen '%s'"
-                        % (entry['url'], entry['title'], found.value)
+                    logger.debug(
+                        "Rejecting '{}' '{}' because of seen '{}'",
+                        entry['url'],
+                        entry['title'],
+                        found.value,
                     )
                     se = (
                         task.session.query(db.SeenEntry)
@@ -102,7 +104,7 @@ class FilterSeen:
         """Remember succeeded entries"""
         config = self.prepare_config(config)
         if config is False:
-            log.debug('disabled')
+            logger.debug('disabled')
             return
 
         fields = config.get('fields')
@@ -115,7 +117,7 @@ class FilterSeen:
             self.learn(task, entry, fields=fields, local=local)
             # verbose if in learning mode
             if task.options.learn:
-                log.info("Learned '%s' (will skip this in the future)" % (entry['title']))
+                logger.info("Learned '{}' (will skip this in the future)", entry['title'])
 
     def learn(self, task, entry, fields=None, reason=None, local=False):
         """Marks entry as seen"""
@@ -133,7 +135,7 @@ class FilterSeen:
             remembered.append(entry[field])
             sf = db.SeenField(str(field), str(entry[field]))
             se.fields.append(sf)
-            log.debug("Learned '%s' (field: %s, local: %d)" % (entry[field], field, local))
+            logger.debug("Learned '{}' (field: {}, local: {})", entry[field], field, local)
         # Only add the entry to the session if it has one of the required fields
         if se.fields:
             task.session.add(se)
@@ -142,7 +144,7 @@ class FilterSeen:
         """Forget SeenEntry with :title:. Return True if forgotten."""
         se = task.session.query(db.SeenEntry).filter(db.SeenEntry.title == title).first()
         if se:
-            log.debug("Forgotten '%s' (%s fields)" % (title, len(se.fields)))
+            logger.debug("Forgotten '{}' ({} fields)", title, len(se.fields))
             task.session.delete(se)
             return True
 

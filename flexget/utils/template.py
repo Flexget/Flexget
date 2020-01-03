@@ -1,5 +1,4 @@
 import locale
-import logging
 import os
 import os.path
 import re
@@ -19,12 +18,13 @@ from jinja2 import (
     TemplateSyntaxError,
 )
 from jinja2.nativetypes import NativeTemplate
+from loguru import logger
 
 from flexget.event import event
 from flexget.utils.lazy_dict import LazyDict
 from flexget.utils.pathscrub import pathscrub
 
-log = logging.getLogger('utils.template')
+logger = logger.bind(name='utils.template')
 
 # The environment will be created after the manager has started
 environment = None
@@ -248,7 +248,7 @@ def render(template, context, native=False):
         result = template.render(context)
     except Exception as e:
         error = RenderError('(%s) %s' % (type(e).__name__, e))
-        log.debug('Error during rendering: %s', error)
+        logger.debug('Error during rendering: {}', error)
         raise error
 
     return result

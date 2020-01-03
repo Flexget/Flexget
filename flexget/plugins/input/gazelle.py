@@ -1,6 +1,6 @@
-import logging
 from datetime import datetime
 
+from loguru import logger
 from sqlalchemy import Column, DateTime, String, Unicode
 
 from flexget import db_schema, plugin
@@ -15,7 +15,7 @@ from flexget.utils.requests import TokenBucketLimiter
 from flexget.utils.tools import parse_filesize
 
 DETECT_2FA = "Authenticator Code", "TOTP code"
-log = logging.getLogger('gazelle')
+logger = logger.bind(name='gazelle')
 Base = db_schema.versioned_base('gazelle_session', 0)
 
 
@@ -114,8 +114,8 @@ class InputGazelle:
         base_url = config.get('base_url', "").rstrip("/")
         if base_url:
             if self.base_url and self.base_url != base_url:
-                log.warning(
-                    "Using plugin designed for %s on %s - things may break",
+                logger.warning(
+                    'Using plugin designed for {} on {} - things may break',
                     self.base_url,
                     base_url,
                 )
@@ -145,7 +145,7 @@ class InputGazelle:
 
         Return True on successful recovery, False otherwise
         """
-        log.debug("Attempting to find an existing session in the DB")
+        logger.debug("Attempting to find an existing session in the DB")
         with Session() as session:
             db_session = (
                 session.query(GazelleSession)
@@ -165,7 +165,7 @@ class InputGazelle:
 
     def save_current_session(self):
         """Store the current session in the database so it can be resumed later"""
-        log.debug("Storing session info in the DB")
+        logger.debug("Storing session info in the DB")
         with Session() as session:
             expires = None
             for c in self._session.cookies:
@@ -190,7 +190,7 @@ class InputGazelle:
         self._session.cookies.clear()
 
         if not force and self.resume_session():
-            log.info("Logged into %s using cached session", self.base_url)
+            logger.info('Logged into {} using cached session', self.base_url)
             return
 
         # Forcing a re-login or no session in DB - log in using provided creds
@@ -209,7 +209,7 @@ class InputGazelle:
         account_info = self.request(no_login=True, action='index')
         self.authkey = account_info['authkey']
         self.passkey = account_info['passkey']
-        log.info("Logged in to %s", self.base_url)
+        logger.info('Logged in to {}', self.base_url)
 
         # Store the session so we can resume it later
         self.save_current_session()
@@ -228,7 +228,7 @@ class InputGazelle:
         ajaxpage = "{}/ajax.php".format(self.base_url)
         r = self._session.get(ajaxpage, params=params, allow_redirects=False, raise_status=True)
         if not no_login and r.is_redirect and r.next.url == "{}/login.php".format(self.base_url):
-            log.warning("Redirected to login page, reauthenticating and trying again")
+            logger.warning("Redirected to login page, reauthenticating and trying again")
             self.authenticate(force=True)
             return self.request(no_login=True, **params)
 
@@ -259,7 +259,7 @@ class InputGazelle:
             if pages and page >= pages:
                 break
 
-            log.debug("Attempting to get page %d of search results", page)
+            logger.debug('Attempting to get page {} of search results', page)
             result = self.request(action='browse', page=page, **params)
             if not result['results']:
                 break
@@ -270,7 +270,7 @@ class InputGazelle:
             page += 1
 
         if page > self.max_pages:
-            log.warning("Stopped after %d pages (out of %d total pages)", self.max_pages, pages)
+            logger.warning('Stopped after {} pages (out of {} total pages)', self.max_pages, pages)
 
     def get_entries(self, search_results):
         """Generator that yields Entry objects from search results"""
@@ -293,7 +293,7 @@ class InputGazelle:
                     content_size=parse_filesize(str(tor['size']) + "b"),
                 )
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def search(self, task, entry, config):
         """Search interface"""
         self.setup(task, config)
@@ -306,7 +306,7 @@ class InputGazelle:
             entries.update(self.get_entries(self.search_results(params)))
         return entries
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def on_task_input(self, task, config):
         """Task input interface"""
         self.setup(task, config)

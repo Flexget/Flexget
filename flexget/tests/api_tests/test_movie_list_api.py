@@ -322,6 +322,40 @@ class TestMovieListUseCases:
         identifiers = MovieListBase().supported_ids
         assert data == identifiers
 
+    def test_movie_list_movies_batch_remove(self, api_client, schema_match):
+        payload = {'name': 'test_list'}
+
+        # Create list
+        api_client.json_post('/movie_list/', data=json.dumps(payload))
+
+        # Add 3 entries to list
+        for i in range(3):
+            payload = {'movie_name': f'movie {i}', 'movie_year': 2000 + i}
+            rsp = api_client.json_post('/movie_list/1/movies/', data=json.dumps(payload))
+            assert rsp.status_code == 201
+
+        # get entries is correct
+        rsp = api_client.get('/movie_list/1/movies/')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.return_movies, data)
+        assert not errors
+        assert len(data) == 3
+
+        payload = {'ids': [1, 2, 3]}
+
+        rsp = api_client.json_delete('movie_list/1/movies/batch', data=json.dumps(payload))
+        assert rsp.status_code == 204
+
+        rsp = api_client.get('/movie_list/1/movies/')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.return_movies, data)
+        assert not errors
+        assert not data
+
 
 class TestMovieListPagination:
     config = 'tasks: {}'

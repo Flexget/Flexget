@@ -1,10 +1,10 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.log import log_once
 
-log = logging.getLogger('thetvdb')
+logger = logger.bind(name='thetvdb')
 
 
 class FilterTvdb:
@@ -134,7 +134,7 @@ class FilterTvdb:
             try:
                 lookup(task, entry)
             except plugin.PluginError as e:
-                log.error('Skipping %s because of an error: %s' % (entry['title'], e.value))
+                logger.error('Skipping {} because of an error: {}', entry['title'], e.value)
                 continue
 
             # Check defined conditions
@@ -212,11 +212,11 @@ class FilterTvdb:
                     ', '.join(reasons),
                 )
                 if task.options.debug:
-                    log.debug(msg)
+                    logger.debug(msg)
                 else:
-                    log_once(msg, log)
+                    log_once(msg, logger)
             else:
-                log.debug('Accepting %s' % (entry))
+                logger.debug('Accepting {}', entry)
                 entry.accept()
 
 

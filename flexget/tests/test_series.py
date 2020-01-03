@@ -5,9 +5,9 @@ from jinja2 import Template
 
 from flexget.components.series import db
 from flexget.entry import Entry
-from flexget.logger import capture_output
 from flexget.manager import Session, get_parser
 from flexget.task import TaskAbort
+from flexget.terminal import capture_console
 
 
 def age_series(**kwargs):
@@ -2177,7 +2177,7 @@ class TestCLI:
         execute_task('learn_series')
         options = get_parser().parse_args(['series', 'list', '--porcelain'])
         buffer = StringIO()
-        with capture_output(buffer, loglevel='error'):
+        with capture_console(buffer):
             manager.handle_cli(options=options)
         lines = buffer.getvalue().split('\n')
         assert all(

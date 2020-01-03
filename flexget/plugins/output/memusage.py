@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 
 from flexget import options, plugin
 from flexget.event import event
@@ -10,7 +10,7 @@ except ImportError:
     # this will leave the plugin unloaded
     raise plugin.DependencyError(issued_by='memusage', missing='ext lib `guppy`', silent=True)
 
-log = logging.getLogger('mem_usage')
+logger = logger.bind(name='mem_usage')
 
 """
 http://blog.mfabrik.com/2008/03/07/debugging-django-memory-leak-with-trackrefs-and-guppy/

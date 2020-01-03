@@ -1,7 +1,7 @@
 import datetime
-import logging
 
 from dateutil.parser import parse as dateutil_parse
+from loguru import logger
 from requests.exceptions import TooManyRedirects
 from sqlalchemy import Column, DateTime, Unicode
 
@@ -16,7 +16,7 @@ from flexget.utils.requests import Session as RequestSession
 from flexget.utils.requests import TimedLimiter
 from flexget.utils.tools import parse_filesize
 
-log = logging.getLogger('passthepopcorn')
+logger = logger.bind(name='passthepopcorn')
 Base = db_schema.versioned_base('passthepopcorn', 1)
 
 requests = RequestSession()
@@ -148,11 +148,11 @@ class SearchPassThePopcorn:
                 invalid_cookie = True
         except TooManyRedirects:
             # TODO Apparently it endlessly redirects if the cookie is invalid? I assume it's a gazelle bug.
-            log.debug('PassThePopcorn request failed: Too many redirects. Invalid cookie?')
+            logger.debug('PassThePopcorn request failed: Too many redirects. Invalid cookie?')
             invalid_cookie = True
         except RequestException as e:
             if e.response is not None and e.response.status_code == 429:
-                log.error('Saved cookie is invalid and will be deleted. Error: %s', str(e))
+                logger.error('Saved cookie is invalid and will be deleted. Error: {}', str(e))
                 # cookie is invalid and must be deleted
                 with Session() as session:
                     session.query(PassThePopcornCookie).filter(
@@ -160,7 +160,7 @@ class SearchPassThePopcorn:
                     ).delete()
                 invalid_cookie = True
             else:
-                log.error('PassThePopcorn request failed: %s', str(e))
+                logger.error('PassThePopcorn request failed: {}', str(e))
 
         if invalid_cookie:
             if self.errors:
@@ -197,7 +197,7 @@ class SearchPassThePopcorn:
                     and saved_cookie.expires
                     and saved_cookie.expires >= datetime.datetime.now()
                 ):
-                    log.debug('Found valid login cookie')
+                    logger.debug('Found valid login cookie')
                     return saved_cookie.cookie
 
         url = self.base_url + 'ajax.php'
@@ -210,15 +210,15 @@ class SearchPassThePopcorn:
             'action': 'login',
         }
         try:
-            log.debug('Attempting to retrieve PassThePopcorn cookie')
+            logger.debug('Attempting to retrieve PassThePopcorn cookie')
             requests.post(url, data=params, timeout=30)
         except RequestException as e:
             raise plugin.PluginError('PassThePopcorn login failed: %s' % e)
 
         with Session() as session:
             expires = datetime.datetime.now() + datetime.timedelta(days=30)
-            log.debug(
-                'Saving or updating PassThePopcorn cookie in db. Expires 30 days from now: %s',
+            logger.debug(
+                'Saving or updating PassThePopcorn cookie in db. Expires 30 days from now: {}',
                 expires,
             )
             cookie = PassThePopcornCookie(
@@ -227,7 +227,7 @@ class SearchPassThePopcorn:
             session.merge(cookie)
             return cookie.cookie
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def search(self, task, entry, config):
         """
             Search for entries on PassThePopcorn
@@ -269,7 +269,7 @@ class SearchPassThePopcorn:
 
         for search_string in search_strings:
             params['searchstr'] = search_string
-            log.debug('Using search params: %s', params)
+            logger.debug('Using search params: {}', params)
             try:
                 result = self.get(
                     self.base_url + 'torrents.php',
@@ -279,11 +279,11 @@ class SearchPassThePopcorn:
                     config['passkey'],
                 ).json()
             except RequestException as e:
-                log.error('PassThePopcorn request failed: %s', e)
+                logger.error('PassThePopcorn request failed: {}', e)
                 continue
 
             total_results = result['TotalResults']
-            log.debug('Total results: %s', total_results)
+            logger.debug('Total results: {}', total_results)
 
             authkey = result['AuthKey']
             passkey = result['PassKey']
@@ -297,8 +297,8 @@ class SearchPassThePopcorn:
                     and 'movie_year' in movie
                     and int(movie['Year']) != int(entry['movie_year'])
                 ):
-                    log.debug(
-                        'Movie year %s does not match default %s',
+                    logger.debug(
+                        'Movie year {} does not match default {}',
                         movie['Year'],
                         entry['movie_year'],
                     )
@@ -306,7 +306,7 @@ class SearchPassThePopcorn:
 
                 # imdb id in the json result is without 'tt'
                 if 'imdb_id' in movie and movie['ImdbId'] not in entry['imdb_id']:
-                    log.debug('imdb id %s does not match %s', movie['ImdbId'], entry['imdb_id'])
+                    logger.debug('imdb id {} does not match {}', movie['ImdbId'], entry['imdb_id'])
                     continue
 
                 for torrent in movie['Torrents']:

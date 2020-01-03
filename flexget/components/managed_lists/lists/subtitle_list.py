@@ -1,9 +1,9 @@
-import logging
 import os
 from collections.abc import MutableSet
 from datetime import date, datetime, time
 
 from babelfish import Language
+from loguru import logger
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, Unicode, and_, func
 from sqlalchemy.orm import relationship
 
@@ -15,7 +15,7 @@ from flexget.manager import Session
 from flexget.utils.template import RenderError
 from flexget.utils.tools import parse_timedelta
 
-log = logging.getLogger('subtitle_list')
+logger = logger.bind(name='subtitle_list')
 Base = versioned_base('subtitle_list', 1)
 
 #: Video extensions stolen from https://github.com/Diaoul/subliminal/blob/master/subliminal/video.py
@@ -227,7 +227,7 @@ class SubtitleList(MutableSet):
             try:
                 path = entry.render(self.config['path'])
             except RenderError as e:
-                log.error(e)
+                logger.error(e)
         else:
             path = entry.get('location')
         return normalize_path(path)
@@ -237,16 +237,16 @@ class SubtitleList(MutableSet):
             path = self._extract_path(entry)
 
             if not path:
-                log.error('Entry %s does not represent a local file/dir.', entry['title'])
+                logger.error('Entry {} does not represent a local file/dir.', entry['title'])
                 return
 
             path_exists = os.path.exists(path)
             if self.config['force_file_existence'] and not path_exists:
-                log.error('Path %s does not exist. Not adding to list.', path)
+                logger.error('Path {} does not exist. Not adding to list.', path)
                 return
             elif path_exists and not self.config.get('allow_dir') and os.path.isdir(path):
-                log.error(
-                    'Path %s is a directory and "allow_dir"=%s.', path, self.config['allow_dir']
+                logger.error(
+                    'Path {} is a directory and "allow_dir"={}.', path, self.config['allow_dir']
                 )
                 return
 
@@ -269,7 +269,7 @@ class SubtitleList(MutableSet):
             for subtitle_language in normalized_languages:
                 language = SubtitleListLanguage(language=subtitle_language)
                 db_file.languages.append(language)
-            log.debug('adding entry %s with languages %s', entry, normalized_languages)
+            logger.debug('adding entry {} with languages {}', entry, normalized_languages)
             db_list.files.append(db_file)
             session.commit()
             return db_file.to_entry()
@@ -278,7 +278,7 @@ class SubtitleList(MutableSet):
         with Session() as session:
             db_file = self._find_entry(entry, session=session)
             if db_file:
-                log.debug('deleting file %s', db_file)
+                logger.debug('deleting file {}', db_file)
                 session.delete(db_file)
 
     def __contains__(self, entry):
@@ -339,11 +339,11 @@ class PluginSubtitleList:
 
             existing_subtitles = set(subliminal.core.search_external_subtitles(file).values())
             if wanted_languages and len(wanted_languages - existing_subtitles) == 0:
-                log.info('Local subtitle(s) already exists for %s.', file)
+                logger.info('Local subtitle(s) already exists for {}.', file)
                 return True
             return False
         except ImportError:
-            log.warning('Subliminal not found. Unable to check for local subtitles.')
+            logger.warning('Subliminal not found. Unable to check for local subtitles.')
 
     def on_task_input(self, task, config):
         subtitle_list = SubtitleList(config)
@@ -352,16 +352,16 @@ class PluginSubtitleList:
         temp_discarded_items = set()
         for item in subtitle_list:
             if not config['force_file_existence'] and not os.path.exists(item['location']):
-                log.error('File %s does not exist. Skipping.', item['location'])
+                logger.error('File {} does not exist. Skipping.', item['location'])
                 temp_discarded_items.add(item)
                 continue
             if not os.path.exists(item['location']):
-                log.error('File %s does not exist. Removing from list.', item['location'])
+                logger.error('File {} does not exist. Removing from list.', item['location'])
                 subtitle_list.discard(item)
                 continue
             if self._expired(item, config):
-                log.info(
-                    'File %s has been in the list for %s. Removing from list.',
+                logger.info(
+                    'File {} has been in the list for {}. Removing from list.',
                     item['location'],
                     item['remove_after'] or config['remove_after'],
                 )
@@ -382,7 +382,7 @@ class PluginSubtitleList:
                         break
                     for file in files:
                         if os.path.splitext(file)[1] not in VIDEO_EXTENSIONS:
-                            log.debug('File %s is not a video file. Skipping', file)
+                            logger.debug('File {} is not a video file. Skipping', file)
                             continue
                         num_potential_files += 1
                         file_path = normalize_path(os.path.join(root_dir, file))
@@ -400,15 +400,15 @@ class PluginSubtitleList:
                             num_added_files += 1
                 # delete the original dir if it contains any video files
                 if num_added_files or num_potential_files:
-                    log.debug(
-                        'Added %s file(s) from %s to subtitle list %s',
+                    logger.debug(
+                        'Added {} file(s) from {} to subtitle list {}',
                         num_added_files,
                         item['location'],
                         config['list'],
                     )
                     subtitle_list.discard(item)
                 else:
-                    log.debug('No files found in %s. Skipping.', item['location'])
+                    logger.debug('No files found in {}. Skipping.', item['location'])
                     temp_discarded_items.add(item)
             elif config['check_subtitles'] and self.all_subtitles_exist(
                 item['location'], languages

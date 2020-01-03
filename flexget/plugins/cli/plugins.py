@@ -1,13 +1,12 @@
-import logging
-
 from colorclass.toggles import disable_all_colors
+from loguru import logger
 
 from flexget import options
 from flexget.event import event
 from flexget.plugin import get_plugins
 from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
 
-log = logging.getLogger('plugins')
+logger = logger.bind(name='plugins')
 
 
 def plugins_summary(manager, options):

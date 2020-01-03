@@ -1,5 +1,6 @@
-import logging
 from pathlib import Path
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -13,7 +14,7 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='parsers')
 
-log = logging.getLogger('exists_series')
+logger = logger.bind(name='exists_series')
 
 
 class FilterExistsSeries:
@@ -55,7 +56,7 @@ class FilterExistsSeries:
     @plugin.priority(-1)
     def on_task_filter(self, task, config):
         if not task.accepted:
-            log.debug('Scanning not needed')
+            logger.debug('Scanning not needed')
             return
         config = self.prepare_config(config)
         accepted_series = {}
@@ -68,11 +69,11 @@ class FilterExistsSeries:
                         try:
                             paths.add(entry.render(folder))
                         except RenderError as e:
-                            log.error('Error rendering path `%s`: %s', folder, e)
+                            logger.error('Error rendering path `{}`: {}', folder, e)
                 else:
-                    log.debug('entry %s series_parser invalid', entry['title'])
+                    logger.debug('entry {} series_parser invalid', entry['title'])
         if not accepted_series:
-            log.warning(
+            logger.warning(
                 'No accepted entries have series information. exists_series cannot filter them'
             )
             return
@@ -85,7 +86,7 @@ class FilterExistsSeries:
             for folder in paths:
                 folder = Path(folder).expanduser()
                 if not folder.is_dir():
-                    log.warning('Directory %s does not exist', folder)
+                    logger.warning('Directory {} does not exist', folder)
                     continue
 
                 for filename in folder.iterdir():
@@ -96,38 +97,40 @@ class FilterExistsSeries:
                         )
                     except plugin_parsers.ParseWarning as pw:
                         disk_parser = pw.parsed
-                        log_once(pw.value, logger=log)
+                        log_once(pw.value, logger=logger)
                     if disk_parser.valid:
-                        log.debug('name %s is same series as %s', filename.name, series)
-                        log.debug('disk_parser.identifier = %s', disk_parser.identifier)
-                        log.debug('disk_parser.quality = %s', disk_parser.quality)
-                        log.debug('disk_parser.proper_count = %s', disk_parser.proper_count)
+                        logger.debug('name {} is same series as {}', filename.name, series)
+                        logger.debug('disk_parser.identifier = {}', disk_parser.identifier)
+                        logger.debug('disk_parser.quality = {}', disk_parser.quality)
+                        logger.debug('disk_parser.proper_count = {}', disk_parser.proper_count)
 
                         for entry in accepted_series[series]:
-                            log.debug(
-                                'series_parser.identifier = %s', entry['series_parser'].identifier
+                            logger.debug(
+                                'series_parser.identifier = {}', entry['series_parser'].identifier
                             )
                             if disk_parser.identifier != entry['series_parser'].identifier:
-                                log.trace('wrong identifier')
+                                logger.trace('wrong identifier')
                                 continue
-                            log.debug('series_parser.quality = %s', entry['series_parser'].quality)
+                            logger.debug(
+                                'series_parser.quality = {}', entry['series_parser'].quality
+                            )
                             if config.get('allow_different_qualities') == 'better':
                                 if entry['series_parser'].quality > disk_parser.quality:
-                                    log.trace('better quality')
+                                    logger.trace('better quality')
                                     continue
                             elif config.get('allow_different_qualities'):
                                 if disk_parser.quality != entry['series_parser'].quality:
-                                    log.trace('wrong quality')
+                                    logger.trace('wrong quality')
                                     continue
-                            log.debug(
-                                'entry parser.proper_count = %s',
+                            logger.debug(
+                                'entry parser.proper_count = {}',
                                 entry['series_parser'].proper_count,
                             )
                             if disk_parser.proper_count >= entry['series_parser'].proper_count:
                                 entry.reject('episode already exists')
                                 continue
                             else:
-                                log.trace('new one is better proper, allowing')
+                                logger.trace('new one is better proper, allowing')
                                 continue
 
 

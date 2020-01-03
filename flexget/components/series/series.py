@@ -1,12 +1,12 @@
 import argparse
 import itertools
-import logging
 import sys
 import time
 from collections import defaultdict
 from copy import copy
 from datetime import datetime
 
+from loguru import logger
 from sqlalchemy import not_
 from sqlalchemy.orm import joinedload, object_session
 
@@ -27,7 +27,7 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='parsers')
 
-log = logging.getLogger(__name__)
+logger = logger.bind(name='series')
 
 try:
     preferred_clock = time.process_time
@@ -45,7 +45,7 @@ def repair(manager):
             for release in (
                 session.query(db.EpisodeRelease).filter(db.EpisodeRelease.episode == None).all()
             ):
-                log.info('Purging orphan release %s from database', release.title)
+                logger.info('Purging orphan release {} from database', release.title)
                 session.delete(release)
             session.commit()
         finally:
@@ -80,14 +80,11 @@ def populate_entry_fields(entry, parser, config):
     """
     entry['series_parser'] = copy(parser)
 
-    if parser.identifier:
-        entry['id'] = ('%s %s' % (parser.name, parser.identifier)).lower().strip()
-
     # add series, season and episode to entry
     entry['series_name'] = parser.name
     if 'quality' in entry and entry['quality'] != parser.quality:
-        log.verbose(
-            'Found different quality for `%s`. Was `%s`, overriding with `%s`.',
+        logger.verbose(
+            'Found different quality for `{}`. Was `{}`, overriding with `{}`.',
             entry['title'],
             entry['quality'],
             parser.quality,
@@ -116,7 +113,9 @@ def populate_entry_fields(entry, parser, config):
     if config:
         # set custom download path
         if 'path' in config:
-            log.debug('setting custom path for `%s` to `%s`', entry['title'], config.get('path'))
+            logger.debug(
+                'setting custom path for `{}` to `{}`', entry['title'], config.get('path')
+            )
             # Just add this to the 'set' dictionary, so that string replacement is done cleanly
             config.setdefault('set', {}).update(path=config['path'])
 
@@ -253,7 +252,7 @@ class FilterSeriesBase:
                     series, series_settings = list(series.items())[0]
                 # Make sure this isn't a series with no name
                 if not series:
-                    log.warning('Series config contains a series with no name!')
+                    logger.warning('Series config contains a series with no name!')
                     continue
                 # make sure series name is a string to accommodate for "24"
                 if not isinstance(series, str):
@@ -270,7 +269,7 @@ class FilterSeriesBase:
                     series_settings['watched'] = {'season': int(season), 'episode': int(episode)}
                 # Convert enough to target for backwards compatibility
                 if 'enough' in series_settings:
-                    log.warning(
+                    logger.warning(
                         'Series setting `enough` has been renamed to `target`. Please update your config.'
                     )
                     series_settings.setdefault('target', series_settings['enough'])
@@ -305,11 +304,11 @@ class FilterSeriesBase:
                 else:
                     if kwargs.get('log_once'):
                         log_once(
-                            'Series `%s` is already configured in series plugin' % series, log
+                            'Series `%s` is already configured in series plugin' % series, logger
                         )
                     else:
-                        log.warning(
-                            'Series `%s` is configured multiple times in series plugin.', series
+                        logger.warning(
+                            'Series `{}` is configured multiple times in series plugin.', series
                         )
                     # Combine the config dicts for both instances of the show
                     unique_series[series].update(series_settings)
@@ -380,8 +379,8 @@ class FilterSeries(FilterSeriesBase):
                     name.lower() != series_name.lower()
                 ):
                     if 'exact' not in series_config:
-                        log.verbose(
-                            'Auto enabling exact matching for series `%s` (reason: `%s`)',
+                        logger.verbose(
+                            'Auto enabling exact matching for series `{}` (reason: `{}`)',
                             series_name,
                             name,
                         )
@@ -448,7 +447,7 @@ class FilterSeries(FilterSeriesBase):
                 if entries:
                     self.parse_series(entries, series_name, series_config, db_identified_by)
 
-        log.debug('series on_task_metainfo took %s to parse', preferred_clock() - start_time)
+        logger.debug('series on_task_metainfo took {} to parse', preferred_clock() - start_time)
 
     def on_task_filter(self, task, config):
         """Filter series"""
@@ -486,8 +485,8 @@ class FilterSeries(FilterSeriesBase):
                 series_name, series_config = list(series_item.items())[0]
 
                 if series_config.get('parse_only'):
-                    log.debug(
-                        'Skipping filtering of series `%s` because of parse_only', series_name
+                    logger.debug(
+                        'Skipping filtering of series `{}` because of parse_only', series_name
                     )
                     continue
 
@@ -495,12 +494,12 @@ class FilterSeries(FilterSeriesBase):
                 series_name = str(series_name)
                 db_series = existing_series_map.get(normalize_series_name(series_name))
                 if not db_series:
-                    log.debug('adding series `%s` into db', series_name)
+                    logger.debug('adding series `{}` into db', series_name)
                     db_series = db.Series()
                     db_series.name = series_name
                     db_series.identified_by = series_config.get('identified_by', 'auto')
                     session.add(db_series)
-                    log.debug('-> added `%s`', db_series)
+                    logger.debug('-> added `{}`', db_series)
                     session.flush()  # Flush to get an id on series before adding alternate names.
                     alts = series_config.get('alternate_name', [])
                     if not isinstance(alts, list):
@@ -534,7 +533,7 @@ class FilterSeries(FilterSeriesBase):
 
                 # If we didn't find any episodes for this series, continue
                 if not series_entries:
-                    log.trace('No entries found for `%s` this run.', series_name)
+                    logger.trace('No entries found for `{}` this run.', series_name)
                     continue
 
                 # configuration always overrides everything
@@ -543,14 +542,14 @@ class FilterSeries(FilterSeriesBase):
                 # if series doesn't have identified_by flag already set, calculate one now that new eps are added to db
                 if not db_series.identified_by or db_series.identified_by == 'auto':
                     db_series.identified_by = db.auto_identified_by(db_series)
-                    log.debug(
-                        'identified_by set to `%s` based on series history',
+                    logger.debug(
+                        'identified_by set to `{}` based on series history',
                         db_series.identified_by,
                     )
 
                 self.process_series(task, series_entries, series_config)
 
-        log.debug('processing series took %s', preferred_clock() - start_time)
+        logger.debug('processing series took {}', preferred_clock() - start_time)
 
     def parse_series(self, entries, series_name, config, db_identified_by=None):
         """
@@ -599,7 +598,9 @@ class FilterSeries(FilterSeriesBase):
                 continue
             parsed.field = 'title'
 
-            log.debug('`%s` detected as `%s`, field: `%s`', entry['title'], parsed, parsed.field)
+            logger.debug(
+                '`{}` detected as `{}`, field: `{}`', entry['title'], parsed, parsed.field
+            )
             populate_entry_fields(entry, parsed, config)
 
     def process_series(self, task, series_entries, config):
@@ -622,7 +623,7 @@ class FilterSeries(FilterSeriesBase):
 
             reason = None
 
-            log.debug('start with entities: %s', [e['title'] for e in entries])
+            logger.debug('start with entities: {}', [e['title'] for e in entries])
 
             season_packs = self.season_pack_opts(config.get('season_packs', False))
             # reject season packs unless specified
@@ -660,10 +661,10 @@ class FilterSeries(FilterSeriesBase):
 
             # skip special episodes if special handling has been turned off
             if not config.get('specials', True) and entity.identified_by == 'special':
-                log.debug('Skipping special episode as support is turned off.')
+                logger.debug('Skipping special episode as support is turned off.')
                 continue
 
-            log.debug('current entities: %s', [e['title'] for e in entries])
+            logger.debug('current entities: {}', [e['title'] for e in entries])
 
             # quality filtering
             if 'quality' in config:
@@ -677,7 +678,7 @@ class FilterSeries(FilterSeriesBase):
             downloaded_qualities = [rls.quality for rls in downloaded]
 
             # proper handling
-            log.debug('-' * 20 + ' process_propers -->')
+            logger.debug('-' * 20 + ' process_propers -->')
             entries = self.process_propers(config, entity, entries)
             if not entries:
                 continue
@@ -709,7 +710,7 @@ class FilterSeries(FilterSeriesBase):
                     continue
                 if 'qualities' in config:
                     # Grab any additional wanted qualities
-                    log.debug('-' * 20 + ' process_qualities -->')
+                    logger.debug('-' * 20 + ' process_qualities -->')
                     self.process_qualities(config, entries, downloaded)
                     continue
                 elif config.get('upgrade'):
@@ -722,15 +723,15 @@ class FilterSeries(FilterSeriesBase):
                 continue
 
             best = entries[0]
-            log.debug('continuing w. entities: %s', [e['title'] for e in entries])
-            log.debug('best entity is: `%s`', best['title'])
+            logger.debug('continuing w. entities: {}', [e['title'] for e in entries])
+            logger.debug('best entity is: `{}`', best['title'])
 
             # episode tracking. used only with season and sequence based series
             if entity.identified_by in ['ep', 'sequence']:
                 if task.options.disable_tracking or not config.get('tracking', True):
-                    log.debug('episode tracking disabled')
+                    logger.debug('episode tracking disabled')
                 else:
-                    log.debug('-' * 20 + ' tracking -->')
+                    logger.debug('-' * 20 + ' tracking -->')
                     # Grace is number of distinct eps in the task for this series + 2
                     backfill = config.get('tracking') == 'backfill'
                     if self.process_entity_tracking(
@@ -768,8 +769,8 @@ class FilterSeries(FilterSeriesBase):
             # need to reject all other episode/season packs for an accepted season during the task,
             # can't wait for task learn phase
             if entity.is_season:
-                log.debug(
-                    'adding season number `%s` to accepted seasons for this task', entity.season
+                logger.debug(
+                    'adding season number `{}` to accepted seasons for this task', entity.season
                 )
                 accepted_seasons.append(entity.season)
 
@@ -801,23 +802,23 @@ class FilterSeries(FilterSeriesBase):
                 return pass_filter
         else:
             # propers with timeframe
-            log.debug('proper timeframe: %s', config['propers'])
+            logger.debug('proper timeframe: {}', config['propers'])
             timeframe = parse_timedelta(config['propers'])
 
             first_seen = episode.first_seen
             expires = first_seen + timeframe
-            log.debug('propers timeframe: %s', timeframe)
-            log.debug('first_seen: %s', first_seen)
-            log.debug('propers ignore after: %s', expires)
+            logger.debug('propers timeframe: {}', timeframe)
+            logger.debug('first_seen: {}', first_seen)
+            logger.debug('propers ignore after: {}', expires)
 
             if datetime.now() > expires:
-                log.debug('propers timeframe expired')
+                logger.debug('propers timeframe expired')
                 return pass_filter
 
         downloaded_qualities = dict(
             (d.quality, d.proper_count) for d in episode.downloaded_releases
         )
-        log.debug('propers - downloaded qualities: %s', downloaded_qualities)
+        logger.debug('propers - downloaded qualities: {}', downloaded_qualities)
 
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for quality, entry in best_propers.items():
@@ -839,13 +840,13 @@ class FilterSeries(FilterSeriesBase):
         req = qualities.Requirements(config['target'])
         if downloaded:
             if any(req.allows(release.quality) for release in downloaded):
-                log.debug('Target quality already achieved.')
+                logger.debug('Target quality already achieved.')
                 return True
         # scan for quality
         for entry in entries:
             if req.allows(entry['quality']):
-                log.debug(
-                    'Accepted by series. `%s` meets quality requirement `%s`.', entry['title'], req
+                logger.debug(
+                    'Accepted by series. `{}` meets quality requirement `{}`.', entry['title'], req
                 )
                 entry.accept('target quality')
                 return True
@@ -857,18 +858,18 @@ class FilterSeries(FilterSeriesBase):
         :returns: A list of eps that are in the acceptable range
         """
         reqs = qualities.Requirements(config['quality'])
-        log.debug('quality req: %s', reqs)
+        logger.debug('quality req: {}', reqs)
         result = []
         # see if any of the eps match accepted qualities
         for entry in entries:
             if reqs.allows(entry['quality']):
                 result.append(entry)
             else:
-                log.verbose(
-                    'Ignored `%s`. Does not meet quality requirement `%s`.', entry['title'], reqs
+                logger.verbose(
+                    'Ignored `{}`. Does not meet quality requirement `{}`.', entry['title'], reqs
                 )
         if not result:
-            log.debug('no quality meets requirements')
+            logger.debug('no quality meets requirements')
         return result
 
     def process_entity_tracking(self, entity, entries, grace, threshold, backfill=False):
@@ -885,20 +886,20 @@ class FilterSeries(FilterSeriesBase):
         latest = db.get_latest_release(entity.series)
         if entity.series.begin and (not latest or entity.series.begin > latest):
             latest = entity.series.begin
-        log.debug('latest download: %s', latest)
-        log.debug('current: %s', entity)
+        logger.debug('latest download: {}', latest)
+        logger.debug('current: {}', entity)
 
         if latest:
             # reject any entity if a season pack for this season was already downloaded
             if entity.season in entity.series.completed_seasons:
-                log.debug('season `%s` already completed for this series', entity.season)
+                logger.debug('season `{}` already completed for this series', entity.season)
                 for entry in entries:
                     entry.reject('season `%s` is already completed' % entity.season)
                 return True
 
             # Test if episode threshold has been met
             if entity.is_season and entity.series.episodes_for_season(entity.season) > threshold:
-                log.debug('threshold of %s has been met, skipping season pack', threshold)
+                logger.debug('threshold of {} has been met, skipping season pack', threshold)
                 for entry in entries:
                     entry.reject(
                         'The configured number of episodes for this season has already been downloaded'
@@ -912,7 +913,7 @@ class FilterSeries(FilterSeriesBase):
                         entity.identified_by == 'sequence'
                         and entity.number < (latest.number - grace)
                     ):
-                        log.debug('too old! rejecting all occurrences')
+                        logger.debug('too old! rejecting all occurrences')
                         for entry in entries:
                             entry.reject(
                                 'Too much in the past from latest downloaded entity %s'
@@ -933,7 +934,7 @@ class FilterSeries(FilterSeriesBase):
                         )
                     )
                 ):
-                    log.debug('too new! rejecting all occurrences')
+                    logger.debug('too new! rejecting all occurrences')
                     for entry in entries:
                         entry.reject(
                             'Too much in the future from latest downloaded entity `%s`. '
@@ -957,7 +958,7 @@ class FilterSeries(FilterSeriesBase):
         best = entries[0]
 
         # parse options
-        log.debug('timeframe: %s', config['timeframe'])
+        logger.debug('timeframe: {}', config['timeframe'])
         timeframe = parse_timedelta(config['timeframe'])
 
         if config.get('quality'):
@@ -968,12 +969,12 @@ class FilterSeries(FilterSeriesBase):
         # Somehow we can get here without having qualifying releases (#2779) make sure min doesn't crash
         first_seen = min(seen_times) if seen_times else datetime.now()
         expires = first_seen + timeframe
-        log.debug('timeframe: %s, first_seen: %s, expires: %s', timeframe, first_seen, expires)
+        logger.debug('timeframe: {}, first_seen: {}, expires: {}', timeframe, first_seen, expires)
 
         stop = normalize_series_name(task.options.stop_waiting) == episode.series._name_normalized
         if expires <= datetime.now() or stop:
             # Expire timeframe, accept anything
-            log.info('Timeframe expired, releasing quality restriction.')
+            logger.info('Timeframe expired, releasing quality restriction.')
             return False
         else:
             # verbose waiting, add to backlog
@@ -983,8 +984,8 @@ class FilterSeries(FilterSeriesBase):
             hours += diff.days * 24
             minutes, _ = divmod(remainder, 60)
 
-            log.info(
-                '`%s`: timeframe waiting for %02dh:%02dmin. Currently best is `%s`.',
+            logger.info(
+                '`{}`: timeframe waiting for {:02d}h:{:02d}min. Currently best is `{}`.',
                 episode.series.name,
                 hours,
                 minutes,
@@ -1006,7 +1007,7 @@ class FilterSeries(FilterSeriesBase):
 
         # Get list of already downloaded qualities
         downloaded_qualities = [r.quality for r in downloaded]
-        log.debug('downloaded_qualities: %s', downloaded_qualities)
+        logger.debug('downloaded_qualities: {}', downloaded_qualities)
 
         # If qualities key is configured, we only want qualities defined in it.
         wanted_qualities = set(
@@ -1018,7 +1019,7 @@ class FilterSeries(FilterSeriesBase):
             for req in wanted_qualities
             if not any(req.allows(qual) for qual in downloaded_qualities)
         ]
-        log.debug('wanted qualities: %s', wanted_qualities)
+        logger.debug('wanted qualities: {}', wanted_qualities)
 
         def wanted(quality):
             """Returns True if we want this quality based on the config options."""
@@ -1031,9 +1032,9 @@ class FilterSeries(FilterSeriesBase):
 
         for entry in entries:
             quality = entry['quality']
-            log.debug('ep: `%s`, quality: `%s`', entry['title'], quality)
+            logger.debug('ep: `{}`, quality: `{}`', entry['title'], quality)
             if not wanted(quality):
-                log.debug('`%s` is an unwanted quality', quality)
+                logger.debug('`{}` is an unwanted quality', quality)
                 continue
             if any(req.allows(quality) for req in still_needed):
                 # Don't get worse qualities in upgrade mode
@@ -1049,7 +1050,7 @@ class FilterSeries(FilterSeriesBase):
 
     def on_task_learn(self, task, config):
         """Learn succeeded episodes"""
-        log.debug('on_task_learn')
+        logger.debug('on_task_learn')
         for entry in task.accepted:
             if 'series_releases' in entry:
                 with Session() as session:
@@ -1067,14 +1068,14 @@ class FilterSeries(FilterSeriesBase):
                             .update({'downloaded': True}, synchronize_session=False)
                         )
 
-                log.debug(
-                    'marking %s episode releases and %s season releases as downloaded for `%s`',
+                logger.debug(
+                    'marking {} episode releases and {} season releases as downloaded for `{}`',
                     ep_num,
                     season_num,
                     entry,
                 )
             else:
-                log.debug('`%s` is not a series', entry['title'])
+                logger.debug('`{}` is not a series', entry['title'])
 
 
 class SeriesDBManager(FilterSeriesBase):
@@ -1122,22 +1123,22 @@ class SeriesDBManager(FilterSeriesBase):
                     ]
                     # Add/update the possibly new alternate names
                 else:
-                    log.debug(
-                        'adding series `%s` `%s` into db (on_task_start)',
+                    logger.debug(
+                        'adding series `{}` `{}` into db (on_task_start)',
                         series_name,
                         normalize_series_name(series_name),
                     )
-                    log.debug('adding series `%s` into db (on_task_start)', series_name)
+                    logger.debug('adding series `{}` into db (on_task_start)', series_name)
                     db_series = db.Series()
                     db_series.name = series_name
                     session.add(db_series)
                     session.flush()  # flush to get id on series before creating alternate names
                     existing_series_map[db_series.name_normalized] = db_series
-                    log.debug('-> added `%s`', db_series)
+                    logger.debug('-> added `{}`', db_series)
                 for alt in alts:
                     db._add_alt_name(alt, db_series, series_name, session)
 
-                log.debug('connecting series `%s` to task `%s`', db_series.name, task.name)
+                logger.debug('connecting series `{}` to task `{}`', db_series.name, task.name)
 
                 # Add in bulk at the end
                 if db_series.id not in add_series_tasks:

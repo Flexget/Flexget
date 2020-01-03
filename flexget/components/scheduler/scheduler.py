@@ -8,13 +8,14 @@ import tzlocal
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
+from loguru import logger
 
 from flexget.config_schema import format_checker, register_config_key, register_schema
 from flexget.event import event
 from flexget.manager import manager
 from flexget.utils import json
 
-log = logging.getLogger('scheduler')
+logger = logger.bind(name='scheduler')
 
 
 # Add a format checker for more detailed errors on cron type schedules
@@ -42,7 +43,7 @@ interval_schema = {
         'weeks': {'type': 'number'},
         'jitter': {'type': 'integer'},
     },
-    'anyOf':[{'required': [unit]} for unit in UNITS],
+    'anyOf': [{'required': [unit]} for unit in UNITS],
     'error_anyOf': 'Interval must be specified as one or more of %s' % ', '.join(UNITS),
     'additionalProperties': False,
 }
@@ -98,21 +99,21 @@ def job_id(conf):
 
 def run_job(tasks):
     """Add the execution to the queue and waits until it is finished"""
-    log.debug('executing tasks: %s', tasks)
+    logger.debug('executing tasks: {}', tasks)
     finished_events = manager.execute(
         options={'tasks': tasks, 'cron': True, 'allow_manual': False}, priority=5
     )
     for _, task_name, event_ in finished_events:
-        log.debug('task finished executing: %s', task_name)
+        logger.debug('task finished executing: {}', task_name)
         event_.wait()
-    log.debug('all tasks in schedule finished executing')
+    logger.debug('all tasks in schedule finished executing')
 
 
 @event('manager.daemon.started')
 def setup_scheduler(manager):
     """Configure and start apscheduler"""
     global scheduler
-    if logging.getLogger().getEffectiveLevel() > logging.DEBUG:
+    if logger.level(manager.options.loglevel).no > logger.level('DEBUG').no:
         logging.getLogger('apscheduler').setLevel(logging.WARNING)
     # Since APScheduler runs in a separate thread, slower devices can sometimes get a DB lock, so use a separate db
     # for the jobs to avoid this
@@ -131,13 +132,13 @@ def setup_scheduler(manager):
         timezone = None
     except struct.error as e:
         # Hiding exception that may occur in tzfile.py seen in entware
-        log.warning('Hiding exception from tzlocal: %s', e)
+        logger.warning('Hiding exception from tzlocal: {}', e)
         timezone = None
     if not timezone:
         # The default sqlalchemy jobstore does not work when there isn't a name for the local timezone.
         # Just fall back to utc in this case
         # FlexGet #2741, upstream ticket https://github.com/agronholm/apscheduler/issues/59
-        log.info(
+        logger.info(
             'Local timezone name could not be determined. Scheduler will display times in UTC for any log'
             'messages. To resolve this set up /etc/timezone with correct time zone name.'
         )
@@ -158,7 +159,7 @@ def setup_jobs(manager):
     scheduler_job_map = {}
 
     if 'schedules' not in manager.config:
-        log.info(
+        logger.info(
             'No schedules defined in config. Defaulting to run all tasks on a 1 hour interval.'
         )
     config = manager.config.get('schedules', True)
@@ -166,11 +167,11 @@ def setup_jobs(manager):
         config = DEFAULT_SCHEDULES
     elif not config:  # Schedules are disabled with `schedules: no`
         if scheduler.running:
-            log.info('Shutting down scheduler')
+            logger.info('Shutting down scheduler')
             scheduler.shutdown()
         return
     if not scheduler.running:
-        log.info('Starting scheduler')
+        logger.info('Starting scheduler')
         scheduler.start(paused=True)
     existing_job_ids = [job.id for job in scheduler.get_jobs()]
     configured_job_ids = []

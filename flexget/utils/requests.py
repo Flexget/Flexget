@@ -7,13 +7,14 @@ from urllib.parse import urlparse
 from urllib.request import urlopen
 
 import requests
+from loguru import logger
 from requests import RequestException
 
 from flexget import __version__ as version
 from flexget.utils.tools import TimedDict, parse_timedelta, timedelta_total_seconds
 
 # If we use just 'requests' here, we'll get the logger created by requests, rather than our own
-log = logging.getLogger('utils.requests')
+logger = logger.bind(name='utils.requests')
 
 # Don't emit info level urllib3 log messages or below
 logging.getLogger('requests.packages.urllib3').setLevel(logging.WARNING)
@@ -115,10 +116,10 @@ class TokenBucketLimiter(DomainLimiter):
             wait = timedelta_total_seconds(self.rate) * (1 - self.tokens)
             # Don't spam console if wait is low
             if wait < 4:
-                level = log.debug
+                level = 'DEBUG'
             else:
-                level = log.verbose
-            level('Waiting %.2f seconds until next request to %s', wait, self.domain)
+                level = 'VERBOSE'
+            logger.log(level, 'Waiting {:.2f} seconds until next request to {}', wait, self.domain)
             # Sleep until it is time for the next request
             time.sleep(wait)
         self.tokens -= 1
@@ -143,7 +144,7 @@ def _wrap_urlopen(url, timeout=None):
         raw = urlopen(url, timeout=timeout)
     except IOError as e:
         msg = 'Error getting %s: %s' % (url, e)
-        log.error(msg)
+        logger.error(msg)
         raise RequestException(msg)
     resp = requests.Response()
     resp.raw = raw
@@ -239,11 +240,13 @@ class Session(requests.Session):
 
         # If we do not have an adapter for this url, pass it off to urllib
         if not any(url.startswith(adapter) for adapter in self.adapters):
-            log.debug('No adaptor, passing off to urllib')
+            logger.debug('No adaptor, passing off to urllib')
             return _wrap_urlopen(url, timeout=kwargs['timeout'])
 
         try:
-            log.debug('%sing URL %s with args %s and kwargs %s', method.upper(), url, args, kwargs)
+            logger.debug(
+                '{}ing URL {} with args {} and kwargs {}', method.upper(), url, args, kwargs
+            )
             result = super().request(method, url, *args, **kwargs)
         except requests.Timeout:
             # Mark this site in known unresponsive list

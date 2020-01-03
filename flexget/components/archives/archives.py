@@ -1,10 +1,10 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.components.archives import utils
 from flexget.event import event
 
-log = logging.getLogger('archives')
+logger = logger.bind(name='archives')
 
 
 class FilterArchives:

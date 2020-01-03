@@ -3,10 +3,11 @@
 # Test scripts and other short code fragments can be considered as being in the public domain.
 import binascii
 import functools
-import logging
 import re
 
-log = logging.getLogger('torrent')
+from loguru import logger
+
+logger = logger.bind(name='torrent')
 
 # Magic indicator used to quickly recognize torrent files
 TORRENT_RE = re.compile(br'^d\d{1,3}:')
@@ -85,9 +86,8 @@ def is_torrent_file(metafilepath):
 
     magic_marker = bool(TORRENT_RE.match(data))
     if not magic_marker:
-        log.trace(
-            '%s doesn\'t seem to be a torrent, got `%s` (hex)'
-            % (metafilepath, binascii.hexlify(data))
+        logger.trace(
+            "{} doesn't seem to be a torrent, got `{}` (hex)", metafilepath, binascii.hexlify(data)
         )
 
     return bool(magic_marker)
@@ -256,9 +256,12 @@ class Torrent:
                     except UnicodeError:
                         # Broken beyond anything reasonable
                         fallback = item[field].decode('utf-8', 'replace').replace(u'\ufffd', '_')
-                        log.warning(
-                            '%s=%r field in torrent %r is wrongly encoded, falling back to `%s`'
-                            % (field, item[field], self.content['info']['name'], fallback)
+                        logger.warning(
+                            '{}={!r} field in torrent {!r} is wrongly encoded, falling back to `{}`',
+                            field,
+                            item[field],
+                            self.content['info']['name'],
+                            fallback,
                         )
                         item[field] = fallback
 

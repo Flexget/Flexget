@@ -1,9 +1,9 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('only_new')
+logger = logger.bind(name='only_new')
 
 
 class FilterOnlyNew:
@@ -20,7 +20,7 @@ class FilterOnlyNew:
         """Reject all entries so remember_rejected will reject them next time"""
         if not config or not task.entries:
             return
-        log.verbose(
+        logger.verbose(
             'Rejecting entries after the task has run so they are not processed next time.'
         )
         for entry in task.entries:

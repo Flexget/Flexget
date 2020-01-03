@@ -1,11 +1,12 @@
-import logging
+from loguru import logger
 
 from flexget import options, plugin
+from flexget.entry import EntryState
 from flexget.event import event
-from flexget.task import log as task_log
+from flexget.task import logger as task_logger
 from flexget.utils.log import log_once
 
-log = logging.getLogger('verbose')
+logger = logger.bind(name='verbose')
 
 
 class Verbose:
@@ -19,16 +20,18 @@ class Verbose:
         if task.options.silent:
             return
         for entry in task.all_entries:
-            entry.on_accept(self.verbose_details, task=task, act='accepted', reason='')
-            entry.on_reject(self.verbose_details, task=task, act='rejected', reason='')
-            entry.on_fail(self.verbose_details, task=task, act='failed', reason='')
+            entry.on_accept(self.verbose_details, task=task, act=EntryState.ACCEPTED, reason='')
+            entry.on_reject(self.verbose_details, task=task, act=EntryState.REJECTED, reason='')
+            entry.on_fail(self.verbose_details, task=task, act=EntryState.FAILED, reason='')
 
-    def verbose_details(self, entry, task=None, act=None, reason=None, **kwargs):
-        msg = "%s: `%s` by %s plugin" % (act.upper(), entry['title'], task.current_plugin)
+    @staticmethod
+    def verbose_details(entry, task=None, act: EntryState = None, reason=None, **kwargs):
+        msg = f"`{entry['title']}` by {task.current_plugin} plugin"
         if reason:
-            msg += ' because %s' % reason[0].lower() + reason[1:]
-
-        task_log.verbose(msg)
+            msg = f'{msg} because {reason[0].lower() + reason[1:]}'
+        msg = msg.replace('<', r'\<')
+        msg = f"{act.log_markup}: {msg}"
+        task_logger.opt(ansi=True).verbose(msg)
 
     def on_task_exit(self, task, config):
         if task.options.silent:
@@ -40,12 +43,12 @@ class Verbose:
                 if entry in task.accepted:
                     continue
                 undecided = True
-                log.verbose('UNDECIDED: `%s`' % entry['title'])
+                logger.verbose('UNDECIDED: `{}`', entry['title'])
             if undecided:
                 log_once(
                     'Undecided entries have not been accepted or rejected. If you expected these to reach output,'
                     ' you must set up filter plugin(s) to accept them.',
-                    logger=log,
+                    logger=logger,
                 )
 
 

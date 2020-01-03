@@ -1,11 +1,12 @@
 import http.cookiejar
-import logging
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.tools import TimedDict
 
-log = logging.getLogger('cookies')
+logger = logger.bind(name='cookies')
 
 
 class PluginCookies:
@@ -58,9 +59,9 @@ class PluginCookies:
             try:
                 from sqlite3 import dbapi2 as sqlite  # try the 2.5+ stdlib
             except ImportError:
-                raise plugin.PluginWarning('Unable to use sqlite3 or pysqlite2', log)
+                raise plugin.PluginWarning('Unable to use sqlite3 or pysqlite2', logger)
 
-        log.debug('connecting: %s' % filename)
+        logger.debug('connecting: {}', filename)
         try:
             con = sqlite.connect(filename)
         except:
@@ -71,7 +72,7 @@ class PluginCookies:
             cur.execute('select host, path, isSecure, expiry, name, value from moz_cookies')
         except sqlite.Error:
             raise plugin.PluginError(
-                '%s does not appear to be a valid Firefox 3 cookies file' % filename, log
+                '%s does not appear to be a valid Firefox 3 cookies file' % filename, logger
             )
 
         ftstr = ['FALSE', 'TRUE']
@@ -87,7 +88,7 @@ class PluginCookies:
         count = 0
         failed = 0
 
-        log.debug('fetching all cookies')
+        logger.debug('fetching all cookies')
 
         def notabs(val):
             if isinstance(val, str):
@@ -113,8 +114,8 @@ class PluginCookies:
                         )
                     )
 
-                    log.trace(
-                        'Adding cookie for %s. key: %s value: %s' % (item[0], item[4], item[5])
+                    logger.trace(
+                        'Adding cookie for {}. key: {} value: {}', item[0], item[4], item[5]
                     )
                     count += 1
                 except IOError:
@@ -125,20 +126,20 @@ class PluginCookies:
                     i = 0
                     for val in item:
                         if isinstance(val, str):
-                            log.debug('item[%s]: %s' % (i, to_hex(val)))
+                            logger.debug('item[{}]: {}', i, to_hex(val))
                         else:
-                            log.debug('item[%s]: %s' % (i, val))
+                            logger.debug('item[{}]: {}', i, val)
                         i += 1
                     failed += 1
 
             except UnicodeDecodeError:
                 # for some god awful reason the sqlite module can throw UnicodeDecodeError ...
-                log.debug('got UnicodeDecodeError from sqlite, ignored')
+                logger.debug('got UnicodeDecodeError from sqlite, ignored')
                 failed += 1
             except StopIteration:
                 break
 
-        log.debug('Added %s cookies to jar. %s failed (non-ascii)' % (count, failed))
+        logger.debug('Added {} cookies to jar. {} failed (non-ascii)', count, failed)
 
         s.seek(0)
         con.close()
@@ -156,31 +157,31 @@ class PluginCookies:
         cookie_file = os.path.expanduser(config.get('file'))
         cj = self.cookiejars.get(cookie_file, None)
         if cj is not None:
-            log.debug('Loading cookiejar from cache.')
+            logger.debug('Loading cookiejar from cache.')
         elif cookie_type == 'firefox3':
-            log.debug('Loading %s cookies' % cookie_type)
+            logger.debug('Loading {} cookies', cookie_type)
             cj = self.sqlite2cookie(cookie_file)
             self.cookiejars[cookie_file] = cj
         else:
             if cookie_type == 'mozilla':
-                log.debug('Loading %s cookies' % cookie_type)
+                logger.debug('Loading {} cookies', cookie_type)
                 cj = http.cookiejar.MozillaCookieJar()
                 self.cookiejars[cookie_file] = cj
             elif cookie_type == 'lwp':
-                log.debug('Loading %s cookies' % cookie_type)
+                logger.debug('Loading {} cookies', cookie_type)
                 cj = http.cookiejar.LWPCookieJar()
                 self.cookiejars[cookie_file] = cj
             else:
-                raise plugin.PluginError('Unknown cookie type %s' % cookie_type, log)
+                raise plugin.PluginError('Unknown cookie type %s' % cookie_type, logger)
 
             try:
                 cj.load(filename=cookie_file, ignore_expires=True)
-                log.debug('%s cookies loaded' % cookie_type)
+                logger.debug('{} cookies loaded', cookie_type)
             except (http.cookiejar.LoadError, IOError):
                 import sys
 
                 raise plugin.PluginError(
-                    'Cookies could not be loaded: %s' % sys.exc_info()[1], log
+                    'Cookies could not be loaded: %s' % sys.exc_info()[1], logger
                 )
 
         # Add cookiejar to our requests session

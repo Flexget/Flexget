@@ -1,9 +1,9 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('spy_headers')
+logger = logger.bind(name='spy_headers')
 
 
 class PluginSpyHeaders:
@@ -17,12 +17,12 @@ class PluginSpyHeaders:
 
     @staticmethod
     def log_requests_headers(response, **kwargs):
-        log.info('Request  : %s' % response.request.url)
-        log.info('Response : %s (%s)' % (response.status_code, response.reason))
-        log.info('-- Headers: --------------------------')
+        logger.info('Request : {}', response.request.url)
+        logger.info('Response : {} ({})', response.status_code, response.reason)
+        logger.info('-- Headers: --------------------------')
         for header, value in response.request.headers.items():
-            log.info('%s: %s' % (header, value))
-        log.info('--------------------------------------')
+            logger.info('{}: {}', header, value)
+        logger.info('--------------------------------------')
         return response
 
     def on_task_start(self, task, config):

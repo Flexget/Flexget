@@ -1,14 +1,14 @@
-import logging
 import queue
 import sys
 import threading
 import time
 
+from loguru import logger
 from sqlalchemy.exc import OperationalError, ProgrammingError
 
 from flexget.task import TaskAbort
 
-log = logging.getLogger('task_queue')
+logger = logger.bind(name='task_queue')
 
 
 class TaskQueue:
@@ -44,12 +44,12 @@ class TaskQueue:
             try:
                 self.current_task.execute()
             except TaskAbort as e:
-                log.debug('task %s aborted: %r' % (self.current_task.name, e))
+                logger.debug('task {} aborted: {!r}', self.current_task.name, e)
             except (ProgrammingError, OperationalError):
-                log.critical('Database error while running a task. Attempting to recover.')
+                logger.critical('Database error while running a task. Attempting to recover.')
                 self.current_task.manager.crash_report()
             except Exception:
-                log.critical('BUG: Unhandled exception during task queue run loop.')
+                logger.critical('BUG: Unhandled exception during task queue run loop.')
                 self.current_task.manager.crash_report()
             finally:
                 self.run_queue.task_done()
@@ -57,12 +57,11 @@ class TaskQueue:
 
         remaining_jobs = self.run_queue.qsize()
         if remaining_jobs:
-            log.warning(
-                'task queue shut down with %s tasks remaining in the queue to run.'
-                % remaining_jobs
+            logger.warning(
+                'task queue shut down with {} tasks remaining in the queue to run.', remaining_jobs
             )
         else:
-            log.debug('task queue shut down')
+            logger.debug('task queue shut down')
 
     def is_alive(self):
         return self._thread.is_alive()
@@ -80,13 +79,13 @@ class TaskQueue:
 
         :param bool finish_queue: Should all tasks be finished before ending thread.
         """
-        log.debug('task queue shutdown requested')
+        logger.debug('task queue shutdown requested')
         if finish_queue:
             self._shutdown_when_finished = True
             if self.run_queue.qsize():
-                log.verbose(
-                    'There are %s tasks to execute. Shutdown will commence when they have completed.'
-                    % self.run_queue.qsize()
+                logger.verbose(
+                    'There are {} tasks to execute. Shutdown will commence when they have completed.',
+                    self.run_queue.qsize(),
                 )
         else:
             self._shutdown_now = True
@@ -106,7 +105,7 @@ class TaskQueue:
             while self._thread.is_alive():
                 time.sleep(0.5)
         except KeyboardInterrupt:
-            log.error('Got ctrl-c, shutting down after running task (if any) completes')
+            logger.error('Got ctrl-c, shutting down after running task (if any) completes')
             self.shutdown(finish_queue=False)
             # We still wait to finish cleanly, pressing ctrl-c again will abort
             while self._thread.is_alive():

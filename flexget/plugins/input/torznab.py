@@ -1,6 +1,7 @@
-import logging
 from urllib.parse import urlencode
 from xml.etree import ElementTree
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.components.sites.utils import torrent_availability
@@ -9,7 +10,7 @@ from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.utils.requests import RequestException
 
-log = logging.getLogger('torznab')
+logger = logger.bind(name='torznab')
 
 
 class Torznab:
@@ -56,7 +57,7 @@ class Torznab:
         """Builds the url with query parameters from the arguments"""
         params = self.params.copy()
         params.update(kwargs)
-        log.debug('Configured parameters: {}'.format(params))
+        logger.debug('Configured parameters: {}', params)
         url = '{}/api?'.format(self.base_url)
         url = '{}{}'.format(url, urlencode(params))
         return url
@@ -68,20 +69,17 @@ class Torznab:
         if config['searcher'] == 'tv':
             config['searcher'] = 'tvsearch'
 
-        self.params = {
-            'apikey': config['apikey'],
-            'extended': 1,
-        }
+        self.params = {'apikey': config['apikey'], 'extended': 1}
 
-        log.debug('Config: {}'.format(config))
+        logger.debug('Config: {}', config)
         self._setup_caps(task, config['searcher'], config['categories'])
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def _setup_caps(self, task, searcher, categories):
         """Gets the capabilities of the torznab indexer and matches it with the provided configuration"""
 
         response = task.requests.get(self._build_url(t='caps'))
-        log.debug('Raw caps response {}'.format(response.content))
+        logger.debug('Raw caps response {}', response.content)
         root = ElementTree.fromstring(response.content)
         self._setup_searcher(root, searcher, categories)
 
@@ -94,23 +92,23 @@ class Torznab:
             if self._check_searcher(searchers, aliases[searcher]):
                 self.supported_params = searchers[aliases[searcher]]['supportedParams'].split(',')
                 self.params['t'] = searcher
-                log.debug(
-                    "Searcher '%s' set up with '%s' parameters",
+                logger.debug(
+                    "Searcher '{}' set up with '{}' parameters",
                     aliases[searcher],
                     self.supported_params,
                 )
                 if searcher != 'search':
                     self._setup_categories(xml_root, categories)
             elif searcher != 'search' and self._check_searcher(searchers, 'search'):
-                log.warning(
-                    "'%s' searcher not available, falling back to 'search'.", aliases[searcher]
+                logger.warning(
+                    "'{}' searcher not available, falling back to 'search'.", aliases[searcher]
                 )
                 self.supported_params = searchers['search']['supportedParams'].split(',')
                 self.params['t'] = 'search'
-                log.debug(
-                    "Searcher '{}' set up with '{}' parameters".format(
-                        aliases[searcher], self.supported_params
-                    )
+                logger.debug(
+                    "Searcher '{}' set up with '{}' parameters",
+                    aliases[searcher],
+                    self.supported_params,
                 )
             else:
                 raise PluginError('No searcher available on {}'.format(self.base_url))
@@ -144,14 +142,14 @@ class Torznab:
             except ValueError:
                 continue
         if used_categories:
-            log.debug('Setting search categories to {}'.format(used_categories))
+            logger.debug('Setting search categories to {}', used_categories)
             self.params['cat'] = ','.join(str(e) for e in used_categories)
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def create_entries_from_query(self, url, task):
         """Fetch feed and fill entries from"""
 
-        log.info('Fetching URL: {}'.format(url))
+        logger.info('Fetching URL: {}', url)
 
         try:
             response = task.requests.get(url)
@@ -164,8 +162,8 @@ class Torznab:
             entry = Entry()
             enclosure = item.find("enclosure[@type='application/x-bittorrent']")
             if enclosure is None:
-                log.warn(
-                    "Item '{}' does not contain a bittorent enclosure.".format(item.title.string)
+                logger.warning(
+                    "Item '{}' does not contain a bittorent enclosure.", item.title.string
                 )
                 continue
             else:

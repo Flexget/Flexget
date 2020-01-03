@@ -1,8 +1,8 @@
 import copy
-import logging
 import pickle
 from datetime import datetime, timedelta
 
+from loguru import logger
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Unicode, select
 from sqlalchemy.orm import relation
 
@@ -15,7 +15,7 @@ from flexget.utils.database import entry_synonym
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 from flexget.utils.tools import TimedDict, get_config_hash, parse_timedelta
 
-log = logging.getLogger('input_cache')
+logger = logger.bind(name='input_cache')
 Base = db_schema.versioned_base('input_cache', 1)
 
 
@@ -35,7 +35,7 @@ def upgrade(ver, session):
                     .values(json=json.dumps(p, encode_datetime=True))
                 )
             except KeyError as e:
-                log.error('Unable error upgrading input_cache pickle object due to %s' % str(e))
+                logger.error('Unable error upgrading input_cache pickle object due to {}', str(e))
         ver = 1
     return ver
 
@@ -70,7 +70,7 @@ def db_cleanup(manager, session):
         .delete()
     )
     if result:
-        log.verbose('Removed %s old input caches.' % result)
+        logger.verbose('Removed {} old input caches.', result)
 
 
 class cached:
@@ -103,19 +103,19 @@ class cached:
             task = args[1]
             self.config_hash = get_config_hash(args[2])
 
-            log.trace('self.name: %s' % self.name)
-            log.trace('hash: %s' % self.config_hash)
+            logger.trace('self.name: {}', self.name)
+            logger.trace('hash: {}', self.config_hash)
 
             self.cache_name = self.name + '_' + self.config_hash
-            log.debug(
-                'cache name: %s (has: %s)' % (self.cache_name, ', '.join(list(self.cache.keys())))
+            logger.debug(
+                'cache name: {} (has: {})', self.cache_name, ', '.join(list(self.cache.keys()))
             )
 
             if not task.options.nocache:
                 cache_value = self.cache.get(self.cache_name, None)
                 if cache_value:
                     # return from the cache
-                    log.verbose('Restored entries from cache')
+                    logger.verbose('Restored entries from cache')
                     return cache_value
 
                 if self.persist:
@@ -125,7 +125,7 @@ class cached:
                         return db_cache
 
             # Nothing was restored from db or memory cache, run the function
-            log.trace('cache miss')
+            logger.trace('cache miss')
             # call input event
             try:
                 response = func(*args, **kwargs)
@@ -134,15 +134,16 @@ class cached:
                 if self.persist and not task.options.nocache:
                     cache = self.load_from_db(load_expired=True)
                     if cache is not None:
-                        log.error(
-                            'There was an error during %s input (%s), using cache instead.'
-                            % (self.name, e)
+                        logger.error(
+                            'There was an error during {} input ({}), using cache instead.',
+                            self.name,
+                            e,
                         )
                         return cache
                 # If there was nothing in the db cache, re-raise the error.
                 raise
             # store results to cache
-            log.debug('storing entries to cache %s ', self.cache_name)
+            logger.debug('storing entries to cache {} ', self.cache_name)
             cache = IterableCache(response, self.store_to_db if self.persist else None)
             self.cache[self.cache_name] = cache
             return cache
@@ -151,7 +152,7 @@ class cached:
 
     def store_to_db(self, entries):
         # Store to database
-        log.debug('Storing cache %s to database.' % self.cache_name)
+        logger.debug('Storing cache {} to database.', self.cache_name)
         with Session() as session:
             db_cache = (
                 session.query(InputCache)
@@ -177,7 +178,7 @@ class cached:
             db_cache = db_cache.first()
             if db_cache:
                 entries = [ent.entry for ent in db_cache.entries]
-                log.verbose('Restored %s entries from db cache' % len(entries))
+                logger.verbose('Restored {} entries from db cache', len(entries))
                 # Store to in memory cache
                 self.cache[self.cache_name] = copy.deepcopy(entries)
                 return entries

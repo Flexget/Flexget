@@ -4,7 +4,7 @@ requires = ["setuptools", "wheel"]
 [tool.black]
 line-length = 99
 skip-string-normalization = true
-target-version = ['py27', 'py34', 'py35', 'py36', 'py37']
+target-version = ['py36', 'py37', 'py38']
 # Only include files in /flexget/, or directly in project root
 include = '^/(flexget/.*)?[^/]*\.pyi?$'
 exclude = '''

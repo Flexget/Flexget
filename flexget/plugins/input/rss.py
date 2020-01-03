@@ -1,6 +1,5 @@
 import hashlib
 import http.client
-import logging
 import os
 import posixpath
 import xml.sax
@@ -9,6 +8,7 @@ from urllib.parse import urlparse, urlsplit
 
 import dateutil.parser
 import feedparser
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
@@ -19,7 +19,7 @@ from flexget.utils.cached_input import cached
 from flexget.utils.pathscrub import pathscrub
 from flexget.utils.tools import decode_html
 
-log = logging.getLogger('rss')
+logger = logger.bind(name='rss')
 feedparser.registerDateHandler(lambda date_string: dateutil.parser.parse(date_string).timetuple())
 
 
@@ -158,19 +158,19 @@ class InputRSS:
         """If feedparser reports error, save the received data and log error."""
 
         if data is None:
-            log.critical('Received empty page - no content')
+            logger.critical('Received empty page - no content')
             return
         else:
             data = bytes(data)  # ahem, dunno about this?
 
         ext = 'xml'
         if b'<html>' in data.lower():
-            log.critical('Received content is HTML page, not an RSS feed')
+            logger.critical('Received content is HTML page, not an RSS feed')
             ext = 'html'
         if b'login' in data.lower() or b'username' in data.lower():
-            log.critical('Received content looks a bit like login page')
+            logger.critical('Received content looks a bit like login page')
         if b'error' in data.lower():
-            log.critical('Received content looks a bit like error page')
+            logger.critical('Received content looks a bit like error page')
         received = os.path.join(task.manager.config_base, 'received')
         if not os.path.isdir(received):
             os.mkdir(received)
@@ -182,7 +182,7 @@ class InputRSS:
         filepath = os.path.join(received, '%s.%s' % (filename, ext))
         with open(filepath, 'wb') as f:
             f.write(data)
-        log.critical('I have saved the invalid content to %s for you to view', filepath)
+        logger.critical('I have saved the invalid content to {} for you to view', filepath)
 
     def escape_content(self, content):
         valid_escapes = (b'&quot;', b'&apos;', b'&lt;', b'&gt;', b'&amp;')
@@ -219,14 +219,14 @@ class InputRSS:
         # If enclosure has size OR there are multiple enclosures use filename from url
         if (entry.get('size') or multiple and basename) and filename:
             entry['filename'] = basename
-            log.trace('filename `%s` from enclosure', entry['filename'])
+            logger.trace('filename `{}` from enclosure', entry['filename'])
 
     @cached('rss')
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def on_task_input(self, task, config):
         config = self.build_config(config)
 
-        log.debug('Requesting task `%s` url `%s`', task.name, config['url'])
+        logger.debug('Requesting task `{}` url `{}`', task.name, config['url'])
 
         # Used to identify which etag/modified to use
         url_hash = hashlib.md5(config['url'].encode('utf-8')).hexdigest()
@@ -243,16 +243,16 @@ class InputRSS:
         if not all_entries:
             etag = task.simple_persistence.get('%s_etag' % url_hash, None)
             if etag:
-                log.debug('Sending etag %s for task %s', etag, task.name)
+                logger.debug('Sending etag {} for task {}', etag, task.name)
                 headers['If-None-Match'] = etag
             modified = task.simple_persistence.get('%s_modified' % url_hash, None)
             if modified:
                 if not isinstance(modified, str):
-                    log.debug('Invalid date was stored for last modified time.')
+                    logger.debug('Invalid date was stored for last modified time.')
                 else:
                     headers['If-Modified-Since'] = modified
-                    log.debug(
-                        'Sending last-modified %s for task %s',
+                    logger.debug(
+                        'Sending last-modified {} for task {}',
                         headers['If-Modified-Since'],
                         task.name,
                     )
@@ -281,8 +281,8 @@ class InputRSS:
             # status checks
             status = response.status_code
             if status == 304:
-                log.verbose(
-                    '%s hasn\'t changed since last run. Not creating entries.', config['url']
+                logger.verbose(
+                    '{} hasn\'t changed since last run. Not creating entries.', config['url']
                 )
                 # Let details plugin know that it is ok if this feed doesn't produce any entries
                 task.no_entries_ok = True
@@ -291,19 +291,20 @@ class InputRSS:
                 raise plugin.PluginError(
                     'Authentication needed for task %s (%s): %s'
                     % (task.name, config['url'], response.headers['www-authenticate']),
-                    log,
+                    logger,
                 )
             elif status == 404:
                 raise plugin.PluginError(
-                    'RSS Feed %s (%s) not found' % (task.name, config['url']), log
+                    'RSS Feed %s (%s) not found' % (task.name, config['url']), logger
                 )
             elif status == 500:
                 raise plugin.PluginError(
-                    'Internal server exception on task %s (%s)' % (task.name, config['url']), log
+                    'Internal server exception on task %s (%s)' % (task.name, config['url']),
+                    logger,
                 )
             elif status != 200:
                 raise plugin.PluginError(
-                    'HTTP error %s received from %s' % (status, config['url']), log
+                    'HTTP error %s received from %s' % (status, config['url']), logger
                 )
 
             # update etag and last modified
@@ -311,11 +312,11 @@ class InputRSS:
                 etag = response.headers.get('etag')
                 if etag:
                     task.simple_persistence['%s_etag' % url_hash] = etag
-                    log.debug('etag %s saved for task %s', etag, task.name)
+                    logger.debug('etag {} saved for task {}', etag, task.name)
                 if response.headers.get('last-modified'):
                     modified = response.headers['last-modified']
                     task.simple_persistence['%s_modified' % url_hash] = modified
-                    log.debug('last modified %s saved for task %s', modified, task.name)
+                    logger.debug('last modified {} saved for task {}', modified, task.name)
         else:
             # This is a file, open it
             with open(config['url'], 'rb') as f:
@@ -325,10 +326,10 @@ class InputRSS:
                 content = content.decode('utf-8', 'ignore').encode('ascii', 'ignore')
 
         if not content:
-            log.error('No data recieved for rss feed.')
+            logger.error('No data recieved for rss feed.')
             return []
         if config.get('escape'):
-            log.debug("Trying to escape unescaped in RSS")
+            logger.debug("Trying to escape unescaped in RSS")
             content = self.escape_content(content)
         try:
             rss = feedparser.parse(content)
@@ -344,16 +345,16 @@ class InputRSS:
                     % type(ex)
                 )
                 if config.get('silent', False):
-                    log.debug(msg)
+                    logger.debug(msg)
                 else:
-                    log.verbose(msg)
+                    logger.verbose(msg)
             else:
                 if isinstance(ex, feedparser.NonXMLContentType):
                     # see: http://www.feedparser.org/docs/character-encoding.html#advanced.encoding.nonxml
-                    log.debug('ignoring feedparser.NonXMLContentType')
+                    logger.debug('ignoring feedparser.NonXMLContentType')
                 elif isinstance(ex, feedparser.CharacterEncodingOverride):
                     # see: ticket 88
-                    log.debug('ignoring feedparser.CharacterEncodingOverride')
+                    logger.debug('ignoring feedparser.CharacterEncodingOverride')
                 elif isinstance(ex, UnicodeEncodeError):
                     raise plugin.PluginError('Feed has UnicodeEncodeError while parsing...')
                 elif isinstance(
@@ -363,7 +364,7 @@ class InputRSS:
                     # html pages (login pages) are received
                     self.process_invalid_content(task, content, config['url'])
                     if task.options.debug:
-                        log.error('bozo error parsing rss: %s' % ex)
+                        logger.error('bozo error parsing rss: {}', ex)
                     raise plugin.PluginError(
                         'Received invalid RSS content from task %s (%s)'
                         % (task.name, config['url'])
@@ -376,10 +377,10 @@ class InputRSS:
                     raise plugin.PluginError(
                         'Unhandled bozo_exception. Type: %s (task: %s)'
                         % (ex.__class__.__name__, task.name),
-                        log,
+                        logger,
                     )
 
-        log.debug('encoding %s', rss.encoding)
+        logger.debug('encoding {}', rss.encoding)
 
         last_entry_id = ''
         if not all_entries:
@@ -417,7 +418,7 @@ class InputRSS:
             title_field = config.get('title', 'title')
             # ignore entries without title
             if not entry.get(title_field):
-                log.debug('skipping entry without title')
+                logger.debug('skipping entry without title')
                 ignored += 1
                 continue
 
@@ -426,7 +427,7 @@ class InputRSS:
 
             # Check we haven't already processed this entry in a previous run
             if last_entry_id == entry.title + entry.get('guid', ''):
-                log.verbose('Not processing entries from last run.')
+                logger.verbose('Not processing entries from last run.')
                 # Let details plugin know that it is ok if this task doesn't produce any entries
                 task.no_entries_ok = True
                 break
@@ -449,13 +450,13 @@ class InputRSS:
                                 try:
                                     content_str += decode_html(content.value)
                                 except UnicodeDecodeError:
-                                    log.warning(
+                                    logger.warning(
                                         'Failed to decode entry `%s` field `%s`',
                                         ea['title'],
                                         rss_field,
                                     )
                             ea[flexget_field] = content_str
-                            log.debug(
+                            logger.debug(
                                 'Field `%s` set to `%s` for `%s`',
                                 rss_field,
                                 ea[rss_field],
@@ -464,12 +465,12 @@ class InputRSS:
                             continue
                         if not isinstance(getattr(entry, rss_field), str):
                             # Error if this field is not a string
-                            log.error('Cannot grab non text field `%s` from rss.', rss_field)
+                            logger.error('Cannot grab non text field `{}` from rss.', rss_field)
                             # Remove field from list of fields to avoid repeated error
                             del fields[rss_field]
                             continue
                         if not getattr(entry, rss_field):
-                            log.debug(
+                            logger.debug(
                                 'Not grabbing blank field %s from rss for %s.',
                                 rss_field,
                                 ea['title'],
@@ -479,14 +480,14 @@ class InputRSS:
                             ea[flexget_field] = decode_html(entry[rss_field])
                             if rss_field in config.get('other_fields', []):
                                 # Print a debug message for custom added fields
-                                log.debug(
+                                logger.debug(
                                     'Field `%s` set to `%s` for `%s`',
                                     rss_field,
                                     ea[rss_field],
                                     ea['title'],
                                 )
                         except UnicodeDecodeError:
-                            log.warning(
+                            logger.warning(
                                 'Failed to decode entry `%s` field `%s`', ea['title'], rss_field
                             )
                 # Also grab pubdate if available
@@ -502,10 +503,10 @@ class InputRSS:
 
             if len(enclosures) > 1 and not config.get('group_links'):
                 # There is more than 1 enclosure, create an Entry for each of them
-                log.debug('adding %i entries from enclosures', len(enclosures))
+                logger.debug('adding {} entries from enclosures', len(enclosures))
                 for enclosure in enclosures:
                     if 'href' not in enclosure:
-                        log.debug('RSS-entry `%s` enclosure does not have URL', entry.title)
+                        logger.debug('RSS-entry `{}` enclosure does not have URL', entry.title)
                         continue
                     # There is a valid url for this enclosure, create an Entry for it
                     ee = Entry()
@@ -553,7 +554,9 @@ class InputRSS:
                     e['urls'].extend(url for url in enclosure_urls if url not in e['urls'])
 
             if not e.get('url'):
-                log.debug('%s does not have link (%s) or enclosure', entry.title, config['link'])
+                logger.debug(
+                    '{} does not have link ({}) or enclosure', entry.title, config['link']
+                )
                 ignored += 1
                 continue
 
@@ -561,7 +564,7 @@ class InputRSS:
 
         # Save last spot in rss
         if rss.entries:
-            log.debug('Saving location in rss feed.')
+            logger.debug('Saving location in rss feed.')
 
             try:
                 entry_id = rss.entries[0].title + rss.entries[0].get('guid', '')
@@ -571,11 +574,13 @@ class InputRSS:
             if entry_id.strip():
                 task.simple_persistence['%s_last_entry' % url_hash] = entry_id
             else:
-                log.debug('rss feed location saving skipped: no title information in first entry')
+                logger.debug(
+                    'rss feed location saving skipped: no title information in first entry'
+                )
 
         if ignored:
             if not config.get('silent'):
-                log.warning(
+                logger.warning(
                     'Skipped %s RSS-entries without required information (title, link or enclosures)',
                     ignored,
                 )

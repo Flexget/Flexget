@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -7,7 +7,7 @@ from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException
 
-log = logging.getLogger('kitsu')
+logger = logger.bind(name='kitsu')
 
 
 class KitsuAnime:
@@ -39,7 +39,7 @@ class KitsuAnime:
                 }
             ),
             'type': one_or_more(
-                {'type': 'string', 'enum': ['ona', 'ova', 'tv', 'movie', 'music', 'special'],}
+                {'type': 'string', 'enum': ['ona', 'ova', 'tv', 'movie', 'music', 'special']}
             ),
             'latest': {'type': 'boolean', 'default': False},
             'status': {'type': 'string', 'enum': ['airing', 'finished']},
@@ -59,7 +59,7 @@ class KitsuAnime:
             error_message = 'Error finding User url: {url}'.format(url=e.request.url)
             if hasattr(e, 'response'):
                 error_message += ' status: {status}'.format(status=e.response.status_code)
-            log.debug(error_message, exc_info=True)
+            logger.opt(exception=True).debug(error_message)
             raise plugin.PluginError(error_message)
         user = user_response.json()
         if not len(user['data']):
@@ -81,7 +81,7 @@ class KitsuAnime:
             error_message = 'Error getting list from {url}'.format(url=e.request.url)
             if hasattr(e, 'response'):
                 error_message += ' status: {status}'.format(status=e.response.status_code)
-            log.debug(error_message, exc_info=True)
+            logger.opt(exception=True).debug(error_message)
             raise plugin.PluginError(error_message)
 
         json_data = response.json()
@@ -137,7 +137,7 @@ class KitsuAnime:
                     )
                     if hasattr(e, 'response'):
                         error_message += ' status: {status}'.format(status=e.response.status_code)
-                    log.debug(error_message, exc_info=True)
+                    logger.opt(exception=True).debug(error_message)
                     raise plugin.PluginError(error_message)
                 json_data = response.json()
             else:

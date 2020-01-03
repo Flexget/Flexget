@@ -1,10 +1,10 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.log import log_once
 
-log = logging.getLogger('urlfix')
+logger = logger.bind(name='urlfix')
 
 
 class UrlFix:
@@ -20,7 +20,9 @@ class UrlFix:
             return
         for entry in task.entries:
             if '&amp;' in entry['url']:
-                log_once('Corrected `%s` url (replaced &amp; with &)' % entry['title'], logger=log)
+                log_once(
+                    'Corrected `%s` url (replaced &amp; with &)' % entry['title'], logger=logger
+                )
                 entry['url'] = entry['url'].replace('&amp;', '&')
 
 

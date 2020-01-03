@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
@@ -15,7 +15,7 @@ lookup_series = plugin_api_trakt.ApiTrakt.lookup_series
 lookup_movie = plugin_api_trakt.ApiTrakt.lookup_movie
 
 
-log = logging.getLogger('trakt_lookup')
+logger = logger.bind(name='trakt_lookup')
 
 
 def is_show(entry):
@@ -44,7 +44,7 @@ class TraktLazyLookup:
             try:
                 result = self.lookup_function(entry, session)
             except LookupError as e:
-                log.debug(e)
+                logger.debug(e)
             else:
                 entry.update_using_map(self.field_map, result)
 
@@ -64,7 +64,7 @@ class TraktUserDataLookup:
                 data_type=self.data_type, media_type=self.media_type, entry=entry
             )
         except LookupError as e:
-            log.debug(e)
+            logger.debug(e)
         else:
             entry[self.field_name] = result
 
@@ -311,7 +311,7 @@ class PluginTraktLookup:
             try:
                 trakt_media = self.getter_map[media_type](entry, session)
             except LookupError as e:
-                log.debug(e)
+                logger.debug(e)
             else:
                 entry.update_using_map(mapping, trakt_media)
         return entry
@@ -329,7 +329,7 @@ class PluginTraktLookup:
             try:
                 return user_data_lookup(lookup(entry, session), entry['title'])
             except LookupError as e:
-                log.debug(e)
+                logger.debug(e)
 
     # Run after series and metainfo series
     @plugin.priority(110)

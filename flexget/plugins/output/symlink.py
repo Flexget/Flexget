@@ -1,12 +1,14 @@
-import logging
 import os
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.pathscrub import pathscrub
 from flexget.utils.template import RenderError, render_from_entry
 
-log = logging.getLogger('symlink')
+logger = logger.bind(name='symlink')
+
 
 class Symlink:
 
@@ -27,7 +29,6 @@ class Symlink:
             {'title': 'specify path', 'type': 'string', 'format': 'path'},
         ]
     }
-
 
     def prepare_config(self, config):
         if not isinstance(config, dict):
@@ -50,7 +51,7 @@ class Symlink:
                 continue
             linkfrom = entry['location']
             linkfrom_path, linkfrom_name = os.path.split(linkfrom)
-            
+
             # get the proper path and name in order of: entry, config, above split
             linkto_path = entry.get('link_to', config.get('to', linkfrom_path))
             if config.get('rename'):
@@ -90,11 +91,11 @@ class Symlink:
             ):
                 msg = 'Symlink destination %s already exists' % linkto
                 if existing == 'ignore':
-                    log.verbose(msg)
+                    logger.verbose(msg)
                 else:
                     entry.fail(msg)
                 continue
-            log.verbose('%slink `%s` to `%s`', config['link_type'], linkfrom, linkto)
+            logger.verbose('{}link `{}` to `{}`', config['link_type'], linkfrom, linkto)
             try:
                 if config['link_type'] == 'soft':
                     os.symlink(linkfrom, linkto)
@@ -115,7 +116,7 @@ class Symlink:
                 os.makedirs(destination)
             except OSError as e:
                 # Raised when it already exists, but are there other cases?
-                log.debug('Failed to create destination dir %s: %s', destination, e)
+                logger.debug('Failed to create destination dir {}: {}', destination, e)
         # 'recursively' traverse and hard link
         working_dir = os.getcwd()
         os.chdir(path)  # change working dir to make dir joins easier
@@ -126,15 +127,15 @@ class Symlink:
                     os.mkdir(d)
                 except OSError as e:
                     # Raised when it already exists, but are there other cases?
-                    log.debug('Failed to create subdir %s: %s', d, e)
+                    logger.debug('Failed to create subdir {}: {}', d, e)
             for f in files:
                 src_file = os.path.join(root, f)
                 dst_file = os.path.join(dst_dir, f)
-                log.debug('Hardlinking %s to %s', src_file, dst_file)
+                logger.debug('Hardlinking {} to {}', src_file, dst_file)
                 try:
                     os.link(src_file, dst_file)
                 except OSError as e:
-                    log.debug('Failed to create hardlink for file %s: %s', f, e)
+                    logger.debug('Failed to create hardlink for file {}: {}', f, e)
                     if existing == 'fail':
                         raise  # reraise to fail the entry in the calling function
 
@@ -144,6 +145,6 @@ class Symlink:
 @event('plugin.register')
 def register_plugin():
     if os.name == 'nt':
-        log.trace('Symlinks not supported on Windows. Skipping Symlink plugin register.')
+        logger.trace('Symlinks not supported on Windows. Skipping Symlink plugin register.')
         return
     plugin.register(Symlink, 'symlink', api_ver=2)

@@ -1,6 +1,6 @@
-import logging
 from collections.abc import MutableSet
 
+from loguru import logger
 from sqlalchemy import or_
 from sqlalchemy.sql.elements import and_
 
@@ -12,7 +12,7 @@ from flexget.manager import Session
 from . import db
 
 plugin_name = 'pending_list'
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 
 class PendingListSet(MutableSet):
@@ -55,7 +55,7 @@ class PendingListSet(MutableSet):
                 .order_by(db.PendingListEntry.added.desc())
                 .all()
             ):
-                log.debug('returning %s', e.entry)
+                logger.debug('returning {}', e.entry)
                 yield e.entry
 
     def __contains__(self, entry):
@@ -70,7 +70,7 @@ class PendingListSet(MutableSet):
         with Session() as session:
             db_entry = self._entry_query(session=session, entry=entry)
             if db_entry:
-                log.debug('deleting entry %s', db_entry)
+                logger.debug('deleting entry {}', db_entry)
                 session.delete(db_entry)
 
     def add(self, entry):
@@ -81,10 +81,10 @@ class PendingListSet(MutableSet):
             stored_entry = self._entry_query(session, entry)
             if stored_entry:
                 # Refresh all the fields if we already have this entry
-                log.debug('refreshing entry %s', entry)
+                logger.debug('refreshing entry {}', entry)
                 stored_entry.entry = entry
             else:
-                log.debug('adding entry %s to list %s', entry, self._db_list(session).name)
+                logger.debug('adding entry {} to list {}', entry, self._db_list(session).name)
                 stored_entry = db.PendingListEntry(
                     entry=entry, pending_list_id=self._db_list(session).id
                 )
