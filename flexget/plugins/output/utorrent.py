@@ -155,7 +155,7 @@ class PluginUtorrent:
             # Check result
             if 'build' in result.json():
                 logger.info('Added `{}` to utorrent', entry['url'])
-                logger.info('in folder {} ', folder + path)
+                logger.info('in folder {} {} ', folder, path)
             else:
                 entry.fail('Fail to add `%s` to utorrent' % entry['url'])
 
