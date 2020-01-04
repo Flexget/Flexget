@@ -17,7 +17,7 @@ ui_assets = os.path.join(ui_dist, 'assets')
 
 webui_app = Flask(__name__, template_folder=ui_dist)
 Compress(webui_app)
-webui_app.url_path = '/v2/'
+webui_app.url_path = '/'
 
 
 @webui_app.route('/assets/<path:path>')

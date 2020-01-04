@@ -1,7 +1,7 @@
 import fnmatch
 import os
 
-from flask import Flask, send_from_directory
+from flask import Flask, redirect, request, send_from_directory
 from flask_compress import Compress
 from loguru import logger
 
@@ -20,7 +20,7 @@ bower_components = os.path.join(ui_base, 'bower_components')
 
 webui_app = Flask(__name__)
 Compress(webui_app)
-webui_app.url_path = '/'
+webui_app.url_path = '/v1/'
 
 
 @webui_app.route('/<path:path>')
@@ -38,6 +38,12 @@ def serve_app(path):
         return send_from_directory(ui_base, 'load.failure.html')
 
     return send_from_directory(app_base, path)
+
+
+@webui_app.route('/api/')
+@webui_app.route('/api/<path:path>')
+def api_redirect(path='/'):
+    return redirect(request.full_path.replace('/v1', '', 1), 302)
 
 
 @webui_app.route('/')

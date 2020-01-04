@@ -51,6 +51,7 @@ def prepare_config(config):
     config.setdefault('web_ui', True)
     config.setdefault('base_url', '')
     config.setdefault('run_v2', False)
+    config.setdefault('run_v1', False)
     if config['base_url']:
         if not config['base_url'].startswith('/'):
             config['base_url'] = '/' + config['base_url']
@@ -100,11 +101,14 @@ def register_web_server(manager):
     # Register WebUI
     if web_server_config.get('web_ui'):
         if web_server_config.get('run_v2'):
-            logger.info('Registering WebUI v2')
-            register_web_ui_v2(web_server_config)
+            logger.warning('Run V2 is deprecated and can be removed from the config')
 
-        logger.info('Registering WebUI v1')
-        register_web_ui_v1(manager)
+        if web_server_config.get('run_v1'):
+            logger.info('Registering WebUI v1')
+            register_web_ui_v1(manager)
+
+        logger.info('Registering WebUI v2')
+        register_web_ui_v2(web_server_config)
 
     web_server = setup_server(web_server_config)
 
