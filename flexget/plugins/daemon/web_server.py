@@ -3,8 +3,7 @@ from loguru import logger
 from flexget.api import api_app
 from flexget.config_schema import register_config_key
 from flexget.event import event
-from flexget.ui.v1 import register_web_ui as register_web_ui_v1
-from flexget.ui.v2 import register_web_ui as register_web_ui_v2
+from flexget.ui import register_web_ui
 from flexget.utils.tools import get_config_hash
 from flexget.webserver import get_secret, register_app, setup_server
 
@@ -100,11 +99,10 @@ def register_web_server(manager):
     # Register WebUI
     if web_server_config.get('web_ui'):
         if web_server_config.get('run_v2'):
-            logger.info('Registering WebUI v2')
-            register_web_ui_v2(web_server_config)
+            logger.warning('run_v2: true is redundant and can be removed')
 
-        logger.info('Registering WebUI v1')
-        register_web_ui_v1(manager)
+        logger.info('Registering WebUI')
+        register_web_ui(web_server_config)
 
     web_server = setup_server(web_server_config)
 
