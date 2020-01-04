@@ -26,6 +26,7 @@ web_config_schema = {
                 'web_ui': {'type': 'boolean'},
                 'base_url': {'type': 'string'},
                 'run_v2': {'type': 'boolean'},
+                'run_v1': {'type': 'boolean'},
             },
             'additionalProperties': False,
             'dependencies': {
