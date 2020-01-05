@@ -62,23 +62,24 @@ class Newznab:
             r = task.requests.get(url)
         except RequestException as e:
             logger.error("Failed fetching '{}': {}", url, e)
+        else:
+            rss = feedparser.parse(r.content)
+            logger.debug('Raw RSS: {}', rss)
 
-        rss = feedparser.parse(r.content)
-        logger.debug('Raw RSS: {}', rss)
+            if not len(rss.entries):
+                logger.info('No results returned')
 
-        if not len(rss.entries):
-            logger.info('No results returned')
+            for rss_entry in rss.entries:
+                new_entry = Entry()
 
-        for rss_entry in rss.entries:
-            new_entry = Entry()
+                for key in list(rss_entry.keys()):
+                    new_entry[key] = rss_entry[key]
+                new_entry['url'] = new_entry['link']
+                if rss_entry.enclosures:
+                    size = int(rss_entry.enclosures[0]['length'])  # B
+                    new_entry['content_size'] = size / (2 ** 20)  # MB
+                entries.append(new_entry)
 
-            for key in list(rss_entry.keys()):
-                new_entry[key] = rss_entry[key]
-            new_entry['url'] = new_entry['link']
-            if rss_entry.enclosures:
-                size = int(rss_entry.enclosures[0]['length'])  # B
-                new_entry['content_size'] = size / (2 ** 20)  # MB
-            entries.append(new_entry)
         return entries
 
     def search(self, task, entry, config=None):
