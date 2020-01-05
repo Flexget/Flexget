@@ -25,7 +25,10 @@ web_config_schema = {
                 'ssl_private_key': {'type': 'string'},
                 'web_ui': {'type': 'boolean'},
                 'base_url': {'type': 'string'},
-                'run_v2': {'type': 'boolean'},
+                'run_v2': {
+                    'type': 'boolean',
+                    'deprecated': 'v2 is registered by default if web_ui: true so `run_v2` is now redundant. To run v1 alongside, use the `run_v1`.',
+                },
                 'run_v1': {'type': 'boolean'},
             },
             'additionalProperties': False,
@@ -101,9 +104,6 @@ def register_web_server(manager):
 
     # Register WebUI
     if web_server_config.get('web_ui'):
-        if web_server_config.get('run_v2'):
-            logger.warning('Run V2 is deprecated and can be removed from the config')
-
         if web_server_config.get('run_v1'):
             logger.info('Registering WebUI v1')
             register_web_ui_v1(manager)
