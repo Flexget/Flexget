@@ -1,4 +1,3 @@
-import logging
 import os
 import re
 from collections import defaultdict
@@ -7,6 +6,7 @@ from urllib.parse import parse_qsl, urlparse
 
 import jsonschema
 from jsonschema.compat import int_types, str_types
+from loguru import logger
 
 from flexget.event import fire_event
 from flexget.utils import qualities, template
@@ -15,7 +15,7 @@ from flexget.utils.tools import parse_episode_identifier, parse_timedelta
 
 schema_paths = {}
 
-log = logging.getLogger('config_schema')
+logger = logger.bind(name='config_schema')
 
 
 # TODO: Rethink how config key and schema registration work
@@ -398,7 +398,7 @@ def validate_oneOf(validator, oneOf, instance, schema):
 
 def validate_deprecated(validator, message, instance, schema):
     """Not really a validator, just warns if deprecated section of config is being used."""
-    log.warning(message)
+    logger.warning(message)
 
 
 validators = {'anyOf': validate_anyOf, 'oneOf': validate_oneOf, 'deprecated': validate_deprecated}

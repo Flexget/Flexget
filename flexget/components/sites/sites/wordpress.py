@@ -1,7 +1,7 @@
-import logging
 import re
 from urllib.parse import urlencode
 
+from loguru import logger
 from requests import Request, RequestException
 from requests.utils import cookiejar_from_dict, dict_from_cookiejar
 
@@ -9,7 +9,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginError
 
-log = logging.getLogger('wordpress_auth')
+logger = logger.bind(name='wordpress_auth')
 
 
 def construct_request(url, username='', password='', redirect='/wp-admin/'):
@@ -87,7 +87,7 @@ class PluginWordPress:
             task.requests.add_cookiejar(cookies)
 
         except RequestException as err:
-            log.error('%s', err)
+            logger.error('{}', err)
             raise PluginError('WordPress Authentication at %s failed' % (url,))
 
 

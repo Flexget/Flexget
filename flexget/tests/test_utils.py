@@ -4,7 +4,7 @@ from datetime import datetime
 import pytest
 
 from flexget.utils import json
-from flexget.utils.tools import parse_filesize, split_title_year, merge_dict_from_to
+from flexget.utils.tools import merge_dict_from_to, parse_filesize, split_title_year
 
 
 def compare_floats(float1, float2):
@@ -106,6 +106,7 @@ class TestSplitYearTitle:
     )
     def test_split_year_title(self, title, expected_title, expected_year):
         assert split_title_year(title) == (expected_title, expected_year)
+
 
 class TestDictMerge(object):
     def test_merge_dict_to_dict_list(self):

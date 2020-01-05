@@ -1,10 +1,11 @@
-import logging
 import time
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('sleep')
+logger = logger.bind(name='sleep')
 
 
 class PluginSleep:
@@ -47,7 +48,7 @@ class PluginSleep:
         if isinstance(config, int):
             config = {'phase': 'start', 'seconds': config}
         if config and config['phase'] == phase:
-            log.verbose('Sleeping for %d seconds.' % config['seconds'])
+            logger.verbose('Sleeping for {} seconds.', config['seconds'])
             time.sleep(int(config['seconds']))
 
     @plugin.priority(plugin.PRIORITY_FIRST)

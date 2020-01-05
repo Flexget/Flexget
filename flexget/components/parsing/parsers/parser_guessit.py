@@ -5,6 +5,7 @@ import time
 
 from guessit.api import GuessItApi, GuessitException
 from guessit.rules import rebulk_builder
+from loguru import logger
 from rebulk import Rebulk
 from rebulk.pattern import RePattern
 
@@ -16,7 +17,7 @@ from flexget.utils.tools import ReList
 
 from .parser_common import MovieParseResult, SeriesParseResult
 
-log = logging.getLogger('parser_guessit')
+logger = logger.bind(name='parser_guessit')
 
 logging.getLogger('rebulk').setLevel(logging.WARNING)
 logging.getLogger('guessit').setLevel(logging.WARNING)
@@ -176,7 +177,7 @@ class ParserGuessit:
 
     # movie_parser API
     def parse_movie(self, data, **kwargs):
-        log.debug('Parsing movie: `%s` [options: %s]', data, kwargs)
+        logger.debug('Parsing movie: `{}` [options: {}]', data, kwargs)
         start = preferred_clock()
         guessit_options = self._guessit_options(kwargs)
         guessit_options['type'] = 'movie'
@@ -193,12 +194,12 @@ class ParserGuessit:
                 guess_result.get('title')
             ),  # It's not valid if it didn't find a name, which sometimes happens
         )
-        log.debug('Parsing result: %s (in %s ms)', parsed, (preferred_clock() - start) * 1000)
+        logger.debug('Parsing result: {} (in {} ms)', parsed, (preferred_clock() - start) * 1000)
         return parsed
 
     # series_parser API
     def parse_series(self, data, **kwargs):
-        log.debug('Parsing series: `%s` [options: %s]', data, kwargs)
+        logger.debug('Parsing series: `{}` [options: {}]', data, kwargs)
         guessit_options = self._guessit_options(kwargs)
         valid = True
         if kwargs.get('name'):
@@ -223,7 +224,7 @@ class ParserGuessit:
         try:
             guess_result = guessit_api.guessit(data, options=guessit_options)
         except GuessitException:
-            log.warning('Parsing %s with guessit failed. Most likely a unicode error.', data)
+            logger.warning('Parsing {} with guessit failed. Most likely a unicode error.', data)
             return SeriesParseResult(data=data, valid=False)
 
         if guess_result.get('type') != 'episode':
@@ -368,7 +369,7 @@ class ParserGuessit:
             valid=valid,
         )
 
-        log.debug('Parsing result: %s (in %s ms)', parsed, (preferred_clock() - start) * 1000)
+        logger.debug('Parsing result: {} (in {} ms)', parsed, (preferred_clock() - start) * 1000)
         return parsed
 
     # TODO: The following functions are sort of legacy. No idea if they should be changed.
@@ -397,11 +398,11 @@ class ParserGuessit:
                 # Always pick the longest matching regex
                 if match_end > name_end:
                     name_end = match_end
-                log.debug('NAME SUCCESS: %s matched to %s', name_re.pattern, data)
+                logger.debug('NAME SUCCESS: {} matched to {}', name_re.pattern, data)
         if not name_end:
             # leave this invalid
-            log.debug(
-                'FAIL: name regexps %s do not match %s',
+            logger.debug(
+                'FAIL: name regexps {} do not match {}',
                 [regexp.pattern for regexp in name_regexps],
                 data,
             )

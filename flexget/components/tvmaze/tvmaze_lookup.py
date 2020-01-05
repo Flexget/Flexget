@@ -1,10 +1,10 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
 
-log = logging.getLogger('tvmaze_lookup')
+logger = logger.bind(name='tvmaze_lookup')
 
 
 class PluginTVMazeLookup:
@@ -136,7 +136,7 @@ class PluginTVMazeLookup:
             try:
                 series = series_lookup(**lookupargs)
             except LookupError as e:
-                log.debug(e)
+                logger.debug(e)
             else:
                 entry.update_using_map(self.series_map, series)
         return entry
@@ -156,7 +156,7 @@ class PluginTVMazeLookup:
             try:
                 season = season_lookup(**lookupargs)
             except LookupError as e:
-                log.debug(e)
+                logger.debug(e)
             else:
                 entry.update_using_map(self.season_map, season)
         return entry
@@ -179,7 +179,7 @@ class PluginTVMazeLookup:
             try:
                 episode = episode_lookup(**lookupargs)
             except LookupError as e:
-                log.debug(e)
+                logger.debug(e)
             else:
                 entry.update_using_map(self.episode_map, episode)
         return entry

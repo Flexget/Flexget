@@ -1,5 +1,6 @@
-import logging
 from functools import partial
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
@@ -11,7 +12,7 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='api_tvdb')
 
-log = logging.getLogger('thetvdb_lookup')
+logger = logger.bind(name='thetvdb_lookup')
 
 
 class PluginThetvdbLookup:
@@ -113,8 +114,8 @@ class PluginThetvdbLookup:
             )
             entry.update_using_map(field_map, series)
         except LookupError as e:
-            log.debug(
-                'Error looking up tvdb series information for %s: %s', entry['title'], e.args[0]
+            logger.debug(
+                'Error looking up tvdb series information for {}: {}', entry['title'], e.args[0]
             )
         return entry
 
@@ -132,13 +133,13 @@ class PluginThetvdbLookup:
             season_offset = entry.get('thetvdb_lookup_season_offset', 0)
             episode_offset = entry.get('thetvdb_lookup_episode_offset', 0)
             if not isinstance(season_offset, int):
-                log.error('thetvdb_lookup_season_offset must be an integer')
+                logger.error('thetvdb_lookup_season_offset must be an integer')
                 season_offset = 0
             if not isinstance(episode_offset, int):
-                log.error('thetvdb_lookup_episode_offset must be an integer')
+                logger.error('thetvdb_lookup_episode_offset must be an integer')
                 episode_offset = 0
             if season_offset != 0 or episode_offset != 0:
-                log.debug(
+                logger.debug(
                     f'Using offset for tvdb lookup: season: {season_offset}, '
                     f'episode: {episode_offset}'
                 )
@@ -160,8 +161,8 @@ class PluginThetvdbLookup:
             episode = plugin_api_tvdb.lookup_episode(**lookupargs)
             entry.update_using_map(self.episode_map, episode)
         except LookupError as e:
-            log.debug(
-                'Error looking up tvdb episode information for %s: %s', entry['title'], e.args[0]
+            logger.debug(
+                'Error looking up tvdb episode information for {}: {}', entry['title'], e.args[0]
             )
 
     # Run after series and metainfo series
@@ -190,8 +191,8 @@ class PluginThetvdbLookup:
                 # If there is season and ep info as well, register episode lazy fields
                 if entry.get('series_id_type') in ('ep', 'sequence', 'date'):
                     if entry.get('season_pack'):
-                        log.verbose(
-                            'TheTVDB API does not support season lookup at this time, skipping %s',
+                        logger.verbose(
+                            'TheTVDB API does not support season lookup at this time, skipping {}',
                             entry,
                         )
                     else:

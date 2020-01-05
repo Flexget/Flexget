@@ -1,5 +1,6 @@
 from distutils.version import LooseVersion
 
+from loguru import logger
 from sqlalchemy import Column, Integer, String
 
 from flexget import db_schema, plugin
@@ -35,6 +36,8 @@ _SOCKSPROXYUSERNAME_ATTR = 'username'
 _SOCKSPROXYPASSWORD_ATTR = 'password'
 
 ChatIdsBase = db_schema.versioned_base('telegram_chat_ids', 0)
+
+logger = logger.bind(name=_PLUGIN_NAME)
 
 
 class ChatIdEntry(ChatIdsBase):
@@ -122,8 +125,6 @@ class TelegramNotifier:
 
     """
 
-    log = None  # initialized during plugin.register
-    """:type: flexget.logger.FlexGetLogger"""
     _token = None
     _usernames = None
     _fullnames = None
@@ -232,8 +233,8 @@ class TelegramNotifier:
     def _real_init(self, session, config):
         self._enforce_telegram_plugin_ver()
         self._parse_config(config)
-        self.log.debug(
-            'token=%s, parse_mode=%s, disable_previews=%s, usernames=%s, fullnames=%s, groups=%s',
+        logger.debug(
+            'token={}, parse_mode={}, disable_previews={}, usernames={}, fullnames={}, groups={}',
             self._token,
             self._parse_mode,
             self._disable_previews,
@@ -268,11 +269,11 @@ class TelegramNotifier:
         try:
             self._bot.getMe()
         except UnicodeDecodeError as e:
-            self.log.trace('bot.getMe() raised: %s', repr(e))
+            logger.trace('bot.getMe() raised: {}', repr(e))
             raise plugin.PluginWarning('invalid bot token')
         except (NetworkError, TelegramError) as e:
-            self.log.error(
-                'Could not connect Telegram servers at this time, please try again later: %s',
+            logger.error(
+                'Could not connect Telegram servers at this time, please try again later: {}',
                 e.message,
             )
 
@@ -296,12 +297,12 @@ class TelegramNotifier:
         kwargs['disable_web_page_preview'] = self._disable_previews
         for chat_id in (x.id for x in chat_ids):
             try:
-                self.log.debug('sending msg to telegram servers: %s', msg)
+                logger.debug('sending msg to telegram servers: {}', msg)
                 self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
             except TelegramError as e:
                 if kwargs.get('parse_mode'):
-                    self.log.warning(
-                        'Failed to render message using parse mode %s. Falling back to basic parsing: %s',
+                    logger.warning(
+                        'Failed to render message using parse mode {}. Falling back to basic parsing: {}',
                         kwargs['parse_mode'],
                         e.message,
                     )
@@ -323,7 +324,7 @@ class TelegramNotifier:
         fullnames = self._fullnames[:]
         groups = self._groups[:]
         chat_ids, has_new_chat_ids = self._get_chat_ids(session, usernames, fullnames, groups)
-        self.log.debug('chat_ids=%s', chat_ids)
+        logger.debug('chat_ids={}', chat_ids)
 
         if not chat_ids:
             raise PluginError(
@@ -331,11 +332,11 @@ class TelegramNotifier:
             )
         else:
             if usernames:
-                self.log.warning('no chat id found for usernames: %s', usernames)
+                logger.warning('no chat id found for usernames: {}', usernames)
             if fullnames:
-                self.log.warning('no chat id found for fullnames: %s', fullnames)
+                logger.warning('no chat id found for fullnames: {}', fullnames)
             if groups:
-                self.log.warning('no chat id found for groups: %s', groups)
+                logger.warning('no chat id found for groups: {}', groups)
             if has_new_chat_ids:
                 self._update_db(session, chat_ids)
 
@@ -353,21 +354,21 @@ class TelegramNotifier:
         :rtype: list[ChatIdEntry], bool
 
         """
-        self.log.debug('loading cached chat ids')
+        logger.debug('loading cached chat ids')
         chat_ids = self._get_cached_chat_ids(session, usernames, fullnames, groups)
-        self.log.debug(
+        logger.debug(
             'found {0} cached chat_ids: {1}'.format(
                 len(chat_ids), ['{0}'.format(x) for x in chat_ids]
             )
         )
 
         if not (usernames or fullnames or groups):
-            self.log.debug('all chat ids found in cache')
+            logger.debug('all chat ids found in cache')
             return chat_ids, False
 
-        self.log.debug('loading new chat ids')
+        logger.debug('loading new chat ids')
         new_chat_ids = list(self._get_new_chat_ids(usernames, fullnames, groups))
-        self.log.debug(
+        logger.debug(
             'found {0} new chat_ids: {1}'.format(
                 len(new_chat_ids), ['{0}'.format(x) for x in new_chat_ids]
             )
@@ -504,7 +505,7 @@ class TelegramNotifier:
             elif chat.type in ('group', 'supergroup' or 'channel'):
                 groups[chat.title] = chat
             else:
-                self.log.warning('unknown chat type: %s}', type(chat))
+                logger.warning('unknown chat type: {}}}', type(chat))
 
         return usernames, fullnames, groups
 
@@ -514,7 +515,7 @@ class TelegramNotifier:
         :type chat_ids: list[ChatIdEntry]
 
         """
-        self.log.info('saving updated chat_ids to db')
+        logger.info('saving updated chat_ids to db')
 
         # avoid duplicate chat_ids. (this is possible if configuration specified both username & fullname
         chat_ids_d = dict((x.id, x) for x in chat_ids)

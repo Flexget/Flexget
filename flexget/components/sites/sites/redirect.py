@@ -1,9 +1,9 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('redirect_url')
+logger = logger.bind(name='redirect_url')
 
 
 class UrlRewriteRedirect:
@@ -26,9 +26,10 @@ class UrlRewriteRedirect:
             auth = None
             if 'download_auth' in entry:
                 auth = entry['download_auth']
-                log.debug(
-                    'Custom auth enabled for %s url_redirect: %s'
-                    % (entry['title'], entry['download_auth'])
+                logger.debug(
+                    'Custom auth enabled for {} url_redirect: {}',
+                    entry['title'],
+                    entry['download_auth'],
                 )
             try:
                 r = task.requests.head(entry['url'], auth=auth, allow_redirects=True)

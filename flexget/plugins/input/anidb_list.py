@@ -1,6 +1,6 @@
-import logging
 import re
 
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
@@ -9,7 +9,7 @@ from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.utils.soup import get_soup
 
-log = logging.getLogger('anidb_list')
+logger = logger.bind(name='anidb_list')
 USER_ID_RE = r'^\d{1,6}$'
 
 
@@ -54,7 +54,7 @@ class AnidbList:
     @cached('anidb_list', persist='2 hours')
     def on_task_input(self, task, config):
         # Create entries by parsing AniDB wishlist page html using beautifulsoup
-        log.verbose('Retrieving AniDB list: mywishlist:%s', config['mode'])
+        logger.verbose('Retrieving AniDB list: mywishlist:{}', config['mode'])
 
         task_headers = task.requests.headers.copy()
         task_headers['User-Agent'] = self.default_user_agent
@@ -87,13 +87,13 @@ class AnidbList:
 
             trs = soup_table.find_all('tr')
             if not trs:
-                log.verbose('No movies were found in AniDB list: mywishlist')
+                logger.verbose('No movies were found in AniDB list: mywishlist')
                 return
             for tr in trs:
                 if tr.find('span', title=entry_type):
                     a = tr.find('td', class_='name').find('a')
                     if not a:
-                        log.debug('No title link found for the row, skipping')
+                        logger.debug('No title link found for the row, skipping')
                         continue
 
                     anime_title = a.string
@@ -107,26 +107,26 @@ class AnidbList:
                     entry['anidb_id'] = tr['id'][
                         1:
                     ]  # The <tr> tag's id is "aN..." where "N..." is the anime id
-                    log.debug('%s id is %s', entry['title'], entry['anidb_id'])
+                    logger.debug('{} id is {}', entry['title'], entry['anidb_id'])
                     entry['anidb_name'] = entry['title']
                     yield entry
                 else:
-                    log.verbose('Entry does not match the requested type')
+                    logger.verbose('Entry does not match the requested type')
             try:
                 # Try to get the link to the next page.
                 next_link = soup.find('li', class_='next').find('a')['href']
             except TypeError:
                 # If it isn't there, there are no more pages to be crawled.
-                log.verbose('No more pages on the wishlist.')
+                logger.verbose('No more pages on the wishlist.')
                 break
             comp_link = self.anidb_url + next_link
-            log.debug('Requesting: %s', comp_link)
+            logger.debug('Requesting: {}', comp_link)
             try:
                 page = task.requests.get(comp_link, headers=task_headers)
             except RequestException as e:
-                log.error(str(e))
+                logger.error(str(e))
             if page.status_code != 200:
-                log.warning('Unable to retrieve next page of wishlist.')
+                logger.warning('Unable to retrieve next page of wishlist.')
                 break
 
 

@@ -1,5 +1,6 @@
 import os
-from logging import getLogger
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
@@ -7,7 +8,7 @@ from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.template import RenderError
 
-log = getLogger('utorrent')
+logger = logger.bind(name='utorrent')
 
 
 class PluginUtorrent:
@@ -74,9 +75,9 @@ class PluginUtorrent:
         except requests.RequestException as e:
             if hasattr(e, 'response') and e.response.status_code == '401':
                 raise plugin.PluginError(
-                    'Invalid credentials, check your utorrent webui username and password.', log
+                    'Invalid credentials, check your utorrent webui username and password.', logger
                 )
-            raise plugin.PluginError('%s' % e, log)
+            raise plugin.PluginError('%s' % e, logger)
         token = get_soup(response.text).find('div', id='token').text
         result = session.get(url, auth=auth, params={'action': 'list-dirs', 'token': token}).json()
         download_dirs = dict(
@@ -91,9 +92,9 @@ class PluginUtorrent:
             try:
                 path = os.path.expanduser(entry.render(path))
             except RenderError as e:
-                log.error(
-                    'Could not render path for `%s` downloading to default directory.'
-                    % entry['title']
+                logger.error(
+                    'Could not render path for `{}` downloading to default directory.',
+                    entry['title'],
                 )
                 # Add to default folder
                 path = ''
@@ -106,15 +107,16 @@ class PluginUtorrent:
                         path = path[len(dir) :].lstrip('\\')
                         break
                 else:
-                    log.error(
-                        'path `%s` (or one of its parents)is not added to utorrent webui allowed download '
-                        'directories. You must add it there before you can use it from flexget. '
-                        'Adding to default download directory instead.' % path
+                    logger.error(
+                        'path `{}` (or one of its parents)is not added to utorrent webui allowed download directories. '
+                        'You must add it there before you can use it from flexget. '
+                        'Adding to default download directory instead.',
+                        path,
                     )
                     path = ''
 
             if task.options.test:
-                log.info('Would add `%s` to utorrent' % entry['title'])
+                logger.info('Would add `{}` to utorrent', entry['title'])
                 continue
 
             # Get downloaded
@@ -128,8 +130,8 @@ class PluginUtorrent:
             # Verify the temp file exists
             if downloaded and not os.path.exists(entry['file']):
                 tmp_path = os.path.join(task.manager.config_base, 'temp')
-                log.debug('entry: %s' % entry)
-                log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
+                logger.debug('entry: {}', entry)
+                logger.debug('temp: {}', ', '.join(os.listdir(tmp_path)))
                 entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
                 continue
 
@@ -152,8 +154,8 @@ class PluginUtorrent:
 
             # Check result
             if 'build' in result.json():
-                log.info('Added `%s` to utorrent' % entry['url'])
-                log.info('in folder %s ' % folder + path)
+                logger.info('Added `{}` to utorrent', entry['url'])
+                logger.info('in folder {} {} ', folder, path)
             else:
                 entry.fail('Fail to add `%s` to utorrent' % entry['url'])
 

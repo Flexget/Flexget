@@ -1,10 +1,11 @@
 import json
-import logging
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('output.sns')
+logger = logger.bind(name='output.sns')
 
 DEFAULT_TEMPLATE_VALUE = json.dumps(
     {
@@ -58,7 +59,7 @@ class SNSNotification:
         try:
             import boto3  # noqa
         except ImportError as e:
-            log.debug("Error importing boto3: %s", e)
+            logger.debug('Error importing boto3: {}', e)
             raise plugin.DependencyError(
                 "sns", "boto3", "Boto3 module required. ImportError: %s" % e
             )
@@ -102,19 +103,19 @@ class SNSNotificationEmitter:
         for entry in task.accepted:
             message = entry.render(self.sns_notification_template)
             if task.options.test:
-                log.info(
-                    "SNS publication: region=%s, arn=%s", self.config['aws_region'], topic.arn
+                logger.info(
+                    'SNS publication: region={}, arn={}', self.config['aws_region'], topic.arn
                 )
-                log.info("Message: %s", message)
+                logger.info('Message: {}', message)
                 continue
 
             try:
                 response = topic.publish(Message=message)
             except Exception as e:
-                log.error("Error publishing %s: %s", entry['title'], e)
+                logger.error('Error publishing {}: {}', entry['title'], e)
                 continue
             else:
-                log.debug("Published %s: %s", entry, response)
+                logger.debug('Published {}: {}', entry, response)
 
 
 @event('plugin.register')

@@ -1,14 +1,14 @@
-import logging
 import math
 from urllib.parse import urlparse
 
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 
-log = logging.getLogger('next_sonarr_episodes')
+logger = logger.bind(name='next_sonarr_episodes')
 
 
 class NextSonarrEpisodes:
@@ -123,13 +123,13 @@ class NextSonarrEpisodes:
                     )
                     # Test mode logging
                     if entry and task.options.test:
-                        log.verbose("Test mode. Entry includes:")
+                        logger.verbose("Test mode. Entry includes:")
                         for key, value in list(entry.items()):
-                            log.verbose('     {}: {}'.format(key.capitalize(), value))
+                            logger.verbose('     {}: {}', key.capitalize(), value)
                     if entry.isvalid():
                         yield entry
                     else:
-                        log.error('Invalid entry created? {}'.format(entry))
+                        logger.error('Invalid entry created? {}', entry)
 
 
 @event('plugin.register')

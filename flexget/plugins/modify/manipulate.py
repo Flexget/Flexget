@@ -1,10 +1,11 @@
-import logging
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('manipulate')
+logger = logger.bind(name='manipulate')
 
 
 class Manipulate:
@@ -74,7 +75,7 @@ class Manipulate:
             # return if no jobs for this phase
             return
         modified = sum(self.process(entry, self.phase_jobs['metainfo']) for entry in task.entries)
-        log.verbose('Modified %d entries.' % modified)
+        logger.verbose('Modified {} entries.', modified)
 
     @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_filter(self, task, config):
@@ -85,7 +86,7 @@ class Manipulate:
             self.process(entry, self.phase_jobs['filter'])
             for entry in task.entries + task.rejected
         )
-        log.verbose('Modified %d entries.' % modified)
+        logger.verbose('Modified {} entries.', modified)
 
     @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_modify(self, task, config):
@@ -96,7 +97,7 @@ class Manipulate:
             self.process(entry, self.phase_jobs['modify'])
             for entry in task.entries + task.rejected
         )
-        log.verbose('Modified %d entries.' % modified)
+        logger.verbose('Modified {} entries.', modified)
 
     def process(self, entry, jobs):
         """Process given jobs from config for an entry.
@@ -113,9 +114,11 @@ class Manipulate:
                 if 'from' in config:
                     from_field = config['from']
                 field_value = entry.get(from_field)
-                log.debug(
-                    'field: `%s` from_field: `%s` field_value: `%s`'
-                    % (field, from_field, field_value)
+                logger.debug(
+                    'field: `{}` from_field: `{}` field_value: `{}`',
+                    field,
+                    from_field,
+                    field_value,
                 )
 
                 if config.get('remove'):
@@ -126,26 +129,26 @@ class Manipulate:
 
                 if 'extract' in config:
                     if not field_value:
-                        log.warning('Cannot extract, field `%s` is not present' % from_field)
+                        logger.warning('Cannot extract, field `{}` is not present', from_field)
                         continue
                     match = re.search(config['extract'], field_value, re.I | re.U)
                     if match:
                         groups = [x for x in match.groups() if x is not None]
-                        log.debug('groups: %s' % groups)
+                        logger.debug('groups: {}', groups)
                         field_value = config.get('separator', ' ').join(groups).strip()
-                        log.debug('field `%s` after extract: `%s`' % (field, field_value))
+                        logger.debug('field `{}` after extract: `{}`', field, field_value)
 
                 if 'replace' in config:
                     if not field_value:
-                        log.warning('Cannot replace, field `%s` is not present' % from_field)
+                        logger.warning('Cannot replace, field `{}` is not present', from_field)
                         continue
                     replace_config = config['replace']
                     regexp = re.compile(replace_config['regexp'], flags=re.I | re.U)
                     field_value = regexp.sub(replace_config['format'], field_value).strip()
-                    log.debug('field `%s` after replace: `%s`' % (field, field_value))
+                    logger.debug('field `{}` after replace: `{}`', field, field_value)
 
                 if from_field != field or entry[field] != field_value:
-                    log.verbose('Field `%s` is now `%s`' % (field, field_value))
+                    logger.verbose('Field `{}` is now `{}`', field, field_value)
                     modified = True
                 entry[field] = field_value
         return modified

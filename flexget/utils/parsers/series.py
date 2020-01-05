@@ -1,20 +1,16 @@
-import logging
 import re
 from datetime import datetime, timedelta
 from string import capwords
 
 from dateutil.parser import parse as parsedate
+from loguru import logger
 
 from flexget.utils import qualities
 from flexget.utils.parsers.generic import ParseWarning, default_ignore_prefixes, name_to_re
 from flexget.utils.parsers.parser import TitleParser
 from flexget.utils.tools import ReList
 
-log = logging.getLogger('seriesparser')
-
-# Forced to INFO !
-# switch to logging.DEBUG if you want to debug this class (produces quite a bit info ..)
-log.setLevel(logging.INFO)
+logger = logger.bind(name='seriesparser')
 
 ID_TYPES = ['ep', 'date', 'sequence', 'id']  # may also be 'special'
 
@@ -245,11 +241,11 @@ class SeriesParser(TitleParser):
         if not self.data:
             raise ParseWarning(self, 'No data supplied to parse.')
         if not self.name:
-            log.debug('No name for series `%s` supplied, guessing name.', self.data)
+            logger.trace('No name for series `{}` supplied, guessing name.', self.data)
             if not self.guess_name():
-                log.debug('Could not determine a series name')
+                logger.trace('Could not determine a series name')
                 return
-            log.debug('Series name for %s guessed to be %s', self.data, self.name)
+            logger.trace('Series name for {} guessed to be {}', self.data, self.name)
 
         # check if data appears to be unwanted (abort)
         if self.parse_unwanted(self.remove_dirt(self.data)):
@@ -259,7 +255,7 @@ class SeriesParser(TitleParser):
 
         name = self.remove_dirt(self.name)
 
-        log.debug('name: %s data: %s', name, self.data)
+        logger.trace('name: {} data: {}', name, self.data)
 
         # name end position
         name_start = 0
@@ -282,11 +278,11 @@ class SeriesParser(TitleParser):
                 # Always pick the longest matching regex
                 if match_end > name_end:
                     name_start, name_end = match_start, match_end
-                log.debug('NAME SUCCESS: %s matched to %s', name_re.pattern, self.data)
+                logger.trace('NAME SUCCESS: {} matched to {}', name_re.pattern, self.data)
         if not name_end:
             # leave this invalid
-            log.debug(
-                'FAIL: name regexps %s do not match %s',
+            logger.trace(
+                'FAIL: name regexps {} do not match {}',
                 [regexp.pattern for regexp in self.name_regexps],
                 self.data,
             )
@@ -295,7 +291,7 @@ class SeriesParser(TitleParser):
         # remove series name from raw data, move any prefix to end of string
         data_stripped = self.data[name_end:] + ' ' + self.data[:name_start]
         data_stripped = data_stripped.lower()
-        log.debug('data stripped: %s', data_stripped)
+        logger.trace('data stripped: {}', data_stripped)
 
         # allow group(s)
         if self.allow_groups:
@@ -303,22 +299,22 @@ class SeriesParser(TitleParser):
                 group = group.lower()
                 for fmt in ['[%s]', '-%s', '(%s)']:
                     if fmt % group in data_stripped:
-                        log.debug('%s is from group %s', self.data, group)
+                        logger.trace('{} is from group {}', self.data, group)
                         self.group = group
                         data_stripped = data_stripped.replace(fmt % group, '')
                         break
                 if self.group:
                     break
             else:
-                log.debug('%s is not from groups %s', self.data, self.allow_groups)
+                logger.trace('{} is not from groups {}', self.data, self.allow_groups)
                 return  # leave invalid
 
         # Find quality and clean from data
-        log.debug('parsing quality ->')
+        logger.trace('parsing quality ->')
         quality = qualities.Quality(data_stripped)
         if quality:
             # Remove quality string from data
-            log.debug('quality detected, using remaining data `%s`', quality.clean_text)
+            logger.trace('quality detected, using remaining data `{}`', quality.clean_text)
             data_stripped = quality.clean_text
         # Don't override passed in quality
         if not self.quality:
@@ -343,7 +339,7 @@ class SeriesParser(TitleParser):
 
         data_stripped = ' '.join(data_parts).strip()
 
-        log.debug("data for date/ep/id parsing '%s'", data_stripped)
+        logger.trace("data for date/ep/id parsing '{}'", data_stripped)
 
         # Try date mode before ep mode
         if self.identified_by in ['date', 'auto']:
@@ -359,7 +355,7 @@ class SeriesParser(TitleParser):
                 if not (self.special and self.prefer_specials):
                     return
             else:
-                log.debug('-> no luck with date_regexps')
+                logger.trace('-> no luck with date_regexps')
 
         if self.identified_by in ['ep', 'auto'] and not self.valid:
             ep_match = self.parse_episode(data_stripped)
@@ -371,8 +367,8 @@ class SeriesParser(TitleParser):
 
                 if ep_match['end_episode'] and ep_match['end_episode'] > ep_match['episode'] + 2:
                     # This is a pack of too many episodes, ignore it.
-                    log.debug(
-                        'Series pack contains too many episodes (%d). Rejecting',
+                    logger.trace(
+                        'Series pack contains too many episodes ({}). Rejecting',
                         ep_match['end_episode'] - ep_match['episode'],
                     )
                     return
@@ -399,14 +395,14 @@ class SeriesParser(TitleParser):
                     self.id_type = 'ep'
                     self.valid = True
                 else:
-                    log.debug('-> no luck with ep_regexps')
+                    logger.trace('-> no luck with ep_regexps')
 
             if self.identified_by == 'ep' and not self.season_pack:
                 # we should be getting season, ep !
                 # try to look up idiotic numbering scheme 101,102,103,201,202
                 # ressu: Added matching for 0101, 0102... It will fail on
                 #        season 11 though
-                log.debug('ep identifier expected. Attempting SEE format parsing.')
+                logger.trace('ep identifier expected. Attempting SEE format parsing.')
                 match = re.search(
                     self.re_not_in_word(r'(\d?\d)(\d\d)'),
                     data_stripped,
@@ -421,12 +417,12 @@ class SeriesParser(TitleParser):
                     self.season = int(match.group(1))
                     self.episode = int(match.group(2))
                     self.id = (self.season, self.episode)
-                    log.debug(self)
+                    logger.trace(self)
                     self.id_type = 'ep'
                     self.valid = True
                     return
                 else:
-                    log.debug('-> no luck with SEE')
+                    logger.trace('-> no luck with SEE')
 
         # Check id regexps
         if self.identified_by in ['id', 'auto'] and not self.valid:
@@ -444,13 +440,13 @@ class SeriesParser(TitleParser):
                     self.id = found_id
                     self.id_type = 'id'
                     self.valid = True
-                    log.debug('found id \'%s\' with regexp \'%s\'', self.id, id_re.pattern)
+                    logger.trace("found id '{}' with regexp '{}'", self.id, id_re.pattern)
                     if not (self.special and self.prefer_specials):
                         return
                     else:
                         break
             else:
-                log.debug('-> no luck with id_regexps')
+                logger.trace('-> no luck with id_regexps')
 
         # Other modes are done, check for unwanted sequence ids
         if self.parse_unwanted_sequence(data_stripped):
@@ -478,13 +474,13 @@ class SeriesParser(TitleParser):
                             self.proper_count = int(match.group('version')) - 1
                     self.id_type = 'sequence'
                     self.valid = True
-                    log.debug('found id \'%s\' with regexp \'%s\'', self.id, sequence_re.pattern)
+                    logger.trace("found id '{}' with regexp '{}'", self.id, sequence_re.pattern)
                     if not (self.special and self.prefer_specials):
                         return
                     else:
                         break
             else:
-                log.debug('-> no luck with sequence_regexps')
+                logger.trace('-> no luck with sequence_regexps')
 
         # No id found, check if this is a special
         if self.special or self.assume_special:
@@ -492,7 +488,7 @@ class SeriesParser(TitleParser):
             self.id = data_stripped or 'special'
             self.id_type = 'special'
             self.valid = True
-            log.debug('found special, setting id to \'%s\'', self.id)
+            logger.trace("found special, setting id to '{}'", self.id)
             return
         if self.valid:
             return
@@ -509,7 +505,7 @@ class SeriesParser(TitleParser):
         for unwanted_re in self.unwanted_regexps:
             match = re.search(unwanted_re, data)
             if match:
-                log.debug('unwanted regexp %s matched %s', unwanted_re.pattern, match.groups())
+                logger.trace('unwanted regexp {} matched {}', unwanted_re.pattern, match.groups())
                 return True
 
     def parse_unwanted_sequence(self, data):
@@ -517,7 +513,7 @@ class SeriesParser(TitleParser):
         for seq_unwanted_re in self.unwanted_sequence_regexps:
             match = re.search(seq_unwanted_re, data)
             if match:
-                log.debug('unwanted id regexp %s matched %s', seq_unwanted_re, match.groups())
+                logger.trace('unwanted id regexp {} matched {}', seq_unwanted_re, match.groups())
                 return True
 
     def parse_date(self, data):
@@ -557,10 +553,10 @@ class SeriesParser(TitleParser):
                         if possdate not in possdates:
                             possdates.append(possdate)
                 except ValueError:
-                    log.debug('%s is not a valid date, skipping', match.group(0))
+                    logger.trace('{} is not a valid date, skipping', match.group(0))
                     continue
                 if not possdates:
-                    log.debug('All possible dates for %s were in the future', match.group(0))
+                    logger.trace('All possible dates for {} were in the future', match.group(0))
                     continue
                 possdates.sort()
                 # Pick the most recent date if there are ambiguities
@@ -581,8 +577,8 @@ class SeriesParser(TitleParser):
             match = re.search(ep_re, data)
 
             if match:
-                log.debug(
-                    'found episode number with regexp %s (%s)', ep_re.pattern, match.groups()
+                logger.trace(
+                    'found episode number with regexp {} ({})', ep_re.pattern, match.groups()
                 )
                 matches = match.groups()
                 if len(matches) >= 2:
@@ -607,8 +603,8 @@ class SeriesParser(TitleParser):
                     else:
                         episode = int(episode)
                 except ValueError:
-                    log.critical(
-                        'Invalid episode number match %s returned with regexp `%s` for %s',
+                    logger.critical(
+                        'Invalid episode number match {} returned with regexp `{}` for {}',
                         match.groups(),
                         ep_re.pattern,
                         self.data,
@@ -635,7 +631,9 @@ class SeriesParser(TitleParser):
         for season_pack_re in self.season_pack_regexps:
             match = re.search(season_pack_re, data)
             if match:
-                log.debug('season pack regexp %s match %s', season_pack_re.pattern, match.groups())
+                logger.trace(
+                    'season pack regexp {} match {}', season_pack_re.pattern, match.groups()
+                )
                 matches = match.groups()
                 if len(matches) == 1:
                     # Single season full pack, no parts etc

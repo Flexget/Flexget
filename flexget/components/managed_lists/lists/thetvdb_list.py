@@ -1,5 +1,6 @@
-import logging
 from collections.abc import MutableSet
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -14,7 +15,7 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='api_tvdb')
 
-log = logging.getLogger('thetvdb_list')
+logger = logger.bind(name='thetvdb_list')
 
 
 class TheTVDBSet(MutableSet):
@@ -74,7 +75,7 @@ class TheTVDBSet(MutableSet):
                         tvdb_id=series_id, language=self.config.get('language')
                     )
                 except LookupError as e:
-                    log.error('Error looking up %s from thetvdb: %s' % (series_id, e.args[0]))
+                    logger.error('Error looking up {} from thetvdb: {}', series_id, e.args[0])
                 else:
                     series_name = series.name
                     if self.config.get('strip_dates'):
@@ -94,7 +95,7 @@ class TheTVDBSet(MutableSet):
 
     def add(self, entry):
         if not entry.get('tvdb_id'):
-            log.verbose(
+            logger.verbose(
                 'entry does not have `tvdb_id`, cannot add to list. Consider using a lookup plugin`'
             )
             return
@@ -105,14 +106,14 @@ class TheTVDBSet(MutableSet):
                 api_key=self.config['api_key'],
             ).put('user/favorites/{}'.format(entry['tvdb_id']))
         except RequestException as e:
-            log.error(
+            logger.error(
                 'Could not add tvdb_id {} to favourites list: {}'.format(entry['tvdb_id'], e)
             )
         self.invalidate_cache()
 
     def discard(self, entry):
         if not entry.get('tvdb_id'):
-            log.verbose(
+            logger.verbose(
                 'entry does not have `tvdb_id`, cannot remove from list. Consider using a lookup plugin`'
             )
             return
@@ -123,14 +124,12 @@ class TheTVDBSet(MutableSet):
                 api_key=self.config['api_key'],
             ).delete('user/favorites/{}'.format(entry['tvdb_id']))
         except RequestException as e:
-            log.error(
-                'Could not add tvdb_id {} to favourites list: {}'.format(entry['tvdb_id'], e)
-            )
+            logger.error('Could not add tvdb_id {} to favourites list: {}', entry['tvdb_id'], e)
         self.invalidate_cache()
 
     def _find_entry(self, entry):
         if not entry.get('tvdb_id'):
-            log.debug('entry does not have `tvdb_id`, skipping: {}'.format(entry))
+            logger.debug('entry does not have `tvdb_id`, skipping: {}', entry)
             return
         for item in self.items:
             if item['tvdb_id'] == entry['tvdb_id']:

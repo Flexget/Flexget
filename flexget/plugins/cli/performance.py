@@ -1,13 +1,13 @@
-import logging
 import time
 from argparse import SUPPRESS
 
+from loguru import logger
 from sqlalchemy.engine import Connection
 
 from flexget import options
 from flexget.event import add_event_handler, event, remove_event_handler
 
-log = logging.getLogger('performance')
+logger = logger.bind(name='performance')
 
 performance = {}
 
@@ -19,7 +19,7 @@ orig_execute = None
 
 def log_query_count(name_point):
     """Debugging purposes, allows logging number of executed queries at :name_point:"""
-    log.info('At point named `%s` total of %s queries were ran' % (name_point, query_count))
+    logger.info('At point named `{}` total of {} queries were ran', name_point, query_count)
 
 
 def before_plugin(task, keyword):
@@ -43,7 +43,7 @@ def startup(manager, options):
     if not options.debug_perf:
         return
 
-    log.info('Enabling plugin and SQLAlchemy performance debugging')
+    logger.info('Enabling plugin and SQLAlchemy performance debugging')
     global query_count, orig_execute
     query_count = 0
 
@@ -58,7 +58,7 @@ def startup(manager, options):
 
         Connection.execute = monkeypatched
     else:
-        log.critical('Unable to monkeypatch sqlalchemy')
+        logger.critical('Unable to monkeypatch sqlalchemy')
 
     add_event_handler('task.execute.before_plugin', before_plugin)
     add_event_handler('task.execute.after_plugin', after_plugin)
@@ -71,12 +71,12 @@ def cleanup(manager, options):
 
     # Print summary
     for name, data in performance.items():
-        log.info('Performance results for task %s:' % name)
+        logger.info('Performance results for task {}:', name)
         for keyword, results in data.items():
             took = results['took']
             queries = results['queries']
             if took > 0.1 or queries > 10:
-                log.info('%-15s took %0.2f sec (%s queries)' % (keyword, took, queries))
+                logger.info('{:<15} took {:0.2f} sec ({} queries)', keyword, took, queries)
 
     # Deregister our hooks
     if hasattr(Connection, 'execute') and orig_execute:

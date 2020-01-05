@@ -15,7 +15,11 @@ if not __version__:
 
 
 def load_requirements(filename):
-    return [line.strip() for line in Path(filename).read_text().splitlines() if not line.startswith('#')]
+    return [
+        line.strip()
+        for line in Path(filename).read_text().splitlines()
+        if not line.startswith('#')
+    ]
 
 
 setup(

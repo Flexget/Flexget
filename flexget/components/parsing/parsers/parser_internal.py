@@ -1,5 +1,6 @@
-import logging
 import time
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
@@ -10,7 +11,7 @@ from flexget.utils.parsers.series import SeriesParser
 
 from .parser_common import MovieParseResult, SeriesParseResult
 
-log = logging.getLogger('parser_internal')
+logger = logger.bind(name='parser_internal')
 
 
 try:
@@ -25,13 +26,13 @@ class ParserInternal:
 
     @plugin.priority(1)
     def parse_movie(self, data, **kwargs):
-        log.debug('Parsing movie: `%s` kwargs: %s', data, kwargs)
+        logger.debug('Parsing movie: `{}` kwargs: {}', data, kwargs)
         start = preferred_clock()
         parser = MovieParser()
         try:
             parser.parse(data)
         except ParseWarning as pw:
-            log_once(pw.value, logger=log)
+            log_once(pw.value, logger=logger)
         result = MovieParseResult(
             data=data,
             name=parser.name,
@@ -40,19 +41,19 @@ class ParserInternal:
             proper_count=parser.proper_count,
             valid=bool(parser.name),
         )
-        log.debug('Parsing result: %s (in %s ms)', parser, (preferred_clock() - start) * 1000)
+        logger.debug('Parsing result: {} (in {} ms)', parser, (preferred_clock() - start) * 1000)
         return result
 
     # series_parser API
     @plugin.priority(1)
     def parse_series(self, data, **kwargs):
-        log.debug('Parsing series: `%s` kwargs: %s', data, kwargs)
+        logger.debug('Parsing series: `{}` kwargs: {}', data, kwargs)
         start = preferred_clock()
         parser = SeriesParser(**kwargs)
         try:
             parser.parse(data)
         except ParseWarning as pw:
-            log_once(pw.value, logger=log)
+            log_once(pw.value, logger=logger)
         # TODO: Returning this invalid object seems a bit silly, raise an exception is probably better
         if not parser.valid:
             return SeriesParseResult(valid=False)
@@ -70,7 +71,7 @@ class ParserInternal:
             strict_name=parser.strict_name,
             identified_by=parser.identified_by,
         )
-        log.debug('Parsing result: %s (in %s ms)', parser, (preferred_clock() - start) * 1000)
+        logger.debug('Parsing result: {} (in {} ms)', parser, (preferred_clock() - start) * 1000)
         return result
 
 

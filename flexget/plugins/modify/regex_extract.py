@@ -1,12 +1,13 @@
-import logging
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils.tools import ReList
 
-log = logging.getLogger('regex_extract')
+logger = logger.bind(name='regex_extract')
 
 
 class RegexExtract:
@@ -62,23 +63,23 @@ class RegexExtract:
         for entry in task.entries:
             for rx in self.regex_list:
                 entry_field = entry.get('title')
-                log.debug('Matching %s with regex: %s' % (entry_field, rx))
+                logger.debug('Matching {} with regex: {}', entry_field, rx)
                 try:
                     match = rx.match(entry_field)
                 except re.error as e:
                     raise plugin.PluginError('Error encountered processing regex: %s' % str(e))
                 if match:
-                    log.debug('Successfully matched %s' % entry_field)
+                    logger.debug('Successfully matched {}', entry_field)
                     data = match.groupdict()
                     if prefix:
                         for key in list(data.keys()):
                             data[prefix + key] = data[key]
                             del data[key]
-                    log.debug('Values added to entry: %s' % data)
+                    logger.debug('Values added to entry: {}', data)
                     entry.update(data)
                     modified += 1
 
-        log.info('%d entries matched and modified' % modified)
+        logger.info('{} entries matched and modified', modified)
 
 
 @event('plugin.register')

@@ -1,6 +1,7 @@
-import logging
 import re
 from collections.abc import MutableSet
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.db_schema import with_session
@@ -9,7 +10,7 @@ from flexget.manager import Session
 
 from . import db
 
-log = logging.getLogger('regexp_list')
+logger = logger.bind(name='regexp_list')
 
 
 class RegexpList(MutableSet):
@@ -58,7 +59,7 @@ class RegexpList(MutableSet):
             for match_regexp in [False, True]:
                 db_regexp = self._find_entry(entry, match_regexp=match_regexp, session=session)
                 if db_regexp:
-                    log.debug('deleting file %s', db_regexp)
+                    logger.debug('deleting file {}', db_regexp)
                     session.delete(db_regexp)
 
     def __contains__(self, entry):

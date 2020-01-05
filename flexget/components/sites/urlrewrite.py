@@ -1,11 +1,12 @@
-import logging
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.components.sites.urlrewriting import UrlRewritingError
 from flexget.event import event
 
-log = logging.getLogger('urlrewrite')
+logger = logger.bind(name='urlrewrite')
 
 
 class UrlRewrite:
@@ -45,14 +46,14 @@ class UrlRewrite:
                 'format': format,
                 'regexp': rewrite_config['regexp'],
             }
-            log.debug('Added rewrite %s' % name)
+            logger.debug('Added rewrite {}', name)
 
     def url_rewritable(self, task, entry):
-        log.trace('running url_rewritable')
-        log.trace(self.resolves)
+        logger.trace('running url_rewritable')
+        logger.trace(self.resolves)
         for _, config in self.resolves.get(task.name, {}).items():
             regexp = config['regexp_compiled']
-            log.trace('testing %s' % config['regexp'])
+            logger.trace('testing {}', config['regexp'])
             if regexp.search(entry['url']):
                 return True
         return False
@@ -62,7 +63,7 @@ class UrlRewrite:
             regexp = config['regexp_compiled']
             format = config['format']
             if regexp.search(entry['url']):
-                log.debug('Regexp resolving %s with %s' % (entry['url'], name))
+                logger.debug('Regexp resolving {} with {}', entry['url'], name)
 
                 # run the regexp
                 entry['url'] = regexp.sub(format, entry['url'])

@@ -1,11 +1,12 @@
-import logging
 from argparse import SUPPRESS
+
+from loguru import logger
 
 from flexget import options, plugin
 from flexget.event import event
 from flexget.terminal import console
 
-log = logging.getLogger('dump_config')
+logger = logger.bind(name='dump_config')
 
 
 class OutputDumpConfig:

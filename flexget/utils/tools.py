@@ -3,7 +3,6 @@ import ast
 import copy
 import hashlib
 import locale
-import logging
 import operator
 import os
 import queue
@@ -17,10 +16,11 @@ from pprint import pformat
 from urllib import request
 
 import requests
+from loguru import logger
 
 import flexget
 
-log = logging.getLogger('utils')
+logger = logger.bind(name='utils')
 
 
 def str_to_boolean(string):
@@ -570,29 +570,29 @@ def aggregate_inputs(task, inputs):
             try:
                 result = method(task, input_config)
             except plugin.PluginError as e:
-                log.warning('Error during input plugin %s: %s', input_name, e)
+                logger.warning('Error during input plugin {}: {}', input_name, e)
                 continue
 
             if not result:
-                log.warning('Input %s did not return anything', input_name)
+                logger.warning('Input {} did not return anything', input_name)
                 continue
 
             for entry in result:
                 urls = ([entry['url']] if entry.get('url') else []) + entry.get('urls', [])
 
                 if any(url in entry_urls for url in urls):
-                    log.debug('URL for `%s` already in entry list, skipping.', entry['title'])
+                    logger.debug('URL for `{}` already in entry list, skipping.', entry['title'])
                     continue
 
                 if entry['title'] in entry_titles:
-                    log.debug(
-                        'Ignored duplicate title `%s`', entry['title']
+                    logger.debug(
+                        'Ignored duplicate title `{}`', entry['title']
                     )  # TODO: should combine?
                     continue
 
                 if entry.get('location') and entry['location'] in entry_locations:
-                    log.debug(
-                        'Ignored duplicate location `%s`', entry['location']
+                    logger.debug(
+                        'Ignored duplicate location `{}`', entry['location']
                     )  # TODO: should combine?
                     continue
 

@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 import re
 from collections import deque
@@ -11,6 +10,7 @@ from flask_cors import CORS
 from flask_restplus import Api as RestPlusAPI
 from flask_restplus import Resource
 from jsonschema import RefResolutionError
+from loguru import logger
 from werkzeug.http import generate_etag
 
 from flexget import manager
@@ -20,9 +20,9 @@ from flexget.webserver import User
 
 from . import __path__
 
-__version__ = '1.5.0'
+__version__ = '1.7.0'
 
-log = logging.getLogger('api')
+logger = logger.bind(name='api')
 
 
 class APIClient:
@@ -137,7 +137,7 @@ class API(RestPlusAPI):
                             code_or_apierror.response_model,
                         )
                     },
-                    **kwargs
+                    **kwargs,
                 )
         except TypeError:
             # If first argument isn't a class this happens
@@ -340,7 +340,7 @@ def api_errors(error):
 
 @with_session
 def api_key(session=None):
-    log.debug('fetching token for internal lookup')
+    logger.debug('fetching token for internal lookup')
     return session.query(User).first().token
 
 

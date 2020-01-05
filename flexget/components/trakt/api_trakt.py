@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
 
-import logging
-
 from dateutil.parser import parse as dateutil_parse
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
@@ -11,7 +10,7 @@ from flexget.utils.tools import TimedDict
 
 from . import db
 
-log = logging.getLogger(__name__)
+logger = logger.bind(name=__name__)
 
 USER_CACHE_DURATION = '15 minutes'  # cache duration for sync data eg. history, collection
 
@@ -83,12 +82,12 @@ class TraktUserCache(TimedDict):
         cache = self._get_user_cache(username=username, account=account)[data_type][media_type]
 
         if not cache:
-            log.debug('No %s found in cache. Refreshing.', data_type)
+            logger.debug('No {} found in cache. Refreshing.', data_type)
             self.updaters[data_type](cache, media_type, username=username, account=account)
             cache = self._get_user_cache(username=username, account=account)[data_type][media_type]
 
         if not cache:
-            log.warning('No %s data returned from trakt.', data_type)
+            logger.warning('No {} data returned from trakt.', data_type)
 
         return cache
 
@@ -164,7 +163,9 @@ class ApiTrakt:
                 .first()
             )
             if found and found.series:
-                log.debug('Found %s in previous search results as %s', title, found.series.title)
+                logger.debug(
+                    'Found {} in previous search results as {}', title, found.series.title
+                )
                 series = found.series
         if only_cached:
             if series:
@@ -178,7 +179,7 @@ class ApiTrakt:
             )
         except LookupError as e:
             if series:
-                log.debug('Error refreshing show data from trakt, using cached. %s', e)
+                logger.debug('Error refreshing show data from trakt, using cached. {}', e)
                 return series
             raise
         try:
@@ -191,10 +192,10 @@ class ApiTrakt:
                     .filter(db.TraktShowSearchResult.search == title.lower())
                     .first()
                 ):
-                    log.debug('Adding search result to db')
+                    logger.debug('Adding search result to db')
                     session.merge(db.TraktShowSearchResult(search=title, series=series))
             elif series and found:
-                log.debug('Updating search result in db')
+                logger.debug('Updating search result in db')
                 found.series = series
             return series
         finally:
@@ -214,7 +215,7 @@ class ApiTrakt:
                 .first()
             )
             if found and found.movie:
-                log.debug('Found %s in previous search results as %s', title, found.movie.title)
+                logger.debug('Found {} in previous search results as {}', title, found.movie.title)
                 movie = found.movie
         if only_cached:
             if movie:
@@ -223,16 +224,19 @@ class ApiTrakt:
         if movie and not movie.expired:
             return movie
         # Parse the movie for better results
-        title_parser = plugin.get('parsing', 'api_trakt').parse_movie(title)
-        y = year or title_parser.year
-        parsed_title = title_parser.name
+        parsed_title = None
+        y = year
+        if title:
+            title_parser = plugin.get('parsing', 'api_trakt').parse_movie(title)
+            y = year or title_parser.year
+            parsed_title = title_parser.name
         try:
             trakt_movie = db.get_trakt_data(
                 'movie', title=parsed_title, year=y, trakt_ids=trakt_movie_ids
             )
         except LookupError as e:
             if movie:
-                log.debug('Error refreshing movie data from trakt, using cached. %s', e)
+                logger.debug('Error refreshing movie data from trakt, using cached. {}', e)
                 return movie
             raise
         try:
@@ -245,10 +249,10 @@ class ApiTrakt:
                     .filter(db.TraktMovieSearchResult.search == title.lower())
                     .first()
                 ):
-                    log.debug('Adding search result to db')
+                    logger.debug('Adding search result to db')
                     session.merge(db.TraktMovieSearchResult(search=title, movie=movie))
             elif movie and found:
-                log.debug('Updating search result in db')
+                logger.debug('Updating search result in db')
                 found.movie = movie
             return movie
         finally:
@@ -266,8 +270,8 @@ class ApiTrakt:
             )
             in_collection = number_of_collected_episodes >= trakt_data.aired_episodes
 
-        log.debug(
-            'The result for show entry "%s" is: %s',
+        logger.debug(
+            'The result for show entry "{}" is: {}',
             title,
             'Owned' if in_collection else 'Not owned',
         )
@@ -286,8 +290,8 @@ class ApiTrakt:
                     in_collection = True
                     break
 
-        log.debug(
-            'The result for season entry "%s" is: %s',
+        logger.debug(
+            'The result for season entry "{}" is: {}',
             title,
             'Owned' if in_collection else 'Not owned',
         )
@@ -306,8 +310,8 @@ class ApiTrakt:
                     in_collection = trakt_data.number in episodes
                     break
 
-        log.debug(
-            'The result for episode entry "%s" is: %s',
+        logger.debug(
+            'The result for episode entry "{}" is: {}',
             title,
             'Owned' if in_collection else 'Not owned',
         )
@@ -316,8 +320,8 @@ class ApiTrakt:
     def is_movie_in_collection(self, trakt_data, title):
         cache = user_cache.get_movie_collection(self.username, self.account)
         in_collection = trakt_data.id in cache
-        log.debug(
-            'The result for movie entry "%s" is: %s',
+        logger.debug(
+            'The result for movie entry "{}" is: {}',
             title,
             'Owned' if in_collection else 'Not owned',
         )
@@ -334,8 +338,8 @@ class ApiTrakt:
             )
             is_watched = number_of_watched_episodes == trakt_data.aired_episodes
 
-        log.debug(
-            'The result for show entry "%s" is: %s',
+        logger.debug(
+            'The result for show entry "{}" is: {}',
             title,
             'Watched' if is_watched else 'Not watched',
         )
@@ -351,8 +355,8 @@ class ApiTrakt:
                 if trakt_data.number == s['number']:
                     is_watched = True
                     break
-        log.debug(
-            'The result for season entry "%s" is: %s',
+        logger.debug(
+            'The result for season entry "{}" is: {}',
             title,
             'Watched' if is_watched else 'Not watched',
         )
@@ -369,8 +373,8 @@ class ApiTrakt:
                     episodes = [ep['number'] for ep in s['episodes']]
                     is_watched = trakt_data.number in episodes
                     break
-        log.debug(
-            'The result for episode entry "%s" is: %s',
+        logger.debug(
+            'The result for episode entry "{}" is: {}',
             title,
             'Watched' if is_watched else 'Not watched',
         )
@@ -379,8 +383,8 @@ class ApiTrakt:
     def is_movie_watched(self, trakt_data, title):
         cache = user_cache.get_watched_movies(username=self.username, account=self.account)
         is_watched = trakt_data.id in cache
-        log.debug(
-            'The result for movie entry "%s" is: %s',
+        logger.debug(
+            'The result for movie entry "{}" is: {}',
             title,
             'Watched' if is_watched else 'Not watched',
         )
@@ -391,7 +395,7 @@ class ApiTrakt:
         user_rating = None
         if trakt_data.id in cache:
             user_rating = cache[trakt_data.id]['rating']
-        log.debug('User rating for show entry "%s" is: %s', title, user_rating)
+        logger.debug('User rating for show entry "{}" is: {}', title, user_rating)
         return user_rating
 
     def season_user_ratings(self, trakt_data, title):
@@ -399,7 +403,7 @@ class ApiTrakt:
         user_rating = None
         if trakt_data.id in cache and trakt_data.number == cache[trakt_data.id]['number']:
             user_rating = cache[trakt_data.id]['rating']
-        log.debug('User rating for season entry "%s" is: %s', title, user_rating)
+        logger.debug('User rating for season entry "{}" is: {}', title, user_rating)
         return user_rating
 
     def episode_user_ratings(self, trakt_data, title):
@@ -407,7 +411,7 @@ class ApiTrakt:
         user_rating = None
         if trakt_data.id in cache:
             user_rating = cache[trakt_data.id]['rating']
-        log.debug('User rating for episode entry "%s" is: %s', title, user_rating)
+        logger.debug('User rating for episode entry "{}" is: {}', title, user_rating)
         return user_rating
 
     def movie_user_ratings(self, trakt_data, title):
@@ -415,7 +419,7 @@ class ApiTrakt:
         user_rating = None
         if trakt_data.id in cache:
             user_rating = cache[trakt_data.id]['rating']
-        log.debug('User rating for movie entry "%s" is: %s', title, user_rating)
+        logger.debug('User rating for movie entry "{}" is: {}', title, user_rating)
         return user_rating
 
 

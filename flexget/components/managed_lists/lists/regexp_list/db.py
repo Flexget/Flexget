@@ -1,18 +1,13 @@
-import logging
-import re
-from collections.abc import MutableSet
 from datetime import datetime
 
+from loguru import logger
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, Unicode, and_, func
 from sqlalchemy.orm import relationship
 
-from flexget import plugin
 from flexget.db_schema import versioned_base, with_session
 from flexget.entry import Entry
-from flexget.event import event
-from flexget.manager import Session
 
-log = logging.getLogger('regexp_list')
+logger = logger.bind(name='regexp_list')
 Base = versioned_base('regexp_list', 1)
 
 
@@ -54,17 +49,17 @@ class RegexListRegexp(Base):
 
 @with_session
 def get_regexp_lists(name=None, session=None):
-    log.debug('retrieving regexp lists')
+    logger.debug('retrieving regexp lists')
     query = session.query(RegexpListList)
     if name:
-        log.debug('filtering by name %s', name)
+        logger.debug('filtering by name {}', name)
         query = query.filter(RegexpListList.name.contains(name))
     return query.all()
 
 
 @with_session
 def get_list_by_exact_name(name, session=None):
-    log.debug('returning list with name %s', name)
+    logger.debug('returning list with name {}', name)
     return (
         session.query(RegexpListList)
         .filter(func.lower(RegexpListList.name) == name.lower())
@@ -89,7 +84,7 @@ def get_regexps_by_list_id(
 
 @with_session
 def get_list_by_id(list_id, session=None):
-    log.debug('fetching list with id %d', list_id)
+    logger.debug('fetching list with id {}', list_id)
     return session.query(RegexpListList).filter(RegexpListList.id == list_id).one_or_none()
 
 
@@ -97,7 +92,7 @@ def get_list_by_id(list_id, session=None):
 def get_regexp(list_id, regexp, session=None):
     regexp_list = get_list_by_id(list_id=list_id, session=session)
     if regexp_list:
-        log.debug('searching for regexp %s in list %d', regexp, list_id)
+        logger.debug('searching for regexp {} in list {}', regexp, list_id)
         return (
             session.query(RegexListRegexp)
             .filter(

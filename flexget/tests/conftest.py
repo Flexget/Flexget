@@ -13,17 +13,19 @@ import jsonschema
 import pytest
 import requests
 import yaml
+from _pytest.logging import caplog as _caplog
+from loguru import logger
 from vcr import VCR
 from vcr.stubs import VCRHTTPConnection, VCRHTTPSConnection
 
-import flexget.logger
+import flexget.log
 from flexget.api import api_app
 from flexget.manager import Manager, Session
 from flexget.plugin import load_plugins
 from flexget.task import Task, TaskAbort
 from flexget.webserver import User
 
-log = logging.getLogger('tests')
+logger = logger.bind(name='tests')
 
 VCR_CASSETTE_DIR = os.path.join(os.path.dirname(__file__), 'cassettes')
 VCR_RECORD_MODE = os.environ.get('VCR_RECORD_MODE', 'once')
@@ -81,7 +83,7 @@ def execute_task(manager):
 
         :param abort: If `True` expect (and require) this task to abort.
         """
-        log.info('********** Running task: %s ********** ' % task_name)
+        logger.info('********** Running task: {} ********** ', task_name)
         config = manager.config['tasks'][task_name]
         task = Task(manager, task_name, config=config, options=options)
 
@@ -123,7 +125,7 @@ def use_vcr(request, monkeypatch):
             online = not os.path.exists(cassette_path)
         # If we are not going online, disable domain limiting during test
         if not online:
-            log.debug('Disabling domain limiters during VCR playback.')
+            logger.debug('Disabling domain limiters during VCR playback.')
             monkeypatch.setattr('flexget.utils.requests.limit_domains', mock.Mock())
         with vcr.use_cassette(path=cassette_path) as cassette:
             yield cassette
@@ -172,6 +174,28 @@ def link_headers(manager):
     return headers
 
 
+@pytest.fixture(autouse=True)
+def caplog(pytestconfig, _caplog):
+    """
+    Override caplog so that we can send loguru messages to logging for compatibility.
+    """
+    # set logging level according to pytest verbosity
+    level = logger.level('DEBUG')
+    if pytestconfig.getoption('verbose') == 1:
+        level = logger.level('TRACE')
+    elif pytestconfig.getoption('quiet', None) == 1:
+        level = logger.level('INFO')
+
+    class PropagateHandler(logging.Handler):
+        def emit(self, record):
+            logging.getLogger(record.name).handle(record)
+
+    handler_id = logger.add(PropagateHandler(), level=level.no, format="{message}", catch=False)
+    _caplog.set_level(level.no)
+    yield _caplog
+    logger.remove(handler_id)
+
+
 # --- End Public Fixtures ---
 
 
@@ -213,7 +237,7 @@ def filecopy(request):
                 dest_path = dst
                 if dest_path.is_dir():
                     dest_path = dest_path / f.name
-                log.debug('copying %s to %s', f, dest_path)
+                logger.debug('copying {} to {}', f, dest_path)
                 if not os.path.isdir(os.path.dirname(dest_path)):
                     os.makedirs(os.path.dirname(dest_path))
                 if os.path.isdir(f):
@@ -259,7 +283,7 @@ def no_requests(monkeypatch):
 @pytest.fixture(scope='session', autouse=True)
 def setup_once(pytestconfig, request):
     #    os.chdir(os.path.join(pytestconfig.rootdir.strpath, 'flexget', 'tests'))
-    flexget.logger.initialize(True)
+    flexget.log.initialize(True)
     m = MockManager(
         'tasks: {}', 'init'
     )  # This makes sure our template environment is set up before any tests are run
@@ -279,20 +303,10 @@ def chdir(pytestconfig, request):
         os.chdir(os.path.dirname(request.module.__file__))
 
 
-@pytest.fixture(autouse=True)
-def setup_loglevel(pytestconfig, caplog):
-    # set logging level according to pytest verbosity
-    level = logging.DEBUG
-    if pytestconfig.getoption('verbose') == 1:
-        level = flexget.logger.TRACE
-    elif pytestconfig.getoption('quiet', None) == 1:
-        level = logging.INFO
-    logging.getLogger().setLevel(level)
-    caplog.set_level(level)
-
-
 class CrashReport(Exception):
-    pass
+    def __init__(self, message, crash_log):
+        self.message = message
+        self.crash_log = crash_log
 
 
 class MockManager(Manager):
@@ -304,7 +318,7 @@ class MockManager(Manager):
         super().__init__(['execute'])
         self.config_name = config_name
         self.database_uri = self._db_uri
-        log.debug('database_uri: %s' % self.database_uri)
+        logger.debug('database_uri: {}', self.database_uri)
         self.initialize()
 
     def _init_config(self, *args, **kwargs):
@@ -335,8 +349,15 @@ class MockManager(Manager):
 
     def crash_report(self):
         # We don't want to silently swallow crash reports during unit tests
-        log.error('Crash Report Traceback:', exc_info=True)
-        raise CrashReport('Crash report created during unit test, check log for traceback.')
+        logger.opt(exception=True).error('Crash Report Traceback:')
+        raise CrashReport(
+            'Crash report created during unit test, check log for traceback.',
+            flexget.log.debug_buffer,
+        )
+
+    def shutdown(self, finish_queue=True):
+        super().shutdown(finish_queue=finish_queue)
+        self._shutdown()
 
 
 class APIClient:
@@ -378,6 +399,12 @@ class APIClient:
         if kwargs.get('auth', True):
             self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
 
+        return self.client.delete(*args, **kwargs)
+
+    def json_delete(self, *args, **kwargs):
+        self._append_header('Content-Type', 'application/json', kwargs)
+        if kwargs.get('auth', True):
+            self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
         return self.client.delete(*args, **kwargs)
 
     def head(self, *args, **kwargs):

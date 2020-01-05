@@ -1,5 +1,4 @@
-import logging
-
+from loguru import logger
 from requests.exceptions import RequestException
 
 from flexget import plugin
@@ -9,7 +8,7 @@ from flexget.utils import requests
 
 plugin_name = 'discord'
 
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 
 class DiscordNotifier:

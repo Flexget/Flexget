@@ -1,15 +1,14 @@
 """
 Miscellaneous SQLAlchemy helpers.
 """
-import logging
-
 import sqlalchemy
+from loguru import logger
 from sqlalchemy import ColumnDefault, Index, Sequence
 from sqlalchemy.exc import NoSuchTableError, OperationalError
 from sqlalchemy.schema import MetaData, Table
 from sqlalchemy.types import TypeEngine
 
-log = logging.getLogger('sql_utils')
+logger = logger.bind(name='sql_utils')
 
 
 def table_exists(name, session):
@@ -124,7 +123,7 @@ def create_index(table_name, session, *column_names):
     try:
         Index(index_name, *columns).create(bind=session.bind)
     except OperationalError:
-        log.debug('Error creating index.', exc_info=True)
+        logger.opt(exception=True).debug('Error creating index.')
 
 
 class ContextSession(sqlalchemy.orm.Session):

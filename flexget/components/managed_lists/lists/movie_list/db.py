@@ -1,6 +1,6 @@
-import logging
 from datetime import datetime
 
+from loguru import logger
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, Unicode, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
@@ -15,7 +15,7 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='parser_common')
 
-log = logging.getLogger('movie_list')
+logger = logger.bind(name='movie_list')
 Base = versioned_base('movie_list', 0)
 
 
@@ -121,9 +121,17 @@ class MovieListID(Base):
 
 @with_session
 def get_movies_by_list_id(
-    list_id, start=None, stop=None, order_by='added', descending=False, session=None
+    list_id,
+    start=None,
+    stop=None,
+    order_by='added',
+    descending=False,
+    movie_ids=None,
+    session=None,
 ):
     query = session.query(MovieListMovie).filter(MovieListMovie.list_id == list_id)
+    if movie_ids:
+        query = query.filter(MovieListMovie.id.in_(movie_ids))
     if descending:
         query = query.order_by(getattr(MovieListMovie, order_by).desc())
     else:
@@ -133,17 +141,17 @@ def get_movies_by_list_id(
 
 @with_session
 def get_movie_lists(name=None, session=None):
-    log.debug('retrieving movie lists')
+    logger.debug('retrieving movie lists')
     query = session.query(MovieListList)
     if name:
-        log.debug('filtering by name %s', name)
+        logger.debug('filtering by name {}', name)
         query = query.filter(MovieListList.name.contains(name))
     return query.all()
 
 
 @with_session
 def get_list_by_exact_name(name, session=None):
-    log.debug('returning list with name %s', name)
+    logger.debug('returning list with name {}', name)
     return (
         session.query(MovieListList).filter(func.lower(MovieListList.name) == name.lower()).one()
     )
@@ -151,13 +159,13 @@ def get_list_by_exact_name(name, session=None):
 
 @with_session
 def get_list_by_id(list_id, session=None):
-    log.debug('fetching list with id %d', list_id)
+    logger.debug('fetching list with id {}', list_id)
     return session.query(MovieListList).filter(MovieListList.id == list_id).one()
 
 
 @with_session
 def get_movie_by_id(list_id, movie_id, session=None):
-    log.debug('fetching movie with id %d from list id %d', movie_id, list_id)
+    logger.debug('fetching movie with id {} from list id {}', movie_id, list_id)
     return (
         session.query(MovieListMovie)
         .filter(and_(MovieListMovie.id == movie_id, MovieListMovie.list_id == list_id))
@@ -169,7 +177,7 @@ def get_movie_by_id(list_id, movie_id, session=None):
 def get_movie_by_title_and_year(list_id, title, year=None, session=None):
     movie_list = get_list_by_id(list_id=list_id, session=session)
     if movie_list:
-        log.debug('searching for movie %s in list %d', title, list_id)
+        logger.debug('searching for movie {} in list {}', title, list_id)
         return (
             session.query(MovieListMovie)
             .filter(
@@ -197,7 +205,7 @@ def get_movie_identifier(identifier_name, identifier_value, movie_id=None, sessi
         .first()
     )
     if db_movie_id:
-        log.debug('fetching movie identifier %s: %s', db_movie_id.id_name, db_movie_id.id_value)
+        logger.debug('fetching movie identifier {}: {}', db_movie_id.id_name, db_movie_id.id_value)
         return db_movie_id
 
 
@@ -211,7 +219,7 @@ def get_db_movie_identifiers(identifier_list, movie_id=None, session=None):
                     identifier_name=key, identifier_value=value, movie_id=movie_id, session=session
                 )
                 if not db_movie_id:
-                    log.debug('creating movie identifier %s: %s', key, value)
+                    logger.debug('creating movie identifier {}: {}', key, value)
                     db_movie_id = MovieListID(id_name=key, id_value=value, movie_id=movie_id)
                 session.merge(db_movie_id)
                 db_movie_ids.append(db_movie_id)

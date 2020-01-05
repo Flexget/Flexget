@@ -1,12 +1,12 @@
-import logging
 import os
 
-from flask import Flask, send_from_directory, render_template
+from flask import Flask, render_template, send_from_directory
 from flask_compress import Compress
+from loguru import logger
 
 from flexget.webserver import register_app
 
-log = logging.getLogger('webui')
+logger = logger.bind(name='webui')
 
 config = None
 exists = True
@@ -39,7 +39,7 @@ def register_web_ui(cfg):
 
     if not os.path.exists(ui_dist):
         exists = False
-        log.fatal(
+        logger.critical(
             'Failed to start web ui,'
             ' this can happen if you are running from GitHub version and forgot to run the web ui build, '
             'see http://flexget.com/wiki/Web-UI/v2 for instructions'

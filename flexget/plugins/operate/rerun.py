@@ -1,9 +1,9 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('rerun')
+logger = logger.bind(name='rerun')
 
 
 class Rerun:
@@ -16,7 +16,7 @@ class Rerun:
     schema = {'type': ['integer']}
 
     def on_task_start(self, task, config):
-        log.debug('Setting max_reruns from %s -> %s', task.max_reruns, config)
+        logger.debug('Setting max_reruns from {} -> {}', task.max_reruns, config)
         task.max_reruns = int(config)
         task.lock_reruns()
 

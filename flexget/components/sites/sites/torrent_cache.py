@@ -1,11 +1,12 @@
-import logging
 import random
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('torrent_cache')
+logger = logger.bind(name='torrent_cache')
 
 MIRRORS = [
     'https://thetorrent.org/',

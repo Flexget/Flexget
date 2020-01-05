@@ -1,6 +1,6 @@
-import logging
 from datetime import datetime, timedelta
 
+from loguru import logger
 from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Table, Unicode
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey, Index
@@ -9,7 +9,7 @@ from flexget import db_schema
 from flexget.components.imdb.utils import extract_id
 from flexget.db_schema import UpgradeImpossible
 
-log = logging.getLogger('imdb.db')
+logger = logger.bind(name='imdb.db')
 
 SCHEMA_VER = 9
 
@@ -90,14 +90,14 @@ class Movie(Base):
         :return: True if movie details are considered to be expired, ie. need of update
         """
         if self.updated is None:
-            log.debug('updated is None: %s' % self)
+            logger.debug('updated is None: {}', self)
             return True
         refresh_interval = 2
         if self.year:
             # Make sure age is not negative
             age = max((datetime.now().year - self.year), 0)
             refresh_interval += age * 5
-            log.debug('movie `%s` age %i expires in %i days' % (self.title, age, refresh_interval))
+            logger.debug('movie `{}` age {} expires in {} days', self.title, age, refresh_interval)
         return self.updated < datetime.now() - timedelta(days=refresh_interval)
 
     def __repr__(self):

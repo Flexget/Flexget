@@ -1,12 +1,11 @@
-import logging
-
 from bs4 import BeautifulSoup
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils import requests
 
-log = logging.getLogger('nnm-club')
+logger = logger.bind(name='nnm-club')
 
 
 class UrlRewriteNnmClub:
@@ -19,7 +18,7 @@ class UrlRewriteNnmClub:
         try:
             r = task.requests.get(entry['url'])
         except requests.RequestException as e:
-            log.error('Error while fetching page: %s' % e)
+            logger.error('Error while fetching page: {}', e)
             entry['url'] = None
             return
         html = r.content
@@ -27,7 +26,7 @@ class UrlRewriteNnmClub:
         links = soup.findAll('a', href=True)
         magnets = [x for x in links if x.get('href').startswith('magnet')]
         if not magnets:
-            log.error('There is no magnet links on page (%s)' % entry['url'])
+            logger.error('There is no magnet links on page ({})', entry['url'])
             entry['url'] = None
             return
         entry['url'] = magnets[0]

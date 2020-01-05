@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 
-import logging
 import time
 from datetime import datetime, timedelta
 
 from dateutil.parser import parse as dateutil_parse
+from loguru import logger
 from sqlalchemy import Column, Date, DateTime, Integer, String, Table, Time, Unicode, and_, or_
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
@@ -19,7 +19,7 @@ from flexget.utils.tools import split_title_year
 
 Base = db_schema.versioned_base('api_trakt', 7)
 AuthBase = db_schema.versioned_base('trakt_auth', 0)
-log = logging.getLogger('api_trakt')
+logger = logger.bind(name='api_trakt')
 # Production Site
 CLIENT_ID = '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af'
 CLIENT_SECRET = 'db4af7531e8df678b134dbc22445a2c04ebdbdd7213be7f5b6d17dfdfabfcdc2'
@@ -67,7 +67,7 @@ def device_auth():
             '{2} minutes.'.format(r['verification_url'], user_code, expires_in / 60.0)
         )
 
-        log.debug('Polling for user authorization.')
+        logger.debug('Polling for user authorization.')
         data['code'] = device_code
         data['client_secret'] = CLIENT_SECRET
         end_time = time.time() + expires_in
@@ -91,7 +91,7 @@ def device_auth():
             elif polling_request.status_code == 418:  # denied -- user denied code
                 raise plugin.PluginError('User code has been denied.')
             elif polling_request.status_code == 429:  # polling too fast
-                log.warning('Polling too quickly. Upping the interval. No action required.')
+                logger.warning('Polling too quickly. Upping the interval. No action required.')
                 interval += 1
         raise plugin.PluginError('User code has expired. Please try again.')
     except requests.RequestException as e:
@@ -137,7 +137,7 @@ def get_access_token(account, token=None, refresh=False, re_auth=False, called_f
                 and (refresh or datetime.now() >= acc.expires - timedelta(days=5))
                 and not re_auth
             ):
-                log.debug('Using refresh token to re-authorize account %s.', account)
+                logger.debug('Using refresh token to re-authorize account {}.', account)
                 data['refresh_token'] = acc.refresh_token
                 data['grant_type'] = 'refresh_token'
                 token_dict = token_oauth(data)
@@ -150,8 +150,8 @@ def get_access_token(account, token=None, refresh=False, re_auth=False, called_f
                 data['grant_type'] = 'authorization_code'
                 token_dict = token_oauth(data)
             elif called_from_cli:
-                log.debug(
-                    'No pin specified for an unknown account %s. Attempting to authorize device.',
+                logger.debug(
+                    'No pin specified for an unknown account {}. Attempting to authorize device.',
                     account,
                 )
                 token_dict = device_auth()
@@ -313,7 +313,7 @@ def get_translations(ident, style):
                 translations.append(translation)
         return translations
     except requests.RequestException as e:
-        log.debug('Error adding translations to trakt id %s: %s', ident, e)
+        logger.debug('Error adding translations to trakt id {}: {}', ident, e)
 
 
 class TraktGenre(Base):
@@ -412,7 +412,7 @@ def get_db_actors(ident, style):
                 actors[trakt_id] = actor
         return list(actors.values())
     except requests.RequestException as e:
-        log.debug('Error searching for actors for trakt id %s', e)
+        logger.debug('Error searching for actors for trakt id {}', e)
         return
 
 
@@ -686,7 +686,9 @@ class TraktShow(Base):
             )
             if only_cached:
                 raise LookupError('Episode %s %s not found in cache' % (season, number))
-            log.debug('Episode %s %s not found in cache, looking up from trakt.', season, number)
+            logger.debug(
+                'Episode {} {} not found in cache, looking up from trakt.', season, number
+            )
             try:
                 data = get_session().get(url).json()
             except requests.RequestException:
@@ -709,7 +711,7 @@ class TraktShow(Base):
             url = get_api_url('shows', self.id, 'seasons', '?extended=full')
             if only_cached:
                 raise LookupError('Season %s not found in cache' % number)
-            log.debug('Season %s not found in cache, looking up from trakt.', number)
+            logger.debug('Season {} not found in cache, looking up from trakt.', number)
             try:
                 ses = get_session()
                 data = ses.get(url).json()
@@ -741,7 +743,7 @@ class TraktShow(Base):
         """
         # TODO stolen from imdb plugin, maybe there's a better way?
         if self.cached_at is None:
-            log.debug('cached_at is None: %s', self)
+            logger.debug('cached_at is None: {}', self)
             return True
         refresh_interval = 2
         # if show has been cancelled or ended, then it is unlikely to be updated often
@@ -749,7 +751,7 @@ class TraktShow(Base):
             # Make sure age is not negative
             age = max((datetime.now().year - self.year), 0)
             refresh_interval += age * 5
-            log.debug('show `%s` age %i expires in %i days', self.title, age, refresh_interval)
+            logger.debug('show `{}` age {} expires in {} days', self.title, age, refresh_interval)
         return self.cached_at < datetime.now() - timedelta(days=refresh_interval)
 
     @property
@@ -856,14 +858,14 @@ class TraktMovie(Base):
         """
         # TODO stolen from imdb plugin, maybe there's a better way?
         if self.updated_at is None:
-            log.debug('updated_at is None: %s', self)
+            logger.debug('updated_at is None: {}', self)
             return True
         refresh_interval = 2
         if self.year:
             # Make sure age is not negative
             age = max((datetime.now().year - self.year), 0)
             refresh_interval += age * 5
-            log.debug('movie `%s` age %i expires in %i days', self.title, age, refresh_interval)
+            logger.debug('movie `{}` age {} expires in {} days', self.title, age, refresh_interval)
         return self.cached_at < datetime.now() - timedelta(days=refresh_interval)
 
     @property
@@ -947,7 +949,7 @@ class TraktShowIds:
         imdb_id=None,
         tvdb_id=None,
         tvrage_id=None,
-        **kwargs
+        **kwargs,
     ):
         self.trakt_id = trakt_id
         self.trakt_slug = trakt_slug
@@ -1021,7 +1023,7 @@ def get_trakt_id_from_id(trakt_ids, media_type):
             continue
         stripped_id_type = id_type.rstrip('_id')  # need to remove _id for the api call
         try:
-            log.debug('Searching with params: %s=%s', stripped_id_type, identifier)
+            logger.debug('Searching with params: {}={}', stripped_id_type, identifier)
             results = requests_session.get(
                 get_api_url('search'), params={'id_type': stripped_id_type, 'id': identifier}
             ).json()
@@ -1045,10 +1047,9 @@ def get_trakt_id_from_title(title, media_type, year=None):
     y = year or y
     try:
         params = {'query': parsed_title, 'type': media_type, 'year': y}
-        log.debug('Type of title: %s', type(parsed_title))
-        log.debug(
-            'Searching with params: %s',
-            ', '.join('{}={}'.format(k, v) for (k, v) in params.items()),
+        logger.debug('Type of title: {}', type(parsed_title))
+        logger.debug(
+            'Searching with params: {}', ', '.join('{}={}'.format(k, v) for k, v in params.items())
         )
         results = requests_session.get(get_api_url('search'), params=params).json()
     except requests.RequestException as e:
@@ -1106,10 +1107,10 @@ def get_user_data(data_type, media_type, session, username):
     try:
         data = session.get(get_api_url('users', username, data_type, media_type)).json()
         if not data:
-            log.warning('No %s data returned from trakt endpoint %s.', data_type, endpoint)
+            logger.warning('No {} data returned from trakt endpoint {}.', data_type, endpoint)
             return []
-        log.verbose(
-            'Received %d records from trakt.tv for user %s from endpoint %s',
+        logger.verbose(
+            'Received {} records from trakt.tv for user {} from endpoint {}',
             len(data),
             username,
             endpoint,

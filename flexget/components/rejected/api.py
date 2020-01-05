@@ -1,7 +1,7 @@
-import logging
 from math import ceil
 
 from flask import jsonify, request
+from loguru import logger
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import APIResource, api
@@ -15,7 +15,7 @@ from flexget.api.app import (
 
 from . import db
 
-log = logging.getLogger('rejected')
+logger = logger.bind(name='rejected')
 
 rejected_api = api.namespace('rejected', description='View and manage remembered rejected entries')
 

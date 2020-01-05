@@ -1,9 +1,9 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('duplicates')
+logger = logger.bind(name='duplicates')
 
 
 class Duplicates:

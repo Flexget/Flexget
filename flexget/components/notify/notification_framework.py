@@ -21,16 +21,15 @@ describes the config format for the plugin.
 """
 
 
-import logging
-
 from jinja2 import Template
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginWarning
 from flexget.utils.template import RenderError
 
-log = logging.getLogger('notify')
+logger = logger.bind(name='notify')
 
 NOTIFY_VIA_SCHEMA = {
     'type': 'array',
@@ -61,8 +60,10 @@ def render_config(config, template_renderer, notifier_name, _path=''):
         try:
             return template_renderer(config)
         except Exception as e:
-            log.error('Error rendering %s plugin config field `%s`: %s', notifier_name, config, e)
-            log.debug('%s notifier config location of error: %s', notifier_name, _path)
+            logger.error(
+                'Error rendering {} plugin config field `{}`: {}', notifier_name, config, e
+            )
+            logger.debug('{} notifier config location of error: {}', notifier_name, _path)
             return config
     elif isinstance(config, list):
         if _path:
@@ -99,11 +100,11 @@ class NotificationFramework:
             try:
                 title = template_renderer(title)
             except RenderError as e:
-                log.error('Error rendering notification title: %s', e)
+                logger.error('Error rendering notification title: {}', e)
             try:
                 message = template_renderer(message)
             except RenderError as e:
-                log.error('Error rendering notification body: %s', e)
+                logger.error('Error rendering notification body: {}', e)
         for notifier in notifiers:
             for notifier_name, notifier_config in notifier.items():
                 notifier_plugin = plugin.get(notifier_name, self)
@@ -116,17 +117,17 @@ class NotificationFramework:
                         notifier_config, template_renderer, notifier_name
                     )
 
-                log.debug('Sending a notification to `%s`', notifier_name)
+                logger.debug('Sending a notification to `{}`', notifier_name)
                 try:
                     notifier_plugin.notify(
                         title, message, rendered_config
                     )  # TODO: Update notifiers for new api
                 except PluginWarning as e:
-                    log.warning(
-                        'Error while sending notification to `%s`: %s', notifier_name, e.value
+                    logger.warning(
+                        'Error while sending notification to `{}`: {}', notifier_name, e.value
                     )
                 else:
-                    log.verbose('Successfully sent a notification to `%s`', notifier_name)
+                    logger.verbose('Successfully sent a notification to `{}`', notifier_name)
 
 
 @event('plugin.register')

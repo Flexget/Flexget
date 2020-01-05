@@ -1,7 +1,7 @@
-import logging
 import os
 import re
 
+from loguru import logger
 from sqlalchemy import Column, Integer, Unicode
 
 from flexget import options, plugin
@@ -10,7 +10,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 
-log = logging.getLogger('tail')
+logger = logger.bind(name='tail')
 Base = versioned_base('tail', 0)
 
 
@@ -95,22 +95,22 @@ class InputTail:
             with open(filename, 'r', encoding=encoding, errors='replace') as file:
                 if task.options.tail_reset == filename or task.options.tail_reset == task.name:
                     if last_pos == 0:
-                        log.info('Task %s tail position is already zero' % task.name)
+                        logger.info('Task {} tail position is already zero', task.name)
                     else:
-                        log.info(
-                            'Task %s tail position (%s) reset to zero' % (task.name, last_pos)
+                        logger.info(
+                            'Task {} tail position ({}) reset to zero', task.name, last_pos
                         )
                         last_pos = 0
 
                 if os.path.getsize(filename) < last_pos:
-                    log.info(
+                    logger.info(
                         'File size is smaller than in previous execution, resetting to beginning of the file'
                     )
                     last_pos = 0
 
                 file.seek(last_pos)
 
-                log.debug('continuing from last position %s' % last_pos)
+                logger.debug('continuing from last position {}', last_pos)
 
                 entry_config = config.get('entry')
                 format_config = config.get('format', {})
@@ -133,17 +133,16 @@ class InputTail:
                             # check if used field detected, in such case start with new entry
                             if field in used:
                                 if entry.isvalid():
-                                    log.info(
-                                        'Found field %s again before entry was completed. \
-                                              Adding current incomplete, but valid entry and moving to next.'
-                                        % field
+                                    logger.info(
+                                        'Found field {} again before entry was completed. Adding current incomplete, but valid entry and moving to next.',
+                                        field,
                                     )
                                     self.format_entry(entry, format_config)
                                     entries.append(entry)
                                 else:
-                                    log.info(
-                                        'Invalid data, entry field %s is already found once. Ignoring entry.'
-                                        % field
+                                    logger.info(
+                                        'Invalid data, entry field {} is already found once. Ignoring entry.',
+                                        field,
                                     )
                                 # start new entry
                                 entry = Entry()
@@ -152,19 +151,19 @@ class InputTail:
                             # add field to entry
                             entry[field] = match.group(1)
                             used[field] = True
-                            log.debug('found field: %s value: %s' % (field, entry[field]))
+                            logger.debug('found field: {} value: {}', field, entry[field])
 
                         # if all fields have been found
                         if len(used) == len(entry_config):
                             # check that entry has at least title and url
                             if not entry.isvalid():
-                                log.info(
+                                logger.info(
                                     'Invalid data, constructed entry is missing mandatory fields (title or url)'
                                 )
                             else:
                                 self.format_entry(entry, format_config)
                                 entries.append(entry)
-                                log.debug('Added entry %s' % entry)
+                                logger.debug('Added entry {}', entry)
                                 # start new entry
                                 entry = Entry()
                                 used = {}
