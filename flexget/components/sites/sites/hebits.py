@@ -139,7 +139,7 @@ class SearchHeBits:
             )
             if saved_cookie and saved_cookie.expires and saved_cookie.expires >= datetime.now():
                 logger.debug('Found valid login cookie')
-                return saved_cookie.cookie
+                return saved_cookie.cookies
 
     def login(self, user_name: str, password: str) -> Optional[RequestsCookieJar]:
         data = dict(username=user_name, password=password)
