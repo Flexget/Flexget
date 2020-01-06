@@ -11,19 +11,18 @@ from sqlalchemy import Column, DateTime, Unicode
 
 from flexget import db_schema, plugin
 from flexget.config_schema import one_or_more
+from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.database import json_synonym
 from flexget.utils.requests import RequestException
 from flexget.utils.requests import Session as RequestSession
-from flexget.utils.requests import TimedLimiter
 from flexget.utils.tools import parse_filesize
 
 logger = logger.bind(name='hebits')
 Base = db_schema.versioned_base('hebits', 0)
 
 requests = RequestSession()
-requests.add_domain_limiter(TimedLimiter('hebits.net', '5 seconds'))
 
 
 @unique
@@ -69,7 +68,7 @@ class HEBitsSort(Enum):
 class HEBitsCookie(Base):
     __tablename__ = 'hebits_cookie'
 
-    username = Column(Unicode, primary_key=True)
+    user_name = Column(Unicode, primary_key=True)
     _cookie = Column('cookie', Unicode)
     cookie = json_synonym('_cookie')
     expires = Column(DateTime)
@@ -83,7 +82,7 @@ class SearchHeBits:
     schema = {
         'type': 'object',
         'properties': {
-            'username': {'type': 'string'},
+            'user_name': {'type': 'string'},
             'password': {'type': 'string'},
             'category': one_or_more(
                 {'type': 'string', 'enum': [_.name for _ in HEBitsCategory]}, unique_items=True
@@ -99,7 +98,7 @@ class SearchHeBits:
             },
             'order_desc': {'type': 'boolean', 'default': True},
         },
-        'required': ['username', 'password'],
+        'required': ['user_name', 'password'],
         'additionalProperties': False,
     }
 
@@ -110,12 +109,15 @@ class SearchHeBits:
     profile_link = f"{base_url}my.php"
 
     @staticmethod
-    def extract_passkey(user_profile_html: HTML) -> str:
+    def _extract_passkey(user_profile_html: HTML) -> str:
+        """Extracts the passkey from the user profile"""
+        logger.debug('trying to extract passkey')
         for tr in user_profile_html.find("tr"):
             td = tr.find("td.pror", first=True)
             if not td:
                 continue
             if td.full_text == "פאסקי":
+                logger.debug('succesfully extracted passkey')
                 return tr.find("td.prol", first=True).text
         else:
             raise plugin.PluginError(
@@ -131,9 +133,10 @@ class SearchHeBits:
 
     @staticmethod
     def load_cookies_from_db(user_name: str) -> Optional[dict]:
+        logger.debug('Trying to load hebits cookies from DB')
         with Session() as session:
             saved_cookie = (
-                session.query(HEBitsCookie).filter(HEBitsCookie.username == user_name).first()
+                session.query(HEBitsCookie).filter(HEBitsCookie.user_name == user_name).first()
             )
             if (
                 saved_cookie
@@ -145,14 +148,18 @@ class SearchHeBits:
 
     def login(self, user_name: str, password: str) -> Optional[RequestsCookieJar]:
         data = dict(username=user_name, password=password)
+        logger.debug('Trying to login to hebits with user name {}', user_name)
         rsp = requests.post(self.login_url, data=data)
-        if "takelogin" in rsp.url:
+        if rsp.text != 'OK':
             raise plugin.PluginError('Could not connect to HEBits, invalid credentials')
         return rsp.cookies
 
     def user_profile(self) -> Optional[Response]:
+        logger.debug('Fetching user profile')
         rsp = requests.get(self.profile_link)
-        return rsp if "returnto" not in rsp.url else None
+        if "returnto" in rsp.url:
+            raise plugin.PluginError('Could not fetch passkey from user profile, layout change?')
+        return rsp
 
     def authenticate(self, config: dict) -> str:
         user_name = config['user_name']
@@ -168,7 +175,7 @@ class SearchHeBits:
                 self.save_cookies_to_db(user_name=user_name, cookies=cookies)
         user_profile = self.user_profile()
         user_profile_html = HTML(html=user_profile.content)
-        passkey = self.extract_passkey(user_profile_html)
+        passkey = self._extract_passkey(user_profile_html)
         return passkey
 
     @staticmethod
@@ -204,7 +211,7 @@ class SearchHeBits:
                 params['cata'].append(HEBitsCategory(category).value)
 
         entries = set()
-        params['sort'] = HEBitsSort(config['order_by']).value
+        params['sort'] = HEBitsSort[config['order_by']].value
         params['type'] = 'desc' if config['order_desc'] else 'asc'
         for value in ('free', 'double', 'triple', 'pack'):
             if config.get(value):
@@ -215,6 +222,7 @@ class SearchHeBits:
             logger.debug('Using search params: {}', params)
             try:
                 page = requests.get(self.search_url, params=params)
+                page.raise_for_status()
             except RequestException as e:
                 logger.error('HEBits request failed: {}', e)
                 continue
@@ -244,16 +252,16 @@ class SearchHeBits:
                     'GET', url=self.download_link, params={'passkey': passkey, 'id': torrent_id}
                 ).prepare()
 
-                entry = {
-                    "seeders": seeders,
-                    "leechers": leechers,
-                    "size": size,
-                    "title": title,
-                    "freeleech": freeleech,
-                    "triple_up": triple_up,
-                    "double_up": double_up,
-                    'url': req.url,
-                }
+                entry = Entry(
+                    seeders=seeders,
+                    leechers=leechers,
+                    size=size,
+                    title=title,
+                    freeleech=freeleech,
+                    triple_up=triple_up,
+                    double_up=double_up,
+                    url=req.url,
+                )
                 entries.add(entry)
 
         return entries
@@ -261,4 +269,4 @@ class SearchHeBits:
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SearchHeBits, 'HEBits', interfaces=['search'], api_ver=2)
+    plugin.register(SearchHeBits, 'hebits', interfaces=['search'], api_ver=2)
