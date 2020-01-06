@@ -84,9 +84,7 @@ class SearchHeBits:
         'properties': {
             'user_name': {'type': 'string'},
             'password': {'type': 'string'},
-            'category': one_or_more(
-                {'type': 'string', 'enum': [_.name for _ in HEBitsCategory]}, unique_items=True
-            ),
+            'category': {'type': 'string', 'enum': [_.name for _ in HEBitsCategory]},
             'free': {'type': 'boolean'},
             'double': {'type': 'boolean'},
             'triple': {'type': 'boolean'},
@@ -193,14 +191,7 @@ class SearchHeBits:
         params = {}
 
         if 'category' in config:
-            params['cata'] = []
-            categories = (
-                config['category']
-                if isinstance(config['category'], list)
-                else [config['category']]
-            )
-            for category in categories:
-                params['cata'].append(HEBitsCategory(category).value)
+            params['cata'] = HEBitsCategory[config['category']].value
 
         entries = set()
         params['sort'] = HEBitsSort[config['order_by']].value
