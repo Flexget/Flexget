@@ -1,5 +1,3 @@
-import datetime
-import re
 from datetime import datetime
 from enum import Enum, unique
 from typing import List, Optional, Tuple
@@ -67,12 +65,12 @@ class HEBitsSort(Enum):
     uploader = 9
 
 
-class HEBitsCookie(Base):
-    __tablename__ = 'hebits_cookie'
+class HEBitsCookies(Base):
+    __tablename__ = 'hebits_cookies'
 
     user_name = Column(Unicode, primary_key=True)
-    _cookie = Column('cookie', Unicode)
-    cookie = json_synonym('_cookie')
+    _cookies = Column('cookies', Unicode)
+    cookies = json_synonym('_cookies')
     expires = Column(DateTime)
 
 
@@ -129,9 +127,9 @@ class SearchHeBits:
     @staticmethod
     def save_cookies_to_db(user_name: str, cookies: RequestsCookieJar):
         logger.debug('Saving or updating HEBits cookie in db')
-        expires = datetime.fromtimestamp(cookies[0].expires)
+        expires = datetime.fromtimestamp(glom(cookies, Iter().first()).expires)
         with Session() as session:
-            cookie = HEBitsCookie(user_name=user_name, cookie=dict(cookies), expires=expires)
+            cookie = HEBitsCookies(user_name=user_name, cookies=dict(cookies), expires=expires)
             session.merge(cookie)
 
     @staticmethod
@@ -139,13 +137,9 @@ class SearchHeBits:
         logger.debug('Trying to load hebits cookies from DB')
         with Session() as session:
             saved_cookie = (
-                session.query(HEBitsCookie).filter(HEBitsCookie.user_name == user_name).first()
+                session.query(HEBitsCookies).filter(HEBitsCookies.user_name == user_name).first()
             )
-            if (
-                saved_cookie
-                and saved_cookie.expires
-                and saved_cookie.expires >= datetime.datetime.now()
-            ):
+            if saved_cookie and saved_cookie.expires and saved_cookie.expires >= datetime.now():
                 logger.debug('Found valid login cookie')
                 return saved_cookie.cookie
 
