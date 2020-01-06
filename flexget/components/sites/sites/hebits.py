@@ -1,5 +1,6 @@
 import datetime
 import re
+from datetime import datetime
 from enum import Enum, unique
 from typing import List, Optional, Tuple
 
@@ -105,7 +106,7 @@ class SearchHeBits:
     base_url = 'https://hebits.net/'
     login_url = f"{base_url}takeloginAjax.php"
     search_url = f"{base_url}browse.php"
-    download_link = f"{base_url}downloadRss.php"
+    download_url = f"{base_url}downloadRss.php"
     profile_link = f"{base_url}my.php"
 
     @staticmethod
@@ -126,9 +127,10 @@ class SearchHeBits:
 
     @staticmethod
     def save_cookies_to_db(user_name: str, cookies: RequestsCookieJar):
+        logger.debug('Saving or updating HEBits cookie in db')
+        expires = datetime.fromtimestamp(cookies[0].expires)
         with Session() as session:
-            logger.debug('Saving or updating HEBits cookie in db')
-            cookie = HEBitsCookie(user_name=user_name, cookie=dict(cookies))
+            cookie = HEBitsCookie(user_name=user_name, cookie=dict(cookies), expires=expires)
             session.merge(cookie)
 
     @staticmethod
@@ -168,11 +170,7 @@ class SearchHeBits:
         if not cookies:
             cookies = self.login(user_name, password)
             self.save_cookies_to_db(user_name=user_name, cookies=cookies)
-        else:
-            user_profile = self.user_profile()
-            if not user_profile:
-                cookies = self.login(user_name, password)
-                self.save_cookies_to_db(user_name=user_name, cookies=cookies)
+
         user_profile = self.user_profile()
         user_profile_html = HTML(html=user_profile.content)
         passkey = self._extract_passkey(user_profile_html)
@@ -249,7 +247,7 @@ class SearchHeBits:
                 images = title_element.find("span > img")
                 freeleech, double_up, triple_up = self._fetch_bonus(images)
                 req = Request(
-                    'GET', url=self.download_link, params={'passkey': passkey, 'id': torrent_id}
+                    'GET', url=self.download_url, params={'passkey': passkey, 'id': torrent_id}
                 ).prepare()
 
                 entry = Entry(
