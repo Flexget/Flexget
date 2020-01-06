@@ -10,7 +10,6 @@ from requests_html import HTML, Element
 from sqlalchemy import Column, DateTime, Unicode
 
 from flexget import db_schema, plugin
-from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
