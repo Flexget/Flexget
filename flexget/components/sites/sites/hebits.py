@@ -5,7 +5,7 @@ from typing import List, Optional, Tuple
 from glom import Iter, glom
 from loguru import logger
 from requests import Request, Response
-from requests.cookies import RequestsCookieJar
+from requests.cookies import RequestsCookieJar, cookiejar_from_dict
 from requests_html import HTML, Element
 from sqlalchemy import Column, DateTime, Unicode
 
@@ -131,7 +131,7 @@ class SearchHeBits:
             session.merge(cookie)
 
     @staticmethod
-    def load_cookies_from_db(user_name: str) -> Optional[dict]:
+    def load_cookies_from_db(user_name: str) -> Optional[RequestsCookieJar]:
         logger.debug('Trying to load hebits cookies from DB')
         with Session() as session:
             saved_cookie = (
@@ -139,7 +139,7 @@ class SearchHeBits:
             )
             if saved_cookie and saved_cookie.expires and saved_cookie.expires >= datetime.now():
                 logger.debug('Found valid login cookie')
-                return saved_cookie.cookies
+                return cookiejar_from_dict(saved_cookie.cookies)
 
     def login(self, user_name: str, password: str) -> Optional[RequestsCookieJar]:
         data = dict(username=user_name, password=password)
@@ -160,8 +160,11 @@ class SearchHeBits:
         """Tried to fetch cookies from DB and fallback to login if fails. Returns passkey from user profile"""
         user_name = config['user_name']
         password = config['password']
+
         cookies = self.load_cookies_from_db(user_name)
-        if not cookies:
+        if cookies:
+            requests.cookies = cookies
+        else:
             cookies = self.login(user_name, password)
             self.save_cookies_to_db(user_name=user_name, cookies=cookies)
 
@@ -184,9 +187,7 @@ class SearchHeBits:
 
     @plugin.internet(logger)
     def search(self, task, entry, config):
-        """
-        Search for entries on HEBits
-        """
+        """Search for entries on HEBits"""
         passkey = self.authenticate(config)
         params = {}
 
@@ -213,11 +214,18 @@ class SearchHeBits:
             html = HTML(html=page.content)
             table = html.find("div.browse", first=True)
             if not table:
+                logger.debug(
+                    'Could not find any results matching {} using the requested params {}',
+                    search_string,
+                    params,
+                )
                 continue
 
             all_results = table.find("div.lineBrown, div.lineGray, div.lineBlue, div.lineGreen")
             if not all_results:
-                continue
+                raise plugin.PluginError(
+                    'Result table found but not with any known items, layout change?'
+                )
 
             for result in all_results:
                 torrent_id = self._extract_id(result.links)
