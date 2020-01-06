@@ -4,6 +4,7 @@ from datetime import datetime
 from enum import Enum, unique
 from typing import List, Optional, Tuple
 
+from glom import Iter, glom
 from loguru import logger
 from requests import Request, Response
 from requests.cookies import RequestsCookieJar
@@ -164,6 +165,7 @@ class SearchHeBits:
         return rsp
 
     def authenticate(self, config: dict) -> str:
+        """Tried to fetch cookies from DB and fallback to login if fails. Returns passkey from user profile"""
         user_name = config['user_name']
         password = config['password']
         cookies = self.load_cookies_from_db(user_name)
@@ -177,10 +179,8 @@ class SearchHeBits:
         return passkey
 
     @staticmethod
-    def _extract_id(links: set) -> Optional[str]:
-        for link in links:
-            if "id=" in link:
-                return re.search(r"\d+", link).group()
+    def _extract_id(links: set) -> str:
+        return glom(links, Iter().first(lambda x: 'id=' in x)).split('=')[-1]
 
     @staticmethod
     def _fetch_bonus(elements: List[Element]) -> Tuple[bool, bool, bool]:
