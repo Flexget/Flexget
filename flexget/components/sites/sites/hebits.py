@@ -162,7 +162,7 @@ class SearchHeBits:
 
         cookies = self.load_cookies_from_db(user_name)
         if cookies:
-            requests.cookies = cookies
+            requests.add_cookiejar(cookies)
         else:
             cookies = self.login(user_name, password)
             self.save_cookies_to_db(user_name=user_name, cookies=cookies)
