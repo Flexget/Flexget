@@ -140,7 +140,7 @@ class SearchHeBits:
                 logger.debug('Found valid login cookie')
                 return cookiejar_from_dict(saved_cookie.cookies)
 
-    def login(self, user_name: str, password: str) -> Optional[RequestsCookieJar]:
+    def login(self, user_name: str, password: str) -> RequestsCookieJar:
         data = dict(username=user_name, password=password)
         logger.debug('Trying to login to hebits with user name {}', user_name)
         rsp = requests.post(self.login_url, data=data)
@@ -148,12 +148,12 @@ class SearchHeBits:
             raise plugin.PluginError('Could not connect to HEBits, invalid credentials')
         return rsp.cookies
 
-    def user_profile(self) -> Optional[Response]:
+    def user_profile(self) -> bytes:
         logger.debug('Fetching user profile')
         rsp = requests.get(self.profile_link)
         if "returnto" in rsp.url:
             raise plugin.PluginError('Could not fetch passkey from user profile, layout change?')
-        return rsp
+        return rsp.content
 
     def authenticate(self, config: dict) -> str:
         """Tried to fetch cookies from DB and fallback to login if fails. Returns passkey from user profile"""
@@ -167,8 +167,8 @@ class SearchHeBits:
             cookies = self.login(user_name, password)
             self.save_cookies_to_db(user_name=user_name, cookies=cookies)
 
-        user_profile = self.user_profile()
-        user_profile_html = HTML(html=user_profile.content)
+        user_profile_content = self.user_profile()
+        user_profile_html = HTML(html=user_profile_content)
         passkey = self._extract_passkey(user_profile_html)
         return passkey
 
