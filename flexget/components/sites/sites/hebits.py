@@ -116,10 +116,7 @@ class SearchHeBits:
             if td.full_text == "פאסקי":
                 logger.debug('succesfully extracted passkey')
                 return tr.find("td.prol", first=True).text
-        else:
-            raise plugin.PluginError(
-                'Could not fetch passkey from user profile, did the page change?'
-            )
+        raise plugin.PluginError('Could not fetch passkey from user profile, did the page change?')
 
     @staticmethod
     def save_cookies_to_db(user_name: str, cookies: RequestsCookieJar):
