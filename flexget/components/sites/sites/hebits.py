@@ -4,7 +4,7 @@ from typing import List, Optional, Tuple
 
 from glom import Iter, glom
 from loguru import logger
-from requests import Request, Response
+from requests import Request
 from requests.cookies import RequestsCookieJar, cookiejar_from_dict
 from requests_html import HTML, Element
 from sqlalchemy import Column, DateTime, Unicode
@@ -160,7 +160,7 @@ class SearchHeBits:
         user_name = config['user_name']
         password = config['password']
 
-        cookies = self.load_cookies_from_db(user_name)
+        cookies = self.load_cookies_from_db(user_name=user_name)
         if cookies:
             requests.add_cookiejar(cookies)
         else:
