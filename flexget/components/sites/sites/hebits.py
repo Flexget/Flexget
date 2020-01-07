@@ -91,7 +91,7 @@ class SearchHeBits:
             'order_by': {
                 'type': 'string',
                 'enum': [_.name for _ in HEBitsSort],
-                'default': 'date',
+                'default': HEBitsSort.date.name,
             },
             'order_desc': {'type': 'boolean', 'default': True},
         },
