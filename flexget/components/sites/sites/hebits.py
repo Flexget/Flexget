@@ -82,14 +82,14 @@ class SearchHeBits:
         'properties': {
             'user_name': {'type': 'string'},
             'password': {'type': 'string'},
-            'category': {'type': 'string', 'enum': [_.name for _ in HEBitsCategory]},
+            'category': {'type': 'string', 'enum': [value.name for value in HEBitsCategory]},
             'free': {'type': 'boolean'},
             'double': {'type': 'boolean'},
             'triple': {'type': 'boolean'},
             'pack': {'type': 'boolean'},
             'order_by': {
                 'type': 'string',
-                'enum': [_.name for _ in HEBitsSort],
+                'enum': [value.name for value in HEBitsSort],
                 'default': HEBitsSort.date.name,
             },
             'order_desc': {'type': 'boolean', 'default': True},
