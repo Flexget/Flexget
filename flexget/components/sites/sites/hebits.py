@@ -2,7 +2,6 @@ from datetime import datetime
 from enum import Enum, unique
 from typing import List, Optional, Tuple
 
-from glom import Iter, glom
 from loguru import logger
 from requests import Request
 from requests.cookies import RequestsCookieJar, cookiejar_from_dict
@@ -121,7 +120,7 @@ class SearchHeBits:
     @staticmethod
     def save_cookies_to_db(user_name: str, cookies: RequestsCookieJar):
         logger.debug('Saving or updating HEBits cookie in db')
-        expires = datetime.fromtimestamp(glom(cookies, Iter().first()).expires)
+        expires = datetime.fromtimestamp(list(cookies)[0].expires)
         with Session() as session:
             cookie = HEBitsCookies(user_name=user_name, cookies=dict(cookies), expires=expires)
             session.merge(cookie)
@@ -171,7 +170,9 @@ class SearchHeBits:
 
     @staticmethod
     def _extract_id(links: set) -> str:
-        return glom(links, Iter().first(lambda x: 'id=' in x)).split('=')[-1]
+        for link in links:
+            if 'id=' in link:
+                return link.split('=')[-1]
 
     @staticmethod
     def _fetch_bonus(elements: List[Element]) -> Tuple[bool, bool, bool]:
