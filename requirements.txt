@@ -8,10 +8,8 @@ aiocontextvars==0.2.2     # via loguru
 aniso8601==1.2.1          # via flask-restful, flask-restplus
 appdirs==1.4.3            # via pyppeteer
 apscheduler==3.5.0
-attrs==19.3.0             # via glom
 babelfish==0.5.5          # via guessit
 beautifulsoup4==4.6.0
-boltons==19.3.0           # via face, glom
 bs4==0.0.1                # via requests-html
 certifi==2017.4.17        # via requests
 chardet==3.0.3            # via requests
@@ -21,7 +19,6 @@ click==6.7                # via flask
 colorclass==2.2.0
 contextvars==2.4          # via aiocontextvars
 cssselect==1.1.0          # via pyquery
-face==19.1.2              # via glom
 fake-useragent==0.1.11    # via requests-html
 feedparser==5.2.1
 flask-compress==1.4.0
@@ -30,7 +27,6 @@ flask-login==0.4.0
 flask-restful==0.3.6
 flask-restplus==0.10.1
 flask==1.0.2
-glom==19.10.0
 guessit==3.1.0
 html5lib==0.999999999
 idna==2.5                 # via requests
