@@ -4,7 +4,6 @@
 #
 #    pip-compile
 #
-aiocontextvars==0.2.2     # via loguru
 aniso8601==1.2.1          # via flask-restful, flask-restplus
 appdirs==1.4.3            # via pyppeteer
 apscheduler==3.5.0
@@ -17,7 +16,6 @@ cheroot==8.2.1            # via cherrypy
 cherrypy==18.4.0
 click==6.7                # via flask
 colorclass==2.2.0
-contextvars==2.4          # via aiocontextvars
 cssselect==1.1.0          # via pyquery
 fake-useragent==0.1.11    # via requests-html
 feedparser==5.2.1
@@ -30,7 +28,6 @@ flask==1.0.2
 guessit==3.1.0
 html5lib==0.999999999
 idna==2.5                 # via requests
-immutables==0.11          # via contextvars
 itsdangerous==0.24        # via flask
 jaraco.functools==2.0     # via cheroot
 jinja2==2.10.1
