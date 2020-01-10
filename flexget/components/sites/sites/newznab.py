@@ -1,4 +1,4 @@
-from urllib.parse import quote, urlencode
+from urllib.parse import urlencode
 
 import feedparser
 from loguru import logger
@@ -52,7 +52,7 @@ class Newznab:
                 if config['category'] == 'all':
                     config['category'] = 'search'
                 params = {'t': config['category'], 'apikey': config['apikey'], 'extended': 1}
-                config['url'] = config['website'] + '/api?' + urlencode(params)
+                config['url'] = f"{config['website']}/api?{urlencode(params)}"
 
         return config
 
@@ -106,10 +106,12 @@ class Newznab:
         ):
             return []
         if arg_entry.get('tvrage_id'):
-            lookup = f"&rid={arg_entry.get('tvrage_id')}"
+            params = {'rid': arg_entry.get('tvrage_id')}
         else:
-            lookup = f"&q={quote(arg_entry['series_name'])}"
-        url = f"{config['url']}{lookup}&season={arg_entry['series_season']}&ep={arg_entry['series_episode']}"
+	    params = {'q': arg_entry['series_name']}
+	params['season'] = arg_entry['series_season']
+	params['ep'] = arg_entry['series_episode']
+        url = f"{config['url']}{urlencode(params)}"
         return self.fill_entries_for_url(url, task)
 
     def do_search_movie(self, arg_entry, task, config=None):
@@ -125,7 +127,8 @@ class Newznab:
 
     def do_search_all(self, arg_entry, task, config=None):
         logger.info('Searching for {}', arg_entry['title'])
-        url = f"{config['url']}&q={arg_entry['title']}"
+	params = {'q': arg_entry['title']}
+        url = f"{config['url']}{urlencode(params)}"
         return self.fill_entries_for_url(url, task)
 
 
