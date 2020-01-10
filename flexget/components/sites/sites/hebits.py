@@ -9,6 +9,7 @@ from requests_html import HTML, Element
 from sqlalchemy import Column, DateTime, Unicode
 
 from flexget import db_schema, plugin
+from flexget.components.sites.utils import torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
@@ -241,9 +242,10 @@ class SearchHeBits:
                 ).prepare()
 
                 entry = Entry(
-                    seeders=seeders,
-                    leechers=leechers,
-                    size=size,
+                    torrent_seeds=seeders,
+                    torrent_leeches=leechers,
+                    torrent_availability=torrent_availability(seeders, leechers),
+                    content_size=size,
                     title=title,
                     freeleech=freeleech,
                     triple_up=triple_up,
