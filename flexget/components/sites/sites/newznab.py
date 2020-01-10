@@ -108,9 +108,9 @@ class Newznab:
         if arg_entry.get('tvrage_id'):
             params = {'rid': arg_entry.get('tvrage_id')}
         else:
-	    params = {'q': arg_entry['series_name']}
-	params['season'] = arg_entry['series_season']
-	params['ep'] = arg_entry['series_episode']
+            params = {'q': arg_entry['series_name']}
+        params['season'] = arg_entry['series_season']
+        params['ep'] = arg_entry['series_episode']
         url = f"{config['url']}{urlencode(params)}"
         return self.fill_entries_for_url(url, task)
 
@@ -127,7 +127,7 @@ class Newznab:
 
     def do_search_all(self, arg_entry, task, config=None):
         logger.info('Searching for {}', arg_entry['title'])
-	params = {'q': arg_entry['title']}
+        params = {'q': arg_entry['title']}
         url = f"{config['url']}{urlencode(params)}"
         return self.fill_entries_for_url(url, task)
 
