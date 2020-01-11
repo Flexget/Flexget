@@ -45,4 +45,4 @@ def register_web_ui(cfg):
             'see http://flexget.com/wiki/Web-UI/v2 for instructions'
         )
 
-    register_app(webui_app.url_path, webui_app)
+    register_app(webui_app.url_path, webui_app, 'WebUI (v2)')

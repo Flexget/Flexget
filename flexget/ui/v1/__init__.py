@@ -91,5 +91,5 @@ def register_web_ui(mgr):
             )
             app_base = None
 
-    register_app(webui_app.url_path, webui_app)
+    register_app(webui_app.url_path, webui_app, 'WebUI (v1)')
     register_home('%s/' % webui_app.url_path)

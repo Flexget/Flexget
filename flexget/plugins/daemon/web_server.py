@@ -100,7 +100,7 @@ def register_web_server(manager):
     api_app.secret_key = get_secret()
 
     logger.info("Initiating API")
-    register_app('/api', api_app)
+    register_app('/api', api_app, 'API')
 
     # Register WebUI
     if web_server_config.get('web_ui'):
