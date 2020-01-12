@@ -13,6 +13,22 @@ schema_api_list = api.schema_model(
 )
 
 
+def rewrite_refs(schema, base_url):
+    """
+    Make sure any $refs in the schema point properly back to this endpoint.
+
+    The refs in the schemas are arbitrary identifiers, and cannot quite be used as-is as real network locations.
+    This rewrites any of those arbitrary refs to be real urls servable by this endpoint.
+    """
+    if isinstance(schema, dict):
+        if '$ref' in schema and schema['$ref'].startswith('/schema/'):
+            return {'$ref': base_url + schema['$ref'][8:]}
+        return {k: rewrite_refs(v, base_url) for k, v in schema.items()}
+    if isinstance(schema, list):
+        return [rewrite_refs(v, base_url) for v in schema]
+    return schema
+
+
 @schema_api.route('/')
 class SchemaAllAPI(APIResource):
     @api.response(200, model=schema_api_list)
@@ -20,8 +36,7 @@ class SchemaAllAPI(APIResource):
         """ List all schema definitions """
         schemas = {}
         for path in schema_paths:
-            schemas[path] = resolve_ref(path)
-
+            schemas[path] = rewrite_refs(resolve_ref(path), request.base_url)
         return jsonify({'schemas': schemas})
 
 
@@ -32,10 +47,7 @@ class SchemaAPI(APIResource):
     @api.response(200, model=schema_api_list)
     def get(self, path, session=None):
         """ Get schema definition """
-        path = f'/schema/{path}'
-        if request.query_string:
-            path += '?' + request.query_string.decode('ascii')
         try:
-            return jsonify(resolve_ref(path))
+            return jsonify(rewrite_refs(resolve_ref(request.full_path), request.base_url))
         except RefResolutionError:
             raise NotFoundError('invalid schema path')
