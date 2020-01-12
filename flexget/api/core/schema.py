@@ -13,16 +13,26 @@ schema_api_list = api.schema_model(
 )
 
 
+def rewrite_ref(identifier, base_url):
+    """
+    The refs in the schemas are arbitrary identifiers, and cannot be used as-is as real network locations.
+    This rewrites any of those arbitrary refs to be real urls servable by this endpoint.
+    """
+    if not base_url.endswith('/'):
+        base_url += '/'
+    if identifier.startswith('/schema/'):
+        return base_url + identifier[8:]
+    return identifier
+
+
 def rewrite_refs(schema, base_url):
     """
     Make sure any $refs in the schema point properly back to this endpoint.
 
-    The refs in the schemas are arbitrary identifiers, and cannot quite be used as-is as real network locations.
-    This rewrites any of those arbitrary refs to be real urls servable by this endpoint.
     """
     if isinstance(schema, dict):
-        if '$ref' in schema and schema['$ref'].startswith('/schema/'):
-            return {'$ref': base_url + schema['$ref'][8:]}
+        if '$ref' in schema:
+            return {'$ref': rewrite_ref(schema['$ref'], base_url)}
         return {k: rewrite_refs(v, base_url) for k, v in schema.items()}
     if isinstance(schema, list):
         return [rewrite_refs(v, base_url) for v in schema]
@@ -37,6 +47,7 @@ class SchemaAllAPI(APIResource):
         schemas = {}
         for path in schema_paths:
             schemas[path] = rewrite_refs(resolve_ref(path), request.base_url)
+            schemas[path]['id'] = rewrite_ref(path, request.base_url)
         return jsonify({'schemas': schemas})
 
 
@@ -48,6 +59,8 @@ class SchemaAPI(APIResource):
     def get(self, path, session=None):
         """ Get schema definition """
         try:
-            return jsonify(rewrite_refs(resolve_ref(request.full_path), request.base_url))
+            schema = resolve_ref(request.full_path)
         except RefResolutionError:
             raise NotFoundError('invalid schema path')
+        schema['id'] = request.url
+        return jsonify(rewrite_refs(schema, request.base_url))
