@@ -5,6 +5,7 @@ from .core import (  # noqa
     database,
     format_checker,
     plugins,
+    schema,
     server,
     tasks,
     user,
