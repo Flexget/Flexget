@@ -28,7 +28,6 @@ def rewrite_ref(identifier, base_url):
 def rewrite_refs(schema, base_url):
     """
     Make sure any $refs in the schema point properly back to this endpoint.
-
     """
     if isinstance(schema, dict):
         if '$ref' in schema:
@@ -44,10 +43,11 @@ class SchemaAllAPI(APIResource):
     @api.response(200, model=schema_api_list)
     def get(self, session=None):
         """ List all schema definitions """
-        schemas = {}
+        schemas = []
         for path in schema_paths:
-            schemas[path] = rewrite_refs(resolve_ref(path), request.base_url)
-            schemas[path]['id'] = rewrite_ref(path, request.base_url)
+            schema = rewrite_refs(resolve_ref(path), request.base_url)
+            schema['id'] = rewrite_ref(path, request.base_url)
+            schemas.append(schema)
         return jsonify({'schemas': schemas})
 
 
