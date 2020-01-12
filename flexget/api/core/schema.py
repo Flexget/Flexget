@@ -21,7 +21,7 @@ def rewrite_ref(identifier, base_url):
     if not base_url.endswith('/'):
         base_url += '/'
     if identifier.startswith('/schema/'):
-        return base_url + identifier[8:]
+        return base_url + identifier[1:]
     return identifier
 
 
@@ -45,8 +45,8 @@ class SchemaAllAPI(APIResource):
         """ List all schema definitions """
         schemas = []
         for path in schema_paths:
-            schema = rewrite_refs(resolve_ref(path), request.base_url)
-            schema['id'] = rewrite_ref(path, request.base_url)
+            schema = rewrite_refs(resolve_ref(path), request.url_root)
+            schema['id'] = rewrite_ref(path, request.url_root)
             schemas.append(schema)
         return jsonify({'schemas': schemas})
 
@@ -63,4 +63,4 @@ class SchemaAPI(APIResource):
         except RefResolutionError:
             raise NotFoundError('invalid schema path')
         schema['id'] = request.url
-        return jsonify(rewrite_refs(schema, request.base_url))
+        return jsonify(rewrite_refs(schema, request.url_root))
