@@ -1,11 +1,12 @@
 from datetime import datetime
 from enum import Enum, unique
-from typing import List, Optional, Tuple
+from typing import Optional, Tuple
 
+from bs4 import ResultSet
 from loguru import logger
+from more_itertools import first
 from requests import Request
 from requests.cookies import RequestsCookieJar, cookiejar_from_dict
-from requests_html import HTML, Element
 from sqlalchemy import Column, DateTime, Unicode
 
 from flexget import db_schema, plugin
@@ -16,6 +17,7 @@ from flexget.manager import Session
 from flexget.utils.database import json_synonym
 from flexget.utils.requests import RequestException
 from flexget.utils.requests import Session as RequestSession
+from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
 logger = logger.bind(name='hebits')
@@ -67,10 +69,10 @@ class HEBitsSort(Enum):
 class HEBitsCookies(Base):
     __tablename__ = 'hebits_cookies'
 
-    user_name = Column(Unicode, primary_key=True)
+    user_name: str = Column(Unicode, primary_key=True)
     _cookies = Column('cookies', Unicode)
-    cookies = json_synonym('_cookies')
-    expires = Column(DateTime)
+    cookies: dict = json_synonym('_cookies')
+    expires: datetime = Column(DateTime)
 
 
 class SearchHeBits:
@@ -106,17 +108,12 @@ class SearchHeBits:
     profile_link = f"{base_url}my.php"
 
     @staticmethod
-    def _extract_passkey(user_profile_html: HTML) -> str:
-        """Extracts the passkey from the user profile"""
-        logger.debug('trying to extract passkey')
-        for tr in user_profile_html.find("tr"):
-            td = tr.find("td.pror", first=True)
-            if not td:
-                continue
-            if td.full_text == "פאסקי":
-                logger.debug('succesfully extracted passkey')
-                return tr.find("td.prol", first=True).text
-        raise plugin.PluginError('Could not fetch passkey from user profile, did the page change?')
+    def _fetch_passkey(results: ResultSet) -> str:
+        logger.debug('Trying to fetch hebits passkey from user profile')
+        for result in results:
+            if result.text == 'פאסקי':
+                return first(result.parent.select('td.prol')).text
+        raise plugin.PluginError('Could not fetch passkey, layout change?')
 
     @staticmethod
     def save_cookies_to_db(user_name: str, cookies: RequestsCookieJar):
@@ -165,19 +162,13 @@ class SearchHeBits:
             self.save_cookies_to_db(user_name=user_name, cookies=cookies)
 
         user_profile_content = self.user_profile()
-        user_profile_html = HTML(html=user_profile_content)
-        passkey = self._extract_passkey(user_profile_html)
+        user_profile_soup = get_soup(user_profile_content)
+        passkey = self._fetch_passkey(user_profile_soup.select('td.pror'))
         return passkey
 
     @staticmethod
-    def _extract_id(links: set) -> str:
-        for link in links:
-            if 'id=' in link:
-                return link.split('=')[-1]
-
-    @staticmethod
-    def _fetch_bonus(elements: List[Element]) -> Tuple[bool, bool, bool]:
-        src_text = [e.attrs["src"] for e in elements]
+    def _fetch_bonus(result: ResultSet) -> Tuple[bool, bool, bool]:
+        src_text = [r.attrs["src"] for r in result]
         freeleech = "/pic/free.jpg" in src_text
         triple_up = "/pic/triple.jpg" in src_text
         double_up = "/pic/double.jpg" in src_text
@@ -208,9 +199,8 @@ class SearchHeBits:
             except RequestException as e:
                 logger.error('HEBits request failed: {}', e)
                 continue
-
-            html = HTML(html=page.content)
-            table = html.find("div.browse", first=True)
+            soup = get_soup(page.content)
+            table = first(soup.select("div.browse"), None)
             if not table:
                 logger.debug(
                     'Could not find any results matching {} using the requested params {}',
@@ -219,23 +209,23 @@ class SearchHeBits:
                 )
                 continue
 
-            all_results = table.find("div.lineBrown, div.lineGray, div.lineBlue, div.lineGreen")
+            all_results = table.select("div.lineBrown, div.lineGray, div.lineBlue, div.lineGreen")
             if not all_results:
                 raise plugin.PluginError(
                     'Result table found but not with any known items, layout change?'
                 )
 
             for result in all_results:
-                torrent_id = self._extract_id(result.links)
-                seeders = int(result.find("div.bUping", first=True).text)
-                leechers = int(result.find("div.bDowning", first=True).text)
-                size_text = "".join(
-                    e.element.tail for e in result.find("div.bSize", first=True).find("br")
-                )
+                torrent_id = first(result.select('a[href^=download]')).attrs['href'].split('=')[-1]
+                seeders = int(first(result.select("div.bUping")).text)
+                leechers = int(first(result.select("div.bDowning")).text)
+
+                size_strings = list(first(result.select("div.bSize")).strings)
+                size_text = f'{size_strings[1]}{size_strings[2]}'
                 size = parse_filesize(size_text)
-                title_element = result.find("div.bTitle", first=True)
-                title = title_element.find("b", first=True).text.split("/")[-1].strip()
-                images = title_element.find("span > img")
+
+                title = first(result.select('a > b')).text.split("/")[-1].strip()
+                images = result.select("span > img")
                 freeleech, double_up, triple_up = self._fetch_bonus(images)
                 req = Request(
                     'GET', url=self.download_url, params={'passkey': passkey, 'id': torrent_id}
