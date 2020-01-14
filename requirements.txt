@@ -29,7 +29,7 @@ jinja2==2.10.1
 jsonschema==2.6.0
 loguru==0.4.0
 markupsafe==1.0           # via jinja2
-more-itertools==7.2.0     # via cheroot, cherrypy, jaraco.functools
+more-itertools==7.2.0
 plumbum==1.6.3            # via rpyc
 portend==2.6              # via cherrypy
 progressbar==2.5
