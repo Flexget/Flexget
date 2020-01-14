@@ -173,7 +173,7 @@ def start(filename=None, level='INFO', to_console=True, to_file=True):
         else:
             # Make sure we don't send any characters that the current terminal doesn't support printing
             safe_stdout = codecs.getwriter(io_encoding)(sys.stdout.buffer, 'replace')
-            logger.add(safe_stdout, level=level, format=LOG_FORMAT, colorize=True)
+            logger.add(safe_stdout, level=level, format=LOG_FORMAT)
 
     # flush what we have stored from the plugin initialization
     global _startup_buffer, _startup_buffer_id
