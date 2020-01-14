@@ -108,6 +108,14 @@ class SearchHeBits:
     profile_link = f"{base_url}my.php"
 
     @staticmethod
+    def _fetch_passkey(results: ResultSet) -> str:
+        logger.debug('Trying to fetch hebits passkey from user profile')
+        for result in results:
+            if result.text == 'פאסקי':
+                return first(result.parent.select('td.prol')).text
+        raise plugin.PluginError('Could not fetch passkey, layout change?')
+
+    @staticmethod
     def save_cookies_to_db(user_name: str, cookies: RequestsCookieJar):
         logger.debug('Saving or updating HEBits cookie in db')
         expires = datetime.fromtimestamp(list(cookies)[0].expires)
@@ -155,7 +163,7 @@ class SearchHeBits:
 
         user_profile_content = self.user_profile()
         user_profile_soup = get_soup(user_profile_content)
-        passkey = user_profile_soup.select('td.pror')[20].parent.select('td')[-1].text
+        passkey = self._fetch_passkey(user_profile_soup.select('td.pror'))
         return passkey
 
     @staticmethod
