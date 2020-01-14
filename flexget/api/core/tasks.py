@@ -434,6 +434,9 @@ class TaskExecutionAPI(APIResource):
         )
         loglevel = data.pop('loglevel', None)
 
+        if loglevel:
+            loglevel = loglevel.upper()
+
         # This emulates the CLI command of using `--now` and `no-cache`
         options = {
             'interval_ignore': data.pop('now', None),
@@ -579,7 +582,7 @@ def update_stream(task, status='pending'):
         'percent': task.stream.get('percent', 0),
     }
 
-    task.stream['queue'].put(json.dumps({'progress': progress}))
+    task.stream['queue'].put(json.dumps({'progress': progress, 'task_id': task.id}))
 
 
 @event('task.execute.started')
@@ -598,7 +601,9 @@ def finish_task(task):
 
         if task.stream['args'].get('entry_dump'):
             entries = [entry.store for entry in task.entries]
-            task.stream['queue'].put(EntryDecoder().encode({'entry_dump': entries}))
+            task.stream['queue'].put(
+                EntryDecoder().encode({'entry_dump': entries, 'task_id': task.id})
+            )
 
         if task.stream['args'].get('summary'):
             task.stream['queue'].put(
@@ -611,7 +616,8 @@ def finish_task(task):
                             'undecided': len(task.undecided),
                             'aborted': task.aborted,
                             'abort_reason': task.abort_reason,
-                        }
+                        },
+                        'task_id': task.id,
                     }
                 )
             )
