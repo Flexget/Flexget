@@ -40,7 +40,7 @@ class ModifySet:
                 except KeyError:
                     pass
                 entry.add_lazy_fields(
-                    'set_field',
+                    self.lazy_set,
                     [field],
                     kwargs={
                         'config': config,

@@ -2,12 +2,13 @@ import copy
 import functools
 import types
 from enum import Enum
+from typing import Callable, Iterable, Mapping, Sequence, Union
 
 from loguru import logger
 
 from flexget import plugin
 from flexget.utils.lazy_dict import LazyDict, LazyLookup
-from flexget.utils.serialization import Serializable, serialize, deserialize
+from flexget.utils.serialization import Serializable, deserialize, serialize
 from flexget.utils.template import FlexGetTemplate, render_from_entry
 
 logger = logger.bind(name='entry')
@@ -335,17 +336,30 @@ class Entry(LazyDict, Serializable):
             result.add_lazy_fields(*lazy_lookup)
         return result
 
-    def add_lazy_fields(self, lazy_func_name, fields, args=None, kwargs=None):
+    def add_lazy_fields(
+        self,
+        lazy_func: Union[Callable[['Entry'], None], str],
+        fields: Iterable[str],
+        args: Sequence = None,
+        kwargs: Mapping = None,
+    ):
         """
         Add lazy fields to an entry.
-        :param lazy_func_name: should be a name previously registered with the `register_lazy_func` decorator.
+        :param lazy_func: should be a funciton previously registered with the `register_lazy_func` decorator,
+            or the name it was registered under.
         :param fields: list of fields this function will fill
         :param args: Arguments that will be passed to the lazy lookup function when called.
         :param kwargs: Keyword arguments which will be passed to the lazy lookup function when called.
         """
-        func = lazy_func_registry[lazy_func_name]
+        if not isinstance(lazy_func, str):
+            lazy_func = getattr(lazy_func, 'lazy_func_id', None)
+        if lazy_func not in lazy_func_registry:
+            raise ValueError(
+                'Lazy lookup functions must be registered with the `register_lazy_func` decorator'
+            )
+        func = lazy_func_registry[lazy_func]
         super().register_lazy_func(func.function, fields, args, kwargs)
-        self.lazy_lookups.append((lazy_func_name, fields, args, kwargs))
+        self.lazy_lookups.append((lazy_func, fields, args, kwargs))
 
     def register_lazy_func(self, func, keys):
         # TODO: This should not be called on entries directly, `add_lazy_fields` should be used instead.
@@ -370,11 +384,11 @@ lazy_func_registry = {}
 class LazyFunc:
     def __init__(self, lazy_func_name, plugin=None):
         self.name = lazy_func_name
-        #self.fields = fields
         self.plugin = plugin
         self._func = None
 
     def __call__(self, func):
+        func.lazy_func_id = self.name
         self._func = func
         lazy_func_registry[self.name] = self
         return func

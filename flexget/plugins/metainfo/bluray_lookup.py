@@ -56,7 +56,7 @@ class PluginBlurayLookup:
 
         :param entry: Entry instance
         """
-        entry.add_lazy_fields('bluray_lookup', self.field_map)
+        entry.add_lazy_fields(self.lazy_loader, self.field_map)
 
     def on_task_metainfo(self, task, config):
         if not config:

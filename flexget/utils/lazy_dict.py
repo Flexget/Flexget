@@ -1,6 +1,6 @@
-import logging
 from collections import namedtuple
 from collections.abc import MutableMapping
+from typing import Callable, Iterable, Mapping, Sequence
 
 from loguru import logger
 
@@ -28,7 +28,9 @@ class LazyLookup:
         from flexget.plugin import PluginError
 
         while self.store.is_lazy(key):
-            index = next((i for i, callee in enumerate(self.callee_list) if key in callee.keys), None)
+            index = next(
+                (i for i, callee in enumerate(self.callee_list) if key in callee.keys), None
+            )
             if index is None:
                 # All lazy lookup functions for this key were tried unsuccessfully
                 return None
@@ -106,15 +108,17 @@ class LazyDict(MutableMapping):
                 return val
         return LazyLookup(self)
 
-    def register_lazy_func(self, func, keys, args, kwargs):
+    def register_lazy_func(
+        self, func: Callable[[Mapping], None], keys: Iterable, args: Sequence, kwargs: Mapping
+    ):
         """Register a list of fields to be lazily loaded by callback func.
 
-        :param list keys:
-          List of key names that `func` can provide.
         :param func:
           Callback function which is called when lazy key needs to be evaluated.
           Function call will get this LazyDict instance as a parameter.
           See :class:`LazyLookup` class for more details.
+        :param keys:
+          List of key names that `func` can provide.
         :param args: Arguments which will be passed to `func` when called.
         :param kwargs: Keyword arguments which will be passed to `func` when called.
         """
