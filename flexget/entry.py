@@ -396,6 +396,8 @@ class LazyFunc:
         self._func = None
 
     def __call__(self, func):
+        if self.name in lazy_func_registry:
+            raise Exception(f'The name {self.name} is already registered to another lazy function.')
         func.lazy_func_id = self.name
         self._func = func
         lazy_func_registry[self.name] = self
