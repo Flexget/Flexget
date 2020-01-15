@@ -1,6 +1,7 @@
 import copy
 import functools
 import types
+import warnings
 from enum import Enum
 from typing import Callable, Iterable, Mapping, Sequence, Union
 
@@ -362,8 +363,15 @@ class Entry(LazyDict, Serializable):
         self.lazy_lookups.append((lazy_func, fields, args, kwargs))
 
     def register_lazy_func(self, func, keys):
-        # TODO: This should not be called on entries directly, `add_lazy_fields` should be used instead.
-        # Add some enforcement on this once we convert plugins
+        """
+        DEPRECATED. Use `add_lazy_fields` instead.
+        """
+        warnings.warn(
+            '`register_lazy_func` is deprecated. `add_lazy_fields` should be used instead. '
+            'This plugin should be updated to work with the latest versions of FlexGet',
+            DeprecationWarning,
+            stacklevel=2,
+        )
         super().register_lazy_func(func, keys, [], {})
 
     def __eq__(self, other):
