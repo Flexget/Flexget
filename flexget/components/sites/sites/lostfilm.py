@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 
-import logging
 import re
 
 import feedparser
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -15,7 +15,7 @@ from flexget.utils.soup import get_soup
 
 __author__ = 'danfocus'
 
-log = logging.getLogger('lostfilm')
+logger = logger.bind(name='lostfilm')
 
 EPISODE_REGEXP = re.compile(r'.*lostfilm.tv/series/.*/season_(\d+)/episode_(\d+)/.*')
 LOSTFILM_ID_REGEXP = re.compile(r'.*static.lostfilm.tv/Images/(\d+)/Posters/.*')
@@ -70,42 +70,42 @@ class LostFilm:
         entries = []
         for item in rss.entries:
             if item.get('link') is None:
-                log.debug('Item doesn\'t have a link')
+                logger.debug('Item doesn\'t have a link')
                 continue
             if item.get('description') is None:
-                log.debug('Item doesn\'t have a description')
+                logger.debug('Item doesn\'t have a description')
                 continue
             try:
                 lostfilm_num = LOSTFILM_ID_REGEXP.search(item['description']).groups()
             except Exception:
-                log.debug('Item doesn\'t have lostfilm id in description')
+                logger.debug('Item doesn\'t have lostfilm id in description')
                 continue
             try:
                 season_num, episode_num = [
                     int(x) for x in EPISODE_REGEXP.search(item['link']).groups()
                 ]
             except Exception:
-                log.debug('Item doesn\'t have episode id in link')
+                logger.debug('Item doesn\'t have episode id in link')
                 continue
             params = {'c': lostfilm_num, 's': season_num, 'e': episode_num}
             redirect_url = 'http://www.lostfilm.tv/v_search.php'
             try:
                 response = task.requests.get(redirect_url, params=params)
             except RequestException as e:
-                log.error('Could not connect to redirect url: {:s}'.format(e))
+                logger.error('Could not connect to redirect url: {:s}'.format(e))
                 continue
 
             page = get_soup(response.content)
             try:
                 redirect_url = page.head.meta['content'].split('url=')[1]
             except Exception:
-                log.error('Missing redirect')
+                logger.error('Missing redirect')
                 continue
 
             try:
                 response = task.requests.get(redirect_url)
             except RequestException as e:
-                log.error('Could not connect to redirect url2: {:s}'.format(e))
+                logger.error('Could not connect to redirect url2: {:s}', e)
                 continue
 
             page = get_soup(response.content)
@@ -123,7 +123,7 @@ class LostFilm:
                 episode_name_rus = episode_name_rus.strip()
                 episode_name_eng = episode_name_eng.strip()
             except Exception:
-                log.debug('Cannot parse head info')
+                logger.debug('Cannot parse head info')
                 continue
 
             episode_id = 'S{:02d}E{:02d}'.format(season_num, episode_num)
@@ -134,10 +134,10 @@ class LostFilm:
                     torrent_link = item.find('div', 'inner-box--link sub').a['href']
                     quality = item.find('div', 'inner-box--label').text.strip()
                 except Exception:
-                    log.debug('Item doesn\'t have a link or quality')
+                    logger.debug('Item doesn\'t have a link or quality')
                     continue
                 if torrent_link is None or quality is None:
-                    log.debug('Item doesn\'t have a link or quality')
+                    logger.debug('Item doesn\'t have a link or quality')
                     continue
                 if quality_map.get(quality):
                     quality, file_ext = quality_map.get(quality)
@@ -158,7 +158,7 @@ class LostFilm:
                     if item.get('title') is not None:
                         new_title = '{} {}'.format(item['title'], quality)
                     else:
-                        log.debug('Item doesn\'t have a title')
+                        logger.debug('Item doesn\'t have a title')
                         continue
                 new_entry = Entry()
                 new_entry['url'] = torrent_link

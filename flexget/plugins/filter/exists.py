@@ -1,12 +1,13 @@
-import logging
 import platform
 from pathlib import Path
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 
-log = logging.getLogger('exists')
+logger = logger.bind(name='exists')
 
 
 class FilterExists:
@@ -29,15 +30,15 @@ class FilterExists:
     @plugin.priority(-1)
     def on_task_filter(self, task, config):
         if not task.accepted:
-            log.debug('No accepted entries, not scanning for existing.')
+            logger.debug('No accepted entries, not scanning for existing.')
             return
-        log.verbose('Scanning path(s) for existing files.')
+        logger.verbose('Scanning path(s) for existing files.')
         config = self.prepare_config(config)
         filenames = {}
         for folder in config:
             folder = Path(folder).expanduser()
             if not folder.exists():
-                raise plugin.PluginWarning('Path %s does not exist' % folder, log)
+                raise plugin.PluginWarning('Path %s does not exist' % folder, logger)
             for p in folder.rglob('*'):
                 if p.is_file():
                     key = p.name
@@ -51,7 +52,7 @@ class FilterExists:
             if platform.system() == 'Windows':
                 name = name.lower()
             if name in filenames:
-                log.debug('Found %s in %s' % (name, filenames[name]))
+                logger.debug('Found {} in {}', name, filenames[name])
                 entry.reject('exists in %s' % filenames[name])
 
 

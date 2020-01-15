@@ -1,6 +1,7 @@
-import logging
 import re
 from urllib.parse import quote, urlparse
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.components.sites.urlrewriting import UrlRewritingError
@@ -10,7 +11,7 @@ from flexget.event import event
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
-log = logging.getLogger('piratebay')
+logger = logger.bind(name='piratebay')
 
 URL = 'https://thepiratebay.org'
 
@@ -90,9 +91,9 @@ class UrlRewritePirateBay:
     # urlrewriter API
     def url_rewrite(self, task, entry):
         if 'url' not in entry:
-            log.error("Didn't actually get a URL...")
+            logger.error("Didn't actually get a URL...")
         else:
-            log.debug("Got the URL: %s" % entry['url'])
+            logger.debug('Got the URL: {}', entry['url'])
         if self.url_search.match(entry['url']):
             # use search
             results = self.search(task, entry)
@@ -104,7 +105,7 @@ class UrlRewritePirateBay:
             # parse download page
             entry['url'] = self.parse_download_page(entry['url'], task.requests)
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def parse_download_page(self, url, requests):
         page = requests.get(url).content
         try:
@@ -121,7 +122,7 @@ class UrlRewritePirateBay:
         except Exception as e:
             raise UrlRewritingError(e)
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def search(self, task, entry, config=None):
         """
         Search for name from piratebay.
@@ -147,14 +148,14 @@ class UrlRewritePirateBay:
 
             # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
             url = '%s/search/%s%s' % (self.url, quote(query.encode('utf-8')), filter_url)
-            log.debug('Using %s as piratebay search url' % url)
+            logger.debug('Using {} as piratebay search url', url)
             page = task.requests.get(url).content
             soup = get_soup(page)
             for link in soup.find_all('a', attrs={'class': 'detLink'}):
                 entry = Entry()
                 entry['title'] = self.extract_title(link)
                 if not entry['title']:
-                    log.error('Malformed search result. No title or url found. Skipping.')
+                    logger.error('Malformed search result. No title or url found. Skipping.')
                     continue
                 href = link.get('href')
                 if href.startswith('/'):  # relative link?
@@ -163,7 +164,7 @@ class UrlRewritePirateBay:
                 row = link.parent.parent.parent
                 description = row.find_all('a', attrs={'class': 'detDesc'})
                 if description and description[0].contents[0] == "piratebay ":
-                    log.debug('Advertisement entry. Skipping.')
+                    logger.debug('Advertisement entry. Skipping.')
                     continue
                 tds = row.find_all('td')
                 entry['torrent_seeds'] = int(tds[-2].contents[0])
@@ -178,8 +179,8 @@ class UrlRewritePirateBay:
                     if size:
                         entry['content_size'] = parse_filesize(size.group(1))
                     else:
-                        log.error(
-                            'Malformed search result? Title: "%s", No size? %s',
+                        logger.error(
+                            'Malformed search result? Title: "{}", No size? {}',
                             entry['title'],
                             size_text,
                         )

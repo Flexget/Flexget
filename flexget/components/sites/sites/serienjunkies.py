@@ -1,8 +1,9 @@
 # coding=utf-8
 
 
-import logging
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.components.sites.urlrewriting import UrlRewritingError
@@ -10,7 +11,7 @@ from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 
-log = logging.getLogger('serienjunkies')
+logger = logger.bind(name='serienjunkies')
 
 regex_single_ep = re.compile(r'(S\d+E\d\d+)(?!-E)', re.I)
 regex_multi_ep = re.compile(r'(?P<season>S\d\d)E(?P<startep>\d\d+)-E?(?P<stopep>\d\d+)', re.I)
@@ -82,11 +83,11 @@ class UrlRewriteSerienjunkies:
             entry['description'] = ", ".join(download_urls)
 
         # Debug Information
-        log.debug('TV Show URL: %s', series_url)
-        log.debug('Episode: %s', search_title)
-        log.debug('Download URL: %s', download_urls)
+        logger.debug('TV Show URL: {}', series_url)
+        logger.debug('Episode: {}', search_title)
+        logger.debug('Download URL: {}', download_urls)
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def parse_downloads(self, series_url, search_title):
         page = requests.get(series_url).content
         try:
@@ -114,20 +115,20 @@ class UrlRewriteSerienjunkies:
             # find episode language
             episode_lang = episode.find_previous('strong', text=re.compile('Sprache')).next_sibling
             if not episode_lang:
-                log.warning('No language found for: %s', series_url)
+                logger.warning('No language found for: {}', series_url)
                 continue
 
             # filter language
             if not self.check_language(episode_lang):
-                log.warning(
-                    'languages not matching: %s <> %s', self.config['language'], episode_lang
+                logger.warning(
+                    'languages not matching: {} <> {}', self.config['language'], episode_lang
                 )
                 continue
 
             # find download links
             links = episode.find_all('a')
             if not links:
-                log.warning('No links found for: %s', series_url)
+                logger.warning('No links found for: {}', series_url)
                 continue
 
             for link in links:
@@ -149,7 +150,7 @@ class UrlRewriteSerienjunkies:
         search_titles = []
         # Check type
         if regex_multi_ep.search(search_title):
-            log.debug('Title seems to describe multiple episodes')
+            logger.debug('Title seems to describe multiple episodes')
             first_ep = int(regex_multi_ep.search(search_title).group('startep'))
             last_ep = int(regex_multi_ep.search(search_title).group('stopep'))
             season = regex_multi_ep.search(search_title).group('season') + 'E'
@@ -161,7 +162,7 @@ class UrlRewriteSerienjunkies:
                     )
                 )
         elif regex_season.search(search_title):
-            log.debug('Title seems to describe one or more season')
+            logger.debug('Title seems to describe one or more season')
             search_string = regex_season.search(search_title).group(0)
             for s in re.findall(r'(?<!\-)S\d\d(?!\-)', search_string):
                 search_titles.append(regex_season.sub(s + '[\\\\w\\\\.]*', search_title))
@@ -173,7 +174,7 @@ class UrlRewriteSerienjunkies:
                         regex_season.sub('S' + str(i).zfill(2) + '[\\\\w\\\\.]*', search_title)
                     )
         else:
-            log.debug('Title seems to describe a single episode')
+            logger.debug('Title seems to describe a single episode')
             search_titles.append(re.escape(search_title))
         return search_titles
 

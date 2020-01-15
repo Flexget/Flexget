@@ -1,9 +1,9 @@
 import io
-import logging
 import os
 import socket
 
 import requests
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
@@ -14,7 +14,7 @@ except ImportError:
     mechanicalsoup = None
 
 
-log = logging.getLogger('formlogin')
+logger = logger.bind(name='formlogin')
 
 
 class FormLogin:
@@ -38,7 +38,7 @@ class FormLogin:
     def on_task_start(self, task, config):
         if not mechanicalsoup:
             raise plugin.PluginError(
-                'mechanicalsoup required (python module), please install it.', log
+                'mechanicalsoup required (python module), please install it.', logger
             )
 
         userfield = config.get('userfield', 'username')
@@ -56,14 +56,14 @@ class FormLogin:
             response = br.open(url)
         except requests.RequestException:
             # TODO: improve error handling
-            log.debug('Exception getting login page.', exc_info=True)
-            raise plugin.PluginError('Unable to get login page', log)
+            logger.opt(exception=True).debug('Exception getting login page.')
+            raise plugin.PluginError('Unable to get login page', logger)
 
         # br.set_debug(True)
 
         num_forms = len(br.get_current_page().find_all('form'))
         if not num_forms:
-            raise plugin.PluginError('Unable to find any forms on {}'.format(url), log)
+            raise plugin.PluginError('Unable to find any forms on {}'.format(url), logger)
         try:
             for form_num in range(num_forms):
                 br.select_form(nr=form_num)
@@ -80,16 +80,18 @@ class FormLogin:
                 filename = os.path.join(received, '%s.formlogin.html' % task.name)
                 with io.open(filename, 'wb') as f:
                     f.write(response.content)
-                log.critical('I have saved the login page content to %s for you to view', filename)
-                raise plugin.PluginError('Unable to find login fields', log)
+                logger.critical(
+                    'I have saved the login page content to {} for you to view', filename
+                )
+                raise plugin.PluginError('Unable to find login fields', logger)
         except socket.timeout:
             raise plugin.PluginError('Timed out on url %s' % url)
 
         try:
             br.submit_selected()
         except requests.RequestException:
-            log.debug('Exception submitting login form.', exc_info=True)
-            raise plugin.PluginError('Unable to post login form', log)
+            logger.opt(exception=True).debug('Exception submitting login form.')
+            raise plugin.PluginError('Unable to post login form', logger)
 
 
 @event('plugin.register')

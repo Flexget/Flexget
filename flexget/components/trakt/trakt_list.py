@@ -1,6 +1,6 @@
-import logging
-import math
 from collections.abc import MutableSet
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -12,7 +12,7 @@ from flexget.utils.tools import split_title_year
 
 from . import db
 
-log = logging.getLogger('trakt_list')
+logger = logger.bind(name='trakt_list')
 IMMUTABLE_LISTS = ['trending', 'popular']
 
 
@@ -194,7 +194,7 @@ class TraktSet(MutableSet):
 
         list_type = (self.config['type']).rstrip('s')
 
-        log.verbose('Retrieving `%s` list `%s`', self.config['type'], self.config['list'])
+        logger.verbose('Retrieving `{}` list `{}`', self.config['type'], self.config['list'])
         try:
             page = 1
             collecting_finished = False
@@ -206,9 +206,9 @@ class TraktSet(MutableSet):
                 number_of_pages = int(result.headers.get('X-Pagination-Page-Count', 1))
                 if page == 2:
                     # If there is more than one page (more than 1000 items) warn user they may want to limit
-                    log.verbose(
-                        'There are a large number of items in trakt `%s` list. You may want to enable `limit`'
-                        ' plugin to reduce the amount of entries in this task.',
+                    logger.verbose(
+                        'There are a large number of items in trakt `{}` list. You may want to enable `limit` '
+                        'plugin to reduce the amount of entries in this task.',
                         self.config['list'],
                     )
 
@@ -218,11 +218,11 @@ class TraktSet(MutableSet):
                 try:
                     trakt_items = result.json()
                 except ValueError:
-                    log.debug('Could not decode json from response: %s', result.text)
+                    logger.debug('Could not decode json from response: {}', result.text)
                     raise plugin.PluginError('Error getting list from trakt.')
                 if not trakt_items:
-                    log.warning(
-                        'No data returned from trakt for %s list %s.',
+                    logger.warning(
+                        'No data returned from trakt for {} list {}.',
                         self.config['type'],
                         self.config['list'],
                     )
@@ -235,19 +235,19 @@ class TraktSet(MutableSet):
                         item = {list_type: item}
                     # Collection and watched lists don't return 'type' along with the items (right now)
                     if 'type' in item and item['type'] != list_type:
-                        log.debug(
-                            'Skipping %s because it is not a %s',
+                        logger.debug(
+                            'Skipping {} because it is not a {}',
                             item[item['type']].get('title', 'unknown'),
                             list_type,
                         )
                         continue
                     if list_type not in item:
                         # Issue 2445
-                        log.warning("Item type can not be determined, skipping item %s", item)
+                        logger.warning('Item type can not be determined, skipping item {}', item)
                         continue
                     if list_type != 'episode' and not item[list_type]['title']:
                         # Skip shows/movies with no title
-                        log.warning(
+                        logger.warning(
                             'Item in trakt list does not appear to have a title, skipping.'
                         )
                         continue
@@ -286,13 +286,13 @@ class TraktSet(MutableSet):
                                 'Could not retrieve movie translation from trakt: %s' % str(e)
                             )
                         if not translation:
-                            log.warning(
-                                'No translation data returned from trakt for movie %s.',
+                            logger.warning(
+                                'No translation data returned from trakt for movie {}.',
                                 entry['title'],
                             )
                         else:
-                            log.verbose(
-                                'Found `%s` translation for movie `%s`: %s',
+                            logger.verbose(
+                                'Found `{}` translation for movie `{}`: {}',
                                 language,
                                 entry['movie_name'],
                                 translation[0]['title'],
@@ -305,7 +305,7 @@ class TraktSet(MutableSet):
                     if entry.isvalid():
                         yield entry
                     else:
-                        log.debug('Invalid entry created? %s', entry)
+                        logger.debug('Invalid entry created? {}', entry)
 
         except RequestException as e:
             raise plugin.PluginError('Could not retrieve list from trakt (%s)' % e)
@@ -351,10 +351,7 @@ class TraktSet(MutableSet):
                     self.config['type'],
                 )
         elif self.config['list'] in ['trending', 'popular']:
-            endpoint = (
-                self.config['type'],
-                self.config['list'],
-            )
+            endpoint = (self.config['type'], self.config['list'])
         else:
             endpoint = (
                 'users',
@@ -431,10 +428,10 @@ class TraktSet(MutableSet):
                         season['episodes'] = [{'number': entry['series_episode']}]
                     show['seasons'] = [season]
                 if self.config['type'] in ['seasons', 'episodes'] and 'seasons' not in show:
-                    log.debug('Not submitting `%s`, no season found.', entry['title'])
+                    logger.debug('Not submitting `{}`, no season found.', entry['title'])
                     continue
                 if self.config['type'] == 'episodes' and 'episodes' not in show['seasons'][0]:
-                    log.debug('Not submitting `%s`, no episode number found.', entry['title'])
+                    logger.debug('Not submitting `{}`, no episode number found.', entry['title'])
                     continue
                 found.setdefault('shows', []).append(show)
             elif self.config['type'] in ['auto', 'movies']:
@@ -444,23 +441,23 @@ class TraktSet(MutableSet):
                         movie['title'] = entry.get('movie_name') or entry.get('imdb_name')
                         movie['year'] = entry.get('movie_year') or entry.get('imdb_year')
                     else:
-                        log.debug(
-                            'Not submitting `%s`, no movie name or id found.', entry['title']
+                        logger.debug(
+                            'Not submitting `{}`, no movie name or id found.', entry['title']
                         )
                         continue
                 found.setdefault('movies', []).append(movie)
 
         if not (found.get('shows') or found.get('movies')):
-            log.debug('Nothing to submit to trakt.')
+            logger.debug('Nothing to submit to trakt.')
             return
 
         url = db.get_api_url(self.get_list_endpoint(remove, submit=True))
 
-        log.debug('Submitting data to trakt.tv (%s): %s', url, found)
+        logger.debug('Submitting data to trakt.tv ({}): {}', url, found)
         try:
             result = self.session.post(url, data=json.dumps(found), raise_status=False)
         except RequestException as e:
-            log.error('Error submitting data to trakt.tv: %s', e)
+            logger.error('Error submitting data to trakt.tv: {}', e)
             return
         if 200 <= result.status_code < 300:
             action = 'deleted' if remove else 'added'
@@ -468,24 +465,27 @@ class TraktSet(MutableSet):
             # Default to 0 for all categories, even if trakt response didn't include them
             for cat in ('movies', 'shows', 'episodes', 'seasons'):
                 res[action].setdefault(cat, 0)
-            log.info(
+            logger.info(
                 'Successfully {0} to/from list {1}: {movies} movie(s), {shows} show(s), {episodes} episode(s), '
-                '{seasons} season(s).'.format(action, self.config['list'], **res[action])
+                '{seasons} season(s).',
+                action,
+                self.config['list'],
+                **res[action],
             )
             for media_type, request in res['not_found'].items():
                 if request:
-                    log.debug('not found %s: %s', media_type, request)
+                    logger.debug('not found {}: {}', media_type, request)
             # TODO: Improve messages about existing and unknown results
             # Mark the results expired if we added or removed anything
             if sum(res[action].values()):
                 self.invalidate_cache()
         elif result.status_code == 404:
-            log.error('List does not appear to exist on trakt: %s', self.config['list'])
+            logger.error('List does not appear to exist on trakt: {}', self.config['list'])
         elif result.status_code == 401:
-            log.error('Authentication error: have you authorized Flexget on Trakt.tv?')
-            log.debug('trakt response: %s', result.text)
+            logger.error('Authentication error: have you authorized Flexget on Trakt.tv?')
+            logger.debug('trakt response: {}', result.text)
         else:
-            log.error('Unknown error submitting data to trakt.tv: %s', result.text)
+            logger.error('Unknown error submitting data to trakt.tv: {}', result.text)
 
     @property
     def online(self):

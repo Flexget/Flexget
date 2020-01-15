@@ -1,0 +1,20 @@
+name: Nightly Cron
+
+on:
+  schedule:
+    - cron: 0 15 * * *
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/github-script@0.3.0
+        name: Create Deployment
+        with:
+          github-token: ${{ secrets.flexgetbot_pat }}
+          script: |
+            await github.repos.createDeployment({
+              ...context.repo,
+              ref: context.ref.slice(11),
+            });

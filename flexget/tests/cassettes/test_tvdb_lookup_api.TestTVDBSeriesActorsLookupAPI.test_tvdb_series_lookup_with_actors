@@ -1,13 +1,19 @@
 interactions:
 - request:
-    body: !!python/unicode '{"apikey": "4D297D8CFDE0E105"}'
+    body: '{"apikey": "4D297D8CFDE0E105"}'
     headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      Content-Length: ['30']
-      Content-Type: [application/json]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '30'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - FlexGet/2.3.33.dev (www.flexget.com)
     method: POST
     uri: https://api.thetvdb.com/login
   response:
@@ -22,26 +28,43 @@ interactions:
         GnjtuKBVrFmcG3rRlQpMqTd7vu+wo1SQQL9mslEg/zXGwKw9oTgKbzP83KiW25XAAkvrxPSTMNUg
         ern++vcfAAD//wMAFd0nLdcBAAA=
     headers:
-      cf-ray: [2e97c837bbc126fc-FRA]
-      connection: [keep-alive]
-      content-encoding: [gzip]
-      content-type: [application/json; charset=utf-8]
-      date: ['Wed, 28 Sep 2016 14:11:00 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d18b07f414a3c3f2d6984c483bb7cb4341475071860; expires=Thu,
-          28-Sep-17 14:11:00 GMT; path=/; domain=.thetvdb.com; HttpOnly']
-      vary: [Accept-Language]
-      x-powered-by: [Thundar!]
-      x-thetvdb-api-version: [2.1.1]
-    status: {code: 200, message: OK}
+      cf-ray:
+      - 2e97c837bbc126fc-FRA
+      connection:
+      - keep-alive
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Wed, 28 Sep 2016 14:11:00 GMT
+      server:
+      - cloudflare-nginx
+      set-cookie:
+      - __cfduid=d18b07f414a3c3f2d6984c483bb7cb4341475071860; expires=Thu, 28-Sep-17
+        14:11:00 GMT; path=/; domain=.thetvdb.com; HttpOnly
+      vary:
+      - Accept-Language
+      x-powered-by:
+      - Thundar!
+      x-thetvdb-api-version:
+      - 2.1.1
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Authorization: [!!python/unicode Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NzUxNTgyNjAsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDc1MDcxODYwfQ.qhwXATjie5g97wC6r8KGdtDWMXXbVSEjK2awMhSC6mzw9_NCltAbVSLWSdiPzMa0mC8vgHz-4Iz3wzeHtWlT1MbeEYl6_mxgFrPy-r_OnGYG8b1mBRw4j-0t0pqkeUq5ZRXMRiUg0x1s9e5a3YmfzvtZy_qyoEpgG4zNYQaqiSF3zOSMVeNjvA_Cz036yu1hpaMOymYx_7IeSo4gKi1BsmqvuvW7XJgRW7Ho4S0nLB_SiHYl7xAScZtZnAnvIDCEdVjR-sTKszlNO0nAKw3wmjQFAk0v_PwPRRNxB4diUFTa9GdSRptX0HlP1dB1rHVuZjEbMk1xUKEo3_uYxCGiFg]
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NzUxNTgyNjAsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDc1MDcxODYwfQ.qhwXATjie5g97wC6r8KGdtDWMXXbVSEjK2awMhSC6mzw9_NCltAbVSLWSdiPzMa0mC8vgHz-4Iz3wzeHtWlT1MbeEYl6_mxgFrPy-r_OnGYG8b1mBRw4j-0t0pqkeUq5ZRXMRiUg0x1s9e5a3YmfzvtZy_qyoEpgG4zNYQaqiSF3zOSMVeNjvA_Cz036yu1hpaMOymYx_7IeSo4gKi1BsmqvuvW7XJgRW7Ho4S0nLB_SiHYl7xAScZtZnAnvIDCEdVjR-sTKszlNO0nAKw3wmjQFAk0v_PwPRRNxB4diUFTa9GdSRptX0HlP1dB1rHVuZjEbMk1xUKEo3_uYxCGiFg
+      Connection:
+      - keep-alive
+      User-Agent:
+      - FlexGet/2.3.33.dev (www.flexget.com)
     method: GET
     uri: https://api.thetvdb.com/search/series?name=The+X-Files
   response:
@@ -73,27 +96,45 @@ interactions:
         Mm6yxCr/FAzXSfeSGLUL6I2lQ4UTu5wpCDfkc6OsL/DhGF4TooEdnfIV+veU8AzQ/U3jWuxWAF+r
         n18AAAD//wMAaGwvS4ELAAA=
     headers:
-      cache-control: ['private, max-age=600']
-      cf-ray: [2e97c83dbe1e274a-FRA]
-      connection: [keep-alive]
-      content-encoding: [gzip]
-      content-type: [application/json; charset=utf-8]
-      date: ['Wed, 28 Sep 2016 14:11:01 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=da619cfb62142d2756c17991ba077844d1475071861; expires=Thu,
-          28-Sep-17 14:11:01 GMT; path=/; domain=.thetvdb.com; HttpOnly']
-      vary: [Accept-Language]
-      x-powered-by: [Thundar!]
-      x-thetvdb-api-version: [2.1.1]
-    status: {code: 200, message: OK}
+      cache-control:
+      - private, max-age=600
+      cf-ray:
+      - 2e97c83dbe1e274a-FRA
+      connection:
+      - keep-alive
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Wed, 28 Sep 2016 14:11:01 GMT
+      server:
+      - cloudflare-nginx
+      set-cookie:
+      - __cfduid=da619cfb62142d2756c17991ba077844d1475071861; expires=Thu, 28-Sep-17
+        14:11:01 GMT; path=/; domain=.thetvdb.com; HttpOnly
+      vary:
+      - Accept-Language
+      x-powered-by:
+      - Thundar!
+      x-thetvdb-api-version:
+      - 2.1.1
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Authorization: [!!python/unicode Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NzUxNTgyNjAsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDc1MDcxODYwfQ.qhwXATjie5g97wC6r8KGdtDWMXXbVSEjK2awMhSC6mzw9_NCltAbVSLWSdiPzMa0mC8vgHz-4Iz3wzeHtWlT1MbeEYl6_mxgFrPy-r_OnGYG8b1mBRw4j-0t0pqkeUq5ZRXMRiUg0x1s9e5a3YmfzvtZy_qyoEpgG4zNYQaqiSF3zOSMVeNjvA_Cz036yu1hpaMOymYx_7IeSo4gKi1BsmqvuvW7XJgRW7Ho4S0nLB_SiHYl7xAScZtZnAnvIDCEdVjR-sTKszlNO0nAKw3wmjQFAk0v_PwPRRNxB4diUFTa9GdSRptX0HlP1dB1rHVuZjEbMk1xUKEo3_uYxCGiFg]
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NzUxNTgyNjAsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDc1MDcxODYwfQ.qhwXATjie5g97wC6r8KGdtDWMXXbVSEjK2awMhSC6mzw9_NCltAbVSLWSdiPzMa0mC8vgHz-4Iz3wzeHtWlT1MbeEYl6_mxgFrPy-r_OnGYG8b1mBRw4j-0t0pqkeUq5ZRXMRiUg0x1s9e5a3YmfzvtZy_qyoEpgG4zNYQaqiSF3zOSMVeNjvA_Cz036yu1hpaMOymYx_7IeSo4gKi1BsmqvuvW7XJgRW7Ho4S0nLB_SiHYl7xAScZtZnAnvIDCEdVjR-sTKszlNO0nAKw3wmjQFAk0v_PwPRRNxB4diUFTa9GdSRptX0HlP1dB1rHVuZjEbMk1xUKEo3_uYxCGiFg
+      Connection:
+      - keep-alive
+      User-Agent:
+      - FlexGet/2.3.33.dev (www.flexget.com)
     method: GET
     uri: https://api.thetvdb.com/series/77398
   response:
@@ -112,28 +153,47 @@ interactions:
         M1+mxWyEpSk3u8jGmBf5vDhZjNQdtYcSd+SbD3men+aL44cQU1nyk6gPwOs+W0I7a8e3JpE/jsqL
         /8Bz12nMljic53vAn70/fwEAAP//AwBBRUjpdwQAAA==
     headers:
-      cache-control: ['private, max-age=600']
-      cf-ray: [2e97c8415fc32720-FRA]
-      connection: [keep-alive]
-      content-encoding: [gzip]
-      content-type: [application/json; charset=utf-8]
-      date: ['Wed, 28 Sep 2016 14:11:02 GMT']
-      last-modified: ['Tue, 27 Sep 2016 21:50:44 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=def0f7b109b4f6f0d2276ee8a01237e791475071861; expires=Thu,
-          28-Sep-17 14:11:01 GMT; path=/; domain=.thetvdb.com; HttpOnly']
-      vary: [Accept-Language]
-      x-powered-by: [Thundar!]
-      x-thetvdb-api-version: [2.1.1]
-    status: {code: 200, message: OK}
+      cache-control:
+      - private, max-age=600
+      cf-ray:
+      - 2e97c8415fc32720-FRA
+      connection:
+      - keep-alive
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Wed, 28 Sep 2016 14:11:02 GMT
+      last-modified:
+      - Tue, 27 Sep 2016 21:50:44 GMT
+      server:
+      - cloudflare-nginx
+      set-cookie:
+      - __cfduid=def0f7b109b4f6f0d2276ee8a01237e791475071861; expires=Thu, 28-Sep-17
+        14:11:01 GMT; path=/; domain=.thetvdb.com; HttpOnly
+      vary:
+      - Accept-Language
+      x-powered-by:
+      - Thundar!
+      x-thetvdb-api-version:
+      - 2.1.1
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Authorization: [!!python/unicode Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NzUxNTgyNjAsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDc1MDcxODYwfQ.qhwXATjie5g97wC6r8KGdtDWMXXbVSEjK2awMhSC6mzw9_NCltAbVSLWSdiPzMa0mC8vgHz-4Iz3wzeHtWlT1MbeEYl6_mxgFrPy-r_OnGYG8b1mBRw4j-0t0pqkeUq5ZRXMRiUg0x1s9e5a3YmfzvtZy_qyoEpgG4zNYQaqiSF3zOSMVeNjvA_Cz036yu1hpaMOymYx_7IeSo4gKi1BsmqvuvW7XJgRW7Ho4S0nLB_SiHYl7xAScZtZnAnvIDCEdVjR-sTKszlNO0nAKw3wmjQFAk0v_PwPRRNxB4diUFTa9GdSRptX0HlP1dB1rHVuZjEbMk1xUKEo3_uYxCGiFg]
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NzUxNTgyNjAsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDc1MDcxODYwfQ.qhwXATjie5g97wC6r8KGdtDWMXXbVSEjK2awMhSC6mzw9_NCltAbVSLWSdiPzMa0mC8vgHz-4Iz3wzeHtWlT1MbeEYl6_mxgFrPy-r_OnGYG8b1mBRw4j-0t0pqkeUq5ZRXMRiUg0x1s9e5a3YmfzvtZy_qyoEpgG4zNYQaqiSF3zOSMVeNjvA_Cz036yu1hpaMOymYx_7IeSo4gKi1BsmqvuvW7XJgRW7Ho4S0nLB_SiHYl7xAScZtZnAnvIDCEdVjR-sTKszlNO0nAKw3wmjQFAk0v_PwPRRNxB4diUFTa9GdSRptX0HlP1dB1rHVuZjEbMk1xUKEo3_uYxCGiFg
+      Connection:
+      - keep-alive
+      User-Agent:
+      - FlexGet/2.3.33.dev (www.flexget.com)
     method: GET
     uri: https://api.thetvdb.com/series/77398/images/query?keyType=poster
   response:
@@ -152,27 +212,45 @@ interactions:
         Ff7oYiajS1SLpuXoQgRr7KGJv0W7yagbs4cexM2VyxnLCsmFHHuLZsTSi5vDom2mvZXJ5/IvAAAA
         //+i0qC2EfVbLvDmOFKBS1bRgtxu4VJQiOWqBQAAAP//AwCjblZo+hcAAA==
     headers:
-      cache-control: ['private, max-age=600']
-      cf-ray: [2e97c847badc15bf-FRA]
-      connection: [keep-alive]
-      content-encoding: [gzip]
-      content-type: [application/json; charset=utf-8]
-      date: ['Wed, 28 Sep 2016 14:11:03 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d294f74944dbe59bb0b5456940473cc721475071862; expires=Thu,
-          28-Sep-17 14:11:02 GMT; path=/; domain=.thetvdb.com; HttpOnly']
-      vary: [Accept-Language]
-      x-powered-by: [Thundar!]
-      x-thetvdb-api-version: [2.1.1]
-    status: {code: 200, message: OK}
+      cache-control:
+      - private, max-age=600
+      cf-ray:
+      - 2e97c847badc15bf-FRA
+      connection:
+      - keep-alive
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Wed, 28 Sep 2016 14:11:03 GMT
+      server:
+      - cloudflare-nginx
+      set-cookie:
+      - __cfduid=d294f74944dbe59bb0b5456940473cc721475071862; expires=Thu, 28-Sep-17
+        14:11:02 GMT; path=/; domain=.thetvdb.com; HttpOnly
+      vary:
+      - Accept-Language
+      x-powered-by:
+      - Thundar!
+      x-thetvdb-api-version:
+      - 2.1.1
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Authorization: [!!python/unicode Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NzUxNTgyNjAsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDc1MDcxODYwfQ.qhwXATjie5g97wC6r8KGdtDWMXXbVSEjK2awMhSC6mzw9_NCltAbVSLWSdiPzMa0mC8vgHz-4Iz3wzeHtWlT1MbeEYl6_mxgFrPy-r_OnGYG8b1mBRw4j-0t0pqkeUq5ZRXMRiUg0x1s9e5a3YmfzvtZy_qyoEpgG4zNYQaqiSF3zOSMVeNjvA_Cz036yu1hpaMOymYx_7IeSo4gKi1BsmqvuvW7XJgRW7Ho4S0nLB_SiHYl7xAScZtZnAnvIDCEdVjR-sTKszlNO0nAKw3wmjQFAk0v_PwPRRNxB4diUFTa9GdSRptX0HlP1dB1rHVuZjEbMk1xUKEo3_uYxCGiFg]
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Authorization:
+      - Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NzUxNTgyNjAsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDc1MDcxODYwfQ.qhwXATjie5g97wC6r8KGdtDWMXXbVSEjK2awMhSC6mzw9_NCltAbVSLWSdiPzMa0mC8vgHz-4Iz3wzeHtWlT1MbeEYl6_mxgFrPy-r_OnGYG8b1mBRw4j-0t0pqkeUq5ZRXMRiUg0x1s9e5a3YmfzvtZy_qyoEpgG4zNYQaqiSF3zOSMVeNjvA_Cz036yu1hpaMOymYx_7IeSo4gKi1BsmqvuvW7XJgRW7Ho4S0nLB_SiHYl7xAScZtZnAnvIDCEdVjR-sTKszlNO0nAKw3wmjQFAk0v_PwPRRNxB4diUFTa9GdSRptX0HlP1dB1rHVuZjEbMk1xUKEo3_uYxCGiFg
+      Connection:
+      - keep-alive
+      User-Agent:
+      - FlexGet/2.3.33.dev (www.flexget.com)
     method: GET
     uri: https://api.thetvdb.com/series/77398/actors
   response:
@@ -196,17 +274,174 @@ interactions:
         dG0g/oSHvTUy+L94TsRXF9GETUnSXhqvrybCXRET0kfob2yHUMDJsZaVVQhLk2fYQLSRVpUS5uZJ
         Wlv9ULKA/1gmdMQioEl9dr32xxXA96vffwAAAP//AwDzsD0f6hAAAA==
     headers:
-      cache-control: ['private, max-age=600']
-      cf-ray: [2e97c84e496d088d-FRA]
-      connection: [keep-alive]
-      content-encoding: [gzip]
-      content-type: [application/json; charset=utf-8]
-      date: ['Wed, 28 Sep 2016 14:11:04 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d294f26423a096c8eb142d19a44dc2f4d1475071864; expires=Thu,
-          28-Sep-17 14:11:04 GMT; path=/; domain=.thetvdb.com; HttpOnly']
-      vary: [Accept-Language]
-      x-powered-by: [Thundar!]
-      x-thetvdb-api-version: [2.1.1]
-    status: {code: 200, message: OK}
+      cache-control:
+      - private, max-age=600
+      cf-ray:
+      - 2e97c84e496d088d-FRA
+      connection:
+      - keep-alive
+      content-encoding:
+      - gzip
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Wed, 28 Sep 2016 14:11:04 GMT
+      server:
+      - cloudflare-nginx
+      set-cookie:
+      - __cfduid=d294f26423a096c8eb142d19a44dc2f4d1475071864; expires=Thu, 28-Sep-17
+        14:11:04 GMT; path=/; domain=.thetvdb.com; HttpOnly
+      vary:
+      - Accept-Language
+      x-powered-by:
+      - Thundar!
+      x-thetvdb-api-version:
+      - 2.1.1
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Accept-Language:
+      - en
+      Authorization:
+      - Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NzUxNTgyNjAsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDc1MDcxODYwfQ.qhwXATjie5g97wC6r8KGdtDWMXXbVSEjK2awMhSC6mzw9_NCltAbVSLWSdiPzMa0mC8vgHz-4Iz3wzeHtWlT1MbeEYl6_mxgFrPy-r_OnGYG8b1mBRw4j-0t0pqkeUq5ZRXMRiUg0x1s9e5a3YmfzvtZy_qyoEpgG4zNYQaqiSF3zOSMVeNjvA_Cz036yu1hpaMOymYx_7IeSo4gKi1BsmqvuvW7XJgRW7Ho4S0nLB_SiHYl7xAScZtZnAnvIDCEdVjR-sTKszlNO0nAKw3wmjQFAk0v_PwPRRNxB4diUFTa9GdSRptX0HlP1dB1rHVuZjEbMk1xUKEo3_uYxCGiFg
+      Connection:
+      - keep-alive
+      User-Agent:
+      - FlexGet/3.0.12 (www.flexget.com)
+    method: GET
+    uri: https://api.thetvdb.com/series/77398
+  response:
+    body:
+      string: '{"Error":"Not authorized","authorizer":"cloudfront"}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '52'
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Tue, 10 Dec 2019 00:18:57 GMT
+      Server:
+      - CloudFront
+      Via:
+      - 1.1 b97800dba63a54d15f1e69f88e3a1a3e.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - tMgqqgpcpMoqwe4VcDtu8BM3T7kOgccGixg13R69ZlbcqzQJHJ5-gg==
+      X-Amz-Cf-Pop:
+      - GRU1-C1
+      X-Cache:
+      - LambdaGeneratedResponse from cloudfront
+    status:
+      code: 401
+      message: ''
+- request:
+    body: '{"apikey": "4D297D8CFDE0E105"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '30'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - FlexGet/3.0.12 (www.flexget.com)
+    method: POST
+    uri: https://api.thetvdb.com/login
+  response:
+    body:
+      string: '{"token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NzY1NDE5MzgsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNTc1OTM3MTM4fQ.QPDpSGF7TiOAHovnUoAIgmdTwQFTqQmWSqPATxGykxLRhvA4V0UIr3_ntSvTX-2spkXjX5fmnQPz3QdzNukT3PtbDOwGxEmSWG91i3ed1JLsr1ac7TlhQYsWPFuD6h9p6ed4JTD0-OfdBbmuLX-sGjn2vQIyIGiqk-WrON-ZyB7fG8mdeysDQcOFLaph75izecYM2RfGUgeJY4TfY0t2EVDXsA8HvQ2J-3NbmXzXTLLcIrM3BY2dtciFv0IGciTAspWTFhUG25XTpMQO8Fohsey6h0QDlXsdq388ERzW83_sEH7hwuJBPXnpdtdKFLCbuUG5cNNLVpQz7to7STv5ug"}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '466'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 10 Dec 2019 00:18:58 GMT
+      Vary:
+      - Accept-Language
+      Via:
+      - 1.1 b97800dba63a54d15f1e69f88e3a1a3e.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - 4RZRyVfhCPr62l6ykqQ1JUYTwTnYrCEGhCnx8jRjbqpCP5QM0WUhSg==
+      X-Amz-Cf-Pop:
+      - GRU1-C1
+      X-Cache:
+      - Miss from cloudfront
+      X-Powered-By:
+      - Thundar!
+      X-Thetvdb-Api-Version:
+      - 3.0.0
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Accept-Language:
+      - en
+      Authorization:
+      - Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NzY1NDE5MzgsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNTc1OTM3MTM4fQ.QPDpSGF7TiOAHovnUoAIgmdTwQFTqQmWSqPATxGykxLRhvA4V0UIr3_ntSvTX-2spkXjX5fmnQPz3QdzNukT3PtbDOwGxEmSWG91i3ed1JLsr1ac7TlhQYsWPFuD6h9p6ed4JTD0-OfdBbmuLX-sGjn2vQIyIGiqk-WrON-ZyB7fG8mdeysDQcOFLaph75izecYM2RfGUgeJY4TfY0t2EVDXsA8HvQ2J-3NbmXzXTLLcIrM3BY2dtciFv0IGciTAspWTFhUG25XTpMQO8Fohsey6h0QDlXsdq388ERzW83_sEH7hwuJBPXnpdtdKFLCbuUG5cNNLVpQz7to7STv5ug
+      Connection:
+      - keep-alive
+      User-Agent:
+      - FlexGet/3.0.12 (www.flexget.com)
+    method: GET
+    uri: https://api.thetvdb.com/series/77398
+  response:
+    body:
+      string: '{"data":{"id":77398,"seriesId":"61","seriesName":"The X-Files","aliases":["The
+        X Files","The X-Files (2016)"],"season":"11","poster":"posters/77398-2.jpg","banner":"graphical/61-g.jpg","fanart":"fanart/original/77398-4.jpg","status":"Ended","firstAired":"1993-09-10","network":"FOX","networkId":"1318","runtime":"45","language":"en","genre":["Science
+        Fiction","Suspense"],"overview":"`The truth is out there,'' and FBI agents
+        Scully and Mulder seek it in this sci-fi phenomenon about their quest to explain
+        the seemingly unexplainable. Their strange cases include UFO sightings, alien
+        abductions and just about anything else paranormal. ","lastUpdated":1574810128,"airsDayOfWeek":"Wednesday","airsTime":"8:00
+        PM","rating":"TV-14","imdbId":"tt0106179","zap2itId":"EP00080955","added":"","addedBy":null,"siteRating":8.9,"siteRatingCount":8113,"slug":"the-x-files"}}'
+    headers:
+      Cache-Control:
+      - private, max-age=86400
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '862'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 10 Dec 2019 00:46:21 GMT
+      Last-Modified:
+      - Tue, 26 Nov 2019 23:15:28 GMT
+      Vary:
+      - Accept-Language
+      Via:
+      - 1.1 fb8b139e9fbca049551cc54f2dd63574.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - eG9ZKJ2Uma9yvYgj5IjoYLvWLQhcek0tqH9daNODTy4FBcgKVp7K7A==
+      X-Amz-Cf-Pop:
+      - GRU50-C1
+      X-Cache:
+      - Hit from cloudfront
+      X-Powered-By:
+      - Thundar!
+      X-Thetvdb-Api-Version:
+      - 3.0.0
+    status:
+      code: 200
+      message: OK
 version: 1

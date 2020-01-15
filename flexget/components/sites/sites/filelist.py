@@ -1,7 +1,7 @@
 import datetime
-import logging
 import re
 
+from loguru import logger
 from sqlalchemy import Column, DateTime, Unicode
 
 from flexget import db_schema, plugin
@@ -15,7 +15,7 @@ from flexget.utils.requests import TimedLimiter
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
-log = logging.getLogger('filelist')
+logger = logger.bind(name='filelist')
 Base = db_schema.versioned_base('filelist', 0)
 
 requests = RequestSession()
@@ -136,12 +136,12 @@ class SearchFileList:
                     and saved_cookie.expires
                     and saved_cookie.expires >= datetime.datetime.now()
                 ):
-                    log.debug('Found valid login cookie')
+                    logger.debug('Found valid login cookie')
                     return saved_cookie.cookie
 
         url = BASE_URL + 'takelogin.php'
         try:
-            log.debug('Attempting to retrieve FileList.ro cookie')
+            logger.debug('Attempting to retrieve FileList.ro cookie')
             response = requests.post(
                 url,
                 data={
@@ -167,14 +167,14 @@ class SearchFileList:
                     expires = c.expires
             if expires:
                 expires = datetime.datetime.fromtimestamp(expires)
-            log.debug('Saving or updating FileList.ro cookie in db')
+            logger.debug('Saving or updating FileList.ro cookie in db')
             cookie = FileListCookie(
                 username=username.lower(), cookie=dict(requests.cookies), expires=expires
             )
             session.merge(cookie)
             return cookie.cookie
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def search(self, task, entry, config):
         """
             Search for entries on FileList.ro
@@ -191,14 +191,14 @@ class SearchFileList:
 
         for search_string in entry.get('search_strings', [entry['title']]):
             params['search'] = search_string
-            log.debug('Using search params: %s', params)
+            logger.debug('Using search params: {}', params)
             try:
                 page = self.get(
                     BASE_URL + 'browse.php', params, config['username'], config['password']
                 )
-                log.debug('requesting: %s', page.url)
+                logger.debug('requesting: {}', page.url)
             except RequestException as e:
-                log.error('FileList.ro request failed: %s', e)
+                logger.error('FileList.ro request failed: {}', e)
                 continue
 
             soup = get_soup(page.content)
@@ -232,7 +232,7 @@ class SearchFileList:
                         try:
                             request = self.get(url, {}, config['username'], config['password'])
                         except RequestException as e:
-                            log.error('FileList.ro request failed: %s', e)
+                            logger.error('FileList.ro request failed: {}', e)
                             continue
                         title_soup = get_soup(request.content)
                         title = title_soup.find('div', attrs={'class': 'cblock-header'}).text

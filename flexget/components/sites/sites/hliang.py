@@ -1,12 +1,13 @@
-import logging
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.components.sites.urlrewriting import UrlRewritingError
 from flexget.event import event
 from flexget.utils.soup import get_soup
 
-log = logging.getLogger('hliang')
+logger = logger.bind(name='hliang')
 
 
 class UrlRewriteHliang:
@@ -23,14 +24,14 @@ class UrlRewriteHliang:
     def url_rewrite(self, task, entry):
         entry['url'] = self.parse_download_page(entry['url'], task.requests)
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def parse_download_page(self, url, requests):
         txheaders = {'User-agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
         try:
             page = requests.get(url, headers=txheaders)
         except requests.exceptions.RequestException as e:
             msg = 'Cannot open "%s" : %s' % (url, str(e))
-            log.error(msg)
+            logger.error(msg)
             raise UrlRewritingError(msg)
 
         try:

@@ -1,17 +1,17 @@
 import difflib
 import json
-import logging
 import random
 import re
 
 from bs4.element import Tag
+from loguru import logger
 
 from flexget import plugin
 from flexget.utils.requests import Session, TimedLimiter
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import str_to_int
 
-log = logging.getLogger('imdb.utils')
+logger = logger.bind(name='imdb.utils')
 # IMDb delivers a version of the page which is unparsable to unknown (and some known) user agents, such as requests'
 # Spoof the old urllib user agent to keep results consistent
 requests = Session()
@@ -93,9 +93,9 @@ class ImdbSearch:
         name = parser.name
         year = parser.year
         if not name:
-            log.critical('Failed to parse name from %s', raw_name)
+            logger.critical('Failed to parse name from {}', raw_name)
             return None
-        log.debug('smart_match name=%s year=%s' % (name, str(year)))
+        logger.debug('smart_match name={} year={}', name, str(year))
         return self.best_match(name, year, single_match)
 
     def best_match(self, name, year=None, single_match=True):
@@ -103,54 +103,57 @@ class ImdbSearch:
         movies = self.search(name)
 
         if not movies:
-            log.debug('search did not return any movies')
+            logger.debug('search did not return any movies')
             return None
 
         # remove all movies below min_match, and different year
         for movie in movies[:]:
             if year and movie.get('year'):
                 if movie['year'] != year:
-                    log.debug(
-                        'best_match removing %s - %s (wrong year: %s)'
-                        % (movie['name'], movie['url'], str(movie['year']))
+                    logger.debug(
+                        'best_match removing {} - {} (wrong year: {})',
+                        movie['name'],
+                        movie['url'],
+                        str(movie['year']),
                     )
                     movies.remove(movie)
                     continue
             if movie['match'] < self.min_match:
-                log.debug('best_match removing %s (min_match)', movie['name'])
+                logger.debug('best_match removing {} (min_match)', movie['name'])
                 movies.remove(movie)
                 continue
 
         if not movies:
-            log.debug('FAILURE: no movies remain')
+            logger.debug('FAILURE: no movies remain')
             return None
 
         # if only one remains ..
         if len(movies) == 1:
-            log.debug('SUCCESS: only one movie remains')
+            logger.debug('SUCCESS: only one movie remains')
             return movies[0]
 
         # check min difference between best two hits
         diff = movies[0]['match'] - movies[1]['match']
         if diff < self.min_diff:
-            log.debug(
-                'unable to determine correct movie, min_diff too small (`%s` <-?-> `%s`)'
-                % (movies[0], movies[1])
+            logger.debug(
+                'unable to determine correct movie, min_diff too small (`{}` <-?-> `{}`)',
+                movies[0],
+                movies[1],
             )
             for m in movies:
-                log.debug('remain: %s (match: %s) %s' % (m['name'], m['match'], m['url']))
+                logger.debug('remain: {} (match: {}) {}', m['name'], m['match'], m['url'])
             return None
         else:
             return movies[0] if single_match else movies
 
     def search(self, name):
         """Return array of movie details (dict)"""
-        log.debug('Searching: %s', name)
+        logger.debug('Searching: {}', name)
         url = u'https://www.imdb.com/find'
         # This may include Shorts and TV series in the results
         params = {'q': name, 's': 'tt'}
 
-        log.debug('Search query: %s', repr(url))
+        logger.debug('Search query: {}', repr(url))
         page = requests.get(url, params=params)
         actual_url = page.url
 
@@ -163,7 +166,7 @@ class ImdbSearch:
             imdb_id = extract_id(actual_url)
             movie_parse = ImdbParser()
             movie_parse.parse(imdb_id, soup=soup)
-            log.debug('Perfect hit. Search got redirected to %s', actual_url)
+            logger.debug('Perfect hit. Search got redirected to {}', actual_url)
             movie = {
                 'match': 1.0,
                 'name': movie_parse.name,
@@ -176,12 +179,12 @@ class ImdbSearch:
 
         section_table = soup.find('table', 'findList')
         if not section_table:
-            log.debug('results table not found')
+            logger.debug('results table not found')
             return
 
         rows = section_table.find_all('tr')
         if not rows:
-            log.debug('Titles section does not have links')
+            logger.debug('Titles section does not have links')
         for count, row in enumerate(rows):
             # Title search gives a lot of results, only check the first ones
             if count > self.max_results:
@@ -196,7 +199,7 @@ class ImdbSearch:
                 elif len(additional) > 1:
                     movie['year'] = str_to_int(additional[-2])
                     if additional[-1] not in ['TV Movie', 'Video']:
-                        log.debug('skipping %s', result_text.text)
+                        logger.debug('skipping {}', result_text.text)
                         continue
             primary_photo = row.find('td', 'primary_photo')
             movie['thumbnail'] = primary_photo.find('a').find('img').get('src')
@@ -205,7 +208,7 @@ class ImdbSearch:
             movie['name'] = link.text
             movie['imdb_id'] = extract_id(link.get('href'))
             movie['url'] = make_url(movie['imdb_id'])
-            log.debug('processing name: %s url: %s' % (movie['name'], movie['url']))
+            logger.debug('processing name: {} url: {}', movie['name'], movie['url'])
 
             # calc & set best matching ratio
             seq = difflib.SequenceMatcher(lambda x: x == ' ', movie['name'].title(), name.title())
@@ -216,24 +219,26 @@ class ImdbSearch:
                 aka = aka.next.string
                 match = re.search(r'".*"', aka)
                 if not match:
-                    log.debug('aka `%s` is invalid' % aka)
+                    logger.debug('aka `{}` is invalid', aka)
                     continue
                 aka = match.group(0).replace('"', '')
-                log.trace('processing aka %s' % aka)
+                logger.trace('processing aka {}', aka)
                 seq = difflib.SequenceMatcher(lambda x: x == ' ', aka.title(), name.title())
                 aka_ratio = seq.ratio()
                 if aka_ratio > ratio:
                     ratio = aka_ratio * self.aka_weight
-                    log.debug(
-                        '- aka `%s` matches better to `%s` ratio %s (weighted to %s)'
-                        % (aka, name, aka_ratio, ratio)
+                    logger.debug(
+                        '- aka `{}` matches better to `{}` ratio {} (weighted to {})',
+                        aka,
+                        name,
+                        aka_ratio,
+                        ratio,
                     )
 
             # prioritize items by position
             position_ratio = (self.first_weight - 1) / (count + 1) + 1
-            log.debug(
-                '- prioritizing based on position %s `%s`: %s'
-                % (count, movie['url'], position_ratio)
+            logger.debug(
+                '- prioritizing based on position {} `{}`: {}', count, movie['url'], position_ratio
             )
             ratio *= position_ratio
 
@@ -292,7 +297,7 @@ class ImdbParser:
         if name_elem:
             self.name = name_elem.strip()
         else:
-            log.error('Possible IMDB parser needs updating, Please report on Github.')
+            logger.error('Possible IMDB parser needs updating, Please report on Github.')
             raise plugin.PluginError(
                 'Unable to set imdb_name for %s from %s' % (self.imdb_id, self.url)
             )
@@ -304,44 +309,44 @@ class ImdbParser:
                 self.year = int(m.group(1))
 
         if not self.year:
-            log.debug('No year found for %s', self.imdb_id)
+            logger.debug('No year found for {}', self.imdb_id)
 
         mpaa_rating_elem = data.get('contentRating')
         if mpaa_rating_elem:
             self.mpaa_rating = mpaa_rating_elem
         else:
-            log.debug('No rating found for %s', self.imdb_id)
+            logger.debug('No rating found for {}', self.imdb_id)
 
         photo_elem = data.get('image')
         if photo_elem:
             self.photo = photo_elem
         else:
-            log.debug('No photo found for %s', self.imdb_id)
+            logger.debug('No photo found for {}', self.imdb_id)
 
         original_name_elem = title_wrapper.find('div', {'class': 'originalTitle'})
         if original_name_elem:
             self.name = title_wrapper.find('h1').contents[0].strip()
             self.original_name = original_name_elem.contents[0].strip().strip('"')
         else:
-            log.debug('No original title found for %s', self.imdb_id)
+            logger.debug('No original title found for {}', self.imdb_id)
 
         votes_elem = data.get('aggregateRating', {}).get('ratingCount')
         if votes_elem:
             self.votes = str_to_int(votes_elem) if not isinstance(votes_elem, int) else votes_elem
         else:
-            log.debug('No votes found for %s', self.imdb_id)
+            logger.debug('No votes found for {}', self.imdb_id)
 
         score_elem = data.get('aggregateRating', {}).get('ratingValue')
         if score_elem:
             self.score = float(score_elem)
         else:
-            log.debug('No score found for %s', self.imdb_id)
+            logger.debug('No score found for {}', self.imdb_id)
 
         meta_score_elem = soup.find(attrs={'class': 'metacriticScore'})
         if meta_score_elem:
             self.meta_score = str_to_int(meta_score_elem.text)
         else:
-            log.debug('No Metacritic score found for %s', self.imdb_id)
+            logger.debug('No Metacritic score found for {}', self.imdb_id)
 
         # get director(s)
         directors = data.get('director', [])
@@ -388,7 +393,7 @@ class ImdbParser:
                     plot_elem.em.replace_with('')
                 self.plot_outline = plot_elem.text.strip()
             else:
-                log.debug('No storyline found for %s', self.imdb_id)
+                logger.debug('No storyline found for {}', self.imdb_id)
 
         genres = data.get('genre', [])
         if not isinstance(genres, list):

@@ -1,6 +1,6 @@
-import logging
 import os
 
+from loguru import logger
 from requests import Session
 from requests.exceptions import RequestException
 
@@ -8,7 +8,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils.template import RenderError
 
-log = logging.getLogger('qbittorrent')
+logger = logger.bind(name='qbittorrent')
 
 
 class OutputQBitTorrent:
@@ -56,14 +56,39 @@ class OutputQBitTorrent:
     def _request(self, method, url, msg_on_fail=None, **kwargs):
         try:
             response = self.session.request(method, url, **kwargs)
-            if response == 'Fails.':
+            if response.text == "Ok.":
+                return response
+            else:
                 msg = (
                     'Failure. URL: {}, data: {}'.format(url, kwargs)
                     if not msg_on_fail
                     else msg_on_fail
                 )
-            else:
+        except RequestException as e:
+            msg = str(e)
+        raise plugin.PluginError(
+            'Error when trying to send request to qBittorrent: {}'.format(msg)
+        )
+
+    def check_api_version(self, msg_on_fail):
+        try:
+            url = self.url + "/api/v2/app/webapiVersion"
+            response = self.session.request('get', url)
+            if response.status_code != 404:
+                self.api_url_login = '/api/v2/auth/login'
+                self.api_url_upload = '/api/v2/torrents/add'
+                self.api_url_download = '/api/v2/torrents/add'
                 return response
+
+            url = self.url + "/version/api"
+            response = self.session.request('get', url)
+            if response.status_code != 404:
+                self.api_url_login = '/login'
+                self.api_url_upload = '/command/upload'
+                self.api_url_download = '/command/download'
+                return response
+
+            msg = 'Failure. URL: {}'.format(url) if not msg_on_fail else msg_on_fail
         except RequestException as e:
             msg = str(e)
         raise plugin.PluginError(
@@ -80,16 +105,17 @@ class OutputQBitTorrent:
         self.url = '{}://{}:{}'.format(
             'https' if config['use_ssl'] else 'http', config['host'], config['port']
         )
+        self.check_api_version('Check API version failed.')
         if config.get('username') and config.get('password'):
             data = {'username': config['username'], 'password': config['password']}
             self._request(
                 'post',
-                self.url + '/login',
+                self.url + self.api_url_login,
                 data=data,
                 msg_on_fail='Authentication failed.',
                 verify=config['verify_cert'],
             )
-        log.debug('Successfully connected to qBittorrent')
+        logger.debug('Successfully connected to qBittorrent')
         self.connected = True
 
     def add_torrent_file(self, file_path, data, verify_cert):
@@ -100,12 +126,12 @@ class OutputQBitTorrent:
             multipart_data['torrents'] = f
             self._request(
                 'post',
-                self.url + '/command/upload',
+                self.url + self.api_url_upload,
                 msg_on_fail='Failed to add file to qBittorrent',
                 files=multipart_data,
                 verify=verify_cert,
             )
-        log.debug('Added torrent file %s to qBittorrent', file_path)
+        logger.debug('Added torrent file {} to qBittorrent', file_path)
 
     def add_torrent_url(self, url, data, verify_cert):
         if not self.connected:
@@ -114,12 +140,12 @@ class OutputQBitTorrent:
         multipart_data = {k: (None, v) for k, v in data.items()}
         self._request(
             'post',
-            self.url + '/command/download',
+            self.url + self.api_url_download,
             msg_on_fail='Failed to add file to qBittorrent',
             files=multipart_data,
             verify=verify_cert,
         )
-        log.debug('Added url %s to qBittorrent', url)
+        logger.debug('Added url {} to qBittorrent', url)
 
     def prepare_config(self, config):
         if isinstance(config, bool):
@@ -143,7 +169,7 @@ class OutputQBitTorrent:
                 if save_path:
                     form_data['savepath'] = save_path
             except RenderError as e:
-                log.error('Error setting path for %s: %s', entry['title'], e)
+                logger.error('Error setting path for {}: {}', entry['title'], e)
 
             label = entry.get('label', config.get('label'))
             if label:
@@ -165,19 +191,19 @@ class OutputQBitTorrent:
             is_magnet = entry['url'].startswith('magnet:')
 
             if task.manager.options.test:
-                log.info('Test mode.')
-                log.info('Would add torrent to qBittorrent with:')
+                logger.info('Test mode.')
+                logger.info('Would add torrent to qBittorrent with:')
                 if not is_magnet:
-                    log.info('File: %s', entry.get('file'))
+                    logger.info('File: {}', entry.get('file'))
                 else:
-                    log.info('Url: %s', entry.get('url'))
-                log.info('Save path: %s', form_data.get('savepath'))
-                log.info('Label: %s', form_data.get('label'))
-                log.info('Paused: %s', form_data.get('paused', 'false'))
+                    logger.info('Url: {}', entry.get('url'))
+                logger.info('Save path: {}', form_data.get('savepath'))
+                logger.info('Label: {}', form_data.get('label'))
+                logger.info('Paused: {}', form_data.get('paused', 'false'))
                 if maxupspeed:
-                    log.info('Upload Speed Limit: %d', form_data.get('upLimit'))
+                    logger.info('Upload Speed Limit: {}', form_data.get('upLimit'))
                 if maxdownspeed:
-                    log.info('Download Speed Limit: %d', form_data.get('dlLimit'))
+                    logger.info('Download Speed Limit: {}', form_data.get('dlLimit'))
                 continue
 
             if not is_magnet:
@@ -186,8 +212,8 @@ class OutputQBitTorrent:
                     continue
                 if not os.path.exists(entry['file']):
                     tmp_path = os.path.join(task.manager.config_base, 'temp')
-                    log.debug('entry: %s', entry)
-                    log.debug('temp: %s', ', '.join(os.listdir(tmp_path)))
+                    logger.debug('entry: {}', entry)
+                    logger.debug('temp: {}', ', '.join(os.listdir(tmp_path)))
                     entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
                     continue
                 self.add_torrent_file(entry['file'], form_data, config['verify_cert'])

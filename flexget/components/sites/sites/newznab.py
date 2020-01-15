@@ -1,7 +1,7 @@
-import logging
 from urllib.parse import quote, urlencode
 
 import feedparser
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -10,7 +10,7 @@ from flexget.utils.requests import RequestException
 
 __author__ = 'deksan'
 
-log = logging.getLogger('newznab')
+logger = logger.bind(name='newznab')
 
 
 class Newznab:
@@ -42,7 +42,7 @@ class Newznab:
     }
 
     def build_config(self, config):
-        log.debug(type(config))
+        logger.debug(type(config))
 
         if config['category'] == 'tv':
             config['category'] = 'tvsearch'
@@ -56,29 +56,30 @@ class Newznab:
 
     def fill_entries_for_url(self, url, task):
         entries = []
-        log.verbose('Fetching %s' % url)
+        logger.verbose('Fetching {}', url)
 
         try:
             r = task.requests.get(url)
         except RequestException as e:
-            log.error("Failed fetching '%s': %s" % (url, e))
+            logger.error("Failed fetching '{}': {}", url, e)
+        else:
+            rss = feedparser.parse(r.content)
+            logger.debug('Raw RSS: {}', rss)
 
-        rss = feedparser.parse(r.content)
-        log.debug("Raw RSS: %s" % rss)
+            if not len(rss.entries):
+                logger.info('No results returned')
 
-        if not len(rss.entries):
-            log.info('No results returned')
+            for rss_entry in rss.entries:
+                new_entry = Entry()
 
-        for rss_entry in rss.entries:
-            new_entry = Entry()
+                for key in list(rss_entry.keys()):
+                    new_entry[key] = rss_entry[key]
+                new_entry['url'] = new_entry['link']
+                if rss_entry.enclosures:
+                    size = int(rss_entry.enclosures[0]['length'])  # B
+                    new_entry['content_size'] = size / (2 ** 20)  # MB
+                entries.append(new_entry)
 
-            for key in list(rss_entry.keys()):
-                new_entry[key] = rss_entry[key]
-            new_entry['url'] = new_entry['link']
-            if rss_entry.enclosures:
-                size = int(rss_entry.enclosures[0]['length'])  # B
-                new_entry['content_size'] = size / (2 ** 20)  # MB
-            entries.append(new_entry)
         return entries
 
     def search(self, task, entry, config=None):
@@ -89,11 +90,11 @@ class Newznab:
             return self.do_search_tvsearch(entry, task, config)
         else:
             entries = []
-            log.warning("Not done yet...")
+            logger.warning("Not done yet...")
             return entries
 
     def do_search_tvsearch(self, arg_entry, task, config=None):
-        log.info('Searching for %s' % (arg_entry['title']))
+        logger.info('Searching for {}', arg_entry['title'])
         # normally this should be used with next_series_episodes who has provided season and episodenumber
         if (
             'series_name' not in arg_entry
@@ -114,7 +115,7 @@ class Newznab:
 
     def do_search_movie(self, arg_entry, task, config=None):
         entries = []
-        log.info('Searching for %s (imdbid:%s)' % (arg_entry['title'], arg_entry['imdb_id']))
+        logger.info('Searching for {} (imdbid:{})', arg_entry['title'], arg_entry['imdb_id'])
         # normally this should be used with emit_movie_queue who has imdbid (i guess)
         if 'imdb_id' not in arg_entry:
             return entries

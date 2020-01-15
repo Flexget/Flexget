@@ -1,6 +1,6 @@
-import logging
 import xml.etree.ElementTree as ET
 
+from loguru import logger
 from requests.exceptions import RequestException
 
 from flexget import plugin
@@ -11,7 +11,7 @@ from flexget.utils.requests import Session as RequestSession
 from flexget.utils.requests import TimedLimiter
 
 plugin_name = 'prowl'
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 PROWL_URL = 'https://api.prowlapp.com/publicapi/add'
 
@@ -78,9 +78,9 @@ class ProwlNotifier:
             raise PluginWarning(error.text)
         else:
             success = request_status.find('success').attrib
-            log.debug(
-                'prowl notification sent. Notifications remaining until next reset: %s. '
-                'Next reset will occur in %s minutes',
+            logger.debug(
+                'prowl notification sent. Notifications remaining until next reset: {}. '
+                'Next reset will occur in {} minutes',
                 success['remaining'],
                 success['resetdate'],
             )

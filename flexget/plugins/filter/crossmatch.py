@@ -1,10 +1,10 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.tools import aggregate_inputs
 
-log = logging.getLogger('crossmatch')
+logger = logger.bind(name='crossmatch')
 
 
 class CrossMatch:
@@ -48,7 +48,7 @@ class CrossMatch:
         # perform action on intersecting entries
         for entry in task.entries:
             for generated_entry in match_entries:
-                log.trace('checking if %s matches %s', entry['title'], generated_entry['title'])
+                logger.trace('checking if {} matches {}', entry['title'], generated_entry['title'])
                 common = self.entry_intersects(
                     entry,
                     generated_entry,
@@ -85,7 +85,7 @@ class CrossMatch:
         for field in fields:
             # Doesn't really make sense to match if field is not in both entries
             if field not in e1 or field not in e2:
-                log.trace('field %s is not in both entries', field)
+                logger.trace('field {} is not in both entries', field)
                 continue
 
             if not case_sensitive and isinstance(e1[field], str):
@@ -101,10 +101,10 @@ class CrossMatch:
                 if v1 == v2 or not exact and (v2 in v1 or v1 in v2):
                     common_fields.append(field)
                 else:
-                    log.trace('not matching')
+                    logger.trace('not matching')
             except TypeError as e:
                 # argument of type <type> is not iterable
-                log.trace('error matching fields: %s', str(e))
+                logger.trace('error matching fields: {}', str(e))
 
         return common_fields
 

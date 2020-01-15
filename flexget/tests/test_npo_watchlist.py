@@ -30,7 +30,7 @@ class TestNpoWatchlistInfo:
         assert entry['npo_runtime'] == '32'
         assert entry['npo_premium'] is False
         assert (
-            entry['npo_version'] == 'NPO.release-1.53.1'
+            entry['npo_version'] == 'NPO.release-1.58.0'
         )  # specify for which version of NPO website we did run this unittest
 
         entry = (
@@ -83,9 +83,9 @@ class TestNpoWatchlistPremium:
 
         task = execute_task('test')
         entry = task.find_entry(
-            url='https://www.npostart.nl/hollands-hoop/04-11-2017/BV_101385161'
+            url='https://www.npostart.nl/hollands-hoop/08-02-2020/BV_101396963'
         )  # a premium serie
-        assert entry['npo_id'] == 'BV_101385161'
+        assert entry['npo_id'] == 'BV_101396963'
         assert entry['npo_url'] == 'https://www.npostart.nl/hollands-hoop/BV_101385153'
         assert entry['npo_name'] == 'Hollands Hoop'
         assert entry['npo_runtime'] == '53'

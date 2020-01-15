@@ -18,7 +18,8 @@ class TestTheTVDBList:
         'api_key': '4D297D8CFDE0E105',
     }
 
-    def test_thetvdb_list_add(self):
+    def test_thetvdb_list_add(self, manager):
+        # manager fixture is requested so that the database is spun up
         tvdb_set = TheTVDBSet(self.tvdb_config)
         # Clearing existing list
         tvdb_set.clear()

@@ -1,6 +1,6 @@
-import logging
 import re
 
+from loguru import logger
 from requests.exceptions import RequestException
 
 from flexget import plugin
@@ -9,7 +9,7 @@ from flexget.components.sites.utils import normalize_unicode
 from flexget.event import event
 from flexget.utils.soup import get_soup
 
-log = logging.getLogger('rlsbb')
+logger = logger.bind(name='rlsbb')
 
 
 class UrlRewriteRlsbb:
@@ -101,27 +101,27 @@ class UrlRewriteRlsbb:
             links.append(link.string())
         return links
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     # urlrewriter API
     def url_rewrite(self, task, entry):
         soup = self._get_soup(task, entry['url'])
 
         # grab links from the main post:
         link_elements = []
-        log.debug(
-            'Searching %s for a tags where the text matches one of: %s',
+        logger.debug(
+            'Searching {} for a tags where the text matches one of: {}',
             entry['url'],
             str(self.config.get('link_text_re')),
         )
         for regexp in self.config.get('link_text_re'):
             link_elements.extend(soup.find_all('a', string=re.compile(regexp)))
-        log.debug('Original urls: %s', str(entry['urls']))
+        logger.debug('Original urls: {}', str(entry['urls']))
         if 'urls' in entry:
             urls = list(entry['urls'])
-            log.debug('Original urls: %s', str(entry['urls']))
+            logger.debug('Original urls: {}', str(entry['urls']))
         else:
             urls = []
-        log.debug('Found link elements: %s', str(link_elements))
+        logger.debug('Found link elements: {}', str(link_elements))
         for element in link_elements:
             if re.search('nfo1.rlsbb.(ru|com)', element['href']):
                 # grab multipart links
@@ -133,10 +133,11 @@ class UrlRewriteRlsbb:
         regexps = self.config.get('filehosters_re', [])
         if self.config.get('parse_comments'):
             comments = soup.find_all('div', id=re.compile("commentbody"))
-            log.debug('Comment parsing enabled: found %d comments.', len(comments))
+            logger.debug('Comment parsing enabled: found {} comments.', len(comments))
             if comments and not regexps:
-                log.warn(
-                    'You have enabled comment parsing but you did not define any filehoster_re filter. You may get a lot of unwanted and potentially dangerous links from the comments.'
+                logger.warning(
+                    'You have enabled comment parsing but you did not define any filehoster_re filter. '
+                    'You may get a lot of unwanted and potentially dangerous links from the comments.'
                 )
             for comment in comments:
                 links = comment.find_all('a')
@@ -150,22 +151,22 @@ class UrlRewriteRlsbb:
             for regexp in regexps:
                 if re.search(regexp, urls[i]):
                     filtered_urls.append(urls[i])
-                    log.debug('Url: "%s" matched filehoster filter: %s', urls[i], regexp)
+                    logger.debug('Url: "{}" matched filehoster filter: {}', urls[i], regexp)
                     break
             else:
                 if regexps:
-                    log.debug(
-                        'Url: "%s" was discarded because it does not match any of the given filehoster filters: %s',
+                    logger.debug(
+                        'Url: "{}" was discarded because it does not match any of the given filehoster filters: {}',
                         urls[i],
                         str(regexps),
                     )
         if regexps:
-            log.debug('Using filehosters_re filters: %s', str(regexps))
+            logger.debug('Using filehosters_re filters: {}', str(regexps))
             urls = filtered_urls
         else:
-            log.debug('No filehoster filters configured, using all found links.')
+            logger.debug('No filehoster filters configured, using all found links.')
         num_links = len(urls)
-        log.verbose('Found %d links at %s.', num_links, entry['url'])
+        logger.verbose('Found {} links at {}.', num_links, entry['url'])
         if num_links:
             entry['urls'] = urls
             entry['url'] = urls[0]

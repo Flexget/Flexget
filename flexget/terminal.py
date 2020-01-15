@@ -1,4 +1,6 @@
+import contextlib
 import sys
+import threading
 from textwrap import wrap
 
 from colorclass import Color, Windows
@@ -11,7 +13,6 @@ from terminaltables import (
 )
 from terminaltables.terminal_io import terminal_size
 
-from flexget.logger import local_context
 from flexget.options import ArgumentParser
 from flexget.utils.tools import io_encoding
 
@@ -19,6 +20,9 @@ from flexget.utils.tools import io_encoding
 # pythonw (flexget-headless) does not have a sys.stdout, this command would crash in that case
 if sys.platform == 'win32' and sys.stdout:
     Windows.enable(auto_colors=True)
+
+
+local_context = threading.local()
 
 
 def terminal_info():
@@ -266,6 +270,20 @@ def colorize(color, text, auto=True):
     if not terminal_info()['isatty']:
         return text
     return Color.colorize(color, text, auto)
+
+
+@contextlib.contextmanager
+def capture_console(filelike):
+    old_output = get_console_output()
+    local_context.output = filelike
+    try:
+        yield
+    finally:
+        local_context.output = old_output
+
+
+def get_console_output():
+    return getattr(local_context, 'output', None)
 
 
 def console(text, *args, **kwargs):

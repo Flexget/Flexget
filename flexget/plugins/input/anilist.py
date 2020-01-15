@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -7,7 +7,7 @@ from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException
 
-log = logging.getLogger('anilist')
+logger = logger.bind(name='anilist')
 
 LIST_STATUS = ['current', 'planning', 'completed', 'dropped', 'paused', 'repeating']
 
@@ -83,9 +83,9 @@ class AniList(object):
         if not isinstance(selected_formats, list):
             selected_formats = [selected_formats]
 
-        log.debug('Selected List Status: %s' % selected_list_status)
-        log.debug('Selected Release Status: %s' % selected_release_status)
-        log.debug('Selected Formats: %s' % selected_formats)
+        logger.debug('Selected List Status: {}', selected_list_status)
+        logger.debug('Selected Release Status: {}', selected_release_status)
+        logger.debug('Selected Formats: {}', selected_formats)
 
         req_variables = {'user': config['username']}
         req_chunk = 1
@@ -96,10 +96,10 @@ class AniList(object):
         )
         while req_chunk:
             req_query = (
-                'query ($user: String){collection: MediaListCollection(userName: $user, type: ANIME, '
-                'perChunk: 500, chunk: %s, status_in: [%s]){ hasNextChunk, statuses: lists { list: entries { '
-                'anime: media { %s }}}}}'
-                % (req_chunk, ', '.join([s.upper() for s in selected_list_status]), req_fields)
+                f'query ($user: String){{ collection: MediaListCollection(userName: $user, '
+                f'type: ANIME, perChunk: 500, chunk: {req_chunk}, status_in: '
+                f'[{", ".join([s.upper() for s in selected_list_status])}]) {{ hasNextChunk, '
+                f'statuses: lists{{ status, list: entries{{ anime: media{{ {req_fields} }}}}}}}}}}'
             )
 
             try:
@@ -112,7 +112,7 @@ class AniList(object):
 
             try:
                 list_response = list_response.json()['data']
-                log.debug('JSON output: %s' % list_response)
+                logger.debug('JSON output: {}', list_response)
                 for list_status in list_response['collection']['statuses']:
                     for anime in list_status['list']:
                         anime = anime['anime']
@@ -130,7 +130,7 @@ class AniList(object):
                             entry['al_title'] = anime['title']
                             entry['al_format'] = anime['format']
                             entry['al_release_status'] = anime['status'].capitalize()
-                            entry['al_list_status'] = list_status
+                            entry['al_list_status'] = list_status['status'].capitalize()
                             entry['alternate_name'] = [anime['title']['english']] + anime[
                                 'synonyms'
                             ]

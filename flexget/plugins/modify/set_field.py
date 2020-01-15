@@ -1,11 +1,10 @@
-import logging
-from functools import partial
+from loguru import logger
 
 from flexget import entry, plugin
 from flexget.event import event
 from flexget.utils.template import RenderError
 
-log = logging.getLogger('set')
+logger = logger.bind(name='set')
 
 UNSET = object()
 
@@ -53,13 +52,13 @@ class ModifySet:
 
     @entry.register_lazy_func('set_field')
     def lazy_set(self, entry, config, field, orig_field_value, errors=True):
-        logger = log.error if errors else log.debug
+        level = 'ERROR' if errors else 'DEBUG'
         if orig_field_value is not UNSET:
             entry[field] = orig_field_value
         try:
             entry[field] = entry.render(config[field], native=True)
         except RenderError as e:
-            logger('Could not set %s for %s: %s' % (field, entry['title'], e))
+            logger.log(level, 'Could not set {} for {}: {}', field, entry['title'], e)
 
 
 @event('plugin.register')

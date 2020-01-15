@@ -2,7 +2,6 @@ import base64
 import binascii
 import copy
 import json
-import logging
 import os
 import sys
 import threading
@@ -13,12 +12,14 @@ from time import sleep
 import cherrypy
 import yaml
 from flask import Response, jsonify, request
+from loguru import logger
 from pyparsing import (
     Combine,
     Forward,
     Group,
     Keyword,
     OneOrMore,
+    Optional,
     ParseException,
     Suppress,
     White,
@@ -44,7 +45,7 @@ from flexget.api.app import (
 )
 from flexget.utils.tools import get_latest_flexget_version_number
 
-log = logging.getLogger('api.server')
+logger = logger.bind(name='api.server')
 
 server_api = api.namespace('server', description='Manage Daemon')
 
@@ -507,6 +508,7 @@ class LogParser:
             + time_cmpnt
             + ':'
             + time_cmpnt
+            + Optional(':' + time_cmpnt)
         )
         word = Word(printables)
 

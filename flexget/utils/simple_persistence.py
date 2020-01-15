@@ -6,12 +6,12 @@ Avoid using this module on your own or in plugins, this was originally made for 
 You can safely use task.simple_persistence and manager.persist, if we implement something better we
 can replace underlying mechanism in single point (and provide transparent switch).
 """
-import logging
 import pickle
 from collections import defaultdict
 from collections.abc import MutableMapping
 from datetime import datetime
 
+from loguru import logger
 from sqlalchemy import Column, DateTime, Index, Integer, String, Unicode, select
 
 from flexget import db_schema
@@ -21,7 +21,7 @@ from flexget.utils import json
 from flexget.utils.database import json_synonym
 from flexget.utils.sqlalchemy_utils import create_index, table_add_column, table_schema
 
-log = logging.getLogger('util.simple_persistence')
+logger = logger.bind(name='util.simple_persistence')
 Base = db_schema.versioned_base('simple_persistence', 4)
 
 # Used to signify that a given key should be deleted from simple persistence on flush
@@ -43,19 +43,18 @@ def upgrade(ver, session):
                 try:
                     pickle.loads(row['value'])
                 except Exception as e:
-                    log.warning(
-                        'Couldn\'t load %s:%s removing from db: %s'
-                        % (row['plugin'], row['key'], e)
+                    logger.warning(
+                        "Couldn't load {}:{} removing from db: {}", row['plugin'], row['key'], e
                     )
                     session.execute(table.delete().where(table.c.id == row['id']))
         except Exception as e:
-            log.warning(
-                'Couldn\'t upgrade the simple_persistence table. Commencing nuke. Error: %s', e
+            logger.warning(
+                "Couldn't upgrade the simple_persistence table. Commencing nuke. Error: {}", e
             )
             raise db_schema.UpgradeImpossible
         ver = 1
     if ver == 1:
-        log.info('Creating index on simple_persistence table.')
+        logger.info('Creating index on simple_persistence table.')
         create_index('simple_persistence', session, 'feed', 'plugin', 'key')
         ver = 2
     if ver == 2 or ver == 3:
@@ -75,8 +74,8 @@ def upgrade(ver, session):
             except Exception as e:
                 failures += 1
         if failures > 0:
-            log.error(
-                'Error upgrading %s simple_persistence pickle objects. Some information has been lost.',
+            logger.error(
+                'Error upgrading {} simple_persistence pickle objects. Some information has been lost.',
                 failures,
             )
         ver = 4
@@ -142,7 +141,7 @@ class SimplePersistence(MutableMapping):
         return self.class_store[self.taskname][self.plugin]
 
     def __setitem__(self, key, value):
-        log.debug('setting key %s value %s', key, repr(value))
+        logger.debug('setting key {} value {}', key, repr(value))
         self.store[key] = value
 
     def __getitem__(self, key):
@@ -167,8 +166,8 @@ class SimplePersistence(MutableMapping):
                 try:
                     cls.class_store[task][skv.plugin][skv.key] = skv.value
                 except TypeError as e:
-                    log.warning(
-                        'Value stored in simple_persistence cannot be decoded. It will be removed. Error: %s',
+                    logger.warning(
+                        'Value stored in simple_persistence cannot be decoded. It will be removed. Error: {}',
                         str(e),
                     )
                     cls.class_store[task][skv.plugin][skv.key] = DELETE
@@ -176,7 +175,7 @@ class SimplePersistence(MutableMapping):
     @classmethod
     def flush(cls, task=None):
         """Flush all in memory key/values to database."""
-        log.debug('Flushing simple persistence for task %s to db.' % task)
+        logger.debug('Flushing simple persistence for task {} to db.', task)
         with Session() as session:
             for pluginname in cls.class_store[task]:
                 for key, value in cls.class_store[task][pluginname].items():

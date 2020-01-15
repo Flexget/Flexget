@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
@@ -11,7 +11,7 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='parser_common')
 
-log = logging.getLogger('metainfo_series')
+logger = logger.bind(name='metainfo_series')
 
 
 class MetainfoSeries:
@@ -29,7 +29,7 @@ class MetainfoSeries:
             return
         for entry in task.entries:
             # If series plugin already parsed this, don't touch it.
-            if entry.get('id'):
+            if entry.get('series_name'):
                 continue
             self.guess_entry(entry)
 

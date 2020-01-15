@@ -1,20 +1,21 @@
-import logging
 import os
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.components.archives import utils as archiveutil
 from flexget.event import event
 from flexget.utils.template import RenderError, render_from_entry
 
-log = logging.getLogger('decompress')
+logger = logger.bind(name='decompress')
 
 
 def fail_entry_with_error(entry, error):
     """
     Log error message at error level and fail the entry
     """
-    log.error(error)
+    logger.error(error)
     entry.fail(error)
 
 
@@ -22,25 +23,23 @@ def open_archive_entry(entry):
     """
     Convenience function for opening archives from entries. Returns an archive.Archive object
     """
-    archive = None
-
+    archive_path = entry.get('location', '')
+    if not archive_path:
+        logger.error('Entry does not appear to represent a local file.')
+        return
+    if not os.path.exists(archive_path):
+        logger.error('File no longer exists: {}', entry['location'])
+        return
     try:
-        archive_path = entry.get('location', '')
-
-        if not archive_path:
-            log.error('Entry does not appear to represent a local file.')
-        elif not os.path.exists(archive_path):
-            log.error('File no longer exists: %s', entry['location'])
-        else:
-            archive = archiveutil.open_archive(archive_path)
+        archive = archiveutil.open_archive(archive_path)
     except archiveutil.BadArchive as error:
         fail_entry_with_error(entry, 'Bad archive: %s (%s)' % (archive_path, error))
     except archiveutil.NeedFirstVolume:
-        log.error('Not the first volume: %s', archive_path)
+        logger.error('Not the first volume: {}', archive_path)
     except archiveutil.ArchiveError as error:
         fail_entry_with_error(entry, 'Failed to open Archive: %s (%s)' % (archive_path, error))
-
-    return archive
+    else:
+        return archive
 
 
 def get_output_path(to, entry):
@@ -59,15 +58,15 @@ def extract_info(info, archive, to, keep_dirs):
 
     destination = get_destination_path(info, to, keep_dirs)
 
-    log.debug('Attempting to extract: %s to %s', info.filename, destination)
+    logger.debug('Attempting to extract: {} to {}', info.filename, destination)
     try:
         info.extract(archive, destination)
     except archiveutil.FSError as error:
-        log.error('OS error while creating file: %s (%s)' % (destination, error))
+        logger.error('OS error while creating file: {} ({})', destination, error)
     except archiveutil.FileAlreadyExists as error:
-        log.warning('File already exists: %s' % destination)
+        logger.warning('File already exists: {}', destination)
     except archiveutil.ArchiveError as error:
-        log.error('Failed to extract file: %s from %s (%s)' % (info.filename, archive.path, error))
+        logger.error('Failed to extract file: {} from {} ({})', info.filename, archive.path, error)
 
 
 def get_destination_path(info, to, keep_dirs):
@@ -84,9 +83,9 @@ def is_match(info, pattern):
     is_match = bool(match(info.filename))
 
     if is_match:
-        log.debug('Found matching file: %s', info.filename)
+        logger.debug('Found matching file: {}', info.filename)
     else:
-        log.debug('File did not match regexp: %s', info.filename)
+        logger.debug('File did not match regexp: {}', info.filename)
 
     return is_match
 

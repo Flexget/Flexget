@@ -1,5 +1,4 @@
-import logging
-
+from loguru import logger
 from requests.exceptions import RequestException
 
 from flexget import plugin
@@ -11,7 +10,7 @@ requests = RequestSession(max_retries=3)
 
 plugin_name = 'slack'
 
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 
 class SlackNotifier:
@@ -92,7 +91,7 @@ class SlackNotifier:
                         'callback_id': {'type': 'string'},
                     },
                     'required': ['fallback'],
-                    'dependencies': {'actions': ['callback_id'],},
+                    'dependencies': {'actions': ['callback_id']},
                     'additionalProperties': False,
                 },
             },

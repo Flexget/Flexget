@@ -2,10 +2,12 @@ import logging
 import os
 import tempfile
 
+from loguru import logger
+
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('subtitles')
+logger = logger.bind(name='subtitles')
 
 
 class PluginPeriscope:
@@ -49,7 +51,7 @@ class PluginPeriscope:
         try:
             import periscope  # noqa
         except ImportError as e:
-            log.debug('Error importing Periscope: %s' % e)
+            logger.debug('Error importing Periscope: {}', e)
             raise plugin.DependencyError(
                 'periscope', 'periscope', 'Periscope module required. ImportError: %s' % e
             )
@@ -71,7 +73,7 @@ class PluginPeriscope:
                     Default: srt, stp, sub, stl, ssa.
         """
         if not task.accepted:
-            log.debug('nothing accepted, aborting')
+            logger.debug('nothing accepted, aborting')
             return
         import periscope
 
@@ -83,17 +85,17 @@ class PluginPeriscope:
             self.exts = ['.' + s for s in config['subexts']]
         for entry in task.accepted:
             if 'location' not in entry:
-                log.warning('Cannot act on entries that do not represent a local file.')
+                logger.warning('Cannot act on entries that do not represent a local file.')
             elif not os.path.exists(entry['location']):
                 entry.fail('file not found: %s' % entry['location'])
             elif '$RECYCLE.BIN' in entry['location']:
                 continue  # ignore deleted files in Windows shares
             elif not config['overwrite'] and self.subbed(entry['location']):
-                log.warning('cannot overwrite existing subs for %s' % entry['location'])
+                logger.warning('cannot overwrite existing subs for {}', entry['location'])
             else:
                 try:
                     if psc.downloadSubtitle(entry['location'].encode("utf8"), langs):
-                        log.info('Subtitles found for %s' % entry['location'])
+                        logger.info('Subtitles found for {}', entry['location'])
                     elif alts and psc.downloadSubtitle(entry['location'].encode('utf8'), alts):
                         entry.fail('subtitles found for a second-choice language.')
                     else:

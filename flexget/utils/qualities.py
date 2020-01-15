@@ -1,11 +1,12 @@
 import copy
 import functools
-import logging
 import re
+
+from loguru import logger
 
 from flexget.utils.serialization import Serializable
 
-log = logging.getLogger('utils.qualities')
+logger = logger.bind(name='utils.qualities')
 
 
 @functools.total_ordering

@@ -1,13 +1,14 @@
-import logging
 import re
 from urllib.parse import unquote
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 
-log = logging.getLogger('regexp')
+logger = logger.bind(name='regexp')
 
 
 class FilterRegexp:
@@ -156,7 +157,7 @@ class FilterRegexp:
         if 'rest' in config:
             rest_method = Entry.accept if config['rest'] == 'accept' else Entry.reject
             for entry in rest:
-                log.debug('Rest method %s for %s' % (config['rest'], entry['title']))
+                logger.debug('Rest method {} for {}', config['rest'], entry['title'])
                 rest_method(entry, 'regexp `rest`')
 
     def matches(self, entry, regexp, find_from=None, not_regexps=None):
@@ -206,7 +207,7 @@ class FilterRegexp:
         method = Entry.accept if 'accept' in operation else Entry.reject
         match_mode = 'excluding' not in operation
         for entry in entries:
-            log.trace('testing %i regexps to %s' % (len(regexps), entry['title']))
+            logger.trace('testing {} regexps to {}', len(regexps), entry['title'])
             for regexp_opts in regexps:
                 regexp, opts = list(regexp_opts.items())[0]
 
@@ -219,14 +220,14 @@ class FilterRegexp:
                     matchtext = 'regexp \'%s\' ' % regexp.pattern + (
                         'matched field \'%s\'' % field if match_mode else 'didn\'t match'
                     )
-                    log.debug('%s for %s' % (matchtext, entry['title']))
+                    logger.debug('{} for {}', matchtext, entry['title'])
                     # apply settings to entry and run the method on it
                     if opts.get('path'):
                         entry['path'] = opts['path']
                     if opts.get('set'):
                         # invoke set plugin with given configuration
-                        log.debug(
-                            'adding set: info to entry:"%s" %s' % (entry['title'], opts['set'])
+                        logger.debug(
+                            'adding set: info to entry:"{}" {}', entry['title'], opts['set']
                         )
                         plugin.get('set', self).modify(entry, opts['set'])
                     method(entry, matchtext)

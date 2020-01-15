@@ -1,10 +1,11 @@
 import itertools
-import logging
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('limit')
+logger = logger.bind(name='limit')
 
 
 class PluginLimit:
@@ -39,7 +40,7 @@ class PluginLimit:
             try:
                 result = method(task, input_config)
             except plugin.PluginError as e:
-                log.warning('Error during input plugin %s: %s' % (input_name, e))
+                logger.warning('Error during input plugin {}: {}', input_name, e)
                 continue
             # A 0 or -1 limit means don't limit.
             if config['amount'] < 1:

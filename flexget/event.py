@@ -1,9 +1,9 @@
 """
 Provides small event framework
 """
-import logging
+from loguru import logger
 
-log = logging.getLogger('event')
+logger = logger.bind(name='event')
 
 _events = {}
 
@@ -78,7 +78,7 @@ def add_event_handler(name, func, priority=128):
                 '%s has already been registered as event listener under name %s'
                 % (func.__name__, name)
             )
-    log.trace('registered function %s to event %s' % (func.__name__, name))
+    logger.trace('registered function {} to event {}', func.__name__, name)
     event = Event(name, func, priority)
     events.append(event)
     return event

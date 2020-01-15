@@ -1,10 +1,11 @@
-import logging
 import re
 from string import capwords
 
+from loguru import logger
+
 from flexget.utils.qualities import Quality
 
-log = logging.getLogger('parser')
+logger = logger.bind(name='parser')
 
 SERIES_ID_TYPES = ['ep', 'date', 'sequence', 'id']
 

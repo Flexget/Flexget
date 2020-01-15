@@ -1,9 +1,9 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('manual')
+logger = logger.bind(name='manual')
 
 
 class ManualTask:
@@ -22,8 +22,8 @@ class ManualTask:
             or task.name not in task.options.tasks
             or not task.options.allow_manual
         ):
-            log.debug(
-                'Disabling task %s, task can only run in manual mode (via API/CLI)' % task.name
+            logger.debug(
+                'Disabling task {}, task can only run in manual mode (via API/CLI)', task.name
             )
             task.abort('manual task not specified in --tasks', silent=True)
 

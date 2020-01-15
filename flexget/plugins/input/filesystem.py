@@ -1,15 +1,16 @@
-import logging
 import re
 import sys
 from datetime import datetime
 from pathlib import Path
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 
-log = logging.getLogger('filesystem')
+logger = logger.bind(name='filesystem')
 
 
 class Filesystem:
@@ -123,22 +124,22 @@ class Filesystem:
         try:
             entry['timestamp'] = datetime.fromtimestamp(file_stat.st_mtime)
         except Exception as e:
-            log.warning('Error setting timestamp for %s: %s' % (filepath, e))
+            logger.warning('Error setting timestamp for {}: {}', filepath, e)
             entry['timestamp'] = None
         entry['accessed'] = datetime.fromtimestamp(file_stat.st_atime)
         entry['modified'] = datetime.fromtimestamp(file_stat.st_mtime)
         entry['created'] = datetime.fromtimestamp(file_stat.st_ctime)
         if entry.isvalid():
             if test_mode:
-                log.info("Test mode. Entry includes:")
-                log.info("    Title: %s" % entry["title"])
-                log.info("    URL: %s" % entry["url"])
-                log.info("    Filename: %s" % entry["filename"])
-                log.info("    Location: %s" % entry["location"])
-                log.info("    Timestamp: %s" % entry["timestamp"])
+                logger.info("Test mode. Entry includes:")
+                logger.info(' Title: {}', entry['title'])
+                logger.info(' URL: {}', entry['url'])
+                logger.info(' Filename: {}', entry['filename'])
+                logger.info(' Location: {}', entry['location'])
+                logger.info(' Timestamp: {}', entry['timestamp'])
             return entry
         else:
-            log.error('Non valid entry created: %s ' % entry)
+            logger.error('Non valid entry created: {} ', entry)
             return
 
     def get_max_depth(self, recursion, base_depth):
@@ -159,19 +160,22 @@ class Filesystem:
         entries = []
 
         for folder in path_list:
-            log.verbose('Scanning folder %s. Recursion is set to %s.', folder, recursion)
+            logger.verbose('Scanning folder {}. Recursion is set to {}.', folder, recursion)
             folder = Path(folder).expanduser()
-            log.debug('Scanning %s', folder)
+            if not folder.exists():
+                logger.error('{} does not exist (anymore.)', folder)
+                continue
+            logger.debug('Scanning {}', folder)
             base_depth = len(folder.parts)
             max_depth = self.get_max_depth(recursion, base_depth)
             folder_objects = self.get_folder_objects(folder, recursion)
             for path_object in folder_objects:
-                log.debug('Checking if %s qualifies to be added as an entry.', path_object)
+                logger.debug('Checking if {} qualifies to be added as an entry.', path_object)
                 try:
                     path_object.exists()
                 except UnicodeError:
-                    log.error(
-                        'File %s not decodable with filesystem encoding: %s',
+                    logger.error(
+                        'File {} not decodable with filesystem encoding: {}',
                         path_object,
                         sys.getfilesystemencoding(),
                     )
@@ -191,8 +195,8 @@ class Filesystem:
                         ):
                             entry = self.create_entry(path_object, test_mode)
                         else:
-                            log.debug(
-                                "Path object's %s type doesn't match requested object types.",
+                            logger.debug(
+                                "Path object's {} type doesn't match requested object types.",
                                 path_object,
                             )
                         if entry and entry not in entries:
@@ -211,7 +215,7 @@ class Filesystem:
         get_dirs = 'dirs' in config['retrieve']
         get_symlinks = 'symlinks' in config['retrieve']
 
-        log.verbose('Starting to scan folders.')
+        logger.verbose('Starting to scan folders.')
         return self.get_entries_from_path(
             path_list, match, recursive, test_mode, get_files, get_dirs, get_symlinks
         )

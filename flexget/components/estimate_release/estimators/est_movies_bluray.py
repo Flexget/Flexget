@@ -1,11 +1,12 @@
 import datetime
-import logging
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.database import Session
 
-log = logging.getLogger('est_movies_bluray')
+logger = logger.bind(name='est_movies_bluray')
 
 
 class EstimatesMoviesBluray:
@@ -18,12 +19,10 @@ class EstimatesMoviesBluray:
         movie_year = entry.get('movie_year')
 
         if movie_year is not None and movie_year > datetime.datetime.now().year:
-            log.debug('Skipping Blu-ray.com lookup since movie year is %s', movie_year)
+            logger.debug('Skipping Blu-ray.com lookup since movie year is {}', movie_year)
             return
 
-        log.debug(
-            'Searching Blu-ray.com for release date of {} ({})'.format(movie_name, movie_year)
-        )
+        logger.debug('Searching Blu-ray.com for release date of {} ({})', movie_name, movie_year)
 
         release_date = None
         try:
@@ -33,9 +32,9 @@ class EstimatesMoviesBluray:
                 if movie:
                     release_date = movie.release_date
         except LookupError as e:
-            log.debug(e)
+            logger.debug(e)
         if release_date:
-            log.debug('received release date: {0}'.format(release_date))
+            logger.debug('received release date: {}', release_date)
         return release_date
 
 
