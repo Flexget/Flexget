@@ -1,7 +1,7 @@
 import logging
 from functools import partial
 
-from flexget import plugin
+from flexget import entry, plugin
 from flexget.event import event
 from flexget.utils.template import RenderError
 
@@ -40,11 +40,19 @@ class ModifySet:
                     del entry[field]
                 except KeyError:
                     pass
-                entry.register_lazy_func(
-                    partial(self.lazy_set, config, field, orig_value, errors=errors), config
+                entry.add_lazy_fields(
+                    'set_field',
+                    [field],
+                    kwargs={
+                        'config': config,
+                        'field': field,
+                        'orig_field_value': orig_value,
+                        'errors': errors,
+                    },
                 )
 
-    def lazy_set(self, config, field, orig_field_value, entry, errors=True):
+    @entry.register_lazy_func('set_field')
+    def lazy_set(self, entry, config, field, orig_field_value, errors=True):
         logger = log.error if errors else log.debug
         if orig_field_value is not UNSET:
             entry[field] = orig_field_value

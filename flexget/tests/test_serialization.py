@@ -4,7 +4,7 @@ from flexget import entry
 from flexget.utils import qualities
 
 
-@entry.register_lazy_func('lazy function', ['lazyfield'])
+@entry.register_lazy_func('lazy function')
 def lazy_func(entry):
     entry['lazyfield'] = 'value a'
 
@@ -24,7 +24,7 @@ class TestSerialization:
             'nestedlist': [qualities.Quality('1080p')],
             'nesteddict': {'a': datetime.date(1999, 9, 9)},
         })
-        entry1.add_lazy_fields('lazy function')
+        entry1.add_lazy_fields('lazy function', ['lazyfield'])
         assert entry1.is_lazy('lazyfield')
         serialized = entry1.dumps()
         print(serialized)

@@ -309,22 +309,25 @@ class Entry(LazyDict, Serializable):
         for key, value in data['fields'].items():
             result[key] = deserialize(value)
         for lazy_lookup in data['lazy_lookups']:
-            result.add_lazy_fields(lazy_lookup)
+            result.add_lazy_fields(*lazy_lookup)
         return result
 
-    def add_lazy_fields(self, lazy_func_name):
+    def add_lazy_fields(self, lazy_func_name, fields, args=None, kwargs=None):
         """
         Add lazy fields to an entry.
-        `lazy_func_name` should be a name previously registered with the `register_lazy_func` decorator.
+        :param lazy_func_name: should be a name previously registered with the `register_lazy_func` decorator.
+        :param fields: list of fields this function will fill
+        :param args: Arguments that will be passed to the lazy lookup function when called.
+        :param kwargs: Keyword arguments which will be passed to the lazy lookup function when called.
         """
         func = lazy_func_registry[lazy_func_name]
-        super().register_lazy_func(func.function, func.fields)
-        self.lazy_lookups.append(lazy_func_name)
+        super().register_lazy_func(func.function, fields, args, kwargs)
+        self.lazy_lookups.append((lazy_func_name, fields, args, kwargs))
 
     def register_lazy_func(self, func, keys):
         # TODO: This should not be called on entries directly, `add_lazy_fields` should be used instead.
         # Add some enforcement on this once we convert plugins
-        super().register_lazy_func(func, keys)
+        super().register_lazy_func(func, keys, [], {})
 
     def __eq__(self, other):
         return self.get('original_title') == other.get('original_title') and self.get(
@@ -342,9 +345,9 @@ lazy_func_registry = {}
 
 
 class LazyFunc:
-    def __init__(self, lazy_func_name, fields, plugin=None):
+    def __init__(self, lazy_func_name, plugin=None):
         self.name = lazy_func_name
-        self.fields = fields
+        #self.fields = fields
         self.plugin = plugin
         self._func = None
 

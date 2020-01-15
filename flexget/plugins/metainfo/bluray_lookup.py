@@ -36,7 +36,7 @@ class PluginBlurayLookup:
 
     schema = {'type': 'boolean'}
 
-    @entry.register_lazy_func('bluray_lookup', field_map)
+    @entry.register_lazy_func('bluray_lookup')
     def lazy_loader(self, entry):
         """Does the lookup for this entry and populates the entry fields."""
         lookup = plugin.get('api_bluray', self).lookup
@@ -56,7 +56,7 @@ class PluginBlurayLookup:
 
         :param entry: Entry instance
         """
-        entry.add_lazy_fields('bluray_lookup')
+        entry.add_lazy_fields('bluray_lookup', self.field_map)
 
     def on_task_metainfo(self, task, config):
         if not config:

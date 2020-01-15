@@ -2,7 +2,7 @@ from flexget.entry import Entry, register_lazy_func
 from flexget.plugin import PluginError
 
 
-@register_lazy_func('lazy_a', ['ab_field', 'a_field', 'a_fail'])
+@register_lazy_func('lazy_a')
 def lazy_a(entry):
     if 'fail' in entry:
         raise PluginError('oh no!')
@@ -10,7 +10,7 @@ def lazy_a(entry):
         entry[f] = 'a'
 
 
-@register_lazy_func('lazy_b', ['ab_field', 'b_field', 'a_fail'])
+@register_lazy_func('lazy_b')
 def lazy_b(entry):
     for f in ['b_field', 'ab_field', 'a_fail']:
         entry[f] = 'b'
@@ -22,8 +22,8 @@ class TestLazyFields:
 
         def setup_entry():
             entry = Entry()
-            entry.add_lazy_fields('lazy_a')
-            entry.add_lazy_fields('lazy_b')
+            entry.add_lazy_fields('lazy_a', ['ab_field', 'a_field', 'a_fail'])
+            entry.add_lazy_fields('lazy_b', ['ab_field', 'b_field', 'a_fail'])
             return entry
 
         entry = setup_entry()

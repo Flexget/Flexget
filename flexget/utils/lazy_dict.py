@@ -1,7 +1,10 @@
 import logging
+from collections import namedtuple
 from collections.abc import MutableMapping
 
 log = logging.getLogger('lazy_lookup')
+
+LazyCallee = namedtuple('LazyCallee', ['func', 'keys', 'args', 'kwargs'])
 
 
 class LazyLookup:
@@ -13,26 +16,23 @@ class LazyLookup:
     def __init__(self, store):
         self.store = store
         # These two lists should always match up
-        self.func_list = []
-        self.key_list = []
+        self.callee_list = []
 
-    def add_func(self, func, keys):
-        if func not in self.func_list:
-            self.func_list.append(func)
-            self.key_list.append(keys)
+    def add_func(self, func, keys, args, kwargs):
+        if func not in self.callee_list:
+            self.callee_list.append(LazyCallee(func, keys, args, kwargs))
 
     def __getitem__(self, key):
         from flexget.plugin import PluginError
 
         while self.store.is_lazy(key):
-            index = next((i for i, keys in enumerate(self.key_list) if key in keys), None)
+            index = next((i for i, callee in enumerate(self.callee_list) if key in callee.keys), None)
             if index is None:
                 # All lazy lookup functions for this key were tried unsuccessfully
                 return None
-            func = self.func_list.pop(index)
-            self.key_list.pop(index)
+            callee = self.callee_list.pop(index)
             try:
-                func(self.store)
+                callee.func(self.store, *(callee.args or []), **(callee.kwargs or {}))
             except PluginError as e:
                 e.log.info(e)
             except Exception as e:
@@ -46,7 +46,7 @@ class LazyLookup:
         return self.store[key]
 
     def __repr__(self):
-        return '<LazyLookup(%r)>' % self.func_list
+        return '<LazyLookup(%r)>' % self.callee_list
 
 
 class LazyDict(MutableMapping):
@@ -104,7 +104,7 @@ class LazyDict(MutableMapping):
                 return val
         return LazyLookup(self)
 
-    def register_lazy_func(self, func, keys):
+    def register_lazy_func(self, func, keys, args, kwargs):
         """Register a list of fields to be lazily loaded by callback func.
 
         :param list keys:
@@ -113,9 +113,11 @@ class LazyDict(MutableMapping):
           Callback function which is called when lazy key needs to be evaluated.
           Function call will get this LazyDict instance as a parameter.
           See :class:`LazyLookup` class for more details.
+        :param args: Arguments which will be passed to `func` when called.
+        :param kwargs: Keyword arguments which will be passed to `func` when called.
         """
         ll = self._lazy_lookup
-        ll.add_func(func, keys)
+        ll.add_func(func, keys, args, kwargs)
         for key in keys:
             if key not in self.store:
                 self[key] = ll
