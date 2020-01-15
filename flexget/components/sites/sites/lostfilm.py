@@ -28,7 +28,7 @@ quality_map = {
     'HD': ('720p', 'mkv'),
 }
 
-LOSTFILM_URL = 'http://lostfilm.tv/rss.xml'
+LOSTFILM_URL = 'https://lostfilm.tv/rss.xml'
 
 
 class LostFilm:
@@ -65,8 +65,9 @@ class LostFilm:
             rss = feedparser.parse(config['url'])
         except Exception:
             raise PluginError('Cannot parse rss feed')
-        if rss.get('status') != 200:
-            raise PluginError('Received not 200 (OK) status')
+        status = rss.get('status')
+        if status != 200:
+            raise PluginError('Received %s status instead of 200 (OK)' % status)
         entries = []
         for item in rss.entries:
             if item.get('link') is None:
@@ -88,7 +89,7 @@ class LostFilm:
                 logger.debug('Item doesn\'t have episode id in link')
                 continue
             params = {'c': lostfilm_num, 's': season_num, 'e': episode_num}
-            redirect_url = 'http://www.lostfilm.tv/v_search.php'
+            redirect_url = 'https://www.lostfilm.tv/v_search.php'
             try:
                 response = task.requests.get(redirect_url, params=params)
             except RequestException as e:
