@@ -63,7 +63,6 @@ class Entry(LazyDict, Serializable):
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.traces = []
-        self.snapshots = {}
         self._state = 'undecided'
         self._hooks = {'accept': [], 'reject': [], 'fail': [], 'complete': []}
         self.task = None
@@ -256,27 +255,6 @@ class Entry(LazyDict, Serializable):
         if not isinstance(self['title'], str):
             return False
         return True
-
-    def take_snapshot(self, name):
-        """
-        Takes a snapshot of the entry under *name*. Snapshots can be accessed via :attr:`.snapshots`.
-        :param string name: Snapshot name
-        """
-        snapshot = {}
-        for field, value in self.items():
-            try:
-                snapshot[field] = copy.deepcopy(value)
-            except TypeError:
-                logger.warning(
-                    'Unable to take `{}` snapshot for field `{}` in `{}`',
-                    name,
-                    field,
-                    self['title'],
-                )
-        if snapshot:
-            if name in self.snapshots:
-                logger.warning('Snapshot `{}` is being overwritten for `{}`', name, self['title'])
-            self.snapshots[name] = snapshot
 
     def update_using_map(self, field_map, source_item, ignore_none=False):
         """

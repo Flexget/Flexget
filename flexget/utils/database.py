@@ -85,6 +85,10 @@ def entry_synonym(name):
 
     def setter(self, entry):
         if isinstance(entry, dict):
+            if entry.get('serializer') == 'Entry' and 'version' in entry and 'value' in entry:
+                # This is already a serialized form of entry
+                setattr(self, name, json.dumps(entry))
+                return
             entry = Entry(entry)
         if isinstance(entry, Entry):
             setattr(self, name, entry.dumps())
