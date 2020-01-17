@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 
 from flexget.utils import json
 
-
 DATE_FMT = '%Y-%m-%d'
 ISO8601_FMT = '%Y-%m-%dT%H:%M:%SZ'
 
@@ -14,7 +13,7 @@ def serialize(value):
     """
     if isinstance(value, Serializable):
         return value.serialize()
-    if isinstance(value, list):
+    if isinstance(value, (list, tuple)):
         return [serialize(v) for v in value]
     if isinstance(value, dict):
         return {k: serialize(v) for k, v in value.items()}
@@ -22,9 +21,9 @@ def serialize(value):
         return DateTimeSerializer.serialize(value)
     if isinstance(value, datetime.date):
         return DateSerializer.serialize(value)
-    if isinstance(value, (str, int, float)):
+    if isinstance(value, (str, int, float, type(None))):
         return value
-    raise TypeError('%r is not serializable', value)
+    raise TypeError(f'{value!r} is not serializable')
 
 
 def deserialize(value):
