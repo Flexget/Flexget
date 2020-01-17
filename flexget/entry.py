@@ -325,7 +325,10 @@ class Entry(LazyDict, Serializable):
         for key in self:
             if self.is_lazy(key):
                 continue
-            fields[key] = serialize(self[key])
+            try:
+                fields[key] = serialize(self[key])
+            except TypeError as exc:
+                logger.debug('field {} was not serializable. {}', key, exc)
         return {'fields': fields, 'lazy_lookups': self.lazy_lookups}
 
     @classmethod
@@ -397,7 +400,9 @@ class LazyFunc:
 
     def __call__(self, func):
         if self.name in lazy_func_registry:
-            raise Exception(f'The name {self.name} is already registered to another lazy function.')
+            raise Exception(
+                f'The name {self.name} is already registered to another lazy function.'
+            )
         func.lazy_func_id = self.name
         self._func = func
         lazy_func_registry[self.name] = self

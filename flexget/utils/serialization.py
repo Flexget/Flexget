@@ -23,7 +23,7 @@ def serialize(value):
         return DateSerializer.serialize(value)
     if isinstance(value, (str, int, float, type(None))):
         return value
-    raise TypeError(f'{value!r} is not serializable')
+    raise TypeError(f'`{value!r}` of type {type(value)!r} is not serializable')
 
 
 def deserialize(value):
