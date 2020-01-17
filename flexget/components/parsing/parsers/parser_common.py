@@ -4,7 +4,6 @@ from string import capwords
 from loguru import logger
 
 from flexget.utils.qualities import Quality
-from flexget.utils.serialization import Serializable, deserialize, serialize
 
 logger = logger.bind(name='parser')
 
@@ -50,7 +49,7 @@ def normalize_name(name):
     return name
 
 
-class MovieParseResult(Serializable):
+class MovieParseResult:
     def __init__(
         self,
         data=None,
@@ -111,17 +110,8 @@ class MovieParseResult(Serializable):
             )
         )
 
-    def _serialize(self):
-        return serialize(self.__dict__)
 
-    @classmethod
-    def _deserialize(cls, data, version):
-        result = cls()
-        result.__dict__.update(deserialize(data))
-        return result
-
-
-class SeriesParseResult(Serializable):
+class SeriesParseResult:
     def __init__(
         self,
         data=None,
@@ -232,12 +222,3 @@ class SeriesParseResult(Serializable):
                 valid,
             )
         )
-
-    def _serialize(self):
-        return serialize(self.__dict__)
-
-    @classmethod
-    def _deserialize(cls, data, version):
-        result = cls()
-        result.__dict__.update(deserialize(data))
-        return result

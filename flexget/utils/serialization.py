@@ -73,6 +73,10 @@ class Serializable(ABC):
 
     @classmethod
     def serializer_name(cls):
+        """
+        Name of the serializer defaults to class name.
+        This can be overridden in subclass implementations if desired though.
+        """
         return cls.__name__
 
     @classmethod
