@@ -48,6 +48,7 @@ class Serializable(ABC):
     Any data types that should be serializable should subclass this, and implement the `_serialize` and `_deserialize`
     methods. This is important for data that is stored in `Entry` fields so that it can be stored to the database.
     """
+
     @abstractmethod
     def _serialize(self):
         """This method should be implemented to return a plain python datatype which is json serializable."""
@@ -91,6 +92,8 @@ class Serializable(ABC):
         return cls.deserialize(json.loads(data))
 
 
+# These two date serializer classes do not follow convention, since the builtin types do not subclass Serializable.
+# Their use is hard coded into the 'serialize' function above.
 class DateSerializer(Serializable):
     @classmethod
     def serializer_name(cls):
