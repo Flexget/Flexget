@@ -323,7 +323,7 @@ class Entry(LazyDict, Serializable):
     def _serialize(self):
         fields = {}
         for key in self:
-            if self.is_lazy(key):
+            if key.startswith('_') or self.is_lazy(key):
                 continue
             try:
                 fields[key] = serialize(self[key])
