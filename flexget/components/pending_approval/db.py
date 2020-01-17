@@ -1,14 +1,29 @@
 from datetime import datetime, timedelta
 
 from loguru import logger
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, Unicode
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, Unicode, select
 
 from flexget import db_schema
+from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils import json
 from flexget.utils.database import entry_synonym
+from flexget.utils.sqlalchemy_utils import table_schema
 
 logger = logger.bind(name='pending_approval')
-Base = db_schema.versioned_base('pending_approval', 0)
+Base = db_schema.versioned_base('pending_approval', 1)
+
+
+@db_schema.upgrade('pending_approval')
+def upgrade(ver, session):
+    if ver == 0:
+        table = table_schema('pending_entries', session)
+        for row in session.execute(select([table.c.id, table.c.json])):
+            e = Entry(json.loads(row['json'], decode_datetime=True))
+            session.execute(table.update().where(table.c.id == row['id']).values(json=e.dumps()))
+
+        ver = 1
+    return ver
 
 
 class PendingEntry(Base):

@@ -7,6 +7,7 @@ from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Unicode, s
 from sqlalchemy.orm import relation
 
 from flexget import db_schema
+from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import PluginError
@@ -16,7 +17,7 @@ from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 from flexget.utils.tools import TimedDict, get_config_hash, parse_timedelta
 
 logger = logger.bind(name='input_cache')
-Base = db_schema.versioned_base('input_cache', 1)
+Base = db_schema.versioned_base('input_cache', 2)
 
 
 @db_schema.upgrade('input_cache')
@@ -37,6 +38,13 @@ def upgrade(ver, session):
             except KeyError as e:
                 logger.error('Unable error upgrading input_cache pickle object due to {}', str(e))
         ver = 1
+    if ver == 1:
+        table = table_schema('input_cache_entry', session)
+        for row in session.execute(select([table.c.id, table.c.json])):
+            e = Entry(json.loads(row['json'], decode_datetime=True))
+            session.execute(table.update().where(table.c.id == row['id']).values(json=e.dumps()))
+
+        ver = 2
     return ver
 
 
