@@ -80,6 +80,7 @@ class Newznab:
                     size = int(rss_entry.enclosures[0]['length'])  # B
                     new_entry['content_size'] = size / (2 ** 20)  # MB
                 entries.append(new_entry)
+                
         return entries
 
     def search(self, task, entry, config=None):
@@ -113,10 +114,10 @@ class Newznab:
         return self.fill_entries_for_url(config['url'], config['params'], task)
 
     def do_search_movie(self, arg_entry, task, config=None):
-        entries = []
         logger.info('Searching for {} (imdbid:{})', arg_entry['title'], arg_entry['imdb_id'])
         # normally this should be used with emit_movie_queue who has imdbid (i guess)
-        if 'imdb_id' not in arg_entry:
+        if not arg_entry.get('imdb_id'):
+            logger.error('Cannot search for `{}` without imdb_id', arg_entry['title'])
             return []
         imdb_id = arg_entry['imdb_id'].replace('tt', '')
         config['params']['imdb_id'] = imdb_id
