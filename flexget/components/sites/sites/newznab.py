@@ -62,7 +62,7 @@ class Newznab:
         try:
             r = task.requests.get(url, params)
         except RequestException as e:
-            logger.error("Failed fetching '{}': {}", url, e)
+            logger.error("Failed fetching '{}', with parameters '{}': {}", url, params, e)
         else:
             rss = feedparser.parse(r.content)
             logger.debug('Raw RSS: {}', rss)
