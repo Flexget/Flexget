@@ -80,7 +80,7 @@ class Newznab:
                     size = int(rss_entry.enclosures[0]['length'])  # B
                     new_entry['content_size'] = size / (2 ** 20)  # MB
                 entries.append(new_entry)
-                
+
         return entries
 
     def search(self, task, entry, config=None):
@@ -119,6 +119,7 @@ class Newznab:
         if not arg_entry.get('imdb_id'):
             logger.error('Cannot search for `{}` without imdb_id', arg_entry['title'])
             return []
+
         imdb_id = arg_entry['imdb_id'].replace('tt', '')
         config['params']['imdb_id'] = imdb_id
         return self.fill_entries_for_url(config['url'], config['params'], task)
