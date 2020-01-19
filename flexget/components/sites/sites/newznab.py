@@ -114,7 +114,7 @@ class Newznab:
         return self.fill_entries_for_url(config['url'], config['params'], task)
 
     def do_search_movie(self, arg_entry, task, config=None):
-        logger.info('Searching for {} (imdbid:{})', arg_entry['title'], arg_entry['imdb_id'])
+        logger.info('Searching for {} (imdb_id:{})', arg_entry['title'], arg_entry.get['imdb_id'])
         # normally this should be used with emit_movie_queue who has imdbid (i guess)
         if not arg_entry.get('imdb_id'):
             logger.error('Cannot search for `{}` without imdb_id', arg_entry['title'])
