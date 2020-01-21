@@ -79,22 +79,26 @@ How to use GIT checkout
 
 Check that you have Python 3.6 or newer available with command ``python -V``.
 
-In some environments newer python might be available under another name like 
+In some environments newer python might be available under another name like
 'python3.6' or 'python3' in which case you need to use that one instead of
 plain 'python'.
 
-To start using FlexGet from this directory:
+To start using FlexGet from this directory::
 
-First, install (a recent version of) the `virtualenv`_ package to your system.
-
-.. _virtualenv: https://pypi.python.org/pypi/virtualenv
-
-Now, in your checkout directory, run::
-
-    virtualenv .
+    python3 -m venv .
 
 This will initialize python virtualenv. This doesn't need to be directly in
 your checkout directory, but these instructions assume that's where it is.
+
+On some linux distributions (eg. debian, ubuntu) venv module is not included with
+python and this fails. Please install `python3-virtualenv` package and retry
+(or use the separate `virtualenv`_ python package).
+
+.. _virtualenv: https://pypi.python.org/pypi/virtualenv
+
+Upgrading pip to latest version is highly advisable and can de done with::
+
+    bin/pip install --upgrade pip
 
 Next we need to install dependencies and FlexGet itself, this can be done simply::
 

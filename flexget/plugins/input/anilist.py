@@ -96,10 +96,10 @@ class AniList(object):
         )
         while req_chunk:
             req_query = (
-                'query ($user: String){collection: MediaListCollection(userName: $user, type: ANIME, '
-                'perChunk: 500, chunk: %s, status_in: [%s]){ hasNextChunk, statuses: lists { list: entries { '
-                'anime: media { %s }}}}}'
-                % (req_chunk, ', '.join([s.upper() for s in selected_list_status]), req_fields)
+                f'query ($user: String){{ collection: MediaListCollection(userName: $user, '
+                f'type: ANIME, perChunk: 500, chunk: {req_chunk}, status_in: '
+                f'[{", ".join([s.upper() for s in selected_list_status])}]) {{ hasNextChunk, '
+                f'statuses: lists{{ status, list: entries{{ anime: media{{ {req_fields} }}}}}}}}}}'
             )
 
             try:
@@ -130,7 +130,7 @@ class AniList(object):
                             entry['al_title'] = anime['title']
                             entry['al_format'] = anime['format']
                             entry['al_release_status'] = anime['status'].capitalize()
-                            entry['al_list_status'] = list_status
+                            entry['al_list_status'] = list_status['status'].capitalize()
                             entry['alternate_name'] = [anime['title']['english']] + anime[
                                 'synonyms'
                             ]

@@ -688,16 +688,16 @@ def get_show(show_name=None, tvmaze_id=None, imdb_id=None, tvrage_id=None, thetv
     params = {'embed': 'seasons'}
     if tvmaze_id:
         url = TVMAZE_SHOW_PATH.format(tvmaze_id)
-    if imdb_id:
+    elif imdb_id:
         url = TVMAZE_LOOKUP_PATH
         params['imdb'] = imdb_id
-    if tvrage_id:
+    elif tvrage_id:
         url = TVMAZE_LOOKUP_PATH
         params['tvrage'] = tvrage_id
-    if thetvdb_id:
+    elif thetvdb_id:
         url = TVMAZE_LOOKUP_PATH
         params['thetvdb'] = thetvdb_id
-    if show_name:
+    else:
         params['q'] = show_name
         url = TVMAZE_SEARCH_PATH
     return tvmaze_lookup(url, params=params)

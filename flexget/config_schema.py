@@ -13,9 +13,10 @@ from flexget.utils import qualities, template
 from flexget.utils.template import get_template
 from flexget.utils.tools import parse_episode_identifier, parse_timedelta
 
-schema_paths = {}
-
 logger = logger.bind(name='config_schema')
+
+schema_paths = {}
+CURRENT_SCHEMA_VERSION = 'http://json-schema.org/draft-04/schema#'
 
 
 # TODO: Rethink how config key and schema registration work
@@ -52,7 +53,12 @@ def register_config_key(key, schema, required=False):
 def get_schema():
     global _root_config_schema
     if _root_config_schema is None:
-        _root_config_schema = {'type': 'object', 'properties': {}, 'additionalProperties': False}
+        _root_config_schema = {
+            'type': 'object',
+            'properties': {},
+            'additionalProperties': False,
+            '$schema': CURRENT_SCHEMA_VERSION,
+        }
         fire_event('config.register')
         # TODO: Is /schema/root this the best place for this?
         register_schema('/schema/config', _root_config_schema)
@@ -89,7 +95,8 @@ def resolve_ref(uri):
     if parsed.path in schema_paths:
         schema = schema_paths[parsed.path]
         if callable(schema):
-            return schema(**dict(parse_qsl(parsed.query)))
+            schema = schema(**dict(parse_qsl(parsed.query)))
+        schema = {'$schema': CURRENT_SCHEMA_VERSION, **schema}
         return schema
     raise jsonschema.RefResolutionError("%s could not be resolved" % uri)
 

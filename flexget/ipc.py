@@ -167,6 +167,8 @@ class IPCServer(threading.Thread):
             port=self.port,
             authenticator=self.authenticator,
             logger=rpyc_logger,
+            # Timeout can happen when piping to 'less' and delaying scrolling to bottom. Make it a long timout.
+            protocol_config={'sync_request_timeout': 3600},
         )
         # If we just chose an open port, write save the chosen one
         self.port = self.server.listener.getsockname()[1]

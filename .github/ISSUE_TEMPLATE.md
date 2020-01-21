@@ -2,6 +2,7 @@
 Before opening an issue, verify:
 
 - Is this a feature request? Post it on https://feathub.com/Flexget/Flexget
+- Is this an issue with webui? Make an issue over on https://github.com/Flexget/webui
 - Did you recently upgrade? Look at the Change Log and Upgrade Actions to make sure that you don't need to make any changes to your config https://flexget.com/ChangeLog https://flexget.com/UpgradeActions
 - Are you running FlexGet as a daemon? Stop it completely and then start it again https://flexget.com/CLI/daemon
 - Did you search to see if the issue already exists? https://github.com/Flexget/Flexget/issues
