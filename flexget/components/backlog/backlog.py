@@ -60,7 +60,7 @@ class InputBacklog:
                 logger.warning(
                     'No input snapshot available for `{}`, using current state', entry['title']
                 )
-            snapshot = entry.serialize()
+            snapshot = serialize(entry)
         expire_time = datetime.now() + parse_timedelta(amount)
         backlog_entry = (
             session.query(BacklogEntry)
