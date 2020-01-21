@@ -338,7 +338,7 @@ class Entry(LazyDict, Serializer):
             lazy_func = getattr(lazy_func, 'lazy_func_id', None)
         if lazy_func not in lazy_func_registry:
             raise ValueError(
-                'Lazy lookup functions must be registered with the `register_lazy_func` decorator'
+                'Lazy lookup functions/methods must be registered with the `register_lazy_lookup` decorator'
             )
         func = lazy_func_registry[lazy_func]
         super().register_lazy_func(func.function, fields, args, kwargs)
@@ -401,4 +401,4 @@ class LazyFunc:
         return self._func
 
 
-register_lazy_func = LazyFunc
+register_lazy_lookup = LazyFunc

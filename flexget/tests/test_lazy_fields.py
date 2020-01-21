@@ -1,8 +1,8 @@
-from flexget.entry import Entry, register_lazy_func
+from flexget.entry import Entry, register_lazy_lookup
 from flexget.plugin import PluginError
 
 
-@register_lazy_func('lazy_a')
+@register_lazy_lookup('lazy_a')
 def lazy_a(entry):
     if 'fail' in entry:
         raise PluginError('oh no!')
@@ -10,7 +10,7 @@ def lazy_a(entry):
         entry[f] = 'a'
 
 
-@register_lazy_func('lazy_b')
+@register_lazy_lookup('lazy_b')
 def lazy_b(entry):
     for f in ['b_field', 'ab_field', 'a_fail']:
         entry[f] = 'b'

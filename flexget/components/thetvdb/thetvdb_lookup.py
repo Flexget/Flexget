@@ -117,19 +117,19 @@ class PluginThetvdbLookup:
             )
         return entry
 
-    @entry.register_lazy_func('tvdb_series_lookup')
+    @entry.register_lazy_lookup('tvdb_series_lookup')
     def lazy_series_lookup(self, entry, language):
         return self.series_lookup(entry, language, self.series_map)
 
-    @entry.register_lazy_func('tvdb_series_actor_lookup')
+    @entry.register_lazy_lookup('tvdb_series_actor_lookup')
     def lazy_series_actor_lookup(self, entry, language):
         return self.series_lookup(entry, language, self.series_actor_map)
 
-    @entry.register_lazy_func('tvdb_series_poster_lookup')
+    @entry.register_lazy_lookup('tvdb_series_poster_lookup')
     def lazy_series_poster_lookup(self, entry, language):
         return self.series_lookup(entry, language, self.series_poster_map)
 
-    @entry.register_lazy_func('tvdb_episode_lookup')
+    @entry.register_lazy_lookup('tvdb_episode_lookup')
     def lazy_episode_lookup(self, entry, language):
         try:
             season_offset = entry.get('thetvdb_lookup_season_offset', 0)

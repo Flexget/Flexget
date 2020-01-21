@@ -32,7 +32,7 @@ class MetainfoQuality:
             else:
                 entry.add_lazy_fields(self.get_quality, ['quality'])
 
-    @entry.register_lazy_func('quality')
+    @entry.register_lazy_lookup('quality')
     def get_quality(self, entry):
         if entry.get('quality', eval_lazy=False):
             logger.debug(

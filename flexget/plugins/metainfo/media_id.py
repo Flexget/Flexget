@@ -21,7 +21,7 @@ class MetainfoMediaId(object):
         for entry in task.entries:
             entry.add_lazy_fields(self.get_media_id, ['media_id'])
 
-    @entry.register_lazy_func('media_id')
+    @entry.register_lazy_lookup('media_id')
     def get_media_id(self, entry):
         # Try to generate a media id based on available parser fields
         media_id = None

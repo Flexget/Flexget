@@ -34,7 +34,7 @@ def is_movie(entry):
     return bool(entry.get('movie_name'))
 
 
-@entry.register_lazy_func('trakt_lazy_lookup')
+@entry.register_lazy_lookup('trakt_lazy_lookup')
 def trakt_lazy_lookup(entry, field_map, lookup_function):
     with Session() as session:
         try:
@@ -47,7 +47,7 @@ def trakt_lazy_lookup(entry, field_map, lookup_function):
     return entry
 
 
-@entry.register_lazy_func('trakt_user_data_lookup')
+@entry.register_lazy_lookup('trakt_user_data_lookup')
 def trakt_user_data_lookup(entry, field_name, data_type, media_type, lookup_function):
     try:
         result = lookup_function(

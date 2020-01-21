@@ -4,7 +4,7 @@ from flexget import entry
 from flexget.utils import qualities, serialization
 
 
-@entry.register_lazy_func('lazy function')
+@entry.register_lazy_lookup('lazy function')
 def lazy_func(entry):
     entry['lazyfield'] = 'value a'
 

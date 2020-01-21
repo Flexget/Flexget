@@ -36,7 +36,7 @@ class PluginBlurayLookup:
 
     schema = {'type': 'boolean'}
 
-    @entry.register_lazy_func('bluray_lookup')
+    @entry.register_lazy_lookup('bluray_lookup')
     def lazy_loader(self, entry):
         """Does the lookup for this entry and populates the entry fields."""
         lookup = plugin.get('api_bluray', self).lookup

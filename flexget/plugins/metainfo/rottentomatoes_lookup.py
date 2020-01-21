@@ -67,7 +67,7 @@ class PluginRottenTomatoesLookup:
     def __init__(self):
         self.key = None
 
-    @entry.register_lazy_func('rottentomatoes_lookup')
+    @entry.register_lazy_lookup('rottentomatoes_lookup')
     def lazy_loader(self, entry):
         """Does the lookup for this entry and populates the entry fields.
 

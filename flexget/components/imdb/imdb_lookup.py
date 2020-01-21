@@ -59,7 +59,7 @@ class ImdbLookup:
         for entry in task.entries:
             entry.add_lazy_fields(self.lazy_loader, self.field_map)
 
-    @entry.register_lazy_func('imdb_lookup')
+    @entry.register_lazy_lookup('imdb_lookup')
     def lazy_loader(self, entry):
         """Does the lookup for this entry and populates the entry fields."""
         try:

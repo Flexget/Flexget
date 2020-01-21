@@ -55,7 +55,7 @@ class PluginTmdbLookup:
         ]
     }
 
-    @entry.register_lazy_func('tmdb_lookup')
+    @entry.register_lazy_lookup('tmdb_lookup')
     def lazy_loader(self, entry, language):
         """Does the lookup for this entry and populates the entry fields."""
         lookup = plugin.get('api_tmdb', self).lookup
