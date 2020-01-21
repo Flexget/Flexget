@@ -41,7 +41,6 @@ class Newznab:
 
     def build_config(self, config):
         logger.debug(type(config))
-        
         config['params'] = {}
         if config['category'] == 'tv':
             config['category'] = 'tvsearch'
@@ -51,7 +50,7 @@ class Newznab:
         if 'url' not in config:
             if 'apikey' in config and 'website' in config:
                 config['params'] = {'t': config['category'], 'apikey': config['apikey'], 'extended': 1}
-                config['url'] = f"{config['website']}/api?"
+                config['url'] = f"{config['website']}/api"
 
         return config
 
@@ -60,14 +59,14 @@ class Newznab:
         logger.verbose("Fetching '{}', with parameters '{}'", url, params)
 
         try:
-            r = task.requests.get(url, params)
+            r = task.requests.get(url, params=params)
         except RequestException as e:
             logger.error("Failed fetching '{}', with parameters '{}': {}", url, params, e)
         else:
             rss = feedparser.parse(r.content)
             logger.debug('Raw RSS: {}', rss)
 
-            if not len(rss.entries):
+            if rss.entries:
                 logger.info('No results returned')
 
             for rss_entry in rss.entries:
