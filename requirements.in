@@ -17,7 +17,7 @@ rebulk>=2.0.0
 apscheduler>=3.2.0
 terminaltables>=3.1.0
 colorclass>=2.2.0
-loguru>=0.4.0
+loguru>=0.4.1
 # WebUI Requirements
 cherrypy>=18.0.0
 flask>=0.7
@@ -29,3 +29,4 @@ flask-cors>=2.1.2
 pyparsing>=2.0.3
 zxcvbn-python
 progressbar==2.5
+more-itertools

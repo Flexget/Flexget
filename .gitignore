@@ -41,3 +41,5 @@ pip-selfcheck.json
 cached_resources/
 pyvenv.cfg
 .pytest_cache
+pip-wheel-metadata
+flexget/ui/v1/app

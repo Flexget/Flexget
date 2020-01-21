@@ -7,8 +7,7 @@ on:
   pull_request:
     branches:
     - "*"
-  schedule:
-  - cron:  '00 15 * * *'
+  deployment: {}
 
 jobs:
   tests:
@@ -51,7 +50,7 @@ jobs:
         pytest -n auto
   release:
     name: Build and release to PyPI
-    if: github.event_name == 'schedule'
+    if: github.event_name == 'deployment'
     needs: tests
     runs-on: ubuntu-18.04
     env:
@@ -80,9 +79,25 @@ jobs:
     - name: Install dev dependencies
       run: |
         pip --cache-dir pip_cache install -r dev-requirements.txt
+    - name: Set Deployment Status Pending
+      uses: deliverybot/deployment-status@v1
+      with:
+        state: pending
+        token: ${{ github.token }}
     - name: Run release script
       env:
         TWINE_USERNAME: "__token__"
         TWINE_PASSWORD: ${{ secrets.pypi_token }}
       run: |
         ./release.sh
+    - name: Set Deployment Status Success
+      uses: deliverybot/deployment-status@v1
+      with:
+        state: success
+        token: ${{ github.token }}
+    - name: Set Deployment Status Failure
+      if: failure() || cancelled()
+      uses: deliverybot/deployment-status@v1
+      with:
+        state: failure
+        token: ${{ github.token }}

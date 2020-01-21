@@ -546,6 +546,17 @@ class FilterSeries(FilterSeriesBase):
                         'identified_by set to `{}` based on series history',
                         db_series.identified_by,
                     )
+                # Remove begin episode if identified_by has now been set to a different type than begin ep
+                if (
+                    db_series.begin
+                    and db_series.identified_by != 'auto'
+                    and db_series.identified_by != db_series.begin.identified_by
+                ):
+                    logger.warning(
+                        f'Removing begin episode for {series_name} ({db_series.begin.identifier}) because '
+                        f'it does not match the identified_by type for series ({db_series.identified_by})'
+                    )
+                    del db_series.begin
 
                 self.process_series(task, series_entries, series_config)
 
