@@ -7,7 +7,7 @@ from sqlalchemy.orm import synonym
 
 from flexget.entry import Entry
 from flexget.manager import Session
-from flexget.utils import json, qualities
+from flexget.utils import json, qualities, serialization
 
 
 def with_session(*args, **kwargs):
@@ -81,7 +81,7 @@ def entry_synonym(name):
     """Use serialization system to store Entries in db."""
 
     def getter(self):
-        return Entry.loads(getattr(self, name))
+        return serialization.loads(getattr(self, name))
 
     def setter(self, entry):
         if isinstance(entry, dict):
@@ -91,7 +91,7 @@ def entry_synonym(name):
                 return
             entry = Entry(entry)
         if isinstance(entry, Entry):
-            setattr(self, name, entry.dumps())
+            setattr(self, name, serialization.dumps(entry))
         else:
             raise TypeError(f'{type(entry)!r} is not type Entry or dict.')
 

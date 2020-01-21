@@ -13,16 +13,17 @@ def serialize(value):
     :param value: Object to serialize.
     :return: JSON serializable representation of this object.
     """
-    if isinstance(value, Serializable):
-        return value.serialize()
-    if isinstance(value, (list, tuple)):
+    s = _serializer_for(value)
+    if s:
+        return {
+            'serializer': s.serializer_name(),
+            'version': s.serializer_version(),
+            'value': s.serialize(value),
+        }
+    if isinstance(value, list):
         return [serialize(v) for v in value]
     if isinstance(value, dict):
         return {k: serialize(v) for k, v in value.items()}
-    if isinstance(value, datetime.datetime):
-        return DateTimeSerializer.serialize(value)
-    if isinstance(value, datetime.date):
-        return DateSerializer.serialize(value)
     if isinstance(value, (str, int, float, type(None))):
         return value
     raise TypeError(f'`{value!r}` of type {type(value)!r} is not serializable')
@@ -36,110 +37,134 @@ def deserialize(value):
     """
     if isinstance(value, dict):
         if all(key in value for key in ('serializer', 'version', 'value')):
-            return _registry()[value['serializer']].deserialize(value)
+            return _deserializer_for(value['serializer']).deserialize(
+                value['value'], value['version']
+            )
         return {k: deserialize(v) for k, v in value.items()}
     if isinstance(value, list):
         return [deserialize(v) for v in value]
     return value
 
 
-class Serializable(ABC):
+def dumps(value) -> str:
     """
-    Any data types that should be serializable should subclass this, and implement the `_serialize` and `_deserialize`
+    Dump an object to text using the serialization system.
+    """
+    return json.dumps(serialize(value))
+
+
+def loads(value: str):
+    """
+    Restore an object from JSON text created by `dumps`
+    """
+    return deserialize(json.loads(value))
+
+
+class Serializer(ABC):
+    """
+    Any data types that should be serializable should subclass this, and implement the `serialize` and `deserialize`
     methods. This is important for data that is stored in `Entry` fields so that it can be stored to the database.
     """
 
-    @abstractmethod
-    def _serialize(self):
-        """This method should be implemented to return a plain python datatype which is json serializable."""
-        pass
-
-    def serialize(self):
-        """Returns a json serializable form of this class, with all information needed to deserialize."""
-        return {
-            'serializer': self.serializer_name(),
-            'version': self.serializer_version(),
-            'value': self._serialize(),
-        }
-
     @classmethod
-    @abstractmethod
-    def _deserialize(cls, data, version):
-        """Returns an instance of this class, recreated from the serialized form."""
-        pass
-
-    @classmethod
-    def deserialize(cls, data):
-        return cls._deserialize(data['value'], data['version'])
-
-    @classmethod
-    def serializer_name(cls):
+    def serializer_name(cls) -> str:
         """
         Name of the serializer defaults to class name.
-        This can be overridden in subclass implementations if desired though.
+        This can be overridden in subclass implementations if desired.
         """
         return cls.__name__
 
     @classmethod
-    def serializer_version(cls):
+    def serializer_version(cls) -> int:
+        """
+        If the format of serialization changes, this number should be incremented.
+        The `deserialize` method of this class should continue to handle the old versions as well as the
+        current version.
+        """
         return 1
 
-    def dumps(self):
-        return json.dumps(self.serialize())
+    @classmethod
+    def serializer_handles(cls, value) -> bool:
+        """Return True if this serializer can handle `value`."""
+        return isinstance(value, cls)
 
     @classmethod
-    def loads(cls, data):
-        return cls.deserialize(json.loads(data))
-
-
-# These two date serializer classes do not follow convention, since the builtin types do not subclass Serializable.
-# Their use is hard coded into the 'serialize' function above.
-class DateSerializer(Serializable):
-    @classmethod
-    def serializer_name(cls):
-        return 'date'
-
-    def _serialize(self):
+    @abstractmethod
+    def serialize(cls, value):
+        """This method should be implemented to return a plain python datatype which is json serializable."""
         pass
 
     @classmethod
-    def serialize(cls, value: datetime.date):
-        return {
-            'serializer': cls.serializer_name(),
-            'version': cls.serializer_version(),
-            'value': value.strftime(DATE_FMT),
-        }
-
-    @classmethod
-    def _deserialize(cls, data, version):
-        return datetime.datetime.strptime(data, DATE_FMT).date()
-
-
-class DateTimeSerializer(Serializable):
-    @classmethod
-    def serializer_name(cls):
-        return 'datetime'
-
-    def _serialize(self):
+    @abstractmethod
+    def deserialize(cls, data, version: int):
+        """Returns an instance of the original class, recreated from the serialized form."""
         pass
+
+
+class DateTimeSerializer(Serializer):
+    @classmethod
+    def serializer_handles(cls, value):
+        return isinstance(value, datetime.datetime)
 
     @classmethod
     def serialize(cls, value: datetime.datetime):
-        return {
-            'serializer': cls.serializer_name(),
-            'version': cls.serializer_version(),
-            'value': value.strftime(ISO8601_FMT),
-        }
+        return value.strftime(ISO8601_FMT)
 
     @classmethod
-    def _deserialize(cls, data, version):
+    def deserialize(cls, data, version: int) -> datetime.datetime:
         return datetime.datetime.strptime(data, ISO8601_FMT)
 
 
-_registry_cache = {}
+class DateSerializer(Serializer):
+    @classmethod
+    def serializer_handles(cls, value):
+        return isinstance(value, datetime.date) and not isinstance(value, datetime.datetime)
+
+    @classmethod
+    def serialize(cls, value: datetime.date):
+        return value.strftime(DATE_FMT)
+
+    @classmethod
+    def deserialize(cls, data, version: int) -> datetime.date:
+        return datetime.datetime.strptime(data, DATE_FMT).date()
 
 
-def _registry():
-    if not _registry_cache:
-        _registry_cache.update({c.serializer_name(): c for c in Serializable.__subclasses__()})
-    return _registry_cache
+class SetSerializer(Serializer):
+    @classmethod
+    def serializer_handles(cls, value):
+        return isinstance(value, set)
+
+    @classmethod
+    def serialize(cls, value: set):
+        return list(value)
+
+    @classmethod
+    def deserialize(cls, data, version: int) -> set:
+        return set(data)
+
+
+class TupleSerializer(Serializer):
+    @classmethod
+    def serializer_handles(cls, value):
+        return isinstance(value, tuple)
+
+    @classmethod
+    def serialize(cls, value: set):
+        return list(value)
+
+    @classmethod
+    def deserialize(cls, data, version) -> tuple:
+        return tuple(data)
+
+
+def _serializer_for(value) -> Serializer:
+    for s in Serializer.__subclasses__():
+        if s.serializer_handles(value):
+            return s
+
+
+def _deserializer_for(serializer_name: str) -> Serializer:
+    for s in Serializer.__subclasses__():
+        if serializer_name == s.serializer_name():
+            return s
+    raise ValueError(f'No deserializer for {serializer_name}')

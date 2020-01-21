@@ -7,6 +7,7 @@ from flexget.components.backlog.db import BacklogEntry, clear_entries, get_entri
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.database import with_session
+from flexget.utils.serialization import serialize
 from flexget.utils.tools import parse_timedelta
 
 logger = logger.bind(name='backlog')
@@ -39,7 +40,7 @@ class InputBacklog:
     def on_task_metainfo(self, task, config):
         # Take a snapshot of any new entries' states before metainfo event in case we have to store them to backlog
         for entry in task.entries:
-            entry['_backlog_snapshot'] = entry.serialize()
+            entry['_backlog_snapshot'] = serialize(entry)
 
     def on_task_abort(self, task, config):
         """Remember all entries until next execution when task gets aborted."""

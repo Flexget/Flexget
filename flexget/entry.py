@@ -9,7 +9,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.utils.lazy_dict import LazyDict, LazyLookup
-from flexget.utils.serialization import Serializable, deserialize, serialize
+from flexget.utils.serialization import Serializer, deserialize, serialize
 from flexget.utils.template import FlexGetTemplate, render_from_entry
 
 logger = logger.bind(name='entry')
@@ -46,7 +46,7 @@ class EntryUnicodeError(Exception):
         return 'Entry strings must be unicode: %s (%r)' % (self.key, self.value)
 
 
-class Entry(LazyDict, Serializable):
+class Entry(LazyDict, Serializer):
     """
     Represents one item in task. Must have `url` and *title* fields.
 
@@ -298,19 +298,20 @@ class Entry(LazyDict, Serializable):
         logger.trace('rendering: {}', template)
         return render_from_entry(template, self, native=native)
 
-    def _serialize(self):
+    @classmethod
+    def serialize(cls, entry: 'Entry'):
         fields = {}
-        for key in self:
-            if key.startswith('_') or self.is_lazy(key):
+        for key in entry:
+            if key.startswith('_') or entry.is_lazy(key):
                 continue
             try:
-                fields[key] = serialize(self[key])
+                fields[key] = serialize(entry[key])
             except TypeError as exc:
                 logger.debug('field {} was not serializable. {}', key, exc)
-        return {'fields': fields, 'lazy_lookups': self.lazy_lookups}
+        return {'fields': fields, 'lazy_lookups': entry.lazy_lookups}
 
     @classmethod
-    def _deserialize(cls, data, version):
+    def deserialize(cls, data, version) -> 'Entry':
         result = cls()
         for key, value in data['fields'].items():
             result[key] = deserialize(value)

@@ -4,7 +4,7 @@ import re
 
 from loguru import logger
 
-from flexget.utils.serialization import Serializable
+from flexget.utils.serialization import Serializer
 
 logger = logger.bind(name='utils.qualities')
 
@@ -188,7 +188,7 @@ def all_components():
 
 
 @functools.total_ordering
-class Quality(Serializable):
+class Quality(Serializer):
     """Parses and stores the quality of an entry in the four component categories."""
 
     def __init__(self, text=''):
@@ -252,11 +252,12 @@ class Quality(Serializable):
     def components(self):
         return [self.resolution, self.source, self.codec, self.audio]
 
-    def _serialize(self):
-        return str(self)
+    @classmethod
+    def serialize(cls, quality: 'Quality'):
+        return str(quality)
 
     @classmethod
-    def _deserialize(cls, data, version):
+    def deserialize(cls, data, version) -> 'Quality':
         return cls(data)
 
     @property
