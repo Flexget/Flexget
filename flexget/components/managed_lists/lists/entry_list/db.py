@@ -16,7 +16,7 @@ from flexget.utils.database import entry_synonym, with_session
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
 logger = logger.bind(name='entry_list.db')
-Base = versioned_base('entry_list', 1)
+Base = versioned_base('entry_list', 2)
 
 
 @db_schema.upgrade('entry_list')
@@ -40,6 +40,12 @@ def upgrade(ver, session):
                 logger.error('Unable error upgrading entry_list pickle object due to {}', str(e))
 
         ver = 1
+    if ver == 1:
+        table = table_schema('entry_list_entries', session)
+        for row in session.execute(select([table.c.id, table.c.json])):
+            e = Entry(json.loads(row['json'], decode_datetime=True))
+            session.execute(table.update().where(table.c.id == row['id']).values(json=e.dumps()))
+        ver = 2
     return ver
 
 

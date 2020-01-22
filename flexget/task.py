@@ -702,8 +702,6 @@ class Task:
                 ):
                     logger.info('Rerunning the task in case better resolution can be achieved.')
                     self._rerun_count += 1
-                    # TODO: Potential optimization is to take snapshots (maybe make the ones backlog uses built in
-                    # instead of taking another one) after input and just inject the same entries for the rerun
                     self._all_entries = EntryContainer()
                     self._rerun = False
                     continue

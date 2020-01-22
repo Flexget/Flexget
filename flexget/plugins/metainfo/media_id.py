@@ -1,6 +1,6 @@
 from loguru import logger
 
-from flexget import plugin
+from flexget import entry, plugin
 from flexget.event import event
 
 logger = logger.bind(name='metainfo_media_id')
@@ -19,10 +19,10 @@ class MetainfoMediaId(object):
         if config is False:
             return
         for entry in task.entries:
-            entry.register_lazy_func(self.get_media_id, ['media_id'])
+            entry.add_lazy_fields(self.get_media_id, ['media_id'])
 
-    @staticmethod
-    def get_media_id(entry):
+    @entry.register_lazy_lookup('media_id')
+    def get_media_id(self, entry):
         # Try to generate a media id based on available parser fields
         media_id = None
         if entry.get('movie_name'):

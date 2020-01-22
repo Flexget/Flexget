@@ -3,7 +3,7 @@
 
 from loguru import logger
 
-from flexget import plugin
+from flexget import entry, plugin
 from flexget.event import event
 from flexget.manager import Session
 
@@ -34,41 +34,31 @@ def is_movie(entry):
     return bool(entry.get('movie_name'))
 
 
-class TraktLazyLookup:
-    def __init__(self, field_map, lookup_function):
-        self.field_map = field_map
-        self.lookup_function = lookup_function
-
-    def __call__(self, entry):
-        with Session() as session:
-            try:
-                result = self.lookup_function(entry, session)
-            except LookupError as e:
-                logger.debug(e)
-            else:
-                entry.update_using_map(self.field_map, result)
-
-        return entry
-
-
-class TraktUserDataLookup:
-    def __init__(self, field_name, data_type, media_type, lookup_function):
-        self.field_name = field_name
-        self.lookup_function = lookup_function
-        self.data_type = data_type
-        self.media_type = media_type
-
-    def __call__(self, entry):
+@entry.register_lazy_lookup('trakt_lazy_lookup')
+def trakt_lazy_lookup(entry, field_map, lookup_function):
+    with Session() as session:
         try:
-            result = self.lookup_function(
-                data_type=self.data_type, media_type=self.media_type, entry=entry
-            )
+            result = lookup_function(entry, session)
         except LookupError as e:
             logger.debug(e)
         else:
-            entry[self.field_name] = result
+            entry.update_using_map(field_map, result)
 
-        return entry
+    return entry
+
+
+@entry.register_lazy_lookup('trakt_user_data_lookup')
+def trakt_user_data_lookup(entry, field_name, data_type, media_type, lookup_function):
+    try:
+        result = lookup_function(
+            data_type=data_type, media_type=media_type, entry=entry
+        )
+    except LookupError as e:
+        logger.debug(e)
+    else:
+        entry[field_name] = result
+
+    return entry
 
 
 class PluginTraktLookup:
@@ -342,36 +332,35 @@ class PluginTraktLookup:
 
         for entry in task.entries:
             if is_show(entry):
-                entry.register_lazy_func(
-                    TraktLazyLookup(self.series_map, self._get_series), self.series_map
+                entry.add_lazy_fields(
+                    trakt_lazy_lookup, self.series_map, args=(self.series_map, self._get_series)
                 )
                 # TODO cleaner way to do this?
-                entry.register_lazy_func(
-                    TraktLazyLookup(self.series_actor_map, self._get_series), self.series_actor_map
+                entry.add_lazy_fields(
+                    trakt_lazy_lookup, self.series_actor_map, args=(self.series_actor_map, self._get_series)
                 )
-                entry.register_lazy_func(
-                    TraktLazyLookup(self.show_translate_map, self._get_series),
-                    self.show_translate_map,
+                entry.add_lazy_fields(
+                    trakt_lazy_lookup, self.show_translate_map, args=(self.show_translate_map, self._get_series)
                 )
                 if is_episode(entry):
-                    entry.register_lazy_func(
-                        TraktLazyLookup(self.episode_map, self._get_episode), self.episode_map
+                    entry.add_lazy_fields(
+                        trakt_lazy_lookup, self.episode_map, args=(self.episode_map, self._get_episode)
                     )
                 elif is_season(entry):
-                    entry.register_lazy_func(
-                        TraktLazyLookup(self.season_map, self._get_season), self.season_map
+                    entry.add_lazy_fields(
+                        trakt_lazy_lookup, self.season_map, args=(self.season_map, self._get_season)
                     )
             else:
-                entry.register_lazy_func(
-                    TraktLazyLookup(self.movie_map, self._get_movie), self.movie_map
+                entry.add_lazy_fields(
+                    trakt_lazy_lookup, self.movie_map, args=(self.movie_map, self._get_movie)
                 )
                 # TODO cleaner way to do this?
-                entry.register_lazy_func(
-                    TraktLazyLookup(self.movie_actor_map, self._get_movie), self.movie_actor_map
+                entry.add_lazy_fields(
+                    trakt_lazy_lookup, self.movie_actor_map, args=(self.movie_actor_map, self._get_movie)
                 )
-                entry.register_lazy_func(
-                    TraktLazyLookup(self.movie_translate_map, self._get_movie),
-                    self.movie_translate_map,
+                entry.add_lazy_fields(
+                    trakt_lazy_lookup,
+                    self.movie_translate_map, args=(self.movie_translate_map, self._get_movie)
                 )
 
             if config.get('username') or config.get('account'):
@@ -397,9 +386,9 @@ class PluginTraktLookup:
         if not media_type:
             return
         field_name = self._get_user_data_field_name(data_type=data_type, media_type=media_type)
-        entry.register_lazy_func(
-            TraktUserDataLookup(field_name, data_type, media_type, self._lazy_user_data_lookup),
-            [field_name],
+        entry.add_lazy_fields(
+            trakt_user_data_lookup,
+            [field_name], args=(field_name, data_type, media_type, self._lazy_user_data_lookup)
         )
 
     def _register_lazy_user_ratings_lookup(self, entry):

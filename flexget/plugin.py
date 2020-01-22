@@ -14,7 +14,7 @@ from requests import RequestException
 from flexget import components as components_pkg
 from flexget import config_schema
 from flexget import plugins as plugins_pkg
-from flexget.event import add_event_handler as add_phase_handler
+from flexget.event import add_event_handler as add_phase_handler, event
 from flexget.event import fire_event, remove_event_handlers
 
 logger = logger.bind(name='plugin')
@@ -611,7 +611,9 @@ def plugin_schemas(**kwargs):
     }
 
 
-config_schema.register_schema('/schema/plugins', plugin_schemas)
+@event('config.register')
+def register_schema():
+    config_schema.register_schema('/schema/plugins', plugin_schemas)
 
 
 def get_phases_by_plugin(name):

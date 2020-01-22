@@ -1,6 +1,6 @@
 from loguru import logger
 
-from flexget import plugin
+from flexget import entry, plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.log import log_once
@@ -36,6 +36,7 @@ class PluginBlurayLookup:
 
     schema = {'type': 'boolean'}
 
+    @entry.register_lazy_lookup('bluray_lookup')
     def lazy_loader(self, entry):
         """Does the lookup for this entry and populates the entry fields."""
         lookup = plugin.get('api_bluray', self).lookup
@@ -51,11 +52,11 @@ class PluginBlurayLookup:
     def lookup(self, entry):
         """
         Populates all lazy fields to an Entry. May be called by other plugins
-        requiring tmdb info on an Entry
+        requiring bluray info on an Entry
 
         :param entry: Entry instance
         """
-        entry.register_lazy_func(self.lazy_loader, self.field_map)
+        entry.add_lazy_fields(self.lazy_loader, self.field_map)
 
     def on_task_metainfo(self, task, config):
         if not config:

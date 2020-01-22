@@ -1,8 +1,6 @@
-from functools import partial
-
 from loguru import logger
 
-from flexget import plugin
+from flexget import entry, plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.log import log_once
@@ -57,6 +55,7 @@ class PluginTmdbLookup:
         ]
     }
 
+    @entry.register_lazy_lookup('tmdb_lookup')
     def lazy_loader(self, entry, language):
         """Does the lookup for this entry and populates the entry fields."""
         lookup = plugin.get('api_tmdb', self).lookup
@@ -84,8 +83,7 @@ class PluginTmdbLookup:
 
         :param entry: Entry instance
         """
-        lazy_func = partial(self.lazy_loader, language=language)
-        entry.register_lazy_func(lazy_func, self.field_map)
+        entry.add_lazy_fields(self.lazy_loader, self.field_map, kwargs={'language': language})
 
     def on_task_metainfo(self, task, config):
         if not config:
