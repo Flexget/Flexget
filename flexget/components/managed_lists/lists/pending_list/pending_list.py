@@ -74,9 +74,6 @@ class PendingListSet(MutableSet):
                 session.delete(db_entry)
 
     def add(self, entry):
-        # Evaluate all lazy fields so that no db access occurs during our db session
-        entry.values()
-
         with Session() as session:
             stored_entry = self._entry_query(session, entry)
             if stored_entry:
@@ -89,15 +86,6 @@ class PendingListSet(MutableSet):
                     entry=entry, pending_list_id=self._db_list(session).id
                 )
             session.add(stored_entry)
-
-    def __ior__(self, other):
-        # Optimization to only open one session when adding multiple items
-        # Make sure lazy lookups are done before opening our session to prevent db locks
-        for value in other:
-            value.values()
-        for value in other:
-            self.add(value)
-        return self
 
     @property
     def immutable(self):
