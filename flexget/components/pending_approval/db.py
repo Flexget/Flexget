@@ -6,7 +6,7 @@ from sqlalchemy import Boolean, Column, DateTime, Integer, String, Unicode, sele
 from flexget import db_schema
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils import json
+from flexget.utils import json, serialization
 from flexget.utils.database import entry_synonym
 from flexget.utils.sqlalchemy_utils import table_schema
 
@@ -20,7 +20,9 @@ def upgrade(ver, session):
         table = table_schema('pending_entries', session)
         for row in session.execute(select([table.c.id, table.c.json])):
             e = Entry(json.loads(row['json'], decode_datetime=True))
-            session.execute(table.update().where(table.c.id == row['id']).values(json=e.dumps()))
+            session.execute(
+                table.update().where(table.c.id == row['id']).values(json=serialization.dumps(e))
+            )
 
         ver = 1
     return ver

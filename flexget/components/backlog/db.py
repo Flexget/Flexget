@@ -6,7 +6,7 @@ from sqlalchemy import Column, DateTime, Index, Integer, String, Unicode, select
 
 from flexget import db_schema
 from flexget.entry import Entry
-from flexget.utils import json
+from flexget.utils import json, serialization
 from flexget.utils.database import entry_synonym, with_session
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
@@ -72,7 +72,9 @@ def upgrade(ver, session):
         table = table_schema('backlog', session)
         for row in session.execute(select([table.c.id, table.c.json])):
             e = Entry(json.loads(row['json'], decode_datetime=True))
-            session.execute(table.update().where(table.c.id == row['id']).values(json=e.dumps()))
+            session.execute(
+                table.update().where(table.c.id == row['id']).values(json=serialization.dumps(e))
+            )
 
         ver = 3
     return ver

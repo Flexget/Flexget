@@ -11,7 +11,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import PluginError
-from flexget.utils import json
+from flexget.utils import json, serialization
 from flexget.utils.database import entry_synonym
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 from flexget.utils.tools import TimedDict, get_config_hash, parse_timedelta
@@ -42,7 +42,9 @@ def upgrade(ver, session):
         table = table_schema('input_cache_entry', session)
         for row in session.execute(select([table.c.id, table.c.json])):
             e = Entry(json.loads(row['json'], decode_datetime=True))
-            session.execute(table.update().where(table.c.id == row['id']).values(json=e.dumps()))
+            session.execute(
+                table.update().where(table.c.id == row['id']).values(json=serialization.dumps(e))
+            )
 
         ver = 2
     return ver
