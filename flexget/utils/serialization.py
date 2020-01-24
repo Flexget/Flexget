@@ -140,11 +140,11 @@ class SetSerializer(Serializer):
 
     @classmethod
     def serialize(cls, value: set):
-        return list(value)
+        return serialize(list(value))
 
     @classmethod
     def deserialize(cls, data, version: int) -> set:
-        return set(data)
+        return set(deserialize(data))
 
 
 class TupleSerializer(Serializer):
@@ -154,11 +154,11 @@ class TupleSerializer(Serializer):
 
     @classmethod
     def serialize(cls, value: set):
-        return list(value)
+        return serialize(list(value))
 
     @classmethod
     def deserialize(cls, data, version) -> tuple:
-        return tuple(data)
+        return tuple(deserialize(data))
 
 
 def _serializer_for(value) -> Serializer:
