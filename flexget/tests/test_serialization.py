@@ -1,5 +1,7 @@
 import datetime
 
+import pytest
+
 from flexget import entry
 from flexget.utils import qualities, serialization
 
@@ -35,3 +37,23 @@ class TestSerialization:
         assert entry2.is_lazy('lazyfield')
         assert dict(entry1) == dict(entry2)
         assert entry2['lazyfield'] == 'value a'
+
+    def test_builtin_serialization(self):
+        # Also test these things nest properly
+        value = {
+            'a': 'aoeu',
+            'b': [1, 2, 3.5],
+            'c': (1, datetime.datetime(2019, 12, 12, 12, 12)),
+            'd': {'a', 1, datetime.date(2019, 11, 11)}
+        }
+        out = serialization.dumps(value)
+        backin = serialization.loads(out)
+        assert backin == value
+
+    def test_unserializable(self):
+        # Hide an unserializable object as deep as we can in supported collections
+        value = ['a', ('b', {'c': {'d', object()}})]
+        with pytest.raises(TypeError):
+            serialization.serialize(value)
+        with pytest.raises(TypeError):
+            serialization.dumps(value)
