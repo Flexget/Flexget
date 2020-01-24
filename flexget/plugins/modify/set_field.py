@@ -6,7 +6,8 @@ from flexget.utils.template import RenderError
 
 logger = logger.bind(name='set')
 
-UNSET = object()
+# Use a string for this sentinel, so it survives serialization
+UNSET = '__unset__'
 
 
 class ModifySet:
