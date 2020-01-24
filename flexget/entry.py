@@ -308,14 +308,23 @@ class Entry(LazyDict, Serializer):
                 fields[key] = serialize(entry[key])
             except TypeError as exc:
                 logger.debug('field {} was not serializable. {}', key, exc)
-        return {'fields': fields, 'lazy_lookups': entry.lazy_lookups}
+        lazy_lookups = []
+        for ll in entry.lazy_lookups:
+            try:
+                lazy_lookups.append(serialize(ll))
+            except TypeError as exc:
+                logger.exception(
+                    'BUG: Lazy lookup was not compatible with serialization. Please file a bug report: {}',
+                    exc,
+                )
+        return {'fields': fields, 'lazy_lookups': lazy_lookups}
 
     @classmethod
     def deserialize(cls, data, version) -> 'Entry':
         result = cls()
         for key, value in data['fields'].items():
             result[key] = deserialize(value)
-        for lazy_lookup in data['lazy_lookups']:
+        for lazy_lookup in deserialize(data['lazy_lookups']):
             result.add_lazy_fields(*lazy_lookup)
         return result
 
@@ -340,6 +349,9 @@ class Entry(LazyDict, Serializer):
             raise ValueError(
                 'Lazy lookup functions/methods must be registered with the `register_lazy_lookup` decorator'
             )
+        # Make sure fields is a plain list. If it is a dict, (or some other iterable) we may try to serialize
+        # extra/unserializable stuff.
+        fields = list(fields)
         func = lazy_func_registry[lazy_func]
         super().register_lazy_func(func.function, fields, args, kwargs)
         self.lazy_lookups.append((lazy_func, fields, args, kwargs))
