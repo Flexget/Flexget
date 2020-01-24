@@ -50,7 +50,11 @@ def dumps(value) -> str:
     """
     Dump an object to text using the serialization system.
     """
-    return json.dumps(serialize(value))
+    serialized = serialize(value)
+    try:
+        return json.dumps(serialized)
+    except TypeError as exc:
+        raise TypeError('Error during dumping {}. Instance: {!r}'.format(exc, serialized)) from exc
 
 
 def loads(value: str):
