@@ -146,8 +146,6 @@ class Manager:
         except:
             flexget.log.start(level=self.options.loglevel, to_file=False)
             raise
-        else:
-            self._init_logging()
 
         manager = self
 
@@ -182,7 +180,7 @@ class Manager:
                 sys.exit(1)
         return options
 
-    def _init_logging(self):
+    def _init_logging(self, to_file=True):
         """
         Initialize logging facilities
         """
@@ -191,7 +189,9 @@ class Manager:
         if not os.path.isabs(log_file):
             log_file = os.path.join(self.config_base, log_file)
         self.log_filename = log_file
-        flexget.log.start(log_file, self.options.loglevel, to_console=not self.options.cron)
+        flexget.log.start(
+            log_file, self.options.loglevel, to_file=to_file, to_console=not self.options.cron
+        )
 
     def initialize(self):
         """
@@ -319,16 +319,14 @@ class Manager:
         and results will be streamed back.
         If not, this will attempt to obtain a lock, initialize the manager, and run the command here.
         """
-        if sys.version_info <= (2, 7):
-            console('-' * 79)
-            console('Python 2.7 will not be maintained past 2020 !')
-            console('Consider upgrading to 3.6 or newer at your earliest convenience.')
-            console('-' * 79)
         # When we are in test mode, we use a different lock file and db
         if self.options.test:
             self.lockfile = os.path.join(self.config_base, '.test-%s-lock' % self.config_name)
         # If another process is started, send the execution to the running process
         ipc_info = self.check_ipc_info()
+        # If we are connecting to a running daemon, we don't want to log to the log file,
+        # the daemon is already handling that.
+        self._init_logging(to_file=not ipc_info)
         if ipc_info:
             console(
                 'There is a FlexGet process already running for this config, sending execution there.'
