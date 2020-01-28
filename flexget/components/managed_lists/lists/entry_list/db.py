@@ -90,7 +90,7 @@ class EntryListEntry(Base):
             'added_on': self.added,
             'title': self.title,
             'original_url': self.original_url,
-            'entry': dict(self.entry),
+            'entry': json.coerce(self.entry),
         }
 
 
