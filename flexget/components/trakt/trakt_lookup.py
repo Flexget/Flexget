@@ -50,15 +50,196 @@ def trakt_lazy_lookup(entry, field_map, lookup_function):
 @entry.register_lazy_lookup('trakt_user_data_lookup')
 def trakt_user_data_lookup(entry, field_name, data_type, media_type, lookup_function):
     try:
-        result = lookup_function(
-            data_type=data_type, media_type=media_type, entry=entry
-        )
+        result = lookup_function(data_type=data_type, media_type=media_type, entry=entry)
     except LookupError as e:
         logger.debug(e)
     else:
         entry[field_name] = result
 
     return entry
+
+
+def _get_lookup_args(entry):
+    args = {
+        'title': entry.get('series_name', eval_lazy=False) or entry.get('title', eval_lazy=False),
+        'year': entry.get('year', eval_lazy=False) or entry.get('movie_year', eval_lazy=False),
+        'trakt_slug': (
+            entry.get('trakt_show_slug', eval_lazy=False)
+            or entry.get('trakt_movie_slug', eval_lazy=False)
+        ),
+        'tmdb_id': entry.get('tmdb_id', eval_lazy=False),
+        'tvdb_id': entry.get('tvdb_id', eval_lazy=False),
+        'imdb_id': entry.get('imdb_id', eval_lazy=False),
+        'tvrage_id': entry.get('tvrage_id', eval_lazy=False),
+    }
+
+    if entry.get('trakt_movie_id', eval_lazy=False):
+        args['trakt_id'] = entry['trakt_movie_id']
+    elif entry.get('trakt_show_id', eval_lazy=False):
+        args['trakt_id'] = entry['trakt_show_id']
+    elif is_movie(entry) and entry.get('trakt_movie_id', eval_lazy=True):
+        args['trakt_id'] = entry['trakt_movie_id']
+    elif entry.get('trakt_show_id', eval_lazy=True):
+        args['trakt_id'] = entry['trakt_show_id']
+
+    return args
+
+
+def _get_series(entry, session):
+    series_lookup_args = _get_lookup_args(entry)
+    return lookup_series(session=session, **series_lookup_args)
+
+
+def _get_season(entry, session):
+    series_lookup_args = _get_lookup_args(entry)
+    show = lookup_series(session=session, **series_lookup_args)
+    return show.get_season(entry['series_season'], session)
+
+
+def _get_episode(entry, session):
+    series_lookup_args = _get_lookup_args(entry)
+    show = lookup_series(session=session, **series_lookup_args)
+    return show.get_episode(entry['series_season'], entry['series_episode'], session)
+
+
+def _get_movie(entry, session):
+    movie_lookup_args = _get_lookup_args(entry)
+    return lookup_movie(session=session, **movie_lookup_args)
+
+
+lazy_lookup_types = {
+    'show': {
+        'lookup_func': _get_series,
+        'field_map': {
+            'trakt_series_name': 'title',
+            'trakt_series_year': 'year',
+            'imdb_id': 'imdb_id',
+            'tvdb_id': 'tvdb_id',
+            'tmdb_id': 'tmdb_id',
+            'trakt_show_id': 'id',
+            'trakt_show_slug': 'slug',
+            'tvrage_id': 'tvrage_id',
+            'trakt_trailer': 'trailer',
+            'trakt_homepage': 'homepage',
+            'trakt_series_runtime': 'runtime',
+            'trakt_series_first_aired': 'first_aired',
+            'trakt_series_air_time': 'air_time',
+            'trakt_series_air_day': 'air_day',
+            'trakt_series_content_rating': 'certification',
+            'trakt_genres': lambda i: [db_genre.name for db_genre in i.genres],
+            'trakt_series_network': 'network',
+            'imdb_url': lambda series: series.imdb_id
+            and 'http://www.imdb.com/title/%s' % series.imdb_id,
+            'trakt_series_url': lambda series: series.slug
+            and 'https://trakt.tv/shows/%s' % series.slug,
+            'trakt_series_country': 'country',
+            'trakt_series_status': 'status',
+            'trakt_series_overview': 'overview',
+            'trakt_series_rating': 'rating',
+            'trakt_series_votes': 'votes',
+            'trakt_series_language': 'language',
+            'trakt_series_aired_episodes': 'aired_episodes',
+            'trakt_series_episodes': lambda show: [episodes.title for episodes in show.episodes],
+            'trakt_languages': 'translation_languages',
+        },
+    },
+    'show_actors': {
+        'lookup_func': _get_series,
+        'field_map': {'trakt_actors': lambda show: db.list_actors(show.actors)},
+    },
+    'show_translations': {
+        'lookup_func': _get_series,
+        'field_map': {
+            'trakt_translations': lambda show: db.get_translations_dict(show.translations, 'show')
+        },
+    },
+    'season': {
+        'lookup_func': _get_season,
+        'field_map': {
+            'trakt_season_name': 'title',
+            'trakt_season_tvdb_id': 'tvdb_id',
+            'trakt_season_tmdb_id': 'tmdb_id',
+            'trakt_season_tvrage': 'tvrage_id',
+            'trakt_season_id': 'id',
+            'trakt_season_first_aired': 'first_aired',
+            'trakt_season_overview': 'overview',
+            'trakt_season_episode_count': 'episode_count',
+            'trakt_season': 'number',
+            'trakt_season_aired_episodes': 'aired_episodes',
+        },
+    },
+    'episode': {
+        'lookup_func': _get_episode,
+        'field_map': {
+            'trakt_ep_name': 'title',
+            'trakt_ep_imdb_id': 'imdb_id',
+            'trakt_ep_tvdb_id': 'tvdb_id',
+            'trakt_ep_tmdb_id': 'tmdb_id',
+            'trakt_ep_tvrage': 'tvrage_id',
+            'trakt_episode_id': 'id',
+            'trakt_ep_first_aired': 'first_aired',
+            'trakt_ep_overview': 'overview',
+            'trakt_ep_abs_number': 'number_abs',
+            'trakt_season': 'season',
+            'trakt_episode': 'number',
+            'trakt_ep_id': lambda ep: 'S%02dE%02d' % (ep.season, ep.number),
+        },
+    },
+    'movie': {
+        'lookup_func': _get_movie,
+        'field_map': {
+            'movie_name': 'title',
+            'movie_year': 'year',
+            'trakt_movie_name': 'title',
+            'trakt_movie_year': 'year',
+            'trakt_movie_id': 'id',
+            'trakt_movie_slug': 'slug',
+            'imdb_id': 'imdb_id',
+            'tmdb_id': 'tmdb_id',
+            'trakt_tagline': 'tagline',
+            'trakt_overview': 'overview',
+            'trakt_released': 'released',
+            'trakt_runtime': 'runtime',
+            'trakt_rating': 'rating',
+            'trakt_votes': 'votes',
+            'trakt_homepage': 'homepage',
+            'trakt_trailer': 'trailer',
+            'trakt_language': 'language',
+            'trakt_genres': lambda i: [db_genre.name for db_genre in i.genres],
+            'trakt_languages': 'translation_languages',
+        },
+    },
+    'movie_actors': {
+        'lookup_func': _get_movie,
+        'field_map': {'trakt_actors': lambda movie: db.list_actors(movie.actors)},
+    },
+    'movie_translations': {
+        'lookup_func': _get_movie,
+        'field_map': {
+            'trakt_translations': lambda movie: db.get_translations_dict(
+                movie.translations, 'movie'
+            )
+        },
+    },
+}
+
+
+@entry.register_lazy_lookup('trakt_lazy_lookup_b')
+def lazy_lookup(entry, lazy_lookup_name):
+    with Session() as session:
+        try:
+            result = lazy_lookup_types[lazy_lookup_name]['lookup_func'](entry, session)
+        except LookupError as e:
+            logger.debug(e)
+        else:
+            entry.update_using_map(lazy_lookup_types[lazy_lookup_name]['field_map'], result)
+    return entry
+
+
+def add_lazy_fields(entry: entry.Entry, lazy_lookup_name):
+    entry.add_lazy_fields(
+        lazy_lookup, lazy_lookup_types[lazy_lookup_name]['field_map'], args=(lazy_lookup_name,)
+    )
 
 
 class PluginTraktLookup:
@@ -104,104 +285,6 @@ class PluginTraktLookup:
 
     """
 
-    # Series info
-    series_map = {
-        'trakt_series_name': 'title',
-        'trakt_series_year': 'year',
-        'imdb_id': 'imdb_id',
-        'tvdb_id': 'tvdb_id',
-        'tmdb_id': 'tmdb_id',
-        'trakt_show_id': 'id',
-        'trakt_show_slug': 'slug',
-        'tvrage_id': 'tvrage_id',
-        'trakt_trailer': 'trailer',
-        'trakt_homepage': 'homepage',
-        'trakt_series_runtime': 'runtime',
-        'trakt_series_first_aired': 'first_aired',
-        'trakt_series_air_time': 'air_time',
-        'trakt_series_air_day': 'air_day',
-        'trakt_series_content_rating': 'certification',
-        'trakt_genres': lambda i: [db_genre.name for db_genre in i.genres],
-        'trakt_series_network': 'network',
-        'imdb_url': lambda series: series.imdb_id
-        and 'http://www.imdb.com/title/%s' % series.imdb_id,
-        'trakt_series_url': lambda series: series.slug
-        and 'https://trakt.tv/shows/%s' % series.slug,
-        'trakt_series_country': 'country',
-        'trakt_series_status': 'status',
-        'trakt_series_overview': 'overview',
-        'trakt_series_rating': 'rating',
-        'trakt_series_votes': 'votes',
-        'trakt_series_language': 'language',
-        'trakt_series_aired_episodes': 'aired_episodes',
-        'trakt_series_episodes': lambda show: [episodes.title for episodes in show.episodes],
-        'trakt_languages': 'translation_languages',
-    }
-
-    series_actor_map = {'trakt_actors': lambda show: db.list_actors(show.actors)}
-    show_translate_map = {
-        'trakt_translations': lambda show: db.get_translations_dict(show.translations, 'show')
-    }
-
-    # Episode info
-    episode_map = {
-        'trakt_ep_name': 'title',
-        'trakt_ep_imdb_id': 'imdb_id',
-        'trakt_ep_tvdb_id': 'tvdb_id',
-        'trakt_ep_tmdb_id': 'tmdb_id',
-        'trakt_ep_tvrage': 'tvrage_id',
-        'trakt_episode_id': 'id',
-        'trakt_ep_first_aired': 'first_aired',
-        'trakt_ep_overview': 'overview',
-        'trakt_ep_abs_number': 'number_abs',
-        'trakt_season': 'season',
-        'trakt_episode': 'number',
-        'trakt_ep_id': lambda ep: 'S%02dE%02d' % (ep.season, ep.number),
-    }
-
-    # Season info
-    season_map = {
-        'trakt_season_name': 'title',
-        'trakt_season_tvdb_id': 'tvdb_id',
-        'trakt_season_tmdb_id': 'tmdb_id',
-        'trakt_season_tvrage': 'tvrage_id',
-        'trakt_season_id': 'id',
-        'trakt_season_first_aired': 'first_aired',
-        'trakt_season_overview': 'overview',
-        'trakt_season_episode_count': 'episode_count',
-        'trakt_season': 'number',
-        'trakt_season_aired_episodes': 'aired_episodes',
-    }
-
-    # Movie info
-    movie_map = {
-        'movie_name': 'title',
-        'movie_year': 'year',
-        'trakt_movie_name': 'title',
-        'trakt_movie_year': 'year',
-        'trakt_movie_id': 'id',
-        'trakt_movie_slug': 'slug',
-        'imdb_id': 'imdb_id',
-        'tmdb_id': 'tmdb_id',
-        'trakt_tagline': 'tagline',
-        'trakt_overview': 'overview',
-        'trakt_released': 'released',
-        'trakt_runtime': 'runtime',
-        'trakt_rating': 'rating',
-        'trakt_votes': 'votes',
-        'trakt_homepage': 'homepage',
-        'trakt_trailer': 'trailer',
-        'trakt_language': 'language',
-        'trakt_genres': lambda i: [db_genre.name for db_genre in i.genres],
-        'trakt_languages': 'translation_languages',
-    }
-
-    movie_translate_map = {
-        'trakt_translations': lambda movie: db.get_translations_dict(movie.translations, 'movie')
-    }
-
-    movie_actor_map = {'trakt_actors': lambda movie: db.list_actors(movie.actors)}
-
     user_data_map = {
         'collected': 'trakt_collected',
         'watched': 'trakt_watched',
@@ -228,10 +311,10 @@ class PluginTraktLookup:
 
     def __init__(self):
         self.getter_map = {
-            'show': self._get_series,
-            'season': self._get_season,
-            'episode': self._get_episode,
-            'movie': self._get_movie,
+            'show': _get_series,
+            'season': _get_season,
+            'episode': _get_episode,
+            'movie': _get_movie,
         }
 
     def on_task_start(self, task, config):
@@ -250,61 +333,6 @@ class PluginTraktLookup:
             return self.user_data_map[data_type][media_type]
 
         return self.user_data_map[data_type]
-
-    def _get_lookup_args(self, entry):
-        args = {
-            'title': entry.get('series_name', eval_lazy=False)
-            or entry.get('title', eval_lazy=False),
-            'year': entry.get('year', eval_lazy=False),
-            'trakt_slug': (
-                entry.get('trakt_show_slug', eval_lazy=False)
-                or entry.get('trakt_movie_slug', eval_lazy=False)
-            ),
-            'tmdb_id': entry.get('tmdb_id', eval_lazy=False),
-            'tvdb_id': entry.get('tvdb_id', eval_lazy=False),
-            'imdb_id': entry.get('imdb_id', eval_lazy=False),
-            'tvrage_id': entry.get('tvrage_id', eval_lazy=False),
-        }
-
-        if entry.get('trakt_movie_id', eval_lazy=False):
-            args['trakt_id'] = entry['trakt_movie_id']
-        elif entry.get('trakt_show_id', eval_lazy=False):
-            args['trakt_id'] = entry['trakt_show_id']
-        elif is_movie(entry) and entry.get('trakt_movie_id', eval_lazy=True):
-            args['trakt_id'] = entry['trakt_movie_id']
-        elif entry.get('trakt_show_id', eval_lazy=True):
-            args['trakt_id'] = entry['trakt_show_id']
-
-        return args
-
-    def _get_series(self, entry, session):
-        series_lookup_args = self._get_lookup_args(entry)
-        return lookup_series(session=session, **series_lookup_args)
-
-    def _get_season(self, entry, session):
-        series_lookup_args = self._get_lookup_args(entry)
-        show = lookup_series(session=session, **series_lookup_args)
-        return show.get_season(entry['series_season'], session)
-
-    def _get_episode(self, entry, session):
-        series_lookup_args = self._get_lookup_args(entry)
-        show = lookup_series(session=session, **series_lookup_args)
-        return show.get_episode(entry['series_season'], entry['series_episode'], session)
-
-    def _get_movie(self, entry, session):
-        movie_lookup_args = self._get_lookup_args(entry)
-        return lookup_movie(session=session, **movie_lookup_args)
-
-    def lazy_lookup(self, entry, media_type, mapping):
-        """Does the lookup for this entry and populates the entry fields."""
-        with Session() as session:
-            try:
-                trakt_media = self.getter_map[media_type](entry, session)
-            except LookupError as e:
-                logger.debug(e)
-            else:
-                entry.update_using_map(mapping, trakt_media)
-        return entry
 
     def _lazy_user_data_lookup(self, data_type, media_type, entry):
         try:
@@ -332,36 +360,17 @@ class PluginTraktLookup:
 
         for entry in task.entries:
             if is_show(entry):
-                entry.add_lazy_fields(
-                    trakt_lazy_lookup, self.series_map, args=(self.series_map, self._get_series)
-                )
-                # TODO cleaner way to do this?
-                entry.add_lazy_fields(
-                    trakt_lazy_lookup, self.series_actor_map, args=(self.series_actor_map, self._get_series)
-                )
-                entry.add_lazy_fields(
-                    trakt_lazy_lookup, self.show_translate_map, args=(self.show_translate_map, self._get_series)
-                )
+                add_lazy_fields(entry, 'show')
+                add_lazy_fields(entry, 'show_actors')
+                add_lazy_fields(entry, 'show_translations')
                 if is_episode(entry):
-                    entry.add_lazy_fields(
-                        trakt_lazy_lookup, self.episode_map, args=(self.episode_map, self._get_episode)
-                    )
+                    add_lazy_fields(entry, 'episode')
                 elif is_season(entry):
-                    entry.add_lazy_fields(
-                        trakt_lazy_lookup, self.season_map, args=(self.season_map, self._get_season)
-                    )
+                    add_lazy_fields(entry, 'season')
             else:
-                entry.add_lazy_fields(
-                    trakt_lazy_lookup, self.movie_map, args=(self.movie_map, self._get_movie)
-                )
-                # TODO cleaner way to do this?
-                entry.add_lazy_fields(
-                    trakt_lazy_lookup, self.movie_actor_map, args=(self.movie_actor_map, self._get_movie)
-                )
-                entry.add_lazy_fields(
-                    trakt_lazy_lookup,
-                    self.movie_translate_map, args=(self.movie_translate_map, self._get_movie)
-                )
+                add_lazy_fields(entry, 'movie')
+                add_lazy_fields(entry, 'movie_actors')
+                add_lazy_fields(entry, 'movie_translations')
 
             if config.get('username') or config.get('account'):
                 self._register_lazy_user_data_lookup(entry, 'collected')
@@ -388,7 +397,8 @@ class PluginTraktLookup:
         field_name = self._get_user_data_field_name(data_type=data_type, media_type=media_type)
         entry.add_lazy_fields(
             trakt_user_data_lookup,
-            [field_name], args=(field_name, data_type, media_type, self._lazy_user_data_lookup)
+            [field_name],
+            args=(field_name, data_type, media_type, self._lazy_user_data_lookup),
         )
 
     def _register_lazy_user_ratings_lookup(self, entry):
