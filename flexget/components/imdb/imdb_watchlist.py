@@ -130,7 +130,7 @@ class ImdbWatchlist:
             total_item_count = len(json_vars['list']['items'])
         if not total_item_count:
             logger.verbose('No movies were found in imdb list: {}', config['list'])
-            return
+            return []
         imdb_ids = []
         for item in json_vars['list']['items']:
             if is_valid_imdb_title_id(item.get('const')):
