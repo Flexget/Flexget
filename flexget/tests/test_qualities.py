@@ -247,6 +247,26 @@ class TestQualityAudio:
               - {title: 'My Show S01E05 720p HDTV DD5.1'}
               - {title: 'My Show S01E05 720p HDTV DD+5.1'}
               - {title: 'My Show S01E05 720p HDTV DD+7.1'}
+          test_ac3_lt_ddp:
+            quality: '<dd+5.1'
+            mock:
+              - {title: 'My Show S01E05 720p HDTV AC3'}
+              - {title: 'My Show S01E05 720p HDTV DD+5.1'}
+          test_dd_lt_ddp:
+            quality: '<dd+5.1'
+            mock:
+              - {title: 'My Show S01E05 720p HDTV DD5.1'}
+              - {title: 'My Show S01E05 720p HDTV DD+5.1'}
+          test_ddp_lt_truehd:
+            quality: '<truehd'
+            mock:
+              - {title: 'My Show S01E05 720p HDTV DD+5.1'}
+              - {title: 'My Show S01E05 720p HDTV TrueHD'}
+          test_dts_lt_dtshd:
+            quality: '<dtshd'
+            mock:
+              - {title: 'My Show S01E05 720p HDTV DTS'}
+              - {title: 'My Show S01E05 720p HDTV DTS-HD MA'}
     """
 
     def test_dd_audio_channels(self, execute_task):
@@ -275,3 +295,27 @@ class TestQualityAudio:
         entry = task.find_entry('undecided', title='My Show S01E05 720p HDTV DD5.1')
         assert entry, 'Entry "My Show S01E05 720p HDTV DD5.1" should not have been rejected'
         assert entry['quality'].audio == 'dd5.1', 'audio should have been parsed as dd5.1'
+
+    def test_ac3_lt_ddp(self, execute_task):
+        task = execute_task('test_ac3_lt_ddp')
+        entry = task.find_entry('undecided', title='My Show S01E05 720p HDTV AC3')
+        assert entry, 'Entry "My Show S01E05 720p HDTV AC3" should not have been rejected'
+        assert entry['quality'].audio == 'ac3', 'ac3 should have been selected'
+
+    def test_dd_lt_ddp(self, execute_task):
+        task = execute_task('test_dd_lt_ddp')
+        entry = task.find_entry('undecided', title='My Show S01E05 720p HDTV DD5.1')
+        assert entry, 'Entry "My Show S01E05 720p HDTV DD5.1" should not have been rejected'
+        assert entry['quality'].audio == 'dd5.1', 'dd5.1 should have been selected'
+
+    def test_ddp_lt_truehd(self, execute_task):
+        task = execute_task('test_ddp_lt_truehd')
+        entry = task.find_entry('undecided', title='My Show S01E05 720p HDTV DD+5.1')
+        assert entry, 'Entry "My Show S01E05 720p HDTV DD+5.1" should not have been rejected'
+        assert entry['quality'].audio == 'dd+5.1', 'dd+5.1 should have been selected'
+
+    def test_dts_lt_dtshd(self, execute_task):
+        task = execute_task('test_dts_lt_dtshd')
+        entry = task.find_entry('undecided', title='My Show S01E05 720p HDTV DTS')
+        assert entry, 'Entry "My Show S01E05 720p HDTV DTS" should not have been rejected'
+        assert entry['quality'].audio == 'dts', 'dts should have been selected'
