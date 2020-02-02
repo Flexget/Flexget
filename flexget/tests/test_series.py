@@ -124,6 +124,16 @@ class TestQuality:
             series:
             - my 720p show:
                 quality: '<720p'
+
+          best_quality_is_chosen:
+            mock:
+              - {title: 'Some.Series.S01E01.720p.HDTV.DD+5.1.x264-FlexGet'}
+              - {title: 'Some.Series.S01E01.1080p.WEB.TrueHD.x264-FlexGet'}
+              - {title: 'Some.Series.S01E01.1080p.WEB.AAC5.1.x264-FlexGet'}
+            series:
+              - Some Series:
+                  target: ac3+
+
     """
 
     def test_exact_quality(self, execute_task):
@@ -184,6 +194,14 @@ class TestQuality:
             'accepted', title='my 720p show S01E01'
         ), 'quality in title should not have been parsed'
         assert len(task.accepted) == 1, 'should not have accepted 720p entry'
+
+    def test_best_quality_is_chosen(self, execute_task):
+        """Series plugin: choose by target quality"""
+        task = execute_task('best_quality_is_chosen')
+        assert task.find_entry(
+            'accepted', title='Some.Series.S01E01.1080p.WEB.TrueHD.x264-FlexGet'
+        ), 'truehd should have been accepted'
+        assert len(task.accepted) == 1, 'should have accepted only one'
 
 
 class TestDatabase:
