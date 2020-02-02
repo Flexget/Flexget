@@ -733,8 +733,10 @@ class FilterSeries(FilterSeriesBase):
                     entry.reject('entity has already been downloaded')
                 continue
 
-            best = entries[0]
             logger.debug('continuing w. entities: {}', [e['title'] for e in entries])
+            # sort qualities from best to worst
+            entries.sort(key=lambda e: (e['quality']), reverse=True)
+            best = entries[0]
             logger.debug('best entity is: `{}`', best['title'])
 
             # episode tracking. used only with season and sequence based series
@@ -774,7 +776,7 @@ class FilterSeries(FilterSeriesBase):
                     continue
 
             # Just pick the best ep if we get here
-            reason = reason or 'choosing first acceptable match'
+            reason = reason or 'choosing best acceptable match'
             best.accept(reason)
 
             # need to reject all other episode/season packs for an accepted season during the task,
