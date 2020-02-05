@@ -48,11 +48,15 @@ class StatusTask(Base):
             select([func.max(TaskExecution.start)])
             .where(TaskExecution.task_id == cls.id)
             .correlate(StatusTask.__table__)
-            .label('last_execution_time')
+            .label('last_execuftion_time')
         )
 
     def to_dict(self):
-        return {'id': self.id, 'name': self.name, 'last_execution_time': self.last_execution_time}
+        return {
+            'id': self.id,
+            'name': self.name,
+            'last_execution_time': self.last_execution_time.astimezone(),
+        }
 
 
 class TaskExecution(Base):
@@ -90,8 +94,8 @@ class TaskExecution(Base):
         return {
             'id': self.id,
             'task_id': self.task_id,
-            'start': self.start,
-            'end': self.end,
+            'start': self.start.astimezone(),
+            'end': self.end.astimezone(),
             'succeeded': self.succeeded,
             'produced': self.produced,
             'accepted': self.accepted,
