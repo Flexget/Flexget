@@ -48,7 +48,7 @@ class StatusTask(Base):
             select([func.max(TaskExecution.start)])
             .where(TaskExecution.task_id == cls.id)
             .correlate(StatusTask.__table__)
-            .label('last_execuftion_time')
+            .label('last_execution_time')
         )
 
     def to_dict(self):
