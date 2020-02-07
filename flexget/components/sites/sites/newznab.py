@@ -1,5 +1,3 @@
-from urllib.parse import quote, urlencode
-
 import feedparser
 from loguru import logger
 
@@ -26,13 +24,13 @@ class Newznab:
           apikey: xxxxxxxxxxxxxxxxxxxxxxxxxx
           category: movie
 
-    Category is any of: movie, tvsearch, music, book
+    Category is any of: movie, tvsearch, music, book, all
     """
 
     schema = {
         'type': 'object',
         'properties': {
-            'category': {'type': 'string', 'enum': ['movie', 'tvsearch', 'tv', 'music', 'book']},
+            'category': {'type': 'string', 'enum': ['movie', 'tvsearch', 'tv', 'music', 'book', 'all']},
             'url': {'type': 'string', 'format': 'url'},
             'website': {'type': 'string', 'format': 'url'},
             'apikey': {'type': 'string'},
@@ -43,30 +41,32 @@ class Newznab:
 
     def build_config(self, config):
         logger.debug(type(config))
-
+        config['params'] = {}
         if config['category'] == 'tv':
             config['category'] = 'tvsearch'
+        if config['category'] == 'all':
+            config['category'] = 'search'
 
         if 'url' not in config:
             if 'apikey' in config and 'website' in config:
-                params = {'t': config['category'], 'apikey': config['apikey'], 'extended': 1}
-                config['url'] = config['website'] + '/api?' + urlencode(params)
+                config['params'] = {'t': config['category'], 'apikey': config['apikey'], 'extended': 1}
+                config['url'] = f"{config['website']}/api"
 
         return config
 
-    def fill_entries_for_url(self, url, task):
+    def fill_entries_for_url(self, url, params, task):
         entries = []
-        logger.verbose('Fetching {}', url)
+        logger.verbose("Fetching '{}', with parameters '{}'", url, params)
 
         try:
-            r = task.requests.get(url)
+            r = task.requests.get(url, params=params)
         except RequestException as e:
-            logger.error("Failed fetching '{}': {}", url, e)
+            logger.error("Failed fetching '{}', with parameters '{}': {}", url, params, e)
         else:
             rss = feedparser.parse(r.content)
             logger.debug('Raw RSS: {}', rss)
 
-            if not len(rss.entries):
+            if rss.entries:
                 logger.info('No results returned')
 
             for rss_entry in rss.entries:
@@ -88,9 +88,11 @@ class Newznab:
             return self.do_search_movie(entry, task, config)
         elif config['category'] == 'tvsearch':
             return self.do_search_tvsearch(entry, task, config)
+        elif config['category'] == 'search':
+            return self.do_search_all(entry, task, config)
         else:
             entries = []
-            logger.warning("Not done yet...")
+            logger.warning("Work in progress. Searching for the specified category is not supported yet...")
             return entries
 
     def do_search_tvsearch(self, arg_entry, task, config=None):
@@ -103,15 +105,12 @@ class Newznab:
         ):
             return []
         if arg_entry.get('tvrage_id'):
-            lookup = '&rid=%s' % arg_entry.get('tvrage_id')
+            config['params']['rid'] = arg_entry.get('tvrage_id')
         else:
-            lookup = '&q=%s' % quote(arg_entry['series_name'])
-        url = (
-            config['url']
-            + lookup
-            + '&season=%s&ep=%s' % (arg_entry['series_season'], arg_entry['series_episode'])
-        )
-        return self.fill_entries_for_url(url, task)
+            config['params']['q'] = arg_entry['series_name']
+        config['params']['season'] = arg_entry['series_season']
+        config['params']['ep'] = arg_entry['series_episode']
+        return self.fill_entries_for_url(config['url'], config['params'], task)
 
     def do_search_movie(self, arg_entry, task, config=None):
         logger.info('Searching for {} (imdb_id:{})', arg_entry['title'], arg_entry.get('imdb_id'))
@@ -121,8 +120,13 @@ class Newznab:
             return []
 
         imdb_id = arg_entry['imdb_id'].replace('tt', '')
-        url = config['url'] + '&imdbid=' + imdb_id
-        return self.fill_entries_for_url(url, task)
+        config['params']['imdb_id'] = imdb_id
+        return self.fill_entries_for_url(config['url'], config['params'], task)
+
+    def do_search_all(self, arg_entry, task, config=None):
+        logger.info('Searching for {}', arg_entry['title'])
+        config['params']['q'] = arg_entry['title']
+        return self.fill_entries_for_url(config['url'], config['params'], task)
 
 
 @event('plugin.register')
