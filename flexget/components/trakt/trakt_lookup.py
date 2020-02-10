@@ -204,7 +204,14 @@ def lazy_lookup(entry, lazy_lookup_name, media_type):
     return entry
 
 
-def add_lazy_fields(entry: entry.Entry, lazy_lookup_name, media_type):
+def add_lazy_fields(entry: entry.Entry, lazy_lookup_name: str, media_type: str):
+    """
+    Adds lazy fields for one of the lookups in our `lazy_lookup_types` dict.
+
+    :param entry: The entry to add lazy fields to.
+    :param lazy_lookup_name: One of the keys in `lazy_lookup_types` dict.
+    :param media_type: show/season/episode/movie (the type of db data needed for this lazy lookup)
+    """
     entry.add_lazy_fields(
         lazy_lookup, lazy_lookup_types[lazy_lookup_name], args=(lazy_lookup_name, media_type)
     )
@@ -222,7 +229,18 @@ user_data_fields = {
 }
 
 
-def add_lazy_user_fields(entry, data_type, media_type, username, account):
+def add_lazy_user_fields(
+    entry: entry.Entry, data_type: str, media_type: str, username: str, account: str
+):
+    """
+    Adds one of the user field lazy lookups to an entry.
+
+    :param entry: Entry to add lazy fields to
+    :param data_type: ratings/collected/watched (one of the keys in `user_data_fields` dict.)
+    :param media_type: show/season/episode/movie
+    :param username: Either this or account is required, the other can be None
+    :param account: Either this or username is required, the other can be None
+    """
     field_name = user_data_fields[data_type]
     if data_type == 'ratings':
         field_name = field_name[media_type]
@@ -321,18 +339,21 @@ class PluginTraktLookup:
                 add_lazy_fields(entry, 'movie_translations', media_type='movie')
 
             if config.get('username') or config.get('account'):
-                creds = {'username': config.get('username'), 'account': config.get('account')}
+                credentials = {
+                    'username': config.get('username'),
+                    'account': config.get('account'),
+                }
                 media_type = get_media_type_for_entry(entry)
-                add_lazy_user_fields(entry, 'collected', media_type=media_type, **creds)
-                add_lazy_user_fields(entry, 'watched', media_type=media_type, **creds)
+                add_lazy_user_fields(entry, 'collected', media_type=media_type, **credentials)
+                add_lazy_user_fields(entry, 'watched', media_type=media_type, **credentials)
                 if is_show(entry):
-                    add_lazy_user_fields(entry, 'ratings', media_type='show', **creds)
+                    add_lazy_user_fields(entry, 'ratings', media_type='show', **credentials)
                     if is_season(entry):
-                        add_lazy_user_fields(entry, 'ratings', media_type='season', **creds)
+                        add_lazy_user_fields(entry, 'ratings', media_type='season', **credentials)
                     if is_episode(entry):
-                        add_lazy_user_fields(entry, 'ratings', media_type='episode', **creds)
+                        add_lazy_user_fields(entry, 'ratings', media_type='episode', **credentials)
                 elif is_movie(entry):
-                    add_lazy_user_fields(entry, 'ratings', media_type='movie', **creds)
+                    add_lazy_user_fields(entry, 'ratings', media_type='movie', **credentials)
 
     @property
     def series_identifier(self):
