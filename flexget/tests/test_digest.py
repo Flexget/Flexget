@@ -91,5 +91,5 @@ class TestDigest:
         task = execute_task('emit state')
         for entry in task.all_entries:
             assert (
-                entry.state == entry['title']
+                str(entry.state) == entry['title']
             ), 'Should have been emitted in same state as when digested'
