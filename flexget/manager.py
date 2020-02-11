@@ -1,3 +1,4 @@
+import argparse  # noqa
 import atexit  # noqa
 import codecs  # noqa
 import copy  # noqa
@@ -13,6 +14,7 @@ import threading  # noqa
 import traceback  # noqa
 from contextlib import contextmanager  # noqa
 from datetime import datetime, timedelta  # noqa
+from typing import List, Optional, Sequence, Tuple, Union  # noqa
 
 import sqlalchemy  # noqa
 import yaml  # noqa
@@ -106,7 +108,7 @@ class Manager:
     unit_test = False
     options = None
 
-    def __init__(self, args):
+    def __init__(self, args: Optional[Sequence]):
         """
         :param args: CLI args
         """
@@ -235,17 +237,22 @@ class Manager:
         self.initialized = True
 
     @property
-    def tasks(self):
+    def tasks(self) -> List[str]:
         """A list of tasks in the config"""
         if not self.config:
             return []
         return list(self.config.get('tasks', {}).keys())
 
     @property
-    def has_lock(self):
+    def has_lock(self) -> bool:
         return self._has_lock
 
-    def execute(self, options=None, priority=1, suppress_warnings=None):
+    def execute(
+        self,
+        options: Optional[Union[dict, argparse.Namespace]] = None,
+        priority: int = 1,
+        suppress_warnings: Optional[Sequence[str]] = None,
+    ) -> List[Tuple[str, str, threading.Event]]:
         """
         Run all (can be limited with options) tasks from the config.
 
@@ -360,7 +367,7 @@ class Manager:
             self.handle_cli()
             self._shutdown()
 
-    def handle_cli(self, options=None):
+    def handle_cli(self, options: Optional[argparse.Namespace] = None):
         """
         Dispatch a cli command to the appropriate function.
 
@@ -388,7 +395,7 @@ class Manager:
             # Otherwise dispatch the command to the callback function
             options.cli_command_callback(self, command_options)
 
-    def execute_command(self, options):
+    def execute_command(self, options: argparse.Namespace):
         """
         Handles the 'execute' CLI command.
 
@@ -426,7 +433,7 @@ class Manager:
             self.task_queue.wait()
         fire_event('manager.execute.completed', self, options)
 
-    def daemon_command(self, options):
+    def daemon_command(self, options: argparse.Namespace):
         """
         Handles the 'daemon' CLI command.
 
@@ -522,7 +529,7 @@ class Manager:
         yaml.Dumper.increase_indent = increase_indent_wrapper(yaml.Dumper.increase_indent)
         yaml.SafeDumper.increase_indent = increase_indent_wrapper(yaml.SafeDumper.increase_indent)
 
-    def _init_config(self, create=False):
+    def _init_config(self, create: bool = False):
         """
         Find and load the configuration file.
 
@@ -588,7 +595,7 @@ class Manager:
         self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
         self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
 
-    def hash_config(self):
+    def hash_config(self) -> Optional[str]:
         if not self.config_path:
             return
         sha1_hash = hashlib.sha1()
@@ -600,7 +607,7 @@ class Manager:
                 sha1_hash.update(data)
         return sha1_hash.hexdigest()
 
-    def load_config(self, output_to_console=True, config_file_hash=None):
+    def load_config(self, output_to_console: bool = True, config_file_hash: Optional[str] = None):
         """
         Loads the config file from disk, validates and activates it.
 
@@ -677,7 +684,7 @@ class Manager:
         # Install the newly loaded config
         self.update_config(config)
 
-    def update_config(self, config):
+    def update_config(self, config: dict):
         """
         Provide a new config for the manager to use.
 
@@ -697,7 +704,7 @@ class Manager:
         self.user_config = copy.deepcopy(new_user_config)
         fire_event('manager.config_updated', self)
 
-    def backup_config(self):
+    def backup_config(self) -> str:
         backup_path = os.path.join(
             self.config_base,
             '%s-%s.bak' % (self.config_name, datetime.now().strftime('%y%m%d%H%M%S')),
@@ -731,7 +738,7 @@ class Manager:
         config_changed()
         fire_event('manager.config_updated', self)
 
-    def validate_config(self, config=None):
+    def validate_config(self, config: Optional[dict] = None) -> dict:
         """
         Check all root level keywords are valid. Config may be modified by before_config_validate hooks. Modified
         config will be returned.
@@ -810,7 +817,7 @@ class Manager:
                 )
             raise
 
-    def _read_lock(self):
+    def _read_lock(self) -> Optional[dict]:
         """
         Read the values from the lock file. Returns None if there is no current lock file.
         """
@@ -838,7 +845,7 @@ class Manager:
             return result
         return None
 
-    def check_lock(self):
+    def check_lock(self) -> bool:
         """Returns True if there is a lock on the database."""
         lock_info = self._read_lock()
         if not lock_info:
@@ -848,7 +855,7 @@ class Manager:
             return False
         return True
 
-    def check_ipc_info(self):
+    def check_ipc_info(self) -> Optional[dict]:
         """If a daemon has a lock on the database, return info to connect to IPC."""
         lock_info = self._read_lock()
         if lock_info and 'port' in lock_info:
@@ -856,7 +863,7 @@ class Manager:
         return None
 
     @contextmanager
-    def acquire_lock(self, event=True):
+    def acquire_lock(self, event: bool = True):
         """
         :param bool event: If True, the 'manager.lock_acquired' event will be fired after a lock is obtained
         """
@@ -890,7 +897,7 @@ class Manager:
                 self.release_lock()
                 self._has_lock = False
 
-    def write_lock(self, ipc_info=None):
+    def write_lock(self, ipc_info: Optional[dict] = None):
         assert self._has_lock
         with io.open(self.lockfile, 'w', encoding='utf-8') as f:
             f.write('PID: %s\n' % os.getpid())
@@ -964,7 +971,7 @@ class Manager:
         if self._has_lock:
             self.write_lock()
 
-    def db_cleanup(self, force=False):
+    def db_cleanup(self, force: bool = False):
         """
         Perform database cleanup if cleanup interval has been met.
 
@@ -992,7 +999,7 @@ class Manager:
         else:
             logger.debug('Not running db cleanup, last run {}', self.persist.get('last_cleanup'))
 
-    def shutdown(self, finish_queue=True):
+    def shutdown(self, finish_queue: bool = True):
         """
         Request manager shutdown.
 
@@ -1021,7 +1028,7 @@ class Manager:
         global manager
         manager = None
 
-    def crash_report(self):
+    def crash_report(self) -> str:
         """
         This should be called when handling an unexpected exception. Will create a new log file containing the last 50
         debug messages as well as the crash traceback.
