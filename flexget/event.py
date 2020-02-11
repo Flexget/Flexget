@@ -1,6 +1,8 @@
 """
 Provides small event framework
 """
+from typing import Callable, List
+
 from loguru import logger
 
 logger = logger.bind(name='event')
@@ -11,7 +13,7 @@ _events = {}
 class Event:
     """Represents one registered event."""
 
-    def __init__(self, name, func, priority=128):
+    def __init__(self, name: str, func: Callable, priority: int = 128):
         self.name = name
         self.func = func
         self.priority = priority
@@ -41,7 +43,7 @@ class Event:
         return hash((self.name, self.func, self.priority))
 
 
-def event(name, priority=128):
+def event(name: str, priority: int = 128) -> Callable[[Callable], Callable]:
     """Register event to function with a decorator"""
 
     def decorator(func):
@@ -51,7 +53,7 @@ def event(name, priority=128):
     return decorator
 
 
-def get_events(name):
+def get_events(name: str) -> List[Event]:
     """
     :param String name: event name
     :return: List of :class:`Event` for *name* ordered by priority
@@ -62,7 +64,7 @@ def get_events(name):
     return _events[name]
 
 
-def add_event_handler(name, func, priority=128):
+def add_event_handler(name: str, func: Callable, priority: int = 128) -> Event:
     """
     :param string name: Event name
     :param function func: Function that acts as event handler
@@ -84,19 +86,19 @@ def add_event_handler(name, func, priority=128):
     return event
 
 
-def remove_event_handlers(name):
+def remove_event_handlers(name: str):
     """Removes all handlers for given event `name`."""
     _events.pop(name, None)
 
 
-def remove_event_handler(name, func):
+def remove_event_handler(name: str, func: Callable):
     """Remove `func` from the handlers for event `name`."""
     for e in list(_events.get(name, [])):
         if e.func is func:
             _events[name].remove(e)
 
 
-def fire_event(name, *args, **kwargs):
+def fire_event(name: str, *args, **kwargs):
     """
     Trigger an event with *name*. If event is not hooked by anything nothing happens. If a function that hooks an event
     returns a value, it will replace the first argument when calling next function.
