@@ -5,6 +5,7 @@ import sys
 from argparse import _UNRECOGNIZED_ARGS_ATTR, PARSER, REMAINDER, SUPPRESS, Action, ArgumentError
 from argparse import ArgumentParser as ArgParser
 from argparse import Namespace, _SubParsersAction, _VersionAction
+from typing import Any, Callable, List, Optional, TextIO
 
 import flexget
 from flexget.entry import Entry
@@ -16,7 +17,7 @@ _UNSET = object()
 core_parser = None
 
 
-def unicode_argv():
+def unicode_argv() -> List[str]:
     """Like sys.argv, but decodes all arguments."""
     args = []
     for arg in sys.argv:
@@ -26,7 +27,7 @@ def unicode_argv():
     return args
 
 
-def get_parser(command=None):
+def get_parser(command: Optional[str] = None) -> 'ArgumentParser':
     global core_parser
     if not core_parser:
         core_parser = CoreArgumentParser()
@@ -37,7 +38,9 @@ def get_parser(command=None):
     return core_parser
 
 
-def register_command(command, callback, **kwargs):
+def register_command(
+    command: str, callback: Callable[['flexget.manager.Manager', Namespace], Any], **kwargs
+) -> 'ArgumentParser':
     """
     Register a callback function to be executed when flexget is launched with the given `command`.
 
@@ -52,7 +55,7 @@ def register_command(command, callback, **kwargs):
     )
 
 
-def required_length(nmin, nmax):
+def required_length(nmin: int, nmax: int):
     """Generates a custom Action to validate an arbitrary range of arguments."""
 
     class RequiredLength(Action):
@@ -175,7 +178,7 @@ class ScopedNamespace(Namespace):
             return getattr(self.__parent__, key)
         raise AttributeError("'%s' object has no attribute '%s'" % (type(self).__name__, key))
 
-    def __setattr__(self, key, value):
+    def __setattr__(self, key: str, value):
         if '.' in key:
             scope, key = key.split('.', 1)
             if not hasattr(self, scope):
@@ -209,7 +212,7 @@ class NestedSubparserAction(_SubParsersAction):
         super().__init__(*args, **kwargs)
         self.required = required
 
-    def add_parser(self, name, parent_defaults=None, **kwargs):
+    def add_parser(self, name: str, parent_defaults: Optional[dict] = None, **kwargs):
         if parent_defaults:
             self.parent_defaults[name] = parent_defaults
         return super().add_parser(name, **kwargs)
@@ -336,11 +339,15 @@ class ArgumentParser(ArgParser):
             if action.dest in kwargs:
                 action.default = SUPPRESS
 
-    def error(self, msg):
+    def error(self, msg: str):
         raise ParserError(msg, self)
 
     def parse_args(
-        self, args=None, namespace=None, raise_errors=False, file=None
+        self,
+        args: Optional[List[str]] = None,
+        namespace: Optional[Namespace] = None,
+        raise_errors: bool = False,
+        file: Optional[TextIO] = None,
     ):  # pylint: disable=W0221
         """
         :param raise_errors: If this is true, errors will be raised as `ParserError`s instead of calling sys.exit
@@ -355,7 +362,12 @@ class ArgumentParser(ArgParser):
         finally:
             ArgumentParser.file = None
 
-    def parse_known_args(self, args=None, namespace=None, do_help=None):
+    def parse_known_args(
+        self,
+        args: Optional[List[str]] = None,
+        namespace: Optional[Namespace] = None,
+        do_help: Optional[bool] = None,
+    ):
         if args is None:
             # Decode all arguments to unicode before parsing
             args = unicode_argv()[1:]
@@ -387,7 +399,7 @@ class ArgumentParser(ArgParser):
         self.subparsers = super().add_subparsers(**kwargs)
         return self.subparsers
 
-    def add_subparser(self, name, **kwargs):
+    def add_subparser(self, name: str, **kwargs):
         """
         Adds a parser for a new subcommand and returns it.
 
@@ -400,7 +412,7 @@ class ArgumentParser(ArgParser):
         result = self.subparsers.add_parser(name, **kwargs)
         return result
 
-    def get_subparser(self, name, default=_UNSET):
+    def get_subparser(self, name: str, default=_UNSET):
         if not self.subparsers:
             raise TypeError('This parser does not have subparsers')
         p = self.subparsers.choices.get(name, default)
