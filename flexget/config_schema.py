@@ -1,7 +1,8 @@
 import os
 import re
 from collections import defaultdict
-from datetime import datetime
+import datetime
+from typing import Union, Callable, Optional, Any
 from urllib.parse import parse_qsl, urlparse
 
 import jsonschema
@@ -20,7 +21,7 @@ CURRENT_SCHEMA_VERSION = 'http://json-schema.org/draft-04/schema#'
 
 
 # TODO: Rethink how config key and schema registration work
-def register_schema(path, schema):
+def register_schema(path: str, schema: Union[dict, Callable[..., dict]]):
     """
     Register `schema` to be available at `path` for $refs
 
@@ -34,7 +35,7 @@ def register_schema(path, schema):
 _root_config_schema = None
 
 
-def register_config_key(key, schema, required=False):
+def register_config_key(key: str, schema: dict, required: bool=False):
     """ Registers a valid root level key for the config.
 
     :param string key:
@@ -44,13 +45,14 @@ def register_config_key(key, schema, required=False):
     :param bool required:
       Specify whether this is a mandatory key.
     """
-    _root_config_schema['properties'][key] = schema
+    root_schema = get_schema()
+    root_schema['properties'][key] = schema
     if required:
-        _root_config_schema.setdefault('required', []).append(key)
+        root_schema.setdefault('required', []).append(key)
     register_schema('/schema/config/%s' % key, schema)
 
 
-def get_schema():
+def get_schema() -> dict:
     global _root_config_schema
     if _root_config_schema is None:
         _root_config_schema = {
@@ -60,12 +62,12 @@ def get_schema():
             '$schema': CURRENT_SCHEMA_VERSION,
         }
         fire_event('config.register')
-        # TODO: Is /schema/root this the best place for this?
+        # TODO: Is /schema/config this the best place for this?
         register_schema('/schema/config', _root_config_schema)
     return _root_config_schema
 
 
-def one_or_more(schema, unique_items=False):
+def one_or_more(schema: dict, unique_items: bool=False) -> dict:
     """
     Helper function to construct a schema that validates items matching `schema` or an array
     containing items matching `schema`.
@@ -87,7 +89,7 @@ def one_or_more(schema, unique_items=False):
     }
 
 
-def resolve_ref(uri):
+def resolve_ref(uri: str) -> dict:
     """
     Finds and returns a schema pointed to by `uri` that has been registered in the register_schema function.
     """
@@ -101,7 +103,7 @@ def resolve_ref(uri):
     raise jsonschema.RefResolutionError("%s could not be resolved" % uri)
 
 
-def process_config(config, schema=None, set_defaults=True):
+def process_config(config: Any, schema: Optional[dict]=None, set_defaults: bool=True):
     """
     Validates the config, and sets defaults within it if `set_defaults` is set.
     If schema is not given, uses the root config schema.
@@ -126,18 +128,18 @@ def process_config(config, schema=None, set_defaults=True):
     return errors
 
 
-def parse_time(time_string):
+def parse_time(time_string: str) -> datetime.time:
     """Parse a time string from the config into a :class:`datetime.time` object."""
     formats = ['%I:%M %p', '%H:%M', '%H:%M:%S']
     for f in formats:
         try:
-            return datetime.strptime(time_string, f).time()
+            return datetime.datetime.strptime(time_string, f).time()
         except ValueError:
             continue
     raise ValueError('invalid time `%s`' % time_string)
 
 
-def parse_interval(interval_string):
+def parse_interval(interval_string: str) -> datetime.timedelta:
     """Takes an interval string from the config and turns it into a :class:`datetime.timedelta` object."""
     regexp = r'^\d+ (second|minute|hour|day|week)s?$'
     if not re.match(regexp, interval_string):
@@ -145,8 +147,8 @@ def parse_interval(interval_string):
     return parse_timedelta(interval_string)
 
 
-def parse_percent(percent_input):
-    """Takes a size string from the config and turns it into int(bytes)."""
+def parse_percent(percent_input: str) -> float:
+    """Takes a percent string from the config and turns it into a float."""
     percent_input = percent_input.rstrip('%')
     try:
         return float(percent_input)
@@ -154,7 +156,7 @@ def parse_percent(percent_input):
         raise ValueError("should be in format '0-x%'")
 
 
-def parse_size(size_input):
+def parse_size(size_input: str) -> int:
     """Takes a size string from the config and turns it into int(bytes)."""
     prefixes = [None, 'K', 'M', 'G', 'T', 'P']
     try:
