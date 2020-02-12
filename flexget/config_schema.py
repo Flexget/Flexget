@@ -1,8 +1,8 @@
+import datetime
 import os
 import re
 from collections import defaultdict
-import datetime
-from typing import Union, Callable, Optional, Any
+from typing import Any, Callable, Optional, Union
 from urllib.parse import parse_qsl, urlparse
 
 import jsonschema
@@ -35,7 +35,7 @@ def register_schema(path: str, schema: Union[dict, Callable[..., dict]]):
 _root_config_schema = None
 
 
-def register_config_key(key: str, schema: dict, required: bool=False):
+def register_config_key(key: str, schema: dict, required: bool = False):
     """ Registers a valid root level key for the config.
 
     :param string key:
@@ -67,7 +67,7 @@ def get_schema() -> dict:
     return _root_config_schema
 
 
-def one_or_more(schema: dict, unique_items: bool=False) -> dict:
+def one_or_more(schema: dict, unique_items: bool = False) -> dict:
     """
     Helper function to construct a schema that validates items matching `schema` or an array
     containing items matching `schema`.
@@ -103,7 +103,7 @@ def resolve_ref(uri: str) -> dict:
     raise jsonschema.RefResolutionError("%s could not be resolved" % uri)
 
 
-def process_config(config: Any, schema: Optional[dict]=None, set_defaults: bool=True):
+def process_config(config: Any, schema: Optional[dict] = None, set_defaults: bool = True):
     """
     Validates the config, and sets defaults within it if `set_defaults` is set.
     If schema is not given, uses the root config schema.
