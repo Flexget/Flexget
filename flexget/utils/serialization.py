@@ -1,5 +1,6 @@
 import datetime
 from abc import ABC, abstractmethod
+from typing import Any, Type, Optional
 
 from flexget.utils import json
 
@@ -7,7 +8,7 @@ DATE_FMT = '%Y-%m-%d'
 ISO8601_FMT = '%Y-%m-%dT%H:%M:%SZ'
 
 
-def serialize(value):
+def serialize(value: Any) -> Any:
     """
     Convert an object to JSON serializable format.
     :param value: Object to serialize.
@@ -29,7 +30,7 @@ def serialize(value):
     raise TypeError(f'`{value!r}` of type {type(value)!r} is not serializable')
 
 
-def deserialize(value):
+def deserialize(value: Any) -> Any:
     """
     Restore an object stored with this serialization system to its original format.
     :param value: Serialized representation of the object.
@@ -46,7 +47,7 @@ def deserialize(value):
     return value
 
 
-def dumps(value) -> str:
+def dumps(value: Any) -> str:
     """
     Dump an object to text using the serialization system.
     """
@@ -57,7 +58,7 @@ def dumps(value) -> str:
         raise TypeError('Error during dumping {}. Instance: {!r}'.format(exc, serialized)) from exc
 
 
-def loads(value: str):
+def loads(value: str) -> Any:
     """
     Restore an object from JSON text created by `dumps`
     """
@@ -88,19 +89,19 @@ class Serializer(ABC):
         return 1
 
     @classmethod
-    def serializer_handles(cls, value) -> bool:
+    def serializer_handles(cls, value: Any) -> bool:
         """Return True if this serializer can handle `value`."""
         return isinstance(value, cls)
 
     @classmethod
     @abstractmethod
-    def serialize(cls, value):
+    def serialize(cls, value: Any) -> Any:
         """This method should be implemented to return a plain python datatype which is json serializable."""
         pass
 
     @classmethod
     @abstractmethod
-    def deserialize(cls, data, version: int):
+    def deserialize(cls, data: Any, version: int) -> Any:
         """Returns an instance of the original class, recreated from the serialized form."""
         pass
 
@@ -161,13 +162,13 @@ class TupleSerializer(Serializer):
         return tuple(deserialize(data))
 
 
-def _serializer_for(value) -> Serializer:
+def _serializer_for(value) -> Optional[Type[Serializer]]:
     for s in Serializer.__subclasses__():
         if s.serializer_handles(value):
             return s
 
 
-def _deserializer_for(serializer_name: str) -> Serializer:
+def _deserializer_for(serializer_name: str) -> Type[Serializer]:
     for s in Serializer.__subclasses__():
         if serializer_name == s.serializer_name():
             return s
