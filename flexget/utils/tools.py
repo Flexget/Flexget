@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from html.entities import name2codepoint
 from pprint import pformat
 from typing import (
+    TYPE_CHECKING,
     Any,
     Dict,
     Iterable,
@@ -30,8 +31,10 @@ import requests
 from loguru import logger
 
 import flexget
-from flexget.entry import Entry
-from flexget.task import Task
+
+if TYPE_CHECKING:
+    from flexget.entry import Entry
+    from flexget.task import Task
 
 logger = logger.bind(name='utils')
 
@@ -478,7 +481,7 @@ def parse_episode_identifier(
     return identified_by, entity_type
 
 
-def group_entries(entries: Iterable[Entry], identifier: str) -> Dict[str, List[Entry]]:
+def group_entries(entries: Iterable['Entry'], identifier: str) -> Dict[str, List['Entry']]:
     from flexget.utils.template import RenderError
 
     grouped_entries = defaultdict(list)
@@ -496,7 +499,7 @@ def group_entries(entries: Iterable[Entry], identifier: str) -> Dict[str, List[E
     return grouped_entries
 
 
-def aggregate_inputs(task: Task, inputs: List[dict]) -> List[Entry]:
+def aggregate_inputs(task: 'Task', inputs: List[dict]) -> List['Entry']:
     from flexget import plugin
 
     entries = []
