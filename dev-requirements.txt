@@ -18,3 +18,4 @@ twine==1.11.0
 isort[pyproject]>=4.3.20
 black>=18.9b0
 pre-commit
+sqlalchemy-stubs

@@ -2,8 +2,10 @@
 import hashlib
 from datetime import datetime, timedelta
 
+import loguru
 from loguru import logger
 from sqlalchemy import Column, DateTime, Index, Integer, String
+from sqlalchemy.orm import Session
 
 from flexget import db_schema
 from flexget.event import event
@@ -41,7 +43,7 @@ class LogMessage(Base):
 
 
 @event('manager.db_cleanup')
-def purge(manager, session):
+def purge(manager, session: Session):
     """Purge old messages from database"""
     old = datetime.now() - timedelta(days=365)
 
@@ -52,11 +54,11 @@ def purge(manager, session):
 
 @with_session
 def log_once(
-    message,
-    logger=logger.bind(name='log_once'),
-    once_level='INFO',
-    suppressed_level='VERBOSE',
-    session=None,
+    message: str,
+    logger: 'loguru.Logger' = logger.bind(name='log_once'),
+    once_level: str = 'INFO',
+    suppressed_level: str = 'VERBOSE',
+    session: Session = None,
 ):
     """
     Log message only once using given logger`. Returns False if suppressed logging.
