@@ -14,7 +14,7 @@ import threading  # noqa
 import traceback  # noqa
 from contextlib import contextmanager  # noqa
 from datetime import datetime, timedelta  # noqa
-from typing import List, Optional, Sequence, Tuple, Union  # noqa
+from typing import Iterator, List, Optional, Sequence, Tuple, Union  # noqa
 
 import sqlalchemy  # noqa
 import yaml  # noqa
@@ -108,7 +108,7 @@ class Manager:
     unit_test = False
     options = None
 
-    def __init__(self, args: Optional[Sequence]):
+    def __init__(self, args: Optional[Sequence]) -> None:
         """
         :param args: CLI args
         """
@@ -165,7 +165,7 @@ class Manager:
                 'locale env variables are set up correctly for the environment which is launching FlexGet.'
             )
 
-    def _init_options(self, args):
+    def _init_options(self, args: Sequence[str]) -> argparse.Namespace:
         """
         Initialize argument parsing
         """
@@ -182,7 +182,7 @@ class Manager:
                 sys.exit(1)
         return options
 
-    def _init_logging(self, to_file=True):
+    def _init_logging(self, to_file: bool=True) -> None:
         """
         Initialize logging facilities
         """
@@ -195,7 +195,7 @@ class Manager:
             log_file, self.options.loglevel, to_file=to_file, to_console=not self.options.cron
         )
 
-    def initialize(self):
+    def initialize(self) -> None:
         """
         Load plugins, database, and config. Also initializes (but does not start) the task queue and ipc server.
         This should only be called after obtaining a lock.
@@ -318,7 +318,7 @@ class Manager:
             finished_events.append((task.id, task.name, task.finished_event))
         return finished_events
 
-    def start(self):
+    def start(self) -> None:
         """
         Starting point when executing from commandline, dispatch execution to correct destination.
 
@@ -367,7 +367,7 @@ class Manager:
             self.handle_cli()
             self._shutdown()
 
-    def handle_cli(self, options: Optional[argparse.Namespace] = None):
+    def handle_cli(self, options: Optional[argparse.Namespace] = None) -> None:
         """
         Dispatch a cli command to the appropriate function.
 
@@ -395,7 +395,7 @@ class Manager:
             # Otherwise dispatch the command to the callback function
             options.cli_command_callback(self, command_options)
 
-    def execute_command(self, options: argparse.Namespace):
+    def execute_command(self, options: argparse.Namespace) -> None:
         """
         Handles the 'execute' CLI command.
 
@@ -433,7 +433,7 @@ class Manager:
             self.task_queue.wait()
         fire_event('manager.execute.completed', self, options)
 
-    def daemon_command(self, options: argparse.Namespace):
+    def daemon_command(self, options: argparse.Namespace) -> None:
         """
         Handles the 'daemon' CLI command.
 
@@ -497,11 +497,11 @@ class Manager:
                 else:
                     logger.info('Config successfully reloaded from disk.')
 
-    def _handle_sigterm(self, signum, frame):
+    def _handle_sigterm(self, signum, frame) -> None:
         logger.info('Got SIGTERM. Shutting down.')
         self.shutdown(finish_queue=False)
 
-    def setup_yaml(self):
+    def setup_yaml(self) -> None:
         """Sets up the yaml loader to return unicode objects for strings by default"""
 
         def construct_yaml_str(self, node):
@@ -529,7 +529,7 @@ class Manager:
         yaml.Dumper.increase_indent = increase_indent_wrapper(yaml.Dumper.increase_indent)
         yaml.SafeDumper.increase_indent = increase_indent_wrapper(yaml.SafeDumper.increase_indent)
 
-    def _init_config(self, create: bool = False):
+    def _init_config(self, create: bool = False) -> None:
         """
         Find and load the configuration file.
 
@@ -607,7 +607,7 @@ class Manager:
                 sha1_hash.update(data)
         return sha1_hash.hexdigest()
 
-    def load_config(self, output_to_console: bool = True, config_file_hash: Optional[str] = None):
+    def load_config(self, output_to_console: bool = True, config_file_hash: Optional[str] = None) -> None:
         """
         Loads the config file from disk, validates and activates it.
 
@@ -684,7 +684,7 @@ class Manager:
         # Install the newly loaded config
         self.update_config(config)
 
-    def update_config(self, config: dict):
+    def update_config(self, config: dict) -> None:
         """
         Provide a new config for the manager to use.
 
@@ -718,7 +718,7 @@ class Manager:
             raise
         return backup_path
 
-    def save_config(self):
+    def save_config(self) -> None:
         """Dumps current config to yaml config file"""
         # TODO: Only keep x number of backups..
 
@@ -730,7 +730,7 @@ class Manager:
         with open(self.config_path, 'w') as config_file:
             config_file.write(yaml.dump(self.user_config, default_flow_style=False))
 
-    def config_changed(self):
+    def config_changed(self) -> None:
         """Makes sure that all tasks will have the config_modified flag come out true on the next run.
         Useful when changing the db and all tasks need to be completely reprocessed."""
         from flexget.task import config_changed
@@ -758,7 +758,7 @@ class Manager:
         else:
             return config
 
-    def init_sqlalchemy(self):
+    def init_sqlalchemy(self) -> None:
         """Initialize SQLAlchemy"""
         try:
             if [int(part) for part in sqlalchemy.__version__.split('.')] < [0, 7, 0]:
@@ -863,7 +863,7 @@ class Manager:
         return None
 
     @contextmanager
-    def acquire_lock(self, event: bool = True):
+    def acquire_lock(self, event: bool = True) -> Iterator:
         """
         :param bool event: If True, the 'manager.lock_acquired' event will be fired after a lock is obtained
         """
@@ -897,7 +897,7 @@ class Manager:
                 self.release_lock()
                 self._has_lock = False
 
-    def write_lock(self, ipc_info: Optional[dict] = None):
+    def write_lock(self, ipc_info: Optional[dict] = None) -> None:
         assert self._has_lock
         with io.open(self.lockfile, 'w', encoding='utf-8') as f:
             f.write('PID: %s\n' % os.getpid())
@@ -905,7 +905,7 @@ class Manager:
                 for key in sorted(ipc_info):
                     f.write('%s: %s\n' % (key, ipc_info[key]))
 
-    def release_lock(self):
+    def release_lock(self) -> None:
         try:
             os.remove(self.lockfile)
         except OSError as e:
@@ -915,7 +915,7 @@ class Manager:
         else:
             logger.debug('Removed {}', self.lockfile)
 
-    def daemonize(self):
+    def daemonize(self) -> None:
         """Daemonizes the current process. Returns the new pid"""
         if sys.platform.startswith('win'):
             logger.error('Cannot daemonize on windows')
@@ -971,7 +971,7 @@ class Manager:
         if self._has_lock:
             self.write_lock()
 
-    def db_cleanup(self, force: bool = False):
+    def db_cleanup(self, force: bool = False) -> None:
         """
         Perform database cleanup if cleanup interval has been met.
 
@@ -999,7 +999,7 @@ class Manager:
         else:
             logger.debug('Not running db cleanup, last run {}', self.persist.get('last_cleanup'))
 
-    def shutdown(self, finish_queue: bool = True):
+    def shutdown(self, finish_queue: bool = True) -> None:
         """
         Request manager shutdown.
 
@@ -1010,7 +1010,7 @@ class Manager:
         fire_event('manager.shutdown_requested', self)
         self.task_queue.shutdown(finish_queue)
 
-    def _shutdown(self):
+    def _shutdown(self) -> None:
         """Runs when the manager is done processing everything."""
         if self.ipc_server:
             self.ipc_server.shutdown()
