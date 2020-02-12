@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, Callable, Union
+from typing import Callable, Optional, Union
 
 from loguru import logger
 from sqlalchemy import Column, DateTime, Integer, String, Table
@@ -58,7 +58,7 @@ class PluginSchema(Base):
     plugin = Column(String)
     version = Column(Integer)
 
-    def __init__(self, plugin: str, version: int=0):
+    def __init__(self, plugin: str, version: int = 0):
         self.plugin = plugin
         self.version = version
 
