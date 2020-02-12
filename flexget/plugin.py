@@ -5,17 +5,18 @@ from functools import total_ordering
 from http.client import BadStatusLine
 from importlib import import_module
 from pathlib import Path
+from typing import Callable, Iterable, List, Optional, Union
 from urllib.error import HTTPError, URLError
 
 import pkg_resources
-from loguru import logger
+from loguru import Logger, logger
 from requests import RequestException
 
 from flexget import components as components_pkg
 from flexget import config_schema
 from flexget import plugins as plugins_pkg
-from flexget.event import add_event_handler as add_phase_handler, event
-from flexget.event import fire_event, remove_event_handlers
+from flexget.event import add_event_handler as add_phase_handler
+from flexget.event import event, fire_event, remove_event_handlers
 
 logger = logger.bind(name='plugin')
 
@@ -35,7 +36,13 @@ class DependencyError(Exception):
     All args are optional.
     """
 
-    def __init__(self, issued_by=None, missing=None, message=None, silent=False):
+    def __init__(
+        self,
+        issued_by: Optional[str] = None,
+        missing: Optional[str] = None,
+        message: Optional[str] = None,
+        silent: bool = False,
+    ):
         super().__init__()
         self.issued_by = issued_by
         self.missing = missing
@@ -51,7 +58,7 @@ class DependencyError(Exception):
     def _set_message(self, message):
         self._message = message
 
-    def has_message(self):
+    def has_message(self) -> bool:
         return self._message is not None
 
     message = property(_get_message, _set_message)
@@ -75,7 +82,7 @@ class RegisterException(Exception):
 
 
 class PluginWarning(Warning):
-    def __init__(self, value, logger=logger, **kwargs):
+    def __init__(self, value, logger: Logger = logger, **kwargs):
         super().__init__()
         self.value = value
         self.logger = logger
@@ -86,7 +93,7 @@ class PluginWarning(Warning):
 
 
 class PluginError(Exception):
-    def __init__(self, value, logger=logger, **kwargs):
+    def __init__(self, value, logger: Logger = logger, **kwargs):
         super().__init__()
         # Value is expected to be a string
         if not isinstance(value, str):
@@ -107,13 +114,13 @@ class internet:
     Task handles PluginErrors by aborting the task.
     """
 
-    def __init__(self, logger=None):
+    def __init__(self, logger: Logger = None):
         if logger:
             self.logger = logger
         else:
             self.logger = logger.bind(name='@internet')
 
-    def __call__(self, func):
+    def __call__(self, func: Callable) -> Callable:
         def wrapped_func(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
@@ -149,7 +156,7 @@ class internet:
         return wrapped_func
 
 
-def priority(value):
+def priority(value: int) -> Callable:
     """Priority decorator for phase methods"""
 
     def decorator(target):
@@ -192,11 +199,9 @@ _plugin_options = []
 _new_phase_queue = {}
 
 
-def register_task_phase(name, before=None, after=None):
+def register_task_phase(name: str, before: str = None, after: str = None):
     """
     Adds a new task phase to the available phases.
-
-    :param suppress_abort: If True, errors during this phase will be suppressed, and not affect task result.
     """
     if before and after:
         raise RegisterException('You can only give either before or after for a phase.')
@@ -240,13 +245,13 @@ class PluginInfo(dict):
 
     def __init__(
         self,
-        plugin_class,
-        name=None,
-        interfaces=None,
-        builtin=False,
-        debug=False,
-        api_ver=1,
-        category=None,
+        plugin_class: type,
+        name: Optional[str] = None,
+        interfaces: Optional[List[str]] = None,
+        builtin: bool = False,
+        debug: bool = False,
+        api_ver: int = 1,
+        category: str = None,
     ):
         """
         Register a plugin.
@@ -259,7 +264,6 @@ class PluginInfo(dict):
         :param int api_ver: Signature of callback hooks (1=task; 2=task,config).
         :param string category: The type of plugin. Can be one of the task phases.
             Defaults to the package name containing the plugin.
-        :param groups: DEPRECATED
         """
         dict.__init__(self)
 
@@ -355,12 +359,12 @@ class PluginInfo(dict):
                 event.plugin = self
                 self.phase_handlers[phase] = event
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr: str):
         if attr in self:
             return self[attr]
         return dict.__getattribute__(self, attr)
 
-    def __setattr__(self, attr, value):
+    def __setattr__(self, attr: str, value):
         self[attr] = value
 
     def __str__(self):
@@ -381,7 +385,7 @@ class PluginInfo(dict):
 register = PluginInfo
 
 
-def _get_standard_plugins_path():
+def _get_standard_plugins_path() -> List[str]:
     """
     :returns: List of directories where traditional plugins should be tried to load from.
     """
@@ -396,7 +400,7 @@ def _get_standard_plugins_path():
     return paths
 
 
-def _get_standard_components_path():
+def _get_standard_components_path() -> List[str]:
     """
     :returns: List of directories where component plugins should be tried to load from.
     """
@@ -415,13 +419,14 @@ def _check_phase_queue():
     if _new_phase_queue:
         for phase, args in _new_phase_queue.items():
             logger.error(
-                'Plugin {} requested new phase {}, but it could not be created at requested point (before, after). Plugin is not working properly.',
+                'Plugin {} requested new phase {}, but it could not be created at requested point (before, after). '
+                'Plugin is not working properly.',
                 args[0],
                 phase,
             )
 
 
-def _import_plugin(module_name, plugin_path):
+def _import_plugin(module_name: str, plugin_path: Union[str, Path]):
     try:
         import_module(module_name)
     except DependencyError as e:
@@ -452,7 +457,7 @@ def _import_plugin(module_name, plugin_path):
         logger.trace('Loaded module {} from {}', module_name, plugin_path)
 
 
-def _load_plugins_from_dirs(dirs):
+def _load_plugins_from_dirs(dirs: List[str]):
     """
     :param list dirs: Directories from where plugins are loaded from
     """
@@ -477,7 +482,7 @@ def _load_plugins_from_dirs(dirs):
 
 
 # TODO: this is now identical to _load_plugins_from_dirs, REMOVE
-def _load_components_from_dirs(dirs):
+def _load_components_from_dirs(dirs: List[str]):
     """
     :param list dirs: Directories where plugin components are loaded from
     """
@@ -532,7 +537,9 @@ def _load_plugins_from_packages():
     _check_phase_queue()
 
 
-def load_plugins(extra_plugins=None, extra_components=None):
+def load_plugins(
+    extra_plugins: Optional[List[str]] = None, extra_components: Optional[List[str]] = None
+):
     """
     Load plugins from the standard plugin and component paths.
 
@@ -569,7 +576,13 @@ def load_plugins(extra_plugins=None, extra_components=None):
     )
 
 
-def get_plugins(phase=None, interface=None, category=None, name=None, min_api=None):
+def get_plugins(
+    phase: Optional[str] = None,
+    interface: Optional[str] = None,
+    category: Optional[str] = None,
+    name: Optional[str] = None,
+    min_api: Optional[int] = None,
+) -> Iterable[PluginInfo]:
     """
     Query other plugins characteristics.
 
@@ -600,7 +613,7 @@ def get_plugins(phase=None, interface=None, category=None, name=None, min_api=No
     return filter(matches, iter(plugins.values()))
 
 
-def plugin_schemas(**kwargs):
+def plugin_schemas(**kwargs) -> dict:
     """Create a dict schema that matches plugins specified by `kwargs`"""
     return {
         'type': 'object',
@@ -616,12 +629,12 @@ def register_schema():
     config_schema.register_schema('/schema/plugins', plugin_schemas)
 
 
-def get_phases_by_plugin(name):
+def get_phases_by_plugin(name: str) -> List[str]:
     """Return all phases plugin :name: hooks"""
     return list(get_plugin_by_name(name).phase_handlers)
 
 
-def get_plugin_by_name(name, issued_by='???'):
+def get_plugin_by_name(name: str, issued_by: str = '???') -> PluginInfo:
     """
     Get plugin by name, preferred way since this structure may be changed at some point.
 
@@ -644,7 +657,7 @@ def get_plugin_by_name(name, issued_by='???'):
     return plugins[name]
 
 
-def get(name, requested_by):
+def get(name: str, requested_by: Union[str, object]) -> object:
     """
 
     :param str name: Name of the requested plugin
