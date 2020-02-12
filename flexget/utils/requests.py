@@ -1,5 +1,6 @@
 import logging
 import time
+
 # Allow some request objects to be imported from here instead of requests
 import warnings
 from datetime import datetime, timedelta
@@ -11,7 +12,7 @@ from loguru import logger
 from requests import RequestException
 
 from flexget import __version__ as version
-from flexget.utils.tools import TimedDict, parse_timedelta, timedelta_total_seconds
+from flexget.utils.tools import TimedDict, parse_timedelta
 
 # If we use just 'requests' here, we'll get the logger created by requests, rather than our own
 logger = logger.bind(name='utils.requests')
@@ -105,15 +106,13 @@ class TokenBucketLimiter(DomainLimiter):
 
     def __call__(self):
         if self.tokens < self.max_tokens:
-            regen = timedelta_total_seconds(
-                datetime.now() - self.last_update
-            ) / timedelta_total_seconds(self.rate)
+            regen = (datetime.now() - self.last_update).total_seconds() / self.rate.total_seconds()
             self.tokens += regen
         self.last_update = datetime.now()
         if self.tokens < 1:
             if not self.wait:
                 raise RequestException('Requests to %s have exceeded their limit.' % self.domain)
-            wait = timedelta_total_seconds(self.rate) * (1 - self.tokens)
+            wait = self.rate.total_seconds() * (1 - self.tokens)
             # Don't spam console if wait is low
             if wait < 4:
                 level = 'DEBUG'
