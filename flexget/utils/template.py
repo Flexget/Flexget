@@ -4,6 +4,7 @@ import os.path
 import re
 from copy import copy
 from datetime import date, datetime, time
+from typing import TYPE_CHECKING, Any, List, Mapping, Optional, Union
 
 import jinja2.filters
 from dateutil import parser as dateutil_parse
@@ -24,10 +25,15 @@ from flexget.event import event
 from flexget.utils.lazy_dict import LazyDict
 from flexget.utils.pathscrub import pathscrub
 
+if TYPE_CHECKING:
+    from flexget.entry import Entry
+    from flexget.manager import Manager
+    from flexget.task import Task
+
 logger = logger.bind(name='utils.template')
 
 # The environment will be created after the manager has started
-environment = None
+environment: Optional[Environment] = None
 
 
 class RenderError(Exception):
@@ -165,7 +171,7 @@ class FlexGetNativeTemplate(FlexGetTemplate, NativeTemplate):
 
 
 @event('manager.initialize')
-def make_environment(manager):
+def make_environment(manager: 'Manager') -> None:
     """Create our environment and add our custom filters"""
     global environment
     environment = Environment(
@@ -187,25 +193,25 @@ def make_environment(manager):
             environment.tests[name.split('_', 1)[1]] = test
 
 
-def list_templates(extensions=None):
+def list_templates(extensions: Optional[List[str]] = None) -> List[str]:
     """
     Returns all templates names that are configured under environment loader dirs
     """
     if environment is None or not hasattr(environment, 'loader'):
-        return
+        return []
     return environment.list_templates(extensions=extensions)
 
 
-def get_filters():
+def get_filters() -> dict:
     """
     Returns all built-in and custom Jinja filters in a dict, where the key is the name, and the value is the filter func
     """
     if environment is None or not hasattr(environment, 'loader'):
         return {}
-    return environment.filters.items()
+    return environment.filters
 
 
-def get_template(template_name, scope='task'):
+def get_template(template_name: str, scope: Optional[str] = 'task') -> FlexGetTemplate:
     """Loads a template from disk. Looks in both included plugins and users custom scope dir."""
 
     if not template_name.endswith('.template'):
@@ -227,7 +233,7 @@ def get_template(template_name, scope='task'):
         raise ValueError(err)
 
 
-def render(template, context, native=False):
+def render(template: Union[FlexGetTemplate, str], context: Mapping, native: bool = False) -> str:
     """
     Renders a Template with `context` as its context.
 
@@ -254,7 +260,9 @@ def render(template, context, native=False):
     return result
 
 
-def render_from_entry(template_string, entry, native=False):
+def render_from_entry(
+    template: Union[FlexGetTemplate, str], entry: 'Entry', native: bool = False
+) -> str:
     """Renders a Template or template string with an Entry as its context."""
 
     # Make a copy of the Entry so we can add some more fields
@@ -267,10 +275,10 @@ def render_from_entry(template_string, entry, native=False):
         # Since `task` has different meaning between entry and task scope, the `task_name` field is create to be
         # consistent
         variables['task_name'] = entry.task.name
-    return render(template_string, variables, native=native)
+    return render(template, variables, native=native)
 
 
-def render_from_task(template, task):
+def render_from_task(template: Union[FlexGetTemplate, str], task: 'Task') -> str:
     """
     Renders a Template with a task as its context.
 
@@ -282,7 +290,7 @@ def render_from_task(template, task):
     return render(template, variables)
 
 
-def evaluate_expression(expression, context):
+def evaluate_expression(expression: str, context: Mapping) -> Any:
     """
     Evaluate a jinja `expression` using a given `context` with support for `LazyDict`s (`Entry`s.)
 
