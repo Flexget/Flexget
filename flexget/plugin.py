@@ -8,8 +8,8 @@ from pathlib import Path
 from typing import Callable, Iterable, List, Optional, Union
 from urllib.error import HTTPError, URLError
 
+import loguru
 import pkg_resources
-from loguru import Logger, logger
 from requests import RequestException
 
 from flexget import components as components_pkg
@@ -18,7 +18,7 @@ from flexget import plugins as plugins_pkg
 from flexget.event import add_event_handler as add_phase_handler
 from flexget.event import event, fire_event, remove_event_handlers
 
-logger = logger.bind(name='plugin')
+logger = loguru.logger.bind(name='plugin')
 
 PRIORITY_DEFAULT = 128
 PRIORITY_LAST = -255
@@ -82,7 +82,7 @@ class RegisterException(Exception):
 
 
 class PluginWarning(Warning):
-    def __init__(self, value, logger: Logger = logger, **kwargs):
+    def __init__(self, value, logger: 'loguru.Logger' = logger, **kwargs):
         super().__init__()
         self.value = value
         self.logger = logger
@@ -93,7 +93,7 @@ class PluginWarning(Warning):
 
 
 class PluginError(Exception):
-    def __init__(self, value, logger: Logger = logger, **kwargs):
+    def __init__(self, value, logger: 'loguru.Logger' = logger, **kwargs):
         super().__init__()
         # Value is expected to be a string
         if not isinstance(value, str):
@@ -114,7 +114,7 @@ class internet:
     Task handles PluginErrors by aborting the task.
     """
 
-    def __init__(self, logger: Logger = None):
+    def __init__(self, logger: 'loguru.Logger' = logger):
         if logger:
             self.logger = logger
         else:
