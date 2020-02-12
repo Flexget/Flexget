@@ -1,7 +1,8 @@
 from datetime import datetime
+from typing import Optional, Callable, Union
 
 from loguru import logger
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import Column, DateTime, Integer, String, Table
 from sqlalchemy.exc import OperationalError
 
 import flexget
@@ -28,7 +29,7 @@ class FlexgetVersion(Base):
 
 
 @event('manager.startup')
-def set_flexget_db_version(manager=None):
+def set_flexget_db_version(manager=None) -> None:
     with Session() as session:
         db_version = session.query(FlexgetVersion).first()
         if not db_version:
@@ -43,7 +44,7 @@ def set_flexget_db_version(manager=None):
             logger.debug('current flexget version already exist in db {}', db_version.version)
 
 
-def get_flexget_db_version():
+def get_flexget_db_version() -> Optional[str]:
     with Session() as session:
         version = session.query(FlexgetVersion).first()
         if version:
@@ -57,7 +58,7 @@ class PluginSchema(Base):
     plugin = Column(String)
     version = Column(Integer)
 
-    def __init__(self, plugin, version=0):
+    def __init__(self, plugin: str, version: int=0):
         self.plugin = plugin
         self.version = version
 
@@ -66,7 +67,7 @@ class PluginSchema(Base):
 
 
 @with_session
-def get_version(plugin, session=None):
+def get_version(plugin: str, session=None) -> Optional[int]:
     schema = session.query(PluginSchema).filter(PluginSchema.plugin == plugin).first()
     if not schema:
         logger.debug('No schema version stored for {}', plugin)
@@ -76,7 +77,7 @@ def get_version(plugin, session=None):
 
 
 @with_session
-def set_version(plugin, version, session=None):
+def set_version(plugin: str, version: int, session=None) -> None:
     if plugin not in plugin_schemas:
         raise ValueError(
             'Tried to set schema version for %s plugin with no versioned_base.' % plugin
@@ -102,7 +103,7 @@ def set_version(plugin, version, session=None):
 
 
 @with_session
-def upgrade_required(session=None):
+def upgrade_required(session=None) -> bool:
     """Returns true if an upgrade of the database is required."""
     old_schemas = session.query(PluginSchema).all()
     if len(old_schemas) < len(plugin_schemas):
@@ -123,7 +124,7 @@ class UpgradeImpossible(Exception):
     """
 
 
-def upgrade(plugin):
+def upgrade(plugin: str) -> Callable:
     """Used as a decorator to register a schema upgrade function.
 
     The wrapped function will be passed the current schema version and a session object.
@@ -184,7 +185,7 @@ def upgrade(plugin):
 
 
 @with_session
-def reset_schema(plugin, session=None):
+def reset_schema(plugin: str, session=None) -> None:
     """
     Removes all tables from given plugin from the database,
     as well as removing current stored schema number.
@@ -210,7 +211,7 @@ def reset_schema(plugin, session=None):
     Base.metadata.create_all(bind=session.bind)
 
 
-def register_plugin_table(tablename, plugin, version):
+def register_plugin_table(tablename: str, plugin: str, version: int):
     plugin_schemas.setdefault(plugin, {'version': version, 'tables': []})
     if plugin_schemas[plugin]['version'] != version:
         raise Exception('Two different schema versions received for plugin %s' % plugin)
@@ -244,7 +245,7 @@ class Meta(type):
 
         return type.__new__(mcs, str(metaname), tuple(new_bases), dict_)
 
-    def register_table(cls, table):
+    def register_table(cls, table: Union[str, Table]):
         """
         This can be used if a plugin is declaring non-declarative sqlalchemy tables.
 
@@ -255,12 +256,12 @@ class Meta(type):
         else:
             register_plugin_table(table.name, cls.plugin, cls.version)
 
-    def __getattr__(self, item):
+    def __getattr__(self, item: str):
         """Transparently return attributes of Base instead of our own."""
         return getattr(Base, item)
 
 
-def versioned_base(plugin, version):
+def versioned_base(plugin: str, version: int) -> type:
     """
     Returns a class which can be used like Base,
     but automatically stores schema version when tables are created.
