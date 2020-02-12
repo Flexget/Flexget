@@ -6,12 +6,13 @@ import random
 import string
 import threading
 from functools import total_ordering, wraps
+from typing import Union, Iterable, List
 
 from loguru import logger
 from sqlalchemy import Column, Integer, String, Unicode
 
 from flexget import config_schema, db_schema
-from flexget.entry import EntryUnicodeError
+from flexget.entry import EntryUnicodeError, EntryState, Entry
 from flexget.event import event, fire_event
 from flexget.manager import Session
 from flexget.plugin import (
@@ -84,13 +85,13 @@ def use_task_logging(func):
 class EntryIterator:
     """An iterator over a subset of entries to emulate old task.accepted/rejected/failed/entries properties."""
 
-    def __init__(self, entries, states):
+    def __init__(self, entries: List[Entry], states: Union[EntryState, Iterable[EntryState]]):
         self.all_entries = entries
-        if isinstance(states, str):
+        if isinstance(states, EntryState):
             states = [states]
         self.filter = lambda e: e._state in states
 
-    def __iter__(self):
+    def __iter__(self) -> Iterable[Entry]:
         return filter(self.filter, self.all_entries)
 
     def __bool__(self):
@@ -105,7 +106,7 @@ class EntryIterator:
     def __radd__(self, other):
         return itertools.chain(other, self)
 
-    def __getitem__(self, item):
+    def __getitem__(self, item) -> Union[Entry, Iterable[Entry]]:
         if isinstance(item, slice):
             return list(itertools.islice(self, item.start, item.stop))
         if not isinstance(item, int):
@@ -129,18 +130,18 @@ class EntryContainer(list):
     def __init__(self, iterable=None):
         list.__init__(self, iterable or [])
 
-        self._entries = EntryIterator(self, ['undecided', 'accepted'])
-        self._accepted = EntryIterator(self, 'accepted')  # accepted entries, can still be rejected
-        self._rejected = EntryIterator(self, 'rejected')  # rejected entries, can not be accepted
-        self._failed = EntryIterator(self, 'failed')  # failed entries
-        self._undecided = EntryIterator(self, 'undecided')  # undecided entries (default)
+        self._entries = EntryIterator(self, [EntryState.UNDECIDED, EntryState.ACCEPTED])
+        self._accepted = EntryIterator(self, EntryState.ACCEPTED)  # accepted entries, can still be rejected
+        self._rejected = EntryIterator(self, EntryState.REJECTED)  # rejected entries, can not be accepted
+        self._failed = EntryIterator(self, EntryState.FAILED)  # failed entries
+        self._undecided = EntryIterator(self, EntryState.UNDECIDED)  # undecided entries (default)
 
     # Make these read-only properties
-    entries = property(lambda self: self._entries)
-    accepted = property(lambda self: self._accepted)
-    rejected = property(lambda self: self._rejected)
-    failed = property(lambda self: self._failed)
-    undecided = property(lambda self: self._undecided)
+    entries: EntryIterator = property(lambda self: self._entries)
+    accepted: EntryIterator = property(lambda self: self._accepted)
+    rejected: EntryIterator = property(lambda self: self._rejected)
+    failed: EntryIterator = property(lambda self: self._failed)
+    undecided: EntryIterator = property(lambda self: self._undecided)
 
     def __repr__(self):
         return '<EntryContainer(%s)>' % list.__repr__(self)

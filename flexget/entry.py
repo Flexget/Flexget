@@ -33,6 +33,18 @@ class EntryState(Enum):
     def log_markup(self) -> str:
         return f'<{self.color}>{self.value.upper()}</>'
 
+    # __str__, __eq__, and __hash__ are make these states almost interchangeable with the old plain string states
+    def __str__(self):
+        return self.value
+
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return self.value == other
+        return super().__eq__(other)
+
+    def __hash__(self):
+        return hash(self.value)
+
 
 class EntryUnicodeError(Exception):
     """This exception is thrown when trying to set non-unicode compatible field value to entry."""
@@ -62,7 +74,7 @@ class Entry(LazyDict, Serializer):
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.traces = []
-        self._state = 'undecided'
+        self._state = EntryState.UNDECIDED
         self._hooks = {'accept': [], 'reject': [], 'fail': [], 'complete': []}
         self.task = None
         self.lazy_lookups = []
@@ -154,7 +166,7 @@ class Entry(LazyDict, Serializer):
         if self.rejected:
             logger.debug('tried to accept rejected {!r}', self)
         elif not self.accepted:
-            self._state = 'accepted'
+            self._state = EntryState.ACCEPTED
             self.trace(reason, operation='accept')
             # Run entry on_accept hooks
             self.run_hooks('accept', reason=reason, **kwargs)
@@ -167,7 +179,7 @@ class Entry(LazyDict, Serializer):
             self.trace('Tried to reject immortal %s' % reason_str)
             return
         if not self.rejected:
-            self._state = 'rejected'
+            self._state = EntryState.REJECTED
             self.trace(reason, operation='reject')
             # Run entry on_reject hooks
             self.run_hooks('reject', reason=reason, **kwargs)
@@ -175,7 +187,7 @@ class Entry(LazyDict, Serializer):
     def fail(self, reason: Optional[str] = None, **kwargs):
         logger.debug("Marking entry '{}' as failed", self['title'])
         if not self.failed:
-            self._state = 'failed'
+            self._state = EntryState.FAILED
             self.trace(reason, operation='fail')
             logger.error('Failed {} ({})', self['title'], reason)
             # Run entry on_fail hooks
@@ -186,24 +198,24 @@ class Entry(LazyDict, Serializer):
         self.run_hooks('complete', **kwargs)
 
     @property
-    def state(self) -> str:
+    def state(self) -> EntryState:
         return self._state
 
     @property
     def accepted(self) -> bool:
-        return self._state == 'accepted'
+        return self._state == EntryState.ACCEPTED
 
     @property
     def rejected(self) -> bool:
-        return self._state == 'rejected'
+        return self._state == EntryState.REJECTED
 
     @property
     def failed(self) -> bool:
-        return self._state == 'failed'
+        return self._state == EntryState.FAILED
 
     @property
     def undecided(self) -> bool:
-        return self._state == 'undecided'
+        return self._state == EntryState.UNDECIDED
 
     def __setitem__(self, key, value):
         # Enforce unicode compatibility.
