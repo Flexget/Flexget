@@ -9,7 +9,9 @@ import sys
 import threading
 import uuid
 import warnings
+from typing import Iterator
 
+import loguru
 from loguru import logger
 
 from flexget import __version__
@@ -31,10 +33,10 @@ local_context = threading.local()
 
 
 @contextlib.contextmanager
-def capture_logs(*args, **kwargs):
+def capture_logs(*args, **kwargs) -> Iterator:
     """Takes the same arguments as `logger.add`, but this sync will only log messages contained in context."""
     old_id = get_log_session_id()
-    session_id = local_context.session_id = old_id or uuid.uuid4()
+    session_id = local_context.session_id = old_id or str(uuid.uuid4())
     existing_filter = kwargs.pop('filter', None)
     kwargs.setdefault('format', LOG_FORMAT)
 
@@ -56,11 +58,11 @@ def capture_logs(*args, **kwargs):
         logger.remove(log_sink)
 
 
-def get_log_session_id():
+def get_log_session_id() -> str:
     return getattr(local_context, 'session_id', None)
 
 
-def record_patcher(record):
+def record_patcher(record: 'loguru.Record') -> None:
     # If a custom name was bound to the logger, move it from extra directly into the record
     name = record['extra'].pop('name', None)
     if name:
@@ -70,7 +72,7 @@ def record_patcher(record):
 class InterceptHandler(logging.Handler):
     """Catch any stdlib log messages from our deps and propagate to loguru."""
 
-    def emit(self, record):
+    def emit(self, record: logging.LogRecord):
         # Get corresponding Loguru level if it exists
         try:
             level = logger.level(record.levelname).name
@@ -96,7 +98,7 @@ _logging_started = False
 debug_buffer = collections.deque(maxlen=100)
 
 
-def initialize(unit_test=False):
+def initialize(unit_test: bool = False) -> None:
     """Prepare logging.
     """
     # Remove default loguru sinks
@@ -141,7 +143,9 @@ def initialize(unit_test=False):
     std_logger.addHandler(InterceptHandler())
 
 
-def start(filename=None, level='INFO', to_console=True, to_file=True):
+def start(
+    filename: str = None, level: str = 'INFO', to_console: bool = True, to_file: bool = True
+):
     """After initialization, start file logging.
     """
     global _logging_started
@@ -156,7 +160,7 @@ def start(filename=None, level='INFO', to_console=True, to_file=True):
     # Make sure stdlib logger is set so that dependency logging gets propagated
     logging.getLogger().setLevel(logger.level(level).no)
 
-    if to_file:
+    if to_file and filename:
         logger.add(
             filename,
             level=level,
