@@ -1,9 +1,8 @@
 """
 Miscellaneous SQLAlchemy helpers.
 """
-from typing import Any, List, Union
+from typing import Any, List, Union, Optional
 
-import sqlalchemy
 from loguru import logger
 from sqlalchemy import ColumnDefault, Index, Sequence
 from sqlalchemy.exc import NoSuchTableError, OperationalError
@@ -105,7 +104,7 @@ def drop_tables(names: List[str], session: Session) -> None:
             table.drop()
 
 
-def get_index_by_name(table: Table, name: str) -> Index:
+def get_index_by_name(table: Table, name: str) -> Optional[Index]:
     """
     Find declaratively defined index from table by name
 
@@ -135,10 +134,10 @@ def create_index(table_name: str, session: Session, *column_names: str) -> None:
         logger.opt(exception=True).debug('Error creating index.')
 
 
-class ContextSession(sqlalchemy.orm.Session):
+class ContextSession(Session):
     """:class:`sqlalchemy.orm.Session` which can be used as context manager"""
 
-    def __enter__(self) -> Session:
+    def __enter__(self) -> 'ContextSession':
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):

@@ -14,7 +14,7 @@ import threading  # noqa
 import traceback  # noqa
 from contextlib import contextmanager  # noqa
 from datetime import datetime, timedelta  # noqa
-from typing import Iterator, List, Optional, Sequence, Tuple, Union  # noqa
+from typing import Iterator, List, Optional, Sequence, Tuple, Type, Union  # noqa
 
 import sqlalchemy  # noqa
 import yaml  # noqa
@@ -28,7 +28,7 @@ from flexget.utils.sqlalchemy_utils import ContextSession  # noqa
 from flexget.utils.tools import get_current_flexget_version, io_encoding, pid_exists  # noqa
 
 Base = declarative_base()
-Session = sessionmaker(class_=ContextSession)
+Session: Type[ContextSession] = sessionmaker(class_=ContextSession)
 
 import flexget.log  # noqa
 from flexget import config_schema, db_schema, plugin  # noqa
