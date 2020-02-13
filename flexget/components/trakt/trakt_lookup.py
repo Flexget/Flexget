@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from typing import Optional
 
 from loguru import logger
 
@@ -18,23 +18,23 @@ lookup_movie = plugin_api_trakt.ApiTrakt.lookup_movie
 logger = logger.bind(name='trakt_lookup')
 
 
-def is_show(entry):
+def is_show(entry: entry.Entry) -> bool:
     return entry.get('series_name') or entry.get('tvdb_id', eval_lazy=False)
 
 
-def is_episode(entry):
+def is_episode(entry: entry.Entry) -> bool:
     return entry.get('series_season') and entry.get('series_episode')
 
 
-def is_season(entry):
+def is_season(entry: entry.Entry) -> bool:
     return entry.get('series_season') and not is_episode(entry)
 
 
-def is_movie(entry):
+def is_movie(entry: entry.Entry) -> bool:
     return bool(entry.get('movie_name'))
 
 
-def get_media_type_for_entry(entry):
+def get_media_type_for_entry(entry: entry.Entry) -> Optional[str]:
     if is_episode(entry):
         return 'episode'
     elif is_season(entry):
@@ -43,6 +43,7 @@ def get_media_type_for_entry(entry):
         return 'show'
     elif is_movie(entry):
         return 'movie'
+    return None
 
 
 @entry.register_lazy_lookup('trakt_user_data_lookup')
@@ -61,7 +62,7 @@ def trakt_user_data_lookup(entry, field_name, data_type, media_type, username, a
     return entry
 
 
-def _get_lookup_args(entry):
+def _get_lookup_args(entry: entry.Entry) -> dict:
     args = {
         'title': entry.get('series_name', eval_lazy=False) or entry.get('title', eval_lazy=False),
         'year': entry.get('year', eval_lazy=False) or entry.get('movie_year', eval_lazy=False),
@@ -87,7 +88,7 @@ def _get_lookup_args(entry):
     return args
 
 
-def get_db_data_for(data_type, entry, session):
+def get_db_data_for(data_type: str, entry: entry.Entry, session: Session):
     if data_type == 'movie':
         movie_lookup_args = _get_lookup_args(entry)
         return lookup_movie(session=session, **movie_lookup_args)
@@ -204,7 +205,7 @@ def lazy_lookup(entry, lazy_lookup_name, media_type):
     return entry
 
 
-def add_lazy_fields(entry: entry.Entry, lazy_lookup_name: str, media_type: str):
+def add_lazy_fields(entry: entry.Entry, lazy_lookup_name: str, media_type: str) -> None:
     """
     Adds lazy fields for one of the lookups in our `lazy_lookup_types` dict.
 
@@ -231,7 +232,7 @@ user_data_fields = {
 
 def add_lazy_user_fields(
     entry: entry.Entry, data_type: str, media_type: str, username: str, account: str
-):
+) -> None:
     """
     Adds one of the user field lazy lookups to an entry.
 
@@ -344,8 +345,9 @@ class PluginTraktLookup:
                     'account': config.get('account'),
                 }
                 media_type = get_media_type_for_entry(entry)
-                add_lazy_user_fields(entry, 'collected', media_type=media_type, **credentials)
-                add_lazy_user_fields(entry, 'watched', media_type=media_type, **credentials)
+                if media_type:
+                    add_lazy_user_fields(entry, 'collected', media_type=media_type, **credentials)
+                    add_lazy_user_fields(entry, 'watched', media_type=media_type, **credentials)
                 if is_show(entry):
                     add_lazy_user_fields(entry, 'ratings', media_type='show', **credentials)
                     if is_season(entry):

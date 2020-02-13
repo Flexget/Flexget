@@ -316,6 +316,13 @@ class TestTraktWatchedAndCollected:
               - {title: 'Into.The.Badlands.S01.720p.BluRay-FlexGet'}
             if:
               - trakt_watched: accept
+          test_trakt_user_lookup_fail:
+            disable: builtins
+            trakt_lookup:
+              username: flexgettest
+            mock:
+              - title: aoetaraeha aeotrae taetaeor
+          
     """
 
     def test_trakt_watched_lookup(self, execute_task):
@@ -385,6 +392,13 @@ class TestTraktWatchedAndCollected:
         entry = task.accepted[0]
         assert entry['trakt_series_name'] == 'Into the Badlands', 'wrong series was accepted'
         assert entry['trakt_watched'] == True, 'the whole season should be marked as watched'
+
+    def test_trakt_user_lookup_fail(self, execute_task):
+        # Just making sure we don't crash. See #2606
+        task = execute_task('test_trakt_user_lookup_fail')
+        for e in task.entries:
+            assert 'trakt_watched' not in e or not e['trakt_watched']
+            assert 'trakt_collected' not in e or not e['trakt_collected']
 
 
 @pytest.mark.online
