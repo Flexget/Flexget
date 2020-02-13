@@ -1,6 +1,7 @@
 import ntpath
 import re
 import sys
+from typing import Optional
 
 os_mode = None  # Can be 'windows', 'mac', 'linux' or None. None will auto-detect os.
 # Replacement order is important, don't use dicts to store
@@ -10,11 +11,11 @@ platform_replaces = {
         [r'[\.\s]+([/\\]|$)', r'\1'],
     ],  # Dots cannot end file or directory names
     'mac': [['[: ]+', ' ']],  # Only colon is illegal here
-    'linux': [],
-}  # No illegal chars
+    'linux': [],  # No illegal chars
+}
 
 
-def pathscrub(dirty_path, os=None, filename=False):
+def pathscrub(dirty_path: str, os: Optional[str] = None, filename: bool = False) -> str:
     """
     Strips illegal characters for a given os from a path.
 
