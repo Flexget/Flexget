@@ -606,7 +606,7 @@ def get_plugins(
     return filter(matches, iter(plugins.values()))
 
 
-def plugin_schemas(**kwargs) -> config_schema.JsonSchema:
+def plugin_schemas(**kwargs) -> 'config_schema.JsonSchema':
     """Create a dict schema that matches plugins specified by `kwargs`"""
     return {
         'type': 'object',
