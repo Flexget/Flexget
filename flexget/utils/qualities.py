@@ -1,7 +1,7 @@
 import copy
 import functools
 import re
-from typing import Iterator, List, Sequence, Tuple, Union
+from typing import Dict, Iterator, List, Optional, Tuple, Union
 
 from loguru import logger
 
@@ -14,7 +14,15 @@ logger = logger.bind(name='utils.qualities')
 class QualityComponent:
     """"""
 
-    def __init__(self, type, value, name, regexp=None, modifier=None, defaults=None):
+    def __init__(
+        self,
+        type: str,
+        value: int,
+        name: str,
+        regexp: Optional[str] = None,
+        modifier: Optional[int] = None,
+        defaults: Optional[List[str]] = None,
+    ) -> None:
         """
         :param type: Type of quality component. (resolution, source, codec, or audio)
         :param value: Value used to sort this component with others of like type.
@@ -178,7 +186,7 @@ _UNKNOWNS = {
     print '}}}'
 '''
 
-_registry = {}
+_registry: Dict[str, QualityComponent] = {}
 for items in (_resolutions, _sources, _codecs, _audios):
     for item in items:
         _registry[item.name] = item
@@ -227,7 +235,7 @@ class Quality(Serializer):
     def _find_best(
         self,
         qlist: List[QualityComponent],
-        default: QualityComponent = None,
+        default: Optional[QualityComponent] = None,
         strip_all: bool = True,
     ) -> QualityComponent:
         """Finds the highest matching quality component from `qlist`"""
@@ -263,7 +271,7 @@ class Quality(Serializer):
         return str(quality)
 
     @classmethod
-    def deserialize(cls, data: str, version) -> 'Quality':
+    def deserialize(cls, data: str, version: int) -> 'Quality':
         return cls(data)
 
     @property

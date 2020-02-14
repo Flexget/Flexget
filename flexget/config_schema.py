@@ -2,7 +2,7 @@ import datetime
 import os
 import re
 from collections import defaultdict
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Dict, Optional, Union
 from urllib.parse import parse_qsl, urlparse
 
 import jsonschema
@@ -18,10 +18,12 @@ logger = logger.bind(name='config_schema')
 
 schema_paths = {}
 CURRENT_SCHEMA_VERSION = 'http://json-schema.org/draft-04/schema#'
+# Type hint for json schemas. (If we upgrade to a newer json schema version, the type might allow more than dicts.)
+JsonSchema = Dict[str, Any]
 
 
 # TODO: Rethink how config key and schema registration work
-def register_schema(path: str, schema: Union[dict, Callable[..., dict]]):
+def register_schema(path: str, schema: Union[JsonSchema, Callable[..., JsonSchema]]):
     """
     Register `schema` to be available at `path` for $refs
 
@@ -32,10 +34,10 @@ def register_schema(path: str, schema: Union[dict, Callable[..., dict]]):
 
 
 # Validator that handles root structure of config.
-_root_config_schema = None
+_root_config_schema: Optional[JsonSchema] = None
 
 
-def register_config_key(key: str, schema: dict, required: bool = False):
+def register_config_key(key: str, schema: JsonSchema, required: bool = False):
     """ Registers a valid root level key for the config.
 
     :param string key:
@@ -52,7 +54,7 @@ def register_config_key(key: str, schema: dict, required: bool = False):
     register_schema('/schema/config/%s' % key, schema)
 
 
-def get_schema() -> dict:
+def get_schema() -> JsonSchema:
     global _root_config_schema
     if _root_config_schema is None:
         _root_config_schema = {
@@ -67,7 +69,7 @@ def get_schema() -> dict:
     return _root_config_schema
 
 
-def one_or_more(schema: dict, unique_items: bool = False) -> dict:
+def one_or_more(schema: JsonSchema, unique_items: bool = False) -> JsonSchema:
     """
     Helper function to construct a schema that validates items matching `schema` or an array
     containing items matching `schema`.
@@ -89,7 +91,7 @@ def one_or_more(schema: dict, unique_items: bool = False) -> dict:
     }
 
 
-def resolve_ref(uri: str) -> dict:
+def resolve_ref(uri: str) -> JsonSchema:
     """
     Finds and returns a schema pointed to by `uri` that has been registered in the register_schema function.
     """
@@ -103,7 +105,7 @@ def resolve_ref(uri: str) -> dict:
     raise jsonschema.RefResolutionError("%s could not be resolved" % uri)
 
 
-def process_config(config: Any, schema: Optional[dict] = None, set_defaults: bool = True):
+def process_config(config: Any, schema: Optional[JsonSchema] = None, set_defaults: bool = True):
     """
     Validates the config, and sets defaults within it if `set_defaults` is set.
     If schema is not given, uses the root config schema.

@@ -4,6 +4,7 @@ from typing import Callable, Optional, Union
 from loguru import logger
 from sqlalchemy import Column, DateTime, Integer, String, Table
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.ext.declarative import DeclarativeMeta, as_declarative
 
 import flexget
 from flexget.event import event
@@ -218,58 +219,40 @@ def register_plugin_table(tablename: str, plugin: str, version: int):
     plugin_schemas[plugin]['tables'].append(tablename)
 
 
-class Meta(type):
+class VersionedBaseMeta(DeclarativeMeta):
     """Metaclass for objects returned by versioned_base factory"""
 
     def __new__(mcs, metaname, bases, dict_):
         """This gets called when a class that subclasses VersionedBase is defined."""
-        new_bases = []
-        for base in bases:
-            # Check if we are creating a subclass of VersionedBase
-            if base.__name__ == 'VersionedBase':
-                # Register this table in plugin_schemas
-                register_plugin_table(dict_['__tablename__'], base.plugin, base.version)
-                # Make sure the resulting class also inherits from Base
-                if not any(isinstance(base, type(Base)) for base in bases):
-                    # We are not already subclassing Base, add it in to the list of bases instead of VersionedBase
-                    new_bases.append(Base)
+        new_class = super().__new__(mcs, str(metaname), bases, dict_)
+        if metaname != 'VersionedBase':
+            register_plugin_table(new_class.__tablename__, new_class._plugin, new_class._version)
+        return new_class
 
-                    # Since Base and VersionedBase have 2 different metaclasses, a class that subclasses both of them
-                    # must have a metaclass that subclasses both of their metaclasses.
-
-                    class mcs(type(Base), mcs):
-                        pass
-
-            else:
-                new_bases.append(base)
-
-        return type.__new__(mcs, str(metaname), tuple(new_bases), dict_)
-
-    def register_table(cls, table: Union[str, Table]):
+    def register_table(cls, table: Union[str, Table]) -> None:
         """
         This can be used if a plugin is declaring non-declarative sqlalchemy tables.
 
         :param table: Can either be the name of the table, or an :class:`sqlalchemy.Table` instance.
         """
         if isinstance(table, str):
-            register_plugin_table(table, cls.plugin, cls.version)
+            register_plugin_table(table, cls._plugin, cls._version)
         else:
-            register_plugin_table(table.name, cls.plugin, cls.version)
-
-    def __getattr__(self, item: str):
-        """Transparently return attributes of Base instead of our own."""
-        return getattr(Base, item)
+            register_plugin_table(table.name, cls._plugin, cls._version)
 
 
-def versioned_base(plugin: str, version: int) -> type:
+def versioned_base(plugin: str, version: int) -> VersionedBaseMeta:
     """
     Returns a class which can be used like Base,
     but automatically stores schema version when tables are created.
     """
 
-    return Meta(
-        'VersionedBase', (object,), {'__metaclass__': Meta, 'plugin': plugin, 'version': version}
-    )
+    @as_declarative(metaclass=VersionedBaseMeta, metadata=Base.metadata)
+    class VersionedBase:
+        _plugin = plugin
+        _version = version
+
+    return VersionedBase
 
 
 def after_table_create(event, target, bind, tables=None, **kw):

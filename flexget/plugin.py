@@ -5,7 +5,7 @@ from functools import total_ordering
 from http.client import BadStatusLine
 from importlib import import_module
 from pathlib import Path
-from typing import Callable, Iterable, List, Optional, Union
+from typing import Callable, Dict, Iterable, List, Optional, Union
 from urllib.error import HTTPError, URLError
 
 import loguru
@@ -15,6 +15,7 @@ from requests import RequestException
 from flexget import components as components_pkg
 from flexget import config_schema
 from flexget import plugins as plugins_pkg
+from flexget.event import Event
 from flexget.event import add_event_handler as add_phase_handler
 from flexget.event import event, fire_event, remove_event_handlers
 
@@ -49,13 +50,13 @@ class DependencyError(Exception):
         self._message = message
         self.silent = silent
 
-    def _get_message(self):
+    def _get_message(self) -> str:
         if self._message:
             return self._message
         else:
             return 'Plugin `%s` requires dependency `%s`' % (self.issued_by, self.missing)
 
-    def _set_message(self, message):
+    def _set_message(self, message: str) -> None:
         self._message = message
 
     def has_message(self) -> bool:
@@ -114,9 +115,9 @@ class internet:
     Task handles PluginErrors by aborting the task.
     """
 
-    def __init__(self, logger: 'loguru.Logger' = logger):
-        if logger:
-            self.logger = logger
+    def __init__(self, logger_: 'loguru.Logger' = logger):
+        if logger_:
+            self.logger = logger_
         else:
             self.logger = logger.bind(name='@internet')
 
@@ -156,10 +157,10 @@ class internet:
         return wrapped_func
 
 
-def priority(value: int) -> Callable:
+def priority(value: int) -> Callable[[Callable], Callable]:
     """Priority decorator for phase methods"""
 
-    def decorator(target):
+    def decorator(target: Callable) -> Callable:
         target.priority = value
         return target
 
@@ -189,7 +190,7 @@ phase_methods = {
 phase_methods.update((_phase, 'on_task_' + _phase) for _phase in task_phases)  # DRY
 
 # Mapping of plugin name to PluginInfo instance (logical singletons)
-plugins = {}
+plugins: Dict[str, 'PluginInfo'] = {}
 
 # Loading done?
 plugins_loaded = False
@@ -251,8 +252,8 @@ class PluginInfo(dict):
         builtin: bool = False,
         debug: bool = False,
         api_ver: int = 1,
-        category: str = None,
-    ):
+        category: Optional[str] = None,
+    ) -> None:
         """
         Register a plugin.
 
@@ -290,12 +291,12 @@ class PluginInfo(dict):
         self.builtin = builtin
         self.debug = debug
         self.category = category
-        self.phase_handlers = {}
-        self.schema = {}
-        self.schema_id = None
+        self.phase_handlers: Dict[str, Event] = {}
+        self.schema: config_schema.JsonSchema = {}
+        self.schema_id: Optional[str] = None
 
-        self.plugin_class = plugin_class
-        self.instance = None
+        self.plugin_class: type = plugin_class
+        self.instance: object = None
 
         if self.name in plugins:
             PluginInfo.dupe_counter += 1
@@ -306,7 +307,7 @@ class PluginInfo(dict):
         else:
             plugins[self.name] = self
 
-    def initialize(self):
+    def initialize(self) -> None:
         if self.instance is not None:
             # We already initialized
             return
@@ -330,15 +331,7 @@ class PluginInfo(dict):
 
         self.build_phase_handlers()
 
-    def reset_phase_handlers(self):
-        """Temporary utility method"""
-        self.phase_handlers = {}
-        self.build_phase_handlers()
-        # TODO: should unregister events (from flexget.event)
-        # this method is not used at the moment anywhere ...
-        raise NotImplementedError
-
-    def build_phase_handlers(self):
+    def build_phase_handlers(self) -> None:
         """(Re)build phase_handlers in this plugin"""
         for phase, method_name in phase_methods.items():
             if phase in self.phase_handlers:
@@ -415,7 +408,7 @@ def _get_standard_components_path() -> List[str]:
     return paths
 
 
-def _check_phase_queue():
+def _check_phase_queue() -> None:
     if _new_phase_queue:
         for phase, args in _new_phase_queue.items():
             logger.error(
@@ -426,7 +419,7 @@ def _check_phase_queue():
             )
 
 
-def _import_plugin(module_name: str, plugin_path: Union[str, Path]):
+def _import_plugin(module_name: str, plugin_path: Union[str, Path]) -> None:
     try:
         import_module(module_name)
     except DependencyError as e:
@@ -457,7 +450,7 @@ def _import_plugin(module_name: str, plugin_path: Union[str, Path]):
         logger.trace('Loaded module {} from {}', module_name, plugin_path)
 
 
-def _load_plugins_from_dirs(dirs: List[str]):
+def _load_plugins_from_dirs(dirs: List[str]) -> None:
     """
     :param list dirs: Directories from where plugins are loaded from
     """
@@ -482,7 +475,7 @@ def _load_plugins_from_dirs(dirs: List[str]):
 
 
 # TODO: this is now identical to _load_plugins_from_dirs, REMOVE
-def _load_components_from_dirs(dirs: List[str]):
+def _load_components_from_dirs(dirs: List[str]) -> None:
     """
     :param list dirs: Directories where plugin components are loaded from
     """
@@ -503,7 +496,7 @@ def _load_components_from_dirs(dirs: List[str]):
     _check_phase_queue()
 
 
-def _load_plugins_from_packages():
+def _load_plugins_from_packages() -> None:
     """Load plugins installed via PIP"""
     for entrypoint in pkg_resources.iter_entry_points('FlexGet.plugins'):
         try:
@@ -539,7 +532,7 @@ def _load_plugins_from_packages():
 
 def load_plugins(
     extra_plugins: Optional[List[str]] = None, extra_components: Optional[List[str]] = None
-):
+) -> None:
     """
     Load plugins from the standard plugin and component paths.
 
@@ -613,7 +606,7 @@ def get_plugins(
     return filter(matches, iter(plugins.values()))
 
 
-def plugin_schemas(**kwargs) -> dict:
+def plugin_schemas(**kwargs) -> 'config_schema.JsonSchema':
     """Create a dict schema that matches plugins specified by `kwargs`"""
     return {
         'type': 'object',
