@@ -75,7 +75,7 @@ class TokenBucketLimiter(DomainLimiter):
     state_cache = {}
 
     def __init__(
-        self, domain: str, tokens: int, rate: Union[str, timedelta], wait: bool = True
+        self, domain: str, tokens: Union[float, int], rate: Union[str, timedelta], wait: bool = True
     ) -> None:
         """
         :param int tokens: Size of bucket
@@ -92,11 +92,11 @@ class TokenBucketLimiter(DomainLimiter):
         )
 
     @property
-    def tokens(self) -> int:
+    def tokens(self) -> Union[float, int]:
         return min(self.max_tokens, self.state['tokens'])
 
     @tokens.setter
-    def tokens(self, value: int) -> None:
+    def tokens(self, value: Union[float, int]) -> None:
         self.state['tokens'] = value
 
     @property
@@ -177,9 +177,9 @@ class Session(requests.Session):
 
     """
 
-    def __init__(self, timeout: int = 30, max_retries: int = 1, *args, **kwargs):
+    def __init__(self, timeout: int = 30, max_retries: int = 1) -> None:
         """Set some defaults for our session if not explicitly defined."""
-        super().__init__(*args, **kwargs)
+        super().__init__()
         self.timeout = timeout
         self.stream = True
         self.adapters['http://'].max_retries = max_retries
