@@ -2,6 +2,7 @@ import queue
 import sys
 import threading
 import time
+from typing import Optional
 
 from loguru import logger
 from sqlalchemy.exc import OperationalError, ProgrammingError
@@ -18,11 +19,11 @@ class TaskQueue:
     """
 
     def __init__(self) -> None:
-        self.run_queue = queue.PriorityQueue()
+        self.run_queue: 'queue.PriorityQueue[Task]' = queue.PriorityQueue()
         self._shutdown_now = False
         self._shutdown_when_finished = False
 
-        self.current_task = None
+        self.current_task: Optional[Task] = None
 
         # We don't override `threading.Thread` because debugging this seems unsafe with pydevd.
         # Overriding __len__(self) seems to cause a debugger deadlock.
