@@ -218,19 +218,19 @@ class InputHtml(object):
                 if (eval(search_terms[scope_num][2]) >= eval(search_terms[scope_num][3]) or
                     eval(search_terms[scope_num][2]) >= len(result_set)):
                     log.warning(
-                        ("The specified start (%s) for scope_limit #%s is the same as or after the specified end (%s)"
-                         " or actual end (%s) for match #%s. The start will be set to the beginning, by default.") % (
-                            str(eval(search_terms[scope_num][2]) + 1), str(scope_num + 1),
-                            str(eval(search_terms[scope_num][3])), str(len(result_set)), str(x + 1))
+                        f"The specified start ({eval(search_terms[scope_num][2]) + 1}) for scope_limit "
+                        f"#{scope_num + 1} is the same as or after the specified end "
+                        f"({eval(search_terms[scope_num][3])}) or actual end ({len(result_set)}) for match "
+                        f"#{x+1}. The start will be set to the beginning, by default."
                     )
                     start = "0"
                 else:
                     start = search_terms[scope_num][2]
                 if eval(search_terms[scope_num][3]) > len(result_set):
                     log.warning(
-                        ("The specified end (%s) for scope_limit #%s is after the actual end (%s) for match #%s. The "
-                         "end will be set to the actual end, by default.") % (
-                          str(eval(search_terms[scope_num][3])), str(scope_num + 1), str(len(result_set)), str(x + 1))
+                        f"The specified end ({eval(search_terms[scope_num][3])}) for scope_limit #{scope_num + 1} "
+                        f"is after the actual end ({len(result_set)}) for match #{x+1}. The end will be set to the "
+                        f"actual end, by default."
                     )
                     end = str(len(result_set))
                 else:
@@ -255,10 +255,10 @@ class InputHtml(object):
 
         for element in scope_list:
             if isinstance(element, str):
-                element_name = re.compile("^" + element + "$")
+                element_name = re.compile(f"^{element}$")
                 refine_dict = {}
                 start = "0"
-                end = "len(result_set)"
+                end = f"len(result_set)"
             else:
                 scope_name = next(iter(element))
                 scope_info = element[scope_name]
@@ -266,7 +266,7 @@ class InputHtml(object):
                 if not raw_element_name:
                     element_name = re.compile('.*')
                 else:
-                    element_name = re.compile("^" + raw_element_name + "$")
+                    element_name = re.compile(f"^{raw_element_name}$")
                 start = str(scope_info.get('start') - 1)
                 end = scope_info.get('end')
                 attribute_name = scope_info.get('attribute_name')
@@ -276,10 +276,10 @@ class InputHtml(object):
                 else:
                     if not attribute_value:
                         attribute_value = '.*'
-                    refine_dict = {attribute_name: re.compile("^" + attribute_value + "$")}
+                    refine_dict = {f"{attribute_name}": re.compile(f"^{attribute_value}$")}
 
                 if end == 31415:
-                    end = "len(result_set)"
+                    end = f"len(result_set)"
                 else:
                     end = str(end)
 
