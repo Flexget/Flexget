@@ -300,4 +300,3 @@ class InputHtml:
 @event('plugin.register')
 def register_plugin():
     plugin.register(InputHtml, 'html', api_ver=2)
-
