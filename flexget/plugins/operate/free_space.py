@@ -15,7 +15,7 @@ def get_free_space(config):
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
-            ssh.connect(config['host'], config['port'], config['user'], key_filename=config['ssh_key_filepath'], look_for_keys=True, timeout=5000)
+            ssh.connect(config['host'], config['port'], config['user'], config['ssh_key_filepath'], timeout=5000)
         except Exception as e:
             logger.error("Issue connecting to remote host. {}", e)
             return "ERR"
@@ -25,6 +25,7 @@ def get_free_space(config):
             stdin, stdout, stderr = ssh.exec_command(f"df -k {config['path']} | tail -1 | tr -s ' ' | cut -d' ' -f4")
         outlines = stdout.readlines()
         resp = ''.join(outlines)
+        ssh.close()
         try:
             if config['allotment'] != -1:
                 free = int(config['allotment']) - ((int(resp.strip()) * 1024) / 1000000)
@@ -32,8 +33,7 @@ def get_free_space(config):
                 free = (int(resp.strip()) / 1000)
         except ValueError:
             logger.error('Non-integer was returned when calcualting disk usage.')
-            task.abort('Remote disk usage could not be calculated.')
-        ssh.close()
+            return "ERR"
         return free
     elif os.name == 'nt':
         import ctypes
@@ -89,7 +89,7 @@ class PluginFreeSpace:
         if task.accepted:
             free_space = get_free_space(config)
             if free_space == "ERR":
-                task.abort('Could not connect to remote host.')
+                task.abort('Error with remote host.')
             elif free_space < config['space']:
                 logger.error(
                     'Less than {} MB of free space in {} aborting task.',
