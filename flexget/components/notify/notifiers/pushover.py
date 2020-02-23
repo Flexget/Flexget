@@ -1,18 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import datetime
-import logging
+
+from loguru import logger
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from flexget.utils.requests import Session as RequestSession, TimedLimiter
-from requests.exceptions import RequestException
+from flexget.utils.requests import Session as RequestSession
+from flexget.utils.requests import TimedLimiter
 
 plugin_name = 'pushover'
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 PUSHOVER_URL = 'https://api.pushover.net/1/messages.json'
 
@@ -20,7 +19,7 @@ requests = RequestSession(max_retries=3)
 requests.add_domain_limiter(TimedLimiter('pushover.net', '5 seconds'))
 
 
-class PushoverNotifier(object):
+class PushoverNotifier:
     """
     Example::
 
@@ -97,7 +96,7 @@ class PushoverNotifier(object):
         expire = config.get('expire')
         retry = config.get('retry')
         if priority == 2 and not all([expire, retry]):
-            log.warning(
+            logger.warning(
                 'Priority set to 2 but fields "expire" and "retry" are not both present.Lowering priority to 1'
             )
             notification['priority'] = 1
@@ -112,12 +111,15 @@ class PushoverNotifier(object):
             except RequestException as e:
                 if e.response is not None:
                     if e.response.status_code == 429:
-                        reset_time = datetime.datetime.fromtimestamp(
-                            int(e.response.headers['X-Limit-App-Reset'])
-                        ).strftime('%Y-%m-%d %H:%M:%S')
-                        error_message = (
-                            'Monthly pushover message limit reached. Next reset: %s' % reset_time
-                        )
+                        app_reset = e.response.headers.get('X-Limit-App-Reset')
+                        if app_reset:
+                            reset_time = datetime.datetime.fromtimestamp(int(app_reset)).strftime(
+                                '%Y-%m-%d %H:%M:%S'
+                            )
+                            error_message = (
+                                f'Monthly pushover message limit reached. Next reset: {reset_time}'
+                            )
+
                     else:
                         error_message = e.response.json()['errors'][0]
                 else:
@@ -128,9 +130,8 @@ class PushoverNotifier(object):
                 int(response.headers['X-Limit-App-Reset'])
             ).strftime('%Y-%m-%d %H:%M:%S')
             remaining = response.headers['X-Limit-App-Remaining']
-            log.debug(
-                'Pushover notification sent. Notifications remaining until next reset: %s. '
-                'Next reset at: %s',
+            logger.debug(
+                'Pushover notification sent. Notifications remaining until next reset: {}. Next reset at: {}',
                 remaining,
                 reset_time,
             )

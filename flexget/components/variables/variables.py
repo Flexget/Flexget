@@ -1,18 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import codecs
-import logging
 import os
 from datetime import datetime
 
 import yaml
-
 from jinja2 import TemplateError
 from jinja2.nativetypes import NativeEnvironment
-
+from loguru import logger
 from sqlalchemy import Column
-from sqlalchemy.sql.sqltypes import Unicode, DateTime, Integer
+from sqlalchemy.sql.sqltypes import DateTime, Integer, Unicode
 
 from flexget import db_schema
 from flexget.config_schema import register_config_key
@@ -21,7 +16,7 @@ from flexget.manager import Session
 from flexget.plugin import PluginError
 from flexget.utils.database import json_synonym
 
-log = logging.getLogger('variables')
+logger = logger.bind(name='variables')
 
 DB_VERSION = 0
 Base = db_schema.versioned_base('variables', DB_VERSION)
@@ -79,15 +74,15 @@ def process_variables(config, manager):
         return
     env = NativeEnvironment(**env_params)
     if isinstance(config['variables'], bool):
-        log.debug('trying to load variables from DB')
+        logger.debug('trying to load variables from DB')
         variables = variables_from_db()
     elif isinstance(config['variables'], dict):
-        log.debug('loading variables from config')
+        logger.debug('loading variables from config')
         variables = config['variables']
     else:
-        log.debug('trying to load variables from file')
+        logger.debug('trying to load variables from file')
         variables = variables_from_file(manager.config_base, config['variables'])
-        log.debug('updating DB with variable file contents')
+        logger.debug('updating DB with variable file contents')
         variables_to_db(variables)
     env.globals = variables
     _process(config, env)
@@ -96,7 +91,7 @@ def process_variables(config, manager):
 
 def _process(element, environment):
     if isinstance(element, dict):
-        for k, v in element.items():
+        for k, v in list(element.items()):
             new_key = _process(k, environment)
             if new_key:
                 element[new_key] = element.pop(k)

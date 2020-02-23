@@ -1,19 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import datetime
-import logging
+import itertools
 import random
 
-from sqlalchemy import Column, Integer, DateTime, Unicode, Index
+from loguru import logger
+from sqlalchemy import Column, DateTime, Index, Integer, Unicode
 
-from flexget import options, plugin
-from flexget import db_schema
+from flexget import db_schema, options, plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.utils.tools import parse_timedelta, multiply_timedelta, aggregate_inputs
+from flexget.utils.tools import aggregate_inputs, multiply_timedelta, parse_timedelta
 
-log = logging.getLogger('discover')
+logger = logger.bind(name='discover')
 Base = db_schema.versioned_base('discover', 0)
 
 
@@ -47,11 +44,11 @@ def db_cleanup(manager, session):
     for discover_entry in (
         session.query(DiscoverEntry).filter(DiscoverEntry.last_execution <= value).all()
     ):
-        log.debug('deleting %s', discover_entry)
+        logger.debug('deleting {}', discover_entry)
         session.delete(discover_entry)
 
 
-class Discover(object):
+class Discover:
     """
     Discover content based on other inputs material.
 
@@ -122,10 +119,12 @@ class Discover(object):
                     plugin_name, plugin_config = item, None
                 search = plugin.get(plugin_name, self)
                 if not callable(getattr(search, 'search')):
-                    log.critical('Search plugin %s does not implement search method', plugin_name)
+                    logger.critical(
+                        'Search plugin {} does not implement search method', plugin_name
+                    )
                     continue
-                log.verbose(
-                    'Searching for `%s` with plugin `%s` (%i of %i)',
+                logger.verbose(
+                    'Searching for `{}` with plugin `{}` ({} of {})',
                     entry['title'],
                     plugin_name,
                     index + 1,
@@ -134,27 +133,28 @@ class Discover(object):
                 try:
                     search_results = search.search(task=task, entry=entry, config=plugin_config)
                     if not search_results:
-                        log.debug('No results from %s', plugin_name)
+                        logger.debug('No results from {}', plugin_name)
                         continue
-                    log.debug('Discovered %s entries from %s', len(search_results), plugin_name)
                     if config.get('limit'):
-                        search_results = search_results[: config['limit']]
+                        search_results = itertools.islice(search_results, config['limit'])
+                    # 'search_results' can be any iterable, make sure it's a list.
+                    search_results = list(search_results)
+                    logger.debug('Discovered {} entries from {}', len(search_results), plugin_name)
                     for e in search_results:
                         e['discovered_from'] = entry['title']
                         e['discovered_with'] = plugin_name
-                        # 'search_results' can be any iterable, make sure it's a list.
                         e.on_complete(
-                            self.entry_complete, query=entry, search_results=list(search_results)
+                            self.entry_complete, query=entry, search_results=search_results
                         )
 
                     entry_results.extend(search_results)
 
                 except plugin.PluginWarning as e:
-                    log.verbose('No results from %s: %s', plugin_name, e)
+                    logger.verbose('No results from {}: {}', plugin_name, e)
                 except plugin.PluginError as e:
-                    log.error('Error searching with %s: %s', plugin_name, e)
+                    logger.error('Error searching with {}: {}', plugin_name, e)
             if not entry_results:
-                log.verbose('No search results for `%s`', entry['title'])
+                logger.verbose('No search results for `{}`', entry['title'])
                 entry.complete()
                 continue
             result.extend(entry_results)
@@ -182,7 +182,7 @@ class Discover(object):
         for entry in entries:
             est_date = estimator.estimate(entry)
             if est_date is None:
-                log.debug('No release date could be determined for %s', entry['title'])
+                logger.debug('No release date could be determined for {}', entry['title'])
                 if estimation_mode['mode'] == 'strict':
                     entry.reject('has no release date')
                     entry.complete()
@@ -193,14 +193,13 @@ class Discover(object):
                 # If we just got a date, add a time so we can compare it to now()
                 est_date = datetime.datetime.combine(est_date, datetime.time())
             if datetime.datetime.now() >= est_date:
-                log.debug('%s has been released at %s', entry['title'], est_date)
+                logger.debug('{} has been released at {}', entry['title'], est_date)
                 result.append(entry)
             elif datetime.datetime.now() >= est_date - parse_timedelta(
                 estimation_mode['optimistic']
             ):
-                log.debug(
-                    '%s will be released at %s. Ignoring release estimation because estimated release date is '
-                    'in less than %s',
+                logger.debug(
+                    '{} will be released at {}. Ignoring release estimation because estimated release date is in less than {}',
                     entry['title'],
                     est_date,
                     estimation_mode['optimistic'],
@@ -209,7 +208,9 @@ class Discover(object):
             else:
                 entry.reject('has not been released')
                 entry.complete()
-                log.verbose("%s hasn't been released yet (Expected: %s)", entry['title'], est_date)
+                logger.verbose(
+                    "{} hasn't been released yet (Expected: {})", entry['title'], est_date
+                )
         return result
 
     def interval_expired(self, config, task, entries):
@@ -222,7 +223,7 @@ class Discover(object):
         config.setdefault('interval', '5 hour')
         interval = parse_timedelta(config['interval'])
         if task.options.discover_now:
-            log.info('Ignoring interval because of --discover-now')
+            logger.info('Ignoring interval because of --discover-now')
         result = []
         interval_count = 0
         with Session() as session:
@@ -235,7 +236,7 @@ class Discover(object):
                 )
 
                 if not discover_entry:
-                    log.debug('%s -> No previous run recorded', entry['title'])
+                    logger.debug('{} -> No previous run recorded', entry['title'])
                     discover_entry = DiscoverEntry(entry['title'], task.name)
                     session.add(discover_entry)
                 if (
@@ -246,24 +247,24 @@ class Discover(object):
                     discover_entry.last_execution = datetime.datetime.now() - delta
                 else:
                     next_time = discover_entry.last_execution + interval
-                    log.debug(
-                        'last_time: %r, interval: %s, next_time: %r, ',
+                    logger.debug(
+                        'last_time: {!r}, interval: {}, next_time: {!r}, ',
                         discover_entry.last_execution,
                         config['interval'],
                         next_time,
                     )
                     if datetime.datetime.now() < next_time:
-                        log.debug('interval not met')
+                        logger.debug('interval not met')
                         interval_count += 1
                         entry.reject('discover interval not met')
                         entry.complete()
                         continue
                     discover_entry.last_execution = datetime.datetime.now()
-                log.trace('interval passed for %s', entry['title'])
+                logger.trace('interval passed for {}', entry['title'])
                 result.append(entry)
         if interval_count and not task.is_rerun:
-            log.verbose(
-                'Discover interval of %s not met for %s entries. Use --discover-now to override.',
+            logger.verbose(
+                'Discover interval of {} not met for {} entries. Use --discover-now to override.',
                 config['interval'],
                 interval_count,
             )
@@ -279,9 +280,9 @@ class Discover(object):
 
         task.no_entries_ok = True
         entries = aggregate_inputs(task, config['what'])
-        log.verbose('Discovering %i titles ...', len(entries))
+        logger.verbose('Discovering {} titles ...', len(entries))
         if len(entries) > 500:
-            log.critical(
+            logger.critical(
                 'Looks like your inputs in discover configuration produced '
                 'over 500 entries, please reduce the amount!'
             )

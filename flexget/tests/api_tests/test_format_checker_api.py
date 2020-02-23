@@ -1,12 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flexget.api.app import base_message
 from flexget.utils import json
 
 
-class TestFormatChecker(object):
+class TestFormatChecker:
     config = 'tasks: {}'
 
     def test_quality(self, api_client, schema_match):

@@ -1,19 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-import logging
 import datetime
 from datetime import timedelta
 
-from flexget.utils.database import with_session
-from flexget.utils.sqlalchemy_utils import create_index
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, select, func, Index
+from loguru import logger
+from sqlalchemy import Boolean, Column, DateTime, Index, Integer, String, func, select
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
+from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
 from flexget.event import event
+from flexget.utils.database import with_session
+from flexget.utils.sqlalchemy_utils import create_index
 
-log = logging.getLogger('status.db')
+logger = logger.bind(name='status.db')
 Base = db_schema.versioned_base('status', 2)
 
 
@@ -53,7 +52,12 @@ class StatusTask(Base):
         )
 
     def to_dict(self):
-        return {'id': self.id, 'name': self.name, 'last_execution_time': self.last_execution_time}
+        return {
+            'id': self.id,
+            'name': self.name,
+            'last_execution_time': self.last_execution_time
+            and self.last_execution_time.astimezone(),
+        }
 
 
 class TaskExecution(Base):
@@ -91,8 +95,8 @@ class TaskExecution(Base):
         return {
             'id': self.id,
             'task_id': self.task_id,
-            'start': self.start,
-            'end': self.end,
+            'start': self.start and self.start.astimezone(),
+            'end': self.end and self.end.astimezone(),
             'succeeded': self.succeeded,
             'produced': self.produced,
             'accepted': self.accepted,
@@ -116,7 +120,7 @@ def db_cleanup(manager, session):
     # Purge all status data for non existing tasks
     for status_task in session.query(StatusTask).all():
         if status_task.name not in manager.config['tasks']:
-            log.verbose('Purging obsolete status data for task %s', status_task.name)
+            logger.verbose('Purging obsolete status data for task {}', status_task.name)
             session.delete(status_task)
 
     # Purge task executions older than 1 year
@@ -126,15 +130,15 @@ def db_cleanup(manager, session):
         .delete()
     )
     if result:
-        log.verbose('Removed %s task executions from history older than 1 year', result)
+        logger.verbose('Removed {} task executions from history older than 1 year', result)
 
 
 @with_session
 def get_status_tasks(
     start=None, stop=None, order_by='last_execution_time', descending=True, session=None
 ):
-    log.debug(
-        'querying status tasks: start=%s, stop=%s, order_by=%s, descending=%s',
+    logger.debug(
+        'querying status tasks: start={}, stop={}, order_by={}, descending={}',
         start,
         stop,
         order_by,
@@ -161,9 +165,9 @@ def get_executions_by_task_id(
     end_date=None,
     session=None,
 ):
-    log.debug(
-        'querying task executions: task_id=%s, start=%s, stop=%s, order_by=%s, descending=%s, succeeded=%s,'
-        ' produced=%s, start_date=%s, end_date=%s',
+    logger.debug(
+        'querying task executions: task_id={}, start={}, stop={}, order_by={}, '
+        'descending={}, succeeded={}, produced={}, start_date={}, end_date={}',
         task_id,
         start,
         stop,

@@ -1,18 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-
-import logging
 import http.cookiejar
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.tools import TimedDict
 
-log = logging.getLogger('cookies')
+logger = logger.bind(name='cookies')
 
 
-class PluginCookies(object):
+class PluginCookies:
     """
     Adds cookie to all requests (rss, resolvers, download). Anything
     that uses urllib2 to be exact.
@@ -43,7 +40,7 @@ class PluginCookies(object):
     }
 
     def prepare_config(self, config):
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = {'file': config}
         if config['file'].endswith('.txt'):
             config.setdefault('type', 'mozilla')
@@ -62,9 +59,9 @@ class PluginCookies(object):
             try:
                 from sqlite3 import dbapi2 as sqlite  # try the 2.5+ stdlib
             except ImportError:
-                raise plugin.PluginWarning('Unable to use sqlite3 or pysqlite2', log)
+                raise plugin.PluginWarning('Unable to use sqlite3 or pysqlite2', logger)
 
-        log.debug('connecting: %s' % filename)
+        logger.debug('connecting: {}', filename)
         try:
             con = sqlite.connect(filename)
         except:
@@ -75,7 +72,7 @@ class PluginCookies(object):
             cur.execute('select host, path, isSecure, expiry, name, value from moz_cookies')
         except sqlite.Error:
             raise plugin.PluginError(
-                '%s does not appear to be a valid Firefox 3 cookies file' % filename, log
+                '%s does not appear to be a valid Firefox 3 cookies file' % filename, logger
             )
 
         ftstr = ['FALSE', 'TRUE']
@@ -91,10 +88,10 @@ class PluginCookies(object):
         count = 0
         failed = 0
 
-        log.debug('fetching all cookies')
+        logger.debug('fetching all cookies')
 
         def notabs(val):
-            if isinstance(val, basestring):
+            if isinstance(val, str):
                 return val.replace('\t', '')
             return val
 
@@ -117,8 +114,8 @@ class PluginCookies(object):
                         )
                     )
 
-                    log.trace(
-                        'Adding cookie for %s. key: %s value: %s' % (item[0], item[4], item[5])
+                    logger.trace(
+                        'Adding cookie for {}. key: {} value: {}', item[0], item[4], item[5]
                     )
                     count += 1
                 except IOError:
@@ -128,21 +125,21 @@ class PluginCookies(object):
 
                     i = 0
                     for val in item:
-                        if isinstance(val, basestring):
-                            log.debug('item[%s]: %s' % (i, to_hex(val)))
+                        if isinstance(val, str):
+                            logger.debug('item[{}]: {}', i, to_hex(val))
                         else:
-                            log.debug('item[%s]: %s' % (i, val))
+                            logger.debug('item[{}]: {}', i, val)
                         i += 1
                     failed += 1
 
             except UnicodeDecodeError:
                 # for some god awful reason the sqlite module can throw UnicodeDecodeError ...
-                log.debug('got UnicodeDecodeError from sqlite, ignored')
+                logger.debug('got UnicodeDecodeError from sqlite, ignored')
                 failed += 1
             except StopIteration:
                 break
 
-        log.debug('Added %s cookies to jar. %s failed (non-ascii)' % (count, failed))
+        logger.debug('Added {} cookies to jar. {} failed (non-ascii)', count, failed)
 
         s.seek(0)
         con.close()
@@ -160,31 +157,31 @@ class PluginCookies(object):
         cookie_file = os.path.expanduser(config.get('file'))
         cj = self.cookiejars.get(cookie_file, None)
         if cj is not None:
-            log.debug('Loading cookiejar from cache.')
+            logger.debug('Loading cookiejar from cache.')
         elif cookie_type == 'firefox3':
-            log.debug('Loading %s cookies' % cookie_type)
+            logger.debug('Loading {} cookies', cookie_type)
             cj = self.sqlite2cookie(cookie_file)
             self.cookiejars[cookie_file] = cj
         else:
             if cookie_type == 'mozilla':
-                log.debug('Loading %s cookies' % cookie_type)
+                logger.debug('Loading {} cookies', cookie_type)
                 cj = http.cookiejar.MozillaCookieJar()
                 self.cookiejars[cookie_file] = cj
             elif cookie_type == 'lwp':
-                log.debug('Loading %s cookies' % cookie_type)
+                logger.debug('Loading {} cookies', cookie_type)
                 cj = http.cookiejar.LWPCookieJar()
                 self.cookiejars[cookie_file] = cj
             else:
-                raise plugin.PluginError('Unknown cookie type %s' % cookie_type, log)
+                raise plugin.PluginError('Unknown cookie type %s' % cookie_type, logger)
 
             try:
                 cj.load(filename=cookie_file, ignore_expires=True)
-                log.debug('%s cookies loaded' % cookie_type)
+                logger.debug('{} cookies loaded', cookie_type)
             except (http.cookiejar.LoadError, IOError):
                 import sys
 
                 raise plugin.PluginError(
-                    'Cookies could not be loaded: %s' % sys.exc_info()[1], log
+                    'Cookies could not be loaded: %s' % sys.exc_info()[1], logger
                 )
 
         # Add cookiejar to our requests session

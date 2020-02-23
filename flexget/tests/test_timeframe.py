@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import datetime
 
 from flexget.manager import Session
@@ -13,7 +11,7 @@ def age_timeframe(**kwargs):
         )
 
 
-class TestTimeFrame(object):
+class TestTimeFrame:
     config = """
         templates:
           global:
@@ -24,31 +22,31 @@ class TestTimeFrame(object):
               wait: 1 day
               target: 1080p
             mock:
-              - {title: 'Movie.BRRip.x264.720p', 'id': 'Movie'}
-              - {title: 'Movie.720p WEB-DL X264 AC3', 'id': 'Movie'} 
+              - {title: 'Movie.BRRip.x264.720p', 'media_id': 'Movie'}
+              - {title: 'Movie.720p WEB-DL X264 AC3', 'media_id': 'Movie'} 
           reached_and_backlog:
             timeframe:
               wait: 1 hour
               target: 1080p
               on_reached: accept
             mock:
-              - {title: 'Movie.720p WEB-DL X264 AC3', 'id': 'Movie'} 
-              - {title: 'Movie.BRRip.x264.720p', 'id': 'Movie'}
+              - {title: 'Movie.720p WEB-DL X264 AC3', 'media_id': 'Movie'} 
+              - {title: 'Movie.BRRip.x264.720p', 'media_id': 'Movie'}
           target1:
             timeframe:
               wait: 1 hour
               target: 1080p
               on_reached: accept
             mock:
-              - {title: 'Movie.720p WEB-DL X264 AC3', 'id': 'Movie'} 
-              - {title: 'Movie.BRRip.x264.720p', 'id': 'Movie'}
+              - {title: 'Movie.720p WEB-DL X264 AC3', 'media_id': 'Movie'} 
+              - {title: 'Movie.BRRip.x264.720p', 'media_id': 'Movie'}
           target2:
             timeframe:
               wait: 1 hour
               target: 1080p
               on_reached: accept
             mock:
-              - {title: 'Movie.1080p WEB-DL X264 AC3', 'id': 'Movie'} 
+              - {title: 'Movie.1080p WEB-DL X264 AC3', 'media_id': 'Movie'} 
     """
 
     def test_wait(self, execute_task):
@@ -56,7 +54,7 @@ class TestTimeFrame(object):
         with Session() as session:
             query = session.query(EntryTimeFrame).all()
             assert len(query) == 1, 'There should be one tracked entity present.'
-            assert query[0].id == 'movie', 'Should of tracked name `Movie`.'
+            assert query[0].id == 'movie', 'Should have tracked name `Movie`.'
 
         entry = task.find_entry('rejected', title='Movie.BRRip.x264.720p')
         assert entry, 'Movie.BRRip.x264.720p should be rejected'
@@ -68,7 +66,7 @@ class TestTimeFrame(object):
         age_timeframe(hours=1)
 
         # simulate movie going away from the task/feed
-        del (manager.config['tasks']['reached_and_backlog']['mock'])
+        del manager.config['tasks']['reached_and_backlog']['mock']
 
         task = execute_task('reached_and_backlog')
         entry = task.find_entry('accepted', title='Movie.BRRip.x264.720p')
@@ -88,7 +86,7 @@ class TestTimeFrame(object):
             assert query[0].status == 'accepted', 'Should be accepted.'
 
 
-class TestTimeFrameActions(object):
+class TestTimeFrameActions:
     config = """
         templates:
           global:

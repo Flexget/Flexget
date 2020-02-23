@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginError
 
-log = logging.getLogger('list_match')
+logger = logger.bind(name='list_match')
 
 
-class ListMatch(object):
+class ListMatch:
     schema = {
         'type': 'object',
         'properties': {
@@ -72,12 +69,14 @@ class ListMatch(object):
                 except AttributeError:
                     raise PluginError('Plugin %s does not support list interface' % plugin_name)
                 if task.manager.options.test and thelist.online:
-                    log.info(
-                        '`%s` is marked as online, would remove accepted items outside of --test mode.',
+                    logger.info(
+                        '`{}` is marked as online, would remove accepted items outside of --test mode.',
                         plugin_name,
                     )
                     continue
-                log.verbose('removing accepted entries from %s - %s', plugin_name, plugin_config)
+                logger.verbose(
+                    'removing accepted entries from {} - {}', plugin_name, plugin_config
+                )
                 thelist -= task.accepted
 
 

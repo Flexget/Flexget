@@ -1,17 +1,9 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import PY3
-
-import mock
 import pytest
-
-from flexget.manager import Session
-from flexget.plugins.input.npo_watchlist import NPOWatchlist
 
 
 @pytest.mark.online
-class TestNpoWatchlistInfo(object):
+class TestNpoWatchlistInfo:
     config = """
         tasks:
           test:
@@ -38,7 +30,7 @@ class TestNpoWatchlistInfo(object):
         assert entry['npo_runtime'] == '32'
         assert entry['npo_premium'] is False
         assert (
-            entry['npo_version'] == 'NPO.release-1.53.1'
+            entry['npo_version'] == 'NPO.release-1.58.0'
         )  # specify for which version of NPO website we did run this unittest
 
         entry = (
@@ -76,7 +68,7 @@ class TestNpoWatchlistInfo(object):
 
 
 @pytest.mark.online
-class TestNpoWatchlistPremium(object):
+class TestNpoWatchlistPremium:
     config = """
         tasks:
           test:
@@ -91,9 +83,9 @@ class TestNpoWatchlistPremium(object):
 
         task = execute_task('test')
         entry = task.find_entry(
-            url='https://www.npostart.nl/hollands-hoop/04-11-2017/BV_101385161'
+            url='https://www.npostart.nl/hollands-hoop/08-02-2020/BV_101396963'
         )  # a premium serie
-        assert entry['npo_id'] == 'BV_101385161'
+        assert entry['npo_id'] == 'BV_101396963'
         assert entry['npo_url'] == 'https://www.npostart.nl/hollands-hoop/BV_101385153'
         assert entry['npo_name'] == 'Hollands Hoop'
         assert entry['npo_runtime'] == '53'
@@ -101,7 +93,7 @@ class TestNpoWatchlistPremium(object):
 
 
 @pytest.mark.online
-class TestNpoWatchlistLanguageTheTVDBLookup(object):
+class TestNpoWatchlistLanguageTheTVDBLookup:
     config = """
         tasks:
           test:

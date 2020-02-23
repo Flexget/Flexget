@@ -1,21 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import quote
+from urllib.parse import quote
 
-import logging
-
+from loguru import logger
 from requests.exceptions import RequestException
 
 from flexget import plugin
+from flexget.components.sites.urlrewriting import UrlRewritingError
+from flexget.components.sites.utils import normalize_unicode, torrent_availability
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
-from flexget.components.sites.urlrewriting import UrlRewritingError
-from flexget.components.sites.utils import torrent_availability, normalize_unicode
 from flexget.utils.tools import parse_filesize
 
-log = logging.getLogger('torrentleech')
+logger = logger.bind(name='torrentleech')
 
 CATEGORIES = {
     'all': 0,
@@ -40,7 +37,7 @@ CATEGORIES = {
 }
 
 
-class UrlRewriteTorrentleech(object):
+class UrlRewriteTorrentleech:
     """
         Torrentleech urlrewriter and search plugin.
 
@@ -82,9 +79,9 @@ class UrlRewriteTorrentleech(object):
     # urlrewriter API
     def url_rewrite(self, task, entry):
         if 'url' not in entry:
-            log.error("Didn't actually get a URL...")
+            logger.error("Didn't actually get a URL...")
         else:
-            log.debug("Got the URL: %s" % entry['url'])
+            logger.debug('Got the URL: {}', entry['url'])
         if entry['url'].startswith('https://www.torrentleech.org/torrents/browse/list/query/'):
             # use search
             results = self.search(task, entry)
@@ -93,7 +90,7 @@ class UrlRewriteTorrentleech(object):
             # TODO: Search doesn't enforce close match to title, be more picky
             entry['url'] = results[0]['url']
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def search(self, task, entry, config=None):
         """
         Search for name from torrentleech.
@@ -140,7 +137,7 @@ class UrlRewriteTorrentleech(object):
                 + quote(query.encode('utf-8'))
                 + filter_url
             )
-            log.debug('Using %s as torrentleech search url', url)
+            logger.debug('Using {} as torrentleech search url', url)
 
             results = task.requests.get(url, headers=request_headers, cookies=login.cookies).json()
 
@@ -153,7 +150,7 @@ class UrlRewriteTorrentleech(object):
                 torrent_url = 'https://www.torrentleech.org/rss/download/{}/{}/{}'.format(
                     torrent['fid'], rss_key, torrent['filename']
                 )
-                log.debug('RSS-ified download link: %s', torrent_url)
+                logger.debug('RSS-ified download link: {}', torrent_url)
                 entry['url'] = torrent_url
 
                 # seeders/leechers

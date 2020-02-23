@@ -1,10 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
+from loguru import logger
 
-import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from functools import partial
-
-from flexget import plugin
+from flexget import entry, plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.log import log_once
@@ -16,10 +12,10 @@ except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='imdb')
 
 
-log = logging.getLogger('tmdb_lookup')
+logger = logger.bind(name='tmdb_lookup')
 
 
-class PluginTmdbLookup(object):
+class PluginTmdbLookup:
     """Retrieves tmdb information for entries.
 
     Example:
@@ -39,7 +35,9 @@ class PluginTmdbLookup(object):
         'tmdb_votes': 'votes',
         # Just grab the top 5 posters
         'tmdb_posters': lambda movie: [poster.url('original') for poster in movie.posters[:5]],
-        'tmdb_backdrops': lambda movie: [poster.url('original') for poster in movie.backdrops[:5]],
+        'tmdb_backdrops': lambda movie: [
+            backdrop.url('original') for backdrop in movie.backdrops[:5]
+        ],
         'tmdb_runtime': 'runtime',
         'tmdb_tagline': 'tagline',
         'tmdb_budget': 'budget',
@@ -57,6 +55,7 @@ class PluginTmdbLookup(object):
         ]
     }
 
+    @entry.register_lazy_lookup('tmdb_lookup')
     def lazy_loader(self, entry, language):
         """Does the lookup for this entry and populates the entry fields."""
         lookup = plugin.get('api_tmdb', self).lookup
@@ -75,7 +74,7 @@ class PluginTmdbLookup(object):
                 )
                 entry.update_using_map(self.field_map, movie)
         except LookupError:
-            log_once('TMDB lookup failed for %s' % entry['title'], log, logging.WARN)
+            log_once('TMDB lookup failed for %s' % entry['title'], logger, 'WARNING')
 
     def lookup(self, entry, language):
         """
@@ -84,8 +83,7 @@ class PluginTmdbLookup(object):
 
         :param entry: Entry instance
         """
-        lazy_func = partial(self.lazy_loader, language=language)
-        entry.register_lazy_func(lazy_func, self.field_map)
+        entry.add_lazy_fields(self.lazy_loader, self.field_map, kwargs={'language': language})
 
     def on_task_metainfo(self, task, config):
         if not config:

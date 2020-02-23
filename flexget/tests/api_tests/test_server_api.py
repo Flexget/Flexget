@@ -1,21 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import json
 import os
+from unittest.mock import patch
 
 import pytest
-from mock import patch
 
 from flexget import __version__
-from flexget.api.app import __version__ as __api_version__, base_message
+from flexget.api.app import __version__ as __api_version__
+from flexget.api.app import base_message
 from flexget.api.core.server import ObjectsContainer as OC
 from flexget.manager import Manager
 from flexget.tests.conftest import MockManager
 from flexget.utils.tools import get_latest_flexget_version_number
 
 
-class TestServerAPI(object):
+class TestServerAPI:
     config = """
         tasks:
           test:
@@ -34,27 +32,27 @@ class TestServerAPI(object):
         assert not errors
         assert data['pid'] == os.getpid()
 
-    @patch.object(MockManager, 'load_config')
-    def test_reload(self, mocked_load_config, api_client, schema_match):
-        payload = {'operation': 'reload'}
-        rsp = api_client.json_post('/server/manage/', data=json.dumps(payload))
-        assert rsp.status_code == 200
-        data = json.loads(rsp.get_data(as_text=True))
+    def test_reload(self, api_client, schema_match):
+        with patch.object(MockManager, 'load_config') as mocked_load_config:
+            payload = {'operation': 'reload'}
+            rsp = api_client.json_post('/server/manage/', data=json.dumps(payload))
+            assert rsp.status_code == 200
+            data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(base_message, data)
-        assert not errors
-        assert mocked_load_config.called
+            errors = schema_match(base_message, data)
+            assert not errors
+            assert mocked_load_config.called
 
-    @patch.object(Manager, 'shutdown')
-    def test_shutdown(self, mocked_shutdown, api_client, schema_match):
-        payload = {'operation': 'shutdown'}
-        rsp = api_client.json_post('/server/manage/', data=json.dumps(payload))
-        assert rsp.status_code == 200
-        data = json.loads(rsp.get_data(as_text=True))
+    def test_shutdown(self, api_client, schema_match):
+        with patch.object(MockManager, 'shutdown') as mocked_shutdown:
+            payload = {'operation': 'shutdown'}
+            rsp = api_client.json_post('/server/manage/', data=json.dumps(payload))
+            assert rsp.status_code == 200
+            data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(base_message, data)
-        assert not errors
-        assert mocked_shutdown.called
+            errors = schema_match(base_message, data)
+            assert not errors
+            assert mocked_shutdown.called
 
     def test_get_config(self, api_client, schema_match):
         rsp = api_client.get('/server/config/')

@@ -1,12 +1,12 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('est_released')
+logger = logger.bind(name='est_released')
 
 
-class EstimateRelease(object):
+class EstimateRelease:
     """
     Front-end for estimator plugins that estimate release times
     for various things (series, movies).
@@ -20,7 +20,7 @@ class EstimateRelease(object):
         :return: estimated date of released for the entry, None if it can't figure it out
         """
 
-        log.debug(entry['title'])
+        logger.debug(entry['title'])
         estimators = [
             e.instance.estimate for e in plugin.get_plugins(interface='estimate_release')
         ]

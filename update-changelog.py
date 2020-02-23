@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import collections
 import datetime
 import io
@@ -9,8 +7,8 @@ import sys
 from git import Repo
 
 
-class MDChangeSet(object):
-    """Represets a markdown changeset for a single version."""
+class MDChangeSet:
+    """Represents a markdown change-set for a single version."""
 
     CATEGORIES = [
         ('### Added\n', ['add', 'added', 'feature']),
@@ -116,25 +114,23 @@ if __name__ == '__main__':
     if commits:
         tags = {}
         for tag in repo.tags:
-            tags[tag.commit.hexsha] = tag.tag
+            tags[tag.commit.hexsha] = tag
         for commit in commits:
             if cur_ver.parse_message(commit.message):
                 modified = True
             if commit.hexsha in tags:
                 modified = True
                 # Tag changeset with release date and version and create new current changeset
-                version = tags[commit.hexsha].tag
-                release_date = datetime.datetime.fromtimestamp(
-                    tags[commit.hexsha].tagged_date
-                ).strftime('%Y-%m-%d')
+                version = tags[commit.hexsha].name.lstrip('v')
+                release_date = tags[commit.hexsha].commit.committed_datetime.strftime('%Y-%m-%d')
                 cur_ver.version_header = '## {0} ({1})\n'.format(version, release_date)
                 diffstartref = oldestref
                 if oldestref in tags:
-                    diffstartref = tags[oldestref].tag
+                    diffstartref = tags[oldestref].name
                 cur_ver.post_header.insert(
                     0,
                     '[all commits](https://github.com/Flexget/Flexget/compare/{0}...{1})\n'.format(
-                        diffstartref, version
+                        diffstartref, tags[commit.hexsha].name
                     ),
                 )
                 released_vers.insert(0, cur_ver)

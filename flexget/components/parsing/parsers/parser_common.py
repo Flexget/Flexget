@@ -1,13 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import re
 from string import capwords
 
+from loguru import logger
+
 from flexget.utils.qualities import Quality
 
-log = logging.getLogger('parser')
+logger = logger.bind(name='parser')
 
 SERIES_ID_TYPES = ['ep', 'date', 'sequence', 'id']
 
@@ -51,7 +49,7 @@ def normalize_name(name):
     return name
 
 
-class MovieParseResult(object):
+class MovieParseResult:
     def __init__(
         self,
         data=None,
@@ -113,7 +111,7 @@ class MovieParseResult(object):
         )
 
 
-class SeriesParseResult(object):
+class SeriesParseResult:
     def __init__(
         self,
         data=None,

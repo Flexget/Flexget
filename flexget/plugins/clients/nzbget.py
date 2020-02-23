@@ -1,15 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('nzbget')
+logger = logger.bind(name='nzbget')
 
 
-class OutputNzbget(object):
+class OutputNzbget:
     """
     Example::
 
@@ -41,7 +38,7 @@ class OutputNzbget(object):
 
         for entry in task.accepted:
             if task.options.test:
-                log.info('Would add into nzbget: %s', entry['title'])
+                logger.info('Would add into nzbget: {}', entry['title'])
                 continue
 
             # allow overriding the category
@@ -56,9 +53,9 @@ class OutputNzbget(object):
                     params['top'],
                     entry['url'],
                 )
-                log.info('Added `%s` to nzbget', entry['title'])
+                logger.info('Added `{}` to nzbget', entry['title'])
             except Exception as e:
-                log.critical('rpc call to nzbget failed: %s', e)
+                logger.critical('rpc call to nzbget failed: {}', e)
                 entry.fail('could not call appendurl via RPC')
 
 

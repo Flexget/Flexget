@@ -1,11 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
 
 @pytest.mark.usefixtures('tmpdir')
-class TestTorrentSize(object):
+class TestTorrentSize:
     config = """
         tasks:
           test_min:
@@ -69,7 +66,7 @@ class TestTorrentSize(object):
 
 
 @pytest.mark.usefixtures('tmpdir')
-class TestFileSize(object):
+class TestFileSize:
     """This is to test that content_size is picked up from the file itself when filesystem is used as the input.
     This doesn't do a super job of testing, because we don't have any test files bigger than 1 MB."""
 

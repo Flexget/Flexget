@@ -1,13 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 
-log = logging.getLogger('disable')
+logger = logger.bind(name='disable')
 
 
 def all_builtins():
@@ -15,7 +12,7 @@ def all_builtins():
     return (p for p in plugin.plugins.values() if p.builtin)
 
 
-class DisablePlugin(object):
+class DisablePlugin:
     """
     Allows disabling built-ins, or plugins referenced by template/include plugin.
 
@@ -54,7 +51,7 @@ class DisablePlugin(object):
             # Disable plugins explicitly included in config.
             if p in task.config:
                 disabled.append(p)
-                del (task.config[p])
+                del task.config[p]
             # Disable built-in plugins.
             if p in plugin.plugins and plugin.plugins[p].builtin:
                 plugin.plugins[p].builtin = False
@@ -67,9 +64,9 @@ class DisablePlugin(object):
                 self.disabled_builtins.append(p.name)
 
         if self.disabled_builtins:
-            log.debug('Disabled built-in plugin(s): %s' % ', '.join(self.disabled_builtins))
+            logger.debug('Disabled built-in plugin(s): {}', ', '.join(self.disabled_builtins))
         if disabled:
-            log.debug('Disabled plugin(s): %s' % ', '.join(disabled))
+            logger.debug('Disabled plugin(s): {}', ', '.join(disabled))
 
     @plugin.priority(plugin.PRIORITY_LAST)
     def on_task_exit(self, task, config):
@@ -78,7 +75,7 @@ class DisablePlugin(object):
 
         for name in self.disabled_builtins:
             plugin.plugins[name].builtin = True
-        log.debug('Re-enabled builtin plugin(s): %s' % ', '.join(self.disabled_builtins))
+        logger.debug('Re-enabled builtin plugin(s): {}', ', '.join(self.disabled_builtins))
         self.disabled_builtins = []
 
     on_task_abort = on_task_exit

@@ -1,10 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import re
 
 import feedparser
+from loguru import logger
 from requests.auth import AuthBase
 
 from flexget import plugin
@@ -13,10 +10,10 @@ from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException
 
-log = logging.getLogger('apple_trailers')
+logger = logger.bind(name='apple_trailers')
 
 
-class AppleTrailers(object):
+class AppleTrailers:
     """
         Adds support for Apple.com movie trailers.
 
@@ -89,8 +86,8 @@ class AppleTrailers(object):
         if rss.get('bozo_exception', False):
             raise plugin.PluginError('Got bozo_exception (bad feed)')
 
-        filmid_regex = re.compile('(FilmId\s*\=\s*\')(\d+)(?=\')')
-        studio_regex = re.compile('(?:[0-9]*\s*)(.+)')
+        filmid_regex = re.compile(r'(FilmId\s*\=\s*\')(\d+)(?=\')')
+        studio_regex = re.compile(r'(?:[0-9]*\s*)(.+)')
         # use the following dict to save json object in case multiple trailers have been released for the same movie
         # no need to do multiple requests for the same thing!
         trailers = {}
@@ -113,14 +110,14 @@ class AppleTrailers(object):
                         self.broken('FilmId not found for {0}'.format(entry['movie_name']))
 
                 except RequestException as e:
-                    log.error('Failed to get trailer %s: %s', entry['title'], e.args[0])
+                    logger.error('Failed to get trailer {}: {}', entry['title'], e.args[0])
                     continue
             else:
                 movie_data = trailers[movie_url]['json']
             genres = {genre.get('name') for genre in movie_data.get('details').get('genres')}
             config_genres = set(config.get('genres', []))
             if genres and config_genres and not set.intersection(config_genres, genres):
-                log.debug('Config genre(s) do not match movie genre(s)')
+                logger.debug('Config genre(s) do not match movie genre(s)')
                 continue
 
             desired_quality = config['quality']
@@ -145,7 +142,7 @@ class AppleTrailers(object):
                     except KeyError as e:
                         self.broken(e.args[0])
             else:
-                log.error('Trailer "%s" not found', entry['apple_trailers_name'])
+                logger.error('Trailer "{}" not found', entry['apple_trailers_name'])
                 continue
 
             # set some entry fields if present

@@ -1,17 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import re
+
+from loguru import logger
 
 from flexget import options, plugin
 from flexget.event import event
 from flexget.terminal import console
 
-log = logging.getLogger('try_regexp')
+logger = logger.bind(name='try_regexp')
 
 
-class PluginTryRegexp(object):
+class PluginTryRegexp:
     """
         This plugin allows user to test regexps for a task.
     """

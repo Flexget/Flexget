@@ -4,10 +4,8 @@ Plugins can just import the methods from this module.
 
 Also allows date and datetime objects to be encoded/decoded.
 """
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import datetime
+from collections import Mapping, Iterable
 
 from flexget.plugin import DependencyError
 
@@ -44,7 +42,7 @@ class DTDecoder(json.JSONDecoder):
                 except (ValueError, TypeError):
                     pass
 
-        return super(DTDecoder, self).decode(obj, **kwargs)
+        return super().decode(obj, **kwargs)
 
 
 def _datetime_encoder(obj):
@@ -122,3 +120,25 @@ def load(*args, **kwargs):
     else:
         kwargs['object_hook'] = _empty_unicode_decoder
     return json.load(*args, **kwargs)
+
+
+def coerce(obj):
+    """
+    Coerce a data structure to a JSON serializable form.
+
+    Will recursively go through data structure, and attempt to turn anything not JSON serializable into a string.
+    """
+    if isinstance(obj, (str, int, float, bool, type(None))):
+        return obj
+    if isinstance(obj, datetime.datetime):
+        return obj.strftime(ISO8601_FMT)
+    if isinstance(obj, datetime.date):
+        return obj.strftime(DATE_FMT)
+    if isinstance(obj, Mapping):
+        return {k: coerce(v) for k, v in obj.items()}
+    if isinstance(obj, Iterable):
+        return [coerce(v) for v in obj]
+    try:
+        return str(obj)
+    except Exception:
+        return 'NOT JSON SERIALIZABLE'

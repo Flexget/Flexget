@@ -1,23 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves import builtins
-
-import logging
 import datetime
 from copy import copy
 
 from jinja2 import UndefinedError
+from loguru import logger
 
 from flexget import plugin
+from flexget.entry import Entry
 from flexget.event import event
 from flexget.task import Task
-from flexget.entry import Entry
 from flexget.utils.template import evaluate_expression
 
-log = logging.getLogger('if')
+logger = logger.bind(name='if')
 
 
-class FilterIf(object):
+class FilterIf:
     """Can run actions on entries that satisfy a given condition.
 
     Actions include accept, reject, and fail, as well as the ability to run other filter plugins on the entries."""
@@ -49,14 +45,14 @@ class FilterIf(object):
             # Restrict eval namespace to have no globals and locals only from eval_locals
             passed = evaluate_expression(condition, eval_locals)
             if passed:
-                log.debug('%s matched requirement %s' % (entry['title'], condition))
+                logger.debug('{} matched requirement {}', entry['title'], condition)
             return passed
         except UndefinedError as e:
             # Extract the name that did not exist
             missing_field = e.args[0].split('\'')[1]
-            log.debug('%s does not contain the field %s' % (entry['title'], missing_field))
+            logger.debug('{} does not contain the field {}', entry['title'], missing_field)
         except Exception as e:
-            log.error('Error occurred while evaluating statement `%s`. (%s)' % (condition, e))
+            logger.error('Error occurred while evaluating statement `{}`. ({})', condition, e)
 
     def __getattr__(self, item):
         """Provides handlers for all phases."""

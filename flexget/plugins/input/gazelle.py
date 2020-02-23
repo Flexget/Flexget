@@ -1,10 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from datetime import datetime
-import logging
 
-from flexget import plugin, db_schema
+from loguru import logger
+from sqlalchemy import Column, DateTime, String, Unicode
+
+from flexget import db_schema, plugin
+from flexget.components.sites.utils import normalize_unicode
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
@@ -12,14 +12,10 @@ from flexget.manager import Session
 from flexget.plugin import PluginError
 from flexget.utils.database import json_synonym
 from flexget.utils.requests import TokenBucketLimiter
-from flexget.components.sites.utils import normalize_unicode
 from flexget.utils.tools import parse_filesize
 
-from sqlalchemy import Column, Unicode, String, DateTime
-
-
-DETECT_2FA = ("Authenticator Code", "TOTP code")
-log = logging.getLogger('gazelle')
+DETECT_2FA = "Authenticator Code", "TOTP code"
+logger = logger.bind(name='gazelle')
 Base = db_schema.versioned_base('gazelle_session', 0)
 
 
@@ -36,7 +32,7 @@ class GazelleSession(Base):
     expires = Column(DateTime)
 
 
-class InputGazelle(object):
+class InputGazelle:
     """A generic plugin that searches a Gazelle-based website
 
     Limited functionality but should work for almost all of them.
@@ -118,8 +114,8 @@ class InputGazelle(object):
         base_url = config.get('base_url', "").rstrip("/")
         if base_url:
             if self.base_url and self.base_url != base_url:
-                log.warning(
-                    "Using plugin designed for %s on %s - things may break",
+                logger.warning(
+                    'Using plugin designed for {} on {} - things may break',
                     self.base_url,
                     base_url,
                 )
@@ -149,7 +145,7 @@ class InputGazelle(object):
 
         Return True on successful recovery, False otherwise
         """
-        log.debug("Attempting to find an existing session in the DB")
+        logger.debug("Attempting to find an existing session in the DB")
         with Session() as session:
             db_session = (
                 session.query(GazelleSession)
@@ -169,7 +165,7 @@ class InputGazelle(object):
 
     def save_current_session(self):
         """Store the current session in the database so it can be resumed later"""
-        log.debug("Storing session info in the DB")
+        logger.debug("Storing session info in the DB")
         with Session() as session:
             expires = None
             for c in self._session.cookies:
@@ -194,7 +190,7 @@ class InputGazelle(object):
         self._session.cookies.clear()
 
         if not force and self.resume_session():
-            log.info("Logged into %s using cached session", self.base_url)
+            logger.info('Logged into {} using cached session', self.base_url)
             return
 
         # Forcing a re-login or no session in DB - log in using provided creds
@@ -213,7 +209,7 @@ class InputGazelle(object):
         account_info = self.request(no_login=True, action='index')
         self.authkey = account_info['authkey']
         self.passkey = account_info['passkey']
-        log.info("Logged in to %s", self.base_url)
+        logger.info('Logged in to {}', self.base_url)
 
         # Store the session so we can resume it later
         self.save_current_session()
@@ -232,7 +228,7 @@ class InputGazelle(object):
         ajaxpage = "{}/ajax.php".format(self.base_url)
         r = self._session.get(ajaxpage, params=params, allow_redirects=False, raise_status=True)
         if not no_login and r.is_redirect and r.next.url == "{}/login.php".format(self.base_url):
-            log.warning("Redirected to login page, reauthenticating and trying again")
+            logger.warning("Redirected to login page, reauthenticating and trying again")
             self.authenticate(force=True)
             return self.request(no_login=True, **params)
 
@@ -263,7 +259,7 @@ class InputGazelle(object):
             if pages and page >= pages:
                 break
 
-            log.debug("Attempting to get page %d of search results", page)
+            logger.debug('Attempting to get page {} of search results', page)
             result = self.request(action='browse', page=page, **params)
             if not result['results']:
                 break
@@ -274,7 +270,7 @@ class InputGazelle(object):
             page += 1
 
         if page > self.max_pages:
-            log.warning("Stopped after %d pages (out of %d total pages)", self.max_pages, pages)
+            logger.warning('Stopped after {} pages (out of {} total pages)', self.max_pages, pages)
 
     def get_entries(self, search_results):
         """Generator that yields Entry objects from search results"""
@@ -297,7 +293,7 @@ class InputGazelle(object):
                     content_size=parse_filesize(str(tor['size']) + "b"),
                 )
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def search(self, task, entry, config):
         """Search interface"""
         self.setup(task, config)
@@ -310,7 +306,7 @@ class InputGazelle(object):
             entries.update(self.get_entries(self.search_results(params)))
         return entries
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def on_task_input(self, task, config):
         """Task input interface"""
         self.setup(task, config)
@@ -328,7 +324,7 @@ class InputGazelleMusic(InputGazelle):
 
     def __init__(self):
         """Set up the majority of parameters that these sites support"""
-        super(InputGazelleMusic, self).__init__()
+        super().__init__()
 
         self.aliases.update(
             {
@@ -393,7 +389,7 @@ class InputGazelleMusic(InputGazelle):
 
         Extends the super's schema
         """
-        schema = super(InputGazelleMusic, self).schema
+        schema = super().schema
         schema['properties'].update(
             {
                 'artist': {'type': 'string'},
@@ -452,7 +448,7 @@ class InputRedacted(InputGazelleMusic):
 
     def __init__(self):
         """Set up custom base_url and parameters"""
-        super(InputRedacted, self).__init__()
+        super().__init__()
         self.base_url = "https://redacted.ch"
 
         self.params['encoding'].remove("q8.x (VBR)")
@@ -466,7 +462,7 @@ class InputNotWhat(InputGazelleMusic):
 
     def __init__(self):
         """Set up custom base_url and parameters"""
-        super(InputNotWhat, self).__init__()
+        super().__init__()
         self.base_url = "https://notwhat.cd"
 
         self.params['media'].extend(['Blu-ray', 'Unknown'])

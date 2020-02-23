@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
 
 @pytest.mark.online
-class TestNfoLookupWithMovies(object):
+class TestNfoLookupWithMovies:
     base = "nfo_lookup_test_dir/"
     config = """
         tasks:
@@ -208,9 +204,11 @@ class TestNfoLookupWithMovies(object):
             # future version make the necessary changes in the assert below.
             assert keys == sorted(
                 [
+                    '_backlog_snapshot',
                     'title',
                     'original_title',
                     'filename',
+                    'media_id',
                     'nfo_id',
                     'task',
                     'url',

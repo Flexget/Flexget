@@ -1,13 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
+from loguru import logger
 
-import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
+from flexget import plugin
 from flexget.event import event
 
 from . import series as plugin_series
-
-from flexget import plugin
 
 try:
     # NOTE: Importing other plugins is discouraged!
@@ -15,10 +11,10 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='parser_common')
 
-log = logging.getLogger('metainfo_series')
+logger = logger.bind(name='metainfo_series')
 
 
-class MetainfoSeries(object):
+class MetainfoSeries:
     """
     Check if entry appears to be a series, and populate series info if so.
     """
@@ -33,7 +29,7 @@ class MetainfoSeries(object):
             return
         for entry in task.entries:
             # If series plugin already parsed this, don't touch it.
-            if entry.get('id'):
+            if entry.get('series_name'):
                 continue
             self.guess_entry(entry)
 

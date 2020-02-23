@@ -1,22 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import re
-import logging
 
+from loguru import logger
 from requests.exceptions import RequestException
 
 from flexget import plugin
+from flexget.components.sites.urlrewriting import UrlRewritingError
+from flexget.components.sites.utils import normalize_unicode, torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
-from flexget.components.sites.urlrewriting import UrlRewritingError
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
-from flexget.components.sites.utils import torrent_availability, normalize_unicode
 from flexget.utils.tools import parse_filesize
 
-log = logging.getLogger('torrentday')
+logger = logger.bind(name='torrentday')
 
 CATEGORIES = {
     'all': 0,
@@ -45,7 +42,7 @@ CATEGORIES = {
 }
 
 
-class UrlRewriteTorrentday(object):
+class UrlRewriteTorrentday:
     """
         Torrentday urlrewriter and search plugin.
 
@@ -95,9 +92,9 @@ class UrlRewriteTorrentday(object):
     # urlrewriter API
     def url_rewrite(self, task, entry):
         if 'url' not in entry:
-            log.error('Didn\'t actually get a URL...')
+            logger.error('Didn\'t actually get a URL...')
         else:
-            log.debug('Got the URL: %s', entry['url'])
+            logger.debug('Got the URL: {}', entry['url'])
         if entry['url'].startswith('https://www.torrentday.com/browse'):
             # use search
             results = self.search(task, entry)
@@ -105,7 +102,7 @@ class UrlRewriteTorrentday(object):
                 raise UrlRewritingError('No search results found')
             entry['url'] = results[0]['url']
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def search(self, task, entry, config=None):
         """
         Search for name from torrentday.
@@ -153,19 +150,19 @@ class UrlRewriteTorrentday(object):
                 # find the torrent names
                 td = tr.find('td', {'class': 'torrentNameInfo'})
                 if not td:
-                    log.warning('Could not find entry torrentNameInfo for %s.', search_string)
+                    logger.warning('Could not find entry torrentNameInfo for {}.', search_string)
                     continue
                 title = td.find('a')
                 if not title:
-                    log.warning('Could not determine title for %s.', search_string)
+                    logger.warning('Could not determine title for {}.', search_string)
                     continue
                 entry['title'] = title.contents[0]
-                log.debug('title: %s', title.contents[0])
+                logger.debug('title: {}', title.contents[0])
 
                 # find download link
                 torrent_url = tr.find('td', {'class': 'ac'})
                 if not torrent_url:
-                    log.warning('Could not determine download link for %s.', search_string)
+                    logger.warning('Could not determine download link for {}.', search_string)
                     continue
                 torrent_url = torrent_url.find('a').get('href')
 
@@ -176,7 +173,7 @@ class UrlRewriteTorrentday(object):
                     + '?torrent_pass='
                     + config['rss_key']
                 )
-                log.debug('RSS-ified download link: %s', torrent_url)
+                logger.debug('RSS-ified download link: {}', torrent_url)
                 entry['url'] = torrent_url
 
                 # us tr object for seeders/leechers

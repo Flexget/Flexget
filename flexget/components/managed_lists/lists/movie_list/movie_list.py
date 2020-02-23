@@ -1,9 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
+from collections.abc import MutableSet
 
-import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from collections import MutableSet
-
+from loguru import logger
 from sqlalchemy import func
 from sqlalchemy.sql.elements import and_
 
@@ -12,8 +9,8 @@ from flexget.db_schema import with_session
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.tools import split_title_year
-from . import db
 
+from . import db
 
 try:
     # NOTE: Importing other plugins is discouraged!
@@ -21,10 +18,10 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='parser_common')
 
-log = logging.getLogger('movie_list')
+logger = logger.bind(name='movie_list')
 
 
-class MovieListBase(object):
+class MovieListBase:
     """
     Class that contains helper methods for movie list as well as plugins that use it,
     such as API and CLI.
@@ -86,7 +83,7 @@ class MovieList(MutableSet):
             for id_name in MovieListBase().supported_ids:
                 if id_name in entry:
                     db_movie.ids.append(db.MovieListID(id_name=id_name, id_value=entry[id_name]))
-            log.debug('adding entry %s', entry)
+            logger.debug('adding entry {}', entry)
             db_list.movies.append(db_movie)
             session.commit()
             return db_movie.to_entry()
@@ -95,7 +92,7 @@ class MovieList(MutableSet):
         with Session() as session:
             db_movie = self._find_entry(entry, session=session)
             if db_movie:
-                log.debug('deleting movie %s', db_movie)
+                logger.debug('deleting movie {}', db_movie)
                 session.delete(db_movie)
 
     def __contains__(self, entry):
@@ -107,7 +104,7 @@ class MovieList(MutableSet):
         # Match by supported IDs
         for id_name in MovieListBase().supported_ids:
             if entry.get(id_name):
-                log.debug('trying to match movie based off id %s: %s', id_name, entry[id_name])
+                logger.debug('trying to match movie based off id {}: {}', id_name, entry[id_name])
                 res = (
                     self._db_list(session)
                     .movies.join(db.MovieListMovie.ids)
@@ -120,7 +117,7 @@ class MovieList(MutableSet):
                     .first()
                 )
                 if res:
-                    log.debug('found movie %s', res)
+                    logger.debug('found movie {}', res)
                     return res
         # Fall back to title/year match
         if not entry.get('movie_name'):
@@ -129,9 +126,9 @@ class MovieList(MutableSet):
             name = entry['movie_name']
             year = entry.get('movie_year') if entry.get('movie_year') else None
         else:
-            log.warning('Could not get a movie name, skipping')
+            logger.warning('Could not get a movie name, skipping')
             return
-        log.debug('trying to match movie based of name: %s and year: %s', name, year)
+        logger.debug('trying to match movie based of name: {} and year: {}', name, year)
         res = (
             self._db_list(session)
             .movies.filter(func.lower(db.MovieListMovie.title) == name.lower())
@@ -139,7 +136,7 @@ class MovieList(MutableSet):
             .first()
         )
         if res:
-            log.debug('found movie %s', res)
+            logger.debug('found movie {}', res)
         return res
 
     @staticmethod
@@ -169,7 +166,7 @@ class MovieList(MutableSet):
         return match.to_entry() if match else None
 
 
-class PluginMovieList(object):
+class PluginMovieList:
     """Remove all accepted elements from your trakt.tv watchlist/library/seen or custom list."""
 
     schema = {

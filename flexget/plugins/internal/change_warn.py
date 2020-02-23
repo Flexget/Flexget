@@ -1,17 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import sys
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('change')
+logger = logger.bind(name='change')
 found_deprecated = False
 
 
-class ChangeWarn(object):
+class ChangeWarn:
     """
         Gives warning if user has deprecated / changed configuration in the root level.
 
@@ -24,11 +22,11 @@ class ChangeWarn(object):
         global found_deprecated
 
         if 'torrent_size' in task.config:
-            log.critical('Plugin torrent_size is deprecated, use content_size instead')
+            logger.critical('Plugin torrent_size is deprecated, use content_size instead')
             found_deprecated = True
 
         if 'nzb_size' in task.config:
-            log.critical('Plugin nzb_size is deprecated, use content_size instead')
+            logger.critical('Plugin nzb_size is deprecated, use content_size instead')
             found_deprecated = True
 
         if found_deprecated:
@@ -87,21 +85,20 @@ try:
                 require_clean = True
 
             if require_clean:
-                log.critical('-' * 79)
-                log.critical('IMPORTANT: Your installation has some files from older FlexGet!')
-                log.critical('')
-                log.critical(
-                    '           Please remove all pre-compiled .pyc and .pyo files from %s'
-                    % plugin_dir
+                logger.critical('-' * 79)
+                logger.critical('IMPORTANT: Your installation has some files from older FlexGet!')
+                logger.critical('')
+                logger.critical(
+                    ' Please remove all pre-compiled .pyc and .pyo files from {}', plugin_dir
                 )
-                log.critical('           Offending file: %s' % name)
-                log.critical('')
-                log.critical(
+                logger.critical(' Offending file: {}', name)
+                logger.critical('')
+                logger.critical(
                     '           After getting rid of these FlexGet should run again normally'
                 )
 
-                log.critical('')
-                log.critical('-' * 79)
+                logger.critical('')
+                logger.critical('-' * 79)
                 found_deprecated = True
                 break
 

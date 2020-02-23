@@ -1,23 +1,20 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
-from datetime import date, datetime, timedelta
 import time
+from datetime import date, datetime, timedelta
 
-from sqlalchemy import Table, Column, Integer, Float, Unicode, DateTime, Date, func
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation
 from dateutil.parser import parse as dateutil_parse
+from loguru import logger
+from sqlalchemy import Column, Date, DateTime, Float, Integer, Table, Unicode, func
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import relation
+from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
-from flexget.utils.soup import get_soup
 from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.database import year_property
+from flexget.utils.soup import get_soup
 
-log = logging.getLogger('api_bluray')
+logger = logger.bind(name='api_bluray')
 Base = db_schema.versioned_base('api_bluray', 0)
 
 # association tables
@@ -96,9 +93,7 @@ class BlurayMovie(Base):
             search_results = response['items']
             countries = bluray_request('countries.json.php', **country_params) or {}
 
-            search_results = sorted(
-                search_results, key=lambda k: extract_release_date(k)
-            )
+            search_results = sorted(search_results, key=lambda k: extract_release_date(k))
         except requests.RequestException as e:
             raise LookupError('Error searching for {} on blu-ray.com: {}'.format(title_year, e))
 
@@ -196,7 +191,7 @@ class BluraySearchResult(Base):
             self.movie = movie
 
 
-class ApiBluray(object):
+class ApiBluray:
     """Does lookups to Blu-ray.com and provides movie information. Caches lookups."""
 
     @staticmethod
@@ -231,26 +226,26 @@ class ApiBluray(object):
                     age_in_years = (datetime.now().date() - movie.release_date).days / 365
                     refresh_time += timedelta(days=age_in_years * 5)
             if movie.updated < datetime.now() - refresh_time and not only_cached:
-                log.debug(
-                    'Cache has expired for %s, attempting to refresh from blu-ray.com.', movie.name
+                logger.debug(
+                    'Cache has expired for {}, attempting to refresh from blu-ray.com.', movie.name
                 )
                 try:
                     updated_movie = BlurayMovie(title=title, year=year)
                 except LookupError as e:
-                    log.error(
-                        'Error refreshing movie details for %s from blu-ray.com, cached info being used. %s',
+                    logger.error(
+                        'Error refreshing movie details for {} from blu-ray.com, cached info being used. {}',
                         title,
                         e,
                     )
                 else:
                     movie = session.merge(updated_movie)
             else:
-                log.debug('Movie %s information restored from cache.', movie.name)
+                logger.debug('Movie {} information restored from cache.', movie.name)
         else:
             if only_cached:
                 raise LookupError('Movie %s not found from cache' % title_year)
             # There was no movie found in the cache, do a lookup from blu-ray.com
-            log.verbose('Searching from blu-ray.com `%s`', title)
+            logger.verbose('Searching from blu-ray.com `{}`', title)
 
             # Add/merge movie to db
             movie = BlurayMovie(title=title, year=year)

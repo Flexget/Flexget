@@ -1,28 +1,27 @@
 # coding=utf-8
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
 
 import json
-import logging
-from time import sleep
-from datetime import datetime, timedelta
-
-from sqlalchemy import Column, Unicode, Integer, DateTime
-from sqlalchemy.types import TypeDecorator, VARCHAR
-
 import re
-from flexget import plugin
-from flexget.event import event
-from flexget.db_schema import versioned_base
-from flexget.plugin import PluginError
-from flexget.manager import Session
+from datetime import datetime, timedelta
+from time import sleep
+
+from loguru import logger
 from requests.auth import AuthBase
-from requests.utils import dict_from_cookiejar
 from requests.exceptions import RequestException
+from requests.utils import dict_from_cookiejar
+from sqlalchemy import Column, DateTime, Integer, Unicode
+from sqlalchemy.types import VARCHAR, TypeDecorator
+
+from flexget import plugin
+from flexget.db_schema import versioned_base
+from flexget.event import event
+from flexget.manager import Session
+from flexget.plugin import PluginError
 
 __author__ = 'asm0dey'
 
-log = logging.getLogger('rutracker_auth')
+logger = logger.bind(name='rutracker_auth')
 Base = versioned_base('rutracker_auth', 0)
 
 MIRRORS = ['https://rutracker.net', 'https://rutracker.org']
@@ -73,7 +72,7 @@ class RutrackerAuth(AuthBase):
                     url = mirror
                     break
             except RequestException as err:
-                log.debug('Connection error. %s', str(err))
+                logger.debug('Connection error. {}', str(err))
 
         if url:
             return url
@@ -93,7 +92,7 @@ class RutrackerAuth(AuthBase):
         self.requests = requests
         self.base_url = self.update_base_url()
         if cookies is None:
-            log.debug('rutracker cookie not found. Requesting new one')
+            logger.debug('rutracker cookie not found. Requesting new one')
             payload_ = {'login_username': login, 'login_password': password, 'login': 'Вход'}
             self.cookies_ = self.try_authenticate(payload_)
             if db_session:
@@ -108,7 +107,7 @@ class RutrackerAuth(AuthBase):
             else:
                 raise ValueError('db_session can not be None if cookies is None')
         else:
-            log.debug('Using previously saved cookie')
+            logger.debug('Using previously saved cookie')
             self.cookies_ = cookies
 
     def __call__(self, r):
@@ -130,7 +129,7 @@ class RutrackerAuth(AuthBase):
         return r
 
 
-class RutrackerUrlrewrite(object):
+class RutrackerUrlrewrite:
     """Usage:
 
     rutracker_auth:

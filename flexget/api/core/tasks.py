@@ -1,40 +1,38 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import argparse
 import cgi
 import copy
 from datetime import datetime, timedelta
 from json import JSONEncoder
+from queue import Empty, Queue
 
-from flask import jsonify, Response, request
+from flask import Response, jsonify, request
 from flask_restplus import inputs
-from queue import Queue, Empty
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import (
     APIError,
-    NotFoundError,
-    Conflict,
     BadRequest,
-    success_response,
+    Conflict,
+    NotFoundError,
     base_message_schema,
     etag,
+    success_response,
 )
 from flexget.config_schema import process_config
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.log import capture_logs
 from flexget.options import get_parser
 from flexget.task import task_phases
-from flexget.utils import json
-from flexget.utils import requests
+from flexget.terminal import capture_console
+from flexget.utils import json, requests
 from flexget.utils.lazy_dict import LazyLookup
 
 # Tasks API
 tasks_api = api.namespace('tasks', description='Manage Tasks')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     tasks_list_object = {
         'oneOf': [
             {'type': 'array', 'items': {'$ref': '#/definitions/tasks.task'}},
@@ -436,6 +434,9 @@ class TaskExecutionAPI(APIResource):
         )
         loglevel = data.pop('loglevel', None)
 
+        if loglevel:
+            loglevel = loglevel.upper()
+
         # This emulates the CLI command of using `--now` and `no-cache`
         options = {
             'interval_ignore': data.pop('now', None),
@@ -474,7 +475,11 @@ class TaskExecutionAPI(APIResource):
                 entries.append(entry)
             options['inject'] = entries
 
-        executed_tasks = self.manager.execute(options=options, output=output, loglevel=loglevel)
+        if output:
+            with capture_console(output), capture_logs(output, level=loglevel):
+                executed_tasks = self.manager.execute(options=options)
+        else:
+            executed_tasks = self.manager.execute(options=options)
 
         tasks_queued = []
 
@@ -577,7 +582,7 @@ def update_stream(task, status='pending'):
         'percent': task.stream.get('percent', 0),
     }
 
-    task.stream['queue'].put(json.dumps({'progress': progress}))
+    task.stream['queue'].put(json.dumps({'progress': progress, 'task_id': task.id}))
 
 
 @event('task.execute.started')
@@ -596,7 +601,9 @@ def finish_task(task):
 
         if task.stream['args'].get('entry_dump'):
             entries = [entry.store for entry in task.entries]
-            task.stream['queue'].put(EntryDecoder().encode({'entry_dump': entries}))
+            task.stream['queue'].put(
+                EntryDecoder().encode({'entry_dump': entries, 'task_id': task.id})
+            )
 
         if task.stream['args'].get('summary'):
             task.stream['queue'].put(
@@ -609,7 +616,8 @@ def finish_task(task):
                             'undecided': len(task.undecided),
                             'aborted': task.aborted,
                             'abort_reason': task.abort_reason,
-                        }
+                        },
+                        'task_id': task.id,
                     }
                 )
             )

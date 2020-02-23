@@ -1,17 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import re
-import logging
+
+from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
 from flexget.components.imdb.utils import extract_id, make_url
+from flexget.event import event
 
-log = logging.getLogger('metainfo_imdb_url')
+logger = logger.bind(name='metainfo_imdb_url')
 
 
-class MetainfoImdbUrl(object):
+class MetainfoImdbUrl:
     """
         Scan entry information for imdb url.
     """
@@ -37,12 +35,12 @@ class MetainfoImdbUrl(object):
                 continue
 
             if len(imdb_ids) > 1:
-                log.debug('Found multiple imdb ids; not using any of: %s' % ' '.join(imdb_ids))
+                logger.debug('Found multiple imdb ids; not using any of: {}', ' '.join(imdb_ids))
                 continue
 
             entry['imdb_id'] = imdb_ids[0]
             entry['imdb_url'] = make_url(entry['imdb_id'])
-            log.debug('Found imdb url in description %s' % entry['imdb_url'])
+            logger.debug('Found imdb url in description {}', entry['imdb_url'])
 
 
 @event('plugin.register')

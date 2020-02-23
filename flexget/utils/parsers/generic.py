@@ -2,9 +2,6 @@
 Collection of generic parser related utilities used by internal parser and with
 parsing plugins.
 """
-from __future__ import absolute_import, division, unicode_literals
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import re
 
 

@@ -1,29 +1,25 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import PY3
-
 import re
 from datetime import datetime, timedelta
+from unittest import mock
 
-import mock
 import pytest
 
-from flexget.manager import Session
 from flexget.components.thetvdb.api_tvdb import (
-    persist,
+    TVDBEpisode,
+    TVDBRequest,
     TVDBSearchResult,
+    find_series_id,
     lookup_series,
     mark_expired,
-    TVDBRequest,
-    TVDBEpisode,
-    find_series_id,
+    persist,
 )
+from flexget.manager import Session
 
 
 @mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')
 @pytest.mark.online
-class TestTVDBLookup(object):
+class TestTVDBLookup:
     config = """
         templates:
           global:
@@ -96,18 +92,16 @@ class TestTVDBLookup(object):
         assert entry['tvdb_content_rating'] == 'TV-14'
         assert entry['tvdb_episode'] == 2
         assert entry['tvdb_first_air_date'] == datetime(2004, 11, 16, 0, 0)
-        assert entry['tvdb_network'] == 'FOX (US)'
-        assert entry['tvdb_genres'] == ['Drama', 'Mystery']
+        assert entry['tvdb_network'] == 'FOX'
+        assert entry['tvdb_genres'] == ['Drama', 'Suspense']
         assert 'Jesse Spencer' in entry['tvdb_actors']
         assert (
             entry['tvdb_overview']
-            == 'Go deeper into the medical mysteries of House, TV\'s most compelling '
-            'drama. Hugh Laurie stars as the brilliant but sarcastic Dr. Gregory'
-            ' House, a maverick physician who is devoid of bedside manner. While'
-            ' his behavior can border on antisocial, Dr. House thrives on the'
-            ' challenge of solving the medical puzzles that other doctors give up on.'
-            ' Together with his hand-picked team of young medical experts, he\'ll'
-            ' do whatever it takes in the race against the clock to solve the case.'
+            == 'Dr. Gregory House is a maverick physician who is devoid of bedside manner. '
+            'While his behavior can border on antisocial, Dr. House thrives on the challenge '
+            'of solving the medical puzzles that other doctors give up on. Together with his '
+            'hand-picked team of young medical experts, he\'ll do whatever it takes in the '
+            'race against the clock to solve the case.'
         )
 
         assert entry['tvdb_ep_air_date'] == datetime(2004, 11, 23, 0, 0)
@@ -188,14 +182,13 @@ class TestTVDBLookup(object):
         assert find_series_id('House M.D.') == 73255
         assert find_series_id('House') == 73255
 
-    @pytest.mark.skipif(not PY3, reason='VCRPY can\'t handle unicode in py2')
     def test_find_series_with_languages(self, mocked_expired, execute_task):
         assert find_series_id('Tegenlicht', 'nl') == 252712
         assert find_series_id('החממה', 'he') == 270698
 
 
 @pytest.mark.online
-class TestTVDBExpire(object):
+class TestTVDBExpire:
     config = """
         templates:
           global:
@@ -294,7 +287,7 @@ class TestTVDBExpire(object):
 
 @mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')
 @pytest.mark.online
-class TestTVDBList(object):
+class TestTVDBList:
     """
         Tests thetvdb list plugin with a test user at thetvdb.
         Test user info:
@@ -353,7 +346,7 @@ class TestTVDBList(object):
 
 @mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')
 @pytest.mark.online
-class TestTVDBFavorites(object):
+class TestTVDBFavorites:
     """
         Tests thetvdb list plugin with a test user at thetvdb.
         Test user info:
@@ -412,7 +405,7 @@ class TestTVDBFavorites(object):
 
 @mock.patch('flexget.components.thetvdb.api_tvdb.mark_expired')
 @pytest.mark.online
-class TestTheTVDBLanguages(object):
+class TestTheTVDBLanguages:
     config = """
             templates:
               global:

@@ -1,9 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import os
+from unittest import mock
 
-import mock
 import pytest
 
 from flexget.config_schema import parse_size
@@ -20,7 +17,7 @@ def mock_os_disk_stats(folder):
 
 
 @mock.patch('flexget.plugins.modify.path_by_space.os_disk_stats', side_effect=mock_os_disk_stats)
-class TestPathSelect(object):
+class TestPathSelect:
     config = """
         tasks:
           test_most_free:

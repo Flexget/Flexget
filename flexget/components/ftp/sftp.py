@@ -1,22 +1,21 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urljoin, urlparse, quote, unquote
-
 import logging
 import os
 import posixpath
 import time
-from functools import partial
 from collections import namedtuple
+from functools import partial
 from itertools import groupby
+from urllib.parse import quote, unquote, urljoin, urlparse
+
+from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
-from flexget.entry import Entry
 from flexget.config_schema import one_or_more
-from flexget.utils.template import render_from_entry, RenderError
+from flexget.entry import Entry
+from flexget.event import event
+from flexget.utils.template import RenderError, render_from_entry
 
-log = logging.getLogger('sftp')
+logger = logger.bind(name='sftp')
 
 ConnectionConfig = namedtuple(
     'ConnectionConfig', ['host', 'port', 'username', 'password', 'private_key', 'private_key_pass']
@@ -59,15 +58,16 @@ def sftp_connect(conf):
                 private_key_pass=conf.private_key_pass,
             )
             sftp.timeout = SOCKET_TIMEOUT
-            log.verbose('Connected to %s' % conf.host)
+            logger.verbose('Connected to {}', conf.host)
         except Exception as e:
             if not tries:
                 raise e
             else:
-                log.debug('Caught exception: %s' % e)
-                log.warning(
-                    'Failed to connect to %s; waiting %d seconds before retrying.'
-                    % (conf.host, retry_interval)
+                logger.debug('Caught exception: {}', e)
+                logger.warning(
+                    'Failed to connect to {}; waiting {} seconds before retrying.',
+                    conf.host,
+                    retry_interval,
                 )
                 time.sleep(retry_interval)
                 tries -= 1
@@ -127,7 +127,7 @@ def dependency_check():
         )
 
 
-class SftpList(object):
+class SftpList:
     """
     Generate entries from SFTP. This plugin requires the pysftp Python module and its dependencies.
 
@@ -207,7 +207,7 @@ class SftpList(object):
         if not isinstance(dirs, list):
             dirs = [dirs]
 
-        log.debug('Connecting to %s' % config['host'])
+        logger.debug('Connecting to {}', config['host'])
 
         sftp = sftp_from_config(config)
         url_prefix = sftp_prefix(config)
@@ -250,7 +250,7 @@ class SftpList(object):
                 try:
                     size = size_handler(path)
                 except Exception as e:
-                    log.error('Failed to get size for %s (%s)' % (path, e))
+                    logger.error('Failed to get size for {} ({})', path, e)
                     size = -1
                 entry['content_size'] = size
 
@@ -269,14 +269,14 @@ class SftpList(object):
             """
             Skip unknown files
             """
-            log.warning('Skipping unknown file: %s' % path)
+            logger.warning('Skipping unknown file: {}', path)
 
         # the business end
         for dir in dirs:
             try:
                 sftp.walktree(dir, handle_file, handle_dir, handle_unknown, recursive)
             except IOError as e:
-                log.error('Failed to open %s (%s)' % (dir, e))
+                logger.error('Failed to open {} ({})', dir, e)
                 continue
 
         sftp.close()
@@ -284,7 +284,7 @@ class SftpList(object):
         return entries
 
 
-class SftpDownload(object):
+class SftpDownload:
     """
     Download files from a SFTP server. This plugin requires the pysftp Python module and its
     dependencies.
@@ -335,7 +335,7 @@ class SftpDownload(object):
                 host, port, username, password, private_key, private_key_pass
             )
         else:
-            log.warning('Scheme does not match SFTP: %s' % entry['url'])
+            logger.warning('Scheme does not match SFTP: {}', entry['url'])
             config = None
 
         return config
@@ -352,29 +352,29 @@ class SftpDownload(object):
         dest_dir = localpath.dirname(destination)
 
         if localpath.exists(destination):
-            log.verbose('Destination file already exists. Skipping %s' % path)
+            logger.verbose('Destination file already exists. Skipping {}', path)
             return
 
         if not localpath.exists(dest_dir):
             os.makedirs(dest_dir)
 
-        log.verbose('Downloading file %s to %s' % (path, destination))
+        logger.verbose('Downloading file {} to {}', path, destination)
 
         try:
             sftp.get(path, destination)
         except Exception as e:
-            log.error('Failed to download %s (%s)' % (path, e))
+            logger.error('Failed to download {} ({})', path, e)
             if localpath.exists(destination):
-                log.debug('Removing partially downloaded file %s' % destination)
+                logger.debug('Removing partially downloaded file {}', destination)
                 os.remove(destination)
             raise e
 
         if delete_origin:
-            log.debug('Deleting remote file %s' % path)
+            logger.debug('Deleting remote file {}', path)
             try:
                 sftp.remove(path)
             except Exception as e:
-                log.error('Failed to delete file %s (%s)' % (path, e))
+                logger.error('Failed to delete file {} ({})', path, e)
                 return
 
             self.remove_dir(sftp, dir_name)
@@ -389,18 +389,18 @@ class SftpDownload(object):
         """
         Dummy unknown file handler. Warns about unknown files.
         """
-        log.warning('Skipping unknown file %s' % path)
+        logger.warning('Skipping unknown file {}', path)
 
     def remove_dir(self, sftp, path):
         """
         Remove a directory if it's empty
         """
         if sftp.exists(path) and not sftp.listdir(path):
-            log.debug('Attempting to delete directory %s' % path)
+            logger.debug('Attempting to delete directory {}', path)
             try:
                 sftp.rmdir(path)
             except Exception as e:
-                log.error('Failed to delete directory %s (%s)' % (path, e))
+                logger.error('Failed to delete directory {} ({})', path, e)
 
     def download_entry(self, entry, config, sftp):
         """
@@ -416,12 +416,12 @@ class SftpDownload(object):
             try:
                 to = render_from_entry(to, entry)
             except RenderError as e:
-                log.error('Could not render path: %s' % to)
+                logger.error('Could not render path: {}', to)
                 entry.fail(e)
                 return
 
         if not sftp.lexists(path):
-            log.error('Remote path does not exist: %s' % path)
+            logger.error('Remote path does not exist: {}', path)
             return
 
         if sftp.isfile(path):
@@ -432,7 +432,7 @@ class SftpDownload(object):
                 self.download_file(source_file, to, sftp, delete_origin)
             except Exception as e:
                 error = 'Failed to download file %s (%s)' % (path, e)
-                log.error(error)
+                logger.error(error)
                 entry.fail(error)
         elif sftp.isdir(path):
             base_path = remotepath.normpath(remotepath.join(path, '..'))
@@ -448,7 +448,7 @@ class SftpDownload(object):
                 )
             except Exception as e:
                 error = 'Failed to download directory %s (%s)' % (path, e)
-                log.error(error)
+                logger.error(error)
                 entry.fail(error)
 
                 return
@@ -456,7 +456,7 @@ class SftpDownload(object):
             if delete_origin:
                 self.remove_dir(sftp, path)
         else:
-            log.warning('Skipping unknown file %s' % path)
+            logger.warning('Skipping unknown file {}', path)
 
     def on_task_download(self, task, config):
         """
@@ -475,7 +475,7 @@ class SftpDownload(object):
                 sftp = sftp_connect(sftp_config)
             except Exception as e:
                 error_message = 'Failed to connect to %s (%s)' % (sftp_config.host, e)
-                log.error(error_message)
+                logger.error(error_message)
 
             for entry in entries:
                 if sftp:
@@ -486,7 +486,7 @@ class SftpDownload(object):
                 sftp.close()
 
 
-class SftpUpload(object):
+class SftpUpload:
     """
     Upload files to a SFTP server. This plugin requires the pysftp Python module and its
     dependencies.
@@ -550,7 +550,7 @@ class SftpUpload(object):
             try:
                 to = render_from_entry(to, entry)
             except RenderError as e:
-                log.error('Could not render path: %s', to)
+                logger.error('Could not render path: {}', to)
                 entry.fail(e)
                 return
 
@@ -558,31 +558,31 @@ class SftpUpload(object):
         destination_url = urljoin(url_prefix, destination)
 
         if not os.path.exists(location):
-            log.warning('File no longer exists: %s', location)
+            logger.warning('File no longer exists: {}', location)
             return
 
         if not sftp.lexists(to):
             try:
                 sftp.makedirs(to)
             except Exception as e:
-                log.error('Failed to create remote directory %s (%s)' % (to, e))
+                logger.error('Failed to create remote directory {} ({})', to, e)
                 entry.fail(e)
                 return
 
         if not sftp.isdir(to):
-            log.error('Not a directory: %s' % to)
+            logger.error('Not a directory: {}', to)
             entry.fail('Not a directory: %s' % to)
             return
 
         try:
             sftp.put(localpath=location, remotepath=destination)
-            log.verbose('Successfully uploaded %s to %s' % (location, destination_url))
+            logger.verbose('Successfully uploaded {} to {}', location, destination_url)
         except IOError as e:
-            log.error('Remote directory does not exist: %s (%s)' % to)
+            logger.error('Remote directory does not exist: {} ({})', to)
             entry.fail('Remote directory does not exist: %s (%s)' % to)
             return
         except Exception as e:
-            log.error('Failed to upload %s (%s)' % (location, e))
+            logger.error('Failed to upload {} ({})', location, e)
             entry.fail('Failed to upload %s (%s)' % (location, e))
             return
 
@@ -590,7 +590,7 @@ class SftpUpload(object):
             try:
                 os.remove(location)
             except Exception as e:
-                log.error('Failed to delete file %s (%s)')
+                logger.error('Failed to delete file {} ({})', location, e)
 
     def on_task_output(self, task, config):
         """Uploads accepted entries to the specified SFTP server."""
@@ -602,10 +602,10 @@ class SftpUpload(object):
 
         for entry in task.accepted:
             if sftp:
-                log.debug('Uploading file: %s' % entry)
+                logger.debug('Uploading file: {}', entry)
                 self.handle_entry(entry, sftp, config, url_prefix)
             else:
-                log.debug('SFTP connection failed; failing entry: %s' % entry)
+                logger.debug('SFTP connection failed; failing entry: {}', entry)
                 entry.fail('SFTP connection failed; failing entry: %s' % entry)
 
 

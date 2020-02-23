@@ -1,22 +1,21 @@
-from __future__ import unicode_literals, division, absolute_import
-
-import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime, timedelta
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.tools import parse_timedelta
+
 from . import db
 
 SCHEMA_VER = 3
 FAIL_LIMIT = 100
 
-log = logging.getLogger('failed')
+logger = logger.bind(name='failed')
 
 
-class PluginFailed(object):
+class PluginFailed:
     """
     Records entry failures and stores them for trying again after a certain interval.
     Rejects them after they have failed too many times.
@@ -97,8 +96,8 @@ class PluginFailed(object):
                 item = db.FailedEntry(entry['title'], entry['original_url'], reason)
                 item.count = 0
             if item.count > FAIL_LIMIT:
-                log.error(
-                    'entry with title \'%s\' has failed over %s times', entry['title'], FAIL_LIMIT
+                logger.error(
+                    "entry with title '{}' has failed over {} times", entry['title'], FAIL_LIMIT
                 )
                 return
             retry_time = self.retry_time(item.count, config)
@@ -107,7 +106,7 @@ class PluginFailed(object):
             item.tof = datetime.now()
             item.reason = reason
             session.merge(item)
-            log.debug('Marking %s in failed list. Has failed %s times.', item.title, item.count)
+            logger.debug('Marking {} in failed list. Has failed {} times.', item.title, item.count)
             if item.count <= config['max_retries']:
                 plugin.get('backlog', self).add_backlog(
                     entry.task, entry, amount=retry_time, session=session

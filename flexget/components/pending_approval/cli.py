@@ -1,8 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import sys
-from argparse import ArgumentTypeError, ArgumentParser
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from argparse import ArgumentParser, ArgumentTypeError
 
 from colorclass.toggles import disable_all_colors
 from sqlalchemy.orm.exc import NoResultFound
@@ -10,7 +7,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console, colorize
+from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
+
 from . import db
 
 

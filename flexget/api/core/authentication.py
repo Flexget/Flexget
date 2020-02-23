@@ -1,17 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import base64
 
-from flask import request, session as flask_session
+from flask import request
+from flask import session as flask_session
 from flask_login import LoginManager
-from flask_login.utils import current_app, login_user, current_user
+from flask_login.utils import current_app, current_user, login_user
 from flask_restplus import inputs
 from werkzeug.security import check_password_hash
 
 from flexget.api import api_app
-from flexget.api.app import Unauthorized, success_response, base_message_schema, api, APIResource
+from flexget.api.app import APIResource, Unauthorized, api, base_message_schema, success_response
 from flexget.utils.database import with_session
 from flexget.webserver import User
 

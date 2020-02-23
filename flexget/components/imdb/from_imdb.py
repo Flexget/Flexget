@@ -1,22 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
-
-import collections
-import logging
+from collections.abc import Iterable
 
 from jsonschema.compat import str_types
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
 from flexget.entry import Entry
+from flexget.event import event
 from flexget.utils.cached_input import cached
 
-log = logging.getLogger('from_imdb')
+logger = logger.bind(name='from_imdb')
 
 
-class FromIMDB(object):
+class FromIMDB:
     """
     This plugin enables generating entries based on an entity, an entity being a person, character or company.
     It's based on IMDBpy which is required (pip install imdbpy). The basic config required just an IMDB ID of the
@@ -149,11 +145,11 @@ class FromIMDB(object):
         config.setdefault('match_type', 'strict')
 
         if isinstance(config.get('content_types'), str_types):
-            log.debug('Converted content type from string to list.')
+            logger.debug('Converted content type from string to list.')
             config['content_types'] = [config['content_types']]
 
         if isinstance(config['job_types'], str_types):
-            log.debug('Converted job type from string to list.')
+            logger.debug('Converted job type from string to list.')
             config['job_types'] = [config['job_types']]
         # Special case in case user meant to add actress instead of actor (different job types in IMDB)
         if 'actor' in config['job_types'] and 'actress' not in config['job_types']:
@@ -167,9 +163,11 @@ class FromIMDB(object):
             try:
                 entity_type, entity_object = self.get_entity_type_and_object(id)
             except Exception as e:
-                log.error(
+                logger.error(
                     'Could not resolve entity via ID: {}. '
-                    'Either error in config or unsupported entity. Error:{}'.format(id, e)
+                    'Either error in config or unsupported entity. Error:{}',
+                    id,
+                    e,
                 )
                 continue
             items += self.get_items_by_entity(
@@ -189,15 +187,15 @@ class FromIMDB(object):
         """
         if imdb_id.startswith('nm'):
             person = self.ia.get_person(imdb_id[2:])
-            log.info('Starting to retrieve items for person: %s' % person)
+            logger.info('Starting to retrieve items for person: {}', person)
             return 'Person', person
         elif imdb_id.startswith('co'):
             company = self.ia.get_company(imdb_id[2:])
-            log.info('Starting to retrieve items for company: %s' % company)
+            logger.info('Starting to retrieve items for company: {}', company)
             return 'Company', company
         elif imdb_id.startswith('ch'):
             character = self.ia.get_character(imdb_id[2:])
-            log.info('Starting to retrieve items for Character: %s' % character)
+            logger.info('Starting to retrieve items for Character: {}', character)
             return 'Character', character
 
     def get_items_by_entity(
@@ -220,7 +218,7 @@ class FromIMDB(object):
         Gets a list of lists and returns a flat list
         """
         for el in _list:
-            if isinstance(el, collections.Iterable) and not isinstance(el, basestring):
+            if isinstance(el, Iterable) and not isinstance(el, str):
                 for sub in self.flatten_list(el):
                     yield sub
             else:
@@ -237,17 +235,19 @@ class FromIMDB(object):
         unfiltered_items = set(unfiltered_items)
         for item in sorted(unfiltered_items):
             if match_type == 'strict':
-                log.debug('Match type is strict, verifying item type to requested content types')
+                logger.debug(
+                    'Match type is strict, verifying item type to requested content types'
+                )
                 self.ia.update(item)
                 if item['kind'] in content_types:
-                    log.verbose(
-                        'Adding item "{}" to list. Item kind is "{}"'.format(item, item['kind'])
+                    logger.verbose(
+                        'Adding item "{}" to list. Item kind is "{}"', item, item['kind']
                     )
                     items.append(item)
                 else:
-                    log.verbose('Rejecting item "{}". Item kind is "{}'.format(item, item['kind']))
+                    logger.verbose('Rejecting item "{}". Item kind is "{}', item, item['kind'])
             else:
-                log.debug('Match type is loose, all items are being added')
+                logger.debug('Match type is loose, all items are being added')
                 items.append(item)
         return items
 
@@ -316,7 +316,7 @@ class FromIMDB(object):
 
             self.ia = IMDb()
         except ImportError:
-            log.error(
+            logger.error(
                 'IMDBPY is required for this plugin. Please install using "pip install imdbpy"'
             )
             return
@@ -325,7 +325,7 @@ class FromIMDB(object):
         config = self.prepare_config(config)
         items = self.get_items(config)
         if not items:
-            log.error('Could not get IMDB item list, check your configuration.')
+            logger.error('Could not get IMDB item list, check your configuration.')
             return
         for item in items:
             entry = Entry(
@@ -339,18 +339,19 @@ class FromIMDB(object):
                 if entry not in entries:
                     entries.append(entry)
                     if entry and task.options.test:
-                        log.info("Test mode. Entry includes:")
+                        logger.info("Test mode. Entry includes:")
                         for key, value in list(entry.items()):
-                            log.info('     {}: {}'.format(key.capitalize(), value))
+                            logger.info('     {}: {}', key.capitalize(), value)
             else:
-                log.error('Invalid entry created? %s' % entry)
+                logger.error('Invalid entry created? {}', entry)
         if len(entries) <= config.get('max_entries'):
             return entries
         else:
-            log.warning(
-                'Number of entries (%s) exceeds maximum allowed value %s. '
-                'Edit your filters or raise the maximum value by entering a higher "max_entries"'
-                % (len(entries), config.get('max_entries'))
+            logger.warning(
+                'Number of entries ({}) exceeds maximum allowed value {}. '
+                'Edit your filters or raise the maximum value by entering a higher "max_entries"',
+                len(entries),
+                config.get('max_entries'),
             )
             return
 

@@ -1,16 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
 
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('shortened')
+logger = logger.bind(name='shortened')
 
 
-class UrlRewriteShortened(object):
+class UrlRewriteShortened:
     """Shortened url rewriter."""
 
     def url_rewritable(self, task, entry):

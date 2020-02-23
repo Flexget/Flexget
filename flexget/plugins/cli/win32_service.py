@@ -1,18 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import argparse
-import logging
 import os
 import socket
 import sys
+
+from loguru import logger
 
 import flexget
 from flexget import options
 from flexget.event import event
 from flexget.terminal import console
 
-log = logging.getLogger('win32_service')
+logger = logger.bind(name='win32_service')
 
 try:
     import servicemanager

@@ -1,24 +1,22 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 from datetime import datetime, timedelta
 from math import ceil
 
 from flask import jsonify, request
 from flask_restplus import inputs
-from flexget.api.app import NotFoundError, etag, pagination_headers, api, APIResource
-from flexget.api.core.tasks import tasks_api
+from loguru import logger
 from sqlalchemy.orm.exc import NoResultFound
+
+from flexget.api.app import APIResource, NotFoundError, api, etag, pagination_headers
+from flexget.api.core.tasks import tasks_api
 
 from . import db
 
-log = logging.getLogger('status_api')
+logger = logger.bind(name='status_api')
 
 status_api = api.namespace('status', description='View and manage task execution status')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     task_status_execution_schema = {
         'type': 'object',
         'properties': {
@@ -89,7 +87,7 @@ class TasksStatusAPI(APIResource):
         include_execution = args.get('include_execution')
 
         if per_page > 100:
-            log.debug('per_page is higher than max value of 100, setting 100')
+            logger.debug('per_page is higher than max value of 100, setting 100')
             per_page = 100
 
         start = per_page * (page - 1)
@@ -105,7 +103,7 @@ class TasksStatusAPI(APIResource):
         }
 
         total_items = session.query(db.StatusTask).count()
-        log.debug('db has a total of %s status tasks', total_items)
+        logger.debug('db has a total of {} status tasks', total_items)
 
         if not total_items:
             return jsonify([])

@@ -1,23 +1,23 @@
-from __future__ import unicode_literals, division, absolute_import
-
 import datetime
-import logging
 import re
 
+from loguru import logger
 from requests.exceptions import TooManyRedirects
-from sqlalchemy import Column, Unicode, DateTime
+from sqlalchemy import Column, DateTime, Unicode
 
-from flexget import plugin, db_schema
+from flexget import db_schema, plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.database import json_synonym
-from flexget.utils.requests import Session as RequestSession, TimedLimiter, RequestException
+from flexget.utils.requests import RequestException
+from flexget.utils.requests import Session as RequestSession
+from flexget.utils.requests import TimedLimiter
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
-log = logging.getLogger('alpharatio')
+logger = logger.bind(name='alpharatio')
 Base = db_schema.versioned_base('alpharatio', 0)
 
 requests = RequestSession()
@@ -27,28 +27,34 @@ requests.add_domain_limiter(TimedLimiter('alpharatio.cc', '5 seconds'))
 CATEGORIES = {
     'tvsd': 'filter_cat[1]',
     'tvhd': 'filter_cat[2]',
-    'tvdvdrip': 'filter_cat[3]',
-    'tvpacksd': 'filter_cat[4]',
-    'tvpackhd': 'filter_cat[5]',
-    'moviesd': 'filter_cat[6]',
-    'moviehd': 'filter_cat[7]',
-    'moviepacksd': 'filter_cat[8]',
-    'moviepackhd': 'filter_cat[9]',
-    'moviexxx': 'filter_cat[10]',
-    'mvid': 'filter_cat[11]',
-    'gamespc': 'filter_cat[12]',
-    'gamesxbox': 'filter_cat[13]',
-    'gamesps3': 'filter_cat[14]',
-    'gameswii': 'filter_cat[15]',
-    'appspc': 'filter_cat[16]',
-    'appsmac': 'filter_cat[17]',
-    'appslinux': 'filter_cat[18]',
-    'appsmobile': 'filter_cat[19]',
-    '0dayXXX': 'filter_cat[20]',
-    'ebook': 'filter_cat[21]',
-    'audiobook': 'filter_cat[22]',
-    'music': 'filter_cat[23]',
-    'misc': 'filter_cat[24]',
+    'tvuhd': 'filter_cat[3]',
+    'tvdvdrip': 'filter_cat[4]',
+    'tvpacksd': 'filter_cat[5]',
+    'tvpackhd': 'filter_cat[6]',
+    'tvpackuhd': 'filter_cat[7]',
+    'moviesd': 'filter_cat[8]',
+    'moviehd': 'filter_cat[9]',
+    'movieuhd': 'filter_cat[10]',
+    'moviepacksd': 'filter_cat[11]',
+    'moviepackhd': 'filter_cat[12]',
+    'moviepackuhd': 'filter_cat[13]',
+    'moviexxx': 'filter_cat[14]',
+    'bluray': 'filter_cat[15]',
+    'animesd': 'filter_cat[16]',
+    'animehd': 'filter_cat[17]',
+    'gamespc': 'filter_cat[18]',
+    'gamesxbox': 'filter_cat[19]',
+    'gamesps': 'filter_cat[20]',
+    'gamesnin': 'filter_cat[21]',
+    'appswindows': 'filter_cat[22]',
+    'appsmac': 'filter_cat[23]',
+    'appslinux': 'filter_cat[24]',
+    'appsmobile': 'filter_cat[25]',
+    'filter_cat[0]dayXXX': 'filter_cat[26]',
+    'ebook': 'filter_cat[27]',
+    'audiobook': 'filter_cat[28]',
+    'music': 'filter_cat[29]',
+    'misc': 'filter_cat[30]',
 }
 
 LEECHSTATUS = {'normal': 0, 'freeleech': 1, 'neutral leech': 2, 'either': 3}
@@ -63,7 +69,7 @@ class AlphaRatioCookie(Base):
     expires = Column(DateTime)
 
 
-class SearchAlphaRatio(object):
+class SearchAlphaRatio:
     """
         AlphaRatio search plugin.
     """
@@ -116,7 +122,7 @@ class SearchAlphaRatio(object):
                 invalid_cookie = True
         except TooManyRedirects:
             # Apparently it endlessly redirects if the cookie is invalid?
-            log.debug('MoreThanTV request failed: Too many redirects. Invalid cookie?')
+            logger.debug('MoreThanTV request failed: Too many redirects. Invalid cookie?')
             invalid_cookie = True
 
         if invalid_cookie:
@@ -153,12 +159,12 @@ class SearchAlphaRatio(object):
                     and saved_cookie.expires
                     and saved_cookie.expires >= datetime.datetime.now()
                 ):
-                    log.debug('Found valid login cookie')
+                    logger.debug('Found valid login cookie')
                     return saved_cookie.cookie
 
         url = self.base_url + 'login.php'
         try:
-            log.debug('Attempting to retrieve AlphaRatio cookie')
+            logger.debug('Attempting to retrieve AlphaRatio cookie')
             response = requests.post(
                 url,
                 data={
@@ -184,7 +190,7 @@ class SearchAlphaRatio(object):
                     expires = c.expires
             if expires:
                 expires = datetime.datetime.fromtimestamp(expires)
-            log.debug('Saving or updating AlphaRatio cookie in db')
+            logger.debug('Saving or updating AlphaRatio cookie in db')
             cookie = AlphaRatioCookie(
                 username=username, cookie=dict(requests.cookies), expires=expires
             )
@@ -204,7 +210,7 @@ class SearchAlphaRatio(object):
             'AlphaRatio layout has changed, unable to parse correctly. Please open a Github issue'
         )
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def search(self, task, entry, config):
         """
             Search for entries on AlphaRatio
@@ -239,14 +245,14 @@ class SearchAlphaRatio(object):
 
         for search_string in entry.get('search_strings', [entry['title']]):
             params['searchstr'] = search_string
-            log.debug('Using search params: %s', params)
+            logger.debug('Using search params: {}', params)
             try:
                 page = self.get(
                     self.base_url + 'torrents.php', params, config['username'], config['password']
                 )
-                log.debug('requesting: %s', page.url)
+                logger.debug('requesting: {}', page.url)
             except RequestException as e:
-                log.error('AlphaRatio request failed: %s', e)
+                logger.error('AlphaRatio request failed: {}', e)
                 continue
 
             soup = get_soup(page.content)
@@ -254,7 +260,7 @@ class SearchAlphaRatio(object):
             # extract the column indices
             header_soup = soup.find('tr', attrs={'class': 'colhead'})
             if not header_soup:
-                log.debug('no search results found for \'%s\'', search_string)
+                logger.debug("no search results found for '{}'", search_string)
                 continue
             header_soup = header_soup.findAll('td')
 
@@ -267,18 +273,18 @@ class SearchAlphaRatio(object):
                 group_info = result.find('td', attrs={'class': 'big_info'}).find(
                     'div', attrs={'class': 'group_info'}
                 )
-                title = group_info.find('a', href=re.compile('torrents.php\?id=\d+')).text
+                title = group_info.find('a', href=re.compile(r'torrents.php\?id=\d+')).text
                 url = (
                     self.base_url
                     + group_info.find(
-                        'a', href=re.compile('torrents.php\?action=download(?!usetoken)')
+                        'a', href=re.compile(r'torrents.php\?action=download(?!usetoken)')
                     )['href']
                 )
 
                 torrent_info = result.findAll('td')
                 size_col = torrent_info[size_idx].text
-                log.debug('AlphaRatio size: %s', size_col)
-                size = re.search('(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', size_col)
+                logger.debug('AlphaRatio size: {}', size_col)
+                size = re.search(r'(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', size_col)
                 torrent_tags = ', '.join(
                     [tag.text for tag in group_info.findAll('div', attrs={'class': 'tags'})]
                 )
@@ -289,8 +295,8 @@ class SearchAlphaRatio(object):
                 e['url'] = url
                 e['torrent_tags'] = torrent_tags
                 if not size:
-                    log.error(
-                        'No size found! Please create a Github issue. Size received: %s', size_col
+                    logger.error(
+                        'No size found! Please create a Github issue. Size received: {}', size_col
                     )
                 else:
                     e['content_size'] = parse_filesize(size.group(0))

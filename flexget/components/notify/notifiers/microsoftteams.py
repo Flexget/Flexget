@@ -1,21 +1,19 @@
-from builtins import *
-
-import logging
+from loguru import logger
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from requests.exceptions import RequestException
 from flexget.utils.requests import Session as RequestSession
 
 requests = RequestSession(max_retries=3)
 
 plugin_name = 'ms_teams'
 
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 
-class MsTeamsNotifier(object):
+class MsTeamsNotifier:
     """
     Example::
 

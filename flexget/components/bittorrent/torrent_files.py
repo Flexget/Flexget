@@ -1,16 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import posixpath
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('torrent_files')
+logger = logger.bind(name='torrent_files')
 
 
-class TorrentFiles(object):
+class TorrentFiles:
     """Provides content files information when dealing with torrents."""
 
     @plugin.priority(200)
@@ -22,7 +20,7 @@ class TorrentFiles(object):
                     for item in entry['torrent'].get_filelist()
                 ]
                 if files:
-                    log.debug('%s files: %s' % (entry['title'], files))
+                    logger.debug('{} files: {}', entry['title'], files)
                     entry['content_files'] = files
 
 

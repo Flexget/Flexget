@@ -1,15 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flask import jsonify
 from flask_restplus import inputs
-from flexget.api import api, APIResource
+
+from flexget.api import APIResource, api
 from flexget.api.app import (
     BadRequest,
     NotFoundError,
-    success_response,
     base_message_schema,
     empty_response,
+    success_response,
 )
 
 irc_api = api.namespace('irc', description='View and manage IRC connections')
@@ -20,14 +18,14 @@ irc_parser.add_argument(
 )
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     connection_object = {
         'type': 'object',
         'properties': {
             'alive': {'type': 'boolean'},
             'channels': {
                 'type': 'array',
-                'items': {'type': 'object', 'patternProperties': {'\w': {'type': 'integer'}}},
+                'items': {'type': 'object', 'patternProperties': {r'\w': {'type': 'integer'}}},
             },
             'connected_channels': {'type': 'array', 'items': {'type': 'string'}},
             'port': {'type': 'integer'},
@@ -35,7 +33,7 @@ class ObjectsContainer(object):
         },
     }
 
-    connection = {'type': 'object', 'patternProperties': {'\w': connection_object}}
+    connection = {'type': 'object', 'patternProperties': {r'\w': connection_object}}
 
     return_response = {'type': 'array', 'items': connection}
 

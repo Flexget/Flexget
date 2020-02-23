@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 
-log = logging.getLogger('require_field')
+logger = logger.bind(name='require_field')
 
 
-class FilterRequireField(object):
+class FilterRequireField:
     """
     Rejects entries without defined field.
 

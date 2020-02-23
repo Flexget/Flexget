@@ -1,6 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import json
 
 import pytest
@@ -9,7 +6,7 @@ from flexget.api.app import base_message
 from flexget.api.core.database import ObjectsContainer as OC
 
 
-class TestDatabaseAPI(object):
+class TestDatabaseAPI:
     config = 'tasks: {}'
 
     @pytest.mark.parametrize(

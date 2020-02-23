@@ -1,7 +1,7 @@
 FlexGet
 =======
-.. image:: https://circleci.com/gh/Flexget/Flexget/tree/develop.svg?style=svg
-    :target: https://circleci.com/gh/Flexget/Flexget/tree/develop
+.. image:: https://github.com/Flexget/Flexget/workflows/Main%20Workflow/badge.svg?branch=develop&event=schedule
+    :target: https://github.com/Flexget/Flexget/actions?query=workflow%3A%22Main+Workflow%22+branch%3Adevelop+event%3Aschedule
 
 .. image:: https://img.shields.io/pypi/v/Flexget.svg
     :target: https://pypi.python.org/pypi/Flexget
@@ -26,7 +26,7 @@ plugins for sites that do not provide any kind of useful feeds.
 Example
 =======
 Flexget uses a `YAML`_ based configuration file.
-The following example will look in the RSS feed in the link, will match any item that match the listes series names and download it::
+The following example will look in the RSS feed in the link, will match any item that match the series names and download it::
 
     tasks:
       tv_task:
@@ -77,24 +77,28 @@ Feature requests
 How to use GIT checkout
 -----------------------
 
-Check that you have Python 2.7 / 3.3 or newer available with command ``python -V``.
+Check that you have Python 3.6 or newer available with command ``python -V``.
 
-In some environments newer python might be available under another name like 
-'python2.7' or 'python3' in which case you need to use that one instead of 
+In some environments newer python might be available under another name like
+'python3.6' or 'python3' in which case you need to use that one instead of
 plain 'python'.
 
-To start using FlexGet from this directory:
+To start using FlexGet from this directory::
 
-First, install (a recent version of) the `virtualenv`_ package to your system.
-
-.. _virtualenv: https://pypi.python.org/pypi/virtualenv
-
-Now, in your checkout directory, run::
-
-    virtualenv .
+    python3 -m venv .
 
 This will initialize python virtualenv. This doesn't need to be directly in
 your checkout directory, but these instructions assume that's where it is.
+
+On some linux distributions (eg. debian, ubuntu) venv module is not included with
+python and this fails. Please install `python3-virtualenv` package and retry
+(or use the separate `virtualenv`_ python package).
+
+.. _virtualenv: https://pypi.python.org/pypi/virtualenv
+
+Upgrading pip to latest version is highly advisable and can de done with::
+
+    bin/pip install --upgrade pip
 
 Next we need to install dependencies and FlexGet itself, this can be done simply::
 

@@ -1,17 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
-import logging
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 
-log = logging.getLogger('run_task')
+logger = logger.bind(name='run_task')
 
 
-class RunTask(object):
+class RunTask:
     schema = {
         'type': 'object',
         'properties': {
@@ -58,7 +56,7 @@ class RunTask(object):
             self.run_tasks(task, config['task'])
 
     def run_tasks(self, current_task, tasks):
-        log.info('Scheduling tasks %s to run', tasks)
+        logger.info('Scheduling tasks {} to run', tasks)
         options = copy.copy(current_task.options)
         options.tasks = tasks
         current_task.manager.execute(options=options)

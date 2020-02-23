@@ -1,18 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring, long, unicode
-
 import functools
-from collections import Mapping
 from datetime import datetime
 
 from sqlalchemy import extract, func
-from sqlalchemy.orm import synonym
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
+from sqlalchemy.orm import synonym
 
-from flexget.manager import Session
-from flexget.utils import qualities, json
 from flexget.entry import Entry
+from flexget.manager import Session
+from flexget.utils import json, qualities, serialization
 
 
 def with_session(*args, **kwargs):
@@ -70,7 +65,7 @@ def text_date_synonym(name):
         return getattr(self, name)
 
     def setter(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             try:
                 setattr(self, name, datetime.strptime(value, '%Y-%m-%d'))
             except ValueError:
@@ -83,55 +78,22 @@ def text_date_synonym(name):
 
 
 def entry_synonym(name):
-    """Use json to serialize python objects for db storage."""
-
-    def only_builtins(item):
-        supported_types = (str, unicode, int, float, long, bool, datetime)
-        # dict, list, tuple and set are also supported, but handled separately
-
-        if isinstance(item, supported_types):
-            return item
-        elif isinstance(item, Mapping):
-            result = {}
-            for key, value in item.items():
-                try:
-                    result[key] = only_builtins(value)
-                except TypeError:
-                    continue
-            return result
-        elif isinstance(item, (list, tuple, set)):
-            result = []
-            for value in item:
-                try:
-                    result.append(only_builtins(value))
-                except ValueError:
-                    continue
-            if isinstance(item, list):
-                return result
-            elif isinstance(item, tuple):
-                return tuple(result)
-            else:
-                return set(result)
-        elif isinstance(item, qualities.Quality):
-            return item.name
-        else:
-            for s_type in supported_types:
-                if isinstance(item, s_type):
-                    return s_type(item)
-
-        # If item isn't a subclass of a builtin python type, raise ValueError.
-        raise TypeError('%r is not of type Entry.' % type(item))
+    """Use serialization system to store Entries in db."""
 
     def getter(self):
-        return Entry(json.loads(getattr(self, name), decode_datetime=True))
+        return serialization.loads(getattr(self, name))
 
     def setter(self, entry):
-        if isinstance(entry, Entry) or isinstance(entry, dict):
-            setattr(
-                self, name, unicode(json.dumps(only_builtins(dict(entry)), encode_datetime=True))
-            )
+        if isinstance(entry, dict):
+            if entry.get('serializer') == 'Entry' and 'version' in entry and 'value' in entry:
+                # This is already a serialized form of entry
+                setattr(self, name, json.dumps(entry))
+                return
+            entry = Entry(entry)
+        if isinstance(entry, Entry):
+            setattr(self, name, serialization.dumps(entry))
         else:
-            raise TypeError('%r is not of type Entry or dict.' % type(entry))
+            raise TypeError(f'{type(entry)!r} is not type Entry or dict.')
 
     return synonym(name, descriptor=property(getter, setter))
 
@@ -143,7 +105,7 @@ def json_synonym(name):
         return json.loads(getattr(self, name), decode_datetime=True)
 
     def setter(self, entry):
-        setattr(self, name, unicode(json.dumps(entry, encode_datetime=True)))
+        setattr(self, name, json.dumps(entry, encode_datetime=True))
 
     return synonym(name, descriptor=property(getter, setter))
 
