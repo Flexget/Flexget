@@ -10,7 +10,7 @@ logger = logger.bind(name='free_space')
 
 def get_free_space(config):
     """ Return folder/drive free space (in megabytes)"""
-    if config['remote']:
+    if 'host' in config:
         import paramiko
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -58,7 +58,6 @@ class PluginFreeSpace:
                 'properties': {
                     'space': {'type': 'number'},
                     'path': {'type': 'string'},
-                    'remote': {'type': 'boolean', 'default': False},
                     'port': {'type': 'integer', 'default': 22},
                     'host': {'type': 'string'},
                     'user': {'type': 'string'},
@@ -67,7 +66,7 @@ class PluginFreeSpace:
                 },
                 'required': ['space'],
                 'dependencies': {
-                    'remote': ['host', 'user', 'ssh_key_filepath', 'path']
+                    'host': ['user', 'ssh_key_filepath', 'path']
                 },
                 'additionalProperties': False,
             },
