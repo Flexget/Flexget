@@ -51,7 +51,7 @@ class TestInputHtml:
     config = """
         tasks:
           test:
-            html: http://download.flexget.com/
+            html: http://google.com/
     """
 
     def test_parsing(self, execute_task):
