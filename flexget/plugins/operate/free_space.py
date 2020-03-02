@@ -18,7 +18,7 @@ def get_free_space(config):
             ssh.connect(config['host'], config['port'], config['user'], config['ssh_key_filepath'], timeout=5000)
         except Exception as e:
             logger.error("Issue connecting to remote host. {}", e)
-            return "ERR"
+            task.abort('Error with remote host.')
         if config['allotment'] != -1:
             stdin, stdout, stderr = ssh.exec_command(f"du -s {config['path']} | cut -f 1")
         else:
@@ -33,7 +33,7 @@ def get_free_space(config):
                 free = (int(resp.strip()) / 1000)
         except ValueError:
             logger.error('Non-integer was returned when calcualting disk usage.')
-            return "ERR"
+            task.abort('Error with remote host.')
         return free
     elif os.name == 'nt':
         import ctypes
@@ -87,9 +87,7 @@ class PluginFreeSpace:
         # Only bother aborting if there were accepted entries this run.
         if task.accepted:
             free_space = get_free_space(config)
-            if free_space == "ERR":
-                task.abort('Error with remote host.')
-            elif free_space < config['space']:
+            if free_space < config['space']:
                 logger.error(
                     'Less than {} MB of free space in {} aborting task.',
                     config['space'],
