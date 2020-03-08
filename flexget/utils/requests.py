@@ -235,7 +235,8 @@ class Session(requests.Session):
             )
 
         # Run domain limiters for this url
-        limit_domains(url, self.domain_limiters)
+        if method == 'GET':
+            limit_domains(url, self.domain_limiters)
 
         kwargs.setdefault('timeout', self.timeout)
         raise_status = kwargs.pop('raise_status', True)
