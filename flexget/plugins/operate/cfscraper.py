@@ -45,7 +45,7 @@ class CFScraper:
                     ('Upgrade-Insecure-Requests', '1'),
                 ]
             )
-            task.requests = CFScrapeWrapper.create_scraper(task.requests)
+            task.requests = CFScrapeWrapper.create_scraper(task.requests, solveDepth=5)
 
 
 @event('plugin.register')
