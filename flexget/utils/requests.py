@@ -177,9 +177,9 @@ class Session(requests.Session):
 
     """
 
-    def __init__(self, timeout: int = 30, max_retries: int = 1) -> None:
+    def __init__(self, timeout: int = 30, max_retries: int = 1, **kwargs) -> None:
         """Set some defaults for our session if not explicitly defined."""
-        super().__init__()
+        super().__init__(**kwargs)
         self.timeout = timeout
         self.stream = True
         self.adapters['http://'].max_retries = max_retries
