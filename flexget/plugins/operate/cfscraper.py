@@ -35,8 +35,9 @@ class CFScraper:
             """
 
             def Challenge_Response(self, resp, **kwargs):
-                kwargs.setdefault('disable_limiters', True)
-                super().Challenge_Response(resp, **kwargs)
+                """Make sure limiters are disabled when doing a cloudflare challenge."""
+                kwargs['disable_limiters'] = True
+                return super().Challenge_Response(resp, **kwargs)
 
         if config is True:
             task.requests.headers = OrderedDict(
