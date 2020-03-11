@@ -75,7 +75,11 @@ class TokenBucketLimiter(DomainLimiter):
     state_cache = {}
 
     def __init__(
-        self, domain: str, tokens: Union[float, int], rate: Union[str, timedelta], wait: bool = True
+        self,
+        domain: str,
+        tokens: Union[float, int],
+        rate: Union[str, timedelta],
+        wait: bool = True,
     ) -> None:
         """
         :param int tokens: Size of bucket
@@ -225,6 +229,7 @@ class Session(requests.Session):
         Also raises errors getting the content by default.
 
         :param bool raise_status: If True, non-success status code responses will be raised as errors (True by default)
+        :param disable_limiters: If True, any limiters configured for this session will be ignored for this request.
         """
 
         # Raise Timeout right away if site is known to timeout
@@ -235,7 +240,7 @@ class Session(requests.Session):
             )
 
         # Run domain limiters for this url
-        if method == 'GET':
+        if not kwargs.pop('disable_limiters', False):
             limit_domains(url, self.domain_limiters)
 
         kwargs.setdefault('timeout', self.timeout)

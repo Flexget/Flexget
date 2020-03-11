@@ -34,6 +34,10 @@ class CFScraper:
             This class allows the FlexGet session to inherit from CloudScraper instead of the requests.Session directly.
             """
 
+            def Challenge_Response(self, resp, **kwargs):
+                kwargs.setdefault('disable_limiters', True)
+                super().Challenge_Response(resp, **kwargs)
+
         if config is True:
             task.requests.headers = OrderedDict(
                 [
