@@ -1,15 +1,14 @@
 #!/usr/bin/python
 import os
 import sys
+import threading
 from pathlib import Path
-
-from flexget import log
-from flexget.manager import Manager
 
 # __version__ import need to be first in order to avoid circular import within logger
 from ._version import __version__  # noqa
-
-ROOT_PATH = Path(__name__)
+from flexget import log
+from flexget.manager import Manager
+from flexget.tray_icon import TrayIcon
 
 
 def main(args=None):
@@ -42,7 +41,11 @@ def main(args=None):
                     os.path.join(manager.config_base, manager.options.profile),
                 )
             else:
-                manager.start()
+                image_path = Path('flexget') / 'resources' / 'flexget.png'
+                tray = TrayIcon(manager=manager, path_to_image=image_path)
+                m = threading.Thread(target=manager.start, daemon=True)
+                m.start()
+                tray.run()
         except (IOError, ValueError) as e:
             if _is_debug():
                 import traceback

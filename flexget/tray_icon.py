@@ -4,12 +4,9 @@ from pathlib import Path
 from PIL import Image
 from pystray import Icon, Menu, MenuItem
 
-from flexget import ROOT_PATH, __version__
-from flexget.config_schema import register_config_key
-from flexget.event import event
+from flexget import __version__
 from flexget.manager import Manager
 
-image = ROOT_PATH / 'resources' / 'flexget.png'
 disabled_action = partial(MenuItem, action=lambda icon, item: 1, enabled=False)
 
 tray_icon_schema = {'type': 'boolean'}
@@ -18,7 +15,7 @@ tray_icon = None
 
 
 class TrayIcon:
-    def __init__(self, manager: Manager, path_to_image: Path = image):
+    def __init__(self, manager: Manager, path_to_image: Path):
         self.manager = manager
         self.icon = None
         self.menu = None
@@ -40,20 +37,3 @@ class TrayIcon:
 
     def stop(self):
         self.icon.stop()
-
-
-@event('config.register')
-def register_config():
-    register_config_key('tray_icon', tray_icon_schema)
-
-
-@event('manager.daemon.started')
-def start_tray_icon(manager):
-    global tray_icon
-    tray_icon = TrayIcon(manager)
-    tray_icon.run()
-
-
-@event('manager.shutdown')
-def stop_tray_icon(manager):
-    tray_icon.stop()
