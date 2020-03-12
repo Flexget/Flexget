@@ -1,11 +1,15 @@
 #!/usr/bin/python
 import os
 import sys
+from pathlib import Path
+
+from flexget import log
+from flexget.manager import Manager
 
 # __version__ import need to be first in order to avoid circular import within logger
 from ._version import __version__  # noqa
-from flexget import log
-from flexget.manager import Manager
+
+ROOT_PATH = Path(__name__)
 
 
 def main(args=None):
