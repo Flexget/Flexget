@@ -36,7 +36,10 @@ class CFScraper:
 
             def Challenge_Response(self, resp, **kwargs):
                 """Make sure limiters are disabled when doing a cloudflare challenge."""
-                kwargs['disable_limiters'] = True
+                if not self.is_reCaptcha_Challenge(resp):
+                    # If this is a recaptcha challenge, the request gets sent straight to requests, not our subclass,
+                    # so it can't have any extra arguments that requests doesn't expect.
+                    kwargs['disable_limiters'] = True
                 return super().Challenge_Response(resp, **kwargs)
 
         if config is True:
