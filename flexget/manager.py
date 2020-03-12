@@ -139,6 +139,7 @@ class Manager:
         self.task_queue = None
         self.persist = None
         self.initialized = False
+        self.tray = None
 
         self.config = {}
 
@@ -182,7 +183,7 @@ class Manager:
                 sys.exit(1)
         return options
 
-    def _init_logging(self, to_file: bool=True) -> None:
+    def _init_logging(self, to_file: bool = True) -> None:
         """
         Initialize logging facilities
         """
@@ -607,7 +608,9 @@ class Manager:
                 sha1_hash.update(data)
         return sha1_hash.hexdigest()
 
-    def load_config(self, output_to_console: bool = True, config_file_hash: Optional[str] = None) -> None:
+    def load_config(
+        self, output_to_console: bool = True, config_file_hash: Optional[str] = None
+    ) -> None:
         """
         Loads the config file from disk, validates and activates it.
 
@@ -1018,6 +1021,8 @@ class Manager:
         if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
             logger.debug('Shutting down')
         self.engine.dispose()
+        if self.tray and self.tray.running:
+            self.tray.stop()
         # remove temporary database used in test mode
         if self.options.test:
             if 'test' not in self.db_filename:

@@ -3,6 +3,7 @@ import os
 import sys
 import threading
 from pathlib import Path
+from time import sleep
 
 # __version__ import need to be first in order to avoid circular import within logger
 from ._version import __version__  # noqa
@@ -43,10 +44,17 @@ def main(args=None):
             else:
                 image_path = Path('flexget') / 'resources' / 'flexget.png'
                 tray = TrayIcon(manager=manager, path_to_image=image_path)
+                manager.tray = tray
                 m = threading.Thread(target=manager.start, daemon=True)
                 m.start()
+
+                # This is an ungodly hack to avoid a race condition since the `is_daemon` property of the `Manager`
+                # takes a while to be populated
+                sleep(3)
+
                 if manager.is_daemon:
                     tray.run()
+                m.join()
         except (IOError, ValueError) as e:
             if _is_debug():
                 import traceback
