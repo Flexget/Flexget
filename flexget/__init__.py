@@ -45,7 +45,8 @@ def main(args=None):
                 tray = TrayIcon(manager=manager, path_to_image=image_path)
                 m = threading.Thread(target=manager.start, daemon=True)
                 m.start()
-                tray.run()
+                if manager.is_daemon:
+                    tray.run()
         except (IOError, ValueError) as e:
             if _is_debug():
                 import traceback
