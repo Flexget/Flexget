@@ -36,7 +36,7 @@ class NextTraktEpisodes:
         'properties': {
             'username': {'type': 'string'},
             'account': {'type': 'string'},
-            'position': {'type': 'string', 'enum': ['last', 'next'], 'default': 'next'},
+            'position': {'type': 'string', 'enum': ['last', 'next', 'fromseason'], 'default': 'next'},
             'context': {
                 'type': 'string',
                 'enum': ['watched', 'collected', 'aired'],
@@ -112,6 +112,26 @@ class NextTraktEpisodes:
                 # If the next episode is already in the trakt database, we'll get it here
                 season_number = data['next_episode']['season']
                 episode_number = data['next_episode']['number']
+            if config['position'] == 'fromseason' and data.get('next_episode'):
+                for seas in reversed(data['seasons']):
+                  if seas['number'] == data['next_episode']['season']:
+                    # Find the season with unwatched episodes
+                    season_number = data['next_episode']['season']
+                    # Pick the season finale
+                    eplast = max(item['number'] for item in seas['episodes'])
+                    # Pick the next collected/watched episode
+                    epnext = data['next_episode']['number']
+                    # Check if there any other collected/watched episodes from this season
+                    if eplast > epnext:
+                      episode_number = []
+                      for i in range(epnext, eplast+1):
+                        episode_number.append(i)
+                    else:
+                      episode_number = epnext
+                      break
+                  else:
+                    # There were no watched/collected episodes, nothing to emit in 'last' mode
+                    continue
             else:
                 # If we need last ep, or next_episode was not provided, search for last ep
                 for season in reversed(data['seasons']):
@@ -124,15 +144,16 @@ class NextTraktEpisodes:
                         item['number'] for item in season['episodes'] if item['completed']
                     )
                     # If we are in next episode mode, we have to increment this number
-                    if config['position'] == 'next':
+                    if config['position'] == 'next' or config['position'] == 'fromseason':
                         if season['completed'] >= season['aired']:
                             # TODO: next_episode doesn't count unaired episodes right now, this will skip to next
                             # season too early when there are episodes left to air this season.
                             season_number += 1
-                        episode_number = 1
+                            episode_number = 1
+                        episode_number += 1
                     break
                 else:
-                    if config['position'] != 'next':
+                    if config['position'] != 'next' or config['position'] == 'fromseason':
                         # There were no watched/collected episodes, nothing to emit in 'last' mode
                         continue
                     season_number = episode_number = 1
@@ -141,8 +162,13 @@ class NextTraktEpisodes:
                 if config.get('strip_dates'):
                     # remove year from end of series_name if present
                     fields['series_name'] = re.sub(r'\s+\(\d{4}\)$', '', fields['series_name'])
-                entry = self.make_entry(fields, season_number, episode_number)
-                entries.append(entry)
+                if isinstance(episode_number, list):
+                  for oneepn in episode_number:
+                    entry = self.make_entry(fields, season_number, oneepn)
+                    entries.append(entry)
+                else:
+                  entry = self.make_entry(fields, season_number, episode_number)
+                  entries.append(entry)
         return entries
 
     @staticmethod
