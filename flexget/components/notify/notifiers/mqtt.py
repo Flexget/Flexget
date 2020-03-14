@@ -123,7 +123,7 @@ class MQTTNotifier:
 
                     #Handle SSL/TLS communication w/out certificate authentication
                     if not self.config.get('certificates',{}).get('client_cert',False) and self.config.get('enable_encrypted_communication',False):
-                        self.tls_set(ca_certs=certs.get('broker_ca_cert',None),
+                        self.tls_set(ca_certs=certs.get('broker_ca_cert'),
                                       certfile=None,
                                       keyfile=None,
                                       cert_reqs=ssl.CERT_NONE)
@@ -148,13 +148,13 @@ class MQTTNotifier:
                             cert_required = ssl.CERT_NONE
                         logger.verbose('TLS cert_required={}',str(cert_required))
 
-                        self.tls_set(ca_certs=certs.get('broker_ca_cert',None),
-                                      certfile=certs.get('client_cert',None),
-                                      keyfile=certs.get('client_key',None),
+                        self.tls_set(ca_certs=certs.get('broker_ca_cert'),
+                                      certfile=certs.get('client_cert'),
+                                      keyfile=certs.get('client_key'),
                                       cert_reqs=cert_required,
                                       tls_version=tls_version)
 
-                        if not certs.get('validate_broker_cert',None):
+                        if not certs.get('validate_broker_cert'):
                             self.tls_insecure_set(True)
 
                             logger.debug('TLS insecure cert mode enabled. Broker cert will not be validated')
@@ -168,7 +168,7 @@ class MQTTNotifier:
                         logger.verbose('You can validate them yourself by calculating the sha256 hex digest of your password string (google is your friend if you do not know how to do this)')
                         logger.verbose('Note: a password that is not provided (i.e. blank) will hash to "{}"',sha256(str('').encode('utf-8')).hexdigest())
 
-                        self.username_pw_set=(self.config.get('username',None),self.config.get('password',None))
+                        self.username_pw_set=(self.config.get('username'),self.config.get('password'))
 
                     logger.verbose("Connecting to {}:{}",self.config.get('broker_address'),str(self.config.get('broker_port')))
                     self.connect(self.config.get('broker_address'), self.config.get('broker_port'), self.config.get('broker_timeout'))
@@ -198,6 +198,7 @@ class MQTTNotifier:
                 self.loop_stop()
 
         PublishMQTT(config)
+        
 
 @event('plugin.register')
 def register_plugin():
