@@ -13,7 +13,7 @@ from flexget.manager import Manager
 
 def init_tray_icon(manager: Manager):
     if os.environ.get('GITHUB_ACTIONS'):
-        # We cannot init tray action via our CI
+        # We cannot init tray action via our CI since it requires X on linux
         return
     from flexget.tray_icon import TrayIcon
 
