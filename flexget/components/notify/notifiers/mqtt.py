@@ -111,7 +111,7 @@ class MQTTNotifier:
                     self.config.get('certificates',{}).update({'client_cert': blank2None(self.config.get('certificates',{}).get('client_cert'))})
                     self.config.get('certificates',{}).update({'client_key': blank2None(self.config.get('certificates',{}).get('client_key'))})
                     self.config.get('certificates',{}).update({'tls_version': blank2None(self.config.get('certificates',{}).get('tls_version'))})
-                    logger.trace('MQTT notify config={}'.format(str(self.config)))
+                    logger.trace('MQTT notify config={}',str(self.config))
 
                     mqtt.Client.__init__(self, protocol=PublishMQTT.MQTT_proto_map.get(self.config.get('broker_protocol',mqtt.MQTTv311)), transport=self.config.get('broker_transport', 'tcp') )
 
@@ -136,17 +136,17 @@ class MQTTNotifier:
                     #Handle SSL/TLS communication with certificate authentication
                     if self.config.get('certificates',False):
                         certs = self.config.get('certificates',{})
-                        logger.debug('TLS certificate config: {}'.format(str(certs)))
+                        logger.debug('TLS certificate config: {}',str(certs))
 
                         tls_version_map = {'tlsv1.2': ssl.PROTOCOL_TLSv1_2, 'tlsv1.1': ssl.PROTOCOL_TLSv1_1, 'tlsv1': ssl.PROTOCOL_TLSv1, '': None}
                         tls_version = tls_version_map.get(certs.get('tls_version'),ssl.PROTOCOL_TLSv1_2)
-                        logger.verbose('TLS version is {}'.format(str(tls_version)))
+                        logger.verbose('TLS version is {}',str(tls_version))
 
                         if certs.get('validate_broker_cert',True):
                             cert_required = ssl.CERT_REQUIRED
                         else:
                             cert_required = ssl.CERT_NONE
-                        logger.verbose('TLS cert_required={}'.format(str(cert_required)))
+                        logger.verbose('TLS cert_required={}',str(cert_required))
 
                         self.tls_set(ca_certs=certs.get('broker_ca_cert',None),
                                       certfile=certs.get('client_cert',None),
@@ -164,19 +164,19 @@ class MQTTNotifier:
                     #Handle user/pass authentication
                     if self.config.get('username',False) or self.config.get('password',False):
                         logger.verbose('Credential passwords s are redacted to protect the innocent...')
-                        logger.verbose('Auth credentials: username=[{}] password sha256 hash is "{}"'.format(self.config.get('username'),sha256(str(self.config.get('password','')).encode('utf-8')).hexdigest()))
+                        logger.verbose('Auth credentials: username=[{}] password sha256 hash is "{}"',self.config.get('username'),sha256(str(self.config.get('password','')).encode('utf-8')).hexdigest())
                         logger.verbose('You can validate them yourself by calculating the sha256 hex digest of your password string (google is your friend if you do not know how to do this)')
-                        logger.verbose('Note: a password that is not provided (i.e. blank) will hash to "{}"'.format(sha256(str('').encode('utf-8')).hexdigest()))
+                        logger.verbose('Note: a password that is not provided (i.e. blank) will hash to "{}"',sha256(str('').encode('utf-8')).hexdigest())
 
                         self.username_pw_set=(self.config.get('username',None),self.config.get('password',None))
 
-                    logger.verbose("Connecting to {}:{}".format(self.config.get('broker_address'),str(self.config.get('broker_port'))))
+                    logger.verbose("Connecting to {}:{}",self.config.get('broker_address'),str(self.config.get('broker_port')))
                     self.connect(self.config.get('broker_address'), self.config.get('broker_port'), self.config.get('broker_timeout'))
                     logger.verbose("Connected to MQTT broker")
 
-                    logger.verbose('Publishing message [{}] to topic [{}] '.format(self.config.get('payload'),self.config.get('topic')))
+                    logger.verbose('Publishing message [{}] to topic [{}] ',self.config.get('payload'),self.config.get('topic'))
                     publish_info = self.publish(self.config.get('topic'), self.config.get('payload'), qos=self.config.get('qos'), retain=self.config.get('retain'))
-                    logger.verbose("Notification sent to broker, waiting for callback response to confirm publishing success - rc={}".format(publish_info))
+                    logger.verbose("Notification sent to broker, waiting for callback response to confirm publishing success - rc={}",publish_info)
 
                     self.loop(timeout=self.config.get('broker_timeout'))
                     self.loop_start()  #Non-blocking
@@ -190,11 +190,11 @@ class MQTTNotifier:
                 self.logger.verbose(str(buff))
 
             def on_publish_cb(self, userdata, mid):
-                self.logger.verbose('MQTT on_publish callback -  message was successfully published to broker as messageID={}'.format(str(mid)))
+                self.logger.verbose('MQTT on_publish callback -  message was successfully published to broker as messageID={}',str(mid))
                 self.disconnect()
 
             def on_disconnect_cb(self, userdata, rc):
-                self.logger.verbose('MQTT on_disconnect callback - disconnected with result code {} [{}]'.format(str(rc),PublishMQTT.conn_rc_description_map.get(rc),'Unknown'))
+                self.logger.verbose('MQTT on_disconnect callback - disconnected with result code {} [{}]',str(rc),PublishMQTT.conn_rc_description_map.get(rc),'Unknown')
                 self.loop_stop()
 
         PublishMQTT(config)
