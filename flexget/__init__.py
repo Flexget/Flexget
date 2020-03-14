@@ -11,7 +11,7 @@ from flexget import log
 from flexget.manager import Manager
 
 
-def init_tray_icon():
+def init_tray_icon(manager: Manager):
     if os.environ.get('GITHUB_ACTIONS'):
         # We cannot init tray action via our CI
         return
@@ -52,7 +52,7 @@ def main(args=None):
                     os.path.join(manager.config_base, manager.options.profile),
                 )
             else:
-                tray = init_tray_icon()
+                tray = init_tray_icon(manager)
                 manager.tray = tray
                 m = threading.Thread(target=manager.start, daemon=True)
                 m.start()
