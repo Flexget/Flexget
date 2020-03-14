@@ -12,6 +12,8 @@ on:
 jobs:
   tests:
     name: Run Tests
+    env:
+      DISPLAY: Flexget CI #  Need for tray icon
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
