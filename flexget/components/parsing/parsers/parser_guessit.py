@@ -1,13 +1,10 @@
 import logging
+import os
 import re
 import sys
 import time
 
-from guessit.api import GuessItApi, GuessitException
-from guessit.rules import rebulk_builder
 from loguru import logger
-from rebulk import Rebulk
-from rebulk.pattern import RePattern
 
 from flexget import plugin
 from flexget.event import event
@@ -16,6 +13,15 @@ from flexget.utils.parsers.generic import ParseWarning, default_ignore_prefixes,
 from flexget.utils.tools import ReList
 
 from .parser_common import MovieParseResult, SeriesParseResult
+
+# rebulk (that underlies guessit) will use the 'regex' module rather than 're' if installed.
+# For consistency, prevent that unless env variable is explicitly already enabling it.
+os.environ.setdefault('REGEX_DISABLED', 'true')  # isort:skip
+from guessit.api import GuessItApi, GuessitException  # isort:skip
+from guessit.rules import rebulk_builder  # isort:skip
+from rebulk import Rebulk  # isort:skip
+from rebulk.pattern import RePattern  # isort:skip
+
 
 logger = logger.bind(name='parser_guessit')
 
@@ -233,7 +239,7 @@ class ParserGuessit:
         name = kwargs.get('name')
         country = guess_result.get('country')
         if not name:
-            name = guess_result.get('title')
+            name = guess_result.get('title', '')
             if not name:
                 valid = False
             elif country and hasattr(country, 'alpha2'):

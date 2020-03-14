@@ -35,12 +35,15 @@ CATEGORIES = {
     'misc': 18,
     'mobile': 22,
     'movies 3d': 25,
+    'movies 4k': 6,
+    'movies 4k blueray': 26,
     'movies bluray': 20,
     'movies dvd': 2,
     'movies dvd-ro': 3,
     'movies hd': 4,
     'movies hd-ro': 19,
     'movies sd': 1,
+    'series 4k': 27,
     'series hd': 21,
     'series sd': 23,
     'software': 8,
@@ -141,12 +144,25 @@ class SearchFileList:
 
         url = BASE_URL + 'takelogin.php'
         try:
+            # get validator token
+            response = requests.get(BASE_URL + 'login.php')
+            soup = get_soup(response.content)
+            
+            login_validator = soup.find("input", {"name": "validator"})
+            
+            if not login_validator:
+                raise plugin.PluginError(
+                    'FileList.ro could not get login validator'
+                )
+            logger.debug('Login Validator: {}'.format(login_validator.get('value')))
             logger.debug('Attempting to retrieve FileList.ro cookie')
+            
             response = requests.post(
                 url,
                 data={
                     'username': username,
                     'password': password,
+                    'validator': login_validator.get('value'),
                     'login': 'Log in',
                     'unlock': '1',
                 },
@@ -179,7 +195,7 @@ class SearchFileList:
         """
             Search for entries on FileList.ro
         """
-        entries = set()
+        entries = list()
 
         params = {
             'cat': CATEGORIES[config['category']],
@@ -257,7 +273,7 @@ class SearchFileList:
                 if genres:
                     e['torrent_genres'] = genres
 
-                entries.add(e)
+                entries.append(e)
 
         return entries
 

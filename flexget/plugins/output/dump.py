@@ -30,6 +30,8 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
 
     for entry in entries:
         for field in sorted(entry, key=sort_key):
+            if field.startswith('_') and not debug:
+                continue
             if title_only and field != 'title':
                 continue
             if entry.is_lazy(field) and not eval_lazy:

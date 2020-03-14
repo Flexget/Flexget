@@ -1,17 +1,19 @@
 """
 Miscellaneous SQLAlchemy helpers.
 """
-import sqlalchemy
+from typing import Any, List, Union, Optional
+
 from loguru import logger
 from sqlalchemy import ColumnDefault, Index, Sequence
 from sqlalchemy.exc import NoSuchTableError, OperationalError
+from sqlalchemy.orm import Session
 from sqlalchemy.schema import MetaData, Table
 from sqlalchemy.types import TypeEngine
 
 logger = logger.bind(name='sql_utils')
 
 
-def table_exists(name, session):
+def table_exists(name: str, session: Session) -> bool:
     """
     Use SQLAlchemy reflect to check table existences.
 
@@ -27,7 +29,7 @@ def table_exists(name, session):
     return True
 
 
-def table_schema(name, session):
+def table_schema(name: str, session: Session) -> Table:
     """
     :returns: Table schema using SQLAlchemy reflect as it currently exists in the db
     :rtype: Table
@@ -35,7 +37,7 @@ def table_schema(name, session):
     return Table(name, MetaData(bind=session.bind), autoload=True)
 
 
-def table_columns(table, session):
+def table_columns(table: Union[str, Table], session: Session) -> List[str]:
     """
     :param string table: Name of table or table schema
     :param Session session: SQLAlchemy Session
@@ -50,7 +52,13 @@ def table_columns(table, session):
     return res
 
 
-def table_add_column(table, name, col_type, session, default=None):
+def table_add_column(
+    table: Union[Table, str],
+    name: str,
+    col_type: Union[TypeEngine, type],
+    session: Session,
+    default: Any = None,
+) -> None:
     """Adds a column to a table
 
     .. warning:: Uses raw statements, probably needs to be changed in
@@ -87,7 +95,7 @@ def table_add_column(table, name, col_type, session, default=None):
         session.commit()
 
 
-def drop_tables(names, session):
+def drop_tables(names: List[str], session: Session) -> None:
     """Takes a list of table names and drops them from the database if they exist."""
     metadata = MetaData()
     metadata.reflect(bind=session.bind)
@@ -96,7 +104,7 @@ def drop_tables(names, session):
             table.drop()
 
 
-def get_index_by_name(table, name):
+def get_index_by_name(table: Table, name: str) -> Optional[Index]:
     """
     Find declaratively defined index from table by name
 
@@ -109,7 +117,7 @@ def get_index_by_name(table, name):
             return index
 
 
-def create_index(table_name, session, *column_names):
+def create_index(table_name: str, session: Session, *column_names: str) -> None:
     """
     Creates an index on specified `columns` in `table_name`
 
@@ -126,10 +134,10 @@ def create_index(table_name, session, *column_names):
         logger.opt(exception=True).debug('Error creating index.')
 
 
-class ContextSession(sqlalchemy.orm.Session):
+class ContextSession(Session):
     """:class:`sqlalchemy.orm.Session` which can be used as context manager"""
 
-    def __enter__(self):
+    def __enter__(self) -> 'ContextSession':
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):

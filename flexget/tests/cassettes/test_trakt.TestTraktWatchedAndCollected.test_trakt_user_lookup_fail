@@ -1,0 +1,65 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
+    method: GET
+    uri: https://api.trakt.tv/search?query=aoetaraeha+aeotrae+taetaeor&type=movie
+  response:
+    body:
+      string: '[]'
+    headers:
+      Age:
+      - '5127'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 564872248818f0fa-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 13 Feb 2020 17:15:42 GMT
+      ETag:
+      - W/"a27c8e2e8df78250ce604e71d2a72e65"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Thu, 13 Feb 2020 23:50:19 GMT
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d04737870e12f6cb839c0bbf5a10f99971581614142; expires=Sat, 14-Mar-20
+        17:15:42 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '0'
+      X-Pagination-Limit:
+      - '10'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '0'
+      X-Request-Id:
+      - c1edd69a-5eee-4d92-9503-e43b1d07b480
+      X-Runtime:
+      - '0.007550'
+      X-XSS-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

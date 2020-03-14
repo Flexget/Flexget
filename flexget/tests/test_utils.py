@@ -1,15 +1,9 @@
-import math
 from datetime import datetime
 
 import pytest
 
 from flexget.utils import json
 from flexget.utils.tools import merge_dict_from_to, parse_filesize, split_title_year
-
-
-def compare_floats(float1, float2):
-    eps = 0.0001
-    return math.fabs(float1 - float2) <= eps
 
 
 class TestJson:
@@ -42,44 +36,26 @@ class TestJson:
 
 
 class TestParseFilesize:
-    def test_parse_filesize_no_space(self):
-        size = '200KB'
-        expected = 200 * 1000 / 1024 ** 2
-        assert compare_floats(parse_filesize(size), expected)
-
-    def test_parse_filesize_space(self):
-        size = '200.0 KB'
-        expected = 200 * 1000 / 1024 ** 2
-        assert compare_floats(parse_filesize(size), expected)
-
-    def test_parse_filesize_non_si(self):
-        size = '1234 GB'
-        expected = 1234 * 1000 ** 3 / 1024 ** 2
-        assert compare_floats(parse_filesize(size), expected)
-
-    def test_parse_filesize_auto(self):
-        size = '1234 GiB'
-        expected = 1234 * 1024 ** 3 / 1024 ** 2
-        assert compare_floats(parse_filesize(size), expected)
-
-    def test_parse_filesize_auto_mib(self):
-        size = '1234 MiB'
-        assert compare_floats(parse_filesize(size), 1234)
+    @pytest.mark.parametrize(
+        'size_text, expected',
+        [
+            ('200KB', 200 * 1000 / 1024 ** 2),
+            ('200.0 KB', 200 * 1000 / 1024 ** 2),
+            ('1234 GB', 1234 * 1000 ** 3 / 1024 ** 2),
+            ('1234 GB', 1234 * 1000 ** 3 / 1024 ** 2),
+            ('1234 GiB', 1234 * 1024 ** 3 / 1024 ** 2),
+            ('1234 MiB', 1234),
+            ('1 GiB', 1024),
+            ('1,234 GiB', 1263616),
+            ('1 234 567 MiB', 1234567),
+        ],
+    )
+    def test_parse_filesize(self, size_text, expected):
+        assert parse_filesize(size_text) == pytest.approx(expected)
 
     def test_parse_filesize_ib_not_valid(self):
         with pytest.raises(ValueError):
             parse_filesize('100 ib')
-
-    def test_parse_filesize_single_digit(self):
-        size = '1 GiB'
-        assert compare_floats(parse_filesize(size), 1024)
-
-    def test_parse_filesize_separators(self):
-        size = '1,234 GiB'
-        assert parse_filesize(size) == 1263616
-
-        size = '1 234 567 MiB'
-        assert parse_filesize(size) == 1234567
 
 
 class TestSplitYearTitle:

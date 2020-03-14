@@ -9,7 +9,7 @@ from flexget.utils.template import get_filters
 def do_cli(manager, options):
     header = ['Name', 'Description']
     table_data = [header]
-    for filter_name, filter in get_filters():
+    for filter_name, filter in get_filters().items():
         if options.name and not options.name in filter_name:
             continue
         filter_doc = inspect.getdoc(filter) or ''

@@ -2,6 +2,7 @@ import contextlib
 import sys
 import threading
 from textwrap import wrap
+from typing import Iterator, List, Optional, TextIO, Union
 
 from colorclass import Color, Windows
 from terminaltables import (
@@ -11,6 +12,7 @@ from terminaltables import (
     PorcelainTable,
     SingleTable,
 )
+from terminaltables.base_table import BaseTable
 from terminaltables.terminal_io import terminal_size
 
 from flexget.options import ArgumentParser
@@ -25,7 +27,7 @@ if sys.platform == 'win32' and sys.stdout:
 local_context = threading.local()
 
 
-def terminal_info():
+def terminal_info() -> dict:
     """
     Returns info we need about the output terminal.
     When called over IPC, this function is monkeypatched to return the info about the client terminal.
@@ -71,7 +73,14 @@ class TerminalTable:
     MIN_WIDTH = 10
     ASCII_TYPES = ['plain', 'porcelain']
 
-    def __init__(self, table_type, table_data, title=None, wrap_columns=None, drop_columns=None):
+    def __init__(
+        self,
+        table_type: str,
+        table_data: List[List[str]],
+        title: Optional[str] = None,
+        wrap_columns: Optional[List[int]] = None,
+        drop_columns: Optional[List[int]] = None,
+    ) -> None:
         self.title = title
         self.wrap_columns = wrap_columns or []
         self.drop_columns = drop_columns or []
@@ -85,7 +94,7 @@ class TerminalTable:
 
         self._init_table()
 
-    def _init_table(self):
+    def _init_table(self) -> None:
         """Assigns self.table with the built table based on data."""
         self.table = self._build_table(self.type, self.table_data)
         if self.type == 'porcelain':
@@ -96,11 +105,11 @@ class TerminalTable:
         if not self.valid_table and adjustable:
             self.table = self._resize_table()
 
-    def _build_table(self, table_type, table_data):
+    def _build_table(self, table_type: str, table_data: List[List[str]]) -> BaseTable:
         return self.supported_table_types()[table_type](table_data)
 
     @property
-    def output(self):
+    def output(self) -> str:
         self.table.title = self.title
         if self.type == 'porcelain':
             return '\n'.join(line.rstrip() for line in self.table.table.splitlines())
@@ -108,7 +117,7 @@ class TerminalTable:
             return '\n' + self.table.table
 
     @staticmethod
-    def supported_table_types():
+    def supported_table_types() -> dict:
         """This method hold the dict for supported table type."""
         return {
             'plain': AsciiTable,
@@ -119,13 +128,13 @@ class TerminalTable:
         }
 
     @property
-    def _columns(self):
+    def _columns(self) -> int:
         if not self.table_data:
             return 0
         else:
             return len(self.table_data[0])
 
-    def _longest_rows(self):
+    def _longest_rows(self) -> dict:
         """
         Calculate longest line for each column.
 
@@ -142,7 +151,7 @@ class TerminalTable:
     def valid_table(self):
         return self.table.table_width <= terminal_info()['size'][0]
 
-    def _calc_wrap(self):
+    def _calc_wrap(self) -> Optional[int]:
         """
         :return: Calculated wrap value to be used for self.wrap_columns.
             If wraps are not defined None is returned
@@ -159,7 +168,7 @@ class TerminalTable:
         # for example in flexget plugins the phases and flags
         return int(space_left / len(self.wrap_columns))
 
-    def _drop_column(self, col):
+    def _drop_column(self, col: int) -> None:
         name = self.table_data[0][col]
         console('Least important column `%s` removed due terminal size' % name)
 
@@ -182,7 +191,7 @@ class TerminalTable:
         self.wrap_columns = adjust(self.wrap_columns)
         self.drop_columns = adjust(self.drop_columns)
 
-    def _drop_columns_with_wrap(self):
+    def _drop_columns_with_wrap(self) -> None:
         """Drop columns until wrapped columns fit or are removed as well"""
         while self.drop_columns and self.wrap_columns:
             drop = self.drop_columns.pop(0)
@@ -193,7 +202,7 @@ class TerminalTable:
             else:
                 return
 
-    def _resize_table(self):
+    def _resize_table(self) -> BaseTable:
         """Adjust table data and columns to fit into terminal"""
         if self.drop_columns and not self.wrap_columns:
             while self.drop_columns and not self.valid_table:
@@ -244,7 +253,7 @@ table_parser.add_argument(
 )
 
 
-def word_wrap(text, max_length):
+def word_wrap(text: str, max_length: int) -> str:
     """A helper method designed to return a wrapped string.
 
     :param text: Text to wrap
@@ -256,7 +265,7 @@ def word_wrap(text, max_length):
     return text
 
 
-def colorize(color, text, auto=True):
+def colorize(color: str, text: str, auto: bool = True) -> Union[Color, str]:
     """
     A simple override of Color.colorize which sets the default auto colors value to True, since it's the more common
     use case. When output isn't TTY just return text
@@ -273,7 +282,7 @@ def colorize(color, text, auto=True):
 
 
 @contextlib.contextmanager
-def capture_console(filelike):
+def capture_console(filelike: TextIO) -> Iterator:
     old_output = get_console_output()
     local_context.output = filelike
     try:
@@ -282,11 +291,11 @@ def capture_console(filelike):
         local_context.output = old_output
 
 
-def get_console_output():
+def get_console_output() -> Optional[TextIO]:
     return getattr(local_context, 'output', None)
 
 
-def console(text, *args, **kwargs):
+def console(text: str, *args, **kwargs) -> None:
     """
     Print to console safely. Output is able to be captured by different streams in different contexts.
 

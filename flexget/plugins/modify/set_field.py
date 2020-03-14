@@ -1,14 +1,13 @@
-from functools import partial
-
 from loguru import logger
 
-from flexget import plugin
+from flexget import entry, plugin
 from flexget.event import event
 from flexget.utils.template import RenderError
 
 logger = logger.bind(name='set')
 
-UNSET = object()
+# Use a string for this sentinel, so it survives serialization
+UNSET = '__unset__'
 
 
 class ModifySet:
@@ -41,11 +40,19 @@ class ModifySet:
                     del entry[field]
                 except KeyError:
                     pass
-                entry.register_lazy_func(
-                    partial(self.lazy_set, config, field, orig_value, errors=errors), config
+                entry.add_lazy_fields(
+                    self.lazy_set,
+                    [field],
+                    kwargs={
+                        'config': config,
+                        'field': field,
+                        'orig_field_value': orig_value,
+                        'errors': errors,
+                    },
                 )
 
-    def lazy_set(self, config, field, orig_field_value, entry, errors=True):
+    @entry.register_lazy_lookup('set_field')
+    def lazy_set(self, entry, config, field, orig_field_value, errors=True):
         level = 'ERROR' if errors else 'DEBUG'
         if orig_field_value is not UNSET:
             entry[field] = orig_field_value

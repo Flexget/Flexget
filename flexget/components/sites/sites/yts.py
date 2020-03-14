@@ -7,6 +7,7 @@ from flexget.components.sites.utils import normalize_unicode, torrent_availabili
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests
+from flexget.utils.qualities import Quality
 from flexget.utils.tools import parse_filesize
 
 logger = logger.bind(name='yts')
@@ -46,7 +47,7 @@ class UrlRewriteYTS:
                     for item in data['data']['movies']:
                         for torrent in item['torrents']:
                             entry = Entry()
-                            entry['title'] = item['title']
+                            entry['title'] = item['title_long']
                             entry['year'] = item['year']
                             entry['url'] = torrent['url']
                             entry['content_size'] = parse_filesize(
@@ -58,7 +59,9 @@ class UrlRewriteYTS:
                             entry['torrent_availability'] = torrent_availability(
                                 entry['torrent_seeds'], entry['torrent_leeches']
                             )
-                            entry['quality'] = torrent['quality']
+                            entry['quality'] = Quality(f"{torrent['quality']} {torrent['type']}")
+                            entry['movie_name'] = item['title']
+                            entry['movie_year'] = item['year']
                             entry['imdb_id'] = item['imdb_code']
                             if entry.isvalid():
                                 entries.add(entry)

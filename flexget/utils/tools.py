@@ -13,28 +13,44 @@ from collections.abc import MutableMapping
 from datetime import datetime, timedelta
 from html.entities import name2codepoint
 from pprint import pformat
-from urllib import request
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Pattern,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 import requests
 from loguru import logger
 
 import flexget
 
+if TYPE_CHECKING:
+    from flexget.entry import Entry
+    from flexget.task import Task
+
 logger = logger.bind(name='utils')
 
 
-def str_to_boolean(string):
+def str_to_boolean(string: str) -> bool:
     return string.lower() in ['true', '1', 't', 'y', 'yes']
 
 
-def str_to_int(string):
+def str_to_int(string: str) -> Optional[int]:
     try:
         return int(string.replace(',', ''))
     except ValueError:
         return None
 
 
-def convert_bytes(bytes):
+def convert_bytes(bytes: Union[int, float]) -> str:
     """Returns given bytes as prettified string."""
 
     bytes = float(bytes)
@@ -63,7 +79,7 @@ class MergeException(Exception):
         return repr(self.value)
 
 
-def strip_html(text):
+def strip_html(text: str) -> str:
     """Tries to strip all HTML tags from *text*. If unsuccessful returns original text."""
     from bs4 import BeautifulSoup
 
@@ -79,7 +95,7 @@ def strip_html(text):
 charrefpat = re.compile(r'&(#(\d+|x[\da-fA-F]+)|[\w.:-]+);?')
 
 
-def _htmldecode(text):
+def _htmldecode(text: str) -> str:
     """Decode HTML entities in the given text."""
     # From screpe.py - licensed under apache 2.0 .. should not be a problem for a MIT afaik
     if isinstance(text, str):
@@ -103,7 +119,7 @@ def _htmldecode(text):
     return charrefpat.sub(entitydecode, text)
 
 
-def decode_html(value):
+def decode_html(value: str) -> str:
     """
     :param string value: String to be html-decoded
     :returns: Html decoded string
@@ -111,35 +127,15 @@ def decode_html(value):
     return _htmldecode(value)
 
 
-def encode_html(unicode_data, encoding='ascii'):
+def encode_html(unicode_data: str, encoding: str = 'ascii') -> bytes:
     """
     Encode unicode_data for use as XML or HTML, with characters outside
     of the encoding converted to XML numeric character references.
     """
-    try:
-        return unicode_data.encode(encoding, 'xmlcharrefreplace')
-    except ValueError:
-        # ValueError is raised if there are unencodable chars in the
-        # data and the 'xmlcharrefreplace' error handler is not found.
-        # Pre-2.3 Python doesn't support the 'xmlcharrefreplace' error
-        # handler, so we'll emulate it.
-        return _xmlcharref_encode(unicode_data, encoding)
+    return unicode_data.encode(encoding, 'xmlcharrefreplace')
 
 
-def _xmlcharref_encode(unicode_data, encoding):
-    """Emulate Python 2.3's 'xmlcharrefreplace' encoding error handler."""
-    chars = []
-    # Phase through the unicode_data string one character at a time in
-    # order to catch unencodable characters:
-    for char in unicode_data:
-        try:
-            chars.append(char.encode(encoding, 'strict'))
-        except UnicodeError:
-            chars.append('&#%i;' % ord(char))
-    return ''.join(chars)
-
-
-def merge_dict_from_to(d1, d2):
+def merge_dict_from_to(d1: dict, d2: dict) -> None:
     """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
     for k, v in d1.items():
         if k in d2:
@@ -168,18 +164,6 @@ def merge_dict_from_to(d1, d2):
             d2[k] = copy.deepcopy(v)
 
 
-class SmartRedirectHandler(request.HTTPRedirectHandler):
-    def http_error_301(self, req, fp, code, msg, headers):
-        result = request.HTTPRedirectHandler.http_error_301(self, req, fp, code, msg, headers)
-        result.status = code
-        return result
-
-    def http_error_302(self, req, fp, code, msg, headers):
-        result = request.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
-        result.status = code
-        return result
-
-
 class ReList(list):
     """
     A list that stores regexps.
@@ -192,27 +176,28 @@ class ReList(list):
     # Set the default flags
     flags = re.IGNORECASE | re.UNICODE
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Optional :flags: keyword argument with regexp flags to compile with"""
         if 'flags' in kwargs:
             self.flags = kwargs['flags']
             del kwargs['flags']
         list.__init__(self, *args, **kwargs)
 
-    def __getitem__(self, k):
+    def __getitem__(self, k) -> Pattern:
+        # Doesn't support slices. Do we care?
         item = list.__getitem__(self, k)
         if isinstance(item, str):
             item = re.compile(item, re.IGNORECASE | re.UNICODE)
             self[k] = item
         return item
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Pattern]:
         for i in range(len(self)):
             yield self[i]
 
 
 # Determine the encoding for io
-io_encoding = None
+io_encoding = ''
 if hasattr(sys.stdout, 'encoding'):
     io_encoding = sys.stdout.encoding
 if not io_encoding:
@@ -232,7 +217,7 @@ else:
         io_encoding = 'ascii'
 
 
-def parse_timedelta(value):
+def parse_timedelta(value: Union[timedelta, str]) -> timedelta:
     """Parse a string like '5 days' into a timedelta object. Also allows timedeltas to pass through."""
     if isinstance(value, timedelta):
         # Allow timedelta objects to pass through
@@ -251,23 +236,14 @@ def parse_timedelta(value):
         raise ValueError('Invalid time format \'%s\'' % value)
 
 
-def timedelta_total_seconds(td):
-    """replaces python 2.7+ timedelta.total_seconds()"""
-    # TODO: Remove this when we no longer support python 2.6
-    try:
-        return td.total_seconds()
-    except AttributeError:
-        return (td.days * 24 * 3600) + td.seconds + (td.microseconds / 1000000)
-
-
-def multiply_timedelta(interval, number):
+def multiply_timedelta(interval: timedelta, number: Union[int, float]) -> timedelta:
     """`timedelta`s can not normally be multiplied by floating points. This does that."""
-    return timedelta(seconds=timedelta_total_seconds(interval) * number)
+    return timedelta(seconds=interval.total_seconds() * number)
 
 
 if os.name == 'posix':
 
-    def pid_exists(pid):
+    def pid_exists(pid: int) -> bool:
         """Check whether pid exists in the current process table."""
         import errno
 
@@ -283,7 +259,7 @@ if os.name == 'posix':
 
 else:
 
-    def pid_exists(pid):
+    def pid_exists(pid: int) -> bool:
         import ctypes
         import ctypes.wintypes
 
@@ -315,34 +291,10 @@ _binOps = {
 }
 
 
-def arithmeticEval(s):
-    """
-    A safe eval supporting basic arithmetic operations.
-
-    :param s: expression to evaluate
-    :return: value
-    """
-    node = ast.parse(s, mode='eval')
-
-    def _eval(node):
-        if isinstance(node, ast.Expression):
-            return _eval(node.body)
-        elif isinstance(node, ast.Str):
-            return node.s
-        elif isinstance(node, ast.Num):
-            return node.n
-        elif isinstance(node, ast.BinOp):
-            return _binOps[type(node.op)](_eval(node.left), _eval(node.right))
-        else:
-            raise Exception('Unsupported type {}'.format(node))
-
-    return _eval(node.body)
-
-
 class TimedDict(MutableMapping):
     """Acts like a normal dict, but keys will only remain in the dictionary for a specified time span."""
 
-    def __init__(self, cache_time='5 minutes'):
+    def __init__(self, cache_time: Union[timedelta, str] = '5 minutes'):
         self.cache_time = parse_timedelta(cache_time)
         self._store = dict()
         self._last_prune = datetime.now()
@@ -395,21 +347,10 @@ class BufferQueue(queue.Queue):
         self.put(line)
 
 
-def singleton(cls):
-    instances = {}
-
-    def getinstance(*args, **kwargs):
-        if cls not in instances:
-            instances[cls] = cls(*args, **kwargs)
-        return instances[cls]
-
-    return getinstance
-
-
-def split_title_year(title):
+def split_title_year(title: str) -> Tuple[str, Optional[int]]:
     """Splits title containing a year into a title, year pair."""
     if not title:
-        return
+        return '', None
     if not re.search(r'\d{4}', title):
         return title, None
     # We only recognize years from the 2nd and 3rd millennium, FlexGetters from the year 3000 be damned!
@@ -429,7 +370,7 @@ def split_title_year(title):
     return title, year
 
 
-def get_latest_flexget_version_number():
+def get_latest_flexget_version_number() -> Optional[str]:
     """
     Return latest Flexget version from https://pypi.python.org/pypi/FlexGet/json
     """
@@ -440,11 +381,11 @@ def get_latest_flexget_version_number():
         return
 
 
-def get_current_flexget_version():
+def get_current_flexget_version() -> str:
     return flexget.__version__
 
 
-def parse_filesize(text_size, si=True):
+def parse_filesize(text_size: str, si: bool = True) -> float:
     """
     Parses a data size and returns its value in mebibytes
 
@@ -477,7 +418,7 @@ def parse_filesize(text_size, si=True):
     return (amount * (base ** order)) / 1024 ** 2
 
 
-def get_config_hash(config):
+def get_config_hash(config: Any) -> str:
     """
     :param dict config: Configuration
     :return: MD5 hash for *config*
@@ -489,7 +430,7 @@ def get_config_hash(config):
         return hashlib.md5(str(config).encode('utf-8')).hexdigest()
 
 
-def get_config_as_array(config, key):
+def get_config_as_array(config: dict, key: str) -> list:
     """
     Return configuration key as array, even if given as a single string
     :param dict config: Configuration
@@ -497,12 +438,14 @@ def get_config_as_array(config, key):
     :return: Array
     """
     v = config.get(key, [])
-    if isinstance(v, str):
+    if not isinstance(v, list):
         return [v]
     return v
 
 
-def parse_episode_identifier(ep_id, identify_season=False):
+def parse_episode_identifier(
+    ep_id: Union[str, int], identify_season: bool = False
+) -> Tuple[str, str]:
     """
     Parses series episode identifier, raises ValueError if it fails
 
@@ -535,10 +478,10 @@ def parse_episode_identifier(ep_id, identify_season=False):
             error = '`%s` is not a valid episode identifier.' % ep_id
     if error:
         raise ValueError(error)
-    return (identified_by, entity_type)
+    return identified_by, entity_type
 
 
-def group_entries(entries, identifier):
+def group_entries(entries: Iterable['Entry'], identifier: str) -> Dict[str, List['Entry']]:
     from flexget.utils.template import RenderError
 
     grouped_entries = defaultdict(list)
@@ -556,7 +499,7 @@ def group_entries(entries, identifier):
     return grouped_entries
 
 
-def aggregate_inputs(task, inputs):
+def aggregate_inputs(task: 'Task', inputs: List[dict]) -> List['Entry']:
     from flexget import plugin
 
     entries = []
@@ -607,7 +550,7 @@ def aggregate_inputs(task, inputs):
 
 # Mainly used due to Too Many Variables error if we use too many variables at a time in the in_ clause.
 # SQLite supports up to 999 by default. Ubuntu, Arch and macOS set this limit to 250,000 though, so it's a rare issue.
-def chunked(seq, limit=900):
+def chunked(seq: Sequence, limit: int = 900) -> Iterator[Sequence]:
     """Helper to divide our expired lists into sizes sqlite can handle in a query. (<1000)"""
     for i in range(0, len(seq), limit):
         yield seq[i : i + limit]

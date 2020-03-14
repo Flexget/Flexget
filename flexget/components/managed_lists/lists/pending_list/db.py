@@ -1,23 +1,41 @@
 from datetime import datetime
 
 from loguru import logger
-from sqlalchemy import Boolean, Column, DateTime, Integer, Unicode, func
+from sqlalchemy import Boolean, Column, DateTime, Integer, Unicode, func, select
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
 from sqlalchemy.sql.schema import ForeignKey
 
 from flexget import db_schema
 from flexget.db_schema import versioned_base
+from flexget.entry import Entry
+from flexget.utils import json, serialization
 from flexget.utils.database import entry_synonym, with_session
+from flexget.utils.sqlalchemy_utils import table_schema
 
 plugin_name = 'pending_list'
 logger = logger.bind(name=plugin_name)
-Base = versioned_base(plugin_name, 0)
+Base = versioned_base(plugin_name, 1)
 
 
 @db_schema.upgrade(plugin_name)
 def upgrade(ver, session):
-    ver = 0
+    if ver is None:
+        ver = 0
+    if ver == 0:
+        table = table_schema('wait_list_entries', session)
+        for row in session.execute(select([table.c.id, table.c.json])):
+            if not row['json']:
+                # Seems there could be invalid data somehow. See #2590
+                continue
+            data = json.loads(row['json'], decode_datetime=True)
+            # If title looked like a date, make sure it's a string
+            title = str(data.pop('title'))
+            e = Entry(title=title, **data)
+            session.execute(
+                table.update().where(table.c.id == row['id']).values(json=serialization.dumps(e))
+            )
+        ver = 1
     return ver
 
 
@@ -66,7 +84,7 @@ class PendingListEntry(Base):
             'added_on': self.added,
             'title': self.title,
             'original_url': self.original_url,
-            'entry': dict(self.entry),
+            'entry': json.coerce(self.entry),
             'approved': self.approved,
         }
 

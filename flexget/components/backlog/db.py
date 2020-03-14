@@ -5,12 +5,13 @@ from loguru import logger
 from sqlalchemy import Column, DateTime, Index, Integer, String, Unicode, select
 
 from flexget import db_schema
-from flexget.utils import json
+from flexget.entry import Entry
+from flexget.utils import json, serialization
 from flexget.utils.database import entry_synonym, with_session
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
 logger = logger.bind(name='backlog.db')
-Base = db_schema.versioned_base('backlog', 2)
+Base = db_schema.versioned_base('backlog', 3)
 
 
 class BacklogEntry(Base):
@@ -67,6 +68,21 @@ def upgrade(ver, session):
                 logger.error('Unable error upgrading backlog pickle object due to {}', str(e))
 
         ver = 2
+    if ver == 2:
+        table = table_schema('backlog', session)
+        for row in session.execute(select([table.c.id, table.c.json])):
+            if not row['json']:
+                # Seems there could be invalid data somehow. See #2590
+                continue
+            data = json.loads(row['json'], decode_datetime=True)
+            # If title looked like a date, make sure it's a string
+            title = str(data.pop('title'))
+            e = Entry(title=title, **data)
+            session.execute(
+                table.update().where(table.c.id == row['id']).values(json=serialization.dumps(e))
+            )
+
+        ver = 3
     return ver
 
 

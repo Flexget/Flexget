@@ -409,8 +409,8 @@ class PluginTransmission(TransmissionBase):
                             filedump = base64.b64encode(f.read()).decode('utf-8')
                         torrent_info = self.client.add_torrent(filedump, 30, **options['add'])
                     else:
-                        # we need to set paused to false so the magnetization begins immediately
-                        options['add']['paused'] = False
+                        if options['post'].get('magnetization_timeout', 0) > 0:
+                            options['add']['paused'] = False
                         torrent_info = self.client.add_torrent(
                             entry['url'], timeout=30, **options['add']
                         )

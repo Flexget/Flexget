@@ -11,12 +11,12 @@ from flexget import db_schema
 from flexget.db_schema import versioned_base
 from flexget.entry import Entry
 from flexget.manager import Session
-from flexget.utils import json
+from flexget.utils import json, serialization
 from flexget.utils.database import entry_synonym, with_session
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
 logger = logger.bind(name='entry_list.db')
-Base = versioned_base('entry_list', 1)
+Base = versioned_base('entry_list', 2)
 
 
 @db_schema.upgrade('entry_list')
@@ -40,6 +40,20 @@ def upgrade(ver, session):
                 logger.error('Unable error upgrading entry_list pickle object due to {}', str(e))
 
         ver = 1
+    if ver == 1:
+        table = table_schema('entry_list_entries', session)
+        for row in session.execute(select([table.c.id, table.c.json])):
+            if not row['json']:
+                # Seems there could be invalid data somehow. See #2590
+                continue
+            data = json.loads(row['json'], decode_datetime=True)
+            # If title looked like a date, make sure it's a string
+            title = str(data.pop('title'))
+            e = Entry(title=title, **data)
+            session.execute(
+                table.update().where(table.c.id == row['id']).values(json=serialization.dumps(e))
+            )
+        ver = 2
     return ver
 
 
@@ -82,7 +96,7 @@ class EntryListEntry(Base):
             'added_on': self.added,
             'title': self.title,
             'original_url': self.original_url,
-            'entry': dict(self.entry),
+            'entry': json.coerce(self.entry),
         }
 
 
@@ -138,9 +152,6 @@ class DBEntrySet(MutableSet):
                 session.delete(db_entry)
 
     def add(self, entry):
-        # Evaluate all lazy fields so that no db access occurs during our db session
-        entry.values()
-
         with Session() as session:
             stored_entry = self._entry_query(session, entry)
             if stored_entry:
@@ -151,15 +162,6 @@ class DBEntrySet(MutableSet):
                 logger.debug('adding entry {} to list {}', entry, self._db_list(session).name)
                 stored_entry = EntryListEntry(entry=entry, entry_list_id=self._db_list(session).id)
             session.add(stored_entry)
-
-    def __ior__(self, other):
-        # Optimization to only open one session when adding multiple items
-        # Make sure lazy lookups are done before opening our session to prevent db locks
-        for value in other:
-            value.values()
-        for value in other:
-            self.add(value)
-        return self
 
     @property
     def immutable(self):

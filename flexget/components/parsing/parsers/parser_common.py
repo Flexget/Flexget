@@ -1,5 +1,7 @@
+import datetime
 import re
 from string import capwords
+from typing import List, Optional, Tuple, Union
 
 from loguru import logger
 
@@ -10,7 +12,7 @@ logger = logger.bind(name='parser')
 SERIES_ID_TYPES = ['ep', 'date', 'sequence', 'id']
 
 
-def clean_value(name):
+def clean_value(name: str) -> str:
     for char in '[]()_,.':
         name = name.replace(char, ' ')
 
@@ -23,7 +25,7 @@ def clean_value(name):
     return name
 
 
-def old_assume_quality(guessed_quality, assumed_quality):
+def old_assume_quality(guessed_quality: Quality, assumed_quality: Quality) -> Quality:
     if assumed_quality:
         if not guessed_quality:
             return assumed_quality
@@ -38,13 +40,13 @@ def old_assume_quality(guessed_quality, assumed_quality):
     return guessed_quality
 
 
-def remove_dirt(name):
+def remove_dirt(name: str) -> str:
     if name:
         name = re.sub(r'[_.,\[\]\(\): ]+', ' ', name).strip().lower()
     return name
 
 
-def normalize_name(name):
+def normalize_name(name: str) -> str:
     name = capwords(name)
     return name
 
@@ -52,35 +54,35 @@ def normalize_name(name):
 class MovieParseResult:
     def __init__(
         self,
-        data=None,
-        name=None,
-        year=None,
-        quality=None,
-        proper_count=0,
-        release_group=None,
-        valid=True,
-    ):
-        self.name = name
-        self.data = data
-        self.year = year
-        self.quality = quality if quality is not None else Quality()
-        self.proper_count = proper_count
-        self.release_group = release_group
-        self.valid = valid
+        data: str = None,
+        name: str = None,
+        year: Optional[int] = None,
+        quality: Quality = None,
+        proper_count: int = 0,
+        release_group: Optional[str] = None,
+        valid: bool = True,
+    ) -> None:
+        self.name: str = name
+        self.data: str = data
+        self.year: Optional[int] = year
+        self.quality: Quality = quality if quality is not None else Quality()
+        self.proper_count: int = proper_count
+        self.release_group: Optional[str] = release_group
+        self.valid: bool = valid
 
     @property
-    def identifier(self):
+    def identifier(self) -> str:
         if self.name and self.year:
             return ('%s %s' % (self.name, self.year)).strip().lower()
         elif self.name:
             return self.name.lower()
 
     @property
-    def proper(self):
+    def proper(self) -> bool:
         return self.proper_count > 0
 
     @property
-    def fields(self):
+    def fields(self) -> dict:
         """
         Return a dict of all parser fields
         """
@@ -94,7 +96,7 @@ class MovieParseResult:
             'release_group': self.release_group,
         }
 
-    def __str__(self):
+    def __str__(self) -> str:
         valid = 'OK' if self.valid else 'INVALID'
         return (
             '<MovieParseResult(data=%s,name=%s,year=%s,id=%s,quality=%s,proper=%s,release_group=%s,status=%s)>'
@@ -114,40 +116,40 @@ class MovieParseResult:
 class SeriesParseResult:
     def __init__(
         self,
-        data=None,
-        name=None,
-        identified_by=None,
-        id_type=None,
-        id=None,
-        episodes=1,
-        season_pack=False,
-        strict_name=False,
-        quality=None,
-        proper_count=0,
-        special=False,
-        group=None,
-        valid=True,
-    ):
-        self.name = name
-        self.data = data
-        self.episodes = episodes
-        self.season_pack = season_pack
-        self.identified_by = identified_by
-        self.id = id
-        self.id_type = id_type
-        self.quality = quality if quality is not None else Quality()
-        self.proper_count = proper_count
-        self.special = special
-        self.group = group
-        self.valid = valid
-        self.strict_name = strict_name
+        data: str = None,
+        name: str = None,
+        identified_by: str = None,
+        id_type: str = None,
+        id: Union[Tuple[int, int], str, int, datetime.date] = None,
+        episodes: int = 1,
+        season_pack: bool = False,
+        strict_name: bool = False,
+        quality: Quality = None,
+        proper_count: int = 0,
+        special: bool = False,
+        group: Optional[str] = None,
+        valid: bool = True,
+    ) -> None:
+        self.name: str = name
+        self.data: str = data
+        self.episodes: int = episodes
+        self.season_pack: bool = season_pack
+        self.identified_by: str = identified_by
+        self.id: Union[Tuple[int, int], str, int, datetime.date] = id
+        self.id_type: str = id_type
+        self.quality: Quality = quality if quality is not None else Quality()
+        self.proper_count: int = proper_count
+        self.special: bool = special
+        self.group: Optional[str] = group
+        self.valid: bool = valid
+        self.strict_name: bool = strict_name
 
     @property
-    def proper(self):
+    def proper(self) -> bool:
         return self.proper_count > 0
 
     @property
-    def season(self):
+    def season(self) -> Optional[int]:
         if self.id_type == 'ep':
             return self.id[0]
         if self.id_type == 'date':
@@ -157,7 +159,7 @@ class SeriesParseResult:
         return None
 
     @property
-    def episode(self):
+    def episode(self) -> Optional[int]:
         if self.id_type == 'ep':
             return self.id[1]
         if self.id_type == 'sequence':
@@ -165,7 +167,7 @@ class SeriesParseResult:
         return None
 
     @property
-    def identifiers(self):
+    def identifiers(self) -> List[str]:
         """Return all identifiers this parser represents. (for packs)"""
         # Currently 'ep' is the only id type that supports packs
         if not self.valid:
@@ -182,14 +184,14 @@ class SeriesParseResult:
             return [self.id]
 
     @property
-    def identifier(self):
+    def identifier(self) -> str:
         """Return String identifier for parsed episode, eg. S01E02
         (will be the first identifier if this is a pack)
         """
         return self.identifiers[0]
 
     @property
-    def pack_identifier(self):
+    def pack_identifier(self) -> str:
         """Return a combined identifier for the whole pack if this has more than one episode."""
         # Currently only supports ep mode
         if self.id_type == 'ep':
@@ -204,7 +206,7 @@ class SeriesParseResult:
         else:
             return self.identifier
 
-    def __str__(self):
+    def __str__(self) -> str:
         valid = 'OK' if self.valid else 'INVALID'
         return (
             '<SeriesParseResult(data=%s,name=%s,id=%s,season=%s,season_pack=%s,episode=%s,quality=%s,proper=%s,'

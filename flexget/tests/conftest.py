@@ -7,8 +7,10 @@ import sys
 from contextlib import contextmanager
 from http import client
 from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional
 from unittest import mock
 
+import flask
 import jsonschema
 import pytest
 import requests
@@ -72,12 +74,12 @@ def manager(
 
 
 @pytest.fixture()
-def execute_task(manager):
+def execute_task(manager: Manager) -> Callable[..., Task]:
     """
     A function that can be used to execute and return a named task in `config` argument.
     """
 
-    def execute(task_name, abort=False, options=None):
+    def execute(task_name: str, abort: bool = False, options: bool = None) -> Task:
         """
         Use to execute one test task from config.
 
@@ -132,7 +134,7 @@ def use_vcr(request, monkeypatch):
 
 
 @pytest.fixture()
-def api_client(manager):
+def api_client(manager) -> 'APIClient':
     with Session() as session:
         user = session.query(User).first()
         if not user:
@@ -143,13 +145,13 @@ def api_client(manager):
 
 
 @pytest.fixture()
-def schema_match(manager):
+def schema_match(manager) -> Callable[[dict, Any], List[dict]]:
     """
     This fixture enables verifying JSON Schema. Return a list of validation error dicts. List is empty if no errors
     occurred.
     """
 
-    def match(schema, response):
+    def match(schema: dict, response: Any) -> List[dict]:
         validator = jsonschema.Draft4Validator(schema)
         errors = list(validator.iter_errors(response))
         return [dict(value=list(e.path), message=e.message) for e in errors]
@@ -158,12 +160,12 @@ def schema_match(manager):
 
 
 @pytest.fixture()
-def link_headers(manager):
+def link_headers(manager) -> Callable[[flask.Response], Dict[str, dict]]:
     """
     Parses link headers and return them in dict form
     """
 
-    def headers(response):
+    def headers(response: flask.Response) -> Dict[str, dict]:
         links = {}
         for link in requests.utils.parse_header_links(response.headers.get('link')):
             url = link['url']
@@ -304,7 +306,7 @@ def chdir(pytestconfig, request):
 
 
 class CrashReport(Exception):
-    def __init__(self, message, crash_log):
+    def __init__(self, message: str, crash_log: str):
         self.message = message
         self.crash_log = crash_log
 
@@ -312,7 +314,7 @@ class CrashReport(Exception):
 class MockManager(Manager):
     unit_test = True
 
-    def __init__(self, config_text, config_name, db_uri=None):
+    def __init__(self, config_text: str, config_name: str, db_uri: Optional[str] = None):
         self.config_text = config_text
         self._db_uri = db_uri or 'sqlite:///:memory:'
         super().__init__(['execute'])
@@ -361,7 +363,7 @@ class MockManager(Manager):
 
 
 class APIClient:
-    def __init__(self, api_key):
+    def __init__(self, api_key: str) -> None:
         self.api_key = api_key
         self.client = api_app.test_client()
 
@@ -371,43 +373,43 @@ class APIClient:
 
         kwargs['headers'][key] = value
 
-    def json_post(self, *args, **kwargs):
+    def json_post(self, *args, **kwargs) -> flask.Response:
         self._append_header('Content-Type', 'application/json', kwargs)
         if kwargs.get('auth', True):
             self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
         return self.client.post(*args, **kwargs)
 
-    def json_put(self, *args, **kwargs):
+    def json_put(self, *args, **kwargs) -> flask.Response:
         self._append_header('Content-Type', 'application/json', kwargs)
         if kwargs.get('auth', True):
             self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
         return self.client.put(*args, **kwargs)
 
-    def json_patch(self, *args, **kwargs):
+    def json_patch(self, *args, **kwargs) -> flask.Response:
         self._append_header('Content-Type', 'application/json', kwargs)
         if kwargs.get('auth', True):
             self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
         return self.client.patch(*args, **kwargs)
 
-    def get(self, *args, **kwargs):
+    def get(self, *args, **kwargs) -> flask.Response:
         if kwargs.get('auth', True):
             self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
 
         return self.client.get(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args, **kwargs) -> flask.Response:
         if kwargs.get('auth', True):
             self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
 
         return self.client.delete(*args, **kwargs)
 
-    def json_delete(self, *args, **kwargs):
+    def json_delete(self, *args, **kwargs) -> flask.Response:
         self._append_header('Content-Type', 'application/json', kwargs)
         if kwargs.get('auth', True):
             self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
         return self.client.delete(*args, **kwargs)
 
-    def head(self, *args, **kwargs):
+    def head(self, *args, **kwargs) -> flask.Response:
         if kwargs.get('auth', True):
             self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
 

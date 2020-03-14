@@ -1,3 +1,4 @@
+import argparse  # noqa
 import atexit  # noqa
 import codecs  # noqa
 import copy  # noqa
@@ -13,6 +14,7 @@ import threading  # noqa
 import traceback  # noqa
 from contextlib import contextmanager  # noqa
 from datetime import datetime, timedelta  # noqa
+from typing import Iterator, List, Optional, Sequence, Tuple, Type, Union  # noqa
 
 import sqlalchemy  # noqa
 import yaml  # noqa
@@ -26,7 +28,7 @@ from flexget.utils.sqlalchemy_utils import ContextSession  # noqa
 from flexget.utils.tools import get_current_flexget_version, io_encoding, pid_exists  # noqa
 
 Base = declarative_base()
-Session = sessionmaker(class_=ContextSession)
+Session: Type[ContextSession] = sessionmaker(class_=ContextSession)
 
 import flexget.log  # noqa
 from flexget import config_schema, db_schema, plugin  # noqa
@@ -106,7 +108,7 @@ class Manager:
     unit_test = False
     options = None
 
-    def __init__(self, args):
+    def __init__(self, args: Optional[Sequence]) -> None:
         """
         :param args: CLI args
         """
@@ -146,8 +148,6 @@ class Manager:
         except:
             flexget.log.start(level=self.options.loglevel, to_file=False)
             raise
-        else:
-            self._init_logging()
 
         manager = self
 
@@ -165,7 +165,7 @@ class Manager:
                 'locale env variables are set up correctly for the environment which is launching FlexGet.'
             )
 
-    def _init_options(self, args):
+    def _init_options(self, args: Sequence[str]) -> argparse.Namespace:
         """
         Initialize argument parsing
         """
@@ -182,7 +182,7 @@ class Manager:
                 sys.exit(1)
         return options
 
-    def _init_logging(self):
+    def _init_logging(self, to_file: bool=True) -> None:
         """
         Initialize logging facilities
         """
@@ -191,9 +191,11 @@ class Manager:
         if not os.path.isabs(log_file):
             log_file = os.path.join(self.config_base, log_file)
         self.log_filename = log_file
-        flexget.log.start(log_file, self.options.loglevel, to_console=not self.options.cron)
+        flexget.log.start(
+            log_file, self.options.loglevel, to_file=to_file, to_console=not self.options.cron
+        )
 
-    def initialize(self):
+    def initialize(self) -> None:
         """
         Load plugins, database, and config. Also initializes (but does not start) the task queue and ipc server.
         This should only be called after obtaining a lock.
@@ -235,17 +237,22 @@ class Manager:
         self.initialized = True
 
     @property
-    def tasks(self):
+    def tasks(self) -> List[str]:
         """A list of tasks in the config"""
         if not self.config:
             return []
         return list(self.config.get('tasks', {}).keys())
 
     @property
-    def has_lock(self):
+    def has_lock(self) -> bool:
         return self._has_lock
 
-    def execute(self, options=None, priority=1, suppress_warnings=None):
+    def execute(
+        self,
+        options: Optional[Union[dict, argparse.Namespace]] = None,
+        priority: int = 1,
+        suppress_warnings: Optional[Sequence[str]] = None,
+    ) -> List[Tuple[str, str, threading.Event]]:
         """
         Run all (can be limited with options) tasks from the config.
 
@@ -311,7 +318,7 @@ class Manager:
             finished_events.append((task.id, task.name, task.finished_event))
         return finished_events
 
-    def start(self):
+    def start(self) -> None:
         """
         Starting point when executing from commandline, dispatch execution to correct destination.
 
@@ -319,16 +326,14 @@ class Manager:
         and results will be streamed back.
         If not, this will attempt to obtain a lock, initialize the manager, and run the command here.
         """
-        if sys.version_info <= (2, 7):
-            console('-' * 79)
-            console('Python 2.7 will not be maintained past 2020 !')
-            console('Consider upgrading to 3.6 or newer at your earliest convenience.')
-            console('-' * 79)
         # When we are in test mode, we use a different lock file and db
         if self.options.test:
             self.lockfile = os.path.join(self.config_base, '.test-%s-lock' % self.config_name)
         # If another process is started, send the execution to the running process
         ipc_info = self.check_ipc_info()
+        # If we are connecting to a running daemon, we don't want to log to the log file,
+        # the daemon is already handling that.
+        self._init_logging(to_file=not ipc_info)
         if ipc_info:
             console(
                 'There is a FlexGet process already running for this config, sending execution there.'
@@ -362,7 +367,7 @@ class Manager:
             self.handle_cli()
             self._shutdown()
 
-    def handle_cli(self, options=None):
+    def handle_cli(self, options: Optional[argparse.Namespace] = None) -> None:
         """
         Dispatch a cli command to the appropriate function.
 
@@ -390,7 +395,7 @@ class Manager:
             # Otherwise dispatch the command to the callback function
             options.cli_command_callback(self, command_options)
 
-    def execute_command(self, options):
+    def execute_command(self, options: argparse.Namespace) -> None:
         """
         Handles the 'execute' CLI command.
 
@@ -428,7 +433,7 @@ class Manager:
             self.task_queue.wait()
         fire_event('manager.execute.completed', self, options)
 
-    def daemon_command(self, options):
+    def daemon_command(self, options: argparse.Namespace) -> None:
         """
         Handles the 'daemon' CLI command.
 
@@ -492,11 +497,11 @@ class Manager:
                 else:
                     logger.info('Config successfully reloaded from disk.')
 
-    def _handle_sigterm(self, signum, frame):
+    def _handle_sigterm(self, signum, frame) -> None:
         logger.info('Got SIGTERM. Shutting down.')
         self.shutdown(finish_queue=False)
 
-    def setup_yaml(self):
+    def setup_yaml(self) -> None:
         """Sets up the yaml loader to return unicode objects for strings by default"""
 
         def construct_yaml_str(self, node):
@@ -524,7 +529,7 @@ class Manager:
         yaml.Dumper.increase_indent = increase_indent_wrapper(yaml.Dumper.increase_indent)
         yaml.SafeDumper.increase_indent = increase_indent_wrapper(yaml.SafeDumper.increase_indent)
 
-    def _init_config(self, create=False):
+    def _init_config(self, create: bool = False) -> None:
         """
         Find and load the configuration file.
 
@@ -590,7 +595,7 @@ class Manager:
         self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
         self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
 
-    def hash_config(self):
+    def hash_config(self) -> Optional[str]:
         if not self.config_path:
             return
         sha1_hash = hashlib.sha1()
@@ -602,7 +607,7 @@ class Manager:
                 sha1_hash.update(data)
         return sha1_hash.hexdigest()
 
-    def load_config(self, output_to_console=True, config_file_hash=None):
+    def load_config(self, output_to_console: bool = True, config_file_hash: Optional[str] = None) -> None:
         """
         Loads the config file from disk, validates and activates it.
 
@@ -679,7 +684,7 @@ class Manager:
         # Install the newly loaded config
         self.update_config(config)
 
-    def update_config(self, config):
+    def update_config(self, config: dict) -> None:
         """
         Provide a new config for the manager to use.
 
@@ -699,7 +704,7 @@ class Manager:
         self.user_config = copy.deepcopy(new_user_config)
         fire_event('manager.config_updated', self)
 
-    def backup_config(self):
+    def backup_config(self) -> str:
         backup_path = os.path.join(
             self.config_base,
             '%s-%s.bak' % (self.config_name, datetime.now().strftime('%y%m%d%H%M%S')),
@@ -713,7 +718,7 @@ class Manager:
             raise
         return backup_path
 
-    def save_config(self):
+    def save_config(self) -> None:
         """Dumps current config to yaml config file"""
         # TODO: Only keep x number of backups..
 
@@ -725,7 +730,7 @@ class Manager:
         with open(self.config_path, 'w') as config_file:
             config_file.write(yaml.dump(self.user_config, default_flow_style=False))
 
-    def config_changed(self):
+    def config_changed(self) -> None:
         """Makes sure that all tasks will have the config_modified flag come out true on the next run.
         Useful when changing the db and all tasks need to be completely reprocessed."""
         from flexget.task import config_changed
@@ -733,7 +738,7 @@ class Manager:
         config_changed()
         fire_event('manager.config_updated', self)
 
-    def validate_config(self, config=None):
+    def validate_config(self, config: Optional[dict] = None) -> dict:
         """
         Check all root level keywords are valid. Config may be modified by before_config_validate hooks. Modified
         config will be returned.
@@ -753,7 +758,7 @@ class Manager:
         else:
             return config
 
-    def init_sqlalchemy(self):
+    def init_sqlalchemy(self) -> None:
         """Initialize SQLAlchemy"""
         try:
             if [int(part) for part in sqlalchemy.__version__.split('.')] < [0, 7, 0]:
@@ -812,7 +817,7 @@ class Manager:
                 )
             raise
 
-    def _read_lock(self):
+    def _read_lock(self) -> Optional[dict]:
         """
         Read the values from the lock file. Returns None if there is no current lock file.
         """
@@ -840,7 +845,7 @@ class Manager:
             return result
         return None
 
-    def check_lock(self):
+    def check_lock(self) -> bool:
         """Returns True if there is a lock on the database."""
         lock_info = self._read_lock()
         if not lock_info:
@@ -850,7 +855,7 @@ class Manager:
             return False
         return True
 
-    def check_ipc_info(self):
+    def check_ipc_info(self) -> Optional[dict]:
         """If a daemon has a lock on the database, return info to connect to IPC."""
         lock_info = self._read_lock()
         if lock_info and 'port' in lock_info:
@@ -858,7 +863,7 @@ class Manager:
         return None
 
     @contextmanager
-    def acquire_lock(self, event=True):
+    def acquire_lock(self, event: bool = True) -> Iterator:
         """
         :param bool event: If True, the 'manager.lock_acquired' event will be fired after a lock is obtained
         """
@@ -892,7 +897,7 @@ class Manager:
                 self.release_lock()
                 self._has_lock = False
 
-    def write_lock(self, ipc_info=None):
+    def write_lock(self, ipc_info: Optional[dict] = None) -> None:
         assert self._has_lock
         with io.open(self.lockfile, 'w', encoding='utf-8') as f:
             f.write('PID: %s\n' % os.getpid())
@@ -900,7 +905,7 @@ class Manager:
                 for key in sorted(ipc_info):
                     f.write('%s: %s\n' % (key, ipc_info[key]))
 
-    def release_lock(self):
+    def release_lock(self) -> None:
         try:
             os.remove(self.lockfile)
         except OSError as e:
@@ -910,7 +915,7 @@ class Manager:
         else:
             logger.debug('Removed {}', self.lockfile)
 
-    def daemonize(self):
+    def daemonize(self) -> None:
         """Daemonizes the current process. Returns the new pid"""
         if sys.platform.startswith('win'):
             logger.error('Cannot daemonize on windows')
@@ -966,7 +971,7 @@ class Manager:
         if self._has_lock:
             self.write_lock()
 
-    def db_cleanup(self, force=False):
+    def db_cleanup(self, force: bool = False) -> None:
         """
         Perform database cleanup if cleanup interval has been met.
 
@@ -994,7 +999,7 @@ class Manager:
         else:
             logger.debug('Not running db cleanup, last run {}', self.persist.get('last_cleanup'))
 
-    def shutdown(self, finish_queue=True):
+    def shutdown(self, finish_queue: bool = True) -> None:
         """
         Request manager shutdown.
 
@@ -1005,7 +1010,7 @@ class Manager:
         fire_event('manager.shutdown_requested', self)
         self.task_queue.shutdown(finish_queue)
 
-    def _shutdown(self):
+    def _shutdown(self) -> None:
         """Runs when the manager is done processing everything."""
         if self.ipc_server:
             self.ipc_server.shutdown()
@@ -1023,7 +1028,7 @@ class Manager:
         global manager
         manager = None
 
-    def crash_report(self):
+    def crash_report(self) -> str:
         """
         This should be called when handling an unexpected exception. Will create a new log file containing the last 50
         debug messages as well as the crash traceback.

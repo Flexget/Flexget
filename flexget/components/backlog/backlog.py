@@ -7,6 +7,7 @@ from flexget.components.backlog.db import BacklogEntry, clear_entries, get_entri
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.database import with_session
+from flexget.utils.serialization import serialize
 from flexget.utils.tools import parse_timedelta
 
 logger = logger.bind(name='backlog')
@@ -29,9 +30,6 @@ class InputBacklog:
     def on_task_input(self, task, config):
         # Get a list of entries to inject
         injections = self.get_injections(task)
-        # Take a snapshot of the entries' states after the input event in case we have to store them to backlog
-        for entry in task.entries + injections:
-            entry.take_snapshot('after_input')
         if config:
             # If backlog is manually enabled for this task, learn the entries.
             self.learn_backlog(task, config)
@@ -41,15 +39,8 @@ class InputBacklog:
     @plugin.priority(plugin.PRIORITY_FIRST)
     def on_task_metainfo(self, task, config):
         # Take a snapshot of any new entries' states before metainfo event in case we have to store them to backlog
-        # This is really a hack to avoid unnecessary lazy lookups causing db locks. Ideally, saving a snapshot
-        # should not cause lazy lookups, but we currently have no other way of saving a lazy field than performing its
-        # action.
-        # https://github.com/Flexget/Flexget/issues/1000
         for entry in task.entries:
-            snapshot = entry.snapshots.get('after_input')
-            if snapshot:
-                continue
-            entry.take_snapshot('after_input')
+            entry['_backlog_snapshot'] = serialize(entry)
 
     def on_task_abort(self, task, config):
         """Remember all entries until next execution when task gets aborted."""
@@ -62,14 +53,14 @@ class InputBacklog:
         """Add single entry to task backlog
 
         If :amount: is not specified, entry will only be injected on next execution."""
-        snapshot = entry.snapshots.get('after_input')
+        snapshot = entry.get('_backlog_snapshot')
         if not snapshot:
             if task.current_phase != 'input':
                 # Not having a snapshot is normal during input phase, don't display a warning
                 logger.warning(
                     'No input snapshot available for `{}`, using current state', entry['title']
                 )
-            snapshot = entry
+            snapshot = serialize(entry)
         expire_time = datetime.now() + parse_timedelta(amount)
         backlog_entry = (
             session.query(BacklogEntry)

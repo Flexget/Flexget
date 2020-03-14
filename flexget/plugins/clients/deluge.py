@@ -150,7 +150,9 @@ class InputDeluge(DelugePlugin):
         try:
             client.connect()
         except ConnectionError as exc:
-            raise plugin.PluginError(f'Error connecting to deluge daemon: {exc}') from exc
+            raise plugin.PluginError(
+                f'Error connecting to deluge daemon: {exc}', logger=logger
+            ) from exc
 
         entries = self.generate_entries(client, config)
         client.disconnect()
@@ -301,7 +303,9 @@ class OutputDeluge(DelugePlugin):
         try:
             client.connect()
         except ConnectionError as exc:
-            raise plugin.PluginError(f'Error connecting to deluge daemon: {exc}') from exc
+            raise plugin.PluginError(
+                f'Error connecting to deluge daemon: {exc}', logger=logger
+            ) from exc
 
         if task.options.test:
             logger.debug('Test connection to deluge daemon successful.')
