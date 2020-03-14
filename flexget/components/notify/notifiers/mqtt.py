@@ -2,6 +2,9 @@ import json
 
 from loguru import logger
 
+from hashlib import sha256
+import ssl
+
 from flexget import plugin
 #from flexget.config_schema import one_or_more
 from flexget.event import event
@@ -73,9 +76,6 @@ class MQTTNotifier:
         """
         try:
             import paho.mqtt.client as mqtt
-            from hashlib import sha256
-            import ssl
-            import time
 
         except ImportError as e:
             logger.verbose('Error importing paho.mqtt.client: {}', e)
