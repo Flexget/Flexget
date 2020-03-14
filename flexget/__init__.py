@@ -9,7 +9,17 @@ from time import sleep
 from ._version import __version__  # noqa
 from flexget import log
 from flexget.manager import Manager
-from flexget.tray_icon import TrayIcon
+
+
+def init_tray_icon():
+    if os.environ.get('GITHUB_ACTIONS'):
+        # We cannot init tray action via our CI
+        return
+    from flexget.tray_icon import TrayIcon
+
+    image_path = Path('flexget') / 'resources' / 'flexget.png'
+    tray = TrayIcon(manager=manager, path_to_image=image_path)
+    return tray
 
 
 def main(args=None):
@@ -42,8 +52,7 @@ def main(args=None):
                     os.path.join(manager.config_base, manager.options.profile),
                 )
             else:
-                image_path = Path('flexget') / 'resources' / 'flexget.png'
-                tray = TrayIcon(manager=manager, path_to_image=image_path)
+                tray = init_tray_icon()
                 manager.tray = tray
                 m = threading.Thread(target=manager.start, daemon=True)
                 m.start()
@@ -52,7 +61,7 @@ def main(args=None):
                 # takes a while to be populated
                 sleep(3)
 
-                if manager.is_daemon:
+                if manager.is_daemon and tray:
                     tray.run()
                 m.join()
         except (IOError, ValueError) as e:

@@ -12,8 +12,6 @@ on:
 jobs:
   tests:
     name: Run Tests
-    env:
-      DISPLAY: ':0' #  Needed for tray icon
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
