@@ -160,9 +160,9 @@ class MQTTNotifier:
                     #Handle user/pass authentication
                     if self.config.get('username',False) or self.config.get('password',False):
                         logger.debug('Credential passwords s are redacted to protect the innocent...')
-                        logger.debug('Auth credentials: username=[{}] password sha256 hash is "{}"',self.config.get('username'),sha256(str(self.config.get('password','')).encode('utf-8')).hexdigest())
+                        logger.debug('Auth credentials: username=[{}] password sha256 hash is "{}"',self.config.get('username'),sha256(str(self.config.get('password')).encode('utf-8')).hexdigest())
                         logger.debug('You can validate them yourself by calculating the sha256 hex digest of your password string (google is your friend if you do not know how to do this)')
-                        logger.debug('Note: a password that is not provided (i.e. blank) will hash to "{}"',sha256(str('').encode('utf-8')).hexdigest())
+                        logger.debug('Note: a password that is not provided (i.e. None) will hash to "{}"',sha256(str(None).encode('utf-8')).hexdigest())
 
                         self.username_pw_set=(self.config.get('username'),self.config.get('password'))
 
