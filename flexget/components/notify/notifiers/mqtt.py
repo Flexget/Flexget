@@ -49,15 +49,15 @@ class MQTTNotifier:
             'broker_timeout': {'type': 'integer', 'default': 30},
             'broker_transport': {'type': 'string', 'default': 'tcp', 'enum': ['tcp', 'websockets']},
             'broker_protocol': {'type': 'string', 'default': 'MQTTv311', 'enum': ['MQTTv31', 'MQTTv311']},
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
+            'username': {'type': 'string', 'default': ''},
+            'password': {'type': 'string', 'default': ''},
             'enable_encrypted_communication': {'type': 'boolean', 'default': False},
             'certificates': {
                 'type': 'object',
                 'properties': {
-                    'broker_ca_cert': {'type': 'string'},
-                    'client_cert': {'type': 'string'},
-                    'client_key': {'type': 'string'},
+                    'broker_ca_cert': {'type': 'string', 'default': ''},
+                    'client_cert': {'type': 'string', 'default': ''},
+                    'client_key': {'type': 'string', 'default': ''},
                     'validate_broker_cert': {'type': 'boolean', 'default': True},
                     'tls_version': {'type': 'string', 'default': '', 'enum': ['tlsv1.2', 'tlsv1.1', 'tlsv1', '']},
                 },
@@ -104,13 +104,6 @@ class MQTTNotifier:
                     self.config = config
                     self.logger = logger
 
-                    blank2None = lambda s: s or None
-                    self.config.update({'username': blank2None(self.config.get('username'))})
-                    self.config.update({'password': blank2None(self.config.get('password'))})
-                    self.config.get('certificates',{}).update({'broker_ca_cert': blank2None(self.config.get('certificates',{}).get('broker_ca_cert'))})
-                    self.config.get('certificates',{}).update({'client_cert': blank2None(self.config.get('certificates',{}).get('client_cert'))})
-                    self.config.get('certificates',{}).update({'client_key': blank2None(self.config.get('certificates',{}).get('client_key'))})
-                    self.config.get('certificates',{}).update({'tls_version': blank2None(self.config.get('certificates',{}).get('tls_version'))})
                     logger.trace('MQTT notify config={}',str(self.config))
 
                     mqtt.Client.__init__(self, protocol=PublishMQTT.MQTT_proto_map.get(self.config.get('broker_protocol',mqtt.MQTTv311)), transport=self.config.get('broker_transport', 'tcp') )
