@@ -59,7 +59,7 @@ class MQTTNotifier:
                     'client_cert': {'type': 'string'},
                     'client_key': {'type': 'string'},
                     'validate_broker_cert': {'type': 'boolean', 'default': True},
-                    'tls_version': {'type': 'string', 'default': '', 'enum': ['tlsv1.2', 'tlsv1.1', 'tlsv1', '']},
+                    'tls_version': {'type': 'string', 'enum': ['tlsv1.2', 'tlsv1.1', 'tlsv1']},
                 },
                 'additionalProperties': False,
             },
