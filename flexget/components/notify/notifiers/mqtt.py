@@ -142,11 +142,7 @@ class MQTTNotifier:
                         tls_version = tls_version_map.get(certs.get('tls_version'),ssl.PROTOCOL_TLSv1_2)
                         logger.verbose('TLS version is {}',str(tls_version))
 
-                        if certs.get('validate_broker_cert',True):
-                            cert_required = ssl.CERT_REQUIRED
-                        else:
-                            cert_required = ssl.CERT_NONE
-                        logger.verbose('TLS cert_required={}',str(cert_required))
+                        cert_required = ssl.CERT_REQUIRED if certs.get('validate_broker_cert', True) else ssl.CERT_NONE
 
                         self.tls_set(ca_certs=certs.get('broker_ca_cert'),
                                       certfile=certs.get('client_cert'),
