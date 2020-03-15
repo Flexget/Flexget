@@ -49,15 +49,15 @@ class MQTTNotifier:
             'broker_timeout': {'type': 'integer', 'default': 30},
             'broker_transport': {'type': 'string', 'default': 'tcp', 'enum': ['tcp', 'websockets']},
             'broker_protocol': {'type': 'string', 'default': 'MQTTv311', 'enum': ['MQTTv31', 'MQTTv311']},
-            'username': {'type': 'string', 'default': ''},
-            'password': {'type': 'string', 'default': ''},
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
             'enable_encrypted_communication': {'type': 'boolean', 'default': False},
             'certificates': {
                 'type': 'object',
                 'properties': {
-                    'broker_ca_cert': {'type': 'string', 'default': ''},
-                    'client_cert': {'type': 'string', 'default': ''},
-                    'client_key': {'type': 'string', 'default': ''},
+                    'broker_ca_cert': {'type': 'string'},
+                    'client_cert': {'type': 'string'},
+                    'client_key': {'type': 'string'},
                     'validate_broker_cert': {'type': 'boolean', 'default': True},
                     'tls_version': {'type': 'string', 'default': '', 'enum': ['tlsv1.2', 'tlsv1.1', 'tlsv1', '']},
                 },
@@ -163,10 +163,10 @@ class MQTTNotifier:
 
                     #Handle user/pass authentication
                     if self.config.get('username',False) or self.config.get('password',False):
-                        logger.verbose('Credential passwords s are redacted to protect the innocent...')
-                        logger.verbose('Auth credentials: username=[{}] password sha256 hash is "{}"',self.config.get('username'),sha256(str(self.config.get('password','')).encode('utf-8')).hexdigest())
-                        logger.verbose('You can validate them yourself by calculating the sha256 hex digest of your password string (google is your friend if you do not know how to do this)')
-                        logger.verbose('Note: a password that is not provided (i.e. blank) will hash to "{}"',sha256(str('').encode('utf-8')).hexdigest())
+                        logger.debug('Credential passwords s are redacted to protect the innocent...')
+                        logger.debug('Auth credentials: username=[{}] password sha256 hash is "{}"',self.config.get('username'),sha256(str(self.config.get('password','')).encode('utf-8')).hexdigest())
+                        logger.debug('You can validate them yourself by calculating the sha256 hex digest of your password string (google is your friend if you do not know how to do this)')
+                        logger.debug('Note: a password that is not provided (i.e. blank) will hash to "{}"',sha256(str('').encode('utf-8')).hexdigest())
 
                         self.username_pw_set=(self.config.get('username'),self.config.get('password'))
 
