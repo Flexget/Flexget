@@ -34,6 +34,7 @@ class TrayIcon:
 
     def run(self):
         logging.getLogger('PIL.PngImagePlugin').setLevel(logging.INFO)  # Silence PIL noisy logging
+        logging.getLogger('PIL.Image').setLevel(logging.INFO)  # Silence PIL noisy logging
         self.icon = Icon('Flexget', Image.open(self.path_to_image), menu=self.menu)
         self.running = True
         self.icon.run()  # This call is blocking and must be done from main thread
