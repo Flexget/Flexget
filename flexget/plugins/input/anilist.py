@@ -134,6 +134,7 @@ class AniList(object):
                             entry['alternate_name'] = anime.get('synonyms', [])
                             if (
                                 anime['title'].get('english')
+                                and anime['title'].get('english') != anime['title']['romaji']
                                 and anime['title'].get('english') not in entry['alternate_name']
                             ):
                                 entry['alternate_name'].insert(0, anime['title']['english'])
