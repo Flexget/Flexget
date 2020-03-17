@@ -5,11 +5,18 @@ from pathlib import Path
 
 from loguru import logger
 from PIL import Image
-from pystray import Menu, MenuItem
 
 from flexget import __version__
 
 logger = logger.bind(name='tray_icon')
+
+try:
+    from pystray import Icon, Menu, MenuItem
+
+    _import_success = True
+except Exception as e:
+    logger.warning('Could not load tray icon: {}', e)
+    _import_success = False
 
 
 class TrayIcon:
@@ -38,6 +45,8 @@ class TrayIcon:
         """
         Add a menu item byt passing its text and function, or pass a created MenuItem. Force position by sending index
         """
+        from pystray import MenuItem
+
         if not any(v for v in (menu_item, text)):
             raise ValueError(f"Either 'text' or 'menu_item' are required")
 
@@ -67,10 +76,6 @@ class TrayIcon:
     def run(self):
         """Run the tray icon. Must be run from the main thread and is blocking"""
         try:
-            # This import is here since it can causes crashes on certain conditions,
-            # like trying load Icon in linux without X running
-            from pystray import Icon
-
             logger.verbose('Starting tray icon')
             self.icon = Icon('Flexget', Image.open(self.path_to_image), menu=self.menu)
             self.running = True
@@ -88,8 +93,9 @@ class TrayIcon:
         self.running = False
 
 
-try:
-    tray_icon = TrayIcon()
-except Exception as e:
-    logger.warning('Could not load tray icon: {}', e)
-    tray_icon = None
+tray_icon = None
+if _import_success:
+    try:
+        tray_icon = TrayIcon()
+    except Exception as e:
+        logger.warning('Could not load tray icon: {}', e)
