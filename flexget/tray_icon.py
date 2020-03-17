@@ -1,4 +1,6 @@
 import logging
+import webbrowser
+from functools import partial
 from pathlib import Path
 
 from loguru import logger
@@ -28,6 +30,8 @@ class TrayIcon:
         self.add_menu_item(Menu.SEPARATOR)
         self.add_menu_item(MenuItem('Shutdown', self.manager.shutdown))
         self.add_menu_item(MenuItem('Reload Config', self.manager.load_config))
+        self.add_menu_item(Menu.SEPARATOR)
+        self.add_menu_item(MenuItem('Homepage', partial(webbrowser.open, 'https://flexget.com/')))
 
     @property
     def menu(self) -> Menu:
