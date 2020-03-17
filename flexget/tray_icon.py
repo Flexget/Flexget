@@ -2,6 +2,7 @@ import logging
 import webbrowser
 from functools import partial
 from pathlib import Path
+from typing import List, Optional
 
 from loguru import logger
 from PIL import Image
@@ -25,12 +26,12 @@ class TrayIcon:
         logging.getLogger('PIL.PngImagePlugin').setLevel(logging.INFO)
         logging.getLogger('PIL.Image').setLevel(logging.INFO)
 
-        self.path_to_image = path_to_image
-        self.icon = None
-        self._menu = None
+        self.path_to_image: Path = path_to_image
+        self.icon: Optional[Icon] = None
+        self._menu: Optional[Menu] = None
+        self.menu_items: List[MenuItem] = []
 
-        self.menu_items = []
-        self.running = False
+        self.running: bool = False
 
         self.add_core_menu_items()
 
@@ -45,8 +46,6 @@ class TrayIcon:
         """
         Add a menu item byt passing its text and function, or pass a created MenuItem. Force position by sending index
         """
-        from pystray import MenuItem
-
         if not any(v for v in (menu_item, text)):
             raise ValueError(f"Either 'text' or 'menu_item' are required")
 
@@ -60,11 +59,11 @@ class TrayIcon:
         self.add_menu_item(menu_item=Menu.SEPARATOR, index=index)
 
     def add_core_menu_items(self):
-        web_page = partial(webbrowser.open)
+        open_web = partial(webbrowser.open)
         self.add_menu_item(text=f'Flexget {__version__}', enabled=False)
         self.add_menu_separator()
-        self.add_menu_item(text='Homepage', action=partial(web_page, 'https://flexget.com/'))
-        self.add_menu_item(text='Forum', action=partial(web_page, 'https://discuss.flexget.com/'))
+        self.add_menu_item(text='Homepage', action=partial(open_web, 'https://flexget.com/'))
+        self.add_menu_item(text='Forum', action=partial(open_web, 'https://discuss.flexget.com/'))
 
     @property
     def menu(self) -> Menu:
