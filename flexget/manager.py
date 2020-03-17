@@ -169,6 +169,9 @@ class Manager:
         self._add_tray_icon_items()
 
     def _add_tray_icon_items(self):
+        if not tray_icon:
+            return
+
         tray_icon.add_menu_item(text='Shutdown', action=self.shutdown, index=2)
         tray_icon.add_menu_item(text='Reload Config', action=self.load_config, index=3)
         tray_icon.add_menu_separator(index=4)
