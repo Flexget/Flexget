@@ -9,6 +9,9 @@ from time import sleep
 from ._version import __version__  # noqa
 from flexget import log
 from flexget.manager import Manager
+from flexget.event import event
+
+manager_loaded = False
 
 
 def init_tray_icon(manager: Manager):
@@ -52,17 +55,15 @@ def main(args=None):
                     os.path.join(manager.config_base, manager.options.profile),
                 )
             else:
+                m = threading.Thread(target=manager.start, daemon=True)
                 tray = init_tray_icon(manager)
                 manager.tray = tray
-                m = threading.Thread(target=manager.start, daemon=True)
                 m.start()
-
-                # This is an ungodly hack to avoid a race condition since the `is_daemon` property of the `Manager`
-                # takes a while to be populated
-                sleep(3)
-
-                if manager.is_daemon and tray:
-                    tray.run()
+                if tray:
+                    while not manager_loaded:
+                        sleep(1)
+                    if manager.is_daemon:
+                        tray.run()
                 m.join()
         except (IOError, ValueError) as e:
             if _is_debug():
@@ -88,3 +89,9 @@ def _is_debug():
         arg in ['debug', '--debug', '--loglevel=trace', '--loglevel=debug']
         for arg in [a.lower() for a in sys.argv]
     )
+
+
+@event('manager.daemon.started')
+def set_manager_started(manager):
+    global manager_loaded
+    manager_loaded = True
