@@ -22,18 +22,24 @@ class TrayIcon:
         self.running = False
         self.add_default_menu_items()
 
-    def add_menu_item(self, menu_item: MenuItem):
+    def add_menu_item(
+        self, text: str = None, action: callable = None, menu_item: MenuItem = None, **kwargs
+    ):
+        if not any(v for v in (menu_item, text)):
+            raise ValueError(f"Either 'text' or 'menu_item' are required")
+
+        menu_item = menu_item or MenuItem(text=text, action=action, **kwargs)
         self.menu_items.append(menu_item)
 
     def add_default_menu_items(self):
         web_page = partial(webbrowser.open)
-        self.add_menu_item(MenuItem(f'Flexget {__version__}', None, enabled=False))
-        self.add_menu_item(Menu.SEPARATOR)
-        self.add_menu_item(MenuItem('Shutdown', self.manager.shutdown))
-        self.add_menu_item(MenuItem('Reload Config', self.manager.load_config))
-        self.add_menu_item(Menu.SEPARATOR)
-        self.add_menu_item(MenuItem('Homepage', partial(web_page, 'https://flexget.com/')))
-        self.add_menu_item(MenuItem('Forum', partial(web_page, 'https://discuss.flexget.com/')))
+        self.add_menu_item(text=f'Flexget {__version__}', enabled=False)
+        self.add_menu_item(menu_item=Menu.SEPARATOR)
+        self.add_menu_item(text='Shutdown', action=self.manager.shutdown)
+        self.add_menu_item(text='Reload Config', action=self.manager.load_config)
+        self.add_menu_item(menu_item=Menu.SEPARATOR)
+        self.add_menu_item(text='Homepage', action=partial(web_page, 'https://flexget.com/'))
+        self.add_menu_item(text='Forum', action=partial(web_page, 'https://discuss.flexget.com/'))
 
     @property
     def menu(self) -> Menu:
