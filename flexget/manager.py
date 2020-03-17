@@ -30,6 +30,7 @@ from flexget.utils.tools import get_current_flexget_version, io_encoding, pid_ex
 Base = declarative_base()
 Session: Type[ContextSession] = sessionmaker(class_=ContextSession)
 
+from flexget import tray
 import flexget.log  # noqa
 from flexget import config_schema, db_schema, plugin  # noqa
 from flexget.event import fire_event  # noqa
@@ -139,7 +140,6 @@ class Manager:
         self.task_queue = None
         self.persist = None
         self.initialized = False
-        self.tray = None
 
         self.config = {}
 
@@ -165,8 +165,15 @@ class Manager:
                 'disk will not work properly for filenames containing non-ascii characters. Make sure your '
                 'locale env variables are set up correctly for the environment which is launching FlexGet.'
             )
+        self._add_tray_icon_items()
 
-    def _init_options(self, args: Sequence[str]) -> argparse.Namespace:
+    def _add_tray_icon_items(self):
+        tray.add_menu_item(text='Shutdown', action=self.shutdown, index=2)
+        tray.add_menu_item(text='Reload Config', action=self.load_config, index=3)
+        tray.add_menu_separator(index=4)
+
+    @staticmethod
+    def _init_options(args: Sequence[str]) -> argparse.Namespace:
         """
         Initialize argument parsing
         """
@@ -1021,8 +1028,8 @@ class Manager:
         if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
             logger.debug('Shutting down')
         self.engine.dispose()
-        if self.tray and self.tray.running:
-            self.tray.stop()
+        if tray and tray.running:
+            tray.stop()
         # remove temporary database used in test mode
         if self.options.test:
             if 'test' not in self.db_filename:

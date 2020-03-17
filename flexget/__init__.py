@@ -8,24 +8,21 @@ from time import sleep
 # __version__ import need to be first in order to avoid circular import within logger
 from ._version import __version__  # noqa
 from flexget import log
-from flexget.manager import Manager
+
 from flexget.event import event
 from loguru import logger
 
 logger = logger.bind(name='main')
 manager_loaded = False
 
+try:
+    from flexget.tray_icon import TrayIcon
 
-def init_tray_icon(manager: Manager):
-    try:
-        from flexget.tray_icon import TrayIcon
-
-        image_path = Path('flexget') / 'resources' / 'flexget.png'
-        tray = TrayIcon(manager=manager, path_to_image=image_path)
-    except Exception as e:
-        logger.warning('Could not load tray icon: {}', e)
-        tray = None
-    return tray
+    image_path = Path('flexget') / 'resources' / 'flexget.png'
+    tray = TrayIcon(path_to_image=image_path)
+except Exception as e:
+    logger.warning('Could not load tray icon: {}', e)
+    tray = None
 
 
 def main(args=None):
@@ -35,6 +32,8 @@ def main(args=None):
         log.initialize()
 
         try:
+            from flexget.manager import Manager
+
             manager = Manager(args)
         except (IOError, ValueError) as e:
             if _is_debug():
@@ -59,7 +58,6 @@ def main(args=None):
                 )
             else:
                 m = threading.Thread(target=manager.start, daemon=True)
-                tray = init_tray_icon(manager)
                 manager.tray = tray
                 m.start()
                 if tray:

@@ -13,8 +13,7 @@ logger = logger.bind(name='tray_icon')
 
 
 class TrayIcon:
-    def __init__(self, manager, path_to_image: Path):
-        self.manager = manager
+    def __init__(self, path_to_image: Path):
         self.path_to_image = path_to_image
         self.icon = None
         self._menu = None
@@ -23,23 +22,31 @@ class TrayIcon:
         self.add_default_menu_items()
 
     def add_menu_item(
-        self, text: str = None, action: callable = None, menu_item: MenuItem = None, **kwargs
+        self,
+        text: str = None,
+        action: callable = None,
+        menu_item: MenuItem = None,
+        index: int = None,
+        **kwargs,
     ):
+        """
+        Add a menu item byt passing its text and function, or pass a created MenuItem. Force position by sending index
+        """
         if not any(v for v in (menu_item, text)):
             raise ValueError(f"Either 'text' or 'menu_item' are required")
 
         menu_item = menu_item or MenuItem(text=text, action=action, **kwargs)
-        self.menu_items.append(menu_item)
+        if index is not None:
+            self.menu_items.insert(index, menu_item)
+        else:
+            self.menu_items.append(menu_item)
 
-    def add_menu_separator(self):
-        self.add_menu_item(menu_item=Menu.SEPARATOR)
+    def add_menu_separator(self, index: int = None):
+        self.add_menu_item(menu_item=Menu.SEPARATOR, index=index)
 
     def add_default_menu_items(self):
         web_page = partial(webbrowser.open)
         self.add_menu_item(text=f'Flexget {__version__}', enabled=False)
-        self.add_menu_separator()
-        self.add_menu_item(text='Shutdown', action=self.manager.shutdown)
-        self.add_menu_item(text='Reload Config', action=self.manager.load_config)
         self.add_menu_separator()
         self.add_menu_item(text='Homepage', action=partial(web_page, 'https://flexget.com/'))
         self.add_menu_item(text='Forum', action=partial(web_page, 'https://discuss.flexget.com/'))
