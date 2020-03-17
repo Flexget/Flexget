@@ -16,7 +16,7 @@ manager_loaded = False
 
 def init_tray_icon(manager: Manager):
     if os.environ.get('GITHUB_ACTIONS'):
-        # We cannot init tray action via our CI since it requires X on linux
+        # We cannot import TrayIcon when running in CI since it must have X loaded in linux
         return
     from flexget.tray_icon import TrayIcon
 
