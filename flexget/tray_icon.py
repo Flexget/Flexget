@@ -50,10 +50,15 @@ class TrayIcon:
     def run(self):
         logging.getLogger('PIL.PngImagePlugin').setLevel(logging.INFO)  # Silence PIL noisy logging
         logging.getLogger('PIL.Image').setLevel(logging.INFO)  # Silence PIL noisy logging
-        self.icon = Icon('Flexget', Image.open(self.path_to_image), menu=self.menu)
-        self.running = True
-        logger.verbose('Starting tray icon')
-        self.icon.run()  # This call is blocking and must be done from main thread
+
+        try:
+            logger.verbose('Starting tray icon')
+            self.icon = Icon('Flexget', Image.open(self.path_to_image), menu=self.menu)
+            self.running = True
+            self.icon.run()  # This call is blocking and must be done from main thread
+        except Exception as e:
+            logger.warning('Could not run tray icon: {}', e)
+            self.running = False
 
     def stop(self):
         logger.verbose('Stopping tray icon')
