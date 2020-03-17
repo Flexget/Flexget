@@ -10,18 +10,21 @@ from ._version import __version__  # noqa
 from flexget import log
 from flexget.manager import Manager
 from flexget.event import event
+from loguru import logger
 
+logger = logger.bind(name='main')
 manager_loaded = False
 
 
 def init_tray_icon(manager: Manager):
-    if os.environ.get('GITHUB_ACTIONS'):
-        # We cannot import TrayIcon when running in CI since it must have X loaded in linux
-        return
-    from flexget.tray_icon import TrayIcon
+    try:
+        from flexget.tray_icon import TrayIcon
 
-    image_path = Path('flexget') / 'resources' / 'flexget.png'
-    tray = TrayIcon(manager=manager, path_to_image=image_path)
+        image_path = Path('flexget') / 'resources' / 'flexget.png'
+        tray = TrayIcon(manager=manager, path_to_image=image_path)
+    except Exception as e:
+        logger.warning('Could not load tray icon: {}', e)
+        tray = None
     return tray
 
 
