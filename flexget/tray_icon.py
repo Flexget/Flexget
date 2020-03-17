@@ -42,7 +42,7 @@ class TrayIcon:
         self,
         text: str = None,
         action: callable = None,
-        menu_item: MenuItem = None,
+        menu_item: 'MenuItem' = None,
         index: int = None,
         **kwargs,
     ):
@@ -69,7 +69,7 @@ class TrayIcon:
         self.add_menu_item(text='Forum', action=partial(open_web, 'https://discuss.flexget.com/'))
 
     @property
-    def menu(self) -> Menu:
+    def menu(self) -> 'Menu':
         # This is lazy loaded since we'd like to delay the menu build until the tray is requested to run
         if not self._menu:
             self._menu = Menu(*self.menu_items)
