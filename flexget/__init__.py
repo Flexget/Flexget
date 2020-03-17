@@ -94,6 +94,6 @@ def _is_debug():
 @event('manager.daemon.started')
 def set_manager_started(manager):
     # This is used since we have to wait until manager is loaded before deciding if manager runs a
-    # daemon or not, and we cant trigger this event from the manager thread since the tray has to run on the main thread
+    # daemon or not, and we cant run the tray by hooking this event since it has to run on the main thread
     global manager_loaded
     manager_loaded = True
