@@ -26,12 +26,14 @@ class TrayIcon:
         self.menu_items.append(menu_item)
 
     def add_default_menu_items(self):
+        web_page = partial(webbrowser.open)
         self.add_menu_item(MenuItem(f'Flexget {__version__}', None, enabled=False))
         self.add_menu_item(Menu.SEPARATOR)
         self.add_menu_item(MenuItem('Shutdown', self.manager.shutdown))
         self.add_menu_item(MenuItem('Reload Config', self.manager.load_config))
         self.add_menu_item(Menu.SEPARATOR)
-        self.add_menu_item(MenuItem('Homepage', partial(webbrowser.open, 'https://flexget.com/')))
+        self.add_menu_item(MenuItem('Homepage', partial(web_page, 'https://flexget.com/')))
+        self.add_menu_item(MenuItem('Forum', partial(web_page, 'https://discuss.flexget.com/')))
 
     @property
     def menu(self) -> Menu:
