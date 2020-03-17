@@ -34,6 +34,14 @@ class CFScraper:
             This class allows the FlexGet session to inherit from CloudScraper instead of the requests.Session directly.
             """
 
+            def Challenge_Response(self, resp, **kwargs):
+                """Make sure limiters are disabled when doing a cloudflare challenge."""
+                if not self.is_reCaptcha_Challenge(resp):
+                    # If this is a recaptcha challenge, the request gets sent straight to requests, not our subclass,
+                    # so it can't have any extra arguments that requests doesn't expect.
+                    kwargs['disable_limiters'] = True
+                return super().Challenge_Response(resp, **kwargs)
+
         if config is True:
             task.requests.headers = OrderedDict(
                 [
