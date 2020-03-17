@@ -25,7 +25,7 @@ class TrayIcon:
         self.menu_items = []
         self.running = False
 
-        self.add_default_menu_items()
+        self.add_core_menu_items()
 
     def add_menu_item(
         self,
@@ -50,7 +50,7 @@ class TrayIcon:
     def add_menu_separator(self, index: int = None):
         self.add_menu_item(menu_item=Menu.SEPARATOR, index=index)
 
-    def add_default_menu_items(self):
+    def add_core_menu_items(self):
         web_page = partial(webbrowser.open)
         self.add_menu_item(text=f'Flexget {__version__}', enabled=False)
         self.add_menu_separator()
@@ -65,6 +65,7 @@ class TrayIcon:
         return self._menu
 
     def run(self):
+        """Run the tray icon. Must be run from the main thread and is blocking"""
         try:
             # This import is here since it can causes crashes on certain conditions,
             # like trying load Icon in linux without X running
@@ -73,12 +74,15 @@ class TrayIcon:
             logger.verbose('Starting tray icon')
             self.icon = Icon('Flexget', Image.open(self.path_to_image), menu=self.menu)
             self.running = True
-            self.icon.run()  # This call is blocking and must be done from main thread
+            self.icon.run()
         except Exception as e:
             logger.warning('Could not run tray icon: {}', e)
             self.running = False
 
     def stop(self):
+        if not self.running:
+            return
+
         logger.verbose('Stopping tray icon')
         self.icon.stop()
         self.running = False

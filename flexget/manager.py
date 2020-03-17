@@ -1029,7 +1029,7 @@ class Manager:
         if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
             logger.debug('Shutting down')
         self.engine.dispose()
-        if tray_icon and tray_icon.running:
+        if tray_icon:
             tray_icon.stop()
         # remove temporary database used in test mode
         if self.options.test:
