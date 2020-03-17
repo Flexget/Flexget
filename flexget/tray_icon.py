@@ -16,8 +16,11 @@ try:
 
     _import_success = True
 except Exception as e:
-    logger.warning('Could not load tray icon: {}', e)
+    logger.warning('Could not import pystray: {}', e)
     _import_success = False
+
+
+tray_icon = None
 
 
 class TrayIcon:
@@ -92,9 +95,5 @@ class TrayIcon:
         self.running = False
 
 
-tray_icon = None
 if _import_success:
-    try:
-        tray_icon = TrayIcon()
-    except Exception as e:
-        logger.warning('Could not load tray icon: {}', e)
+    tray_icon = TrayIcon()
