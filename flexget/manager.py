@@ -30,7 +30,6 @@ from flexget.utils.tools import get_current_flexget_version, io_encoding, pid_ex
 Base = declarative_base()
 Session: Type[ContextSession] = sessionmaker(class_=ContextSession)
 
-from flexget import tray
 import flexget.log  # noqa
 from flexget import config_schema, db_schema, plugin  # noqa
 from flexget.event import fire_event  # noqa
@@ -45,6 +44,8 @@ from flexget.options import (  # noqa
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
 from flexget.terminal import console, get_console_output  # noqa
+from flexget.tray_icon import tray_icon  # noqa
+
 
 logger = logger.bind(name='manager')
 
@@ -168,9 +169,9 @@ class Manager:
         self._add_tray_icon_items()
 
     def _add_tray_icon_items(self):
-        tray.add_menu_item(text='Shutdown', action=self.shutdown, index=2)
-        tray.add_menu_item(text='Reload Config', action=self.load_config, index=3)
-        tray.add_menu_separator(index=4)
+        tray_icon.add_menu_item(text='Shutdown', action=self.shutdown, index=2)
+        tray_icon.add_menu_item(text='Reload Config', action=self.load_config, index=3)
+        tray_icon.add_menu_separator(index=4)
 
     @staticmethod
     def _init_options(args: Sequence[str]) -> argparse.Namespace:
@@ -1028,8 +1029,8 @@ class Manager:
         if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
             logger.debug('Shutting down')
         self.engine.dispose()
-        if tray and tray.running:
-            tray.stop()
+        if tray_icon and tray_icon.running:
+            tray_icon.stop()
         # remove temporary database used in test mode
         if self.options.test:
             if 'test' not in self.db_filename:

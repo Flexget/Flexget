@@ -2,27 +2,19 @@
 import os
 import sys
 import threading
-from pathlib import Path
 from time import sleep
+
+from loguru import logger
 
 # __version__ import need to be first in order to avoid circular import within logger
 from ._version import __version__  # noqa
 from flexget import log
-
 from flexget.event import event
-from loguru import logger
+from flexget.tray_icon import tray_icon
+from flexget.manager import Manager
 
 logger = logger.bind(name='main')
 manager_loaded = False
-
-try:
-    from flexget.tray_icon import TrayIcon
-
-    image_path = Path('flexget') / 'resources' / 'flexget.png'
-    tray = TrayIcon(path_to_image=image_path)
-except Exception as e:
-    logger.warning('Could not load tray icon: {}', e)
-    tray = None
 
 
 def main(args=None):
@@ -32,8 +24,6 @@ def main(args=None):
         log.initialize()
 
         try:
-            from flexget.manager import Manager
-
             manager = Manager(args)
         except (IOError, ValueError) as e:
             if _is_debug():
@@ -58,13 +48,12 @@ def main(args=None):
                 )
             else:
                 m = threading.Thread(target=manager.start, daemon=True)
-                manager.tray = tray
                 m.start()
-                if tray:
+                if tray_icon:
                     while not manager_loaded:
                         sleep(1)
                     if manager.is_daemon:
-                        tray.run()
+                        tray_icon.run()
                 m.join()
         except (IOError, ValueError) as e:
             if _is_debug():
@@ -95,6 +84,6 @@ def _is_debug():
 @event('manager.daemon.started')
 def set_manager_started(manager):
     # This is used since we have to wait until manager is loaded before deciding if manager runs a
-    # daemon or not, and we cant run the tray by hooking this event since it has to run on the main thread
+    # daemon or not, and we cant run the tray_icon by hooking this event since it has to run on the main thread
     global manager_loaded
     manager_loaded = True

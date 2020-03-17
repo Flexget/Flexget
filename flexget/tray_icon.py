@@ -5,7 +5,7 @@ from pathlib import Path
 
 from loguru import logger
 from PIL import Image
-from pystray import Icon, Menu, MenuItem
+from pystray import Menu, MenuItem
 
 from flexget import __version__
 
@@ -13,12 +13,17 @@ logger = logger.bind(name='tray_icon')
 
 
 class TrayIcon:
-    def __init__(self, path_to_image: Path):
+    def __init__(self, path_to_image: Path = Path('flexget') / 'resources' / 'flexget.png'):
+        logging.getLogger('PIL.PngImagePlugin').setLevel(logging.INFO)  # Silence PIL noisy logging
+        logging.getLogger('PIL.Image').setLevel(logging.INFO)  # Silence PIL noisy logging
+
         self.path_to_image = path_to_image
         self.icon = None
         self._menu = None
+
         self.menu_items = []
         self.running = False
+
         self.add_default_menu_items()
 
     def add_menu_item(
@@ -53,15 +58,17 @@ class TrayIcon:
 
     @property
     def menu(self) -> Menu:
+        # This is lazy loaded since we'd like to delay the menu build until the tray is requested to run
         if not self._menu:
             self._menu = Menu(*self.menu_items)
         return self._menu
 
     def run(self):
-        logging.getLogger('PIL.PngImagePlugin').setLevel(logging.INFO)  # Silence PIL noisy logging
-        logging.getLogger('PIL.Image').setLevel(logging.INFO)  # Silence PIL noisy logging
-
         try:
+            # This import is here since it can causes crashes on certain conditions,
+            # like trying load Icon in linux without X running
+            from pystray import Icon
+
             logger.verbose('Starting tray icon')
             self.icon = Icon('Flexget', Image.open(self.path_to_image), menu=self.menu)
             self.running = True
@@ -74,3 +81,10 @@ class TrayIcon:
         logger.verbose('Stopping tray icon')
         self.icon.stop()
         self.running = False
+
+
+try:
+    tray_icon = TrayIcon()
+except Exception as e:
+    logger.warning('Could not load tray icon: {}', e)
+    tray_icon = None
