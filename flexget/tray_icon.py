@@ -1,10 +1,13 @@
 import logging
 from pathlib import Path
 
+from loguru import logger
 from PIL import Image
 from pystray import Icon, Menu, MenuItem
 
 from flexget import __version__
+
+logger = logger.bind(name='tray_icon')
 
 
 class TrayIcon:
@@ -37,8 +40,10 @@ class TrayIcon:
         logging.getLogger('PIL.Image').setLevel(logging.INFO)  # Silence PIL noisy logging
         self.icon = Icon('Flexget', Image.open(self.path_to_image), menu=self.menu)
         self.running = True
+        logger.verbose('Starting tray icon')
         self.icon.run()  # This call is blocking and must be done from main thread
 
     def stop(self):
+        logger.verbose('Stopping tray icon')
         self.icon.stop()
         self.running = False
