@@ -14,8 +14,9 @@ logger = logger.bind(name='tray_icon')
 
 class TrayIcon:
     def __init__(self, path_to_image: Path = Path('flexget') / 'resources' / 'flexget.png'):
-        logging.getLogger('PIL.PngImagePlugin').setLevel(logging.INFO)  # Silence PIL noisy logging
-        logging.getLogger('PIL.Image').setLevel(logging.INFO)  # Silence PIL noisy logging
+        # Silence PIL noisy logging
+        logging.getLogger('PIL.PngImagePlugin').setLevel(logging.INFO)
+        logging.getLogger('PIL.Image').setLevel(logging.INFO)
 
         self.path_to_image = path_to_image
         self.icon = None
