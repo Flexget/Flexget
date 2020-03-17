@@ -31,13 +31,16 @@ class TrayIcon:
         menu_item = menu_item or MenuItem(text=text, action=action, **kwargs)
         self.menu_items.append(menu_item)
 
+    def add_menu_separator(self):
+        self.add_menu_item(menu_item=Menu.SEPARATOR)
+
     def add_default_menu_items(self):
         web_page = partial(webbrowser.open)
         self.add_menu_item(text=f'Flexget {__version__}', enabled=False)
-        self.add_menu_item(menu_item=Menu.SEPARATOR)
+        self.add_menu_separator()
         self.add_menu_item(text='Shutdown', action=self.manager.shutdown)
         self.add_menu_item(text='Reload Config', action=self.manager.load_config)
-        self.add_menu_item(menu_item=Menu.SEPARATOR)
+        self.add_menu_separator()
         self.add_menu_item(text='Homepage', action=partial(web_page, 'https://flexget.com/'))
         self.add_menu_item(text='Forum', action=partial(web_page, 'https://discuss.flexget.com/'))
 
