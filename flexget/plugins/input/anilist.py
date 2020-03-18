@@ -108,7 +108,8 @@ class AniList(object):
                 f'query ($user: String){{ collection: MediaListCollection(userName: $user, '
                 f'type: ANIME, perChunk: 500, chunk: {req_chunk}, status_in: '
                 f'[{", ".join([s.upper() for s in selected_list_status])}]) {{ hasNextChunk, '
-                f'statuses: lists{{ status, list: entries{{ anime: media{{ {req_fields} }}}}}}}}}}'
+                f'statuses: lists{{ status, name, list: entries{{ anime: media{{ {req_fields}'
+                f' }}}}}}}}}}'
             )
 
             try:
@@ -123,7 +124,7 @@ class AniList(object):
                 list_response = list_response.json()['data']
                 logger.debug('JSON output: {}', list_response)
                 for list_status in list_response['collection']['statuses']:
-                    if not list_status.get('status'):
+                    if selected_list_name and list_status['name'] not in selected_list_name:
                         continue
                     for anime in list_status['list']:
                         anime = anime['anime']
@@ -141,7 +142,8 @@ class AniList(object):
                             entry['al_title'] = anime['title']
                             entry['al_format'] = anime['format']
                             entry['al_release_status'] = anime['status'].capitalize()
-                            entry['al_list_status'] = list_status['status'].capitalize()
+                            entry['al_list'] = list_status['name'].capitalize()
+                            entry['al_list_status'] = (
                             entry['alternate_name'] = [anime['title']['english']] + anime[
                                 'synonyms'
                             ]
