@@ -114,6 +114,8 @@ class AniList(object):
                 list_response = list_response.json()['data']
                 logger.debug('JSON output: {}', list_response)
                 for list_status in list_response['collection']['statuses']:
+                    if not list_status.get('status'):
+                        continue
                     for anime in list_status['list']:
                         anime = anime['anime']
                         has_selected_release_status = (
