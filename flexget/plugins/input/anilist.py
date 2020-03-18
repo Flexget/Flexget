@@ -61,9 +61,7 @@ class AniList(object):
                     'format': one_or_more(
                         {'type': 'string', 'enum': ANIME_FORMAT}, unique_items=True
                     ),
-                    'list': one_or_more(
-                        {'type': 'string'},
-                    ),
+                    'list': one_or_more({'type': 'string'}),
                 },
                 'required': ['username'],
                 'additionalProperties': False,
@@ -91,6 +89,7 @@ class AniList(object):
 
         if not isinstance(selected_list_name, list):
             selected_list_name = [selected_list_name]
+        selected_list_name = [i.lower() for i in selected_list_name]
 
         logger.debug('Selected List Status: {}', selected_list_status)
         logger.debug('Selected Release Status: {}', selected_release_status)
@@ -124,7 +123,10 @@ class AniList(object):
                 list_response = list_response.json()['data']
                 logger.debug('JSON output: {}', list_response)
                 for list_status in list_response['collection']['statuses']:
-                    if selected_list_name and list_status['name'] not in selected_list_name:
+                    if (
+                        selected_list_name
+                        and list_status['name'].lower() not in selected_list_name
+                    ):
                         continue
                     for anime in list_status['list']:
                         anime = anime['anime']
@@ -142,7 +144,7 @@ class AniList(object):
                             entry['al_title'] = anime['title']
                             entry['al_format'] = anime['format']
                             entry['al_release_status'] = anime['status'].capitalize()
-                            entry['al_list'] = list_status['name'].capitalize()
+                            entry['al_list'] = list_status['name']
                             entry['al_list_status'] = (
                                 list_status['status'].capitalize()
                                 if list_status.get('status')
