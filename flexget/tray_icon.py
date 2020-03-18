@@ -7,7 +7,7 @@ from typing import List, Optional
 from loguru import logger
 from PIL import Image
 
-from flexget import __version__
+from flexget import ROOT_DIR, __version__
 
 logger = logger.bind(name='tray_icon')
 
@@ -22,10 +22,11 @@ except Exception as e:
 
 
 tray_icon = None
+image_path = ROOT_DIR / 'resources' / 'flexget.png'
 
 
 class TrayIcon:
-    def __init__(self, path_to_image: Path = Path('flexget') / 'resources' / 'flexget.png'):
+    def __init__(self, path_to_image: Path = image_path):
         # Silence PIL noisy logging
         logging.getLogger('PIL.PngImagePlugin').setLevel(logging.INFO)
         logging.getLogger('PIL.Image').setLevel(logging.INFO)
