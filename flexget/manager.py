@@ -44,6 +44,8 @@ from flexget.options import (  # noqa
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
 from flexget.terminal import console, get_console_output  # noqa
+from flexget.tray_icon import tray_icon  # noqa
+
 
 logger = logger.bind(name='manager')
 
@@ -164,8 +166,18 @@ class Manager:
                 'disk will not work properly for filenames containing non-ascii characters. Make sure your '
                 'locale env variables are set up correctly for the environment which is launching FlexGet.'
             )
+        self._add_tray_icon_items()
 
-    def _init_options(self, args: Sequence[str]) -> argparse.Namespace:
+    def _add_tray_icon_items(self):
+        if not tray_icon:
+            return
+
+        tray_icon.add_menu_item(text='Shutdown', action=self.shutdown, index=2)
+        tray_icon.add_menu_item(text='Reload Config', action=self.load_config, index=3)
+        tray_icon.add_menu_separator(index=4)
+
+    @staticmethod
+    def _init_options(args: Sequence[str]) -> argparse.Namespace:
         """
         Initialize argument parsing
         """
@@ -182,7 +194,7 @@ class Manager:
                 sys.exit(1)
         return options
 
-    def _init_logging(self, to_file: bool=True) -> None:
+    def _init_logging(self, to_file: bool = True) -> None:
         """
         Initialize logging facilities
         """
@@ -607,7 +619,9 @@ class Manager:
                 sha1_hash.update(data)
         return sha1_hash.hexdigest()
 
-    def load_config(self, output_to_console: bool = True, config_file_hash: Optional[str] = None) -> None:
+    def load_config(
+        self, output_to_console: bool = True, config_file_hash: Optional[str] = None
+    ) -> None:
         """
         Loads the config file from disk, validates and activates it.
 
@@ -1018,6 +1032,8 @@ class Manager:
         if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
             logger.debug('Shutting down')
         self.engine.dispose()
+        if tray_icon:
+            tray_icon.stop()
         # remove temporary database used in test mode
         if self.options.test:
             if 'test' not in self.db_filename:
