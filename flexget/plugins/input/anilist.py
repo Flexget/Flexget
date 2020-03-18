@@ -148,9 +148,13 @@ class AniList(object):
                                 if 'status' in list_status
                                 else ''
                             )
-                            entry['alternate_name'] = [anime['title']['english']] + anime[
-                                'synonyms'
-                            ]
+                            entry['alternate_name'] = anime.get('synonyms', [])
+                            if (
+                                anime['title'].get('english')
+                                and anime['title'].get('english') != anime['title']['romaji']
+                                and anime['title'].get('english') not in entry['alternate_name']
+                            ):
+                                entry['alternate_name'].insert(0, anime['title']['english'])
                             entry['url'] = anime['siteUrl']
                             entry['al_idMal'] = anime['idMal']
                             entry['al_episodes'] = anime['episodes']
