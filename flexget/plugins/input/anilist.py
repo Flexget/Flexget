@@ -144,8 +144,8 @@ class AniList(object):
                             entry['al_release_status'] = anime['status'].capitalize()
                             entry['al_list'] = list_status['name'].capitalize()
                             entry['al_list_status'] = (
-                                list_status['status'].capitalize()
-                                if 'status' in list_status
+                                list_status.capitalize()
+                                if list_status.get('status')
                                 else ''
                             )
                             entry['alternate_name'] = anime.get('synonyms', [])
