@@ -75,11 +75,10 @@ class AniList(object):
     def on_task_input(self, task, config):
         if isinstance(config, str):
             config = {'username': config}
-        selected_list_status = config['status'] if 'status' in config else ['current', 'planning']
-        selected_release_status = (
-            config['release_status'] if 'release_status' in config else ['all']
-        )
-        selected_formats = config['format'] if 'format' in config else ['all']
+        selected_list_status = config.get('status', ['current', 'planning'])
+        selected_release_status = config.get('release_status', ['all'])
+        selected_formats = config.get('format', ['all'])
+        selected_list_name = config.get('list', [])
 
         if not isinstance(selected_list_status, list):
             selected_list_status = [selected_list_status]
@@ -89,6 +88,9 @@ class AniList(object):
 
         if not isinstance(selected_formats, list):
             selected_formats = [selected_formats]
+
+        if not isinstance(selected_list_name, list):
+            selected_list_name = [selected_list_name]
 
         logger.debug('Selected List Status: {}', selected_list_status)
         logger.debug('Selected Release Status: {}', selected_release_status)
