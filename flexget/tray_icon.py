@@ -12,11 +12,12 @@ from flexget import __version__
 logger = logger.bind(name='tray_icon')
 
 try:
+    # If we are running outside of a graphical environment, these imports will fail
     from pystray import Icon, Menu, MenuItem
 
     _import_success = True
 except Exception as e:
-    logger.warning('Could not import pystray: {}', e)
+    logger.debug('Could not import pystray: {}', e)
     _import_success = False
 
 
