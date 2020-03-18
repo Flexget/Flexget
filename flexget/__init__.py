@@ -5,7 +5,6 @@ import sys
 # __version__ import need to be first in order to avoid circular import within logger
 from ._version import __version__  # noqa
 from flexget import log
-from flexget.event import event
 from flexget.manager import Manager
 
 
