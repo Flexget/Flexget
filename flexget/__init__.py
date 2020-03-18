@@ -2,7 +2,6 @@
 import os
 import sys
 import threading
-from time import sleep
 
 from loguru import logger
 
@@ -14,7 +13,7 @@ from flexget.tray_icon import tray_icon
 from flexget.manager import Manager
 
 logger = logger.bind(name='main')
-daemon_loaded = threading.Event()
+daemon_or_shutdown = threading.Event()
 
 
 def main(args=None):
@@ -49,7 +48,7 @@ def main(args=None):
             else:
                 m = threading.Thread(target=manager.start, daemon=True)
                 m.start()
-                if tray_icon and daemon_loaded.wait(timeout=60):
+                if tray_icon and daemon_or_shutdown.wait(timeout=60) and manager.is_daemon:
                     tray_icon.run()
                 m.join()
         except (IOError, ValueError) as e:
@@ -79,7 +78,8 @@ def _is_debug():
 
 
 @event('manager.daemon.started')
-def set_manager_started(manager):
-    # This is used since we have to wait until manager is loaded before deciding if manager runs a
-    # daemon or not, and we cant run the tray_icon by hooking this event since it has to run on the main thread
-    daemon_loaded.set()
+@event('manager.shutdown')
+def try_icon_hook(manager):
+    """The daemon.started event is hooked in order to make sure that we trigger the tray icon only in daemon mode.
+    In addition, the shutdown event is hooked so we won't wait for the daemon to start on non daemon commands"""
+    daemon_or_shutdown.set()
