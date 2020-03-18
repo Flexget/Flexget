@@ -478,11 +478,25 @@ class Manager:
                 # main thread, this error will occur.
                 logger.debug('Error registering sigterm handler: {}', e)
             self.is_daemon = True
-            fire_event('manager.daemon.started', self)
-            self.task_queue.start()
-            self.ipc_server.start()
-            self.task_queue.wait()
-            fire_event('manager.daemon.completed', self)
+
+            def run_daemon():
+                fire_event('manager.daemon.started', self)
+                self.task_queue.start()
+                self.ipc_server.start()
+                self.task_queue.wait()
+                fire_event('manager.daemon.completed', self)
+                if tray_icon:
+                    tray_icon.stop()
+
+            if tray_icon:
+                # Tray icon must be run in the main thread.
+                m = threading.Thread(target=run_daemon)
+                m.start()
+                tray_icon.run()
+                m.join()
+            else:
+                run_daemon()
+
         elif options.action in ['stop', 'reload-config', 'status']:
             if not self.is_daemon:
                 logger.error('There does not appear to be a daemon running.')
@@ -1032,8 +1046,6 @@ class Manager:
         if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
             logger.debug('Shutting down')
         self.engine.dispose()
-        if tray_icon:
-            tray_icon.stop()
         # remove temporary database used in test mode
         if self.options.test:
             if 'test' not in self.db_filename:
