@@ -79,7 +79,7 @@ def _is_debug():
 
 @event('manager.daemon.started')
 @event('manager.shutdown')
-def try_icon_hook(manager):
+def tray_icon_hook(manager):
     """The daemon.started event is hooked in order to make sure that we trigger the tray icon only in daemon mode.
     In addition, the shutdown event is hooked so we won't wait for the daemon to start on non daemon commands"""
     daemon_or_shutdown.set()
