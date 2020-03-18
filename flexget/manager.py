@@ -169,9 +169,6 @@ class Manager:
         self._add_tray_icon_items()
 
     def _add_tray_icon_items(self):
-        if not tray_icon:
-            return
-
         tray_icon.add_menu_item(text='Shutdown', action=self.shutdown, index=2)
         tray_icon.add_menu_item(text='Reload Config', action=self.load_config, index=3)
         tray_icon.add_menu_separator(index=4)
@@ -485,17 +482,13 @@ class Manager:
                 self.ipc_server.start()
                 self.task_queue.wait()
                 fire_event('manager.daemon.completed', self)
-                if tray_icon:
-                    tray_icon.stop()
+                tray_icon.stop()
 
-            if tray_icon:
-                # Tray icon must be run in the main thread.
-                m = threading.Thread(target=run_daemon)
-                m.start()
-                tray_icon.run()
-                m.join()
-            else:
-                run_daemon()
+            # Tray icon must be run in the main thread.
+            m = threading.Thread(target=run_daemon)
+            m.start()
+            tray_icon.run()
+            m.join()
 
         elif options.action in ['stop', 'reload-config', 'status']:
             if not self.is_daemon:

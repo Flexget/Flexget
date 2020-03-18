@@ -1,6 +1,6 @@
 import logging
 import webbrowser
-from functools import partial
+from functools import partial, wraps
 from pathlib import Path
 from typing import List, Optional
 
@@ -21,7 +21,16 @@ except Exception as e:
     _import_success = False
 
 
-tray_icon = None
+def check_if_tray_is_active(f):
+    @wraps(f)
+    def wrapped(self, *args, **kwargs):
+        if not self.active:
+            return
+        return f(self, *args, **kwargs)
+
+    return wrapped
+
+
 image_path = ROOT_DIR / 'resources' / 'flexget.png'
 
 
@@ -32,14 +41,16 @@ class TrayIcon:
         logging.getLogger('PIL.Image').setLevel(logging.INFO)
 
         self.path_to_image: Path = path_to_image
-        self.icon: Optional[Icon] = None
-        self._menu: Optional[Menu] = None
-        self.menu_items: List[MenuItem] = []
+        self.icon: Optional['Icon'] = None
+        self._menu: Optional['Menu'] = None
+        self.menu_items: List['MenuItem'] = []
 
+        self.active: bool = _import_success
         self.running: bool = False
 
         self.add_core_menu_items()
 
+    @check_if_tray_is_active
     def add_menu_item(
         self,
         text: str = None,
@@ -60,6 +71,7 @@ class TrayIcon:
         else:
             self.menu_items.append(menu_item)
 
+    @check_if_tray_is_active
     def add_menu_separator(self, index: int = None):
         self.add_menu_item(menu_item=Menu.SEPARATOR, index=index)
 
@@ -77,6 +89,7 @@ class TrayIcon:
             self._menu = Menu(*self.menu_items)
         return self._menu
 
+    @check_if_tray_is_active
     def run(self):
         """Run the tray icon. Must be run from the main thread and is blocking"""
         try:
@@ -88,6 +101,7 @@ class TrayIcon:
             logger.warning('Could not run tray icon: {}', e)
             self.running = False
 
+    @check_if_tray_is_active
     def stop(self):
         if not self.running:
             return
@@ -97,5 +111,4 @@ class TrayIcon:
         self.running = False
 
 
-if _import_success:
-    tray_icon = TrayIcon()
+tray_icon = TrayIcon()
