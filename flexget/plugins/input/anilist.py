@@ -26,7 +26,7 @@ class AniList(object):
 
     Syntax:
     anilist:
-      username: <value>
+      username: <string>
       status:
         - <current|planning|completed|dropped|paused|repeating>
         - <current|planning|completed|dropped|paused|repeating>
@@ -38,6 +38,10 @@ class AniList(object):
       format:
         - <all|tv|tv_short|movie|special|ova|ona>
         - <tv|tv_short|movie|special|ova|ona>
+        ...
+      list:
+        - <string>
+        - <string>
         ...
     """
 
@@ -56,6 +60,9 @@ class AniList(object):
                     ),
                     'format': one_or_more(
                         {'type': 'string', 'enum': ANIME_FORMAT}, unique_items=True
+                    ),
+                    'list': one_or_more(
+                        {'type': 'string'},
                     ),
                 },
                 'required': ['username'],
