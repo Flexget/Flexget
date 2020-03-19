@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import List, Optional
 
 from loguru import logger
-from PIL import Image
 
 from flexget import ROOT_DIR, __version__
 
@@ -13,6 +12,7 @@ logger = logger.bind(name='tray_icon')
 
 try:
     # If we are running outside of a graphical environment, these imports will fail
+    from PIL import Image
     from pystray import Icon, Menu, MenuItem
 
     _import_success = True
