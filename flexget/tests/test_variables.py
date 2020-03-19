@@ -1,7 +1,7 @@
 import pytest
 
 from flexget.components.variables.variables import Variables
-from flexget.event import fire_event
+from flexget.event import EventType, fire_event
 from flexget.manager import Session
 
 
@@ -84,7 +84,7 @@ class TestVariablesFromDB:
             s = Variables(variables={'test_variable_db': True})
             session.add(s)
 
-        fire_event('manager.before_config_validate', manager.config, manager)
+        fire_event(EventType.manager__before_config_validate, manager.config, manager)
 
         task = execute_task('test_variable_from_db')
         assert len(task.accepted) == 1

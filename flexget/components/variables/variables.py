@@ -11,7 +11,7 @@ from sqlalchemy.sql.sqltypes import DateTime, Integer, Unicode
 
 from flexget import db_schema
 from flexget.config_schema import register_config_key
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.plugin import PluginError
 from flexget.utils.database import json_synonym
@@ -61,7 +61,7 @@ def variables_to_db(variables_dict):
         session.merge(variables)
 
 
-@event('manager.before_config_validate')
+@event(EventType.manager__before_config_validate)
 def process_variables(config, manager):
     """Render all string elements of the config against defined variables."""
     env_params = {

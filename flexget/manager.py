@@ -32,7 +32,7 @@ Session: Type[ContextSession] = sessionmaker(class_=ContextSession)
 
 import flexget.log  # noqa
 from flexget import config_schema, db_schema, plugin  # noqa
-from flexget.event import fire_event  # noqa
+from flexget.event import fire_event, EventType  # noqa
 from flexget.ipc import IPCClient, IPCServer  # noqa
 from flexget.options import (  # noqa
     CoreArgumentParser,
@@ -770,7 +770,7 @@ class Manager:
         """
         if not config:
             config = self.config
-        config = fire_event('manager.before_config_validate', config, self)
+        config = fire_event(EventType.manager__before_config_validate, config, self)
         errors = config_schema.process_config(config)
         if errors:
             err = ValueError('Did not pass schema validation.')

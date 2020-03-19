@@ -22,7 +22,7 @@ import functools
 from loguru import logger
 
 from flexget import options
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='cli_config')
 
@@ -45,7 +45,7 @@ def replace_in_item(replaces, item):
         return item
 
 
-@event('manager.before_config_validate')
+@event(EventType.manager__before_config_validate)
 def substitute_cli_variables(config, manager):
     if not manager.options.execute.cli_config:
         return
