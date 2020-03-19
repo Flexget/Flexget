@@ -12,6 +12,7 @@ logger = logger.bind(name='event')
 
 class EventType(Enum):
     forget = 'forget'
+    config__register = 'config.register'
     manager__before_config_validate = 'manager.before_config_validate'
 
 

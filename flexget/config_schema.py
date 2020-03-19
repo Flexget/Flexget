@@ -9,7 +9,7 @@ import jsonschema
 from jsonschema.compat import int_types, str_types
 from loguru import logger
 
-from flexget.event import fire_event
+from flexget.event import EventType, fire_event
 from flexget.utils import qualities, template
 from flexget.utils.template import get_template
 from flexget.utils.tools import parse_episode_identifier, parse_timedelta
@@ -63,7 +63,7 @@ def get_schema() -> JsonSchema:
             'additionalProperties': False,
             '$schema': CURRENT_SCHEMA_VERSION,
         }
-        fire_event('config.register')
+        fire_event(EventType.config__register)
         # TODO: Is /schema/config this the best place for this?
         register_schema('/schema/config', _root_config_schema)
     return _root_config_schema

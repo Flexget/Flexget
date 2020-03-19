@@ -4,7 +4,7 @@ import os
 import pytest
 
 from flexget import plugin, plugins
-from flexget.event import event, fire_event
+from flexget.event import EventType, event, fire_event
 
 
 class TestPluginApi:
@@ -77,7 +77,7 @@ class TestExternalPluginLoading:
         )
         plugin.load_plugins()
         # fire the config register event again so that task schema is rebuilt with new plugin
-        fire_event('config.register')
+        fire_event(EventType.config__register)
         yield self._config
         del os.environ['FLEXGET_PLUGIN_PATH']
 

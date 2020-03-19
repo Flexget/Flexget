@@ -2,7 +2,7 @@ from loguru import logger
 
 from flexget.api import api_app
 from flexget.config_schema import register_config_key
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.ui.v1 import register_web_ui as register_web_ui_v1
 from flexget.ui.v2 import register_web_ui as register_web_ui_v2
 from flexget.utils.tools import get_config_hash
@@ -65,7 +65,7 @@ def prepare_config(config):
     return config
 
 
-@event('config.register')
+@event(EventType.config__register)
 def register_config():
     register_config_key('web_server', web_config_schema)
 

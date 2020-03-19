@@ -15,7 +15,7 @@ from requests import RequestException
 from flexget import components as components_pkg
 from flexget import config_schema
 from flexget import plugins as plugins_pkg
-from flexget.event import Event
+from flexget.event import Event, EventType
 from flexget.event import add_event_handler as add_phase_handler
 from flexget.event import event, fire_event, remove_event_handlers
 
@@ -617,7 +617,7 @@ def plugin_schemas(**kwargs) -> 'config_schema.JsonSchema':
     }
 
 
-@event('config.register')
+@event(EventType.config__register)
 def register_schema():
     config_schema.register_schema('/schema/plugins', plugin_schemas)
 

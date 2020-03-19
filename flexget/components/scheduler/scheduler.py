@@ -11,7 +11,7 @@ from apscheduler.triggers.cron import CronTrigger
 from loguru import logger
 
 from flexget.config_schema import format_checker, register_config_key, register_schema
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import manager
 from flexget.utils import json
 
@@ -211,7 +211,7 @@ def stop_scheduler(manager):
         scheduler.shutdown(wait=False)
 
 
-@event('config.register')
+@event(EventType.config__register)
 def register_config():
     register_config_key('schedules', main_schema)
     register_schema('/schema/config/schedule', schedule_schema)

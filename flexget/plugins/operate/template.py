@@ -2,7 +2,7 @@ from loguru import logger
 
 from flexget import options, plugin
 from flexget.config_schema import register_config_key
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.tools import MergeException
 
 plugin_name = 'template'
@@ -123,7 +123,7 @@ def register_plugin():
     plugin.register(PluginTemplate, 'template', builtin=True, api_ver=2)
 
 
-@event('config.register')
+@event(EventType.config__register)
 def register_config():
     root_config_schema = {
         'type': 'object',

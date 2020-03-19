@@ -12,7 +12,7 @@ from loguru import logger
 
 from flexget.config_schema import one_or_more, register_config_key
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import manager
 from flexget.utils import requests
 from flexget.utils.tools import get_config_hash
@@ -1090,6 +1090,6 @@ def stop_irc(manager, wait=False):
             irc_manager.thread.join(len(irc_connections.keys()) * 11)
 
 
-@event('config.register')
+@event(EventType.config__register)
 def register_plugin():
     register_config_key('irc', schema)

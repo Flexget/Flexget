@@ -115,6 +115,6 @@ def _process(element, environment):
 variables_config_schema = {'type': ['string', 'boolean', 'object']}
 
 
-@event('config.register')
+@event(EventType.config__register)
 def register_config():
     register_config_key('variables', variables_config_schema)

@@ -6,14 +6,14 @@ import random
 import string
 import threading
 from functools import total_ordering, wraps
-from typing import Union, Iterable, List
+from typing import Iterable, List, Union
 
 from loguru import logger
 from sqlalchemy import Column, Integer, String, Unicode
 
 from flexget import config_schema, db_schema
-from flexget.entry import EntryUnicodeError, EntryState, Entry
-from flexget.event import event, fire_event
+from flexget.entry import Entry, EntryState, EntryUnicodeError
+from flexget.event import EventType, event, fire_event
 from flexget.manager import Session
 from flexget.plugin import (
     DependencyError,
@@ -131,8 +131,12 @@ class EntryContainer(list):
         list.__init__(self, iterable or [])
 
         self._entries = EntryIterator(self, [EntryState.UNDECIDED, EntryState.ACCEPTED])
-        self._accepted = EntryIterator(self, EntryState.ACCEPTED)  # accepted entries, can still be rejected
-        self._rejected = EntryIterator(self, EntryState.REJECTED)  # rejected entries, can not be accepted
+        self._accepted = EntryIterator(
+            self, EntryState.ACCEPTED
+        )  # accepted entries, can still be rejected
+        self._rejected = EntryIterator(
+            self, EntryState.REJECTED
+        )  # rejected entries, can not be accepted
         self._failed = EntryIterator(self, EntryState.FAILED)  # failed entries
         self._undecided = EntryIterator(self, EntryState.UNDECIDED)  # undecided entries (default)
 
@@ -752,7 +756,7 @@ class Task:
         return render_from_task(template, self)
 
 
-@event('config.register')
+@event(EventType.config__register)
 def register_config_key():
     task_config_schema = {
         'type': 'object',
