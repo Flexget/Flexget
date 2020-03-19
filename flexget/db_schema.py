@@ -7,7 +7,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import DeclarativeMeta, as_declarative
 
 import flexget
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Base, Session
 from flexget.utils.database import with_session
 from flexget.utils.sqlalchemy_utils import table_schema
@@ -146,7 +146,7 @@ def upgrade(plugin: str) -> Callable:
     """
 
     def upgrade_decorator(upgrade_func):
-        @event('manager.upgrade')
+        @event(EventType.manager__upgrade)
         def upgrade_wrapper(manager):
             with Session() as session:
                 current_ver = get_version(plugin, session=session)
