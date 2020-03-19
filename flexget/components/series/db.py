@@ -25,7 +25,7 @@ from sqlalchemy.orm import backref, relation
 
 from flexget import db_schema, plugin
 from flexget.components.series.utils import normalize_series_name
-from flexget.event import event, fire_event
+from flexget.event import EventType, event, fire_event
 from flexget.manager import Session
 from flexget.utils.database import quality_property, with_session
 from flexget.utils.sqlalchemy_utils import (
@@ -1231,7 +1231,7 @@ def remove_series(name, forget=False):
         else:
             raise ValueError('Unknown series `%s`' % name)
     for downloaded_release in downloaded_releases:
-        fire_event('forget', downloaded_release)
+        fire_event(EventType.forget, downloaded_release)
 
 
 def remove_series_entity(name, identifier, forget=False):
@@ -1294,7 +1294,7 @@ def remove_series_entity(name, identifier, forget=False):
 
     if forget:
         for downloaded_release in downloaded_releases:
-            fire_event('forget', downloaded_release)
+            fire_event(EventType.forget, downloaded_release)
 
 
 def delete_episode_release_by_id(release_id):

@@ -6,7 +6,7 @@ from sqlalchemy.schema import Index
 from sqlalchemy.sql.expression import desc
 
 from flexget import plugin
-from flexget.event import event, fire_event
+from flexget.event import EventType, event, fire_event
 from flexget.manager import Base
 from flexget.utils.log import log_once
 from flexget.utils.tools import parse_timedelta
@@ -145,7 +145,7 @@ class FilterProperMovies:
                 )
                 # TODO: does this need to be called?
                 # fire_event('forget', entry['imdb_url'])
-                fire_event('forget', entry['imdb_id'])
+                fire_event(EventType.forget, entry['imdb_id'])
                 entry.accept('proper version of previously downloaded movie')
 
     def on_task_learn(self, task, config):

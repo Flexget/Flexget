@@ -16,7 +16,7 @@ from flexget.api.app import (
     pagination_headers,
     success_response,
 )
-from flexget.event import fire_event
+from flexget.event import EventType, fire_event
 from flexget.plugin import PluginError
 
 from . import db
@@ -847,7 +847,7 @@ class SeriesSeasonsReleasesAPI(APIResource):
 
         for release in release_items:
             if args.get('forget'):
-                fire_event('forget', release.title)
+                fire_event(EventType.forget, release.title)
             db.delete_season_release_by_id(release.id)
         return success_response(
             'successfully deleted all releases for season %s from show %s' % (season_id, show_id)
@@ -946,7 +946,7 @@ class SeriesSeasonReleaseAPI(APIResource):
             raise BadRequest('release id %s does not belong to season %s' % (rel_id, season_id))
         args = delete_parser.parse_args()
         if args.get('forget'):
-            fire_event('forget', release.title)
+            fire_event(EventType.forget, release.title)
 
         db.delete_season_release_by_id(rel_id)
         return success_response(
@@ -1105,7 +1105,7 @@ class SeriesEpisodeReleasesAPI(APIResource):
 
         for release in release_items:
             if args.get('forget'):
-                fire_event('forget', release.title)
+                fire_event(EventType.forget, release.title)
             db.delete_episode_release_by_id(release.id)
         return success_response(
             'successfully deleted all releases for episode %s from show %s' % (ep_id, show_id)
@@ -1204,7 +1204,7 @@ class SeriesEpisodeReleaseAPI(APIResource):
             raise BadRequest('release id %s does not belong to episode %s' % (rel_id, ep_id))
         args = delete_parser.parse_args()
         if args.get('forget'):
-            fire_event('forget', release.title)
+            fire_event(EventType.forget, release.title)
 
         db.delete_episode_release_by_id(rel_id)
         return success_response(

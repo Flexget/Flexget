@@ -1,20 +1,29 @@
 """
 Provides small event framework
 """
-from typing import Callable, List
+from collections import defaultdict
+from enum import Enum
+from typing import Callable, Dict, List
 
 from loguru import logger
 
 logger = logger.bind(name='event')
 
-_events = {}
+
+class EventType(Enum):
+    forget = 'forget'
+    manager__before_config_validate = 'before_config_validate'
+
+
+_events: Dict[EventType, List[Callable]] = defaultdict(list)
 
 
 class Event:
     """Represents one registered event."""
 
-    def __init__(self, name: str, func: Callable, priority: int = 128):
-        self.name = name
+    def __init__(self, event_type: EventType, func: Callable, priority: int = 128):
+        self.event_type = event_type
+        self.name = event_type.value
         self.func = func
         self.priority = priority
 
@@ -31,84 +40,81 @@ class Event:
         return self.priority > other.priority
 
     def __str__(self):
-        return '<Event(name=%s,func=%s,priority=%s)>' % (
-            self.name,
-            self.func.__name__,
-            self.priority,
+        return (
+            f'<Event(type={self.event_type},func={self.func.__name__},priority={self.priority})>'
         )
 
     __repr__ = __str__
 
     def __hash__(self):
-        return hash((self.name, self.func, self.priority))
+        return hash((self.event_type, self.func, self.priority))
 
 
-def event(name: str, priority: int = 128) -> Callable[[Callable], Callable]:
+def event(event_type: EventType, priority: int = 128) -> Callable[[Callable], Callable]:
     """Register event to function with a decorator"""
 
     def decorator(func):
-        add_event_handler(name, func, priority)
+        add_event_handler(event_type, func, priority)
         return func
 
     return decorator
 
 
-def get_events(name: str) -> List[Event]:
+def get_events(event_type: EventType) -> List[Event]:
     """
-    :param String name: event name
+    :param EventType event_type: event name
     :return: List of :class:`Event` for *name* ordered by priority
     """
-    if name not in _events:
-        raise KeyError('No such event %s' % name)
-    _events[name].sort(reverse=True)
-    return _events[name]
+    if event_type not in _events:
+        raise KeyError(f'No such event {event_type}')
+    _events[event_type].sort(reverse=True)
+    return _events[event_type]
 
 
-def add_event_handler(name: str, func: Callable, priority: int = 128) -> Event:
+def add_event_handler(event_type: EventType, func: Callable, priority: int = 128) -> Event:
     """
-    :param string name: Event name
+    :param EventType event_type: Event type
     :param function func: Function that acts as event handler
     :param priority: Priority for this hook
     :return: Event created
     :rtype: Event
     :raises Exception: If *func* is already registered in an event
     """
-    events = _events.setdefault(name, [])
-    for event in events:
-        if event.func == func:
+    events = _events[event_type]
+    for event_ in events:
+        if event_.func == func:
             raise ValueError(
-                '%s has already been registered as event listener under name %s'
-                % (func.__name__, name)
+                f'{func.__name__} has already been registered as event listener under name {event_type}'
             )
-    logger.trace('registered function {} to event {}', func.__name__, name)
-    event = Event(name, func, priority)
-    events.append(event)
-    return event
+    logger.trace('registered function {} to event {}', func.__name__, event_type)
+    event_ = Event(event_type, func, priority)
+    events.append(event_)
+    return event_
 
 
-def remove_event_handlers(name: str):
-    """Removes all handlers for given event `name`."""
-    _events.pop(name, None)
+def remove_event_handlers(event_type: EventType):
+    """Removes all handlers for given event `event_type`."""
+    _events.pop(event_type, None)
 
 
-def remove_event_handler(name: str, func: Callable):
-    """Remove `func` from the handlers for event `name`."""
-    for e in list(_events.get(name, [])):
+def remove_event_handler(event_type: EventType, func: Callable):
+    """Remove `func` from the handlers for event `event_type`."""
+    for e in _events[event_type]:
         if e.func is func:
-            _events[name].remove(e)
+            _events[event_type].remove(e)
 
 
-def fire_event(name: str, *args, **kwargs):
+def fire_event(event_type: EventType, *args, **kwargs):
     """
     Trigger an event with *name*. If event is not hooked by anything nothing happens. If a function that hooks an event
     returns a value, it will replace the first argument when calling next function.
 
-    :param name: Name of event to be called
+    :param event_type: Type of event to be called
     :param args: List of arguments passed to handler function
     :param kwargs: Key Value arguments passed to handler function
     """
-    if name in _events:
-        for event in get_events(name):
+    if event_type in _events:
+        for event in get_events(event_type):
             result = event(*args, **kwargs)
             if result is not None:
                 args = (result,) + args[1:]
