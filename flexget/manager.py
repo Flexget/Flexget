@@ -225,7 +225,7 @@ class Manager:
 
         self.setup_yaml()
         self.init_sqlalchemy()
-        fire_event('manager.initialize', self)
+        fire_event(EventType.manager__initialize, self)
         try:
             self.load_config()
         except ValueError as e:

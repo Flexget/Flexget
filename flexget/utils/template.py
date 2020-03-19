@@ -21,7 +21,7 @@ from jinja2 import (
 from jinja2.nativetypes import NativeTemplate
 from loguru import logger
 
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.lazy_dict import LazyDict
 from flexget.utils.pathscrub import pathscrub
 
@@ -170,7 +170,7 @@ class FlexGetNativeTemplate(FlexGetTemplate, NativeTemplate):
     pass
 
 
-@event('manager.initialize')
+@event(EventType.manager__initialize)
 def make_environment(manager: 'Manager') -> None:
     """Create our environment and add our custom filters"""
     global environment
