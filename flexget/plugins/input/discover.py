@@ -6,7 +6,7 @@ from loguru import logger
 from sqlalchemy import Column, DateTime, Index, Integer, Unicode
 
 from flexget import db_schema, options, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.utils.tools import aggregate_inputs, multiply_timedelta, parse_timedelta
 
@@ -38,7 +38,7 @@ class DiscoverEntry(Base):
 Index('ix_discover_entry_title_task', DiscoverEntry.title, DiscoverEntry.task)
 
 
-@event('manager.db_cleanup')
+@event(EventType.manager__db_cleanup)
 def db_cleanup(manager, session):
     value = datetime.datetime.now() - parse_timedelta('7 days')
     for discover_entry in (

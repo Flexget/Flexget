@@ -5,7 +5,7 @@ from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, Uni
 from sqlalchemy.orm import relation
 
 from flexget import db_schema
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.sqlalchemy_utils import table_add_column, table_columns
 
 logger = logger.bind(name='remember_rej')
@@ -62,7 +62,7 @@ class RememberEntry(Base):
 Index('remember_feed_title_url', RememberEntry.task_id, RememberEntry.title, RememberEntry.url)
 
 
-@event('manager.db_cleanup')
+@event(EventType.manager__db_cleanup)
 def db_cleanup(manager, session):
     # Remove entries older than 30 days
     result = (

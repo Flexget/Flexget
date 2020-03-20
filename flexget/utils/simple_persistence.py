@@ -15,7 +15,7 @@ from loguru import logger
 from sqlalchemy import Column, DateTime, Index, Integer, String, Unicode, select
 
 from flexget import db_schema
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.utils import json
 from flexget.utils.database import json_synonym
@@ -82,7 +82,7 @@ def upgrade(ver, session):
     return ver
 
 
-@event('manager.db_cleanup')
+@event(EventType.manager__db_cleanup)
 def db_cleanup(manager, session):
     """Clean up values in the db from tasks which no longer exist."""
     # SKVs not associated with any task use None as task tame

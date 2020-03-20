@@ -4,7 +4,7 @@ from datetime import timedelta
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 
 from . import db
@@ -56,7 +56,7 @@ class Status:
     on_task_abort = on_task_exit
 
 
-@event('manager.db_cleanup')
+@event(EventType.manager__db_cleanup)
 def db_cleanup(manager, session):
     # Purge all status data for non existing tasks
     for status_task in session.query(db.StatusTask).all():

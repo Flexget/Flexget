@@ -25,7 +25,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import relation
 
 from flexget import db_schema, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.utils.database import with_session
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
@@ -213,7 +213,7 @@ def search_by_field_values(field_value_list, task_name, local=False, session=Non
     return found.first()
 
 
-@event('manager.db_cleanup')
+@event(EventType.manager__db_cleanup)
 def db_cleanup(manager, session):
     # TODO: Look into this, is it still valid?
     logger.debug('TODO: Disabled because of ticket #1321')

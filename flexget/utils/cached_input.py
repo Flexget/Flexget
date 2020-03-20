@@ -8,7 +8,7 @@ from sqlalchemy.orm import relation
 
 from flexget import db_schema
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.plugin import PluginError
 from flexget.utils import json, serialization
@@ -77,7 +77,7 @@ class InputCacheEntry(Base):
     cache_id = Column(Integer, ForeignKey('input_cache.id'), nullable=False)
 
 
-@event('manager.db_cleanup')
+@event(EventType.manager__db_cleanup)
 def db_cleanup(manager, session):
     """Removes old input caches from plugins that are no longer configured."""
     result = (

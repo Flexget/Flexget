@@ -722,7 +722,7 @@ def upgrade(ver, session):
     return ver
 
 
-@event('manager.db_cleanup')
+@event(EventType.manager__db_cleanup)
 def db_cleanup(manager, session):
     # Clean up old undownloaded releases
     result = (

@@ -5,7 +5,7 @@ from sqlalchemy import Column, DateTime, Integer, String, Unicode
 from sqlalchemy.schema import Index
 
 from flexget import db_schema
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.sqlalchemy_utils import table_add_column
 
 SCHEMA_VER = 3
@@ -65,7 +65,7 @@ columns = Base.metadata.tables['failed'].c
 Index('failed_title_url', columns.title, columns.url, columns.count)
 
 
-@event('manager.db_cleanup')
+@event(EventType.manager__db_cleanup)
 def db_cleanup(manager, session):
     # Delete everything older than 30 days
     session.query(FailedEntry).filter(

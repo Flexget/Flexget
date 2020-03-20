@@ -60,6 +60,6 @@ If the plugin accumulates data into database that should be cleaned at some poin
 
 .. code-block:: python
 
-   @event('manager.db_cleanup')
+   @event(EventType.manager__db_cleanup)
    def db_cleanup(session):
        # cleanup actions here

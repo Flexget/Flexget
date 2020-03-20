@@ -8,7 +8,7 @@ from sqlalchemy import Column, DateTime, Index, Integer, String
 from sqlalchemy.orm import Session
 
 from flexget import db_schema
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.database import with_session
 from flexget.utils.sqlalchemy_utils import table_schema
 
@@ -42,7 +42,7 @@ class LogMessage(Base):
         return "<LogMessage('%s')>" % self.md5sum
 
 
-@event('manager.db_cleanup')
+@event(EventType.manager__db_cleanup)
 def purge(manager, session: Session):
     """Purge old messages from database"""
     old = datetime.now() - timedelta(days=365)

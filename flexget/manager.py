@@ -1011,7 +1011,7 @@ class Manager:
         if force or expired:
             logger.info('Running database cleanup.')
             with Session() as session:
-                fire_event('manager.db_cleanup', self, session)
+                fire_event(EventType.manager__db_cleanup, self, session)
             # Try to VACUUM after cleanup
             fire_event('manager.db_vacuum', self)
             # Just in case some plugin was overzealous in its cleaning, mark the config changed

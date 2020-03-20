@@ -5,7 +5,7 @@ from sqlalchemy import Boolean, Column, DateTime, Integer, String, Unicode, sele
 
 from flexget import db_schema
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import json, serialization
 from flexget.utils.database import entry_synonym
 from flexget.utils.sqlalchemy_utils import table_schema
@@ -69,7 +69,7 @@ class PendingEntry(Base):
         }
 
 
-@event('manager.db_cleanup')
+@event(EventType.manager__db_cleanup)
 def db_cleanup(manager, session):
     # Clean unapproved entries older than 1 year
     deleted = (

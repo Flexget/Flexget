@@ -8,7 +8,7 @@ from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.database import with_session
 from flexget.utils.sqlalchemy_utils import create_index
 
@@ -115,7 +115,7 @@ Index(
 )
 
 
-@event('manager.db_cleanup')
+@event(EventType.manager__db_cleanup)
 def db_cleanup(manager, session):
     # Purge all status data for non existing tasks
     for status_task in session.query(StatusTask).all():
