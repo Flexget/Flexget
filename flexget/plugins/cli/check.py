@@ -4,13 +4,13 @@ import yaml
 from loguru import logger
 
 from flexget import options
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.terminal import console
 
 logger = logger.bind(name='check')
 
 
-@event('manager.before_config_load')
+@event(EventType.manager__before_config_load)
 def before_config_load(manager):
     if manager.options.cli_command == 'check':
         pre_check_config(manager.config_path)

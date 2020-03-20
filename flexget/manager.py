@@ -634,7 +634,7 @@ class Manager:
 
         :raises: `ValueError` if there is a problem loading the config file
         """
-        fire_event('manager.before_config_load', self)
+        fire_event(EventType.manager__before_config_load, self)
         with io.open(self.config_path, 'r', encoding='utf-8') as f:
             try:
                 raw_config = f.read()
