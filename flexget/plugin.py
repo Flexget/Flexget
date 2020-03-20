@@ -355,9 +355,10 @@ class PluginInfo(dict):
         self[attr] = value
 
     def __str__(self):
-        return '<PluginInfo(name=%s)>' % self.name
+        return f'<PluginInfo(name={self.name})>'
 
-    def _is_valid_operand(self, other):
+    @staticmethod
+    def _is_valid_operand(other):
         return hasattr(other, 'name')
 
     def __eq__(self, other):
@@ -417,17 +418,13 @@ def _import_plugin(module_name: str, plugin_path: Union[str, Path]) -> None:
     try:
         import_module(module_name)
     except DependencyError as e:
-        if e.has_message():
-            msg = e.message
-        else:
-            msg = 'Plugin `%s` requires plugin `%s` to load.' % (
-                e.issued_by or module_name,
-                e.missing or 'N/A',
-            )
-        if not e.silent:
-            logger.warning(msg)
-        else:
-            logger.debug(msg)
+        msg = (
+            e.message
+            if e.has_message()
+            else f'Plugin `{e.issued_by or module_name}` requires plugin `{e.missing or "N/A"}` to load.'
+        )
+        logger_method = logger.warning if not e.silent else logger.debug
+        logger_method(msg)
     except ImportError:
         logger.opt(exception=True).critical(
             'Plugin `{}` failed to import dependencies', module_name
