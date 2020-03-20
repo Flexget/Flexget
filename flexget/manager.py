@@ -1028,7 +1028,7 @@ class Manager:
         """
         if not self.initialized:
             raise RuntimeError('Cannot shutdown manager that was never initialized.')
-        fire_event('manager.shutdown_requested', self)
+        fire_event(EventType.manager__shutdown_requested, self)
         self.task_queue.shutdown(finish_queue)
 
     def _shutdown(self) -> None:

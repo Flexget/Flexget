@@ -1073,7 +1073,7 @@ def irc_update_config(manager):
         irc_manager = IRCConnectionManager(config)
 
 
-@event('manager.shutdown_requested')
+@event(EventType.manager__shutdown_requested)
 def shutdown_requested(manager):
     stop_irc(manager, wait=True)
 

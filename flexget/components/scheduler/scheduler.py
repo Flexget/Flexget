@@ -199,7 +199,7 @@ def setup_jobs(manager):
     scheduler.resume()
 
 
-@event('manager.shutdown_requested')
+@event(EventType.manager__shutdown_requested)
 def shutdown_requested(manager):
     if scheduler and scheduler.running:
         scheduler.shutdown(wait=True)
