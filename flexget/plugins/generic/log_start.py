@@ -21,6 +21,6 @@ def log_on_shutdown(manager):
         logger.info('FlexGet stopped (PID: {})', os.getpid())
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_options():
     options.get_parser().add_argument('--log-start', action='store_true', help=SUPPRESS)

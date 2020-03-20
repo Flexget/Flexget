@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 from colorclass.toggles import disable_all_colors
 
 from flexget import options
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
 
 try:
@@ -94,7 +94,7 @@ def action_stop(options, irc_manager):
         console('ERROR: %s is not a valid irc connection' % connection)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     # Common option to be used in multiple subparsers
     irc_parser = ArgumentParser(add_help=False)

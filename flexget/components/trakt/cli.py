@@ -1,5 +1,5 @@
 from flexget import options, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
 
@@ -93,7 +93,7 @@ def do_cli(manager, options):
     action_map[options.action](options)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     acc_text = 'Local identifier which should be used in your config to refer these credentials'
     # Register subcommand

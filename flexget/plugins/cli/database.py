@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 
 from flexget import options
 from flexget.db_schema import plugin_schemas, reset_schema
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Base, Session
 from flexget.terminal import console
 
@@ -50,7 +50,7 @@ def reset_plugin(options):
         console('Unable to reset %s: %s' % (plugin, e.message))
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     plugins_parser = ArgumentParser(add_help=False)
     plugins_parser.add_argument(

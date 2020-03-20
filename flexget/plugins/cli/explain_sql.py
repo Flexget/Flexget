@@ -46,7 +46,7 @@ def deregister_sql_explain(man, options):
         manager.Session.kw.pop('query_cls', None)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     options.get_parser('execute').add_argument(
         '--explain-sql', action='store_true', dest='explain_sql', default=False, help=SUPPRESS

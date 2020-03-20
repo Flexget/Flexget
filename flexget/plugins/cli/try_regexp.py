@@ -3,7 +3,7 @@ import re
 from loguru import logger
 
 from flexget import options, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.terminal import console
 
 logger = logger.bind(name='try_regexp')
@@ -76,7 +76,7 @@ def register_plugin():
     plugin.register(PluginTryRegexp, '--try-regexp', builtin=True, interfaces=[], api_ver=2)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     options.get_parser('execute').add_argument(
         '--try-regexp',

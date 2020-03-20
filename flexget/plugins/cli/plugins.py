@@ -2,7 +2,7 @@ from colorclass.toggles import disable_all_colors
 from loguru import logger
 
 from flexget import options
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.plugin import get_plugins
 from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
 
@@ -46,7 +46,7 @@ def plugins_summary(manager, options):
     console(colorize('green', ' Built-in plugins'))
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     parser = options.register_command(
         'plugins',

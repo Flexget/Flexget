@@ -85,7 +85,7 @@ def cleanup(manager, options):
     remove_event_handler('task.execute.after_plugin', after_plugin)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     options.get_parser('execute').add_argument(
         '--debug-perf', action='store_true', dest='debug_perf', default=False, help=SUPPRESS

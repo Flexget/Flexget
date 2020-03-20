@@ -7,7 +7,7 @@ from loguru import logger
 import flexget.components.archive.db
 from flexget import options
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.options import ParseExtrasAction, get_parser
 from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
@@ -233,7 +233,7 @@ def cli_inject(manager, options):
     manager.execute_command(options)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     archive_parser = options.register_command(
         'archive', do_cli, help='Search and manipulate the archive database'

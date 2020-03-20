@@ -58,7 +58,7 @@ def key_value_pair(text):
     return text.split('=', 1)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     options.get_parser('execute').add_argument(
         '--cli-config',

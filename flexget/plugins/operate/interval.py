@@ -4,7 +4,7 @@ from loguru import logger
 
 from flexget import options, plugin
 from flexget.config_schema import parse_interval
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='interval')
 
@@ -52,7 +52,7 @@ def register_plugin():
     plugin.register(PluginInterval, 'interval', api_ver=2)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     options.get_parser('execute').add_argument(
         '--now',

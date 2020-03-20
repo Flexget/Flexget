@@ -1,5 +1,5 @@
 from flexget import options, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
 from flexget.utils.database import with_session
 
@@ -84,7 +84,7 @@ def seen_search(options, session=None):
         console('ERROR: %s' % str(e))
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     parser = options.register_command(
         'seen', do_cli, help='View or forget entries remembered by the seen plugin'

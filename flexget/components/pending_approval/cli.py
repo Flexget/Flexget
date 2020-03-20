@@ -5,7 +5,7 @@ from colorclass.toggles import disable_all_colors
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import options
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
 
@@ -105,7 +105,7 @@ def clear_entries(options):
         console('Successfully deleted %i pending entries' % deleted)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     selection_parser = ArgumentParser(add_help=False)
     selection_parser.add_argument(

@@ -6,7 +6,7 @@ from colorclass.toggles import disable_all_colors
 
 import flexget.components.series.utils
 from flexget import options
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
 
@@ -327,7 +327,7 @@ def add(manager, options):
     manager.config_changed()
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     # Register the command
     parser = options.register_command(

@@ -1177,7 +1177,7 @@ def register_plugin():
     plugin.register(SeriesDBManager, 'series_db', builtin=True, api_ver=2)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     exec_parser = options.get_parser('execute')
     exec_parser.add_argument(

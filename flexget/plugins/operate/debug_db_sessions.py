@@ -103,7 +103,7 @@ def debug_warnings(manager):
         sqlalchemy.event.listen(Session, 'after_transaction_end', after_end)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     options.get_parser().add_argument(
         '--debug-db-sessions',

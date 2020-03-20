@@ -299,7 +299,7 @@ def register_plugin():
     plugin.register(Discover, 'discover', api_ver=2)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     options.get_parser('execute').add_argument(
         '--discover-now',

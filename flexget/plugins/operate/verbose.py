@@ -2,7 +2,7 @@ from loguru import logger
 
 from flexget import options, plugin
 from flexget.entry import EntryState
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.task import logger as task_logger
 from flexget.utils.log import log_once
 
@@ -55,7 +55,7 @@ def register_plugin():
     plugin.register(Verbose, 'verbose', builtin=True, api_ver=2)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     exec_parser = options.get_parser('execute')
     exec_parser.add_argument(

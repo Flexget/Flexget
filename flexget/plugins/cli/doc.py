@@ -3,7 +3,7 @@ import sys
 from loguru import logger
 
 from flexget import options
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.plugin import plugins
 from flexget.terminal import console
 
@@ -50,7 +50,7 @@ def print_doc(manager, options):
         console('Could not find plugin %s' % plugin_name)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     parser = options.register_command('doc', print_doc, help='display plugin documentation')
     parser.add_argument('doc', metavar='<plugin name>', help='name of plugin to show docs for')

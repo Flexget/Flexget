@@ -61,7 +61,7 @@ def on_manager_shutdown(manager):
     heapy = None
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     options.get_parser().add_argument(
         '--mem-usage',

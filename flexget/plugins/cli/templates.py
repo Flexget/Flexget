@@ -1,5 +1,5 @@
 from flexget import options
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
 from flexget.utils.template import get_template, list_templates
 
@@ -34,7 +34,7 @@ def list_file_templates(manager, options):
         console(table.output)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     parser = options.register_command(
         'templates',

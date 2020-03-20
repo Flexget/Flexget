@@ -3,7 +3,7 @@ from pathlib import Path
 
 import flexget
 from flexget import options
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.terminal import console
 from flexget.utils.tools import io_encoding
 
@@ -17,7 +17,7 @@ def print_debug_info(manager, options):
     console('Detected IO encoding: {}'.format(io_encoding))
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     options.register_command(
         'debug-info', print_debug_info, help='display useful info for debugging'

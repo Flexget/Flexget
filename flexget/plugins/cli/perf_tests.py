@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import options
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.terminal import console
 
@@ -74,7 +74,7 @@ def imdb_query(session):
     logger.debug('Took %.2f seconds to query %i movies' % (took, len(imdb_urls)))
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     perf_parser = options.register_command('perf-test', cli_perf_test)
     perf_parser.add_argument('test_name', metavar='<test name>', choices=TESTS)

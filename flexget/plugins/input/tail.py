@@ -7,7 +7,7 @@ from sqlalchemy import Column, Integer, Unicode
 from flexget import options, plugin
 from flexget.db_schema import versioned_base
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 
 logger = logger.bind(name='tail')
@@ -180,7 +180,7 @@ def register_plugin():
     plugin.register(InputTail, 'tail', api_ver=2)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     options.get_parser('execute').add_argument(
         '--tail-reset',

@@ -6,7 +6,7 @@ from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import options
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, colorize, console, table_parser
 
@@ -125,7 +125,7 @@ def do_cli_summary(manager, options):
         console('ERROR: %s' % str(e))
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     parser = options.register_command(
         'status', do_cli, help='View task health status', parents=[table_parser]

@@ -32,6 +32,8 @@ class EventType(Enum):
     manager__shutdown_requested = 'manager.shutdown_requested'
     manager__shutdown = 'manager.shutdown'
 
+    options__register = 'options.register'
+
 
 _events: Dict[EventType, List[Callable]] = defaultdict(list)
 

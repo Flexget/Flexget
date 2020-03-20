@@ -9,7 +9,7 @@ from typing import Any, Callable, List, Optional, TextIO
 
 import flexget
 from flexget.entry import Entry
-from flexget.event import fire_event
+from flexget.event import EventType, fire_event
 from flexget.utils.tools import get_current_flexget_version, get_latest_flexget_version_number
 
 _UNSET = object()
@@ -32,7 +32,7 @@ def get_parser(command: Optional[str] = None) -> 'ArgumentParser':
     if not core_parser:
         core_parser = CoreArgumentParser()
         # Add all plugin options to the parser
-        fire_event('options.register')
+        fire_event(EventType.options__register)
     if command:
         return core_parser.get_subparser(command)
     return core_parser

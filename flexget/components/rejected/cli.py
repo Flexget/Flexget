@@ -1,5 +1,5 @@
 from flexget import options, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
 
@@ -45,7 +45,7 @@ def clear_rejected(manager):
             manager.config_changed()
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     parser = options.register_command(
         'rejected', do_cli, help='list or clear remembered rejections'

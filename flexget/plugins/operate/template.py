@@ -132,7 +132,7 @@ def register_config():
     register_config_key('templates', root_config_schema)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     options.get_parser('execute').add_argument(
         '-T', '--template', metavar='NAME', help='execute tasks using given template'

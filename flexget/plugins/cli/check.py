@@ -168,6 +168,6 @@ def check(manager, options):
         logger.verbose('Config passed check.')
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_options():
     options.register_command('check', check, help='validate configuration file and print errors')

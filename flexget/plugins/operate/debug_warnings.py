@@ -15,7 +15,7 @@ def debug_warnings(manager):
         warnings.simplefilter('error')
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     options.get_parser().add_argument(
         '--debug-warnings',

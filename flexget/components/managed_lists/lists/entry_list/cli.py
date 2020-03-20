@@ -3,7 +3,7 @@ from argparse import ArgumentParser, ArgumentTypeError
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import options
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
 
@@ -199,7 +199,7 @@ def entry_list_purge(options):
         session.delete(entry_list)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     # Common option to be used in multiple subparsers
     entry_parser = ArgumentParser(add_help=False)

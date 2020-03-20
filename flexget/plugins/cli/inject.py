@@ -7,7 +7,7 @@ import yaml
 
 from flexget import options
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.terminal import console
 from flexget.utils import requests
 
@@ -59,7 +59,7 @@ def key_equals_value(text):
 
 
 # Run after other plugins, so we can get all exec subcommand options
-@event('options.register', priority=0)
+@event(EventType.options__register, priority=0)
 def register_parser_arguments():
     exec_parser = options.get_parser('execute')
     inject_parser = options.register_command(

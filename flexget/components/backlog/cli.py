@@ -1,5 +1,5 @@
 from flexget import options
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, console, table_parser
 
@@ -26,7 +26,7 @@ def do_cli(manager, options):
             console('ERROR: %s' % str(e))
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_options():
     parser = options.register_command(
         'backlog', do_cli, help='View or clear entries from backlog plugin', parents=[table_parser]

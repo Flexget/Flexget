@@ -7,7 +7,7 @@ from loguru import logger
 
 import flexget
 from flexget import options
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.terminal import console
 
 logger = logger.bind(name='win32_service')
@@ -72,7 +72,7 @@ def do_cli(manager, options):
     win32serviceutil.HandleCommandLine(AppServerSvc, argv=['flexget service'] + argv)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     if not sys.platform.startswith('win'):
         return

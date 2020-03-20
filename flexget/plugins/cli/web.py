@@ -1,5 +1,5 @@
 from flexget import options
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.terminal import console
 from flexget.utils.database import with_session
 from flexget.webserver import WeakPassword, change_password, generate_token, get_user
@@ -24,7 +24,7 @@ def do_cli(manager, options, session=None):
         console('Token: %s' % user.token)
 
 
-@event('options.register')
+@event(EventType.options__register)
 def register_parser_arguments():
     parser = options.register_command('web', do_cli, help='Manage web server settings')
     subparsers = parser.add_subparsers(dest='action', metavar='<action>')
