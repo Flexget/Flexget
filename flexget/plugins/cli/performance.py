@@ -5,7 +5,7 @@ from loguru import logger
 from sqlalchemy.engine import Connection
 
 from flexget import options
-from flexget.event import add_event_handler, event, remove_event_handler
+from flexget.event import EventType, add_event_handler, event, remove_event_handler
 
 logger = logger.bind(name='performance')
 
@@ -38,7 +38,7 @@ def after_plugin(task, keyword):
     data['queries'] = data.get('queries', 0) + queries
 
 
-@event('manager.execute.started')
+@event(EventType.manager__execute_started)
 def startup(manager, options):
     if not options.debug_perf:
         return

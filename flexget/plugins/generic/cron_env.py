@@ -2,7 +2,7 @@ import sys
 
 from loguru import logger
 
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.log import log_once
 from flexget.utils.simple_persistence import SimplePersistence
 
@@ -11,7 +11,7 @@ __author__ = 'paranoidi'
 logger = logger.bind(name='cron_env')
 
 
-@event('manager.execute.started')
+@event(EventType.manager__execute_started)
 def check_env(manager, options):
     persistence = SimplePersistence(plugin='cron_env')
     encoding = sys.getfilesystemencoding()

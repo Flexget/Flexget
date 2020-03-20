@@ -418,7 +418,7 @@ class Manager:
 
         :param options: argparse options
         """
-        fire_event('manager.execute.started', self, options)
+        fire_event(EventType.manager__execute_started, self, options)
         if self.task_queue.is_alive() or self.is_daemon:
             if not self.task_queue.is_alive():
                 logger.error(

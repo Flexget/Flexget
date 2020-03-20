@@ -7,7 +7,7 @@ from sqlalchemy.orm.query import Query
 from sqlalchemy.sql.expression import ClauseElement, Executable, _literal_as_text
 
 from flexget import manager, options
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='explain_sql')
 
@@ -34,7 +34,7 @@ class ExplainQuery(Query):
         return result
 
 
-@event('manager.execute.started')
+@event(EventType.manager__execute_started)
 def register_sql_explain(man, options):
     if options.explain_sql:
         manager.Session.kw['query_cls'] = ExplainQuery
