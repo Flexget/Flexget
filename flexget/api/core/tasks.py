@@ -593,7 +593,7 @@ def start_task(task):
         update_stream(task, status='running')
 
 
-@event('task.execute.completed')
+@event(EventType.task_execute_completed)
 def finish_task(task):
     if task.stream:
         if task.stream['args'].get('progress'):

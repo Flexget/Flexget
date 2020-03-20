@@ -224,7 +224,7 @@ def load_task(task):
         SimplePersistence.load(task.name)
 
 
-@event('task.execute.completed')
+@event(EventType.task_execute_completed)
 def flush_task(task):
     """Stores all in memory key/value pairs to database when a task has completed."""
     SimplePersistence.flush(task.name)

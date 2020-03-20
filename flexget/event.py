@@ -39,6 +39,7 @@ class EventType(Enum):
     task_execute_before_plugin = 'task.execute.before_plugin'
     task_execute_after_plugin = 'task.execute.after_plugin'
     task_execute_started = 'task.execute.started'
+    task_execute_completed = 'task.execute.completed'
 
 
 _events: Dict[EventType, List[Callable]] = defaultdict(list)

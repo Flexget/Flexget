@@ -716,7 +716,7 @@ class Task:
                         self._rerun_count,
                     )
                 break
-            fire_event('task.execute.completed', self)
+            fire_event(EventType.task_execute_completed, self)
         finally:
             self.finished_event.set()
 
