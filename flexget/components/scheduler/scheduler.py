@@ -109,7 +109,7 @@ def run_job(tasks):
     logger.debug('all tasks in schedule finished executing')
 
 
-@event('manager.daemon.started')
+@event(EventType.manager__daemon_started)
 def setup_scheduler(manager):
     """Configure and start apscheduler"""
     global scheduler

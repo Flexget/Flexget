@@ -71,7 +71,7 @@ def register_config():
 
 
 @event('manager.config_updated')
-@event('manager.daemon.started')
+@event(EventType.manager__daemon_started)
 def register_web_server(manager):
     """Registers Web Server and loads API (always) and WebUi via config"""
     global web_server, config_hash

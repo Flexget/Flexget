@@ -477,7 +477,7 @@ class Manager:
             self.is_daemon = True
 
             def run_daemon():
-                fire_event('manager.daemon.started', self)
+                fire_event(EventType.manager__daemon_started, self)
                 self.task_queue.start()
                 self.ipc_server.start()
                 self.task_queue.wait()

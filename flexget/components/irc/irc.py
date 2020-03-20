@@ -1031,7 +1031,7 @@ class IRCConnectionManager:
         self.config = config
 
 
-@event('manager.daemon.started')
+@event(EventType.manager__daemon_started)
 def irc_start(manager):
     irc_update_config(manager)
 

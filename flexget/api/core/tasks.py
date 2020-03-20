@@ -20,7 +20,7 @@ from flexget.api.app import (
 )
 from flexget.config_schema import process_config
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.log import capture_logs
 from flexget.options import get_parser
 from flexget.task import task_phases
@@ -515,7 +515,7 @@ class TaskExecutionAPI(APIResource):
         return Response(stream_response(), mimetype='text/event-stream')
 
 
-@event('manager.daemon.started')
+@event(EventType.manager__daemon_started)
 def setup_params(mgr):
     parser = get_parser('execute')
 
