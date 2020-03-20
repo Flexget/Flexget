@@ -17,6 +17,7 @@ class EventType(Enum):
 
     manager__before_config_load = 'manager.before_config_load'
     manager__before_config_validate = 'manager.before_config_validate'
+    manager__config_updated = 'manager.config_updated'
     manager__initialize = 'manager.initialize'
     manager__upgrade = 'manager.upgrade'
     manager__db_upgraded = 'manager.db_upgraded'

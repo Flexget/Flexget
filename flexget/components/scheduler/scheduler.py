@@ -149,7 +149,7 @@ def setup_scheduler(manager):
     setup_jobs(manager)
 
 
-@event('manager.config_updated')
+@event(EventType.manager__config_updated)
 def setup_jobs(manager):
     """Set up the jobs for apscheduler to run."""
     if not manager.is_daemon:

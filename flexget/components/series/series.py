@@ -12,7 +12,7 @@ from sqlalchemy.orm import joinedload, object_session
 
 from flexget import options, plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.utils.log import log_once
@@ -57,7 +57,7 @@ def repair(manager):
     clean_series(manager)
 
 
-@event('manager.config_updated')
+@event(EventType.manager__config_updated)
 def clean_series(manager):
     # Unmark series from tasks which have been deleted.
     if not manager.has_lock:

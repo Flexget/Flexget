@@ -723,7 +723,7 @@ class Manager:
             raise
         logger.debug('New config data loaded.')
         self.user_config = copy.deepcopy(new_user_config)
-        fire_event('manager.config_updated', self)
+        fire_event(EventType.manager__config_updated, self)
 
     def backup_config(self) -> str:
         backup_path = os.path.join(
@@ -757,7 +757,7 @@ class Manager:
         from flexget.task import config_changed
 
         config_changed()
-        fire_event('manager.config_updated', self)
+        fire_event(EventType.manager__config_updated, self)
 
     def validate_config(self, config: Optional[dict] = None) -> dict:
         """

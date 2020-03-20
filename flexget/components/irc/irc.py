@@ -1036,7 +1036,7 @@ def irc_start(manager):
     irc_update_config(manager)
 
 
-@event('manager.config_updated')
+@event(EventType.manager__config_updated)
 def irc_update_config(manager):
     global irc_manager, config_hash
 
