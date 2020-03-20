@@ -886,7 +886,7 @@ class Manager:
     @contextmanager
     def acquire_lock(self, event: bool = True) -> Iterator:
         """
-        :param bool event: If True, the 'manager.lock_acquired' event will be fired after a lock is obtained
+        :param bool event: If True, the EventType.manager__lock_acquired event will be fired after a lock is obtained
         """
         acquired = False
         try:
@@ -911,7 +911,7 @@ class Manager:
                 self.write_lock()
                 acquired = True
                 if event:
-                    fire_event('manager.lock_acquired', self)
+                    fire_event(EventType.manager__lock_acquired, self)
             yield
         finally:
             if acquired:

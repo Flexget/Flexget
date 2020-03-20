@@ -35,7 +35,7 @@ except AttributeError:
     preferred_clock = time.clock
 
 
-@event('manager.lock_acquired')
+@event(EventType.manager__lock_acquired)
 def repair(manager):
     # Perform database repairing and upgrading at startup.
     if not manager.persist.get('series_repaired', False):

@@ -26,6 +26,7 @@ class EventType(Enum):
     manager__execute_completed = 'manager.execute.completed'
     manager__daemon_started = 'manager.daemon.started'
     manager__daemon_completed = 'manager.daemon.completed'
+    manager__lock_acquired = 'manager.lock_acquired'
 
 
 _events: Dict[EventType, List[Callable]] = defaultdict(list)

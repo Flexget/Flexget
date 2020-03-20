@@ -3,7 +3,7 @@ import sys
 
 from loguru import logger
 
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.simple_persistence import SimplePersistence
 
 __author__ = 'paranoidi'
@@ -11,7 +11,7 @@ __author__ = 'paranoidi'
 logger = logger.bind(name='welcome')
 
 
-@event('manager.lock_acquired')
+@event(EventType.manager__lock_acquired)
 def welcome_message(manager):
     # Only run for cli cron executions
     if manager.options.cli_command != 'execute' or not manager.options.cron:
