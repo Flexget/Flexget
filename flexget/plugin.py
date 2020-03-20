@@ -336,21 +336,15 @@ class PluginInfo(dict):
         for phase, method_name in phase_methods.items():
             if phase in self.phase_handlers:
                 continue
-            if hasattr(self.instance, method_name):
-                method = getattr(self.instance, method_name)
-                if not callable(method):
-                    continue
-                # check for priority decorator
-                if hasattr(method, 'priority'):
-                    handler_prio = method.priority
-                else:
-                    handler_prio = PRIORITY_DEFAULT
-                event = add_phase_handler(
-                    'plugin.%s.%s' % (self.name, phase), method, handler_prio
-                )
-                # provides backwards compatibility
-                event.plugin = self
-                self.phase_handlers[phase] = event
+            method = getattr(self.instance, method_name, None)
+            if not method or not callable(method):
+                continue
+            # check for priority decorator
+            handler_priority = getattr(method, 'priority', PRIORITY_DEFAULT)
+            event_ = add_phase_handler(f'plugin.{self.name}.{phase}', method, handler_priority)
+            # provides backwards compatibility
+            event_.plugin = self
+            self.phase_handlers[phase] = event_
 
     def __getattr__(self, attr: str):
         if attr in self:

@@ -567,6 +567,6 @@ class RadarrList:
         return list(RadarrSet(config))
 
 
-@event("plugin.register")
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(RadarrList, "radarr_list", api_ver=2, interfaces=["task", "list"])

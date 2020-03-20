@@ -163,7 +163,7 @@ def add(title, task_name, fields, reason=None, local=None, session=None):
     return se.to_dict()
 
 
-@event('forget')
+@event(EventType.forget)
 def forget(value):
     """
     See module docstring

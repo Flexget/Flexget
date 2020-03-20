@@ -3,7 +3,7 @@ Provides small event framework
 """
 from collections import defaultdict
 from enum import Enum
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Union
 
 from loguru import logger
 
@@ -43,15 +43,15 @@ class EventType(Enum):
     task_execute_completed = 'task.execute.completed'
 
 
-_events: Dict[EventType, List[Callable]] = defaultdict(list)
+_events: Dict[Union[EventType, str], List[Callable]] = defaultdict(list)
 
 
 class Event:
     """Represents one registered event."""
 
-    def __init__(self, event_type: EventType, func: Callable, priority: int = 128):
+    def __init__(self, event_type: Union[EventType, str], func: Callable, priority: int = 128):
         self.event_type = event_type
-        self.name = event_type.value
+        self.name = event_type.value if isinstance(event_type, EventType) else event_type
         self.func = func
         self.priority = priority
 
@@ -68,9 +68,7 @@ class Event:
         return self.priority > other.priority
 
     def __str__(self):
-        return (
-            f'<Event(type={self.event_type},func={self.func.__name__},priority={self.priority})>'
-        )
+        return f'<Event(name={self.name},func={self.func.__name__},priority={self.priority})>'
 
     __repr__ = __str__
 
@@ -88,7 +86,7 @@ def event(event_type: EventType, priority: int = 128) -> Callable[[Callable], Ca
     return decorator
 
 
-def get_events(event_type: EventType) -> List[Event]:
+def get_events(event_type: Union[EventType, str]) -> List[Event]:
     """
     :param EventType event_type: event name
     :return: List of :class:`Event` for *name* ordered by priority
@@ -99,7 +97,9 @@ def get_events(event_type: EventType) -> List[Event]:
     return _events[event_type]
 
 
-def add_event_handler(event_type: EventType, func: Callable, priority: int = 128) -> Event:
+def add_event_handler(
+    event_type: Union[EventType, str], func: Callable, priority: int = 128
+) -> Event:
     """
     :param EventType event_type: Event type
     :param function func: Function that acts as event handler
@@ -119,19 +119,19 @@ def add_event_handler(event_type: EventType, func: Callable, priority: int = 128
     return event_
 
 
-def remove_event_handlers(event_type: EventType):
+def remove_event_handlers(event_type: Union[EventType, str]):
     """Removes all handlers for given event `event_type`."""
     _events.pop(event_type, None)
 
 
-def remove_event_handler(event_type: EventType, func: Callable):
+def remove_event_handler(event_type: Union[EventType, str], func: Callable):
     """Remove `func` from the handlers for event `event_type`."""
     for e in _events[event_type]:
         if e.func is func:
             _events[event_type].remove(e)
 
 
-def fire_event(event_type: EventType, *args, **kwargs):
+def fire_event(event_type: Union[EventType, str], *args, **kwargs):
     """
     Trigger an event with *name*. If event is not hooked by anything nothing happens. If a function that hooks an event
     returns a value, it will replace the first argument when calling next function.

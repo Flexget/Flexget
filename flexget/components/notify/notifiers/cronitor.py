@@ -91,6 +91,6 @@ class Cronitor:
         self._send_request("complete", config, task.name)
 
 
-@event("plugin.register")
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(Cronitor, plugin_name, api_ver=2)
