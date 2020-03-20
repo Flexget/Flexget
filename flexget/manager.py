@@ -1035,7 +1035,7 @@ class Manager:
         """Runs when the manager is done processing everything."""
         if self.ipc_server:
             self.ipc_server.shutdown()
-        fire_event('manager.shutdown', self)
+        fire_event(EventType.manager__shutdown, self)
         if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
             logger.debug('Shutting down')
         self.engine.dispose()

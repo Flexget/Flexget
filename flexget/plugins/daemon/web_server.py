@@ -114,7 +114,7 @@ def register_web_server(manager):
     web_server = setup_server(web_server_config)
 
 
-@event('manager.shutdown')
+@event(EventType.manager__shutdown)
 def stop_server(manager):
     """ Sets up and starts/restarts the webui. """
     global web_server

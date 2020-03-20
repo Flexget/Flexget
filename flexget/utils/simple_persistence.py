@@ -212,7 +212,7 @@ def load_taskless(manager):
     SimplePersistence.load()
 
 
-@event('manager.shutdown')
+@event(EventType.manager__shutdown)
 def flush_taskless(manager):
     SimplePersistence.flush()
 

@@ -1078,7 +1078,7 @@ def shutdown_requested(manager):
     stop_irc(manager, wait=True)
 
 
-@event('manager.shutdown')
+@event(EventType.manager__shutdown)
 def stop_irc(manager, wait=False):
     if irc_manager is not None and irc_manager.is_alive():
         logger.info('Shutting down IRC.')

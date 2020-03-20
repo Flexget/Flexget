@@ -30,6 +30,7 @@ class EventType(Enum):
     manager__daemon_completed = 'manager.daemon.completed'
     manager__lock_acquired = 'manager.lock_acquired'
     manager__shutdown_requested = 'manager.shutdown_requested'
+    manager__shutdown = 'manager.shutdown'
 
 
 _events: Dict[EventType, List[Callable]] = defaultdict(list)

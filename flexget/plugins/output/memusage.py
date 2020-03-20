@@ -41,7 +41,7 @@ def on_manager_startup(manager):
     heapy = hpy()
 
 
-@event('manager.shutdown')
+@event(EventType.manager__shutdown)
 def on_manager_shutdown(manager):
     if not manager.options.mem_usage:
         return

@@ -15,7 +15,7 @@ def log_on_start(manager):
         logger.info('FlexGet started (PID: {})', os.getpid())
 
 
-@event('manager.shutdown')
+@event(EventType.manager__shutdown)
 def log_on_shutdown(manager):
     if manager.options.log_start:
         logger.info('FlexGet stopped (PID: {})', os.getpid())

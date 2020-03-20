@@ -205,7 +205,7 @@ def shutdown_requested(manager):
         scheduler.shutdown(wait=True)
 
 
-@event('manager.shutdown')
+@event(EventType.manager__shutdown)
 def stop_scheduler(manager):
     if scheduler and scheduler.running:
         scheduler.shutdown(wait=False)
