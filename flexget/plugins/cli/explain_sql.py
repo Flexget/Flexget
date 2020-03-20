@@ -40,7 +40,7 @@ def register_sql_explain(man, options):
         manager.Session.kw['query_cls'] = ExplainQuery
 
 
-@event('manager.execute.completed')
+@event(EventType.manager__execute_completed)
 def deregister_sql_explain(man, options):
     if options.explain_sql:
         manager.Session.kw.pop('query_cls', None)

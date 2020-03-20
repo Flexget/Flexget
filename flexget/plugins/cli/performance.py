@@ -64,7 +64,7 @@ def startup(manager, options):
     add_event_handler('task.execute.after_plugin', after_plugin)
 
 
-@event('manager.execute.completed')
+@event(EventType.manager__execute_completed)
 def cleanup(manager, options):
     if not options.debug_perf:
         return

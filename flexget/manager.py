@@ -440,7 +440,7 @@ class Manager:
             self.execute(options)
             self.shutdown(finish_queue=True)
             self.task_queue.wait()
-        fire_event('manager.execute.completed', self, options)
+        fire_event(EventType.manager__execute_completed, self, options)
 
     def daemon_command(self, options: argparse.Namespace) -> None:
         """
