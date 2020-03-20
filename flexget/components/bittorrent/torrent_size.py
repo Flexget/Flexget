@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='torrent_size')
 
@@ -20,6 +20,6 @@ class TorrentSize:
                 entry['content_size'] = size
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(TorrentSize, 'torrent_size', builtin=True, api_ver=2)

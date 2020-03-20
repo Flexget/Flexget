@@ -5,7 +5,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.template import RenderError, render_from_entry, render_from_task
 from flexget.utils.tools import io_encoding
 
@@ -219,6 +219,6 @@ class PluginExec:
         return phase_handler
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginExec, 'exec', api_ver=2)

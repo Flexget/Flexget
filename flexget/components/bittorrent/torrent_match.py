@@ -3,7 +3,7 @@ import os
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.tools import aggregate_inputs
 
 logger = logger.bind(name='torrent_match')
@@ -196,6 +196,6 @@ class TorrentMatch:
             )
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(TorrentMatch, 'torrent_match', api_ver=2)

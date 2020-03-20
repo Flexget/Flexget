@@ -6,7 +6,7 @@ from flexget import plugin
 from flexget.components.sites.utils import torrent_availability
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import json, requests
 from flexget.utils.requests import TokenBucketLimiter
 
@@ -136,6 +136,6 @@ class SearchBTN:
         return results
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(SearchBTN, 'btn', interfaces=['search'], api_ver=2)

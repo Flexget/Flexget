@@ -6,7 +6,7 @@ from sqlalchemy import Column, Integer, Unicode
 
 from flexget import plugin
 from flexget.db_schema import versioned_base
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import requests
 from flexget.utils.parsers.generic import name_to_re
 from flexget.utils.soup import get_soup
@@ -115,6 +115,6 @@ class PogcalAcquired:
             logger.verbose('Could not find pogdesign calendar id for show `{}`', show_re)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PogcalAcquired, 'pogcal_acquired', api_ver=2)

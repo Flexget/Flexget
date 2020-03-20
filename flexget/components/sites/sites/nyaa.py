@@ -6,7 +6,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.components.sites.utils import normalize_unicode, torrent_availability
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.tools import parse_filesize
 
 logger = logger.bind(name='nyaa')
@@ -115,6 +115,6 @@ class UrlRewriteNyaa:
         entry['url'] = entry['url'].replace('view', 'download') + ".torrent"
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(UrlRewriteNyaa, 'nyaa', interfaces=['search', 'urlrewriter'], api_ver=2)

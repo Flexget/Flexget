@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='est_released')
 
@@ -33,6 +33,6 @@ class EstimateRelease:
                 return estimate
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(EstimateRelease, 'estimate_release', api_ver=2, interfaces=[])

@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.qualities import Quality
 from flexget.utils.tools import parse_timedelta
 
@@ -278,6 +278,6 @@ class PluginSortByWeight:
         entry['weights'][key] = '%s = %s' % (weight, short_args)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginSortByWeight, 'sort_by_weight', api_ver=2)

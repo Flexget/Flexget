@@ -6,7 +6,7 @@ from urllib.parse import unquote, urlparse
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.pathscrub import pathscrub
 from flexget.utils.template import RenderError
 
@@ -222,6 +222,6 @@ class OutputFtp:
         return ftp
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(OutputFtp, 'ftp_download', api_ver=2)

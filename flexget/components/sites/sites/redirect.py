@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='redirect_url')
 
@@ -42,6 +42,6 @@ class UrlRewriteRedirect:
             self.processed.add(entry['url'])
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(UrlRewriteRedirect, 'redirect_url', api_ver=2)

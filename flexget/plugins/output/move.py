@@ -6,7 +6,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.pathscrub import pathscrub
 from flexget.utils.template import RenderError
 
@@ -294,7 +294,9 @@ class TransformingOps(BaseFileOps):
             if not src_isdir and dst_ext != src_ext:
                 self.logger.verbose('Adding extension `{}` to dst `{}`', src_ext, dst)
                 dst += src_ext
-                dst_file += dst_ext  # this is used for sibling files. dst_ext turns out not to be an extension!
+                dst_file += (
+                    dst_ext
+                )  # this is used for sibling files. dst_ext turns out not to be an extension!
 
         funct_name = 'move' if self.move else 'copy'
         funct_done = 'moved' if self.move else 'copied'
@@ -385,7 +387,7 @@ class MoveFiles(TransformingOps):
     logger = logger.bind(name='move')
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(DeleteFiles, 'delete', api_ver=2)
     plugin.register(CopyFiles, 'copy', api_ver=2)

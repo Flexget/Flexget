@@ -4,7 +4,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.components.backlog.db import BacklogEntry, clear_entries, get_entries
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.utils.database import with_session
 from flexget.utils.serialization import serialize
@@ -110,6 +110,6 @@ class InputBacklog:
         return entries
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(InputBacklog, 'backlog', builtin=True, api_ver=2)

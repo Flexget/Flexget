@@ -6,7 +6,7 @@ from sqlalchemy import Column, DateTime, Integer, String
 
 from flexget import plugin
 from flexget.db_schema import versioned_base
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import requests
 
 logger = logger.bind(name='myepisodes')
@@ -322,6 +322,6 @@ class MyEpisodes:
         return session
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(MyEpisodes, 'myepisodes', api_ver=2)

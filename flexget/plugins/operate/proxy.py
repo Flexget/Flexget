@@ -3,7 +3,7 @@ import os
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='proxy')
 
@@ -46,6 +46,6 @@ class Proxy:
         task.requests.proxies = proxies
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(Proxy, 'proxy', builtin=True, api_ver=2)

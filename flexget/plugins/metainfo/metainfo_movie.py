@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 try:
     # NOTE: Importing other plugins is discouraged!
@@ -51,6 +51,6 @@ class MetainfoMovie:
         return False
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(MetainfoMovie, 'metainfo_movie', api_ver=2)

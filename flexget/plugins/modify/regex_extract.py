@@ -4,7 +4,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.tools import ReList
 
 logger = logger.bind(name='regex_extract')
@@ -82,6 +82,6 @@ class RegexExtract:
         logger.info('{} entries matched and modified', modified)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(RegexExtract, 'regex_extract', api_ver=2)

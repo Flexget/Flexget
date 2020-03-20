@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.plugin import PluginError
 
 logger = logger.bind(name='list_match')
@@ -80,6 +80,6 @@ class ListMatch:
                 thelist -= task.accepted
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(ListMatch, 'list_match', api_ver=2)

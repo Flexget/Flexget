@@ -10,7 +10,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.plugin import PluginWarning
 
 plugin_name = 'email'
@@ -195,6 +195,6 @@ class EmailNotifier:
                     raise PluginWarning('Could not connect to SMTP server: %s' % str(e))
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(EmailNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])

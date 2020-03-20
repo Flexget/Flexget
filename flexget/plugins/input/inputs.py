@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='inputs')
 
@@ -66,6 +66,6 @@ class PluginInputs:
                     entry_urls.update(urls)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginInputs, 'inputs', api_ver=2)

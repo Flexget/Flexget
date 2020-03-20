@@ -4,7 +4,7 @@ from loguru import logger
 from sqlalchemy import Column, DateTime
 
 from flexget import db_schema, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.utils.tools import get_current_flexget_version, get_latest_flexget_version_number
 
@@ -109,6 +109,6 @@ class VersionChecker:
             session.add(last_check)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(VersionChecker, 'version_checker', api_ver=2)

@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 from . import series as plugin_series
 
@@ -58,6 +58,6 @@ class MetainfoSeries:
         return False
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(MetainfoSeries, 'metainfo_series', api_ver=2)

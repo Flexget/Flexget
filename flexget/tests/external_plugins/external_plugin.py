@@ -1,6 +1,6 @@
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 
 
 class ExternalPlugin:
@@ -10,6 +10,6 @@ class ExternalPlugin:
         return [Entry('test entry', 'fake url')]
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(ExternalPlugin, 'external_plugin', api_ver=2)

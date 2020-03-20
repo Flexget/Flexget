@@ -2,7 +2,7 @@ from loguru import logger
 from requests.exceptions import RequestException
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.plugin import PluginWarning
 from flexget.utils import requests
 
@@ -128,6 +128,6 @@ class DiscordNotifier:
             raise PluginWarning(e.args[0])
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(DiscordNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])

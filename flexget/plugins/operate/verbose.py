@@ -50,7 +50,7 @@ class Verbose:
                 )
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(Verbose, 'verbose', builtin=True, api_ver=2)
 

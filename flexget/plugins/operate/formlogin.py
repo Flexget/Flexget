@@ -6,7 +6,7 @@ import requests
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 try:
     import mechanicalsoup
@@ -94,6 +94,6 @@ class FormLogin:
             raise plugin.PluginError('Unable to post login form', logger)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FormLogin, 'form', api_ver=2)

@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='accept_all')
 
@@ -23,6 +23,6 @@ class FilterAcceptAll:
                 entry.accept()
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FilterAcceptAll, 'accept_all', api_ver=2)

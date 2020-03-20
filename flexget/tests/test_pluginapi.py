@@ -50,7 +50,7 @@ class TestPluginApi:
 
         assert 'test_plugin' not in plugin.plugins
 
-        @event('plugin.register')
+        @event(EventType.plugin__register)
         def rp():
             plugin.register(TestPlugin, api_ver=2)
             plugin.register(Oneword, api_ver=2)

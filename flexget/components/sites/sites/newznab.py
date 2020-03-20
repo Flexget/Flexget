@@ -3,7 +3,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.requests import RequestException
 
 __author__ = 'deksan'
@@ -30,7 +30,10 @@ class Newznab:
     schema = {
         'type': 'object',
         'properties': {
-            'category': {'type': 'string', 'enum': ['movie', 'tvsearch', 'tv', 'music', 'book', 'all']},
+            'category': {
+                'type': 'string',
+                'enum': ['movie', 'tvsearch', 'tv', 'music', 'book', 'all'],
+            },
             'url': {'type': 'string', 'format': 'url'},
             'website': {'type': 'string', 'format': 'url'},
             'apikey': {'type': 'string'},
@@ -49,7 +52,11 @@ class Newznab:
 
         if 'url' not in config:
             if 'apikey' in config and 'website' in config:
-                config['params'] = {'t': config['category'], 'apikey': config['apikey'], 'extended': 1}
+                config['params'] = {
+                    't': config['category'],
+                    'apikey': config['apikey'],
+                    'extended': 1,
+                }
                 config['url'] = f"{config['website']}/api"
 
         return config
@@ -92,7 +99,9 @@ class Newznab:
             return self.do_search_all(entry, task, config)
         else:
             entries = []
-            logger.warning("Work in progress. Searching for the specified category is not supported yet...")
+            logger.warning(
+                "Work in progress. Searching for the specified category is not supported yet..."
+            )
             return entries
 
     def do_search_tvsearch(self, arg_entry, task, config=None):
@@ -129,6 +138,6 @@ class Newznab:
         return self.fill_entries_for_url(config['url'], config['params'], task)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(Newznab, 'newznab', api_ver=2, interfaces=['search'])

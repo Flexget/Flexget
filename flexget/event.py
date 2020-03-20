@@ -34,6 +34,8 @@ class EventType(Enum):
 
     options__register = 'options.register'
 
+    plugin__register = 'plugin.register'
+
 
 _events: Dict[EventType, List[Callable]] = defaultdict(list)
 

@@ -9,7 +9,7 @@ from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import requests
 from flexget.utils.database import year_property
 from flexget.utils.soup import get_soup
@@ -262,6 +262,6 @@ class ApiBluray:
         return movie
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(ApiBluray, 'api_bluray', api_ver=2, interfaces=[])

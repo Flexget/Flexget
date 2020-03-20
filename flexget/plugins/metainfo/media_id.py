@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import entry, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='metainfo_media_id')
 
@@ -50,6 +50,6 @@ class MetainfoMediaId(object):
         entry['media_id'] = media_id
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(MetainfoMediaId, 'metainfo_media_id', api_ver=2, builtin=True)

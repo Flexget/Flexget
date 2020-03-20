@@ -3,7 +3,7 @@ import json
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='output.sns')
 
@@ -118,6 +118,6 @@ class SNSNotificationEmitter:
                 logger.debug('Published {}: {}', entry, response)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_sns_plugin():
     plugin.register(SNSNotification, 'sns', api_ver=2)

@@ -14,7 +14,7 @@ from loguru import logger
 from requests import RequestException
 
 from flexget import options, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.pathscrub import pathscrub
 from flexget.utils.template import RenderError
 from flexget.utils.tools import decode_html
@@ -546,7 +546,7 @@ class PluginDownload:
             self.cleanup_temp_file(entry)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginDownload, 'download', api_ver=2)
 

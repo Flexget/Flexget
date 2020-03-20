@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 try:
     # NOTE: Importing other plugins is discouraged!
@@ -246,6 +246,6 @@ class NfoReader:
         return d
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(NfoLookup, 'nfo_lookup', api_ver=2)

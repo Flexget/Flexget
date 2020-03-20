@@ -5,7 +5,7 @@ from requests import RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.cached_input import cached
 
 logger = logger.bind(name='csv')
@@ -73,6 +73,6 @@ class InputCSV:
         return entries
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(InputCSV, 'csv', api_ver=2)

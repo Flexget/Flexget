@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import qualities
 
 logger = logger.bind(name='reorder_quality')
@@ -80,6 +80,6 @@ class ReorderQuality:
     on_task_abort = on_task_exit
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(ReorderQuality, 'reorder_quality', api_ver=2)

@@ -4,7 +4,7 @@ from loguru import logger
 from sqlalchemy import and_
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.utils.tools import parse_timedelta
 
@@ -126,6 +126,6 @@ class FilterRememberRejected:
                 )
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FilterRememberRejected, 'remember_rejected', builtin=True, api_ver=2)

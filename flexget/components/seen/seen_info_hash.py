@@ -1,5 +1,5 @@
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 from . import seen as plugin_seen
 
@@ -42,6 +42,6 @@ class FilterSeenInfoHash(plugin_seen.FilterSeen):
                     accepted_infohashes.add(infohash)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FilterSeenInfoHash, 'seen_info_hash', builtin=True, api_ver=2)

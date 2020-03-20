@@ -12,7 +12,7 @@ from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import requests
 from flexget.utils.bittorrent import bdecode
 
@@ -274,6 +274,6 @@ class TorrentAlive:
                     logger.debug('Found {} seeds from trackers', seeds)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(TorrentAlive, 'torrent_alive', api_ver=2)

@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.task import Task
 
 logger = logger.bind(name='max_reruns')
@@ -35,6 +35,6 @@ class MaxReRuns:
         self.reset(task)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(MaxReRuns, 'max_reruns', api_ver=2)

@@ -28,7 +28,7 @@ class OutputDumpConfig:
             task.abort(silent=True)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(OutputDumpConfig, 'dump_config', debug=True, builtin=True, api_ver=2)
 

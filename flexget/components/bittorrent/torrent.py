@@ -3,7 +3,7 @@ import os
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.bittorrent import Torrent, is_torrent_file
 
 logger = logger.bind(name='modif_torrent')
@@ -113,6 +113,6 @@ class TorrentFilename:
         del entry['file']
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(TorrentFilename, 'torrent', builtin=True, api_ver=2)

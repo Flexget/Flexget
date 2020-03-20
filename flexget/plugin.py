@@ -556,9 +556,9 @@ def load_plugins(
     _load_components_from_dirs(extra_components)
     _load_plugins_from_packages()
     # Register them
-    fire_event('plugin.register')
+    fire_event(EventType.plugin__register)
     # Plugins should only be registered once, remove their handlers after
-    remove_event_handlers('plugin.register')
+    remove_event_handlers(EventType.plugin__register)
     # After they have all been registered, instantiate them
     for plugin in list(plugins.values()):
         plugin.initialize()

@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.requests import TimedLimiter
 
 logger = logger.bind(name='domain_delay')
@@ -24,6 +24,6 @@ class DomainDelay:
             task.requests.add_domain_limiter(TimedLimiter(domain, delay))
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(DomainDelay, 'domain_delay', api_ver=2)

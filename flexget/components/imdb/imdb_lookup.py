@@ -5,7 +5,7 @@ from loguru import logger
 from flexget import entry, plugin
 from flexget.components.imdb.utils import ImdbParser, ImdbSearch, extract_id, make_url
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.database import with_session
 from flexget.utils.log import log_once
 
@@ -310,6 +310,6 @@ class ImdbLookup:
         return 'imdb_id'
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(ImdbLookup, 'imdb_lookup', api_ver=2, interfaces=['task', 'movie_metainfo'])

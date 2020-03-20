@@ -6,7 +6,7 @@ from requests import RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='next_sonarr_episodes')
 
@@ -132,6 +132,6 @@ class NextSonarrEpisodes:
                         logger.error('Invalid entry created? {}', entry)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(NextSonarrEpisodes, 'next_sonarr_episodes', api_ver=2)

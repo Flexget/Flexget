@@ -8,7 +8,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.pathscrub import pathscrub
 from flexget.utils.template import RenderError
 
@@ -700,7 +700,7 @@ class OutputDeluge(DelugePlugin):
                 )
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(InputDeluge, 'from_deluge', api_ver=2)
     plugin.register(OutputDeluge, 'deluge', api_ver=2)

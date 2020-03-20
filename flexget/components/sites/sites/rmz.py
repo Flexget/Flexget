@@ -6,7 +6,7 @@ from requests.exceptions import RequestException
 from flexget import plugin
 from flexget.components.sites.urlrewriting import UrlRewritingError
 from flexget.components.sites.utils import normalize_unicode
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.soup import get_soup
 
 logger = logger.bind(name='rmz')
@@ -105,6 +105,6 @@ class UrlRewriteRmz:
             raise UrlRewritingError('No useable links found at %s' % entry['url'])
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(UrlRewriteRmz, 'rmz', interfaces=['urlrewriter', 'task'], api_ver=2)

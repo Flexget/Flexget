@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 from . import db
 
@@ -45,6 +45,6 @@ class SetSeriesBegin:
                 )
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(SetSeriesBegin, 'set_series_begin', api_ver=2)

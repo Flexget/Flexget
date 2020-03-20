@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.log import log_once
 
 logger = logger.bind(name='rt')
@@ -220,6 +220,6 @@ class FilterRottenTomatoes:
                 entry.accept()
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FilterRottenTomatoes, 'rottentomatoes', api_ver=2)

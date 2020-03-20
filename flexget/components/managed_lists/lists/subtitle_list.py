@@ -10,7 +10,7 @@ from sqlalchemy.orm import relationship
 from flexget import plugin
 from flexget.db_schema import versioned_base, with_session
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.utils.template import RenderError
 from flexget.utils.tools import parse_timedelta
@@ -429,6 +429,6 @@ class PluginSubtitleList:
         return False
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginSubtitleList, 'subtitle_list', api_ver=2, interfaces=['task', 'list'])

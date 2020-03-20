@@ -7,7 +7,7 @@ from flexget import plugin
 from flexget.components.sites.urlrewriting import UrlRewritingError
 from flexget.components.sites.utils import normalize_unicode, torrent_availability
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
@@ -198,7 +198,7 @@ class UrlRewritePirateBay:
             return soup.get('href').rsplit('/', 1)[-1]
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(
         UrlRewritePirateBay, 'piratebay', interfaces=['urlrewriter', 'search', 'task'], api_ver=2

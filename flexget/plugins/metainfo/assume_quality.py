@@ -4,7 +4,7 @@ from loguru import logger
 
 import flexget.utils.qualities as qualities
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='assume_quality')
 
@@ -111,6 +111,6 @@ class AssumeQuality:
             logger.verbose('New quality: {}', entry.get('quality'))
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(AssumeQuality, 'assume_quality', api_ver=2)

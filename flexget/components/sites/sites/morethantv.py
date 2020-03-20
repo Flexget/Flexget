@@ -8,7 +8,7 @@ from sqlalchemy import Column, DateTime, Unicode
 from flexget import db_schema, plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.utils.database import json_synonym
 from flexget.utils.requests import RequestException
@@ -317,6 +317,6 @@ class SearchMoreThanTV:
         return entries
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(SearchMoreThanTV, 'morethantv', interfaces=['search'], api_ver=2)

@@ -6,7 +6,7 @@ from flexget import plugin
 from flexget.components.imdb.utils import extract_id
 from flexget.components.sites.utils import torrent_availability
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
@@ -145,6 +145,6 @@ class SearchPTN:
         return results
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(SearchPTN, 'ptn', interfaces=['search'], api_ver=2)

@@ -197,7 +197,7 @@ After creating the base class, the plugin class itself need to be created.
             return list(DBEntrySet(config))
 
 
-    @event('plugin.register')
+    @event(EventType.plugin__register)
     def register_plugin():
         plugin.register(EntryList, 'entry_list', api_ver=2, interfaces=['list', 'task'])
 

@@ -8,7 +8,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.cached_input import cached
 from flexget.utils.soup import get_soup
 
@@ -297,6 +297,6 @@ class InputHtml:
         return queue
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(InputHtml, 'html', api_ver=2)

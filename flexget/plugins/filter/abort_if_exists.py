@@ -3,7 +3,7 @@ import re
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='abort_if_exists')
 
@@ -35,6 +35,6 @@ class PluginAbortIfExists:
                 task.abort('An entry contained %s in field %s. Abort!' % (config['regexp'], field))
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginAbortIfExists, 'abort_if_exists', api_ver=2)

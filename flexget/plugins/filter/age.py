@@ -4,7 +4,7 @@ from dateutil.parser import parse as dateutil_parse
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.tools import parse_timedelta
 
 logger = logger.bind(name='age')
@@ -77,6 +77,6 @@ class Age:
                 )
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(Age, 'age', api_ver=2)

@@ -5,7 +5,7 @@ from dateutil.parser import parse as dateutil_parse
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.tools import TimedDict
 
 from . import db
@@ -423,6 +423,6 @@ class ApiTrakt:
         return user_rating
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(ApiTrakt, 'api_trakt', api_ver=2, interfaces=[])

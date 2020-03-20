@@ -6,7 +6,7 @@ from requests.auth import AuthBase
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException
 
@@ -171,6 +171,6 @@ class AppleTrailersHeader(AuthBase):
         return request
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(AppleTrailers, 'apple_trailers', api_ver=2)

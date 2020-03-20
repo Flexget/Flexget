@@ -2,7 +2,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 
@@ -68,6 +68,6 @@ class InputPogDesign:
         return entries
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(InputPogDesign, 'pogcal', api_ver=2)

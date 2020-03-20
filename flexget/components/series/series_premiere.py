@@ -1,5 +1,5 @@
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 from . import db
 from . import series as plugin_series
@@ -92,6 +92,6 @@ class FilterSeriesPremiere(plugin_series.FilterSeriesBase):
         self.merge_config(task, allseries)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FilterSeriesPremiere, 'series_premiere', api_ver=2)

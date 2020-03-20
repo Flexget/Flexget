@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='priv_torrents')
 
@@ -44,6 +44,6 @@ class FilterPrivateTorrents:
                 entry.reject('public torrent', remember=True)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FilterPrivateTorrents, 'private_torrents', api_ver=2)

@@ -3,7 +3,7 @@ import os
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.pathscrub import pathscrub
 from flexget.utils.template import RenderError, render_from_entry
 
@@ -142,7 +142,7 @@ class Symlink:
         os.chdir(working_dir)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     if os.name == 'nt':
         logger.trace('Symlinks not supported on Windows. Skipping Symlink plugin register.')

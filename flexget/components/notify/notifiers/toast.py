@@ -4,7 +4,7 @@ import sys
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.plugin import DependencyError, PluginWarning
 
 plugin_name = 'toast'
@@ -196,6 +196,6 @@ class NotifyToast:
         notify = linux_notify
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(NotifyToast, plugin_name, api_ver=2, interfaces=['notifiers'])

@@ -6,7 +6,7 @@ from sqlalchemy.sql.elements import and_
 
 from flexget import plugin
 from flexget.db_schema import with_session
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.utils.tools import split_title_year
 
@@ -189,6 +189,6 @@ class PluginMovieList:
         return list(MovieList(config))
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginMovieList, 'movie_list', api_ver=2, interfaces=['task', 'list'])

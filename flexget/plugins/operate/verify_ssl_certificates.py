@@ -2,7 +2,7 @@ from loguru import logger
 from requests.packages import urllib3
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='verify_ssl')
 
@@ -33,6 +33,6 @@ class VerifySSLCertificates:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(VerifySSLCertificates, 'verify_ssl_certificates', api_ver=2)

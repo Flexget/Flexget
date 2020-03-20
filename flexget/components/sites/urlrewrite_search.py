@@ -3,7 +3,7 @@ from difflib import SequenceMatcher
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='urlrewrite_search')
 
@@ -89,6 +89,6 @@ class PluginSearch:
                 entry.reject('search failed')
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginSearch, 'urlrewrite_search', api_ver=2)

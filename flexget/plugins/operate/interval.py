@@ -47,7 +47,7 @@ class PluginInterval:
         task.simple_persistence['last_time'] = datetime.datetime.now()
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginInterval, 'interval', api_ver=2)
 

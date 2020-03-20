@@ -4,7 +4,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.components.imdb.utils import extract_id, make_url
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='metainfo_imdb_url')
 
@@ -43,6 +43,6 @@ class MetainfoImdbUrl:
             logger.debug('Found imdb url in description {}', entry['imdb_url'])
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(MetainfoImdbUrl, 'scan_imdb', builtin=True, api_ver=2)

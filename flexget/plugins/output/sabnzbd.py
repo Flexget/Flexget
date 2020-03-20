@@ -4,7 +4,7 @@ from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='sabnzbd')
 
@@ -105,6 +105,6 @@ class OutputSabnzbd:
                 logger.info('Added `{}` to SABnzbd', entry['title'])
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(OutputSabnzbd, 'sabnzbd', api_ver=2)

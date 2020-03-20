@@ -10,7 +10,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import requests
 
 logger = logger.bind(name='plex')
@@ -414,6 +414,6 @@ class InputPlex:
         return entries
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(InputPlex, 'plex', api_ver=2)

@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.plugin import PluginError
 
 logger = logger.bind(name='list_remove')
@@ -46,6 +46,6 @@ class ListRemove:
                 thelist -= task.accepted
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(ListRemove, 'list_remove', api_ver=2)

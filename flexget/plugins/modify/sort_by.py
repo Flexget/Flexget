@@ -4,7 +4,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.template import evaluate_expression
 
 logger = logger.bind(name='sort_by')
@@ -85,6 +85,6 @@ class PluginSortBy:
             task.all_entries.sort(key=sort_key, reverse=reverse)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginSortBy, 'sort_by', api_ver=2)

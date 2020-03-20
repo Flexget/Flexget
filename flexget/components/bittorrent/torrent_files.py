@@ -3,7 +3,7 @@ import posixpath
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='torrent_files')
 
@@ -24,6 +24,6 @@ class TorrentFiles:
                     entry['content_files'] = files
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(TorrentFiles, 'torrent_files', builtin=True, api_ver=2)

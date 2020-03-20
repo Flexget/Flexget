@@ -3,7 +3,7 @@ import json
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.requests import RequestException
 
 logger = logger.bind(name='kodi_library')
@@ -74,6 +74,6 @@ class KodiLibrary:
             logger.info('No entries were accepted. No request is sent.')
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(KodiLibrary, 'kodi_library', api_ver=2)

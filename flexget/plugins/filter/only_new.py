@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='only_new')
 
@@ -27,6 +27,6 @@ class FilterOnlyNew:
             entry.reject('Already processed entry', remember=True)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FilterOnlyNew, 'only_new', api_ver=2)

@@ -1,13 +1,13 @@
 """Plugin for json files."""
-from loguru import logger
 from pathlib import Path
 
 import dateutil.parser as parser
+from loguru import logger
 
 from flexget import plugin
-from flexget.utils import json
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
+from flexget.utils import json
 
 logger = logger.bind(name='json')
 
@@ -41,10 +41,7 @@ class Json:
         'properties': {
             'file': {'type': 'string', 'format': 'file'},
             'encoding': {'type': 'string'},
-            'field_map': {
-                'type': 'object',
-                'additionalProperties': {'type': 'string'}
-            },
+            'field_map': {'type': 'object', 'additionalProperties': {'type': 'string'}},
         },
         'required': ['file'],
         'additionalProperties': False,
@@ -71,10 +68,12 @@ class Json:
                     else:
                         entry[field] = ds_dt(value)
                 if not entry.isvalid():
-                    logger.error('No title and url defined for entry, you may need to use field_map to map them.')
+                    logger.error(
+                        'No title and url defined for entry, you may need to use field_map to map them.'
+                    )
                 yield Entry(item)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(Json, 'json', api_ver=2)

@@ -3,7 +3,7 @@ from collections import OrderedDict
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.requests import Session
 
 logger = logger.bind(name='cfscraper')
@@ -56,6 +56,6 @@ class CFScraper:
             task.requests = CFScrapeWrapper.create_scraper(task.requests, solveDepth=5)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(CFScraper, 'cfscraper', api_ver=2)

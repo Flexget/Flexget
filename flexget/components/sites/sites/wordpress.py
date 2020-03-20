@@ -6,7 +6,7 @@ from requests import Request, RequestException
 from requests.utils import cookiejar_from_dict, dict_from_cookiejar
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.plugin import PluginError
 
 logger = logger.bind(name='wordpress_auth')
@@ -91,6 +91,6 @@ class PluginWordPress:
             raise PluginError('WordPress Authentication at %s failed' % (url,))
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginWordPress, 'wordpress_auth', api_ver=2)

@@ -4,7 +4,7 @@ from requests import RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.cached_input import cached
 from flexget.utils.soup import get_soup
 
@@ -100,6 +100,6 @@ class InputSceper:
         return [Entry(release) for release in releases]
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(InputSceper, 'sceper', api_ver=2)

@@ -4,7 +4,7 @@ from loguru import logger
 from sqlalchemy import desc, func
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.utils.tools import multiply_timedelta
 
@@ -57,7 +57,7 @@ class EstimatesSeriesInternal:
             return episodes[0].first_seen + multiply_timedelta(last_diff, 0.9)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(
         EstimatesSeriesInternal, 'est_series_internal', interfaces=['estimate_release'], api_ver=2

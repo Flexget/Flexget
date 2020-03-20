@@ -3,7 +3,7 @@ import time
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.log import log_once
 from flexget.utils.parsers.generic import ParseWarning
 from flexget.utils.parsers.movie import MovieParser
@@ -75,7 +75,7 @@ class ParserInternal:
         return result
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(
         ParserInternal, 'parser_internal', interfaces=['movie_parser', 'series_parser'], api_ver=2

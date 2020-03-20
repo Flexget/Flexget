@@ -87,6 +87,6 @@ class PluginParsing:
         return parser.parse_movie(data, **kwargs)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginParsing, 'parsing', api_ver=2)

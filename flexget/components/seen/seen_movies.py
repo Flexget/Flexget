@@ -3,7 +3,7 @@ from collections import defaultdict
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 from . import seen as plugin_seen
 
@@ -73,6 +73,6 @@ class FilterSeenMovies(plugin_seen.FilterSeen):
         super().on_task_learn(task, config.get('scope', True))
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FilterSeenMovies, 'seen_movies', api_ver=2)

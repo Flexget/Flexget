@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='details')
 
@@ -48,7 +48,7 @@ class NoEntriesOk:
         task.no_entries_ok = config
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginDetails, 'details', builtin=True, api_ver=2)
     plugin.register(NoEntriesOk, 'no_entries_ok', api_ver=2)

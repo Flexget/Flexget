@@ -5,7 +5,7 @@ from requests import Session
 from requests.exceptions import RequestException
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.template import RenderError
 
 logger = logger.bind(name='qbittorrent')
@@ -242,6 +242,6 @@ class OutputQBitTorrent:
             self.add_entries(task, config)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(OutputQBitTorrent, 'qbittorrent', api_ver=2)

@@ -175,7 +175,7 @@ class InputTail:
         return entries
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(InputTail, 'tail', api_ver=2)
 

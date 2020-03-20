@@ -5,7 +5,7 @@ from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.components.sites.utils import normalize_unicode
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.soup import get_soup
 
 try:
@@ -108,6 +108,6 @@ class UrlRewriteAllyoulike:
             raise UrlRewritingError('No useable links found at %s' % entry['url'])
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(UrlRewriteAllyoulike, 'allyoulike', interfaces=['urlrewriter'], api_ver=2)

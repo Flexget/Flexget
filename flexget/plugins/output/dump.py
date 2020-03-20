@@ -114,7 +114,7 @@ class OutputDump:
                 console('No failed entries')
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(OutputDump, 'dump', builtin=True, api_ver=2)
 

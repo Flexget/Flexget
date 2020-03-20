@@ -4,7 +4,7 @@ import time
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.pathscrub import pathscrub
 from flexget.utils.tools import parse_timedelta
 
@@ -112,6 +112,6 @@ class ConvertMagnet:
                 entry['urls'].insert(0, 'file://{}'.format(torrent_file))
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(ConvertMagnet, 'convert_magnet', api_ver=2)

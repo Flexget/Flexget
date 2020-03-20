@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import requests
 
 logger = logger.bind(name='nnm-club')
@@ -32,6 +32,6 @@ class UrlRewriteNnmClub:
         entry['url'] = magnets[0]
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(UrlRewriteNnmClub, 'nnm-club', interfaces=['urlrewriter'], api_ver=2)

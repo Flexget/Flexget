@@ -3,7 +3,7 @@ import re
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='manipulate')
 
@@ -154,6 +154,6 @@ class Manipulate:
         return modified
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(Manipulate, 'manipulate', api_ver=2)

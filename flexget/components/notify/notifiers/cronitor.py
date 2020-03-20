@@ -4,7 +4,7 @@ from loguru import logger
 from requests.exceptions import RequestException
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession
 

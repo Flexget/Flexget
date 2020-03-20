@@ -5,7 +5,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.db_schema import with_session
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 
 from . import db
@@ -112,6 +112,6 @@ class PluginRegexpList:
         return list(regexp_list)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginRegexpList, 'regexp_list', api_ver=2, interfaces=['task', 'list'])

@@ -8,7 +8,7 @@ from requests import RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.qualities import Requirements
 
 logger = logger.bind(name='radarr')

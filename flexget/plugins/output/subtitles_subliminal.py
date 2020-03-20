@@ -7,7 +7,7 @@ import tempfile
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='subtitles')
 
@@ -272,6 +272,6 @@ class PluginSubliminal:
                     save_subtitles(video, subtitle, single=single_mode, directory=_directory)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginSubliminal, 'subliminal', api_ver=2)

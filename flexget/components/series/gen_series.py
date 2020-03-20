@@ -5,7 +5,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='gen_series')
 
@@ -76,6 +76,6 @@ class GenSeries:
             task._rerun_count = 0
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(GenSeries, 'gen_series_data', api_ver=2, debug=True)

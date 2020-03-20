@@ -2,7 +2,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='generate')
 
@@ -36,6 +36,6 @@ class Generate:
         return entries
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(Generate, 'generate', api_ver=2, debug=True)

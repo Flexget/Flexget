@@ -4,7 +4,7 @@ from loguru import logger
 from sqlalchemy import Column, Integer, String
 
 from flexget import db_schema, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.plugin import PluginError, PluginWarning
 
@@ -524,6 +524,6 @@ class TelegramNotifier:
         session.commit()
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(TelegramNotifier, _PLUGIN_NAME, api_ver=2, interfaces=['notifiers'])

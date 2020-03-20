@@ -6,7 +6,7 @@ from requests import RequestException
 
 from flexget import plugin
 from flexget.components.sites.urlrewriting import UrlRewritingError
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.soup import get_soup
 
 logger = logger.bind(name='eztv')
@@ -52,6 +52,6 @@ class UrlRewriteEztv:
         entry['url'] = mirrors[0].get('href')
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(UrlRewriteEztv, 'eztv', interfaces=['urlrewriter'], api_ver=2)

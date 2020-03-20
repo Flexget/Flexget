@@ -5,7 +5,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.components.sites.urlrewriting import UrlRewritingError
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.requests import Session, TimedLimiter
 from flexget.utils.soup import get_soup
 
@@ -89,7 +89,7 @@ class UrlRewriteGoogle:
         raise UrlRewritingError('Unable to resolve')
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(UrlRewriteGoogleCse, 'google_cse', interfaces=['urlrewriter'], api_ver=2)
     plugin.register(UrlRewriteGoogle, 'google', interfaces=['urlrewriter'], api_ver=2)

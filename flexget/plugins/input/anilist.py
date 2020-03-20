@@ -3,7 +3,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException
 
@@ -159,6 +159,6 @@ class AniList(object):
                 raise plugin.PluginError('Invalid JSON response')
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(AniList, 'anilist', api_ver=2)

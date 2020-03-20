@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import entry, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.database import with_session
 
 try:
@@ -212,7 +212,7 @@ class PluginThetvdbLookup:
         return 'tvdb_id'
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(
         PluginThetvdbLookup, 'thetvdb_lookup', api_ver=2, interfaces=['task', 'series_metainfo']

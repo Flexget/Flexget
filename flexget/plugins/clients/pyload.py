@@ -5,7 +5,7 @@ from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import json
 from flexget.utils.template import RenderError
 
@@ -232,6 +232,6 @@ class PluginPyLoad:
                 entry.fail(str(e))
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginPyLoad, 'pyload', api_ver=2)

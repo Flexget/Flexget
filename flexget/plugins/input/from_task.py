@@ -2,7 +2,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.task import Task
 
 logger = logger.bind(name='from_task')
@@ -35,6 +35,6 @@ class FromTask(object):
         return [Entry(e) for e in input_task.accepted]
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FromTask, 'from_task', api_ver=2)

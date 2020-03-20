@@ -20,7 +20,7 @@ from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.utils import requests
 from flexget.utils.database import json_synonym, with_session, year_property
@@ -409,6 +409,6 @@ class ApiTmdb:
         return movie
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(ApiTmdb, 'api_tmdb', api_ver=2, interfaces=[])

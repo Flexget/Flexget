@@ -4,7 +4,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.plugin import PluginError
 from flexget.utils.requests import RequestException
 from flexget.utils.tools import split_title_year
@@ -152,6 +152,6 @@ class TheTVDBList:
         return list(TheTVDBSet(config))
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(TheTVDBList, 'thetvdb_list', api_ver=2, interfaces=['task', 'list'])

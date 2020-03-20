@@ -2,7 +2,7 @@ from loguru import logger
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 
 from . import db
@@ -43,6 +43,6 @@ class EntryList:
                 return entries
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(EntryList, 'entry_list', api_ver=2, interfaces=['task', 'list', 'search'])

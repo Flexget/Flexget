@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='p_priority')
 
@@ -51,6 +51,6 @@ class PluginPriority:
     on_task_abort = on_task_exit
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginPriority, 'plugin_priority', api_ver=2)

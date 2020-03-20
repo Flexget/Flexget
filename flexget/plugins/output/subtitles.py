@@ -6,7 +6,7 @@ from xmlrpc.client import ServerProxy
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='subtitles')
 
@@ -144,6 +144,6 @@ class Subtitles:
         s.LogOut(token)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(Subtitles, 'subtitles', api_ver=2)

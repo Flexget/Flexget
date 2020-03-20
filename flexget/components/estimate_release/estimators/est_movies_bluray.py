@@ -3,7 +3,7 @@ import datetime
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.database import Session
 
 logger = logger.bind(name='est_movies_bluray')
@@ -38,7 +38,7 @@ class EstimatesMoviesBluray:
         return release_date
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(
         EstimatesMoviesBluray, 'est_movies_bluray', interfaces=['estimate_release'], api_ver=2

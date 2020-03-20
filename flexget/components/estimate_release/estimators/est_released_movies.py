@@ -3,7 +3,7 @@ from datetime import datetime
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='est_movies')
 
@@ -25,7 +25,7 @@ class EstimatesReleasedMovies:
         )
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(
         EstimatesReleasedMovies, 'est_released_movies', interfaces=['estimate_release'], api_ver=2

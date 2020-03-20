@@ -118,7 +118,7 @@ class PluginTemplate:
         logger.trace('templates: {}', config)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginTemplate, 'template', builtin=True, api_ver=2)
 

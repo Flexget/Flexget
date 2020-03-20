@@ -3,7 +3,7 @@ import re
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='modify_torrents')
 
@@ -112,7 +112,7 @@ class ModifyTrackers:
                                 logger.info('Modify {} in {}', tracker, trackernew)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(AddTrackers, 'add_trackers', api_ver=2)
     plugin.register(RemoveTrackers, 'remove_trackers', api_ver=2)

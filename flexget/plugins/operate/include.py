@@ -6,7 +6,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more, process_config
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.tools import MergeException
 
 plugin_name = 'include'
@@ -59,6 +59,6 @@ class PluginInclude:
                 )
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginInclude, 'include', api_ver=2, builtin=True)

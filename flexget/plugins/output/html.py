@@ -3,7 +3,7 @@ import os
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.template import RenderError, get_template, render_from_task
 
 PLUGIN_NAME = 'make_html'
@@ -41,6 +41,6 @@ class OutputHtml:
             raise plugin.PluginError('There was an error rendering the specified template')
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(OutputHtml, PLUGIN_NAME, api_ver=2)

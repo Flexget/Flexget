@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='entry_trace')
 
@@ -34,6 +34,6 @@ class EntryOperations:
             entry.on_fail(on_entry_action, act='failed', task=task)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(EntryOperations, 'entry_operations', builtin=True, api_ver=2)

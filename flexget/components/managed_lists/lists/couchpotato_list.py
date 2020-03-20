@@ -7,7 +7,7 @@ from requests import RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='couchpotato_list')
 
@@ -293,6 +293,6 @@ class CouchPotatoList:
         return list(CouchPotatoSet(config))
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(CouchPotatoList, 'couchpotato_list', api_ver=2, interfaces=['task', 'list'])

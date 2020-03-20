@@ -9,7 +9,7 @@ from flexget import plugin
 from flexget.components.sites.utils import normalize_scene, torrent_availability
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.plugin import PluginError
 from flexget.utils.requests import Session as RequestSession
 from flexget.utils.soup import get_soup
@@ -167,6 +167,6 @@ class UrlRewriteFuzer:
         )
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(UrlRewriteFuzer, 'fuzer', interfaces=['search'], api_ver=2)

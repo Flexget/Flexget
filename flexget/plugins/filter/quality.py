@@ -2,7 +2,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import qualities
 
 logger = logger.bind(name='quality')
@@ -34,6 +34,6 @@ class FilterQuality:
                 entry.reject('%s does not match quality requirement %s' % (entry['quality'], reqs))
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FilterQuality, 'quality', api_ver=2)

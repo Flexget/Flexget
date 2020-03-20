@@ -6,7 +6,7 @@ from requests import RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.cached_input import cached
 
 from . import db
@@ -112,7 +112,9 @@ class TraktCalendar:
 
             try:
                 results = (
-                    db.get_session(config.get('account')).get(url, params={'extended': 'full'}).json()
+                    db.get_session(config.get('account'))
+                    .get(url, params={'extended': 'full'})
+                    .json()
                 )
                 logger.debug('Found {} calendar entries', len(results))
             except RequestException as e:
@@ -147,6 +149,6 @@ class TraktCalendar:
         return list(entries)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(TraktCalendar, 'trakt_calendar', api_ver=2, interfaces=['task'])

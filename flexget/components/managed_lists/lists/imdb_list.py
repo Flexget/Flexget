@@ -12,7 +12,7 @@ from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.plugin import PluginError
 from flexget.utils.database import json_synonym
@@ -429,6 +429,6 @@ class ImdbList:
         return list(self.get_list(config))
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(ImdbList, 'imdb_list', api_ver=2, interfaces=['task', 'list'])

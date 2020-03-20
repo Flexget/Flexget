@@ -4,7 +4,7 @@ from typing import Optional
 from loguru import logger
 
 from flexget import entry, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 
 from . import api_trakt as plugin_api_trakt
@@ -368,7 +368,7 @@ class PluginTraktLookup:
         return 'trakt_movie_id'
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(
         PluginTraktLookup,

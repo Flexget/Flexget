@@ -5,7 +5,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.components.archives import utils as archiveutil
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.template import RenderError, render_from_entry
 
 logger = logger.bind(name='decompress')
@@ -202,6 +202,6 @@ class Decompress:
             self.handle_entry(entry, config)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(Decompress, 'decompress', api_ver=2)

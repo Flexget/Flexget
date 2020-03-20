@@ -5,7 +5,7 @@ from sqlalchemy import desc
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 
 from . import db
@@ -300,6 +300,6 @@ class NextSeriesEpisodes:
                     task.rerun(plugin='next_series_episodes', reason='Look for next season')
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(NextSeriesEpisodes, 'next_series_episodes', api_ver=2)

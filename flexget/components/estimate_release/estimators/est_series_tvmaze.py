@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.tools import split_title_year
 
 logger = logger.bind(name='est_series_tvmaze')
@@ -61,7 +61,7 @@ class EstimatesSeriesTVMaze:
         return
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(
         EstimatesSeriesTVMaze, 'est_series_tvmaze', interfaces=['estimate_release'], api_ver=2

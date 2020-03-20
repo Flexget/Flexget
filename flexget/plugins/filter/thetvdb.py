@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.log import log_once
 
 logger = logger.bind(name='thetvdb')
@@ -220,6 +220,6 @@ class FilterTvdb:
                 entry.accept()
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FilterTvdb, 'thetvdb', api_ver=2)

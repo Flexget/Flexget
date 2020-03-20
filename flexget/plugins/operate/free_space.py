@@ -3,7 +3,7 @@ import os
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='free_space')
 
@@ -12,17 +12,26 @@ def get_free_space(config):
     """ Return folder/drive free space (in megabytes)"""
     if 'host' in config:
         import paramiko
+
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
-            ssh.connect(config['host'], config['port'], config['user'], config['ssh_key_filepath'], timeout=5000)
+            ssh.connect(
+                config['host'],
+                config['port'],
+                config['user'],
+                config['ssh_key_filepath'],
+                timeout=5000,
+            )
         except Exception as e:
             logger.error("Issue connecting to remote host. {}", e)
             task.abort('Error with remote host.')
         if config['allotment'] != -1:
             stdin, stdout, stderr = ssh.exec_command(f"du -s {config['path']} | cut -f 1")
         else:
-            stdin, stdout, stderr = ssh.exec_command(f"df -k {config['path']} | tail -1 | tr -s ' ' | cut -d' ' -f4")
+            stdin, stdout, stderr = ssh.exec_command(
+                f"df -k {config['path']} | tail -1 | tr -s ' ' | cut -d' ' -f4"
+            )
         outlines = stdout.readlines()
         resp = ''.join(outlines)
         ssh.close()
@@ -30,13 +39,14 @@ def get_free_space(config):
             if config['allotment'] != -1:
                 free = int(config['allotment']) - ((int(resp.strip()) * 1024) / 1000000)
             else:
-                free = (int(resp.strip()) / 1000)
+                free = int(resp.strip()) / 1000
         except ValueError:
             logger.error('Non-integer was returned when calcualting disk usage.')
             task.abort('Error with remote host.')
         return free
     elif os.name == 'nt':
         import ctypes
+
         free_bytes = ctypes.c_ulonglong(0)
         ctypes.windll.kernel32.GetDiskFreeSpaceExW(
             ctypes.c_wchar_p(config['path']), None, None, ctypes.pointer(free_bytes)
@@ -65,9 +75,7 @@ class PluginFreeSpace:
                     'allotment': {'type': 'number', 'default': -1},
                 },
                 'required': ['space'],
-                'dependencies': {
-                    'host': ['user', 'ssh_key_filepath', 'path']
-                },
+                'dependencies': {'host': ['user', 'ssh_key_filepath', 'path']},
                 'additionalProperties': False,
             },
         ]
@@ -97,6 +105,6 @@ class PluginFreeSpace:
                 task.abort('Less than {} MB of free space in {}', config['space'], config['path'])
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginFreeSpace, 'free_space', api_ver=2)

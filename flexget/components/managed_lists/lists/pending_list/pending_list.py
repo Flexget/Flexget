@@ -6,7 +6,7 @@ from sqlalchemy.sql.elements import and_
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 
 from . import db
@@ -117,6 +117,6 @@ class PendingList:
         return list(PendingListSet(config))
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PendingList, plugin_name, api_ver=2, interfaces=['task', 'list'])

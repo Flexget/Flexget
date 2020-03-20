@@ -4,7 +4,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='run_task')
 
@@ -62,6 +62,6 @@ class RunTask:
         current_task.manager.execute(options=options)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(RunTask, 'run_task', api_ver=2)

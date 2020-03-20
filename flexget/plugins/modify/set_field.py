@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import entry, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.template import RenderError
 
 logger = logger.bind(name='set')
@@ -62,6 +62,6 @@ class ModifySet:
             logger.log(level, 'Could not set {} for {}: {}', field, entry['title'], e)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(ModifySet, 'set', api_ver=2)

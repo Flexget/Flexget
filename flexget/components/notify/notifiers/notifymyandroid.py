@@ -6,7 +6,7 @@ from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.plugin import PluginWarning
 
 plugin_name = 'notifymyandroid'
@@ -87,6 +87,6 @@ class NotifyMyAndroidNotifier:
             )
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(NotifyMyAndroidNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])

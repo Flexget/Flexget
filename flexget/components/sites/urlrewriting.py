@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='urlrewriter')
 
@@ -117,7 +117,7 @@ class DisableUrlRewriter:
     on_task_abort = on_task_exit
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginUrlRewriting, 'urlrewriting', builtin=True, api_ver=2)
     plugin.register(DisableUrlRewriter, 'disable_urlrewriters', api_ver=2)

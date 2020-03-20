@@ -8,7 +8,7 @@ from loguru import logger
 from sqlalchemy import Column, DateTime, Integer, String, Unicode
 
 from flexget import db_schema, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.sqlalchemy_utils import table_add_column, table_columns
 from flexget.utils.template import RenderError, get_template, render_from_entry
 
@@ -306,6 +306,6 @@ class OutputRSS:
                 return
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(OutputRSS, 'make_rss', api_ver=2)

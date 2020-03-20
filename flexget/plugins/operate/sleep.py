@@ -3,7 +3,7 @@ import time
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='sleep')
 
@@ -92,6 +92,6 @@ class PluginSleep:
         self.do_sleep(config, 'exit')
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginSleep, 'sleep', api_ver=2)

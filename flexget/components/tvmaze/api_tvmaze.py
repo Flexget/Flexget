@@ -19,7 +19,7 @@ from sqlalchemy.orm import relation
 from sqlalchemy.orm.exc import MultipleResultsFound
 
 from flexget import db_schema, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import requests
 from flexget.utils.database import json_synonym, with_session
 from flexget.utils.tools import split_title_year
@@ -735,6 +735,6 @@ def tvmaze_lookup(lookup_url, **kwargs):
     return result
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(APITVMaze, 'api_tvmaze', api_ver=2, interfaces=[])

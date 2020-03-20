@@ -7,7 +7,7 @@ from flexget import plugin
 from flexget.components.sites.urlrewriting import UrlRewritingError
 from flexget.components.sites.utils import normalize_unicode
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import requests
 from flexget.utils.requests import Session, TimedLimiter
 from flexget.utils.soup import get_soup
@@ -134,7 +134,7 @@ class UrlRewriteDescargas2020:
         return results
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(
         UrlRewriteDescargas2020, 'descargas2020', interfaces=['urlrewriter', 'search'], api_ver=2

@@ -1170,7 +1170,7 @@ class SeriesDBManager(FilterSeriesBase):
                 session.bulk_save_objects(add_series_tasks.values())
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FilterSeries, 'series', api_ver=2)
     # This is a builtin so that it can update the database for tasks that may have had series plugin removed

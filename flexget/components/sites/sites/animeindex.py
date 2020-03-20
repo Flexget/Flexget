@@ -3,7 +3,7 @@ from urllib.parse import quote
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='animeindex')
 
@@ -25,6 +25,6 @@ class UrlRewriteAnimeIndex:
         entry['url'] += '&f=%s.torrent' % (quote(entry['title'], safe=''))
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(UrlRewriteAnimeIndex, 'animeindex', interfaces=['urlrewriter'], api_ver=2)

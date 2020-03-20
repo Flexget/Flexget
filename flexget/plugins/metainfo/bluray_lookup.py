@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import entry, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.utils.log import log_once
 from flexget.utils.tools import split_title_year
@@ -70,7 +70,7 @@ class PluginBlurayLookup:
         return 'bluray_id'
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(
         PluginBlurayLookup, 'bluray_lookup', api_ver=2, interfaces=['task', 'movie_metainfo']

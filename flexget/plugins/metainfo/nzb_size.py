@@ -3,7 +3,7 @@ import mimetypes
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='nzb_size')
 
@@ -64,6 +64,6 @@ class NzbSize:
                 logger.trace('{} does not seem to be nzb', entry['title'])
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(NzbSize, 'nzb_size', api_ver=2, builtin=True)

@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 from . import db
 
@@ -29,6 +29,6 @@ class OutputSeriesRemove:
                     )
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(OutputSeriesRemove, 'series_remove', api_ver=2)

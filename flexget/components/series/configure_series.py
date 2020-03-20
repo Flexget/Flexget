@@ -2,7 +2,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import process_config
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.plugin import PluginError
 
 from . import series as plugin_series
@@ -93,6 +93,6 @@ class ConfigureSeries(plugin_series.FilterSeriesBase):
         self.merge_config(task, series_config)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(ConfigureSeries, 'configure_series', api_ver=2)

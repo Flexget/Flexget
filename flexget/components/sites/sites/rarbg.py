@@ -4,7 +4,7 @@ from flexget import plugin
 from flexget.components.sites.utils import normalize_scene
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.plugin import PluginError
 from flexget.utils.requests import RequestException, Session, TimedLimiter
 
@@ -217,6 +217,6 @@ class SearchRarBG:
         return entries
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(SearchRarBG, 'rarbg', interfaces=['search'], api_ver=2)

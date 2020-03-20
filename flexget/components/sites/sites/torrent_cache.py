@@ -4,7 +4,7 @@ import re
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='torrent_cache')
 
@@ -51,7 +51,7 @@ class TorrentCache:
                 entry['urls'].extend(urls)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     # Built-in status is disabled due to this not working properly currently
     # https://github.com/Flexget/Flexget/issues/2307

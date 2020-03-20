@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.tools import aggregate_inputs
 
 logger = logger.bind(name='crossmatch')
@@ -109,6 +109,6 @@ class CrossMatch:
         return common_fields
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(CrossMatch, 'crossmatch', api_ver=2)

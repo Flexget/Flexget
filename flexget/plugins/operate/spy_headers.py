@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='spy_headers')
 
@@ -41,6 +41,6 @@ class PluginSpyHeaders:
     on_task_abort = on_task_exit
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginSpyHeaders, 'spy_headers', api_ver=2)

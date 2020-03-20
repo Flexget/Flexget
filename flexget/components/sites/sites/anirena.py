@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='anirena')
 
@@ -16,6 +16,6 @@ class UrlRewriteAniRena:
         entry['url'] = entry['url'].replace('details', 'download')
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(UrlRewriteAniRena, 'anirena', interfaces=['urlrewriter'], api_ver=2)

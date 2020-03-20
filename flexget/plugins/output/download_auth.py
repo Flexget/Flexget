@@ -4,7 +4,7 @@ from loguru import logger
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 PLUGIN_NAME = 'download_auth'
 
@@ -44,6 +44,6 @@ class DownloadAuth:
                         entry['download_auth'] = self.auth_mapper[auth_type](username, password)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(DownloadAuth, PLUGIN_NAME, api_ver=2)

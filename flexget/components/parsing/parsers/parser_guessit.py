@@ -7,7 +7,7 @@ import time
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import qualities
 from flexget.utils.parsers.generic import ParseWarning, default_ignore_prefixes, name_to_re
 from flexget.utils.tools import ReList
@@ -428,7 +428,7 @@ class ParserGuessit:
         return group.lower() in normalized_allow_groups
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(
         ParserGuessit, 'parser_guessit', interfaces=['movie_parser', 'series_parser'], api_ver=2

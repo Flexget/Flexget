@@ -1,5 +1,5 @@
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import pathscrub
 
 
@@ -25,6 +25,6 @@ class PathScrub:
     on_task_abort = on_task_exit
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PathScrub, 'pathscrub', api_ver=2)

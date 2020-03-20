@@ -15,7 +15,7 @@ from sqlalchemy.types import VARCHAR, TypeDecorator
 
 from flexget import plugin
 from flexget.db_schema import versioned_base
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.plugin import PluginError
 
@@ -176,6 +176,6 @@ class RutrackerUrlrewrite:
             return None
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(RutrackerUrlrewrite, 'rutracker_auth', api_ver=2)

@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='metainfo_task')
 
@@ -22,6 +22,6 @@ class MetainfoTask:
             entry['task'] = task.name
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(MetainfoTask, 'metainfo_task', api_ver=2, builtin=True)

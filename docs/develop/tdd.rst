@@ -44,13 +44,13 @@ Within this file we will add our plugin.
 .. testcode::
 
    from flexget import plugin
-   from flexget.event import event
+   from flexget.event import event, EventType
 
 
    class Hello:
        pass
 
-   @event('plugin.register')
+   @event(EventType.plugin__register)
    def register_plugin():
        plugin.register(Hello, 'hello', api_ver=2)
 
@@ -95,7 +95,7 @@ Continue by implementing the test case.
 .. testcode::
 
    from flexget import plugin
-   from flexget.event import event
+   from flexget.event import event, EventType
 
 
    class Hello:
@@ -103,7 +103,7 @@ Continue by implementing the test case.
            for entry in task.entries:
                entry['hello'] = True
 
-   @event('plugin.register')
+   @event(EventType.plugin__register)
    def register_plugin():
        plugin.register(Hello, 'hello', api_ver=2)
 

@@ -7,7 +7,7 @@ from flexget import db_schema, plugin
 from flexget.components.sites.utils import normalize_unicode
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.plugin import PluginError
 from flexget.utils.database import json_synonym
@@ -482,7 +482,7 @@ class InputNotWhat(InputGazelleMusic):
         )
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(InputGazelle, 'gazelle', interfaces=['task', 'search'], api_ver=2)
     plugin.register(InputGazelleMusic, 'gazellemusic', interfaces=['task', 'search'], api_ver=2)

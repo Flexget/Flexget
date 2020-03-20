@@ -4,7 +4,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 
 from . import db
@@ -123,7 +123,7 @@ class UrlrewriteArchive:
         return entries
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(Archive, 'archive', api_ver=2)
     plugin.register(UrlrewriteArchive, 'flexget_archive', interfaces=['search'], api_ver=2)

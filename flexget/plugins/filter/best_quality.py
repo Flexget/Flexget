@@ -2,7 +2,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.tools import group_entries
 
 logger = logger.bind(name='best_quality')
@@ -64,6 +64,6 @@ class FilterBestQuality:
                     action_on_lower(entry, 'lower quality for identifier %s' % identifier)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FilterBestQuality, 'best_quality', api_ver=2)

@@ -6,7 +6,7 @@ from sqlalchemy import Column, DateTime, Index, Integer, String, Unicode, select
 
 from flexget import db_schema, plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import json, serialization
 from flexget.utils.database import entry_synonym
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
@@ -148,6 +148,6 @@ class FilterDelay:
         return delayed_entries
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FilterDelay, 'delay', api_ver=2)

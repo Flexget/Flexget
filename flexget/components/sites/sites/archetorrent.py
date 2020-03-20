@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name="archetorrent")
 
@@ -25,6 +25,6 @@ class UrlRewriteArchetorrent:
             logger.debug('New URL: {}', entry['url'])
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(UrlRewriteArchetorrent, 'archetorrent', interfaces=['urlrewriter'], api_ver=2)

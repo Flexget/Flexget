@@ -1,5 +1,5 @@
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.tools import parse_timedelta
 
 
@@ -12,7 +12,7 @@ class RejectRememberPlugin:
                 entry.reject(remember=True)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(RejectRememberPlugin, 'test_remember_reject', api_ver=2, debug=True)
 

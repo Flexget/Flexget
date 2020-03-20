@@ -25,7 +25,7 @@ from jinja2 import Template
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.plugin import PluginWarning
 from flexget.utils.template import RenderError
 
@@ -130,6 +130,6 @@ class NotificationFramework:
                     logger.verbose('Successfully sent a notification to `{}`', notifier_name)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(NotificationFramework, 'notification_framework', api_ver=2, interfaces=[])

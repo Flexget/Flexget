@@ -2,7 +2,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.components.archives import utils
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='archives')
 
@@ -56,6 +56,6 @@ class FilterArchives:
             entry.accept() if utils.is_archive(str(archive_path)) else entry.reject()
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FilterArchives, 'archives', api_ver=2)

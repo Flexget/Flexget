@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 from . import db
 
@@ -149,6 +149,6 @@ class FilterSeen:
             return True
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FilterSeen, 'seen', builtin=True, api_ver=2)

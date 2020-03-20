@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='manual')
 
@@ -28,6 +28,6 @@ class ManualTask:
             task.abort('manual task not specified in --tasks', silent=True)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(ManualTask, 'manual', api_ver=2)

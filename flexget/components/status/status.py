@@ -74,6 +74,6 @@ def db_cleanup(manager, session):
         logger.verbose('Removed {} task executions from history older than 1 year', result)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(Status, 'status', builtin=True, api_ver=2)

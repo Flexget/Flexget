@@ -8,7 +8,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.components.sites.utils import normalize_unicode, torrent_availability
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='torrentz')
 
@@ -120,7 +120,7 @@ class Torrentz:
         return entries
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     # TODO: The torrent_cache plugin is broken, so urlrewriting has been disabled for this plugin. #2307 #2363
     plugin.register(Torrentz, 'torrentz', interfaces=['search'], api_ver=2)

@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.plugin import PluginError
 
 logger = logger.bind(name='list_clear')
@@ -55,6 +55,6 @@ class ListClear:
                     thelist.clear()
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(ListClear, 'list_clear', api_ver=2)

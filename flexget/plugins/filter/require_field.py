@@ -2,7 +2,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='require_field')
 
@@ -32,6 +32,6 @@ class FilterRequireField:
                     break
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FilterRequireField, 'require_field', api_ver=2)

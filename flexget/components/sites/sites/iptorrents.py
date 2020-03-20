@@ -8,7 +8,7 @@ from flexget.components.sites.urlrewriting import UrlRewritingError
 from flexget.components.sites.utils import normalize_unicode, torrent_availability
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
@@ -182,7 +182,7 @@ class UrlRewriteIPTorrents:
         return entries
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(
         UrlRewriteIPTorrents, 'iptorrents', interfaces=['urlrewriter', 'search'], api_ver=2

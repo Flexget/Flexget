@@ -5,7 +5,7 @@ from requests import RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 
 from . import db
 
@@ -162,6 +162,6 @@ class NextTraktEpisodes:
         return entry
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(NextTraktEpisodes, 'next_trakt_episodes', api_ver=2)

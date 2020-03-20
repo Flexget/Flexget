@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import entry, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import qualities
 
 logger = logger.bind(name='metainfo_quality')
@@ -46,6 +46,6 @@ class MetainfoQuality:
             logger.trace('Found quality {} for {}', entry['quality'], entry['title'])
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(MetainfoQuality, 'metainfo_quality', api_ver=2, builtin=True)

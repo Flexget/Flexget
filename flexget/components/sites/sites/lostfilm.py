@@ -8,7 +8,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.plugin import PluginError
 from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
@@ -177,6 +177,6 @@ class LostFilm:
         return entries
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(LostFilm, 'lostfilm', api_ver=2)

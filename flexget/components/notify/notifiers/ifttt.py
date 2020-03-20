@@ -3,7 +3,7 @@ from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session
 
@@ -80,6 +80,6 @@ class IFTTTNotifier:
         return config
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(IFTTTNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])

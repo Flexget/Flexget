@@ -6,7 +6,7 @@ from requests import RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.cached_input import cached
 from flexget.utils.soup import get_soup
 
@@ -104,6 +104,6 @@ class MyEpisodesList:
         return entries
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(MyEpisodesList, 'myepisodes_list', api_ver=2, interfaces=['task'])

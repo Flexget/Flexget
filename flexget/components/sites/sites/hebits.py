@@ -12,7 +12,7 @@ from sqlalchemy import Column, DateTime, Unicode
 from flexget import db_schema, plugin
 from flexget.components.sites.utils import torrent_availability
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.utils.database import json_synonym
 from flexget.utils.requests import RequestException
@@ -247,6 +247,6 @@ class SearchHeBits:
         return entries
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(SearchHeBits, 'hebits', interfaces=['search'], api_ver=2)

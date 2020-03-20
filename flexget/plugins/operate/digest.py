@@ -8,7 +8,7 @@ from flexget import db_schema, plugin
 from flexget.config_schema import one_or_more
 from flexget.db_schema import versioned_base
 from flexget.entry import Entry, EntryState
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.utils import json, serialization
 from flexget.utils.database import entry_synonym
@@ -151,7 +151,7 @@ class FromDigest:
         return entries
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(OutputDigest, 'digest', api_ver=2)
     plugin.register(FromDigest, 'from_digest', api_ver=2)

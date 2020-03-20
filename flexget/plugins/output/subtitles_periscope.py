@@ -5,7 +5,7 @@ import tempfile
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='subtitles')
 
@@ -106,6 +106,6 @@ class PluginPeriscope:
                     entry.fail(err.message)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginPeriscope, 'periscope', api_ver=2)

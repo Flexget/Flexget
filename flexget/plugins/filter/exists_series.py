@@ -4,7 +4,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.log import log_once
 from flexget.utils.template import RenderError
 
@@ -134,6 +134,6 @@ class FilterExistsSeries:
                                 continue
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FilterExistsSeries, 'exists_series', interfaces=['task'], api_ver=2)

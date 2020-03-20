@@ -185,6 +185,6 @@ class FilterProperMovies:
                 logger.debug('{} already exists', proper_movie)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FilterProperMovies, 'proper_movies', api_ver=2)

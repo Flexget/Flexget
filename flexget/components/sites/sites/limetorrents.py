@@ -6,7 +6,7 @@ from loguru import logger
 from flexget import plugin
 from flexget.components.sites.utils import torrent_availability
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
@@ -137,6 +137,6 @@ class Limetorrents:
         return entries
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(Limetorrents, 'limetorrents', interfaces=['search'], api_ver=2)

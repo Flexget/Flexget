@@ -5,7 +5,7 @@ from socket import error as socket_error
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils.template import RenderError
 
 logger = logger.bind(name='aria2')
@@ -148,6 +148,6 @@ class OutputAria2:
         return aria2.addUri([entry['url']], options)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(OutputAria2, 'aria2', api_ver=2)

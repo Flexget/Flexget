@@ -2,7 +2,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='disable')
 
@@ -81,6 +81,6 @@ class DisablePlugin:
     on_task_abort = on_task_exit
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(DisablePlugin, 'disable', api_ver=2)

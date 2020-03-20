@@ -6,7 +6,7 @@ from sqlalchemy import Column, DateTime, Unicode
 
 from flexget import db_schema, plugin
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 from flexget.utils.database import json_synonym
 from flexget.utils.requests import RequestException
@@ -147,16 +147,14 @@ class SearchFileList:
             # get validator token
             response = requests.get(BASE_URL + 'login.php')
             soup = get_soup(response.content)
-            
+
             login_validator = soup.find("input", {"name": "validator"})
-            
+
             if not login_validator:
-                raise plugin.PluginError(
-                    'FileList.ro could not get login validator'
-                )
+                raise plugin.PluginError('FileList.ro could not get login validator')
             logger.debug('Login Validator: {}'.format(login_validator.get('value')))
             logger.debug('Attempting to retrieve FileList.ro cookie')
-            
+
             response = requests.post(
                 url,
                 data={
@@ -278,6 +276,6 @@ class SearchFileList:
         return entries
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(SearchFileList, 'filelist', interfaces=['search'], api_ver=2)

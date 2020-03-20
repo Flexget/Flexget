@@ -6,7 +6,7 @@ from sqlalchemy import Column, DateTime, Integer, String, Unicode
 from flexget import db_schema, plugin
 from flexget.db_schema import Session
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import qualities
 from flexget.utils.database import quality_property
 from flexget.utils.tools import group_entries, parse_timedelta
@@ -231,6 +231,6 @@ class FilterUpgrade:
                 )
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(FilterUpgrade, 'upgrade', api_ver=2)

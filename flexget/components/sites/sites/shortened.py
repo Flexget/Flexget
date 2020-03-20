@@ -3,7 +3,7 @@ from urllib.parse import urlparse
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='shortened')
 
@@ -19,6 +19,6 @@ class UrlRewriteShortened:
         entry['url'] = request.url
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(UrlRewriteShortened, 'shortened', interfaces=['urlrewriter'], api_ver=2)

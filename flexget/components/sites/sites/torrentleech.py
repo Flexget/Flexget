@@ -8,7 +8,7 @@ from flexget.components.sites.urlrewriting import UrlRewritingError
 from flexget.components.sites.utils import normalize_unicode, torrent_availability
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.plugin import PluginError
 from flexget.utils.tools import parse_filesize
 
@@ -165,7 +165,7 @@ class UrlRewriteTorrentleech:
         return sorted(entries, reverse=True, key=lambda x: x.get('torrent_availability'))
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(
         UrlRewriteTorrentleech, 'torrentleech', interfaces=['urlrewriter', 'search'], api_ver=2

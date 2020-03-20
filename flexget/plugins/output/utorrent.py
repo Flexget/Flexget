@@ -3,7 +3,7 @@ import os
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.template import RenderError
@@ -168,6 +168,6 @@ class PluginUtorrent:
     on_task_abort = on_task_learn
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(PluginUtorrent, 'utorrent', api_ver=2)

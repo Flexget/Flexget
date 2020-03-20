@@ -2,7 +2,7 @@ from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='unique')
 
@@ -78,6 +78,6 @@ class Unique:
                         prospect.reject(msg)
 
 
-@event('plugin.register')
+@event(EventType.plugin__register)
 def register_plugin():
     plugin.register(Unique, 'unique', api_ver=2)
