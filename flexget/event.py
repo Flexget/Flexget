@@ -31,6 +31,7 @@ class EventType(Enum):
     manager__lock_acquired = 'manager.lock_acquired'
     manager__shutdown_requested = 'manager.shutdown_requested'
     manager__shutdown = 'manager.shutdown'
+    manager__subcommand_inject = 'manager.subcommand.inject'
 
     options__register = 'options.register'
 

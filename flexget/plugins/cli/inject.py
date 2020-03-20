@@ -12,7 +12,7 @@ from flexget.terminal import console
 from flexget.utils import requests
 
 
-@event('manager.subcommand.inject')
+@event(EventType.manager__subcommand_inject)
 def do_cli(manager, options):
     if not options.url:
         # Determine if first positional argument is a URL or a title
