@@ -241,7 +241,7 @@ class Manager:
             logger.info('Database upgrade is required. Attempting now.')
             fire_event(EventType.manager__upgrade, self)
             if manager.db_upgraded:
-                fire_event('manager.db_upgraded', self)
+                fire_event(EventType.manager__db_upgraded, self)
         fire_event('manager.startup', self)
         self.initialized = True
 
