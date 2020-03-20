@@ -88,15 +88,14 @@ def add_event_handler(event_type: EventType, func: Callable, priority: int = 128
     :rtype: Event
     :raises Exception: If *func* is already registered in an event
     """
-    events = _events[event_type]
-    for event_ in events:
+    for event_ in _events[event_type]:
         if event_.func == func:
             raise ValueError(
                 f'{func.__name__} has already been registered as event listener under name {event_type}'
             )
     logger.trace('registered function {} to event {}', func.__name__, event_type)
     event_ = Event(event_type, func, priority)
-    events.append(event_)
+    _events[event_type].append(event_)
     return event_
 
 
