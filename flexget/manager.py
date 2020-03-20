@@ -481,7 +481,7 @@ class Manager:
                 self.task_queue.start()
                 self.ipc_server.start()
                 self.task_queue.wait()
-                fire_event('manager.daemon.completed', self)
+                fire_event(EventType.manager__daemon_completed, self)
                 tray_icon.stop()
 
             # Tray icon must be run in the main thread.
