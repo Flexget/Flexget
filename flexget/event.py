@@ -36,6 +36,8 @@ class EventType(Enum):
 
     plugin__register = 'plugin.register'
 
+    task_execute_before_plugin = 'task.execute.before_plugin'
+
 
 _events: Dict[EventType, List[Callable]] = defaultdict(list)
 

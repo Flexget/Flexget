@@ -623,7 +623,7 @@ def finish_task(task):
             )
 
 
-@event('task.execute.before_plugin')
+@event(EventType.task_execute_before_plugin)
 def track_progress(task, plugin_name):
     if task.stream and task.stream['args'].get('progress'):
         update_stream(task, status='running')

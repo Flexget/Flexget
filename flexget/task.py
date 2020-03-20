@@ -489,7 +489,7 @@ class Task:
             with Session() as session:
                 self.session = session
                 try:
-                    fire_event('task.execute.before_plugin', self, plugin.name)
+                    fire_event(EventType.task_execute_before_plugin, self, plugin.name)
                     response = self.__run_plugin(plugin, phase, args)
                     if phase == 'input' and response:
                         # add entries returned by input to self.all_entries

@@ -60,7 +60,7 @@ def startup(manager, options):
     else:
         logger.critical('Unable to monkeypatch sqlalchemy')
 
-    add_event_handler('task.execute.before_plugin', before_plugin)
+    add_event_handler(EventType.task_execute_before_plugin, before_plugin)
     add_event_handler('task.execute.after_plugin', after_plugin)
 
 
@@ -81,7 +81,7 @@ def cleanup(manager, options):
     # Deregister our hooks
     if hasattr(Connection, 'execute') and orig_execute:
         Connection.execute = orig_execute
-    remove_event_handler('task.execute.before_plugin', before_plugin)
+    remove_event_handler(EventType.task_execute_before_plugin, before_plugin)
     remove_event_handler('task.execute.after_plugin', after_plugin)
 
 
