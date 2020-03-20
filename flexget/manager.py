@@ -1013,7 +1013,7 @@ class Manager:
             with Session() as session:
                 fire_event(EventType.manager__db_cleanup, self, session)
             # Try to VACUUM after cleanup
-            fire_event('manager.db_vacuum', self)
+            fire_event(EventType.manager__db_vacuum, self)
             # Just in case some plugin was overzealous in its cleaning, mark the config changed
             self.config_changed()
             self.persist['last_cleanup'] = datetime.now()
