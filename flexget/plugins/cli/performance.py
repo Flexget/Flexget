@@ -61,7 +61,7 @@ def startup(manager, options):
         logger.critical('Unable to monkeypatch sqlalchemy')
 
     add_event_handler(EventType.task_execute_before_plugin, before_plugin)
-    add_event_handler('task.execute.after_plugin', after_plugin)
+    add_event_handler(EventType.task_execute_after_plugin, after_plugin)
 
 
 @event(EventType.manager__execute_completed)
@@ -82,7 +82,7 @@ def cleanup(manager, options):
     if hasattr(Connection, 'execute') and orig_execute:
         Connection.execute = orig_execute
     remove_event_handler(EventType.task_execute_before_plugin, before_plugin)
-    remove_event_handler('task.execute.after_plugin', after_plugin)
+    remove_event_handler(EventType.task_execute_after_plugin, after_plugin)
 
 
 @event(EventType.options__register)

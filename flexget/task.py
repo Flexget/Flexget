@@ -497,7 +497,7 @@ class Task:
                             e.task = self
                             self.all_entries.append(e)
                 finally:
-                    fire_event('task.execute.after_plugin', self, plugin.name)
+                    fire_event(EventType.task_execute_after_plugin, self, plugin.name)
                 self.session = None
         # check config hash for changes at the end of 'prepare' phase
         if phase == 'prepare':
