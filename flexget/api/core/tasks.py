@@ -585,7 +585,7 @@ def update_stream(task, status='pending'):
     task.stream['queue'].put(json.dumps({'progress': progress, 'task_id': task.id}))
 
 
-@event('task.execute.started')
+@event(EventType.task_execute_started)
 def start_task(task):
     task.stream = _streams.get(task.id)
 

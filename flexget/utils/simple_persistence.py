@@ -217,7 +217,7 @@ def flush_taskless(manager):
     SimplePersistence.flush()
 
 
-@event('task.execute.started')
+@event(EventType.task_execute_started)
 def load_task(task):
     """Loads all key/value pairs into memory before a task starts."""
     if not SimplePersistence.class_store[task.name]:

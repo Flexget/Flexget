@@ -696,7 +696,7 @@ class Task:
         try:
             if self.options.cron:
                 self.manager.db_cleanup()
-            fire_event('task.execute.started', self)
+            fire_event(EventType.task_execute_started, self)
             while True:
                 self._execute()
                 # rerun task
