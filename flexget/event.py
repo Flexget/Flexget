@@ -19,6 +19,7 @@ class EventType(Enum):
     manager__initialize = 'manager.initialize'
     manager__upgrade = 'manager.upgrade'
     manager__db_upgraded = 'manager.db_upgraded'
+    manager__startup = 'manager.startup'
 
 
 _events: Dict[EventType, List[Callable]] = defaultdict(list)

@@ -4,12 +4,12 @@ from argparse import SUPPRESS
 from loguru import logger
 
 from flexget import options
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='log_start')
 
 
-@event('manager.startup')
+@event(EventType.manager__startup)
 def log_on_start(manager):
     if manager.options.log_start:
         logger.info('FlexGet started (PID: {})', os.getpid())

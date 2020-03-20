@@ -6,7 +6,7 @@ import sqlalchemy
 from loguru import logger
 
 from flexget import options
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.manager import Session
 
 logger = logger.bind(name='debug_db_sess')
@@ -95,7 +95,7 @@ def after_end(session, transaction):
         del open_transactions[transaction]
 
 
-@event('manager.startup')
+@event(EventType.manager__startup)
 def debug_warnings(manager):
     if manager.options.debug_db_sessions:
         sqlalchemy.event.listen(Session, 'after_begin', after_begin)

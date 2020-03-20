@@ -3,12 +3,12 @@ import warnings
 from loguru import logger
 
 from flexget import options
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='debug_warnings')
 
 
-@event('manager.startup')
+@event(EventType.manager__startup)
 def debug_warnings(manager):
     if manager.options.debug_warnings:
         logger.info('All warnings will be raised as errors for debugging purposes.')

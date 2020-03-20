@@ -242,7 +242,7 @@ class Manager:
             fire_event(EventType.manager__upgrade, self)
             if manager.db_upgraded:
                 fire_event(EventType.manager__db_upgraded, self)
-        fire_event('manager.startup', self)
+        fire_event(EventType.manager__startup, self)
         self.initialized = True
 
     @property

@@ -206,7 +206,7 @@ class SimpleTaskPersistence(SimplePersistence):
         return self.task.current_plugin
 
 
-@event('manager.startup')
+@event(EventType.manager__startup)
 def load_taskless(manager):
     """Loads all key/value pairs into memory which aren't associated with a specific task."""
     SimplePersistence.load()

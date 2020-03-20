@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
+from flexget.event import EventType, event
 
 logger = logger.bind(name='parsing')
 PARSER_TYPES = ['movie', 'series']
@@ -14,7 +14,7 @@ selected_parsers = {}
 
 
 # We need to wait until manager startup to access other plugin instances, to make sure they have all been loaded
-@event('manager.startup')
+@event(EventType.manager__startup)
 def init_parsers(manager):
     """Prepare our list of parsing plugins and default parsers."""
     for parser_type in PARSER_TYPES:

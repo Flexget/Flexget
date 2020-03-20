@@ -1,7 +1,7 @@
 from loguru import logger
 
 from flexget import options, plugin
-from flexget.event import event
+from flexget.event import EventType, event
 from flexget.terminal import console
 
 try:
@@ -33,7 +33,7 @@ def update()
 heapy = None
 
 
-@event('manager.startup')
+@event(EventType.manager__startup)
 def on_manager_startup(manager):
     if not manager.options.mem_usage:
         return
