@@ -484,11 +484,14 @@ class Manager:
                 fire_event('manager.daemon.completed', self)
                 tray_icon.stop()
 
-            # Tray icon must be run in the main thread.
-            m = threading.Thread(target=run_daemon)
-            m.start()
-            tray_icon.run()
-            m.join()
+            if options.tray_icon:
+                # Tray icon must be run in the main thread.
+                m = threading.Thread(target=run_daemon)
+                m.start()
+                tray_icon.run()
+                m.join()
+            else:
+                run_daemon()
 
         elif options.action in ['stop', 'reload-config', 'status']:
             if not self.is_daemon:
