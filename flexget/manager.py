@@ -44,7 +44,6 @@ from flexget.options import (  # noqa
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
 from flexget.terminal import console, get_console_output  # noqa
-from flexget.tray_icon import tray_icon  # noqa
 
 
 logger = logger.bind(name='manager')
@@ -166,9 +165,8 @@ class Manager:
                 'disk will not work properly for filenames containing non-ascii characters. Make sure your '
                 'locale env variables are set up correctly for the environment which is launching FlexGet.'
             )
-        self._add_tray_icon_items()
 
-    def _add_tray_icon_items(self):
+    def _add_tray_icon_items(self, tray_icon: 'TrayIcon'):
         tray_icon.add_menu_item(text='Shutdown', action=self.shutdown, index=2)
         tray_icon.add_menu_item(text='Reload Config', action=self.load_config, index=3)
         tray_icon.add_menu_separator(index=4)
@@ -476,17 +474,22 @@ class Manager:
                 logger.debug('Error registering sigterm handler: {}', e)
             self.is_daemon = True
 
-            def run_daemon():
+            def run_daemon(tray_icon: Optional['TrayIcon'] = None):
                 fire_event('manager.daemon.started', self)
                 self.task_queue.start()
                 self.ipc_server.start()
                 self.task_queue.wait()
                 fire_event('manager.daemon.completed', self)
-                tray_icon.stop()
+                if tray_icon:
+                    tray_icon.stop()
 
             if options.tray_icon:
+                from flexget.tray_icon import tray_icon  # noqa
+
+                self._add_tray_icon_items(tray_icon)
+
                 # Tray icon must be run in the main thread.
-                m = threading.Thread(target=run_daemon)
+                m = threading.Thread(target=run_daemon, args=(tray_icon,))
                 m.start()
                 tray_icon.run()
                 m.join()
