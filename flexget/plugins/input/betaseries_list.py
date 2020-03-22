@@ -157,6 +157,10 @@ def query_member_id(api_key, user_token, login_name):
 
 
 def query_series(api_key, user_token, member_name=None):
+    return query_series_status(api_key, user_token, member_name, 'active') + query_series_status(api_key, user_token, member_name, 'current')
+
+def query_series_status(api_key, user_token, member_name=None, status='active'):
+
     """
     Get the list of series followed by the authenticated user
 
@@ -170,7 +174,7 @@ def query_series(api_key, user_token, member_name=None):
     if member_name:
         member_id = query_member_id(api_key, user_token, member_name)
         if member_id:
-            params = {'id': member_id}
+            params = {'id': member_id, 'status': status, 'limit': '199'}
         else:
             logger.error('member {!r} not found', member_name)
             return []
