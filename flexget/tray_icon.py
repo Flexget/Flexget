@@ -5,14 +5,14 @@ from pathlib import Path
 from typing import List, Optional
 
 from loguru import logger
-from PIL import Image
 
-from flexget import ROOT_DIR, __version__
+from flexget import __version__
 
 logger = logger.bind(name='tray_icon')
 
 try:
     # If we are running outside of a graphical environment, these imports will fail
+    from PIL import Image
     from pystray import Icon, Menu, MenuItem
 
     _import_success = True
@@ -31,7 +31,7 @@ def check_if_tray_is_active(f):
     return wrapped
 
 
-image_path = ROOT_DIR / 'resources' / 'flexget.png'
+image_path = Path(__file__).parent / 'resources' / 'flexget.png'
 
 
 class TrayIcon:

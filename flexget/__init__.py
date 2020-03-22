@@ -1,9 +1,6 @@
 #!/usr/bin/python
 import os
 import sys
-from pathlib import Path
-
-ROOT_DIR = Path(__name__)
 
 # __version__ import need to be first in order to avoid circular import within logger
 from ._version import __version__  # noqa

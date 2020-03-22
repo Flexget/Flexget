@@ -569,6 +569,12 @@ class CoreArgumentParser(ArgumentParser):
             action='store_true',
             help='automatically reload the config from disk if the daemon detects any changes',
         )
+        start_parser.add_argument(
+            '--enable-tray-icon',
+            action='store_true',
+            dest='tray_icon',
+            help='Enable the tray icon',
+        )
         stop_parser = daemon_parser.add_subparser('stop', help='shutdown the running daemon')
         stop_parser.add_argument(
             '--wait',
