@@ -72,10 +72,10 @@ class OutputQBitTorrent:
             msg = str(e)
         raise plugin.PluginError(f'Error when trying to send request to qBittorrent: {msg}')
 
-    def check_api_version(self, msg_on_fail):
+    def check_api_version(self, msg_on_fail, verify=True):
         try:
             url = self.url + "/api/v2/app/webapiVersion"
-            response = self.session.request('get', url)
+            response = self.session.request('get', url, verify=verify)
             if response.status_code != 404:
                 self.api_url_login = '/api/v2/auth/login'
                 self.api_url_upload = '/api/v2/torrents/add'
@@ -83,7 +83,7 @@ class OutputQBitTorrent:
                 return response
 
             url = self.url + "/version/api"
-            response = self.session.request('get', url)
+            response = self.session.request('get', url, verify=verify)
             if response.status_code != 404:
                 self.api_url_login = '/login'
                 self.api_url_upload = '/command/upload'
@@ -106,7 +106,7 @@ class OutputQBitTorrent:
         self.url = '{}://{}:{}'.format(
             'https' if config['use_ssl'] else 'http', config['host'], config['port']
         )
-        self.check_api_version('Check API version failed.')
+        self.check_api_version('Check API version failed.', verify=config['verify_cert'])
         if config.get('username') and config.get('password'):
             data = {'username': config['username'], 'password': config['password']}
             self._request(
