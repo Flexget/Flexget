@@ -50,6 +50,7 @@ class Json:
         'additionalProperties': False,
     }
 
+    @staticmethod
     def ds_dt(val):
         try:
             return parser.parse(val)
@@ -67,9 +68,9 @@ class Json:
                 entry = Entry()
                 for field, value in item.items():
                     if field in field_map:
-                        entry[field_map[field]] = ds_dt(value)
+                        entry[field_map[field]] = self.ds_dt(value)
                     else:
-                        entry[field] = ds_dt(value)
+                        entry[field] = self.ds_dt(value)
                 if not entry.isvalid():
                     logger.error('No title and url defined for entry, you may need to use field_map to map them.')
                 yield Entry(item)
