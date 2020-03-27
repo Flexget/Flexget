@@ -8,7 +8,6 @@ from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils import json
 from flexget.utils.template import RenderError
-from packaging import version
 logger = logger.bind(name='pyload')
 
 
@@ -123,6 +122,15 @@ class PluginPyLoad:
 
         self.add_entries(task, config)
 
+    @staticmethod
+    def get_version_from_packaging():
+        version = None
+        try:
+            from packaging import version
+        except ModuleNotFoundError:
+            logger.warning('packaging is not installed')
+        return version
+
     def add_entries(self, task, config):
         """Adds accepted entries"""
 
@@ -152,7 +160,8 @@ class PluginPyLoad:
         set_package_data_command = 'setPackageData'
 
         is_pyload_ng = False
-        if version.parse(remote_version) >= version.parse('0.5'):
+        version = self.get_version_from_packaging()
+        if version and version.parse(remote_version) >= version.parse('0.5'):
             parse_urls_command = 'parse_urls'
             add_package_command = 'add_package'
             set_package_data_command = 'set_package_date'
