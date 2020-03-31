@@ -5,6 +5,7 @@ from flexget import plugin
 
 logger = logger.bind(name='tarantool_queue')
 
+
 class TarantoolTube:
     def __init__(self, queue, tube_name):
         self._queue = queue
@@ -22,6 +23,7 @@ class TarantoolTube:
     def ack(self, task_id):
         return self._queue.call('queue.tube.{0}:ack'.format(self._tube_name), task_id)
 
+
 class TarantoolQueue:
     def __init__(self, tarantool_module, host, port, user, password):
         self._server = tarantool_module.connect(host, port, user=user, password=password)
@@ -38,6 +40,7 @@ class TarantoolQueue:
     def call(self, function, *args):
         return self._server.call(function, *args)
 
+
 class PluginTarantoolQueueBase:
     schema = {
         'anyOf': [
@@ -52,6 +55,7 @@ class PluginTarantoolQueueBase:
                     'tube': {'type': 'string'},
                     'chunk_size': {'type': 'integer', 'default': 30}
                 },
+                'required': ['host', 'port', 'user', 'password', 'tube'],
                 'additionalProperties': False,
             },
         ]
@@ -59,17 +63,18 @@ class PluginTarantoolQueueBase:
 
     def get_queue(self, tarantool_module, config):
         queue = TarantoolQueue(tarantool_module,
-                                     config.get('host'),
-                                     config.get('port'),
-                                     config.get('user'),
-                                     config.get('password'))
+                               config.get('host'),
+                               config.get('port'),
+                               config.get('user'),
+                               config.get('password'))
 
         return queue
 
-    def get_tube(self, tarantool_module, config):
+    def get_tube_of_queue(self, tarantool_module, config):
         return self.get_queue(tarantool_module, config).get_tube(config.get('tube'))
 
-    def get_tarantool_module(self):
+    @staticmethod
+    def get_tarantool_module():
         try:
             import tarantool
         except:
@@ -80,7 +85,7 @@ class PluginTarantoolQueueBase:
 class PluginTarantoolQueueInput(PluginTarantoolQueueBase):
     def on_task_input(self, task, config):
         tarantool_module = self.get_tarantool_module()
-        tube = self.get_tube(tarantool_module, config)
+        tube = self.get_tube_of_queue(tarantool_module, config)
         tarantool_entries = tube.take(0)
         do_continue = True
         entry_count = 0
@@ -106,12 +111,13 @@ class PluginTarantoolQueueOutput(PluginTarantoolQueueBase):
             return
 
         tarantool_module = self.get_tarantool_module()
-        tube = self.get_tube(tarantool_module, config)
+        tube = self.get_tube_of_queue(tarantool_module, config)
         for entry in task.accepted:
             try:
                 tube.put(Entry.serialize(entry))
             except Exception as e:
                 entry.fail(e)
+
 
 @event('plugin.register')
 def register_plugin():
