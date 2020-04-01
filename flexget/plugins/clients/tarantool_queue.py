@@ -12,16 +12,16 @@ class TarantoolTube:
         self._tube_name = tube_name
 
     def put(self, data):
-        return self._queue.call('queue.tube.{0}:put'.format(self._tube_name), data)
+        return self._queue.call(f'queue.tube.{self._tube_name}:put', data)
 
     def take(self, timeout=None):
-        entries = self._queue.call('queue.tube.{0}:take'.format(self._tube_name), timeout)
+        entries = self._queue.call(f'queue.tube.{self._tube_name}:take', timeout)
         if entries is None:
             entries = []
         return entries
 
     def ack(self, task_id):
-        return self._queue.call('queue.tube.{0}:ack'.format(self._tube_name), task_id)
+        return self._queue.call(f'queue.tube.{self._tube_name}:ack', task_id)
 
 
 class TarantoolQueue:
