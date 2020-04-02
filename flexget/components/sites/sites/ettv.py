@@ -14,6 +14,7 @@ DOMAINS = [
     'www.ettvdl.com',
 ]
 
+
 class UrlRewriteETTV:
     """ETTV urlrewriter."""
 
