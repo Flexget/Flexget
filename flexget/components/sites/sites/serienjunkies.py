@@ -147,7 +147,7 @@ class UrlRewriteSerienjunkies:
         series_url = entry['url']
         search_title = re.sub(r'\[.*\] ', '', entry['title'])
 
-        download_urls = self.parse_downloads(series_url, search_title, self.config['season_pack_fallback'])
+        download_urls = self.parse_downloads(series_url, search_title, self.config.get('season_pack_fallback', False))
         if not download_urls:
             entry.reject('No Episode found')
         else:
@@ -218,7 +218,7 @@ class UrlRewriteSerienjunkies:
             # filter language
             if not self.check_language(episode_lang):
                 logger.warning(
-                    'languages not matching: {} <> {}', self.config['language'], episode_lang
+                    'languages not matching: {} <> {}', self.config.get('language'), episode_lang
                 )
                 do_exit = True
 
@@ -238,7 +238,7 @@ class UrlRewriteSerienjunkies:
 
                 url = link['href']
                 next_sibling = str(link.next_sibling).strip(" |")
-                match = SerienjunkiesMatch.factory(url, next_sibling, self.config['hoster'])
+                match = SerienjunkiesMatch.factory(url, next_sibling, self.config.get('hoster', 'all'))
 
                 if match.found:
                     if best_hoster_match is None:
@@ -295,19 +295,24 @@ class UrlRewriteSerienjunkies:
 
         language_list = re.split(r'[,&]', languages)
 
+        configured_language = self.config.get('language')
+
+        if configured_language is None:
+            return True
+
         try:
-            if self.config['language'] == 'german':
+            if configured_language == 'german':
                 if regex_is_german.search(language_list[0]):
                     return True
-            elif self.config['language'] == 'foreign':
+            elif configured_language == 'foreign':
                 if (regex_is_foreign.search(language_list[0]) and len(language_list) == 1) or (
                         len(language_list) > 1 and not regex_is_subtitle.search(language_list[1])
                 ):
                     return True
-            elif self.config['language'] == 'subtitle':
+            elif configured_language == 'subtitle':
                 if len(language_list) > 1 and regex_is_subtitle.search(language_list[1]):
                     return True
-            elif self.config['language'] == 'dual':
+            elif configured_language == 'dual':
                 if len(language_list) > 1 and not regex_is_subtitle.search(language_list[1]):
                     return True
         except (KeyError, re.error):
