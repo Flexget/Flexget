@@ -94,7 +94,7 @@ return_schema = api.schema_model('tmdb_search_schema', ObjectsContainer.movie_ob
 tmdb_parser = api.parser()
 tmdb_parser.add_argument('title', help='Movie title')
 tmdb_parser.add_argument('tmdb_id', help='TMDB ID')
-tmdb_parser.add_argument('tmdb_id', help='TMDB ID')
+tmdb_parser.add_argument('imdb_id', help='IMDB ID')
 tmdb_parser.add_argument('language', help='ISO 639-1 language code')
 tmdb_parser.add_argument('year', type=int, help='Movie year')
 tmdb_parser.add_argument('only_cached', type=int, help='Return only cached results')
