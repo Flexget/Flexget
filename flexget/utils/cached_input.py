@@ -1,6 +1,7 @@
 import copy
 import pickle
 from datetime import datetime, timedelta
+from functools import partial
 
 from loguru import logger
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Unicode, select
@@ -46,8 +47,10 @@ def upgrade(ver, session):
                 continue
             data = json.loads(row['json'], decode_datetime=True)
             # If title looked like a date, make sure it's a string
-            title = str(data.pop('title'))
-            e = Entry(title=title, **data)
+            # Had a weird case of an entry without a title: https://github.com/Flexget/Flexget/issues/2636
+            title = data.pop('title', None)
+            entry = partial(Entry, **data)
+            e = entry(title=str(title)) if title else entry()
             session.execute(
                 table.update().where(table.c.id == row['id']).values(json=serialization.dumps(e))
             )
