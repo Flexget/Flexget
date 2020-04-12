@@ -458,6 +458,9 @@ class SftpDownload:
         else:
             logger.warning('Skipping unknown file {}', path)
 
+    def on_task_output(self, task, config):
+        """Register this as an output plugin"""
+
     def on_task_download(self, task, config):
         """
         Task handler for sftp_download plugin
