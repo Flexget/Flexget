@@ -399,10 +399,7 @@ class ImdbParser:
             keyword_elem = storyline.find('h4').parent
             if keyword_elem:
                 # The last "a" tag is a link to the full list
-                for keyword_elem in keyword_elem.find_all("a")[:-1]:
-                    keyword = keyword_elem.text.strip()
-                    self.plot_keywords.append(keyword)
-
+                self.plot_keywords = [keyword_elem.text.strip() for keyword_elem in keyword_elem.find_all("a")[:-1]]
 
         genres = data.get('genre', [])
         if not isinstance(genres, list):
