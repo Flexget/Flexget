@@ -45,6 +45,7 @@ class ImdbLookup:
             (writer.imdb_id, writer.name) for writer in movie.writers
         ),
         'imdb_mpaa_rating': 'mpaa_rating',
+        'imdb_plot_keywords': lambda movie: [plot_keyword.name for plot_keyword in movie.plot_keywords],
         # Generic fields filled by all movie lookup plugins:
         'movie_name': 'title',
         'movie_year': 'year',
@@ -299,7 +300,12 @@ class ImdbLookup:
             if not writer:
                 writer = db.Writer(imdb_id, name)
             movie.writers.append(writer)  # pylint:disable=E1101
-            # so that we can track how long since we've updated the info later
+        for name in parser.plot_keywords:
+            plot_keyword = session.query(db.PlotKeyword).filter(db.PlotKeyword.name == name).first()
+            if not plot_keyword:
+                plot_keyword = db.PlotKeyword(name)
+            movie.plot_keywords.append(plot_keyword)  # pylint:disable=E1101
+        # so that we can track how long since we've updated the info later
         movie.updated = datetime.now()
         session.add(movie)
         return movie

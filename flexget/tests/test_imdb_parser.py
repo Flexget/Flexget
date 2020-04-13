@@ -49,6 +49,11 @@ class TestImdbParser:
         assert parser.url == 'https://www.imdb.com/title/tt0114814/', 'URL not parsed correctly'
         assert 400000 < parser.votes < 1000000, 'Votes not parsed correctly'
         assert parser.year == 1995, 'Year not parsed correctly'
+        expected_keywords = {u'criminal', u'suspect', u'criminal mastermind', u'dirty cop', u'burying a body'}
+        assert len(expected_keywords.intersection(parser.plot_keywords)) == len(expected_keywords),\
+            'Parsed plot keywords missing items from the expected result'
+        assert len(expected_keywords) == len(parser.plot_keywords),\
+            'Parsed plot keyword count does not match expected.'
 
     def test_no_plot(self):
         # Make sure parser doesn't crash for movies with no plot
