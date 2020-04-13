@@ -11,7 +11,7 @@ from flexget.db_schema import UpgradeImpossible
 
 logger = logger.bind(name='imdb.db')
 
-SCHEMA_VER = 9
+SCHEMA_VER = 10
 
 Base = db_schema.versioned_base('imdb_lookup', SCHEMA_VER)
 
@@ -52,6 +52,15 @@ writers_table = Table(
 )
 Base.register_table(writers_table)
 
+plot_keywords_table = Table(
+    'imdb_movie_plot_keywords',
+    Base.metadata,
+    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
+    Column('keyword_id', Integer, ForeignKey('imdb_plot_keywords.id')),
+    Index('ix_imdb_movie_plot_keywords', 'movie_id', 'keyword_id'),
+)
+Base.register_table(plot_keywords_table)
+
 
 class Movie(Base):
     __tablename__ = 'imdb_movies'
@@ -66,6 +75,7 @@ class Movie(Base):
     actors = relation('Actor', secondary=actors_table, backref='movies')
     directors = relation('Director', secondary=directors_table, backref='movies')
     writers = relation('Writer', secondary=writers_table, backref='movies')
+    plot_keywords = relation('PlotKeyword', secondary=plot_keywords_table, backref='movies')
     languages = relation('MovieLanguage', order_by='MovieLanguage.prominence')
 
     score = Column(Float)
@@ -174,6 +184,16 @@ class Writer(Base):
         self.name = name
 
 
+class PlotKeyword(Base):
+    __tablename__ = "imdb_plot_keywords"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+
+    def __init__(self, name):
+        self.name = name
+
+
 class SearchResult(Base):
     __tablename__ = 'imdb_search'
 
@@ -198,12 +218,13 @@ class SearchResult(Base):
 
 @db_schema.upgrade('imdb_lookup')
 def upgrade(ver, session):
-    # v5 We may have cached bad data due to imdb changes, just wipe everything. GitHub #697
-    # v6 The association tables were not cleared on the last upgrade, clear again. GitHub #714
-    # v7 Another layout change cached bad data. GitHub #729
-    # v8 Added writers to the DB Schema
-    # v9 Added Metacritic score exftraction/filtering
-    if ver is None or ver <= 8:
+    # v5  We may have cached bad data due to imdb changes, just wipe everything. GitHub #697
+    # v6  The association tables were not cleared on the last upgrade, clear again. GitHub #714
+    # v7  Another layout change cached bad data. GitHub #729
+    # v8  Added writers to the DB Schema
+    # v9  Added Metacritic score exftraction/filtering
+    # v10 Added plot keywords to the DB schema
+    if ver is None or ver <= 9:
         raise UpgradeImpossible(
             'Resetting imdb_lookup caches because bad data may have been cached.'
         )
