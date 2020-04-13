@@ -17,7 +17,7 @@ try:
 
     _import_success = True
 except Exception as e:
-    logger.debug('Could not import pystray: {}', e)
+    logger.debug('Could not load tray icon: {}', e)
     _import_success = False
 
 

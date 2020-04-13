@@ -31,7 +31,6 @@ jsonschema==2.6.0         # via -r requirements.in, flask-restplus
 loguru==0.4.1             # via -r requirements.in
 markupsafe==1.1.1         # via jinja2
 more-itertools==7.2.0     # via -r requirements.in, cheroot, cherrypy, jaraco.functools
-pillow==7.0.0             # via -r requirements.in
 plumbum==1.6.3            # via rpyc
 portend==2.6              # via cherrypy
 progressbar==2.5          # via -r requirements.in
@@ -55,7 +54,6 @@ webencodings==0.5.1       # via html5lib
 werkzeug==0.15.6          # via flask
 zc.lockfile==2.0          # via cherrypy
 zxcvbn-python==4.4.15     # via -r requirements.in
-pystray==0.15.0
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
