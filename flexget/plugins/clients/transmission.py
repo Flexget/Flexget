@@ -225,6 +225,7 @@ class PluginTransmissionInput(TransmissionBase):
                 'progress',
                 'secondsDownloading',
                 'secondsSeeding',
+                'torrentFile',
             ]:
                 try:
                     entry['transmission_' + attr] = getattr(torrent, attr)
