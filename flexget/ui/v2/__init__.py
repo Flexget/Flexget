@@ -42,7 +42,7 @@ def register_web_ui(cfg):
         logger.critical(
             'Failed to start web ui,'
             ' this can happen if you are running from GitHub version and forgot to run the web ui build, '
-            'see http://flexget.com/wiki/Web-UI/v2 for instructions'
+            'see https://flexget.com/Web-UI for instructions'
         )
 
     register_app(webui_app.url_path, webui_app, 'WebUI (v2)')
