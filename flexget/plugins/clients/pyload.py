@@ -157,18 +157,19 @@ class PluginPyLoad:
             urls = []
 
             # check for preferred hoster
-            for name in hoster:
-                if name in parsed:
-                    urls.extend(parsed[name])
-                    if not config.get('multiple_hoster', self.DEFAULT_MULTIPLE_HOSTER):
-                        break
+            if hoster != "all":
+                for name in hoster:
+                    if name in parsed:
+                        urls.extend(parsed[name])
+                        if not config.get('multiple_hoster', self.DEFAULT_MULTIPLE_HOSTER):
+                            break
 
             # no preferred hoster and not preferred hoster only - add all recognized plugins
             if not urls and not config.get(
                 'preferred_hoster_only', self.DEFAULT_PREFERRED_HOSTER_ONLY
             ):
                 for name, purls in parsed.items():
-                    if name != 'BasePlugin':
+                    if name != 'BasePlugin' and name != 'DefaultPlugin':
                         urls.extend(purls)
 
             if task.options.test:
