@@ -44,7 +44,7 @@ class SftpClient:
 
         self.prefix = self._get_prefix()
         self._sftp = self._connect()
-        self._handler_builder: HandlerBuilder = HandlerBuilder(self._sftp, self._logger, self.prefix)
+        self._handler_builder = HandlerBuilder(self._sftp, self._logger, self.prefix)
 
     def list_directories(self, directories, recursive, get_size, files_only):
 
@@ -284,12 +284,12 @@ class HandlerBuilder:
     :param url_prefix: SFTP URL prefix
     """
 
-    def __init__(self, sftp, logger: logging.Logger, url_prefix):
+    def __init__(self, sftp, logger, url_prefix):
         self._sftp = sftp
         self._logger = logger
         self._prefix = url_prefix
 
-    def get_file_handler(self, get_size, entry_accumulator: list):
+    def get_file_handler(self, get_size, entry_accumulator):
         """
         Builds a file node handler suitable for use with pysftp.Connection.walktree
 
@@ -298,7 +298,7 @@ class HandlerBuilder:
         """
         return partial(Handlers.handle_file, self._sftp, self._logger, self._prefix, get_size, entry_accumulator)
 
-    def get_dir_handler(self, get_size, files_only, entry_accumulator: list):
+    def get_dir_handler(self, get_size, files_only, entry_accumulator):
         """
         Builds a file node handler suitable for use with pysftp.Connection.walktree
 
@@ -324,7 +324,7 @@ class HandlerBuilder:
 
 class Handlers:
     @classmethod
-    def handle_file(cls, sftp, logger: logging.Logger, prefix, get_size, entry_accumulator, path):
+    def handle_file(cls, sftp, logger, prefix, get_size, entry_accumulator, path):
         """
         File node handler. Adds a file entry to entry_accumulator.
 
@@ -340,7 +340,7 @@ class Handlers:
         entry_accumulator.append(entry)
 
     @classmethod
-    def handle_directory(cls, sftp, logger: logging.Logger, prefix, get_size, files_only, entry_accumulator, path):
+    def handle_directory(cls, sftp, logger, prefix, get_size, files_only, entry_accumulator, path):
         """
         Directory node handler. Adds a directory entry to entry_accumulator.
 
@@ -360,7 +360,7 @@ class Handlers:
         entry_accumulator.append(entry)
 
     @staticmethod
-    def handle_unknown(logger: logging.Logger, path):
+    def handle_unknown(logger, path):
         """
         Handler for unknown nodes; logs a warning.
 
@@ -370,7 +370,7 @@ class Handlers:
         logger.warning('Skipping unknown file: {}', path)
 
     @staticmethod
-    def null_node_handler(logger: logging.Logger, path):
+    def null_node_handler(logger, path):
         """
         Generic noop node handler
 
