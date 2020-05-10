@@ -304,11 +304,11 @@ class SftpUpload:
 
         for entry in task.accepted:
             if sftp:
-                logger.debug('Uploading file: {}', entry)
+                logger.debug('Uploading file: {}', entry['location'])
                 cls.handle_entry(entry, sftp, config)
             else:
-                logger.debug('SFTP connection failed; failing entry: {}', entry)
-                entry.fail('SFTP connection failed; failing entry: %s' % entry)
+                logger.debug('SFTP connection failed; failing entry: {}', entry['title'])
+                entry.fail('SFTP connection failed; failing entry: %s' % entry['title'])
 
 
 def task_config_to_sftp_config(config):
