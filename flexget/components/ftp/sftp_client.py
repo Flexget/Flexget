@@ -79,7 +79,7 @@ class SftpClient:
 
         return entries
 
-    def download(self, path: str, to: str, recursive: bool, delete_origin: bool) -> None:
+    def download_file(self, path: str, to: str, recursive: bool, delete_origin: bool) -> None:
         """
         Downloads the specified path
         """

@@ -168,7 +168,7 @@ class SftpDownload:
         to: str = config['to']
 
         try:
-            sftp.download(path, to, recursive, delete_origin)
+            sftp.download_file(path, to, recursive, delete_origin)
         except SftpError as e:
             entry.fail(e)  # type: ignore
 
