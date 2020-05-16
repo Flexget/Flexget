@@ -11,8 +11,8 @@ from flexget import plugin
 from flexget.entry import Entry
 
 # retry configuration constants
-RETRY_INTERVAL: int = 15
-RETRY_STEP: int = 5
+RETRY_INTERVAL_SEC: int = 15
+RETRY_STEP_SEC: int = 5
 
 try:
     import pysftp
@@ -189,7 +189,7 @@ class SftpClient:
         """
 
         tries: int = connection_tries
-        retry_interval: int = RETRY_INTERVAL
+        retry_interval: int = RETRY_INTERVAL_SEC
 
         logger.debug('Connecting to {}', self.host)
 
@@ -216,7 +216,7 @@ class SftpClient:
                         f'Failed to connect to {self.host}; waiting {retry_interval} seconds before retrying.'
                     )  # type: ignore
                     time.sleep(retry_interval)
-                    retry_interval += RETRY_STEP
+                    retry_interval += RETRY_STEP_SEC
 
         return sftp
 
