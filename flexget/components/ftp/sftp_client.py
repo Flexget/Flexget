@@ -74,7 +74,7 @@ class SftpClient:
                     directory, file_handler, dir_handler, unknown_handler, recursive
                 )
             except IOError as e:
-                logger.error(f'Failed to open {directory} ({e})')
+                logger.warning(f'Failed to open {directory} ({e})')
                 continue
 
         return entries
