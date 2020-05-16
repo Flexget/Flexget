@@ -8,7 +8,7 @@ on:
 jobs:
   fail:
     runs-on: ubuntu-latest
-    name: No PRs to master, please make them to develop
+    name: Please make them to develop
     steps:
       - name: No PRs to master, please make them to develop
         run: |
