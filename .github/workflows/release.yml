@@ -22,6 +22,7 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
       # TODO: Uncomment this when supported: https://github.com/actions/cache/issues/63
+      # NOTE(2020/05/16) - This has been implemented and will be included in actions/cache@v2
     # - name: Set up pip cache
       # uses: actions/cache@v1
       # with:
