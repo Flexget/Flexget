@@ -1,0 +1,15 @@
+name: No PRs to Master
+
+on:
+  pull_request:
+    branches:
+      - 'master'
+
+jobs:
+  fail:
+    name: No PRs to master, please make them to develop
+    steps:
+      - name: No PRs to master, please make them to develop
+        run: |
+          echo "::error::No PRs should be made against master"
+          exit 1
