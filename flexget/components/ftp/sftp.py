@@ -278,8 +278,8 @@ class SftpUpload:
         'required': ['host', 'username'],
     }
 
-    @classmethod
-    def prepare_config(cls, config: dict) -> dict:
+    @staticmethod
+    def prepare_config(config: dict) -> dict:
         """
         Sets defaults for the provided configuration
         """
