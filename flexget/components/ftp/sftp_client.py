@@ -273,15 +273,15 @@ class SftpClient:
 
         def get_login_string() -> str:
             if self.username and self.password:
-                return '%s:%s@' % (self.username, self.password)
+                return f'{self.username}:{self.password}'
             elif self.username:
-                return '%s@' % self.username
+                return f'{self.username}@'
             else:
                 return ''
 
         def get_port_string() -> str:
             if self.port and self.port != 22:
-                return ':%d' % self.port
+                return f':{self.port}'
             else:
                 return ''
 
