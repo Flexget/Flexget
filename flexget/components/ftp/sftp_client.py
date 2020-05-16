@@ -214,7 +214,7 @@ class SftpClient:
                     logger.debug(f'Caught exception: {e}')
                     logger.warning(
                         f'Failed to connect to {self.host}; waiting {retry_interval} seconds before retrying.'
-                    )  # type: ignore
+                    )
                     time.sleep(retry_interval)
                     retry_interval += RETRY_STEP_SEC
 
@@ -414,7 +414,7 @@ class Handlers:
         :param logger: a logger object
         :param path: path to handle
         """
-        logger.warning('Skipping unknown file: {}', path)  # type: ignore
+        logger.warning('Skipping unknown file: {}', path)
 
     @staticmethod
     def null_node_handler(path: str) -> None:
@@ -445,7 +445,7 @@ class Handlers:
             try:
                 size = size_handler(path)
             except Exception as e:
-                logger.error('Failed to get size for {} ({})', path, e)
+                logger.warning('Failed to get size for {} ({})', path, e)
                 size = -1
             entry['content_size'] = size
 
