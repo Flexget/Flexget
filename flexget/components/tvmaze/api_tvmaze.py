@@ -453,7 +453,7 @@ class APITVMaze:
             lookup_params.get('series_name')
             or lookup_params.get('show_name')
             or lookup_params.get('title')
-        )
+        ).replace('.', ' ')
         if not series and title:
             log.debug(
                 'did not find exact match for series {0} in cache, looking in search table'.format(
