@@ -1,8 +1,10 @@
-import logging
 from datetime import datetime
+from typing import Callable, Optional, Union
 
-from sqlalchemy import Column, DateTime, Integer, String
+from loguru import logger
+from sqlalchemy import Column, DateTime, Integer, String, Table
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.ext.declarative import DeclarativeMeta, as_declarative
 
 import flexget
 from flexget.event import event
@@ -11,7 +13,7 @@ from flexget.utils.database import with_session
 from flexget.utils.sqlalchemy_utils import table_schema
 from flexget.utils.tools import get_current_flexget_version
 
-log = logging.getLogger('schema')
+logger = logger.bind(name='schema')
 
 # Stores a mapping of {plugin: {'version': version, 'tables': ['table_names'])}
 plugin_schemas = {}
@@ -28,22 +30,22 @@ class FlexgetVersion(Base):
 
 
 @event('manager.startup')
-def set_flexget_db_version(manager=None):
+def set_flexget_db_version(manager=None) -> None:
     with Session() as session:
         db_version = session.query(FlexgetVersion).first()
         if not db_version:
-            log.debug('entering flexget version %s to db', get_current_flexget_version())
+            logger.debug('entering flexget version {} to db', get_current_flexget_version())
             session.add(FlexgetVersion())
         elif db_version.version != get_current_flexget_version():
-            log.debug('updating flexget version %s in db', get_current_flexget_version())
+            logger.debug('updating flexget version {} in db', get_current_flexget_version())
             db_version.version = get_current_flexget_version()
             db_version.created = datetime.now()
             session.commit()
         else:
-            log.debug('current flexget version already exist in db %s', db_version.version)
+            logger.debug('current flexget version already exist in db {}', db_version.version)
 
 
-def get_flexget_db_version():
+def get_flexget_db_version() -> Optional[str]:
     with Session() as session:
         version = session.query(FlexgetVersion).first()
         if version:
@@ -57,7 +59,7 @@ class PluginSchema(Base):
     plugin = Column(String)
     version = Column(Integer)
 
-    def __init__(self, plugin, version=0):
+    def __init__(self, plugin: str, version: int = 0):
         self.plugin = plugin
         self.version = version
 
@@ -66,17 +68,17 @@ class PluginSchema(Base):
 
 
 @with_session
-def get_version(plugin, session=None):
+def get_version(plugin: str, session=None) -> Optional[int]:
     schema = session.query(PluginSchema).filter(PluginSchema.plugin == plugin).first()
     if not schema:
-        log.debug('No schema version stored for %s' % plugin)
+        logger.debug('No schema version stored for {}', plugin)
         return None
     else:
         return schema.version
 
 
 @with_session
-def set_version(plugin, version, session=None):
+def set_version(plugin: str, version: int, session=None) -> None:
     if plugin not in plugin_schemas:
         raise ValueError(
             'Tried to set schema version for %s plugin with no versioned_base.' % plugin
@@ -89,20 +91,20 @@ def set_version(plugin, version, session=None):
         )
     schema = session.query(PluginSchema).filter(PluginSchema.plugin == plugin).first()
     if not schema:
-        log.debug('Initializing plugin %s schema version to %i' % (plugin, version))
+        logger.debug('Initializing plugin {} schema version to {}', plugin, version)
         schema = PluginSchema(plugin, version)
         session.add(schema)
     else:
         if version < schema.version:
-            raise ValueError('Tried to set plugin %s schema version to lower value' % plugin)
+            raise ValueError('Tried to set plugin {} schema version to lower value', plugin)
         if version != schema.version:
-            log.debug('Updating plugin %s schema version to %i' % (plugin, version))
+            logger.debug('Updating plugin {} schema version to {}', plugin, version)
             schema.version = version
     session.commit()
 
 
 @with_session
-def upgrade_required(session=None):
+def upgrade_required(session=None) -> bool:
     """Returns true if an upgrade of the database is required."""
     old_schemas = session.query(PluginSchema).all()
     if len(old_schemas) < len(plugin_schemas):
@@ -123,7 +125,7 @@ class UpgradeImpossible(Exception):
     """
 
 
-def upgrade(plugin):
+def upgrade(plugin: str) -> Callable:
     """Used as a decorator to register a schema upgrade function.
 
     The wrapped function will be passed the current schema version and a session object.
@@ -151,26 +153,29 @@ def upgrade(plugin):
                 try:
                     new_ver = upgrade_func(current_ver, session)
                 except UpgradeImpossible:
-                    log.info(
-                        'Plugin %s database is not upgradable. Flushing data and regenerating.'
-                        % plugin
+                    logger.info(
+                        'Plugin {} database is not upgradable. Flushing data and regenerating.',
+                        plugin,
                     )
                     reset_schema(plugin, session=session)
                     manager.db_upgraded = True
                 except Exception as e:
-                    log.exception('Failed to upgrade database for plugin %s: %s' % (plugin, e))
+                    logger.exception('Failed to upgrade database for plugin {}: {}', plugin, e)
                     session.rollback()
                     manager.shutdown(finish_queue=False)
                 else:
                     current_ver = -1 if current_ver is None else current_ver
                     if new_ver > current_ver:
-                        log.info('Plugin `%s` schema upgraded successfully' % plugin)
+                        logger.info('Plugin `{}` schema upgraded successfully', plugin)
                         set_version(plugin, new_ver, session=session)
                         manager.db_upgraded = True
                     elif new_ver < current_ver:
-                        log.critical(
-                            'A lower schema version was returned (%s) from plugin %s upgrade function '
-                            'than passed in (%s)' % (new_ver, plugin, current_ver)
+                        logger.critical(
+                            'A lower schema version was returned ({}) from plugin '
+                            '{} upgrade function than passed in ({})',
+                            new_ver,
+                            plugin,
+                            current_ver,
                         )
                         session.rollback()
                         manager.shutdown(finish_queue=False)
@@ -181,7 +186,7 @@ def upgrade(plugin):
 
 
 @with_session
-def reset_schema(plugin, session=None):
+def reset_schema(plugin: str, session=None) -> None:
     """
     Removes all tables from given plugin from the database,
     as well as removing current stored schema number.
@@ -207,65 +212,47 @@ def reset_schema(plugin, session=None):
     Base.metadata.create_all(bind=session.bind)
 
 
-def register_plugin_table(tablename, plugin, version):
+def register_plugin_table(tablename: str, plugin: str, version: int):
     plugin_schemas.setdefault(plugin, {'version': version, 'tables': []})
     if plugin_schemas[plugin]['version'] != version:
         raise Exception('Two different schema versions received for plugin %s' % plugin)
     plugin_schemas[plugin]['tables'].append(tablename)
 
 
-class Meta(type):
+class VersionedBaseMeta(DeclarativeMeta):
     """Metaclass for objects returned by versioned_base factory"""
 
     def __new__(mcs, metaname, bases, dict_):
         """This gets called when a class that subclasses VersionedBase is defined."""
-        new_bases = []
-        for base in bases:
-            # Check if we are creating a subclass of VersionedBase
-            if base.__name__ == 'VersionedBase':
-                # Register this table in plugin_schemas
-                register_plugin_table(dict_['__tablename__'], base.plugin, base.version)
-                # Make sure the resulting class also inherits from Base
-                if not any(isinstance(base, type(Base)) for base in bases):
-                    # We are not already subclassing Base, add it in to the list of bases instead of VersionedBase
-                    new_bases.append(Base)
+        new_class = super().__new__(mcs, str(metaname), bases, dict_)
+        if metaname != 'VersionedBase':
+            register_plugin_table(new_class.__tablename__, new_class._plugin, new_class._version)
+        return new_class
 
-                    # Since Base and VersionedBase have 2 different metaclasses, a class that subclasses both of them
-                    # must have a metaclass that subclasses both of their metaclasses.
-
-                    class mcs(type(Base), mcs):
-                        pass
-
-            else:
-                new_bases.append(base)
-
-        return type.__new__(mcs, str(metaname), tuple(new_bases), dict_)
-
-    def register_table(cls, table):
+    def register_table(cls, table: Union[str, Table]) -> None:
         """
         This can be used if a plugin is declaring non-declarative sqlalchemy tables.
 
         :param table: Can either be the name of the table, or an :class:`sqlalchemy.Table` instance.
         """
         if isinstance(table, str):
-            register_plugin_table(table, cls.plugin, cls.version)
+            register_plugin_table(table, cls._plugin, cls._version)
         else:
-            register_plugin_table(table.name, cls.plugin, cls.version)
-
-    def __getattr__(self, item):
-        """Transparently return attributes of Base instead of our own."""
-        return getattr(Base, item)
+            register_plugin_table(table.name, cls._plugin, cls._version)
 
 
-def versioned_base(plugin, version):
+def versioned_base(plugin: str, version: int) -> VersionedBaseMeta:
     """
     Returns a class which can be used like Base,
     but automatically stores schema version when tables are created.
     """
 
-    return Meta(
-        'VersionedBase', (object,), {'__metaclass__': Meta, 'plugin': plugin, 'version': version}
-    )
+    @as_declarative(metaclass=VersionedBaseMeta, metadata=Base.metadata)
+    class VersionedBase:
+        _plugin = plugin
+        _version = version
+
+    return VersionedBase
 
 
 def after_table_create(event, target, bind, tables=None, **kw):

@@ -1,6 +1,6 @@
-import logging
+from loguru import logger
 
-from flexget import plugin
+from flexget import entry, plugin
 from flexget.event import event
 from flexget.utils.log import log_once
 
@@ -10,7 +10,7 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='api_rottentomatoes')
 
-log = logging.getLogger('rottentomatoes_lookup')
+logger = logger.bind(name='rottentomatoes_lookup')
 
 
 def get_rt_url(movie):
@@ -67,6 +67,7 @@ class PluginRottenTomatoesLookup:
     def __init__(self):
         self.key = None
 
+    @entry.register_lazy_lookup('rottentomatoes_lookup')
     def lazy_loader(self, entry):
         """Does the lookup for this entry and populates the entry fields.
 
@@ -76,7 +77,7 @@ class PluginRottenTomatoesLookup:
         try:
             self.lookup(entry, key=self.key)
         except plugin.PluginError as e:
-            log_once(e.value.capitalize(), logger=log)
+            log_once(e.value.capitalize(), logger=logger)
 
     def lookup(self, entry, search_allowed=True, key=None):
         """
@@ -95,7 +96,7 @@ class PluginRottenTomatoesLookup:
             only_cached=(not search_allowed),
             api_key=key,
         )
-        log.debug(u'Got movie: %s' % movie)
+        logger.debug('Got movie: {}', movie)
         entry.update_using_map(self.field_map, movie)
 
         if not entry.get('imdb_id', eval_lazy=False):
@@ -114,7 +115,7 @@ class PluginRottenTomatoesLookup:
             self.key = None
 
         for entry in task.entries:
-            entry.register_lazy_func(self.lazy_loader, self.field_map)
+            entry.add_lazy_fields(self.lazy_loader, self.field_map)
 
     @property
     def movie_identifier(self):

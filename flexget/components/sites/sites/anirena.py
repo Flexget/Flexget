@@ -1,9 +1,9 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('anirena')
+logger = logger.bind(name='anirena')
 
 
 class UrlRewriteAniRena:

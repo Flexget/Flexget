@@ -2,10 +2,12 @@ import logging
 import os
 import tempfile
 
-from flexget import plugin
+from loguru import logger
+
+from flexget import entry, plugin
 from flexget.event import event
 
-log = logging.getLogger('check_subtitles')
+logger = logger.bind(name='check_subtitles')
 
 
 class MetainfoSubs:
@@ -23,7 +25,7 @@ class MetainfoSubs:
         try:
             import subliminal
         except ImportError as e:
-            log.debug('Error importing Subliminal: %s' % e)
+            logger.debug('Error importing Subliminal: {}', e)
             raise plugin.DependencyError(
                 'subliminal', 'subliminal', 'Subliminal module required. ImportError: %s' % e
             )
@@ -48,8 +50,9 @@ class MetainfoSubs:
         if config is False:
             return
         for entry in task.entries:
-            entry.register_lazy_func(self.get_subtitles, ['subtitles'])
+            entry.add_lazy_fields(self.get_subtitles, ['subtitles'])
 
+    @entry.register_lazy_lookup('subtitles_check')
     def get_subtitles(self, entry):
         if (
             entry.get('subtitles', eval_lazy=False)
@@ -72,9 +75,9 @@ class MetainfoSubs:
                 # convert to human-readable strings
                 subtitles = [str(l) for l in subtitles]
                 entry['subtitles'] = subtitles
-                log.debug('Found subtitles %s for %s', '/'.join(subtitles), entry['title'])
+                logger.debug('Found subtitles {} for {}', '/'.join(subtitles), entry['title'])
         except Exception as e:
-            log.error('Error checking local subtitles for %s: %s', entry['title'], e)
+            logger.error('Error checking local subtitles for {}: {}', entry['title'], e)
 
 
 @event('plugin.register')

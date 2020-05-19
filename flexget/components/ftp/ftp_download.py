@@ -1,15 +1,16 @@
 import ftplib
-import logging
 import os
 import time
 from urllib.parse import unquote, urlparse
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.pathscrub import pathscrub
 from flexget.utils.template import RenderError
 
-log = logging.getLogger('ftp')
+logger = logger.bind(name='ftp')
 
 
 class OutputFtp:
@@ -58,14 +59,14 @@ class OutputFtp:
             ftp = ftplib.FTP()
 
         # ftp.set_debuglevel(2)
-        log.debug("Connecting to " + ftp_url.hostname)
+        logger.debug('Connecting to ' + ftp_url.hostname)
         ftp.connect(ftp_url.hostname, ftp_url.port)
         ftp.login(ftp_url.username, ftp_url.password)
         if config['use-ssl']:
             ftp.prot_p()
         ftp.sendcmd('TYPE I')
         ftp.set_pasv(True)
-        log.debug("Changing directory to: " + current_path)
+        logger.debug('Changing directory to: ' + current_path)
         ftp.cwd(current_path)
 
         return ftp
@@ -86,7 +87,7 @@ class OutputFtp:
             try:
                 ftp = self.ftp_connect(config, ftp_url, current_path)
             except ftplib.all_errors as e:
-                entry.fail("Unable to connect to server : %s" % (e))
+                entry.fail("Unable to connect to server : %s" % e)
                 break
 
             to_path = config['ftp_tmp_path']
@@ -102,7 +103,7 @@ class OutputFtp:
             to_path = pathscrub(to_path)
 
             if not os.path.exists(to_path):
-                log.debug("Creating base path: %s" % to_path)
+                logger.debug('Creating base path: {}', to_path)
                 os.makedirs(to_path)
             if not os.path.isdir(to_path):
                 raise plugin.PluginWarning("Destination `%s` is not a directory." % to_path)
@@ -128,20 +129,20 @@ class OutputFtp:
         """Count this as an output plugin."""
 
     def ftp_walk(self, ftp, tmp_path, config, ftp_url, current_path):
-        log.debug("DIR->" + ftp.pwd())
-        log.debug("FTP tmp_path : " + tmp_path)
+        logger.debug('DIR->' + ftp.pwd())
+        logger.debug('FTP tmp_path : ' + tmp_path)
         try:
             ftp = self.check_connection(ftp, config, ftp_url, current_path)
             dirs = ftp.nlst(ftp.pwd())
         except ftplib.error_perm as ex:
-            log.info("Error %s" % ex)
+            logger.info('Error {}', ex)
             return ftp
 
         if not dirs:
             if config['download_empty_dirs']:
                 os.mkdir(tmp_path)
             else:
-                log.debug("Empty directory, skipping.")
+                logger.debug("Empty directory, skipping.")
             return ftp
 
         for file_name in (path for path in dirs if path not in ('.', '..')):
@@ -151,7 +152,7 @@ class OutputFtp:
                 ftp.cwd(file_name)
                 if not os.path.isdir(tmp_path):
                     os.mkdir(tmp_path)
-                    log.debug("Directory %s created" % tmp_path)
+                    logger.debug('Directory {} created', tmp_path)
                 ftp = self.ftp_walk(
                     ftp,
                     os.path.join(tmp_path, os.path.basename(file_name)),
@@ -171,7 +172,7 @@ class OutputFtp:
         return ftp
 
     def ftp_down(self, ftp, file_name, tmp_path, config, ftp_url, current_path):
-        log.debug("Downloading %s into %s" % (file_name, tmp_path))
+        logger.debug('Downloading {} into {}', file_name, tmp_path)
 
         if not os.path.exists(tmp_path):
             os.makedirs(tmp_path)
@@ -186,7 +187,7 @@ class OutputFtp:
 
         max_attempts = 5
         size_at_last_err = 0
-        log.info("Starting download of %s into %s" % (file_name, tmp_path))
+        logger.info('Starting download of {} into {}', file_name, tmp_path)
         while file_size > local_file.tell():
             try:
                 if local_file.tell() != 0:
@@ -206,11 +207,11 @@ class OutputFtp:
                         max_attempts -= 1
 
                     size_at_last_err = local_file.tell()
-                    log.debug("Retrying download after error %s" % error.args[0])
+                    logger.debug('Retrying download after error {}', error.args[0])
                     # Short timeout before retry.
                     time.sleep(1)
                 else:
-                    log.error("Too many errors downloading %s. Aborting." % file_name)
+                    logger.error('Too many errors downloading {}. Aborting.', file_name)
                     break
 
         local_file.close()

@@ -1,25 +1,29 @@
-import logging
+import datetime
 import os
 import re
 from collections import defaultdict
-from datetime import datetime
+from typing import Any, Callable, Dict, Optional, Union
 from urllib.parse import parse_qsl, urlparse
 
 import jsonschema
 from jsonschema.compat import int_types, str_types
+from loguru import logger
 
 from flexget.event import fire_event
 from flexget.utils import qualities, template
 from flexget.utils.template import get_template
 from flexget.utils.tools import parse_episode_identifier, parse_timedelta
 
-schema_paths = {}
+logger = logger.bind(name='config_schema')
 
-log = logging.getLogger('config_schema')
+schema_paths = {}
+CURRENT_SCHEMA_VERSION = 'http://json-schema.org/draft-04/schema#'
+# Type hint for json schemas. (If we upgrade to a newer json schema version, the type might allow more than dicts.)
+JsonSchema = Dict[str, Any]
 
 
 # TODO: Rethink how config key and schema registration work
-def register_schema(path, schema):
+def register_schema(path: str, schema: Union[JsonSchema, Callable[..., JsonSchema]]):
     """
     Register `schema` to be available at `path` for $refs
 
@@ -30,10 +34,10 @@ def register_schema(path, schema):
 
 
 # Validator that handles root structure of config.
-_root_config_schema = None
+_root_config_schema: Optional[JsonSchema] = None
 
 
-def register_config_key(key, schema, required=False):
+def register_config_key(key: str, schema: JsonSchema, required: bool = False):
     """ Registers a valid root level key for the config.
 
     :param string key:
@@ -43,23 +47,29 @@ def register_config_key(key, schema, required=False):
     :param bool required:
       Specify whether this is a mandatory key.
     """
-    _root_config_schema['properties'][key] = schema
+    root_schema = get_schema()
+    root_schema['properties'][key] = schema
     if required:
-        _root_config_schema.setdefault('required', []).append(key)
+        root_schema.setdefault('required', []).append(key)
     register_schema('/schema/config/%s' % key, schema)
 
 
-def get_schema():
+def get_schema() -> JsonSchema:
     global _root_config_schema
     if _root_config_schema is None:
-        _root_config_schema = {'type': 'object', 'properties': {}, 'additionalProperties': False}
+        _root_config_schema = {
+            'type': 'object',
+            'properties': {},
+            'additionalProperties': False,
+            '$schema': CURRENT_SCHEMA_VERSION,
+        }
         fire_event('config.register')
-        # TODO: Is /schema/root this the best place for this?
+        # TODO: Is /schema/config this the best place for this?
         register_schema('/schema/config', _root_config_schema)
     return _root_config_schema
 
 
-def one_or_more(schema, unique_items=False):
+def one_or_more(schema: JsonSchema, unique_items: bool = False) -> JsonSchema:
     """
     Helper function to construct a schema that validates items matching `schema` or an array
     containing items matching `schema`.
@@ -81,7 +91,7 @@ def one_or_more(schema, unique_items=False):
     }
 
 
-def resolve_ref(uri):
+def resolve_ref(uri: str) -> JsonSchema:
     """
     Finds and returns a schema pointed to by `uri` that has been registered in the register_schema function.
     """
@@ -89,12 +99,13 @@ def resolve_ref(uri):
     if parsed.path in schema_paths:
         schema = schema_paths[parsed.path]
         if callable(schema):
-            return schema(**dict(parse_qsl(parsed.query)))
+            schema = schema(**dict(parse_qsl(parsed.query)))
+        schema = {'$schema': CURRENT_SCHEMA_VERSION, **schema}
         return schema
     raise jsonschema.RefResolutionError("%s could not be resolved" % uri)
 
 
-def process_config(config, schema=None, set_defaults=True):
+def process_config(config: Any, schema: Optional[JsonSchema] = None, set_defaults: bool = True):
     """
     Validates the config, and sets defaults within it if `set_defaults` is set.
     If schema is not given, uses the root config schema.
@@ -119,18 +130,18 @@ def process_config(config, schema=None, set_defaults=True):
     return errors
 
 
-def parse_time(time_string):
+def parse_time(time_string: str) -> datetime.time:
     """Parse a time string from the config into a :class:`datetime.time` object."""
     formats = ['%I:%M %p', '%H:%M', '%H:%M:%S']
     for f in formats:
         try:
-            return datetime.strptime(time_string, f).time()
+            return datetime.datetime.strptime(time_string, f).time()
         except ValueError:
             continue
     raise ValueError('invalid time `%s`' % time_string)
 
 
-def parse_interval(interval_string):
+def parse_interval(interval_string: str) -> datetime.timedelta:
     """Takes an interval string from the config and turns it into a :class:`datetime.timedelta` object."""
     regexp = r'^\d+ (second|minute|hour|day|week)s?$'
     if not re.match(regexp, interval_string):
@@ -138,8 +149,8 @@ def parse_interval(interval_string):
     return parse_timedelta(interval_string)
 
 
-def parse_percent(percent_input):
-    """Takes a size string from the config and turns it into int(bytes)."""
+def parse_percent(percent_input: str) -> float:
+    """Takes a percent string from the config and turns it into a float."""
     percent_input = percent_input.rstrip('%')
     try:
         return float(percent_input)
@@ -147,7 +158,7 @@ def parse_percent(percent_input):
         raise ValueError("should be in format '0-x%'")
 
 
-def parse_size(size_input):
+def parse_size(size_input: str) -> int:
     """Takes a size string from the config and turns it into int(bytes)."""
     prefixes = [None, 'K', 'M', 'G', 'T', 'P']
     try:
@@ -398,7 +409,7 @@ def validate_oneOf(validator, oneOf, instance, schema):
 
 def validate_deprecated(validator, message, instance, schema):
     """Not really a validator, just warns if deprecated section of config is being used."""
-    log.warning(message)
+    logger.warning(message)
 
 
 validators = {'anyOf': validate_anyOf, 'oneOf': validate_oneOf, 'deprecated': validate_deprecated}

@@ -4,10 +4,12 @@ import os
 import sys
 import tempfile
 
+from loguru import logger
+
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('subtitles')
+logger = logger.bind(name='subtitles')
 
 try:
     from subliminal.extensions import provider_manager
@@ -73,14 +75,14 @@ class PluginSubliminal:
         try:
             import babelfish  # noqa
         except ImportError as e:
-            log.debug('Error importing Babelfish: %s', e)
+            logger.debug('Error importing Babelfish: {}', e)
             raise plugin.DependencyError(
                 'subliminal', 'babelfish', 'Babelfish module required. ImportError: %s' % e
             )
         try:
             import subliminal  # noqa
         except ImportError as e:
-            log.debug('Error importing Subliminal: %s', e)
+            logger.debug('Error importing Subliminal: {}', e)
             raise plugin.DependencyError(
                 'subliminal', 'subliminal', 'Subliminal module required. ImportError: %s' % e
             )
@@ -102,7 +104,7 @@ class PluginSubliminal:
                   `password`.
         """
         if not task.accepted:
-            log.debug('nothing accepted, aborting')
+            logger.debug('nothing accepted, aborting')
             return
         from babelfish import Language
         from dogpile.cache.exception import RegionAlreadyConfigured
@@ -130,7 +132,7 @@ class PluginSubliminal:
             pass
 
         # Let subliminal be more verbose if our logger is set to DEBUG
-        if log.isEnabledFor(logging.DEBUG):
+        if logger.level(task.manager.options.loglevel).no <= logger.level('DEBUG').no:
             logging.getLogger("subliminal").setLevel(logging.INFO)
         else:
             logging.getLogger("subliminal").setLevel(logging.CRITICAL)
@@ -162,7 +164,7 @@ class PluginSubliminal:
         ) as provider_pool:
             for entry in task.accepted:
                 if 'location' not in entry:
-                    log.warning('Cannot act on entries that do not represent a local file.')
+                    logger.warning('Cannot act on entries that do not represent a local file.')
                     continue
                 if not os.path.exists(entry['location']):
                     entry.fail('file not found: %s' % entry['location'])
@@ -193,10 +195,12 @@ class PluginSubliminal:
                     else:
                         title = video.title
                         hash_scores = movie_scores['hash']
-                    log.info('Name computed for %s was %s', entry['location'], title)
+                    logger.info('Name computed for {} was {}', entry['location'], title)
                     msc = hash_scores if config['exact_match'] else 0
                     if entry_languages.issubset(video.subtitle_languages):
-                        log.debug('All preferred languages already exist for "%s"', entry['title'])
+                        logger.debug(
+                            'All preferred languages already exist for "{}"', entry['title']
+                        )
                         entry['subtitles_missing'] = set()
                         continue  # subs for preferred lang(s) already exists
                     else:
@@ -214,15 +218,14 @@ class PluginSubliminal:
                                 hearing_impaired=hearing_impaired,
                             )
                         except TypeError as e:
-                            log.error(
-                                'Downloading subtitles failed due to a bug in subliminal. Please see'
-                                'https://github.com/Diaoul/subliminal/issues/921. Error: %s',
+                            logger.error(
+                                'Downloading subtitles failed due to a bug in subliminal. Please seehttps://github.com/Diaoul/subliminal/issues/921. Error: {}',
                                 e,
                             )
                             subtitles = []
                         if subtitles:
                             downloaded_subtitles[video].extend(subtitles)
-                            log.info('Subtitles found for %s', entry['location'])
+                            logger.info('Subtitles found for {}', entry['location'])
                         else:
                             # only try to download for alternatives that aren't already downloaded
                             subtitles = provider_pool.download_best_subtitles(
@@ -247,12 +250,12 @@ class PluginSubliminal:
                             if len(entry['subtitles_missing']) > 0:
                                 entry.reject('Subtitles for all primary languages not found')
                 except ValueError as e:
-                    log.error('subliminal error: %s', e)
+                    logger.error('subliminal error: {}', e)
                     entry.fail()
 
         if downloaded_subtitles:
             if task.options.test:
-                log.verbose('Test mode. Found subtitles:')
+                logger.verbose('Test mode. Found subtitles:')
             # save subtitles to disk
             for video, subtitle in downloaded_subtitles.items():
                 if subtitle:
@@ -260,8 +263,8 @@ class PluginSubliminal:
                     if _directory:
                         _directory = os.path.expanduser(_directory)
                     if task.options.test:
-                        log.verbose(
-                            '     FOUND LANGUAGES %s for %s',
+                        logger.verbose(
+                            '     FOUND LANGUAGES {} for {}',
                             [str(l.language) for l in subtitle],
                             video.name,
                         )

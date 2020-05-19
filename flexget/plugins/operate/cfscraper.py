@@ -1,11 +1,12 @@
-import logging
 from collections import OrderedDict
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.requests import Session
 
-log = logging.getLogger('cfscraper')
+logger = logger.bind(name='cfscraper')
 
 
 class CFScraper:
@@ -23,7 +24,7 @@ class CFScraper:
         try:
             import cloudscraper
         except ImportError as e:
-            log.debug('Error importing cloudscraper: %s' % e)
+            logger.debug('Error importing cloudscraper: {}', e)
             raise plugin.DependencyError(
                 'cfscraper', 'cloudscraper', 'cloudscraper module required. ImportError: %s' % e
             )
@@ -32,6 +33,14 @@ class CFScraper:
             """
             This class allows the FlexGet session to inherit from CloudScraper instead of the requests.Session directly.
             """
+
+            def Challenge_Response(self, resp, **kwargs):
+                """Make sure limiters are disabled when doing a cloudflare challenge."""
+                if not self.is_reCaptcha_Challenge(resp):
+                    # If this is a recaptcha challenge, the request gets sent straight to requests, not our subclass,
+                    # so it can't have any extra arguments that requests doesn't expect.
+                    kwargs['disable_limiters'] = True
+                return super().Challenge_Response(resp, **kwargs)
 
         if config is True:
             task.requests.headers = OrderedDict(
@@ -44,7 +53,7 @@ class CFScraper:
                     ('Upgrade-Insecure-Requests', '1'),
                 ]
             )
-            task.requests = CFScrapeWrapper.create_scraper(task.requests)
+            task.requests = CFScrapeWrapper.create_scraper(task.requests, solveDepth=5)
 
 
 @event('plugin.register')

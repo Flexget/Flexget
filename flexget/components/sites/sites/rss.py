@@ -1,13 +1,13 @@
-import logging
 from urllib.parse import quote
 
 from jinja2 import TemplateSyntaxError
+from loguru import logger
 
 from flexget import plugin
 from flexget.components.sites.utils import normalize_unicode
 from flexget.event import event
 
-log = logging.getLogger('search_rss')
+logger = logger.bind(name='search_rss')
 
 
 class SearchRSS:
@@ -37,7 +37,7 @@ class SearchRSS:
             try:
                 results = rss_plugin.phase_handlers['input'](task, rss_config)
             except plugin.PluginError as e:
-                log.error('Error attempting to get rss for %s: %s', rss_config['url'], e)
+                logger.error('Error attempting to get rss for {}: {}', rss_config['url'], e)
             else:
                 entries.update(results)
         return entries

@@ -1,10 +1,10 @@
 import difflib
-import logging
 import time
 from datetime import datetime, timedelta
 from urllib.error import URLError
 from urllib.parse import quote_plus
 
+from loguru import logger
 from sqlalchemy import Column, DateTime, Integer, String, Table, func, sql
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey, Index
@@ -15,7 +15,7 @@ from flexget.utils import requests
 from flexget.utils.database import text_date_synonym, with_session
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
-log = logging.getLogger('api_rottentomatoes')
+logger = logger.bind(name='api_rottentomatoes')
 Base = db_schema.versioned_base('api_rottentomatoes', 2)
 session = requests.Session()
 # There is a 5 call per second rate limit per api key with multiple users on the same api key, this can be problematic
@@ -141,13 +141,13 @@ class RottenTomatoesMovie(RottenTomatoesContainer, Base):
         :return: True if movie details are considered to be expired, ie. need of update
         """
         if self.updated is None:
-            log.debug('updated is None: %s' % self)
+            logger.debug('updated is None: {}', self)
             return True
         refresh_interval = 2
         if self.year:
             age = datetime.now().year - self.year
             refresh_interval += age * 5
-            log.debug('movie `%s` age %i expires in %i days' % (self.title, age, refresh_interval))
+            logger.debug('movie `{}` age {} expires in {} days', self.title, age, refresh_interval)
         return self.updated < datetime.now() - timedelta(days=refresh_interval)
 
     def __repr__(self):
@@ -255,7 +255,7 @@ class RottenTomatoesSearchResult(Base):
         )
 
 
-@internet(log)
+@internet(logger)
 @with_session
 def lookup_movie(
     title=None,
@@ -300,7 +300,7 @@ def lookup_movie(
     def id_str():
         return '<title=%s,year=%s,rottentomatoes_id=%s>' % (title, year, rottentomatoes_id)
 
-    log.debug('Looking up rotten tomatoes information for %s' % id_str())
+    logger.debug('Looking up rotten tomatoes information for {}', id_str())
 
     movie = None
 
@@ -319,36 +319,36 @@ def lookup_movie(
             movie_filter = movie_filter.filter(RottenTomatoesMovie.year == year)
         movie = movie_filter.first()
         if not movie:
-            log.debug('No matches in movie cache found, checking search cache.')
+            logger.debug('No matches in movie cache found, checking search cache.')
             found = (
                 session.query(RottenTomatoesSearchResult)
                 .filter(func.lower(RottenTomatoesSearchResult.search) == search_string)
                 .first()
             )
             if found and found.movie:
-                log.debug('Movie found in search cache.')
+                logger.debug('Movie found in search cache.')
                 movie = found.movie
     if movie:
         # Movie found in cache, check if cache has expired.
         if movie.expired and not only_cached:
-            log.debug(
-                'Cache has expired for %s, attempting to refresh from Rotten Tomatoes.' % id_str()
+            logger.debug(
+                'Cache has expired for {}, attempting to refresh from Rotten Tomatoes.', id_str()
             )
             try:
                 result = movies_info(movie.id, api_key)
                 movie = _set_movie_details(movie, session, result, api_key)
                 session.merge(movie)
             except URLError:
-                log.error(
+                logger.error(
                     'Error refreshing movie details from Rotten Tomatoes, cached info being used.'
                 )
         else:
-            log.debug('Movie %s information restored from cache.' % id_str())
+            logger.debug('Movie {} information restored from cache.', id_str())
     else:
         if only_cached:
             raise PluginError('Movie %s not found from cache' % id_str())
         # There was no movie found in the cache, do a lookup from Rotten Tomatoes
-        log.debug('Movie %s not found in cache, looking up from rotten tomatoes.' % id_str())
+        logger.debug('Movie {} not found in cache, looking up from rotten tomatoes.', id_str())
         try:
             if not movie and rottentomatoes_id:
                 result = movies_info(rottentomatoes_id, api_key)
@@ -359,7 +359,7 @@ def lookup_movie(
 
             if not movie and title:
                 # TODO: Extract to method
-                log.verbose('Searching from rt `%s`' % search_string)
+                logger.verbose('Searching from rt `{}`', search_string)
                 results = movies_search(search_string, api_key=api_key)
                 if results:
                     results = results.get('movies')
@@ -379,28 +379,26 @@ def lookup_movie(
                                 if movie_res['year'] != year:
                                     release_year = False
                                     if movie_res.get('release_dates', {}).get('theater'):
-                                        log.debug('Checking year against theater release date')
+                                        logger.debug('Checking year against theater release date')
                                         release_year = time.strptime(
                                             movie_res['release_dates'].get('theater'), '%Y-%m-%d'
                                         ).tm_year
                                     elif movie_res.get('release_dates', {}).get('dvd'):
-                                        log.debug('Checking year against dvd release date')
+                                        logger.debug('Checking year against dvd release date')
                                         release_year = time.strptime(
                                             movie_res['release_dates'].get('dvd'), '%Y-%m-%d'
                                         ).tm_year
                                     if not (release_year and release_year == year):
-                                        log.debug(
-                                            'removing %s - %s (wrong year: %s)'
-                                            % (
-                                                movie_res['title'],
-                                                movie_res['id'],
-                                                str(release_year or movie_res['year']),
-                                            )
+                                        logger.debug(
+                                            'removing {} - {} (wrong year: {})',
+                                            movie_res['title'],
+                                            movie_res['id'],
+                                            str(release_year or movie_res['year']),
                                         )
                                         results.remove(movie_res)
                                         continue
                             if movie_res['match'] < MIN_MATCH:
-                                log.debug('removing %s (min_match)' % movie_res['title'])
+                                logger.debug('removing {} (min_match)', movie_res['title'])
                                 results.remove(movie_res)
                                 continue
 
@@ -408,27 +406,26 @@ def lookup_movie(
                             raise PluginError('no appropiate results')
 
                         if len(results) == 1:
-                            log.debug('SUCCESS: only one movie remains')
+                            logger.debug('SUCCESS: only one movie remains')
                         else:
                             # Check min difference between best two hits
                             diff = results[0]['match'] - results[1]['match']
                             if diff < MIN_DIFF:
-                                log.debug(
-                                    'unable to determine correct movie, min_diff too small'
-                                    '(`%s (%s) - %s` <-?-> `%s (%s) - %s`)'
-                                    % (
-                                        results[0]['title'],
-                                        results[0]['year'],
-                                        results[0]['id'],
-                                        results[1]['title'],
-                                        results[1]['year'],
-                                        results[1]['id'],
-                                    )
+                                logger.debug(
+                                    'unable to determine correct movie, min_diff too small(`{} ({}) - {}` <-?-> `{} ({}) - {}`)',
+                                    results[0]['title'],
+                                    results[0]['year'],
+                                    results[0]['id'],
+                                    results[1]['title'],
+                                    results[1]['year'],
+                                    results[1]['id'],
                                 )
                                 for r in results:
-                                    log.debug(
-                                        'remain: %s (match: %s) %s'
-                                        % (r['title'], r['match'], r['id'])
+                                    logger.debug(
+                                        'remain: {} (match: {}) {}',
+                                        r['title'],
+                                        r['match'],
+                                        r['id'],
                                     )
                                 raise PluginError('min_diff')
 
@@ -450,7 +447,7 @@ def lookup_movie(
                             session.commit()
 
                         if title.lower() != movie.title.lower():
-                            log.debug('Saving search result for \'%s\'' % search_string)
+                            logger.debug("Saving search result for '{}'", search_string)
                             session.add(
                                 RottenTomatoesSearchResult(search=search_string, movie=movie)
                             )
@@ -492,7 +489,7 @@ def _set_movie_details(movie, session, movie_data=None, api_key=None):
         movie_data = movies_info(movie.id, api_key)
     if movie_data:
         if movie.id:
-            log.debug(
+            logger.debug(
                 "Updating movie info (actually just deleting the old info and adding the new)"
             )
             del movie.release_dates[:]
@@ -610,12 +607,12 @@ def movies_search(q, page_limit=None, page=None, api_key=None):
 
 def get_json(url):
     try:
-        log.debug('fetching json at %s' % url)
+        logger.debug('fetching json at {}', url)
         data = session.get(url)
         return data.json()
     except requests.RequestException as e:
-        log.warning('Request failed %s: %s' % (url, e))
+        logger.warning('Request failed {}: {}', url, e)
         return
     except ValueError:
-        log.warning('Rotten Tomatoes returned invalid json at: %s' % url)
+        logger.warning('Rotten Tomatoes returned invalid json at: {}', url)
         return

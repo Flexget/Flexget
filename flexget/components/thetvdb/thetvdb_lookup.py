@@ -1,7 +1,6 @@
-import logging
-from functools import partial
+from loguru import logger
 
-from flexget import plugin
+from flexget import entry, plugin
 from flexget.event import event
 from flexget.utils.database import with_session
 
@@ -11,7 +10,7 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='api_tvdb')
 
-log = logging.getLogger('thetvdb_lookup')
+logger = logger.bind(name='thetvdb_lookup')
 
 
 class PluginThetvdbLookup:
@@ -113,32 +112,36 @@ class PluginThetvdbLookup:
             )
             entry.update_using_map(field_map, series)
         except LookupError as e:
-            log.debug(
-                'Error looking up tvdb series information for %s: %s', entry['title'], e.args[0]
+            logger.debug(
+                'Error looking up tvdb series information for {}: {}', entry['title'], e.args[0]
             )
         return entry
 
+    @entry.register_lazy_lookup('tvdb_series_lookup')
     def lazy_series_lookup(self, entry, language):
         return self.series_lookup(entry, language, self.series_map)
 
+    @entry.register_lazy_lookup('tvdb_series_actor_lookup')
     def lazy_series_actor_lookup(self, entry, language):
         return self.series_lookup(entry, language, self.series_actor_map)
 
+    @entry.register_lazy_lookup('tvdb_series_poster_lookup')
     def lazy_series_poster_lookup(self, entry, language):
         return self.series_lookup(entry, language, self.series_poster_map)
 
+    @entry.register_lazy_lookup('tvdb_episode_lookup')
     def lazy_episode_lookup(self, entry, language):
         try:
             season_offset = entry.get('thetvdb_lookup_season_offset', 0)
             episode_offset = entry.get('thetvdb_lookup_episode_offset', 0)
             if not isinstance(season_offset, int):
-                log.error('thetvdb_lookup_season_offset must be an integer')
+                logger.error('thetvdb_lookup_season_offset must be an integer')
                 season_offset = 0
             if not isinstance(episode_offset, int):
-                log.error('thetvdb_lookup_episode_offset must be an integer')
+                logger.error('thetvdb_lookup_episode_offset must be an integer')
                 episode_offset = 0
             if season_offset != 0 or episode_offset != 0:
-                log.debug(
+                logger.debug(
                     f'Using offset for tvdb lookup: season: {season_offset}, '
                     f'episode: {episode_offset}'
                 )
@@ -160,8 +163,8 @@ class PluginThetvdbLookup:
             episode = plugin_api_tvdb.lookup_episode(**lookupargs)
             entry.update_using_map(self.episode_map, episode)
         except LookupError as e:
-            log.debug(
-                'Error looking up tvdb episode information for %s: %s', entry['title'], e.args[0]
+            logger.debug(
+                'Error looking up tvdb episode information for {}: {}', entry['title'], e.args[0]
             )
 
     # Run after series and metainfo series
@@ -175,28 +178,33 @@ class PluginThetvdbLookup:
         for entry in task.entries:
             # If there is information for a series lookup, register our series lazy fields
             if entry.get('series_name') or entry.get('tvdb_id', eval_lazy=False):
-                lazy_series_lookup = partial(self.lazy_series_lookup, language=language)
-                lazy_series_actor_lookup = partial(
-                    self.lazy_series_actor_lookup, language=language
+                entry.add_lazy_fields(
+                    self.lazy_series_lookup, self.series_map, kwargs={'language': language}
                 )
-                lazy_series_poster_lookup = partial(
-                    self.lazy_series_poster_lookup, language=language
+                entry.add_lazy_fields(
+                    self.lazy_series_actor_lookup,
+                    self.series_actor_map,
+                    kwargs={'language': language},
                 )
-
-                entry.register_lazy_func(lazy_series_lookup, self.series_map)
-                entry.register_lazy_func(lazy_series_actor_lookup, self.series_actor_map)
-                entry.register_lazy_func(lazy_series_poster_lookup, self.series_poster_map)
+                entry.add_lazy_fields(
+                    self.lazy_series_poster_lookup,
+                    self.series_poster_map,
+                    kwargs={'language': language},
+                )
 
                 # If there is season and ep info as well, register episode lazy fields
                 if entry.get('series_id_type') in ('ep', 'sequence', 'date'):
                     if entry.get('season_pack'):
-                        log.verbose(
-                            'TheTVDB API does not support season lookup at this time, skipping %s',
+                        logger.verbose(
+                            'TheTVDB API does not support season lookup at this time, skipping {}',
                             entry,
                         )
                     else:
-                        lazy_episode_lookup = partial(self.lazy_episode_lookup, language=language)
-                        entry.register_lazy_func(lazy_episode_lookup, self.episode_map)
+                        entry.add_lazy_fields(
+                            self.lazy_episode_lookup,
+                            self.episode_map,
+                            kwargs={'language': language},
+                        )
 
     @property
     def series_identifier(self):

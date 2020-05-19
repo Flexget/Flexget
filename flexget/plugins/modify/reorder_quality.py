@@ -1,10 +1,10 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils import qualities
 
-log = logging.getLogger('reorder_quality')
+logger = logger.bind(name='reorder_quality')
 
 
 class ReorderQuality:
@@ -56,7 +56,7 @@ class ReorderQuality:
                 )
 
             self.quality_priorities[quality] = quality_component.value
-            log.debug('stored %s original value %s' % (quality, quality_component.value))
+            logger.debug('stored {} original value {}', quality, quality_component.value)
 
             new_value = other_quality_component.value
             if action == 'above':
@@ -65,16 +65,16 @@ class ReorderQuality:
                 new_value -= 1
 
             quality_component.value = new_value
-            log.debug('New value for %s: %s (%s %s)', quality, new_value, action, other_quality)
-        log.debug('Changed priority for: %s' % ', '.join(list(config.keys())))
+            logger.debug('New value for {}: {} ({} {})', quality, new_value, action, other_quality)
+        logger.debug('Changed priority for: {}', ', '.join(list(config.keys())))
 
     def on_task_exit(self, task, config):
         if not self.quality_priorities:
-            log.debug('nothing changed, aborting restore')
+            logger.debug('nothing changed, aborting restore')
             return
         for name, value in self.quality_priorities.items():
             qualities._registry[name].value = value
-        log.debug('Restored priority for: %s' % ', '.join(list(self.quality_priorities.keys())))
+        logger.debug('Restored priority for: {}', ', '.join(list(self.quality_priorities.keys())))
         self.quality_priorities = {}
 
     on_task_abort = on_task_exit

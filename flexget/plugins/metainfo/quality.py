@@ -1,10 +1,10 @@
-import logging
+from loguru import logger
 
-from flexget import plugin
+from flexget import entry, plugin
 from flexget.event import event
 from flexget.utils import qualities
 
-log = logging.getLogger('metainfo_quality')
+logger = logger.bind(name='metainfo_quality')
 
 
 class MetainfoQuality:
@@ -23,24 +23,27 @@ class MetainfoQuality:
             return
         for entry in task.entries:
             if isinstance(entry.get('quality', eval_lazy=False), str):
-                log.debug(
-                    'Quality is already set to %s for %s, but has not been instantiated properly.'
-                    % (entry['quality'], entry['title'])
+                logger.debug(
+                    'Quality is already set to {} for {}, but has not been instantiated properly.',
+                    entry['quality'],
+                    entry['title'],
                 )
                 entry['quality'] = qualities.Quality(entry.get('quality', eval_lazy=False))
             else:
-                entry.register_lazy_func(self.get_quality, ['quality'])
+                entry.add_lazy_fields(self.get_quality, ['quality'])
 
+    @entry.register_lazy_lookup('quality')
     def get_quality(self, entry):
         if entry.get('quality', eval_lazy=False):
-            log.debug(
-                'Quality is already set to %s for %s, skipping quality detection.'
-                % (entry['quality'], entry['title'])
+            logger.debug(
+                'Quality is already set to {} for {}, skipping quality detection.',
+                entry['quality'],
+                entry['title'],
             )
             return
         entry['quality'] = qualities.Quality(entry['title'])
         if entry['quality']:
-            log.trace('Found quality %s for %s' % (entry['quality'], entry['title']))
+            logger.trace('Found quality {} for {}', entry['quality'], entry['title'])
 
 
 @event('plugin.register')

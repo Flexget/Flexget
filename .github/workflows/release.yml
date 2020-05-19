@@ -1,0 +1,57 @@
+name: Build and release to PyPI
+on:
+  deployment: {}
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      PYTHON_VERSION: "3.7"
+    strategy:
+      matrix:
+        node: [12.x]
+    steps:
+    - uses: actions/checkout@v1.1.0
+      with:
+        token: ${{ secrets.flexgetbot_pat }}
+    - name: Setup Git User
+      run: |
+        git config user.email ${{ secrets.git_email }}
+        git config user.name ${{ secrets.git_user }}
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+      # TODO: Uncomment this when supported: https://github.com/actions/cache/issues/63
+      # NOTE(2020/05/16) - This has been implemented and will be included in actions/cache@v2
+    # - name: Set up pip cache
+      # uses: actions/cache@v1
+      # with:
+        # path: pip_cache
+        # key: ${{ runner.OS }}-python${{ env.PYTHON_VERSION }}-${{ hashFiles('*requirements*.txt') }}
+        # restore-keys: |
+          # ${{ runner.OS }}-python${{ env.PYTHON_VERSION }}-
+    - name: Install dev dependencies
+      run: |
+        pip --cache-dir pip_cache install -r dev-requirements.txt
+    - name: Set Deployment Status Pending
+      uses: deliverybot/deployment-status@v1
+      with:
+        state: pending
+        token: ${{ github.token }}
+    - name: Run release script
+      env:
+        TWINE_USERNAME: "__token__"
+        TWINE_PASSWORD: ${{ secrets.pypi_token }}
+      run: |
+        ./release.sh
+    - name: Set Deployment Status Success
+      uses: deliverybot/deployment-status@v1
+      with:
+        state: success
+        token: ${{ github.token }}
+    - name: Set Deployment Status Failure
+      if: failure() || cancelled()
+      uses: deliverybot/deployment-status@v1
+      with:
+        state: failure
+        token: ${{ github.token }}

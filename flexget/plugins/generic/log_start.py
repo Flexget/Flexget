@@ -1,23 +1,24 @@
-import logging
 import os
 from argparse import SUPPRESS
+
+from loguru import logger
 
 from flexget import options
 from flexget.event import event
 
-log = logging.getLogger('log_start')
+logger = logger.bind(name='log_start')
 
 
 @event('manager.startup')
 def log_on_start(manager):
     if manager.options.log_start:
-        log.info('FlexGet started (PID: %s)' % os.getpid())
+        logger.info('FlexGet started (PID: {})', os.getpid())
 
 
 @event('manager.shutdown')
 def log_on_shutdown(manager):
     if manager.options.log_start:
-        log.info('FlexGet stopped (PID: %s)' % os.getpid())
+        logger.info('FlexGet stopped (PID: {})', os.getpid())
 
 
 @event('options.register')

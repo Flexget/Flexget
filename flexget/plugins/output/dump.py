@@ -1,10 +1,10 @@
-import logging
+from loguru import logger
 
 from flexget import options, plugin
 from flexget.event import event
 from flexget.terminal import console
 
-log = logging.getLogger('dump')
+logger = logger.bind(name='dump')
 
 
 def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
@@ -30,6 +30,8 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
 
     for entry in entries:
         for field in sorted(entry, key=sort_key):
+            if field.startswith('_') and not debug:
+                continue
             if title_only and field != 'title':
                 continue
             if entry.is_lazy(field) and not eval_lazy:

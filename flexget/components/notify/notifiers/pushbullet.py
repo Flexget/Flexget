@@ -1,7 +1,7 @@
 import base64
 import datetime
-import logging
 
+from loguru import logger
 from requests.exceptions import RequestException
 
 from flexget import plugin
@@ -12,7 +12,7 @@ from flexget.utils.requests import Session as RequestSession
 from flexget.utils.requests import TimedLimiter
 
 plugin_name = 'pushbullet'
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 PUSHBULLET_URL = 'https://api.pushbullet.com/v2/pushes'
 
@@ -129,9 +129,9 @@ class PushbulletNotifier:
         remaining = response.headers.get('X-Ratelimit-Remaining')
         if reset_time and remaining:
             reset_time = datetime.datetime.fromtimestamp(int(reset_time))
-            log.debug(
-                'Pushbullet notification sent. Database operations remaining until next reset: %s. '
-                'Next reset at: %s',
+            logger.debug(
+                'Pushbullet notification sent. Database operations remaining until next reset: {}. '
+                'Next reset at: {}',
                 remaining,
                 reset_time,
             )

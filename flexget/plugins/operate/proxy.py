@@ -1,10 +1,11 @@
-import logging
 import os
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('proxy')
+logger = logger.bind(name='proxy')
 
 PROTOCOLS = ['http', 'https', 'ftp', 'socks5', 'socks5h']
 
@@ -41,7 +42,7 @@ class Proxy:
         else:
             # Map all protocols to the configured proxy
             proxies = dict((prot, config) for prot in PROTOCOLS)
-        log.verbose('Setting proxy to %s', proxies)
+        logger.verbose('Setting proxy to {}', proxies)
         task.requests.proxies = proxies
 
 

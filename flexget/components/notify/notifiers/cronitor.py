@@ -1,6 +1,6 @@
-import logging
 import socket
 
+from loguru import logger
 from requests.exceptions import RequestException
 
 from flexget import plugin
@@ -12,7 +12,7 @@ requests = RequestSession(max_retries=3)
 
 plugin_name = "cronitor"
 
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 
 class Cronitor:

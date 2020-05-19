@@ -1,6 +1,6 @@
-import logging
 import re
 
+from loguru import logger
 from sqlalchemy import desc
 
 from flexget import plugin
@@ -10,7 +10,7 @@ from flexget.manager import Session
 
 from . import db
 
-log = logging.getLogger('next_series_episodes')
+logger = logger.bind(name='next_series_episodes')
 
 
 class NextSeriesEpisodes:
@@ -109,15 +109,15 @@ class NextSeriesEpisodes:
                 session.query(db.SeriesTask).filter(db.SeriesTask.name == task.name).all()
             ):
                 series = seriestask.series
-                log.trace('evaluating %s', series.name)
+                logger.trace('evaluating {}', series.name)
                 if not series:
                     # TODO: How can this happen?
-                    log.debug('Found SeriesTask item without series specified. Cleaning up.')
+                    logger.debug('Found SeriesTask item without series specified. Cleaning up.')
                     session.delete(seriestask)
                     continue
 
                 if series.identified_by not in ['ep', 'sequence']:
-                    log.trace('unsupported identified_by scheme')
+                    logger.trace('unsupported identified_by scheme')
                     reason = series.identified_by or 'auto'
                     impossible.setdefault(reason, []).append(series.name)
                     continue
@@ -143,9 +143,11 @@ class NextSeriesEpisodes:
 
                 for season in range(latest_season, low_season, -1):
                     if season in series.completed_seasons:
-                        log.debug('season %s is marked as completed, skipping', season)
+                        logger.debug('season {} is marked as completed, skipping', season)
                         continue
-                    log.trace('Evaluating episodes for series %s, season %d', series.name, season)
+                    logger.trace(
+                        'Evaluating episodes for series {}, season {}', series.name, season
+                    )
                     latest = db.get_latest_release(
                         series, season=season, downloaded=check_downloaded
                     )
@@ -218,21 +220,20 @@ class NextSeriesEpisodes:
                         if config.get('from_start') or config.get('backfill'):
                             entries.append(self.search_entry(series, season, 1, task))
                         else:
-                            log.verbose(
-                                'Series `%s` has no history. Set begin option, '
-                                'or use CLI `series begin` '
+                            logger.verbose(
+                                'Series `{}` has no history. Set begin option, or use CLI `series begin` '
                                 'subcommand to set first episode to emit',
                                 series.name,
                             )
                             break
                     # Skip older seasons if we are not in backfill mode
                     if not config.get('backfill'):
-                        log.debug('backfill is not enabled; skipping older seasons')
+                        logger.debug('backfill is not enabled; skipping older seasons')
                         break
 
         for reason, series in impossible.items():
-            log.verbose(
-                'Series `%s` with identified_by value `%s` are not supported. ',
+            logger.verbose(
+                'Series `{}` with identified_by value `{}` are not supported. ',
                 ', '.join(sorted(series)),
                 reason,
             )
@@ -257,9 +258,10 @@ class NextSeriesEpisodes:
             )
 
             if entry.accepted:
-                log.debug(
-                    '%s %s was accepted, rerunning to look for next ep.'
-                    % (entry['series_name'], entry['series_id'])
+                logger.debug(
+                    '{} {} was accepted, rerunning to look for next ep.',
+                    entry['series_name'],
+                    entry['series_id'],
                 )
                 self.rerun_entries.append(
                     self.search_entry(
@@ -290,9 +292,10 @@ class NextSeriesEpisodes:
                     self.rerun_entries.append(
                         self.search_entry(series, latest.season + 1, 1, task)
                     )
-                    log.debug(
-                        '%s %s not found, rerunning to look for next season'
-                        % (entry['series_name'], entry['series_id'])
+                    logger.debug(
+                        '{} {} not found, rerunning to look for next season',
+                        entry['series_name'],
+                        entry['series_id'],
                     )
                     task.rerun(plugin='next_series_episodes', reason='Look for next season')
 

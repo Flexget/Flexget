@@ -1,10 +1,10 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.requests import TimedLimiter
 
-log = logging.getLogger('domain_delay')
+logger = logger.bind(name='domain_delay')
 
 
 class DomainDelay:
@@ -20,7 +20,7 @@ class DomainDelay:
 
     def on_task_start(self, task, config):
         for domain, delay in config.items():
-            log.debug('Adding minimum interval of %s between requests to %s' % (delay, domain))
+            logger.debug('Adding minimum interval of {} between requests to {}', delay, domain)
             task.requests.add_domain_limiter(TimedLimiter(domain, delay))
 
 

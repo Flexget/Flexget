@@ -1,5 +1,4 @@
-import logging
-
+from loguru import logger
 from requests.exceptions import RequestException
 
 from flexget import plugin
@@ -10,7 +9,7 @@ from flexget.utils.requests import Session as RequestSession
 from flexget.utils.requests import TimedLimiter
 
 plugin_name = 'pushalot'
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 PUSHALOT_URL = 'https://pushalot.com/api/sendmessage'
 

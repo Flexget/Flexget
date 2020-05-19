@@ -1,12 +1,11 @@
-import logging
-
 from flask import jsonify, request
+from loguru import logger
 
 from flexget.api import APIResource, api
 from flexget.api.app import empty_response, etag
 from flexget.components.variables.variables import variables_from_db, variables_to_db
 
-log = logging.getLogger('variables')
+logger = logger.bind(name='variables')
 
 variables_api = api.namespace('variables', description='View and edit config variables')
 

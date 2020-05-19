@@ -1,14 +1,16 @@
-import logging
 from urllib.parse import quote
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.components.sites.utils import normalize_unicode, torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests
+from flexget.utils.qualities import Quality
 from flexget.utils.tools import parse_filesize
 
-log = logging.getLogger('yts')
+logger = logger.bind(name='yts')
 
 
 class UrlRewriteYTS:
@@ -26,14 +28,14 @@ class UrlRewriteYTS:
                 quote(search_string.encode('utf-8'))
             )
 
-            log.debug('requesting: %s' % url)
+            logger.debug('requesting: {}', url)
 
             try:
                 result = requests.get(url)
                 try:
                     data = result.json()
                 except ValueError:
-                    log.debug('Could not decode json from response: %s', result.text)
+                    logger.debug('Could not decode json from response: {}', result.text)
                     raise plugin.PluginError('Error getting result from yts.')
             except requests.RequestException as e:
                 raise plugin.PluginError('Could not retrieve query from yts (%s)' % e.args[0])
@@ -45,7 +47,7 @@ class UrlRewriteYTS:
                     for item in data['data']['movies']:
                         for torrent in item['torrents']:
                             entry = Entry()
-                            entry['title'] = item['title']
+                            entry['title'] = item['title_long']
                             entry['year'] = item['year']
                             entry['url'] = torrent['url']
                             entry['content_size'] = parse_filesize(
@@ -57,14 +59,16 @@ class UrlRewriteYTS:
                             entry['torrent_availability'] = torrent_availability(
                                 entry['torrent_seeds'], entry['torrent_leeches']
                             )
-                            entry['quality'] = torrent['quality']
+                            entry['quality'] = Quality(f"{torrent['quality']} {torrent['type']}")
+                            entry['movie_name'] = item['title']
+                            entry['movie_year'] = item['year']
                             entry['imdb_id'] = item['imdb_code']
                             if entry.isvalid():
                                 entries.add(entry)
             except Exception:
-                log.debug('invalid return structure from YTS')
+                logger.debug('invalid return structure from YTS')
 
-        log.debug('Search got %d results' % len(entries))
+        logger.debug('Search got {} results', len(entries))
         return entries
 
 

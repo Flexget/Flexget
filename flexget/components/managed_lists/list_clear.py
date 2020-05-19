@@ -1,10 +1,10 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginError
 
-log = logging.getLogger('list_clear')
+logger = logger.bind(name='list_clear')
 
 
 class ListClear:
@@ -47,11 +47,11 @@ class ListClear:
                     raise plugin.PluginError(thelist.immutable)
                 if config['phase'] == task.current_phase:
                     if task.manager.options.test and thelist.online:
-                        log.info(
-                            'would have cleared all items from %s - %s', plugin_name, plugin_config
+                        logger.info(
+                            'would have cleared all items from {} - {}', plugin_name, plugin_config
                         )
                         continue
-                    log.verbose('clearing all items from %s - %s', plugin_name, plugin_config)
+                    logger.verbose('clearing all items from {} - {}', plugin_name, plugin_config)
                     thelist.clear()
 
 

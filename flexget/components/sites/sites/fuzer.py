@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-import logging
 import re
 from urllib.parse import quote_plus
 
+from loguru import logger
 from requests.exceptions import RequestException
 
 from flexget import plugin
@@ -15,7 +15,7 @@ from flexget.utils.requests import Session as RequestSession
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
-log = logging.getLogger('fuzer')
+logger = logger.bind(name='fuzer')
 
 requests = RequestSession()
 
@@ -72,7 +72,7 @@ class UrlRewriteFuzer:
         if 'login' in page.url:
             raise PluginError('Could not fetch results from Fuzer. Check config')
 
-        log.debug('Using %s as fuzer search url', page.url)
+        logger.debug('Using {} as fuzer search url', page.url)
         return get_soup(page.content)
 
     def extract_entry_from_soup(self, soup):
@@ -80,10 +80,10 @@ class UrlRewriteFuzer:
         if table is None:
             raise PluginError('Could not fetch results table from Fuzer, aborting')
 
-        log.trace('fuzer results table: %s', table)
+        logger.trace('fuzer results table: {}', table)
         table = table.find('table', {'class': 'table_info'})
         if len(table.find_all('tr')) == 1:
-            log.debug('No search results were returned from Fuzer, continuing')
+            logger.debug('No search results were returned from Fuzer, continuing')
             return []
 
         entries = []
@@ -106,7 +106,7 @@ class UrlRewriteFuzer:
                 attachment_id, self.user_id, self.rss_key, torrent_name
             )
 
-            log.debug('RSS-ified download link: %s', final_url)
+            logger.debug('RSS-ified download link: {}', final_url)
             e['url'] = final_url
 
             e['torrent_seeds'] = seeders
@@ -121,7 +121,7 @@ class UrlRewriteFuzer:
             entries.append(e)
         return entries
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def search(self, task, entry, config=None):
         """
         Search for name from fuzer.
@@ -148,7 +148,7 @@ class UrlRewriteFuzer:
 
         entries = []
         if entry.get('imdb_id'):
-            log.debug("imdb_id '%s' detected, using in search.", entry['imdb_id'])
+            logger.debug("imdb_id '{}' detected, using in search.", entry['imdb_id'])
             soup = self.get_fuzer_soup(entry['imdb_id'], c_list)
             entries = self.extract_entry_from_soup(soup)
             if entries:

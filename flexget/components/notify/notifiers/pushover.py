@@ -1,6 +1,6 @@
 import datetime
-import logging
 
+from loguru import logger
 from requests.exceptions import RequestException
 
 from flexget import plugin
@@ -11,7 +11,7 @@ from flexget.utils.requests import Session as RequestSession
 from flexget.utils.requests import TimedLimiter
 
 plugin_name = 'pushover'
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 PUSHOVER_URL = 'https://api.pushover.net/1/messages.json'
 
@@ -96,7 +96,7 @@ class PushoverNotifier:
         expire = config.get('expire')
         retry = config.get('retry')
         if priority == 2 and not all([expire, retry]):
-            log.warning(
+            logger.warning(
                 'Priority set to 2 but fields "expire" and "retry" are not both present.Lowering priority to 1'
             )
             notification['priority'] = 1
@@ -130,9 +130,8 @@ class PushoverNotifier:
                 int(response.headers['X-Limit-App-Reset'])
             ).strftime('%Y-%m-%d %H:%M:%S')
             remaining = response.headers['X-Limit-App-Remaining']
-            log.debug(
-                'Pushover notification sent. Notifications remaining until next reset: %s. '
-                'Next reset at: %s',
+            logger.debug(
+                'Pushover notification sent. Notifications remaining until next reset: {}. Next reset at: {}',
                 remaining,
                 reset_time,
             )

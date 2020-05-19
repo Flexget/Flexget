@@ -1,25 +1,29 @@
-from flexget.entry import Entry
+from flexget.entry import Entry, register_lazy_lookup
 from flexget.plugin import PluginError
+
+
+@register_lazy_lookup('lazy_a')
+def lazy_a(entry):
+    if 'fail' in entry:
+        raise PluginError('oh no!')
+    for f in ['a_field', 'ab_field', 'a_fail']:
+        entry[f] = 'a'
+
+
+@register_lazy_lookup('lazy_b')
+def lazy_b(entry):
+    for f in ['b_field', 'ab_field', 'a_fail']:
+        entry[f] = 'b'
 
 
 class TestLazyFields:
     def test_lazy_queue(self):
         """Tests behavior when multiple plugins register lazy lookups for the same field"""
 
-        def lazy_a(entry):
-            if 'fail' in entry:
-                raise PluginError('oh no!')
-            for f in ['a_field', 'ab_field', 'a_fail']:
-                entry[f] = 'a'
-
-        def lazy_b(entry):
-            for f in ['b_field', 'ab_field', 'a_fail']:
-                entry[f] = 'b'
-
         def setup_entry():
             entry = Entry()
-            entry.register_lazy_func(lazy_a, ['ab_field', 'a_field', 'a_fail'])
-            entry.register_lazy_func(lazy_b, ['ab_field', 'b_field', 'a_fail'])
+            entry.add_lazy_fields('lazy_a', ['ab_field', 'a_field', 'a_fail'])
+            entry.add_lazy_fields('lazy_b', ['ab_field', 'b_field', 'a_fail'])
             return entry
 
         entry = setup_entry()

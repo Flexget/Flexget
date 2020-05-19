@@ -1,9 +1,9 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('priv_torrents')
+logger = logger.bind(name='priv_torrents')
 
 
 class FilterPrivateTorrents:
@@ -34,7 +34,7 @@ class FilterPrivateTorrents:
 
         for entry in task.accepted:
             if 'torrent' not in entry:
-                log.debug('`%s` is not a torrent' % entry['title'])
+                logger.debug('`{}` is not a torrent', entry['title'])
                 continue
             private = entry['torrent'].private
 

@@ -1,6 +1,6 @@
-import logging
 from datetime import datetime
 
+from loguru import logger
 from sqlalchemy import Column, DateTime, Integer, String, Unicode
 
 from flexget import db_schema, plugin
@@ -11,7 +11,7 @@ from flexget.utils import qualities
 from flexget.utils.database import quality_property
 from flexget.utils.tools import group_entries, parse_timedelta
 
-log = logging.getLogger('upgrade')
+logger = logger.bind(name='upgrade')
 
 Base = db_schema.versioned_base('upgrade', 0)
 
@@ -71,15 +71,15 @@ class FilterUpgrade:
             # Filter out entries within target
             if target:
                 if not target_requirement.allows(entry['quality']):
-                    log.debug(
-                        'Skipping %s as does not meet upgrade quality requirements', entry['title']
+                    logger.debug(
+                        'Skipping {} as does not meet upgrade quality requirements', entry['title']
                     )
                     if action_on_lower:
                         action_on_lower(entry, 'does not meet upgrade quality requirements')
                     continue
 
             if entry['quality'] < existing.quality:
-                log.debug('Skipping %s as lower quality then existing', entry['title'])
+                logger.debug('Skipping {} as lower quality then existing', entry['title'])
                 if action_on_lower:
                     action_on_lower(entry, 'lower quality then existing')
                 continue
@@ -88,7 +88,7 @@ class FilterUpgrade:
                 entry['quality'] == existing.quality
                 and entry.get('proper_count', 0) <= existing.proper_count
             ):
-                log.debug('Skipping %s as same quality but lower proper', entry['title'])
+                logger.debug('Skipping {} as same quality but lower proper', entry['title'])
                 if action_on_lower:
                     action_on_lower(entry, 'lower proper then existing')
                 continue
@@ -104,7 +104,7 @@ class FilterUpgrade:
             return
 
         identified_by = (
-            '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
+            '{{ media_id }}' if config['identified_by'] == 'auto' else config['identified_by']
         )
 
         grouped_entries = group_entries(task.accepted + task.undecided, identified_by)
@@ -129,8 +129,8 @@ class FilterUpgrade:
                     # No existing, do_nothing
                     continue
 
-                log.debug(
-                    'Looking for upgrades for identifier %s (within %s entries)',
+                logger.debug(
+                    'Looking for upgrades for identifier {} (within {} entries)',
                     identifier,
                     len(entries),
                 )
@@ -140,8 +140,8 @@ class FilterUpgrade:
                     expires = existing.first_seen + parse_timedelta(config['timeframe'])
                     if expires <= datetime.now():
                         # Timeframe reached, allow
-                        log.debug(
-                            'Skipping upgrade with identifier %s as timeframe reached', identifier
+                        logger.debug(
+                            'Skipping upgrade with identifier {} as timeframe reached', identifier
                         )
                         continue
 
@@ -167,14 +167,14 @@ class FilterUpgrade:
                 # First entry will be the best quality
                 best = upgradeable.pop(0)
                 best.accept('upgraded quality')
-                log.debug(
-                    'Found %s as upgraded quality for identifier %s', best['title'], identifier
+                logger.debug(
+                    'Found {} as upgraded quality for identifier {}', best['title'], identifier
                 )
 
                 # Process rest
                 for entry in upgradeable:
-                    log.debug(
-                        'Skipping %s as lower quality then best %s', entry['title'], best['title']
+                    logger.debug(
+                        'Skipping {} as lower quality then best {}', entry['title'], best['title']
                     )
                     if action_on_lower:
                         action_on_lower(entry, 'lower quality then best match')
@@ -185,7 +185,7 @@ class FilterUpgrade:
             return
 
         identified_by = (
-            '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
+            '{{ media_id }}' if config['identified_by'] == 'auto' else config['identified_by']
         )
 
         grouped_entries = group_entries(task.accepted, identified_by)
@@ -224,8 +224,8 @@ class FilterUpgrade:
                 existing.proper_count = best_entry.get('proper_count', 0)
                 existing.updated = datetime.now()
 
-                log.debug(
-                    'Tracking upgrade on identifier `%s` current quality `%s`',
+                logger.debug(
+                    'Tracking upgrade on identifier `{}` current quality `{}`',
                     identifier,
                     best_entry['quality'],
                 )

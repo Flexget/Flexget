@@ -1,10 +1,10 @@
-import logging
+from loguru import logger
 
-from flexget import plugin
+from flexget import entry, plugin
 from flexget.event import event
 from flexget.manager import Session
 
-log = logging.getLogger('tvmaze_lookup')
+logger = logger.bind(name='tvmaze_lookup')
 
 
 class PluginTVMazeLookup:
@@ -121,6 +121,7 @@ class PluginTVMazeLookup:
 
     schema = {'type': 'boolean'}
 
+    @entry.register_lazy_lookup('tvmaze_series_lookup')
     def lazy_series_lookup(self, entry):
         """Does the lookup for this entry and populates the entry fields."""
         series_lookup = plugin.get('api_tvmaze', self).series_lookup
@@ -136,11 +137,12 @@ class PluginTVMazeLookup:
             try:
                 series = series_lookup(**lookupargs)
             except LookupError as e:
-                log.debug(e)
+                logger.debug(e)
             else:
                 entry.update_using_map(self.series_map, series)
         return entry
 
+    @entry.register_lazy_lookup('tvmaze_season_lookup')
     def lazy_season_lookup(self, entry):
         season_lookup = plugin.get('api_tvmaze', self).season_lookup
         with Session(expire_on_commit=False) as session:
@@ -156,11 +158,12 @@ class PluginTVMazeLookup:
             try:
                 season = season_lookup(**lookupargs)
             except LookupError as e:
-                log.debug(e)
+                logger.debug(e)
             else:
                 entry.update_using_map(self.season_map, season)
         return entry
 
+    @entry.register_lazy_lookup('tvmaze_episode_lookup')
     def lazy_episode_lookup(self, entry):
         episode_lookup = plugin.get('api_tvmaze', self).episode_lookup
         with Session(expire_on_commit=False) as session:
@@ -179,7 +182,7 @@ class PluginTVMazeLookup:
             try:
                 episode = episode_lookup(**lookupargs)
             except LookupError as e:
-                log.debug(e)
+                logger.debug(e)
             else:
                 entry.update_using_map(self.episode_map, episode)
         return entry
@@ -197,13 +200,13 @@ class PluginTVMazeLookup:
                 or entry.get('tvmaze_id', eval_lazy=False)
                 or entry.get('tvrage_id', eval_lazy=False)
             ):
-                entry.register_lazy_func(self.lazy_series_lookup, self.series_map)
+                entry.add_lazy_fields(self.lazy_series_lookup, self.series_map)
                 if entry.get('season_pack', eval_lazy=False):
-                    entry.register_lazy_func(self.lazy_season_lookup, self.season_map)
+                    entry.add_lazy_fields(self.lazy_season_lookup, self.season_map)
                 if ('series_season' in entry and 'series_episode' in entry) or (
                     'series_date' in entry
                 ):
-                    entry.register_lazy_func(self.lazy_episode_lookup, self.episode_map)
+                    entry.add_lazy_fields(self.lazy_episode_lookup, self.episode_map)
 
     @property
     def series_identifier(self):

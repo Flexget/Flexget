@@ -1,16 +1,28 @@
 import copy
 import functools
-import logging
 import re
+from typing import Dict, Iterator, List, Optional, Tuple, Union
 
-log = logging.getLogger('utils.qualities')
+from loguru import logger
+
+from flexget.utils.serialization import Serializer
+
+logger = logger.bind(name='utils.qualities')
 
 
 @functools.total_ordering
 class QualityComponent:
     """"""
 
-    def __init__(self, type, value, name, regexp=None, modifier=None, defaults=None):
+    def __init__(
+        self,
+        type: str,
+        value: int,
+        name: str,
+        regexp: Optional[str] = None,
+        modifier: Optional[int] = None,
+        defaults: Optional[List[str]] = None,
+    ) -> None:
         """
         :param type: Type of quality component. (resolution, source, codec, or audio)
         :param value: Value used to sort this component with others of like type.
@@ -33,7 +45,7 @@ class QualityComponent:
             regexp = re.escape(name)
         self.regexp = re.compile(r'(?<![^\W_])(' + regexp + r')(?![^\W_])', re.IGNORECASE)
 
-    def matches(self, text):
+    def matches(self, text: str) -> Tuple[bool, str]:
         """Test if quality matches to text.
 
         :param string text: data te be tested against
@@ -174,21 +186,21 @@ _UNKNOWNS = {
     print '}}}'
 '''
 
-_registry = {}
+_registry: Dict[str, QualityComponent] = {}
 for items in (_resolutions, _sources, _codecs, _audios):
     for item in items:
         _registry[item.name] = item
 
 
-def all_components():
+def all_components() -> Iterator[QualityComponent]:
     return iter(_registry.values())
 
 
 @functools.total_ordering
-class Quality:
+class Quality(Serializer):
     """Parses and stores the quality of an entry in the four component categories."""
 
-    def __init__(self, text=''):
+    def __init__(self, text: str = '') -> None:
         """
         :param text: A string to parse quality from
         """
@@ -202,7 +214,7 @@ class Quality:
             self.codec = _UNKNOWNS['codec']
             self.audio = _UNKNOWNS['audio']
 
-    def parse(self, text):
+    def parse(self, text: str):
         """Parses a string to determine the quality in the four component categories.
 
         :param text: The string to parse
@@ -220,7 +232,12 @@ class Quality:
                 if not getattr(self, default.type):
                     setattr(self, default.type, default)
 
-    def _find_best(self, qlist, default=None, strip_all=True):
+    def _find_best(
+        self,
+        qlist: List[QualityComponent],
+        default: Optional[QualityComponent] = None,
+        strip_all: bool = True,
+    ) -> QualityComponent:
         """Finds the highest matching quality component from `qlist`"""
         result = None
         search_in = self.clean_text
@@ -239,18 +256,26 @@ class Quality:
         return result or default
 
     @property
-    def name(self):
+    def name(self) -> str:
         name = ' '.join(
             str(p) for p in (self.resolution, self.source, self.codec, self.audio) if p.value != 0
         )
         return name or 'unknown'
 
     @property
-    def components(self):
+    def components(self) -> List[QualityComponent]:
         return [self.resolution, self.source, self.codec, self.audio]
 
+    @classmethod
+    def serialize(cls, quality: 'Quality') -> str:
+        return str(quality)
+
+    @classmethod
+    def deserialize(cls, data: str, version: int) -> 'Quality':
+        return cls(data)
+
     @property
-    def _comparator(self):
+    def _comparator(self) -> List:
         modifier = sum(c.modifier for c in self.components if c.modifier)
         return [modifier] + self.components
 
@@ -300,7 +325,7 @@ class Quality:
         return hash(self.name)
 
 
-def get(quality_name):
+def get(quality_name: str) -> Quality:
     """Returns a quality object based on canonical quality name."""
 
     found_components = {}
@@ -323,17 +348,17 @@ class RequirementComponent:
     """Represents requirements for a given component type. Can evaluate whether a given QualityComponent
     meets those requirements."""
 
-    def __init__(self, type):
+    def __init__(self, type: str) -> None:
         self.type = type
         self.reset()
 
-    def reset(self):
+    def reset(self) -> None:
         self.min = None
         self.max = None
         self.acceptable = set()
         self.none_of = set()
 
-    def allows(self, comp, loose=False):
+    def allows(self, comp: QualityComponent, loose: bool = False) -> bool:
         if comp.type != self.type:
             raise TypeError('Cannot compare %r against %s' % (comp, self.type))
         if comp in self.none_of:
@@ -352,7 +377,7 @@ class RequirementComponent:
             return True
         return False
 
-    def add_requirement(self, text):
+    def add_requirement(self, text: str) -> None:
         if '-' in text:
             min, max = text.split('-')
             min, max = _registry[min], _registry[max]
@@ -402,7 +427,7 @@ class RequirementComponent:
 class Requirements:
     """Represents requirements for allowable qualities. Can determine whether a given Quality passes requirements."""
 
-    def __init__(self, req=''):
+    def __init__(self, req: str = '') -> None:
         self.text = ''
         self.resolution = RequirementComponent('resolution')
         self.source = RequirementComponent('source')
@@ -412,10 +437,10 @@ class Requirements:
             self.parse_requirements(req)
 
     @property
-    def components(self):
+    def components(self) -> List[RequirementComponent]:
         return [self.resolution, self.source, self.codec, self.audio]
 
-    def parse_requirements(self, text):
+    def parse_requirements(self, text: str) -> None:
         """
         Parses a requirements string.
 
@@ -446,7 +471,7 @@ class Requirements:
         except KeyError as e:
             raise ValueError('%s is not a valid quality component.' % e.args[0])
 
-    def allows(self, qual, loose=False):
+    def allows(self, qual: Union[Quality, str], loose: bool = False) -> bool:
         """Determine whether this set of requirements allows a given quality.
 
         :param Quality qual: The quality to evaluate.

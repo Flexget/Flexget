@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -7,7 +7,7 @@ from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException
 
-log = logging.getLogger('anilist')
+logger = logger.bind(name='anilist')
 
 LIST_STATUS = ['current', 'planning', 'completed', 'dropped', 'paused', 'repeating']
 
@@ -26,7 +26,7 @@ class AniList(object):
 
     Syntax:
     anilist:
-      username: <value>
+      username: <string>
       status:
         - <current|planning|completed|dropped|paused|repeating>
         - <current|planning|completed|dropped|paused|repeating>
@@ -38,6 +38,10 @@ class AniList(object):
       format:
         - <all|tv|tv_short|movie|special|ova|ona>
         - <tv|tv_short|movie|special|ova|ona>
+        ...
+      list:
+        - <string>
+        - <string>
         ...
     """
 
@@ -57,6 +61,7 @@ class AniList(object):
                     'format': one_or_more(
                         {'type': 'string', 'enum': ANIME_FORMAT}, unique_items=True
                     ),
+                    'list': one_or_more({'type': 'string'}),
                 },
                 'required': ['username'],
                 'additionalProperties': False,
@@ -68,11 +73,10 @@ class AniList(object):
     def on_task_input(self, task, config):
         if isinstance(config, str):
             config = {'username': config}
-        selected_list_status = config['status'] if 'status' in config else ['current', 'planning']
-        selected_release_status = (
-            config['release_status'] if 'release_status' in config else ['all']
-        )
-        selected_formats = config['format'] if 'format' in config else ['all']
+        selected_list_status = config.get('status', ['current', 'planning'])
+        selected_release_status = config.get('release_status', ['all'])
+        selected_formats = config.get('format', ['all'])
+        selected_list_name = config.get('list', [])
 
         if not isinstance(selected_list_status, list):
             selected_list_status = [selected_list_status]
@@ -83,9 +87,13 @@ class AniList(object):
         if not isinstance(selected_formats, list):
             selected_formats = [selected_formats]
 
-        log.debug('Selected List Status: %s' % selected_list_status)
-        log.debug('Selected Release Status: %s' % selected_release_status)
-        log.debug('Selected Formats: %s' % selected_formats)
+        if not isinstance(selected_list_name, list):
+            selected_list_name = [selected_list_name]
+        selected_list_name = [i.lower() for i in selected_list_name]
+
+        logger.debug('Selected List Status: {}', selected_list_status)
+        logger.debug('Selected Release Status: {}', selected_release_status)
+        logger.debug('Selected Formats: {}', selected_formats)
 
         req_variables = {'user': config['username']}
         req_chunk = 1
@@ -96,10 +104,11 @@ class AniList(object):
         )
         while req_chunk:
             req_query = (
-                'query ($user: String){collection: MediaListCollection(userName: $user, type: ANIME, '
-                'perChunk: 500, chunk: %s, status_in: [%s]){ hasNextChunk, statuses: lists { list: entries { '
-                'anime: media { %s }}}}}'
-                % (req_chunk, ', '.join([s.upper() for s in selected_list_status]), req_fields)
+                f'query ($user: String){{ collection: MediaListCollection(userName: $user, '
+                f'type: ANIME, perChunk: 500, chunk: {req_chunk}, status_in: '
+                f'[{", ".join([s.upper() for s in selected_list_status])}]) {{ hasNextChunk, '
+                f'statuses: lists{{ status, name, list: entries{{ anime: media{{ {req_fields}'
+                f' }}}}}}}}}}'
             )
 
             try:
@@ -112,8 +121,13 @@ class AniList(object):
 
             try:
                 list_response = list_response.json()['data']
-                log.debug('JSON output: %s' % list_response)
+                logger.debug('JSON output: {}', list_response)
                 for list_status in list_response['collection']['statuses']:
+                    if (
+                        selected_list_name
+                        and list_status['name'].lower() not in selected_list_name
+                    ):
+                        continue
                     for anime in list_status['list']:
                         anime = anime['anime']
                         has_selected_release_status = (
@@ -130,10 +144,19 @@ class AniList(object):
                             entry['al_title'] = anime['title']
                             entry['al_format'] = anime['format']
                             entry['al_release_status'] = anime['status'].capitalize()
-                            entry['al_list_status'] = list_status
-                            entry['alternate_name'] = [anime['title']['english']] + anime[
-                                'synonyms'
-                            ]
+                            entry['al_list'] = list_status['name']
+                            entry['al_list_status'] = (
+                                list_status['status'].capitalize()
+                                if list_status.get('status')
+                                else ''
+                            )
+                            entry['alternate_name'] = anime.get('synonyms', [])
+                            if (
+                                anime['title'].get('english')
+                                and anime['title'].get('english') != anime['title']['romaji']
+                                and anime['title'].get('english') not in entry['alternate_name']
+                            ):
+                                entry['alternate_name'].insert(0, anime['title']['english'])
                             entry['url'] = anime['siteUrl']
                             entry['al_idMal'] = anime['idMal']
                             entry['al_episodes'] = anime['episodes']

@@ -204,9 +204,11 @@ class TestNfoLookupWithMovies:
             # future version make the necessary changes in the assert below.
             assert keys == sorted(
                 [
+                    '_backlog_snapshot',
                     'title',
                     'original_title',
                     'filename',
+                    'media_id',
                     'nfo_id',
                     'task',
                     'url',

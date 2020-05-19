@@ -1,7 +1,7 @@
-import logging
 import re
 from itertools import chain
 
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
@@ -10,7 +10,7 @@ from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.utils.soup import get_soup
 
-log = logging.getLogger('myepisodes_list')
+logger = logger.bind(name='myepisodes_list')
 
 URL = 'http://www.myepisodes.com/'
 
@@ -42,13 +42,13 @@ class MyEpisodesList:
     }
 
     @cached('myepisodes_list')
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def on_task_input(self, task, config):
         if not task.requests.cookies:
             username = config['username']
             password = config['password']
 
-            log.debug("Logging in to %s ..." % URL)
+            logger.debug('Logging in to {} ...', URL)
             params = {'username': username, 'password': password, 'action': 'Login'}
             try:
                 loginsrc = task.requests.post(URL + 'login.php', data=params)
@@ -58,7 +58,7 @@ class MyEpisodesList:
                             'Login to myepisodes.com failed, please check '
                             'your account data or see if the site is down.'
                         ),
-                        log,
+                        logger,
                     )
             except RequestException as e:
                 raise plugin.PluginError("Error logging in to myepisodes: %s" % e)
@@ -94,10 +94,12 @@ class MyEpisodesList:
             if entry.isvalid():
                 entries.append(entry)
             else:
-                log.debug('Invalid entry created? %s' % entry)
+                logger.debug('Invalid entry created? {}', entry)
 
         if not entries:
-            log.warning("No shows found on myepisodes.com list. Maybe you need to add some first?")
+            logger.warning(
+                "No shows found on myepisodes.com list. Maybe you need to add some first?"
+            )
 
         return entries
 

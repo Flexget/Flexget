@@ -1,11 +1,12 @@
-import logging
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 
-log = logging.getLogger('twitterfeed')
+logger = logger.bind(name='twitterfeed')
 
 # Size of the chunks when fetching a timeline
 CHUNK_SIZE = 200
@@ -70,13 +71,13 @@ class TwitterFeed:
         try:
             import twitter  # noqa
         except ImportError:
-            raise plugin.PluginError('twitter module required', logger=log)
+            raise plugin.PluginError('twitter module required', logger=logger)
 
     def on_task_input(self, task, config):
         import twitter
 
         account = config['account']
-        log.debug('Looking at twitter account `%s`', account)
+        logger.debug('Looking at twitter account `{}`', account)
 
         try:
             self.api = twitter.Api(
@@ -91,36 +92,38 @@ class TwitterFeed:
             )
 
         if config['all_entries']:
-            log.debug(
-                'Fetching %d last tweets from %s timeline' % (config['tweets'], config['account'])
+            logger.debug(
+                'Fetching {} last tweets from {} timeline', config['tweets'], config['account']
             )
             tweets = self.get_tweets(account, number=config['tweets'])
         else:
             # Fetching from where we left off last time
             since_id = task.simple_persistence.get('since_id', None)
             if since_id:
-                log.debug(
-                    'Fetching from tweet id %d from %s timeline' % (since_id, config['account'])
+                logger.debug(
+                    'Fetching from tweet id {} from {} timeline', since_id, config['account']
                 )
                 kwargs = {'since_id': since_id}
             else:
-                log.debug('No since_id, fetching last %d tweets' % config['tweets'])
+                logger.debug('No since_id, fetching last {} tweets', config['tweets'])
                 kwargs = {'number': config['tweets']}
 
             tweets = self.get_tweets(account, **kwargs)
             if task.config_modified and len(tweets) < config['tweets']:
-                log.debug('Configuration modified; fetching at least %d tweets' % config['tweets'])
+                logger.debug(
+                    'Configuration modified; fetching at least {} tweets', config['tweets']
+                )
                 max_id = tweets[-1].id if tweets else None
                 remaining_tweets = config['tweets'] - len(tweets)
                 tweets = tweets + self.get_tweets(account, max_id=max_id, number=remaining_tweets)
             if tweets:
                 last_tweet = tweets[0]
-                log.debug('New last tweet id: %d' % last_tweet.id)
+                logger.debug('New last tweet id: {}', last_tweet.id)
                 task.simple_persistence['since_id'] = last_tweet.id
 
-        log.debug('%d tweets fetched' % len(tweets))
+        logger.debug('{} tweets fetched', len(tweets))
         for t in tweets:
-            log.debug('id:%d' % t.id)
+            logger.debug('id:{}', t.id)
 
         return [self.entry_from_tweet(e) for e in tweets]
 

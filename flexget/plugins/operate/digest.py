@@ -1,21 +1,22 @@
-import logging
 import pickle
 from datetime import datetime
 
+from loguru import logger
 from sqlalchemy import Column, DateTime, Integer, Unicode, select
 
 from flexget import db_schema, plugin
 from flexget.config_schema import one_or_more
 from flexget.db_schema import versioned_base
+from flexget.entry import Entry, EntryState
 from flexget.event import event
 from flexget.manager import Session
-from flexget.utils import json
+from flexget.utils import json, serialization
 from flexget.utils.database import entry_synonym
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 from flexget.utils.tools import parse_timedelta
 
-log = logging.getLogger('digest')
-Base = versioned_base('digest', 1)
+logger = logger.bind(name='digest')
+Base = versioned_base('digest', 2)
 
 
 @db_schema.upgrade('digest')
@@ -36,9 +37,23 @@ def upgrade(ver, session):
                     .values(json=json.dumps(p, encode_datetime=True))
                 )
             except KeyError as e:
-                log.error('Unable error upgrading backlog pickle object due to %s' % str(e))
+                logger.error('Unable error upgrading backlog pickle object due to {}', str(e))
 
         ver = 1
+    if ver == 1:
+        table = table_schema('digest_entries', session)
+        for row in session.execute(select([table.c.id, table.c.json])):
+            if not row['json']:
+                # Seems there could be invalid data somehow. See #2590
+                continue
+            data = json.loads(row['json'], decode_datetime=True)
+            # If title looked like a date, make sure it's a string
+            title = str(data.pop('title'))
+            e = Entry(title=title, **data)
+            session.execute(
+                table.update().where(table.c.id == row['id']).values(json=serialization.dumps(e))
+            )
+        ver = 2
     return ver
 
 
@@ -81,10 +96,11 @@ class OutputDigest:
         config = self.prepare_config(config)
         with Session() as session:
             for entry in task.all_entries:
-                if entry.state not in config['state']:
+                state = str(entry.state)
+                if state not in config['state']:
                     continue
                 entry['digest_task'] = task.name
-                entry['digest_state'] = entry.state
+                entry['digest_state'] = state
                 session.add(DigestEntry(list=config['list'], entry=entry))
 
 
@@ -127,7 +143,7 @@ class FromDigest:
                 if config.get('restore_state') and entry.get('digest_state'):
                     # Not sure this is the best way, but we don't want hooks running on this task
                     # (like backlog hooking entry.fail)
-                    entry._state = entry['digest_state']
+                    entry._state = EntryState(entry['digest_state'])
                 entries.append(entry)
                 # If expire is 'True', we remove it after it is output once.
                 if config.get('expire', True) is True:

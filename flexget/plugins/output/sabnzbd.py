@@ -1,12 +1,12 @@
-import logging
 from urllib.parse import urlencode
 
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('sabnzbd')
+logger = logger.bind(name='sabnzbd')
 
 
 class OutputSabnzbd:
@@ -66,7 +66,7 @@ class OutputSabnzbd:
     def on_task_output(self, task, config):
         for entry in task.accepted:
             if task.options.test:
-                log.info('Would add into sabnzbd: %s' % entry['title'])
+                logger.info('Would add into sabnzbd: {}', entry['title'])
                 continue
 
             params = self.get_params(config)
@@ -88,21 +88,21 @@ class OutputSabnzbd:
                 params['mode'] = 'addurl'
 
             request_url = config['url'] + urlencode(params)
-            log.debug('request_url: %s' % request_url)
+            logger.debug('request_url: {}', request_url)
             try:
                 response = task.requests.get(request_url)
             except RequestException as e:
-                log.critical('Failed to use sabnzbd. Requested %s' % request_url)
-                log.critical('Result was: %s' % e.args[0])
+                logger.critical('Failed to use sabnzbd. Requested {}', request_url)
+                logger.critical('Result was: {}', e.args[0])
                 entry.fail('sabnzbd unreachable')
                 if task.options.debug:
-                    log.exception(e)
+                    logger.exception(e)
                 continue
 
             if 'error' in response.text.lower():
                 entry.fail(response.text.replace('\n', ''))
             else:
-                log.info('Added `%s` to SABnzbd' % (entry['title']))
+                logger.info('Added `{}` to SABnzbd', entry['title'])
 
 
 @event('plugin.register')

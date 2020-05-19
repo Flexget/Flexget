@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -6,7 +6,7 @@ from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 
-log = logging.getLogger('pogcal')
+logger = logger.bind(name='pogcal')
 
 
 class InputPogDesign:

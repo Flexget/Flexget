@@ -1,24 +1,25 @@
 """Logging utilities"""
 import hashlib
-import logging
 from datetime import datetime, timedelta
 
+import loguru
+from loguru import logger
 from sqlalchemy import Column, DateTime, Index, Integer, String
+from sqlalchemy.orm import Session
 
 from flexget import db_schema
-from flexget import logger as f_logger
 from flexget.event import event
 from flexget.utils.database import with_session
 from flexget.utils.sqlalchemy_utils import table_schema
 
-log = logging.getLogger('util.log')
+logger = logger.bind(name='util.log')
 Base = db_schema.versioned_base('log_once', 0)
 
 
 @db_schema.upgrade('log_once')
 def upgrade(ver, session):
     if ver is None:
-        log.info('Adding index to md5sum column of log_once table.')
+        logger.info('Adding index to md5sum column of log_once table.')
         table = table_schema('log_once', session)
         Index('log_once_md5sum', table.c.md5sum, unique=True).create()
         ver = 0
@@ -42,22 +43,22 @@ class LogMessage(Base):
 
 
 @event('manager.db_cleanup')
-def purge(manager, session):
+def purge(manager, session: Session):
     """Purge old messages from database"""
     old = datetime.now() - timedelta(days=365)
 
     result = session.query(LogMessage).filter(LogMessage.added < old).delete()
     if result:
-        log.verbose('Purged %s entries from log_once table.' % result)
+        logger.verbose('Purged {} entries from log_once table.', result)
 
 
 @with_session
 def log_once(
-    message,
-    logger=logging.getLogger('log_once'),
-    once_level=logging.INFO,
-    suppressed_level=f_logger.VERBOSE,
-    session=None,
+    message: str,
+    logger: 'loguru.Logger' = logger.bind(name='log_once'),
+    once_level: str = 'INFO',
+    suppressed_level: str = 'VERBOSE',
+    session: Session = None,
 ):
     """
     Log message only once using given logger`. Returns False if suppressed logging.
@@ -67,7 +68,7 @@ def log_once(
     from flexget.manager import manager
 
     if not manager:
-        log.warning('DB not initialized. log_once will not work properly.')
+        logger.warning('DB not initialized. log_once will not work properly.')
         logger.log(once_level, message)
         return
 

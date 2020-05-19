@@ -1,8 +1,8 @@
-import logging
 import pickle
 from collections.abc import MutableSet
 from datetime import datetime
 
+from loguru import logger
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, Unicode, func, or_, select
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
@@ -11,12 +11,12 @@ from flexget import db_schema
 from flexget.db_schema import versioned_base
 from flexget.entry import Entry
 from flexget.manager import Session
-from flexget.utils import json
+from flexget.utils import json, serialization
 from flexget.utils.database import entry_synonym, with_session
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
-log = logging.getLogger('entry_list.db')
-Base = versioned_base('entry_list', 1)
+logger = logger.bind(name='entry_list.db')
+Base = versioned_base('entry_list', 2)
 
 
 @db_schema.upgrade('entry_list')
@@ -37,9 +37,23 @@ def upgrade(ver, session):
                     .values(json=json.dumps(p, encode_datetime=True))
                 )
             except KeyError as e:
-                log.error('Unable error upgrading entry_list pickle object due to %s' % str(e))
+                logger.error('Unable error upgrading entry_list pickle object due to {}', str(e))
 
         ver = 1
+    if ver == 1:
+        table = table_schema('entry_list_entries', session)
+        for row in session.execute(select([table.c.id, table.c.json])):
+            if not row['json']:
+                # Seems there could be invalid data somehow. See #2590
+                continue
+            data = json.loads(row['json'], decode_datetime=True)
+            # If title looked like a date, make sure it's a string
+            title = str(data.pop('title'))
+            e = Entry(title=title, **data)
+            session.execute(
+                table.update().where(table.c.id == row['id']).values(json=serialization.dumps(e))
+            )
+        ver = 2
     return ver
 
 
@@ -82,7 +96,7 @@ class EntryListEntry(Base):
             'added_on': self.added,
             'title': self.title,
             'original_url': self.original_url,
-            'entry': dict(self.entry),
+            'entry': json.coerce(self.entry),
         }
 
 
@@ -119,7 +133,7 @@ class DBEntrySet(MutableSet):
     def __iter__(self):
         with Session() as session:
             for e in self._db_list(session).entries.order_by(EntryListEntry.added.desc()).all():
-                log.debug('returning %s', e.entry)
+                logger.debug('returning {}', e.entry)
                 yield e.entry
 
     def __contains__(self, entry):
@@ -134,32 +148,20 @@ class DBEntrySet(MutableSet):
         with Session() as session:
             db_entry = self._entry_query(session=session, entry=entry)
             if db_entry:
-                log.debug('deleting entry %s', db_entry)
+                logger.debug('deleting entry {}', db_entry)
                 session.delete(db_entry)
 
     def add(self, entry):
-        # Evaluate all lazy fields so that no db access occurs during our db session
-        entry.values()
-
         with Session() as session:
             stored_entry = self._entry_query(session, entry)
             if stored_entry:
                 # Refresh all the fields if we already have this entry
-                log.debug('refreshing entry %s', entry)
+                logger.debug('refreshing entry {}', entry)
                 stored_entry.entry = entry
             else:
-                log.debug('adding entry %s to list %s', entry, self._db_list(session).name)
+                logger.debug('adding entry {} to list {}', entry, self._db_list(session).name)
                 stored_entry = EntryListEntry(entry=entry, entry_list_id=self._db_list(session).id)
             session.add(stored_entry)
-
-    def __ior__(self, other):
-        # Optimization to only open one session when adding multiple items
-        # Make sure lazy lookups are done before opening our session to prevent db locks
-        for value in other:
-            value.values()
-        for value in other:
-            self.add(value)
-        return self
 
     @property
     def immutable(self):
@@ -183,17 +185,17 @@ class DBEntrySet(MutableSet):
 
 @with_session
 def get_entry_lists(name=None, session=None):
-    log.debug('retrieving entry lists')
+    logger.debug('retrieving entry lists')
     query = session.query(EntryListList)
     if name:
-        log.debug('searching for entry lists with name %s', name)
+        logger.debug('searching for entry lists with name {}', name)
         query = query.filter(EntryListList.name.contains(name))
     return query.all()
 
 
 @with_session
 def get_list_by_exact_name(name, session=None):
-    log.debug('returning entry list with name %s', name)
+    logger.debug('returning entry list with name {}', name)
     return (
         session.query(EntryListList).filter(func.lower(EntryListList.name) == name.lower()).one()
     )
@@ -201,7 +203,7 @@ def get_list_by_exact_name(name, session=None):
 
 @with_session
 def get_list_by_id(list_id, session=None):
-    log.debug('fetching entry list with id %d', list_id)
+    logger.debug('fetching entry list with id {}', list_id)
     return session.query(EntryListList).filter(EntryListList.id == list_id).one()
 
 
@@ -209,16 +211,24 @@ def get_list_by_id(list_id, session=None):
 def delete_list_by_id(list_id, session=None):
     entry_list = get_list_by_id(list_id=list_id, session=session)
     if entry_list:
-        log.debug('deleting entry list with id %d', list_id)
+        logger.debug('deleting entry list with id {}', list_id)
         session.delete(entry_list)
 
 
 @with_session
 def get_entries_by_list_id(
-    list_id, start=None, stop=None, order_by='title', descending=False, session=None
+    list_id,
+    start=None,
+    stop=None,
+    order_by='title',
+    descending=False,
+    entry_ids=None,
+    session=None,
 ):
-    log.debug('querying entries from entry list with id %d', list_id)
+    logger.debug('querying entries from entry list with id {}', list_id)
     query = session.query(EntryListEntry).filter(EntryListEntry.list_id == list_id)
+    if entry_ids:
+        query = query.filter(EntryListEntry.id.in_(entry_ids))
     if descending:
         query = query.order_by(getattr(EntryListEntry, order_by).desc())
     else:
@@ -239,7 +249,7 @@ def get_entry_by_title(list_id, title, session=None):
 
 @with_session
 def get_entry_by_id(list_id, entry_id, session=None):
-    log.debug('fetching entry with id %d from list id %d', entry_id, list_id)
+    logger.debug('fetching entry with id {} from list id {}', entry_id, list_id)
     return (
         session.query(EntryListEntry)
         .filter(and_(EntryListEntry.id == entry_id, EntryListEntry.list_id == list_id))

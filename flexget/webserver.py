@@ -1,5 +1,4 @@
 import hashlib
-import logging
 import random
 import socket
 import threading
@@ -8,13 +7,14 @@ import cherrypy
 import zxcvbn
 from flask import Flask, abort, redirect
 from flask_login import UserMixin
+from loguru import logger
 from sqlalchemy import Column, Integer, Unicode
 from werkzeug.security import generate_password_hash
 
 from flexget.manager import Base
 from flexget.utils.database import with_session
 
-log = logging.getLogger('web_server')
+logger = logger.bind(name='web_server')
 
 _home = None
 _app_register = {}
@@ -57,13 +57,13 @@ def get_secret(session=None):
 
 
 class WeakPassword(Exception):
-    def __init__(self, value, logger=log, **kwargs):
+    def __init__(self, value, logger=logger, **kwargs):
         super().__init__()
         # Value is expected to be a string
         if not isinstance(value, str):
             value = str(value)
         self.value = value
-        self.log = logger
+        self.logger = logger
         self.kwargs = kwargs
 
     def __str__(self):
@@ -99,10 +99,10 @@ class WebSecret(Base):
     value = Column(Unicode)
 
 
-def register_app(path, application):
+def register_app(path, application, name):
     if path in _app_register:
         raise ValueError('path %s already registered' % path)
-    _app_register[path] = application
+    _app_register[path] = (application, name)
 
 
 def register_home(route):
@@ -133,7 +133,7 @@ def setup_server(config):
 
     user = get_user()
     if not user or not user.password:
-        log.warning(
+        logger.warning(
             'No password set for web server, create one by using'
             ' `flexget web passwd <password>`'
         )
@@ -173,7 +173,7 @@ class WebServer(threading.Thread):
     def _start_server(self):
         # Mount the WSGI callable object (app) on the root directory
         cherrypy.tree.graft(_default_app, '/')
-        for path, registered_app in _app_register.items():
+        for path, (registered_app, name) in _app_register.items():
             cherrypy.tree.graft(registered_app, self.base_url + path)
 
         cherrypy.log.error_log.propagate = False
@@ -207,9 +207,10 @@ class WebServer(threading.Thread):
 
         protocol = 'https' if self.ssl_certificate and self.ssl_private_key else 'http'
 
-        log.info(
-            'Web interface available at %s://%s:%s%s', protocol, host, self.port, self.base_url
-        )
+        server_url = f'{protocol}://{host}:{self.port}{self.base_url}'
+        logger.info('Web server started at {}', server_url)
+        for path, (registered_app, name) in _app_register.items():
+            logger.info('{} available at {}{}', name, server_url, path)
 
         # Start the CherryPy WSGI web server
         cherrypy.engine.start()
@@ -221,7 +222,7 @@ class WebServer(threading.Thread):
     def stop(self):
         global _app_register
 
-        log.info('Shutting down web server')
+        logger.info('Shutting down web server')
         cherrypy.engine.exit()
 
         # Unregister apps

@@ -1,6 +1,7 @@
-import logging
 import re
 from urllib.parse import quote_plus
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.components.sites.urlrewriting import UrlRewritingError
@@ -12,7 +13,7 @@ from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
-log = logging.getLogger('iptorrents')
+logger = logger.bind(name='iptorrents')
 
 CATEGORIES = {
     # All
@@ -102,9 +103,9 @@ class UrlRewriteIPTorrents:
     # urlrewriter API
     def url_rewrite(self, task, entry):
         if 'url' not in entry:
-            log.error("Didn't actually get a URL...")
+            logger.error("Didn't actually get a URL...")
         else:
-            log.debug("Got the URL: %s" % entry['url'])
+            logger.debug('Got the URL: {}', entry['url'])
         if entry['url'].startswith(BASE_URL + '/t?'):
             # use search
             results = self.search(task, entry)
@@ -113,7 +114,7 @@ class UrlRewriteIPTorrents:
             # TODO: Search doesn't enforce close match to title, be more picky
             entry['url'] = results[0]['url']
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def search(self, task, entry, config=None):
         """
         Search for name from iptorrents
@@ -137,7 +138,7 @@ class UrlRewriteIPTorrents:
             url = "{base_url}/t?{filter}&q={query}&qf=".format(
                 base_url=BASE_URL, filter=filter_url, query=query
             )
-            log.debug('searching with url: %s' % url)
+            logger.debug('searching with url: {}', url)
             req = requests.get(
                 url, cookies={'uid': str(config['uid']), 'pass': config['password']}
             )
@@ -154,7 +155,7 @@ class UrlRewriteIPTorrents:
                     # Header column
                     continue
                 if torrent.find('td', {'colspan': '99'}):
-                    log.debug('No results found for search %s', search_string)
+                    logger.debug('No results found for search {}', search_string)
                     break
                 entry = Entry()
                 link = torrent.find('a', href=re.compile('download'))['href']
@@ -175,7 +176,7 @@ class UrlRewriteIPTorrents:
                 size = re.search(r'^([\.\d]+) ([GMK]?)B$', size)
 
                 entry['content_size'] = parse_filesize(size.group(0))
-                log.debug('Found entry %s', entry)
+                logger.debug('Found entry {}', entry)
                 entries.add(entry)
 
         return entries

@@ -1,13 +1,13 @@
 import fnmatch
-import logging
 import os
 
-from flask import Flask, send_from_directory
+from flask import Flask, redirect, request, send_from_directory
 from flask_compress import Compress
+from loguru import logger
 
 from flexget.webserver import register_app, register_home
 
-log = logging.getLogger('webui')
+logger = logger.bind(name='webui')
 
 manager = None
 debug = False
@@ -20,7 +20,9 @@ bower_components = os.path.join(ui_base, 'bower_components')
 
 webui_app = Flask(__name__)
 Compress(webui_app)
-webui_app.url_path = '/'
+webui_app.url_path = '/v1/'
+
+HTTP_METHODS = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH']
 
 
 @webui_app.route('/<path:path>')
@@ -38,6 +40,12 @@ def serve_app(path):
         return send_from_directory(ui_base, 'load.failure.html')
 
     return send_from_directory(app_base, path)
+
+
+@webui_app.route('/api/')
+@webui_app.route('/api/<path:path>', methods=HTTP_METHODS)
+def api_redirect(path='/'):
+    return redirect(request.full_path.replace('/v1', '', 1), 307)
 
 
 @webui_app.route('/')
@@ -66,22 +74,22 @@ def register_web_ui(mgr):
     if debug:
         app_base = os.path.join(ui_base, '.tmp', 'serve')
         if not os.path.exists(app_base):
-            log.warning(
+            logger.warning(
                 'Unable to start web ui in debug mode. To enable debug mode please run the debug build, '
                 'see http://flexget.com/wiki/Web-UI for instructions'
             )
-            log.warning('Attempting to serve web ui from complied directory')
+            logger.warning('Attempting to serve web ui from complied directory')
             app_base = None
 
     if not app_base:
         app_base = ui_dist
         if not os.path.exists(app_base):
-            log.fatal(
+            logger.critical(
                 'Failed to start web ui,'
                 ' this can happen if you are running from GitHub version and forgot to run the web ui build, '
                 'see http://flexget.com/wiki/Web-UI for instructions'
             )
             app_base = None
 
-    register_app(webui_app.url_path, webui_app)
+    register_app(webui_app.url_path, webui_app, 'WebUI (v1)')
     register_home('%s/' % webui_app.url_path)
