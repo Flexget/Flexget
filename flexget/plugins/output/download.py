@@ -170,7 +170,7 @@ class PluginDownload:
         logger.error(
             'Error retrieving {}, the error page has been saved to {}', entry['title'], filename
         )
-        with io.open(filename, 'wb') as outfile:
+        with open(filename, 'wb') as outfile:
             outfile.write(page)
 
     def get_temp_files(
@@ -299,7 +299,7 @@ class PluginDownload:
         tmp_dir = tempfile.mkdtemp(dir=tmp_path)
         fname = hashlib.md5(url.encode('utf-8', 'replace')).hexdigest()
         datafile = os.path.join(tmp_dir, fname)
-        outfile = io.open(datafile, 'wb')
+        outfile = open(datafile, 'wb')
         try:
             for chunk in response.iter_content(chunk_size=150 * 1024, decode_unicode=False):
                 outfile.write(chunk)

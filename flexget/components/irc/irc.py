@@ -273,7 +273,7 @@ class IRCConnection(SimpleIRCBot):
         :return: the parsed XML
         """
         try:
-            with io.open(path, 'rb') as xml_file:
+            with open(path, 'rb') as xml_file:
                 return parse(xml_file).getroot()
         except Exception as e:
             raise TrackerFileParseError('Unable to parse tracker config file %s: %s' % (path, e))
@@ -361,7 +361,7 @@ class IRCConnection(SimpleIRCBot):
 
         # If we got this far, let's save our work :)
         save_path = os.path.join(base_dir, tracker_name)
-        with io.open(save_path, 'wb') as tracker_file:
+        with open(save_path, 'wb') as tracker_file:
             for chunk in tracker.iter_content(8192):
                 tracker_file.write(chunk)
         return cls.read_tracker_config(save_path)

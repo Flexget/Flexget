@@ -624,7 +624,7 @@ class Manager:
         if not self.config_path:
             return
         sha1_hash = hashlib.sha1()
-        with io.open(self.config_path, 'rb') as f:
+        with open(self.config_path, 'rb') as f:
             while True:
                 data = f.read(65536)
                 if not data:
@@ -641,7 +641,7 @@ class Manager:
         :raises: `ValueError` if there is a problem loading the config file
         """
         fire_event('manager.before_config_load', self)
-        with io.open(self.config_path, 'r', encoding='utf-8') as f:
+        with open(self.config_path, 'r', encoding='utf-8') as f:
             try:
                 raw_config = f.read()
             except UnicodeDecodeError:
@@ -850,7 +850,7 @@ class Manager:
         """
         if self.lockfile and os.path.exists(self.lockfile):
             result = {}
-            with io.open(self.lockfile, encoding='utf-8') as f:
+            with open(self.lockfile, encoding='utf-8') as f:
                 lines = [l for l in f.readlines() if l]
             for line in lines:
                 try:
@@ -900,7 +900,7 @@ class Manager:
             if not self._has_lock:
                 # Exit if there is an existing lock.
                 if self.check_lock():
-                    with io.open(self.lockfile, encoding='utf-8') as f:
+                    with open(self.lockfile, encoding='utf-8') as f:
                         pid = f.read()
                     print(
                         'Another process (%s) is running, will exit.' % pid.split('\n')[0],
@@ -926,7 +926,7 @@ class Manager:
 
     def write_lock(self, ipc_info: Optional[dict] = None) -> None:
         assert self._has_lock
-        with io.open(self.lockfile, 'w', encoding='utf-8') as f:
+        with open(self.lockfile, 'w', encoding='utf-8') as f:
             f.write('PID: %s\n' % os.getpid())
             if ipc_info:
                 for key in sorted(ipc_info):

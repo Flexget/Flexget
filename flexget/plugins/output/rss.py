@@ -293,7 +293,7 @@ class OutputRSS:
 
         # write rss
         fn = os.path.expanduser(config['file'])
-        with io.open(fn, 'wb') as file:
+        with open(fn, 'wb') as file:
             try:
                 logger.verbose('Writing output rss to {}', fn)
                 rss.write_xml(file, encoding=config['encoding'])
