@@ -205,7 +205,7 @@ class RTorrent:
         parsed_uri = urlparse(uri)
 
         if self.username and self.password and parsed_uri.scheme not in ['http', 'https']:
-            raise IOError('Username and password only supported on http(s)')
+            raise OSError('Username and password only supported on http(s)')
 
         # Determine the proxy server
         if parsed_uri.scheme in ['http', 'https']:
@@ -216,7 +216,7 @@ class RTorrent:
             self.uri = parsed_uri.path
             sp = create_proxy
         else:
-            raise IOError('Unsupported scheme %s for uri %s' % (parsed_uri.scheme, self.uri))
+            raise OSError('Unsupported scheme %s for uri %s' % (parsed_uri.scheme, self.uri))
 
         # Use a special transport if http(s)
         if parsed_uri.scheme in ['http', 'https']:
@@ -507,7 +507,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                         continue
                     self.update_entry(client, entry, config)
 
-        except IOError as e:
+        except OSError as e:
             raise plugin.PluginError("Couldn't connect to rTorrent: %s" % str(e))
 
     def delete_entry(self, client, entry):
@@ -619,7 +619,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             try:
                 with open(entry['file'], 'rb') as f:
                     torrent_raw = f.read()
-            except IOError as e:
+            except OSError as e:
                 entry.fail('Failed to add to rTorrent %s' % str(e))
                 return
 
@@ -692,7 +692,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
 
         try:
             torrents = client.torrents(config['view'], fields=fields)
-        except (IOError, xmlrpc_client.Error) as e:
+        except (OSError, xmlrpc_client.Error) as e:
             task.abort('Could not get torrents (%s): %s' % (config['view'], e))
             return
 

@@ -118,7 +118,7 @@ class PluginCookies:
                         'Adding cookie for {}. key: {} value: {}', item[0], item[4], item[5]
                     )
                     count += 1
-                except IOError:
+                except OSError:
 
                     def to_hex(x):
                         return ''.join([hex(ord(c))[2:].zfill(2) for c in x])
@@ -177,7 +177,7 @@ class PluginCookies:
             try:
                 cj.load(filename=cookie_file, ignore_expires=True)
                 logger.debug('{} cookies loaded', cookie_type)
-            except (http.cookiejar.LoadError, IOError):
+            except (http.cookiejar.LoadError, OSError):
                 import sys
 
                 raise plugin.PluginError(

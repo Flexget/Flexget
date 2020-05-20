@@ -114,7 +114,7 @@ def get_udp_seeds(url, info_hash):
         # set recieve size of 8 + 12 bytes
         res = clisocket.recv(20)
 
-    except IOError as e:
+    except OSError as e:
         logger.warning('Socket Error: {}', e)
         return 0
     # Check for UDP error packet
@@ -148,7 +148,7 @@ def get_http_seeds(url, info_hash):
     except BadStatusLine as e:
         logger.warning('Error BadStatusLine: {}', e)
         return 0
-    except IOError as e:
+    except OSError as e:
         logger.warning('Server error: {}', e)
         return 0
     if not data:

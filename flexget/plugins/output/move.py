@@ -126,7 +126,7 @@ class BaseFileOps:
                             )
                 # execute action in subclasses
                 self.handle_entry(task, config, entry, siblings)
-            except (OSError, IOError) as err:
+            except OSError as err:
                 entry.fail(str(err))
                 continue
 

@@ -322,7 +322,7 @@ class IRCConnection(SimpleIRCBot):
         if not os.path.exists(base_dir):  # will only try to create the default `trackers` dir
             try:
                 os.mkdir(base_dir)
-            except IOError as e:
+            except OSError as e:
                 raise TrackerFileError(e)
         logger.info(
             'Tracker file not found on disk. Attempting to fetch tracker config file from Github.'
@@ -330,7 +330,7 @@ class IRCConnection(SimpleIRCBot):
         tracker = None
         try:
             tracker = requests.get(base_url + tracker_config_file)
-        except (requests.RequestException, IOError):
+        except (requests.RequestException, OSError):
             pass
         if not tracker:
             try:
@@ -351,7 +351,7 @@ class IRCConnection(SimpleIRCBot):
                     tracker = requests.get(base_url + name)
                     tracker_name = name
                     break
-            except (requests.RequestException, IOError) as e:
+            except (requests.RequestException, OSError) as e:
                 raise TrackerFileError(e)
         if not tracker:
             raise TrackerFileError(
@@ -899,7 +899,7 @@ class IRCConnectionManager:
                 if not conn and self.config.get(conn_name):
                     try:
                         self.restart_connection(conn_name, self.config[conn_name])
-                    except IOError as e:
+                    except OSError as e:
                         logger.error(e)
                 elif not conn.is_alive() and conn.running:
                     if conn_name not in schedule:
@@ -916,7 +916,7 @@ class IRCConnectionManager:
                         )
                         try:
                             self.restart_connection(conn_name, conn.config)
-                        except IOError as e:
+                        except OSError as e:
                             logger.error(e)
                         # remove it from the schedule
                         del schedule[conn_name]
@@ -954,7 +954,7 @@ class IRCConnectionManager:
                 conn = IRCConnection(config, conn_name)
                 irc_connections[conn_name] = conn
                 config_hash['names'][conn_name] = get_config_hash(config)
-            except (MissingConfigOption, TrackerFileParseError, TrackerFileError, IOError) as e:
+            except (MissingConfigOption, TrackerFileParseError, TrackerFileError, OSError) as e:
                 logger.error(e)
                 if conn_name in irc_connections:
                     del irc_connections[conn_name]  # remove it from the list of connections
@@ -1012,7 +1012,7 @@ class IRCConnectionManager:
             try:
                 new_irc_connections[name] = IRCConnection(conf, name)
                 config_hash['names'][name] = hash
-            except (MissingConfigOption, TrackerFileParseError, TrackerFileError, IOError) as e:
+            except (MissingConfigOption, TrackerFileParseError, TrackerFileError, OSError) as e:
                 logger.error('Failed to update config. Error when updating {}: {}', name, e)
                 return
 

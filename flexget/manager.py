@@ -559,7 +559,7 @@ class Manager:
         Find and load the configuration file.
 
         :param bool create: If a config file is not found, and create is True, one will be created in the home folder
-        :raises: `IOError` when no config file could be found, and `create` is False.
+        :raises: `OSError` when no config file could be found, and `create` is False.
         """
         home_path = os.path.join(os.path.expanduser('~'), '.flexget')
         options_config = os.path.expanduser(self.options.config)
@@ -609,9 +609,9 @@ class Manager:
         elif not config:
             logger.critical('Failed to find configuration file {}', options_config)
             logger.info('Tried to read from: {}', ', '.join(possible))
-            raise IOError('No configuration file found.')
+            raise OSError('No configuration file found.')
         if not os.path.isfile(config):
-            raise IOError('Config `%s` does not appear to be a file.' % config)
+            raise OSError('Config `%s` does not appear to be a file.' % config)
 
         logger.debug('Config file {} selected', config)
         self.config_path = config
@@ -740,7 +740,7 @@ class Manager:
         logger.debug('backing up old config to {} before new save', backup_path)
         try:
             shutil.copy(self.config_path, backup_path)
-        except (OSError, IOError) as e:
+        except OSError as e:
             logger.warning('Config backup creation failed: {}', str(e))
             raise
         return backup_path
@@ -752,7 +752,7 @@ class Manager:
         # Back up the user's current config before overwriting
         try:
             self.backup_config()
-        except (OSError, IOError):
+        except OSError:
             return
         with open(self.config_path, 'w') as config_file:
             config_file.write(yaml.dump(self.user_config, default_flow_style=False))

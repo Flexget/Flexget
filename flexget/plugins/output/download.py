@@ -221,13 +221,13 @@ class PluginDownload:
         except BadStatusLine as e:
             logger.warning('Failed to reach server. Reason: {}', getattr(e, 'message', 'N/A'))
             return 'BadStatusLine'
-        except IOError as e:
+        except OSError as e:
             if hasattr(e, 'reason'):
                 logger.warning('Failed to reach server. Reason: {}', e.reason)
             elif hasattr(e, 'code'):
                 logger.warning("The server couldn't fulfill the request. Error code: {}", e.code)
-            logger.opt(exception=True).debug('IOError')
-            return 'IOError'
+            logger.opt(exception=True).debug('OSError')
+            return 'OSError'
         except ValueError as e:
             # Probably unknown url type
             msg = 'ValueError %s' % e
@@ -508,7 +508,7 @@ class PluginDownload:
 
                 try:
                     shutil.move(entry['file'], destfile)
-                except (IOError, OSError) as err:
+                except (OSError, OSError) as err:
                     # ignore permission errors, see ticket #555
                     import errno
 

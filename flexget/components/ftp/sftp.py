@@ -275,7 +275,7 @@ class SftpList:
         for dir in dirs:
             try:
                 sftp.walktree(dir, handle_file, handle_dir, handle_unknown, recursive)
-            except IOError as e:
+            except OSError as e:
                 logger.error('Failed to open {} ({})', dir, e)
                 continue
 
@@ -580,7 +580,7 @@ class SftpUpload:
         try:
             sftp.put(localpath=location, remotepath=destination)
             logger.verbose('Successfully uploaded {} to {}', location, destination_url)
-        except IOError as e:
+        except OSError as e:
             logger.error('Remote directory does not exist: {} ({})', to)
             entry.fail('Remote directory does not exist: %s (%s)' % to)
             return

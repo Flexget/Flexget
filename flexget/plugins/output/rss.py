@@ -300,7 +300,7 @@ class OutputRSS:
             except LookupError:
                 logger.critical('Unknown encoding {}', config['encoding'])
                 return
-            except IOError:
+            except OSError:
                 # TODO: plugins cannot raise PluginWarnings in terminate event ..
                 logger.critical('Unable to write {}', fn)
                 return
