@@ -534,12 +534,12 @@ class Manager:
             # to always return unicode objects
             return self.construct_scalar(node)
 
-        yaml.Loader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
-        yaml.SafeLoader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
+        yaml.Loader.add_constructor('tag:yaml.org,2002:str', construct_yaml_str)
+        yaml.SafeLoader.add_constructor('tag:yaml.org,2002:str', construct_yaml_str)
 
         # Set up the dumper to not tag every string with !!python/unicode
         def unicode_representer(dumper, uni):
-            node = yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
+            node = yaml.ScalarNode(tag='tag:yaml.org,2002:str', value=uni)
             return node
 
         yaml.add_representer(str, unicode_representer)

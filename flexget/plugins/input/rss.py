@@ -433,7 +433,7 @@ class InputRSS:
                 break
 
             # remove annoying zero width spaces
-            entry.title = entry.title.replace(u'\u200B', u'')
+            entry.title = entry.title.replace('\u200B', '')
 
             # helper
             # TODO: confusing? refactor into class member ...

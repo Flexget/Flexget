@@ -694,7 +694,7 @@ class IRCConnection(SimpleIRCBot):
         # Clean up the messages
         lines = [MESSAGE_CLEAN.sub('', line) for line in self.line_cache[channel][nickname]]
 
-        logger.debug('Received line(s): {}', u'\n'.join(lines))
+        logger.debug('Received line(s): {}', '\n'.join(lines))
 
         # Generate some entries
         if self.linepatterns:

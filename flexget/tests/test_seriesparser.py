@@ -562,7 +562,7 @@ class TestSeriesParser:
         assert not s.valid
 
     def test_unicode(self, parse):
-        s = parse(name=u'abc äää abc', data=u'abc.äää.abc.s01e02')
+        s = parse(name='abc äää abc', data='abc.äää.abc.s01e02')
         assert s.season == 1
         assert s.episode == 2
 
