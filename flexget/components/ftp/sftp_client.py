@@ -138,7 +138,7 @@ class SftpClient:
         :param to: destination
         """
         if Path(source).is_dir():
-            logger.verbose('Skipping directory {}', source)
+            logger.verbose('Skipping directory {}', source) # type: ignore
         else:
             self._upload_file(source, to)
 
