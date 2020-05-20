@@ -168,7 +168,7 @@ class SftpDownload:
         to: str = config['to']
 
         try:
-            sftp.download_file(path, to, recursive, delete_origin)
+            sftp.download(path, to, recursive, delete_origin)
         except SftpError as e:
             entry.fail(e)  # type: ignore
 
@@ -226,7 +226,7 @@ class SftpDownload:
         if parsed.scheme == 'sftp':
             config = SftpConfig(host, port, username, password, private_key, private_key_pass)
         else:
-            logger.warning(f'Scheme does not match SFTP: {entry["url"]}',)
+            logger.warning('Scheme does not match SFTP: {}', entry['url'])
 
         return config
 
@@ -295,26 +295,26 @@ class SftpUpload:
 
         to: str = config['to']
         location: str = entry['location']
+        delete_origin: bool = config['delete_origin']
 
         if to:
             try:
                 to = render_from_entry(to, entry)
             except RenderError as e:
-                logger.error(f'Could not render path: {to}')
-                entry.fail(e)  # type: ignore
+                logger.error('Could not render path: {}', to)
+                entry.fail(str(e))  # type: ignore
                 return
 
         try:
-            sftp.upload_file(location, to)
+            sftp.upload(location, to)
         except SftpError as e:
-            entry.fail(e)  # type: ignore
-            raise e
+            entry.fail(str(e))  # type: ignore
 
-        if config['delete_origin']:
+        if delete_origin and Path(location).is_file():
             try:
                 Path(location).unlink()
             except Exception as e:
-                logger.warning(f'Failed to delete file {location} ({e})')  # type: ignore
+                logger.warning('Failed to delete file {} ({})', location, e)  # type: ignore
 
     @classmethod
     def on_task_output(cls, task: Task, config: dict) -> None:
@@ -330,7 +330,7 @@ class SftpUpload:
 
         for entry in task.accepted:
             if sftp:
-                logger.debug(f'Uploading file: {entry["location"]}')
+                logger.debug('Uploading file: {}', entry['location'])
                 cls.handle_entry(entry, sftp, config)
             else:
                 entry.fail('SFTP connection failed.')

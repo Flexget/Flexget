@@ -59,6 +59,14 @@ class SftpClient:
     def list_directories(
         self, directories: List[str], recursive: bool, get_size: bool, files_only: bool
     ) -> List[Entry]:
+        """
+        Build a list of entries from a provided list of directories on an SFTP server
+        :param directories: list of directories to generate entries for
+        :param recursive: boolean indicating whether to list recursively
+        :param get_size: boolean indicating whether to compute size for each node (potentially slow for directories)
+        :param files_only: boolean indicating whether to exclude directories
+        :return: a list of entries describing the contents of the provided directories
+        """
 
         entries: List[Entry] = []
 
@@ -74,33 +82,40 @@ class SftpClient:
                     directory, file_handler, dir_handler, unknown_handler, recursive
                 )
             except IOError as e:
-                logger.warning(f'Failed to open {directory} ({e})')
+                logger.warning('Failed to open {} ({})', directory, str(e))
                 continue
 
         return entries
 
-    def download_file(self, path: str, to: str, recursive: bool, delete_origin: bool) -> None:
+    def download(self, source: str, to: str, recursive: bool, delete_origin: bool) -> None:
         """
-        Downloads the specified path
+        Downloads the file specified in "source" to the destination specified in "to"
+        :param source: path of the resource to download
+        :param to: path of the directory to download to
+        :param recursive: indicates whether to download the contents of "source" recursively
+        :param delete_origin: indicates whether to delete the source resource upon download
         """
 
         dir_handler: NodeHandler = self._handler_builder.get_null_handler()
         unknown_handler: NodeHandler = self._handler_builder.get_unknown_handler()
 
-        parsed_path: PurePosixPath = PurePosixPath(path)
+        parsed_path: PurePosixPath = PurePosixPath(source)
 
-        if not self.path_exists(path):
-            raise SftpError(f'Remote path does not exist: {path}')
+        if not self.path_exists(source):
+            raise SftpError(f'Remote path does not exist: {source}')
 
-        if self.is_file(path):
+        if self.is_file(source):
             source_file: str = parsed_path.name
             source_dir: str = parsed_path.parent.as_posix()
             try:
                 self._sftp.cwd(source_dir)
-                self._download_file(source_file, to, delete_origin)
+                self._download_file(to, delete_origin, source_file)
             except Exception as e:
-                raise SftpError(f'Failed to download file {path} ({e})')
-        elif self.is_dir(path):
+                raise SftpError(f'Failed to download file {source} ({str(e)})')
+
+            if delete_origin:
+                self.remove_dir(source_dir)
+        elif self.is_dir(source):
             base_path: str = parsed_path.joinpath('..').as_posix()
             dir_name: str = parsed_path.name
             handle_file: NodeHandler = partial(self._download_file, to, delete_origin)
@@ -109,62 +124,62 @@ class SftpClient:
                 self._sftp.cwd(base_path)
                 self._sftp.walktree(dir_name, handle_file, dir_handler, unknown_handler, recursive)
             except Exception as e:
-                raise SftpError(f'Failed to download directory {path} ({e})')
+                raise SftpError(f'Failed to download directory {source} ({str(e)})')
 
             if delete_origin:
-                self.remove_dir(path)
+                self.remove_dir(source)
         else:
-            logger.warning(f'Skipping unknown file {path}')
+            logger.warning('Skipping unknown file: {}', source)
 
-    def upload_file(self, source: str, to: str) -> None:
-
-        filename: str = PurePath(source).name
-        destination: str = PurePosixPath(to, filename).as_posix()
-        destination_url: str = urljoin(self.prefix, destination)
-
-        if not Path(source).exists():
-            logger.warning(f'File no longer exists: {source}')
-
-        if not self.path_exists(to):
-            try:
-                self.make_dirs(to)
-            except Exception as e:
-                raise SftpError(f'Failed to create remote directory {to} ({e})')
-
-        if not self.is_dir(to):
-            raise SftpError(f'Not a directory: {to}')
-
-        try:
-            self._put_file(source, destination)
-            logger.verbose(f'Successfully uploaded {source} to {destination_url}')  # type: ignore
-        except IOError:
-            raise SftpError(f'Remote directory does not exist: {to}')
-        except Exception as e:
-            raise SftpError(f'Failed to upload {source} ({e})')
+    def upload(self, source: str, to: str) -> None:
+        """
+        Upload files or directories to an SFTP server
+        :param source: file or directory to upload
+        :param to: destination
+        """
+        if Path(source).is_dir():
+            logger.verbose('Skipping directory {}', source)
+        else:
+            self._upload_file(source, to)
 
     def remove_dir(self, path: str) -> None:
         """
         Remove a directory if it's empty
+        :param path: directory to remove
         """
         if self._sftp.exists(path) and not self._sftp.listdir(path):
             logger.debug('Attempting to delete directory {}', path)
             try:
                 self._sftp.rmdir(path)
             except Exception as e:
-                logger.error('Failed to delete directory {} ({})', path, e)
+                logger.error('Failed to delete directory {} ({})', path, str(e))
 
     def remove_file(self, path: str) -> None:
+        """
+        Remove a file if it's empty
+        :param path: file to remove
+        """
         logger.debug('Deleting remote file {}', path)
         try:
             self._sftp.remove(path)
         except Exception as e:
-            logger.error('Failed to delete file {} ({})', path, e)
+            logger.error('Failed to delete file {} ({})', path, str(e))
             return
 
     def is_file(self, path: str) -> bool:
+        """
+        Check if the node at a given path is a file
+        :param path: path to check
+        :return: boolean indicating if the path is a file
+        """
         return self._sftp.isfile(path)
 
     def is_dir(self, path: str) -> bool:
+        """
+        Check if the node at a given path is a directory
+        :param path: path to check
+        :return: boolean indicating if the path is a directory
+        """
         return self._sftp.isdir(path)
 
     def path_exists(self, path: str) -> bool:
@@ -182,11 +197,26 @@ class SftpClient:
 
         :param path: path to build
         """
-        self._sftp.mkdir(path)
+        if not self.path_exists(path):
+            try:
+                self._sftp.mkdir(path)
+            except Exception as e:
+                raise SftpError(f'Failed to create remote directory {path} ({str(e)})')
+
+    def close(self) -> None:
+        """
+        Close the sftp connection
+        """
+        self._sftp.close()
+
+    def set_socket_timeout(self, socket_timeout_sec):
+        """
+        Sets the SFTP client socket timeout
+        :param socket_timeout_sec: Socket timeout in seconds
+        """
+        self._sftp.timeout = socket_timeout_sec
 
     def _connect(self, connection_tries: int) -> 'pysftp.Connection':
-        """
-        """
 
         tries: int = connection_tries
         retry_interval: int = RETRY_INTERVAL_SEC
@@ -205,66 +235,77 @@ class SftpClient:
                     port=self.port,
                     private_key_pass=self.private_key_pass,
                 )
-                logger.verbose(f'Connected to {self.host}')  # type: ignore
+                logger.verbose('Connected to {}', self.host)  # type: ignore
             except Exception as e:
                 tries -= 1
                 if not tries:
                     raise e
                 else:
-                    logger.debug(f'Caught exception: {e}')
+                    logger.debug('Caught exception: {}', e)
                     logger.warning(
-                        f'Failed to connect to {self.host}; waiting {retry_interval} seconds before retrying.'
+                        'Failed to connect to {}; waiting {} seconds before retrying.',
+                        self.host,
+                        retry_interval,
                     )
                     time.sleep(retry_interval)
                     retry_interval += RETRY_STEP_SEC
 
         return sftp
 
-    def close(self) -> None:
-        """
-        Close the sftp connection
-        """
-        self._sftp.close()
+    def _upload_file(self, source: str, to: str) -> None:
+        if not Path(source).exists():
+            logger.warning('File no longer exists:', source)
+            return
 
-    def set_socket_timeout(self, socket_timeout_sec):
-        """
-        Sets the SFTP client socket timeout
-        :param socket_timeout_sec: Socket timeout in seconds
-        :return:
-        """
-        self._sftp.timeout = socket_timeout_sec
+        destination = self._get_upload_path(source, to)
+        destination_url: str = urljoin(self.prefix, destination)
 
-    def _put_file(self, source: str, destination: str) -> None:
-        return self._sftp.put(source, destination)
+        if not self.path_exists(to):
+            try:
+                self.make_dirs(to)
+            except Exception as e:
+                raise SftpError(f'Failed to create remote directory {to} ({str(e)})')
 
-    def _download_file(self, source: str, destination: str, delete_origin: bool) -> None:
+        if not self.is_dir(to):
+            raise SftpError(f'Not a directory: {to}')
 
-        dir_name: str = PurePosixPath(source).parent.as_posix()
-        destination_path: str = self._get_destination_path(source, destination)
-        destination_dir: str = Path(destination).parent.as_posix()
+        try:
+            self._put_file(source, destination)
+            logger.verbose('Successfully uploaded {} to {}', source, destination_url)  # type: ignore
+        except IOError:
+            raise SftpError(f'Remote directory does not exist: {to}')
+        except Exception as e:
+            raise SftpError(f'Failed to upload {source} ({str(e)})')
+
+    def _download_file(self, destination: str, delete_origin: bool, source: str) -> None:
+
+        destination_path: str = self._get_download_path(source, destination)
+        destination_dir: str = Path(destination_path).parent.as_posix()
 
         if Path(destination_path).exists():
             logger.verbose(  # type: ignore
-                f'Skipping {source} because destination file {destination_path} already exists.'
+                'Skipping {} because destination file {} already exists.', source, destination_path
             )
             return
 
         Path(destination_dir).mkdir(parents=True, exist_ok=True)
 
-        logger.verbose(f'Downloading file {source} to {destination}')  # type: ignore
+        logger.verbose('Downloading file {} to {}', source, destination)  # type: ignore
 
         try:
             self._sftp.get(source, destination_path)
         except Exception as e:
-            logger.error(f'Failed to download {source} ({e})')
+            logger.error('Failed to download {} ({})', source, e)
             if Path(destination_path).exists():
-                logger.debug(f'Removing partially downloaded file {destination_path}')
+                logger.debug('Removing partially downloaded file {}', destination_path)
                 Path(destination_path).unlink()
             raise e
 
         if delete_origin:
             self.remove_file(source)
-            self.remove_dir(dir_name)
+
+    def _put_file(self, source: str, destination: str) -> None:
+        return self._sftp.put(source, destination)
 
     def _get_prefix(self) -> str:
         """
@@ -273,7 +314,7 @@ class SftpClient:
 
         def get_login_string() -> str:
             if self.username and self.password:
-                return f'{self.username}:{self.password}'
+                return f'{self.username}:{self.password}@'
             elif self.username:
                 return f'{self.username}@'
             else:
@@ -292,8 +333,13 @@ class SftpClient:
         return f'sftp://{login_string}{host}{port_string}/'
 
     @staticmethod
-    def _get_destination_path(path: str, destination: str) -> str:
+    def _get_download_path(path: str, destination: str) -> str:
         return PurePosixPath(destination).joinpath(Path(path)).as_posix()
+
+    @staticmethod
+    def _get_upload_path(source: str, to: str):
+        basename: str = PurePath(source).name
+        return PurePosixPath(to, basename).as_posix()
 
 
 class SftpError(Exception):
