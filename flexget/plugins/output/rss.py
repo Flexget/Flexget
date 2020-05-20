@@ -1,7 +1,6 @@
 import base64
 import datetime
 import hashlib
-import io
 import os
 
 from loguru import logger

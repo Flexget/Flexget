@@ -5,7 +5,6 @@ import copy  # noqa
 import errno  # noqa
 import fnmatch  # noqa
 import hashlib  # noqa
-import io  # noqa
 import os  # noqa
 import shutil  # noqa
 import signal  # noqa

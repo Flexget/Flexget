@@ -1,5 +1,4 @@
 import hashlib
-import io
 import mimetypes
 import os
 import shutil

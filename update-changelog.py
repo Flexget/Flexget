@@ -1,6 +1,5 @@
 import collections
 import datetime
-import io
 import re
 import sys
 
