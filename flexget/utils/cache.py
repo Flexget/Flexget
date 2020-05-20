@@ -1,5 +1,4 @@
 import hashlib
-import io
 import os
 
 import requests
@@ -44,7 +43,7 @@ def cached_resource(url, base_dir, force=False, max_size=250, directory='cached_
                 trim_dir(directory)
                 size = dir_size(directory) / (1024 * 1024.0)
 
-        with io.open(file_path, 'wb') as file:
+        with open(file_path, 'wb') as file:
             file.write(content)
     return file_path, mime_type
 

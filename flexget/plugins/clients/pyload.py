@@ -139,7 +139,7 @@ class PluginPyLoad:
 
         try:
             session = api.get_session(config)
-        except IOError:
+        except OSError:
             raise plugin.PluginError('pyLoad not reachable', logger)
         except plugin.PluginError:
             raise

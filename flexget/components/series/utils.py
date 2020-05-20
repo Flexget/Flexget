@@ -1,8 +1,8 @@
-TRANSLATE_MAP = {ord(u'&'): u' and '}
-for char in u'\'\\':
-    TRANSLATE_MAP[ord(char)] = u''
-for char in u'_./-,[]():':
-    TRANSLATE_MAP[ord(char)] = u' '
+TRANSLATE_MAP = {ord('&'): ' and '}
+for char in '\'\\':
+    TRANSLATE_MAP[ord(char)] = ''
+for char in '_./-,[]():':
+    TRANSLATE_MAP[ord(char)] = ' '
 
 
 def normalize_series_name(name):
@@ -10,5 +10,5 @@ def normalize_series_name(name):
     name = name.lower()
     name = name.replace('&amp;', ' and ')
     name = name.translate(TRANSLATE_MAP)  # Replaced some symbols with spaces
-    name = u' '.join(name.split())
+    name = ' '.join(name.split())
     return name

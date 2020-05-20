@@ -47,8 +47,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'FlexGet'
-copyright = u'2011, FlexGet'
+project = 'FlexGet'
+copyright = '2011, FlexGet'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -219,7 +219,7 @@ latex_documents = [('index', 'FlexGet.tex', u'FlexGet Documentation', u'FlexGet'
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [('index', 'flexget', u'FlexGet Documentation', [u'FlexGet'], 1)]
+man_pages = [('index', 'flexget', 'FlexGet Documentation', ['FlexGet'], 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
@@ -234,8 +234,8 @@ texinfo_documents = [
     (
         'index',
         'FlexGet',
-        u'FlexGet Technical Documentation',
-        u'FlexGet',
+        'FlexGet Technical Documentation',
+        'FlexGet',
         'FlexGet',
         'Automation tool.',
         'Miscellaneous',

@@ -1,4 +1,3 @@
-import io
 import os
 
 import yaml
@@ -39,7 +38,7 @@ class PluginInclude:
             file = os.path.expanduser(file_name)
             if not os.path.isabs(file):
                 file = os.path.join(task.manager.config_base, file)
-            with io.open(file, encoding='utf-8') as inc_file:
+            with open(file, encoding='utf-8') as inc_file:
                 include = yaml.safe_load(inc_file)
                 inc_file.flush()
             errors = process_config(include, plugin.plugin_schemas(interface='task'))

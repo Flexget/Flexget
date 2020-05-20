@@ -16,7 +16,7 @@ def main(args=None):
 
         try:
             manager = Manager(args)
-        except (IOError, ValueError) as e:
+        except (OSError, ValueError) as e:
             if _is_debug():
                 import traceback
 
@@ -39,7 +39,7 @@ def main(args=None):
                 )
             else:
                 manager.start()
-        except (IOError, ValueError) as e:
+        except (OSError, ValueError) as e:
             if _is_debug():
                 import traceback
 

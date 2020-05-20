@@ -198,8 +198,8 @@ class TestHtmlUtils:
         """utils decode_html"""
         from flexget.utils.tools import decode_html
 
-        assert decode_html('&lt;&#51;') == u'<3'
-        assert decode_html('&#x2500;') == u'\u2500'
+        assert decode_html('&lt;&#51;') == '<3'
+        assert decode_html('&#x2500;') == '\u2500'
 
     @pytest.mark.skip(reason='FAILS - DISABLED')
     def test_encode_html(self):

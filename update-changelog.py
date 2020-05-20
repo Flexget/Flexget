@@ -1,6 +1,5 @@
 import collections
 import datetime
-import io
 import re
 import sys
 
@@ -99,7 +98,7 @@ if __name__ == '__main__':
     except IndexError:
         print('No filename specified, using changelog.md')
         filename = 'changelog.md'
-    with io.open(filename, encoding='utf-8') as logfile:
+    with open(filename, encoding='utf-8') as logfile:
         pre_lines, start_comment, tail = isplit('<!---', logfile)
         active_lines, end_comment, tail = isplit('<!---', tail)
         post_lines = list(tail)
@@ -150,7 +149,7 @@ if __name__ == '__main__':
 
     if modified:
         print('Writing modified changelog.')
-        with io.open(filename, 'w', encoding='utf-8') as logfile:
+        with open(filename, 'w', encoding='utf-8') as logfile:
             logfile.writelines(pre_lines)
             logfile.write('<!---{0}--->\n'.format(commit.hexsha))
             logfile.writelines(cur_ver.to_md_lines())

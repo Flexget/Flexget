@@ -1,7 +1,6 @@
 import base64
 import datetime
 import hashlib
-import io
 import os
 
 from loguru import logger
@@ -293,14 +292,14 @@ class OutputRSS:
 
         # write rss
         fn = os.path.expanduser(config['file'])
-        with io.open(fn, 'wb') as file:
+        with open(fn, 'wb') as file:
             try:
                 logger.verbose('Writing output rss to {}', fn)
                 rss.write_xml(file, encoding=config['encoding'])
             except LookupError:
                 logger.critical('Unknown encoding {}', config['encoding'])
                 return
-            except IOError:
+            except OSError:
                 # TODO: plugins cannot raise PluginWarnings in terminate event ..
                 logger.critical('Unable to write {}', fn)
                 return

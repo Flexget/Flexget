@@ -46,7 +46,7 @@ class TransmissionBase:
                 config['username'], _, config['password'] = netrc(netrc_path).authenticators(
                     config['host']
                 )
-            except IOError as e:
+            except OSError as e:
                 logger.error('netrc: unable to open: {}', e.filename)
             except NetrcParseError as e:
                 logger.error('netrc: {}, file: {}, line: {}', e.msg, e.filename, e.lineno)

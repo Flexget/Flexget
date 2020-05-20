@@ -404,8 +404,8 @@ class TestTVMazeShowLookup:
     def test_show_with_non_ascii_chars(self, execute_task):
         task = execute_task('test_show_with_non_ascii_chars')
         entry = task.entries[0]
-        assert entry['tvmaze_series_name'] == u'Unit\xe9 9', (
-            u'series id should be Unit\xe9 9, instead its %s' % entry['tvmaze_series_name']
+        assert entry['tvmaze_series_name'] == 'Unit\xe9 9', (
+            'series id should be Unit\xe9 9, instead its %s' % entry['tvmaze_series_name']
         )
         assert entry['tvmaze_series_id'] == 8652, (
             'series id should be 8652, instead its %s' % entry['tvmaze_series_id']
