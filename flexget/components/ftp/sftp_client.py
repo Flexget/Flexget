@@ -81,7 +81,7 @@ class SftpClient:
                 self._sftp.walktree(
                     directory, file_handler, dir_handler, unknown_handler, recursive
                 )
-            except IOError as e:
+            except OSError as e:
                 logger.warning('Failed to open {} ({})', directory, str(e))
                 continue
 
@@ -272,7 +272,7 @@ class SftpClient:
         try:
             self._put_file(source, destination)
             logger.verbose('Successfully uploaded {} to {}', source, destination_url)  # type: ignore
-        except IOError:
+        except OSError:
             raise SftpError(f'Remote directory does not exist: {to}')
         except Exception as e:
             raise SftpError(f'Failed to upload {source} ({str(e)})')

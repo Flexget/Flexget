@@ -29,7 +29,7 @@ class TestTaskAPI:
                 'config': {
                     'mock': [{'title': 'entry 1'}],
                     'rss': {
-                        'url': u'http://test/rss',
+                        'url': 'http://test/rss',
                         'group_links': False,
                         'ascii': False,
                         'escape': False,
@@ -52,7 +52,7 @@ class TestTaskAPI:
             'config': {
                 'mock': [{'title': 'entry 1'}],
                 'rss': {
-                    'url': u'http://test/rss',
+                    'url': 'http://test/rss',
                     'group_links': False,
                     'ascii': False,
                     'escape': False,
@@ -97,7 +97,7 @@ class TestTaskAPI:
             'config': {
                 'mock': [{'title': 'entry 1'}],
                 'rss': {
-                    'url': u'http://test/rss',
+                    'url': 'http://test/rss',
                     'group_links': False,
                     'ascii': False,
                     'escape': False,

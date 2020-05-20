@@ -267,7 +267,7 @@ class InputHtml:
                 continue
 
             # strip unicode white spaces
-            title = title.replace(u'\u200B', u'').strip()
+            title = title.replace('\u200B', '').strip()
 
             # in case the title contains xxxxxxx.torrent - foooo.torrent clean it a bit (get up to first .torrent)
             # TODO: hack

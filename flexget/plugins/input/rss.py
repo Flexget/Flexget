@@ -369,7 +369,7 @@ class InputRSS:
                         'Received invalid RSS content from task %s (%s)'
                         % (task.name, config['url'])
                     )
-                elif isinstance(ex, http.client.BadStatusLine) or isinstance(ex, IOError):
+                elif isinstance(ex, http.client.BadStatusLine) or isinstance(ex, OSError):
                     raise ex  # let the @internet decorator handle
                 else:
                     # all other bozo errors
@@ -433,7 +433,7 @@ class InputRSS:
                 break
 
             # remove annoying zero width spaces
-            entry.title = entry.title.replace(u'\u200B', u'')
+            entry.title = entry.title.replace('\u200B', '')
 
             # helper
             # TODO: confusing? refactor into class member ...

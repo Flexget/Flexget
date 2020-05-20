@@ -148,7 +148,7 @@ def _wrap_urlopen(url: str, timeout: Optional[int] = None) -> requests.Response:
     """
     try:
         raw = urlopen(url, timeout=timeout)
-    except IOError as e:
+    except OSError as e:
         msg = 'Error getting %s: %s' % (url, e)
         logger.error(msg)
         raise RequestException(msg)

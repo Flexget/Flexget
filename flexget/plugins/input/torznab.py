@@ -49,10 +49,19 @@ class Torznab:
             params = self._convert_query_parameters(
                 entry, ['rid', 'tvdbid', 'traktid', 'tvmazeid', 'imdbid', 'tmdbid', 'season', 'ep']
             )
+        
         if 'q' not in params.keys():
-            params['q'] = entry['title']
-        return self.create_entries_from_query(self._build_url(**params), task)
-
+            query = entry['title']
+        else:
+            query = params['q']
+        
+        entries = []
+        for search_string in entry.get('search_strings', [query]):
+            params['q'] = search_string
+            results = self.create_entries_from_query(self._build_url(**params), task)
+            entries.extend(results)
+        return entries
+            
     def _build_url(self, **kwargs):
         """Builds the url with query parameters from the arguments"""
         params = self.params.copy()

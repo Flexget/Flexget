@@ -120,7 +120,7 @@ class Newznab:
             return []
 
         imdb_id = arg_entry['imdb_id'].replace('tt', '')
-        config['params']['imdb_id'] = imdb_id
+        config['params']['imdbid'] = imdb_id
         return self.fill_entries_for_url(config['url'], config['params'], task)
 
     def do_search_all(self, arg_entry, task, config=None):

@@ -412,7 +412,7 @@ class ServerLogAPI(APIResource):
                         fh.seek(stream_from_byte)
                         line = fh.readline().decode(sys.getfilesystemencoding())
                         stream_from_byte = fh.tell()
-                except IOError:
+                except OSError:
                     yield '{}'
                     continue
 

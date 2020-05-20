@@ -1,4 +1,3 @@
-import io
 import os
 import socket
 
@@ -78,7 +77,7 @@ class FormLogin:
                 if not os.path.isdir(received):
                     os.mkdir(received)
                 filename = os.path.join(received, '%s.formlogin.html' % task.name)
-                with io.open(filename, 'wb') as f:
+                with open(filename, 'wb') as f:
                     f.write(response.content)
                 logger.critical(
                     'I have saved the login page content to {} for you to view', filename

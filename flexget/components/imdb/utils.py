@@ -67,7 +67,7 @@ def extract_id(url):
 
 def make_url(imdb_id):
     """Return IMDb URL of the given ID"""
-    return u'https://www.imdb.com/title/%s/' % imdb_id
+    return 'https://www.imdb.com/title/%s/' % imdb_id
 
 
 class ImdbSearch:
@@ -149,7 +149,7 @@ class ImdbSearch:
     def search(self, name):
         """Return array of movie details (dict)"""
         logger.debug('Searching: {}', name)
-        url = u'https://www.imdb.com/find'
+        url = 'https://www.imdb.com/find'
         # This may include Shorts and TV series in the results
         params = {'q': name, 's': 'tt'}
 
