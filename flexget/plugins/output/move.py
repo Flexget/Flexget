@@ -238,15 +238,13 @@ class TransformingOps(BaseFileOps):
         try:
             dst_path = entry.render(dst_path)
         except RenderError as err:
-            raise plugin.PluginError(
-                'Path value replacement `%s` failed: %s' % (dst_path, err.args[0])
-            )
+            entry.fail(f'Path value replacement `{dst_path}` failed: {err.args[0]}')
+            return
         try:
             dst_name = entry.render(dst_name)
         except RenderError as err:
-            raise plugin.PluginError(
-                'Filename value replacement `%s` failed: %s' % (dst_name, err.args[0])
-            )
+            entry.fail(f'Filename value replacement `{dst_name}` failed: {err.args[0]}')
+            return
 
         # Clean invalid characters with pathscrub plugin
         dst_path = pathscrub(os.path.expanduser(dst_path))
