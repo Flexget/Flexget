@@ -43,7 +43,7 @@ class CrossMatch:
         action = config['action']
         all_fields = config['all_fields']
 
-        if len(task.entries) == 0:
+        if not task.entries:
           logger.trace('Stopping crossmatch filter because of no entries to check')
           return
         
