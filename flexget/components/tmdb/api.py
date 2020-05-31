@@ -1,5 +1,5 @@
 from flask import jsonify
-from flask_restplus import inputs
+from flask_restx import inputs
 
 from flexget import plugin
 from flexget.api import APIResource, api

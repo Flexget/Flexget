@@ -1,7 +1,7 @@
 from math import ceil
 
 from flask import jsonify, request
-from flask_restplus import inputs
+from flask_restx import inputs
 from loguru import logger
 
 from flexget.api import APIResource, api

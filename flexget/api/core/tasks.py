@@ -6,7 +6,7 @@ from json import JSONEncoder
 from queue import Empty, Queue
 
 from flask import Response, jsonify, request
-from flask_restplus import inputs
+from flask_restx import inputs
 
 from flexget.api import APIResource, api
 from flexget.api.app import (
