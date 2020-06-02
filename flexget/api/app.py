@@ -7,8 +7,8 @@ from functools import partial, wraps
 from flask import Flask, jsonify, make_response, request
 from flask_compress import Compress
 from flask_cors import CORS
-from flask_restplus import Api as RestPlusAPI
-from flask_restplus import Resource
+from flask_restx import Api as RestxAPI
+from flask_restx import Resource
 from jsonschema import RefResolutionError
 from loguru import logger
 from werkzeug.http import generate_etag
@@ -88,9 +88,9 @@ class APIResource(Resource):
         super().__init__(api, *args, **kwargs)
 
 
-class API(RestPlusAPI):
+class API(RestxAPI):
     """
-    Extends a flask restplus :class:`flask_restplus.Api` with:
+    Extends a flask restx :class:`flask_restx.Api` with:
       - methods to make using json schemas easier
       - methods to auto document and handle :class:`ApiError` responses
     """
@@ -123,7 +123,7 @@ class API(RestPlusAPI):
 
     def response(self, code_or_apierror, description='Success', model=None, **kwargs):
         """
-        Extends :meth:`flask_restplus.Api.response` to allow passing an :class:`ApiError` class instead of
+        Extends :meth:`flask_restx.Api.response` to allow passing an :class:`ApiError` class instead of
         response code. If an `ApiError` is used, the response code, and expected response model, is automatically
         documented.
         """

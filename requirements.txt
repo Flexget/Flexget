@@ -19,7 +19,7 @@ flask-compress==1.4.0     # via -r requirements.in
 flask-cors==3.0.2         # via -r requirements.in
 flask-login==0.4.0        # via -r requirements.in
 flask-restful==0.3.6      # via -r requirements.in
-flask-restplus==0.10.1    # via -r requirements.in
+flask-restx==0.2.0        # via -r requirements.in
 flask==1.0.2              # via -r requirements.in, flask-compress, flask-cors, flask-login, flask-restful, flask-restplus
 guessit==3.1.0            # via -r requirements.in
 html5lib==0.999999999     # via -r requirements.in

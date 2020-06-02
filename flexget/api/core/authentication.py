@@ -4,7 +4,7 @@ from flask import request
 from flask import session as flask_session
 from flask_login import LoginManager
 from flask_login.utils import current_app, current_user, login_user
-from flask_restplus import inputs
+from flask_restx import inputs
 from werkzeug.security import check_password_hash
 
 from flexget.api import api_app

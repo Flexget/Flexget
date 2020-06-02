@@ -1,7 +1,7 @@
 import copy
 
 from flask import jsonify, redirect
-from flask_restplus import inputs
+from flask_restx import inputs
 
 from flexget.api import APIResource, api
 from flexget.api.app import NotFoundError, etag
