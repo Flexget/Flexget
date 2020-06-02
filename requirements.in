@@ -26,7 +26,7 @@ flask-restplus==0.10.1
 flask-compress>=1.2.1
 flask-login>=0.4.0
 flask-cors>=2.1.2
-pyparsing>=2.0.3
+pyparsing>=2.4.7
 zxcvbn-python
 progressbar==2.5
 more-itertools

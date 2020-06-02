@@ -35,7 +35,7 @@ plumbum==1.6.3            # via rpyc
 portend==2.6              # via cherrypy
 progressbar==2.5          # via -r requirements.in
 pynzb==0.1.0              # via -r requirements.in
-pyparsing==2.2.0          # via -r requirements.in
+pyparsing==2.4.7          # via -r requirements.in
 pyrss2gen==1.1            # via -r requirements.in
 python-dateutil==2.6.1    # via -r requirements.in, aniso8601, guessit
 pytz==2017.2              # via apscheduler, flask-restful, flask-restplus, tempora, tzlocal
