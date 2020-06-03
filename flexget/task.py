@@ -271,6 +271,7 @@ class Task:
         self._rerun = False
 
         self.disabled_phases = []
+        self.disabled_plugins = []
 
         # current state
         self.current_phase = None
@@ -386,6 +387,16 @@ class Task:
             logger.debug('Disabling {} phase', phase)
             self.disabled_phases.append(phase)
 
+    def disable_plugin(self, plugin):
+        """Disable ``plugin`` from execution.
+
+        :param string plugin: Name of ``plugin``
+        :raises ValueError: *plugin* could not be found.
+        """
+        if plugin not in all_plugins:
+            raise ValueError(f'`{plugin}` is not a valid plugin.')
+        self.disabled_plugins.append(plugin)
+
     def abort(self, reason='Unknown', silent=False, traceback=None):
         """Abort this task execution, no more plugins will be executed except the abort handling ones."""
         self.aborted = True
@@ -469,6 +480,8 @@ class Task:
             # Abort this phase if one of the plugins disables it
             if phase in self.disabled_phases:
                 return
+            if plugin.name in self.disabled_plugins:
+                continue
             # store execute info, except during entry events
             self.current_phase = phase
             self.current_plugin = plugin.name
