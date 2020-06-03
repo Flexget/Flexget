@@ -34,7 +34,11 @@ class PluginSequence:
             for item in config:
                 for plugin_name, plugin_config in item.items():
                     if phase in plugin.get_phases_by_plugin(plugin_name):
-                        method = plugin.get_plugin_by_name(plugin_name).phase_handlers[phase]
+                        try:
+                            method = task.get_plugin_by_name(plugin_name).phase_handlers[phase]
+                        except ValueError as exc:
+                            logger.debug('{}', exc)
+                            continue
                         logger.debug('Running plugin {}', plugin_name)
                         result = method(task, plugin_config)
                         if phase == 'input' and result:

@@ -21,9 +21,13 @@ class EstimateRelease:
         """
 
         logger.debug(entry['title'])
-        estimators = [
-            e.instance.estimate for e in plugin.get_plugins(interface='estimate_release')
-        ]
+        # If the entry is in a task context, use the task interface to get estimator plugins, so that we don't get ones
+        # that are disabled on that task.
+        if entry.task:
+            get_plugins = entry.task.get_plugins
+        else:
+            get_plugins = plugin.get_plugins
+        estimators = [e.instance.estimate for e in get_plugins(interface='estimate_release')]
         for estimator in sorted(
             estimators, key=lambda e: getattr(e, 'priority', plugin.PRIORITY_DEFAULT), reverse=True
         ):

@@ -43,7 +43,7 @@ class PluginSearch:
             return
 
         plugins = {}
-        for p in plugin.get_plugins(interface='search'):
+        for p in task.get_plugins(interface='search'):
             plugins[p.name] = p.instance
 
         # search accepted

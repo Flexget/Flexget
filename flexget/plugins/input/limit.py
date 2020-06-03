@@ -35,7 +35,11 @@ class PluginLimit:
 
     def on_task_input(self, task, config):
         for input_name, input_config in config['from'].items():
-            input = plugin.get_plugin_by_name(input_name)
+            try:
+                input = task.get_plugin_by_name(input_name)
+            except ValueError as e:
+                logger.debug('{}', e)
+                continue
             method = input.phase_handlers['input']
             try:
                 result = method(task, input_config)

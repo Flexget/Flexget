@@ -82,7 +82,11 @@ class FilterIf:
 
                     methods = {}
                     for plugin_name, plugin_config in action.items():
-                        p = plugin.get_plugin_by_name(plugin_name)
+                        try:
+                            p = task.get_plugin_by_name(plugin_name)
+                        except ValueError as e:
+                            logger.debug('{}', e)
+                            continue
                         method = p.phase_handlers.get(phase)
                         if method:
                             methods[method] = (fake_task, plugin_config)

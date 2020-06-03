@@ -82,7 +82,7 @@ class FilterProperMovies:
                 raise plugin.PluginError('Invalid time format', logger)
 
         # throws DependencyError if not present aborting task
-        imdb_lookup = plugin.get_plugin_by_name('imdb_lookup').instance
+        imdb_lookup = task.get_plugin_by_name('imdb_lookup').instance
 
         for entry in task.entries:
             parser = plugin.get('parsing', self).parse_movie(entry['title'])

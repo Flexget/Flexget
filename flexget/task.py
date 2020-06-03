@@ -6,7 +6,7 @@ import random
 import string
 import threading
 from functools import total_ordering, wraps
-from typing import Union, Iterable, List
+from typing import Union, Iterable, List, Optional
 
 from loguru import logger
 from sqlalchemy import Column, Integer, String, Unicode
@@ -22,6 +22,8 @@ from flexget.plugin import (
     get_plugins,
     phase_methods,
     plugin_schemas,
+    get_plugin_by_name,
+    PluginInfo,
 )
 from flexget.plugin import plugins as all_plugins
 from flexget.plugin import task_phases
@@ -131,8 +133,12 @@ class EntryContainer(list):
         list.__init__(self, iterable or [])
 
         self._entries = EntryIterator(self, [EntryState.UNDECIDED, EntryState.ACCEPTED])
-        self._accepted = EntryIterator(self, EntryState.ACCEPTED)  # accepted entries, can still be rejected
-        self._rejected = EntryIterator(self, EntryState.REJECTED)  # rejected entries, can not be accepted
+        self._accepted = EntryIterator(
+            self, EntryState.ACCEPTED
+        )  # accepted entries, can still be rejected
+        self._rejected = EntryIterator(
+            self, EntryState.REJECTED
+        )  # rejected entries, can not be accepted
         self._failed = EntryIterator(self, EntryState.FAILED)  # failed entries
         self._undecided = EntryIterator(self, EntryState.UNDECIDED)  # undecided entries (default)
 
@@ -375,7 +381,7 @@ class Task:
     def __str__(self):
         return '<Task(name=%s,aborted=%s)>' % (self.name, self.aborted)
 
-    def disable_phase(self, phase):
+    def disable_phase(self, phase: str):
         """Disable ``phase`` from execution.
 
         :param string phase: Name of ``phase``
@@ -387,7 +393,7 @@ class Task:
             logger.debug('Disabling {} phase', phase)
             self.disabled_phases.append(phase)
 
-    def disable_plugin(self, plugin):
+    def disable_plugin(self, plugin: str):
         """Disable ``plugin`` from execution.
 
         :param string plugin: Name of ``plugin``
@@ -428,8 +434,27 @@ class Task:
                 return entry
         return None
 
-    def plugins(self, phase=None):
-        """Get currently enabled plugins.
+    def get_plugin_by_name(self, name: str) -> PluginInfo:
+        if name in self.disabled_plugins:
+            raise ValueError(f'`{name}` plugin is disabled for this task.')
+        return get_plugin_by_name(name)
+
+    def get_plugins(
+        self,
+        phase: Optional[str] = None,
+        interface: Optional[str] = None,
+        category: Optional[str] = None,
+        name: Optional[str] = None,
+        min_api: Optional[int] = None,
+    ) -> Iterable[PluginInfo]:
+        return (
+            p
+            for p in get_plugins(phase, interface, category, name, min_api)
+            if p.name not in self.disabled_plugins
+        )
+
+    def plugins(self, phase: Optional[str] = None):
+        """Get plugins configured to run on this task.
 
         :param string phase:
           Optional, limits to plugins currently configured on given phase, sorted in phase order.
@@ -438,10 +463,10 @@ class Task:
         """
         if phase:
             plugins = sorted(
-                get_plugins(phase=phase), key=lambda p: p.phase_handlers[phase], reverse=True
+                self.get_plugins(phase=phase), key=lambda p: p.phase_handlers[phase], reverse=True
             )
         else:
-            plugins = iter(all_plugins.values())
+            plugins = self.get_plugins()
         return (p for p in plugins if p.name in self.config or p.builtin)
 
     def __run_task_phase(self, phase):
@@ -480,8 +505,6 @@ class Task:
             # Abort this phase if one of the plugins disables it
             if phase in self.disabled_phases:
                 return
-            if plugin.name in self.disabled_plugins:
-                continue
             # store execute info, except during entry events
             self.current_phase = phase
             self.current_plugin = plugin.name

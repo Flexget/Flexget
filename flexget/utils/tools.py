@@ -508,7 +508,12 @@ def aggregate_inputs(task: 'Task', inputs: List[dict]) -> List['Entry']:
     entry_locations = set()
     for item in inputs:
         for input_name, input_config in item.items():
-            input = plugin.get_plugin_by_name(input_name)
+            try:
+                input = task.get_plugin_by_name(input_name)
+            except ValueError as e:
+                # Plugin is disabled in this task
+                logger.debug('Error getting `{}` plugin: {}', input_name, e)
+                continue
             method = input.phase_handlers['input']
             try:
                 result = method(task, input_config)
