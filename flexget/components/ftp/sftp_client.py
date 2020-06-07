@@ -54,7 +54,9 @@ class SftpClient:
 
         self.prefix: str = self._get_prefix()
         self._sftp: 'pysftp.Connection' = self._connect(connection_tries)
-        self._handler_builder: HandlerBuilder = HandlerBuilder(self._sftp, self.prefix)
+        self._handler_builder: HandlerBuilder = HandlerBuilder(
+            self._sftp, self.prefix, self.private_key, self.private_key_pass
+        )
 
     def list_directories(
         self, directories: List[str], recursive: bool, get_size: bool, files_only: bool
@@ -138,7 +140,7 @@ class SftpClient:
         :param to: destination
         """
         if Path(source).is_dir():
-            logger.verbose('Skipping directory {}', source) # type: ignore
+            logger.verbose('Skipping directory {}', source)  # type: ignore
         else:
             self._upload_file(source, to)
 
@@ -355,9 +357,17 @@ class HandlerBuilder:
     :param url_prefix: SFTP URL prefix
     """
 
-    def __init__(self, sftp: 'pysftp.Connection', url_prefix: str):
+    def __init__(
+        self,
+        sftp: 'pysftp.Connection',
+        url_prefix: str,
+        private_key: Optional[str],
+        private_key_pass: Optional[str],
+    ):
         self._sftp = sftp
         self._prefix = url_prefix
+        self._private_key = private_key
+        self._private_key_pass = private_key_pass
 
     def get_file_handler(self, get_size: bool, entry_accumulator: list) -> NodeHandler:
         """
@@ -366,7 +376,15 @@ class HandlerBuilder:
         :param get_size: boolean indicating whether to compute the for each file
         :param entry_accumulator: list to add entries to
         """
-        return partial(Handlers.handle_file, self._sftp, self._prefix, get_size, entry_accumulator)
+        return partial(
+            Handlers.handle_file,
+            self._sftp,
+            self._prefix,
+            get_size,
+            self._private_key,
+            self._private_key_pass,
+            entry_accumulator,
+        )
 
     def get_dir_handler(
         self, get_size: bool, files_only: bool, entry_accumulator: list
@@ -384,6 +402,8 @@ class HandlerBuilder:
             self._prefix,
             get_size,
             files_only,
+            self._private_key,
+            self._private_key_pass,
             entry_accumulator,
         )
 
@@ -407,6 +427,8 @@ class Handlers:
         sftp: 'pysftp.Connection',
         prefix: str,
         get_size: bool,
+        private_key: Optional[str],
+        private_key_pass: Optional[str],
         entry_accumulator: List[Entry],
         path: str,
     ) -> None:
@@ -417,11 +439,15 @@ class Handlers:
         :param logger: a logger object
         :param prefix: SFTP URL prefix
         :param get_size: boolean indicating whether to compute the size of each file
+        :param private_key: private key path
+        :param private_key_pass: private key password
         :param entry_accumulator: a list in which to store entries
         :param path: path to handle
         """
         size_handler = partial(cls._file_size, sftp)
-        entry = cls._get_entry(sftp, prefix, size_handler, get_size, path)
+        entry = cls._get_entry(
+            sftp, prefix, size_handler, get_size, path, private_key, private_key_pass
+        )
         entry_accumulator.append(entry)
 
     @classmethod
@@ -431,6 +457,8 @@ class Handlers:
         prefix: str,
         get_size: bool,
         files_only: bool,
+        private_key: Optional[str],
+        private_key_pass: Optional[str],
         entry_accumulator: List[Entry],
         path: str,
     ) -> None:
@@ -443,13 +471,17 @@ class Handlers:
         :param get_size: boolean indicating whether to compute the size of each directory
         :param files_only: Boolean indicating whether to skip directories
         :param entry_accumulator: a list in which to store entries
+        :param private_key: private key path
+        :param private_key_pass: private key password
         :param path: path to handle
         """
         if files_only:
             return
 
         dir_size: Callable[[str], int] = partial(cls._dir_size, sftp)
-        entry: Entry = cls._get_entry(sftp, prefix, dir_size, get_size, path)
+        entry: Entry = cls._get_entry(
+            sftp, prefix, dir_size, get_size, path, private_key, private_key_pass
+        )
         entry_accumulator.append(entry)
 
     @staticmethod
@@ -480,6 +512,8 @@ class Handlers:
         size_handler: Callable[[str], int],
         get_size,
         path: str,
+        private_key: Optional[str],
+        private_key_pass: Optional[str],
     ) -> Entry:
 
         url = urljoin(prefix, quote(sftp.normalize(path)))
@@ -494,6 +528,9 @@ class Handlers:
                 logger.warning('Failed to get size for {} ({})', path, e)
                 size = -1
             entry['content_size'] = size
+
+        entry['private_key'] = private_key
+        entry['private_key_pass'] = private_key_pass
 
         return entry
 
