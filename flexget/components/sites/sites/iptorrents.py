@@ -86,6 +86,7 @@ class UrlRewriteIPTorrents:
             'category': one_or_more(
                 {'oneOf': [{'type': 'integer'}, {'type': 'string', 'enum': list(CATEGORIES)}]}
             ),
+            'free': {'type': 'boolean', 'default': False},
         },
         'required': ['rss_key', 'uid', 'password'],
         'additionalProperties': False,
@@ -135,9 +136,14 @@ class UrlRewriteIPTorrents:
             query = normalize_unicode(search_string)
             query = quote_plus(query.encode('utf8'))
 
-            url = "{base_url}/t?{filter}&q={query}&qf=".format(
-                base_url=BASE_URL, filter=filter_url, query=query
-            )
+            if config.get('free'):
+                url = "{base_url}/t?{filter}&free=on&q={query}&qf=".format(
+                    base_url=BASE_URL, filter=filter_url, query=query
+                )
+            else:
+                url = "{base_url}/t?{filter}&q={query}&qf=".format(
+                    base_url=BASE_URL, filter=filter_url, query=query
+                )
             logger.debug('searching with url: {}', url)
             req = requests.get(
                 url, cookies={'uid': str(config['uid']), 'pass': config['password']}
