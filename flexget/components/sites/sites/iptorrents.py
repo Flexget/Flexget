@@ -55,6 +55,7 @@ CATEGORIES = {
 }
 
 BASE_URL = 'https://iptorrents.com'
+SEARCH_URL = 'https://iptorrents.com/t?'
 
 
 class UrlRewriteIPTorrents:
@@ -107,7 +108,7 @@ class UrlRewriteIPTorrents:
             logger.error("Didn't actually get a URL...")
         else:
             logger.debug('Got the URL: {}', entry['url'])
-        if entry['url'].startswith(BASE_URL + '/t?'):
+        if entry['url'].startswith(SEARCH_URL):
             # use search
             results = self.search(task, entry)
             if not results:
@@ -128,25 +129,23 @@ class UrlRewriteIPTorrents:
 
         # If there are any text categories, turn them into their id number
         categories = [c if isinstance(c, int) else CATEGORIES[c] for c in categories]
-        filter_url = '&'.join((str(c) + '=') for c in categories)
+        category_params = {str(c):'' for c in categories if str(c)}
 
         entries = set()
 
         for search_string in entry.get('search_strings', [entry['title']]):
+            search_params = {key:value for (key,value) in category_params.items()}
+
             query = normalize_unicode(search_string)
             query = quote_plus(query.encode('utf8'))
+            search_params.update({'q':query, 'qf':''})
 
             if config.get('free'):
-                url = "{base_url}/t?{filter}&free=on&q={query}&qf=".format(
-                    base_url=BASE_URL, filter=filter_url, query=query
-                )
-            else:
-                url = "{base_url}/t?{filter}&q={query}&qf=".format(
-                    base_url=BASE_URL, filter=filter_url, query=query
-                )
-            logger.debug('searching with url: {}', url)
+                search_params['free'] = 'on'
+
+            logger.debug('searching with params: {}', search_params)
             req = requests.get(
-                url, cookies={'uid': str(config['uid']), 'pass': config['password']}
+                SEARCH_URL, params=search_params, cookies={'uid': str(config['uid']), 'pass': config['password']}
             )
 
             if '/u/' + str(config['uid']) not in req.text:
@@ -165,9 +164,7 @@ class UrlRewriteIPTorrents:
                     break
                 entry = Entry()
                 link = torrent.find('a', href=re.compile('download'))['href']
-                entry['url'] = "{base}{link}?torrent_pass={key}".format(
-                    base=BASE_URL, link=link, key=config.get('rss_key')
-                )
+                entry['url'] = f"{BASE_URL}{link}?torrent_pass={config.get('rss_key')}"
                 entry['title'] = torrent.find('a', href=re.compile('details')).text
 
                 seeders = torrent.findNext('td', {'class': 'ac t_seeders'}).text
