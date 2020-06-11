@@ -1,5 +1,4 @@
 import re
-from urllib.parse import quote_plus
 
 from loguru import logger
 
@@ -56,7 +55,7 @@ CATEGORIES = {
 
 BASE_URL = 'https://iptorrents.com'
 SEARCH_URL = 'https://iptorrents.com/t?'
-
+FREE_SEARCH_URL = 'https://iptorrents.com/t?free=on'
 
 class UrlRewriteIPTorrents:
     """
@@ -137,16 +136,18 @@ class UrlRewriteIPTorrents:
             search_params = {key:value for (key,value) in category_params.items()}
 
             query = normalize_unicode(search_string)
-            query = quote_plus(query.encode('utf8'))
             search_params.update({'q':query, 'qf':''})
 
-            if config.get('free'):
-                search_params['free'] = 'on'
-
             logger.debug('searching with params: {}', search_params)
-            req = requests.get(
-                SEARCH_URL, params=search_params, cookies={'uid': str(config['uid']), 'pass': config['password']}
-            )
+            if config.get('free'):
+                req = requests.get(
+                    FREE_SEARCH_URL, params=search_params, cookies={'uid': str(config['uid']), 'pass': config['password']}
+                )
+            else:
+                req = requests.get(
+                    SEARCH_URL, params=search_params, cookies={'uid': str(config['uid']), 'pass': config['password']}
+                )
+            logger.debug('full search URL: {}', req.url)
 
             if '/u/' + str(config['uid']) not in req.text:
                 raise plugin.PluginError("Invalid cookies (user not logged in)...")
