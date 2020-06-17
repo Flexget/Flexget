@@ -18,10 +18,8 @@ class ManualTask:
             return
         # If --task hasn't been specified disable this plugin
         if (
-            not task.options.tasks
-            or task.name not in task.options.tasks
-            or not task.options.allow_manual
-        ):
+            not task.options.tasks or task.name not in task.options.tasks
+        ) and not task.options.allow_manual:
             logger.debug(
                 'Disabling task {}, task can only run in manual mode (via API/CLI)', task.name
             )

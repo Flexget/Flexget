@@ -2,6 +2,7 @@ class TestFromTask(object):
     config = """
         tasks:
           subtask:
+            manual: yes
             mock:
             - title: subtask entry 1
               other_field: 5
