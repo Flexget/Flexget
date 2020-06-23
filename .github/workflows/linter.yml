@@ -47,4 +47,3 @@ jobs:
         env:
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_PYTHON: true
-...
