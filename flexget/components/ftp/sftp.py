@@ -7,7 +7,7 @@ from urllib.parse import unquote, urlparse
 from loguru import logger
 
 from flexget import plugin
-from flexget.components.ftp.sftp_client import SftpClient, SftpError
+from flexget.components.ftp.sftp_client import SftpClient, SftpError, SftpClientBuilder
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
@@ -353,7 +353,7 @@ def task_config_to_sftp_config(config: dict) -> SftpConfig:
 def sftp_connect(
     sftp_config: SftpConfig, socket_timeout_sec: int, connection_tries: int
 ) -> SftpClient:
-    sftp_client: SftpClient = SftpClient(
+    sftp_client: SftpClient = SftpClientBuilder.build_sftp_client(
         host=sftp_config.host,
         username=sftp_config.username,
         private_key=sftp_config.private_key,
