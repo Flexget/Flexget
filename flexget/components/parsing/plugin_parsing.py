@@ -1,12 +1,9 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('parsing')
+logger = logger.bind(name='parsing')
 PARSER_TYPES = ['movie', 'series']
 
 # Mapping of parser type to (mapping of parser name to plugin instance)
@@ -30,13 +27,15 @@ def init_parsers(manager):
             iter(parsers[parser_type].items()),
             key=lambda p: getattr(getattr(p[1], func_name), 'priority', 0),
         )[0]
-        log.debug(
-            'setting default %s parser to %s. (options: %s)'
-            % (parser_type, default_parsers[parser_type], parsers[parser_type])
+        logger.debug(
+            'setting default {} parser to {}. (options: {})',
+            parser_type,
+            default_parsers[parser_type],
+            parsers[parser_type],
         )
 
 
-class PluginParsing(object):
+class PluginParsing:
     """Provides parsing framework"""
 
     @property

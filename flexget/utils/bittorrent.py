@@ -1,15 +1,13 @@
 """Torrenting utils, mostly for handling bencoding and torrent files."""
 # Torrent decoding is a short fragment from effbot.org. Site copyright says:
 # Test scripts and other short code fragments can be considered as being in the public domain.
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import binascii
 import functools
 import re
-import logging
 
-log = logging.getLogger('torrent')
+from loguru import logger
+
+logger = logger.bind(name='torrent')
 
 # Magic indicator used to quickly recognize torrent files
 TORRENT_RE = re.compile(br'^d\d{1,3}:')
@@ -88,15 +86,14 @@ def is_torrent_file(metafilepath):
 
     magic_marker = bool(TORRENT_RE.match(data))
     if not magic_marker:
-        log.trace(
-            '%s doesn\'t seem to be a torrent, got `%s` (hex)'
-            % (metafilepath, binascii.hexlify(data))
+        logger.trace(
+            "{} doesn't seem to be a torrent, got `{}` (hex)", metafilepath, binascii.hexlify(data)
         )
 
     return bool(magic_marker)
 
 
-def tokenize(text, match=re.compile(b'([idel])|(\d+):|(-?\d+)').match):
+def tokenize(text, match=re.compile(br'([idel])|(\d+):|(-?\d+)').match):
     i = 0
     while i < len(text):
         m = match(text, i)
@@ -197,7 +194,7 @@ def bencode(data):
     raise TypeError('Unknown type for bencode: ' + str(type(data)))
 
 
-class Torrent(object):
+class Torrent:
     """Represents a torrent"""
 
     # string type used for keys, if this ever changes, stuff like "x in y"
@@ -258,10 +255,13 @@ class Torrent(object):
                         item[field] = item[field].decode(self.content.get('encoding', 'cp1252'))
                     except UnicodeError:
                         # Broken beyond anything reasonable
-                        fallback = item[field].decode('utf-8', 'replace').replace(u'\ufffd', '_')
-                        log.warning(
-                            '%s=%r field in torrent %r is wrongly encoded, falling back to `%s`'
-                            % (field, item[field], self.content['info']['name'], fallback)
+                        fallback = item[field].decode('utf-8', 'replace').replace('\ufffd', '_')
+                        logger.warning(
+                            '{}={!r} field in torrent {!r} is wrongly encoded, falling back to `{}`',
+                            field,
+                            item[field],
+                            self.content['info']['name'],
+                            fallback,
                         )
                         item[field] = fallback
 

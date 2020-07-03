@@ -1,19 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import logging
 
+from loguru import logger
+
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 from flexget.plugin import DependencyError, PluginWarning
 
 plugin_name = 'xmpp'
 
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 
-class XMPPNotifier(object):
+class XMPPNotifier:
     """
     Sends messages via XMPP. The sleekxmpp library is required to be installed.
     Install it with: `pip install sleekxmpp`
@@ -48,9 +47,9 @@ class XMPPNotifier(object):
         try:
             import sleekxmpp  # noqa
         except ImportError as e:
-            log.debug('Error importing SleekXMPP: %s', e)
+            logger.debug('Error importing SleekXMPP: {}', e)
             raise DependencyError(
-                plugin_name, 'sleekxmpp', 'SleekXMPP module required. ImportError: %s', e
+                plugin_name, 'sleekxmpp', 'SleekXMPP module required. ImportError: %s' % e
             )
         try:
             import dns  # noqa
@@ -58,7 +57,7 @@ class XMPPNotifier(object):
             try:
                 import dnspython  # noqa
             except ImportError as e:
-                log.debug('Error importing dnspython: %s', e)
+                logger.debug('Error importing dnspython: {}', e)
                 raise DependencyError(
                     plugin_name, 'dnspython', 'dnspython module required. ImportError: %s' % e
                 )
@@ -79,7 +78,7 @@ class XMPPNotifier(object):
                 self.disconnect(wait=True)
 
         message = '%s\n%s' % (title, message)
-        log.debug('Sending XMPP notification about: %s', message)
+        logger.debug('Sending XMPP notification about: {}', message)
         logging.getLogger('sleekxmpp').setLevel(logging.CRITICAL)
 
         if not isinstance(config['recipients'], list):

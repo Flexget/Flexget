@@ -1,8 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-
-class TestRegexp(object):
+class TestRegexp:
     config = """
         templates:
           global:
@@ -48,6 +44,20 @@ class TestRegexp(object):
                 - regexp1
               rest: reject
 
+          test_rest2:
+            template: no_global
+            mock:
+            - title: accept
+            regexp:
+              accept:
+              - accept
+              reject:
+              - reject
+              rest: reject
+              
+          test_only_rest:
+            regexp:
+              rest: reject
 
           # test excluding
           test_excluding:
@@ -122,6 +132,14 @@ class TestRegexp(object):
         task = execute_task('test_rest')
         assert task.find_entry('accepted', title='regexp1'), 'regexp1 should have been accepted'
         assert task.find_entry('rejected', title='regexp3'), 'regexp3 should have been rejected'
+
+    def test_rest2(self, execute_task):
+        task = execute_task('test_rest2')
+        assert task.find_entry('accepted', title='accept'), 'regexp1 should have been accepted'
+
+    def test_only_rest(self, execute_task):
+        task = execute_task('test_only_rest')
+        assert len(task.all_entries) == len(task.rejected), 'all entries should have been rejected'
 
     def test_excluding(self, execute_task):
         task = execute_task('test_excluding')

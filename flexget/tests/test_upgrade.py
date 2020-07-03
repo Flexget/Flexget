@@ -1,11 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flexget.manager import Session
 from flexget.plugins.filter.upgrade import EntryUpgrade
 
 
-class TestUpgrade(object):
+class TestUpgrade:
     config = """
         tasks:
           first_download:
@@ -13,27 +10,27 @@ class TestUpgrade(object):
             upgrade:
               tracking: yes
             mock:
-              - {title: 'Movie.720p.WEB-DL.X264.AC3-GRP1', 'id': 'Movie'}
+              - {title: 'Movie.720p.WEB-DL.X264.AC3-GRP1', 'media_id': 'Movie'}
           tracking_only:
             upgrade:
               tracking: yes
             mock:
-              - {title: 'Movie.1080p WEB-DL X264 AC3', 'id': 'Movie'} 
+              - {title: 'Movie.1080p WEB-DL X264 AC3', 'media_id': 'Movie'} 
           upgrade_quality:
             upgrade:
               target: 1080p
             mock:
-              - {title: 'Movie.1080p WEB-DL X264 AC3', 'id': 'Movie'}
-              - {title: 'Movie.720p.WEB-DL.X264.AC3', 'id': 'Movie'}
-              - {title: 'Movie.BRRip.x264.720p', 'id': 'Movie'}
+              - {title: 'Movie.1080p WEB-DL X264 AC3', 'media_id': 'Movie'}
+              - {title: 'Movie.720p.WEB-DL.X264.AC3', 'media_id': 'Movie'}
+              - {title: 'Movie.BRRip.x264.720p', 'media_id': 'Movie'}
           reject_lower:
             upgrade:
               target: 1080p
               on_lower: reject
             mock:
-              - {title: 'Movie.1080p.BRRip.X264.AC3', 'id': 'Movie'}
-              - {title: 'Movie.1080p WEB-DL X264', 'id': 'Movie'}
-              - {title: 'Movie.BRRip.x264.720p', 'id': 'Movie'}
+              - {title: 'Movie.1080p.BRRip.X264.AC3', 'media_id': 'Movie'}
+              - {title: 'Movie.1080p WEB-DL X264', 'media_id': 'Movie'}
+              - {title: 'Movie.BRRip.x264.720p', 'media_id': 'Movie'}
     """
 
     def test_learn(self, execute_task):
@@ -41,7 +38,7 @@ class TestUpgrade(object):
         with Session() as session:
             query = session.query(EntryUpgrade).all()
             assert len(query) == 1, 'There should be one tracked entity present.'
-            assert query[0].id == 'movie', 'Should of tracked name `Movie`.'
+            assert query[0].id == 'movie', 'Should have tracked name `Movie`.'
 
     def test_tracking(self, execute_task):
         execute_task('first_download')
@@ -66,7 +63,7 @@ class TestUpgrade(object):
         assert entry, 'Movie.BRRip.x264.720p should have been rejected'
 
 
-class TestUpgradeTarget(object):
+class TestUpgradeTarget:
     config = """
         tasks:
           existing_download_480p:
@@ -134,7 +131,7 @@ class TestUpgradeTarget(object):
         assert entry, 'Movie.720p.WEB-DL.X264.AC3 should have been undecided'
 
 
-class TestUpgradeTimeFrame(object):
+class TestUpgradeTimeFrame:
     config = """
         tasks:
           existing_download_480p:
@@ -170,7 +167,7 @@ class TestUpgradeTimeFrame(object):
         assert entry, 'Movie.HDRip.XviD.AC3 should have been accepted'
 
 
-class TestUpgradePropers(object):
+class TestUpgradePropers:
     config = """
         templates:
           global:

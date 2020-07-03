@@ -1,13 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flexget import plugin
 
 
-class TestInterfaces(object):
+class TestInterfaces:
     """Test that any plugins declaring certain interfaces at least superficially comply with those interfaces."""
 
-    def get_plugins(self, interface):
+    @staticmethod
+    def get_plugins(interface):
         plugins = list(plugin.get_plugins(interface=interface))
         assert plugins, 'No plugins for this interface found.'
         return plugins

@@ -1,9 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-
-import logging
 import re
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
@@ -12,10 +9,10 @@ from flexget.event import event
 
 from . import db
 
-log = logging.getLogger('next_trakt_episodes')
+logger = logger.bind(name='next_trakt_episodes')
 
 
-class NextTraktEpisodes(object):
+class NextTraktEpisodes:
     """
     Creates an entry for the latest or the next item in your watched or collected
     episodes in your trakt account.
@@ -69,13 +66,13 @@ class NextTraktEpisodes(object):
         except RequestException as e:
             raise plugin.PluginError('Unable to get trakt list `%s`: %s' % (config['list'], e))
         if not data:
-            log.warning('The list "%s" is empty.', config['list'])
+            logger.warning('The list "{}" is empty.', config['list'])
             return
         for item in data:
             if item.get('show'):
                 if not item['show']['title']:
                     # Seems we can get entries with a blank show title sometimes
-                    log.warning('Found trakt list show without series name.')
+                    logger.warning('Found trakt list show without series name.')
                     continue
                 ids = item['show']['ids']
                 trakt_id = ids['trakt']
@@ -101,7 +98,7 @@ class NextTraktEpisodes(object):
             try:
                 response = session.get(url)
                 if response.status_code == 204:
-                    log.debug('No %s episode for %s', config['position'], fields['series_name'])
+                    logger.debug('No {} episode for {}', config['position'], fields['series_name'])
                     continue
                 data = response.json()
             except RequestException as e:
@@ -109,8 +106,8 @@ class NextTraktEpisodes(object):
                     'An error has occurred looking up: Trakt_id: %s Error: %s' % (trakt_id, e)
                 )
             if context == 'aired':
-                eps = data['season']
-                epn = data['number']
+                season_number = data['season']
+                episode_number = data['number']
             elif config['position'] == 'next' and data.get('next_episode'):
                 # If the next episode is already in the trakt database, we'll get it here
                 season_number = data['next_episode']['season']

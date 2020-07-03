@@ -1,18 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import re
-import logging
+
+from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
 from flexget.components.sites.urlrewriting import UrlRewritingError
+from flexget.event import event
 
-log = logging.getLogger('urlrewrite')
+logger = logger.bind(name='urlrewrite')
 
 
-class UrlRewrite(object):
-    """
+class UrlRewrite:
+    r"""
     Generic configurable urlrewriter.
 
     Example::
@@ -48,14 +46,14 @@ class UrlRewrite(object):
                 'format': format,
                 'regexp': rewrite_config['regexp'],
             }
-            log.debug('Added rewrite %s' % name)
+            logger.debug('Added rewrite {}', name)
 
     def url_rewritable(self, task, entry):
-        log.trace('running url_rewritable')
-        log.trace(self.resolves)
+        logger.trace('running url_rewritable')
+        logger.trace(self.resolves)
         for _, config in self.resolves.get(task.name, {}).items():
             regexp = config['regexp_compiled']
-            log.trace('testing %s' % config['regexp'])
+            logger.trace('testing {}', config['regexp'])
             if regexp.search(entry['url']):
                 return True
         return False
@@ -65,7 +63,7 @@ class UrlRewrite(object):
             regexp = config['regexp_compiled']
             format = config['format']
             if regexp.search(entry['url']):
-                log.debug('Regexp resolving %s with %s' % (entry['url'], name))
+                logger.debug('Regexp resolving {} with {}', entry['url'], name)
 
                 # run the regexp
                 entry['url'] = regexp.sub(format, entry['url'])

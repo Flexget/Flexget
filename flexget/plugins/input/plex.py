@@ -1,24 +1,22 @@
 """Plugin for plex media server (www.plexapp.com)."""
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import re
-import logging
 import os
+import re
 from datetime import datetime
 from os.path import basename
 from socket import gethostbyname
 from xml.dom.minidom import parseString
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests
 
-log = logging.getLogger('plex')
+logger = logger.bind(name='plex')
 
 
-class InputPlex(object):
+class InputPlex:
     """
     Uses a plex media server (www.plexapp.com) tv section as an input.
 
@@ -128,7 +126,7 @@ class InputPlex(object):
         if not globalaccesstoken:
             raise plugin.PluginError('Myplex: could not find a server!')
         else:
-            log.debug('Myplex: Got global accesstoken: %s', globalaccesstoken)
+            logger.debug('Myplex: Got global accesstoken: {}', globalaccesstoken)
         return globalaccesstoken
 
     def plex_get_accesstoken(self, config, globalaccesstoken=""):
@@ -136,7 +134,7 @@ class InputPlex(object):
         if not globalaccesstoken:
             globalaccesstoken = self.plex_get_globalaccesstoken(config)
         if config['server'] in ('localhost', '127.0.0.1'):
-            log.debug('Server using localhost. Global Token will be used')
+            logger.debug('Server using localhost. Global Token will be used')
             return globalaccesstoken
         try:
             r = requests.get(
@@ -154,7 +152,7 @@ class InputPlex(object):
                 node.getAttribute('localAddresses'),
             ):
                 accesstoken = node.getAttribute('accessToken')
-                log.debug("Got plextoken: %s", accesstoken)
+                logger.debug('Got plextoken: {}', accesstoken)
         if not accesstoken:
             raise plugin.PluginError('Could not retrieve accesstoken for %s.' % config['server'])
         else:
@@ -181,11 +179,11 @@ class InputPlex(object):
             urlconfig['unwatched'] = '1'
         if config.get('token'):
             accesstoken = config['token']
-            log.debug("Using accesstoken: %s", accesstoken)
+            logger.debug('Using accesstoken: {}', accesstoken)
             urlconfig['X-Plex-Token'] = accesstoken
         elif config.get('username'):
             accesstoken = self.plex_get_accesstoken(config)
-            log.debug("Got accesstoken: %s", accesstoken)
+            logger.debug('Got accesstoken: {}', accesstoken)
             urlconfig['X-Plex-Token'] = accesstoken
 
         for key in urlconfig:
@@ -205,8 +203,8 @@ class InputPlex(object):
         if not self.plex_section_is_int(config['section']):
             raise plugin.PluginError('Could not find section \'%s\'' % config['section'])
 
-        log.debug(
-            "Fetching http://%s:%d/library/sections/%s/%s%s",
+        logger.debug(
+            'Fetching http://{}:{}/library/sections/{}/{}{}',
             config['server'],
             config['port'],
             config['section'],
@@ -226,7 +224,7 @@ class InputPlex(object):
         plexsectionname = dom.getElementsByTagName('MediaContainer')[0].getAttribute('title1')
         viewgroup = dom.getElementsByTagName('MediaContainer')[0].getAttribute('viewGroup')
 
-        log.debug("Plex section \"%s\" is a \"%s\" section", plexsectionname, viewgroup)
+        logger.debug('Plex section "{}" is a "{}" section', plexsectionname, viewgroup)
         if viewgroup != "movie" and viewgroup != "show" and viewgroup != "episode":
             raise plugin.PluginError("Section is neither a movie nor tv show section!")
         domroot = "Directory"
@@ -316,8 +314,8 @@ class InputPlex(object):
                     e['series_id_type'] = 'ep'
                     e['series_id'] = 'S%02dE%02d' % (season, episode)
                 else:
-                    log.debug(
-                        "Could not get episode number for '%s' (Hint, ratingKey: %s)",
+                    logger.debug(
+                        "Could not get episode number for '{}' (Hint, ratingKey: {})",
                         title,
                         node.getAttribute('ratingKey'),
                     )
@@ -410,7 +408,7 @@ class InputPlex(object):
                     entry['plex_duration'] = duration
                     entry['filename'] = filename
                     if key == "":
-                        log.debug("Could not find anything in PMS to download. Next!")
+                        logger.debug("Could not find anything in PMS to download. Next!")
                     else:
                         entries.append(entry)
         return entries

@@ -1,9 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-
-class TestManipulate(object):
-    config = """
+class TestManipulate:
+    config = r"""
         tasks:
 
           test_1:
@@ -54,7 +50,7 @@ class TestManipulate(object):
               - title:
                   replace:
                     regexp: (1234)\-(7890)
-                    format: 'e\\2'
+                    format: 'e\2'
     """
 
     def test_replace(self, execute_task):

@@ -1,7 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-
-import logging
-
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -10,10 +7,10 @@ from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException
 
-log = logging.getLogger('kitsu')
+logger = logger.bind(name='kitsu')
 
 
-class KitsuAnime(object):
+class KitsuAnime:
     """
     Creates an entry for each item in your kitsu.io list.
 
@@ -42,10 +39,7 @@ class KitsuAnime(object):
                 }
             ),
             'type': one_or_more(
-                {
-                    'type': 'string',
-                    'enum': ['ona', 'ova', 'tv', 'movie', 'music', 'special'],
-                }
+                {'type': 'string', 'enum': ['ona', 'ova', 'tv', 'movie', 'music', 'special']}
             ),
             'latest': {'type': 'boolean', 'default': False},
             'status': {'type': 'string', 'enum': ['airing', 'finished']},
@@ -65,7 +59,7 @@ class KitsuAnime(object):
             error_message = 'Error finding User url: {url}'.format(url=e.request.url)
             if hasattr(e, 'response'):
                 error_message += ' status: {status}'.format(status=e.response.status_code)
-            log.debug(error_message, exc_info=True)
+            logger.opt(exception=True).debug(error_message)
             raise plugin.PluginError(error_message)
         user = user_response.json()
         if not len(user['data']):
@@ -87,7 +81,7 @@ class KitsuAnime(object):
             error_message = 'Error getting list from {url}'.format(url=e.request.url)
             if hasattr(e, 'response'):
                 error_message += ' status: {status}'.format(status=e.response.status_code)
-            log.debug(error_message, exc_info=True)
+            logger.opt(exception=True).debug(error_message)
             raise plugin.PluginError(error_message)
 
         json_data = response.json()
@@ -113,7 +107,7 @@ class KitsuAnime(object):
                     subType = anime['attributes']['subtype']
                     if subType is None or not subType.lower() in types:
                         continue
-                    
+
                 entry = Entry()
                 entry['title'] = anime['attributes']['canonicalTitle']
                 titles_en = anime['attributes']['titles'].get('en')
@@ -143,7 +137,7 @@ class KitsuAnime(object):
                     )
                     if hasattr(e, 'response'):
                         error_message += ' status: {status}'.format(status=e.response.status_code)
-                    log.debug(error_message, exc_info=True)
+                    logger.opt(exception=True).debug(error_message)
                     raise plugin.PluginError(error_message)
                 json_data = response.json()
             else:

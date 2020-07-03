@@ -1,17 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from datetime import datetime, timedelta
 
-from flexget.entry import Entry
 from flexget import plugin
+from flexget.entry import Entry
 
 
-class SearchPlugin(object):
+class SearchPlugin:
     """
     Fake search plugin. Result differs depending on config value:
       `'fail'`: raises a PluginError
       `False`: Returns an empty list
+      list of suffixes:
+        Returns a list of entries with the same title searched for, but with each of the suffixes appended
       otherwise: Just passes back the entry that was searched for
     """
 
@@ -22,13 +21,16 @@ class SearchPlugin(object):
             return []
         elif config == 'fail':
             raise plugin.PluginError('search plugin failure')
+        elif isinstance(config, list):
+            l = [{**entry, 'title': entry['title'] + suffix} for suffix in config]
+            return [Entry(e) for e in l]
         return [Entry(entry)]
 
 
 plugin.register(SearchPlugin, 'test_search', interfaces=['search'], api_ver=2)
 
 
-class EstRelease(object):
+class EstRelease:
     """Fake release estimate plugin. Just returns 'est_release' entry field."""
 
     def estimate(self, entry):
@@ -38,7 +40,7 @@ class EstRelease(object):
 plugin.register(EstRelease, 'test_release', interfaces=['estimate_release'], api_ver=2)
 
 
-class TestDiscover(object):
+class TestDiscover:
     config = """
         tasks:
           test_interval:
@@ -79,6 +81,19 @@ class TestDiscover(object):
               - test_search: fail
               - test_search: no
               - test_search: yes
+            series:
+            - My Show:
+                identified_by: ep
+            mock_output: yes
+            max_reruns: 3
+          test_next_series_episodes_with_multiple_results:
+            discover:
+              release_estimations: ignore
+              what:
+              - next_series_episodes:
+                  from_start: yes
+              from:
+              - test_search: [' a', ' b', ' c']
             series:
             - My Show:
                 identified_by: ep
@@ -128,8 +143,15 @@ class TestDiscover(object):
             task.mock_output
         )
 
+    def test_next_series_episodes_multiple_results(self, execute_task):
+        # Makes sure the next episode is being searched for on reruns, even when there are multiple search
+        # results per episode.
+        task = execute_task('test_next_series_episodes_with_multiple_results')
+        assert len(task.mock_output) == 4, 'Should have kept rerunning and accepted 4 episodes'
+        assert task.find_entry(title='My Show S01E04 a')
 
-class TestEmitSeriesInDiscover(object):
+
+class TestEmitSeriesInDiscover:
     config = """
         tasks:
           inject_series:

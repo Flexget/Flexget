@@ -1,19 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import quote
-
-import logging
 import re
+from urllib.parse import quote
 
 import feedparser
 import requests
+from loguru import logger
 
 from flexget import plugin
+from flexget.components.sites.utils import normalize_unicode, torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.components.sites.utils import torrent_availability, normalize_unicode
 
-log = logging.getLogger('torrentz')
+logger = logger.bind(name='torrentz')
 
 REGEXP = re.compile(r'https?://torrentz2\.(eu|is)/(?P<hash>[a-f0-9]{40})')
 REPUTATIONS = {  # Maps reputation name to feed address
@@ -24,7 +21,7 @@ REPUTATIONS = {  # Maps reputation name to feed address
 }
 
 
-class Torrentz(object):
+class Torrentz:
     """Torrentz search and urlrewriter"""
 
     schema = {
@@ -73,13 +70,13 @@ class Torrentz(object):
             for domain in ['eu', 'is']:
                 # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
                 url = 'http://torrentz2.%s/%s?f=%s' % (domain, feed, quote(query.encode('utf-8')))
-                log.debug('requesting: %s' % url)
+                logger.debug('requesting: {}', url)
                 try:
                     r = task.requests.get(url)
                     break
                 except requests.ConnectionError as err:
                     # The different domains all resolve to the same ip, so only try more if it was a dns error
-                    log.warning('torrentz.%s connection failed. Error: %s' % (domain, err))
+                    logger.warning('torrentz.{} connection failed. Error: {}', domain, err)
                     continue
                 except requests.RequestException as err:
                     raise plugin.PluginError('Error getting torrentz search results: %s' % err)
@@ -104,7 +101,7 @@ class Torrentz(object):
                     re.IGNORECASE,
                 )
                 if not m:
-                    log.debug('regexp did not find seeds / peer data')
+                    logger.debug('regexp did not find seeds / peer data')
                     continue
 
                 entry = Entry()
@@ -119,7 +116,7 @@ class Torrentz(object):
                 )
                 entries.add(entry)
 
-        log.debug('Search got %d results' % len(entries))
+        logger.debug('Search got {} results', len(entries))
         return entries
 
 

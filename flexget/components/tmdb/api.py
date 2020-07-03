@@ -1,16 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-
 from flask import jsonify
-from flask_restplus import inputs
+from flask_restx import inputs
 
-from flexget.api import api, APIResource
-from flexget.api.app import etag, BadRequest, NotFoundError
 from flexget import plugin
+from flexget.api import APIResource, api
+from flexget.api.app import BadRequest, NotFoundError, etag
 
 tmdb_api = api.namespace('tmdb', description='TMDB lookup endpoint')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     poster_object = {
         'type': 'object',
         'properties': {
@@ -96,7 +94,7 @@ return_schema = api.schema_model('tmdb_search_schema', ObjectsContainer.movie_ob
 tmdb_parser = api.parser()
 tmdb_parser.add_argument('title', help='Movie title')
 tmdb_parser.add_argument('tmdb_id', help='TMDB ID')
-tmdb_parser.add_argument('tmdb_id', help='TMDB ID')
+tmdb_parser.add_argument('imdb_id', help='IMDB ID')
 tmdb_parser.add_argument('language', help='ISO 639-1 language code')
 tmdb_parser.add_argument('year', type=int, help='Movie year')
 tmdb_parser.add_argument('only_cached', type=int, help='Return only cached results')

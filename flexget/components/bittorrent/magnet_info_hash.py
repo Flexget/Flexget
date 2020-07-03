@@ -1,17 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import base64
 import re
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('magnet_btih')
+logger = logger.bind(name='magnet_btih')
 
 
-class MagnetBtih(object):
+class MagnetBtih:
     """Sets torrent_info_hash from magnet url."""
 
     schema = {'type': 'boolean'}

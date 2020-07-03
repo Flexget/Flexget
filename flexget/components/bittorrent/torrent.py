@@ -1,17 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import os
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.bittorrent import Torrent, is_torrent_file
 
-log = logging.getLogger('modif_torrent')
+logger = logger.bind(name='modif_torrent')
 
 
-class TorrentFilename(object):
+class TorrentFilename:
     """
         Makes sure that entries containing torrent-file have .torrent
         extension. This is enabled always by default (builtins).
@@ -25,17 +23,17 @@ class TorrentFilename(object):
         for entry in task.accepted:
             # skip if entry does not have file assigned
             if 'file' not in entry:
-                log.trace('%s doesn\'t have a file associated', entry['title'])
+                logger.trace("{} doesn't have a file associated", entry['title'])
                 continue
             if not os.path.exists(entry['file']):
-                log.debug('File %s does not exist', entry['file'])
+                logger.debug('File {} does not exist', entry['file'])
                 continue
             if os.path.getsize(entry['file']) == 0:
-                log.debug('File %s is 0 bytes in size', entry['file'])
+                logger.debug('File {} is 0 bytes in size', entry['file'])
                 continue
             if not is_torrent_file(entry['file']):
                 continue
-            log.debug('%s seems to be a torrent', entry['title'])
+            logger.debug('{} seems to be a torrent', entry['title'])
 
             # create torrent object from torrent
             try:
@@ -60,7 +58,7 @@ class TorrentFilename(object):
                     self.purge(entry)
                     continue
 
-                log.trace('working on torrent %s', torrent)
+                logger.trace('working on torrent {}', torrent)
                 entry['torrent'] = torrent
                 entry['torrent_info_hash'] = torrent.info_hash
                 # if we do not have good filename (by download plugin)
@@ -73,7 +71,7 @@ class TorrentFilename(object):
                     # generate filename from torrent or fall back to title plus extension
                     entry['filename'] = self.make_filename(torrent, entry)
             except Exception as e:
-                log.exception(e)
+                logger.exception(e)
 
     @plugin.priority(TORRENT_PRIO)
     def on_task_output(self, task, config):
@@ -81,7 +79,7 @@ class TorrentFilename(object):
             if 'torrent' in entry:
                 if entry['torrent'].modified:
                     # re-write data into a file
-                    log.debug('Writing modified torrent file for %s' % entry['title'])
+                    logger.debug('Writing modified torrent file for {}', entry['title'])
                     with open(entry['file'], 'wb+') as f:
                         f.write(entry['torrent'].encode())
 
@@ -105,14 +103,14 @@ class TorrentFilename(object):
         # TODO: replace only zero width spaces, leave unicode alone?
 
         fn = '%s.torrent' % title
-        log.debug('make_filename made %s' % fn)
+        logger.debug('make_filename made {}', fn)
         return fn
 
     def purge(self, entry):
         if os.path.exists(entry['file']):
-            log.debug('removing temp file %s from %s' % (entry['file'], entry['title']))
+            logger.debug('removing temp file {} from {}', entry['file'], entry['title'])
             os.remove(entry['file'])
-        del (entry['file'])
+        del entry['file']
 
 
 @event('plugin.register')

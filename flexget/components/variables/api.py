@@ -1,14 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
+from flask import jsonify, request
+from loguru import logger
 
-import logging
-
-from flask import request, jsonify
-
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import empty_response, etag
 from flexget.components.variables.variables import variables_from_db, variables_to_db
 
-log = logging.getLogger('variables')
+logger = logger.bind(name='variables')
 
 variables_api = api.namespace('variables', description='View and edit config variables')
 
@@ -35,3 +32,18 @@ class VariablesAPI(APIResource):
         rsp = jsonify(variables_from_db())
         rsp.status_code = 201
         return rsp
+
+    @api.response(200, 'Successfully updated variables file')
+    @api.validate(empty_response)
+    @api.doc(
+        description='Note that editing variables may not be persistent, depending on user config'
+    )
+    def patch(self, session=None):
+        """ Update variables data to DB """
+        data = request.json
+        existing_variables = variables_from_db()
+        existing_variables.update(data)
+        variables_to_db(existing_variables)
+        # This will trigger reloading the variables file
+        self.manager.validate_config()
+        return jsonify(variables_from_db())

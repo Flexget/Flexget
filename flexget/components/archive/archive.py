@@ -1,19 +1,18 @@
-from __future__ import unicode_literals, division, absolute_import
-
-import logging
 import re
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
+
 from . import db
 
-log = logging.getLogger('archive')
+logger = logger.bind(name='archive')
 
 
-class Archive(object):
+class Archive:
     """
     Archives all new items into database where they can be later searched and injected.
     Stores the entries in the state as they are at the exit phase, this way task cleanup for title
@@ -54,13 +53,13 @@ class Archive(object):
                 # add (missing) sources
                 source = db.get_source(task.name, task.session)
                 if source not in ae.sources:
-                    log.debug('Adding `%s` into `%s` sources' % (task.name, ae))
+                    logger.debug('Adding `{}` into `{}` sources', task.name, ae)
                     ae.sources.append(source)
                 # add (missing) tags
                 for tag_name in tag_names:
                     atag = db.get_tag(tag_name, task.session)
                     if atag not in ae.tags:
-                        log.debug('Adding tag %s into %s' % (tag_name, ae))
+                        logger.debug('Adding tag {} into {}', tag_name, ae)
                         ae.tags.append(atag)
             else:
                 # create new archive entry
@@ -74,11 +73,11 @@ class Archive(object):
                 if tags:
                     # note, we're extending empty list
                     ae.tags.extend(tags)
-                log.debug('Adding `%s` with %i tags to archive' % (ae, len(tags)))
+                logger.debug('Adding `{}` with {} tags to archive', ae, len(tags))
                 task.session.add(ae)
                 count += 1
         if count:
-            log.verbose('Added %i new entries to archive' % count)
+            logger.verbose('Added {} new entries to archive', count)
 
     def on_task_abort(self, task, config):
         """
@@ -89,7 +88,7 @@ class Archive(object):
             self.on_task_learn(task, config)
 
 
-class UrlrewriteArchive(object):
+class UrlrewriteArchive:
     """
     Provides capability to rewrite urls from archive or make searches with discover.
     """
@@ -110,17 +109,17 @@ class UrlrewriteArchive(object):
         try:
             for query in entry.get('search_strings', [entry['title']]):
                 # clean some characters out of the string for better results
-                query = re.sub(r'[ \(\)]+', ' ', query).strip()
-                log.debug('looking for `%s` config: %s' % (query, config))
+                query = re.sub(r'[ \(\)\:]+', ' ', query).strip()
+                logger.debug('looking for `{}` config: {}', query, config)
                 for archive_entry in db.search(session, query, tags=tag_names, desc=True):
-                    log.debug('rewrite search result: %s' % archive_entry)
+                    logger.debug('rewrite search result: {}', archive_entry)
                     entry = Entry()
                     entry.update_using_map(self.entry_map, archive_entry, ignore_none=True)
                     if entry.isvalid():
                         entries.add(entry)
         finally:
             session.close()
-        log.debug('found %i entries' % len(entries))
+        logger.debug('found {} entries', len(entries))
         return entries
 
 

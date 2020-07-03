@@ -1,20 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, Unicode, DateTime
+from loguru import logger
+from sqlalchemy import Column, DateTime, Integer, String, Unicode
 from sqlalchemy.schema import Index
 from sqlalchemy.sql.expression import desc
 
 from flexget import plugin
-from flexget.event import fire_event, event
+from flexget.event import event, fire_event
 from flexget.manager import Base
 from flexget.utils.log import log_once
 from flexget.utils.tools import parse_timedelta
 
-log = logging.getLogger('proper_movies')
+logger = logger.bind(name='proper_movies')
 
 
 class ProperMovie(Base):
@@ -49,7 +46,7 @@ Index(
 )
 
 
-class FilterProperMovies(object):
+class FilterProperMovies:
     """
         Automatically download proper movies.
 
@@ -67,7 +64,7 @@ class FilterProperMovies(object):
     schema = {'oneOf': [{'type': 'boolean'}, {'type': 'string', 'format': 'interval'}]}
 
     def on_task_filter(self, task, config):
-        log.debug('check for enforcing')
+        logger.debug('check for enforcing')
 
         # parse config
         if isinstance(config, bool):
@@ -78,11 +75,11 @@ class FilterProperMovies(object):
             timeframe = None
         else:
             # parse time window
-            log.debug('interval: %s' % config)
+            logger.debug('interval: {}', config)
             try:
                 timeframe = parse_timedelta(config)
             except ValueError:
-                raise plugin.PluginError('Invalid time format', log)
+                raise plugin.PluginError('Invalid time format', logger)
 
         # throws DependencyError if not present aborting task
         imdb_lookup = plugin.get_plugin_by_name('imdb_lookup').instance
@@ -107,9 +104,9 @@ class FilterProperMovies(object):
 
             quality = parser.quality.name
 
-            log.debug('quality: %s' % quality)
-            log.debug('imdb_id: %s' % entry['imdb_id'])
-            log.debug('current proper count: %s' % parser.proper_count)
+            logger.debug('quality: {}', quality)
+            logger.debug('imdb_id: {}', entry['imdb_id'])
+            logger.debug('current proper count: {}', parser.proper_count)
 
             proper_movie = (
                 task.session.query(ProperMovie)
@@ -120,31 +117,31 @@ class FilterProperMovies(object):
             )
 
             if not proper_movie:
-                log.debug('no previous download recorded for %s' % entry['imdb_id'])
+                logger.debug('no previous download recorded for {}', entry['imdb_id'])
                 continue
 
             highest_proper_count = proper_movie.proper_count
-            log.debug('highest_proper_count: %i' % highest_proper_count)
+            logger.debug('highest_proper_count: {}', highest_proper_count)
 
             accept_proper = False
             if parser.proper_count > highest_proper_count:
-                log.debug('proper detected: %s ' % proper_movie)
+                logger.debug('proper detected: {} ', proper_movie)
 
                 if timeframe is None:
                     accept_proper = True
                 else:
                     expires = proper_movie.added + timeframe
-                    log.debug('propers timeframe: %s' % timeframe)
-                    log.debug('added: %s' % proper_movie.added)
-                    log.debug('propers ignore after: %s' % str(expires))
+                    logger.debug('propers timeframe: {}', timeframe)
+                    logger.debug('added: {}', proper_movie.added)
+                    logger.debug('propers ignore after: {}', str(expires))
                     if datetime.now() < expires:
                         accept_proper = True
                     else:
-                        log.verbose('Proper `%s` has past it\'s expiration time' % entry['title'])
+                        logger.verbose("Proper `{}` has past it's expiration time", entry['title'])
 
             if accept_proper:
-                log.info(
-                    'Accepting proper version previously downloaded movie `%s`' % entry['title']
+                logger.info(
+                    'Accepting proper version previously downloaded movie `{}`', entry['title']
                 )
                 # TODO: does this need to be called?
                 # fire_event('forget', entry['imdb_url'])
@@ -153,19 +150,19 @@ class FilterProperMovies(object):
 
     def on_task_learn(self, task, config):
         """Add downloaded movies to the database"""
-        log.debug('check for learning')
+        logger.debug('check for learning')
         for entry in task.accepted:
             if 'imdb_id' not in entry:
-                log.debug('`%s` does not have imdb_id' % entry['title'])
+                logger.debug('`{}` does not have imdb_id', entry['title'])
                 continue
 
             parser = plugin.get('parsing', self).parse_movie(entry['title'])
 
             quality = parser.quality.name
 
-            log.debug('quality: %s' % quality)
-            log.debug('imdb_id: %s' % entry['imdb_id'])
-            log.debug('proper count: %s' % parser.proper_count)
+            logger.debug('quality: {}', quality)
+            logger.debug('imdb_id: {}', entry['imdb_id'])
+            logger.debug('proper count: {}', parser.proper_count)
 
             proper_movie = (
                 task.session.query(ProperMovie)
@@ -183,9 +180,9 @@ class FilterProperMovies(object):
                 pm.quality = quality
                 pm.proper_count = parser.proper_count
                 task.session.add(pm)
-                log.debug('added %s' % pm)
+                logger.debug('added {}', pm)
             else:
-                log.debug('%s already exists' % proper_movie)
+                logger.debug('{} already exists', proper_movie)
 
 
 @event('plugin.register')

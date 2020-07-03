@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.tools import split_title_year
 
-log = logging.getLogger('est_series_tvmaze')
+logger = logger.bind(name='est_series_tvmaze')
 
 
-class EstimatesSeriesTVMaze(object):
+class EstimatesSeriesTVMaze:
     @plugin.priority(2)
     def estimate(self, entry):
         if not all(field in entry for field in ['series_name', 'series_season']):
@@ -44,22 +41,22 @@ class EstimatesSeriesTVMaze(object):
         api_tvmaze = plugin.get('api_tvmaze', self)
         if season_pack:
             lookup = api_tvmaze.season_lookup
-            log.debug('Searching api_tvmaze for season')
+            logger.debug('Searching api_tvmaze for season')
         else:
-            log.debug('Searching api_tvmaze for episode')
+            logger.debug('Searching api_tvmaze for episode')
             lookup = api_tvmaze.episode_lookup
 
         for k, v in list(kwargs.items()):
             if v:
-                log.debug('%s: %s', k, v)
+                logger.debug('{}: {}', k, v)
 
         try:
             entity = lookup(**kwargs)
         except LookupError as e:
-            log.debug(str(e))
+            logger.debug(str(e))
             return
         if entity and entity.airdate:
-            log.debug('received air-date: %s', entity.airdate)
+            logger.debug('received air-date: {}', entity.airdate)
             return entity.airdate
         return
 

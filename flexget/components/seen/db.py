@@ -7,29 +7,28 @@ forget (string)
     task name then everything in that task will be forgotten. With title all learned fields from it and the
     title will be forgotten. With field value only that particular field is forgotten.
 """
-import logging
 from datetime import datetime
 
-from sqlalchemy import or_
+from loguru import logger
 from sqlalchemy import (
-    select,
-    update,
-    Index,
     Boolean,
     Column,
-    Integer,
-    Unicode,
     DateTime,
     ForeignKey,
+    Index,
+    Integer,
+    Unicode,
+    or_,
+    select,
+    update,
 )
 from sqlalchemy.orm import relation
 
-from flexget import db_schema
-from flexget import plugin
+from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.database import with_session
-from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
+from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
 try:
     # NOTE: Importing other plugins is discouraged!
@@ -38,14 +37,14 @@ except ImportError:
     raise plugin.DependencyError(issued_by=__name__, missing='imdb')
 
 
-log = logging.getLogger('seen.db')
+logger = logger.bind(name='seen.db')
 Base = db_schema.versioned_base('seen', 4)
 
 
 @db_schema.upgrade('seen')
 def upgrade(ver, session):
     if ver is None:
-        log.info('Converting seen imdb_url to imdb_id for seen movies.')
+        logger.info('Converting seen imdb_url to imdb_id for seen movies.')
         field_table = table_schema('seen_field', session)
         for row in session.execute(
             select([field_table.c.id, field_table.c.value], field_table.c.field == 'imdb_url')
@@ -55,16 +54,16 @@ def upgrade(ver, session):
         ver = 1
     if ver == 1:
         field_table = table_schema('seen_field', session)
-        log.info('Adding index to seen_field table.')
+        logger.info('Adding index to seen_field table.')
         Index('ix_seen_field_seen_entry_id', field_table.c.seen_entry_id).create(bind=session.bind)
         ver = 2
     if ver == 2:
-        log.info('Adding local column to seen_entry table')
+        logger.info('Adding local column to seen_entry table')
         table_add_column('seen_entry', 'local', Boolean, session, default=False)
         ver = 3
     if ver == 3:
         # setting the default to False in the last migration was broken, fix the data
-        log.info('Repairing seen table')
+        logger.info('Repairing seen table')
         entry_table = table_schema('seen_entry', session)
         session.execute(update(entry_table, entry_table.c.local == None, {'local': False}))
         ver = 4
@@ -173,7 +172,7 @@ def forget(value):
     :return: count, field_count where count is number of entries removed and field_count number of fields
     """
     with Session() as session:
-        log.debug('forget called with %s', value)
+        logger.debug('forget called with {}', value)
         count = 0
         field_count = 0
         for se in (
@@ -183,14 +182,14 @@ def forget(value):
         ):
             field_count += len(se.fields)
             count += 1
-            log.debug('forgetting %s', se)
+            logger.debug('forgetting {}', se)
             session.delete(se)
 
         for sf in session.query(SeenField).filter(SeenField.value == value).all():
             se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
             field_count += len(se.fields)
             count += 1
-            log.debug('forgetting %s', se)
+            logger.debug('forgetting {}', se)
             session.delete(se)
     return count, field_count
 
@@ -217,7 +216,7 @@ def search_by_field_values(field_value_list, task_name, local=False, session=Non
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
     # TODO: Look into this, is it still valid?
-    log.debug('TODO: Disabled because of ticket #1321')
+    logger.debug('TODO: Disabled because of ticket #1321')
     return
 
     # Remove seen fields over a year old
@@ -264,5 +263,5 @@ def forget_by_id(entry_id, session=None):
     :param session: DB Session
     """
     entry = get_entry_by_id(entry_id, session=session)
-    log.debug('Deleting seen entry with ID {0}'.format(entry_id))
+    logger.debug('Deleting seen entry with ID {}', entry_id)
     session.delete(entry)

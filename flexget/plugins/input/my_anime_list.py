@@ -1,7 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -10,7 +7,7 @@ from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException
 
-log = logging.getLogger('my_anime_list')
+logger = logger.bind(name='my_anime_list')
 
 STATUS = {'watching': 1, 'completed': 2, 'on_hold': 3, 'dropped': 4, 'plan_to_watch': 6, 'all': 7}
 
@@ -19,7 +16,7 @@ AIRING_STATUS = {'airing': 1, 'finished': 2, 'planned': 3, 'all': 6}
 ANIME_TYPE = ['all', 'tv', 'ova', 'movie', 'special', 'ona', 'music', 'unknown']
 
 
-class MyAnimeList(object):
+class MyAnimeList:
     """" Creates entries for series and movies from MyAnimeList list
 
     Syntax:

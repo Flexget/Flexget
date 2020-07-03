@@ -1,30 +1,25 @@
-from __future__ import unicode_literals, division, absolute_import
-
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
 from flexget.api.app import base_message
-from flexget.components.series.api import ObjectsContainer as OC
-from flexget.components.thetvdb.api import ObjectsContainer as tvdb
-from flexget.components.tvmaze.api import ObjectsContainer as tvmaze
 from flexget.components.seen.db import SeenEntry
-from flexget.manager import Session
-
+from flexget.components.series.api import ObjectsContainer as OC
 # TODO: would be nicer to import db module
 from flexget.components.series.db import (
-    Series,
-    SeriesTask,
+    AlternateNames,
     Episode,
     EpisodeRelease,
-    AlternateNames,
     Season,
     SeasonRelease,
+    Series,
+    SeriesTask,
 )
+from flexget.components.thetvdb.api import ObjectsContainer as tvdb
+from flexget.components.tvmaze.api import ObjectsContainer as tvmaze
+from flexget.manager import Session
 from flexget.utils import json
 
 
-class TestSeriesRootAPI(object):
+class TestSeriesRootAPI:
     config = """
         tasks: {}
     """
@@ -291,7 +286,7 @@ class TestSeriesRootAPI(object):
         assert not errors
 
 
-class TestSeriesSearchAPI(object):
+class TestSeriesSearchAPI:
     config = """
         tasks: {}
     """
@@ -334,7 +329,7 @@ class TestSeriesSearchAPI(object):
         assert len(data) == 0
 
 
-class TestSeriesSingleAPI(object):
+class TestSeriesSingleAPI:
     config = """
         tasks: {}
     """
@@ -438,7 +433,7 @@ class TestSeriesSingleAPI(object):
         assert not errors
 
 
-class TestSeriesSeasonsAPI(object):
+class TestSeriesSeasonsAPI:
     config = """
         tasks: {}
     """
@@ -508,7 +503,7 @@ class TestSeriesSeasonsAPI(object):
         assert len(data) == 0
 
 
-class TestSeriesSeasonAPI(object):
+class TestSeriesSeasonAPI:
     config = """
         tasks: {}
     """
@@ -612,7 +607,7 @@ class TestSeriesSeasonAPI(object):
         assert not errors
 
 
-class TestSeriesSeasonReleasesAPI(object):
+class TestSeriesSeasonReleasesAPI:
     config = """
         tasks: {}
     """
@@ -823,7 +818,7 @@ class TestSeriesSeasonReleasesAPI(object):
         assert not errors
 
 
-class TestSeriesEpisodesAPI(object):
+class TestSeriesEpisodesAPI:
     config = """
         tasks: {}
     """
@@ -895,7 +890,7 @@ class TestSeriesEpisodesAPI(object):
         assert len(data) == 0
 
 
-class TestSeriesEpisodeAPI(object):
+class TestSeriesEpisodeAPI:
     config = """
         tasks: {}
     """
@@ -1011,7 +1006,7 @@ class TestSeriesEpisodeAPI(object):
         assert not errors
 
 
-class TestSeriesEpisodeReleasesAPI(object):
+class TestSeriesEpisodeReleasesAPI:
     config = """
         tasks: {}
     """
@@ -1289,7 +1284,7 @@ class TestSeriesEpisodeReleasesAPI(object):
         assert not errors
 
 
-class TestSeriesEpisodeReleaseAPI(object):
+class TestSeriesEpisodeReleaseAPI:
     config = """
         tasks: {}
     """
@@ -1621,7 +1616,7 @@ class TestSeriesEpisodeReleaseAPI(object):
         assert not errors
 
 
-class TestSeriesForgetFlag(object):
+class TestSeriesForgetFlag:
     config = """
             tasks:
               series_data:
@@ -1770,7 +1765,7 @@ class TestSeriesForgetFlag(object):
             assert len(seen) == 3
 
 
-class TestSeriesPagination(object):
+class TestSeriesPagination:
     config = 'tasks: {}'
 
     def test_series_pagination(self, api_client, link_headers):

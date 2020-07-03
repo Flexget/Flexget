@@ -1,15 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('priv_torrents')
+logger = logger.bind(name='priv_torrents')
 
 
-class FilterPrivateTorrents(object):
+class FilterPrivateTorrents:
     """How to handle private torrents.
 
     private_torrents: yes|no
@@ -37,7 +34,7 @@ class FilterPrivateTorrents(object):
 
         for entry in task.accepted:
             if 'torrent' not in entry:
-                log.debug('`%s` is not a torrent' % entry['title'])
+                logger.debug('`{}` is not a torrent', entry['title'])
                 continue
             private = entry['torrent'].private
 

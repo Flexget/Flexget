@@ -1,9 +1,7 @@
 """Input plugin for www.betaseries.com"""
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from hashlib import md5
-import logging
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -11,12 +9,12 @@ from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.cached_input import cached
 
-log = logging.getLogger('betaseries_list')
+logger = logger.bind(name='betaseries_list')
 
 API_URL_PREFIX = 'https://api.betaseries.com/'
 
 
-class BetaSeriesList(object):
+class BetaSeriesList:
     """
     Emits an entry for each serie followed by one or more BetaSeries account.
     See https://www.betaseries.com/
@@ -84,9 +82,11 @@ class BetaSeriesList(object):
             for member in members:
                 titles.update(query_series(api_key, user_token, member))
         except (requests.RequestException, AssertionError) as err:
-            log.critical('Failed to get series at BetaSeries.com: %s' % err.message, exc_info=err)
+            logger.opt(exception=True).critical(
+                'Failed to get series at BetaSeries.com: {}', err.message
+            )
 
-        log.verbose("series: " + ", ".join(titles))
+        logger.verbose('series: ' + ', '.join(titles))
         entries = []
         for t in titles:
             e = Entry()
@@ -118,7 +118,7 @@ def create_token(api_key, login, password):
     j = r.json()
     error_list = j['errors']
     for err in error_list:
-        log.error(str(err))
+        logger.error(str(err))
     if not error_list:
         return j['token']
 
@@ -146,7 +146,7 @@ def query_member_id(api_key, user_token, login_name):
     j = r.json()
     error_list = j['errors']
     for err in error_list:
-        log.error(str(err))
+        logger.error(str(err))
     found_id = None
     if not error_list:
         for candidate in j['users']:
@@ -172,10 +172,10 @@ def query_series(api_key, user_token, member_name=None):
         if member_id:
             params = {'id': member_id}
         else:
-            log.error("member %r not found" % member_name)
+            logger.error('member {!r} not found', member_name)
             return []
     r = requests.get(
-        API_URL_PREFIX + 'members/infos',
+        API_URL_PREFIX + 'shows/member',
         params=params,
         headers={
             'Accept': 'application/json',
@@ -188,9 +188,9 @@ def query_series(api_key, user_token, member_name=None):
     j = r.json()
     error_list = j['errors']
     for err in error_list:
-        log.error(str(err))
+        logger.error(str(err))
     if not error_list:
-        return [x['title'] for x in j['member']['shows'] if x['user']['archived'] is False]
+        return [x['title'] for x in j['shows'] if x['user']['archived'] is False]
     else:
         return []
 

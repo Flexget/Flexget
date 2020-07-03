@@ -5,6 +5,7 @@
 .settings/
 .project
 .pydevproject
+.vscode/
 /.Python
 FlexGet.egg-info/
 bin/
@@ -37,10 +38,9 @@ cherrypy
 pip-selfcheck.json
 .config-lock
 .cache/
-*.yml
-!.circleci/config.yml
-!raw_config.yml
-!variables.yml
+/*.yml
 cached_resources/
 pyvenv.cfg
 .pytest_cache
+pip-wheel-metadata
+flexget/ui/v1/app

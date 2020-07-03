@@ -1,23 +1,21 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, division, absolute_import
-
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 
 import pytest
 
-from flexget.manager import Session
 from flexget.components.tvmaze.api_tvmaze import (
     APITVMaze,
+    TVMazeEpisodes,
     TVMazeLookup,
     TVMazeSeries,
-    TVMazeEpisodes,
 )
+from flexget.manager import Session
 
 lookup_series = APITVMaze.series_lookup
 
 
 @pytest.mark.online
-class TestTVMazeShowLookup(object):
+class TestTVMazeShowLookup:
     config = """
         templates:
           global:
@@ -406,8 +404,8 @@ class TestTVMazeShowLookup(object):
     def test_show_with_non_ascii_chars(self, execute_task):
         task = execute_task('test_show_with_non_ascii_chars')
         entry = task.entries[0]
-        assert entry['tvmaze_series_name'] == u'Unit\xe9 9', (
-            u'series id should be Unit\xe9 9, instead its %s' % entry['tvmaze_series_name']
+        assert entry['tvmaze_series_name'] == 'Unit\xe9 9', (
+            'series id should be Unit\xe9 9, instead its %s' % entry['tvmaze_series_name']
         )
         assert entry['tvmaze_series_id'] == 8652, (
             'series id should be 8652, instead its %s' % entry['tvmaze_series_id']
@@ -472,7 +470,7 @@ class TestTVMazeShowLookup(object):
 
 
 @pytest.mark.online
-class TestTVMazeUnicodeLookup(object):
+class TestTVMazeUnicodeLookup:
     config = """
         templates:
           global:
@@ -501,7 +499,7 @@ class TestTVMazeUnicodeLookup(object):
 
 
 @pytest.mark.online
-class TestTVMazeSeasonLookup(object):
+class TestTVMazeSeasonLookup:
     config = """
         templates:
           global:

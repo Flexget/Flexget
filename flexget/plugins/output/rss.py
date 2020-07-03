@@ -1,21 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import base64
-import hashlib
-import io
-import logging
 import datetime
+import hashlib
 import os
 
-from sqlalchemy import Column, Integer, String, DateTime, Unicode
+from loguru import logger
+from sqlalchemy import Column, DateTime, Integer, String, Unicode
 
 from flexget import db_schema, plugin
 from flexget.event import event
-from flexget.utils.sqlalchemy_utils import table_columns, table_add_column
-from flexget.utils.template import render_from_entry, get_template, RenderError
+from flexget.utils.sqlalchemy_utils import table_add_column, table_columns
+from flexget.utils.template import RenderError, get_template, render_from_entry
 
-log = logging.getLogger('make_rss')
+logger = logger.bind(name='make_rss')
 Base = db_schema.versioned_base('make_rss', 0)
 
 rss2gen = True
@@ -30,7 +26,7 @@ def upgrade(ver, session):
     if ver is None:
         columns = table_columns('make_rss', session)
         if 'rsslink' not in columns:
-            log.info('Adding rsslink column to table make_rss.')
+            logger.info('Adding rsslink column to table make_rss.')
             table_add_column('make_rss', 'rsslink', String, session)
         ver = 0
     return ver
@@ -50,7 +46,7 @@ class RSSEntry(Base):
     enc_type = Column(String)
 
 
-class OutputRSS(object):
+class OutputRSS:
     """
     Write RSS containing succeeded (downloaded) entries.
 
@@ -185,7 +181,7 @@ class OutputRSS(object):
 
         # when history is disabled, remove everything from backlog on every run (a bit hackish, rarely useful)
         if not config['history']:
-            log.debug('disabling history')
+            logger.debug('disabling history')
             for item in task.session.query(RSSEntry).filter(RSSEntry.file == config['file']).all():
                 task.session.delete(item)
 
@@ -195,8 +191,8 @@ class OutputRSS(object):
             try:
                 rss.title = entry.render(config['title'])
             except RenderError as e:
-                log.error(
-                    'Error rendering jinja title for `%s` falling back to entry title: %s',
+                logger.error(
+                    'Error rendering jinja title for `{}` falling back to entry title: {}',
                     entry['title'],
                     e,
                 )
@@ -213,8 +209,8 @@ class OutputRSS(object):
             try:
                 rss.description = render_from_entry(template, entry)
             except RenderError as e:
-                log.error(
-                    'Error while rendering entry %s, falling back to plain title: %s', entry, e
+                logger.error(
+                    'Error while rendering entry {}, falling back to plain title: {}', entry, e
                 )
                 rss.description = entry['title'] + ' - (Render Error)'
             rss.file = config['file']
@@ -225,7 +221,7 @@ class OutputRSS(object):
             rss.enc_type = entry['type'] if 'type' in entry else None
 
             # TODO: check if this exists and suggest disabling history if it does since it shouldn't happen normally ...
-            log.debug('Saving %s into rss database', entry['title'])
+            logger.debug('Saving {} into rss database', entry['title'])
             task.session.add(rss)
 
         if not rss2gen:
@@ -274,7 +270,7 @@ class OutputRSS(object):
                     gen['enclosure'] = PyRSS2Gen.Enclosure(
                         db_item.link, db_item.enc_length, db_item.enc_type
                     )
-                log.trace('Adding %s into rss %s', gen['title'], config['file'])
+                logger.trace('Adding {} into rss {}', gen['title'], config['file'])
                 rss_items.append(PyRSS2Gen.RSSItem(**gen))
             else:
                 # no longer needed
@@ -291,21 +287,21 @@ class OutputRSS(object):
 
         # don't run with --test
         if task.options.test:
-            log.info('Would write rss file with %d entries.', len(rss_items))
+            logger.info('Would write rss file with {} entries.', len(rss_items))
             return
 
         # write rss
         fn = os.path.expanduser(config['file'])
-        with io.open(fn, 'wb') as file:
+        with open(fn, 'wb') as file:
             try:
-                log.verbose('Writing output rss to %s', fn)
+                logger.verbose('Writing output rss to {}', fn)
                 rss.write_xml(file, encoding=config['encoding'])
             except LookupError:
-                log.critical('Unknown encoding %s', config['encoding'])
+                logger.critical('Unknown encoding {}', config['encoding'])
                 return
-            except IOError:
+            except OSError:
                 # TODO: plugins cannot raise PluginWarnings in terminate event ..
-                log.critical('Unable to write %s', fn)
+                logger.critical('Unable to write {}', fn)
                 return
 
 

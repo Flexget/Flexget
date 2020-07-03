@@ -1,34 +1,31 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.error import HTTPError, URLError
-from future.utils import python_2_unicode_compatible
-
-import logging
 import os
 import re
 import time
-import pkg_resources
 from functools import total_ordering
 from http.client import BadStatusLine
 from importlib import import_module
+from pathlib import Path
+from typing import Callable, Dict, Iterable, List, Optional, Union
+from urllib.error import HTTPError, URLError
 
-from path import Path
+import loguru
+import pkg_resources
 from requests import RequestException
 
-from flexget import plugins as plugins_pkg
 from flexget import components as components_pkg
 from flexget import config_schema
+from flexget import plugins as plugins_pkg
+from flexget.event import Event
 from flexget.event import add_event_handler as add_phase_handler
-from flexget.event import fire_event, remove_event_handlers
+from flexget.event import event, fire_event, remove_event_handlers
 
-log = logging.getLogger('plugin')
+logger = loguru.logger.bind(name='plugin')
 
 PRIORITY_DEFAULT = 128
 PRIORITY_LAST = -255
 PRIORITY_FIRST = 255
 
 
-@python_2_unicode_compatible
 class DependencyError(Exception):
     """Plugin depends on other plugin, but it cannot be loaded.
 
@@ -40,23 +37,29 @@ class DependencyError(Exception):
     All args are optional.
     """
 
-    def __init__(self, issued_by=None, missing=None, message=None, silent=False):
-        super(DependencyError, self).__init__()
+    def __init__(
+        self,
+        issued_by: Optional[str] = None,
+        missing: Optional[str] = None,
+        message: Optional[str] = None,
+        silent: bool = False,
+    ):
+        super().__init__()
         self.issued_by = issued_by
         self.missing = missing
         self._message = message
         self.silent = silent
 
-    def _get_message(self):
+    def _get_message(self) -> str:
         if self._message:
             return self._message
         else:
             return 'Plugin `%s` requires dependency `%s`' % (self.issued_by, self.missing)
 
-    def _set_message(self, message):
+    def _set_message(self, message: str) -> None:
         self._message = message
 
-    def has_message(self):
+    def has_message(self) -> bool:
         return self._message is not None
 
     message = property(_get_message, _set_message)
@@ -72,34 +75,32 @@ class DependencyError(Exception):
 
 class RegisterException(Exception):
     def __init__(self, value):
-        super(RegisterException, self).__init__()
+        super().__init__()
         self.value = value
 
     def __str__(self):
         return repr(self.value)
 
 
-@python_2_unicode_compatible
 class PluginWarning(Warning):
-    def __init__(self, value, logger=log, **kwargs):
-        super(PluginWarning, self).__init__()
+    def __init__(self, value, logger: 'loguru.Logger' = logger, **kwargs):
+        super().__init__()
         self.value = value
-        self.log = logger
+        self.logger = logger
         self.kwargs = kwargs
 
     def __str__(self):
         return self.value
 
 
-@python_2_unicode_compatible
 class PluginError(Exception):
-    def __init__(self, value, logger=log, **kwargs):
-        super(PluginError, self).__init__()
+    def __init__(self, value, logger: 'loguru.Logger' = logger, **kwargs):
+        super().__init__()
         # Value is expected to be a string
         if not isinstance(value, str):
             value = str(value)
         self.value = value
-        self.log = logger
+        self.logger = logger
         self.kwargs = kwargs
 
     def __str__(self):
@@ -107,55 +108,59 @@ class PluginError(Exception):
 
 
 # TODO: move to utils or somewhere more appropriate
-class internet(object):
+class internet:
     """@internet decorator for plugin phase methods.
 
     Catches all internet related exceptions and raises PluginError with relevant message.
     Task handles PluginErrors by aborting the task.
     """
 
-    def __init__(self, logger=None):
-        if logger:
-            self.log = logger
+    def __init__(self, logger_: 'loguru.Logger' = logger):
+        if logger_:
+            self.logger = logger_
         else:
-            self.log = logging.getLogger('@internet')
+            self.logger = logger.bind(name='@internet')
 
-    def __call__(self, func):
+    def __call__(self, func: Callable) -> Callable:
         def wrapped_func(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
             except RequestException as e:
-                log.debug('decorator caught RequestException. handled traceback:', exc_info=True)
+                logger.opt(exception=True).debug(
+                    'decorator caught RequestException. handled traceback:'
+                )
                 raise PluginError('RequestException: %s' % e)
             except HTTPError as e:
-                raise PluginError('HTTPError %s' % e.code, self.log)
+                raise PluginError('HTTPError %s' % e.code, self.logger)
             except URLError as e:
-                log.debug('decorator caught urlerror. handled traceback:', exc_info=True)
-                raise PluginError('URLError %s' % e.reason, self.log)
+                logger.opt(exception=True).debug('decorator caught urlerror. handled traceback:')
+                raise PluginError('URLError %s' % e.reason, self.logger)
             except BadStatusLine:
-                log.debug('decorator caught badstatusline. handled traceback:', exc_info=True)
-                raise PluginError('Got BadStatusLine', self.log)
+                logger.opt(exception=True).debug(
+                    'decorator caught badstatusline. handled traceback:'
+                )
+                raise PluginError('Got BadStatusLine', self.logger)
             except ValueError as e:
-                log.debug('decorator caught ValueError. handled traceback:', exc_info=True)
+                logger.opt(exception=True).debug('decorator caught ValueError. handled traceback:')
                 raise PluginError(e)
-            except IOError as e:
-                log.debug('decorator caught ioerror. handled traceback:', exc_info=True)
+            except OSError as e:
+                logger.opt(exception=True).debug('decorator caught OSError. handled traceback:')
                 if hasattr(e, 'reason'):
-                    raise PluginError('Failed to reach server. Reason: %s' % e.reason, self.log)
+                    raise PluginError('Failed to reach server. Reason: %s' % e.reason, self.logger)
                 elif hasattr(e, 'code'):
                     raise PluginError(
                         'The server couldn\'t fulfill the request. Error code: %s' % e.code,
-                        self.log,
+                        self.logger,
                     )
-                raise PluginError('IOError when connecting to server: %s' % e, self.log)
+                raise PluginError('OSError when connecting to server: %s' % e, self.logger)
 
         return wrapped_func
 
 
-def priority(value):
+def priority(value: int) -> Callable[[Callable], Callable]:
     """Priority decorator for phase methods"""
 
-    def decorator(target):
+    def decorator(target: Callable) -> Callable:
         target.priority = value
         return target
 
@@ -185,7 +190,7 @@ phase_methods = {
 phase_methods.update((_phase, 'on_task_' + _phase) for _phase in task_phases)  # DRY
 
 # Mapping of plugin name to PluginInfo instance (logical singletons)
-plugins = {}
+plugins: Dict[str, 'PluginInfo'] = {}
 
 # Loading done?
 plugins_loaded = False
@@ -195,11 +200,9 @@ _plugin_options = []
 _new_phase_queue = {}
 
 
-def register_task_phase(name, before=None, after=None):
+def register_task_phase(name: str, before: str = None, after: str = None):
     """
     Adds a new task phase to the available phases.
-
-    :param suppress_abort: If True, errors during this phase will be suppressed, and not affect task result.
     """
     if before and after:
         raise RegisterException('You can only give either before or after for a phase.')
@@ -243,14 +246,14 @@ class PluginInfo(dict):
 
     def __init__(
         self,
-        plugin_class,
-        name=None,
-        interfaces=None,
-        builtin=False,
-        debug=False,
-        api_ver=1,
-        category=None,
-    ):
+        plugin_class: type,
+        name: Optional[str] = None,
+        interfaces: Optional[List[str]] = None,
+        builtin: bool = False,
+        debug: bool = False,
+        api_ver: int = 1,
+        category: Optional[str] = None,
+    ) -> None:
         """
         Register a plugin.
 
@@ -262,7 +265,6 @@ class PluginInfo(dict):
         :param int api_ver: Signature of callback hooks (1=task; 2=task,config).
         :param string category: The type of plugin. Can be one of the task phases.
             Defaults to the package name containing the plugin.
-        :param groups: DEPRECATED
         """
         dict.__init__(self)
 
@@ -289,30 +291,31 @@ class PluginInfo(dict):
         self.builtin = builtin
         self.debug = debug
         self.category = category
-        self.phase_handlers = {}
+        self.phase_handlers: Dict[str, Event] = {}
+        self.schema: config_schema.JsonSchema = {}
+        self.schema_id: Optional[str] = None
 
-        self.plugin_class = plugin_class
-        self.instance = None
+        self.plugin_class: type = plugin_class
+        self.instance: object = None
 
         if self.name in plugins:
             PluginInfo.dupe_counter += 1
-            log.critical(
-                'Error while registering plugin %s. '
-                'A plugin with the same name is already registered',
+            logger.critical(
+                'Error while registering plugin {}. A plugin with the same name is already registered',
                 self.name,
             )
         else:
             plugins[self.name] = self
 
-    def initialize(self):
+    def initialize(self) -> None:
         if self.instance is not None:
             # We already initialized
             return
         # Create plugin instance
         self.instance = self.plugin_class()
         self.instance.plugin_info = self  # give plugin easy access to its own info
-        self.instance.log = logging.getLogger(
-            getattr(self.instance, "LOGGER_NAME", None) or self.name
+        self.instance.logger = logger.bind(
+            name=getattr(self.instance, "LOGGER_NAME", None) or self.name
         )
         if hasattr(self.instance, 'schema'):
             self.schema = self.instance.schema
@@ -323,21 +326,12 @@ class PluginInfo(dict):
             self.schema = {}
 
         if self.schema is not None:
-            location = '/schema/plugin/%s' % self.name
-            self.schema['id'] = location
-            config_schema.register_schema(location, self.schema)
+            self.schema_id = f'/schema/plugin/{self.name}'
+            config_schema.register_schema(self.schema_id, self.schema)
 
         self.build_phase_handlers()
 
-    def reset_phase_handlers(self):
-        """Temporary utility method"""
-        self.phase_handlers = {}
-        self.build_phase_handlers()
-        # TODO: should unregister events (from flexget.event)
-        # this method is not used at the moment anywhere ...
-        raise NotImplementedError
-
-    def build_phase_handlers(self):
+    def build_phase_handlers(self) -> None:
         """(Re)build phase_handlers in this plugin"""
         for phase, method_name in phase_methods.items():
             if phase in self.phase_handlers:
@@ -358,12 +352,12 @@ class PluginInfo(dict):
                 event.plugin = self
                 self.phase_handlers[phase] = event
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr: str):
         if attr in self:
             return self[attr]
         return dict.__getattribute__(self, attr)
 
-    def __setattr__(self, attr, value):
+    def __setattr__(self, attr: str, value):
         self[attr] = value
 
     def __str__(self):
@@ -384,11 +378,7 @@ class PluginInfo(dict):
 register = PluginInfo
 
 
-def _strip_trailing_sep(path):
-    return path.rstrip("\\/")
-
-
-def _get_standard_plugins_path():
+def _get_standard_plugins_path() -> List[str]:
     """
     :returns: List of directories where traditional plugins should be tried to load from.
     """
@@ -403,7 +393,7 @@ def _get_standard_plugins_path():
     return paths
 
 
-def _get_standard_components_path():
+def _get_standard_components_path() -> List[str]:
     """
     :returns: List of directories where component plugins should be tried to load from.
     """
@@ -418,18 +408,18 @@ def _get_standard_components_path():
     return paths
 
 
-def _check_phase_queue():
+def _check_phase_queue() -> None:
     if _new_phase_queue:
         for phase, args in _new_phase_queue.items():
-            log.error(
-                'Plugin %s requested new phase %s, but it could not be created at requested '
-                'point (before, after). Plugin is not working properly.',
+            logger.error(
+                'Plugin {} requested new phase {}, but it could not be created at requested point (before, after). '
+                'Plugin is not working properly.',
                 args[0],
                 phase,
             )
 
 
-def _import_plugin(module_name, plugin_path):
+def _import_plugin(module_name: str, plugin_path: Union[str, Path]) -> None:
     try:
         import_module(module_name)
     except DependencyError as e:
@@ -441,39 +431,41 @@ def _import_plugin(module_name, plugin_path):
                 e.missing or 'N/A',
             )
         if not e.silent:
-            log.warning(msg)
+            logger.warning(msg)
         else:
-            log.debug(msg)
+            logger.debug(msg)
     except ImportError:
-        log.critical('Plugin `%s` failed to import dependencies', module_name, exc_info=True)
+        logger.opt(exception=True).critical(
+            'Plugin `{}` failed to import dependencies', module_name
+        )
     except ValueError as e:
         # Debugging #2755
-        log.error(
-            'ValueError attempting to import `%s` (from %s): %s', module_name, plugin_path, e
+        logger.error(
+            'ValueError attempting to import `{}` (from {}): {}', module_name, plugin_path, e
         )
     except Exception:
-        log.critical('Exception while loading plugin %s', module_name, exc_info=True)
+        logger.opt(exception=True).critical('Exception while loading plugin {}', module_name)
         raise
     else:
-        log.trace('Loaded module %s from %s', module_name, plugin_path)
+        logger.trace('Loaded module {} from {}', module_name, plugin_path)
 
 
-def _load_plugins_from_dirs(dirs):
+def _load_plugins_from_dirs(dirs: List[str]) -> None:
     """
     :param list dirs: Directories from where plugins are loaded from
     """
 
-    log.debug('Trying to load plugins from: %s', dirs)
+    logger.debug('Trying to load plugins from: {}', dirs)
     dirs = [Path(d) for d in dirs if os.path.isdir(d)]
     # add all dirs to plugins_pkg load path so that imports work properly from any of the plugin dirs
-    plugins_pkg.__path__ = list(map(_strip_trailing_sep, dirs))
+    plugins_pkg.__path__ = [str(d) for d in dirs]
     for plugins_dir in dirs:
-        for plugin_path in plugins_dir.walkfiles('*.py'):
+        for plugin_path in plugins_dir.glob('**/*.py'):
             if plugin_path.name == '__init__.py':
                 continue
             # Split the relative path from the plugins dir to current file's parent dir to find subpackage names
             plugin_subpackages = [
-                _f for _f in plugin_path.relpath(plugins_dir).parent.splitall() if _f
+                _f for _f in plugin_path.relative_to(plugins_dir).parent.parts if _f
             ]
             module_name = '.'.join(
                 [plugins_pkg.__name__] + plugin_subpackages + [plugin_path.stem]
@@ -483,19 +475,19 @@ def _load_plugins_from_dirs(dirs):
 
 
 # TODO: this is now identical to _load_plugins_from_dirs, REMOVE
-def _load_components_from_dirs(dirs):
+def _load_components_from_dirs(dirs: List[str]) -> None:
     """
     :param list dirs: Directories where plugin components are loaded from
     """
-    log.debug('Trying to load components from: %s', dirs)
+    logger.debug('Trying to load components from: {}', dirs)
     dirs = [Path(d) for d in dirs if os.path.isdir(d)]
     for component_dir in dirs:
-        for component_path in component_dir.walkfiles('*.py'):
+        for component_path in component_dir.glob('**/*.py'):
             if component_path.name == '__init__.py':
                 continue
             # Split the relative path from the plugins dir to current file's parent dir to find subpackage names
             plugin_subpackages = [
-                _f for _f in component_path.relpath(component_dir).parent.splitall() if _f
+                _f for _f in component_path.relative_to(component_dir).parent.parts if _f
             ]
             package_name = '.'.join(
                 [components_pkg.__name__] + plugin_subpackages + [component_path.stem]
@@ -504,7 +496,7 @@ def _load_components_from_dirs(dirs):
     _check_phase_queue()
 
 
-def _load_plugins_from_packages():
+def _load_plugins_from_packages() -> None:
     """Load plugins installed via PIP"""
     for entrypoint in pkg_resources.iter_entry_points('FlexGet.plugins'):
         try:
@@ -519,26 +511,28 @@ def _load_plugins_from_packages():
                     e.missing or 'N/A',
                 )
             if not e.silent:
-                log.warning(msg)
+                logger.warning(msg)
             else:
-                log.debug(msg)
+                logger.debug(msg)
         except ImportError:
-            log.critical(
-                'Plugin `%s` failed to import dependencies', entrypoint.module_name, exc_info=True
+            logger.opt(exception=True).critical(
+                'Plugin `{}` failed to import dependencies', entrypoint.module_name
             )
         except Exception:
-            log.critical(
-                'Exception while loading plugin %s', entrypoint.module_name, exc_info=True
+            logger.opt(exception=True).critical(
+                'Exception while loading plugin {}', entrypoint.module_name
             )
             raise
         else:
-            log.trace(
-                'Loaded packaged module %s from %s', entrypoint.module_name, plugin_module.__file__
+            logger.trace(
+                'Loaded packaged module {} from {}', entrypoint.module_name, plugin_module.__file__
             )
     _check_phase_queue()
 
 
-def load_plugins(extra_plugins=None, extra_components=None):
+def load_plugins(
+    extra_plugins: Optional[List[str]] = None, extra_components: Optional[List[str]] = None
+) -> None:
     """
     Load plugins from the standard plugin and component paths.
 
@@ -570,12 +564,18 @@ def load_plugins(extra_plugins=None, extra_components=None):
         plugin.initialize()
     took = time.time() - start_time
     plugins_loaded = True
-    log.debug(
-        'Plugins took %.2f seconds to load. %s plugins in registry.', took, len(plugins.keys())
+    logger.debug(
+        'Plugins took {:.2f} seconds to load. {} plugins in registry.', took, len(plugins.keys())
     )
 
 
-def get_plugins(phase=None, interface=None, category=None, name=None, min_api=None):
+def get_plugins(
+    phase: Optional[str] = None,
+    interface: Optional[str] = None,
+    category: Optional[str] = None,
+    name: Optional[str] = None,
+    min_api: Optional[int] = None,
+) -> Iterable[PluginInfo]:
     """
     Query other plugins characteristics.
 
@@ -606,26 +606,28 @@ def get_plugins(phase=None, interface=None, category=None, name=None, min_api=No
     return filter(matches, iter(plugins.values()))
 
 
-def plugin_schemas(**kwargs):
+def plugin_schemas(**kwargs) -> 'config_schema.JsonSchema':
     """Create a dict schema that matches plugins specified by `kwargs`"""
     return {
         'type': 'object',
-        'properties': dict((p.name, {'$ref': p.schema['id']}) for p in get_plugins(**kwargs)),
+        'properties': {p.name: {'$ref': p.schema_id} for p in get_plugins(**kwargs)},
         'additionalProperties': False,
         'error_additionalProperties': '{{message}} Only known plugin names are valid keys.',
         'patternProperties': {'^_': {'title': 'Disabled Plugin'}},
     }
 
 
-config_schema.register_schema('/schema/plugins', plugin_schemas)
+@event('config.register')
+def register_schema():
+    config_schema.register_schema('/schema/plugins', plugin_schemas)
 
 
-def get_phases_by_plugin(name):
+def get_phases_by_plugin(name: str) -> List[str]:
     """Return all phases plugin :name: hooks"""
     return list(get_plugin_by_name(name).phase_handlers)
 
 
-def get_plugin_by_name(name, issued_by='???'):
+def get_plugin_by_name(name: str, issued_by: str = '???') -> PluginInfo:
     """
     Get plugin by name, preferred way since this structure may be changed at some point.
 
@@ -648,7 +650,7 @@ def get_plugin_by_name(name, issued_by='???'):
     return plugins[name]
 
 
-def get(name, requested_by):
+def get(name: str, requested_by: Union[str, object]) -> object:
     """
 
     :param str name: Name of the requested plugin

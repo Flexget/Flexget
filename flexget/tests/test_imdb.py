@@ -8,14 +8,11 @@
    switch to find_entry to use that instead!
 """
 
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
 
 @pytest.mark.online
-class TestImdb(object):
+class TestImdb:
     config = """
         tasks:
           test:
@@ -317,7 +314,7 @@ class TestImdb(object):
 
 
 @pytest.mark.online
-class TestImdbLookup(object):
+class TestImdbLookup:
     config = """
         tasks:
           identifier:

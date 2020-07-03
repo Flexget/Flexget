@@ -1,14 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-
-import logging
 import re
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+from loguru import logger
 from requests.exceptions import RequestException
 
 from flexget import plugin
-from flexget.event import event
 from flexget.components.sites.utils import normalize_unicode
+from flexget.event import event
 from flexget.utils.soup import get_soup
 
 try:
@@ -21,11 +18,11 @@ except ImportError:
     )
 
 
-log = logging.getLogger('rlsbb')
+logger = logger.bind(name='rlsbb')
 
 
-class UrlRewriteAllyoulike(object):
-    """
+class UrlRewriteAllyoulike:
+    r"""
     allyoulike.com urlrewriter
     Version 0.1
 
@@ -63,7 +60,7 @@ class UrlRewriteAllyoulike(object):
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        rewritable_regex = '^https?:\/\/(www.)?allyoulike\.com\/.*'
+        rewritable_regex = r'^https?:\/\/(www.)?allyoulike\.com\/.*'
         return re.match(rewritable_regex, url) is not None
 
     def _get_soup(self, task, url):
@@ -76,12 +73,12 @@ class UrlRewriteAllyoulike(object):
         except Exception as e:
             raise UrlRewritingError(str(e))
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     # urlrewriter API
     def url_rewrite(self, task, entry):
         soup = self._get_soup(task, entry['url'])
 
-        link_re = re.compile('rarefile\.net.*\.rar$')
+        link_re = re.compile(r'rarefile\.net.*\.rar$')
 
         # grab links from the main entry:
         blog_entry = soup.find('div', class_="entry")
@@ -103,7 +100,7 @@ class UrlRewriteAllyoulike(object):
             raise UrlRewritingError('No useable links found at %s' % entry['url'])
 
         num_links = len(urls)
-        log.verbose('Found %d links at %s.', num_links, entry['url'])
+        logger.verbose('Found {} links at {}.', num_links, entry['url'])
         if num_links:
             entry['urls'] = urls
             entry['url'] = urls[0]

@@ -1,9 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-
-import logging
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime, timedelta
 
+from loguru import logger
 from sqlalchemy import and_
 
 from flexget import plugin
@@ -13,10 +10,10 @@ from flexget.utils.tools import parse_timedelta
 
 from . import db
 
-log = logging.getLogger('remember_rej')
+logger = logger.bind(name='remember_rej')
 
 
-class FilterRememberRejected(object):
+class FilterRememberRejected:
     """Internal.
     Rejects entries which have been rejected in the past.
 
@@ -35,7 +32,7 @@ class FilterRememberRejected(object):
                 session.query(db.RememberTask).filter(db.RememberTask.name == task.name).first()
             )
             if not task.is_rerun and old_task and task.config_modified:
-                log.debug('Task config has changed since last run, purging remembered entries.')
+                logger.debug('Task config has changed since last run, purging remembered entries.')
                 session.delete(old_task)
                 old_task = None
             if not old_task:
@@ -50,7 +47,7 @@ class FilterRememberRejected(object):
                     .delete()
                 )
                 if deleted:
-                    log.debug('%s entries have expired from remember_rejected table.' % deleted)
+                    logger.debug('{} entries have expired from remember_rejected table.', deleted)
                     task.config_changed()
 
     @plugin.priority(plugin.PRIORITY_LAST)
@@ -91,7 +88,7 @@ class FilterRememberRejected(object):
         if not (remember or remember_time):
             return
         if not entry.get('title') or not entry.get('original_url'):
-            log.debug('Can\'t remember rejection for entry without title or url.')
+            logger.debug('Can\'t remember rejection for entry without title or url.')
             return
         if remember_time:
             if isinstance(remember_time, str):
@@ -99,7 +96,7 @@ class FilterRememberRejected(object):
         message = 'Remembering rejection of `%s`' % entry['title']
         if remember_time:
             message += ' for %i minutes' % (remember_time.seconds / 60)
-        log.info(message)
+        logger.info(message)
         entry['remember_rejected'] = remember_time or remember
 
     @plugin.priority(plugin.PRIORITY_LAST)

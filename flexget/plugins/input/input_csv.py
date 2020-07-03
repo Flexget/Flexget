@@ -1,10 +1,6 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import PY3
-
-import logging
 import csv
 
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
@@ -12,10 +8,10 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
 
-log = logging.getLogger('csv')
+logger = logger.bind(name='csv')
 
 
-class InputCSV(object):
+class InputCSV:
     """
     Adds support for CSV format. Configuration may seem a bit complex,
     but this has advantage of being universal solution regardless of CSV
@@ -61,22 +57,15 @@ class InputCSV(object):
             r = task.requests.get(config['url'])
         except RequestException as e:
             raise plugin.PluginError('Error fetching `%s`: %s' % (config['url'], e))
-        # CSV module needs byte strings, we'll convert back to unicode later
-        if PY3:
-            page = r.text.splitlines()
-        else:
-            page = r.text.encode('utf-8').splitlines()
+
+        page = r.text.splitlines()
         for row in csv.reader(page):
             if not row:
                 continue
             entry = Entry()
             for name, index in list(config.get('values', {}).items()):
                 try:
-                    # Convert the value back to unicode
-                    if PY3:
-                        entry[name] = row[index - 1].strip()
-                    else:
-                        entry[name] = row[index - 1].decode('utf-8').strip()
+                    entry[name] = row[index - 1].strip()
                 except IndexError:
                     raise plugin.PluginError('Field `%s` index is out of range' % name)
 

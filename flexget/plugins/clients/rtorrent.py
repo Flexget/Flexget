@@ -1,30 +1,26 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.xmlrpc import client as xmlrpc_client
-from future.moves.urllib.parse import urlparse, urljoin, urlsplit
-from future.utils import native_str
-
-import logging
 import os
-import socket
 import re
+import socket
 from io import BytesIO
 from time import sleep
+from urllib.parse import urljoin, urlparse, urlsplit
+from xmlrpc import client as xmlrpc_client
 
-from flexget.utils.template import RenderError
-from flexget.utils.pathscrub import pathscrub
+from loguru import logger
+from requests.auth import HTTPBasicAuth, HTTPDigestAuth
+
 from flexget import plugin
-from flexget.event import event
-from flexget.entry import Entry
 from flexget.config_schema import one_or_more
+from flexget.entry import Entry
+from flexget.event import event
 from flexget.utils.bittorrent import Torrent, is_torrent_file
+from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError
 
-from requests.auth import HTTPDigestAuth, HTTPBasicAuth
-
-log = logging.getLogger('rtorrent')
+logger = logger.bind(name='rtorrent')
 
 
-class _Method(object):
+class _Method:
     # some magic to bind an XML-RPC method to an RPC server.
     # supports "nested" methods (e.g. examples.getStateName)
 
@@ -64,8 +60,8 @@ class HTTPDigestTransport(xmlrpc_client.Transport):
 
         # if status code is 401, it means we used the wrong auth method
         if response.status_code == 401:
-            log.warning(
-                '%s auth failed. Retrying with %s. Please change your config.',
+            logger.warning(
+                '{} auth failed. Retrying with {}. Please change your config.',
                 'Digest' if self.__digest_auth else 'Basic',
                 'Basic' if self.__digest_auth else 'Digest',
             )
@@ -90,7 +86,7 @@ class HTTPDigestTransport(xmlrpc_client.Transport):
         p, u = self.getparser()
 
         if self.verbose:
-            log.info('body: %s', repr(response))
+            logger.info('body: {!r}', response)
 
         p.feed(response.content)
         p.close()
@@ -160,11 +156,11 @@ def create_proxy(url):
     if parsed.scheme == 'scgi':
         url = 'http://%s' % parsed.netloc
         return xmlrpc_client.ServerProxy(url, transport=SCGITransport())
-    log.debug('Creating Normal XMLRPC Proxy with url %r' % url)
+    logger.debug('Creating Normal XMLRPC Proxy with url {!r}', url)
     return xmlrpc_client.ServerProxy(url)
 
 
-class RTorrent(object):
+class RTorrent:
     """ rTorrent API client """
 
     default_fields = (
@@ -209,7 +205,7 @@ class RTorrent(object):
         parsed_uri = urlparse(uri)
 
         if self.username and self.password and parsed_uri.scheme not in ['http', 'https']:
-            raise IOError('Username and password only supported on http(s)')
+            raise OSError('Username and password only supported on http(s)')
 
         # Determine the proxy server
         if parsed_uri.scheme in ['http', 'https']:
@@ -220,7 +216,7 @@ class RTorrent(object):
             self.uri = parsed_uri.path
             sp = create_proxy
         else:
-            raise IOError('Unsupported scheme %s for uri %s' % (parsed_uri.scheme, self.uri))
+            raise OSError('Unsupported scheme %s for uri %s' % (parsed_uri.scheme, self.uri))
 
         # Use a special transport if http(s)
         if parsed_uri.scheme in ['http', 'https']:
@@ -240,7 +236,7 @@ class RTorrent(object):
         if reverse:
             for field in ['up.total', 'down.total', 'down.rate']:
                 if field in fields:
-                    fields[fields.index(field)] = native_str(field.replace('.', '_'))
+                    fields[fields.index(field)] = field.replace('.', '_')
             return fields
 
         for required_field in self.required_fields:
@@ -249,7 +245,7 @@ class RTorrent(object):
 
         for field in ['up_total', 'down_total', 'down_rate']:
             if field in fields:
-                fields[fields.index(field)] = native_str(field.replace('_', '.'))
+                fields[fields.index(field)] = field.replace('_', '.')
 
         return fields
 
@@ -264,7 +260,7 @@ class RTorrent(object):
         for key, val in fields.items():
             # Values must be escaped if within params
             # TODO: What are the escaping requirements? re.escape works differently on python 3.7+
-            params.append('d.%s.set=%s' % (key, re.escape(native_str(val))))
+            params.append('d.%s.set=%s' % (key, re.escape(str(val))))
 
         if mkdir and 'directory' in fields:
             result = self._server.execute.throw('', 'mkdir', '-p', fields['directory'])
@@ -295,7 +291,6 @@ class RTorrent(object):
 
     def torrent(self, info_hash, fields=None):
         """ Get the details of a torrent """
-        info_hash = native_str(info_hash)
         if not fields:
             fields = list(self.default_fields)
 
@@ -329,28 +324,27 @@ class RTorrent(object):
 
         for key, val in fields.items():
             method_name = 'd.%s.set' % key
-            getattr(multi_call, method_name)(native_str(info_hash), native_str(val))
+            getattr(multi_call, method_name)(info_hash, val)
 
         return multi_call()[0]
 
     def delete(self, info_hash):
-        return self._server.d.erase(native_str(info_hash))
+        return self._server.d.erase(info_hash)
 
     def stop(self, info_hash):
         self._server.d.stop(info_hash)
-        return self._server.d.close(native_str(info_hash))
+        return self._server.d.close(info_hash)
 
     def start(self, info_hash):
-        return self._server.d.start(native_str(info_hash))
+        return self._server.d.start(info_hash)
 
     def move(self, info_hash, dst_path):
-        info_hash = native_str(info_hash)
         self.stop(info_hash)
 
         torrent = self.torrent(info_hash, fields=['base_path'])
 
         try:
-            log.verbose('Creating destination directory `%s`' % dst_path)
+            logger.verbose('Creating destination directory `{}`', dst_path)
             self._server.execute.throw('', 'mkdir', '-p', dst_path)
         except xmlrpc_client.Error:
             raise xmlrpc_client.Error("unable to create folder %s" % dst_path)
@@ -360,7 +354,7 @@ class RTorrent(object):
         self.start(info_hash)
 
 
-class RTorrentPluginBase(object):
+class RTorrentPluginBase:
     priority_map = {'high': 3, 'medium': 2, 'low': 1, 'off': 0}
 
     def _build_options(self, config, entry, entry_first=True):
@@ -468,7 +462,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             for entry in task.accepted:
                 if config['action'] == 'add':
                     if task.options.test:
-                        log.info('Would add %s to rTorrent', entry['url'])
+                        logger.info('Would add {} to rTorrent', entry['url'])
                         continue
                     try:
                         options = self._build_options(config, entry)
@@ -495,8 +489,8 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
                 if config['action'] == 'delete':
                     if task.options.test:
-                        log.info(
-                            'Would delete %s (%s) from rTorrent',
+                        logger.info(
+                            'Would delete {} ({}) from rTorrent',
                             entry['title'],
                             entry['torrent_info_hash'],
                         )
@@ -505,22 +499,22 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
                 if config['action'] == 'update':
                     if task.options.test:
-                        log.info(
-                            'Would update %s (%s) in rTorrent',
+                        logger.info(
+                            'Would update {} ({}) in rTorrent',
                             entry['title'],
                             entry['torrent_info_hash'],
                         )
                         continue
                     self.update_entry(client, entry, config)
 
-        except IOError as e:
+        except OSError as e:
             raise plugin.PluginError("Couldn't connect to rTorrent: %s" % str(e))
 
     def delete_entry(self, client, entry):
         try:
             client.delete(entry['torrent_info_hash'])
-            log.verbose(
-                'Deleted %s (%s) in rtorrent ' % (entry['title'], entry['torrent_info_hash'])
+            logger.verbose(
+                'Deleted {} ({}) in rtorrent ', entry['title'], entry['torrent_info_hash']
             )
         except xmlrpc_client.Error as e:
             entry.fail('Failed to delete: %s' % str(e))
@@ -548,9 +542,10 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                 'directory'
             ] != os.path.dirname(existing['base_path']):
                 try:
-                    log.verbose(
-                        "Path is changing, moving files from '%s' to '%s'"
-                        % (existing['base_path'], options['directory'])
+                    logger.verbose(
+                        "Path is changing, moving files from '{}' to '{}'",
+                        existing['base_path'],
+                        options['directory'],
                     )
                     client.move(info_hash, options['directory'])
                 except xmlrpc_client.Error as e:
@@ -563,7 +558,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
         try:
             client.update(info_hash, options)
-            log.verbose('Updated %s (%s) in rtorrent ' % (entry['title'], info_hash))
+            logger.verbose('Updated {} ({}) in rtorrent ', entry['title'], info_hash)
         except xmlrpc_client.Error as e:
             entry.fail('Failed to update: %s' % str(e))
             return
@@ -624,7 +619,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             try:
                 with open(entry['file'], 'rb') as f:
                     torrent_raw = f.read()
-            except IOError as e:
+            except OSError as e:
                 entry.fail('Failed to add to rTorrent %s' % str(e))
                 return
 
@@ -637,7 +632,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
         # First check if it already exists
         try:
             if client.torrent(entry['torrent_info_hash']):
-                log.warning("Torrent %s already exists, won't add" % entry['title'])
+                logger.warning("Torrent {} already exists, won't add", entry['title'])
                 return
         except xmlrpc_client.Error:
             # No existing found
@@ -648,16 +643,16 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             if resp != 0:
                 entry.fail('Failed to add to rTorrent invalid return value %s' % resp)
         except xmlrpc_client.Error as e:
-            log.exception(e)
+            logger.exception(e)
             entry.fail('Failed to add to rTorrent %s' % str(e))
             return
 
         # Verify the torrent loaded
         try:
             self._verify_load(client, entry['torrent_info_hash'])
-            log.info('%s added to rtorrent' % entry['title'])
+            logger.info('{} added to rtorrent', entry['title'])
         except xmlrpc_client.Error as e:
-            log.warning('Failed to verify torrent %s loaded: %s', entry['title'], str(e))
+            logger.warning('Failed to verify torrent {} loaded: {}', entry['title'], str(e))
 
     def on_task_learn(self, task, config):
         """ Make sure all temp files are cleaned up when entries are learned """
@@ -697,7 +692,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
 
         try:
             torrents = client.torrents(config['view'], fields=fields)
-        except (IOError, xmlrpc_client.Error) as e:
+        except (OSError, xmlrpc_client.Error) as e:
             task.abort('Could not get torrents (%s): %s' % (config['view'], e))
             return
 

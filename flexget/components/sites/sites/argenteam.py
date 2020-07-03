@@ -1,19 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
-
+from loguru import logger
 from requests import RequestException
 
 from flexget import plugin
+from flexget.components.sites.utils import normalize_scene
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.components.sites.utils import normalize_scene
 
-log = logging.getLogger('argenteam')
+logger = logger.bind(name='argenteam')
 
 
-class SearchArgenteam(object):
+class SearchArgenteam:
     """ Argenteam
     Search plugin which gives results from www.argenteam.net, latin american (Argentina) web.
 
@@ -33,7 +29,7 @@ class SearchArgenteam(object):
 
     base_url = 'http://www.argenteam.net/api/v1/'
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def search(self, task, entry, config):
         """
             Search for releases
@@ -46,34 +42,35 @@ class SearchArgenteam(object):
             try:
                 params = {'q': normalize_scene(search_string)}
                 resp = task.requests.get(self.base_url + 'search', params=params)
-                log.debug('Requesting: %s', resp.url)
+                logger.debug('Requesting: {}', resp.url)
                 response = resp.json()
             except RequestException as e:
-                log.error('Argenteam request failed: %s', e)
+                logger.error('Argenteam request failed: {}', e)
                 return
 
             if not response:
-                log.debug('Empty response from Argenteam')
+                logger.debug('Empty response from Argenteam')
                 continue
 
             if not response.get('total'):
-                log.debug('No results found for %s', search_string)
+                logger.debug('No results found for {}', search_string)
                 continue
 
             results = response.get('results')
             if results[0]['type'] == 'tvshow':
-                log.error('Argenteam type tvshow not supported yet.')
+                logger.error('Argenteam type tvshow not supported yet.')
                 continue
 
             url = '{}{}?id={}'.format(self.base_url, results[0]['type'], results[0]['id'])
             try:
                 resp = task.requests.get(url)
-                log.debug('Requesting releases for: %s', url)
+                logger.debug('Requesting releases for: {}', url)
                 response = resp.json()
             except RequestException as e:
-                log.error('Argenteam request failed: %s', e)
+                logger.error('Argenteam request failed: {}', e)
                 return
 
+            logger.debug('{} releases found.', len(response['releases']))
             for release in response['releases']:
                 for torrent in release['torrents']:
                     if (
@@ -95,9 +92,9 @@ class SearchArgenteam(object):
                         e['url'] = torrent['uri']
 
                         # Save aRGENTeaM subtitle URL for this release
-                        if 'subtitles' in release:
+                        if 'subtitles' in release and len(release['subtitles']) > 0:
                             e['argenteam_subtitle'] = release['subtitles'][0]['uri']
-                            log.debug('Argenteam subtitle found: %s', e['argenteam_subtitle'])
+                            logger.debug('Argenteam subtitle found: {}', e['argenteam_subtitle'])
 
                         if 'tvdb' in response:
                             e['tvdb_id'] = response['tvdb']

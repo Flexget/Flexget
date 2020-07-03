@@ -1,11 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flexget import plugin
 from flexget.entry import Entry
 
 
-class OneEntryInput(object):
+class OneEntryInput:
     """Fake input plugin, fails if second entry is grabbed."""
 
     def on_task_input(self, task, config):
@@ -16,7 +13,7 @@ class OneEntryInput(object):
 plugin.register(OneEntryInput, 'one_entry_input', api_ver=2)
 
 
-class TestLimit(object):
+class TestLimit:
     config = """
         tasks:
           test_limit:

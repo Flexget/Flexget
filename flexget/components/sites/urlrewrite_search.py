@@ -1,16 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 from difflib import SequenceMatcher
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('urlrewrite_search')
+logger = logger.bind(name='urlrewrite_search')
 
 
-class PluginSearch(object):
+class PluginSearch:
     """
     Search entry from sites. Accepts list of known search plugins, list is in priority order.
     Once hit has been found no more searches are performed. Should be used only when
@@ -56,7 +54,7 @@ class PluginSearch(object):
                 if isinstance(name, dict):
                     # the name is the first/only key in the dict.
                     name, search_config = list(name.items())[0]
-                log.verbose('Searching `%s` from %s' % (entry['title'], name))
+                logger.verbose('Searching `{}` from {}', entry['title'], name)
                 try:
                     try:
                         results = plugins[name].search(
@@ -64,22 +62,24 @@ class PluginSearch(object):
                         )
                     except TypeError:
                         # Old search api did not take task argument
-                        log.warning('Search plugin %s does not support latest search api.' % name)
+                        logger.warning(
+                            'Search plugin {} does not support latest search api.', name
+                        )
                         results = plugins[name].search(entry, search_config)
                     matcher = SequenceMatcher(a=entry['title'])
                     for result in results:
                         matcher.set_seq2(result['title'])
                         if matcher.ratio() > 0.9:
-                            log.debug('Found url: %s', result['url'])
+                            logger.debug('Found url: {}', result['url'])
                             entry['url'] = result['url']
                             break
                         else:
-                            log.debug('Match %s is not close enough', result['title'])
+                            logger.debug('Match {} is not close enough', result['title'])
                     else:
                         continue
                     break
                 except (plugin.PluginError, plugin.PluginWarning) as pw:
-                    log.verbose('Failed: %s' % pw.value)
+                    logger.verbose('Failed: {}', pw.value)
                     continue
 
             # Search failed

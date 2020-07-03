@@ -24,7 +24,7 @@ Core
 * Some smaller misc libraries
 
 HTTPServer
-~~~~~
+~~~~~~~~~~
 
 * Flask
 * Jinja2
@@ -35,11 +35,11 @@ CherryPy is only used for WSGI server.
 How do I get started?
 ---------------------
 
-Set up development environment, which is basically just two steps.
+Set up development environment, which is basically just three steps:
 
-#. `GIT clone`_ our repository.
-#. Create a virtualenv in your clone dir.
-#. Run ``pip install -e .`` from your checkout directory with your virtualenv pip.
+#. Git clone `our repository`_.
+#. Create a virtual environment in your clone dir (``python3 -m venv <venv-dir>``).
+#. Run ``<venv-dir>/bin/pip install -e .`` from your checkout directory.
 
 For easier collaboration we recommend forking us on github and sending pull
 request. Once we see any semi-serious input from a developer we will grant
@@ -47,14 +47,11 @@ write permissions to our central repository. You can also request this earlier
 if you wish.
 
 If you are new to Git there are several interactive tutorials you can try to get
-you started including `tryGit`_ and `LearnGitBranching`_.
+you started including `try Git`_ and `Learn Git Branching`_.
 
-.. _setuptools: https://pypi.python.org/pypi/setuptools
-.. _pip: https://pypi.python.org/pypi/pip
-.. _virtualenv: https://pypi.python.org/pypi/virtualenv
-.. _GIT clone: https://github.com/Flexget/Flexget
-.. _tryGit: http://try.github.io
-.. _LearnGitBranching: http://pcottle.github.io/learnGitBranching/
+.. _our repository: https://github.com/Flexget/Flexget
+.. _try Git: http://try.github.io
+.. _Learn Git Branching: http://pcottle.github.io/learnGitBranching/
 
 Environment
 -----------
@@ -63,16 +60,16 @@ Once you have bootstrapped the environment you have fully functional FlexGet in
 a `virtual environment`_ in your clone directory. You can easily add or modify
 existing plugins in here and it will not mess your other FlexGet instances in
 any way. The commands in the documentation expect the virtual environment to be
-activated. If you don't activate it you must run commands explicitly from under
-environment ``bin`` directory or ``scripts`` in windows. E.g. ``flexget`` would
-be ``bin/flexget`` (at project root) in unactivated `virtual environment`_.
+activated. If you don't activate it you must run commands explicitly from the
+environment's ``bin`` directory or ``scripts`` in windows. E.g. ``flexget`` would
+be ``bin/flexget`` relative to the root of the unactivated `virtual environment`_.
 
-How to activate virtualenv under linux::
+How to activate virtual environment under linux::
 
   source bin/activate
 
 
-.. _virtual environment: https://pypi.python.org/pypi/virtualenv
+.. _virtual environment: https://docs.python.org/3/library/venv.html
 
 Code quality
 ------------

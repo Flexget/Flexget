@@ -1,23 +1,21 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import datetime
 import re
 
-from sqlalchemy import Column, Unicode, DateTime
+from loguru import logger
+from sqlalchemy import Column, DateTime, Unicode
 
-from flexget import plugin, db_schema
+from flexget import db_schema, plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.requests import TimedLimiter, RequestException
 from flexget.manager import Session
 from flexget.utils.database import json_synonym
+from flexget.utils.requests import RequestException
 from flexget.utils.requests import Session as RequestSession
+from flexget.utils.requests import TimedLimiter
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
 
-log = logging.getLogger('filelist')
+logger = logger.bind(name='filelist')
 Base = db_schema.versioned_base('filelist', 0)
 
 requests = RequestSession()
@@ -37,12 +35,15 @@ CATEGORIES = {
     'misc': 18,
     'mobile': 22,
     'movies 3d': 25,
+    'movies 4k': 6,
+    'movies 4k blueray': 26,
     'movies bluray': 20,
     'movies dvd': 2,
     'movies dvd-ro': 3,
     'movies hd': 4,
     'movies hd-ro': 19,
     'movies sd': 1,
+    'series 4k': 27,
     'series hd': 21,
     'series sd': 23,
     'software': 8,
@@ -66,13 +67,14 @@ class FileListCookie(Base):
     expires = Column(DateTime)
 
 
-class SearchFileList(object):
+class SearchFileList:
     """
         FileList.ro search plugin.
     """
 
     schema = {
         'type': 'object',
+        'deprecated': 'plugin filelist is deprecated, please consider using plugin filelist_api',
         'properties': {
             'username': {'type': 'string'},
             'password': {'type': 'string'},
@@ -138,17 +140,30 @@ class SearchFileList(object):
                     and saved_cookie.expires
                     and saved_cookie.expires >= datetime.datetime.now()
                 ):
-                    log.debug('Found valid login cookie')
+                    logger.debug('Found valid login cookie')
                     return saved_cookie.cookie
 
         url = BASE_URL + 'takelogin.php'
         try:
-            log.debug('Attempting to retrieve FileList.ro cookie')
+            # get validator token
+            response = requests.get(BASE_URL + 'login.php')
+            soup = get_soup(response.content)
+            
+            login_validator = soup.find("input", {"name": "validator"})
+            
+            if not login_validator:
+                raise plugin.PluginError(
+                    'FileList.ro could not get login validator'
+                )
+            logger.debug('Login Validator: {}'.format(login_validator.get('value')))
+            logger.debug('Attempting to retrieve FileList.ro cookie')
+            
             response = requests.post(
                 url,
                 data={
                     'username': username,
                     'password': password,
+                    'validator': login_validator.get('value'),
                     'login': 'Log in',
                     'unlock': '1',
                 },
@@ -169,19 +184,19 @@ class SearchFileList(object):
                     expires = c.expires
             if expires:
                 expires = datetime.datetime.fromtimestamp(expires)
-            log.debug('Saving or updating FileList.ro cookie in db')
+            logger.debug('Saving or updating FileList.ro cookie in db')
             cookie = FileListCookie(
                 username=username.lower(), cookie=dict(requests.cookies), expires=expires
             )
             session.merge(cookie)
             return cookie.cookie
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def search(self, task, entry, config):
         """
             Search for entries on FileList.ro
         """
-        entries = set()
+        entries = list()
 
         params = {
             'cat': CATEGORIES[config['category']],
@@ -193,14 +208,14 @@ class SearchFileList(object):
 
         for search_string in entry.get('search_strings', [entry['title']]):
             params['search'] = search_string
-            log.debug('Using search params: %s', params)
+            logger.debug('Using search params: {}', params)
             try:
                 page = self.get(
                     BASE_URL + 'browse.php', params, config['username'], config['password']
                 )
-                log.debug('requesting: %s', page.url)
+                logger.debug('requesting: {}', page.url)
             except RequestException as e:
-                log.error('FileList.ro request failed: %s', e)
+                logger.error('FileList.ro request failed: {}', e)
                 continue
 
             soup = get_soup(page.content)
@@ -234,7 +249,7 @@ class SearchFileList(object):
                         try:
                             request = self.get(url, {}, config['username'], config['password'])
                         except RequestException as e:
-                            log.error('FileList.ro request failed: %s', e)
+                            logger.error('FileList.ro request failed: {}', e)
                             continue
                         title_soup = get_soup(request.content)
                         title = title_soup.find('div', attrs={'class': 'cblock-header'}).text
@@ -259,7 +274,7 @@ class SearchFileList(object):
                 if genres:
                     e['torrent_genres'] = genres
 
-                entries.add(e)
+                entries.append(e)
 
         return entries
 

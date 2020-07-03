@@ -1,19 +1,14 @@
 # pylint: disable=no-self-use
-
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.utils import text_type
-
 import os
 import stat
 import sys
 
 import pytest
 
-from flexget.entry import EntryUnicodeError, Entry
+from flexget.entry import Entry, EntryUnicodeError
 
 
-class TestDisableBuiltins(object):
+class TestDisableBuiltins:
     """
         Quick a hack, test disable functionality by checking if seen filtering (builtin) is working
     """
@@ -52,11 +47,11 @@ class TestDisableBuiltins(object):
 
 
 @pytest.mark.online
-class TestInputHtml(object):
+class TestInputHtml:
     config = """
         tasks:
           test:
-            html: http://download.flexget.com/
+            html: http://google.com/
     """
 
     def test_parsing(self, execute_task):
@@ -64,7 +59,7 @@ class TestInputHtml(object):
         assert task.entries, 'did not produce entries'
 
 
-class TestPriority(object):
+class TestPriority:
     config = """
         tasks:
           test:
@@ -101,7 +96,7 @@ class TestPriority(object):
         assert task.rejected, 'quality plugin should have rejected Smoke as hdtv'
 
 
-class TestImmortal(object):
+class TestImmortal:
     config = """
         tasks:
           test:
@@ -120,7 +115,7 @@ class TestImmortal(object):
 
 
 @pytest.mark.online
-class TestDownload(object):
+class TestDownload:
     config = """
         tasks:
           test:
@@ -151,24 +146,21 @@ class TestDownload(object):
         ), 'download file mode not honoring umask'
 
 
-class TestEntryUnicodeError(object):
+class TestEntryUnicodeError:
     def test_encoding(self):
         e = Entry('title', 'url')
         with pytest.raises(EntryUnicodeError):
             e['invalid'] = b'\x8e'
 
 
-class TestEntryStringCoercion(object):
+class TestEntryStringCoercion:
     def test_coercion(self):
-        class EnrichedString(text_type):
-            pass
-
         e = Entry('title', 'url')
-        e['test'] = EnrichedString("test")
-        assert type(e['test']) == text_type  # pylint: disable=unidiomatic-typecheck
+        e['test'] = str("test")
+        assert type(e['test']) == str  # pylint: disable=unidiomatic-typecheck
 
 
-class TestFilterRequireField(object):
+class TestFilterRequireField:
     config = """
         tasks:
           test:
@@ -201,13 +193,13 @@ class TestFilterRequireField(object):
         ), 'Entry2 should have been rejected'
 
 
-class TestHtmlUtils(object):
+class TestHtmlUtils:
     def test_decode_html(self):
         """utils decode_html"""
         from flexget.utils.tools import decode_html
 
-        assert decode_html('&lt;&#51;') == u'<3'
-        assert decode_html('&#x2500;') == u'\u2500'
+        assert decode_html('&lt;&#51;') == '<3'
+        assert decode_html('&#x2500;') == '\u2500'
 
     @pytest.mark.skip(reason='FAILS - DISABLED')
     def test_encode_html(self):
@@ -219,7 +211,7 @@ class TestHtmlUtils(object):
         assert encode_html('<3') == '&lt;3'
 
 
-class TestSetPlugin(object):
+class TestSetPlugin:
     config = """
         templates:
           global:
@@ -302,5 +294,7 @@ class TestSetPlugin(object):
     def test_native_types(self, execute_task):
         task = execute_task('test_native_types')
         entry = task.find_entry('entries', title='Entry 1')
-        assert (isinstance(entry['int_field'], int)), 'should allow setting values as integers rather than strings'
+        assert isinstance(
+            entry['int_field'], int
+        ), 'should allow setting values as integers rather than strings'
         assert entry['int_field'] == 3

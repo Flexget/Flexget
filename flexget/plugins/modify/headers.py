@@ -1,15 +1,12 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('headers')
+logger = logger.bind(name='headers')
 
 
-class PluginHeaders(object):
+class PluginHeaders:
     """Allow setting up any headers in all requests (which use urllib2)
 
     Example:
@@ -24,7 +21,7 @@ class PluginHeaders(object):
     def on_task_start(self, task, config):
         """Task starting"""
         # Set the headers for this task's request session
-        log.debug('headers to add: %s' % config)
+        logger.debug('headers to add: {}', config)
         if task.requests.headers:
             task.requests.headers.update(config)
         else:

@@ -1,13 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import copy
 from datetime import datetime
 
 from flexget.api.app import base_message
 from flexget.components.rejected.api import ObjectsContainer as OC
-from flexget.manager import Session
 from flexget.components.rejected.db import RememberEntry, RememberTask
+from flexget.manager import Session
 from flexget.utils import json
 from flexget.utils.tools import parse_timedelta
 
@@ -31,7 +28,7 @@ def add_rejected_entry(entry):
         )
 
 
-class TestRejectedAPI(object):
+class TestRejectedAPI:
     config = "{'tasks': {}}"
 
     entry = dict(
@@ -159,7 +156,7 @@ class TestRejectedAPI(object):
         assert not errors
 
 
-class TestRejectedPagination(object):
+class TestRejectedPagination:
     config = 'tasks: {}'
 
     def test_rejected_pagination(self, api_client, link_headers):

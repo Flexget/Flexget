@@ -1,16 +1,15 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.xmlrpc.client import ServerProxy
-
-import re
 import difflib
 import os.path
-import logging
+import re
+from xmlrpc.client import ServerProxy
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('subtitles')
+logger = logger.bind(name='subtitles')
+
 
 # movie hash, won't work here though
 # http://trac.opensubtitles.org/projects/opensubtitles/wiki/HashSourceCodes#Python
@@ -19,7 +18,7 @@ log = logging.getLogger('subtitles')
 # http://trac.opensubtitles.org/projects/opensubtitles/wiki/XMLRPC
 
 
-class Subtitles(object):
+class Subtitles:
     """
     Fetch subtitles from opensubtitles.org
     """
@@ -56,7 +55,7 @@ class Subtitles(object):
             s = ServerProxy("http://api.opensubtitles.org/xml-rpc")
             res = s.LogIn("", "", "en", "FlexGet")
         except Exception:
-            log.warning('Error connecting to opensubtitles.org')
+            logger.warning('Error connecting to opensubtitles.org')
             return
 
         if res['status'] != '200 OK':
@@ -77,7 +76,7 @@ class Subtitles(object):
         for entry in entries:
             imdbid = entry.get('imdb_id')
             if not imdbid:
-                log.debug('no match for %s' % entry['title'])
+                logger.debug('no match for {}', entry['title'])
                 continue
 
             query = []
@@ -125,9 +124,11 @@ class Subtitles(object):
 
             # download
             for sub in filtered_subs:
-                log.debug(
-                    'SUBS FOUND: %s %s %s'
-                    % (sub['MovieReleaseName'], sub['SubRating'], sub['SubLanguageID'])
+                logger.debug(
+                    'SUBS FOUND: {} {} {}',
+                    sub['MovieReleaseName'],
+                    sub['SubRating'],
+                    sub['SubLanguageID'],
                 )
 
                 f = task.requests.get(sub['ZipDownloadLink'])

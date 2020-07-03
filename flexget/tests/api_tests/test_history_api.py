@@ -1,7 +1,3 @@
-from __future__ import unicode_literals, division, absolute_import
-
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 from flexget.api.app import base_message
 from flexget.components.history.api import ObjectsContainer as OC
 from flexget.components.history.db import History
@@ -9,7 +5,7 @@ from flexget.manager import Session
 from flexget.utils import json
 
 
-class TestHistoryAPI(object):
+class TestHistoryAPI:
     config = "{'tasks': {}}"
 
     def test_history(self, api_client, schema_match):
@@ -67,7 +63,7 @@ class TestHistoryAPI(object):
         assert data == []
 
 
-class TestHistoryPaginationAPI(object):
+class TestHistoryPaginationAPI:
     config = "{'tasks': {}}"
 
     def test_history_pagination(self, api_client, schema_match, link_headers):

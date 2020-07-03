@@ -1,16 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.log import log_once
 
-log = logging.getLogger('rt')
+logger = logger.bind(name='rt')
 
 
-class FilterRottenTomatoes(object):
+class FilterRottenTomatoes:
     """
         This plugin allows filtering based on Rotten Tomatoes score, votes and genres etc.
 
@@ -99,8 +96,7 @@ class FilterRottenTomatoes(object):
             except plugin.PluginError as e:
                 # logs skip message once through log_once (info) and then only when ran from cmd line (w/o --cron)
                 msg = 'Skipping %s because of an error: %s' % (entry['title'], e.value)
-                if not log_once(msg, logger=log):
-                    log.verbose(msg)
+                log_once(msg, logger=logger)
                 continue
 
             # for key, value in entry.iteritems():
@@ -177,7 +173,7 @@ class FilterRottenTomatoes(object):
                 accepted = config['accept_actors']
                 for actor_name in entry.get('rt_actors', []):
                     if actor_name in accepted:
-                        log.debug('Accepting because of accept_actors %s' % actor_name)
+                        logger.debug('Accepting because of accept_actors {}', actor_name)
                         force_accept = True
                         break
 
@@ -193,7 +189,7 @@ class FilterRottenTomatoes(object):
                 accepted = config['accept_directors']
                 for director_name in entry.get('rt_directors', []):
                     if director_name in accepted:
-                        log.debug('Accepting because of accept_directors %s' % director_name)
+                        logger.debug('Accepting because of accept_directors {}', director_name)
                         force_accept = True
                         break
 
@@ -213,14 +209,14 @@ class FilterRottenTomatoes(object):
                     ', '.join(reasons),
                 )
                 if task.options.debug:
-                    log.debug(msg)
+                    logger.debug(msg)
                 else:
                     if task.options.cron:
-                        log_once(msg, log)
+                        log_once(msg, logger)
                     else:
-                        log.info(msg)
+                        logger.info(msg)
             else:
-                log.debug('Accepting %s' % (entry['title']))
+                logger.debug('Accepting {}', entry['title'])
                 entry.accept()
 
 

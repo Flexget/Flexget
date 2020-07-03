@@ -1,22 +1,20 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import quote
-
-import logging
 import re
+from urllib.parse import quote
+
+from loguru import logger
 
 from flexget import plugin
+from flexget.components.sites.urlrewriting import UrlRewritingError
+from flexget.components.sites.utils import normalize_unicode, torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.components.sites.urlrewriting import UrlRewritingError
-from flexget.utils.soup import get_soup
-from flexget.components.sites.utils import torrent_availability, normalize_unicode
 from flexget.utils import requests
+from flexget.utils.soup import get_soup
 
-log = logging.getLogger('newtorrents')
+logger = logger.bind(name='newtorrents')
 
 
-class NewTorrents(object):
+class NewTorrents:
     """NewTorrents urlrewriter and search plugin."""
 
     def __init__(self):
@@ -58,7 +56,7 @@ class NewTorrents(object):
             entries.update(self.entries_from_search(search_string))
         return entries
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def url_from_page(self, url):
         """Parses torrent url from newtorrents download page"""
         try:
@@ -76,7 +74,7 @@ class NewTorrents(object):
         else:
             return f.group(1)
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def entries_from_search(self, name, url=None):
         """Parses torrent download url from search results"""
         name = normalize_unicode(name)
@@ -85,7 +83,7 @@ class NewTorrents(object):
                 name.encode('utf-8'), safe=b':/~?=&%'
             )
 
-        log.debug('search url: %s' % url)
+        logger.debug('search url: {}', url)
 
         html = requests.get(url).text
         # fix </SCR'+'IPT> so that BS does not crash
@@ -106,8 +104,8 @@ class NewTorrents(object):
                 try:
                     seed = int(seed)
                 except ValueError:
-                    log.warning(
-                        'Error converting seed value (%s) from newtorrents to integer.' % seed
+                    logger.warning(
+                        'Error converting seed value ({}) from newtorrents to integer.', seed
                     )
                     seed = 0
 
@@ -131,10 +129,10 @@ class NewTorrents(object):
                 return torrents
         else:
             if len(torrents) == 1:
-                log.debug('found only one matching search result.')
+                logger.debug('found only one matching search result.')
             else:
-                log.debug(
-                    'search result contains multiple matches, sorted %s by most seeders' % torrents
+                logger.debug(
+                    'search result contains multiple matches, sorted {} by most seeders', torrents
                 )
             return torrents
 

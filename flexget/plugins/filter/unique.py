@@ -1,14 +1,13 @@
-from __future__ import unicode_literals, division, absolute_import
-import logging
+from loguru import logger
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 
-log = logging.getLogger('unique')
+logger = logger.bind(name='unique')
 
 
-class Unique(object):
+class Unique:
     """
     Take action on entries with duplicate fields, except for the first item
 

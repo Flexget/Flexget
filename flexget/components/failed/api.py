@@ -1,28 +1,26 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 from math import ceil
 
 from flask import jsonify, request
+from loguru import logger
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource
+from flexget.api import APIResource, api
 from flexget.api.app import (
-    base_message_schema,
-    success_response,
     NotFoundError,
+    base_message_schema,
     etag,
     pagination_headers,
+    success_response,
 )
+
 from . import db
 
-log = logging.getLogger('failed_api')
+logger = logger.bind(name='failed_api')
 
 retry_failed_api = api.namespace('failed', description='View and manage failed entries')
 
 
-class ObjectsContainer(object):
+class ObjectsContainer:
     retry_failed_entry_object = {
         'type': 'object',
         'properties': {
@@ -120,7 +118,7 @@ class RetryFailed(APIResource):
     @api.response(200, 'successfully deleted failed entry', model=base_message_schema)
     def delete(self, session=None):
         """ Clear all failed entries """
-        log.debug('deleting all failed entries')
+        logger.debug('deleting all failed entries')
         deleted = session.query(db.FailedEntry).delete()
         return success_response('successfully deleted %d failed entries' % deleted)
 
@@ -150,6 +148,6 @@ class RetryFailedID(APIResource):
             )
         except NoResultFound:
             raise NotFoundError('could not find entry with ID %i' % failed_entry_id)
-        log.debug('deleting failed entry: "%s"' % failed_entry.title)
+        logger.debug('deleting failed entry: "{}"', failed_entry.title)
         session.delete(failed_entry)
         return success_response('successfully delete failed entry %d' % failed_entry_id)

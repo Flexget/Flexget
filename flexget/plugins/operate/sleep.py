@@ -1,16 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import time
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('sleep')
+logger = logger.bind(name='sleep')
 
 
-class PluginSleep(object):
+class PluginSleep:
     """
     Causes a pause in execution to occur at the beginning of the specified phase of a task.
     The point at which the pause occurs can be adjusted using the `plugin_priority` plugin.
@@ -50,7 +48,7 @@ class PluginSleep(object):
         if isinstance(config, int):
             config = {'phase': 'start', 'seconds': config}
         if config and config['phase'] == phase:
-            log.verbose('Sleeping for %d seconds.' % config['seconds'])
+            logger.verbose('Sleeping for {} seconds.', config['seconds'])
             time.sleep(int(config['seconds']))
 
     @plugin.priority(plugin.PRIORITY_FIRST)

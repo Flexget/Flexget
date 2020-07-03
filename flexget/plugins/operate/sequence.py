@@ -1,16 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import itertools
-import logging
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('sequence')
+logger = logger.bind(name='sequence')
 
 
-class PluginSequence(object):
+class PluginSequence:
     """ Allows the same plugin to be configured multiple times in a task.
 
     Example:
@@ -37,7 +35,7 @@ class PluginSequence(object):
                 for plugin_name, plugin_config in item.items():
                     if phase in plugin.get_phases_by_plugin(plugin_name):
                         method = plugin.get_plugin_by_name(plugin_name).phase_handlers[phase]
-                        log.debug('Running plugin %s' % plugin_name)
+                        logger.debug('Running plugin {}', plugin_name)
                         result = method(task, plugin_config)
                         if phase == 'input' and result:
                             results.append(result)

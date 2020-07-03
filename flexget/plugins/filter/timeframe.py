@@ -1,18 +1,17 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime
-from sqlalchemy import Column, String, Unicode, DateTime, Integer
-import logging
+
+from loguru import logger
+from sqlalchemy import Column, DateTime, Integer, String, Unicode
 
 from flexget import db_schema, plugin
-from flexget.event import event
-from flexget.entry import Entry
-from flexget.utils.database import quality_property
 from flexget.db_schema import Session
+from flexget.entry import Entry
+from flexget.event import event
 from flexget.utils import qualities
-from flexget.utils.tools import parse_timedelta, group_entries
+from flexget.utils.database import quality_property
+from flexget.utils.tools import group_entries, parse_timedelta
 
-log = logging.getLogger('timeframe')
+logger = logger.bind(name='timeframe')
 
 Base = db_schema.versioned_base('upgrade', 0)
 
@@ -34,7 +33,7 @@ class EntryTimeFrame(Base):
         return '<Timeframe(id=%s,added=%s,quality=%s)>' % (self.id, self.added, self.quality)
 
 
-class FilterTimeFrame(object):
+class FilterTimeFrame:
     schema = {
         'type': 'object',
         'properties': {
@@ -63,7 +62,7 @@ class FilterTimeFrame(object):
             return
 
         identified_by = (
-            '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
+            '{{ media_id }}' if config['identified_by'] == 'auto' else config['identified_by']
         )
 
         grouped_entries = group_entries(task.accepted, identified_by)
@@ -99,8 +98,8 @@ class FilterTimeFrame(object):
                     session.add(id_timeframe)
 
                 if id_timeframe.status == 'accepted':
-                    log.debug(
-                        'Previously accepted %s with %s skipping', identifier, id_timeframe.title
+                    logger.debug(
+                        'Previously accepted {} with {} skipping', identifier, id_timeframe.title
                     )
                     continue
 
@@ -108,7 +107,9 @@ class FilterTimeFrame(object):
                 entries.sort(key=lambda e: (e['quality'], e.get('proper_count', 0)), reverse=True)
                 best_entry = entries[0]
 
-                log.debug('Current best for identifier %s is %s', identifier, best_entry['title'])
+                logger.debug(
+                    'Current best for identifier {} is {}', identifier, best_entry['title']
+                )
 
                 id_timeframe.title = best_entry['title']
                 id_timeframe.quality = best_entry['quality']
@@ -121,9 +122,10 @@ class FilterTimeFrame(object):
                     target_requirement.allows(best_entry['quality'])
                     or best_entry['quality'] >= target_quality
                 ):
-                    log.debug(
-                        'timeframe reach target quality %s or higher for %s'
-                        % (target_quality, identifier)
+                    logger.debug(
+                        'timeframe reach target quality {} or higher for {}',
+                        target_quality,
+                        identifier,
                     )
                     if action_on_reached:
                         action_on_reached(best_entry, 'timeframe reached target quality or higher')
@@ -132,8 +134,8 @@ class FilterTimeFrame(object):
                 # Check if passed wait time
                 expires = id_timeframe.first_seen + parse_timedelta(config['wait'])
                 if expires <= datetime.now():
-                    log.debug(
-                        'timeframe expired, releasing quality restriction for %s' % identifier
+                    logger.debug(
+                        'timeframe expired, releasing quality restriction for {}', identifier
                     )
                     if action_on_reached:
                         action_on_reached(best_entry, 'timeframe wait expired')
@@ -148,8 +150,8 @@ class FilterTimeFrame(object):
                 hours += diff.days * 24
                 minutes, _ = divmod(remainder, 60)
 
-                log.info(
-                    '`%s`: timeframe waiting for %02dh:%02dmin. Currently best is `%s`.',
+                logger.info(
+                    '`{}`: timeframe waiting for {:02d}h:{:02d}min. Currently best is `{}`.',
                     identifier,
                     hours,
                     minutes,
@@ -164,7 +166,7 @@ class FilterTimeFrame(object):
             return
 
         identified_by = (
-            '{{ id }}' if config['identified_by'] == 'auto' else config['identified_by']
+            '{{ media_id }}' if config['identified_by'] == 'auto' else config['identified_by']
         )
 
         grouped_entries = group_entries(task.accepted, identified_by)

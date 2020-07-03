@@ -1,14 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
 import pytest
 
-from flexget.manager import Session
 from flexget.components.tmdb.api_tmdb import TMDBSearchResult
+from flexget.manager import Session
 
 
 @pytest.mark.online
-class TestTmdbLookup(object):
+class TestTmdbLookup:
     config = """
         tasks:
           test:
@@ -30,7 +27,7 @@ class TestTmdbLookup(object):
 
 
 @pytest.mark.online
-class TestTmdbUnicodeLookup(object):
+class TestTmdbUnicodeLookup:
     config = """
         templates:
           global:

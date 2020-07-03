@@ -1,22 +1,19 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
+from loguru import logger
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from requests.exceptions import RequestException
 from flexget.utils.requests import Session as RequestSession
 
 requests = RequestSession(max_retries=3)
 
 plugin_name = 'slack'
 
-log = logging.getLogger(plugin_name)
+logger = logger.bind(name=plugin_name)
 
 
-class SlackNotifier(object):
+class SlackNotifier:
     """
     Example:
 
@@ -94,9 +91,7 @@ class SlackNotifier(object):
                         'callback_id': {'type': 'string'},
                     },
                     'required': ['fallback'],
-                    'dependencies': {
-                        'actions': ['callback_id'],
-                    },
+                    'dependencies': {'actions': ['callback_id']},
                     'additionalProperties': False,
                 },
             },

@@ -1,25 +1,23 @@
-from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-
-import logging
 import datetime
 import re
 
-from sqlalchemy import Column, Unicode, DateTime
+from loguru import logger
 from requests.exceptions import TooManyRedirects
+from sqlalchemy import Column, DateTime, Unicode
 
-from flexget import plugin, db_schema
+from flexget import db_schema, plugin
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.requests import TimedLimiter, RequestException
 from flexget.manager import Session
 from flexget.utils.database import json_synonym
+from flexget.utils.requests import RequestException
 from flexget.utils.requests import Session as RequestSession
+from flexget.utils.requests import TimedLimiter
 from flexget.utils.soup import get_soup
-from flexget.config_schema import one_or_more
 from flexget.utils.tools import parse_filesize
 
-log = logging.getLogger('morethantv')
+logger = logger.bind(name='morethantv')
 Base = db_schema.versioned_base('morethantv', 0)
 
 requests = RequestSession()
@@ -105,7 +103,7 @@ class MoreThanTVCookie(Base):
     expires = Column(DateTime)
 
 
-class SearchMoreThanTV(object):
+class SearchMoreThanTV:
     """
         MorethanTV search plugin.
     """
@@ -154,7 +152,7 @@ class SearchMoreThanTV(object):
                 invalid_cookie = True
         except TooManyRedirects:
             # Apparently it endlessly redirects if the cookie is invalid?
-            log.debug('MoreThanTV request failed: Too many redirects. Invalid cookie?')
+            logger.debug('MoreThanTV request failed: Too many redirects. Invalid cookie?')
             invalid_cookie = True
 
         if invalid_cookie:
@@ -191,12 +189,12 @@ class SearchMoreThanTV(object):
                     and saved_cookie.expires
                     and saved_cookie.expires >= datetime.datetime.now()
                 ):
-                    log.debug('Found valid login cookie')
+                    logger.debug('Found valid login cookie')
                     return saved_cookie.cookie
 
         url = self.base_url + 'login.php'
         try:
-            log.debug('Attempting to retrieve MoreThanTV cookie')
+            logger.debug('Attempting to retrieve MoreThanTV cookie')
             response = requests.post(
                 url,
                 data={
@@ -222,14 +220,14 @@ class SearchMoreThanTV(object):
                     expires = c.expires
             if expires:
                 expires = datetime.datetime.fromtimestamp(expires)
-            log.debug('Saving or updating MoreThanTV cookie in db')
+            logger.debug('Saving or updating MoreThanTV cookie in db')
             cookie = MoreThanTVCookie(
                 username=username, cookie=dict(requests.cookies), expires=expires
             )
             session.merge(cookie)
             return cookie.cookie
 
-    @plugin.internet(log)
+    @plugin.internet(logger)
     def search(self, task, entry, config):
         """
             Search for entries on MoreThanTV
@@ -265,14 +263,14 @@ class SearchMoreThanTV(object):
 
         for search_string in entry.get('search_strings', [entry['title']]):
             params['searchstr'] = search_string.replace("'", "")
-            log.debug('Using search params: %s', params)
+            logger.debug('Using search params: {}', params)
             try:
                 page = self.get(
                     self.base_url + 'torrents.php', params, config['username'], config['password']
                 )
-                log.debug('requesting: %s', page.url)
+                logger.debug('requesting: {}', page.url)
             except RequestException as e:
-                log.error('MoreThanTV request failed: %s', e)
+                logger.error('MoreThanTV request failed: {}', e)
                 continue
 
             soup = get_soup(page.content)
@@ -284,7 +282,7 @@ class SearchMoreThanTV(object):
                 title = group_info.find('a', href=re.compile(r'torrents.php\?id=\d+')).text
                 url = (
                     self.base_url
-                    + group_info.find('a', href=re.compile('torrents.php\?action=download'))[
+                    + group_info.find('a', href=re.compile(r'torrents.php\?action=download'))[
                         'href'
                     ]
                 )

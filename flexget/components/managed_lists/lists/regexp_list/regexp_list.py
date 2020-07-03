@@ -1,17 +1,16 @@
-from __future__ import unicode_literals, division, absolute_import
-
-import logging
 import re
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from collections import MutableSet
+from collections.abc import MutableSet
+
+from loguru import logger
 
 from flexget import plugin
 from flexget.db_schema import with_session
 from flexget.event import event
 from flexget.manager import Session
+
 from . import db
 
-log = logging.getLogger('regexp_list')
+logger = logger.bind(name='regexp_list')
 
 
 class RegexpList(MutableSet):
@@ -60,7 +59,7 @@ class RegexpList(MutableSet):
             for match_regexp in [False, True]:
                 db_regexp = self._find_entry(entry, match_regexp=match_regexp, session=session)
                 if db_regexp:
-                    log.debug('deleting file %s', db_regexp)
+                    logger.debug('deleting file {}', db_regexp)
                     session.delete(db_regexp)
 
     def __contains__(self, entry):
@@ -98,7 +97,7 @@ class RegexpList(MutableSet):
         return match.to_entry() if match else None
 
 
-class PluginRegexpList(object):
+class PluginRegexpList:
     """Subtitle list"""
 
     schema = RegexpList.schema
