@@ -129,24 +129,24 @@ class Manipulate:
                     continue
                 if 'extract' in config:
                     if not field_value:
-                        logger.warning('Cannot extract, field `%s` is not present', from_field)
+                        logger.warning('Cannot extract, field `{}` is not present', from_field)
                         continue
                     if config.get('find_all'):
                         match = re.findall(config['extract'], field_value, re.I | re.U)
-                        logger.debug('all matches: %s', match)
+                        logger.debug('all matches: {}', match)
                         field_value = config.get('separator', ' ').join(match).strip()
-                        logger.debug('field `%s` after extract: `%s`', field, field_value)
+                        logger.debug('field `{}` after extract: `{}`', field, field_value)
                     else:
                         match = re.search(config['extract'], field_value, re.I | re.U)
                         if match:
                             groups = [x for x in match.groups() if x is not None]
-                            logger.debug('groups: %s', groups)
+                            logger.debug('groups: {}', groups)
                             field_value = config.get('separator', ' ').join(groups).strip()
-                            logger.debug('field `%s` after extract: `%s`', field, field_value)
+                            logger.debug('field `{}` after extract: `{}`', field, field_value)
 
                 if 'replace' in config:
                     if not field_value:
-                        logger.warning('Cannot replace, field `%s` is not present', from_field)
+                        logger.warning('Cannot replace, field `{}` is not present', from_field)
                         continue
                     replace_config = config['replace']
                     regexp = re.compile(replace_config['regexp'], flags=re.I | re.U)
