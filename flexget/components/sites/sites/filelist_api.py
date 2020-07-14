@@ -99,7 +99,7 @@ class SearchFileList:
             )
 
         # extras: internal release, moderated torrent, freeleech
-        params.update({extra: 1 for extra in valid_extras if config.get(extra)})
+        params.update({extra: 1 for extra in self.valid_extras if config.get(extra)})
 
         # set season/episode if series
         if entry.get('series_episode'):
