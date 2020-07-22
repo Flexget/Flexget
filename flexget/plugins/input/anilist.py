@@ -169,7 +169,9 @@ class AniList(object):
                             entry['al_banner'] = anime['bannerImage']
                             entry['al_genres'] = anime['genres']
                             entry['al_tags'] = [t['name'] for t in anime['tags']]
-                            entry['al_links'] = anime['externalLinks']
+                            entry['al_links'] = {
+                                item['site']: item['url'] for item in anime.get('externalLinks')
+                            }
                             if entry.isvalid():
                                 yield entry
                 req_chunk = req_chunk + 1 if list_response['collection']['hasNextChunk'] else False
