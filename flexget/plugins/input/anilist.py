@@ -125,17 +125,17 @@ class AniList(object):
                 for list_status in list_response.get('collection', {}).get('statuses', []):
                     if (
                         selected_list_name
-                        and str(list_status.get('name')).lower() not in selected_list_name
+                        and list_status.get('name', 'None').lower() not in selected_list_name
                     ):
                         continue
                     for anime in list_status['list']:
                         anime = anime.get('anime')
                         has_selected_release_status = (
-                            str(anime.get('status')).lower() in selected_release_status
+                            anime.get('status', 'None').lower() in selected_release_status
                             or 'all' in selected_release_status
                         )
                         has_selected_type = (
-                            str(anime.get('format')).lower() in selected_formats
+                            anime.get('format', 'None').lower() in selected_formats
                             or 'all' in selected_formats
                         )
                         if has_selected_type and has_selected_release_status:
