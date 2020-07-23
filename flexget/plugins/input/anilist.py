@@ -122,7 +122,7 @@ class AniList(object):
             try:
                 list_response = list_response.json()['data']
                 logger.debug('JSON output: {}', list_response)
-                for list_status in list_response.get('collection', {}).get('statuses'):
+                for list_status in list_response.get('collection', {}).get('statuses', []):
                     if (
                         selected_list_name
                         and str(list_status.get('name')).lower() not in selected_list_name
