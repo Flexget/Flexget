@@ -123,21 +123,25 @@ class AniList(object):
                 list_response = list_response.json()['data']
                 logger.debug('JSON output: {}', list_response)
                 for list_status in list_response.get('collection', {}).get('statuses', []):
-                    if (
-                        selected_list_name
-                        and list_status.get('name', 'None').lower() not in selected_list_name
+                    if selected_list_name and (
+                        list_status.get('name')
+                        and list_status.get('name').lower() not in selected_list_name
                     ):
                         continue
                     for anime in list_status['list']:
                         anime = anime.get('anime')
                         has_selected_release_status = (
-                            anime.get('status', 'None').lower() in selected_release_status
-                            or 'all' in selected_release_status
-                        )
+                            (
+                                anime.get('status')
+                                and anime.get('status').lower() in selected_release_status
+                            )
+                        ) or 'all' in selected_release_status
                         has_selected_type = (
-                            anime.get('format', 'None').lower() in selected_formats
-                            or 'all' in selected_formats
-                        )
+                            (
+                                anime.get('format')
+                                and anime.get('format').lower() in selected_formats
+                            )
+                        ) or 'all' in selected_formats
                         if has_selected_type and has_selected_release_status:
                             entry = Entry()
                             entry['al_banner'] = anime.get('bannerImage')
@@ -176,10 +180,10 @@ class AniList(object):
                                 and eng_title not in entry['alternate_name']
                             ):
                                 entry['alternate_name'].insert(0, eng_title)
-                            entry['series_name'] = entry['title']
-                            entry['title'] = entry['al_title'].get('romaji') or entry[
+                            entry['series_name'] = entry['al_title'].get('romaji') or entry[
                                 'al_title'
                             ].get('english')
+                            entry['title'] = entry['series_name']
                             entry['url'] = anime.get('siteUrl')
                             if entry.isvalid():
                                 yield entry
