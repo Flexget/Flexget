@@ -1,5 +1,4 @@
 import re
-from urllib.parse import quote, urlparse
 
 from loguru import logger
 
@@ -9,10 +8,9 @@ from flexget.components.sites.utils import normalize_unicode, torrent_availabili
 from flexget.entry import Entry
 from flexget.event import event
 
-from flexget.utils.tools import parse_filesize
-
 import json
 from urllib.parse import urlparse, parse_qs, urlencode
+from requests.exceptions import Timeout, ConnectionError, RequestException
 
 logger = logger.bind(name='piratebay')
 
@@ -91,12 +89,15 @@ class UrlRewritePirateBay:
         if self.url != url:
             self.url = url
             parsed_url = urlparse(url)
+            escaped_url_scheme = re.escape(parsed_url.scheme)
+            escaped_url_netloc = re.escape(parsed_url.netloc)
             # most api mirrors share the same domain with frontend, except thepiratebay.org which uses apibay.org
+            # some api mirrors might contain path, for ex https://pirateproxy.surf/api?url=/q.php?q=ubuntu&cat=0
+            # valid URLs are https://piratebay.org/description.php?id=\d+ and https://apibay.org/description.php?id=\d+
             self.url_match = re.compile(
-                r'^%s://(?:[a-z0-9]+\.)?(?:thepiratebay\.org(?:\:\d+)?|%s)/description\.php\?id=(\d+)$'
-                % (re.escape(parsed_url.scheme), re.escape(parsed_url.netloc))
+                fr'^{escaped_url_scheme}://(?:thepiratebay\.org(?:\:\d+)?|{escaped_url_netloc})/description\.php\?id=(\d+)$'
             )
-            self.url_search = re.compile(r'^(?:thepiratebay\.org(?:\:\d+)?|%s)/search\.php\?q=.*$' % (re.escape(url)))
+            self.url_search = re.compile(fr'^(?:https?://thepiratebay\.org(?:\:\d+)?|{escaped_url_scheme}://{escaped_url_netloc})/search\.php\?q=.*$')
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
@@ -120,14 +121,13 @@ class UrlRewritePirateBay:
             entry['url'] = results[0]['url']
         else:
             torrent_id = self.url_match.match(entry['url']).group(1)
-            url = '%s/t.php?id=%s' % (self.url, torrent_id)
+            url = f"{self.url}/t.php?id={torrent_id}"
             logger.debug('Getting info for torrent ID {}', torrent_id)
             page = task.requests.get(url).content
             json_result = json.loads(page)[0]
             if json_result['id'] == '0':
                 raise UrlRewritingError("Torrent with ID does not exist.")
-            else:
-                entry['url'] = UrlRewritePirateBay.info_hash_to_magnet(json_result['info_hash'], json_result['name'])
+            entry['url'] = self.info_hash_to_magnet(json_result['info_hash'], json_result['name'])
 
     @plugin.internet(logger)
     def search(self, task, entry, config=None):
@@ -143,22 +143,17 @@ class UrlRewritePirateBay:
             category = config['category']
         else:
             category = CATEGORIES.get(config.get('category', 'all'))
-        filter_url = '&cat=%s' % category
 
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
-            query = normalize_unicode(search_string)
-
-            # TPB search doesn't like dashes or quotes
-            # query = query.replace('-', ' ').replace("'", " ")
-
-            # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-            url = '%s/q.php?q=%s%s' % (self.url, quote(query.encode('utf-8')), filter_url)
+            # query = normalize_unicode(search_string)
+            search_qs = urlencode({'q': search_string, 'cat': category}, doseq=True)
+            url = f"{self.url}/q.php?{search_qs}"
             logger.debug('Using {} as piratebay search url', url)
             page = task.requests.get(url).content
             json_results = json.loads(page)
-            if len(json_results) == 0:
-                logger.error("Error while searching piratebay for %s." % search_string)
+            if not json_results:
+                raise plugin.PluginError("Error while searching piratebay for %s.", search_string)
             for result in json_results:
                 if result['id'] == '0':
                     # JSON when no results found:
@@ -178,27 +173,14 @@ class UrlRewritePirateBay:
                     #    "total_found":"1"
                     # }]
                     break
-                try:
-                    entry = Entry()
-                    entry['title'] = result['name']
-                    entry['torrent_seeds'] = int(result['seeders'])
-                    entry['torrent_leeches'] = int(result['leechers'])
-                    entry['torrent_timestamp'] = int(result['added'])
-                    entry['torrent_availability'] = torrent_availability(
-                        entry['torrent_seeds'], entry['torrent_leeches']
-                    )
-                    entry['content_size'] = result['size']
-                    entry['torrent_info_hash'] = result['info_hash']
-                    entry['url'] = UrlRewritePirateBay.info_hash_to_magnet(result['info_hash'], result['name'])
-                except KeyError:
-                    logger.error("Error when parsing an entry.")
-
+                entry = self.json_to_entry(result)
                 entries.add(entry)
 
         return sorted(entries, reverse=sort_reverse, key=lambda x: x.get(sort))
 
+    # convert an info_hash string to a magnet uri
     @staticmethod
-    def info_hash_to_magnet(info_hash, name):
+    def info_hash_to_magnet(info_hash: str, name: str) -> str:
         magnet = {
             'xt': f"urn:btih:{info_hash}",
             'dn': name,
@@ -207,6 +189,22 @@ class UrlRewritePirateBay:
         magnet_qs = urlencode(magnet, doseq=True, safe=':')
         magnet_uri = f"magnet:?{magnet_qs}"
         return magnet_uri
+
+    # convert a single json result to an Entry
+    def json_to_entry(self, json_result: dict) -> Entry:
+        entry = Entry()
+        entry['title'] = json_result['name']
+        entry['torrent_seeds'] = int(json_result['seeders'])
+        entry['torrent_leeches'] = int(json_result['leechers'])
+        entry['torrent_timestamp'] = int(json_result['added']) # custom field for sorting by date
+        entry['torrent_availability'] = torrent_availability(
+            entry['torrent_seeds'], entry['torrent_leeches']
+        )
+        entry['content_size'] = json_result['size']
+        entry['torrent_info_hash'] = json_result['info_hash']
+        entry['url'] = self.info_hash_to_magnet(json_result['info_hash'], json_result['name'])
+        return entry
+
 
 @event('plugin.register')
 def register_plugin():
