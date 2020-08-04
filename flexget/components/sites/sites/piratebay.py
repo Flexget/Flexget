@@ -1,4 +1,5 @@
 import re
+from urllib.parse import urlparse, urlencode
 
 from loguru import logger
 
@@ -7,10 +8,6 @@ from flexget.components.sites.urlrewriting import UrlRewritingError
 from flexget.components.sites.utils import normalize_unicode, torrent_availability
 from flexget.entry import Entry
 from flexget.event import event
-
-import json
-from urllib.parse import urlparse, parse_qs, urlencode
-from requests.exceptions import Timeout, ConnectionError, RequestException
 
 logger = logger.bind(name='piratebay')
 
@@ -123,8 +120,7 @@ class UrlRewritePirateBay:
             torrent_id = self.url_match.match(entry['url']).group(1)
             url = f"{self.url}/t.php?id={torrent_id}"
             logger.debug('Getting info for torrent ID {}', torrent_id)
-            page = task.requests.get(url).content
-            json_result = json.loads(page)[0]
+            json_result = task.requests.get(url).json()
             if json_result['id'] == '0':
                 raise UrlRewritingError("Torrent with ID does not exist.")
             entry['url'] = self.info_hash_to_magnet(json_result['info_hash'], json_result['name'])
@@ -147,11 +143,9 @@ class UrlRewritePirateBay:
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             # query = normalize_unicode(search_string)
-            search_qs = urlencode({'q': search_string, 'cat': category}, doseq=True)
-            url = f"{self.url}/q.php?{search_qs}"
-            logger.debug('Using {} as piratebay search url', url)
-            page = task.requests.get(url).content
-            json_results = json.loads(page)
+            params = urlencode({'q': search_string, 'cat': category}, doseq=True)
+            url = f"{self.url}/q.php"
+            json_results = task.requests.get(url, params=params).json()
             if not json_results:
                 raise plugin.PluginError("Error while searching piratebay for %s.", search_string)
             for result in json_results:
@@ -200,7 +194,7 @@ class UrlRewritePirateBay:
         entry['torrent_availability'] = torrent_availability(
             entry['torrent_seeds'], entry['torrent_leeches']
         )
-        entry['content_size'] = json_result['size']
+        entry['content_size'] = int(round(int(json_result['size']) / (1024 * 1024))) # content_size is in MiB
         entry['torrent_info_hash'] = json_result['info_hash']
         entry['url'] = self.info_hash_to_magnet(json_result['info_hash'], json_result['name'])
         return entry
