@@ -122,7 +122,7 @@ class UrlRewritePirateBay:
             logger.debug('Getting info for torrent ID {}', torrent_id)
             json_result = task.requests.get(url).json()
             if json_result['id'] == '0':
-                raise UrlRewritingError("Torrent with ID does not exist.")
+                raise UrlRewritingError("Torrent with ID %s does not exist." % torrent_id)
             entry['url'] = self.info_hash_to_magnet(json_result['info_hash'], json_result['name'])
 
     @plugin.internet(logger)
@@ -143,29 +143,14 @@ class UrlRewritePirateBay:
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             # query = normalize_unicode(search_string)
-            params = urlencode({'q': search_string, 'cat': category}, doseq=True)
+            params = {'q': search_string, 'cat': category}
             url = f"{self.url}/q.php"
             json_results = task.requests.get(url, params=params).json()
             if not json_results:
                 raise plugin.PluginError("Error while searching piratebay for %s.", search_string)
             for result in json_results:
                 if result['id'] == '0':
-                    # JSON when no results found:
-                    # [{
-                    #    "id":"0",
-                    #    "name":"No results returned",
-                    #    "info_hash":"0000000000000000000000000000000000000000",
-                    #    "leechers":"0",
-                    #    "seeders":"0",
-                    #    "num_files":"0",
-                    #    "size":"0",
-                    #    "username":"",
-                    #    "added":"0",
-                    #    "status":"member",
-                    #    "category":"0",
-                    #    "imdb":"",
-                    #    "total_found":"1"
-                    # }]
+                    # JSON when no results found: [{ "id":"0", "name":"No results returned", ... }]
                     break
                 entry = self.json_to_entry(result)
                 entries.add(entry)
