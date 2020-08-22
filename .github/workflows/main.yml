@@ -17,9 +17,9 @@ jobs:
         operating-system: [ubuntu-latest] # TODO: Fix a couple tests and enable windows. windows-latest
       fail-fast: false
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Set up pip cache
-      uses: actions/cache@v1
+      uses: actions/cache@v2
       with:
         path: pip_cache
         key: ${{ runner.OS }}-python${{ matrix.python-version }}-${{ hashFiles('*requirements*.txt') }}
@@ -32,7 +32,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install -qy unrar
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
