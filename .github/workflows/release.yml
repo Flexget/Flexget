@@ -6,9 +6,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PYTHON_VERSION: "3.7"
-    strategy:
-      matrix:
-        node: [12.x]
     steps:
     - uses: actions/checkout@v2
       with:
