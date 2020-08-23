@@ -10,6 +10,7 @@ jobs:
     - uses: actions/checkout@v2
       with:
         token: ${{ secrets.flexgetbot_pat }}
+        fetch-depth: 0
     - name: Setup Git User
       run: |
         git config user.email ${{ secrets.git_email }}
