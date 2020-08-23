@@ -18,6 +18,7 @@ jobs:
         repository: Flexget/wiki
         path: wiki
         token: ${{ secrets.flexgetbot_pat }}
+        fetch-depth: 0
         ref: master
     - name: Setup Git User
       run: |
