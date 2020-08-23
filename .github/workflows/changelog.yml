@@ -40,6 +40,5 @@ jobs:
         git add ChangeLog.md
         if ! git diff --cached --exit-code; then
             git commit -m "Automated ChangeLog update"
-            git branch -f master
             git push origin master
         fi
