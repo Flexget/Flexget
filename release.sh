@@ -38,7 +38,6 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
   python dev_tools.py bump_version dev
   git add flexget/_version.py
   git commit -m "Prepare v`python dev_tools.py version`"
-  git branch -f develop HEAD
 
   # master branch should be at the release we tagged
   git branch -f master v${VERSION}
