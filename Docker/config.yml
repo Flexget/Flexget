@@ -1,0 +1,7 @@
+web_server: yes
+
+tasks:
+    test:
+        exec:
+            on_exit:
+                phase: echo "Test Successful"
