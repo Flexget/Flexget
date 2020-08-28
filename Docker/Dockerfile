@@ -5,10 +5,10 @@ VOLUME [ "/config" ]
 RUN apk add --no-cache --virtual .build-deps \
         gcc \
         make \
-        libressl-dev \
         libffi-dev \
         musl-dev &&\
     apk add --no-cache \
+        libressl-dev \
         boost-python3 \ 
         libstdc++ \
         unrar \
