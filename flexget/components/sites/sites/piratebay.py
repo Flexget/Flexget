@@ -1,5 +1,5 @@
 import re
-from urllib.parse import urlparse, urlencode
+from urllib.parse import urlencode, urlparse
 
 from loguru import logger
 
@@ -11,7 +11,7 @@ from flexget.event import event
 
 logger = logger.bind(name='piratebay')
 
-URL = 'https://apibay.org' # for TOR: http://piratebayztemzmv.onion
+URL = 'https://apibay.org'  # for TOR: http://piratebayztemzmv.onion
 
 CATEGORIES = {
     'all': 0,
@@ -94,7 +94,9 @@ class UrlRewritePirateBay:
             self.url_match = re.compile(
                 fr'^{escaped_url_scheme}://(?:thepiratebay\.org(?:\:\d+)?|{escaped_url_netloc})/description\.php\?id=(\d+)$'
             )
-            self.url_search = re.compile(fr'^(?:https?://thepiratebay\.org(?:\:\d+)?|{escaped_url_scheme}://{escaped_url_netloc})/search\.php\?q=.*$')
+            self.url_search = re.compile(
+                fr'^(?:https?://thepiratebay\.org(?:\:\d+)?|{escaped_url_scheme}://{escaped_url_netloc})/search\.php\?q=.*$'
+            )
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
@@ -122,7 +124,7 @@ class UrlRewritePirateBay:
             logger.debug('Getting info for torrent ID {}', torrent_id)
             json_result = task.requests.get(url).json()
             if json_result['id'] == '0':
-                raise UrlRewritingError("Torrent with ID %s does not exist." % torrent_id)
+                raise UrlRewritingError(f"Torrent with ID {torrent_id} does not exist.")
             entry['url'] = self.info_hash_to_magnet(json_result['info_hash'], json_result['name'])
 
     @plugin.internet(logger)
@@ -160,11 +162,7 @@ class UrlRewritePirateBay:
     # convert an info_hash string to a magnet uri
     @staticmethod
     def info_hash_to_magnet(info_hash: str, name: str) -> str:
-        magnet = {
-            'xt': f"urn:btih:{info_hash}",
-            'dn': name,
-            'tr': TRACKERS
-        }
+        magnet = {'xt': f"urn:btih:{info_hash}", 'dn': name, 'tr': TRACKERS}
         magnet_qs = urlencode(magnet, doseq=True, safe=':')
         magnet_uri = f"magnet:?{magnet_qs}"
         return magnet_uri
@@ -175,11 +173,13 @@ class UrlRewritePirateBay:
         entry['title'] = json_result['name']
         entry['torrent_seeds'] = int(json_result['seeders'])
         entry['torrent_leeches'] = int(json_result['leechers'])
-        entry['torrent_timestamp'] = int(json_result['added']) # custom field for sorting by date
+        entry['torrent_timestamp'] = int(json_result['added'])  # custom field for sorting by date
         entry['torrent_availability'] = torrent_availability(
             entry['torrent_seeds'], entry['torrent_leeches']
         )
-        entry['content_size'] = int(round(int(json_result['size']) / (1024 * 1024))) # content_size is in MiB
+        entry['content_size'] = int(
+            round(int(json_result['size']) / (1024 * 1024))
+        )  # content_size is in MiB
         entry['torrent_info_hash'] = json_result['info_hash']
         entry['url'] = self.info_hash_to_magnet(json_result['info_hash'], json_result['name'])
         return entry
@@ -190,4 +190,3 @@ def register_plugin():
     plugin.register(
         UrlRewritePirateBay, 'piratebay', interfaces=['urlrewriter', 'search', 'task'], api_ver=2
     )
-
