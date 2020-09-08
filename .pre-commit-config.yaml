@@ -3,9 +3,6 @@ repos:
   rev: 5.5.1
   hooks:
   - id: isort
-    exclude: (flexget/__init__.py|flexget/manager.py)
-    additional_dependencies:
-    - toml
 - repo: https://github.com/psf/black
   rev: stable
   hooks:

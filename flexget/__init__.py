@@ -4,6 +4,8 @@ import sys
 
 # __version__ import need to be first in order to avoid circular import within logger
 from ._version import __version__  # noqa
+
+# isort: split
 from flexget import log  # noqa
 from flexget.manager import Manager  # noqa
 

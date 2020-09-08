@@ -15,7 +15,7 @@ gitpython==3.0.8
 codacy-coverage>=1.2.18
 pip-tools==3.2.0
 twine==1.11.0
-isort[pyproject]>=4.3.20
+isort>=5.5.1
 black>=18.9b0
 pre-commit
 sqlalchemy-stubs

@@ -44,7 +44,6 @@ from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
 from flexget.terminal import console, get_console_output  # noqa
 
-
 logger = logger.bind(name='manager')
 
 manager = None
