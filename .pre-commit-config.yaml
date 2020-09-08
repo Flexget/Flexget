@@ -1,6 +1,6 @@
 repos:
-- repo: https://github.com/timothycrosley/isort
-  rev: 4.3.21-2
+- repo: https://github.com/pycqa/isort
+  rev: 5.5.1
   hooks:
   - id: isort
     exclude: (flexget/__init__.py|flexget/manager.py)
