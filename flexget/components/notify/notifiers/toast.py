@@ -106,20 +106,16 @@ class NotifyToast:
             from win32api import GetModuleHandle, PostQuitMessage
             from win32con import (
                 CW_USEDEFAULT,
-                IMAGE_ICON,
                 IDI_APPLICATION,
+                IMAGE_ICON,
                 LR_DEFAULTSIZE,
                 LR_LOADFROMFILE,
                 WM_DESTROY,
+                WM_USER,
                 WS_OVERLAPPED,
                 WS_SYSMENU,
-                WM_USER,
             )
             from win32gui import (
-                CreateWindow,
-                DestroyWindow,
-                LoadIcon,
-                LoadImage,
                 NIF_ICON,
                 NIF_INFO,
                 NIF_MESSAGE,
@@ -127,10 +123,14 @@ class NotifyToast:
                 NIM_ADD,
                 NIM_DELETE,
                 NIM_MODIFY,
+                WNDCLASS,
+                CreateWindow,
+                DestroyWindow,
+                LoadIcon,
+                LoadImage,
                 RegisterClass,
                 Shell_NotifyIcon,
                 UpdateWindow,
-                WNDCLASS,
             )
         except ImportError:
             raise DependencyError(

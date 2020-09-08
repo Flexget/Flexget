@@ -19,8 +19,7 @@ from flexget.utils.tools import parse_timedelta
 
 try:
     import transmissionrpc
-    from transmissionrpc import TransmissionError
-    from transmissionrpc import HTTPHandlerError
+    from transmissionrpc import HTTPHandlerError, TransmissionError
 except ImportError:
     # If transmissionrpc is not found, errors will be shown later
     pass
@@ -124,8 +123,8 @@ class TransmissionBase:
     def on_task_start(self, task, config):
         try:
             import transmissionrpc
-            from transmissionrpc import TransmissionError  # noqa
             from transmissionrpc import HTTPHandlerError  # noqa
+            from transmissionrpc import TransmissionError  # noqa
         except:
             raise plugin.PluginError(
                 'Transmissionrpc module version 0.11 or higher required.', logger

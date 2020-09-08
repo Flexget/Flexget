@@ -8,6 +8,7 @@ from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils import json
 from flexget.utils.template import RenderError
+
 logger = logger.bind(name='pyload')
 
 
@@ -175,11 +176,7 @@ class PluginPyLoad:
             content = json.dumps(content)
 
             if is_pyload_ng:
-                url = (
-                    entry['url']
-                    if config.get('parse_url', self.DEFAULT_PARSE_URL)
-                    else ''
-                )
+                url = entry['url'] if config.get('parse_url', self.DEFAULT_PARSE_URL) else ''
             else:
                 url = (
                     json.dumps(entry['url'])
@@ -251,7 +248,7 @@ class PluginPyLoad:
                         'name': json.dumps(name.encode('ascii', 'ignore').decode()),
                         'links': json.dumps(urls),
                         'dest': json.dumps(dest),
-                        'session': session
+                        'session': session,
                     }
 
                 pid = api.post(add_package_command, data=data).text

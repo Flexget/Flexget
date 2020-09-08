@@ -9,9 +9,9 @@ from flexget.event import event
 from flexget.plugin import DependencyError, PluginError
 
 try:
-    from ftputil.error import FTPOSError
     import ftputil
     import ftputil.session
+    from ftputil.error import FTPOSError
 
     imported = True
 except ImportError:

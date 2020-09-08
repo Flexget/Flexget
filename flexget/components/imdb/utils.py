@@ -270,7 +270,7 @@ class ImdbParser:
         self.imdb_id = None
         self.photo = None
         self.mpaa_rating = ''
-        self.plot_keywords=[]
+        self.plot_keywords = []
 
     def __str__(self):
         return '<ImdbParser(name=%s,imdb_id=%s)>' % (self.name, self.imdb_id)
@@ -399,7 +399,9 @@ class ImdbParser:
             keyword_elem = storyline.find('h4').parent
             if keyword_elem:
                 # The last "a" tag is a link to the full list
-                self.plot_keywords = [keyword_elem.text.strip() for keyword_elem in keyword_elem.find_all("a")[:-1]]
+                self.plot_keywords = [
+                    keyword_elem.text.strip() for keyword_elem in keyword_elem.find_all("a")[:-1]
+                ]
 
         genres = data.get('genre', [])
         if not isinstance(genres, list):

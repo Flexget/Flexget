@@ -80,8 +80,7 @@ class TestURLRewriters:
         urlrewriter.url_rewrite(task, entry)
         assert (
             entry['url']
-            ==
-            'magnet:?xt=urn:btih:38527C88CFE76411EF0C20FDF36B84DFE2C2D210&tr=http:%2F%2Fbt.t-ru.org%2Fann%3Fmagnet&tr=http:%2F%2Fbt2.t-ru.org%2Fann%3Fmagnet&tr=http:%2F%2Fbt3.t-ru.org%2Fann%3Fmagnet&tr=http:%2F%2Fbt4.t-ru.org%2Fann%3Fmagnet&dn=%D0%9F%D0%A0%D0%AB%D0%96%D0%9A%D0%98+%D0%9D%D0%90+%D0%9B%D0%AB%D0%96%D0%90%D0%A5+%D0%A1+%D0%A2%D0%A0%D0%90%D0%9C%D0%9F%D0%9B%D0%98%D0%9D%D0%90.+%D0%A1%D0%B5%D0%B7%D0%BE%D0%BD+2008-2009.+%D0%92%D0%A1%D0%95+%D0%A1%D0%9E%D0%A0%D0%95%D0%92%D0%9D%D0%9E%D0%92%D0%90%D0%9D%D0%98%D0%AF.+%D0%A1+%D1%80%D0%B0%D0%B7%D0%BD%D1%8B%D1%85+%D0%BA%D0%B0%D0%BD%D0%B0%D0%BB%D0%BE%D0%B2.%5B%D0%A1%D0%B5%D0%B7%D0%BE%D0%BD+2008-2009%2C+%D1%80%D0%B0%D0%B7%D0%BD%D0%BE%D0%B3%D0%BE+%D0%BA%D0%B0%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B0.%5D'
+            == 'magnet:?xt=urn:btih:38527C88CFE76411EF0C20FDF36B84DFE2C2D210&tr=http:%2F%2Fbt.t-ru.org%2Fann%3Fmagnet&tr=http:%2F%2Fbt2.t-ru.org%2Fann%3Fmagnet&tr=http:%2F%2Fbt3.t-ru.org%2Fann%3Fmagnet&tr=http:%2F%2Fbt4.t-ru.org%2Fann%3Fmagnet&dn=%D0%9F%D0%A0%D0%AB%D0%96%D0%9A%D0%98+%D0%9D%D0%90+%D0%9B%D0%AB%D0%96%D0%90%D0%A5+%D0%A1+%D0%A2%D0%A0%D0%90%D0%9C%D0%9F%D0%9B%D0%98%D0%9D%D0%90.+%D0%A1%D0%B5%D0%B7%D0%BE%D0%BD+2008-2009.+%D0%92%D0%A1%D0%95+%D0%A1%D0%9E%D0%A0%D0%95%D0%92%D0%9D%D0%9E%D0%92%D0%90%D0%9D%D0%98%D0%AF.+%D0%A1+%D1%80%D0%B0%D0%B7%D0%BD%D1%8B%D1%85+%D0%BA%D0%B0%D0%BD%D0%B0%D0%BB%D0%BE%D0%B2.%5B%D0%A1%D0%B5%D0%B7%D0%BE%D0%BD+2008-2009%2C+%D1%80%D0%B0%D0%B7%D0%BD%D0%BE%D0%B3%D0%BE+%D0%BA%D0%B0%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B0.%5D'
         )
 
 

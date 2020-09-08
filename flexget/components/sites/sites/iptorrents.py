@@ -57,6 +57,7 @@ BASE_URL = 'https://iptorrents.com'
 SEARCH_URL = 'https://iptorrents.com/t?'
 FREE_SEARCH_URL = 'https://iptorrents.com/t?free=on'
 
+
 class UrlRewriteIPTorrents:
     """
         IpTorrents urlrewriter and search plugin.
@@ -128,24 +129,28 @@ class UrlRewriteIPTorrents:
 
         # If there are any text categories, turn them into their id number
         categories = [c if isinstance(c, int) else CATEGORIES[c] for c in categories]
-        category_params = {str(c):'' for c in categories if str(c)}
+        category_params = {str(c): '' for c in categories if str(c)}
 
         entries = set()
 
         for search_string in entry.get('search_strings', [entry['title']]):
-            search_params = {key:value for (key,value) in category_params.items()}
+            search_params = {key: value for (key, value) in category_params.items()}
 
             query = normalize_unicode(search_string)
-            search_params.update({'q':query, 'qf':''})
+            search_params.update({'q': query, 'qf': ''})
 
             logger.debug('searching with params: {}', search_params)
             if config.get('free'):
                 req = requests.get(
-                    FREE_SEARCH_URL, params=search_params, cookies={'uid': str(config['uid']), 'pass': config['password']}
+                    FREE_SEARCH_URL,
+                    params=search_params,
+                    cookies={'uid': str(config['uid']), 'pass': config['password']},
                 )
             else:
                 req = requests.get(
-                    SEARCH_URL, params=search_params, cookies={'uid': str(config['uid']), 'pass': config['password']}
+                    SEARCH_URL,
+                    params=search_params,
+                    cookies={'uid': str(config['uid']), 'pass': config['password']},
                 )
             logger.debug('full search URL: {}', req.url)
 

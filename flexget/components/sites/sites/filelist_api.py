@@ -1,5 +1,7 @@
 from http import HTTPStatus
+
 from loguru import logger
+
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
@@ -49,7 +51,7 @@ class SearchFileList:
     }
 
     valid_extras = ['internal', 'moderated', 'freeleech', 'doubleup']
-    
+
     schema = {
         'type': 'object',
         'properties': {
@@ -76,7 +78,9 @@ class SearchFileList:
             http_status = HTTPStatus(response.status_code)
             error_message = response.json().get('error', http_status.description)
 
-            raise plugin.PluginError(f'FileList request failed; err code: {http_status}; err msg: `{error_message}`')
+            raise plugin.PluginError(
+                f'FileList request failed; err code: {http_status}; err msg: `{error_message}`'
+            )
 
         return response
 
@@ -88,7 +92,11 @@ class SearchFileList:
         entries = []
 
         # mandatory params
-        params = {'username': config['username'], 'passkey': config['passkey'], 'action': 'search-torrents'}
+        params = {
+            'username': config['username'],
+            'passkey': config['passkey'],
+            'action': 'search-torrents',
+        }
 
         # category
         if config.get('category'):
@@ -127,7 +135,9 @@ class SearchFileList:
             if not results:
                 logger.verbose('No torrent found on Filelist for `{}`', search_title)
             else:
-                logger.verbose('{} torrent(s) were found on Filelist for `{}`', len(results), search_title)
+                logger.verbose(
+                    '{} torrent(s) were found on Filelist for `{}`', len(results), search_title
+                )
 
             for result in results:
                 entry = Entry()
@@ -143,7 +153,9 @@ class SearchFileList:
                 entry['torrent_internal'] = bool(result['internal'])
                 entry['torrent_moderated'] = bool(result['moderated'])
                 entry['torrent_freeleech'] = bool(result['freeleech'])
-                entry['torrent_genres'] = [genres.strip() for genres in result['small_description'].split(',')]
+                entry['torrent_genres'] = [
+                    genres.strip() for genres in result['small_description'].split(',')
+                ]
 
                 entries.append(entry)
 
