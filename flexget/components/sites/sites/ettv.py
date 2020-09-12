@@ -12,6 +12,7 @@ logger = logger.bind(name='ettv')
 DOMAINS = [
     'www.ettv.to',
     'www.ettvdl.com',
+    'www.ettvcentral.com',
 ]
 
 
