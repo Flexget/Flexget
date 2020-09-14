@@ -29,8 +29,8 @@ class MetainfoSubs:
             raise plugin.DependencyError(
                 'subliminal', 'subliminal', 'Subliminal module required. ImportError: %s' % e
             )
-        from subliminal.cli import MutexLock
         from dogpile.cache.exception import RegionAlreadyConfigured
+        from subliminal.cli import MutexLock
 
         try:
             subliminal.region.configure(
@@ -62,7 +62,7 @@ class MetainfoSubs:
         ):
             return
         from subliminal import scan_video
-        from subliminal.core import search_external_subtitles, refine
+        from subliminal.core import refine, search_external_subtitles
 
         try:
             video = scan_video(entry['location'])

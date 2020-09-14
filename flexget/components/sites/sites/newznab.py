@@ -30,7 +30,10 @@ class Newznab:
     schema = {
         'type': 'object',
         'properties': {
-            'category': {'type': 'string', 'enum': ['movie', 'tvsearch', 'tv', 'music', 'book', 'all']},
+            'category': {
+                'type': 'string',
+                'enum': ['movie', 'tvsearch', 'tv', 'music', 'book', 'all'],
+            },
             'url': {'type': 'string', 'format': 'url'},
             'website': {'type': 'string', 'format': 'url'},
             'apikey': {'type': 'string'},
@@ -49,7 +52,11 @@ class Newznab:
 
         if 'url' not in config:
             if 'apikey' in config and 'website' in config:
-                config['params'] = {'t': config['category'], 'apikey': config['apikey'], 'extended': 1}
+                config['params'] = {
+                    't': config['category'],
+                    'apikey': config['apikey'],
+                    'extended': 1,
+                }
                 config['url'] = f"{config['website']}/api"
 
         return config
@@ -92,7 +99,9 @@ class Newznab:
             return self.do_search_all(entry, task, config)
         else:
             entries = []
-            logger.warning("Work in progress. Searching for the specified category is not supported yet...")
+            logger.warning(
+                "Work in progress. Searching for the specified category is not supported yet..."
+            )
             return entries
 
     def do_search_tvsearch(self, arg_entry, task, config=None):
@@ -120,7 +129,7 @@ class Newznab:
             return []
 
         imdb_id = arg_entry['imdb_id'].replace('tt', '')
-        config['params']['imdb_id'] = imdb_id
+        config['params']['imdbid'] = imdb_id
         return self.fill_entries_for_url(config['url'], config['params'], task)
 
     def do_search_all(self, arg_entry, task, config=None):

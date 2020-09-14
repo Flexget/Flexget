@@ -74,6 +74,7 @@ class SearchFileList:
 
     schema = {
         'type': 'object',
+        'deprecated': 'plugin filelist is deprecated, please consider using plugin filelist_api',
         'properties': {
             'username': {'type': 'string'},
             'password': {'type': 'string'},
@@ -147,16 +148,14 @@ class SearchFileList:
             # get validator token
             response = requests.get(BASE_URL + 'login.php')
             soup = get_soup(response.content)
-            
+
             login_validator = soup.find("input", {"name": "validator"})
-            
+
             if not login_validator:
-                raise plugin.PluginError(
-                    'FileList.ro could not get login validator'
-                )
+                raise plugin.PluginError('FileList.ro could not get login validator')
             logger.debug('Login Validator: {}'.format(login_validator.get('value')))
             logger.debug('Attempting to retrieve FileList.ro cookie')
-            
+
             response = requests.post(
                 url,
                 data={

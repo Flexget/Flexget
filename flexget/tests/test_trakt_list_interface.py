@@ -147,20 +147,20 @@ class TestTraktList:
 
         entry = Entry(
             **{
-                u'trakt_show_slug': u'game-of-thrones',
-                u'original_url': u'https://trakt.tv/shows/game-of-thrones/seasons/4/episodes/5',
-                u'url': u'https://trakt.tv/shows/game-of-thrones/seasons/4/episodes/5',
-                u'series_season': 4,
-                u'tvdb_id': 121361,
-                u'series_name': u'Game of Thrones (2011)',
-                u'imdb_id': u'tt0944947',
-                u'series_id': u'S04E05',
-                u'series_episode': 5,
-                u'trakt_episode_id': 73674,
-                u'title': u'Game of Thrones (2011) S04E05 First of His Name',
-                u'trakt_show_id': 1390,
-                u'trakt_ep_name': u'First of His Name',
-                u'tvrage_id': 24493,
+                'trakt_show_slug': 'game-of-thrones',
+                'original_url': 'https://trakt.tv/shows/game-of-thrones/seasons/4/episodes/5',
+                'url': 'https://trakt.tv/shows/game-of-thrones/seasons/4/episodes/5',
+                'series_season': 4,
+                'tvdb_id': 121361,
+                'series_name': 'Game of Thrones (2011)',
+                'imdb_id': 'tt0944947',
+                'series_id': 'S04E05',
+                'series_episode': 5,
+                'trakt_episode_id': 73674,
+                'title': 'Game of Thrones (2011) S04E05 First of His Name',
+                'trakt_show_id': 1390,
+                'trakt_ep_name': 'First of His Name',
+                'tvrage_id': 24493,
             }
         )
 
@@ -178,11 +178,11 @@ class TestTraktList:
 
         entry = Entry(
             **{
-                u'series_name': u'Game of Thrones (2011)',
-                u'series_id': u'S04E05',
-                u'series_episode': 5,
-                u'series_season': 4,
-                u'title': u'Game of Thrones (2011) S04E05 First of His Name',
+                'series_name': 'Game of Thrones (2011)',
+                'series_id': 'S04E05',
+                'series_episode': 5,
+                'series_season': 4,
+                'title': 'Game of Thrones (2011) S04E05 First of His Name',
             }
         )
 

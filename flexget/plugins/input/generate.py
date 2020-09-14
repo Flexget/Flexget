@@ -17,8 +17,8 @@ class Generate:
         entries = []
         for i in range(amount):
             entry = Entry()
-            import string
             import random
+            import string
 
             entry['url'] = 'http://localhost/generate/%s/%s' % (
                 i,

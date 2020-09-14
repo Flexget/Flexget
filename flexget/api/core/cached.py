@@ -1,5 +1,5 @@
 from flask.helpers import send_file
-from flask_restplus import inputs
+from flask_restx import inputs
 from requests import RequestException
 
 from flexget.api import APIResource, api

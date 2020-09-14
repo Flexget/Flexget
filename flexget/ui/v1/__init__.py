@@ -45,7 +45,7 @@ def serve_app(path):
 @webui_app.route('/api/')
 @webui_app.route('/api/<path:path>', methods=HTTP_METHODS)
 def api_redirect(path='/'):
-    return redirect(request.full_path.replace('/v1', '', 1), 307)
+    return redirect(request.url.replace('/v1', '', 1), 307)
 
 
 @webui_app.route('/')

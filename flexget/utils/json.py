@@ -5,7 +5,7 @@ Plugins can just import the methods from this module.
 Also allows date and datetime objects to be encoded/decoded.
 """
 import datetime
-from collections import Mapping, Iterable
+from collections import Iterable, Mapping
 
 from flexget.plugin import DependencyError
 

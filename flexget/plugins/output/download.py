@@ -1,5 +1,4 @@
 import hashlib
-import io
 import mimetypes
 import os
 import shutil
@@ -170,7 +169,7 @@ class PluginDownload:
         logger.error(
             'Error retrieving {}, the error page has been saved to {}', entry['title'], filename
         )
-        with io.open(filename, 'wb') as outfile:
+        with open(filename, 'wb') as outfile:
             outfile.write(page)
 
     def get_temp_files(
@@ -221,13 +220,13 @@ class PluginDownload:
         except BadStatusLine as e:
             logger.warning('Failed to reach server. Reason: {}', getattr(e, 'message', 'N/A'))
             return 'BadStatusLine'
-        except IOError as e:
+        except OSError as e:
             if hasattr(e, 'reason'):
                 logger.warning('Failed to reach server. Reason: {}', e.reason)
             elif hasattr(e, 'code'):
                 logger.warning("The server couldn't fulfill the request. Error code: {}", e.code)
-            logger.opt(exception=True).debug('IOError')
-            return 'IOError'
+            logger.opt(exception=True).debug('OSError')
+            return 'OSError'
         except ValueError as e:
             # Probably unknown url type
             msg = 'ValueError %s' % e
@@ -299,7 +298,7 @@ class PluginDownload:
         tmp_dir = tempfile.mkdtemp(dir=tmp_path)
         fname = hashlib.md5(url.encode('utf-8', 'replace')).hexdigest()
         datafile = os.path.join(tmp_dir, fname)
-        outfile = io.open(datafile, 'wb')
+        outfile = open(datafile, 'wb')
         try:
             for chunk in response.iter_content(chunk_size=150 * 1024, decode_unicode=False):
                 outfile.write(chunk)
@@ -508,7 +507,7 @@ class PluginDownload:
 
                 try:
                     shutil.move(entry['file'], destfile)
-                except (IOError, OSError) as err:
+                except (OSError, OSError) as err:
                     # ignore permission errors, see ticket #555
                     import errno
 

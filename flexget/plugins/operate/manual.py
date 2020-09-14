@@ -17,6 +17,7 @@ class ManualTask:
         if not config:
             return
         # If --task hasn't been specified disable this plugin
+        # TODO: allow_manual is confusing. Make it less confusing.
         if (
             not task.options.tasks
             or task.name not in task.options.tasks

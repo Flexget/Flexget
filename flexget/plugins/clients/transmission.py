@@ -19,8 +19,7 @@ from flexget.utils.tools import parse_timedelta
 
 try:
     import transmissionrpc
-    from transmissionrpc import TransmissionError
-    from transmissionrpc import HTTPHandlerError
+    from transmissionrpc import HTTPHandlerError, TransmissionError
 except ImportError:
     # If transmissionrpc is not found, errors will be shown later
     pass
@@ -46,7 +45,7 @@ class TransmissionBase:
                 config['username'], _, config['password'] = netrc(netrc_path).authenticators(
                     config['host']
                 )
-            except IOError as e:
+            except OSError as e:
                 logger.error('netrc: unable to open: {}', e.filename)
             except NetrcParseError as e:
                 logger.error('netrc: {}, file: {}, line: {}', e.msg, e.filename, e.lineno)
@@ -124,8 +123,8 @@ class TransmissionBase:
     def on_task_start(self, task, config):
         try:
             import transmissionrpc
-            from transmissionrpc import TransmissionError  # noqa
             from transmissionrpc import HTTPHandlerError  # noqa
+            from transmissionrpc import TransmissionError  # noqa
         except:
             raise plugin.PluginError(
                 'Transmissionrpc module version 0.11 or higher required.', logger
@@ -220,10 +219,12 @@ class PluginTransmissionInput(TransmissionBase):
                 'date_added',
                 'date_done',
                 'date_started',
+                'errorString',
                 'priority',
                 'progress',
                 'secondsDownloading',
                 'secondsSeeding',
+                'torrentFile',
             ]:
                 try:
                     entry['transmission_' + attr] = getattr(torrent, attr)

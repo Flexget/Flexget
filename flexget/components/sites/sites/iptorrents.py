@@ -1,5 +1,4 @@
 import re
-from urllib.parse import quote_plus
 
 from loguru import logger
 
@@ -55,6 +54,8 @@ CATEGORIES = {
 }
 
 BASE_URL = 'https://iptorrents.com'
+SEARCH_URL = 'https://iptorrents.com/t?'
+FREE_SEARCH_URL = 'https://iptorrents.com/t?free=on'
 
 
 class UrlRewriteIPTorrents:
@@ -86,6 +87,7 @@ class UrlRewriteIPTorrents:
             'category': one_or_more(
                 {'oneOf': [{'type': 'integer'}, {'type': 'string', 'enum': list(CATEGORIES)}]}
             ),
+            'free': {'type': 'boolean', 'default': False},
         },
         'required': ['rss_key', 'uid', 'password'],
         'additionalProperties': False,
@@ -106,7 +108,7 @@ class UrlRewriteIPTorrents:
             logger.error("Didn't actually get a URL...")
         else:
             logger.debug('Got the URL: {}', entry['url'])
-        if entry['url'].startswith(BASE_URL + '/t?'):
+        if entry['url'].startswith(SEARCH_URL):
             # use search
             results = self.search(task, entry)
             if not results:
@@ -127,21 +129,30 @@ class UrlRewriteIPTorrents:
 
         # If there are any text categories, turn them into their id number
         categories = [c if isinstance(c, int) else CATEGORIES[c] for c in categories]
-        filter_url = '&'.join((str(c) + '=') for c in categories)
+        category_params = {str(c): '' for c in categories if str(c)}
 
         entries = set()
 
         for search_string in entry.get('search_strings', [entry['title']]):
-            query = normalize_unicode(search_string)
-            query = quote_plus(query.encode('utf8'))
+            search_params = {key: value for (key, value) in category_params.items()}
 
-            url = "{base_url}/t?{filter}&q={query}&qf=".format(
-                base_url=BASE_URL, filter=filter_url, query=query
-            )
-            logger.debug('searching with url: {}', url)
-            req = requests.get(
-                url, cookies={'uid': str(config['uid']), 'pass': config['password']}
-            )
+            query = normalize_unicode(search_string)
+            search_params.update({'q': query, 'qf': ''})
+
+            logger.debug('searching with params: {}', search_params)
+            if config.get('free'):
+                req = requests.get(
+                    FREE_SEARCH_URL,
+                    params=search_params,
+                    cookies={'uid': str(config['uid']), 'pass': config['password']},
+                )
+            else:
+                req = requests.get(
+                    SEARCH_URL,
+                    params=search_params,
+                    cookies={'uid': str(config['uid']), 'pass': config['password']},
+                )
+            logger.debug('full search URL: {}', req.url)
 
             if '/u/' + str(config['uid']) not in req.text:
                 raise plugin.PluginError("Invalid cookies (user not logged in)...")
@@ -159,9 +170,7 @@ class UrlRewriteIPTorrents:
                     break
                 entry = Entry()
                 link = torrent.find('a', href=re.compile('download'))['href']
-                entry['url'] = "{base}{link}?torrent_pass={key}".format(
-                    base=BASE_URL, link=link, key=config.get('rss_key')
-                )
+                entry['url'] = f"{BASE_URL}{link}?torrent_pass={config.get('rss_key')}"
                 entry['title'] = torrent.find('a', href=re.compile('details')).text
 
                 seeders = torrent.findNext('td', {'class': 'ac t_seeders'}).text

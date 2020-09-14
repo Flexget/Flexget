@@ -5,7 +5,6 @@ import copy  # noqa
 import errno  # noqa
 import fnmatch  # noqa
 import hashlib  # noqa
-import io  # noqa
 import os  # noqa
 import shutil  # noqa
 import signal  # noqa
@@ -165,7 +164,13 @@ class Manager:
                 'locale env variables are set up correctly for the environment which is launching FlexGet.'
             )
 
-    def _init_options(self, args: Sequence[str]) -> argparse.Namespace:
+    def _add_tray_icon_items(self, tray_icon: 'TrayIcon'):
+        tray_icon.add_menu_item(text='Shutdown', action=self.shutdown, index=2)
+        tray_icon.add_menu_item(text='Reload Config', action=self.load_config, index=3)
+        tray_icon.add_menu_separator(index=4)
+
+    @staticmethod
+    def _init_options(args: Sequence[str]) -> argparse.Namespace:
         """
         Initialize argument parsing
         """
@@ -182,7 +187,7 @@ class Manager:
                 sys.exit(1)
         return options
 
-    def _init_logging(self, to_file: bool=True) -> None:
+    def _init_logging(self, to_file: bool = True) -> None:
         """
         Initialize logging facilities
         """
@@ -466,11 +471,29 @@ class Manager:
                 # main thread, this error will occur.
                 logger.debug('Error registering sigterm handler: {}', e)
             self.is_daemon = True
-            fire_event('manager.daemon.started', self)
-            self.task_queue.start()
-            self.ipc_server.start()
-            self.task_queue.wait()
-            fire_event('manager.daemon.completed', self)
+
+            def run_daemon(tray_icon: Optional['TrayIcon'] = None):
+                fire_event('manager.daemon.started', self)
+                self.task_queue.start()
+                self.ipc_server.start()
+                self.task_queue.wait()
+                fire_event('manager.daemon.completed', self)
+                if tray_icon:
+                    tray_icon.stop()
+
+            if options.tray_icon:
+                from flexget.tray_icon import tray_icon  # noqa
+
+                self._add_tray_icon_items(tray_icon)
+
+                # Tray icon must be run in the main thread.
+                m = threading.Thread(target=run_daemon, args=(tray_icon,))
+                m.start()
+                tray_icon.run()
+                m.join()
+            else:
+                run_daemon()
+
         elif options.action in ['stop', 'reload-config', 'status']:
             if not self.is_daemon:
                 logger.error('There does not appear to be a daemon running.')
@@ -509,12 +532,12 @@ class Manager:
             # to always return unicode objects
             return self.construct_scalar(node)
 
-        yaml.Loader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
-        yaml.SafeLoader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
+        yaml.Loader.add_constructor('tag:yaml.org,2002:str', construct_yaml_str)
+        yaml.SafeLoader.add_constructor('tag:yaml.org,2002:str', construct_yaml_str)
 
         # Set up the dumper to not tag every string with !!python/unicode
         def unicode_representer(dumper, uni):
-            node = yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
+            node = yaml.ScalarNode(tag='tag:yaml.org,2002:str', value=uni)
             return node
 
         yaml.add_representer(str, unicode_representer)
@@ -534,7 +557,7 @@ class Manager:
         Find and load the configuration file.
 
         :param bool create: If a config file is not found, and create is True, one will be created in the home folder
-        :raises: `IOError` when no config file could be found, and `create` is False.
+        :raises: `OSError` when no config file could be found, and `create` is False.
         """
         home_path = os.path.join(os.path.expanduser('~'), '.flexget')
         options_config = os.path.expanduser(self.options.config)
@@ -584,9 +607,9 @@ class Manager:
         elif not config:
             logger.critical('Failed to find configuration file {}', options_config)
             logger.info('Tried to read from: {}', ', '.join(possible))
-            raise IOError('No configuration file found.')
+            raise OSError('No configuration file found.')
         if not os.path.isfile(config):
-            raise IOError('Config `%s` does not appear to be a file.' % config)
+            raise OSError('Config `%s` does not appear to be a file.' % config)
 
         logger.debug('Config file {} selected', config)
         self.config_path = config
@@ -599,7 +622,7 @@ class Manager:
         if not self.config_path:
             return
         sha1_hash = hashlib.sha1()
-        with io.open(self.config_path, 'rb') as f:
+        with open(self.config_path, 'rb') as f:
             while True:
                 data = f.read(65536)
                 if not data:
@@ -607,14 +630,16 @@ class Manager:
                 sha1_hash.update(data)
         return sha1_hash.hexdigest()
 
-    def load_config(self, output_to_console: bool = True, config_file_hash: Optional[str] = None) -> None:
+    def load_config(
+        self, output_to_console: bool = True, config_file_hash: Optional[str] = None
+    ) -> None:
         """
         Loads the config file from disk, validates and activates it.
 
         :raises: `ValueError` if there is a problem loading the config file
         """
         fire_event('manager.before_config_load', self)
-        with io.open(self.config_path, 'r', encoding='utf-8') as f:
+        with open(self.config_path, 'r', encoding='utf-8') as f:
             try:
                 raw_config = f.read()
             except UnicodeDecodeError:
@@ -713,7 +738,7 @@ class Manager:
         logger.debug('backing up old config to {} before new save', backup_path)
         try:
             shutil.copy(self.config_path, backup_path)
-        except (OSError, IOError) as e:
+        except OSError as e:
             logger.warning('Config backup creation failed: {}', str(e))
             raise
         return backup_path
@@ -725,7 +750,7 @@ class Manager:
         # Back up the user's current config before overwriting
         try:
             self.backup_config()
-        except (OSError, IOError):
+        except OSError:
             return
         with open(self.config_path, 'w') as config_file:
             config_file.write(yaml.dump(self.user_config, default_flow_style=False))
@@ -823,7 +848,7 @@ class Manager:
         """
         if self.lockfile and os.path.exists(self.lockfile):
             result = {}
-            with io.open(self.lockfile, encoding='utf-8') as f:
+            with open(self.lockfile, encoding='utf-8') as f:
                 lines = [l for l in f.readlines() if l]
             for line in lines:
                 try:
@@ -873,7 +898,7 @@ class Manager:
             if not self._has_lock:
                 # Exit if there is an existing lock.
                 if self.check_lock():
-                    with io.open(self.lockfile, encoding='utf-8') as f:
+                    with open(self.lockfile, encoding='utf-8') as f:
                         pid = f.read()
                     print(
                         'Another process (%s) is running, will exit.' % pid.split('\n')[0],
@@ -899,7 +924,7 @@ class Manager:
 
     def write_lock(self, ipc_info: Optional[dict] = None) -> None:
         assert self._has_lock
-        with io.open(self.lockfile, 'w', encoding='utf-8') as f:
+        with open(self.lockfile, 'w', encoding='utf-8') as f:
             f.write('PID: %s\n' % os.getpid())
             if ipc_info:
                 for key in sorted(ipc_info):

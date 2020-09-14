@@ -133,7 +133,7 @@ class TestRTorrentClient:
                 assert False, 'Invalid hash returned'
 
         assert mocked_proxy.system.multicall.called_with(
-            (['main', 'd.directory_base=', 'd.name=', 'd.hash=', u'd.custom1='],)
+            (['main', 'd.directory_base=', 'd.name=', 'd.hash=', 'd.custom1='],)
         )
 
     def test_update(self, mocked_proxy):

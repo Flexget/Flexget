@@ -1,6 +1,6 @@
 import datetime
 from abc import ABC, abstractmethod
-from typing import Any, Type, Optional
+from typing import Any, Optional, Type
 
 from flexget.utils import json
 

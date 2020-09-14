@@ -143,8 +143,8 @@ class internet:
             except ValueError as e:
                 logger.opt(exception=True).debug('decorator caught ValueError. handled traceback:')
                 raise PluginError(e)
-            except IOError as e:
-                logger.opt(exception=True).debug('decorator caught ioerror. handled traceback:')
+            except OSError as e:
+                logger.opt(exception=True).debug('decorator caught OSError. handled traceback:')
                 if hasattr(e, 'reason'):
                     raise PluginError('Failed to reach server. Reason: %s' % e.reason, self.logger)
                 elif hasattr(e, 'code'):
@@ -152,7 +152,7 @@ class internet:
                         'The server couldn\'t fulfill the request. Error code: %s' % e.code,
                         self.logger,
                     )
-                raise PluginError('IOError when connecting to server: %s' % e, self.logger)
+                raise PluginError('OSError when connecting to server: %s' % e, self.logger)
 
         return wrapped_func
 

@@ -6,9 +6,9 @@ from flexget.event import event
 from flexget.utils.cached_input import cached
 
 try:
+    from filmweb.exceptions import RequestFailed
     from filmweb.filmweb import Filmweb as FilmwebAPI
     from filmweb.items import LoggedUser
-    from filmweb.exceptions import RequestFailed
 except ImportError:
     # Errors are handled later
     pass

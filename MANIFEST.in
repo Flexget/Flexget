@@ -3,6 +3,7 @@ include README.rst
 include flexget/ui/load.failure.html
 include requirements.txt
 include dev-requirements.txt
+include flexget/resources/flexget.png
 recursive-include flexget/ui/v1/app **
 recursive-include flexget/ui/v2/dist **
 recursive-include flexget/templates **

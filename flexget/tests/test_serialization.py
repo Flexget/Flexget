@@ -44,7 +44,7 @@ class TestSerialization:
             'a': 'aoeu',
             'b': [1, 2, 3.5],
             'c': (1, datetime.datetime(2019, 12, 12, 12, 12)),
-            'd': {'a', 1, datetime.date(2019, 11, 11)}
+            'd': {'a', 1, datetime.date(2019, 11, 11)},
         }
         out = serialization.dumps(value)
         backin = serialization.loads(out)

@@ -24,7 +24,11 @@ class PyloadApi:
         response = result.json()
         if not response:
             raise plugin.PluginError('Login failed', logger)
-        return response.replace('"', '')
+
+        if isinstance(response, str):
+            return response.replace('"', '')
+        else:
+            return response
 
     def get(self, method):
         try:
@@ -119,6 +123,15 @@ class PluginPyLoad:
 
         self.add_entries(task, config)
 
+    @staticmethod
+    def get_version_from_packaging():
+        version = None
+        try:
+            from packaging import version
+        except ModuleNotFoundError:
+            logger.warning('packaging is not installed')
+        return version
+
     def add_entries(self, task, config):
         """Adds accepted entries"""
 
@@ -127,12 +140,33 @@ class PluginPyLoad:
 
         try:
             session = api.get_session(config)
-        except IOError:
+        except OSError:
             raise plugin.PluginError('pyLoad not reachable', logger)
         except plugin.PluginError:
             raise
         except Exception as e:
             raise plugin.PluginError('Unknown error: %s' % str(e), logger)
+
+        remote_version = None
+        try:
+            remote_version = api.get('getServerVersion')
+        except RequestException as e:
+            if e.response is not None and e.response.status_code == 404:
+                remote_version = json.loads(api.get('get_server_version').content)
+            else:
+                raise e
+
+        parse_urls_command = 'parseURLs'
+        add_package_command = 'addPackage'
+        set_package_data_command = 'setPackageData'
+
+        is_pyload_ng = False
+        version = self.get_version_from_packaging()
+        if version and version.parse(remote_version) >= version.parse('0.5'):
+            parse_urls_command = 'parse_urls'
+            add_package_command = 'add_package'
+            set_package_data_command = 'set_package_date'
+            is_pyload_ng = True
 
         hoster = config.get('hoster', self.DEFAULT_HOSTER)
 
@@ -141,16 +175,21 @@ class PluginPyLoad:
             content = entry.get('description', '') + ' ' + quote(entry['url'])
             content = json.dumps(content)
 
-            url = (
-                json.dumps(entry['url'])
-                if config.get('parse_url', self.DEFAULT_PARSE_URL)
-                else "''"
-            )
+            if is_pyload_ng:
+                url = entry['url'] if config.get('parse_url', self.DEFAULT_PARSE_URL) else ''
+            else:
+                url = (
+                    json.dumps(entry['url'])
+                    if config.get('parse_url', self.DEFAULT_PARSE_URL)
+                    else "''"
+                )
 
             logger.debug('Parsing url {}', url)
 
-            data = {'html': content, 'url': url, 'session': session}
-            result = api.post('parseURLs', data=data)
+            data = {'html': content, 'url': url}
+            if not is_pyload_ng:
+                data['session'] = session
+            result = api.post(parse_urls_command, data=data)
 
             parsed = result.json()
 
@@ -198,14 +237,21 @@ class PluginPyLoad:
                     name = entry['title']
                     logger.error('Error rendering jinja event: {}', e)
 
-                data = {
-                    'name': json.dumps(name.encode('ascii', 'ignore').decode()),
-                    'links': json.dumps(urls),
-                    'dest': json.dumps(dest),
-                    'session': session,
-                }
+                if is_pyload_ng:
+                    data = {
+                        'name': name.encode('ascii', 'ignore').decode(),
+                        'links': urls,
+                        'dest': dest,
+                    }
+                else:
+                    data = {
+                        'name': json.dumps(name.encode('ascii', 'ignore').decode()),
+                        'links': json.dumps(urls),
+                        'dest': json.dumps(dest),
+                        'session': session,
+                    }
 
-                pid = api.post('addPackage', data=data).text
+                pid = api.post(add_package_command, data=data).text
                 logger.debug('added package pid: {}', pid)
 
                 # Set Folder
@@ -220,13 +266,19 @@ class PluginPyLoad:
                         logger.error('Error rendering jinja event: {}', e)
                     # set folder with api
                     data = json.dumps({'folder': folder})
-                    api.post("setPackageData", data={'pid': pid, 'data': data, 'session': session})
+                    post_data = {'pid': pid, 'data': data}
+                    if not is_pyload_ng:
+                        post_data['session'] = session
+                    api.post(set_package_data_command, data=post_data)
 
                 # Set Package Password
                 package_password = config.get('package_password')
                 if package_password:
                     data = json.dumps({'password': package_password})
-                    api.post('setPackageData', data={'pid': pid, 'data': data, 'session': session})
+                    post_data = {'pid': pid, 'data': data}
+                    if not is_pyload_ng:
+                        post_data['session'] = session
+                    api.post(set_package_data_command, data=post_data)
 
             except Exception as e:
                 entry.fail(str(e))

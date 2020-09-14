@@ -67,7 +67,7 @@ def extract_id(url):
 
 def make_url(imdb_id):
     """Return IMDb URL of the given ID"""
-    return u'https://www.imdb.com/title/%s/' % imdb_id
+    return 'https://www.imdb.com/title/%s/' % imdb_id
 
 
 class ImdbSearch:
@@ -149,7 +149,7 @@ class ImdbSearch:
     def search(self, name):
         """Return array of movie details (dict)"""
         logger.debug('Searching: {}', name)
-        url = u'https://www.imdb.com/find'
+        url = 'https://www.imdb.com/find'
         # This may include Shorts and TV series in the results
         params = {'q': name, 's': 'tt'}
 
@@ -270,6 +270,7 @@ class ImdbParser:
         self.imdb_id = None
         self.photo = None
         self.mpaa_rating = ''
+        self.plot_keywords = []
 
     def __str__(self):
         return '<ImdbParser(name=%s,imdb_id=%s)>' % (self.name, self.imdb_id)
@@ -394,6 +395,13 @@ class ImdbParser:
                 self.plot_outline = plot_elem.text.strip()
             else:
                 logger.debug('No storyline found for {}', self.imdb_id)
+
+            keyword_elem = storyline.find('h4').parent
+            if keyword_elem:
+                # The last "a" tag is a link to the full list
+                self.plot_keywords = [
+                    keyword_elem.text.strip() for keyword_elem in keyword_elem.find_all("a")[:-1]
+                ]
 
         genres = data.get('genre', [])
         if not isinstance(genres, list):
