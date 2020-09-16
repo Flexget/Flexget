@@ -54,9 +54,6 @@ class SonarrSet(MutableSet):
         self.config = config
         self._shows = None
 
-        # all tags must be lowercase
-        self.config_tags = [t.lower() for t in self.config.get("tags", [])]
-
         # cache tags
         self._tags = None
 
@@ -102,25 +99,21 @@ class SonarrSet(MutableSet):
 
         return allowed_qualities, cutoff
 
-    @property
-    def tags(self):
-        """ Property that returns tag by id """
-        if not self.config_tags:
-            self._tags = []
-            return self._tags
-
+    def get_tag_ids(self, entry):
         tags_ids = []
-        if self._tags is None:
-            existing = {t["label"].lower(): t["id"] for t in self._sonarr_request("tag")}
-            for tag in self.config_tags:
-                tag = tag.lower()
-                found = existing.get(tag)
-                if not found:
-                    logger.verbose('Adding missing tag %s to Sonarr' % tag)
-                    found = self._sonarr_request("tag", method="post", data={"label": tag})["id"]
-                tags_ids.append(found)
-            self._tags = tags_ids
-        return self._tags
+
+        if not self._tags:
+            self._tags = {t["label"].lower(): t["id"] for t in self._sonarr_request("tag")}
+
+        for tag in self.config.get("tags", []):
+            tag = entry.render(tag).lower()
+            found = self._tags.get(tag)
+            if not found:
+                logger.verbose('Adding missing tag %s to Sonarr' % tag)
+                found = self._sonarr_request("tag", method="post", data={"label": tag})["id"]
+                self._tags[tag] = found
+            tags_ids.append(found)
+        return tags_ids
 
     def list_entries(self, filters=True):
         shows = self._sonarr_request(SERIES_ENDPOINT)
@@ -201,7 +194,7 @@ class SonarrSet(MutableSet):
         show['seasonFolder'] = self.config.get('season_folder')
         show['monitored'] = self.config.get('monitored')
         show['seriesType'] = self.config.get('series_type')
-        show['tags'] = self.tags
+        show['tags'] = self.get_tag_ids(entry)
         show['rootFolderPath'] = root_path
         show['addOptions'] = {
             "ignoreEpisodesWithFiles": self.config.get('ignore_episodes_with_files'),

@@ -316,9 +316,6 @@ class RadarrSet(MutableSet):
         self.config = config
         self.service = RadarrAPIService(config["api_key"], config["base_url"], config["port"])
 
-        # all tags must be lowercase
-        self.config_tags = [t.lower() for t in self.config.get("tags", [])]
-
         # cache tags
         self._tags = None
 
@@ -333,6 +330,22 @@ class RadarrSet(MutableSet):
 
     def __len__(self):
         return len(self.items)
+
+    def get_tag_ids(self, entry):
+        tags_ids = []
+
+        if not self._tags:
+            self._tags = {t["label"].lower(): t["id"] for t in self.service.get_tags()}
+
+        for tag in self.config.get("tags", []):
+            tag = entry.render(tag).lower()
+            found = self._tags.get(tag)
+            if not found:
+                logger.verbose('Adding missing tag %s to Radarr' % tag)
+                found = self._sonarr_request("tag", method="post", data={"label": tag})["id"]
+                self._tags[tag] = found
+            tags_ids.append(found)
+        return tags_ids
 
     def discard(self, entry):
         if not entry:
@@ -381,7 +394,7 @@ class RadarrSet(MutableSet):
                     result["tmdbId"],
                     root_folder_path,
                     monitored=self.config.get('monitored', False),
-                    tags=self.tags
+                    tags=self.get_tag_ids(entry)
                 )
                 logger.verbose('Added movie {} to Radarr list', result['title'])
             except RadarrMovieAlreadyExistsError:
@@ -389,12 +402,13 @@ class RadarrSet(MutableSet):
                     'Could not add movie {} because it already exists on Radarr', result['title']
                 )
             except RadarrRequestError as ex:
-                logger.error('The movie add command raised exception: {}', ex)
+                msg = 'The movie add command raised exception: %s' % ex
+                logger.error(msg)
+                entry.fail(msg)
         else:
-            logger.verbose(
-                'The lookup for entry {} did not return any results.Can not add the movie in Radarr.',
-                entry,
-            )
+            msg = 'The lookup for entry %s did not return any results.Can not add the movie in Radarr.' % entry
+            logger.verbose(msg)
+            entry.fail(msg)
 
     def _from_iterable(self, it):
         # The following implementation is what's done in every other
