@@ -342,7 +342,7 @@ class RadarrSet(MutableSet):
             found = self._tags.get(tag)
             if not found:
                 logger.verbose('Adding missing tag %s to Radarr' % tag)
-                found = self._sonarr_request("tag", method="post", data={"label": tag})["id"]
+                found = self.service.add_tag(tag)["id"]
                 self._tags[tag] = found
             tags_ids.append(found)
         return tags_ids
