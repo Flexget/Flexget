@@ -1,6 +1,6 @@
 sphinx==1.6.3
 click==6.7
-pylint
+pylint>=2.6.0 #pylint < 2.6 doesn't work with isort5
 coverage==4.4.1
 flake8
 vcrpy~=1.11.1  # requests 2.16.3 doesn't work with vcrpy <1.11.1
@@ -17,5 +17,5 @@ pip-tools==3.2.0
 twine==1.11.0
 isort>=5.5.1
 black>=18.9b0
-pre-commit
+pre-commit==2.3.0
 sqlalchemy-stubs
