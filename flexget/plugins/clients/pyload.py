@@ -152,7 +152,7 @@ class PluginPyLoad:
             remote_version = json.loads(api.get('getServerVersion').content)
         except RequestException as e:
             if e.response is not None and e.response.status_code == 404:
-                remote_version = json.loads(api.get('get_server_version').content)
+                remote_version = json.loads(api.get('getServerVersion').content)
             else:
                 raise e
 
