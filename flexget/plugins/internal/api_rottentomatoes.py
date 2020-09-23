@@ -32,7 +32,7 @@ MIN_DIFF = 0.01
 
 @db_schema.upgrade('api_rottentomatoes')
 def upgrade(ver, session):
-    if ver is 0:
+    if ver == 0:
         table_names = [
             'rottentomatoes_actors',
             'rottentomatoes_alternate_ids',
@@ -52,7 +52,7 @@ def upgrade(ver, session):
             session.execute(table.delete())
         table_add_column('rottentomatoes_actors', 'rt_id', String, session)
         ver = 1
-    if ver is 1:
+    if ver == 1:
         table = table_schema('rottentomatoes_search_results', session)
         session.execute(sql.delete(table, table.c.movie_id == None))
         ver = 2
