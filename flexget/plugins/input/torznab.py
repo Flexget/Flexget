@@ -165,7 +165,7 @@ class Torznab:
         logger.info('Fetching URL: {}', url)
 
         try:
-            response = task.requests.get(url, timeout=self.timeout))
+            response = task.requests.get(url, timeout=self.timeout)
         except RequestException as e:
             raise PluginError("Failed fetching '{}': {}".format(url, e))
 
