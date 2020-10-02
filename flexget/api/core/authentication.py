@@ -91,14 +91,6 @@ login_parser.add_argument(
 )
 
 
-@auth_api.route('/verify')
-class CheckLoginAPI(APIResource):
-    @api.response(200, 'Login successful', model=base_message_schema)
-    def get(self, session=None):
-        """ Check if you are logged in """
-        return success_response('user logged in')
-
-
 @auth_api.route('/login/')
 class LoginAPI(APIResource):
     @api.validate(login_api_schema, description='Username and Password')
