@@ -51,6 +51,12 @@ class UserManagementAPI(APIResource):
 @user_api.route('/token/')
 @api.doc('Change user token')
 class UserManagementTokenAPI(APIResource):
+    @api.response(200, 'Successfully got user token', user_token_response_schema)
+    @api.doc(description='Get current user token')
+    def get(self, session=None):
+        token = current_user.token
+        return jsonify({'token': token})
+
     @api.response(200, 'Successfully changed user token', user_token_response_schema)
     @api.doc(description='Get new user token')
     def put(self, session=None):
