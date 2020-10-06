@@ -5,7 +5,7 @@ from flexget.plugin import get_plugin_by_name
 
 class TestURLRewriters:
     """
-        Bad example, does things manually, you should use task.find_entry to check existance
+    Bad example, does things manually, you should use task.find_entry to check existance
     """
 
     config = """
@@ -13,11 +13,11 @@ class TestURLRewriters:
           test:
             # make test data
             mock:
-              - {title: 'tpb page', url: 'https://thepiratebay.org/tor/8492471/Test.avi'}
-              - {title: 'tbp search', url: 'https://thepiratebay.org/search/something'}
+              - {title: 'tpb page', url: 'https://thepiratebay.org/description.php?id=8492471'}
+              - {title: 'tbp search', url: 'https://thepiratebay.org/search.php?q=something'}
               - {title: 'tbp torrent', url: 'https://torrents.thepiratebay.org/8492471/Test.torrent'}
-              - {title: 'tbp torrent subdomain', url: 'https://torrents.thepiratebay.org/8492471/Test.avi'}
-              - {title: 'tbp torrent bad subdomain', url: 'https://torrent.thepiratebay.org/8492471/Test.avi'}
+              - {title: 'tbp apibay', url: 'https://apibay.org/description.php?id=8492471'}
+              - {title: 'tbp torrent bad subdomain', url: 'https://torrent.thepiratebay.org/description.php?id=8492471'}
               - {title: 'nyaa', url: 'https://www.nyaa.si/view/15'}
               - {title: 'cinemageddon download', url: 'http://cinemageddon.net/details.php?id=1234'}
               - {title: 'rutracker_topic', url: 'https://rutracker.org/forum/viewtopic.php?t=2455223'}
@@ -37,7 +37,7 @@ class TestURLRewriters:
         assert not urlrewriter.url_rewritable(
             task, entry
         ), 'TPB direct torrent link should not be url_rewritable'
-        entry = task.find_entry(title='tbp torrent subdomain')
+        entry = task.find_entry(title='tbp apibay')
         assert urlrewriter.url_rewritable(task, entry)
         entry = task.find_entry(title='tbp torrent bad subdomain')
         assert not urlrewriter.url_rewritable(
