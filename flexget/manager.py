@@ -499,7 +499,7 @@ class Manager:
                 logger.error('There does not appear to be a daemon running.')
                 return
             if options.action == 'status':
-                logger.info('Daemon running. (PID: {})', os.getpid())
+                logger.debug('Daemon running. (PID: {})', os.getpid())
             elif options.action == 'stop':
                 tasks = (
                     'all queued tasks (if any) have'
