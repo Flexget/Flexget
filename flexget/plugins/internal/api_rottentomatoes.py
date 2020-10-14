@@ -32,7 +32,7 @@ MIN_DIFF = 0.01
 
 @db_schema.upgrade('api_rottentomatoes')
 def upgrade(ver, session):
-    if ver is 0:
+    if ver == 0:
         table_names = [
             'rottentomatoes_actors',
             'rottentomatoes_alternate_ids',
@@ -52,7 +52,7 @@ def upgrade(ver, session):
             session.execute(table.delete())
         table_add_column('rottentomatoes_actors', 'rt_id', String, session)
         ver = 1
-    if ver is 1:
+    if ver == 1:
         table = table_schema('rottentomatoes_search_results', session)
         session.execute(sql.delete(table, table.c.movie_id == None))
         ver = 2
@@ -289,7 +289,8 @@ def lookup_movie(
         year = title_parser.year
         if title == '' and not (rottentomatoes_id or title):
             raise PluginError('Failed to parse name from %s' % smart_match)
-
+    
+    search_string = ""
     if title:
         search_string = title.lower()
         if year:
@@ -298,7 +299,7 @@ def lookup_movie(
         raise PluginError('No criteria specified for rotten tomatoes lookup')
 
     def id_str():
-        return '<title=%s,year=%s,rottentomatoes_id=%s>' % (title, year, rottentomatoes_id)
+        return f'<title={title},year={year},rottentomatoes_id={rottentomatoes_id}>'
 
     logger.debug('Looking up rotten tomatoes information for {}', id_str())
 
