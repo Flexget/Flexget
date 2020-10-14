@@ -14,6 +14,7 @@ class Manipulate:
 
       manipulate:
         - <destination field>:
+            [find_all]: <boolean>
             [phase]: <phase>
             [from]: <source field>
             [extract]: <regexp>
@@ -42,6 +43,7 @@ class Manipulate:
                     'extract': {'type': 'string', 'format': 'regex'},
                     'separator': {'type': 'string'},
                     'remove': {'type': 'boolean'},
+                    'find_all': {'type': 'boolean'},
                     'replace': {
                         'type': 'object',
                         'properties': {
@@ -120,23 +122,27 @@ class Manipulate:
                     from_field,
                     field_value,
                 )
-
                 if config.get('remove'):
                     if field in entry:
                         del entry[field]
                         modified = True
                     continue
-
                 if 'extract' in config:
                     if not field_value:
                         logger.warning('Cannot extract, field `{}` is not present', from_field)
                         continue
-                    match = re.search(config['extract'], field_value, re.I | re.U)
-                    if match:
-                        groups = [x for x in match.groups() if x is not None]
-                        logger.debug('groups: {}', groups)
-                        field_value = config.get('separator', ' ').join(groups).strip()
+                    if config.get('find_all'):
+                        match = re.findall(config['extract'], field_value, re.I | re.U)
+                        logger.debug('all matches: {}', match)
+                        field_value = config.get('separator', ' ').join(match).strip()
                         logger.debug('field `{}` after extract: `{}`', field, field_value)
+                    else:
+                        match = re.search(config['extract'], field_value, re.I | re.U)
+                        if match:
+                            groups = [x for x in match.groups() if x is not None]
+                            logger.debug('groups: {}', groups)
+                            field_value = config.get('separator', ' ').join(groups).strip()
+                            logger.debug('field `{}` after extract: `{}`', field, field_value)
 
                 if 'replace' in config:
                     if not field_value:
