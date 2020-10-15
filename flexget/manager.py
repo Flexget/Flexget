@@ -13,11 +13,12 @@ import threading  # noqa
 import traceback  # noqa
 from contextlib import contextmanager  # noqa
 from datetime import datetime, timedelta  # noqa
-from typing import Iterator, List, Optional, Sequence, Tuple, Type, Union  # noqa
+from typing import Iterator, List, Optional, Sequence, Tuple, Type, Union, Dict, TYPE_CHECKING  # noqa
 
 import sqlalchemy  # noqa
 import yaml  # noqa
 from loguru import logger  # noqa
+from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError  # noqa
 from sqlalchemy.ext.declarative import declarative_base  # noqa
 from sqlalchemy.orm import sessionmaker  # noqa
@@ -44,9 +45,13 @@ from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
 from flexget.terminal import console, get_console_output  # noqa
 
+if TYPE_CHECKING:
+    from flexget.tray_icon import TrayIcon
+    from flexget.utils.simple_persistence import SimplePersistence
+
 logger = logger.bind(name='manager')
 
-manager = None
+manager: Optional['Manager'] = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
 
 
@@ -105,9 +110,9 @@ class Manager:
     """
 
     unit_test = False
-    options = None
+    options: argparse.Namespace
 
-    def __init__(self, args: Optional[Sequence]) -> None:
+    def __init__(self, args: Optional[List[str]]) -> None:
         """
         :param args: CLI args
         """
@@ -122,29 +127,29 @@ class Manager:
             args = unicode_argv()[1:]
         self.args = args
         self.autoreload_config = False
-        self.config_file_hash = None
-        self.config_base = None
-        self.config_name = None
-        self.config_path = None
-        self.log_filename = None
-        self.db_filename = None
-        self.engine = None
-        self.lockfile = None
-        self.database_uri = None
+        self.config_file_hash: Optional[str] = None
+        self.config_base: str = ''
+        self.config_name: str = ''
+        self.config_path: str = ''
+        self.log_filename: str = ''
+        self.db_filename: str = ''
+        self.engine: Optional[Engine] = None
+        self.lockfile: str = ''
+        self.database_uri: str = ''
         self.db_upgraded = False
         self._has_lock = False
         self.is_daemon = False
-        self.ipc_server = None
-        self.task_queue = None
-        self.persist = None
+        self.ipc_server: IPCServer
+        self.task_queue: TaskQueue
+        self.persist: 'SimplePersistence'
         self.initialized = False
 
-        self.config = {}
+        self.config: Dict = {}
 
-        self.options = self._init_options(args)
+        self.options = self._init_options(self.args)
         try:
             self._init_config(create=False)
-        except:
+        except Exception:
             flexget.log.start(level=self.options.loglevel, to_file=False)
             raise
 
@@ -170,10 +175,8 @@ class Manager:
         tray_icon.add_menu_separator(index=4)
 
     @staticmethod
-    def _init_options(args: Sequence[str]) -> argparse.Namespace:
-        """
-        Initialize argument parsing
-        """
+    def _init_options(args: List[str]) -> argparse.Namespace:
+        """Initialize argument parsing"""
         try:
             options = CoreArgumentParser().parse_known_args(args, do_help=False)[0]
         except ParserError as exc:
@@ -181,16 +184,14 @@ class Manager:
                 # If a non-built-in command was used, we need to parse with a parser that
                 # doesn't define the subparsers
                 options = manager_parser.parse_known_args(args, do_help=False)[0]
-            except ParserError as e:
+            except ParserError:
                 manager_parser.print_help()
                 print(f'\nError: {exc.message}')
                 sys.exit(1)
         return options
 
     def _init_logging(self, to_file: bool = True) -> None:
-        """
-        Initialize logging facilities
-        """
+        """Initialize logging facilities"""
         log_file = os.path.expanduser(self.options.logfile)
         # If an absolute path is not specified, use the config directory.
         if not os.path.isabs(log_file):
@@ -254,9 +255,9 @@ class Manager:
 
     def execute(
         self,
-        options: Optional[Union[dict, argparse.Namespace]] = None,
+        options: Union[dict, argparse.Namespace] = None,
         priority: int = 1,
-        suppress_warnings: Optional[Sequence[str]] = None,
+        suppress_warnings: Sequence[str] = None,
     ) -> List[Tuple[str, str, threading.Event]]:
         """
         Run all (can be limited with options) tasks from the config.
@@ -372,7 +373,7 @@ class Manager:
             self.handle_cli()
             self._shutdown()
 
-    def handle_cli(self, options: Optional[argparse.Namespace] = None) -> None:
+    def handle_cli(self, options: argparse.Namespace = None) -> None:
         """
         Dispatch a cli command to the appropriate function.
 
@@ -472,7 +473,7 @@ class Manager:
                 logger.debug('Error registering sigterm handler: {}', e)
             self.is_daemon = True
 
-            def run_daemon(tray_icon: Optional['TrayIcon'] = None):
+            def run_daemon(tray_icon: 'TrayIcon' = None):
                 fire_event('manager.daemon.started', self)
                 self.task_queue.start()
                 self.ipc_server.start()
@@ -620,7 +621,7 @@ class Manager:
 
     def hash_config(self) -> Optional[str]:
         if not self.config_path:
-            return
+            return None
         sha1_hash = hashlib.sha1()
         with open(self.config_path, 'rb') as f:
             while True:
@@ -631,7 +632,7 @@ class Manager:
         return sha1_hash.hexdigest()
 
     def load_config(
-        self, output_to_console: bool = True, config_file_hash: Optional[str] = None
+        self, output_to_console: bool = True, config_file_hash: str = None
     ) -> None:
         """
         Loads the config file from disk, validates and activates it.
@@ -648,7 +649,7 @@ class Manager:
         try:
             self.config_file_hash = config_file_hash or self.hash_config()
             config = yaml.safe_load(raw_config) or {}
-        except Exception as e:
+        except yaml.YAMLError as e:
             msg = str(e).replace('\n', ' ')
             msg = ' '.join(msg.split())
             logger.critical(msg)
@@ -668,11 +669,7 @@ class Manager:
 
                 # Not very good practice but we get several kind of exceptions here, I'm not even sure all of them
                 # At least: ReaderError, YmlScannerError (or something like that)
-                if (
-                    hasattr(e, 'problem')
-                    and hasattr(e, 'context_mark')
-                    and hasattr(e, 'problem_mark')
-                ):
+                if isinstance(e, yaml.MarkedYAMLError):
                     lines = 0
                     if e.problem is not None:
                         print(' Reason: %s\n' % e.problem)
@@ -763,7 +760,7 @@ class Manager:
         config_changed()
         fire_event('manager.config_updated', self)
 
-    def validate_config(self, config: Optional[dict] = None) -> dict:
+    def validate_config(self, config: dict = None) -> dict:
         """
         Check all root level keywords are valid. Config may be modified by before_config_validate hooks. Modified
         config will be returned.
@@ -772,16 +769,15 @@ class Manager:
         :raises: `ValueError` when config fails validation. There will be an `errors` attribute with the schema errors.
         :returns: Final validated config.
         """
-        if not config:
-            config = self.config
-        config = fire_event('manager.before_config_validate', config, self)
-        errors = config_schema.process_config(config)
+        conf = config if config else self.config
+        conf = fire_event('manager.before_config_validate', conf, self)
+        errors = config_schema.process_config(conf)
         if errors:
             err = ValueError('Did not pass schema validation.')
             err.errors = errors
             raise err
         else:
-            return config
+            return conf
 
     def init_sqlalchemy(self) -> None:
         """Initialize SQLAlchemy"""
@@ -792,14 +788,14 @@ class Manager:
                     file=sys.stderr,
                 )
                 sys.exit(1)
-        except ValueError as e:
+        except ValueError:
             logger.critical('Failed to check SQLAlchemy version, you may need to upgrade it')
 
         # SQLAlchemy
         if self.database_uri is None:
             # in case running on windows, needs double \\
             filename = self.db_filename.replace('\\', '\\\\')
-            self.database_uri = 'sqlite:///%s' % filename
+            self.database_uri = f'sqlite:///{filename}'
 
         if self.db_filename and not os.path.exists(self.db_filename):
             logger.verbose('Creating new database {} - DO NOT INTERRUPT ...', self.db_filename)
@@ -847,9 +843,9 @@ class Manager:
         Read the values from the lock file. Returns None if there is no current lock file.
         """
         if self.lockfile and os.path.exists(self.lockfile):
-            result = {}
+            result: Dict[str, Union[str, int]] = {}
             with open(self.lockfile, encoding='utf-8') as f:
-                lines = [l for l in f.readlines() if l]
+                lines = [line for line in f.readlines() if line]
             for line in lines:
                 try:
                     key, value = line.split(':', 1)
@@ -922,7 +918,7 @@ class Manager:
                 self.release_lock()
                 self._has_lock = False
 
-    def write_lock(self, ipc_info: Optional[dict] = None) -> None:
+    def write_lock(self, ipc_info: dict = None) -> None:
         assert self._has_lock
         with open(self.lockfile, 'w', encoding='utf-8') as f:
             f.write('PID: %s\n' % os.getpid())
@@ -945,7 +941,7 @@ class Manager:
         if sys.platform.startswith('win'):
             logger.error('Cannot daemonize on windows')
             return
-        if threading.activeCount() != 1:
+        if threading.active_count() != 1:
             logger.critical(
                 'There are {!r} active threads. Daemonizing now may cause strange failures.',
                 threading.enumerate(),
