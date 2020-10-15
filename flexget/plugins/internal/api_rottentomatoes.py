@@ -1,12 +1,13 @@
 import difflib
 import time
 from datetime import datetime, timedelta
+from typing import Any, Dict, Optional, Type
 from urllib.error import URLError
 from urllib.parse import quote_plus
 
 from loguru import logger
 from sqlalchemy import Column, DateTime, Integer, String, Table, func, sql
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relation, Session
 from sqlalchemy.schema import ForeignKey, Index
 
 from flexget import db_schema, plugin
@@ -16,7 +17,7 @@ from flexget.utils.database import text_date_synonym, with_session
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
 logger = logger.bind(name='api_rottentomatoes')
-Base = db_schema.versioned_base('api_rottentomatoes', 2)
+Base: Type[db_schema.VersionedBaseMeta] = db_schema.versioned_base('api_rottentomatoes', 2)
 session = requests.Session()
 # There is a 5 call per second rate limit per api key with multiple users on the same api key, this can be problematic
 session.add_domain_limiter(requests.TimedLimiter('api.rottentomatoes.com', '0.4 seconds'))
@@ -31,7 +32,7 @@ MIN_DIFF = 0.01
 
 
 @db_schema.upgrade('api_rottentomatoes')
-def upgrade(ver, session):
+def upgrade(ver: int, session: Session) -> int:
     if ver == 0:
         table_names = [
             'rottentomatoes_actors',
@@ -92,11 +93,11 @@ Base.register_table(directors_table)
 class RottenTomatoesContainer:
     """Base class for RottenTomatoes objects"""
 
-    def __init__(self, init_dict=None):
+    def __init__(self, init_dict: Optional[Dict[str, Any]] = None) -> None:
         if isinstance(init_dict, dict):
             self.update_from_dict(init_dict)
 
-    def update_from_dict(self, update_dict):
+    def update_from_dict(self, update_dict: Dict[str, Any]) -> None:
         """Populates any simple (string or number) attributes from a dict"""
         for col in self.__table__.columns:
             if isinstance(update_dict.get(col.name), (str, int, float)):
@@ -136,7 +137,7 @@ class RottenTomatoesMovie(RottenTomatoesContainer, Base):
     updated = Column(DateTime)
 
     @property
-    def expired(self):
+    def expired(self) -> bool:
         """
         :return: True if movie details are considered to be expired, ie. need of update
         """
@@ -150,7 +151,7 @@ class RottenTomatoesMovie(RottenTomatoesContainer, Base):
             logger.debug('movie `{}` age {} expires in {} days', self.title, age, refresh_interval)
         return self.updated < datetime.now() - timedelta(days=refresh_interval)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '<RottenTomatoesMovie(title=%s,id=%s,year=%s)>' % (self.title, self.id, self.year)
 
 
@@ -160,7 +161,7 @@ class RottenTomatoesGenre(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
 
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         self.name = name
 
 
@@ -173,7 +174,7 @@ class ReleaseDate(Base):
     date = text_date_synonym('_date')
     _date = Column('date', DateTime)
 
-    def __init__(self, name, date):
+    def __init__(self, name: str, date: datetime) -> None:
         self.name = name
         self.date = date
 
@@ -186,7 +187,7 @@ class RottenTomatoesPoster(Base):
     name = Column(String)
     url = Column(String)
 
-    def __init__(self, name, url):
+    def __init__(self, name: str, url: str) -> None:
         self.name = name
         self.url = url
 
@@ -198,7 +199,7 @@ class RottenTomatoesActor(Base):
     rt_id = Column(String)
     name = Column(String)
 
-    def __init__(self, name, rt_id):
+    def __init__(self, name: str, rt_id: str) -> None:
         self.name = name
         self.rt_id = rt_id
 
@@ -209,7 +210,7 @@ class RottenTomatoesDirector(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
 
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         self.name = name
 
 
@@ -221,7 +222,7 @@ class RottenTomatoesAlternateId(Base):
     name = Column(String)
     id = Column(String)
 
-    def __init__(self, name, id):
+    def __init__(self, name: str, id: str) -> None:
         self.name = name
         self.id = id
 
@@ -234,7 +235,7 @@ class RottenTomatoesLink(Base):
     name = Column(String)
     url = Column(String)
 
-    def __init__(self, name, url):
+    def __init__(self, name: str, url: str) -> None:
         self.name = name
         self.url = url
 
@@ -247,7 +248,7 @@ class RottenTomatoesSearchResult(Base):
     movie_id = Column(Integer, ForeignKey('rottentomatoes_movies.id'), nullable=False)
     movie = relation(RottenTomatoesMovie, backref='search_strings')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '<RottenTomatoesSearchResult(search=%s,movie_id=%s,movie=%s)>' % (
             self.search,
             self.movie_id,
@@ -258,14 +259,14 @@ class RottenTomatoesSearchResult(Base):
 @internet(logger)
 @with_session
 def lookup_movie(
-    title=None,
-    year=None,
-    rottentomatoes_id=None,
-    smart_match=None,
-    only_cached=False,
-    session=None,
-    api_key=None,
-):
+    title: Optional[str] = None,
+    year: Optional[int] = None,
+    rottentomatoes_id: Optional[int] = None,
+    smart_match: Optional[bool] = None,
+    only_cached: bool = False,
+    session: Optional[Session] = None,
+    api_key: Optional[str] = None,
+) -> RottenTomatoesMovie:
     """
     Do a lookup from Rotten Tomatoes for the movie matching the passed arguments.
     Any combination of criteria can be passed, the most specific criteria specified will be used.
@@ -279,9 +280,7 @@ def lookup_movie(
     :param api_key: optionaly specify an API key to use
     :returns: The Movie object populated with data from Rotten Tomatoes
     :raises: PluginError if a match cannot be found or there are other problems with the lookup
-
     """
-
     if smart_match:
         # If smart_match was specified, and we don't have more specific criteria, parse it into a title and year
         title_parser = plugin.get('parsing', 'api_rottentomatoes').parse_movie(smart_match)
@@ -289,7 +288,7 @@ def lookup_movie(
         year = title_parser.year
         if title == '' and not (rottentomatoes_id or title):
             raise PluginError('Failed to parse name from %s' % smart_match)
-    
+
     search_string = ""
     if title:
         search_string = title.lower()
@@ -298,7 +297,7 @@ def lookup_movie(
     elif not rottentomatoes_id:
         raise PluginError('No criteria specified for rotten tomatoes lookup')
 
-    def id_str():
+    def id_str() -> str:
         return f'<title={title},year={year},rottentomatoes_id={rottentomatoes_id}>'
 
     logger.debug('Looking up rotten tomatoes information for {}', id_str())
@@ -474,7 +473,12 @@ def lookup_movie(
 
 
 # TODO: get rid of or heavily refactor
-def _set_movie_details(movie, session, movie_data=None, api_key=None):
+def _set_movie_details(
+    movie: RottenTomatoesMovie,
+    session: Session,
+    movie_data: Optional[Dict[str, Any]] = None,
+    api_key: Optional[str] = None,
+) -> Any:
     """
     Populate ``movie`` object from given data
 
@@ -557,16 +561,23 @@ def _set_movie_details(movie, session, movie_data=None, api_key=None):
     return movie
 
 
-def movies_info(id, api_key=None):
+def movies_info(id, api_key: Optional[str] = None):
     if not api_key:
         api_key = API_KEY
-    url = '%s/%s/movies/%s.json?apikey=%s' % (SERVER, API_VER, id, api_key)
+    url = f'{SERVER}/{API_VER}/movies/{id}.json?apikey={api_key}'
     result = get_json(url)
     if isinstance(result, dict) and result.get('id'):
         return result
 
 
-def lists(list_type, list_name, limit=20, page_limit=20, page=None, api_key=None):
+def lists(
+    list_type,
+    list_name,
+    limit: int = 20,
+    page_limit: int = 20,
+    page: Optional[int] = None,
+    api_key=None,
+):
     if isinstance(list_type, str):
         list_type = list_type.replace(' ', '_')
     if isinstance(list_name, str):
@@ -575,45 +586,47 @@ def lists(list_type, list_name, limit=20, page_limit=20, page=None, api_key=None
     if not api_key:
         api_key = API_KEY
 
-    url = '%s/%s/lists/%s/%s.json?apikey=%s' % (SERVER, API_VER, list_type, list_name, api_key)
+    url = f'{SERVER}/{API_VER}/lists/{list_type}/{list_name}.json?apikey={api_key}'
     if limit:
-        url += '&limit=%i' % limit
+        url += f'&limit={limit}'
     if page_limit:
-        url += '&page_limit=%i' % page_limit
+        url += f'&page_limit={page_limit}'
     if page:
-        url += '&page=%i' % page
+        url += f'&page={page}'
 
     results = get_json(url)
     if isinstance(results, dict) and len(results.get('movies')):
         return results
 
 
-def movies_search(q, page_limit=None, page=None, api_key=None):
+def movies_search(
+    q, page_limit: Optional[int] = None, page: Optional[int] = None, api_key: Optional[str] = None
+):
     if isinstance(q, str):
         q = quote_plus(q.encode('latin-1', errors='ignore'))
 
     if not api_key:
         api_key = API_KEY
 
-    url = '%s/%s/movies.json?q=%s&apikey=%s' % (SERVER, API_VER, q, api_key)
+    url = f'{SERVER}/{API_VER}/movies.json?q={q}&apikey={api_key}'
     if page_limit:
-        url += '&page_limit=%i' % page_limit
+        url += f'&page_limit={page_limit}'
     if page:
-        url += '&page=%i' % page
+        url += f'&page={page}'
 
     results = get_json(url)
-    if isinstance(results, dict) and results.get('total') and len(results.get('movies')):
+    if isinstance(results, dict) and results.get('total') and results.get('movies'):
         return results
 
 
-def get_json(url):
+def get_json(url: str) -> Optional[Dict[str, Any]]:
     try:
         logger.debug('fetching json at {}', url)
         data = session.get(url)
         return data.json()
     except requests.RequestException as e:
         logger.warning('Request failed {}: {}', url, e)
-        return
+        return None
     except ValueError:
         logger.warning('Rotten Tomatoes returned invalid json at: {}', url)
-        return
+        return None

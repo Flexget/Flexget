@@ -1,11 +1,12 @@
 import time
 from datetime import date, datetime, timedelta
+from typing import Dict, Any, Optional
 
 from dateutil.parser import parse as dateutil_parse
 from loguru import logger
 from sqlalchemy import Column, Date, DateTime, Float, Integer, Table, Unicode, func
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relation, Session
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, plugin
@@ -29,14 +30,14 @@ Base.register_table(genres_table)
 BASE_URL = 'http://m.blu-ray.com/'
 
 
-def bluray_request(endpoint, **params):
+def bluray_request(endpoint, **params) -> Any:
     full_url = BASE_URL + endpoint
     response = requests.get(full_url, params=params)
     if response.content:
         return response.json(strict=False)
 
 
-def extract_release_date(bluray_entry):
+def extract_release_date(bluray_entry: Dict[str, Any]) -> date:
     release_date = bluray_entry.get('reldate')
     if not release_date or release_date.lower() == 'no release date':
         try:
@@ -68,9 +69,9 @@ class BlurayMovie(Base):
     genres = association_proxy('_genres', 'name')
     updated = Column(DateTime, default=datetime.now, nullable=False)
 
-    def __init__(self, title, year):
+    def __init__(self, title: str, year: Optional[int]) -> None:
         if year:
-            title_year = '{} ({})'.format(title, year)
+            title_year = f'{title} ({year})'
         else:
             title_year = title
 
@@ -183,7 +184,9 @@ class BluraySearchResult(Base):
     movie_id = Column(Integer, ForeignKey('bluray_movies.id'), nullable=True)
     movie = relation(BlurayMovie)
 
-    def __init__(self, search, movie_id=None, movie=None):
+    def __init__(
+        self, search: str, movie_id: Optional[int] = None, movie: Optional[BlurayMovie] = None
+    ) -> None:
         self.search = search.lower()
         if movie_id:
             self.movie_id = movie_id
@@ -195,7 +198,12 @@ class ApiBluray:
     """Does lookups to Blu-ray.com and provides movie information. Caches lookups."""
 
     @staticmethod
-    def lookup(title=None, year=None, only_cached=False, session=None):
+    def lookup(
+        title: Optional[str] = None,
+        year: Optional[int] = None,
+        only_cached: bool = False,
+        session: Optional[Session] = None,
+    ):
         if not title:
             raise LookupError('No criteria specified for blu-ray.com lookup')
         title_year = title + ' ({})'.format(year) if year else title
@@ -263,5 +271,5 @@ class ApiBluray:
 
 
 @event('plugin.register')
-def register_plugin():
+def register_plugin() -> None:
     plugin.register(ApiBluray, 'api_bluray', api_ver=2, interfaces=[])
