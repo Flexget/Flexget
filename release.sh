@@ -34,6 +34,9 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
   git commit -m "v${VERSION}"
   git tag -a -f "v${VERSION}" -m "v${VERSION} release"
 
+  # Save tag name to github actions environment
+  echo "release_tag=v${VERSION}" >> $GITHUB_ENV
+
   # Bump to new dev version, then commit again
   python dev_tools.py bump_version dev
   git add flexget/_version.py

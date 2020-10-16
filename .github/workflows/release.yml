@@ -42,6 +42,7 @@ jobs:
         ./release.sh
     - uses: ncipollo/release-action@v1
       with:
+        tag: ${{ env.release_tag }}
         artifacts: "dist/*.whl"
         token: ${{ secrets.GITHUB_TOKEN }}
     - name: Set Deployment Status Success
