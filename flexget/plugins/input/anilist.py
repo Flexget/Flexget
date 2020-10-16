@@ -122,54 +122,69 @@ class AniList(object):
             try:
                 list_response = list_response.json()['data']
                 logger.debug('JSON output: {}', list_response)
-                for list_status in list_response['collection']['statuses']:
-                    if (
-                        selected_list_name
-                        and list_status['name'].lower() not in selected_list_name
+                for list_status in list_response.get('collection', {}).get('statuses', []):
+                    if selected_list_name and (
+                        list_status.get('name')
+                        and list_status.get('name').lower() not in selected_list_name
                     ):
                         continue
                     for anime in list_status['list']:
-                        anime = anime['anime']
+                        anime = anime.get('anime')
                         has_selected_release_status = (
-                            anime['status'].lower() in selected_release_status
-                            or 'all' in selected_release_status
-                        )
+                            (
+                                anime.get('status')
+                                and anime.get('status').lower() in selected_release_status
+                            )
+                        ) or 'all' in selected_release_status
                         has_selected_type = (
-                            anime['format'].lower() in selected_formats
-                            or 'all' in selected_formats
-                        )
+                            (
+                                anime.get('format')
+                                and anime.get('format').lower() in selected_formats
+                            )
+                        ) or 'all' in selected_formats
                         if has_selected_type and has_selected_release_status:
                             entry = Entry()
-                            entry['title'] = anime['title']['romaji']
-                            entry['al_title'] = anime['title']
-                            entry['al_format'] = anime['format']
-                            entry['al_release_status'] = anime['status'].capitalize()
-                            entry['al_list'] = list_status['name']
+                            entry['al_banner'] = anime.get('bannerImage')
+                            entry['al_cover'] = anime.get('coverImage', {}).get('large')
+                            entry['al_episodes'] = anime.get('episodes')
+                            entry['al_format'] = anime.get('format')
+                            entry['al_genres'] = anime.get('genres')
+                            entry['al_idMal'] = anime.get('idMal')
+                            entry['al_links'] = {
+                                item['site']: item['url'] for item in anime.get('externalLinks')
+                            }
+                            entry['al_list'] = list_status.get('name')
                             entry['al_list_status'] = (
                                 list_status['status'].capitalize()
                                 if list_status.get('status')
-                                else ''
+                                else None
+                            )
+                            entry['al_release_status'] = (
+                                anime['status'].capitalize() if anime.get('status') else None
+                            )
+                            entry['al_tags'] = [t.get('name') for t in anime.get('tags')]
+                            entry['al_title'] = anime.get('title')
+                            entry['al_trailer'] = (
+                                TRAILER_SOURCE[anime.get('trailer', {}).get('site')]
+                                + anime.get('trailer', {}).get('id')
+                                if anime.get('trailer')
+                                and anime.get('trailer').get('site') in TRAILER_SOURCE
+                                else None
                             )
                             entry['alternate_name'] = anime.get('synonyms', [])
+                            eng_title = anime.get('title', {}).get('english')
                             if (
-                                anime['title'].get('english')
-                                and anime['title'].get('english') != anime['title']['romaji']
-                                and anime['title'].get('english') not in entry['alternate_name']
+                                eng_title
+                                and eng_title.lower()
+                                != anime.get('title', {}).get('romaji').lower()
+                                and eng_title not in entry['alternate_name']
                             ):
-                                entry['alternate_name'].insert(0, anime['title']['english'])
-                            entry['url'] = anime['siteUrl']
-                            entry['al_idMal'] = anime['idMal']
-                            entry['al_episodes'] = anime['episodes']
-                            entry['al_trailer'] = (
-                                TRAILER_SOURCE[anime['trailer']['site']] + anime['trailer']['id']
-                                if anime['trailer']
-                                else ''
-                            )
-                            entry['al_cover'] = anime['coverImage']['large']
-                            entry['al_banner'] = anime['bannerImage']
-                            entry['al_genres'] = anime['genres']
-                            entry['al_tags'] = [t['name'] for t in anime['tags']]
-                            entry['al_links'] = anime['externalLinks']
+                                entry['alternate_name'].insert(0, eng_title)
+                            entry['series_name'] = entry['al_title'].get('romaji') or entry[
+                                'al_title'
+                            ].get('english')
+                            entry['title'] = entry['series_name']
+                            entry['url'] = anime.get('siteUrl')
                             if entry.isvalid():
                                 yield entry
                 req_chunk = req_chunk + 1 if list_response['collection']['hasNextChunk'] else False
