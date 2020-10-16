@@ -26,7 +26,7 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
   python dev_tools.py bundle_webui
 
   # Build and upload to pypi.
-  python setup.py sdist bdist_wheel --universal
+  python setup.py sdist bdist_wheel
   twine upload dist/*
 
   # Commit and tag released version
