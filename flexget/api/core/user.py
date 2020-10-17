@@ -1,5 +1,6 @@
-from flask import jsonify, request
+from flask import jsonify, request, Response
 from flask_login import current_user
+from sqlalchemy.orm import Session
 
 from flexget.api import APIResource, api
 from flexget.api.app import BadRequest, base_message_schema, success_response
@@ -37,7 +38,7 @@ class UserManagementAPI(APIResource):
         description='Change user password. A score of at least 3 is needed.'
         'See https://github.com/dropbox/zxcvbn for details'
     )
-    def put(self, session=None):
+    def put(self, session: Session = None) -> Response:
         """ Change user password """
         user = current_user
         data = request.json
@@ -53,13 +54,13 @@ class UserManagementAPI(APIResource):
 class UserManagementTokenAPI(APIResource):
     @api.response(200, 'Successfully got user token', user_token_response_schema)
     @api.doc(description='Get current user token')
-    def get(self, session=None):
+    def get(self, session: Session = None) -> Response:
         token = current_user.token
         return jsonify({'token': token})
 
     @api.response(200, 'Successfully changed user token', user_token_response_schema)
     @api.doc(description='Get new user token')
-    def put(self, session=None):
+    def put(self, session: Session = None) -> Response:
         """ Change current user token """
         token = generate_token(username=current_user.name, session=session)
         return jsonify({'token': token})
