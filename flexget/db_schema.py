@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Callable, Optional, Union
+from typing import Callable, Optional, Union, Dict, Any, List
 
 from loguru import logger
 from sqlalchemy import Column, DateTime, Integer, String, Table
@@ -16,7 +16,7 @@ from flexget.utils.tools import get_current_flexget_version
 logger = logger.bind(name='schema')
 
 # Stores a mapping of {plugin: {'version': version, 'tables': ['table_names'])}
-plugin_schemas = {}
+plugin_schemas: Dict[str, Dict[str, Any]] = {}
 
 
 class FlexgetVersion(Base):
@@ -50,6 +50,7 @@ def get_flexget_db_version() -> Optional[str]:
         version = session.query(FlexgetVersion).first()
         if version:
             return version.version
+    return None
 
 
 class PluginSchema(Base):
@@ -63,8 +64,8 @@ class PluginSchema(Base):
         self.plugin = plugin
         self.version = version
 
-    def __str__(self):
-        return '<PluginSchema(plugin=%s,version=%i)>' % (self.plugin, self.version)
+    def __str__(self) -> str:
+        return f'<PluginSchema(plugin={self.plugin},version={self.version})>'
 
 
 @with_session
@@ -81,13 +82,13 @@ def get_version(plugin: str, session=None) -> Optional[int]:
 def set_version(plugin: str, version: int, session=None) -> None:
     if plugin not in plugin_schemas:
         raise ValueError(
-            'Tried to set schema version for %s plugin with no versioned_base.' % plugin
+            f'Tried to set schema version for {plugin} plugin with no versioned_base.'
         )
     base_version = plugin_schemas[plugin]['version']
     if version != base_version:
         raise ValueError(
-            'Tried to set %s plugin schema version to %d when '
-            'it should be %d as defined in versioned_base.' % (plugin, version, base_version)
+            f'Tried to set {plugin} plugin schema version to {version} when '
+            f'it should be {base_version} as defined in versioned_base.'
         )
     schema = session.query(PluginSchema).filter(PluginSchema.plugin == plugin).first()
     if not schema:
@@ -96,7 +97,7 @@ def set_version(plugin: str, version: int, session=None) -> None:
         session.add(schema)
     else:
         if version < schema.version:
-            raise ValueError('Tried to set plugin {} schema version to lower value', plugin)
+            raise ValueError(f'Tried to set plugin {plugin} schema version to lower value')
         if version != schema.version:
             logger.debug('Updating plugin {} schema version to {}', plugin, version)
             schema.version = version
@@ -255,7 +256,7 @@ def versioned_base(plugin: str, version: int) -> VersionedBaseMeta:
     return VersionedBase
 
 
-def after_table_create(event, target, bind, tables=None, **kw):
+def after_table_create(event, target, bind, tables: List[Table] = None, **kw) -> None:
     """Sets the schema version to most recent for a plugin when it's tables are freshly created."""
     if tables:
         # TODO: Detect if any database upgrading is needed and acquire the lock only in one place

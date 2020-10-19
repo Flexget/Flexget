@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from typing import List
 
 from setuptools import find_packages, setup
 
@@ -14,7 +15,7 @@ if not __version__:
     sys.exit(1)
 
 
-def load_requirements(filename):
+def load_requirements(filename: str) -> List[str]:
     return [
         line.strip()
         for line in Path(filename).read_text().splitlines()

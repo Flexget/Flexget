@@ -1,7 +1,7 @@
 import collections
-import datetime
 import re
 import sys
+from typing import Generator, Iterable, List, Optional, Tuple
 
 from git import Repo
 
@@ -17,12 +17,12 @@ class MDChangeSet:
         ('### Removed\n', ['remove', 'removed']),
     ]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.pre_header = ['\n']
         self.version_header = ''
-        self.post_header = []
-        self.sections = collections.OrderedDict()
-        self.footer = []
+        self.post_header: List[str] = []
+        self.sections: collections.OrderedDict[str, List[str]] = collections.OrderedDict()
+        self.footer: List[str] = []
 
     @classmethod
     def from_md_lines(cls, lines):
@@ -36,7 +36,7 @@ class MDChangeSet:
             instance.sections[section], section, tail = isplit('### ', tail)
         return instance
 
-    def parse_message(self, message):
+    def parse_message(self, message: str) -> bool:
         """
         Parses a git commit message and formats and adds any tagged messages to this changeset.
         Returns True if one or more changelog messages was found.
@@ -47,11 +47,11 @@ class MDChangeSet:
             item = re.sub(
                 r'#(\d{3,4})', r'[#\1](https://github.com/Flexget/Flexget/issues/\1)', item
             )
-            item = '- {0}\n'.format(item)
+            item = f'- {item}\n'
             self.sections.setdefault(cat, ['\n']).insert(0, item)
         return found
 
-    def change_items(self, message):
+    def change_items(self, message: str):
         """An iterator of changelog updates from a commit message in the form (category, message)"""
         for line in message.split('\n'):
             for cat_match in re.finditer(r'\[(\w+)\]', line):
@@ -60,13 +60,14 @@ class MDChangeSet:
                     line = line.replace(cat_match.group(0), '').strip()
                     yield found_cat, line
 
-    def cat_lookup(self, cat):
+    def cat_lookup(self, cat: str) -> Optional[str]:
         """Return an official category for `cat` tag text."""
         for cat_item in self.CATEGORIES:
             if cat.lower() in cat_item[1]:
                 return cat_item[0]
+        return None
 
-    def to_md_lines(self):
+    def to_md_lines(self) -> Generator[str, None, None]:
         """An iterator over the markdown lines representing this changeset."""
         for l in self.pre_header:
             yield l
@@ -81,9 +82,11 @@ class MDChangeSet:
             yield l
 
 
-def isplit(start_text, iterator):
+def isplit(
+    start_text: str, iterator: Iterable[str]
+) -> Tuple[List[str], Optional[str], Iterable[str]]:
     """Returns head, match, tail tuple, where match is the first line that starts with `start_text`"""
-    head = []
+    head: List[str] = []
     iterator = iter(iterator)
     for item in iterator:
         if item.startswith(start_text):
@@ -107,7 +110,7 @@ if __name__ == '__main__':
     cur_ver = MDChangeSet.from_md_lines(active_lines)
     latestref = re.match(r'<!---\s*([\d\w]+)', start_comment).group(1)
     oldestref = re.match(r'<!---\s*([\d\w]+)', end_comment).group(1)
-    released_vers = []
+    released_vers: List[MDChangeSet] = []
     commits = list(repo.iter_commits(f'{latestref}..HEAD', reverse=True))
     modified = False
     if commits:
@@ -130,14 +133,14 @@ if __name__ == '__main__':
                 cur_ver.post_header.insert(
                     0,
                     '[all commits]'
-                    f'(https://github.com/Flexget/Flexget/compare/{diffstartref}...{tag_name})\n'
+                    f'(https://github.com/Flexget/Flexget/compare/{diffstartref}...{tag_name})\n',
                 )
                 released_vers.insert(0, cur_ver)
                 cur_ver = MDChangeSet()
                 oldestref = commit.hexsha
             if cur_ver.sections:
                 verfile = repo.tree('HEAD')['flexget/_version.py'].data_stream.read()
-                __version__ = None
+                __version__: Optional[str] = None
                 try:
                     exec(verfile)  # pylint: disable=W0122
                 except Exception:
