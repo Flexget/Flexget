@@ -792,7 +792,7 @@ class Manager:
             logger.critical('Failed to check SQLAlchemy version, you may need to upgrade it')
 
         # SQLAlchemy
-        if self.database_uri is None:
+        if self.database_uri in ['', None]:
             # in case running on windows, needs double \\
             filename = self.db_filename.replace('\\', '\\\\')
             self.database_uri = f'sqlite:///{filename}'
