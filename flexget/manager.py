@@ -13,7 +13,17 @@ import threading  # noqa
 import traceback  # noqa
 from contextlib import contextmanager  # noqa
 from datetime import datetime, timedelta  # noqa
-from typing import Iterator, List, Optional, Sequence, Tuple, Type, Union, Dict, TYPE_CHECKING  # noqa
+from typing import (  # noqa
+    TYPE_CHECKING,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
+)
 
 import sqlalchemy  # noqa
 import yaml  # noqa
@@ -631,9 +641,7 @@ class Manager:
                 sha1_hash.update(data)
         return sha1_hash.hexdigest()
 
-    def load_config(
-        self, output_to_console: bool = True, config_file_hash: str = None
-    ) -> None:
+    def load_config(self, output_to_console: bool = True, config_file_hash: str = None) -> None:
         """
         Loads the config file from disk, validates and activates it.
 
@@ -792,7 +800,7 @@ class Manager:
             logger.critical('Failed to check SQLAlchemy version, you may need to upgrade it')
 
         # SQLAlchemy
-        if self.database_uri in ['', None]:
+        if not self.database_uri:
             # in case running on windows, needs double \\
             filename = self.db_filename.replace('\\', '\\\\')
             self.database_uri = f'sqlite:///{filename}'
