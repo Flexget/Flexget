@@ -41,6 +41,7 @@ jobs:
       run: |
         ./release.sh
     - uses: ncipollo/release-action@v1
+      if: env.release_tag
       with:
         tag: ${{ env.release_tag }}
         artifacts: "dist/*"
