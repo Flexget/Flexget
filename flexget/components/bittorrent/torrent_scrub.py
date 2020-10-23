@@ -63,7 +63,7 @@ class TorrentScrub:
 
             if mode in ("on", "all", "true"):
                 modified = bittorrent.clean_meta(
-                    metainfo, including_info=(mode == "all"), logger=logger.debug
+                    metainfo, including_info=(mode == "all"), log_func=logger.debug
                 )
             elif mode in ("resume", "rtorrent"):
                 if mode == "resume":
