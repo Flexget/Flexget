@@ -2,9 +2,10 @@ import locale
 import os
 import os.path
 import re
+from contextlib import suppress
 from copy import copy
 from datetime import date, datetime, time
-from typing import TYPE_CHECKING, Any, List, Mapping, Optional, Union
+from typing import TYPE_CHECKING, Any, List, Mapping, Optional, Union, AnyStr, Type, cast
 
 import jinja2.filters
 from dateutil import parser as dateutil_parse
@@ -33,46 +34,44 @@ if TYPE_CHECKING:
 logger = logger.bind(name='utils.template')
 
 # The environment will be created after the manager has started
-environment: Optional[Environment] = None
+environment: Optional['FlexGetEnvironment'] = None
 
 
 class RenderError(Exception):
     """Error raised when there is a problem with jinja rendering."""
 
-    pass
 
-
-def filter_pathbase(val):
+def filter_pathbase(val: Optional[str]) -> str:
     """Base name of a path."""
     return os.path.basename(val or '')
 
 
-def filter_pathname(val):
+def filter_pathname(val: Optional[str]) -> str:
     """Base name of a path, without its extension."""
     return os.path.splitext(os.path.basename(val or ''))[0]
 
 
-def filter_pathext(val):
+def filter_pathext(val: Optional[str]) -> str:
     """Extension of a path (including the '.')."""
     return os.path.splitext(val or '')[1]
 
 
-def filter_pathdir(val):
+def filter_pathdir(val: Optional[str]) -> str:
     """Directory containing the given path."""
     return os.path.dirname(val or '')
 
 
-def filter_pathscrub(val, os_mode=None):
+def filter_pathscrub(val: str, os_mode: str = None) -> str:
     """Replace problematic characters in a path."""
     return pathscrub(val, os_mode)
 
 
-def filter_re_replace(val, pattern, repl):
+def filter_re_replace(val: AnyStr, pattern: str, repl: str) -> str:
     """Perform a regexp replacement on the given string."""
     return re.sub(pattern, repl, str(val))
 
 
-def filter_re_search(val, pattern):
+def filter_re_search(val, pattern: str):
     """Perform a search for given regexp pattern, return the matching portion of the text."""
     if not isinstance(val, str):
         return val
@@ -82,12 +81,12 @@ def filter_re_search(val, pattern):
     return ''
 
 
-def filter_formatdate(val, format):
+def filter_formatdate(val, format_str):
     """Returns a string representation of a datetime object according to format string."""
     encoding = locale.getpreferredencoding()
     if not isinstance(val, (datetime, date, time)):
         return val
-    return val.strftime(format)
+    return val.strftime(format_str)
 
 
 def filter_parsedate(val):
@@ -95,32 +94,32 @@ def filter_parsedate(val):
     return dateutil_parse.parse(val)
 
 
-def filter_date_suffix(date):
+def filter_date_suffix(date_str: str):
     """Returns a date suffix for a given date"""
-    day = int(date[-2:])
+    day = int(date_str[-2:])
     if 4 <= day <= 20 or 24 <= day <= 30:
         suffix = "th"
     else:
         suffix = ["st", "nd", "rd"][day % 10 - 1]
-    return date + suffix
+    return date_str + suffix
 
 
-def filter_format_number(val, places=None, grouping=True):
+def filter_format_number(val, places: int = None, grouping: bool = True) -> str:
     """Formats a number according to the user's locale."""
     if not isinstance(val, (int, float)):
         return val
     if places is not None:
-        format = '%.' + str(places) + 'f'
+        format_str = f'%.{places}f'
     elif isinstance(val, int):
-        format = '%d'
+        format_str = '%d'
     else:
-        format = '%.02f'
+        format_str = '%.02f'
 
     locale.setlocale(locale.LC_ALL, '')
-    return locale.format(format, val, grouping)
+    return locale.format_string(format_str, val, grouping)
 
 
-def filter_pad(val, width, fillchar='0'):
+def filter_pad(val: Union[int, str], width: int, fillchar: str = '0') -> str:
     """Pads a number or string with fillchar to the specified width."""
     return str(val).rjust(width, fillchar)
 
@@ -132,25 +131,25 @@ def filter_to_date(date_time_val):
     return date_time_val.date()
 
 
-def filter_default(value, default_value='', boolean=True):
-    """Override the built-in Jinja default filter to change the `boolean` param to True by default"""
+def filter_default(value, default_value: str = '', boolean: bool = True) -> str:
+    """Override the built-in Jinja default filter to set the `boolean` param to True by default"""
     return jinja2.filters.do_default(value, default_value, boolean)
 
 
 filter_d = filter_default
 
 
-def is_fs_file(pathname):
+def is_fs_file(pathname: Union[str, os.PathLike]) -> bool:
     """Test whether item is existing file in filesystem"""
     return os.path.isfile(pathname)
 
 
-def is_fs_dir(pathname):
+def is_fs_dir(pathname: Union[str, os.PathLike]) -> bool:
     """Test whether item is existing directory in filesystem"""
     return os.path.isdir(pathname)
 
 
-def is_fs_link(pathname):
+def is_fs_link(pathname: Union[str, os.PathLike]) -> bool:
     """Test whether item is existing link in filesystem"""
     return os.path.islink(pathname)
 
@@ -167,14 +166,18 @@ class FlexGetTemplate(Template):
 class FlexGetNativeTemplate(FlexGetTemplate, NativeTemplate):
     """Lazy lookup support and native python return types."""
 
-    pass
+
+class FlexGetEnvironment(Environment):
+    """Environment with template_class support"""
+
+    template_class: Type[FlexGetTemplate]
 
 
 @event('manager.initialize')
 def make_environment(manager: 'Manager') -> None:
     """Create our environment and add our custom filters"""
     global environment
-    environment = Environment(
+    environment = FlexGetEnvironment(
         undefined=StrictUndefined,
         loader=ChoiceLoader(
             [
@@ -193,18 +196,17 @@ def make_environment(manager: 'Manager') -> None:
             environment.tests[name.split('_', 1)[1]] = test
 
 
-def list_templates(extensions: Optional[List[str]] = None) -> List[str]:
-    """
-    Returns all templates names that are configured under environment loader dirs
-    """
+def list_templates(extensions: List[str] = None) -> List[str]:
+    """Returns all templates names that are configured under environment loader dirs"""
     if environment is None or not hasattr(environment, 'loader'):
         return []
     return environment.list_templates(extensions=extensions)
 
 
 def get_filters() -> dict:
-    """
-    Returns all built-in and custom Jinja filters in a dict, where the key is the name, and the value is the filter func
+    """Returns all built-in and custom Jinja filters in a dict
+
+    The key is the name, and the value is the filter func
     """
     if environment is None or not hasattr(environment, 'loader'):
         return {}
@@ -221,15 +223,13 @@ def get_template(template_name: str, scope: Optional[str] = 'task') -> FlexGetTe
         locations.append(scope + '/' + template_name)
     locations.append(template_name)
     for location in locations:
-        try:
-            return environment.get_template(location)
-        except TemplateNotFound:
-            pass
+        if environment is not None:
+            with suppress(TemplateNotFound):
+                return cast(FlexGetTemplate, environment.get_template(location))
     else:
+        err = f'Template not found in templates dir: {template_name}'
         if scope:
-            err = 'Template not found in templates dir: %s (%s)' % (template_name, scope)
-        else:
-            err = 'Template not found in templates dir: %s' % template_name
+            err += f' ({scope})'
         raise ValueError(err)
 
 
@@ -242,19 +242,22 @@ def render(template: Union[FlexGetTemplate, str], context: Mapping, native: bool
     :param native: If True, and the rendering result can be all native python types, not just strings.
     :return: The rendered template text.
     """
-    if isinstance(template, str):
+    if isinstance(template, str) and environment is not None:
         template_class = None
         if native:
             template_class = FlexGetNativeTemplate
         try:
-            template = environment.from_string(template, template_class=template_class)
+            template = cast(
+                FlexGetTemplate, environment.from_string(template, template_class=template_class)
+            )
         except TemplateSyntaxError as e:
-            raise RenderError('Error in template syntax: ' + e.message)
+            raise RenderError(f'Error in template syntax: {e.message}')
     try:
+        template = cast(FlexGetTemplate, template)
         result = template.render(context)
     except Exception as e:
-        error = RenderError('(%s) %s' % (type(e).__name__, e))
-        logger.debug('Error during rendering: {}', error)
+        error = RenderError(f'({type(e).__name__}) {e}')
+        logger.debug(f'Error during rendering: {error}')
         raise error
 
     return result
@@ -297,8 +300,10 @@ def evaluate_expression(expression: str, context: Mapping) -> Any:
     :param str expression:  A jinja expression to evaluate
     :param context: dictlike, supporting LazyDicts
     """
-    compiled_expr = environment.compile_expression(expression)
-    # If we have a LazyDict, grab the underlying store. Our environment supports LazyFields directly
-    if isinstance(context, LazyDict):
-        context = context.store
-    return compiled_expr(**context)
+    if environment is not None:
+        compiled_expr = environment.compile_expression(expression)
+        # If we have a LazyDict, grab the underlying store. Our environment supports LazyFields directly
+        if isinstance(context, LazyDict):
+            context = context.store
+        return compiled_expr(**context)
+    return None

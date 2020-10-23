@@ -8,7 +8,7 @@ import os
 import queue
 import re
 import sys
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from collections.abc import MutableMapping
 from datetime import datetime, timedelta
 from html.entities import name2codepoint
@@ -50,32 +50,27 @@ def str_to_int(string: str) -> Optional[int]:
         return None
 
 
-def convert_bytes(bytes: Union[int, float]) -> str:
+def convert_bytes(bytes_num: Union[int, float]) -> str:
     """Returns given bytes as prettified string."""
 
-    bytes = float(bytes)
-    if bytes >= 1099511627776:
-        terabytes = bytes / 1099511627776
-        size = '%.2fT' % terabytes
-    elif bytes >= 1073741824:
-        gigabytes = bytes / 1073741824
-        size = '%.2fG' % gigabytes
-    elif bytes >= 1048576:
-        megabytes = bytes / 1048576
-        size = '%.2fM' % megabytes
-    elif bytes >= 1024:
-        kilobytes = bytes / 1024
-        size = '%.2fK' % kilobytes
-    else:
-        size = '%.2fb' % bytes
-    return size
+    bytes_num = float(bytes_num)
+    units_prefixes = OrderedDict({
+        'T': 1099511627776,  # 1024 ** 4
+        'G': 1073741824,  # 1024 ** 3
+        'M': 1048576,  # 1024 ** 2
+        'K': 1024,
+    })
+    for unit, threshold in units_prefixes.items():
+        if bytes_num > threshold:
+            return f'{bytes_num/threshold:.2f}{unit}'
+    return f'{bytes_num:.2f}b'
 
 
 class MergeException(Exception):
-    def __init__(self, value):
+    def __init__(self, value: str):
         self.value = value
 
-    def __str__(self):
+    def __str__(self) -> str:
         return repr(self.value)
 
 
@@ -147,12 +142,9 @@ def merge_dict_from_to(d1: dict, d2: dict) -> None:
                 elif isinstance(v, (str, bool, int, float, type(None))):
                     pass
                 else:
-                    raise Exception(
-                        'Unknown type: %s value: %s in dictionary' % (type(v), repr(v))
-                    )
-            elif isinstance(v, (str, bool, int, float, list, type(None))) and isinstance(
-                d2[k], (str, bool, int, float, list, type(None))
-            ):
+                    raise Exception(f'Unknown type: {type(v)} value: {repr(v)} in dictionary')
+            elif (isinstance(v, (str, bool, int, float, list, type(None))) and
+                  isinstance(d2[k], (str, bool, int, float, list, type(None)))):
                 # Allow overriding of non-container types with other non-container types
                 pass
             else:
@@ -174,20 +166,19 @@ class ReList(list):
     """
 
     # Set the default flags
-    flags = re.IGNORECASE | re.UNICODE
+    flags = re.IGNORECASE
 
     def __init__(self, *args, **kwargs) -> None:
         """Optional :flags: keyword argument with regexp flags to compile with"""
         if 'flags' in kwargs:
-            self.flags = kwargs['flags']
-            del kwargs['flags']
+            self.flags = kwargs.pop('flags')
         list.__init__(self, *args, **kwargs)
 
-    def __getitem__(self, k) -> Pattern:
+    def __getitem__(self, k) -> Pattern:  # type: ignore
         # Doesn't support slices. Do we care?
         item = list.__getitem__(self, k)
         if isinstance(item, str):
-            item = re.compile(item, re.IGNORECASE | re.UNICODE)
+            item = re.compile(item, self.flags)
             self[k] = item
         return item
 
@@ -217,7 +208,7 @@ else:
         io_encoding = 'ascii'
 
 
-def parse_timedelta(value: Union[timedelta, str]) -> timedelta:
+def parse_timedelta(value: Union[timedelta, str, None]) -> timedelta:
     """Parse a string like '5 days' into a timedelta object. Also allows timedeltas to pass through."""
     if isinstance(value, timedelta):
         # Allow timedelta objects to pass through
@@ -231,9 +222,9 @@ def parse_timedelta(value: Union[timedelta, str]) -> timedelta:
         unit += 's'
     params = {unit: float(amount)}
     try:
-        return timedelta(**params)
+        return timedelta(**params)  # type: ignore
     except TypeError:
-        raise ValueError('Invalid time format \'%s\'' % value)
+        raise ValueError(f"Invalid time format '{value}'")
 
 
 def multiply_timedelta(interval: timedelta, number: Union[int, float]) -> timedelta:
@@ -296,7 +287,7 @@ class TimedDict(MutableMapping):
 
     def __init__(self, cache_time: Union[timedelta, str] = '5 minutes'):
         self.cache_time = parse_timedelta(cache_time)
-        self._store = dict()
+        self._store: dict = {}
         self._last_prune = datetime.now()
 
     def _prune(self):
@@ -356,6 +347,8 @@ def split_title_year(title: str) -> Tuple[str, Optional[int]]:
     # We only recognize years from the 2nd and 3rd millennium, FlexGetters from the year 3000 be damned!
     match = re.search(r'(.*?)\(?([12]\d{3})?\)?$', title)
 
+    if not match:
+        return title, None
     title = match.group(1).strip()
     year_match = match.group(2)
 
@@ -378,7 +371,7 @@ def get_latest_flexget_version_number() -> Optional[str]:
         data = requests.get('https://pypi.python.org/pypi/FlexGet/json').json()
         return data.get('info', {}).get('version')
     except requests.RequestException:
-        return
+        return None
 
 
 def get_current_flexget_version() -> str:
@@ -402,7 +395,7 @@ def parse_filesize(text_size: str, si: bool = True) -> float:
     )
     if not parsed_size:
         raise ValueError('%s does not look like a file size' % text_size)
-    amount = parsed_size.group(1)
+    amount_str = parsed_size.group(1)
     unit = parsed_size.group(2)
     if not unit.endswith('b'):
         raise ValueError('%s does not look like a file size' % text_size)
@@ -413,7 +406,7 @@ def parse_filesize(text_size: str, si: bool = True) -> float:
     if unit not in prefix_order:
         raise ValueError('%s does not look like a file size' % text_size)
     order = prefix_order[unit]
-    amount = float(amount.replace(',', '').replace(' ', ''))
+    amount = float(amount_str.replace(',', '').replace(' ', ''))
     base = 1000 if si else 1024
     return (amount * (base ** order)) / 1024 ** 2
 
@@ -454,7 +447,7 @@ def parse_episode_identifier(
     :raises ValueError: If ep_id does not match any valid types
     """
     error = None
-    identified_by = None
+    identified_by = ''
     entity_type = 'episode'
     if isinstance(ep_id, int):
         if ep_id <= 0:
@@ -475,7 +468,7 @@ def parse_episode_identifier(
                 error = 'sequence type episode must be higher than 0'
             identified_by = 'sequence'
         except ValueError:
-            error = '`%s` is not a valid episode identifier.' % ep_id
+            error = f'`{ep_id}` is not a valid episode identifier.'
     if error:
         raise ValueError(error)
     return identified_by, entity_type
