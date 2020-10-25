@@ -185,7 +185,7 @@ class OutputQBitTorrent:
 
             skip_check = entry.get('skip_check', config.get('skip_check'))
             if skip_check:
-                form_data['skip_check'] = 'true'
+                form_data['skip_checking'] = 'true'
 
             maxupspeed = entry.get('maxupspeed', config.get('maxupspeed'))
             if maxupspeed:
@@ -207,7 +207,7 @@ class OutputQBitTorrent:
                 logger.info('Save path: {}', form_data.get('savepath'))
                 logger.info('Label: {}', form_data.get('label'))
                 logger.info('Paused: {}', form_data.get('paused', 'false'))
-                logger.info('Skip Hash Check: {}', form_data.get('skip_check', 'false'))
+                logger.info('Skip Hash Check: {}', form_data.get('skip_checking', 'false'))
                 if maxupspeed:
                     logger.info('Upload Speed Limit: {}', form_data.get('upLimit'))
                 if maxdownspeed:
