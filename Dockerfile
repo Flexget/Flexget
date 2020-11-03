@@ -45,7 +45,7 @@ RUN pip install -U pip && \
                 cloudscraper && \
     rm -rf /wheels
 
-COPY --from=0 /flexget-ui-v2 /usr/local/lib/python3.8/site-packages/flexget/ui/v2/
+COPY --from=0 /flexget-ui-v2 /usr/local/lib/python3.9/site-packages/flexget/ui/v2/
 
 RUN mkdir /root/.flexget
 VOLUME /root/.flexget
