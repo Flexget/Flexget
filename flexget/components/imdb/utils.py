@@ -25,7 +25,7 @@ requests.headers.update(
 )
 
 # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
-requests.add_domain_limiter(TimedLimiter('imdb.com', '3 seconds'))
+requests.add_domain_limiter(TimedLimiter('imdb.com', '1 seconds'))
 
 
 def is_imdb_url(url):

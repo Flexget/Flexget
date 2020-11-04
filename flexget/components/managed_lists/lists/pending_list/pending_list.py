@@ -19,15 +19,20 @@ class PendingListSet(MutableSet):
     def _db_list(self, session):
         return (
             session.query(db.PendingListList)
-            .filter(db.PendingListList.name == self.config)
+            .filter(db.PendingListList.name == self.list_name)
             .first()
         )
 
     def __init__(self, config):
-        self.config = config
+        if not isinstance(config, dict):
+            config = {'list_name': config}
+        config.setdefault('include_pending', False)
+        self.list_name = config.get('list_name')
+        self.only_approved = False if config.get('include_pending') else True
+
         with Session() as session:
             if not self._db_list(session):
-                session.add(db.PendingListList(name=self.config))
+                session.add(db.PendingListList(name=self.list_name))
 
     def _entry_query(self, session, entry, approved=None):
         query = (
@@ -51,7 +56,7 @@ class PendingListSet(MutableSet):
         with Session() as session:
             for e in (
                 self._db_list(session)
-                .entries.filter(db.PendingListEntry.approved == True)
+                .entries.filter(db.PendingListEntry.approved == self.only_approved)
                 .order_by(db.PendingListEntry.added.desc())
                 .all()
             ):
@@ -102,12 +107,25 @@ class PendingListSet(MutableSet):
 
     def get(self, entry):
         with Session() as session:
-            match = self._entry_query(session=session, entry=entry, approved=True)
+            match = self._entry_query(session=session, entry=entry, approved=self.only_approved)
             return Entry(match.entry) if match else None
 
 
 class PendingList:
-    schema = {'type': 'string'}
+    schema = {
+        'oneOf': [
+            {'type': 'string'},
+            {
+                'type': 'object',
+                'properties': {
+                    'list_name': {'type': 'string'},
+                    'include_pending': {'type': 'boolean', 'default': False}
+                },
+                'required': ['list_name'],
+                'additionalProperties': False,
+            },
+        ]
+    }
 
     @staticmethod
     def get_list(config):
