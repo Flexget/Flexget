@@ -12,6 +12,11 @@ class TestListInterface:
           list_get:
             pending_list: test_list
 
+          list_get_including_pending:
+            pending_list:
+              list_name: "test_list"
+              include_pending: True
+               
           pending_list_add:
             mock:
               - {title: 'title 1', url: "http://mock.url/file1.torrent"}
@@ -28,6 +33,7 @@ class TestListInterface:
             list_match:
               from:
                 - pending_list: test_list
+
     """
 
     def test_list_add(self, execute_task):
@@ -67,3 +73,10 @@ class TestListInterface:
 
         task = execute_task('list_get')
         assert len(task.entries) == 0
+
+    def test_list_match_include_pending(self, execute_task):
+        task = execute_task('pending_list_add')
+        assert len(task.entries) == 2
+
+        task = execute_task('list_get_including_pending')
+        assert len(task.entries) == 2
