@@ -2,10 +2,12 @@ import copy
 import pickle
 from datetime import datetime, timedelta
 from functools import partial
+from typing import TYPE_CHECKING, List, Iterable, Callable, Optional
 
 from loguru import logger
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Unicode, select
 from sqlalchemy.orm import relation
+from sqlalchemy.orm import Session as DBSession
 
 from flexget import db_schema
 from flexget.entry import Entry
@@ -18,11 +20,16 @@ from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 from flexget.utils.tools import TimedDict, get_config_hash, parse_timedelta
 
 logger = logger.bind(name='input_cache')
-Base = db_schema.versioned_base('input_cache', 2)
+
+if TYPE_CHECKING:
+    class Base:
+        def __init__(self, *args, **kwargs) -> None: ...
+else:
+    Base = db_schema.versioned_base('input_cache', 2)
 
 
 @db_schema.upgrade('input_cache')
-def upgrade(ver, session):
+def upgrade(ver: int, session: DBSession) -> int:
     if ver == 0:
         table = table_schema('input_cache_entry', session)
         table_add_column(table, 'json', Unicode, session)
@@ -36,8 +43,8 @@ def upgrade(ver, session):
                     .where(table.c.id == row['id'])
                     .values(json=json.dumps(p, encode_datetime=True))
                 )
-            except KeyError as e:
-                logger.error('Unable error upgrading input_cache pickle object due to {}', str(e))
+            except KeyError as ex:
+                logger.error(f'Unable error upgrading input_cache pickle object due to {ex}')
         ver = 1
     if ver == 1:
         table = table_schema('input_cache_entry', session)
@@ -81,7 +88,7 @@ class InputCacheEntry(Base):
 
 
 @event('manager.db_cleanup')
-def db_cleanup(manager, session):
+def db_cleanup(manager, session: DBSession) -> None:
     """Removes old input caches from plugins that are no longer configured."""
     result = (
         session.query(InputCache)
@@ -107,11 +114,11 @@ class cached:
 
     cache = TimedDict(cache_time='5 minutes')
 
-    def __init__(self, name, persist=None):
+    def __init__(self, name: str, persist: str = None) -> None:
         # Cast name to unicode to prevent sqlalchemy warnings when filtering
         self.name = str(name)
         # Parse persist time
-        self.persist = persist and parse_timedelta(persist)
+        self.persist: Optional[timedelta] = parse_timedelta(persist) if persist else None
         # Will be set when wrapped function is called
         self.config_hash = None
         self.cache_name = None
@@ -169,9 +176,9 @@ class cached:
 
         return wrapped_func
 
-    def store_to_db(self, entries):
+    def store_to_db(self, entries: List[str]):
         # Store to database
-        logger.debug('Storing cache {} to database.', self.cache_name)
+        logger.debug(f'Storing cache {self.cache_name} to database.')
         with Session() as session:
             db_cache = (
                 session.query(InputCache)
@@ -185,22 +192,23 @@ class cached:
             db_cache.added = datetime.now()
             session.merge(db_cache)
 
-    def load_from_db(self, load_expired=False):
+    def load_from_db(self, load_expired: bool = False) -> Optional[List[InputCacheEntry]]:
         with Session() as session:
             db_cache = (
                 session.query(InputCache)
                 .filter(InputCache.name == self.name)
                 .filter(InputCache.hash == self.config_hash)
             )
-            if not load_expired:
+            if self.persist and not load_expired:
                 db_cache = db_cache.filter(InputCache.added > datetime.now() - self.persist)
             db_cache = db_cache.first()
             if db_cache:
                 entries = [ent.entry for ent in db_cache.entries]
-                logger.verbose('Restored {} entries from db cache', len(entries))
+                logger.verbose(f'Restored {len(entries)} entries from db cache')
                 # Store to in memory cache
                 self.cache[self.cache_name] = copy.deepcopy(entries)
                 return entries
+            return None
 
 
 class IterableCache:
@@ -209,9 +217,9 @@ class IterableCache:
     If `finished_hook` is supplied, it will be called the first time the iterable is run to the end.
     """
 
-    def __init__(self, iterable, finished_hook=None):
+    def __init__(self, iterable: Iterable, finished_hook: Callable[[List[str]], None] = None):
         self.iterable = iter(iterable)
-        self.cache = []
+        self.cache: List[dict] = []
         self.finished_hook = finished_hook
 
     def __iter__(self):

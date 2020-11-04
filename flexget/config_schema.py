@@ -16,10 +16,10 @@ from flexget.utils.tools import parse_episode_identifier, parse_timedelta
 
 logger = logger.bind(name='config_schema')
 
-schema_paths = {}
 CURRENT_SCHEMA_VERSION = 'http://json-schema.org/draft-04/schema#'
 # Type hint for json schemas. (If we upgrade to a newer json schema version, the type might allow more than dicts.)
 JsonSchema = Dict[str, Any]
+schema_paths: Dict[str, Union[JsonSchema, Callable[..., JsonSchema]]] = {}
 
 
 # TODO: Rethink how config key and schema registration work
@@ -293,7 +293,7 @@ def is_valid_template(instance):
     return get_template(instance) is not None
 
 
-def set_error_message(error):
+def set_error_message(error: jsonschema.ValidationError):
     """
     Create user facing error message from a :class:`jsonschema.ValidationError` `error`
 

@@ -40,6 +40,12 @@ jobs:
         TWINE_PASSWORD: ${{ secrets.pypi_token }}
       run: |
         ./release.sh
+    - uses: ncipollo/release-action@v1
+      if: env.release_tag
+      with:
+        tag: ${{ env.release_tag }}
+        artifacts: "dist/*"
+        token: ${{ secrets.GITHUB_TOKEN }}
     - name: Set Deployment Status Success
       uses: deliverybot/deployment-status@v1
       with:

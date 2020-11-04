@@ -13,8 +13,8 @@ logger = logger.bind(name='task_queue')
 
 
 class TaskQueue:
-    """
-    Task processing thread.
+    """Task processing thread.
+
     Only executes one task at a time, if more are requested they are queued up and run in turn.
     """
 
@@ -75,8 +75,7 @@ class TaskQueue:
         return self.run_queue.qsize()
 
     def shutdown(self, finish_queue: bool = True) -> None:
-        """
-        Request shutdown.
+        """Request shutdown.
 
         :param bool finish_queue: Should all tasks be finished before ending thread.
         """
@@ -92,8 +91,8 @@ class TaskQueue:
             self._shutdown_now = True
 
     def wait(self) -> None:
-        """
-        Waits for the thread to exit.
+        """Waits for the thread to exit.
+
         Allows abortion of task queue with ctrl-c
         """
         if sys.version_info >= (3, 4):

@@ -2,7 +2,7 @@ import functools
 import types
 import warnings
 from enum import Enum
-from typing import Callable, Iterable, Mapping, Optional, Sequence, Union
+from typing import Callable, Iterable, Mapping, Optional, Sequence, Union, Dict
 
 from loguru import logger
 
@@ -23,10 +23,10 @@ class EntryState(Enum):
     @property
     def color(self) -> str:
         return {
-            self.ACCEPTED: 'green',
-            self.REJECTED: 'red',
-            self.FAILED: 'RED',
-            self.UNDECIDED: 'dim',
+            EntryState.ACCEPTED: 'green',
+            EntryState.REJECTED: 'red',
+            EntryState.FAILED: 'RED',
+            EntryState.UNDECIDED: 'dim',
         }[self]
 
     @property
@@ -34,22 +34,22 @@ class EntryState(Enum):
         return f'<{self.color}>{self.value.upper()}</>'
 
     # __str__, __eq__, and __hash__ are make these states almost interchangeable with the old plain string states
-    def __str__(self):
+    def __str__(self) -> str:
         return self.value
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if isinstance(other, str):
             return self.value == other
         return super().__eq__(other)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.value)
 
 
 class EntryUnicodeError(Exception):
     """This exception is thrown when trying to set non-unicode compatible field value to entry."""
 
-    def __init__(self, key, value):
+    def __init__(self, key: str, value) -> None:
         self.key = key
         self.value = value
 
@@ -87,7 +87,12 @@ class Entry(LazyDict, Serializer):
         # Make sure constructor does not escape our __setitem__ enforcement
         self.update(*args, **kwargs)
 
-    def trace(self, message: str, operation: Optional[str] = None, plugin: Optional[str] = None):
+    def trace(
+        self,
+        message: Optional[str],
+        operation: str = None,
+        plugin: str = None,
+    ) -> None:
         """
         Adds trace message to the entry which should contain useful information about why
         plugin did not operate on entry. Accept and Reject messages are added to trace automatically.
@@ -102,7 +107,7 @@ class Entry(LazyDict, Serializer):
         if item not in self.traces:
             self.traces.append(item)
 
-    def run_hooks(self, action: str, **kwargs):
+    def run_hooks(self, action: str, **kwargs) -> None:
         """
         Run hooks that have been registered for given ``action``.
 
@@ -112,7 +117,7 @@ class Entry(LazyDict, Serializer):
         for func in self._hooks[action]:
             func(self, **kwargs)
 
-    def add_hook(self, action: str, func: Callable, **kwargs):
+    def add_hook(self, action: str, func: Callable, **kwargs) -> None:
         """
         Add a hook for ``action`` to this entry.
 
@@ -126,7 +131,7 @@ class Entry(LazyDict, Serializer):
         except KeyError:
             raise ValueError('`%s` is not a valid entry action' % action)
 
-    def on_accept(self, func: Callable, **kwargs):
+    def on_accept(self, func: Callable, **kwargs) -> None:
         """
         Register a function to be called when this entry is accepted.
 
@@ -135,7 +140,7 @@ class Entry(LazyDict, Serializer):
         """
         self.add_hook('accept', func, **kwargs)
 
-    def on_reject(self, func: Callable, **kwargs):
+    def on_reject(self, func: Callable, **kwargs) -> None:
         """
         Register a function to be called when this entry is rejected.
 
@@ -144,7 +149,7 @@ class Entry(LazyDict, Serializer):
         """
         self.add_hook('reject', func, **kwargs)
 
-    def on_fail(self, func: Callable, **kwargs):
+    def on_fail(self, func: Callable, **kwargs) -> None:
         """
         Register a function to be called when this entry is failed.
 
@@ -153,7 +158,7 @@ class Entry(LazyDict, Serializer):
         """
         self.add_hook('fail', func, **kwargs)
 
-    def on_complete(self, func: Callable, **kwargs):
+    def on_complete(self, func: Callable, **kwargs) -> None:
         """
         Register a function to be called when a :class:`Task` has finished processing this entry.
 
@@ -162,7 +167,7 @@ class Entry(LazyDict, Serializer):
         """
         self.add_hook('complete', func, **kwargs)
 
-    def accept(self, reason: Optional[str] = None, **kwargs):
+    def accept(self, reason: str = None, **kwargs) -> None:
         if self.rejected:
             logger.debug('tried to accept rejected {!r}', self)
         elif not self.accepted:
@@ -171,12 +176,12 @@ class Entry(LazyDict, Serializer):
             # Run entry on_accept hooks
             self.run_hooks('accept', reason=reason, **kwargs)
 
-    def reject(self, reason: Optional[str] = None, **kwargs):
+    def reject(self, reason: str = None, **kwargs) -> None:
         # ignore rejections on immortal entries
         if self.get('immortal'):
             reason_str = '(%s)' % reason if reason else ''
             logger.info('Tried to reject immortal {} {}', self['title'], reason_str)
-            self.trace('Tried to reject immortal %s' % reason_str)
+            self.trace(f'Tried to reject immortal {reason_str}')
             return
         if not self.rejected:
             self._state = EntryState.REJECTED

@@ -103,7 +103,7 @@ class UrlRewritePirateBay:
         url = entry['url']
         if url.endswith('.torrent'):
             return False
-        return bool(self.url_match.match(url))
+        return any((self.url_match.match(url), self.url_search.match(url)))
 
     # urlrewriter API
     def url_rewrite(self, task, entry):

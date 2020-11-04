@@ -9,7 +9,7 @@ import sys
 import threading
 import uuid
 import warnings
-from typing import Iterator
+from typing import Iterator, Union, List, Deque, Optional
 
 import loguru
 from loguru import logger
@@ -74,6 +74,7 @@ class InterceptHandler(logging.Handler):
 
     def emit(self, record: logging.LogRecord):
         # Get corresponding Loguru level if it exists
+        level: Union[str, int]
         try:
             level = logger.level(record.levelname).name
         except ValueError:
@@ -91,16 +92,15 @@ class InterceptHandler(logging.Handler):
 
 
 _logging_configured = False
-_startup_buffer = []
-_startup_buffer_id = None
+_startup_buffer: List['loguru.Record'] = []
+_startup_buffer_id: Optional[int] = None
 _logging_started = False
 # Stores the last 100 debug messages
-debug_buffer = collections.deque(maxlen=100)
+debug_buffer: Deque['loguru.Message'] = collections.deque(maxlen=100)
 
 
 def initialize(unit_test: bool = False) -> None:
-    """Prepare logging.
-    """
+    """Prepare logging."""
     # Remove default loguru sinks
     logger.remove()
     global _logging_configured, _logging_started, _buff_handler
@@ -145,9 +145,8 @@ def initialize(unit_test: bool = False) -> None:
 
 def start(
     filename: str = None, level: str = 'INFO', to_console: bool = True, to_file: bool = True
-):
-    """After initialization, start file logging.
-    """
+) -> None:
+    """After initialization, start file logging."""
     global _logging_started
 
     assert _logging_configured

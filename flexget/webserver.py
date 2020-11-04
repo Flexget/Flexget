@@ -2,6 +2,7 @@ import hashlib
 import random
 import socket
 import threading
+from typing import Optional, Dict, Tuple
 
 import cherrypy
 import zxcvbn
@@ -16,16 +17,16 @@ from flexget.utils.database import with_session
 
 logger = logger.bind(name='web_server')
 
-_home = None
-_app_register = {}
+_home: Optional[str] = None
+_app_register: Dict[str, Tuple[Flask, str]] = {}
 _default_app = Flask(__name__)
 
-random = random.SystemRandom()
+rand = random.SystemRandom()
 
 
 def generate_key():
     """ Generate key for use to authentication """
-    return str(hashlib.sha224(str(random.getrandbits(128)).encode('utf-8')).hexdigest())
+    return str(hashlib.sha224(str(rand.getrandbits(128)).encode('utf-8')).hexdigest())
 
 
 def get_random_string(
@@ -39,7 +40,7 @@ def get_random_string(
 
     Taken from the django.utils.crypto module.
     """
-    return ''.join(random.choice(allowed_chars) for __ in range(length))
+    return ''.join(rand.choice(allowed_chars) for __ in range(length))
 
 
 @with_session
@@ -48,7 +49,7 @@ def get_secret(session=None):
     web_secret = session.query(WebSecret).first()
     if not web_secret:
         web_secret = WebSecret(
-            id=1, value=get_random_string(50, 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)')
+            id='1', value=get_random_string(50, 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)')
         )
         session.add(web_secret)
         session.commit()

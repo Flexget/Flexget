@@ -2,7 +2,7 @@ import logging
 import webbrowser
 from functools import partial, wraps
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Callable
 
 from loguru import logger
 
@@ -54,7 +54,7 @@ class TrayIcon:
     def add_menu_item(
         self,
         text: str = None,
-        action: callable = None,
+        action: Callable = None,
         menu_item: 'MenuItem' = None,
         index: int = None,
         **kwargs,
