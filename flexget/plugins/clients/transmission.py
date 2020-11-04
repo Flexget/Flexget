@@ -286,7 +286,7 @@ class PluginTransmission(TransmissionBase):
                     'password': {'type': 'string'},
                     'action': {
                         'type': 'string',
-                        'enum': ['add', 'remove', 'purge', 'pause', 'resume'],
+                        'enum': ['add', 'remove', 'purge', 'pause', 'resume', 'start now'],
                     },
                     'path': {'type': 'string'},
                     'max_up_speed': {'type': 'number'},
@@ -631,7 +631,10 @@ class PluginTransmission(TransmissionBase):
                 elif config['action'] == 'resume':
                     self.client.start_torrent([torrent_info.id])
                     logger.info('resumed {} in transmission', torrent_info.name)
-
+                elif config['action'] == 'start now':
+                    self.client.start_torrent([torrent_info.id], bypass_queue=True)
+                    logger.info('started {} in transmission', torrent_info.name)
+                    
             except TransmissionError as e:
                 logger.opt(exception=True).debug('TransmissionError')
                 logger.debug('Failed options dict: {}', options)
