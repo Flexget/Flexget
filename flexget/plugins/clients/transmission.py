@@ -235,7 +235,7 @@ class PluginTransmissionInput(TransmissionBase):
                         'error when requesting transmissionrpc attribute {}', attr
                     )
             # Availability in percent
-            entry['transmission_availability'] = torrent.desiredAvailable / torrent.leftUntilDone if torrent.leftUntilDone else 0
+            entry['transmission_availability'] = (torrent.desiredAvailable / torrent.leftUntilDone) if torrent.leftUntilDone else 0
             
             entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
             entry['transmission_seed_ratio_ok'] = seed_ratio_ok
