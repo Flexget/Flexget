@@ -210,9 +210,11 @@ class PluginTransmissionInput(TransmissionBase):
             for attr in [
                 'id',
                 'comment',
+                'desiredAvailable',
                 'downloadDir',
                 'isFinished',
                 'isPrivate',
+                'leftUntilDone',
                 'ratio',
                 'status',
                 'date_active',
