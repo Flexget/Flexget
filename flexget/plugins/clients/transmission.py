@@ -291,7 +291,7 @@ class PluginTransmission(TransmissionBase):
                     'password': {'type': 'string'},
                     'action': {
                         'type': 'string',
-                        'enum': ['add', 'remove', 'purge', 'pause', 'resume', 'start bypass_queue'],
+                        'enum': ['add', 'remove', 'purge', 'pause', 'resume', 'bypass_queue'],
                     },
                     'path': {'type': 'string'},
                     'max_up_speed': {'type': 'number'},
@@ -613,6 +613,8 @@ class PluginTransmission(TransmissionBase):
                 if list(options['change'].keys()):
                     self.client.change_torrent(torrent_info.id, 30, **options['change'])
 
+                start_torrent = partial(self.client.start_torrent, [torrent_info.id])
+
                 if config['action'] == 'add':
                     # if add_paused was defined and set to False start the torrent;
                     # prevents downloading data before we set what files we want
@@ -634,11 +636,11 @@ class PluginTransmission(TransmissionBase):
                     self.client.stop_torrent([torrent_info.id])
                     logger.info('paused {} in transmission', torrent_info.name)
                 elif config['action'] == 'resume':
-                    self.client.start_torrent([torrent_info.id])
+                    start_torrent()
                     logger.info('resumed {} in transmission', torrent_info.name)
-                elif config['action'] == 'start bypass_queue':
-                    self.client.start_torrent([torrent_info.id], bypass_queue=True)
-                    logger.info('started {} in transmission', torrent_info.name)
+                elif config['action'] == 'bypass_queue':
+                    start_torrent(bypass_queue=True)
+                    logger.info('resumed (bypass queue) {} in transmission', torrent_info.name)
                     
             except TransmissionError as e:
                 logger.opt(exception=True).debug('TransmissionError')
