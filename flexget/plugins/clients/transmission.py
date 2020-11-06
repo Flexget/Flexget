@@ -210,9 +210,11 @@ class PluginTransmissionInput(TransmissionBase):
             for attr in [
                 'id',
                 'comment',
+                'desiredAvailable',
                 'downloadDir',
                 'isFinished',
                 'isPrivate',
+                'leftUntilDone',
                 'ratio',
                 'status',
                 'date_active',
@@ -232,6 +234,9 @@ class PluginTransmissionInput(TransmissionBase):
                     logger.opt(exception=True).debug(
                         'error when requesting transmissionrpc attribute {}', attr
                     )
+            # Availability in percent
+            entry['transmission_availability'] = (torrent.desiredAvailable / torrent.leftUntilDone) if torrent.leftUntilDone else 0
+            
             entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
             entry['transmission_seed_ratio_ok'] = seed_ratio_ok
             entry['transmission_idle_limit_ok'] = idle_limit_ok
@@ -286,7 +291,7 @@ class PluginTransmission(TransmissionBase):
                     'password': {'type': 'string'},
                     'action': {
                         'type': 'string',
-                        'enum': ['add', 'remove', 'purge', 'pause', 'resume'],
+                        'enum': ['add', 'remove', 'purge', 'pause', 'resume', 'bypass_queue'],
                     },
                     'path': {'type': 'string'},
                     'max_up_speed': {'type': 'number'},
@@ -608,6 +613,8 @@ class PluginTransmission(TransmissionBase):
                 if list(options['change'].keys()):
                     self.client.change_torrent(torrent_info.id, 30, **options['change'])
 
+                start_torrent = partial(self.client.start_torrent, [torrent_info.id])
+
                 if config['action'] == 'add':
                     # if add_paused was defined and set to False start the torrent;
                     # prevents downloading data before we set what files we want
@@ -629,9 +636,12 @@ class PluginTransmission(TransmissionBase):
                     self.client.stop_torrent([torrent_info.id])
                     logger.info('paused {} in transmission', torrent_info.name)
                 elif config['action'] == 'resume':
-                    self.client.start_torrent([torrent_info.id])
+                    start_torrent()
                     logger.info('resumed {} in transmission', torrent_info.name)
-
+                elif config['action'] == 'bypass_queue':
+                    start_torrent(bypass_queue=True)
+                    logger.info('resumed (bypass queue) {} in transmission', torrent_info.name)
+                    
             except TransmissionError as e:
                 logger.opt(exception=True).debug('TransmissionError')
                 logger.debug('Failed options dict: {}', options)
