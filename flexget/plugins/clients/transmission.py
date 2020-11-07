@@ -234,8 +234,11 @@ class PluginTransmissionInput(TransmissionBase):
                     logger.opt(exception=True).debug(
                         'error when requesting transmissionrpc attribute {}', attr
                     )
+
+            bytes_completed = sum(map(lambda x: x['bytesCompleted'] if x['wanted'] else 0, t.fileStats))
+            entry['transmission_bytes_completed'] = bytes_completed
             # Availability in percent
-            entry['transmission_availability'] = (torrent.desiredAvailable / torrent.leftUntilDone) if torrent.leftUntilDone else 0
+            entry['transmission_availability'] = ((bytes_completed + t.desiredAvailable) / t.sizeWhenDone) if t.sizeWhenDone else 0
             
             entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
             entry['transmission_seed_ratio_ok'] = seed_ratio_ok
