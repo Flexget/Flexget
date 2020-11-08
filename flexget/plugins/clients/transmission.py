@@ -7,6 +7,7 @@ from netrc import NetrcParseError, netrc
 from time import sleep
 from urllib.parse import urlparse
 
+from functools import partial
 from loguru import logger
 
 from flexget import plugin
