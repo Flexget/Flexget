@@ -26,9 +26,13 @@ class PendingListSet(MutableSet):
     def __init__(self, config):
         if not isinstance(config, dict):
             config = {'list_name': config}
-        config.setdefault('include_pending', False)
         self.list_name = config.get('list_name')
-        self.only_approved = False if config.get('include_pending') else True
+
+        self.filter_approved = True
+        if config.get('include') == "pending":
+            self.filter_approved = False
+        if config.get('include') == "all":
+            self.filter_approved = None
 
         with Session() as session:
             if not self._db_list(session):
@@ -48,18 +52,18 @@ class PendingListSet(MutableSet):
                 )
             )
         )
-        if approved:
-            query = query.filter(db.PendingListEntry.approved == True)
+
+        if approved is not None:
+            query = query.filter(db.PendingListEntry.approved == approved)
+
         return query.first()
 
     def __iter__(self):
         with Session() as session:
-            for e in (
-                self._db_list(session)
-                .entries.filter(db.PendingListEntry.approved == self.only_approved)
-                .order_by(db.PendingListEntry.added.desc())
-                .all()
-            ):
+            query = self._db_list(session).entries.order_by(db.PendingListEntry.added.desc())
+            if self.filter_approved is not None:
+                query = query.filter(db.PendingListEntry.approved == self.filter_approved)
+            for e in query.all():
                 logger.debug('returning {}', e.entry)
                 yield e.entry
 
@@ -107,7 +111,7 @@ class PendingListSet(MutableSet):
 
     def get(self, entry):
         with Session() as session:
-            match = self._entry_query(session=session, entry=entry, approved=self.only_approved)
+            match = self._entry_query(session=session, entry=entry, approved=self.filter_approved)
             return Entry(match.entry) if match else None
 
 
@@ -119,7 +123,7 @@ class PendingList:
                 'type': 'object',
                 'properties': {
                     'list_name': {'type': 'string'},
-                    'include_pending': {'type': 'boolean', 'default': False}
+                    'include': {'type': 'string', 'enum': ['pending', 'approved', 'all'], 'default': 'approved'}
                 },
                 'required': ['list_name'],
                 'additionalProperties': False,
