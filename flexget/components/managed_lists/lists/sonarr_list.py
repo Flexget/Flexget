@@ -179,6 +179,11 @@ class SonarrSet(MutableSet):
         elif len(lookup_results) > 1:
             logger.debug('got multiple results for Sonarr, using first one')
         show = lookup_results[0]
+
+        if show.get("id"):
+            logger.debug('entry {} already exists in Sonarr list as show {}', entry, show)
+            return show
+
         logger.debug('using show {}', show)
 
         # Getting root folder

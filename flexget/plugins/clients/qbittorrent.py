@@ -47,6 +47,7 @@ class OutputQBitTorrent:
                     'maxdownspeed': {'type': 'integer'},
                     'fail_html': {'type': 'boolean'},
                     'add_paused': {'type': 'boolean'},
+                    'skip_check': {'type': 'boolean'},
                 },
                 'additionalProperties': False,
             },
@@ -182,6 +183,10 @@ class OutputQBitTorrent:
             if add_paused:
                 form_data['paused'] = 'true'
 
+            skip_check = entry.get('skip_check', config.get('skip_check'))
+            if skip_check:
+                form_data['skip_checking'] = 'true'
+
             maxupspeed = entry.get('maxupspeed', config.get('maxupspeed'))
             if maxupspeed:
                 form_data['upLimit'] = maxupspeed * 1024
@@ -202,6 +207,7 @@ class OutputQBitTorrent:
                 logger.info('Save path: {}', form_data.get('savepath'))
                 logger.info('Label: {}', form_data.get('label'))
                 logger.info('Paused: {}', form_data.get('paused', 'false'))
+                logger.info('Skip Hash Check: {}', form_data.get('skip_checking', 'false'))
                 if maxupspeed:
                     logger.info('Upload Speed Limit: {}', form_data.get('upLimit'))
                 if maxdownspeed:
