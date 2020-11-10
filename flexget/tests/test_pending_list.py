@@ -92,10 +92,6 @@ class TestListInterface:
             entry = session.query(PendingListList).first().entries.first()
             entry.approved = True
 
-        with Session() as session:
-            entries = session.query(PendingListList).first().entries.all()
-            print(entries)
-
         task = execute_task('list_get_all')
         assert len(task.entries) == 2
 
