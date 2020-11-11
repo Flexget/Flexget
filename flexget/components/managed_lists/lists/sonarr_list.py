@@ -106,13 +106,20 @@ class SonarrSet(MutableSet):
             self._tags = {t["label"].lower(): t["id"] for t in self._sonarr_request("tag")}
 
         for tag in self.config.get("tags", []):
-            tag = entry.render(tag).lower()
-            found = self._tags.get(tag)
-            if not found:
-                logger.verbose('Adding missing tag %s to Sonarr' % tag)
-                found = self._sonarr_request("tag", method="post", data={"label": tag})["id"]
-                self._tags[tag] = found
-            tags_ids.append(found)
+            if isinstance(tag, int):
+                # Handle tags by id
+                if tag not in self._tags.values():
+                    logger.error('Unable to add tag with id {} to entry {} as the tag does not exist in sonarr', entry, tag)
+                    continue
+                tags_ids.append(tag)
+            else:
+                tag = entry.render(tag).lower()
+                found = self._tags.get(tag)
+                if not found:
+                    logger.verbose('Adding missing tag %s to Sonarr' % tag)
+                    found = self._sonarr_request("tag", method="post", data={"label": tag})["id"]
+                    self._tags[tag] = found
+                tags_ids.append(found)
         return tags_ids
 
     def list_entries(self, filters=True):
