@@ -116,7 +116,7 @@ class SonarrSet(MutableSet):
                 tag = entry.render(tag).lower()
                 found = self._tags.get(tag)
                 if not found:
-                    logger.verbose('Adding missing tag %s to Sonarr' % tag)
+                    logger.verbose('Adding missing tag {} to Sonarr', tag)
                     found = self._sonarr_request("tag", method="post", data={"label": tag})["id"]
                     self._tags[tag] = found
                 tags_ids.append(found)

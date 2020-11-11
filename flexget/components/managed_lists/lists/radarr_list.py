@@ -349,7 +349,7 @@ class RadarrSet(MutableSet):
                 tag = entry.render(tag).lower()
                 found = self._tags.get(tag)
                 if not found:
-                    logger.verbose('Adding missing tag %s to Radarr' % tag)
+                    logger.verbose('Adding missing tag {} to Radarr', tag)
                     found = self.service.add_tag(tag)["id"]
                     self._tags[tag] = found
                 tags_ids.append(found)
@@ -448,7 +448,7 @@ class RadarrSet(MutableSet):
                 tag = tag.lower()
                 found = existing.get(tag)
                 if not found:
-                    logger.verbose('Adding missing tag %s to Radarr' % tag)
+                    logger.verbose('Adding missing tag {}} to Radarr', tag)
                     found = self.service.add_tag(tag)["id"]
                 tags_ids.append(found)
             self._tags = tags_ids
