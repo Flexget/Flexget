@@ -136,6 +136,19 @@ class RadarrAPIService:
         headers = self._default_headers()
         return request_get_json(request_url, headers)
 
+    def get_tags(self):
+        """ Gets all tags """
+        request_url = self.api_url + "tag"
+        headers = self._default_headers()
+        return request_get_json(request_url, headers)
+
+    def add_tag(self, label):
+        """ Adds a tag """
+        request_url = self.api_url + "tag"
+        headers = self._default_headers()
+        data = {"label": label}
+        return request_post_json(request_url, headers, json.dumps(data))
+
     def get_movies(self):
         """ Gets all movies """
         request_url = self.api_url + "movie"
@@ -178,6 +191,7 @@ class RadarrAPIService:
     def add_movie(
         self,
         title,
+        year,
         quality_profile_id,
         title_slug,
         images,
@@ -185,19 +199,23 @@ class RadarrAPIService:
         root_folder_path,
         monitored=True,
         add_options=None,
+        tags=()
     ):
         """ Adds a movie """
         request_url = self.api_url + "movie"
         headers = self._default_headers()
         data = {
             "title": title,
+            "year": year,
             "qualityProfileId": quality_profile_id,
             "titleSlug": title_slug,
             "images": images,
             "tmdbId": tmdb_id,
             "rootFolderPath": root_folder_path,
             "monitored": monitored,
+            "tags": tags
         }
+
         if add_options:
             data["addOptions"] = add_options
 
@@ -298,6 +316,9 @@ class RadarrSet(MutableSet):
         self.config = config
         self.service = RadarrAPIService(config["api_key"], config["base_url"], config["port"])
 
+        # cache tags
+        self._tags = None
+
         # Class member used for caching the items to avoid
         # unnecessary calls to the Radarr API.
         # We use the self.items property to access it.
@@ -309,6 +330,30 @@ class RadarrSet(MutableSet):
 
     def __len__(self):
         return len(self.items)
+
+    def get_tag_ids(self, entry):
+        tags_ids = []
+
+        if not self._tags:
+            self._tags = {t["label"].lower(): t["id"] for t in self.service.get_tags()}
+
+        for tag in self.config.get("tags", []):
+            if isinstance(tag, int):
+                # Handle tags by id
+                if tag not in self._tags.values():
+                    logger.error('Unable to add tag with id {} to entry {} as the tag does not exist in radarr', entry, tag)
+                    continue
+                tags_ids.append(tag)
+            else:
+                # Handle tags by name
+                tag = entry.render(tag).lower()
+                found = self._tags.get(tag)
+                if not found:
+                    logger.verbose('Adding missing tag {} to Radarr', tag)
+                    found = self.service.add_tag(tag)["id"]
+                    self._tags[tag] = found
+                tags_ids.append(found)
+        return tags_ids
 
     def discard(self, entry):
         if not entry:
@@ -347,18 +392,17 @@ class RadarrSet(MutableSet):
             root_folders = self.service.get_root_folders()
             root_folder_path = root_folders[0]["path"]
 
-            # TODO: should we let the user affect this one,
-            # or try to parse the 'quality' entry somehow?
-            quality_profile_id = 1
-
             try:
                 self.service.add_movie(
                     result["title"],
-                    quality_profile_id,
+                    result["year"],
+                    self.config.get("profile_id"),
                     result["titleSlug"],
                     result["images"],
                     result["tmdbId"],
                     root_folder_path,
+                    monitored=self.config.get('monitored', False),
+                    tags=self.get_tag_ids(entry)
                 )
                 logger.verbose('Added movie {} to Radarr list', result['title'])
             except RadarrMovieAlreadyExistsError:
@@ -366,12 +410,13 @@ class RadarrSet(MutableSet):
                     'Could not add movie {} because it already exists on Radarr', result['title']
                 )
             except RadarrRequestError as ex:
-                logger.error('The movie add command raised exception: {}', ex)
+                msg = 'The movie add command raised exception: %s' % ex
+                logger.error(msg)
+                entry.fail(msg)
         else:
-            logger.verbose(
-                'The lookup for entry {} did not return any results.Can not add the movie in Radarr.',
-                entry,
-            )
+            msg = 'The lookup for entry %s did not return any results.Can not add the movie in Radarr.' % entry
+            logger.verbose(msg)
+            entry.fail(msg)
 
     def _from_iterable(self, it):
         # The following implementation is what's done in every other
@@ -392,6 +437,22 @@ class RadarrSet(MutableSet):
         if self._movie_entries is None:
             self._movie_entries = self._get_movie_entries()
         return self._movie_entries
+
+    @property
+    def tags(self):
+        """ Property that returns tag by id """
+        tags_ids = []
+        if self._tags is None:
+            existing = {t["label"].lower(): t["id"] for t in self.service.get_tags()}
+            for tag in self.config_tags:
+                tag = tag.lower()
+                found = existing.get(tag)
+                if not found:
+                    logger.verbose('Adding missing tag {}} to Radarr', tag)
+                    found = self.service.add_tag(tag)["id"]
+                tags_ids.append(found)
+            self._tags = tags_ids
+        return self._tags
 
     @property
     def immutable(self):
@@ -533,7 +594,7 @@ class RadarrSet(MutableSet):
                         "Radarr lookup for '{}' returned {:d} results. Using the first result '{}'.",
                         title,
                         len(results),
-                        results[0]['title'],
+                        results[ 0]['title'],
                     )
                     return results[0]
             except RadarrRequestError as ex:
@@ -552,6 +613,9 @@ class RadarrList:
             "only_monitored": {"type": "boolean", "default": True},
             "include_data": {"type": "boolean", "default": False},
             "only_use_cutoff_quality": {"type": "boolean", "default": False},
+            "monitored": {"type": "boolean", "default": True},
+            "profile_id": {"type": "integer", "default": 1},
+            "tags": {"type": "array", "items": {'type': ['integer', 'string']}},
         },
         "required": ["api_key", "base_url"],
         "additionalProperties": False,
