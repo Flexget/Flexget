@@ -338,13 +338,21 @@ class RadarrSet(MutableSet):
             self._tags = {t["label"].lower(): t["id"] for t in self.service.get_tags()}
 
         for tag in self.config.get("tags", []):
-            tag = entry.render(tag).lower()
-            found = self._tags.get(tag)
-            if not found:
-                logger.verbose('Adding missing tag %s to Radarr' % tag)
-                found = self.service.add_tag(tag)["id"]
-                self._tags[tag] = found
-            tags_ids.append(found)
+            if isinstance(tag, int):
+                # Handle tags by id
+                if tag not in self._tags.values():
+                    logger.error('Unable to add tag with id {} to entry {} as the tag does not exist in radarr', entry, tag)
+                    continue
+                tags_ids.append(tag)
+            else:
+                # Handle tags by name
+                tag = entry.render(tag).lower()
+                found = self._tags.get(tag)
+                if not found:
+                    logger.verbose('Adding missing tag %s to Radarr' % tag)
+                    found = self.service.add_tag(tag)["id"]
+                    self._tags[tag] = found
+                tags_ids.append(found)
         return tags_ids
 
     def discard(self, entry):
@@ -433,10 +441,6 @@ class RadarrSet(MutableSet):
     @property
     def tags(self):
         """ Property that returns tag by id """
-        if not self.config_tags:
-            self._tags = []
-            return self._tags
-
         tags_ids = []
         if self._tags is None:
             existing = {t["label"].lower(): t["id"] for t in self.service.get_tags()}
@@ -590,7 +594,7 @@ class RadarrSet(MutableSet):
                         "Radarr lookup for '{}' returned {:d} results. Using the first result '{}'.",
                         title,
                         len(results),
-                        results[0]['title'],
+                        results[ 0]['title'],
                     )
                     return results[0]
             except RadarrRequestError as ex:
@@ -611,7 +615,7 @@ class RadarrList:
             "only_use_cutoff_quality": {"type": "boolean", "default": False},
             "monitored": {"type": "boolean", "default": True},
             "profile_id": {"type": "integer", "default": 1},
-            "tags": {"type": "array", "items": {'type': 'string'}},
+            "tags": {"type": "array", "items": {'type': ['integer', 'string']}},
         },
         "required": ["api_key", "base_url"],
         "additionalProperties": False,
