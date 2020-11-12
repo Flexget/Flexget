@@ -15,7 +15,7 @@ cherrypy==18.4.0          # via -r requirements.in
 click==6.7                # via flask
 colorama==0.4.4           # via loguru
 colorclass==2.2.0         # via -r requirements.in
-feedparser==6.0.1         # via -r requirements.in
+feedparser==6.0.2         # via -r requirements.in
 flask-compress==1.4.0     # via -r requirements.in
 flask-cors==3.0.2         # via -r requirements.in
 flask-login==0.4.0        # via -r requirements.in
