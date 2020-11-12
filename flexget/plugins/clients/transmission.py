@@ -238,7 +238,7 @@ class PluginTransmissionInput(TransmissionBase):
             bytes_completed = sum(map(lambda x: x['bytesCompleted'] if x['wanted'] else 0, t.fileStats))
             entry['transmission_bytes_completed'] = bytes_completed
             # Availability in percent
-            entry['transmission_availability'] = ((bytes_completed + t.desiredAvailable) / t.sizeWhenDone) if t.sizeWhenDone else 0
+            entry['transmission_availability'] = round((bytes_completed + t.desiredAvailable) / t.sizeWhenDone, 4) if t.sizeWhenDone else 0
             
             entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
             entry['transmission_seed_ratio_ok'] = seed_ratio_ok
