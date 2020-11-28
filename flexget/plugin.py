@@ -342,9 +342,7 @@ class PluginInfo(dict):
                     handler_prio = method.priority
                 else:
                     handler_prio = PRIORITY_DEFAULT
-                event = add_phase_handler(
-                    'plugin.%s.%s' % (self.name, phase), method, handler_prio
-                )
+                event = add_phase_handler(f'plugin.{self.name}.{phase}', method, handler_prio)
                 # provides backwards compatibility
                 event.plugin = self
                 self.phase_handlers[phase] = event
