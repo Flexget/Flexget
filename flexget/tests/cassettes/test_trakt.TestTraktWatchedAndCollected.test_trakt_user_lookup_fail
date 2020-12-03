@@ -14,12 +14,10 @@ interactions:
     body:
       string: '[]'
     headers:
-      Age:
-      - '5127'
       CF-Cache-Status:
-      - HIT
+      - MISS
       CF-RAY:
-      - 564872248818f0fa-IAD
+      - 5fbe77da1e22e0fe-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -27,22 +25,26 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 13 Feb 2020 17:15:42 GMT
+      - Thu, 03 Dec 2020 15:54:46 GMT
       ETag:
-      - W/"a27c8e2e8df78250ce604e71d2a72e65"
+      - W/"9f9809bdcbe1636002f24924ea67a94a"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 13 Feb 2020 23:50:19 GMT
+      - Thu, 03 Dec 2020 23:54:45 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d04737870e12f6cb839c0bbf5a10f99971581614142; expires=Sat, 14-Mar-20
-        17:15:42 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=db55ae3ab678f394936a61b9de3d7f5fb1607010886; expires=Sat, 02-Jan-21
+        15:54:46 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
       - nosniff
+      X-Download-Options:
+      - noopen
       X-Frame-Options:
       - SAMEORIGIN
       X-Pagination-Item-Count:
@@ -53,12 +55,18 @@ interactions:
       - '1'
       X-Pagination-Page-Count:
       - '0'
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":967,"until":"2020-12-03T15:55:00Z"}'
       X-Request-Id:
-      - c1edd69a-5eee-4d92-9503-e43b1d07b480
+      - fcdd7295-f0b0-4e59-bd98-04c0c70dbf84
       X-Runtime:
-      - '0.007550'
+      - '0.007647'
       X-XSS-Protection:
       - 1; mode=block
+      cf-request-id:
+      - 06cae93c520000e0fe0f096000000001
     status:
       code: 200
       message: OK

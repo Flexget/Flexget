@@ -48,10 +48,10 @@ class TestTraktShowLookup:
               - naruto
           test_search_result:
             mock:
-              - {title: 'Shameless.2011.S01E02.HDTV.XViD-FlexGet'}
-              - {title: 'Shameless.2011.S03E02.HDTV.XViD-FlexGet'}
+              - {title: 'Shameless.2010.S01E02.HDTV.XViD-FlexGet'}
+              - {title: 'Shameless.2010.S03E02.HDTV.XViD-FlexGet'}
             series:
-              - Shameless (2011)
+              - Shameless (2010)
           test_search_success:
             mock:
               - {title: '11-22-63.S01E01.HDTV.XViD-FlexGet'}
@@ -128,7 +128,7 @@ class TestTraktShowLookup:
                 len(session.query(TraktShow).all()) == 1
             ), 'should only have added one show to show table'
             assert session.query(TraktShow).first().title == 'Shameless', (
-                'should have added Shameless and' 'not Shameless (2011)'
+                'should have added Shameless and' 'not Shameless (2010)'
             )
             # change the search query
             session.query(TraktShowSearchResult).update(
@@ -481,9 +481,10 @@ class TestTraktMovieLookup:
             'Belinda McClory',
             'Anthony Ray Parker',
             'Paul Goddard',
+            'Rana Morrison',
             'Robert Taylor',
             'David Aston',
-            'Marc Aden',
+            'Marc Aden Gray',
             'Ada Nicodemou',
             'Deni Gordon',
             'Rowan Witt',

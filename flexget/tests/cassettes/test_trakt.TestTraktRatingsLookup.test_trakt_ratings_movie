@@ -2,106 +2,237 @@ interactions:
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
-    uri: https://api.trakt.tv/search?year=2016&type=movie&query=Doctor+Strange
+    uri: https://api.trakt.tv/search?query=Doctor+Strange&type=movie&year=2016
   response:
-    body: {string: '[{"type":"movie","score":83.59071,"movie":{"title":"Doctor Strange","overview":"After
-        his career is destroyed, a brilliant but arrogant surgeon gets a new lease
-        on life when a sorcerer takes him under his wing and trains him to defend
-        the world against evil.","year":2016,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":181311,"slug":"doctor-strange-2016","imdb":"tt1211837","tmdb":284052}}},{"type":"movie","score":0.5110413,"movie":{"title":"My
-        Future Love","overview":"In 1973, the 20-year-old Svante has a heart condition
+    body:
+      string: "[{\"type\":\"movie\",\"score\":84.18182,\"movie\":{\"title\":\"Doctor
+        Strange\",\"overview\":\"After his career is destroyed, a brilliant but arrogant
+        surgeon gets a new lease on life when a sorcerer takes him under her wing
+        and trains him to defend the world against evil.\",\"year\":2016,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":181311,\"slug\":\"doctor-strange-2016\",\"imdb\":\"tt1211837\",\"tmdb\":284052}}},{\"type\":\"movie\",\"score\":0.6101355,\"movie\":{\"title\":\"Nekro\",\"overview\":\"\u0130hsan
+        is a maintenance worker at a hospital. He seems to be a colourless, introverted,
+        dull guy, who never raises his voice to anyone. As anger mounts inside him,
+        he maintains his silent, awkward, weak appearance. Life goes by, boring and
+        monotonous. Ihsan carries test tubes and x-rays to doctors, counts needles,
+        finishes work and leaves the hospital to go home. He buys food, ignores the
+        local guys who taunt him, obediently listens to his landlady who lives in
+        the same building and who always has something to say, and eats a TV dinner
+        thus completing another day. However, just as everyone, he has his dirty little
+        secrets as well. The doctor is cheating on his wife, the nurse is doing drugs
+        and Ihsan is involved in unusual activities at the morgue. This is a strange
+        film about strange people doing strange things. 18 - Contains sexually explicit
+        scenes that may be inappropriate for younger viewers.\",\"year\":2016,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":567737,\"slug\":\"nekro-2016\",\"imdb\":\"tt5389854\",\"tmdb\":725326}}},{\"type\":\"movie\",\"score\":0.5423912,\"movie\":{\"title\":\"My
+        Future Love\",\"overview\":\"In 1973, the 20-year-old Svante has a heart condition
         that the doctors cannot fix. When he has a breakdown on a subway platform,
         a strange train suddenly appears. He steps into the subway car filled with
         wonder, without knowing that the destination is the future. In the future
-        he meets Elsa and together they must solve Svante''s problems and figure out
-        how to live together when they are from two different eras.","year":2016,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":280281,"slug":"my-future-love-2016","imdb":"tt5194446","tmdb":425553}}}]'}
+        he meets Elsa and together they must solve Svante's problems and figure out
+        how to live together when they are from two different eras.\",\"year\":2016,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":280281,\"slug\":\"my-future-love-2016\",\"imdb\":\"tt5194446\",\"tmdb\":425553}}},{\"type\":\"movie\",\"score\":0.4649067,\"movie\":{\"title\":\"Ranmaru:
+        The Man with the God Tongue\",\"overview\":\"Ranmaru is a shy, dorky guy with
+        a tongue that can analyze any element simply by licking an object, a skill
+        that allows him to solve all manner of crimes. With his cute, but annoying
+        sidekick Hikaru, plus the steadying hand of friend Kanji, Ranmaru solves a
+        series of strange events at a failing hot spring resort deep in the mountains.
+        Ranmaru falls in love with a doctor who saves his life. The loveable, endearing
+        Ranmaru and his band of quirky pals team up to solve a nasty murder mystery
+        that devastates the village.\",\"year\":2016,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":330862,\"slug\":\"ranmaru-the-man-with-the-god-tongue-2016\",\"imdb\":\"tt6299262\",\"tmdb\":455660}}}]"
     headers:
-      CF-Cache-Status: [MISS]
-      CF-RAY: [3549f1dacb4e3d3d-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Mon, 24 Apr 2017 15:02:38 GMT']
-      ETag: [W/"e027d2010454cfe5b2b61efa3e9cfe25"]
-      Expires: ['Mon, 24 Apr 2017 23:02:38 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=de5f6ff62c6de4e4c8de145ad4b0d7f161493046158; expires=Tue,
-          24-Apr-18 15:02:38 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Pagination-Item-Count: ['2']
-      X-Pagination-Limit: ['10']
-      X-Pagination-Page: ['1']
-      X-Pagination-Page-Count: ['1']
-      X-Request-Id: [be56536f-e846-4391-b182-283b548e2586]
-      X-Runtime: ['0.128512']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - EXPIRED
+      CF-RAY:
+      - 5fbe78016dfae0c6-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 03 Dec 2020 15:54:53 GMT
+      ETag:
+      - W/"4c531486062366381bf910ae886851d6"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Thu, 03 Dec 2020 23:54:54 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d56c7d6ed78bddb07473a592919e177dd1607010893; expires=Sat, 02-Jan-21
+        15:54:53 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '4'
+      X-Pagination-Limit:
+      - '10'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '1'
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":956,"until":"2020-12-03T15:55:00Z"}'
+      X-Request-Id:
+      - 550c038b-854d-4cf4-a029-82a67d690607
+      X-Runtime:
+      - '0.025863'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 06cae954e00000e0c6d7278000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      Cookie: [__cfduid=de5f6ff62c6de4e4c8de145ad4b0d7f161493046158]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/movies/181311?extended=full
   response:
-    body: {string: '{"title":"Doctor Strange","year":2016,"ids":{"trakt":181311,"slug":"doctor-strange-2016","imdb":"tt1211837","tmdb":284052},"tagline":"Open
+    body:
+      string: '{"title":"Doctor Strange","year":2016,"ids":{"trakt":181311,"slug":"doctor-strange-2016","imdb":"tt1211837","tmdb":284052},"tagline":"Open
         your mind. Change your reality.","overview":"After his career is destroyed,
         a brilliant but arrogant surgeon gets a new lease on life when a sorcerer
-        takes him under his wing and trains him to defend the world against evil.","released":"2016-11-04","runtime":115,"trailer":null,"homepage":"http://marvel.com/doctorstrange","rating":7.85966,"votes":25808,"updated_at":"2017-04-22T09:11:09.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fi","fr","he","hr","hu","id","it","ja","ka","ko","lt","nl","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","vi","zh"],"genres":["action","adventure","science-fiction","fantasy"],"certification":"PG-13"}'}
+        takes him under her wing and trains him to defend the world against evil.","released":"2016-11-04","runtime":115,"country":"us","trailer":"http://youtube.com/watch?v=HSzx-zryEgM","homepage":"http://marvel.com/doctorstrange","status":"released","rating":7.85482,"votes":58136,"comment_count":123,"updated_at":"2020-12-02T08:09:16.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hr","hu","id","it","ja","ka","ko","lt","lv","nl","no","pl","pt","ro","ru","sk","sl","sr","sv","th","tr","uk","uz","vi","zh"],"genres":["action","adventure","science-fiction","fantasy","superhero"],"certification":"PG-13"}'
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [3549f1dc9be33d3d-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Mon, 24 Apr 2017 15:02:38 GMT']
-      ETag: [W/"eefc9890c7c8513e617bcbc4bd6efe5e"]
-      Expires: ['Mon, 24 Apr 2017 23:02:38 GMT']
-      Last-Modified: ['Sat, 22 Apr 2017 09:11:09 GMT']
-      Server: [cloudflare-nginx]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [a3b97d4b-845f-4b24-b17b-e4d1a1c35024]
-      X-Runtime: ['0.013714']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      Age:
+      - '19367'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 5fbe78024a9e27b1-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 03 Dec 2020 15:54:53 GMT
+      ETag:
+      - W/"4d8717e179103ba6b213a12f1fd56388"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Thu, 03 Dec 2020 18:32:07 GMT
+      Last-Modified:
+      - Wed, 02 Dec 2020 08:09:16 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=db6141fcb4eb618bd237a2f62da111a5a1607010893; expires=Sat, 02-Jan-21
+        15:54:53 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"AUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":929,"until":"2020-12-02T17:55:00Z"}'
+      X-Request-Id:
+      - 4967683d-cc49-4e09-9547-166b85faae9a
+      X-Runtime:
+      - '0.009318'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 06cae95570000027b1bc13d000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/users/flexgettest/ratings/movies
   response:
-    body: {string: '[{"rated_at":"2017-04-23T19:37:42.000Z","rating":9,"type":"movie","movie":{"title":"Doctor
-        Strange","year":2016,"ids":{"trakt":181311,"slug":"doctor-strange-2016","imdb":"tt1211837","tmdb":284052}}}]'}
+    body:
+      string: '[{"rated_at":"2017-04-23T19:37:42.000Z","rating":9,"type":"movie","movie":{"title":"Doctor
+        Strange","year":2016,"ids":{"trakt":181311,"slug":"doctor-strange-2016","imdb":"tt1211837","tmdb":284052}}}]'
     headers:
-      CF-RAY: [3549f1dd8d983cc5-CPH]
-      Cache-Control: ['max-age=0, private, must-revalidate']
-      Cf-Railgun: [d7ac9e9b62 stream 0.000000 0200 e6be]
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Mon, 24 Apr 2017 15:02:39 GMT']
-      Etag: [W/"c6cd96bd892f46c28ba57ce8f1e4bfad"]
-      Last-Modified: ['Sun, 23 Apr 2017 19:37:42 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d7302d9ae904026440e49309f496d95231493046158; expires=Tue,
-          24-Apr-18 15:02:38 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Private-User: ['false']
-      X-Request-Id: [62ebd470-403f-41a9-adf4-a5f08cacc965]
-      X-Runtime: ['0.032675']
-      X-Xss-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 5fbe78039de69f3a-IAD
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Thu, 03 Dec 2020 15:54:53 GMT
+      ETag:
+      - W/"af6b83c0eae2b5a74e1db3223c36d0f9"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Last-Modified:
+      - Sun, 23 Apr 2017 19:37:42 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d9ec0d091bc3c0c68ee4986e0ac8fce461607010893; expires=Sat, 02-Jan-21
+        15:54:53 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Private-User:
+      - 'false'
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":955,"until":"2020-12-03T15:55:00Z"}'
+      X-Request-Id:
+      - fc93ef8e-31ec-44b1-b63b-dffd57d18207
+      X-Runtime:
+      - '0.023401'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 06cae9563d00009f3a6e3d9000000001
+    status:
+      code: 200
+      message: OK
 version: 1
