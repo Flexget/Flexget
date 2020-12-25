@@ -19,8 +19,9 @@ from flexget.utils.template import RenderError
 from flexget.utils.tools import parse_timedelta
 
 try:
-    import transmissionrpc
-    from transmissionrpc import HTTPHandlerError, TransmissionError
+    import transmission_rpc as transmissionrpc
+    from transmission_rpc import TransmissionError
+    import requests.exceptions
 except ImportError:
     # If transmissionrpc is not found, errors will be shown later
     pass
@@ -56,25 +57,26 @@ class TransmissionBase:
         user, password = config.get('username'), config.get('password')
 
         try:
-            cli = transmissionrpc.Client(config['host'], config['port'], user, password)
+            cli = transmissionrpc.Client(host = config['host'],
+                                         port = config['port'],
+                                         username=user,
+                                         password=password)
         except TransmissionError as e:
-            if isinstance(e.original, HTTPHandlerError):
-                if e.original.code == 111:
-                    raise plugin.PluginError("Cannot connect to transmission. Is it running?")
-                elif e.original.code == 401:
-                    raise plugin.PluginError(
-                        "Username/password for transmission is incorrect. Cannot connect."
-                    )
-                elif e.original.code == 110:
-                    raise plugin.PluginError(
-                        "Cannot connect to transmission: Connection timed out."
-                    )
-                else:
-                    raise plugin.PluginError(
-                        "Error connecting to transmission: %s" % e.original.message
-                    )
+            if e.original and e.original.code == 401:
+                raise plugin.PluginError(
+                    "Username/password for transmission is incorrect. Cannot connect."
+                )
             else:
                 raise plugin.PluginError("Error connecting to transmission: %s" % e.message)
+        except requests.exceptions.ConnectTimeout as e:
+            raise plugin.PluginError(
+                "Cannot connect to transmission: Connection timed out."
+                    )
+        except requests.exceptions.ConnectionError as e:
+            raise plugin.PluginError(
+                "Error connecting to transmission: %s" %
+                e.args[0].reason
+            )
         return cli
 
     def torrent_info(self, torrent, config):
@@ -123,16 +125,11 @@ class TransmissionBase:
 
     def on_task_start(self, task, config):
         try:
-            import transmissionrpc
-            from transmissionrpc import HTTPHandlerError  # noqa
-            from transmissionrpc import TransmissionError  # noqa
+            import transmission_rpc as transmissionrpc
+            from transmission_rpc import TransmissionError  # noqa
         except:
             raise plugin.PluginError(
-                'Transmissionrpc module version 0.11 or higher required.', logger
-            )
-        if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 11]:
-            raise plugin.PluginError(
-                'Transmissionrpc module version 0.11 or higher required, please upgrade', logger
+                'transmission-rpc module version 0.11 or higher required.', logger
             )
 
         # Mark rpc client for garbage collector so every task can start
