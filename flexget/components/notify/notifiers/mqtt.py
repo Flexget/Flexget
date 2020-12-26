@@ -133,8 +133,8 @@ class MQTTNotifier:
 
         #Handle SSL/TLS communication with certificate authentication
         if config.get('certificates',False):
-            certs = config.get('certificates',{})
-            logger.debug('TLS certificate config: {}',str(certs))
+            certs = config['certificates']
+            logger.debug('TLS certificate config: {}',certs)
 
             tls_version_map = {'tlsv1.2': ssl.PROTOCOL_TLSv1_2, 'tlsv1.1': ssl.PROTOCOL_TLSv1_1, 'tlsv1': ssl.PROTOCOL_TLSv1, '': None}
             tls_version = tls_version_map.get(certs.get('tls_version'),ssl.PROTOCOL_TLSv1_2)
