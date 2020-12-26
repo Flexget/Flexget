@@ -164,18 +164,18 @@ class MQTTNotifier:
             client.username_pw_set=(config.get('username'),config.get('password'))
 
         try:
-            logger.verbose("Connecting to {}:{}",config.get('broker_address'),str(config.get('broker_port')))
+            logger.verbose("Connecting to {}:{}",config.get('broker_address'),config.get('broker_port'))
             client.connect(config.get('broker_address'), config.get('broker_port'), config.get('broker_timeout'))
             logger.verbose("Connected to MQTT broker")
         except Exception as e:
-            raise PluginWarning('Error connecting to MQTT broker:  %s' % e)
+            raise PluginWarning(f'Error connecting to MQTT broker: {e}')
 
         try:
             logger.verbose('Publishing message [{}] to topic [{}] ',config.get('payload'),config.get('topic'))
             publish_info = client.publish(config.get('topic'), config.get('payload'), qos=config.get('qos'), retain=config.get('retain'))
             logger.verbose("Notification sent to broker, waiting for callback response to confirm publishing success - rc={}",publish_info)
         except Exception as e:
-            raise PluginWarning('Error publishing to MQTT broker:  %s' % e)
+            raise PluginWarning(f'Error publishing to MQTT broker: {e}')
             
         client.loop(timeout=config.get('broker_timeout'))
         client.loop_start()  
