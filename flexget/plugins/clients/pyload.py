@@ -193,7 +193,7 @@ class PluginPyLoad:
 
             parsed = result.json()
 
-            urls = []
+            urls = entry.get('urls', [])
 
             # check for preferred hoster
             for name in hoster:
