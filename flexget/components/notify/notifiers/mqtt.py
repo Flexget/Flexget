@@ -105,12 +105,16 @@ class MQTTNotifier:
                             4: 	'Connection Refused, bad user name or password - The data in the user name or password is malformed',
                             5: 	'Connection Refused, not authorized - The Client is not authorized to connect' }
 
-        MQTT_proto_map = { 'MQTTv31' : mqtt.MQTTv311,
-                           'MQTTv311': 	mqtt.MQTTv31 }
+        #Handle the MQTT broker protocol to be used
+        if config.get('broker_protocol') == 'MQTTv311':
+            config['broker_protocol_class'] = mqtt.MQTTv311
+        else:
+            config['broker_protocol_class'] = mqtt.MQTTv31
 
         logger.trace('MQTT notify config={}', config)
 
-        client = mqtt.Client(protocol=MQTT_proto_map.get(config.get('broker_protocol',mqtt.MQTTv311)), transport=config.get('broker_transport', 'tcp') )
+        #create the mqtt client
+        client = mqtt.Client(protocol=config['broker_protocol_class'], transport=config['broker_transport'])
 
         client.enable_logger(logger=logger)
 
