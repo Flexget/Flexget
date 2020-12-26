@@ -80,18 +80,18 @@ class MQTTNotifier:
         except ImportError as e:
             logger.verbose('Error importing paho.mqtt.client: {}', e)
             raise DependencyError(
-                plugin_name, 'paho.mqtt.client', 'paho-mqtt python module is required for MQTT notify plugin. ImportError: %s' % e
+                plugin_name, 'paho.mqtt.client', f'paho-mqtt python module is required for MQTT notify plugin. ImportError: {e}'
             )
 
         def on_log_cb(client, userdata, level, buff):
             logger.verbose(str(buff))
 
         def on_publish_cb(client, userdata, mid):
-            logger.verbose('MQTT on_publish callback -  message was successfully published to broker as messageID={}',str(mid))
+            logger.verbose('MQTT on_publish callback -  message was successfully published to broker as messageID={}',mid)
             client.disconnect()
 
         def on_disconnect_cb(client, userdata, rc):
-            logger.verbose('MQTT on_disconnect callback - disconnected with result code {} [{}]',str(rc),conn_rc_description_map.get(rc),'Unknown')
+            logger.verbose('MQTT on_disconnect callback - disconnected with result code {} [{}]',rc,conn_rc_description_map.get(rc),'Unknown')
             client.loop_stop()
             
         config['title'] = title
@@ -108,7 +108,7 @@ class MQTTNotifier:
         MQTT_proto_map = { 'MQTTv31' : mqtt.MQTTv311,
                            'MQTTv311': 	mqtt.MQTTv31 }
 
-        logger.trace('MQTT notify config={}',str(config))
+        logger.trace('MQTT notify config={}', config)
 
         client = mqtt.Client(protocol=MQTT_proto_map.get(config.get('broker_protocol',mqtt.MQTTv311)), transport=config.get('broker_transport', 'tcp') )
 
@@ -138,7 +138,7 @@ class MQTTNotifier:
 
             tls_version_map = {'tlsv1.2': ssl.PROTOCOL_TLSv1_2, 'tlsv1.1': ssl.PROTOCOL_TLSv1_1, 'tlsv1': ssl.PROTOCOL_TLSv1, '': None}
             tls_version = tls_version_map.get(certs.get('tls_version'),ssl.PROTOCOL_TLSv1_2)
-            logger.verbose('TLS version is {}',str(tls_version))
+            logger.verbose('TLS version is {}',tls_version)
 
             cert_required = ssl.CERT_REQUIRED if certs.get('validate_broker_cert', True) else ssl.CERT_NONE
 
