@@ -6,7 +6,6 @@ from hashlib import sha256
 import ssl
 
 from flexget import plugin
-#from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import DependencyError, PluginWarning
 
