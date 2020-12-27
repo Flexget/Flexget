@@ -96,7 +96,7 @@ class MQTTNotifier:
             
         config['title'] = title
         config['message'] = message
-        config['payload'] = '{} - {}'.format(config.get('title'),config.get('message'))
+        config['payload'] = f"{config['title']} - {config['message']}"
 
         conn_rc_description_map = { 0: 	'Connection Accepted',
                             1: 	'Connection Refused, unacceptable protocol version - The Server does not support the level of the MQTT protocol requested by the Client',
