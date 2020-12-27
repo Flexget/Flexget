@@ -29,6 +29,11 @@ class NextSeriesEpisodes:
                     'from_start': {'type': 'boolean', 'default': False},
                     'backfill': {'type': 'boolean', 'default': False},
                     'only_same_season': {'type': 'boolean', 'default': False},
+                    'downloaded': {
+                        'type': ['boolean', 'string'],
+                        'enum': [True, False, 'only'],
+                        'default': False,
+                    },
                 },
                 'additionalProperties': False,
             },
@@ -185,20 +190,28 @@ class NextSeriesEpisodes:
                             desc(db.Episode.number)
                         ).first()
                         if latest_ep_this_season:
-                            downloaded_this_season = (
-                                episodes_this_season.join(db.Episode.releases)
-                                .filter(db.EpisodeRelease.downloaded == True)
-                                .all()
-                            )
                             # Calculate the episodes we still need to get from this season
                             if series.begin and series.begin.season == season:
                                 start_at_ep = max(start_at_ep, series.begin.number)
                             eps_to_get = list(range(start_at_ep, latest_ep_this_season.number + 1))
-                            for ep in downloaded_this_season:
-                                try:
-                                    eps_to_get.remove(ep.number)
-                                except ValueError:
-                                    pass
+                            if (
+                                not self.config.get('downloaded')
+                                or self.config.get('downloaded') == 'only'
+                            ):
+                                downloaded_this_season = (
+                                    episodes_this_season.join(db.Episode.releases)
+                                    .filter(db.EpisodeRelease.downloaded == True)
+                                    .all()
+                                )
+
+                                if self.config.get('downloaded') == 'only':
+                                    eps_to_get = [ep.number for ep in downloaded_this_season]
+                                else:
+                                    for ep in downloaded_this_season:
+                                        try:
+                                            eps_to_get.remove(ep.number)
+                                        except ValueError:
+                                            pass
                             entries.extend(
                                 self.search_entry(series, season, x, task, rerun=False)
                                 for x in eps_to_get
