@@ -122,7 +122,7 @@ class MQTTNotifier:
         client.on_disconnect = on_disconnect_cb
 
         #Handle SSL/TLS communication w/out certificate authentication
-        if not config.get('certificates',{}).get('client_cert',False) and config.get('enable_encrypted_communication',False):
+        if not config.get('certificates',{}).get('client_cert') and config.get('enable_encrypted_communication'):
             client.tls_set(ca_certs=certs.get('broker_ca_cert'),
                           certfile=None,
                           keyfile=None,
@@ -135,7 +135,7 @@ class MQTTNotifier:
 
 
         #Handle SSL/TLS communication with certificate authentication
-        if config.get('certificates',False):
+        if config.get('certificates'):
             certs = config['certificates']
             logger.debug('TLS certificate config: {}',certs)
 
@@ -158,7 +158,7 @@ class MQTTNotifier:
                 logger.debug('TLS secure cert mode enabled. Broker cert will be validated')
 
         #Handle user/pass authentication
-        if config.get('username',False) or config.get('password',False):
+        if config.get('username') or config.get('password'):
             logger.debug('Credential passwords s are redacted to protect the innocent...')
             logger.debug('Auth credentials: username=[{}] password sha256 hash is "{}"',config.get('username'),sha256(str(config.get('password')).encode('utf-8')).hexdigest())
             logger.debug('You can validate them yourself by calculating the sha256 hex digest of your password string (google is your friend if you do not know how to do this)')
