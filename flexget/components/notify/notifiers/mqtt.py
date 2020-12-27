@@ -28,7 +28,7 @@ class MQTTNotifier:
                 [broker_protocol: ['MQTTv31', 'MQTTv311'] ]
                 [username: yourUsernameHere]
                 [password: yourPasswordHere]
-                [enable_encrypted_communication: True/False]
+                [encrypted_communication: True/False]
                 [certificates:
                     broker_ca_cert: /path/to/pem/encoded/broker_ca_certificate.crt
                     client_cert: /path/to/pem/encoded/client_certificate.crt
@@ -59,7 +59,7 @@ class MQTTNotifier:
             },
             'username': {'type': 'string'},
             'password': {'type': 'string'},
-            'enable_encrypted_communication': {'type': 'boolean', 'default': False},
+            'encrypted_communication': {'type': 'boolean', 'default': False},
             'certificates': {
                 'type': 'object',
                 'properties': {
@@ -147,7 +147,7 @@ class MQTTNotifier:
 
         # Handle SSL/TLS communication w/out certificate authentication
         if not config.get('certificates', {}).get('client_cert') and config.get(
-            'enable_encrypted_communication'
+            'encrypted_communication'
         ):
             client.tls_set(
                 ca_certs=certs.get('broker_ca_cert'),
