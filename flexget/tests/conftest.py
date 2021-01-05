@@ -305,6 +305,14 @@ def chdir(pytestconfig, request):
         os.chdir(os.path.dirname(request.module.__file__))
 
 
+@pytest.fixture(autouse=True)
+def clear_caches():
+    """Make sure cached_input, and other caches are cleared between tests."""
+    from flexget.utils.tools import TimedDict
+
+    TimedDict.clear_all()
+
+
 class CrashReport(Exception):
     def __init__(self, message: str, crash_log: str):
         self.message = message

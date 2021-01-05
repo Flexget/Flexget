@@ -17,7 +17,7 @@ interactions:
       CF-Cache-Status:
       - MISS
       CF-RAY:
-      - 5fbe77da1e22e0fe-IAD
+      - 60caac50ad08574b-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -25,20 +25,20 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:46 GMT
+      - Tue, 05 Jan 2021 05:07:00 GMT
       ETag:
-      - W/"9f9809bdcbe1636002f24924ea67a94a"
+      - W/"fa2cac37076dfa294787f69b80437d63"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 23:54:45 GMT
+      - Tue, 05 Jan 2021 13:06:57 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=db55ae3ab678f394936a61b9de3d7f5fb1607010886; expires=Sat, 02-Jan-21
-        15:54:46 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=dd2f7217e5a0158b0b9618a51c535b4331609823219; expires=Thu, 04-Feb-21
+        05:06:59 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -58,15 +58,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":967,"until":"2020-12-03T15:55:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":960,"until":"2021-01-05T05:10:00Z"}'
       X-Request-Id:
-      - fcdd7295-f0b0-4e59-bd98-04c0c70dbf84
+      - d341253e-933e-454a-8161-b17cac41ddf9
       X-Runtime:
-      - '0.007647'
+      - '1.042776'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae93c520000e0fe0f096000000001
+      - 07728a06650000574b9a26a000000001
     status:
       code: 200
       message: OK

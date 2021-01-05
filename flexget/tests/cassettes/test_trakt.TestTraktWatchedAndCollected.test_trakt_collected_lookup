@@ -12,9 +12,9 @@ interactions:
     uri: https://api.trakt.tv/search?query=Homeland&type=show&year=2011
   response:
     body:
-      string: "[{\"type\":\"show\",\"score\":104.77865,\"show\":{\"title\":\"Homeland\",\"overview\":\"A
+      string: "[{\"type\":\"show\",\"score\":103.00026,\"show\":{\"title\":\"Homeland\",\"overview\":\"A
         bipolar CIA operative becomes convinced a prisoner of war has been turned
-        by al-Qaeda and is planning to carry out a terrorist attack on American soil.\",\"year\":2011,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1398,\"slug\":\"homeland\",\"tvdb\":247897,\"imdb\":\"tt1796960\",\"tmdb\":1407,\"tvrage\":27811}}},{\"type\":\"show\",\"score\":0.26166332,\"show\":{\"title\":\"Return
+        by al-Qaeda and is planning to carry out a terrorist attack on American soil.\",\"year\":2011,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1398,\"slug\":\"homeland\",\"tvdb\":247897,\"imdb\":\"tt1796960\",\"tmdb\":1407,\"tvrage\":27811}}},{\"type\":\"show\",\"score\":0.25720808,\"show\":{\"title\":\"Return
         to Tuscany\",\"overview\":\"Join Giancarlo Caldesi as he sets out to fulfil
         his dream - a cookery school in his Tuscan homeland. But there\u2019s a lot
         of hard work to do before he gets there\u2026After 30 years in the UK, successful
@@ -40,7 +40,7 @@ interactions:
       CF-Cache-Status:
       - MISS
       CF-RAY:
-      - 5fbe77acff949fb2-IAD
+      - 60caac21ad5229de-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -48,20 +48,20 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:39 GMT
+      - Tue, 05 Jan 2021 05:06:51 GMT
       ETag:
-      - W/"c3a193f703c0b6c91962120bb899c5a8"
+      - W/"5961a9abca25370c9e19435483f01969"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 23:54:39 GMT
+      - Tue, 05 Jan 2021 13:06:51 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d22f4f9cb78de05534edb83dc08f5363b1607010879; expires=Sat, 02-Jan-21
-        15:54:39 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=d5db413490cb804e510636ad40b04521e1609823211; expires=Thu, 04-Feb-21
+        05:06:51 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -81,15 +81,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":981,"until":"2020-12-03T15:55:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":975,"until":"2021-01-05T05:10:00Z"}'
       X-Request-Id:
-      - 4cb23fcc-e2ad-4ef0-b39b-5ec763589776
+      - 9d0f6d29-2bec-47b6-9fd1-24e42af18847
       X-Runtime:
-      - '0.017777'
+      - '0.015531'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae9201c00009fb2f8363000000001
+      - 077289e90b000029de42117000000001
     status:
       code: 200
       message: OK
@@ -108,14 +108,14 @@ interactions:
     body:
       string: '{"title":"Homeland","year":2011,"ids":{"trakt":1398,"slug":"homeland","tvdb":247897,"imdb":"tt1796960","tmdb":1407,"tvrage":27811},"overview":"A
         bipolar CIA operative becomes convinced a prisoner of war has been turned
-        by al-Qaeda and is planning to carry out a terrorist attack on American soil.","first_aired":"2011-10-03T01:00:00.000Z","airs":{"day":"Sunday","time":"21:00","timezone":"America/New_York"},"runtime":50,"certification":"TV-MA","network":"Showtime","country":"us","trailer":"https://youtube.com/watch?v=KyFmS3wRPCQ","homepage":"http://www.sho.com/sho/homeland/home","status":"ended","rating":8.34647,"votes":25289,"comment_count":129,"updated_at":"2020-12-03T10:04:33.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hr","hu","it","ja","ko","lb","lt","nl","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"genres":["drama","action","crime","adventure","war"],"aired_episodes":96}'
+        by al-Qaeda and is planning to carry out a terrorist attack on American soil.","first_aired":"2011-10-03T01:00:00.000Z","airs":{"day":"Sunday","time":"21:00","timezone":"America/New_York"},"runtime":50,"certification":"TV-MA","network":"Showtime","country":"us","trailer":"https://youtube.com/watch?v=KyFmS3wRPCQ","homepage":"http://www.sho.com/sho/homeland/home","status":"ended","rating":8.34671,"votes":25416,"comment_count":131,"updated_at":"2021-01-03T09:16:43.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hr","hu","it","ja","ko","lb","lt","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"genres":["drama","action","crime","adventure","war"],"aired_episodes":96}'
     headers:
       Age:
-      - '7833'
+      - '3971'
       CF-Cache-Status:
       - HIT
       CF-RAY:
-      - 5fbe77addb8528f2-IAD
+      - 60caac228ded2739-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -123,22 +123,22 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:39 GMT
+      - Tue, 05 Jan 2021 05:06:51 GMT
       ETag:
-      - W/"b1716532a99e7c53c98feb3e095f6afa"
+      - W/"de8dcc7d107b089498fea082a1e5d031"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 21:44:06 GMT
+      - Tue, 05 Jan 2021 12:00:37 GMT
       Last-Modified:
-      - Thu, 03 Dec 2020 10:04:33 GMT
+      - Sun, 03 Jan 2021 09:16:43 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d1ae2ea89c62f2513a392d9276c9454b71607010879; expires=Sat, 02-Jan-21
-        15:54:39 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=d5b20eedf3051198ce46adf628ca195231609823211; expires=Thu, 04-Feb-21
+        05:06:51 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -150,15 +150,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":989,"until":"2020-12-03T13:45:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":964,"until":"2021-01-03T11:55:00Z"}'
       X-Request-Id:
-      - 97272e4b-ea3f-4283-89b0-e98e52561a99
+      - c1d6d516-36c7-4447-afed-ccf57cb24cd4
       X-Runtime:
-      - '0.009705'
+      - '0.007505'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae920a5000028f22332b000000001
+      - 077289e99600002739611a6000000001
     status:
       code: 200
       message: OK
@@ -182,12 +182,12 @@ interactions:
         from her former life comes in from the cold. Meanwhile, freshman Congressman
         Nick Brody discovers that Abu Nazir may not be content with his nonviolent
         approach to affecting change in American foreign policy. Brody''s daughter
-        Dana lets a vital secret slip.","rating":7.78403,"votes":3019,"comment_count":0,"first_aired":"2012-10-01T01:00:00.000Z","updated_at":"2020-12-03T10:01:05.000Z","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hr","hu","it","ja","ko","lb","lt","nl","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"runtime":55}'
+        Dana lets a vital secret slip.","rating":7.7834,"votes":3024,"comment_count":0,"first_aired":"2012-10-01T01:00:00.000Z","updated_at":"2021-01-04T19:21:43.000Z","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hr","hu","it","ja","ko","lb","lt","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"runtime":55}'
     headers:
       CF-Cache-Status:
       - MISS
       CF-RAY:
-      - 5fbe77ae98c0ea55-IAD
+      - 60caac235a660db6-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -195,20 +195,20 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:39 GMT
+      - Tue, 05 Jan 2021 05:06:52 GMT
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 23:54:39 GMT
+      - Tue, 05 Jan 2021 13:06:49 GMT
       Last-Modified:
-      - Thu, 03 Dec 2020 10:01:05 GMT
+      - Mon, 04 Jan 2021 19:21:43 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d384e84242da2853dc9a7f66d655f18161607010879; expires=Sat, 02-Jan-21
-        15:54:39 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=d5264e791d5ddcd28879f6596beba13171609823212; expires=Thu, 04-Feb-21
+        05:06:52 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -220,15 +220,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":980,"until":"2020-12-03T15:55:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":974,"until":"2021-01-05T05:10:00Z"}'
       X-Request-Id:
-      - 44aa6064-360c-4dcc-9bf2-5960582bfb5a
+      - dbc09311-b28f-4598-a458-a9eb82264856
       X-Runtime:
-      - '0.009674'
+      - '0.006573'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae921240000ea554daa3000000001
+      - 077289ea1b00000db682908000000001
     status:
       code: 200
       message: OK
@@ -252,7 +252,7 @@ interactions:
       CF-Cache-Status:
       - DYNAMIC
       CF-RAY:
-      - 5fbe77af8a3b3830-IAD
+      - 60caac24295573d5-IAD
       Cache-Control:
       - max-age=0, private, must-revalidate
       Connection:
@@ -260,7 +260,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:40 GMT
+      - Tue, 05 Jan 2021 05:06:52 GMT
       ETag:
       - W/"67b6fbf4def62161df9f8932b764eaf3"
       Expect-CT:
@@ -272,8 +272,8 @@ interactions:
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d9ee510bfb91d06280442caeab8f9d5581607010879; expires=Sat, 02-Jan-21
-        15:54:39 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=dec6ec675e633c792c40242c49573ddfd1609823212; expires=Thu, 04-Feb-21
+        05:06:52 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -287,15 +287,15 @@ interactions:
       X-Private-User:
       - 'false'
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":979,"until":"2020-12-03T15:55:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":973,"until":"2021-01-05T05:10:00Z"}'
       X-Request-Id:
-      - e7a2fc60-04d1-49e3-b8b3-93070ab9baab
+      - 8ddd36ef-ee2b-4995-905d-43a6fb9568a2
       X-Runtime:
-      - '0.075447'
+      - '0.007492'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae921b30000383010b5a000000001
+      - 077289ea94000073d5618dc000000001
     status:
       code: 200
       message: OK
@@ -312,24 +312,24 @@ interactions:
     uri: https://api.trakt.tv/search?query=The+Flash&type=show&year=2014
   response:
     body:
-      string: "[{\"type\":\"show\",\"score\":65.40832,\"show\":{\"title\":\"The Flash\",\"overview\":\"After
+      string: "[{\"type\":\"show\",\"score\":66.17269,\"show\":{\"title\":\"The Flash\",\"overview\":\"After
         being struck by lightning, Barry Allen wakes up from his coma to discover
         he's been given the power of super speed, becoming the Flash, fighting crime
-        in Central City.\",\"year\":2014,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939}}},{\"type\":\"show\",\"score\":0.55527735,\"show\":{\"title\":\"Tornado
+        in Central City.\",\"year\":2014,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939}}},{\"type\":\"show\",\"score\":0.5474538,\"show\":{\"title\":\"Tornado
         Hunters\",\"overview\":\"Greg Johnson, Chris Chittick, and Ricky Forbes are
         the Tornado Hunters.Outfitted with their truck Flash and the best equipment
         money can buy, they target the biggest tornadoes in North America. From Regina
         to Mexico, there\u2019s nowhere they won\u2019t go as they risk life, limb
         and a lot of windshields to chase their passion for the world\u2019s worst
         weather. - See more at: http://www.cmt.ca/show/tornado-hunters/#sthash.FtuhY0T3.dpuf\",\"year\":2014,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":81448,\"slug\":\"tornado-hunters\",\"tvdb\":287638,\"imdb\":\"tt4355258\",\"tmdb\":69391,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.55527735,\"show\":{\"title\":\"Tornado
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":81448,\"slug\":\"tornado-hunters\",\"tvdb\":287638,\"imdb\":\"tt4355258\",\"tmdb\":69391,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.5474538,\"show\":{\"title\":\"Tornado
         Hunters\",\"overview\":\"Greg Johnson, Chris Chittick, and Ricky Forbes are
         the Tornado Hunters.Outfitted with their truck Flash and the best equipment
         money can buy, they target the biggest tornadoes in North America. From Regina
         to Mexico, there\u2019s nowhere they won\u2019t go as they risk life, limb
         and a lot of windshields to chase their passion for the world\u2019s worst
         weather. - See more at: http://www.cmt.ca/show/tornado-hunters/#sthash.FtuhY0T3.dpuf\",\"year\":2014,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":152880,\"slug\":\"tornado-hunters-2014\",\"tvdb\":287638,\"imdb\":\"tt4355258\",\"tmdb\":69391,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.30638188,\"show\":{\"title\":\"Lucia's
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":152880,\"slug\":\"tornado-hunters-2014\",\"tvdb\":287638,\"imdb\":\"tt4355258\",\"tmdb\":69391,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.30103868,\"show\":{\"title\":\"Lucia's
         Secrets\",\"overview\":\"In a hostile, urban world brimming with violence
         and inhabited by ruthless people, the beautiful Luc\xEDa is running for her
         life and doesn't know who she is running from. A mysterious event has left
@@ -354,11 +354,11 @@ interactions:
         one step behind them.\",\"year\":2014,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":111509,\"slug\":\"lucia-s-secrets\",\"tvdb\":317415,\"imdb\":\"tt2738004\",\"tmdb\":null,\"tvrage\":null}}}]"
     headers:
       Age:
-      - '2'
+      - '1'
       CF-Cache-Status:
       - HIT
       CF-RAY:
-      - 5fbe77b0e90acf30-IAD
+      - 60caac24dab7eaaa-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -366,20 +366,20 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:40 GMT
+      - Tue, 05 Jan 2021 05:06:52 GMT
       ETag:
-      - W/"a2a9a789880d7eee3b55f835717d9377"
+      - W/"674cea35afd9dae9daa92e63132e590e"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 23:54:38 GMT
+      - Tue, 05 Jan 2021 13:06:49 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=da4a0548a37f22a547d0027cf788b76311607010880; expires=Sat, 02-Jan-21
-        15:54:40 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=de0d68bc07c210d264d01e00ac96d4a7b1609823212; expires=Thu, 04-Feb-21
+        05:06:52 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -399,15 +399,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":983,"until":"2020-12-03T15:55:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":977,"until":"2021-01-05T05:10:00Z"}'
       X-Request-Id:
-      - 34f81f9c-f4e4-4272-a8e4-7d7b2f766fc2
+      - 59ffe598-c3a7-4c36-846c-83c55ec2db49
       X-Runtime:
-      - '0.019645'
+      - '0.020609'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae9228f0000cf30971d4000000001
+      - 077289eb0a0000eaaafa20b000000001
     status:
       code: 200
       message: OK
@@ -429,14 +429,14 @@ interactions:
         he''s been given the power of super speed, becoming the Flash, fighting crime
         in Central City.","first_aired":"2014-10-08T00:00:00.000Z","airs":{"day":"Tuesday","time":"20:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-PG","network":"The
         CW","country":"us","trailer":"https://youtube.com/watch?v=Yj0l7iGKh8g","homepage":"http://www.cwtv.com/shows/the-flash/","status":"returning
-        series","rating":8.01722,"votes":22594,"comment_count":129,"updated_at":"2020-12-02T09:17:36.000Z","language":"en","available_translations":["ar","be","bg","bs","cs","da","de","el","en","es","fa","fr","he","hr","hu","id","it","ja","ka","ko","lb","lt","lv","ml","ms","ng","nl","no","pl","pt","ro","ru","sk","sr","sv","te","th","tr","uk","uz","vi","za","zh"],"genres":["drama","fantasy","science-fiction","superhero"],"aired_episodes":133}'
+        series","rating":8.01263,"votes":22717,"comment_count":129,"updated_at":"2021-01-04T10:33:13.000Z","language":"en","available_translations":["ar","be","bg","bs","cs","da","de","el","en","es","fa","fr","he","hr","hu","id","it","ja","ka","ko","lb","lt","lv","ml","ms","ng","nl","no","pl","pt","ro","ru","sk","sr","sv","te","th","tr","uk","uz","vi","za","zh"],"genres":["drama","fantasy","science-fiction","superhero"],"aired_episodes":133}'
     headers:
       Age:
-      - '16776'
+      - '14000'
       CF-Cache-Status:
       - HIT
       CF-RAY:
-      - 5fbe77b1ca4ef12e-IAD
+      - 60caac2569bc74bf-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -444,22 +444,22 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:40 GMT
+      - Tue, 05 Jan 2021 05:06:52 GMT
       ETag:
-      - W/"d4e1ab9111b5459d13dee25a10e935d0"
+      - W/"f66fd84823f78afc909bf9300dc855d3"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 19:15:04 GMT
+      - Tue, 05 Jan 2021 09:13:31 GMT
       Last-Modified:
-      - Wed, 02 Dec 2020 09:17:36 GMT
+      - Mon, 04 Jan 2021 10:33:13 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d02b0e247f87229e701ca9be8ddaf124a1607010880; expires=Sat, 02-Jan-21
-        15:54:40 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=db7480be5a194173e9b49077027b44bd41609823212; expires=Thu, 04-Feb-21
+        05:06:52 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -471,15 +471,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":994,"until":"2020-12-03T11:20:00Z"}'
+      - '{"name":"AUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":992,"until":"2021-01-04T17:15:00Z"}'
       X-Request-Id:
-      - c03c402c-5d10-4d6b-9317-95d6a87dda7d
+      - 683fd129-162e-4219-80a9-bc38a71ca7fa
       X-Runtime:
-      - '0.013036'
+      - '0.007417'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae9231a0000f12e3fa15000000001
+      - 077289eb64000074bfb0254000000001
     status:
       code: 200
       message: OK
@@ -506,14 +506,14 @@ interactions:
         that happened the last time they fought. Meanwhile, Barry asks Dr. Wells,
         Caitlin and Cisco to help him double his training efforts so he\u2019s ready
         for the Reverse Flash when he returns to Central City. Iris deals with the
-        aftermath of Barry\u2019s confession, and Cisco makes the CCPD a new shield.\",\"rating\":7.74263,\"votes\":3221,\"comment_count\":7,\"first_aired\":\"2015-01-21T01:00:00.000Z\",\"updated_at\":\"2020-12-03T02:58:04.000Z\",\"available_translations\":[\"ar\",\"be\",\"bg\",\"bs\",\"cs\",\"da\",\"de\",\"el\",\"en\",\"es\",\"fa\",\"fr\",\"he\",\"hr\",\"hu\",\"id\",\"it\",\"ja\",\"ka\",\"ko\",\"lb\",\"lt\",\"lv\",\"ml\",\"ms\",\"ng\",\"nl\",\"no\",\"pl\",\"pt\",\"ro\",\"ru\",\"sk\",\"sr\",\"sv\",\"th\",\"tr\",\"uk\",\"uz\",\"vi\",\"za\",\"zh\"],\"runtime\":42}"
+        aftermath of Barry\u2019s confession, and Cisco makes the CCPD a new shield.\",\"rating\":7.74217,\"votes\":3223,\"comment_count\":7,\"first_aired\":\"2015-01-21T01:00:00.000Z\",\"updated_at\":\"2021-01-04T17:43:18.000Z\",\"available_translations\":[\"ar\",\"be\",\"bg\",\"bs\",\"cs\",\"da\",\"de\",\"el\",\"en\",\"es\",\"fa\",\"fr\",\"he\",\"hr\",\"hu\",\"id\",\"it\",\"ja\",\"ka\",\"ko\",\"lb\",\"lt\",\"lv\",\"ml\",\"ms\",\"ng\",\"nl\",\"no\",\"pl\",\"pt\",\"ro\",\"ru\",\"sk\",\"sr\",\"sv\",\"th\",\"tr\",\"uk\",\"uz\",\"vi\",\"za\",\"zh\"],\"runtime\":42}"
     headers:
       Age:
       - '1'
       CF-Cache-Status:
       - HIT
       CF-RAY:
-      - 5fbe77b28ea60d96-IAD
+      - 60caac262d547451-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -521,20 +521,20 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:40 GMT
+      - Tue, 05 Jan 2021 05:06:52 GMT
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 23:54:39 GMT
+      - Tue, 05 Jan 2021 13:06:52 GMT
       Last-Modified:
-      - Thu, 03 Dec 2020 02:58:04 GMT
+      - Mon, 04 Jan 2021 17:43:18 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d6b92e348e6ee8d64f8f7c087c59ec3101607010880; expires=Sat, 02-Jan-21
-        15:54:40 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=daadf639b99b31b2ebfc62d75ca6bd2661609823212; expires=Thu, 04-Feb-21
+        05:06:52 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -546,15 +546,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":982,"until":"2020-12-03T15:55:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":976,"until":"2021-01-05T05:10:00Z"}'
       X-Request-Id:
-      - 6013f5f9-3c2b-462b-8649-5e02b80a1ca3
+      - 06b32e25-d861-4a76-bb8b-830a638fd1f4
       X-Runtime:
-      - '0.013587'
+      - '0.011499'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae9239800000d96c18ac000000001
+      - 077289ebd60000745172923000000001
     status:
       code: 200
       message: OK

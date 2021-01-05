@@ -12,20 +12,20 @@ interactions:
     uri: https://api.trakt.tv/search?query=the+daily+show+%28with+trevor+noah%29&type=show
   response:
     body:
-      string: "[{\"type\":\"show\",\"score\":35.309147,\"show\":{\"title\":\"The Daily
+      string: "[{\"type\":\"show\",\"score\":34.41192,\"show\":{\"title\":\"The Daily
         Show\",\"overview\":\"Forget trying to keep pace with 24 hour news networks;
         the best fake news show in the world will provide you with all the news you
         can handle. The Daily Show is a comedic view of recent news headlines and
         political figures through a series of satirical monologues along with segments
         by correspondents and finally interviews with guest celebrities and political
         figures. The Daily Show with Trevor Noah is filmed at 733 11th Avenue,  New
-        York, NY.\",\"year\":1996,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":2211,\"slug\":\"the-daily-show\",\"tvdb\":71256,\"imdb\":\"tt0115147\",\"tmdb\":2224,\"tvrage\":5714}}},{\"type\":\"show\",\"score\":26.121712,\"show\":{\"title\":\"Daily
+        York, NY.\",\"year\":1996,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":2211,\"slug\":\"the-daily-show\",\"tvdb\":71256,\"imdb\":\"tt0115147\",\"tmdb\":2224,\"tvrage\":5714}}},{\"type\":\"show\",\"score\":25.49773,\"show\":{\"title\":\"Daily
         Tech News Show\",\"overview\":\"Tom is an award-winning independent tech podcaster
         and host of regular tech news and information shows. Tom hosts Sword and Laser,
         a science fiction and fantasy podcast, and book club with Veronica Belmont.
         He also hosts Daily Tech News Show, covering the most important tech issues
         of the day with the smartest minds in technology. \",\"year\":2014,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":78590,\"slug\":\"daily-tech-news-show\",\"tvdb\":281008,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":24.893566,\"show\":{\"title\":\"Daily
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":78590,\"slug\":\"daily-tech-news-show\",\"tvdb\":281008,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":24.239386,\"show\":{\"title\":\"Daily
         Planet\",\"overview\":\"Ever since the Discovery Channel was created in 1995,
         Daily Planet (2002; previously @discovery.ca), continues to be Canada's only
         daily science series. Daily Planet is a show about new advances in science.
@@ -34,10 +34,10 @@ interactions:
         Among some of the common topics in Daily Planet are nature and the environment,
         advances in robotics, medicine, space travel and many more as the occasion
         warrants. The show also features theme weeks: an in-depth week-long view at
-        several interesting domains.\",\"year\":2009,\"status\":\"canceled\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":11421,\"slug\":\"daily-planet\",\"tvdb\":83356,\"imdb\":\"tt1405800\",\"tmdb\":11473,\"tvrage\":26680}}},{\"type\":\"show\",\"score\":24.381254,\"show\":{\"title\":\"The
+        several interesting domains.\",\"year\":2009,\"status\":\"canceled\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":11421,\"slug\":\"daily-planet\",\"tvdb\":83356,\"imdb\":\"tt1405800\",\"tmdb\":11473,\"tvrage\":26680}}},{\"type\":\"show\",\"score\":23.78557,\"show\":{\"title\":\"The
         Daily Show: Global Edition\",\"overview\":\"The Daily Show: Global Edition
         is a weekly version of the Daily Show with Jon Stewart created for overseas
-        markets and airs on foreign networks. \",\"year\":2008,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":60953,\"slug\":\"the-daily-show-global-edition\",\"tvdb\":83846,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":20.245262,\"show\":{\"title\":\"Crime
+        markets and airs on foreign networks. \",\"year\":2008,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":60953,\"slug\":\"the-daily-show-global-edition\",\"tvdb\":83846,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":19.721094,\"show\":{\"title\":\"Crime
         Watch Daily\",\"overview\":\"A one-hour program covering the most compelling
         aspects of the world of crime, mystery and intrigue, \\\"CRIME WATCH DAILY\\\"
         is the very first crime show to air in daytime syndication. From unsolved
@@ -53,7 +53,7 @@ interactions:
         and Andrea Isom, as well as New York Times bestselling author Jason Mattera.
         The series, created by Extra's Lisa Gregorisch-Dempsey, will feature real-life
         investigations and deliver crime stories alive with mystery, intrigue and
-        sheer human drama.\",\"year\":null,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":110854,\"slug\":\"crime-watch-daily\",\"tvdb\":316068,\"imdb\":\"tt4662568\",\"tmdb\":75149,\"tvrage\":null}}},{\"type\":\"show\",\"score\":19.94402,\"show\":{\"title\":\"Day[9]
+        sheer human drama.\",\"year\":null,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":110854,\"slug\":\"crime-watch-daily\",\"tvdb\":316068,\"imdb\":\"tt4662568\",\"tmdb\":75149,\"tvrage\":null}}},{\"type\":\"show\",\"score\":19.41962,\"show\":{\"title\":\"Day[9]
         Daily\",\"overview\":\"The Day[9] Daily is an internet television show streamed
         live from Los Angeles over Justin.TV Sunday through Thursday at 7pm PST. The
         host of the show, Day[9], offers his personal reflections on competitive StarCraft
@@ -61,12 +61,12 @@ interactions:
         and game analysis, the Daily is popular among fans for its special Funday
         Mondays (StarCraft with lol worthy handicaps), Newbie Tuesdays (StarCraft
         for frustrated beginners) as well as for its host\u2019s whimsical observations
-        about the gaming lifestyle and geek subculture.\",\"year\":2009,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":66221,\"slug\":\"day-9-daily\",\"tvdb\":258077,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":19.93948,\"show\":{\"title\":\"Your
+        about the gaming lifestyle and geek subculture.\",\"year\":2009,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":66221,\"slug\":\"day-9-daily\",\"tvdb\":258077,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":19.415216,\"show\":{\"title\":\"Your
         Daily Horoscope\",\"overview\":\"The show will track the daily mishaps of
         twelve millennial zodiac characters who work at a technology start-up, Estrella.
         The characters will have personalities that coincide with their astrological
         signs and will each have a storyline that provides useful \u2014 albeit hilarious
-        \u2014 astrological guidance.\",\"year\":2020,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":163937,\"slug\":\"your-daily-horoscope\",\"tvdb\":384808,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":19.895815,\"show\":{\"title\":\"Daily
+        \u2014 astrological guidance.\",\"year\":2020,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":163937,\"slug\":\"your-daily-horoscope\",\"tvdb\":384808,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":19.372978,\"show\":{\"title\":\"Daily
         Kitchen Live\",\"overview\":\"Matt Tebbutt is joined by food writer Jack Monroe,
         with a range of culinary talent from across the country taking part by live
         link. Together they cook up a range of dishes to inspire the audience during
@@ -78,7 +78,7 @@ interactions:
         the constantly evolving challenges facing people at home.Daily Kitchen Live
         will dish up healthy, wholesome and accessible meals in each episode, using
         ingredients we know are available in the shops, accompanied by tips for cooks
-        of all levels.\",\"year\":2020,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":160482,\"slug\":\"daily-kitchen-live\",\"tvdb\":380175,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":19.891582,\"show\":{\"title\":\"ESPN
+        of all levels.\",\"year\":2020,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":160482,\"slug\":\"daily-kitchen-live\",\"tvdb\":380175,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":19.368713,\"show\":{\"title\":\"ESPN
         FC Daily\",\"overview\":\"The ESPN FC program will integrate several elements
         of the digital platform\u2019s content via social media, the industry-leading
         ESPN Stats \\u0026 Information Group\u2019s data visualization analysis, and
@@ -98,18 +98,17 @@ interactions:
         of key personalities in the sport;Previews of key matches throughout the soccer
         calendar year (eg. El Cl\xE1sico, Manchester Derby, top-tier UEFA Champions
         League matchups, select FIFA World Cup qualifying matchups such as USA vs.
-        Mexico, and more).\",\"year\":2013,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":79058,\"slug\":\"espn-fc-daily\",\"tvdb\":275117,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":12.890526,\"show\":{\"title\":\"The
-        Crusoe Show\",\"overview\":\"The day-in-the-life of Crusoe, a miniature dachshund
-        (wiener dog) who lives with his Mum and Dad (Mumager and Pooper-Scooper) and
-        has far-fetched imaginations of just how much of a celebrity he actually is.
-        His episodes go into his life on set - at home and abroad - as he acts out
-        his viral skits and handles the daily tribulations of being unsatisfyingly
-        world famous.\",\"year\":2018,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":154462,\"slug\":\"the-crusoe-show\",\"tvdb\":371424,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}}]"
+        Mexico, and more).\",\"year\":2013,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":79058,\"slug\":\"espn-fc-daily\",\"tvdb\":275117,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":13.888076,\"show\":{\"title\":\"12-Week
+        Hardcore Daily Video Trainer with Kris Gethin\",\"overview\":\"This is the
+        program that taught millions what it means to be a bodybuilder. Kris Gethin
+        is more than a guide\u2014he's a force of nature. He'll show you how to eat,
+        how to lift, and how to bring intensity to each and every thing you do. Join
+        the ranks of the hardcore!\",\"year\":null,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":170745,\"slug\":\"12-week-hardcore-daily-video-trainer-with-kris-gethin\",\"tvdb\":393297,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"
     headers:
       CF-Cache-Status:
       - MISS
       CF-RAY:
-      - 5fbe778909b8ea45-IAD
+      - 60caabffdf57292e-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -117,20 +116,20 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:33 GMT
+      - Tue, 05 Jan 2021 05:06:46 GMT
       ETag:
-      - W/"c7d41e705ea608285f332a3713071fc4"
+      - W/"6091c779a2d690d0c67d25d9f63966d9"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 23:54:34 GMT
+      - Tue, 05 Jan 2021 13:06:45 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d07f7a33f10046ad589d529238ad766bb1607010873; expires=Sat, 02-Jan-21
-        15:54:33 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=d0d15b659185ef8e2863874b6b749c0511609823206; expires=Thu, 04-Feb-21
+        05:06:46 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -140,25 +139,25 @@ interactions:
       X-Frame-Options:
       - SAMEORIGIN
       X-Pagination-Item-Count:
-      - '169'
+      - '171'
       X-Pagination-Limit:
       - '10'
       X-Pagination-Page:
       - '1'
       X-Pagination-Page-Count:
-      - '17'
+      - '18'
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":992,"until":"2020-12-03T15:55:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":988,"until":"2021-01-05T05:10:00Z"}'
       X-Request-Id:
-      - 98e47434-1fef-4f19-b396-b51ef46e80c7
+      - 8623acf9-08d9-4b56-9378-52a35451420f
       X-Runtime:
-      - '0.037465'
+      - '0.026572'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae909a20000ea456992e000000001
+      - 077289d3eb0000292e3d354000000001
     status:
       code: 200
       message: OK
@@ -181,16 +180,16 @@ interactions:
         is a comedic view of recent news headlines and political figures through a
         series of satirical monologues along with segments by correspondents and finally
         interviews with guest celebrities and political figures. The Daily Show with
-        Trevor Noah is filmed at 733 11th Avenue,  New York, NY.","first_aired":"1996-07-22T00:00:00.000Z","airs":{"day":"Wednesday","time":"23:00","timezone":"America/New_York"},"runtime":25,"certification":"TV-14","network":"Comedy
+        Trevor Noah is filmed at 733 11th Avenue,  New York, NY.","first_aired":"1996-07-23T03:00:00.000Z","airs":{"day":"Thursday","time":"23:00","timezone":"America/New_York"},"runtime":25,"certification":"TV-14","network":"Comedy
         Central","country":"us","trailer":null,"homepage":"http://www.cc.com/shows/the-daily-show-with-trevor-noah","status":"returning
-        series","rating":8.37108,"votes":3665,"comment_count":9,"updated_at":"2020-12-02T11:58:27.000Z","language":"en","available_translations":["bg","da","de","en","es","fr","he","ja","ko","nl","pt","ro","ru","sv","tr","uk","zh"],"genres":["comedy","news"],"aired_episodes":3862}'
+        series","rating":8.36921,"votes":3670,"comment_count":9,"updated_at":"2020-12-31T18:47:41.000Z","language":"en","available_translations":["bg","da","de","en","es","fr","he","ja","ko","nl","pt","ro","ru","sv","tr","uk","zh"],"genres":["comedy","news"],"aired_episodes":3871}'
     headers:
       Age:
-      - '1162'
+      - '1172'
       CF-Cache-Status:
       - HIT
       CF-RAY:
-      - 5fbe778a4f20f470-IAD
+      - 60caac00df8a032b-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -198,22 +197,22 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:33 GMT
+      - Tue, 05 Jan 2021 05:06:46 GMT
       ETag:
-      - W/"fb273911890fc8d19369eb80b95eaf17"
+      - W/"fcbe0cd3288daa922a6765a94d6adbae"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 23:35:12 GMT
+      - Tue, 05 Jan 2021 12:47:13 GMT
       Last-Modified:
-      - Wed, 02 Dec 2020 11:58:27 GMT
+      - Thu, 31 Dec 2020 18:47:41 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d68f863d4e171e60bf4db870c383fc5181607010873; expires=Sat, 02-Jan-21
-        15:54:33 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=da7445db89da535b81522613be9f076651609823206; expires=Thu, 04-Feb-21
+        05:06:46 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -225,15 +224,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":971,"until":"2020-12-02T14:05:00Z"}'
+      - '{"name":"AUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":999,"until":"2021-01-01T08:45:00Z"}'
       X-Request-Id:
-      - 39e459cd-97ee-4aba-bdff-1b46f299a004
+      - 0705578f-af8f-458d-8e73-b1dbaf97acef
       X-Runtime:
-      - '0.014826'
+      - '0.007467'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae90a6b0000f47035939000000001
+      - 077289d4880000032b9c172000000001
     status:
       code: 200
       message: OK

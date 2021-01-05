@@ -12,47 +12,45 @@ interactions:
     uri: https://api.trakt.tv/search?query=Game+Of+Thrones&type=show
   response:
     body:
-      string: "[{\"type\":\"show\",\"score\":57.100643,\"show\":{\"title\":\"Game
+      string: "[{\"type\":\"show\",\"score\":56.782696,\"show\":{\"title\":\"Game
         of Thrones\",\"overview\":\"Seven noble families fight for control of the
         mythical land of Westeros. Friction between the houses leads to full-scale
         war. All while a very ancient evil awakens in the farthest north. Amidst the
         war, a neglected military order of misfits, the Night's Watch, is all that
-        stands between the realms of men and the icy horrors beyond.\",\"year\":2011,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1390,\"slug\":\"game-of-thrones\",\"tvdb\":121361,\"imdb\":\"tt0944947\",\"tmdb\":1399,\"tvrage\":24493}}},{\"type\":\"show\",\"score\":49.963062,\"show\":{\"title\":\"Game
-        of Thrones Talk\",\"year\":2015,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":97709,\"slug\":\"game-of-thrones-talk\",\"tvdb\":293887,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":42.82548,\"show\":{\"title\":\"Game
-        of Thrones: The Legacy\",\"year\":2019,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":156127,\"slug\":\"game-of-thrones-the-legacy\",\"tvdb\":361333,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":42.82548,\"show\":{\"title\":\"Game
+        stands between the realms of men and the icy horrors beyond.\",\"year\":2011,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1390,\"slug\":\"game-of-thrones\",\"tvdb\":121361,\"imdb\":\"tt0944947\",\"tmdb\":1399,\"tvrage\":24493}}},{\"type\":\"show\",\"score\":49.684856,\"show\":{\"title\":\"Game
+        of Thrones Talk\",\"year\":2015,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":97709,\"slug\":\"game-of-thrones-talk\",\"tvdb\":293887,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":42.58702,\"show\":{\"title\":\"Game
+        of Thrones: The Legacy\",\"year\":2019,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":156127,\"slug\":\"game-of-thrones-the-legacy\",\"tvdb\":361333,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":42.58702,\"show\":{\"title\":\"Game
         of Thrones: Cartoon Parody\",\"overview\":\"A spoof/parody Based on HBO's
         hit series \\\"A Game of Thrones\\\" and George RR Martin's A Song of Ice
-        and Fire\",\"year\":2011,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":107818,\"slug\":\"game-of-thrones-cartoon-parody\",\"tvdb\":311939,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":42.82548,\"show\":{\"title\":\"Game
+        and Fire\",\"year\":2011,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":107818,\"slug\":\"game-of-thrones-cartoon-parody\",\"tvdb\":311939,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":42.58702,\"show\":{\"title\":\"Game
         Of Thrones: Characters Recaps\",\"overview\":\"Are you pumped for the 8th
         Season of Game of Thrones? Our GOT character recap will have you fish up to
         date with the characters you love and love to hate like Daenerys, Jon Snow,
-        Tyrion Lannister, Sansa Stark, Cersei, and more!\",\"year\":2018,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":145949,\"slug\":\"game-of-thrones-characters-recaps\",\"tvdb\":361746,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":42.82548,\"show\":{\"title\":\"Game
+        Tyrion Lannister, Sansa Stark, Cersei, and more!\",\"year\":2018,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":145949,\"slug\":\"game-of-thrones-characters-recaps\",\"tvdb\":361746,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":42.58702,\"show\":{\"title\":\"Game
         of Thrones: House Recaps\",\"overview\":\"A look at the histories, traditions
         and primary figures of the families in Game of Thrones. Meet the members of
         House Lannister, Stark, Targaryen, Baratheon, Tyrell, Greyjoy and Martell
-        in this special featuring interviews, scenes and more.\",\"year\":2018,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":146024,\"slug\":\"game-of-thrones-house-recaps\",\"tvdb\":361827,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":42.220707,\"show\":{\"title\":\"Gay
+        in this special featuring interviews, scenes and more.\",\"year\":2018,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":146024,\"slug\":\"game-of-thrones-house-recaps\",\"tvdb\":361827,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":41.915344,\"show\":{\"title\":\"Gay
         of Thrones\",\"overview\":\"Hairstylist extraordinaire Jonathan Van Ness recaps
         new episodes of Game of Thrones using his unique brand of panache, flair,
-        and fabulousness.\",\"year\":2013,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":108159,\"slug\":\"gay-of-thrones\",\"tvdb\":312618,\"imdb\":\"tt2946308\",\"tmdb\":66901,\"tvrage\":null}}},{\"type\":\"show\",\"score\":36.93249,\"show\":{\"title\":\"The
+        and fabulousness.\",\"year\":2013,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":108159,\"slug\":\"gay-of-thrones\",\"tvdb\":312618,\"imdb\":\"tt2946308\",\"tmdb\":66901,\"tvrage\":null}}},{\"type\":\"show\",\"score\":36.665253,\"show\":{\"title\":\"The
         Throne of Frogz\",\"overview\":\"Le Tr\xF4ne des Frogz is a medieval parody
         of Game of Thrones on a House full of losers who plan to take over the iron
-        throne. But as we just said, they're losers.\",\"year\":2016,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":169355,\"slug\":\"the-throne-of-frogz\",\"tvdb\":318432,\"imdb\":\"tt5485592\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":35.7262,\"show\":{\"title\":\"After
+        throne. But as we just said, they're losers.\",\"year\":2016,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":169355,\"slug\":\"the-throne-of-frogz\",\"tvdb\":318432,\"imdb\":\"tt5485592\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":35.489185,\"show\":{\"title\":\"Hip
+        Hop Tribe 2: Game of Thrones\",\"overview\":\"Tribe of Hip Hop (Hangul: \uD799\uD569\uC758
+        \uBBFC\uC871) is a hip hop competition program where celebrities with little-to-no
+        background in hip hop are teamed up with professional hip hop music producers.\",\"year\":2016,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":113754,\"slug\":\"hip-hop-tribe-2-game-of-thrones\",\"tvdb\":320829,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":35.429783,\"show\":{\"title\":\"After
         the Thrones\",\"overview\":\"Weekly show that takes a lively, humorous and
         sophisticated look at Game of Thrones. Each week, the show will recap the
         latest episode, explaining the different events, exploring the complicated
         politics and history, and offering theories about future episodes. \",\"year\":2016,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":106908,\"slug\":\"after-the-thrones\",\"tvdb\":309875,\"imdb\":\"tt5665732\",\"tmdb\":66346,\"tvrage\":null}}},{\"type\":\"show\",\"score\":35.6879,\"show\":{\"title\":\"Hip
-        Hop Tribe 2: Game of Thrones\",\"overview\":\"Tribe of Hip Hop (Hangul: \uD799\uD569\uC758
-        \uBBFC\uC871) is a hip hop competition program where celebrities with little-to-no
-        background in hip hop are teamed up with professional hip hop music producers.\",\"year\":2016,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":113754,\"slug\":\"hip-hop-tribe-2-game-of-thrones\",\"tvdb\":320829,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":106908,\"slug\":\"after-the-thrones\",\"tvdb\":309875,\"imdb\":\"tt5665732\",\"tmdb\":66346,\"tvrage\":null}}}]"
     headers:
-      Age:
-      - '21610'
       CF-Cache-Status:
-      - HIT
+      - EXPIRED
       CF-RAY:
-      - 5fbe77974f94c1f2-IAD
+      - 60caac0cbeabe0da-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -60,20 +58,20 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:36 GMT
+      - Tue, 05 Jan 2021 05:06:48 GMT
       ETag:
-      - W/"8dc39602054c65cf30bd099c9ef3af0f"
+      - W/"72dc305e7cecc213da5014b49b2841ff"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 17:54:25 GMT
+      - Tue, 05 Jan 2021 13:06:46 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d8cb5d88d35a3d27064b41360d8f941eb1607010876; expires=Sat, 02-Jan-21
-        15:54:36 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=d11be677865a1fa890a9e43d378a5324c1609823208; expires=Thu, 04-Feb-21
+        05:06:48 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -83,7 +81,7 @@ interactions:
       X-Frame-Options:
       - SAMEORIGIN
       X-Pagination-Item-Count:
-      - '36'
+      - '35'
       X-Pagination-Limit:
       - '10'
       X-Pagination-Page:
@@ -93,15 +91,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":965,"until":"2020-12-03T09:55:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":985,"until":"2021-01-05T05:10:00Z"}'
       X-Request-Id:
-      - d2ab7433-ef86-48d4-af0e-1c40aa802809
+      - 7a7fd09a-5213-4ad4-ad0f-6d317d9a182f
       X-Runtime:
-      - '0.021664'
+      - '0.017151'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae912880000c1f2f4194000000001
+      - 077289dbf60000e0daaab6f000000001
     status:
       code: 200
       message: OK
@@ -123,14 +121,14 @@ interactions:
         between the houses leads to full-scale war. All while a very ancient evil
         awakens in the farthest north. Amidst the war, a neglected military order
         of misfits, the Night''s Watch, is all that stands between the realms of men
-        and the icy horrors beyond.","first_aired":"2011-04-18T01:00:00.000Z","airs":{"day":"Sunday","time":"21:00","timezone":"America/New_York"},"runtime":52,"certification":"TV-MA","network":"HBO","country":"us","trailer":"https://youtube.com/watch?v=bjqEWgDVPe0","homepage":"http://www.hbo.com/game-of-thrones","status":"ended","rating":9.124079605445957,"votes":115168,"comment_count":375,"updated_at":"2020-12-02T09:27:44.000Z","language":"en","available_translations":["ar","be","bg","bs","cn","cs","da","de","el","en","eo","es","et","fa","fi","fr","he","hr","hu","id","is","it","ja","ka","ko","lb","lt","lv","ml","nl","no","pl","pt","ro","ru","sk","sr","sv","ta","th","tr","tw","uk","uz","vi","zh"],"genres":["drama","fantasy","science-fiction","action","adventure","mystery"],"aired_episodes":73}'
+        and the icy horrors beyond.","first_aired":"2011-04-18T01:00:00.000Z","airs":{"day":"Sunday","time":"21:00","timezone":"America/New_York"},"runtime":52,"certification":"TV-MA","network":"HBO","country":"us","trailer":"https://youtube.com/watch?v=bjqEWgDVPe0","homepage":"http://www.hbo.com/game-of-thrones","status":"ended","rating":9.117440569909403,"votes":116229,"comment_count":375,"updated_at":"2021-01-03T08:37:48.000Z","language":"en","available_translations":["ar","be","bg","bs","cn","cs","da","de","el","en","eo","es","et","fa","fi","fr","he","hr","hu","id","is","it","ja","ka","ko","lb","lt","lv","ml","nl","no","pl","pt","ro","ru","sk","sr","sv","ta","th","tr","tw","uk","uz","vi","zh"],"genres":["drama","fantasy","science-fiction","action","adventure","mystery"],"aired_episodes":73}'
     headers:
       Age:
-      - '2166'
+      - '5800'
       CF-Cache-Status:
       - HIT
       CF-RAY:
-      - 5fbe7797f880030c-IAD
+      - 60caac0d89300daa-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -138,22 +136,22 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:36 GMT
+      - Tue, 05 Jan 2021 05:06:48 GMT
       ETag:
-      - W/"12624dc19d00209cefd98a1b4e8af4be"
+      - W/"4f3c36804359f23b9da9a4c0ae713b8f"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 23:18:33 GMT
+      - Tue, 05 Jan 2021 11:30:07 GMT
       Last-Modified:
-      - Wed, 02 Dec 2020 09:27:44 GMT
+      - Sun, 03 Jan 2021 08:37:48 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d84a3f7c20a26027e46cf32739157f0741607010876; expires=Sat, 02-Jan-21
-        15:54:36 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=d518d106022487657b68f7dd59807c0bc1609823208; expires=Thu, 04-Feb-21
+        05:06:48 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -165,15 +163,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":999,"until":"2020-12-02T15:10:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":998,"until":"2021-01-03T11:30:00Z"}'
       X-Request-Id:
-      - 544eafcf-4b0f-4f57-b28d-a3fb0357ce67
+      - b6df8f05-28f5-46d1-b334-45689826f476
       X-Runtime:
-      - '0.008462'
+      - '0.008928'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae912f80000030ce125b000000001
+      - 077289dc7600000daa6a177000000001
     status:
       code: 200
       message: OK
@@ -250,18 +248,15 @@ interactions:
         Zem\xED ot\u0159\xE1s\xE1 zrada, cht\xED\u010D, intriky a nadp\u0159irozen\xE9
         s\xEDly. Krvav\xFD boj o \u017Delezn\xFD tr\u016Fn, post nejvy\u0161\u0161\xEDho
         vl\xE1dce Sedmi kr\xE1lovstv\xED, bude m\xEDt nep\u0159edv\xEDdateln\xE9 a
-        dalekos\xE1hl\xE9 d\u016Fsledky\u2026\",\"language\":\"cs\"},{\"title\":null,\"overview\":\"George
-        R. R. Martins Game of Thrones er en lang fort\xE6lling gennem syv b\xF8ger.
-        Handlingen foreg\xE5r i et fiktivt kongerige kaldet Westeros. Denne middelalderlige
-        verden er fuld af k\xE6mper, profetier og fortryllede skove, og bag en mur
-        af is, der adskiller Riget, truer sp\xF8gelser og andre farer. Men de overnaturlige
-        elementer er ikke rigtig s\xE5 fremtr\xE6dende i serien. Den narrative ramme
-        er den hensynsl\xF8se kamp om magten, hvilket involverer en r\xE6kke konger,
-        riddere og herrem\xE6nd med navne som Baratheon, Stark og Lannister. Det er
-        ingen opl\xF8ftende historie, hvor det gode n\xF8dvendigvis sejrer frem for
-        det onde, eller hvor det egentlig er s\xE5 let at afg\xF8re, hvad der er godt
-        og ondt. Men Martin form\xE5r at tryllebinde publikum - ogs\xE5 dem, der normalt
-        ikke synes om magi og fantasiverdener.\",\"language\":\"da\"},{\"title\":null,\"overview\":\"Die
+        dalekos\xE1hl\xE9 d\u016Fsledky\u2026\",\"language\":\"cs\"},{\"title\":null,\"overview\":\"I
+        et land, hvor somrene varer i \xE5rtier og vintrene kan vare en livstid, er
+        der problemer undervejs. Fra det beregnende syd og det barske \xF8st til det
+        frosne nord og den \xE6ldgamle Mur, der beskytter landet fra m\xF8rket p\xE5
+        den anden side, er to magtfulde familier midt i en d\xF8delig kamp for kontrollen
+        over Westeros' Syv Konged\xF8mmer. Mens forr\xE6deri, beg\xE6r, intriger og
+        overnaturlige kr\xE6fter ryster de fire hj\xF8rner af Konged\xF8mmerne, vil
+        deres blodige kamp om Jerntronen have uforudsete og vidtr\xE6kkende konsekvenser.
+        Lad Game of Thrones begynde.\",\"language\":\"da\"},{\"title\":null,\"overview\":\"Die
         Handlung ist in einer fiktiven Welt angesiedelt und spielt auf den Kontinenten
         Westeros, den Sieben K\xF6nigreichen sowie im Gebiet der \\\"Mauer\\\" und
         jenseits davon im Norden und Essos. In dieser Welt ist die L\xE4nge der Sommer
@@ -528,17 +523,17 @@ interactions:
         en verreikende gevolgen hebben. Achter een eeuwenoude, gigantische muur van
         ijs in het uiterste noorden van Westeros maakt een kille vijand zich immers
         op om het land onder de voet te lopen. Gebaseerd op de bestseller fantasyreeks
-        \\\"A Song of Ice and Fire\\\" van George R.R. Martin.\",\"language\":\"nl\"},{\"title\":null,\"overview\":\"Denne
-        nye HBO-serien er basert p\xE5 b\xF8kene til George R.R. Martin, og finner
-        sted i en realistisk fantasy-verden full av \xE6rgjerrige menn og kvinner.
-        Serien handler om flere familier som \xF8nsker \xE5 erobre Jerntronen i kongeriket
-        Westeros: Den edle Stark-slekten og Eddard Stark, som utnevnes til Kongens
-        h\xE5nd etter at forgjengeren d\xF8r under mystiske omstendigheter; Den intrigefylte
-        Lannister-slekten, som med sine planer vil gj\xF8re slutt p\xE5 freden i riket;
-        Og drageprinsessen Daenerys, arvingen etter det forrige dynastiet, som venter
-        p\xE5 den andre siden av sj\xF8en sammen med sin ondskapsfulle bror Viserys.
-        Dette er en historie om svik og forr\xE6deri, edelhet og \xE6re, erobring
-        og triumf. I spillet om tronene vinner man eller d\xF8r man.\",\"language\":\"no\"},{\"title\":\"Gra
+        \\\"A Song of Ice and Fire\\\" van George R.R. Martin.\",\"language\":\"nl\"},{\"title\":null,\"overview\":\"Serien
+        er basert p\xE5 b\xF8kene til George R.R. Martin, og finner sted i en realistisk
+        fantasy-verden full av \xE6rgjerrige menn og kvinner. Serien handler om flere
+        familier som \xF8nsker \xE5 erobre Jerntronen i kongeriket Westeros: Den edle
+        Stark-slekten og Eddard Stark, som utnevnes til Kongens h\xE5nd etter at forgjengeren
+        d\xF8r under mystiske omstendigheter; Den intrigefylte Lannister-slekten,
+        som med sine planer vil gj\xF8re slutt p\xE5 freden i riket; Og drageprinsessen
+        Daenerys, arvingen etter det forrige dynastiet, som venter p\xE5 den andre
+        siden av sj\xF8en sammen med sin ondskapsfulle bror Viserys. Dette er en historie
+        om svik og forr\xE6deri, edelhet og \xE6re, erobring og triumf. I spillet
+        om tronene vinner man eller d\xF8r man.\",\"language\":\"no\"},{\"title\":\"Gra
         o Tron\",\"overview\":\"W krainie Westeros kr\xF3lowie i kr\xF3lowe, rycerze
         i renegaci, k\u0142amcy, a tak\u017Ce ci o szlachetnym sercu tocz\u0105 nieustaj\u0105c\u0105
         walk\u0119 o w\u0142adz\u0119 nad siedmioma kr\xF3lestwami. Tam, gdzie lato
@@ -710,7 +705,7 @@ interactions:
       CF-Cache-Status:
       - MISS
       CF-RAY:
-      - 5fbe7798cec324a0-IAD
+      - 60caac0e5afacf38-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -718,20 +713,20 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:36 GMT
+      - Tue, 05 Jan 2021 05:06:48 GMT
       ETag:
       - W/"f5f3c5ca96b09ce89f206d1f65516a63"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 23:54:36 GMT
+      - Tue, 05 Jan 2021 13:06:45 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=dee1a3b6ce4d289a704501a670af47e711607010876; expires=Sat, 02-Jan-21
-        15:54:36 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=d22150c007aaa99bd33ccdd06d644c7b91609823208; expires=Thu, 04-Feb-21
+        05:06:48 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -743,15 +738,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":989,"until":"2020-12-03T15:55:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":984,"until":"2021-01-05T05:10:00Z"}'
       X-Request-Id:
-      - 4e728f0b-bf38-4c02-958b-34d32c78da58
+      - 6f639e28-6b1d-4d24-9809-b7fb1b5feb43
       X-Runtime:
-      - '0.016370'
+      - '0.011814'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae9137b000024a06d08d000000001
+      - 077289dcf70000cf3883ad7000000001
     status:
       code: 200
       message: OK

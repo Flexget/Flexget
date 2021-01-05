@@ -48,10 +48,10 @@ class TestTraktShowLookup:
               - naruto
           test_search_result:
             mock:
-              - {title: 'Shameless.2010.S01E02.HDTV.XViD-FlexGet'}
-              - {title: 'Shameless.2010.S03E02.HDTV.XViD-FlexGet'}
+              - {title: 'Shameless.2011.S01E02.HDTV.XViD-FlexGet'}
+              - {title: 'Shameless.2011.S03E02.HDTV.XViD-FlexGet'}
             series:
-              - Shameless (2010)
+              - Shameless (2011)
           test_search_success:
             mock:
               - {title: '11-22-63.S01E01.HDTV.XViD-FlexGet'}

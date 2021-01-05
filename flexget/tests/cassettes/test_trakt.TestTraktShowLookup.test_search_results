@@ -9,21 +9,21 @@ interactions:
       trakt-api-version:
       - '2'
     method: GET
-    uri: https://api.trakt.tv/search?query=Shameless&type=show&year=2010
+    uri: https://api.trakt.tv/search?query=Shameless&type=show&year=2011
   response:
     body:
-      string: '[{"type":"show","score":121.04692,"show":{"title":"Shameless","overview":"Chicagoan
+      string: '[{"type":"show","score":120.64967,"show":{"title":"Shameless","overview":"Chicagoan
         Frank Gallagher is the proud single dad of six smart, industrious, independent
         kids, who without him would be... franco, perhaps better off. When Frank''s
         not at the bar spending what little money they have, he''s passed out on the
         floor. But the kids have found ways to grow up in spite of him. They may not
         be like any family you know, but they make no apologies for being exactly
-        who they are.","year":2010,"status":"returning series","images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":34160,"slug":"shameless-2010","tvdb":161511,"imdb":"tt1586680","tmdb":34307,"tvrage":25117}}}]'
+        who they are.","year":2011,"status":"returning series","images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":34160,"slug":"shameless-2011","tvdb":161511,"imdb":"tt1586680","tmdb":34307,"tvrage":25117}}}]'
     headers:
       CF-Cache-Status:
       - MISS
       CF-RAY:
-      - 5fbe9ac65b50746a-IAD
+      - 60caafd1ab8df0b5-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -31,20 +31,20 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 16:18:37 GMT
+      - Tue, 05 Jan 2021 05:09:22 GMT
       ETag:
-      - W/"0e12ecf3cd23b7761bb73807c537aeda"
+      - W/"db2d35bd71d8fa6a0f8a92cc922b9442"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Fri, 04 Dec 2020 00:18:37 GMT
+      - Tue, 05 Jan 2021 13:09:22 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=dbc465bd4b99b960a67ec4828ba4d5a651607012317; expires=Sat, 02-Jan-21
-        16:18:37 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=d9d9df360c5a03b98bdf246e1217a1c4f1609823362; expires=Thu, 04-Feb-21
+        05:09:22 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -64,15 +64,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":999,"until":"2020-12-03T16:20:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":947,"until":"2021-01-05T05:10:00Z"}'
       X-Request-Id:
-      - 83a8932a-3fd4-4bb5-82d9-1a7239a63207
+      - 160508d9-5f07-446d-a8bf-69ce7f4c6d8b
       X-Runtime:
-      - '0.017777'
+      - '0.017918'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06caff0ff20000746afb21b000000001
+      - 07728c370d0000f0b555869000000001
     status:
       code: 200
       message: OK
@@ -89,21 +89,21 @@ interactions:
     uri: https://api.trakt.tv/shows/34160?extended=full
   response:
     body:
-      string: '{"title":"Shameless","year":2011,"ids":{"trakt":34160,"slug":"shameless-2010","tvdb":161511,"imdb":"tt1586680","tmdb":34307,"tvrage":25117},"overview":"Chicagoan
+      string: '{"title":"Shameless","year":2011,"ids":{"trakt":34160,"slug":"shameless-2011","tvdb":161511,"imdb":"tt1586680","tmdb":34307,"tvrage":25117},"overview":"Chicagoan
         Frank Gallagher is the proud single dad of six smart, industrious, independent
         kids, who without him would be... franco, perhaps better off. When Frank''s
         not at the bar spending what little money they have, he''s passed out on the
         floor. But the kids have found ways to grow up in spite of him. They may not
         be like any family you know, but they make no apologies for being exactly
-        who they are.","first_aired":"2011-01-10T02:00:00.000Z","airs":{"day":"Sunday","time":"21:00","timezone":"America/New_York"},"runtime":60,"certification":"TV-MA","network":"Showtime","country":"us","trailer":"https://youtube.com/watch?v=CHstRRD_8LE","homepage":"http://www.sho.com/shameless","status":"returning
-        series","rating":8.69692,"votes":12848,"comment_count":64,"updated_at":"2020-12-01T09:09:48.000Z","language":"en","available_translations":["ar","bg","bs","cs","de","el","en","es","fi","fr","he","hu","it","ja","ka","ko","lt","ms","nb","nl","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","vi","zh"],"genres":["comedy","drama"],"aired_episodes":122}'
+        who they are.","first_aired":"2011-01-10T02:00:00.000Z","airs":{"day":"Sunday","time":"21:00","timezone":"America/New_York"},"runtime":55,"certification":"TV-MA","network":"Showtime","country":"us","trailer":"https://youtube.com/watch?v=CHstRRD_8LE","homepage":"http://www.sho.com/shameless","status":"returning
+        series","rating":8.69268,"votes":12970,"comment_count":64,"updated_at":"2021-01-04T10:13:47.000Z","language":"en","available_translations":["ar","bg","bs","cs","de","el","en","es","fi","fr","he","hu","it","ja","ka","ko","lt","ms","nb","nl","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","vi","zh"],"genres":["comedy","drama"],"aired_episodes":125}'
     headers:
       Age:
-      - '13160'
+      - '7635'
       CF-Cache-Status:
       - HIT
       CF-RAY:
-      - 5fbe9ac75dea3824-IAD
+      - 60caafd2787a290a-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -111,22 +111,22 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 16:18:37 GMT
+      - Tue, 05 Jan 2021 05:09:22 GMT
       ETag:
-      - W/"7fbbc1f177448424eaf25aaa39266929"
+      - W/"38972c24bc184106deee90b1d7a4add1"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 20:39:20 GMT
+      - Tue, 05 Jan 2021 11:02:07 GMT
       Last-Modified:
-      - Tue, 01 Dec 2020 09:09:48 GMT
+      - Mon, 04 Jan 2021 10:13:47 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d0e62db3b3967a436b52141cfa63929f41607012317; expires=Sat, 02-Jan-21
-        16:18:37 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=d7d70825fb3439215d68fd71b918de7c11609823362; expires=Thu, 04-Feb-21
+        05:09:22 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -138,15 +138,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":953,"until":"2020-12-01T12:05:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":999,"until":"2021-01-04T10:55:00Z"}'
       X-Request-Id:
-      - 9fac495f-e6da-4ade-a54c-5947c0391c9f
+      - 3a2e5234-b5f0-4202-9993-db797f85b144
       X-Runtime:
-      - '0.008427'
+      - '0.010926'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06caff1095000038249b210000000001
+      - 07728c37880000290a4e052000000001
     status:
       code: 200
       message: OK

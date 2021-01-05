@@ -12,7 +12,7 @@ interactions:
     uri: https://api.trakt.tv/search?query=11-22-63&type=show
   response:
     body:
-      string: '[{"type":"show","score":9.005377,"show":{"title":"11.22.63","overview":"Jake
+      string: '[{"type":"show","score":8.850669,"show":{"title":"11.22.63","overview":"Jake
         Epping, an ordinary high school teacher, is presented with a chance to change
         history. When a longtime friend shows Jake how to travel back in time, he
         tasks Jake with a mission he has been trying in vain to complete: stopping
@@ -23,7 +23,7 @@ interactions:
       CF-Cache-Status:
       - MISS
       CF-RAY:
-      - 5fbe7784fd923854-IAD
+      - 60caabfbfd0c74cb-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -31,20 +31,20 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:33 GMT
+      - Tue, 05 Jan 2021 05:06:45 GMT
       ETag:
-      - W/"85dd91e74b88b34e6f87633a56007801"
+      - W/"7c213018a822e997dad048e269b59f79"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 23:54:34 GMT
+      - Tue, 05 Jan 2021 13:06:38 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d1d58617b066823970524e3ed95dd77481607010873; expires=Sat, 02-Jan-21
-        15:54:33 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=d247ff668329b13d6c7ff7f73dc6d53961609823205; expires=Thu, 04-Feb-21
+        05:06:45 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -64,15 +64,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":993,"until":"2020-12-03T15:55:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":990,"until":"2021-01-05T05:10:00Z"}'
       X-Request-Id:
-      - d0d882e1-faf1-4fd3-9892-d7df9acdcd78
+      - a22dc3b9-b083-4d06-b795-35550d987d29
       X-Runtime:
-      - '0.012953'
+      - '0.010163'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae9071b000038546888b000000001
+      - 077289d17f000074cb9f850000000001
     status:
       code: 200
       message: OK
@@ -95,14 +95,12 @@ interactions:
         tasks Jake with a mission he has been trying in vain to complete: stopping
         the assassination of John F. Kennedy on Nov. 22, 1963. Jake quickly learns
         that the past does not want to be changed, and that his attempts to divert
-        the course of history can quickly turn dangerous.","first_aired":"2016-02-15T05:00:00.000Z","airs":{"day":"Monday","time":"00:00","timezone":"America/New_York"},"runtime":50,"certification":"TV-MA","network":"Hulu","country":"us","trailer":"https://youtube.com/watch?v=2QIShmtBdto","homepage":"http://www.hulu.com/112263","status":"ended","rating":8.01869,"votes":4656,"comment_count":35,"updated_at":"2020-11-26T15:02:06.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fr","he","hu","it","ko","nl","no","pl","pt","ru","sk","tr","uk","zh"],"genres":["science-fiction","drama","fantasy"],"aired_episodes":8}'
+        the course of history can quickly turn dangerous.","first_aired":"2016-02-15T05:00:00.000Z","airs":{"day":"Monday","time":"00:00","timezone":"America/New_York"},"runtime":50,"certification":"TV-MA","network":"Hulu","country":"us","trailer":"https://youtube.com/watch?v=2QIShmtBdto","homepage":"http://www.hulu.com/112263","status":"ended","rating":8.01426,"votes":4700,"comment_count":35,"updated_at":"2020-11-26T15:02:06.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fr","he","hu","it","ko","nl","no","pl","pt","ru","sk","tr","uk","zh"],"genres":["science-fiction","drama","fantasy"],"aired_episodes":8}'
     headers:
-      Age:
-      - '22000'
       CF-Cache-Status:
-      - HIT
+      - REVALIDATED
       CF-RAY:
-      - 5fbe7785d82c295e-IAD
+      - 60caabfcb9282550-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -110,13 +108,13 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:33 GMT
+      - Tue, 05 Jan 2021 05:06:45 GMT
       ETag:
       - W/"87c8d0b45dd5c8b433263fd56b45beae"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 17:47:52 GMT
+      - Tue, 05 Jan 2021 13:06:46 GMT
       Last-Modified:
       - Thu, 26 Nov 2020 15:02:06 GMT
       Referrer-Policy:
@@ -124,8 +122,8 @@ interactions:
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d96d4a3468363196ac9e99c35dc912f1a1607010873; expires=Sat, 02-Jan-21
-        15:54:33 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=d8d92795b41d6a9429f2a96337694ba571609823205; expires=Thu, 04-Feb-21
+        05:06:45 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -137,16 +135,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":974,"until":"2020-11-26T21:30:00Z"}'
-      - '{"name":"AUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":974,"until":"2020-11-26T21:30:00Z"}'
+      - '{"name":"AUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":998,"until":"2020-12-31T02:45:00Z"}'
       X-Request-Id:
-      - 6e57a169-223d-470a-b21f-6abad71b903e
+      - 7f5c5fcb-d511-4ea5-a43f-49daa039bd18
       X-Runtime:
-      - '0.008997'
+      - '0.006941'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae907a90000295e12911000000001
+      - 077289d1f00000255072383000000001
     status:
       code: 200
       message: OK

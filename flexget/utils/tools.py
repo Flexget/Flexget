@@ -8,7 +8,7 @@ import os
 import queue
 import re
 import sys
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from collections.abc import MutableMapping
 from datetime import datetime, timedelta
 from html.entities import name2codepoint
@@ -54,12 +54,14 @@ def convert_bytes(bytes_num: Union[int, float]) -> str:
     """Returns given bytes as prettified string."""
 
     bytes_num = float(bytes_num)
-    units_prefixes = OrderedDict({
-        'T': 1099511627776,  # 1024 ** 4
-        'G': 1073741824,  # 1024 ** 3
-        'M': 1048576,  # 1024 ** 2
-        'K': 1024,
-    })
+    units_prefixes = OrderedDict(
+        {
+            'T': 1099511627776,  # 1024 ** 4
+            'G': 1073741824,  # 1024 ** 3
+            'M': 1048576,  # 1024 ** 2
+            'K': 1024,
+        }
+    )
     for unit, threshold in units_prefixes.items():
         if bytes_num > threshold:
             return f'{bytes_num/threshold:.2f}{unit}'
@@ -143,8 +145,9 @@ def merge_dict_from_to(d1: dict, d2: dict) -> None:
                     pass
                 else:
                     raise Exception(f'Unknown type: {type(v)} value: {repr(v)} in dictionary')
-            elif (isinstance(v, (str, bool, int, float, list, type(None))) and
-                  isinstance(d2[k], (str, bool, int, float, list, type(None)))):
+            elif isinstance(v, (str, bool, int, float, list, type(None))) and isinstance(
+                d2[k], (str, bool, int, float, list, type(None))
+            ):
                 # Allow overriding of non-container types with other non-container types
                 pass
             else:
@@ -285,9 +288,12 @@ _binOps = {
 class TimedDict(MutableMapping):
     """Acts like a normal dict, but keys will only remain in the dictionary for a specified time span."""
 
+    _all_stores: List[dict] = []
+
     def __init__(self, cache_time: Union[timedelta, str] = '5 minutes'):
         self.cache_time = parse_timedelta(cache_time)
         self._store: dict = {}
+        self._all_stores.append(self._store)
         self._last_prune = datetime.now()
 
     def _prune(self):
@@ -326,6 +332,15 @@ class TimedDict(MutableMapping):
             self.__class__.__name__,
             dict(list(zip(self._store, (v[1] for v in list(self._store.values()))))),
         )
+
+    @classmethod
+    def clear_all(cls):
+        """
+        Clears all instantiated TimedDicts.
+        Used by tests to make sure artifacts don't leak between tests.
+        """
+        for store in cls._all_stores:
+            store.clear()
 
 
 class BufferQueue(queue.Queue):

@@ -12,18 +12,18 @@ interactions:
     uri: https://api.trakt.tv/search?query=Breaking+Bad&type=show
   response:
     body:
-      string: "[{\"type\":\"show\",\"score\":63.517952,\"show\":{\"title\":\"Breaking
+      string: "[{\"type\":\"show\",\"score\":62.4589,\"show\":{\"title\":\"Breaking
         Bad\",\"overview\":\"When Walter White, a chemistry teacher, is diagnosed
         with Stage III cancer and given a prognosis of two years left to live, he
         chooses to enter a dangerous world of drugs and crime with the intent to secure
-        his family's financial security.\",\"year\":2008,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1388,\"slug\":\"breaking-bad\",\"tvdb\":81189,\"imdb\":\"tt0903747\",\"tmdb\":1396,\"tvrage\":18164}}},{\"type\":\"show\",\"score\":44.462563,\"show\":{\"title\":\"Breaking
-        Bad: Original Minisodes\",\"year\":2009,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":140684,\"slug\":\"breaking-bad-original-minisodes\",\"tvdb\":356427,\"imdb\":\"tt2387761\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":33.27909,\"show\":{\"title\":\"Breaking
+        his family's financial security.\",\"year\":2008,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1388,\"slug\":\"breaking-bad\",\"tvdb\":81189,\"imdb\":\"tt0903747\",\"tmdb\":1396,\"tvrage\":18164}}},{\"type\":\"show\",\"score\":43.72123,\"show\":{\"title\":\"Breaking
+        Bad: Original Minisodes\",\"year\":2009,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":140684,\"slug\":\"breaking-bad-original-minisodes\",\"tvdb\":356427,\"imdb\":\"tt2387761\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":32.545033,\"show\":{\"title\":\"Breaking
         Boston\",\"overview\":\"\\\"Breaking Boston\\\" follows a group of four blue-collar
         women in their twenties trying to break the cycle of their peers in a town
         where education, employment and opportunities are hard to come by. Each one
         of them has already hit rock bottom via destructive relationships or bad choices,
         but they're all leaning on each other and looking for a way out.\",\"year\":2014,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":76361,\"slug\":\"breaking-boston\",\"tvdb\":278764,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":33.178432,\"show\":{\"title\":\"Breaking
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":76361,\"slug\":\"breaking-boston\",\"tvdb\":278764,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":32.44703,\"show\":{\"title\":\"Breaking
         In\",\"overview\":\"Contra Security, corporate America's answer to \\\"The
         A-Team\\\", gives clients a sense of security by first ripping it away. The
         firm is led by OZ, a larger-than-life head honcho who is a man of mystery
@@ -35,7 +35,7 @@ interactions:
         for Cameron, cracking into state-of-the-art security systems is a lot easier
         than dealing with his co-workers. Between Melanie's sex appeal and Cash's
         hazing, Cameron has more than a few obstacles to overcome if he wants to cement
-        his status as part of the team and become Oz's go-to guy.\",\"year\":2011,\"status\":\"canceled\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":34392,\"slug\":\"breaking-in\",\"tvdb\":206751,\"imdb\":\"tt1630574\",\"tmdb\":34541,\"tvrage\":26082}}},{\"type\":\"show\",\"score\":30.798805,\"show\":{\"title\":\"Talking
+        his status as part of the team and become Oz's go-to guy.\",\"year\":2011,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":34392,\"slug\":\"breaking-in\",\"tvdb\":206751,\"imdb\":\"tt1630574\",\"tmdb\":34541,\"tvrage\":26082}}},{\"type\":\"show\",\"score\":30.458418,\"show\":{\"title\":\"Talking
         Bad\",\"overview\":\"Talking Bad is a weekly, half-hour live after-show and
         companion piece for AMC's Emmy Award-winning series, Breaking Bad. Hosted
         by Chris Hardwick, Talking Bad will analyze and examine every detail of Breaking
@@ -44,23 +44,23 @@ interactions:
         recent Breaking Bad episode, and taking questions and comments from viewers.
         Fans may continue to engage with the after-show following the on-air conclusion,
         online, at amc.com for more videos, weekly polls and photo galleries of the
-        guests featured on the series.\",\"year\":2013,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":72145,\"slug\":\"talking-bad\",\"tvdb\":272219,\"imdb\":\"tt3115468\",\"tmdb\":64902,\"tvrage\":null}}},{\"type\":\"show\",\"score\":23.375889,\"show\":{\"title\":\"Donal
+        guests featured on the series.\",\"year\":2013,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":72145,\"slug\":\"talking-bad\",\"tvdb\":272219,\"imdb\":\"tt3115468\",\"tmdb\":64902,\"tvrage\":null}}},{\"type\":\"show\",\"score\":22.859928,\"show\":{\"title\":\"Donal
         MacIntyre: Breaking Crime\",\"overview\":\"The investigative journalist explores
         the world of youth crime, examining its causes and the ripple effect on the
         wider community, as well as looking at what drives young people to choose
         a bad path. He meets those at the heart of the issue, including offenders,
         reformed criminals, the families and communities, and individuals making a
-        difference.\",\"year\":2015,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":94493,\"slug\":\"donal-macintyre-breaking-crime\",\"tvdb\":290284,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":21.69172,\"show\":{\"title\":\"Ariel
+        difference.\",\"year\":2015,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":94493,\"slug\":\"donal-macintyre-breaking-crime\",\"tvdb\":290284,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":21.449667,\"show\":{\"title\":\"Ariel
         \\u0026 The Bad Guy\",\"overview\":\"The best insider in MMA, Ariel Helwani,
         and best personality in the sport, Chael Sonnen, break down the weekend and
         look ahead to upcoming fight cards.\",\"year\":null,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":155963,\"slug\":\"ariel-the-bad-guy-155963\",\"tvdb\":373273,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":18.528784,\"show\":{\"title\":\"The
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":155963,\"slug\":\"ariel-the-bad-guy-155963\",\"tvdb\":373273,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":18.323141,\"show\":{\"title\":\"The
         Broken and the Bad\",\"overview\":\"This short-form docu-series, hosted by
         Giancarlo Esposito, is inspired by the most memorable characters, situations
         and themes of the Better Call Saul and Breaking Bad universe. Episodes follow:
         a real-life Saul Goodman character, a meth lab clean-up crew, a convicted
         conman, a radio-free zone in West Virginia, and patrolling the drug cartel
-        tunnels between the US and Mexico.\",\"year\":2020,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":163917,\"slug\":\"the-broken-and-the-bad\",\"tvdb\":384782,\"imdb\":\"tt12675696\",\"tmdb\":105839,\"tvrage\":null}}},{\"type\":\"show\",\"score\":1.8169537,\"show\":{\"title\":\"Unfair\",\"overview\":\"Yukihira
+        tunnels between the US and Mexico.\",\"year\":2020,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":163917,\"slug\":\"the-broken-and-the-bad\",\"tvdb\":384782,\"imdb\":\"tt12675696\",\"tmdb\":105839,\"tvrage\":null}}},{\"type\":\"show\",\"score\":1.7955943,\"show\":{\"title\":\"Unfair\",\"overview\":\"Yukihira
         Natsumi is a no-nonsense, intelligent, Tokyo homicide cop with a bad reputation
         for not working well with others and pushing the limits of the law. As she
         sees it, her only job is bringing in the bad guys and the results are all
@@ -68,14 +68,14 @@ interactions:
         earning the ire and distrust of some of her coworkers and members of the community.
         To bring balance to her life, she must deal with work, a divorce, and caring
         of her young daughter.A dark crime drama of a serial murderer who is serializing
-        the murders in short stories.\",\"year\":2006,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":8654,\"slug\":\"unfair\",\"tvdb\":106621,\"imdb\":\"tt1160697\",\"tmdb\":8700,\"tvrage\":null}}},{\"type\":\"show\",\"score\":1.7249329,\"show\":{\"title\":\"Better
+        the murders in short stories.\",\"year\":2006,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":8654,\"slug\":\"unfair\",\"tvdb\":106621,\"imdb\":\"tt1160697\",\"tmdb\":8700,\"tvrage\":null}}},{\"type\":\"show\",\"score\":1.6777506,\"show\":{\"title\":\"Better
         call Saul\",\"overview\":\"Spin off to breaking bad\",\"year\":null,\"status\":\"returning
         series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":155903,\"slug\":\"better-call-saul-155903\",\"tvdb\":373210,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}}]"
     headers:
       CF-Cache-Status:
       - MISS
       CF-RAY:
-      - 5fbe77f0fb182520-IAD
+      - 60caac6bcba073b1-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -83,20 +83,20 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:50 GMT
+      - Tue, 05 Jan 2021 05:07:03 GMT
       ETag:
-      - W/"793e677158d8451c26f1cb3ea24858ac"
+      - W/"cb29dc279b506980e3f8401f28bffff3"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 23:54:48 GMT
+      - Tue, 05 Jan 2021 13:06:59 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d9f6b05087b7c1177029f7505e11339ee1607010890; expires=Sat, 02-Jan-21
-        15:54:50 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=dbc6c9889ce2e14a8df680b07316d51a31609823223; expires=Thu, 04-Feb-21
+        05:07:03 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -106,7 +106,7 @@ interactions:
       X-Frame-Options:
       - SAMEORIGIN
       X-Pagination-Item-Count:
-      - '46'
+      - '45'
       X-Pagination-Limit:
       - '10'
       X-Pagination-Page:
@@ -116,15 +116,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":962,"until":"2020-12-03T15:55:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":955,"until":"2021-01-05T05:10:00Z"}'
       X-Request-Id:
-      - 8bb429ef-a0f1-4792-8895-57890eda4bc6
+      - bf789b8f-960c-48df-b225-02166a5786c2
       X-Runtime:
-      - '0.020503'
+      - '0.016946'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae94aa000002520668d0000000001
+      - 07728a1762000073b16c0f5000000001
     status:
       code: 200
       message: OK
@@ -145,14 +145,14 @@ interactions:
         Walter White, a chemistry teacher, is diagnosed with Stage III cancer and
         given a prognosis of two years left to live, he chooses to enter a dangerous
         world of drugs and crime with the intent to secure his family''s financial
-        security.","first_aired":"2008-01-21T02:00:00.000Z","airs":{"day":"Sunday","time":"21:00","timezone":"America/New_York"},"runtime":47,"certification":"TV-MA","network":"AMC","country":"us","trailer":"https://youtube.com/watch?v=XZ8daibM3AE","homepage":"http://www.amc.com/shows/breaking-bad","status":"ended","rating":9.29215,"votes":79708,"comment_count":407,"updated_at":"2020-11-30T08:46:55.000Z","language":"en","available_translations":["ar","bg","bs","ca","cs","da","de","el","en","es","et","fa","fi","fr","he","hr","hu","id","it","ja","ko","lt","lv","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","vi","zh"],"genres":["drama"],"aired_episodes":62}'
+        security.","first_aired":"2008-01-21T02:00:00.000Z","airs":{"day":"Sunday","time":"21:00","timezone":"America/New_York"},"runtime":47,"certification":"TV-MA","network":"AMC","country":"us","trailer":"https://youtube.com/watch?v=XZ8daibM3AE","homepage":"http://www.amc.com/shows/breaking-bad","status":"ended","rating":9.291848218509573,"votes":80326,"comment_count":407,"updated_at":"2020-12-31T08:38:01.000Z","language":"en","available_translations":["ar","bg","bs","ca","cs","da","de","el","en","es","et","fa","fi","fr","he","hr","hu","id","it","ja","ko","lt","lv","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","vi","zh"],"genres":["drama"],"aired_episodes":62}'
     headers:
       Age:
-      - '25975'
+      - '27857'
       CF-Cache-Status:
       - HIT
       CF-RAY:
-      - 5fbe77f22defea86-IAD
+      - 60caac6c8d780300-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -160,22 +160,22 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:50 GMT
+      - Tue, 05 Jan 2021 05:07:03 GMT
       ETag:
-      - W/"1a9c8e0043707430b117aef3fdc07b22"
+      - W/"c10dcacea6eb6de521d6d7d3397142c6"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 16:41:55 GMT
+      - Tue, 05 Jan 2021 05:22:46 GMT
       Last-Modified:
-      - Mon, 30 Nov 2020 08:46:55 GMT
+      - Thu, 31 Dec 2020 08:38:01 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d789dd2a64e050547d2a214a3ce5649061607010890; expires=Sat, 02-Jan-21
-        15:54:50 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=d0fc16f755fbffc37632e3f625ed64ec81609823223; expires=Thu, 04-Feb-21
+        05:07:03 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -187,15 +187,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":998,"until":"2020-12-03T00:45:00Z"}'
+      - '{"name":"AUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":971,"until":"2020-12-31T13:00:00Z"}'
       X-Request-Id:
-      - 260ddbce-118e-4720-862a-fa43150c514c
+      - 6ef6936e-1cda-4676-be76-0d580cf0ecd1
       X-Runtime:
-      - '0.008424'
+      - '0.010376'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae94b570000ea8671377000000001
+      - 07728a17d800000300afa18000000001
     status:
       code: 200
       message: OK
@@ -213,12 +213,12 @@ interactions:
   response:
     body:
       string: '{"season":5,"number":14,"title":"Ozymandias","ids":{"trakt":73541,"tvdb":4553040,"imdb":"tt2301451","tmdb":62162,"tvrage":null},"number_abs":60,"overview":"Everyone
-        copes with radically changed circumstances.","rating":9.04007,"votes":6514,"comment_count":15,"first_aired":"2013-09-16T01:00:00.000Z","updated_at":"2020-12-03T15:13:34.000Z","available_translations":["ar","bg","bs","ca","cs","da","de","el","en","es","et","fa","fi","fr","he","hr","hu","id","it","ja","ko","lt","lv","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","vi","zh"],"runtime":47}'
+        copes with radically changed circumstances.","rating":9.04084,"votes":6537,"comment_count":15,"first_aired":"2013-09-16T01:00:00.000Z","updated_at":"2021-01-05T03:48:46.000Z","available_translations":["ar","bg","bs","ca","cs","da","de","el","en","es","et","fa","fi","fr","he","hr","hu","id","it","ja","ko","lt","lv","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","vi","zh"],"runtime":47}'
     headers:
       CF-Cache-Status:
       - MISS
       CF-RAY:
-      - 5fbe77f30fd80973-IAD
+      - 60caac6d5cf5cf3c-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -226,20 +226,20 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:50 GMT
+      - Tue, 05 Jan 2021 05:07:03 GMT
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 23:54:49 GMT
+      - Tue, 05 Jan 2021 13:07:03 GMT
       Last-Modified:
-      - Thu, 03 Dec 2020 15:13:34 GMT
+      - Tue, 05 Jan 2021 03:48:46 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d97381c588634935369924d121113b60b1607010890; expires=Sat, 02-Jan-21
-        15:54:50 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=d9271ed3cb07c51dcf02496966c650c6c1609823223; expires=Thu, 04-Feb-21
+        05:07:03 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -251,15 +251,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":961,"until":"2020-12-03T15:55:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":954,"until":"2021-01-05T05:10:00Z"}'
       X-Request-Id:
-      - d29bb765-6be9-4316-a76f-d5524889ce78
+      - fabd9947-4c52-46d7-90af-26d9b50b653d
       X-Runtime:
-      - '0.004742'
+      - '0.011302'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae94be80000097318838000000001
+      - 07728a185c0000cf3c813c3000000001
     status:
       code: 200
       message: OK
@@ -282,7 +282,7 @@ interactions:
       CF-Cache-Status:
       - DYNAMIC
       CF-RAY:
-      - 5fbe77f40808cefc-IAD
+      - 60caac6e2c3eea20-IAD
       Cache-Control:
       - max-age=0, private, must-revalidate
       Connection:
@@ -290,7 +290,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:50 GMT
+      - Tue, 05 Jan 2021 05:07:04 GMT
       ETag:
       - W/"c9963bc9c9f0d47cf58865589c2fc37c"
       Expect-CT:
@@ -302,8 +302,8 @@ interactions:
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d29b3c538115ab8e7fad796344273ad0b1607010890; expires=Sat, 02-Jan-21
-        15:54:50 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=d7b91dea950df778e63acf254e72165e31609823224; expires=Thu, 04-Feb-21
+        05:07:04 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -317,15 +317,15 @@ interactions:
       X-Private-User:
       - 'false'
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":960,"until":"2020-12-03T15:55:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":953,"until":"2021-01-05T05:10:00Z"}'
       X-Request-Id:
-      - ab9fad01-9e5f-48f9-8787-bf72a136a256
+      - 3de2035f-8be5-4fef-8863-2b9b5a3d8a42
       X-Runtime:
-      - '0.015615'
+      - '0.013054'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae94c880000cefced0a7000000001
+      - 07728a18db0000ea200d8a0000000001
     status:
       code: 200
       message: OK

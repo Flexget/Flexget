@@ -12,12 +12,12 @@ interactions:
     uri: https://api.trakt.tv/search?query=House&type=show
   response:
     body:
-      string: "[{\"type\":\"show\",\"score\":62.144806,\"show\":{\"title\":\"House\",\"overview\":\"Dr.
+      string: "[{\"type\":\"show\",\"score\":61.29207,\"show\":{\"title\":\"House\",\"overview\":\"Dr.
         Gregory House is a maverick physician who is devoid of bedside manner. While
         his behavior can border on antisocial, Dr. House thrives on the challenge
         of solving the medical puzzles that other doctors give up on. Together with
         his hand-picked team of young medical experts, he'll do whatever it takes
-        in the race against the clock to solve the case.\",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\":50.22059,\"show\":{\"title\":\"House
+        in the race against the clock to solve the case.\",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\":49.53147,\"show\":{\"title\":\"House
         vs. House\",\"overview\":\"House vs. House is a new home makeover competition
         series where amateur and experienced renovation teams compete for the chance
         to win $10,000 by proving they can create the better DIY projects in their
@@ -25,37 +25,37 @@ interactions:
         each episode features two teams will go head-to-head in grueling challenges.
         Tanya McQueen, a DIY design expert, and David Brian Sanders, an architect
         and designer, will determine which team completes the most impressive transformation
-        and award the cash prize.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\":\"house-vs-house\",\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.38915,\"show\":{\"title\":\"Full
+        and award the cash prize.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\":\"house-vs-house\",\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Full
         House\",\"overview\":\"Full House is an American sitcom created by Jeff Franklin
         for ABC. The show chronicles a widowed father, who enlists his best friend
         and his brother-in-law to help raise his three daughters. It aired from September
-        22, 1987, to May 23, 1995, broadcasting eight seasons and 192 episodes.\",\"year\":1987,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":4289,\"slug\":\"full-house-1987\",\"tvdb\":70500,\"imdb\":\"tt0092359\",\"tmdb\":4313,\"tvrage\":3622}}},{\"type\":\"show\",\"score\":44.38915,\"show\":{\"title\":\"House
+        22, 1987, to May 23, 1995, broadcasting eight seasons and 192 episodes.\",\"year\":1987,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":4289,\"slug\":\"full-house-1987\",\"tvdb\":70500,\"imdb\":\"tt0092359\",\"tmdb\":4313,\"tvrage\":3622}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"House
         Hunters\",\"overview\":\"House Hunters takes viewers behind the scenes as
         individuals, couples and families learn what to look for and decide whether
         or not a home is meant for them. Focusing on the emotional experience of finding
         and purchasing a new home, each episode follows a prospective buyer and real
         estate agent through the home-buying process, from start to finish.\",\"year\":1999,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":6441,\"slug\":\"house-hunters\",\"tvdb\":73182,\"imdb\":\"tt0369117\",\"tmdb\":6480,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.38915,\"show\":{\"title\":\"Fuller
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":6441,\"slug\":\"house-hunters\",\"tvdb\":73182,\"imdb\":\"tt0369117\",\"tmdb\":6480,\"tvrage\":null}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Fuller
         House\",\"overview\":\"Recently widowed D.J. Tanner-Fuller gets help from
         her sister Stephanie and best friend Kimmy when the women move in with their
         families to help D.J. raise her children in this spin-off series filled with
-        familiar faces.\",\"year\":2016,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":102424,\"slug\":\"fuller-house\",\"tvdb\":301236,\"imdb\":\"tt3986586\",\"tmdb\":63623,\"tvrage\":48701}}},{\"type\":\"show\",\"score\":44.38915,\"show\":{\"title\":\"Alpha
+        familiar faces.\",\"year\":2016,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":102424,\"slug\":\"fuller-house\",\"tvdb\":301236,\"imdb\":\"tt3986586\",\"tmdb\":63623,\"tvrage\":48701}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Alpha
         House\",\"overview\":\"Alpha House follows four senators who live together
         in a rented house in Washington DC.Re-election battles, looming indictments,
-        parties, their Party... these senators need a drink. And a new housemate.\",\"year\":2013,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":60285,\"slug\":\"alpha-house\",\"tvdb\":269008,\"imdb\":\"tt3012160\",\"tmdb\":60719,\"tvrage\":34454}}},{\"type\":\"show\",\"score\":44.38915,\"show\":{\"title\":\"Playing
+        parties, their Party... these senators need a drink. And a new housemate.\",\"year\":2013,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":60285,\"slug\":\"alpha-house\",\"tvdb\":269008,\"imdb\":\"tt3012160\",\"tmdb\":60719,\"tvrage\":34454}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Playing
         House\",\"overview\":\"A single-camera buddy comedy about what happens when
         two best friends come back together, just when they need each other most.Inspired
         by the ultra-close friendship between the series' creators and stars, \\\"Playing
         House\\\" centers on mother to-be Maggie who asks her single and career-driven
         best friend Emma to return home from her job overseas to attend her baby shower,
-        having no idea what\u2019s truly in store.\",\"year\":2014,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":73385,\"slug\":\"playing-house\",\"tvdb\":269898,\"imdb\":\"tt2750182\",\"tmdb\":61762,\"tvrage\":35945}}},{\"type\":\"show\",\"score\":44.38915,\"show\":{\"title\":\"Summer
+        having no idea what\u2019s truly in store.\",\"year\":2014,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":73385,\"slug\":\"playing-house\",\"tvdb\":269898,\"imdb\":\"tt2750182\",\"tmdb\":61762,\"tvrage\":35945}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Summer
         House\",\"overview\":\"Summer House takes the beach town of Montauk, New York
         by storm, while following a group of nine friends who make the exclusive enclave
         their go-to party spot between Memorial Day and Labor Day \u2014 that is,
         when they're not hustling at their day jobs. You could say they work hard
-        and party way harder.\",\"year\":2017,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":113867,\"slug\":\"summer-house\",\"tvdb\":321121,\"imdb\":\"tt6645582\",\"tmdb\":69720,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.38915,\"show\":{\"title\":\"House
+        and party way harder.\",\"year\":2017,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":113867,\"slug\":\"summer-house\",\"tvdb\":321121,\"imdb\":\"tt6645582\",\"tmdb\":69720,\"tvrage\":null}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"House
         Husbands\",\"overview\":\"House Husbands centres around four families with
-        one thing in common, the husbands stay home to raise the children.\",\"year\":2012,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":43830,\"slug\":\"house-husbands\",\"tvdb\":262026,\"imdb\":\"tt2402807\",\"tmdb\":44072,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.38915,\"show\":{\"title\":\"Safe
+        one thing in common, the husbands stay home to raise the children.\",\"year\":2012,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":43830,\"slug\":\"house-husbands\",\"tvdb\":262026,\"imdb\":\"tt2402807\",\"tmdb\":44072,\"tvrage\":null}}},{\"type\":\"show\",\"score\":43.780052,\"show\":{\"title\":\"Safe
         House\",\"overview\":\"A married couple, former detective Robert and teacher
         Katy, are asked by close friend and police officer Mark, to turn their remote
         Guest House into a Safe House.\",\"year\":2015,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":97962,\"slug\":\"safe-house\",\"tvdb\":294195,\"imdb\":\"tt4567314\",\"tmdb\":62452,\"tvrage\":42379}}}]"
@@ -63,7 +63,7 @@ interactions:
       CF-Cache-Status:
       - MISS
       CF-RAY:
-      - 5fbe776fe93be09a-IAD
+      - 60caabe91eff098c-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -71,20 +71,20 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:29 GMT
+      - Tue, 05 Jan 2021 05:06:42 GMT
       ETag:
-      - W/"761081302ddf5192d537f2a253f08d7f"
+      - W/"0cf3d4a9f1312e6c842e9909cbe57074"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 23:54:28 GMT
+      - Tue, 05 Jan 2021 13:06:41 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d5298e04b9e0d768555c77bf63440b4c41607010869; expires=Sat, 02-Jan-21
-        15:54:29 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=ddf440dec0c4f8dfed6a8271f4c5ea6421609823202; expires=Thu, 04-Feb-21
+        05:06:42 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -94,25 +94,25 @@ interactions:
       X-Frame-Options:
       - SAMEORIGIN
       X-Pagination-Item-Count:
-      - '2739'
+      - '2771'
       X-Pagination-Limit:
       - '10'
       X-Pagination-Page:
       - '1'
       X-Pagination-Page-Count:
-      - '274'
+      - '278'
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":999,"until":"2020-12-03T15:55:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":996,"until":"2021-01-05T05:10:00Z"}'
       X-Request-Id:
-      - c39b86d6-7169-45c6-a9d6-209d8040b7e3
+      - c49b1d72-4730-4d30-bb32-9a94a15128fa
       X-Runtime:
-      - '0.026063'
+      - '0.021687'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae8f9ef0000e09a6930d000000001
+      - 077289c5ac0000098c62a57000000001
     status:
       code: 200
       message: OK
@@ -134,14 +134,14 @@ interactions:
         his behavior can border on antisocial, Dr. House thrives on the challenge
         of solving the medical puzzles that other doctors give up on. Together with
         his hand-picked team of young medical experts, he''ll do whatever it takes
-        in the race against the clock to solve the case.","first_aired":"2004-11-17T02:00:00.000Z","airs":{"day":"Monday","time":"21:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"FOX","country":"us","trailer":"https://youtube.com/watch?v=MczMB8nU1sY","homepage":"http://www.fox.com/house/index.htm","status":"ended","rating":8.67275,"votes":27606,"comment_count":78,"updated_at":"2020-11-30T09:11:56.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fi","fr","he","hr","hu","it","ja","ko","lt","lv","nl","no","pl","pt","ro","ru","sk","sr","sv","tr","uk","zh"],"genres":["comedy","drama","mystery"],"aired_episodes":176}'
+        in the race against the clock to solve the case.","first_aired":"2004-11-17T02:00:00.000Z","airs":{"day":"Monday","time":"21:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"FOX","country":"us","trailer":"https://youtube.com/watch?v=MczMB8nU1sY","homepage":"http://www.fox.com/house/index.htm","status":"ended","rating":8.67064,"votes":27790,"comment_count":78,"updated_at":"2021-01-04T10:06:30.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fi","fr","he","hr","hu","it","ja","ko","lt","lv","nl","no","pl","pt","ro","ru","sk","sr","sv","tr","uk","zh"],"genres":["comedy","drama","mystery"],"aired_episodes":176}'
     headers:
       Age:
-      - '19945'
+      - '6527'
       CF-Cache-Status:
       - HIT
       CF-RAY:
-      - 5fbe77713e9af0fa-IAD
+      - 60caabe9ee8d2aec-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -149,22 +149,22 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:29 GMT
+      - Tue, 05 Jan 2021 05:06:42 GMT
       ETag:
-      - W/"99030abb54a74cd456ff843edc5cd06a"
+      - W/"827bab8d052f204657fcd14b08b642e9"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 18:22:03 GMT
+      - Tue, 05 Jan 2021 11:17:54 GMT
       Last-Modified:
-      - Mon, 30 Nov 2020 09:11:56 GMT
+      - Mon, 04 Jan 2021 10:06:30 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=dea53791cfe79ac12c932aa60aca7c4171607010869; expires=Sat, 02-Jan-21
-        15:54:29 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=d9406508a1d2924dce016a25287fce44b1609823202; expires=Thu, 04-Feb-21
+        05:06:42 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -176,15 +176,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":999,"until":"2020-12-02T01:35:00Z"}'
+      - '{"name":"AUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":977,"until":"2021-01-04T11:15:00Z"}'
       X-Request-Id:
-      - e71b2393-08f1-47f4-b3e5-252019967b44
+      - e566eda7-88e1-448d-a4e2-63f5974c15bd
       X-Runtime:
-      - '0.012067'
+      - '0.009825'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae8fabf0000f0fa0b138000000001
+      - 077289c63500002aece70bc000000001
     status:
       code: 200
       message: OK

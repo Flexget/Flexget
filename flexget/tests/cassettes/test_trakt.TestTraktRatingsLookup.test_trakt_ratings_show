@@ -12,17 +12,17 @@ interactions:
     uri: https://api.trakt.tv/search?query=Time+After+Time&type=show&year=2017
   response:
     body:
-      string: "[{\"type\":\"show\",\"score\":64.85581,\"show\":{\"title\":\"Time After
-        Time\",\"overview\":\"A young H.G. Wells travels through centuries, decades
-        and days in the time machine he created. In the pursuit of the charismatic
+      string: "[{\"type\":\"show\",\"score\":63.803703,\"show\":{\"title\":\"Time
+        After Time\",\"overview\":\"A young H.G. Wells travels through centuries,
+        decades and days in the time machine he created. In the pursuit of the charismatic
         Dr. John Stevenson, better known as \u201CJack the Ripper,\u201D Wells arrives
         in modern day New York City, searching for Stevenson after the doctor escapes
         authorities in Wells\u2019 London home. But instead of the Utopia he imagined,
-        Wells finds a world more aligned with Stevenson\u2019s temperament ...\",\"year\":2017,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":107801,\"slug\":\"time-after-time-2017\",\"tvdb\":311898,\"imdb\":\"tt5031234\",\"tmdb\":68002,\"tvrage\":null}}},{\"type\":\"show\",\"score\":30.695187,\"show\":{\"title\":\"Part-Time
+        Wells finds a world more aligned with Stevenson\u2019s temperament ...\",\"year\":2017,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":107801,\"slug\":\"time-after-time-2017\",\"tvdb\":311898,\"imdb\":\"tt5031234\",\"tmdb\":68002,\"tvrage\":null}}},{\"type\":\"show\",\"score\":30.299433,\"show\":{\"title\":\"Part-Time
         Idol\",\"overview\":\"The drama is set inside a fictional label, where a producer
         starts feeling doubtful about making stars after producing several popular
         idols. The story starts when the producer comes back after a hiatus and starts
-        to produce a co-ed group from the trainees that the labels have given up on.\",\"year\":2017,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":125643,\"slug\":\"part-time-idol\",\"tvdb\":338478,\"imdb\":\"tt8835780\",\"tmdb\":75552,\"tvrage\":null}}},{\"type\":\"show\",\"score\":26.80897,\"show\":{\"title\":\"Long
+        to produce a co-ed group from the trainees that the labels have given up on.\",\"year\":2017,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":125643,\"slug\":\"part-time-idol\",\"tvdb\":338478,\"imdb\":\"tt8835780\",\"tmdb\":75552,\"tvrage\":null}}},{\"type\":\"show\",\"score\":26.464333,\"show\":{\"title\":\"Long
         Time No See\",\"overview\":\"The renown hitman, 'Flying Dagger', bumps into
         'Wild Dog', who happens to be a hired assassin for mobster 'Black Leopard'.
         While both of them try to be incognito, they cannot help falling in love with
@@ -30,7 +30,7 @@ interactions:
         Dagger'. After all, 'Flying Dagger' and 'Wild Dog' reveal their secret identities
         to each other during the fight led by their bosses. They run into danger as
         gangsters brand them as traitors. Will they be able to overcome obstacles
-        and keep their love?\",\"year\":2017,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":126905,\"slug\":\"long-time-no-see\",\"tvdb\":340904,\"imdb\":\"tt7863474\",\"tmdb\":76376,\"tvrage\":null}}},{\"type\":\"show\",\"score\":22.964663,\"show\":{\"title\":\"Class
+        and keep their love?\",\"year\":2017,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":126905,\"slug\":\"long-time-no-see\",\"tvdb\":340904,\"imdb\":\"tt7863474\",\"tmdb\":76376,\"tvrage\":null}}},{\"type\":\"show\",\"score\":22.669743,\"show\":{\"title\":\"Class
         of '92: Full Time\",\"overview\":\"Collectively known as the \\\"Class of
         '92\\\" Ryan Giggs, Paul Scholes, Nicky Butt and the Neville brothers - Phil
         \\u0026 Gary - have decided to transform Salford City into a full time football
@@ -49,11 +49,11 @@ interactions:
         deadlines and work falling behind, the club could face relegation if the stadium
         doesn't meet safety standards. As the season draws to a close, Salford are
         desperate to salvage a place in the playoffs. After league promotions in the
-        previous 2 seasons, can they make it a remarkable hat-trick? \",\"year\":2017,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":151318,\"slug\":\"class-of-92-full-time\",\"tvdb\":367983,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":2.251612,\"show\":{\"title\":\"The
+        previous 2 seasons, can they make it a remarkable hat-trick?\",\"year\":2017,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":151318,\"slug\":\"class-of-92-full-time\",\"tvdb\":367983,\"imdb\":\"\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":2.2230425,\"show\":{\"title\":\"The
         Restaurant\",\"overview\":\"Big changes come to a family restaurant in Stockholm
         after World War II as traditions fade, class divides simmer and a new generation
-        rises up.\",\"year\":2017,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":121276,\"slug\":\"the-restaurant-2017\",\"tvdb\":330606,\"imdb\":\"tt5603140\",\"tmdb\":74731,\"tvrage\":null}}},{\"type\":\"show\",\"score\":2.1757267,\"show\":{\"title\":\"The
+        rises up.\",\"year\":2017,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":121276,\"slug\":\"the-restaurant-2017\",\"tvdb\":330606,\"imdb\":\"tt5603140\",\"tmdb\":74731,\"tvrage\":null}}},{\"type\":\"show\",\"score\":2.1496937,\"show\":{\"title\":\"The
         King's Avatar\",\"overview\":\"In the multiplayer online game Glory, Ye Xiu
         is regarded as a textbook and a top-tier pro-player. However, due to a myriad
         of reasons, he is kicked from the team. After leaving the pro scene, he finds
@@ -61,14 +61,14 @@ interactions:
         he throws himself in to the game once more. Possessing ten years of experience,
         the memories of his past, and an incomplete, self-made weapon, his return
         along the road to the summit begins!\",\"year\":2017,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":117930,\"slug\":\"the-king-s-avatar\",\"tvdb\":326270,\"imdb\":\"tt6859260\",\"tmdb\":71194,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.48279488,\"show\":{\"title\":\"ERASED\",\"overview\":\"After
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":117930,\"slug\":\"the-king-s-avatar\",\"tvdb\":326270,\"imdb\":\"tt6859260\",\"tmdb\":71194,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.46903023,\"show\":{\"title\":\"ERASED\",\"overview\":\"After
         finding his mom killed, Satoru's time-traveling ability takes him back 18
-        years for a chance to prevent her death and those of three classmates.\",\"year\":2017,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":124954,\"slug\":\"erased-2017\",\"tvdb\":337206,\"imdb\":\"tt7573686\",\"tmdb\":74939,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.48279488,\"show\":{\"title\":\"Voice\",\"overview\":\"Set
+        years for a chance to prevent her death and those of three classmates.\",\"year\":2017,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":124954,\"slug\":\"erased-2017\",\"tvdb\":337206,\"imdb\":\"tt7573686\",\"tmdb\":74939,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.46903023,\"show\":{\"title\":\"Voice\",\"overview\":\"Set
         around an emergency 112 call center. During the golden time after a crime
-        takes place, the call center chases criminals including a serial killer.\",\"year\":2017,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":113907,\"slug\":\"voice-2017\",\"tvdb\":321206,\"imdb\":\"tt6212854\",\"tmdb\":69087,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.45471686,\"show\":{\"title\":\"Rapunzel's
+        takes place, the call center chases criminals including a serial killer.\",\"year\":2017,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":113907,\"slug\":\"voice-2017\",\"tvdb\":321206,\"imdb\":\"tt6212854\",\"tmdb\":69087,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.44149518,\"show\":{\"title\":\"Rapunzel's
         Tangled Adventure\",\"overview\":\"The adventures of Rapunzel, Flynn Rider
         and their friends in the time between the film, 'Tangled' \\u0026 the TV-Movie
-        'Tangled: Before Ever After' to the short film, 'Tangled Ever After'.\",\"year\":2017,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":112751,\"slug\":\"rapunzel-s-tangled-adventure\",\"tvdb\":318990,\"imdb\":\"tt4902964\",\"tmdb\":70047,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.4132731,\"show\":{\"title\":\"My
+        'Tangled: Before Ever After' to the short film, 'Tangled Ever After'.\",\"year\":2017,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":112751,\"slug\":\"rapunzel-s-tangled-adventure\",\"tvdb\":318990,\"imdb\":\"tt4902964\",\"tmdb\":70047,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.40169662,\"show\":{\"title\":\"My
         Brother Loves Me Too Much\",\"overview\":\"Setoka Tachibana is a female high
         school student who has confessed her feelings to other boys 12 times, but
         has been rebuffed each time. Her older brother Haruka Tachibana cares for
@@ -79,7 +79,7 @@ interactions:
       CF-Cache-Status:
       - MISS
       CF-RAY:
-      - 5fbe77fc88593872-IAD
+      - 60caac75e97129c6-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -87,20 +87,20 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:52 GMT
+      - Tue, 05 Jan 2021 05:07:05 GMT
       ETag:
-      - W/"199ede6748e75a45240c1578f6db405f"
+      - W/"cd88303bf24405350cfbbed01ea16a33"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 23:54:53 GMT
+      - Tue, 05 Jan 2021 13:06:59 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d022c4a106cbebe2157b20d1080a363a51607010892; expires=Sat, 02-Jan-21
-        15:54:52 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=df4523732174a19996f699865c5a171211609823225; expires=Thu, 04-Feb-21
+        05:07:05 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -110,7 +110,7 @@ interactions:
       X-Frame-Options:
       - SAMEORIGIN
       X-Pagination-Item-Count:
-      - '74'
+      - '76'
       X-Pagination-Limit:
       - '10'
       X-Pagination-Page:
@@ -120,15 +120,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":958,"until":"2020-12-03T15:55:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":951,"until":"2021-01-05T05:10:00Z"}'
       X-Request-Id:
-      - 556de5a9-8bdc-4bcf-be97-7c98a2328562
+      - d265599c-6e4d-4bcf-b974-5eef84693c4f
       X-Runtime:
-      - '0.029890'
+      - '0.024777'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae951d7000038722ab22000000001
+      - 07728a1daf000029c6cd1b5000000001
     status:
       code: 200
       message: OK
@@ -151,14 +151,14 @@ interactions:
         as \u201CJack the Ripper,\u201D Wells arrives in modern day New York City,
         searching for Stevenson after the doctor escapes authorities in Wells\u2019
         London home. But instead of the Utopia he imagined, Wells finds a world more
-        aligned with Stevenson\u2019s temperament ...\",\"first_aired\":\"2017-03-06T02:00:00.000Z\",\"airs\":{\"day\":\"Sunday\",\"time\":\"21:00\",\"timezone\":\"America/New_York\"},\"runtime\":45,\"certification\":\"TV-14\",\"network\":\"ABC\",\"country\":\"us\",\"trailer\":\"https://youtube.com/watch?v=rKXOmFUco8A\",\"homepage\":\"http://abc.go.com/shows/time-after-time\",\"status\":\"ended\",\"rating\":6.75769,\"votes\":260,\"comment_count\":13,\"updated_at\":\"2020-11-26T01:07:26.000Z\",\"language\":\"en\",\"available_translations\":[\"bg\",\"el\",\"en\",\"es\",\"fr\",\"hu\",\"it\",\"pt\",\"ru\",\"tr\",\"zh\"],\"genres\":[\"fantasy\",\"science-fiction\",\"drama\"],\"aired_episodes\":12}"
+        aligned with Stevenson\u2019s temperament ...\",\"first_aired\":\"2017-03-06T02:00:00.000Z\",\"airs\":{\"day\":\"Sunday\",\"time\":\"21:00\",\"timezone\":\"America/New_York\"},\"runtime\":45,\"certification\":\"TV-14\",\"network\":\"ABC\",\"country\":\"us\",\"trailer\":\"https://youtube.com/watch?v=rKXOmFUco8A\",\"homepage\":\"http://abc.go.com/shows/time-after-time\",\"status\":\"ended\",\"rating\":6.75769,\"votes\":260,\"comment_count\":13,\"updated_at\":\"2020-12-31T09:38:49.000Z\",\"language\":\"en\",\"available_translations\":[\"bg\",\"el\",\"en\",\"es\",\"fr\",\"hu\",\"it\",\"pt\",\"ru\",\"tr\",\"zh\"],\"genres\":[\"fantasy\",\"science-fiction\",\"drama\"],\"aired_episodes\":12}"
     headers:
       Age:
-      - '4378'
+      - '438'
       CF-Cache-Status:
       - HIT
       CF-RAY:
-      - 5fbe77fdae5b0db2-IAD
+      - 60caac76cbe23836-IAD
       Cache-Control:
       - public, max-age=28800
       Connection:
@@ -166,22 +166,22 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:52 GMT
+      - Tue, 05 Jan 2021 05:07:05 GMT
       ETag:
-      - W/"0d009beb9d57f8a85abf79bb8256c5d5"
+      - W/"0cf863489c80d4589357ede8cfc03356"
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Expires:
-      - Thu, 03 Dec 2020 22:41:54 GMT
+      - Tue, 05 Jan 2021 12:59:47 GMT
       Last-Modified:
-      - Thu, 26 Nov 2020 01:07:26 GMT
+      - Thu, 31 Dec 2020 09:38:49 GMT
       Referrer-Policy:
       - strict-origin-when-cross-origin
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d48250be7b20267fdf66fb383554eb5f31607010892; expires=Sat, 02-Jan-21
-        15:54:52 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=d5970083064b8fd50d7342066aef652071609823225; expires=Thu, 04-Feb-21
+        05:07:05 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -193,15 +193,15 @@ interactions:
       X-Permitted-Cross-Domain-Policies:
       - none
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":957,"until":"2020-11-26T09:50:00Z"}'
+      - '{"name":"AUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":975,"until":"2020-12-31T14:25:00Z"}'
       X-Request-Id:
-      - bc33b3ae-9944-4ba7-93b9-99071c961f70
+      - ff241e87-3f15-43ca-8b49-3d272ec2c064
       X-Runtime:
-      - '0.008624'
+      - '0.008355'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae9528b00000db293b2b000000001
+      - 07728a1e3a0000383637228000000001
     status:
       code: 200
       message: OK
@@ -224,7 +224,7 @@ interactions:
       CF-Cache-Status:
       - DYNAMIC
       CF-RAY:
-      - 5fbe77feca5b0e2e-IAD
+      - 60caac776ac5f102-IAD
       Cache-Control:
       - max-age=0, private, must-revalidate
       Connection:
@@ -232,7 +232,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Thu, 03 Dec 2020 15:54:52 GMT
+      - Tue, 05 Jan 2021 05:07:05 GMT
       ETag:
       - W/"a9115f882a0b5a5f31a640a1c40be015"
       Expect-CT:
@@ -244,8 +244,8 @@ interactions:
       Server:
       - cloudflare
       Set-Cookie:
-      - __cfduid=d6995c92fdf51a147499f74624b24de341607010892; expires=Sat, 02-Jan-21
-        15:54:52 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      - __cfduid=d9d1ed87c7d8458fd0d494d11c49a3a481609823225; expires=Thu, 04-Feb-21
+        05:07:05 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
       Vary:
       - Accept-Encoding
       X-Content-Type-Options:
@@ -259,15 +259,15 @@ interactions:
       X-Private-User:
       - 'false'
       X-Ratelimit:
-      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":957,"until":"2020-12-03T15:55:00Z"}'
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":950,"until":"2021-01-05T05:10:00Z"}'
       X-Request-Id:
-      - 3f44b0d0-e6c2-4094-ab57-9eb6da3c0f70
+      - e0b020da-64cd-4850-9fd4-8f48e57ad93a
       X-Runtime:
-      - '0.023999'
+      - '0.014299'
       X-XSS-Protection:
       - 1; mode=block
       cf-request-id:
-      - 06cae9533f00000e2eb88cb000000001
+      - 07728a1ea20000f10217b05000000001
     status:
       code: 200
       message: OK
