@@ -8,6 +8,7 @@ import os
 import queue
 import re
 import sys
+import weakref
 from collections import OrderedDict, defaultdict
 from collections.abc import MutableMapping
 from datetime import datetime, timedelta
@@ -23,6 +24,7 @@ from typing import (
     Optional,
     Pattern,
     Sequence,
+    Set,
     Tuple,
     Union,
 )
@@ -288,13 +290,13 @@ _binOps = {
 class TimedDict(MutableMapping):
     """Acts like a normal dict, but keys will only remain in the dictionary for a specified time span."""
 
-    _all_stores: List[dict] = []
+    _instances: Set['TimedDict'] = weakref.WeakSet()
 
     def __init__(self, cache_time: Union[timedelta, str] = '5 minutes'):
         self.cache_time = parse_timedelta(cache_time)
         self._store: dict = {}
-        self._all_stores.append(self._store)
         self._last_prune = datetime.now()
+        self._instances.add(self)
 
     def _prune(self):
         """Prune all expired keys."""
@@ -339,7 +341,7 @@ class TimedDict(MutableMapping):
         Clears all instantiated TimedDicts.
         Used by tests to make sure artifacts don't leak between tests.
         """
-        for store in cls._all_stores:
+        for store in cls._instances:
             store.clear()
 
 
