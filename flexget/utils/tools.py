@@ -24,7 +24,6 @@ from typing import (
     Optional,
     Pattern,
     Sequence,
-    Set,
     Tuple,
     Union,
 )
@@ -290,13 +289,13 @@ _binOps = {
 class TimedDict(MutableMapping):
     """Acts like a normal dict, but keys will only remain in the dictionary for a specified time span."""
 
-    _instances: Set['TimedDict'] = weakref.WeakSet()
+    _instances: Dict[int, 'TimedDict'] = weakref.WeakValueDictionary()
 
     def __init__(self, cache_time: Union[timedelta, str] = '5 minutes'):
         self.cache_time = parse_timedelta(cache_time)
         self._store: dict = {}
         self._last_prune = datetime.now()
-        self._instances.add(self)
+        self._instances[id(self)] = self
 
     def _prune(self):
         """Prune all expired keys."""
@@ -341,7 +340,7 @@ class TimedDict(MutableMapping):
         Clears all instantiated TimedDicts.
         Used by tests to make sure artifacts don't leak between tests.
         """
-        for store in cls._instances:
+        for store in cls._instances.values():
             store.clear()
 
 
