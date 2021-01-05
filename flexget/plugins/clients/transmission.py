@@ -55,12 +55,24 @@ class TransmissionBase:
 
     def create_rpc_client(self, config):
         user, password = config.get('username'), config.get('password')
+        urlo = urlparse(config['host'])
+
+        if urlo.scheme == '':
+            urlo = urlparse('http://' + config['host'])
+
+        protocol = urlo.scheme if urlo.scheme else 'http'
+        port = str(urlo.port) if urlo.port else config['port']
+        path = urlo.path.rstrip('rpc') if urlo.path else '/transmission/'
+
+        logger.debug('Connecting to {}://{}:{}{}', protocol, urlo.hostname, port, path)
 
         try:
-            cli = transmissionrpc.Client(host = config['host'],
-                                         port = config['port'],
-                                         username=user,
-                                         password=password)
+            cli = transmissionrpc.Client(protocol = protocol,
+                                         host = urlo.hostname,
+                                         port = port,
+                                         path = path,
+                                         username = user,
+                                         password = password)
         except TransmissionError as e:
             if e.original and e.original.code == 401:
                 raise plugin.PluginError(
