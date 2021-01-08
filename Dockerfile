@@ -1,4 +1,4 @@
-FROM python:3-alpine
+FROM docker.io/python:3-alpine
 ENV PYTHONUNBUFFERED 1
 
 RUN apk add --no-cache --upgrade \
@@ -16,7 +16,7 @@ COPY . /flexget
 
 RUN pip install -U pip && \
     pip wheel -e /flexget && \
-    pip wheel transmissionrpc && \
+    pip wheel transmission-rpc && \
     pip wheel deluge-client && \
     pip wheel cloudscraper
 
@@ -25,7 +25,7 @@ RUN wget https://github.com/Flexget/webui/releases/latest/download/dist.zip && \
     unzip dist.zip && \
     rm dist.zip
 
-FROM python:3-alpine
+FROM docker.io/python:3-alpine
 ENV PYTHONUNBUFFERED 1
 
 RUN apk add --no-cache --upgrade \
@@ -40,7 +40,7 @@ RUN pip install -U pip && \
                 --no-index \
                 -f /wheels \
                 FlexGet \
-                transmissionrpc \
+                transmission-rpc \
                 deluge-client \
                 cloudscraper && \
     rm -rf /wheels
