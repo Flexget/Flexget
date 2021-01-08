@@ -3,11 +3,11 @@ import os
 import re
 from datetime import datetime, timedelta
 from fnmatch import fnmatch
+from functools import partial
 from netrc import NetrcParseError, netrc
 from time import sleep
 from urllib.parse import urlparse
 
-from functools import partial
 from loguru import logger
 
 from flexget import plugin
@@ -19,9 +19,9 @@ from flexget.utils.template import RenderError
 from flexget.utils.tools import parse_timedelta
 
 try:
+    import requests.exceptions
     import transmission_rpc as transmissionrpc
     from transmission_rpc import TransmissionError
-    import requests.exceptions
 except ImportError:
     # If transmissionrpc is not found, errors will be shown later
     pass
@@ -67,12 +67,14 @@ class TransmissionBase:
         logger.debug('Connecting to {}://{}:{}{}', protocol, urlo.hostname, port, path)
 
         try:
-            cli = transmissionrpc.Client(protocol = protocol,
-                                         host = urlo.hostname,
-                                         port = port,
-                                         path = path,
-                                         username = user,
-                                         password = password)
+            cli = transmissionrpc.Client(
+                protocol=protocol,
+                host=urlo.hostname,
+                port=port,
+                path=path,
+                username=user,
+                password=password,
+            )
         except TransmissionError as e:
             if e.original and e.original.code == 401:
                 raise plugin.PluginError(
@@ -81,14 +83,9 @@ class TransmissionBase:
             else:
                 raise plugin.PluginError("Error connecting to transmission: %s" % e.message)
         except requests.exceptions.ConnectTimeout as e:
-            raise plugin.PluginError(
-                "Cannot connect to transmission: Connection timed out."
-                    )
+            raise plugin.PluginError("Cannot connect to transmission: Connection timed out.")
         except requests.exceptions.ConnectionError as e:
-            raise plugin.PluginError(
-                "Error connecting to transmission: %s" %
-                e.args[0].reason
-            )
+            raise plugin.PluginError("Error connecting to transmission: %s" % e.args[0].reason)
         return cli
 
     def torrent_info(self, torrent, config):
@@ -141,7 +138,7 @@ class TransmissionBase:
             from transmission_rpc import TransmissionError  # noqa
         except:
             raise plugin.PluginError(
-                'transmission-rpc module version 0.11 or higher required.', logger
+                'transmission-rpc module version 3.0 or higher required.', logger
             )
 
         # Mark rpc client for garbage collector so every task can start
@@ -238,8 +235,10 @@ class PluginTransmissionInput(TransmissionBase):
                         'error when requesting transmissionrpc attribute {}', attr
                     )
             # Availability in percent
-            entry['transmission_availability'] = (torrent.desiredAvailable / torrent.leftUntilDone) if torrent.leftUntilDone else 0
-            
+            entry['transmission_availability'] = (
+                (torrent.desiredAvailable / torrent.leftUntilDone) if torrent.leftUntilDone else 0
+            )
+
             entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
             entry['transmission_seed_ratio_ok'] = seed_ratio_ok
             entry['transmission_idle_limit_ok'] = idle_limit_ok
@@ -492,34 +491,34 @@ class PluginTransmission(TransmissionBase):
                     if 'main_file_ratio' in options['post']:
                         main_ratio = options['post']['main_file_ratio']
 
-                    for f in file_list:
+                    for file_id, file in enumerate(file_list):
                         # No need to set main_id if we're not going to need it
-                        if find_main_file and file_list[f]['size'] > total_size * main_ratio:
-                            main_id = f
+                        if find_main_file and file.size > total_size * main_ratio:
+                            main_id = file_id
 
                         if 'include_files' in options['post']:
                             if any(
-                                fnmatch(file_list[f]['name'], mask)
+                                fnmatch(file.name, mask)
                                 for mask in options['post']['include_files']
                             ):
-                                dl_list.append(f)
+                                dl_list.append(file_id)
                             elif options['post'].get('include_subs') and any(
-                                fnmatch(file_list[f]['name'], mask) for mask in ext_list
+                                fnmatch(file.name, mask) for mask in ext_list
                             ):
-                                dl_list.append(f)
+                                dl_list.append(file_id)
 
                         if skip_files:
-                            if any(fnmatch(file_list[f]['name'], mask) for mask in skip_files):
-                                skip_list.append(f)
+                            if any(fnmatch(file.name, mask) for mask in skip_files):
+                                skip_list.append(file_id)
 
                     if main_id is not None:
                         # Look for files matching main ID title but with a different extension
                         if options['post'].get('rename_like_files'):
-                            for f in file_list:
+                            for file_id, file in enumerate(file_list):
                                 # if this filename matches main filename we want to rename it as well
-                                fs = os.path.splitext(file_list[f]['name'])
-                                if fs[0] == os.path.splitext(file_list[main_id]['name'])[0]:
-                                    main_list.append(f)
+                                fs = os.path.splitext(file.name)
+                                if fs[0] == os.path.splitext(file_list[main_id].name)[0]:
+                                    main_list.append(file_id)
                         else:
                             main_list = [main_id]
 
@@ -540,19 +539,16 @@ class PluginTransmission(TransmissionBase):
                             download_dir = options['add']['download_dir']
 
                         # Get new filename without ext
-                        file_ext = os.path.splitext(file_list[main_id]['name'])[1]
+                        file_ext = os.path.splitext(file_list[main_id].name)[1]
                         file_path = os.path.dirname(
-                            os.path.join(download_dir, file_list[main_id]['name'])
+                            os.path.join(download_dir, file_list[main_id].name)
                         )
                         filename = options['post']['content_filename']
                         if config['host'] == 'localhost' or config['host'] == '127.0.0.1':
                             counter = 1
                             while os.path.exists(os.path.join(file_path, filename + file_ext)):
                                 # Try appending a (#) suffix till a unique filename is found
-                                filename = '%s(%s)' % (
-                                    options['post']['content_filename'],
-                                    counter,
-                                )
+                                filename = f'{options["post"]["content_filename"]}({counter})'
                                 counter += 1
                         else:
                             logger.debug(
@@ -560,11 +556,11 @@ class PluginTransmission(TransmissionBase):
                                 'when adding to a remote transmission daemon.'
                             )
 
-                        for index in main_list:
-                            file_ext = os.path.splitext(file_list[index]['name'])[1]
+                        for file_id in main_list:
+                            file_ext = os.path.splitext(file_list[file_id].name)[1]
                             logger.debug(
                                 'File {} renamed to {}',
-                                file_list[index]['name'],
+                                file_list[file_id].name,
                                 filename + file_ext,
                             )
                             # change to below when set_files will allow setting name, more efficient to have one call
@@ -572,7 +568,7 @@ class PluginTransmission(TransmissionBase):
                             try:
                                 self.client.rename_torrent_path(
                                     torrent_info.id,
-                                    file_list[index]['name'],
+                                    file_list[file_id].name,
                                     os.path.basename(str(pathscrub(filename + file_ext))),
                                 )
                             except TransmissionError:
@@ -644,7 +640,7 @@ class PluginTransmission(TransmissionBase):
                 elif config['action'] == 'bypass_queue':
                     start_torrent(bypass_queue=True)
                     logger.info('resumed (bypass queue) {} in transmission', torrent_info.name)
-                    
+
             except TransmissionError as e:
                 logger.opt(exception=True).debug('TransmissionError')
                 logger.debug('Failed options dict: {}', options)
