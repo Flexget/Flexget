@@ -1,7 +1,7 @@
 import copy
 import functools
 import re
-from typing import Dict, Iterator, List, Optional, Tuple, Union, Set
+from typing import Dict, Iterator, List, Optional, Set, Tuple, Union
 
 from loguru import logger
 
@@ -233,10 +233,7 @@ class Quality(Serializer):
                     setattr(self, default.type, default)
 
     def _find_best(
-        self,
-        qlist: List[QualityComponent],
-        default: QualityComponent,
-        strip_all: bool = True,
+        self, qlist: List[QualityComponent], default: QualityComponent, strip_all: bool = True,
     ) -> QualityComponent:
         """Finds the highest matching quality component from `qlist`"""
         result = None
@@ -503,4 +500,4 @@ class Requirements:
         return self.text or 'any'
 
     def __repr__(self) -> str:
-        return f'<Requirements(self)>'
+        return f'<Requirements({self})>'

@@ -31,7 +31,10 @@ class FilterQuality:
                 entry.reject('Entry doesn\'t have a quality')
                 continue
             if not any(req.allows(entry['quality']) for req in reqs):
-                entry.reject('%s does not match quality requirement %s' % (entry['quality'], reqs))
+                text_reqs = ', '.join(f'`{req}`' for req in reqs)
+                entry.reject(
+                    f'`{entry["quality"]}` does not match any of quality requirements: {text_reqs}'
+                )
 
 
 @event('plugin.register')
