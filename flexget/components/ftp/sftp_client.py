@@ -199,9 +199,10 @@ class SftpClient:
 
         :param path: path to build
         """
+
         if not self.path_exists(path):
             try:
-                self._sftp.mkdir(path)
+                self._sftp.makedirs(path)
             except Exception as e:
                 raise SftpError(f'Failed to create remote directory {path} ({str(e)})')
 
