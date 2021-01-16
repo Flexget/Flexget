@@ -166,8 +166,8 @@ _audios = [
     QualityComponent('audio', 45, 'dd+5.1', 'dd[p+]%s' % channels),
     QualityComponent('audio', 50, 'flac', 'flac%s?' % channels),
     # The DTSs are a bit backwards, but the more specific one needs to be parsed first
-    QualityComponent('audio', 60, 'dtshd', r'dts[\W_]?hd(?:[\W_]?ma)?%s?' % channels),
-    QualityComponent('audio', 70, 'dts'),
+    QualityComponent('audio', 70, 'dtshd', r'dts[\W_]?hd(?:[\W_]?ma)?%s?' % channels),
+    QualityComponent('audio', 60, 'dts'),
     QualityComponent('audio', 80, 'truehd', 'truehd%s?' % channels),
 ]
 
