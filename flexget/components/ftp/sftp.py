@@ -309,6 +309,7 @@ class SftpUpload:
             sftp.upload(location, to)
         except SftpError as e:
             entry.fail(str(e))  # type: ignore
+            return
 
         if delete_origin and Path(location).is_file():
             try:
