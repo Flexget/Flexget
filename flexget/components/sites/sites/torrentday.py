@@ -18,6 +18,7 @@ logger = logger.bind(name='torrentday')
 CATEGORIES = {
     'all': 0,
     # Movies
+    'mov4k': 96,
     'mov480p': 25,
     'movHD': 11,
     'movBD': 5,
@@ -34,6 +35,7 @@ CATEGORIES = {
     'tvDVD': 31,
     'tvDVDrip': 33,
     'tvMOBILE': 46,
+    'tvNonEnglish': 82,
     'tvPACKS': 14,
     'tvSDx264': 26,
     'tvHDx264': 7,
@@ -53,16 +55,16 @@ class UrlRewriteTorrentday:
           rss_key: xxxxxxxxx  (required)    get this from your profile page
           category: xxxxxxxx
 
-          Category can be one of 
+          Category can be one of
             ID from browsing site OR 'name'
             movies:
-              mov480p, movHD, movBD, movDVD,
+              mov4k, mov480p, movHD, movBD, movDVD,
               movMP4, movNonEnglish, movPACKS,
               movSDx264, movX265, movXVID
             tv:
               tv480p, tvBRD, tvDVD, tvDVDrip,
-              tvMOBILE, tvPACKS, tvSDx264, 
-              tvHDx264, tvX265, tvXVID
+              tvMOBILE, tvNonEnglish, tvPACKS,
+              tvSDx264, tvHDx264, tvX265, tvXVID
     """
 
     schema = {
@@ -114,11 +116,9 @@ class UrlRewriteTorrentday:
             categories = [categories]
         # If there are any text categories, turn them into their id number
         categories = [c if isinstance(c, int) else CATEGORIES[c] for c in categories]
-        params = {
-            'cata': 'yes',
-            'c{}'.format(','.join(str(c) for c in categories)): 1,
-            'clear-new': 1,
-        }
+        params = {'cata': 'yes', 'clear-new': 1}
+        params.update({str(c): 1 for c in categories})
+
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
 
@@ -137,7 +137,7 @@ class UrlRewriteTorrentday:
 
             # the following should avoid table being None due to a malformed
             # html in td search results
-            soup = get_soup(page).contents[1].contents[1].next.next.nextSibling
+            soup = get_soup(page).contents[1].contents[1].contents[1].next.nextSibling
             table = soup.find('table', {'id': 'torrentTable'})
             if table is None:
                 raise PluginError(
