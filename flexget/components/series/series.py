@@ -648,8 +648,8 @@ class FilterSeries(FilterSeriesBase):
             # Add season exclude hook to all entries so it will get added to list in all code paths of entry acceptance
             for entry in entries:
                 entry.add_hook(
-                    'accept',
-                    _exclude_season_on_accept,
+                    action='accept',
+                    func=_exclude_season_on_accept,
                     series_entity=entity,
                     accepted_seasons_list=accepted_seasons,
                 )
