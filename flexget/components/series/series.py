@@ -630,7 +630,7 @@ class FilterSeries(FilterSeriesBase):
             series_entity: Union[db.Season, db.Episode],
             accepted_seasons_list: List[int],
             **kwargs,
-        ):
+        ) -> None:
             # need to reject all other episode/season packs for an accepted season during the task,
             # can't wait for task learn phase
             if series_entity.is_season:
