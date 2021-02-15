@@ -626,7 +626,10 @@ class FilterSeries(FilterSeriesBase):
         accepted_seasons: List[int] = []
 
         def _exclude_season_on_accept(
-            series_entity: Union[db.Season, db.Episode], accepted_seasons_list: List[int]
+            *args,
+            series_entity: Union[db.Season, db.Episode],
+            accepted_seasons_list: List[int],
+            **kwargs,
         ):
             # need to reject all other episode/season packs for an accepted season during the task,
             # can't wait for task learn phase
