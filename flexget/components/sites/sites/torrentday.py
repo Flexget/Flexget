@@ -6,6 +6,7 @@ from requests.exceptions import RequestException
 from flexget import plugin
 from flexget.components.sites.urlrewriting import UrlRewritingError
 from flexget.components.sites.utils import normalize_unicode, torrent_availability
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
@@ -71,12 +72,12 @@ class UrlRewriteTorrentday:
         'type': 'object',
         'properties': {
             'rss_key': {'type': 'string'},
-            'uid': {'type': 'string'},
+            'uid': {'oneOf': [{'type': 'integer'}, {'type': 'string'}]},
             'passkey': {'type': 'string'},
             'cfduid': {'type': 'string'},
-            'category': {
-                'oneOf': [{'type': 'integer'}, {'type': 'string', 'enum': list(CATEGORIES)}]
-            },
+            'category': one_or_more(
+                {'oneOf': [{'type': 'integer'}, {'type': 'string', 'enum': list(CATEGORIES)}]}
+            ),
         },
         'required': ['rss_key', 'uid', 'passkey', 'cfduid'],
         'additionalProperties': False,
@@ -125,7 +126,7 @@ class UrlRewriteTorrentday:
             url = 'https://www.torrentday.com/t'
             params['q'] = normalize_unicode(search_string).replace(':', '')
             cookies = {
-                'uid': config['uid'],
+                'uid': str(config['uid']),
                 'pass': config['passkey'],
                 '__cfduid': config['cfduid'],
             }
