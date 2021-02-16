@@ -186,7 +186,7 @@ class Decompress:
                 extract_info(info, archive, to, config['keep_dirs'], test=test)
 
         if config['delete_archive']:
-            if test:
+            if not test:
                 archive.delete()
             else:
                 logger.info(f'Would delete archive {archive.path}')
