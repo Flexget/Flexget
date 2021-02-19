@@ -81,7 +81,6 @@ class TelegramInput:
                     'title': {'type': 'string', 'format': 'regex'},
                 },
                 'additionalProperties': {'type': 'string', 'format': 'regex'},
-                'required': [],
             },
         },
         'required': ['token'],
@@ -98,7 +97,7 @@ class TelegramInput:
         types = config.get('types')
 
         #Defaults
-        if types is None:
+        if not types:
             types = ['private', 'group']
 
         #Get Last Checked ID
@@ -106,7 +105,7 @@ class TelegramInput:
 
         #Set Last Checked ID as Offset
         offset = ""
-        if update_id is not None:
+        if update_id:
             update_id += 1
             offset = "?offset="+str(update_id)
         
@@ -123,7 +122,7 @@ class TelegramInput:
             return
 
         #We have a error
-        if response['ok'] == False:
+        if not response['ok']:
             logger.error("Telegram updater returned error {}: {}", response['error_code'], response['description'] )
             return
 
@@ -136,7 +135,8 @@ class TelegramInput:
             update_id = message['update_id']
 
             #If desired update the last ID for the Bot
-            if clean_update == True:
+            if clean_update:
+                logger.debug("Last Update set to {}",update_id)
                 task.simple_persistence[token+'_update_id'] = update_id
             
             #We Don't care if it's not a message or no text
@@ -160,20 +160,20 @@ class TelegramInput:
             entry['title'] =  text
 
             #We need a url, so we add a dummy
-            entry['url']   = "http://localhost?update_id="+str(update_id)
+            entry['url'] = "http://localhost?update_id="+str(update_id)
 
             #Store the message if we need to use it in other plugins
             entry['telegram_message'] =  message['message']
             
             #Check Types
-            if types is not None:
+            if types:
                 if message['message']['chat']['type'] not in types:
                     logger.debug("Ignoring message because of invalid type {}",message)
                     continue
 
             #Check From
             append = True
-            if whitelist is not None:
+            if whitelist:
                 append = False
                 for i in whitelist:
                     if 'username' in i and i['username'] == message['message']['from']['username']:
@@ -191,12 +191,12 @@ class TelegramInput:
                                 append = True
                                 break
 
-                if append != True:
-                    logger.debug("Ignoring message because of no white list match {}",message)
+                if not append:
+                    logger.debug("Ignoring message because of no whitelist match {}",message)
                     continue
             
             #Process the entry config
-            if entry_config is None:
+            if not entry_config:
                 pass
             else:
                 for field, regexp in entry_config.items():
@@ -216,7 +216,7 @@ class TelegramInput:
                         break
             
             #Append the entry
-            if append == True:
+            if append:
                 entries.append(entry)
                 logger.debug('Added entry {}', entry)
 
