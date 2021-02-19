@@ -33,6 +33,7 @@ class EstimatesMoviesBluray:
                     release_date = movie.release_date
         except LookupError as e:
             logger.debug(e)
+            logger.debug('No data for Movie {} ({})', movie_name,movie_year)
             release_date = False
         if release_date:
             logger.debug('received release date: {}', release_date)
