@@ -54,7 +54,7 @@ class EstimatesSeriesTVMaze:
             entity = lookup(**kwargs)
         except LookupError as e:
             logger.debug(str(e))
-            return
+            return False
         if entity and entity.airdate:
             logger.debug('received air-date: {}', entity.airdate)
             return entity.airdate
