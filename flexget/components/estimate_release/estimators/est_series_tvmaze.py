@@ -39,14 +39,6 @@ class EstimatesSeriesTVMaze:
         }
 
         api_tvmaze = plugin.get('api_tvmaze', self)
-
-        lookup_series = api_tvmaze.series_lookup
-        try:
-            series_data = lookup_series(**kwargs)
-        except LookupError as e:
-            logger.debug('No data for Series {}', series_name)
-            return False
-
         if season_pack:
             lookup = api_tvmaze.season_lookup
             logger.debug('Searching api_tvmaze for season')

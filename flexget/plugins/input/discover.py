@@ -90,20 +90,8 @@ class Discover:
                     {'type': 'string', 'default': 'strict', 'enum': ['loose', 'strict', 'ignore']},
                     {
                         'type': 'object',
-                        'properties': {
-                            'optimistic': {'type': 'string', 'format': 'interval'},
-                            'no_data_ignore': {'type': 'boolean'},
-                        },
+                        'properties': {'optimistic': {'type': 'string', 'format': 'interval'}},
                         'required': ['optimistic'],
-                    },
-                    {
-                        'type': 'object',
-                        'properties': {
-                            'mode':  {'type': 'string', 'default': 'strict', 'enum': ['loose', 'strict', 'ignore']},
-                            'no_data_ignore': {'type': 'boolean'},
-                        },
-                        'required': ['mode'],
-                        'additionalProperties': False,
                     },
                 ]
             },
@@ -193,16 +181,7 @@ class Discover:
         result = []
         for entry in entries:
             est_date = estimator.estimate(entry)
-            if est_date is False:
-                if estimation_mode['mode'] == 'strict' and estimation_mode['no_data_ignore'] == False:                    
-                    logger.debug('No data is present for {}, not possible to determin release date', entry['title'])
-                    entry.reject('has no data to determin release date')
-                    entry.complete()
-                else:
-                    logger.debug('No data is present for {}, but accepting because of no_data_ignore', entry['title'])
-                    result.append(entry)
-                continue
-            elif est_date is None:
+            if est_date is None:
                 logger.debug('No release date could be determined for {}', entry['title'])
                 if estimation_mode['mode'] == 'strict':
                     entry.reject('has no release date')
@@ -298,7 +277,6 @@ class Discover:
 
         config['release_estimations'].setdefault('mode', 'strict')
         config['release_estimations'].setdefault('optimistic', '0 days')
-        config['release_estimations'].setdefault('no_data_ignore', False)
 
         task.no_entries_ok = True
         entries = aggregate_inputs(task, config['what'])
