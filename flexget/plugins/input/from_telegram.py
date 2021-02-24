@@ -5,8 +5,9 @@ from flexget.config_schema import one_or_more
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
+from requests.exceptions import HTTPError, RequestException
 
-logger = logger.bind(name='telegram_input')
+logger = logger.bind(name='from_telegram')
 
 _TELEGRAM_API_URL = "https://api.telegram.org/"
 
@@ -15,10 +16,9 @@ class TelegramInput:
     """
     Parse any messages from Telegram and fills fields with regex
 
-    Example::
-
+    Example:
       token: <token>
-      clean_update: yes
+      only_new: yes
       whitelist:
         - username: <my_username>
         - group: <my_group>
@@ -28,7 +28,7 @@ class TelegramInput:
       entry:
         <field>: <regexp to match value>
 
-    Note: If not declated, title will be the message
+    Note: If not declared, title will be the message
     """
 
     schema = {
@@ -73,7 +73,7 @@ class TelegramInput:
                 },
             },
 
-            'clean_update': {'type': 'boolean','default': True},
+            'only_new': {'type': 'boolean','default': True},
             'entry': {
                 'type': 'object',
                 'properties': {
@@ -91,9 +91,9 @@ class TelegramInput:
     def on_task_input(self, task, config):
         #Load The Configs
         token = config['token']
-        clean_update = config['clean_update']
+        only_new = config['only_new']
         entry_config = config.get('entry')
-        whitelist = config.get('whitelist')
+        whitelist = config.get('whitelist',[])
         types = config.get('types')
 
         #Defaults
@@ -103,27 +103,30 @@ class TelegramInput:
         #Get Last Checked ID
         update_id = task.simple_persistence.get(token+'_update_id')
 
-        #Set Last Checked ID as Offset
-        offset = ""
-        if update_id:
+        #Get only new messages
+        params={}
+        if update_id and only_new:
             update_id += 1
-            offset = "?offset="+str(update_id)
+            params['offset'] = update_id
         
         #The Target URL
-        url = _TELEGRAM_API_URL + "bot" + token + "/getUpdates" + offset  
+        url = "{domain}bot{token}/getUpdates".format(
+            domain=_TELEGRAM_API_URL,
+            token=token
+        )
 
         #Get Telegram Updates
         try:
             response = task.requests.get(
-                url, timeout=60, raise_status=False
+                url, timeout=60, raise_status=False, params=params
             ).json()
-        except:
-            logger.error("Error getting telegram update")
+        except HTTPError as e:
+            raise plugin.PluginError("Error getting telegram update: {}" % e)
             return
 
         #We have a error
         if not response['ok']:
-            logger.error("Telegram updater returned error {}: {}", response['error_code'], response['description'] )
+            raise plugin.PluginError("Telegram updater returned error {}: {}" % (response['error_code'], response['description'] ) )
             return
 
         #Get All New Messages
@@ -134,22 +137,13 @@ class TelegramInput:
             #This is the ID
             update_id = message['update_id']
 
-            #If desired update the last ID for the Bot
-            if clean_update:
-                logger.debug("Last Update set to {}",update_id)
-                task.simple_persistence[token+'_update_id'] = update_id
+            #Update the last ID for the Bot
+            logger.debug("Last Update set to {}",update_id)
+            task.simple_persistence[token+'_update_id'] = update_id
             
             #We Don't care if it's not a message or no text
-            if 'message' not in message:
-                continue
-
-            if 'text' not in message['message']:
-                continue
-
-            if 'chat' not in message['message']:
-                continue
-
-            if 'type' not in message['message']['chat']:
+            if 'message' not in message or 'text' not in message['message'] or 'chat' not in message['message'] or 'type' not in message['message']['chat']:
+                logger.debug("Invalid message discarted: {}", message)
                 continue
 
             logger.debug("Income message: {}", message)
@@ -166,36 +160,32 @@ class TelegramInput:
             entry['telegram_message'] =  message['message']
             
             #Check Types
-            if types:
-                if message['message']['chat']['type'] not in types:
-                    logger.debug("Ignoring message because of invalid type {}",message)
-                    continue
+            if types and message['message']['chat']['type'] not in types:
+                logger.debug("Ignoring message because of invalid type {}",message)
+                continue
 
             #Check From
-            append = True
-            if whitelist:
-                append = False
-                for i in whitelist:
-                    if 'username' in i and i['username'] == message['message']['from']['username']:
-                        logger.debug("WhiteListing: Username {}",message['message']['from']['username'])
-                        append = True
-                        break
-                    elif ('fullname' in i) and (i ['fullname']['first'] == message['message']['from']['first_name'] and i['fullname']['sur'] == message['message']['from']['last_name']):
-                        logger.debug("WhiteListing: Full Name {} {}",message['message']['from']['first_name'],message['message']['from']['last_name'])
-                        append = True
-                        break
-                    elif 'group' in i:
-                        if message['message']['chat']['type'] == 'group':
-                            if message['message']['chat']['title'] == i['group']:
-                                logger.debug("WhiteListing: Group {}",message['message']['chat']['title'])
-                                append = True
-                                break
+            message_from = message['message']['from']
+            message_chat = message['message']['chat']
 
-                if not append:
+            if whitelist:
+                for check in whitelist:
+                    if 'username' in check and check['username'] == message_from['username']:
+                        logger.debug("WhiteListing: Username {}",message_from['username'])
+                        break
+                    elif 'fullname' in check and check['fullname']['first'] == message_from['first_name'] and check['fullname']['sur'] == message_from['last_name']:
+                        logger.debug("WhiteListing: Full Name {} {}",message_from['first_name'],message_from['last_name'])
+                        break
+                    elif 'group' in check:
+                        if message_chat['type'] == 'group' and message_chat['title'] == check['group']:
+                            logger.debug("WhiteListing: Group {}",message_chat['title'])
+                            break
+                else:
                     logger.debug("Ignoring message because of no whitelist match {}",message)
                     continue
             
             #Process the entry config
+            accept = True
             if not entry_config:
                 pass
             else:
@@ -203,20 +193,21 @@ class TelegramInput:
                     match = re.search(regexp, text)
                     if match:
                         try:
-                            # add field to entry
+                            # Add field to entry
                             entry[field] = match.group(1)
                         except IndexError:
                             logger.error('Regex for field `{}` must contain a capture group', field)
                             raise plugin.PluginError(
-                                'Your telegram_input plugin config contains errors, please correct them.'
+                                'Your from_telegram plugin config contains errors, please correct them.'
                             )
                     else:
                         logger.debug('Ignored entry, not match on field {}: {}',field, entry)
-                        append = False
+                        accept = False
                         break
-            
+    
+
             #Append the entry
-            if append:
+            if accept:
                 entries.append(entry)
                 logger.debug('Added entry {}', entry)
 
@@ -225,4 +216,4 @@ class TelegramInput:
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(TelegramInput, 'telegram_input', api_ver=2)
+    plugin.register(TelegramInput, 'from_telegram', api_ver=2)
