@@ -126,7 +126,7 @@ class TestDiscover:
         task = execute_task('test_estimates')
         assert len(task.entries) == 0
         # It should be searched after the release date
-        mock_config[0]['est_release'] = datetime.now()
+        mock_config[0]['est_release'] = {'data_exists': True, 'entity_date': datetime.now()}
         task = execute_task('test_estimates')
         assert len(task.entries) == 1
 
