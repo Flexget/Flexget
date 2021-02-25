@@ -87,23 +87,11 @@ class Discover:
             'interval': {'type': 'string', 'format': 'interval', 'default': '5 hours'},
             'release_estimations': {
                 'oneOf': [
-                    {'type': 'string', 'default': 'strict', 'enum': ['loose', 'strict', 'ignore']},
+                    {'type': 'string', 'default': 'strict', 'enum': ['loose', 'strict', 'ignore','smart']},
                     {
                         'type': 'object',
-                        'properties': {
-                            'optimistic': {'type': 'string', 'format': 'interval'},
-                            'no_data_ignore': {'type': 'boolean'},
-                        },
+                        'properties': {'optimistic': {'type': 'string', 'format': 'interval'}},
                         'required': ['optimistic'],
-                    },
-                    {
-                        'type': 'object',
-                        'properties': {
-                            'mode':  {'type': 'string', 'default': 'strict', 'enum': ['loose', 'strict', 'ignore']},
-                            'no_data_ignore': {'type': 'boolean'},
-                        },
-                        'required': ['mode'],
-                        'additionalProperties': False,
                     },
                 ]
             },
@@ -192,21 +180,23 @@ class Discover:
         estimator = plugin.get('estimate_release', self)
         result = []
         for entry in entries:
-            est_date = estimator.estimate(entry)
-            if est_date is False:
-                if estimation_mode['mode'] == 'strict' and estimation_mode['no_data_ignore'] == False:                    
-                    logger.debug('No data is present for {}, not possible to determin release date', entry['title'])
-                    entry.reject('has no data to determin release date')
-                    entry.complete()
-                else:
-                    logger.debug('No data is present for {}, but accepting because of no_data_ignore', entry['title'])
-                    result.append(entry)
-                continue
-            elif est_date is None:
-                logger.debug('No release date could be determined for {}', entry['title'])
+            estimation = estimator.estimate(entry)
+
+            est_date    = estimation['entity_date']
+            data_exists = estimation['data_exists']
+
+            if est_date is None:
                 if estimation_mode['mode'] == 'strict':
+                    logger.debug('No release date could be determined for {}', entry['title'])
                     entry.reject('has no release date')
                     entry.complete()
+                elif estimation_mode['mode'] == 'smart' and data_exists:
+                    logger.debug('No release date could be determined for {}, but exists data', entry['title'])
+                    entry.reject('exists but has no release date')
+                    entry.complete()
+                elif estimation_mode['mode'] == 'smart' and not data_exists:
+                    logger.debug('Discovering because mode is \'{}\' and no data is found for entry', estimation_mode['mode'])
+                    result.append(entry)
                 else:
                     result.append(entry)
                 continue
@@ -298,7 +288,6 @@ class Discover:
 
         config['release_estimations'].setdefault('mode', 'strict')
         config['release_estimations'].setdefault('optimistic', '0 days')
-        config['release_estimations'].setdefault('no_data_ignore', False)
 
         task.no_entries_ok = True
         entries = aggregate_inputs(task, config['what'])

@@ -14,7 +14,7 @@ class EstimatesMoviesBluray:
     def estimate(self, entry):
         if 'movie_name' not in entry:
             return
-
+            
         movie_name = entry['movie_name']
         movie_year = entry.get('movie_year')
 
@@ -24,19 +24,19 @@ class EstimatesMoviesBluray:
 
         logger.debug('Searching Blu-ray.com for release date of {} ({})', movie_name, movie_year)
 
-        release_date = None
+        entity_data = {'data_exists': True, 'entity_date': None}
         try:
             with Session() as session:
                 lookup = plugin.get('api_bluray', self).lookup
                 movie = lookup(title=movie_name, year=movie_year, session=session)
                 if movie:
-                    release_date = movie.release_date
+                    entity_data['entity_date'] = movie.release_date
         except LookupError as e:
             logger.debug(e)
-            release_date = False
-        if release_date:
-            logger.debug('received release date: {}', release_date)
-        return release_date
+            entity_data['data_exists'] = False
+        if entity_data['entity_date']:
+            logger.debug('received release date: {}', entity_data['entity_date'])
+        return entity_data
 
 
 @event('plugin.register')
