@@ -2495,6 +2495,35 @@ class TestSeriesSeasonPack:
         assert task.find_entry('accepted', title='bro.s02.720p.HDTV-Flexget')
 
 
+class TestSeriesSeasonPackAdvanced:
+    _config = """
+    tasks:
+      timeframe_and_target:
+        parsing:
+          series: internal
+        mock:
+          - title: "foo S01 720p hdtv h264"
+          - title: "foo S01E01 720p hdtv h264"
+        series:
+          - foo:
+              identified_by: ep
+              quality: 720p|1080p webrip+
+              timeframe: 4 hours
+              target: 720p webrip+ h264+      
+              season_packs: true
+    """
+
+    @pytest.fixture()
+    def config(self):
+        """Overrides outer config fixture since season pack support does not work with guessit parser"""
+        return self._config
+
+    def test_season_pack_with_timeframe_and_target(self, execute_task):
+        task = execute_task('timeframe_and_target')
+        assert task.find_entry('accepted', title="foo S01 720p hdtv h264")
+        assert not task.find_entry('accepted', title="foo S01E01 720p hdtv h264")
+
+
 class TestSeriesDDAudio:
     _config = """
       templates:

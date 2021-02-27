@@ -5,6 +5,7 @@ import time
 from collections import defaultdict
 from copy import copy
 from datetime import datetime
+from typing import List, Union
 
 from loguru import logger
 from sqlalchemy import not_
@@ -622,7 +623,22 @@ class FilterSeries(FilterSeriesBase):
         :param series_entries: dict mapping Episodes or Seasons to entries for that episode or season_pack
         :param config: Series configuration
         """
-        accepted_seasons = []
+        accepted_seasons: List[int] = []
+
+        def _exclude_season_on_accept(
+            *args,
+            series_entity: Union[db.Season, db.Episode],
+            accepted_seasons_list: List[int],
+            **kwargs,
+        ) -> None:
+            # need to reject all other episode/season packs for an accepted season during the task,
+            # can't wait for task learn phase
+            if series_entity.is_season:
+                logger.debug(
+                    'adding season number `{}` to accepted seasons for this task',
+                    series_entity.season,
+                )
+                accepted_seasons_list.append(series_entity.season)
 
         # sort for season packs first, order by season number ascending. Uses -1 in case entity does not return a
         # season number or sort will crash
@@ -631,6 +647,15 @@ class FilterSeries(FilterSeriesBase):
         ):
             if not entries:
                 continue
+
+            # Add season exclude hook to all entries so it will get added to list in all code paths of entry acceptance
+            for entry in entries:
+                entry.add_hook(
+                    action='accept',
+                    func=_exclude_season_on_accept,
+                    series_entity=entity,
+                    accepted_seasons_list=accepted_seasons,
+                )
 
             reason = None
 
@@ -652,7 +677,7 @@ class FilterSeries(FilterSeriesBase):
             # Determine episode threshold for season pack
             ep_threshold = season_packs['threshold'] if season_packs else 0
 
-            # check that a season ack for this season wasn't already accepted in this task run
+            # check that a season pack for this season wasn't already accepted in this task run
             if entity.season in accepted_seasons:
                 for entry in entries:
                     entry.reject(
@@ -776,14 +801,6 @@ class FilterSeries(FilterSeriesBase):
             # Just pick the best ep if we get here
             reason = reason or 'choosing first acceptable match'
             best.accept(reason)
-
-            # need to reject all other episode/season packs for an accepted season during the task,
-            # can't wait for task learn phase
-            if entity.is_season:
-                logger.debug(
-                    'adding season number `{}` to accepted seasons for this task', entity.season
-                )
-                accepted_seasons.append(entity.season)
 
     def process_propers(self, config, episode, entries):
         """
