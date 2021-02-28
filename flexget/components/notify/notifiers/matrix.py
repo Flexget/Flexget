@@ -70,7 +70,7 @@ class MatrixNotifier:
         message = '%s\n%s' % (title, message)
         logger.debug('Sending Matrix notification about: {}', message)
         logging.getLogger('matrix').setLevel(logging.CRITICAL)
-        matrix = MatrixHttpApi(token=config['server'], token=config['token'])
+        matrix = MatrixHttpApi(config['server'], token=config['token'])
         response = matrix.send_message(config['roomid'], message)
 
 
