@@ -574,7 +574,8 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None, lang
             try:
                 updated_series = TVDBSeries(series.id, language)
                 series = session.merge(updated_series)
-                _update_search_strings(series, session, search=name)
+                if series and series.name:
+                    _update_search_strings(series, session, search=name)
             except LookupError as e:
                 logger.warning(
                     'Error while updating from tvdb ({}), using cached data.', e.args[0]
