@@ -22,7 +22,7 @@ TRAILER_SOURCE = {
 
 
 class AniList(object):
-    """" Creates entries for series and movies from your AniList list
+    """ " Creates entries for series and movies from your AniList list
 
     Syntax:
     anilist:

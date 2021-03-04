@@ -8,13 +8,13 @@ logger = logger.bind(name='p_priority')
 
 class PluginPriority:
     """
-        Allows modifying plugin priorities from default values.
+    Allows modifying plugin priorities from default values.
 
-        Example:
+    Example:
 
-        plugin_priority:
-          ignore: 50
-          series: 100
+    plugin_priority:
+      ignore: 50
+      series: 100
     """
 
     schema = {'type': 'object', 'additionalProperties': {'type': 'integer'}}

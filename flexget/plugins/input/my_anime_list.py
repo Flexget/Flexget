@@ -17,7 +17,7 @@ ANIME_TYPE = ['all', 'tv', 'ova', 'movie', 'special', 'ona', 'music', 'unknown']
 
 
 class MyAnimeList:
-    """" Creates entries for series and movies from MyAnimeList list
+    """ " Creates entries for series and movies from MyAnimeList list
 
     Syntax:
     my_anime_list:

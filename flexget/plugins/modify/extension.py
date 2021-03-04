@@ -8,11 +8,11 @@ logger = logger.bind(name='extension')
 
 class ModifyExtension:
     """
-        Allows specifying file extension explicitly when all other built-in detection mechanisms fail.
+    Allows specifying file extension explicitly when all other built-in detection mechanisms fail.
 
-        Example:
+    Example:
 
-        extension: nzb
+    extension: nzb
     """
 
     schema = {'type': ['string', 'number']}
