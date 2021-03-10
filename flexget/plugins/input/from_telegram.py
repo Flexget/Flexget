@@ -1,11 +1,13 @@
 """Plugin for telegram input"""
 import re
+
 from loguru import logger
+from requests.exceptions import HTTPError, RequestException
+
 from flexget.config_schema import one_or_more
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from requests.exceptions import HTTPError, RequestException
 
 logger = logger.bind(name='from_telegram')
 
@@ -96,7 +98,8 @@ class TelegramInput:
         types = config.get('types', ['private', 'group'])
 
         # Get Last Checked ID
-        update_id = task.simple_persistence.get('{}_update_id'.format(token))
+        persistence_name = f"{token}_update_id"
+        update_id = task.simple_persistence.get(persistence_name)
 
         # Get only new messages
         params = {}
@@ -105,20 +108,18 @@ class TelegramInput:
             params['offset'] = update_id
 
         # The Target URL
-        url = "{domain}bot{token}/getUpdates".format(domain=_TELEGRAM_API_URL, token=token)
+        url = f"{_TELEGRAM_API_URL}bot{token}/getUpdates"
 
         # Get Telegram Updates
         try:
             response = task.requests.get(url, timeout=60, raise_status=False, params=params).json()
         except HTTPError as e:
-            raise plugin.PluginError("Error getting telegram update: {}".format(e))
+            raise plugin.PluginError(f"Error getting telegram update: {e}")
 
         # We have a error
         if not response['ok']:
             raise plugin.PluginError(
-                "Telegram updater returned error {}: {}".format(
-                    response['error_code'], response['description']
-                )
+                f"Telegram updater returned error {response['error_code']}: {response['description']}"
             )
 
         # Get All New Messages
@@ -131,7 +132,7 @@ class TelegramInput:
 
             # Update the last ID for the Bot
             logger.debug("Last Update set to {}", update_id)
-            task.simple_persistence[token + '_update_id'] = update_id
+            task.simple_persistence[persistence_name] = update_id
 
             # We Don't care if it's not a message or no text
             if (
@@ -156,7 +157,7 @@ class TelegramInput:
             entry['title'] = text
 
             # We need a url, so we add a dummy
-            entry['url'] = "http://localhost?update_id={}".format(str(update_id))
+            entry['url'] = f"http://localhost?update_id={str(update_id)}"
 
             # Store the message if we need to use it in other plugins
             entry['telegram_message'] = message['message']
