@@ -94,14 +94,10 @@ class TelegramInput:
         only_new = config['only_new']
         entry_config = config.get('entry')
         whitelist = config.get('whitelist',[])
-        types = config.get('types')
-
-        #Defaults
-        if not types:
-            types = ['private', 'group']
+        types = config.get('types', ['private', 'group'])
 
         #Get Last Checked ID
-        update_id = task.simple_persistence.get(token+'_update_id')
+        update_id = task.simple_persistence.get('{}_update_id'.format(token))
 
         #Get only new messages
         params={}
@@ -121,13 +117,11 @@ class TelegramInput:
                 url, timeout=60, raise_status=False, params=params
             ).json()
         except HTTPError as e:
-            raise plugin.PluginError("Error getting telegram update: {}" % e)
-            return
+            raise plugin.PluginError("Error getting telegram update: {}".format(e))
 
         #We have a error
         if not response['ok']:
-            raise plugin.PluginError("Telegram updater returned error {}: {}" % (response['error_code'], response['description'] ) )
-            return
+            raise plugin.PluginError("Telegram updater returned error {}: {}".format(response['error_code'], response['description']))
 
         #Get All New Messages
         messages = response['result']
@@ -142,11 +136,19 @@ class TelegramInput:
             task.simple_persistence[token+'_update_id'] = update_id
             
             #We Don't care if it's not a message or no text
-            if 'message' not in message or 'text' not in message['message'] or 'chat' not in message['message'] or 'type' not in message['message']['chat']:
+            if ( 'message' not in message  
+                    or 'text' not in message['message']
+                    or 'chat' not in message['message']
+                    or 'type' not in message['message']['chat'] ):
                 logger.debug("Invalid message discarted: {}", message)
                 continue
 
             logger.debug("Income message: {}", message)
+
+            #Check Types
+            if types and message['message']['chat']['type'] not in types:
+                logger.debug("Ignoring message because of invalid type {}",message)
+                continue
 
             #Create Base Entry
             text = message['message']['text']
@@ -154,15 +156,10 @@ class TelegramInput:
             entry['title'] =  text
 
             #We need a url, so we add a dummy
-            entry['url'] = "http://localhost?update_id="+str(update_id)
+            entry['url'] = "http://localhost?update_id={}".format(str(update_id))
 
             #Store the message if we need to use it in other plugins
             entry['telegram_message'] =  message['message']
-            
-            #Check Types
-            if types and message['message']['chat']['type'] not in types:
-                logger.debug("Ignoring message because of invalid type {}",message)
-                continue
 
             #Check From
             message_from = message['message']['from']
@@ -186,9 +183,7 @@ class TelegramInput:
             
             #Process the entry config
             accept = True
-            if not entry_config:
-                pass
-            else:
+            if entry_config:
                 for field, regexp in entry_config.items():
                     match = re.search(regexp, text)
                     if match:
@@ -197,9 +192,7 @@ class TelegramInput:
                             entry[field] = match.group(1)
                         except IndexError:
                             logger.error('Regex for field `{}` must contain a capture group', field)
-                            raise plugin.PluginError(
-                                'Your from_telegram plugin config contains errors, please correct them.'
-                            )
+                            raise plugin.PluginError('Your from_telegram plugin config contains errors, please correct them.')
                     else:
                         logger.debug('Ignored entry, not match on field {}: {}',field, entry)
                         accept = False
