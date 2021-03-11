@@ -112,7 +112,7 @@ class TelegramInput:
 
         # Get Telegram Updates
         try:
-            response = task.requests.get(url, timeout=60, raise_status=False, params=params).json()
+            response = task.requests.get(url, timeout=60, raise_status=True, params=params).json()
         except HTTPError as e:
             raise plugin.PluginError(f"Error getting telegram update: {e}")
 
