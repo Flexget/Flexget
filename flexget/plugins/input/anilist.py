@@ -26,7 +26,7 @@ class AniList(object):
 
     Syntax:
     anilist:
-      username: <value>
+      username: <string>
       status:
         - <current|planning|completed|dropped|paused|repeating>
         - <current|planning|completed|dropped|paused|repeating>
@@ -38,6 +38,10 @@ class AniList(object):
       format:
         - <all|tv|tv_short|movie|special|ova|ona>
         - <tv|tv_short|movie|special|ova|ona>
+        ...
+      list:
+        - <string>
+        - <string>
         ...
     """
 
@@ -57,6 +61,7 @@ class AniList(object):
                     'format': one_or_more(
                         {'type': 'string', 'enum': ANIME_FORMAT}, unique_items=True
                     ),
+                    'list': one_or_more({'type': 'string'}),
                 },
                 'required': ['username'],
                 'additionalProperties': False,
@@ -68,11 +73,10 @@ class AniList(object):
     def on_task_input(self, task, config):
         if isinstance(config, str):
             config = {'username': config}
-        selected_list_status = config['status'] if 'status' in config else ['current', 'planning']
-        selected_release_status = (
-            config['release_status'] if 'release_status' in config else ['all']
-        )
-        selected_formats = config['format'] if 'format' in config else ['all']
+        selected_list_status = config.get('status', ['current', 'planning'])
+        selected_release_status = config.get('release_status', ['all'])
+        selected_formats = config.get('format', ['all'])
+        selected_list_name = config.get('list', [])
 
         if not isinstance(selected_list_status, list):
             selected_list_status = [selected_list_status]
@@ -82,6 +86,10 @@ class AniList(object):
 
         if not isinstance(selected_formats, list):
             selected_formats = [selected_formats]
+
+        if not isinstance(selected_list_name, list):
+            selected_list_name = [selected_list_name]
+        selected_list_name = [i.lower() for i in selected_list_name]
 
         logger.debug('Selected List Status: {}', selected_list_status)
         logger.debug('Selected Release Status: {}', selected_release_status)
@@ -99,7 +107,8 @@ class AniList(object):
                 f'query ($user: String){{ collection: MediaListCollection(userName: $user, '
                 f'type: ANIME, perChunk: 500, chunk: {req_chunk}, status_in: '
                 f'[{", ".join([s.upper() for s in selected_list_status])}]) {{ hasNextChunk, '
-                f'statuses: lists{{ status, list: entries{{ anime: media{{ {req_fields} }}}}}}}}}}'
+                f'statuses: lists{{ status, name, list: entries{{ anime: media{{ {req_fields}'
+                f' }}}}}}}}}}'
             )
 
             try:
@@ -113,40 +122,69 @@ class AniList(object):
             try:
                 list_response = list_response.json()['data']
                 logger.debug('JSON output: {}', list_response)
-                for list_status in list_response['collection']['statuses']:
+                for list_status in list_response.get('collection', {}).get('statuses', []):
+                    if selected_list_name and (
+                        list_status.get('name')
+                        and list_status.get('name').lower() not in selected_list_name
+                    ):
+                        continue
                     for anime in list_status['list']:
-                        anime = anime['anime']
+                        anime = anime.get('anime')
                         has_selected_release_status = (
-                            anime['status'].lower() in selected_release_status
-                            or 'all' in selected_release_status
-                        )
+                            (
+                                anime.get('status')
+                                and anime.get('status').lower() in selected_release_status
+                            )
+                        ) or 'all' in selected_release_status
                         has_selected_type = (
-                            anime['format'].lower() in selected_formats
-                            or 'all' in selected_formats
-                        )
+                            (
+                                anime.get('format')
+                                and anime.get('format').lower() in selected_formats
+                            )
+                        ) or 'all' in selected_formats
                         if has_selected_type and has_selected_release_status:
                             entry = Entry()
-                            entry['title'] = anime['title']['romaji']
-                            entry['al_title'] = anime['title']
-                            entry['al_format'] = anime['format']
-                            entry['al_release_status'] = anime['status'].capitalize()
-                            entry['al_list_status'] = list_status['status'].capitalize()
-                            entry['alternate_name'] = [anime['title']['english']] + anime[
-                                'synonyms'
-                            ]
-                            entry['url'] = anime['siteUrl']
-                            entry['al_idMal'] = anime['idMal']
-                            entry['al_episodes'] = anime['episodes']
-                            entry['al_trailer'] = (
-                                TRAILER_SOURCE[anime['trailer']['site']] + anime['trailer']['id']
-                                if anime['trailer']
-                                else ''
+                            entry['al_banner'] = anime.get('bannerImage')
+                            entry['al_cover'] = anime.get('coverImage', {}).get('large')
+                            entry['al_episodes'] = anime.get('episodes')
+                            entry['al_format'] = anime.get('format')
+                            entry['al_genres'] = anime.get('genres')
+                            entry['al_idMal'] = anime.get('idMal')
+                            entry['al_links'] = {
+                                item['site']: item['url'] for item in anime.get('externalLinks')
+                            }
+                            entry['al_list'] = list_status.get('name')
+                            entry['al_list_status'] = (
+                                list_status['status'].capitalize()
+                                if list_status.get('status')
+                                else None
                             )
-                            entry['al_cover'] = anime['coverImage']['large']
-                            entry['al_banner'] = anime['bannerImage']
-                            entry['al_genres'] = anime['genres']
-                            entry['al_tags'] = [t['name'] for t in anime['tags']]
-                            entry['al_links'] = anime['externalLinks']
+                            entry['al_release_status'] = (
+                                anime['status'].capitalize() if anime.get('status') else None
+                            )
+                            entry['al_tags'] = [t.get('name') for t in anime.get('tags')]
+                            entry['al_title'] = anime.get('title')
+                            entry['al_trailer'] = (
+                                TRAILER_SOURCE[anime.get('trailer', {}).get('site')]
+                                + anime.get('trailer', {}).get('id')
+                                if anime.get('trailer')
+                                and anime.get('trailer').get('site') in TRAILER_SOURCE
+                                else None
+                            )
+                            entry['alternate_name'] = anime.get('synonyms', [])
+                            eng_title = anime.get('title', {}).get('english')
+                            if (
+                                eng_title
+                                and eng_title.lower()
+                                != anime.get('title', {}).get('romaji').lower()
+                                and eng_title not in entry['alternate_name']
+                            ):
+                                entry['alternate_name'].insert(0, eng_title)
+                            entry['series_name'] = entry['al_title'].get('romaji') or entry[
+                                'al_title'
+                            ].get('english')
+                            entry['title'] = entry['series_name']
+                            entry['url'] = anime.get('siteUrl')
                             if entry.isvalid():
                                 yield entry
                 req_chunk = req_chunk + 1 if list_response['collection']['hasNextChunk'] else False

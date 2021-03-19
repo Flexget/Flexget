@@ -1,10 +1,12 @@
+import datetime
 import os
 import re
 from collections import defaultdict
-from datetime import datetime
+from typing import Any, Callable, Dict, Optional, Union, List, Pattern, Match
 from urllib.parse import parse_qsl, urlparse
 
 import jsonschema
+from jsonschema import ValidationError
 from jsonschema.compat import int_types, str_types
 from loguru import logger
 
@@ -15,12 +17,22 @@ from flexget.utils.tools import parse_episode_identifier, parse_timedelta
 
 logger = logger.bind(name='config_schema')
 
-schema_paths = {}
 CURRENT_SCHEMA_VERSION = 'http://json-schema.org/draft-04/schema#'
+# Type hint for json schemas. (If we upgrade to a newer json schema version, the type might allow more than dicts.)
+JsonSchema = Dict[str, Any]
+schema_paths: Dict[str, Union[JsonSchema, Callable[..., JsonSchema]]] = {}
+
+
+class ConfigValidationError(ValidationError):
+    json_pointer: str
+
+
+class ConfigError(ValueError):
+    errors: List[ConfigValidationError]
 
 
 # TODO: Rethink how config key and schema registration work
-def register_schema(path, schema):
+def register_schema(path: str, schema: Union[JsonSchema, Callable[..., JsonSchema]]):
     """
     Register `schema` to be available at `path` for $refs
 
@@ -31,10 +43,10 @@ def register_schema(path, schema):
 
 
 # Validator that handles root structure of config.
-_root_config_schema = None
+_root_config_schema: Optional[JsonSchema] = None
 
 
-def register_config_key(key, schema, required=False):
+def register_config_key(key: str, schema: JsonSchema, required: bool = False):
     """ Registers a valid root level key for the config.
 
     :param string key:
@@ -44,13 +56,14 @@ def register_config_key(key, schema, required=False):
     :param bool required:
       Specify whether this is a mandatory key.
     """
-    _root_config_schema['properties'][key] = schema
+    root_schema = get_schema()
+    root_schema['properties'][key] = schema
     if required:
-        _root_config_schema.setdefault('required', []).append(key)
+        root_schema.setdefault('required', []).append(key)
     register_schema('/schema/config/%s' % key, schema)
 
 
-def get_schema():
+def get_schema() -> JsonSchema:
     global _root_config_schema
     if _root_config_schema is None:
         _root_config_schema = {
@@ -60,12 +73,12 @@ def get_schema():
             '$schema': CURRENT_SCHEMA_VERSION,
         }
         fire_event('config.register')
-        # TODO: Is /schema/root this the best place for this?
+        # TODO: Is /schema/config this the best place for this?
         register_schema('/schema/config', _root_config_schema)
     return _root_config_schema
 
 
-def one_or_more(schema, unique_items=False):
+def one_or_more(schema: JsonSchema, unique_items: bool = False) -> JsonSchema:
     """
     Helper function to construct a schema that validates items matching `schema` or an array
     containing items matching `schema`.
@@ -87,7 +100,7 @@ def one_or_more(schema, unique_items=False):
     }
 
 
-def resolve_ref(uri):
+def resolve_ref(uri: str) -> JsonSchema:
     """
     Finds and returns a schema pointed to by `uri` that has been registered in the register_schema function.
     """
@@ -101,7 +114,11 @@ def resolve_ref(uri):
     raise jsonschema.RefResolutionError("%s could not be resolved" % uri)
 
 
-def process_config(config, schema=None, set_defaults=True):
+def process_config(
+    config: Any,
+    schema: Optional[JsonSchema] = None,
+    set_defaults: bool = True
+) -> List[ConfigValidationError]:
     """
     Validates the config, and sets defaults within it if `set_defaults` is set.
     If schema is not given, uses the root config schema.
@@ -116,7 +133,7 @@ def process_config(config, schema=None, set_defaults=True):
     if set_defaults:
         validator.VALIDATORS['properties'] = validate_properties_w_defaults
     try:
-        errors = list(validator.iter_errors(config))
+        errors: List[ValidationError] = list(validator.iter_errors(config))
     finally:
         validator.VALIDATORS['properties'] = jsonschema.Draft4Validator.VALIDATORS['properties']
     # Customize the error messages
@@ -126,18 +143,18 @@ def process_config(config, schema=None, set_defaults=True):
     return errors
 
 
-def parse_time(time_string):
+def parse_time(time_string: str) -> datetime.time:
     """Parse a time string from the config into a :class:`datetime.time` object."""
     formats = ['%I:%M %p', '%H:%M', '%H:%M:%S']
     for f in formats:
         try:
-            return datetime.strptime(time_string, f).time()
+            return datetime.datetime.strptime(time_string, f).time()
         except ValueError:
             continue
     raise ValueError('invalid time `%s`' % time_string)
 
 
-def parse_interval(interval_string):
+def parse_interval(interval_string: str) -> datetime.timedelta:
     """Takes an interval string from the config and turns it into a :class:`datetime.timedelta` object."""
     regexp = r'^\d+ (second|minute|hour|day|week)s?$'
     if not re.match(regexp, interval_string):
@@ -145,8 +162,8 @@ def parse_interval(interval_string):
     return parse_timedelta(interval_string)
 
 
-def parse_percent(percent_input):
-    """Takes a size string from the config and turns it into int(bytes)."""
+def parse_percent(percent_input: str) -> float:
+    """Takes a percent string from the config and turns it into a float."""
     percent_input = percent_input.rstrip('%')
     try:
         return float(percent_input)
@@ -154,7 +171,7 @@ def parse_percent(percent_input):
         raise ValueError("should be in format '0-x%'")
 
 
-def parse_size(size_input):
+def parse_size(size_input: str) -> int:
     """Takes a size string from the config and turns it into int(bytes)."""
     prefixes = [None, 'K', 'M', 'G', 'T', 'P']
     try:
@@ -195,35 +212,35 @@ def is_quality_req(instance):
 
 
 @format_checker.checks('time', raises=ValueError)
-def is_time(time_string):
+def is_time(time_string) -> bool:
     if not isinstance(time_string, str_types):
         return True
     return parse_time(time_string) is not None
 
 
 @format_checker.checks('interval', raises=ValueError)
-def is_interval(interval_string):
+def is_interval(interval_string) -> bool:
     if not isinstance(interval_string, str_types):
         return True
     return parse_interval(interval_string) is not None
 
 
 @format_checker.checks('size', raises=ValueError)
-def is_size(size_string):
+def is_size(size_string) -> bool:
     if not isinstance(size_string, (str_types, int_types)):
         return True
     return parse_size(size_string) is not None
 
 
 @format_checker.checks('percent', raises=ValueError)
-def is_percent(percent_string):
+def is_percent(percent_string) -> bool:
     if not isinstance(percent_string, str_types):
         return True
     return parse_percent(percent_string) is not None
 
 
 @format_checker.checks('regex', raises=ValueError)
-def is_regex(instance):
+def is_regex(instance) -> Union[bool, Pattern]:
     if not isinstance(instance, str_types):
         return True
     try:
@@ -233,7 +250,7 @@ def is_regex(instance):
 
 
 @format_checker.checks('file', raises=ValueError)
-def is_file(instance):
+def is_file(instance) -> bool:
     if not isinstance(instance, str_types):
         return True
     if os.path.isfile(os.path.expanduser(instance)):
@@ -242,7 +259,7 @@ def is_file(instance):
 
 
 @format_checker.checks('path', raises=ValueError)
-def is_path(instance):
+def is_path(instance) -> bool:
     if not isinstance(instance, str_types):
         return True
     # Only validate the part of the path before the first identifier to be replaced
@@ -257,7 +274,7 @@ def is_path(instance):
 
 # TODO: jsonschema has a format checker for uri if rfc3987 is installed, perhaps we should use that
 @format_checker.checks('url')
-def is_url(instance):
+def is_url(instance) -> Union[None, bool, Match]:
     if not isinstance(instance, str_types):
         return True
     regexp = (
@@ -269,7 +286,7 @@ def is_url(instance):
 
 
 @format_checker.checks('episode_identifier', raises=ValueError)
-def is_episode_identifier(instance):
+def is_episode_identifier(instance) -> bool:
     if not isinstance(instance, (str_types, int)):
         return True
     return parse_episode_identifier(instance) is not None
@@ -283,13 +300,13 @@ def is_episode_or_season_id(instance):
 
 
 @format_checker.checks('file_template', raises=ValueError)
-def is_valid_template(instance):
+def is_valid_template(instance) -> bool:
     if not isinstance(instance, str_types):
         return True
     return get_template(instance) is not None
 
 
-def set_error_message(error):
+def set_error_message(error: jsonschema.ValidationError) -> None:
     """
     Create user facing error message from a :class:`jsonschema.ValidationError` `error`
 
@@ -297,19 +314,19 @@ def set_error_message(error):
     # First, replace default error messages with our custom ones
     if error.validator == 'type':
         if isinstance(error.validator_value, str):
-            valid_types = [error.validator_value]
+            valid_types_list = [error.validator_value]
         else:
-            valid_types = list(error.validator_value)
+            valid_types_list = list(error.validator_value)
         # Replace some types with more pythony ones
         replace = {'object': 'dict', 'array': 'list'}
-        valid_types = [replace.get(t, t) for t in valid_types]
+        valid_types_list = [replace.get(t, t) for t in valid_types_list]
         # Make valid_types into an english list, with commas and 'or'
-        valid_types = ', '.join(valid_types[:-2] + ['']) + ' or '.join(valid_types[-2:])
+        valid_types = ', '.join(valid_types_list[:-2] + ['']) + ' or '.join(valid_types_list[-2:])
         if isinstance(error.instance, dict):
-            error.message = 'Got a dict, expected: %s' % valid_types
+            error.message = f'Got a dict, expected: {valid_types}'
         if isinstance(error.instance, list):
-            error.message = 'Got a list, expected: %s' % valid_types
-        error.message = 'Got `%s`, expected: %s' % (error.instance, valid_types)
+            error.message = f'Got a list, expected: {valid_types}'
+        error.message = f'Got `{error.instance}`, expected: {valid_types}'
     elif error.validator == 'format':
         if error.cause:
             error.message = str(error.cause)

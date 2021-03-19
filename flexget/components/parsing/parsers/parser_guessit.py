@@ -239,7 +239,7 @@ class ParserGuessit:
         name = kwargs.get('name')
         country = guess_result.get('country')
         if not name:
-            name = guess_result.get('title')
+            name = guess_result.get('title', '')
             if not name:
                 valid = False
             elif country and hasattr(country, 'alpha2'):

@@ -19,7 +19,13 @@ def upgrade(ver, session):
     if ver == 0:
         table = table_schema('pending_entries', session)
         for row in session.execute(select([table.c.id, table.c.json])):
-            e = Entry(json.loads(row['json'], decode_datetime=True))
+            if not row['json']:
+                # Seems there could be invalid data somehow. See #2590
+                continue
+            data = json.loads(row['json'], decode_datetime=True)
+            # If title looked like a date, make sure it's a string
+            title = str(data.pop('title'))
+            e = Entry(title=title, **data)
             session.execute(
                 table.update().where(table.c.id == row['id']).values(json=serialization.dumps(e))
             )

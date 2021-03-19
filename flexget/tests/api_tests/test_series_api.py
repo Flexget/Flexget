@@ -3,6 +3,7 @@ import pytest
 from flexget.api.app import base_message
 from flexget.components.seen.db import SeenEntry
 from flexget.components.series.api import ObjectsContainer as OC
+
 # TODO: would be nicer to import db module
 from flexget.components.series.db import (
     AlternateNames,

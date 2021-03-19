@@ -116,7 +116,7 @@ class Archive:
             for volume in volumes:
                 os.remove(volume)
                 logger.verbose('Deleted archive: {}', volume)
-        except (IOError, os.error) as error:
+        except OSError as error:
             raise FSError(error)
 
     def volumes(self):
@@ -146,7 +146,7 @@ class Archive:
             with self.open(member) as source:
                 with open(destination, 'wb') as target:
                     shutil.copyfileobj(source, target)
-        except (IOError, os.error) as error:
+        except OSError as error:
             raise FSError(error)
 
         logger.verbose('Extracted: {}', member)
@@ -275,7 +275,7 @@ def is_archive(path):
         if archive:
             archive.close()
             return True
-    except (IOError, ArchiveError) as error:
+    except (OSError, ArchiveError) as error:
         logger.debug('Failed to open file as archive: {} ({})', path, error)
 
     return False

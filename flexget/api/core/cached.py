@@ -1,6 +1,8 @@
+from flask import Response
 from flask.helpers import send_file
-from flask_restplus import inputs
+from flask_restx import inputs
 from requests import RequestException
+from sqlalchemy.orm import Session
 
 from flexget.api import APIResource, api
 from flexget.api.app import APIError, BadRequest
@@ -22,7 +24,7 @@ class CachedResource(APIResource):
     @api.response(BadRequest)
     @api.response(APIError)
     @api.doc(parser=cached_parser)
-    def get(self, session=None):
+    def get(self, session: Session = None) -> Response:
         """ Cache remote resources """
         args = cached_parser.parse_args()
         url = args.get('url')
@@ -30,7 +32,7 @@ class CachedResource(APIResource):
         try:
             file_path, mime_type = cached_resource(url, self.manager.config_base, force=force)
         except RequestException as e:
-            raise BadRequest('Request Error: {}'.format(e.args[0]))
+            raise BadRequest(f'Request Error: {e.args[0]}')
         except OSError as e:
-            raise APIError('Error: {}'.format(str(e)))
+            raise APIError(f'Error: {e}')
         return send_file(file_path, mimetype=mime_type)

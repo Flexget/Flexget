@@ -123,7 +123,7 @@ class EmailNotifier:
                 # Forcing to use `str` type
                 logger.debug('logging in to smtp server using username: {}', self.username)
                 self.mail_server.login(self.username, self.password)
-        except (IOError, SMTPAuthenticationError) as e:
+        except (OSError, SMTPAuthenticationError) as e:
             raise PluginWarning(str(e))
 
     schema = {

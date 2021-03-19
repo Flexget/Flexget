@@ -2,15 +2,20 @@ import json
 import os
 import re
 from collections import deque
+from contextlib import suppress
 from functools import partial, wraps
+from typing import Callable, List, Dict, Union, Mapping, Tuple, TYPE_CHECKING
 
-from flask import Flask, jsonify, make_response, request
+from jsonschema.exceptions import ValidationError as SchemaValidationError
+from flask import Flask, Response, jsonify, make_response, request, Request
 from flask_compress import Compress
 from flask_cors import CORS
-from flask_restplus import Api as RestPlusAPI
-from flask_restplus import Resource
+from flask_restx import Api as RestxAPI
+from flask_restx import Resource, Model
+from flask_restx.reqparse import RequestParser
 from jsonschema import RefResolutionError
 from loguru import logger
+from sqlalchemy.orm import Session
 from werkzeug.http import generate_etag
 
 from flexget import manager
@@ -20,9 +25,21 @@ from flexget.webserver import User
 
 from . import __path__
 
-__version__ = '1.7.1'
+__version__ = '1.8.0'
 
 logger = logger.bind(name='api')
+
+if TYPE_CHECKING:
+    from typing import TypedDict
+    _TypeDict = TypedDict('_TypeDict', {'type': str})
+
+    class MessageDict(_TypeDict):
+        properties: Dict[str, _TypeDict]
+        required: List[str]
+
+    PaginationHeaders = TypedDict(
+        'PaginationHeaders', {'Link': str, 'Total-Count': int, 'Count': int}
+    )
 
 
 class APIClient:
@@ -32,13 +49,13 @@ class APIClient:
     It skips http, and is only usable from within the running flexget process.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.app = api_app.test_client()
 
-    def __getattr__(self, item):
+    def __getattr__(self, item: str) -> 'APIEndpoint':
         return APIEndpoint('/api/' + item, self.get_endpoint)
 
-    def get_endpoint(self, url, data=None, method=None):
+    def get_endpoint(self, url: str, data=None, method: str = None):
         if method is None:
             method = 'POST' if data is not None else 'GET'
         auth_header = dict(Authorization='Token %s' % api_key())
@@ -53,7 +70,7 @@ class APIClient:
 
 
 class APIEndpoint:
-    def __init__(self, endpoint, caller):
+    def __init__(self, endpoint: str, caller: Callable) -> None:
         self.endpoint = endpoint
         self.caller = caller
 
@@ -62,11 +79,11 @@ class APIEndpoint:
 
     __getitem__ = __getattr__
 
-    def __call__(self, data=None, method=None):
+    def __call__(self, data=None, method: str = None):
         return self.caller(self.endpoint, data=data, method=method)
 
 
-def api_version(f):
+def api_version(f: Callable[..., Response]):
     """ Add the 'API-Version' header to all responses """
 
     @wraps(f)
@@ -83,19 +100,24 @@ class APIResource(Resource):
 
     method_decorators = [with_session, api_version]
 
-    def __init__(self, api, *args, **kwargs):
+    def __init__(self, api: RestxAPI, *args, **kwargs) -> None:
         self.manager = manager.manager
         super().__init__(api, *args, **kwargs)
 
 
-class API(RestPlusAPI):
+class API(RestxAPI):
     """
-    Extends a flask restplus :class:`flask_restplus.Api` with:
+    Extends a flask restx :class:`flask_restx.Api` with:
       - methods to make using json schemas easier
       - methods to auto document and handle :class:`ApiError` responses
     """
 
-    def validate(self, model, schema_override=None, description=None):
+    def validate(
+        self,
+        model: Model,
+        schema_override: Dict[str, List[Dict[str, str]]] = None,
+        description=None
+    ):
         """
         When a method is decorated with this, json data submitted to the endpoint will be validated with the given
         `model`. This also auto-documents the expected model, as well as the possible :class:`ValidationError` response.
@@ -121,13 +143,13 @@ class API(RestPlusAPI):
 
         return decorator
 
-    def response(self, code_or_apierror, description='Success', model=None, **kwargs):
+    def response(self, code_or_apierror, description: str = 'Success', model=None, **kwargs):
         """
-        Extends :meth:`flask_restplus.Api.response` to allow passing an :class:`ApiError` class instead of
+        Extends :meth:`flask_restx.Api.response` to allow passing an :class:`ApiError` class instead of
         response code. If an `ApiError` is used, the response code, and expected response model, is automatically
         documented.
         """
-        try:
+        with suppress(TypeError):  # If first argument isn't a class this happens
             if issubclass(code_or_apierror, APIError):
                 description = code_or_apierror.description or description
                 return self.doc(
@@ -139,12 +161,15 @@ class API(RestPlusAPI):
                     },
                     **kwargs,
                 )
-        except TypeError:
-            # If first argument isn't a class this happens
-            pass
         return self.doc(responses={code_or_apierror: (description, model)}, **kwargs)
 
-    def pagination_parser(self, parser=None, sort_choices=None, default=None, add_sort=None):
+    def pagination_parser(
+        self,
+        parser: RequestParser = None,
+        sort_choices: List[str] = None,
+        default: str = None,
+        add_sort: bool = None
+    ) -> RequestParser:
         """
         Return a standardized pagination parser, to be used for any endpoint that has pagination.
 
@@ -191,7 +216,7 @@ api = API(
     format_checker=format_checker,
 )
 
-base_message = {
+base_message: "MessageDict" = {
     'type': 'object',
     'properties': {
         'status_code': {'type': 'integer'},
@@ -210,7 +235,7 @@ class APIError(Exception):
     status = 'Error'
     response_model = base_message_schema
 
-    def __init__(self, message=None, payload=None):
+    def __init__(self, message: str = None, payload=None) -> None:
         self.message = message
         self.payload = payload
 
@@ -300,14 +325,18 @@ class ValidationError(APIError):
         'parent',
     )
 
-    def __init__(self, validation_errors, message='validation error'):
+    def __init__(
+        self,
+        validation_errors: List[SchemaValidationError],
+        message: str = 'validation error'
+    ) -> None:
         payload = {
             'validation_errors': [self._verror_to_dict(error) for error in validation_errors]
         }
         super().__init__(message, payload=payload)
 
-    def _verror_to_dict(self, error):
-        error_dict = {}
+    def _verror_to_dict(self, error: SchemaValidationError) -> Mapping[str, Union[str, list]]:
+        error_dict: Dict[str, Union[str, list]] = {}
         for attr in self.verror_attrs:
             if isinstance(getattr(error, attr), deque):
                 error_dict[attr] = list(getattr(error, attr))
@@ -319,7 +348,7 @@ class ValidationError(APIError):
 empty_response = api.schema_model('empty', {'type': 'object'})
 
 
-def success_response(message, status_code=200, status='success'):
+def success_response(message: str, status_code: int = 200, status: str = 'success') -> Response:
     rsp_dict = {'message': message, 'status_code': status_code, 'status': status}
     rsp = jsonify(rsp_dict)
     rsp.status_code = status_code
@@ -334,17 +363,17 @@ def success_response(message, status_code=200, status='success'):
 @api.errorhandler(Conflict)
 @api.errorhandler(NotModified)
 @api.errorhandler(PreconditionFailed)
-def api_errors(error):
+def api_errors(error: APIError) -> Tuple[dict, int]:
     return error.to_dict(), error.status_code
 
 
 @with_session
-def api_key(session=None):
+def api_key(session: Session = None) -> str:
     logger.debug('fetching token for internal lookup')
-    return session.query(User).first().token
+    return session.query(User).first().token  # type: ignore
 
 
-def etag(method=None, cache_age=0):
+def etag(method: Callable = None, cache_age: int = 0):
     """
     A decorator that add an ETag header to the response and checks for the "If-Match" and "If-Not-Match" headers to
      return an appropriate response.
@@ -394,7 +423,12 @@ def etag(method=None, cache_age=0):
     return wrapped
 
 
-def pagination_headers(total_pages, total_items, page_count, request):
+def pagination_headers(
+    total_pages: int,
+    total_items: int,
+    page_count: int,
+    request: Request
+) -> 'PaginationHeaders':
     """
     Creates the `Link`. 'Count' and  'Total-Count' headers, to be used for pagination traversing
 
@@ -411,7 +445,7 @@ def pagination_headers(total_pages, total_items, page_count, request):
     page = int(request.args.get('page', 1))
 
     # Build the base template
-    LINKTEMPLATE = '<{}?per_page={}&'.format(url, per_page)
+    link_with_params = f'<{url}?per_page={per_page}&'
 
     # Removed page and per_page from query string
     query_string = re.sub(br'per_page=\d+', b'', request.query_string)
@@ -419,14 +453,14 @@ def pagination_headers(total_pages, total_items, page_count, request):
     query_string = re.sub(b'&{2,}', b'&', query_string)
 
     # Add all original query params
-    LINKTEMPLATE += query_string.decode().lstrip('&') + '&page={}>; rel="{}"'
+    link_with_params += query_string.decode().lstrip('&')
 
     link_string = ''
 
     if page > 1:
-        link_string += LINKTEMPLATE.format(page - 1, 'prev') + ', '
+        link_string += f'{link_with_params}&page={page-1}>; rel="prev", '
     if page < total_pages:
-        link_string += LINKTEMPLATE.format(page + 1, 'next') + ', '
-    link_string += LINKTEMPLATE.format(total_pages, 'last')
+        link_string += f'{link_with_params}&page={page+1}>; rel="next", '
+    link_string += f'{link_with_params}&page={total_pages}>; rel="last"'
 
     return {'Link': link_string, 'Total-Count': total_items, 'Count': page_count}

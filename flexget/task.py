@@ -6,12 +6,14 @@ import random
 import string
 import threading
 from functools import total_ordering, wraps
+from typing import Iterable, List, Union, Optional, TYPE_CHECKING
 
 from loguru import logger
 from sqlalchemy import Column, Integer, String, Unicode
 
 from flexget import config_schema, db_schema
-from flexget.entry import EntryUnicodeError
+from flexget.db_schema import VersionedBaseMeta
+from flexget.entry import Entry, EntryState, EntryUnicodeError
 from flexget.event import event, fire_event
 from flexget.manager import Session
 from flexget.plugin import (
@@ -28,11 +30,16 @@ from flexget.terminal import capture_console
 from flexget.utils import requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimpleTaskPersistence
+from flexget.utils.sqlalchemy_utils import ContextSession
 from flexget.utils.template import FlexGetTemplate, render_from_task
 from flexget.utils.tools import MergeException, get_config_hash, merge_dict_from_to
 
 logger = logger.bind(name='task')
-Base = db_schema.versioned_base('feed', 0)
+
+if TYPE_CHECKING:
+    Base = VersionedBaseMeta
+else:
+    Base = db_schema.versioned_base('feed', 0)
 
 
 class TaskConfigHash(Base):
@@ -44,12 +51,12 @@ class TaskConfigHash(Base):
     task = Column('name', Unicode, index=True, nullable=False)
     hash = Column('hash', String)
 
-    def __repr__(self):
-        return '<TaskConfigHash(task=%s,hash=%s)>' % (self.task, self.hash)
+    def __repr__(self) -> str:
+        return f'<TaskConfigHash(task={self.task},hash={self.hash})>'
 
 
 @with_session
-def config_changed(task=None, session=None):
+def config_changed(task: str = None, session: ContextSession = None) -> None:
     """
     Forces config_modified flag to come out true on next run of `task`. Used when the db changes, and all
     entries need to be reprocessed.
@@ -57,6 +64,7 @@ def config_changed(task=None, session=None):
     .. WARNING: DO NOT (FURTHER) USE FROM PLUGINS
 
     :param task: Name of the task. If `None`, will be set for all tasks.
+    :param session: sqlalchemy Session instance
     """
     logger.debug('Marking config for {} as changed.', (task or 'all tasks'))
     task_hash = session.query(TaskConfigHash)
@@ -84,20 +92,20 @@ def use_task_logging(func):
 class EntryIterator:
     """An iterator over a subset of entries to emulate old task.accepted/rejected/failed/entries properties."""
 
-    def __init__(self, entries, states):
+    def __init__(self, entries: List[Entry], states: Union[EntryState, Iterable[EntryState]]):
         self.all_entries = entries
-        if isinstance(states, str):
+        if isinstance(states, EntryState):
             states = [states]
         self.filter = lambda e: e._state in states
 
-    def __iter__(self):
+    def __iter__(self) -> Iterable[Entry]:
         return filter(self.filter, self.all_entries)
 
     def __bool__(self):
         return any(e for e in self)
 
     def __len__(self):
-        return sum(1 for e in self)
+        return sum(1 for _e in self)
 
     def __add__(self, other):
         return itertools.chain(self, other)
@@ -105,7 +113,7 @@ class EntryIterator:
     def __radd__(self, other):
         return itertools.chain(other, self)
 
-    def __getitem__(self, item):
+    def __getitem__(self, item) -> Union[Entry, Iterable[Entry]]:
         if isinstance(item, slice):
             return list(itertools.islice(self, item.start, item.stop))
         if not isinstance(item, int):
@@ -114,7 +122,7 @@ class EntryIterator:
             if index == item:
                 return entry
         else:
-            raise IndexError('%d is out of bounds' % item)
+            raise IndexError(f'{item} is out of bounds')
 
     def reverse(self):
         self.all_entries.sort(reverse=True)
@@ -126,33 +134,37 @@ class EntryIterator:
 class EntryContainer(list):
     """Container for a list of entries, also contains accepted, rejected failed iterators over them."""
 
-    def __init__(self, iterable=None):
+    def __init__(self, iterable: list = None):
         list.__init__(self, iterable or [])
 
-        self._entries = EntryIterator(self, ['undecided', 'accepted'])
-        self._accepted = EntryIterator(self, 'accepted')  # accepted entries, can still be rejected
-        self._rejected = EntryIterator(self, 'rejected')  # rejected entries, can not be accepted
-        self._failed = EntryIterator(self, 'failed')  # failed entries
-        self._undecided = EntryIterator(self, 'undecided')  # undecided entries (default)
+        self._entries = EntryIterator(self, [EntryState.UNDECIDED, EntryState.ACCEPTED])
+        self._accepted = EntryIterator(
+            self, EntryState.ACCEPTED
+        )  # accepted entries, can still be rejected
+        self._rejected = EntryIterator(
+            self, EntryState.REJECTED
+        )  # rejected entries, can not be accepted
+        self._failed = EntryIterator(self, EntryState.FAILED)  # failed entries
+        self._undecided = EntryIterator(self, EntryState.UNDECIDED)  # undecided entries (default)
 
     # Make these read-only properties
-    entries = property(lambda self: self._entries)
-    accepted = property(lambda self: self._accepted)
-    rejected = property(lambda self: self._rejected)
-    failed = property(lambda self: self._failed)
-    undecided = property(lambda self: self._undecided)
+    entries: EntryIterator = property(lambda self: self._entries)
+    accepted: EntryIterator = property(lambda self: self._accepted)
+    rejected: EntryIterator = property(lambda self: self._rejected)
+    failed: EntryIterator = property(lambda self: self._failed)
+    undecided: EntryIterator = property(lambda self: self._undecided)
 
-    def __repr__(self):
-        return '<EntryContainer(%s)>' % list.__repr__(self)
+    def __repr__(self) -> str:
+        return f'<EntryContainer({list.__repr__(self)})>'
 
 
 class TaskAbort(Exception):
-    def __init__(self, reason, silent=False):
+    def __init__(self, reason: str, silent: bool = False) -> None:
         self.reason = reason
         self.silent = silent
 
     def __repr__(self):
-        return 'TaskAbort(reason=%s, silent=%s)' % (self.reason, self.silent)
+        return f'TaskAbort(reason={self.reason}, silent={self.silent})'
 
 
 @total_ordering
@@ -270,10 +282,12 @@ class Task:
         self._rerun = False
 
         self.disabled_phases = []
+        self.disabled_plugins = []
 
         # current state
         self.current_phase = None
         self.current_plugin = None
+        self.traceback: Optional[str] = None
 
     @property
     def max_reruns(self):
@@ -385,7 +399,17 @@ class Task:
             logger.debug('Disabling {} phase', phase)
             self.disabled_phases.append(phase)
 
-    def abort(self, reason='Unknown', silent=False, traceback=None):
+    def disable_plugin(self, plugin):
+        """Disable ``plugin`` from execution.
+
+        :param string plugin: Name of ``plugin``
+        :raises ValueError: *plugin* could not be found.
+        """
+        if plugin not in all_plugins:
+            raise ValueError(f'`{plugin}` is not a valid plugin.')
+        self.disabled_plugins.append(plugin)
+
+    def abort(self, reason='Unknown', silent=False, traceback: str = None):
         """Abort this task execution, no more plugins will be executed except the abort handling ones."""
         self.aborted = True
         self.abort_reason = reason
@@ -468,6 +492,8 @@ class Task:
             # Abort this phase if one of the plugins disables it
             if phase in self.disabled_phases:
                 return
+            if plugin.name in self.disabled_plugins:
+                continue
             # store execute info, except during entry events
             self.current_phase = phase
             self.current_plugin = plugin.name

@@ -84,8 +84,13 @@ def bundle_webui():
         app_path = os.path.join(ui_path, 'v1', 'app')
         if os.path.exists(app_path):
             shutil.rmtree(app_path)
-        download_extract('http://download.flexget.com/webui_v1.zip', os.path.join(ui_path, 'v1'))
-    except IOError as e:
+        # Just stashed the old webui zip on a random github release for easy hosting.
+        # It doesn't get updated anymore, we should probably stop bundling it with releases soon.
+        download_extract(
+            'https://github.com/Flexget/Flexget/releases/download/v3.0.6/webui_v1.zip',
+            os.path.join(ui_path, 'v1'),
+        )
+    except OSError as e:
         click.echo('Unable to download and extract WebUI v1 due to %e' % str(e))
         raise click.Abort()
 
@@ -109,7 +114,7 @@ def bundle_webui():
             click.echo('Unable to find dist.zip in assets')
             raise click.Abort()
         download_extract(v2_package, os.path.join(ui_path, 'v2'))
-    except (IOError, ValueError) as e:
+    except (OSError, ValueError) as e:
         click.echo('Unable to download and extract WebUI v2 due to %s' % str(e))
         raise click.Abort()
 

@@ -4,9 +4,11 @@ import copy
 from datetime import datetime, timedelta
 from json import JSONEncoder
 from queue import Empty, Queue
+from typing import Dict, TYPE_CHECKING, Any
 
 from flask import Response, jsonify, request
-from flask_restplus import inputs
+from flask_restx import inputs
+from sqlalchemy.orm import Session
 
 from flexget.api import APIResource, api
 from flexget.api.app import (
@@ -198,7 +200,7 @@ class TasksAPI(APIResource):
     @etag
     @api.response(200, model=tasks_list_schema)
     @api.doc(parser=tasks_parser)
-    def get(self, session=None):
+    def get(self, session: Session = None) -> Response:
         """ List all tasks """
 
         active_tasks = {
@@ -218,7 +220,7 @@ class TasksAPI(APIResource):
     @api.response(201, description='Newly created task', model=task_return_schema)
     @api.response(Conflict)
     @api.response(APIError)
-    def post(self, session=None):
+    def post(self, session: Session = None) -> Response:
         """ Add new task """
         data = request.json
 
@@ -257,10 +259,10 @@ class TaskAPI(APIResource):
     @etag
     @api.response(200, model=task_return_schema)
     @api.response(NotFoundError, description='task not found')
-    def get(self, task, session=None):
+    def get(self, task, session: Session = None) -> Response:
         """ Get task config """
         if task not in self.manager.user_config.get('tasks', {}):
-            raise NotFoundError('task `%s` not found' % task)
+            raise NotFoundError(f'task `{task}` not found')
 
         return jsonify({'name': task, 'config': self.manager.user_config['tasks'][task]})
 
@@ -268,14 +270,14 @@ class TaskAPI(APIResource):
     @api.response(200, model=task_return_schema)
     @api.response(NotFoundError)
     @api.response(BadRequest)
-    def put(self, task, session=None):
+    def put(self, task, session: Session = None) -> Response:
         """ Update tasks config """
         data = request.json
 
         new_task_name = data['name']
 
         if task not in self.manager.user_config.get('tasks', {}):
-            raise NotFoundError('task `%s` not found' % task)
+            raise NotFoundError(f'task `{task}` not found')
 
         if 'tasks' not in self.manager.user_config:
             self.manager.user_config['tasks'] = {}
@@ -313,7 +315,7 @@ class TaskAPI(APIResource):
 
     @api.response(200, model=base_message_schema, description='deleted task')
     @api.response(NotFoundError)
-    def delete(self, task, session=None):
+    def delete(self, task, session: Session = None) -> Response:
         """ Delete a task """
         try:
             self.manager.config['tasks'].pop(task)
@@ -370,7 +372,7 @@ def _task_info_dict(task):
 @tasks_api.route('/queue/')
 class TaskQueueAPI(APIResource):
     @api.response(200, model=task_api_queue_schema)
-    def get(self, session=None):
+    def get(self, session: Session = None) -> Response:
         """ List task(s) in queue for execution """
         tasks = [_task_info_dict(task) for task in self.manager.task_queue.run_queue.queue]
 
@@ -387,6 +389,12 @@ class ExecuteLog(Queue):
         self.put(json.dumps({'log': s}))
 
 
+if TYPE_CHECKING:
+    from typing import TypedDict
+    StreamTaskDict = TypedDict(
+        'StreamTaskDict', {'queue': ExecuteLog, 'last_update': datetime, 'args': Dict[str, Any]}
+    )
+    _streams: Dict[str, StreamTaskDict]
 _streams = {}
 
 # Another namespace for the same endpoint
@@ -399,7 +407,7 @@ inject_api = api.namespace('inject', description='Entry injection API')
 class TaskExecutionParams(APIResource):
     @etag(cache_age=3600)
     @api.response(200, model=task_execution_params)
-    def get(self, session=None):
+    def get(self, session: Session = None) -> Response:
         """ Execute payload parameters """
         return jsonify(ObjectsContainer.task_execution_input)
 
@@ -412,14 +420,14 @@ class TaskExecutionAPI(APIResource):
     @api.response(BadRequest)
     @api.response(200, model=task_api_execute_schema)
     @api.validate(task_execution_schema)
-    def post(self, session=None):
+    def post(self, session: Session = None) -> Response:
         """ Execute task and stream results """
         data = request.json
         for task in data.get('tasks'):
             if task.lower() not in [
                 t.lower() for t in self.manager.user_config.get('tasks', {}).keys()
             ]:
-                raise NotFoundError('task %s does not exist' % task)
+                raise NotFoundError(f'task {task} does not exist')
 
         queue = ExecuteLog()
         output = queue if data.get('loglevel') else None
@@ -571,7 +579,7 @@ _phase_percents = {
 }
 
 
-def update_stream(task, status='pending'):
+def update_stream(task, status: str = 'pending') -> None:
     if task.current_phase in _phase_percents:
         task.stream['percent'] = _phase_percents[task.current_phase]
 
@@ -624,6 +632,6 @@ def finish_task(task):
 
 
 @event('task.execute.before_plugin')
-def track_progress(task, plugin_name):
+def track_progress(task, plugin_name: str):
     if task.stream and task.stream['args'].get('progress'):
         update_stream(task, status='running')

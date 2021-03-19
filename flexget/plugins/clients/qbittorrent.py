@@ -47,33 +47,36 @@ class OutputQBitTorrent:
                     'maxdownspeed': {'type': 'integer'},
                     'fail_html': {'type': 'boolean'},
                     'add_paused': {'type': 'boolean'},
+                    'skip_check': {'type': 'boolean'},
                 },
                 'additionalProperties': False,
             },
         ]
     }
 
+    def __init__(self):
+        super().__init__()
+        self.session = Session()
+        self.api_url_login = None
+        self.api_url_upload = None
+        self.api_url_download = None
+        self.url = None
+        self.connected = False
+
     def _request(self, method, url, msg_on_fail=None, **kwargs):
         try:
             response = self.session.request(method, url, **kwargs)
             if response.text == "Ok.":
                 return response
-            else:
-                msg = (
-                    'Failure. URL: {}, data: {}'.format(url, kwargs)
-                    if not msg_on_fail
-                    else msg_on_fail
-                )
+            msg = msg_on_fail if msg_on_fail else f'Failure. URL: {url}, data: {kwargs}'
         except RequestException as e:
             msg = str(e)
-        raise plugin.PluginError(
-            'Error when trying to send request to qBittorrent: {}'.format(msg)
-        )
+        raise plugin.PluginError(f'Error when trying to send request to qBittorrent: {msg}')
 
-    def check_api_version(self, msg_on_fail):
+    def check_api_version(self, msg_on_fail, verify=True):
         try:
             url = self.url + "/api/v2/app/webapiVersion"
-            response = self.session.request('get', url)
+            response = self.session.request('get', url, verify=verify)
             if response.status_code != 404:
                 self.api_url_login = '/api/v2/auth/login'
                 self.api_url_upload = '/api/v2/torrents/add'
@@ -81,7 +84,7 @@ class OutputQBitTorrent:
                 return response
 
             url = self.url + "/version/api"
-            response = self.session.request('get', url)
+            response = self.session.request('get', url, verify=verify)
             if response.status_code != 404:
                 self.api_url_login = '/login'
                 self.api_url_upload = '/command/upload'
@@ -101,11 +104,10 @@ class OutputQBitTorrent:
         if 'Bypass authentication for localhost' is checked and host is
         'localhost'.
         """
-        self.session = Session()
         self.url = '{}://{}:{}'.format(
             'https' if config['use_ssl'] else 'http', config['host'], config['port']
         )
-        self.check_api_version('Check API version failed.')
+        self.check_api_version('Check API version failed.', verify=config['verify_cert'])
         if config.get('username') and config.get('password'):
             data = {'username': config['username'], 'password': config['password']}
             self._request(
@@ -147,7 +149,8 @@ class OutputQBitTorrent:
         )
         logger.debug('Added url {} to qBittorrent', url)
 
-    def prepare_config(self, config):
+    @staticmethod
+    def prepare_config(config):
         if isinstance(config, bool):
             config = {'enabled': config}
         config.setdefault('enabled', True)
@@ -171,7 +174,7 @@ class OutputQBitTorrent:
             except RenderError as e:
                 logger.error('Error setting path for {}: {}', entry['title'], e)
 
-            label = entry.get('label', config.get('label'))
+            label = entry.render(entry.get('label', config.get('label', '')))
             if label:
                 form_data['label'] = label  # qBittorrent v3.3.3-
                 form_data['category'] = label  # qBittorrent v3.3.4+
@@ -179,6 +182,10 @@ class OutputQBitTorrent:
             add_paused = entry.get('add_paused', config.get('add_paused'))
             if add_paused:
                 form_data['paused'] = 'true'
+
+            skip_check = entry.get('skip_check', config.get('skip_check'))
+            if skip_check:
+                form_data['skip_checking'] = 'true'
 
             maxupspeed = entry.get('maxupspeed', config.get('maxupspeed'))
             if maxupspeed:
@@ -200,6 +207,7 @@ class OutputQBitTorrent:
                 logger.info('Save path: {}', form_data.get('savepath'))
                 logger.info('Label: {}', form_data.get('label'))
                 logger.info('Paused: {}', form_data.get('paused', 'false'))
+                logger.info('Skip Hash Check: {}', form_data.get('skip_checking', 'false'))
                 if maxupspeed:
                     logger.info('Upload Speed Limit: {}', form_data.get('upLimit'))
                 if maxdownspeed:

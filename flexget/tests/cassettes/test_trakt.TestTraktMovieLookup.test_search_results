@@ -2,89 +2,159 @@ interactions:
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
-    uri: https://api.trakt.tv/search?type=movie&query=harry+potter+and+the+philosopher%27s+stone
+    uri: https://api.trakt.tv/search?query=harry+potter+and+the+philosopher%27s+stone&type=movie
   response:
-    body: {string: '[{"type":"movie","score":85.60594,"movie":{"title":"Harry Potter
-        and the Philosopher''s Stone","overview":"Harry Potter has lived under the
-        stairs at his aunt and uncle''s house his whole life. But on his 11th birthday,
-        he learns he''s a powerful wizard -- with a place waiting for him at the Hogwarts
-        School of Witchcraft and Wizardry. As he learns to harness his newfound powers
-        with the help of the school''s kindly headmaster, Harry uncovers the truth
-        about his parents'' deaths -- and about the villain who''s to blame.","year":2001,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":545,"slug":"harry-potter-and-the-philosopher-s-stone-2001","imdb":"tt0241527","tmdb":671}}},{"type":"movie","score":2.2677402,"movie":{"title":"Magic
-        Beyond Words: The JK Rowling Story","overview":"Magic Beyond Words: The J.K.
-        Rowling Story is a made-for-TV film starring Australian actress Poppy Montgomery.
-        The film, which was shot in B.C. Canada locations altered to look like British
-        locations, details the journey of struggling single mother J. K. Rowling,
-        her bid to become a published author, and her rise to fame that followed the
-        publication of Harry Potter and the Philosopher''s Stone. The film aired on
-        Lifetime on July 18th and was criticized for being too lacklustre (mainly
-        down to the fiercely private author having no say in the production) but it
-        also shed some light on her personal life and featured scenes such as her
-        highly abusive first husband and the death of her mother. The eponymous J.K.
-        Rowling is the world''s first billionaire (in terms of US dollars) author
-        and the films inspired by her books have been the highest grossing films of
-        all time.  Poppy Montgomery reportedly got blue contact lenses to play the
-        role of the highly influential author.","year":2011,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":59971,"slug":"magic-beyond-words-the-jk-rowling-story-2011","imdb":"tt1979269","tmdb":80530}}}]'}
+    body:
+      string: "[{\"type\":\"movie\",\"score\":84.234795,\"movie\":{\"title\":\"Harry
+        Potter and the Philosopher's Stone\",\"overview\":\"Harry Potter has lived
+        under the stairs at his aunt and uncle's house his whole life. But on his
+        11th birthday, he learns he's a powerful wizard -- with a place waiting for
+        him at the Hogwarts School of Witchcraft and Wizardry. As he learns to harness
+        his newfound powers with the help of the school's kindly headmaster, Harry
+        uncovers the truth about his parents' deaths -- and about the villain who's
+        to blame.\",\"year\":2001,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":545,\"slug\":\"harry-potter-and-the-philosopher-s-stone-2001\",\"imdb\":\"tt0241527\",\"tmdb\":671}}},{\"type\":\"movie\",\"score\":45.72015,\"movie\":{\"title\":\"Harry
+        Potter Series\",\"overview\":\"Harry Potter is a British-American film series
+        based on the Harry Potter novels by author J. K. Rowling. The series is distributed
+        by Warner Bros. and consists of eight fantasy films, beginning with Harry
+        Potter and the Philosopher's Stone and culminating with Harry Potter and the
+        Deathly Hallows \u2013 Part 2.\",\"year\":2011,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":398346,\"slug\":\"harry-potter-series-2011\",\"imdb\":null,\"tmdb\":548281}}},{\"type\":\"movie\",\"score\":41.32524,\"movie\":{\"title\":\"R-Rated
+        Harry Potter\",\"overview\":\"An inappropriate spoof of Harry Potter and the
+        Philosopher's Stone.\",\"year\":2015,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":541150,\"slug\":\"r-rated-harry-potter-2015\",\"imdb\":\"tt5324298\",\"tmdb\":697495}}}]"
     headers:
-      CF-Cache-Status: [MISS]
-      CF-RAY: [312a16bb4a343cd7-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:26 GMT']
-      ETag: [W/"06fe93905ca8e9511aa07931d2ba4a56"]
-      Expires: ['Sat, 17 Dec 2016 19:38:26 GMT']
-      Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=da5ea6ed59003324c1d089786af91f7301481974706; expires=Sun,
-          17-Dec-17 11:38:26 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Pagination-Item-Count: ['2']
-      X-Pagination-Limit: ['10']
-      X-Pagination-Page: ['1']
-      X-Pagination-Page-Count: ['1']
-      X-Request-Id: [2b693012-f5ef-46e6-9af4-5a6d3257f863]
-      X-Runtime: ['0.017707']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      CF-Cache-Status:
+      - MISS
+      CF-RAY:
+      - 60caac5cae8d2aab-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:07:01 GMT
+      ETag:
+      - W/"49ad337bbb01e6235fdaee068e462f91"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 13:06:59 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d83d181f883985032c446f50b68b4f0831609823221; expires=Thu, 04-Feb-21
+        05:07:01 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Pagination-Item-Count:
+      - '3'
+      X-Pagination-Limit:
+      - '10'
+      X-Pagination-Page:
+      - '1'
+      X-Pagination-Page-Count:
+      - '1'
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"UNAUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":959,"until":"2021-01-05T05:10:00Z"}'
+      X-Request-Id:
+      - 6611bd20-9cac-496f-842b-acca5395b6af
+      X-Runtime:
+      - '0.014060'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 07728a0deb00002aab7725e000000001
+    status:
+      code: 200
+      message: OK
 - request:
     body: null
     headers:
-      Content-Type: [application/json]
-      Cookie: [__cfduid=da5ea6ed59003324c1d089786af91f7301481974706]
-      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: ['2']
+      Content-Type:
+      - application/json
+      trakt-api-key:
+      - 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af
+      trakt-api-version:
+      - '2'
     method: GET
     uri: https://api.trakt.tv/movies/545?extended=full
   response:
-    body: {string: '{"title":"Harry Potter and the Philosopher''s Stone","year":2001,"ids":{"trakt":545,"slug":"harry-potter-and-the-philosopher-s-stone-2001","imdb":"tt0241527","tmdb":671},"tagline":"Let
+    body:
+      string: '{"title":"Harry Potter and the Philosopher''s Stone","year":2001,"ids":{"trakt":545,"slug":"harry-potter-and-the-philosopher-s-stone-2001","imdb":"tt0241527","tmdb":671},"tagline":"Let
         the Magic Begin.","overview":"Harry Potter has lived under the stairs at his
         aunt and uncle''s house his whole life. But on his 11th birthday, he learns
         he''s a powerful wizard -- with a place waiting for him at the Hogwarts School
         of Witchcraft and Wizardry. As he learns to harness his newfound powers with
         the help of the school''s kindly headmaster, Harry uncovers the truth about
-        his parents'' deaths -- and about the villain who''s to blame.","released":"2001-11-16","runtime":152,"trailer":"http://youtube.com/watch?v=qPvlb6eXzMA","homepage":"http://harrypotter.warnerbros.com/harrypotterandthedeathlyhallows/mainsite/index.html","rating":7.94546,"votes":13862,"updated_at":"2016-11-26T08:53:08.000Z","language":"en","available_translations":["ca","cs","da","de","el","en","es","et","fa","fi","fr","he","hu","it","ja","ko","lv","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"genres":["adventure","fantasy","family"],"certification":"PG"}'}
+        his parents'' deaths -- and about the villain who''s to blame.","released":"2001-11-16","runtime":152,"country":"us","trailer":"http://youtube.com/watch?v=PbdM1db3JbY","homepage":"https://www.warnerbros.com/movies/harry-potter-and-sorcerers-stone/","status":"released","rating":8.05495,"votes":37053,"comment_count":43,"updated_at":"2021-01-04T08:06:23.000Z","language":"en","available_translations":["ar","bg","ca","cs","da","de","el","en","eo","es","et","eu","fa","fi","fr","gl","he","hr","hu","id","is","it","ja","ka","ko","lt","lv","mk","nb","nl","no","pl","pt","ro","ru","sk","sl","sr","sv","th","tr","uk","vi","zh"],"genres":["adventure","fantasy"],"certification":"PG"}'
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [312a16bdfa743cd7-CPH]
-      Cache-Control: ['public, max-age=28800']
-      Connection: [keep-alive]
-      Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:26 GMT']
-      ETag: [W/"18b860b847b452c86beb37ff6422798a"]
-      Expires: ['Sat, 17 Dec 2016 19:38:26 GMT']
-      Last-Modified: ['Sat, 26 Nov 2016 08:53:08 GMT']
-      Server: [cloudflare-nginx]
-      Vary: [Accept-Encoding]
-      X-Content-Type-Options: [nosniff]
-      X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [268a9e6a-5a63-4a53-a08e-7751743db713]
-      X-Runtime: ['0.008231']
-      X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
+      Age:
+      - '22612'
+      CF-Cache-Status:
+      - HIT
+      CF-RAY:
+      - 60caac5d7890cf1c-IAD
+      Cache-Control:
+      - public, max-age=28800
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 05 Jan 2021 05:07:01 GMT
+      ETag:
+      - W/"e1f1e38beb3a7b46cd11bb978f45146a"
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Expires:
+      - Tue, 05 Jan 2021 06:50:08 GMT
+      Last-Modified:
+      - Mon, 04 Jan 2021 08:06:23 GMT
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d130aa6a8dab5992fc6b63382507992e11609823221; expires=Thu, 04-Feb-21
+        05:07:01 GMT; path=/; domain=.trakt.tv; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Ratelimit:
+      - '{"name":"AUTHED_API_GET_LIMIT","period":300,"limit":1000,"remaining":996,"until":"2021-01-04T14:50:00Z"}'
+      X-Request-Id:
+      - cd158c13-380a-406b-85dd-d947d97691ad
+      X-Runtime:
+      - '0.007289'
+      X-XSS-Protection:
+      - 1; mode=block
+      cf-request-id:
+      - 07728a0e660000cf1cce9b5000000001
+    status:
+      code: 200
+      message: OK
 version: 1

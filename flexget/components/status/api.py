@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from math import ceil
 
 from flask import jsonify, request
-from flask_restplus import inputs
+from flask_restx import inputs
 from loguru import logger
 from sqlalchemy.orm.exc import NoResultFound
 

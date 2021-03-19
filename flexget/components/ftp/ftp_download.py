@@ -74,7 +74,7 @@ class OutputFtp:
     def check_connection(self, ftp, config, ftp_url, current_path):
         try:
             ftp.voidcmd("NOOP")
-        except (IOError, ftplib.Error):
+        except (OSError, ftplib.Error):
             ftp = self.ftp_connect(config, ftp_url, current_path)
         return ftp
 

@@ -5,19 +5,21 @@ from functools import total_ordering
 from http.client import BadStatusLine
 from importlib import import_module
 from pathlib import Path
+from typing import Callable, Dict, Iterable, List, Optional, Union
 from urllib.error import HTTPError, URLError
 
+import loguru
 import pkg_resources
-from loguru import logger
 from requests import RequestException
 
 from flexget import components as components_pkg
 from flexget import config_schema
 from flexget import plugins as plugins_pkg
-from flexget.event import add_event_handler as add_phase_handler, event
-from flexget.event import fire_event, remove_event_handlers
+from flexget.event import Event
+from flexget.event import add_event_handler as add_phase_handler
+from flexget.event import event, fire_event, remove_event_handlers
 
-logger = logger.bind(name='plugin')
+logger = loguru.logger.bind(name='plugin')
 
 PRIORITY_DEFAULT = 128
 PRIORITY_LAST = -255
@@ -35,28 +37,33 @@ class DependencyError(Exception):
     All args are optional.
     """
 
-    def __init__(self, issued_by=None, missing=None, message=None, silent=False):
+    def __init__(
+        self,
+        issued_by: Optional[str] = None,
+        missing: Optional[str] = None,
+        message: Optional[str] = None,
+        silent: bool = False,
+    ):
         super().__init__()
         self.issued_by = issued_by
         self.missing = missing
         self._message = message
         self.silent = silent
 
-    def _get_message(self):
+    def _get_message(self) -> str:
         if self._message:
             return self._message
-        else:
-            return 'Plugin `%s` requires dependency `%s`' % (self.issued_by, self.missing)
+        return f'Plugin `{self.issued_by}` requires dependency `{self.missing}`'
 
-    def _set_message(self, message):
+    def _set_message(self, message: str) -> None:
         self._message = message
 
-    def has_message(self):
+    def has_message(self) -> bool:
         return self._message is not None
 
     message = property(_get_message, _set_message)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '<DependencyError(issued_by=%r,missing=%r,message=%r,silent=%r)>' % (
             self.issued_by,
             self.missing,
@@ -75,7 +82,7 @@ class RegisterException(Exception):
 
 
 class PluginWarning(Warning):
-    def __init__(self, value, logger=logger, **kwargs):
+    def __init__(self, value, logger: 'loguru.Logger' = logger, **kwargs):
         super().__init__()
         self.value = value
         self.logger = logger
@@ -86,7 +93,7 @@ class PluginWarning(Warning):
 
 
 class PluginError(Exception):
-    def __init__(self, value, logger=logger, **kwargs):
+    def __init__(self, value, logger: 'loguru.Logger' = logger, **kwargs):
         super().__init__()
         # Value is expected to be a string
         if not isinstance(value, str):
@@ -107,13 +114,13 @@ class internet:
     Task handles PluginErrors by aborting the task.
     """
 
-    def __init__(self, logger=None):
-        if logger:
-            self.logger = logger
+    def __init__(self, logger_: 'loguru.Logger' = logger):
+        if logger_:
+            self.logger = logger_
         else:
             self.logger = logger.bind(name='@internet')
 
-    def __call__(self, func):
+    def __call__(self, func: Callable) -> Callable:
         def wrapped_func(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
@@ -121,12 +128,12 @@ class internet:
                 logger.opt(exception=True).debug(
                     'decorator caught RequestException. handled traceback:'
                 )
-                raise PluginError('RequestException: %s' % e)
+                raise PluginError(f'RequestException: {e}')
             except HTTPError as e:
-                raise PluginError('HTTPError %s' % e.code, self.logger)
+                raise PluginError(f'HTTPError {e.code}', self.logger)
             except URLError as e:
                 logger.opt(exception=True).debug('decorator caught urlerror. handled traceback:')
-                raise PluginError('URLError %s' % e.reason, self.logger)
+                raise PluginError(f'URLError {e.reason}', self.logger)
             except BadStatusLine:
                 logger.opt(exception=True).debug(
                     'decorator caught badstatusline. handled traceback:'
@@ -135,24 +142,24 @@ class internet:
             except ValueError as e:
                 logger.opt(exception=True).debug('decorator caught ValueError. handled traceback:')
                 raise PluginError(e)
-            except IOError as e:
-                logger.opt(exception=True).debug('decorator caught ioerror. handled traceback:')
+            except OSError as e:
+                logger.opt(exception=True).debug('decorator caught OSError. handled traceback:')
                 if hasattr(e, 'reason'):
-                    raise PluginError('Failed to reach server. Reason: %s' % e.reason, self.logger)
-                elif hasattr(e, 'code'):
+                    raise PluginError(f'Failed to reach server. Reason: {e.reason}', self.logger)
+                if hasattr(e, 'code'):
                     raise PluginError(
-                        'The server couldn\'t fulfill the request. Error code: %s' % e.code,
+                        f"The server couldn't fulfill the request. Error code: {e.code}",
                         self.logger,
                     )
-                raise PluginError('IOError when connecting to server: %s' % e, self.logger)
+                raise PluginError(f'OSError when connecting to server: {e}', self.logger)
 
         return wrapped_func
 
 
-def priority(value):
+def priority(value: int) -> Callable[[Callable], Callable]:
     """Priority decorator for phase methods"""
 
-    def decorator(target):
+    def decorator(target: Callable) -> Callable:
         target.priority = value
         return target
 
@@ -182,30 +189,26 @@ phase_methods = {
 phase_methods.update((_phase, 'on_task_' + _phase) for _phase in task_phases)  # DRY
 
 # Mapping of plugin name to PluginInfo instance (logical singletons)
-plugins = {}
+plugins: Dict[str, 'PluginInfo'] = {}
 
 # Loading done?
 plugins_loaded = False
 
 _loaded_plugins = {}
 _plugin_options = []
-_new_phase_queue = {}
+_new_phase_queue: Dict[str, List[Optional[str]]] = {}
 
 
-def register_task_phase(name, before=None, after=None):
-    """
-    Adds a new task phase to the available phases.
-
-    :param suppress_abort: If True, errors during this phase will be suppressed, and not affect task result.
-    """
+def register_task_phase(name: str, before: str = None, after: str = None):
+    """Adds a new task phase to the available phases."""
     if before and after:
         raise RegisterException('You can only give either before or after for a phase.')
     if not before and not after:
         raise RegisterException('You must specify either a before or after phase.')
     if name in task_phases or name in _new_phase_queue:
-        raise RegisterException('Phase %s already exists.' % name)
+        raise RegisterException(f'Phase {name} already exists.')
 
-    def add_phase(phase_name, before, after):
+    def add_phase(phase_name: str, before: Optional[str], after: Optional[str]):
         if before is not None and before not in task_phases:
             return False
         if after is not None and after not in task_phases:
@@ -213,9 +216,9 @@ def register_task_phase(name, before=None, after=None):
         # add method name to phase -> method lookup table
         phase_methods[phase_name] = 'on_task_' + phase_name
         # place phase in phase list
-        if before is None:
+        if before is None and after is not None:
             task_phases.insert(task_phases.index(after) + 1, phase_name)
-        if after is None:
+        if after is None and before is not None:
             task_phases.insert(task_phases.index(before), phase_name)
         return True
 
@@ -240,14 +243,14 @@ class PluginInfo(dict):
 
     def __init__(
         self,
-        plugin_class,
-        name=None,
-        interfaces=None,
-        builtin=False,
-        debug=False,
-        api_ver=1,
-        category=None,
-    ):
+        plugin_class: type,
+        name: Optional[str] = None,
+        interfaces: Optional[List[str]] = None,
+        builtin: bool = False,
+        debug: bool = False,
+        api_ver: int = 1,
+        category: Optional[str] = None,
+    ) -> None:
         """
         Register a plugin.
 
@@ -259,7 +262,6 @@ class PluginInfo(dict):
         :param int api_ver: Signature of callback hooks (1=task; 2=task,config).
         :param string category: The type of plugin. Can be one of the task phases.
             Defaults to the package name containing the plugin.
-        :param groups: DEPRECATED
         """
         dict.__init__(self)
 
@@ -286,12 +288,12 @@ class PluginInfo(dict):
         self.builtin = builtin
         self.debug = debug
         self.category = category
-        self.phase_handlers = {}
-        self.schema = {}
-        self.schema_id = None
+        self.phase_handlers: Dict[str, Event] = {}
+        self.schema: config_schema.JsonSchema = {}
+        self.schema_id: Optional[str] = None
 
-        self.plugin_class = plugin_class
-        self.instance = None
+        self.plugin_class: type = plugin_class
+        self.instance: object = None
 
         if self.name in plugins:
             PluginInfo.dupe_counter += 1
@@ -302,7 +304,7 @@ class PluginInfo(dict):
         else:
             plugins[self.name] = self
 
-    def initialize(self):
+    def initialize(self) -> None:
         if self.instance is not None:
             # We already initialized
             return
@@ -326,15 +328,7 @@ class PluginInfo(dict):
 
         self.build_phase_handlers()
 
-    def reset_phase_handlers(self):
-        """Temporary utility method"""
-        self.phase_handlers = {}
-        self.build_phase_handlers()
-        # TODO: should unregister events (from flexget.event)
-        # this method is not used at the moment anywhere ...
-        raise NotImplementedError
-
-    def build_phase_handlers(self):
+    def build_phase_handlers(self) -> None:
         """(Re)build phase_handlers in this plugin"""
         for phase, method_name in phase_methods.items():
             if phase in self.phase_handlers:
@@ -348,19 +342,17 @@ class PluginInfo(dict):
                     handler_prio = method.priority
                 else:
                     handler_prio = PRIORITY_DEFAULT
-                event = add_phase_handler(
-                    'plugin.%s.%s' % (self.name, phase), method, handler_prio
-                )
+                event = add_phase_handler(f'plugin.{self.name}.{phase}', method, handler_prio)
                 # provides backwards compatibility
                 event.plugin = self
                 self.phase_handlers[phase] = event
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr: str):
         if attr in self:
             return self[attr]
         return dict.__getattribute__(self, attr)
 
-    def __setattr__(self, attr, value):
+    def __setattr__(self, attr: str, value):
         self[attr] = value
 
     def __str__(self):
@@ -381,7 +373,7 @@ class PluginInfo(dict):
 register = PluginInfo
 
 
-def _get_standard_plugins_path():
+def _get_standard_plugins_path() -> List[str]:
     """
     :returns: List of directories where traditional plugins should be tried to load from.
     """
@@ -396,7 +388,7 @@ def _get_standard_plugins_path():
     return paths
 
 
-def _get_standard_components_path():
+def _get_standard_components_path() -> List[str]:
     """
     :returns: List of directories where component plugins should be tried to load from.
     """
@@ -411,17 +403,18 @@ def _get_standard_components_path():
     return paths
 
 
-def _check_phase_queue():
+def _check_phase_queue() -> None:
     if _new_phase_queue:
         for phase, args in _new_phase_queue.items():
             logger.error(
-                'Plugin {} requested new phase {}, but it could not be created at requested point (before, after). Plugin is not working properly.',
+                'Plugin {} requested new phase {}, but it could not be created at requested point (before, after). '
+                'Plugin is not working properly.',
                 args[0],
                 phase,
             )
 
 
-def _import_plugin(module_name, plugin_path):
+def _import_plugin(module_name: str, plugin_path: Union[str, Path]) -> None:
     try:
         import_module(module_name)
     except DependencyError as e:
@@ -452,16 +445,16 @@ def _import_plugin(module_name, plugin_path):
         logger.trace('Loaded module {} from {}', module_name, plugin_path)
 
 
-def _load_plugins_from_dirs(dirs):
+def _load_plugins_from_dirs(dirs: List[str]) -> None:
     """
     :param list dirs: Directories from where plugins are loaded from
     """
 
-    logger.debug('Trying to load plugins from: {}', dirs)
-    dirs = [Path(d) for d in dirs if os.path.isdir(d)]
+    logger.debug(f'Trying to load plugins from: {dirs}')
+    dir_paths = [Path(d) for d in dirs if os.path.isdir(d)]
     # add all dirs to plugins_pkg load path so that imports work properly from any of the plugin dirs
-    plugins_pkg.__path__ = [str(d) for d in dirs]
-    for plugins_dir in dirs:
+    plugins_pkg.__path__ = [str(d) for d in dir_paths]
+    for plugins_dir in dir_paths:
         for plugin_path in plugins_dir.glob('**/*.py'):
             if plugin_path.name == '__init__.py':
                 continue
@@ -477,13 +470,13 @@ def _load_plugins_from_dirs(dirs):
 
 
 # TODO: this is now identical to _load_plugins_from_dirs, REMOVE
-def _load_components_from_dirs(dirs):
+def _load_components_from_dirs(dirs: List[str]) -> None:
     """
     :param list dirs: Directories where plugin components are loaded from
     """
     logger.debug('Trying to load components from: {}', dirs)
-    dirs = [Path(d) for d in dirs if os.path.isdir(d)]
-    for component_dir in dirs:
+    dir_paths = [Path(d) for d in dirs if os.path.isdir(d)]
+    for component_dir in dir_paths:
         for component_path in component_dir.glob('**/*.py'):
             if component_path.name == '__init__.py':
                 continue
@@ -498,7 +491,7 @@ def _load_components_from_dirs(dirs):
     _check_phase_queue()
 
 
-def _load_plugins_from_packages():
+def _load_plugins_from_packages() -> None:
     """Load plugins installed via PIP"""
     for entrypoint in pkg_resources.iter_entry_points('FlexGet.plugins'):
         try:
@@ -532,7 +525,9 @@ def _load_plugins_from_packages():
     _check_phase_queue()
 
 
-def load_plugins(extra_plugins=None, extra_components=None):
+def load_plugins(
+    extra_plugins: Optional[List[str]] = None, extra_components: Optional[List[str]] = None
+) -> None:
     """
     Load plugins from the standard plugin and component paths.
 
@@ -569,7 +564,13 @@ def load_plugins(extra_plugins=None, extra_components=None):
     )
 
 
-def get_plugins(phase=None, interface=None, category=None, name=None, min_api=None):
+def get_plugins(
+    phase: Optional[str] = None,
+    interface: Optional[str] = None,
+    category: Optional[str] = None,
+    name: Optional[str] = None,
+    min_api: Optional[int] = None,
+) -> Iterable[PluginInfo]:
     """
     Query other plugins characteristics.
 
@@ -600,7 +601,7 @@ def get_plugins(phase=None, interface=None, category=None, name=None, min_api=No
     return filter(matches, iter(plugins.values()))
 
 
-def plugin_schemas(**kwargs):
+def plugin_schemas(**kwargs) -> 'config_schema.JsonSchema':
     """Create a dict schema that matches plugins specified by `kwargs`"""
     return {
         'type': 'object',
@@ -616,12 +617,12 @@ def register_schema():
     config_schema.register_schema('/schema/plugins', plugin_schemas)
 
 
-def get_phases_by_plugin(name):
+def get_phases_by_plugin(name: str) -> List[str]:
     """Return all phases plugin :name: hooks"""
     return list(get_plugin_by_name(name).phase_handlers)
 
 
-def get_plugin_by_name(name, issued_by='???'):
+def get_plugin_by_name(name: str, issued_by: str = '???') -> PluginInfo:
     """
     Get plugin by name, preferred way since this structure may be changed at some point.
 
@@ -644,7 +645,7 @@ def get_plugin_by_name(name, issued_by='???'):
     return plugins[name]
 
 
-def get(name, requested_by):
+def get(name: str, requested_by: Union[str, object]) -> object:
     """
 
     :param str name: Name of the requested plugin

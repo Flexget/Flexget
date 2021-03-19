@@ -7,7 +7,7 @@ from sqlalchemy import Column, DateTime, Integer, Unicode, select
 from flexget import db_schema, plugin
 from flexget.config_schema import one_or_more
 from flexget.db_schema import versioned_base
-from flexget.entry import Entry
+from flexget.entry import Entry, EntryState
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import json, serialization
@@ -43,7 +43,13 @@ def upgrade(ver, session):
     if ver == 1:
         table = table_schema('digest_entries', session)
         for row in session.execute(select([table.c.id, table.c.json])):
-            e = Entry(json.loads(row['json'], decode_datetime=True))
+            if not row['json']:
+                # Seems there could be invalid data somehow. See #2590
+                continue
+            data = json.loads(row['json'], decode_datetime=True)
+            # If title looked like a date, make sure it's a string
+            title = str(data.pop('title'))
+            e = Entry(title=title, **data)
             session.execute(
                 table.update().where(table.c.id == row['id']).values(json=serialization.dumps(e))
             )
@@ -90,10 +96,11 @@ class OutputDigest:
         config = self.prepare_config(config)
         with Session() as session:
             for entry in task.all_entries:
-                if entry.state not in config['state']:
+                state = str(entry.state)
+                if state not in config['state']:
                     continue
                 entry['digest_task'] = task.name
-                entry['digest_state'] = entry.state
+                entry['digest_state'] = state
                 session.add(DigestEntry(list=config['list'], entry=entry))
 
 
@@ -136,7 +143,7 @@ class FromDigest:
                 if config.get('restore_state') and entry.get('digest_state'):
                     # Not sure this is the best way, but we don't want hooks running on this task
                     # (like backlog hooking entry.fail)
-                    entry._state = entry['digest_state']
+                    entry._state = EntryState(entry['digest_state'])
                 entries.append(entry)
                 # If expire is 'True', we remove it after it is output once.
                 if config.get('expire', True) is True:

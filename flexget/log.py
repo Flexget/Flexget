@@ -9,7 +9,9 @@ import sys
 import threading
 import uuid
 import warnings
+from typing import Iterator, Union, List, Deque, Optional
 
+import loguru
 from loguru import logger
 
 from flexget import __version__
@@ -31,10 +33,10 @@ local_context = threading.local()
 
 
 @contextlib.contextmanager
-def capture_logs(*args, **kwargs):
+def capture_logs(*args, **kwargs) -> Iterator:
     """Takes the same arguments as `logger.add`, but this sync will only log messages contained in context."""
     old_id = get_log_session_id()
-    session_id = local_context.session_id = old_id or uuid.uuid4()
+    session_id = local_context.session_id = old_id or str(uuid.uuid4())
     existing_filter = kwargs.pop('filter', None)
     kwargs.setdefault('format', LOG_FORMAT)
 
@@ -56,11 +58,11 @@ def capture_logs(*args, **kwargs):
         logger.remove(log_sink)
 
 
-def get_log_session_id():
+def get_log_session_id() -> str:
     return getattr(local_context, 'session_id', None)
 
 
-def record_patcher(record):
+def record_patcher(record: 'loguru.Record') -> None:
     # If a custom name was bound to the logger, move it from extra directly into the record
     name = record['extra'].pop('name', None)
     if name:
@@ -70,8 +72,9 @@ def record_patcher(record):
 class InterceptHandler(logging.Handler):
     """Catch any stdlib log messages from our deps and propagate to loguru."""
 
-    def emit(self, record):
+    def emit(self, record: logging.LogRecord):
         # Get corresponding Loguru level if it exists
+        level: Union[str, int]
         try:
             level = logger.level(record.levelname).name
         except ValueError:
@@ -89,16 +92,15 @@ class InterceptHandler(logging.Handler):
 
 
 _logging_configured = False
-_startup_buffer = []
-_startup_buffer_id = None
+_startup_buffer: List['loguru.Record'] = []
+_startup_buffer_id: Optional[int] = None
 _logging_started = False
 # Stores the last 100 debug messages
-debug_buffer = collections.deque(maxlen=100)
+debug_buffer: Deque['loguru.Message'] = collections.deque(maxlen=100)
 
 
-def initialize(unit_test=False):
-    """Prepare logging.
-    """
+def initialize(unit_test: bool = False) -> None:
+    """Prepare logging."""
     # Remove default loguru sinks
     logger.remove()
     global _logging_configured, _logging_started, _buff_handler
@@ -141,9 +143,10 @@ def initialize(unit_test=False):
     std_logger.addHandler(InterceptHandler())
 
 
-def start(filename=None, level='INFO', to_console=True, to_file=True):
-    """After initialization, start file logging.
-    """
+def start(
+    filename: str = None, level: str = 'INFO', to_console: bool = True, to_file: bool = True
+) -> None:
+    """After initialization, start file logging."""
     global _logging_started
 
     assert _logging_configured
@@ -156,7 +159,7 @@ def start(filename=None, level='INFO', to_console=True, to_file=True):
     # Make sure stdlib logger is set so that dependency logging gets propagated
     logging.getLogger().setLevel(logger.level(level).no)
 
-    if to_file:
+    if to_file and filename:
         logger.add(
             filename,
             level=level,

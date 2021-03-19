@@ -5,6 +5,7 @@
 .settings/
 .project
 .pydevproject
+.vscode/
 /.Python
 FlexGet.egg-info/
 bin/
@@ -43,3 +44,5 @@ pyvenv.cfg
 .pytest_cache
 pip-wheel-metadata
 flexget/ui/v1/app
+.dmypy.json
+.mypy_cache/

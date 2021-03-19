@@ -19,14 +19,14 @@ fi
 if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
 
   # Bump to new release version
-  python dev_tools.py bump_version release
+  python dev_tools.py bump-version release
   export VERSION=`python dev_tools.py version`
 
   # Package WebUI
-  python dev_tools.py bundle_webui
+  python dev_tools.py bundle-webui
 
   # Build and upload to pypi.
-  python setup.py sdist bdist_wheel --universal
+  python setup.py sdist bdist_wheel
   twine upload dist/*
 
   # Commit and tag released version
@@ -34,11 +34,13 @@ if git log --skip 1 origin/master..origin/develop|grep '^commit '; then
   git commit -m "v${VERSION}"
   git tag -a -f "v${VERSION}" -m "v${VERSION} release"
 
+  # Save tag name to github actions environment
+  echo "release_tag=v${VERSION}" >> $GITHUB_ENV
+
   # Bump to new dev version, then commit again
-  python dev_tools.py bump_version dev
+  python dev_tools.py bump-version dev
   git add flexget/_version.py
   git commit -m "Prepare v`python dev_tools.py version`"
-  git branch -f develop HEAD
 
   # master branch should be at the release we tagged
   git branch -f master v${VERSION}

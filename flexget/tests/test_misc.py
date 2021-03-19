@@ -51,7 +51,7 @@ class TestInputHtml:
     config = """
         tasks:
           test:
-            html: http://download.flexget.com/
+            html: http://google.com/
     """
 
     def test_parsing(self, execute_task):
@@ -198,8 +198,8 @@ class TestHtmlUtils:
         """utils decode_html"""
         from flexget.utils.tools import decode_html
 
-        assert decode_html('&lt;&#51;') == u'<3'
-        assert decode_html('&#x2500;') == u'\u2500'
+        assert decode_html('&lt;&#51;') == '<3'
+        assert decode_html('&#x2500;') == '\u2500'
 
     @pytest.mark.skip(reason='FAILS - DISABLED')
     def test_encode_html(self):

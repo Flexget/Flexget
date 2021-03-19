@@ -4,6 +4,7 @@ import random
 import string
 import sys
 import threading
+from typing import Optional, Callable
 
 import rpyc
 from loguru import logger
@@ -32,19 +33,19 @@ class RemoteStream:
     logged, but no exception raised.
     """
 
-    def __init__(self, writer):
+    def __init__(self, writer: Optional[Callable]):
         """
         :param writer: A function which writes a line of text to remote client.
         """
         self.buffer = ''
         self.writer = writer
 
-    def write(self, text):
+    def write(self, text: str) -> None:
         self.buffer += text
         if '\n' in self.buffer:
             self.flush()
 
-    def flush(self):
+    def flush(self) -> None:
         if self.buffer is None or self.writer is None:
             return
         try:
@@ -167,7 +168,7 @@ class IPCServer(threading.Thread):
             port=self.port,
             authenticator=self.authenticator,
             logger=rpyc_logger,
-            # Timeout can happen when piping to 'less' and delaying scrolling to bottom. Make it a long timout.
+            # Timeout can happen when piping to 'less' and delaying scrolling to bottom. Make it a long timeout.
             protocol_config={'sync_request_timeout': 3600},
         )
         # If we just chose an open port, write save the chosen one
@@ -181,7 +182,7 @@ class IPCServer(threading.Thread):
 
 
 class IPCClient:
-    def __init__(self, port, password):
+    def __init__(self, port, password: str):
         channel = rpyc.Channel(rpyc.SocketStream.connect('127.0.0.1', port))
         channel.send(password.encode('utf-8'))
         response = channel.recv()

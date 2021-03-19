@@ -1,6 +1,7 @@
 import copy
 import functools
 import re
+from typing import Dict, Iterator, List, Optional, Set, Tuple, Union
 
 from loguru import logger
 
@@ -13,7 +14,15 @@ logger = logger.bind(name='utils.qualities')
 class QualityComponent:
     """"""
 
-    def __init__(self, type, value, name, regexp=None, modifier=None, defaults=None):
+    def __init__(
+        self,
+        type: str,
+        value: int,
+        name: str,
+        regexp: Optional[str] = None,
+        modifier: Optional[int] = None,
+        defaults: Optional[List['QualityComponent']] = None,
+    ) -> None:
         """
         :param type: Type of quality component. (resolution, source, codec, or audio)
         :param value: Value used to sort this component with others of like type.
@@ -36,7 +45,7 @@ class QualityComponent:
             regexp = re.escape(name)
         self.regexp = re.compile(r'(?<![^\W_])(' + regexp + r')(?![^\W_])', re.IGNORECASE)
 
-    def matches(self, text):
+    def matches(self, text: str) -> Tuple[bool, str]:
         """Test if quality matches to text.
 
         :param string text: data te be tested against
@@ -51,13 +60,13 @@ class QualityComponent:
             text = text[: match.start()] + text[match.end() :]
         return True, text
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.type + str(self.value))
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return bool(self.value)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if isinstance(other, str):
             other = _registry.get(other)
         if not isinstance(other, QualityComponent):
@@ -67,7 +76,7 @@ class QualityComponent:
         else:
             raise TypeError('Cannot compare %s and %s' % (self.type, other.type))
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bool:
         if isinstance(other, str):
             other = _registry.get(other)
         if not isinstance(other, QualityComponent):
@@ -95,10 +104,10 @@ class QualityComponent:
             index = 0
         return l[index]
 
-    def __repr__(self):
-        return '<%s(name=%s,value=%s)>' % (self.type.title(), self.name, self.value)
+    def __repr__(self) -> str:
+        return f'<{self.type.title()}(name={self.name},value={self.value})>'
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     def __deepcopy__(self, memo=None):
@@ -176,13 +185,13 @@ _UNKNOWNS = {
     print '}}}'
 '''
 
-_registry = {}
+_registry: Dict[Union[str, QualityComponent], QualityComponent] = {}
 for items in (_resolutions, _sources, _codecs, _audios):
     for item in items:
         _registry[item.name] = item
 
 
-def all_components():
+def all_components() -> Iterator[QualityComponent]:
     return iter(_registry.values())
 
 
@@ -190,7 +199,7 @@ def all_components():
 class Quality(Serializer):
     """Parses and stores the quality of an entry in the four component categories."""
 
-    def __init__(self, text=''):
+    def __init__(self, text: str = '') -> None:
         """
         :param text: A string to parse quality from
         """
@@ -204,7 +213,7 @@ class Quality(Serializer):
             self.codec = _UNKNOWNS['codec']
             self.audio = _UNKNOWNS['audio']
 
-    def parse(self, text):
+    def parse(self, text: str) -> None:
         """Parses a string to determine the quality in the four component categories.
 
         :param text: The string to parse
@@ -222,7 +231,9 @@ class Quality(Serializer):
                 if not getattr(self, default.type):
                     setattr(self, default.type, default)
 
-    def _find_best(self, qlist, default=None, strip_all=True):
+    def _find_best(
+        self, qlist: List[QualityComponent], default: QualityComponent, strip_all: bool = True,
+    ) -> QualityComponent:
         """Finds the highest matching quality component from `qlist`"""
         result = None
         search_in = self.clean_text
@@ -241,26 +252,26 @@ class Quality(Serializer):
         return result or default
 
     @property
-    def name(self):
+    def name(self) -> str:
         name = ' '.join(
             str(p) for p in (self.resolution, self.source, self.codec, self.audio) if p.value != 0
         )
         return name or 'unknown'
 
     @property
-    def components(self):
+    def components(self) -> List[QualityComponent]:
         return [self.resolution, self.source, self.codec, self.audio]
 
     @classmethod
-    def serialize(cls, quality: 'Quality'):
+    def serialize(cls, quality: 'Quality') -> str:
         return str(quality)
 
     @classmethod
-    def deserialize(cls, data, version) -> 'Quality':
+    def deserialize(cls, data: str, version: int) -> 'Quality':
         return cls(data)
 
     @property
-    def _comparator(self):
+    def _comparator(self) -> List:
         modifier = sum(c.modifier for c in self.components if c.modifier)
         return [modifier] + self.components
 
@@ -275,10 +286,10 @@ class Quality(Serializer):
                 return False
         return True
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return any(self._comparator)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if isinstance(other, str):
             other = Quality(other)
         if not isinstance(other, Quality):
@@ -287,14 +298,14 @@ class Quality(Serializer):
             raise TypeError('Cannot compare %r and %r' % (self, other))
         return self._comparator == other._comparator
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bool:
         if isinstance(other, str):
             other = Quality(other)
         if not isinstance(other, Quality):
             raise TypeError('Cannot compare %r and %r' % (self, other))
         return self._comparator < other._comparator
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '<Quality(resolution=%s,source=%s,codec=%s,audio=%s)>' % (
             self.resolution,
             self.source,
@@ -302,15 +313,15 @@ class Quality(Serializer):
             self.audio,
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         # Make these usable as dict keys
         return hash(self.name)
 
 
-def get(quality_name):
+def get(quality_name: str) -> Quality:
     """Returns a quality object based on canonical quality name."""
 
     found_components = {}
@@ -333,17 +344,20 @@ class RequirementComponent:
     """Represents requirements for a given component type. Can evaluate whether a given QualityComponent
     meets those requirements."""
 
-    def __init__(self, type):
+    def __init__(self, type: str) -> None:
         self.type = type
-        self.reset()
+        self.min: Optional[QualityComponent] = None
+        self.max: Optional[QualityComponent] = None
+        self.acceptable: Set[QualityComponent] = set()
+        self.none_of: Set[QualityComponent] = set()
 
-    def reset(self):
+    def reset(self) -> None:
         self.min = None
         self.max = None
         self.acceptable = set()
         self.none_of = set()
 
-    def allows(self, comp, loose=False):
+    def allows(self, comp: QualityComponent, loose: bool = False) -> bool:
         if comp.type != self.type:
             raise TypeError('Cannot compare %r against %s' % (comp, self.type))
         if comp in self.none_of:
@@ -362,16 +376,16 @@ class RequirementComponent:
             return True
         return False
 
-    def add_requirement(self, text):
+    def add_requirement(self, text: str) -> None:
         if '-' in text:
-            min, max = text.split('-')
-            min, max = _registry[min], _registry[max]
-            if min.type != max.type != self.type:
+            min_str, max_str = text.split('-')
+            min_quality, max_quality = _registry[min_str], _registry[max_str]
+            if min_quality.type != max_quality.type != self.type:
                 raise ValueError('Component type mismatch: %s' % text)
-            self.min, self.max = min, max
+            self.min, self.max = min_quality, max_quality
         elif '|' in text:
-            quals = text.split('|')
-            quals = {_registry[qual] for qual in quals}
+            req_quals = text.split('|')
+            quals = {_registry[qual] for qual in req_quals}
             if any(qual.type != self.type for qual in quals):
                 raise ValueError('Component type mismatch: %s' % text)
             self.acceptable |= quals
@@ -393,7 +407,9 @@ class RequirementComponent:
                 elif text[0] == '!':
                     self.none_of.add(qual)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, RequirementComponent):
+            return False
         return (self.max, self.max, self.acceptable, self.none_of) == (
             other.max,
             other.max,
@@ -401,7 +417,7 @@ class RequirementComponent:
             other.none_of,
         )
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(
             tuple(
                 [self.min, self.max, tuple(sorted(self.acceptable)), tuple(sorted(self.none_of))]
@@ -412,7 +428,7 @@ class RequirementComponent:
 class Requirements:
     """Represents requirements for allowable qualities. Can determine whether a given Quality passes requirements."""
 
-    def __init__(self, req=''):
+    def __init__(self, req: str = '') -> None:
         self.text = ''
         self.resolution = RequirementComponent('resolution')
         self.source = RequirementComponent('source')
@@ -422,10 +438,10 @@ class Requirements:
             self.parse_requirements(req)
 
     @property
-    def components(self):
+    def components(self) -> List[RequirementComponent]:
         return [self.resolution, self.source, self.codec, self.audio]
 
-    def parse_requirements(self, text):
+    def parse_requirements(self, text: str) -> None:
         """
         Parses a requirements string.
 
@@ -456,7 +472,7 @@ class Requirements:
         except KeyError as e:
             raise ValueError('%s is not a valid quality component.' % e.args[0])
 
-    def allows(self, qual, loose=False):
+    def allows(self, qual: Union[Quality, str], loose: bool = False) -> bool:
         """Determine whether this set of requirements allows a given quality.
 
         :param Quality qual: The quality to evaluate.
@@ -471,16 +487,16 @@ class Requirements:
                 return False
         return True
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if isinstance(other, str):
             other = Requirements(other)
         return self.components == other.components
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(tuple(self.components))
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.text or 'any'
 
-    def __repr__(self):
-        return '<Requirements(%s)>' % self
+    def __repr__(self) -> str:
+        return f'<Requirements({self})>'

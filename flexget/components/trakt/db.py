@@ -3,6 +3,7 @@
 
 import time
 from datetime import datetime, timedelta
+from typing import List
 
 from dateutil.parser import parse as dateutil_parse
 from loguru import logger
@@ -394,9 +395,9 @@ movie_actors_table = Table(
 Base.register_table(movie_actors_table)
 
 
-def get_db_actors(ident, style):
+def get_db_actors(ident, style) -> List[TraktActor]:
     actors = {}
-    url = get_api_url(style + 's', ident, 'people')
+    url = get_api_url(f'{style}s', ident, 'people')
     req_session = get_session()
     try:
         results = req_session.get(url, params={'extended': 'full'}).json()
@@ -410,10 +411,9 @@ def get_db_actors(ident, style):
                 if not actor:
                     actor = TraktActor(result.get('person'), session)
                 actors[trakt_id] = actor
-        return list(actors.values())
     except requests.RequestException as e:
         logger.debug('Error searching for actors for trakt id {}', e)
-        return
+    return list(actors.values())
 
 
 def get_translations_dict(translate, style):
@@ -638,7 +638,8 @@ class TraktShow(Base):
             self.air_day = airs.get('day')
             self.timezone = airs.get('timezone')
             if airs.get('time'):
-                self.air_time = datetime.strptime(airs.get('time'), '%H:%M').time()
+                # Time might be HH:MM, or HH:MM:SS #2783
+                self.air_time = dateutil_parse(airs['time'], ignoretz=True).time()
             else:
                 self.air_time = None
         if trakt_show.get('first_aired'):
