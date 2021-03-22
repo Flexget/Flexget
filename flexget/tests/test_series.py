@@ -1372,6 +1372,19 @@ class TestTimeframe:
             mock:
             - title: q test s01e01 hdtv
 
+          test_max_target_quality:
+            template: no_global
+            series:
+              - test:
+                  timeframe: 0 hours
+                  quality: 720p-1080p
+                  target: dd+5.1
+            mock:
+              - {title: 'Test.S01E01.720p.WEB-DL.DDP5.1.x264-FlexGet'}
+              - {title: 'Test.S01E01.1080p.WEB-DL.DDP5.1.x264-FlexGet'}
+              - {title: 'Test.S01E01.1080p.WEB-DL.AAC5.1.x264-FlexGet'}
+              - {title: 'Test.S01E01.2160p.WEB-DL.DDP5.1.x264-FlexGet'}
+
     """
 
     def test_no_waiting(self, execute_task):
@@ -1466,6 +1479,13 @@ class TestTimeframe:
         age_series(hours=6)
         task = execute_task('test_with_quality_2')
         assert task.accepted, 'Timeframe should have passed'
+
+    def test_max_target_quality(self, execute_task):
+        task = execute_task('test_max_target_quality')
+        assert task.find_entry(
+            'accepted', title='Test.S01E01.1080p.WEB-DL.DDP5.1.x264-FlexGet'
+        ), 'should have accepted max target quality'
+        assert len(task.accepted) == 1
 
 
 class TestBacklog:
