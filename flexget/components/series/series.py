@@ -861,7 +861,7 @@ class FilterSeries(FilterSeriesBase):
 
     def process_timeframe_target(self, config, entries, downloaded=None):
         """
-        Accepts first episode matching the quality configured for the series.
+        Accepts episode having the maximum allowed quality configured for the series.
 
         :return: True if accepted something
         """
@@ -871,7 +871,7 @@ class FilterSeries(FilterSeriesBase):
                 logger.debug('Target quality already achieved.')
                 return True
         # scan for quality
-        for entry in entries:
+        for entry in sorted(entries, key=lambda entry: entry['quality'], reverse=True):
             if req.allows(entry['quality']):
                 logger.debug(
                     'Accepted by series. `{}` meets quality requirement `{}`.', entry['title'], req
