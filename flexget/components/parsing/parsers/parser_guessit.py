@@ -138,6 +138,9 @@ class ParserGuessit:
         if 'region 5' in other or 'region c' in other:
             source.append('r5')
 
+        if 'remux' in other and any(bd in source for bd in ['bluray', 'ultra hd bluray']):
+            source = ['remux']
+
         return source
 
     def _quality(self, guessit_result):

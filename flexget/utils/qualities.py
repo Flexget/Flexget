@@ -145,13 +145,13 @@ _sources = [
     QualityComponent('source', 150, 'hdtv', r'a?hdtv(?:[\W_]?rip)?'),
     QualityComponent('source', 160, 'webdl', r'web(?:[\W_]?(dl|hd))?'),
     QualityComponent('source', 170, 'dvdrip', r'dvd(?:[\W_]?rip)?'),
-    QualityComponent('source', 175, 'remux'),
-    QualityComponent('source', 180, 'bluray', r'(?:b[dr][\W_]?rip|blu[\W_]?ray(?:[\W_]?rip)?)'),
+    QualityComponent('source', 175, 'bluray', r'(?:b[dr][\W_]?rip|blu[\W_]?ray(?:[\W_]?rip)?)'),
+    QualityComponent('source', 180, 'remux'),
 ]
 _codecs = [
     QualityComponent('codec', 10, 'divx'),
     QualityComponent('codec', 20, 'xvid'),
-    QualityComponent('codec', 30, 'h264', '[hx].?264'),
+    QualityComponent('codec', 30, 'h264', '[hx].?264|avc'),
     QualityComponent('codec', 35, 'vp9'),
     QualityComponent('codec', 40, 'h265', '[hx].?265|hevc'),
 ]

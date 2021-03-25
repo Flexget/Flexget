@@ -66,6 +66,12 @@ class TestParser:
         assert movie.year == 2013, 'failed to parse year from %s' % movie.data
         assert movie.quality.name == '720p h264'
 
+        movie = parse('Just.High.Quality.2019.1080p.BluRay.REMUX.AVC.DTS-HD.MA5.1-FlexGet')
+        assert movie.quality.name == '1080p remux h264 dtshd'
+
+        movie = parse('Ultra.High.Quality.2021.UHD.BluRay.2160p.TrueHD.Atmos.7.1.HEVC.REMUX-FlexGet')
+        assert movie.quality.name == '2160p remux h265 truehd'
+
     def test_multiple_property_values(self, parse):
         """ Test correct parsing for title's with multiple propertie definitions """
         movie = parse(
