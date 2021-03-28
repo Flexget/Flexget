@@ -87,7 +87,7 @@ class SeriesParser(TitleParser):
         [
             TitleParser.re_not_in_word(regexp)
             for regexp in [
-                r'(\d{1,3})(?:v(?P<version>\d))?',
+                r'(\d+)(?:v(?P<version>\d))?',
                 r'(?:pt|part)\s?(\d+|%s)' % roman_numeral_re,
             ]
         ]
