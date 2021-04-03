@@ -31,8 +31,10 @@ unresponsive_hosts = TimedDict(WAIT_TIME)
 
 if TYPE_CHECKING:
     from typing import TypedDict
-    StateCacheDict = TypedDict('StateCacheDict',
-                               {'tokens': Union[float, int], 'last_update': datetime})
+
+    StateCacheDict = TypedDict(
+        'StateCacheDict', {'tokens': Union[float, int], 'last_update': datetime}
+    )
 
 
 def is_unresponsive(url: str) -> bool:
@@ -258,9 +260,7 @@ class Session(requests.Session):
             return _wrap_urlopen(url, timeout=kwargs['timeout'])
 
         try:
-            logger.debug(
-                f'{method.upper()}ing URL {url} with args {args} and kwargs {kwargs}'
-            )
+            logger.debug(f'{method.upper()}ing URL {url} with args {args} and kwargs {kwargs}')
             result = super().request(method, url, *args, **kwargs)
         except requests.Timeout:
             # Mark this site in known unresponsive list

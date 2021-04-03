@@ -233,7 +233,10 @@ class Quality(Serializer):
                     setattr(self, default.type, default)
 
     def _find_best(
-        self, qlist: List[QualityComponent], default: QualityComponent, strip_all: bool = True,
+        self,
+        qlist: List[QualityComponent],
+        default: QualityComponent,
+        strip_all: bool = True,
     ) -> QualityComponent:
         """Finds the highest matching quality component from `qlist`"""
         result = None

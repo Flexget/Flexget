@@ -71,7 +71,7 @@ class AlphaRatioCookie(Base):
 
 class SearchAlphaRatio:
     """
-        AlphaRatio search plugin.
+    AlphaRatio search plugin.
     """
 
     schema = {
@@ -213,7 +213,7 @@ class SearchAlphaRatio:
     @plugin.internet(logger)
     def search(self, task, entry, config):
         """
-            Search for entries on AlphaRatio
+        Search for entries on AlphaRatio
         """
         params = {}
 

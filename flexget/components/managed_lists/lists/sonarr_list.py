@@ -109,7 +109,11 @@ class SonarrSet(MutableSet):
             if isinstance(tag, int):
                 # Handle tags by id
                 if tag not in self._tags.values():
-                    logger.error('Unable to add tag with id {} to entry {} as the tag does not exist in sonarr', entry, tag)
+                    logger.error(
+                        'Unable to add tag with id {} to entry {} as the tag does not exist in sonarr',
+                        entry,
+                        tag,
+                    )
                     continue
                 tags_ids.append(tag)
             else:
@@ -272,7 +276,7 @@ class SonarrSet(MutableSet):
 
     @property
     def online(self):
-        """ Set the online status of the plugin, online plugin should be treated differently in certain situations,
+        """Set the online status of the plugin, online plugin should be treated differently in certain situations,
         like test mode"""
         return True
 

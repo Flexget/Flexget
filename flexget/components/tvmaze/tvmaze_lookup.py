@@ -58,7 +58,7 @@ class PluginTVMazeLookup:
     tvmaze_ep_overview
     tvmaze_ep_runtime
 
-  """
+    """
 
     # Series info
     series_map = {

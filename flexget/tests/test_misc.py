@@ -10,7 +10,7 @@ from flexget.entry import Entry, EntryUnicodeError
 
 class TestDisableBuiltins:
     """
-        Quick a hack, test disable functionality by checking if seen filtering (builtin) is working
+    Quick a hack, test disable functionality by checking if seen filtering (builtin) is working
     """
 
     config = """

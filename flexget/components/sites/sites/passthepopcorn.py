@@ -103,7 +103,7 @@ class PassThePopcornCookie(Base):
 
 class SearchPassThePopcorn:
     """
-        PassThePopcorn search plugin.
+    PassThePopcorn search plugin.
     """
 
     schema = {
@@ -230,7 +230,7 @@ class SearchPassThePopcorn:
     @plugin.internet(logger)
     def search(self, task, entry, config):
         """
-            Search for entries on PassThePopcorn
+        Search for entries on PassThePopcorn
         """
         params = {}
 
