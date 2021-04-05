@@ -46,24 +46,24 @@ CATEGORIES = {
 
 class SearchRarBG:
     """
-        RarBG search plugin. Implements https://torrentapi.org/apidocs_v2.txt
+    RarBG search plugin. Implements https://torrentapi.org/apidocs_v2.txt
 
-        To perform search against single category:
+    To perform search against single category:
 
-        rarbg:
-            category: x264 720p
+    rarbg:
+        category: x264 720p
 
-        To perform search against multiple categories:
+    To perform search against multiple categories:
 
-        rarbg:
-            category:
-                - x264 720p
-                - x264 1080p
+    rarbg:
+        category:
+            - x264 720p
+            - x264 1080p
 
-        Movie categories accepted: x264 720p, x264 1080p, XviD, Full BD
-        TV categories accepted: HDTV, SDTV
+    Movie categories accepted: x264 720p, x264 1080p, XviD, Full BD
+    TV categories accepted: HDTV, SDTV
 
-        You can use also use category ID manually if you so desire (eg. x264 720p is actually category id '45')
+    You can use also use category ID manually if you so desire (eg. x264 720p is actually category id '45')
     """
 
     schema = {
@@ -135,7 +135,7 @@ class SearchRarBG:
     @plugin.internet(logger)
     def search(self, task, entry, config):
         """
-            Search for entries on RarBG
+        Search for entries on RarBG
         """
 
         categories = config.get('category', 'all')

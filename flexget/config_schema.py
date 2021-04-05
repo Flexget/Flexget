@@ -47,7 +47,7 @@ _root_config_schema: Optional[JsonSchema] = None
 
 
 def register_config_key(key: str, schema: JsonSchema, required: bool = False):
-    """ Registers a valid root level key for the config.
+    """Registers a valid root level key for the config.
 
     :param string key:
       Name of the root level key being registered.
@@ -115,9 +115,7 @@ def resolve_ref(uri: str) -> JsonSchema:
 
 
 def process_config(
-    config: Any,
-    schema: Optional[JsonSchema] = None,
-    set_defaults: bool = True
+    config: Any, schema: Optional[JsonSchema] = None, set_defaults: bool = True
 ) -> List[ConfigValidationError]:
     """
     Validates the config, and sets defaults within it if `set_defaults` is set.

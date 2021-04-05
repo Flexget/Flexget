@@ -77,7 +77,7 @@ class HEBitsCookies(Base):
 
 class SearchHeBits:
     """
-        HEBits search plugin.
+    HEBits search plugin.
     """
 
     schema = {

@@ -368,9 +368,11 @@ class TestFilterSeries:
             'accepted', title='Test.Series.with.extra.crap.S01E02.PDTV.XViD-FlexGet'
         )
         assert not entry.get('series_guessed'), 'series plugin should override series_guessed'
-        assert entry['series_name'] == entry['series_parser'].name == 'Test Series', (
-            'Series name should be \'Test Series\', was: entry: %s, parser: %s'
-            % (entry['series_name'], entry['series_parser'].name)
+        assert (
+            entry['series_name'] == entry['series_parser'].name == 'Test Series'
+        ), 'Series name should be \'Test Series\', was: entry: %s, parser: %s' % (
+            entry['series_name'],
+            entry['series_parser'].name,
         )
 
     def test_all_series_mode(self, execute_task):

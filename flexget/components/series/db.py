@@ -54,8 +54,7 @@ class NormalizedComparator(Comparator):
 
 
 class Series(Base):
-    """ Name is handled case insensitively transparently
-    """
+    """Name is handled case insensitively transparently"""
 
     __tablename__ = 'series'
 
@@ -512,8 +511,7 @@ class SeasonRelease(Base):
 
 
 class AlternateNames(Base):
-    """ Similar to Series. Name is handled case insensitively transparently.
-    """
+    """Similar to Series. Name is handled case insensitively transparently."""
 
     __tablename__ = 'series_alternate_names'
     id = Column(Integer, primary_key=True)

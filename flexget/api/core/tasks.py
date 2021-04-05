@@ -391,6 +391,7 @@ class ExecuteLog(Queue):
 
 if TYPE_CHECKING:
     from typing import TypedDict
+
     StreamTaskDict = TypedDict(
         'StreamTaskDict', {'queue': ExecuteLog, 'last_update': datetime, 'args': Dict[str, Any]}
     )

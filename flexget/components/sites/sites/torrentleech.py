@@ -39,18 +39,18 @@ CATEGORIES = {
 
 class UrlRewriteTorrentleech:
     """
-        Torrentleech urlrewriter and search plugin.
+    Torrentleech urlrewriter and search plugin.
 
-        torrentleech:
-          rss_key: xxxxxxxxx  (required)
-          username: xxxxxxxx  (required)
-          password: xxxxxxxx  (required)
-          category: HD
+    torrentleech:
+      rss_key: xxxxxxxxx  (required)
+      username: xxxxxxxx  (required)
+      password: xxxxxxxx  (required)
+      category: HD
 
-          Category is any combination of: all, Cam, TS, TS/TC, DVDRip,
-          DVDRip/DVDScreener, WEBRip': 37, HDRip': 43, BDRip, DVDR,
-          DVD-R, HD, Bluray, 4KUpscaled, Real4K, Movie Boxsets,
-          Boxsets': 15, Documentaries, Episodes, TV Boxsets, Episodes HD
+      Category is any combination of: all, Cam, TS, TS/TC, DVDRip,
+      DVDRip/DVDScreener, WEBRip': 37, HDRip': 43, BDRip, DVDR,
+      DVD-R, HD, Bluray, 4KUpscaled, Real4K, Movie Boxsets,
+      Boxsets': 15, Documentaries, Episodes, TV Boxsets, Episodes HD
     """
 
     schema = {
