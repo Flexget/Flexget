@@ -579,7 +579,7 @@ class PluginTransmission(TransmissionBase):
                     if options['post'].get('main_file_only') and main_id is not None:
                         # Set Unwanted Files
                         options['change']['files_unwanted'] = [
-                            x for x in file_list if x not in dl_list
+                            x for x in range(len(file_list)) if x not in dl_list
                         ]
                         options['change']['files_wanted'] = dl_list
                         logger.debug(
@@ -600,7 +600,7 @@ class PluginTransmission(TransmissionBase):
                         else:
                             options['change']['files_unwanted'] = skip_list
                             options['change']['files_wanted'] = [
-                                x for x in file_list if x not in skip_list
+                                x for x in range(len(file_list)) if x not in skip_list
                             ]
                             logger.debug(
                                 'Downloading {} of {} files in torrent.',
