@@ -2,7 +2,7 @@ import datetime
 import os
 import re
 from collections import defaultdict
-from typing import Any, Callable, Dict, Optional, Union, List, Pattern, Match
+from typing import Any, Callable, Dict, List, Match, Optional, Pattern, Union
 from urllib.parse import parse_qsl, urlparse
 
 import jsonschema
@@ -86,7 +86,8 @@ def one_or_more(schema: JsonSchema, unique_items: bool = False) -> JsonSchema:
     """
 
     schema.setdefault('title', 'single value')
-    return {
+    default = schema.pop('default', None)
+    result = {
         'oneOf': [
             {
                 'title': 'multiple values',
@@ -98,6 +99,9 @@ def one_or_more(schema: JsonSchema, unique_items: bool = False) -> JsonSchema:
             schema,
         ]
     }
+    if default:
+        result['default'] = default
+    return result
 
 
 def resolve_ref(uri: str) -> JsonSchema:
