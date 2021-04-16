@@ -13,9 +13,9 @@ pytest-runner
 pytest-cov==2.5.1
 gitpython==3.0.8
 codacy-coverage>=1.2.18
-pip-tools==5.5.0
+pip-tools~=5.5.0
 twine==1.11.0
-isort>=5.5.1
-black>=18.9b0
+isort>=5.8.0
+black~=20.8b1
 pre-commit==2.3.0
 sqlalchemy-stubs
