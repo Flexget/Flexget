@@ -73,6 +73,16 @@ class EmbyLookup:
         for entry in task.entries:
             self.add_lazy(entry, EmbyApi.get_type(**entry))
 
+    @property
+    def movie_identifier(self):
+        """Returns the plugin main identifier type"""
+        return 'emby_id'
+
+    @property
+    def series_identifier(self):
+        """Returns the plugin main identifier type"""
+        return 'emby_id'
+
 
 @event('plugin.register')
 def register_plugin():
