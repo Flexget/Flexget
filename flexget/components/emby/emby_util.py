@@ -32,7 +32,11 @@ def SCHEMA_SERVER():
 
 
 def SCHEMA_SERVER_TAG():
+<<<<<<< HEAD
     return {"server": {**SCHEMA_SERVER()}, 'required': ['server']}
+=======
+    return {"server": {**SCHEMA_SERVER()}}
+>>>>>>> local_emby_integration
 
 
 def SORT_FIELDS():
