@@ -24,7 +24,7 @@ class EmbyLookup:
 
     auth = {}
 
-    schema = {**SCHEMA_SERVER()}
+    schema = {**SCHEMA_SERVER}
 
     def on_task_start(self, task, config):
         if not isinstance(config, dict):

@@ -30,7 +30,7 @@ class EmbyRefreshLibrary:
     schema = {
         'type': 'object',
         'properties': {
-            **SCHEMA_SERVER_TAG(),
+            **SCHEMA_SERVER_TAG,
             'when': one_or_more(
                 {
                     'type': 'string',

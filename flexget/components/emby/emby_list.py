@@ -29,7 +29,7 @@ class PluginEmbyList:
     schema = {
         'type': 'object',
         'properties': {
-            **SCHEMA_SERVER_TAG(),
+            **SCHEMA_SERVER_TAG,
             'list': {'type': 'string'},
         },
         'required': ['server', 'list'],

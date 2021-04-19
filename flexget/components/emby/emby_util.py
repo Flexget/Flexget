@@ -1,54 +1,51 @@
-def SCHEMA_SERVER():
-    return {
-        'oneOf': [
-            {
-                'type': 'object',
-                'properties': {
-                    "protocol": {'type': 'string', 'enum': ['http', 'https'], "default": "http"},
-                    'host': {'type': 'string', "default": "localhost"},
-                    'port': {'type': 'integer', "default": 8096},
-                    "username": {'type': 'string'},
-                    "password": {'type': 'string'},
-                    "return_host": {'type': 'string', 'enum': ['lan', 'wan']},
-                },
-                'required': ['username', "password"],
-                'additionalProperties': False,
+SCHEMA_SERVER = {
+    'oneOf': [
+        {
+            'type': 'object',
+            'properties': {
+                "protocol": {'type': 'string', 'enum': ['http', 'https'], "default": "http"},
+                'host': {'type': 'string', "default": "localhost"},
+                'port': {'type': 'integer', "default": 8096},
+                "username": {'type': 'string'},
+                "password": {'type': 'string'},
+                "return_host": {'type': 'string', 'enum': ['lan', 'wan']},
             },
-            {
-                'type': 'object',
-                'properties': {
-                    "protocol": {'type': 'string', 'enum': ['http', 'https'], "default": "http"},
-                    'host': {'type': 'string', "default": "localhost"},
-                    'port': {'type': 'integer', "default": 8096},
-                    'username': {'type': 'string'},
-                    "apikey": {'type': 'string'},
-                    "return_host": {'type': 'string', 'enum': ['lan', 'wan']},
-                },
-                'required': ['username', 'apikey'],
-                'additionalProperties': False,
+            'required': ['username', "password"],
+            'additionalProperties': False,
+        },
+        {
+            'type': 'object',
+            'properties': {
+                "protocol": {'type': 'string', 'enum': ['http', 'https'], "default": "http"},
+                'host': {'type': 'string', "default": "localhost"},
+                'port': {'type': 'integer', "default": 8096},
+                'username': {'type': 'string'},
+                "apikey": {'type': 'string'},
+                "return_host": {'type': 'string', 'enum': ['lan', 'wan']},
             },
-        ]
-    }
-
-
-def SCHEMA_SERVER_TAG():
-    return {"server": {**SCHEMA_SERVER()}}
-
-
-def SORT_FIELDS():
-    return [
-        'comunity_rating',
-        'critic_rating',
-        'date_created',
-        'date_played',
-        'play_count',
-        'premiere_date',
-        'production_year',
-        'sort_name',
-        'random',
-        'revenue',
-        'runtime',
+            'required': ['username', 'apikey'],
+            'additionalProperties': False,
+        },
     ]
+}
+
+
+SCHEMA_SERVER_TAG = {"server": {**SCHEMA_SERVER}}
+
+
+SORT_FIELDS = [
+    'comunity_rating',
+    'critic_rating',
+    'date_created',
+    'date_played',
+    'play_count',
+    'premiere_date',
+    'production_year',
+    'sort_name',
+    'random',
+    'revenue',
+    'runtime',
+]
 
 
 field_map = {

@@ -31,7 +31,7 @@ class EmbyInput:
     schema = {
         'type': 'object',
         'properties': {
-            **SCHEMA_SERVER_TAG(),
+            **SCHEMA_SERVER_TAG,
             'list': {'type': 'string'},
             'types': one_or_more(
                 {'type': 'string', 'enum': ['movie', 'series', 'season', 'episode']}
@@ -42,14 +42,14 @@ class EmbyInput:
                 'oneOf': [
                     {
                         'type': 'string',
-                        'enum': SORT_FIELDS(),
+                        'enum': SORT_FIELDS,
                     },
                     {
                         'type': 'object',
                         'properties': {
                             'field': {
                                 'type': 'string',
-                                'enum': SORT_FIELDS(),
+                                'enum': SORT_FIELDS,
                             },
                             'order': {'type': 'string', 'enum': ['ascending', 'descending']},
                         },
