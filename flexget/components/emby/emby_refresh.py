@@ -16,9 +16,7 @@ class EmbyRefreshLibrary:
     Example:
         emby_refresh:
             server:
-                protocol: http
-                host: localhost
-                port: 8096
+                host: http://localhost:8096
                 username: <username>
                 apikey: <apikey>
                 return_host: wan

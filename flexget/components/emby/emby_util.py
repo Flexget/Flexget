@@ -3,9 +3,7 @@ SCHEMA_SERVER = {
         {
             'type': 'object',
             'properties': {
-                "protocol": {'type': 'string', 'enum': ['http', 'https'], "default": "http"},
-                'host': {'type': 'string', "default": "localhost"},
-                'port': {'type': 'integer', "default": 8096},
+                'host': {'type': 'string', "default": "http://localhost:8096"},
                 "username": {'type': 'string'},
                 "password": {'type': 'string'},
                 "return_host": {'type': 'string', 'enum': ['lan', 'wan']},
@@ -16,9 +14,7 @@ SCHEMA_SERVER = {
         {
             'type': 'object',
             'properties': {
-                "protocol": {'type': 'string', 'enum': ['http', 'https'], "default": "http"},
-                'host': {'type': 'string', "default": "localhost"},
-                'port': {'type': 'integer', "default": 8096},
+                'host': {'type': 'string', "default": "http://localhost:8096"},
                 'username': {'type': 'string'},
                 "apikey": {'type': 'string'},
                 "return_host": {'type': 'string', 'enum': ['lan', 'wan']},
