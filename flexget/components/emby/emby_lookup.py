@@ -76,12 +76,12 @@ class EmbyLookup:
     @property
     def movie_identifier(self):
         """Returns the plugin main identifier type"""
-        return 'emby_id'
+        return 'emby_movie_id'
 
     @property
     def series_identifier(self):
         """Returns the plugin main identifier type"""
-        return 'emby_id'
+        return 'emby_serie_id'
 
 
 @event('plugin.register')

@@ -38,7 +38,9 @@ logger = logger.bind(name='api_emby')
 
 
 class EmbyApiBase(ABC):
-    """Base Class to all API integratios"""
+    """
+    Base Class to all API integratios
+    """
 
     EMBY_PREF = 'emby_'
 
@@ -67,7 +69,9 @@ class EmbyApiBase(ABC):
         return destination
 
     def update_using_map(self, field_map: dict, source_item):
-        """Updates based on field map with source"""
+        """
+        Updates based on field map with source
+        """
 
         my_field_map = field_map.copy()
 
@@ -101,7 +105,9 @@ class EmbyApiBase(ABC):
 
 
 class EmbyAuth(EmbyApiBase):
-    """Manage API Authorizations"""
+    """
+    Manage API Authorizations
+    """
 
     _last_auth = None
 
