@@ -14,7 +14,7 @@ class EstimatesMoviesBluray:
     def estimate(self, entry):
         if 'movie_name' not in entry:
             return
-            
+
         movie_name = entry['movie_name']
         movie_year = entry.get('movie_year')
 
