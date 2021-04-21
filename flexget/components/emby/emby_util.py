@@ -129,7 +129,7 @@ def get_field_map(**kwargs):
 
     media_type = media_type.lower()
 
-    if field_map.get(media_type):
+    if media_type in field_map:
         lazy_fields = {**lazy_fields, **field_map[media_type]}
     else:
         lazy_fields = {**lazy_fields, **field_map['movie']}
