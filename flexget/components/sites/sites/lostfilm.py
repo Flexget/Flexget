@@ -18,7 +18,7 @@ __author__ = 'danfocus'
 logger = logger.bind(name='lostfilm')
 
 EPISODE_REGEXP = re.compile(r'.*/series/.*/season_(\d+)/episode_(\d+)/.*')
-LOSTFILM_ID_REGEXP = re.compile(r'.*static.lostfilm.tv/Images/(\d+)/Posters/.*')
+LOSTFILM_ID_REGEXP = re.compile(r'.*static\.lostfilm\..*/Images/(\d+)/Posters/.*')
 TEXT_REGEXP = re.compile(r'^\d+\s+сезон\s+\d+\s+серия\.\s(.+)\s\((.+)\)$')
 
 quality_map = {
