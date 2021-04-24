@@ -148,4 +148,4 @@ class HookFramework:
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(HookFramework, PLUGIN_NAME, api_ver=2)
+    plugin.register(HookFramework, PLUGIN_NAME, api_ver=2, interfaces=[])
