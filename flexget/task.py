@@ -596,8 +596,10 @@ class Task:
         :param str plugin: Plugin name
         :param str reason: Why the rerun is done
         """
-        msg = 'Plugin {0} has requested task to be ran again after execution has completed.'.format(
-            self.current_plugin if plugin is None else plugin
+        msg = (
+            'Plugin {0} has requested task to be ran again after execution has completed.'.format(
+                self.current_plugin if plugin is None else plugin
+            )
         )
         if reason:
             msg += ' Reason: {0}'.format(reason)
@@ -685,7 +687,9 @@ class Task:
                     logger.debug('not running task_exit yet because task will rerun')
                 else:
                     # run all plugins with this phase
+                    fire_event('task.execute.before_phase', self, phase)
                     self.__run_task_phase(phase)
+                    fire_event('task.execute.after_phase', self, phase)
                     if phase == 'start':
                         # Store a copy of the config state after start phase to restore for reruns
                         self.prepared_config = copy.deepcopy(self.config)
