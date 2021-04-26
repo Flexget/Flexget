@@ -312,7 +312,7 @@ class FilterSeriesBase:
                             'Series `{}` is configured multiple times in series plugin.', series
                         )
                     # Combine the config dicts for both instances of the show
-                    unique_series[series].update(series_settings)
+                    merge_dict_from_to(series_settings, unique_series[series])
         # Turn our all_series dict back into a list
         # sort by reverse alpha, so that in the event of 2 series with common prefix, more specific is parsed first
         return [{s: unique_series[s]} for s in sorted(unique_series, reverse=True)]
