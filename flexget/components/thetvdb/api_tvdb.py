@@ -205,6 +205,11 @@ class TVDBSeries(Base):
         self._banner = series['banner']
         self._genres = [TVDBGenre(id=name) for name in series['genre']] if series['genre'] else []
 
+        if not self.name:
+            raise LookupError(
+                f'Not possible to get name to series with id {self.id} in language \'{self.language}\''
+            )
+
         if self.first_aired is None:
             logger.debug(
                 'Falling back to getting first episode aired date for series {}', self.name
