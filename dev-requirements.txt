@@ -20,7 +20,7 @@ attrs==20.3.0
     #   pytest
 babel==2.9.0
     # via sphinx
-black==20.8b1
+black==21.4b1
     # via -r dev-requirements.in
 boto3==1.17.58
     # via -r dev-requirements.in
@@ -217,12 +217,9 @@ tqdm==4.60.0
 twine==1.11.0
     # via -r dev-requirements.in
 typed-ast==1.4.3
-    # via
-    #   black
-    #   mypy
+    # via mypy
 typing-extensions==3.7.4.3
     # via
-    #   black
     #   mypy
     #   sqlalchemy-stubs
 urllib3==1.26.3
