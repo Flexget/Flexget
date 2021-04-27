@@ -2,7 +2,7 @@
 sphinx==3.5.4
 click~=7.1.2
 pylint>=2.6.0 #pylint < 2.6 doesn't work with isort5
-coverage==4.4.1
+coverage==5.5
 flake8
 vcrpy~=4.1.1  # requests 2.16.3 doesn't work with vcrpy <1.11.1
 boto3
