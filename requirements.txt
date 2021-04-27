@@ -50,7 +50,7 @@ flask==1.1.2
     #   flask-login
     #   flask-restful
     #   flask-restx
-guessit==3.2.0
+guessit==3.3.1
     # via -r requirements.in
 html5lib==1.1
     # via -r requirements.in

@@ -12,7 +12,7 @@ jinja2~=2.10
 requests>=2.20.0
 python-dateutil
 jsonschema>=2.0
-guessit==3.2.0
+guessit==3.3.1
 rebulk>=2.0.0
 apscheduler>=3.2.0
 terminaltables>=3.1.0
