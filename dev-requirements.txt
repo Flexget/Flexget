@@ -242,7 +242,7 @@ virtualenv==20.4.3
     # via pre-commit
 wcwidth==0.2.5
     # via pytest
-wheel==0.31.1
+wheel==0.36.2
     # via -r dev-requirements.in
 wrapt==1.12.1
     # via
