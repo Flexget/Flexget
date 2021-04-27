@@ -54,7 +54,7 @@ coverage==4.4.1
     #   pytest-cov
 distlib==0.3.1
     # via virtualenv
-docutils==0.17
+docutils==0.16
     # via sphinx
 execnet==1.8.0
     # via pytest-xdist
@@ -114,7 +114,9 @@ mypy==0.812
 nodeenv==1.6.0
     # via pre-commit
 packaging==20.9
-    # via pytest
+    # via
+    #   pytest
+    #   sphinx
 pathspec==0.8.1
     # via black
 pep517==0.10.0
@@ -188,18 +190,25 @@ six==1.15.0
     #   -c requirements.txt
     #   pytest-xdist
     #   python-dateutil
-    #   sphinx
     #   vcrpy
     #   virtualenv
 smmap==4.0.0
     # via gitdb
 snowballstemmer==2.1.0
     # via sphinx
-sphinx==1.6.3
+sphinx==3.5.4
     # via -r dev-requirements.in
+sphinxcontrib-applehelp==1.0.2
+    # via sphinx
+sphinxcontrib-devhelp==1.0.2
+    # via sphinx
+sphinxcontrib-htmlhelp==1.0.3
+    # via sphinx
+sphinxcontrib-jsmath==1.0.1
+    # via sphinx
+sphinxcontrib-qthelp==1.0.3
+    # via sphinx
 sphinxcontrib-serializinghtml==1.1.4
-    # via sphinxcontrib-websupport
-sphinxcontrib-websupport==1.2.4
     # via sphinx
 sqlalchemy-stubs==0.4
     # via -r dev-requirements.in
