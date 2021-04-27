@@ -117,7 +117,9 @@ packaging==20.9
     # via pytest
 pathspec==0.8.1
     # via black
-pip-tools==5.5.0
+pep517==0.10.0
+    # via pip-tools
+pip-tools==6.1.0
     # via -r dev-requirements.in
 pkginfo==1.7.0
     # via twine
@@ -204,6 +206,7 @@ sqlalchemy-stubs==0.4
 toml==0.10.2
     # via
     #   black
+    #   pep517
     #   pre-commit
     #   pylint
 tqdm==4.60.0
