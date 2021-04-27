@@ -74,6 +74,7 @@ idna==2.10
     # via
     #   -c requirements.txt
     #   requests
+    #   yarl
 imagesize==1.2.0
     # via sphinx
 isort==5.8.0
@@ -102,6 +103,8 @@ more-itertools==8.7.0
     # via
     #   -c requirements.txt
     #   pytest
+multidict==5.1.0
+    # via yarl
 mypy-extensions==0.4.3
     # via
     #   black
@@ -221,7 +224,7 @@ urllib3==1.26.3
     #   -c requirements.txt
     #   botocore
     #   requests
-vcrpy==1.11.1
+vcrpy==4.1.1
     # via -r dev-requirements.in
 virtualenv==20.4.3
     # via pre-commit
@@ -233,6 +236,8 @@ wrapt==1.12.1
     # via
     #   astroid
     #   vcrpy
+yarl==1.6.3
+    # via vcrpy
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
