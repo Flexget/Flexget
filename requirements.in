@@ -6,7 +6,7 @@ beautifulsoup4>=4.5
 html5lib>=0.11
 PyRSS2Gen
 pynzb
-rpyc~=4.0
+rpyc~=5.0
 jinja2~=2.10
 # There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
 requests>=2.20.0

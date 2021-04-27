@@ -121,7 +121,7 @@ rebulk==3.0.1
     #   guessit
 requests==2.25.1
     # via -r requirements.in
-rpyc==4.1.5
+rpyc==5.0.1
     # via -r requirements.in
 sgmllib3k==1.0.0
     # via feedparser
