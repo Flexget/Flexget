@@ -4,6 +4,7 @@
 import re
 
 import feedparser
+from urllib.request import ProxyHandler
 from loguru import logger
 
 from flexget import plugin
@@ -61,8 +62,11 @@ class LostFilm:
         config = self.build_config(config)
         if config is False:
             return
+        proxy_handler = None
+        if task.requests.proxies is not None:
+            proxy_handler = ProxyHandler(task.requests.proxies)
         try:
-            rss = feedparser.parse(config['url'])
+            rss = feedparser.parse(config['url'], handlers=[proxy_handler])
         except Exception:
             raise PluginError('Cannot parse rss feed')
         status = rss.get('status')
