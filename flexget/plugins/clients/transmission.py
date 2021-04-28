@@ -86,6 +86,8 @@ class TransmissionBase:
             raise plugin.PluginError("Cannot connect to transmission: Connection timed out.")
         except requests.exceptions.ConnectionError as e:
             raise plugin.PluginError("Error connecting to transmission: %s" % e.args[0].reason)
+        except ValueError as e:
+            raise plugin.PluginError("Error connecting to transmission")
         return cli
 
     def torrent_info(self, torrent, config):
