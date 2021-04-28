@@ -164,7 +164,7 @@ pyparsing==2.4.7
     # via
     #   -c requirements.txt
     #   packaging
-pytest-cov==2.5.1
+pytest-cov==2.11.1
     # via -r dev-requirements.in
 pytest-forked==1.3.0
     # via pytest-xdist
