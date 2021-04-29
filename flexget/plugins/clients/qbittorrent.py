@@ -1,4 +1,5 @@
 import os
+from json import loads, JSONDecodeError
 
 from loguru import logger
 from requests import Session
@@ -7,6 +8,7 @@ from requests.exceptions import RequestException
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.template import RenderError
+from flexget.utils.bittorrent import Torrent
 
 logger = logger.bind(name='qbittorrent')
 
@@ -60,6 +62,7 @@ class OutputQBitTorrent:
         self.api_url_login = None
         self.api_url_upload = None
         self.api_url_download = None
+        self.api_url_info = None
         self.url = None
         self.connected = False
 
@@ -81,6 +84,7 @@ class OutputQBitTorrent:
                 self.api_url_login = '/api/v2/auth/login'
                 self.api_url_upload = '/api/v2/torrents/add'
                 self.api_url_download = '/api/v2/torrents/add'
+                self.api_url_info = '/api/v2/torrents/info'
                 return response
 
             url = self.url + "/version/api"
@@ -89,6 +93,7 @@ class OutputQBitTorrent:
                 self.api_url_login = '/login'
                 self.api_url_upload = '/command/upload'
                 self.api_url_download = '/command/download'
+                self.api_url_info = '/query/torrents'
                 return response
 
             msg = 'Failure. URL: {}'.format(url) if not msg_on_fail else msg_on_fail
@@ -120,9 +125,63 @@ class OutputQBitTorrent:
         logger.debug('Successfully connected to qBittorrent')
         self.connected = True
 
+    def check_torrent_exists(self, file_path, verify_cert):
+        if not self.connected:
+            raise plugin.PluginError('Not connected.')
+        try:
+            torrent = Torrent.from_file(file_path)
+        except FileNotFoundError as e:
+            logger.error('Error checking torrent file, file {} does not exist', file_path)
+            return False
+
+        hash = torrent.info_hash
+        if not isinstance(hash, str):
+            logger.error('Error getting torrent info, invalid hash {}', hash)
+            return False
+
+        hash = hash.lower()
+
+        url = f'{self.url}{self.api_url_info}'
+        params = {'hashes': hash}
+
+        try:
+            respose = self.session.request(
+                'get',
+                url,
+                params=params,
+                verify=verify_cert,
+            )
+        except RequestException as e:
+            logger.error('Error getting torrent info, request to hash {} failed', hash)
+            return False
+
+        if respose.status_code != 200:
+            logger.error(
+                'Error getting torrent info, hash {} search returned', hash, respose.status_code
+            )
+            return False
+
+        try:
+            check_file = loads(respose.text)
+        except JSONDecodeError as e:
+            logger.error(
+                'Error getting torrent info for hash {}, response not a json', hash, file_path
+            )
+            return False
+
+        if len(check_file) > 0:
+            logger.warning('File with hash {} already in qbittorrent', hash)
+            return True
+
+        return False
+
     def add_torrent_file(self, file_path, data, verify_cert):
         if not self.connected:
             raise plugin.PluginError('Not connected.')
+
+        if self.check_torrent_exists(file_path, verify_cert):
+            return
+
         multipart_data = {k: (None, v) for k, v in data.items()}
         with open(file_path, 'rb') as f:
             multipart_data['torrents'] = f
@@ -138,6 +197,7 @@ class OutputQBitTorrent:
     def add_torrent_url(self, url, data, verify_cert):
         if not self.connected:
             raise plugin.PluginError('Not connected.')
+
         data['urls'] = url
         multipart_data = {k: (None, v) for k, v in data.items()}
         self._request(
