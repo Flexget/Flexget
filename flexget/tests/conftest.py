@@ -54,7 +54,7 @@ def config(request):
     return request.cls.config
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def manager(
     request, config, caplog, monkeypatch, filecopy
 ):  # enforce filecopy is run before manager
@@ -105,7 +105,7 @@ def execute_task(manager: Manager) -> Callable[..., Task]:
     return execute
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def use_vcr(request, monkeypatch):
     """
     This fixture is applied automatically to any test using the `online` mark. It will record and playback network
@@ -223,7 +223,7 @@ def pytest_runtest_setup(item):
         item.fixturenames.append('no_requests')
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def filecopy(request):
     out_files = []
     for marker in request.node.iter_markers('filecopy'):
