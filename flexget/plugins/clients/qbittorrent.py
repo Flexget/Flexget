@@ -1,4 +1,5 @@
 import os
+import re
 from json import loads, JSONDecodeError
 
 from loguru import logger
@@ -128,21 +129,30 @@ class OutputQBitTorrent:
     def check_torrent_exists(self, file_path, verify_cert):
         if not self.connected:
             raise plugin.PluginError('Not connected.')
-        try:
-            torrent = Torrent.from_file(file_path)
-        except FileNotFoundError as e:
-            logger.error('Error checking torrent file, file {} does not exist', file_path)
+
+        hash_torrent = None
+
+        if 'magnet:' in file_path:
+            hash_search = re.search('magnet\:.*btih:((\w*))', file_path, re.IGNORECASE)
+            if hash_search:
+                hash_torrent = hash_search.group(1)
+        else:
+            try:
+                torrent = Torrent.from_file(file_path)
+            except FileNotFoundError as e:
+                logger.error('Error checking torrent file, file {} does not exist', file_path)
+                return False
+
+            hash_torrent = torrent.info_hash
+
+        if not isinstance(hash_torrent, str):
+            logger.error('Error getting torrent info, invalid hash {}', hash_torrent)
             return False
 
-        hash = torrent.info_hash
-        if not isinstance(hash, str):
-            logger.error('Error getting torrent info, invalid hash {}', hash)
-            return False
-
-        hash = hash.lower()
+        hash_torrent = hash_torrent.lower()
 
         url = f'{self.url}{self.api_url_info}'
-        params = {'hashes': hash}
+        params = {'hashes': hash_torrent}
 
         try:
             respose = self.session.request(
@@ -152,12 +162,14 @@ class OutputQBitTorrent:
                 verify=verify_cert,
             )
         except RequestException as e:
-            logger.error('Error getting torrent info, request to hash {} failed', hash)
+            logger.error('Error getting torrent info, request to hash {} failed', hash_torrent)
             return False
 
         if respose.status_code != 200:
             logger.error(
-                'Error getting torrent info, hash {} search returned', hash, respose.status_code
+                'Error getting torrent info, hash {} search returned',
+                hash_torrent,
+                respose.status_code,
             )
             return False
 
@@ -165,12 +177,14 @@ class OutputQBitTorrent:
             check_file = loads(respose.text)
         except JSONDecodeError as e:
             logger.error(
-                'Error getting torrent info for hash {}, response not a json', hash, file_path
+                'Error getting torrent info for hash {}, response not a json',
+                hash_torrent,
+                file_path,
             )
             return False
 
         if len(check_file) > 0:
-            logger.warning('File with hash {} already in qbittorrent', hash)
+            logger.warning('File with hash {} already in qbittorrent', hash_torrent)
             return True
 
         return False
@@ -197,6 +211,9 @@ class OutputQBitTorrent:
     def add_torrent_url(self, url, data, verify_cert):
         if not self.connected:
             raise plugin.PluginError('Not connected.')
+
+        if self.check_torrent_exists(url, verify_cert):
+            return
 
         data['urls'] = url
         multipart_data = {k: (None, v) for k, v in data.items()}
