@@ -20,7 +20,7 @@ attrs==20.3.0
     #   pytest
 babel==2.9.0
     # via sphinx
-black==21.4b1
+black==21.4b2
     # via -r dev-requirements.in
 bleach==3.3.0
     # via readme-renderer
