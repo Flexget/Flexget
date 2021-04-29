@@ -316,10 +316,10 @@ class TelegramNotifier:
                 logger.debug("Chat migrated to id {}", e.new_chat_id)
                 try:
                     self._bot.sendMessage(chat_id=e.new_chat_id, text=msg, **kwargs)
+                    self._replace_chat_id(chat_id, e.new_chat_id, session)
                 except TelegramError as e:
                     raise PluginWarning(e.message)
 
-                self._replace_chat_id(chat_id, e.new_chat_id, session)
             except TelegramError as e:
                 if kwargs.get('parse_mode'):
                     logger.warning(
