@@ -124,7 +124,7 @@ class OutputQBitTorrent:
         logger.debug('Successfully connected to qBittorrent')
         self.connected = True
 
-    def check_torrent_exists(self, file_path, verify_cert, hash_torrent):
+    def check_torrent_exists(self, hash_torrent, verify_cert):
         if not self.connected:
             raise plugin.PluginError('Not connected.')
 
@@ -156,28 +156,17 @@ class OutputQBitTorrent:
             )
             return False
 
-        try:
-            check_file = loads(respose.text)
-        except JSONDecodeError as e:
-            logger.error(
-                'Error getting torrent info for hash {}, response not a json',
-                hash_torrent,
-                file_path,
-            )
-            return False
+        check_file = respose.json()
 
-        if len(check_file) > 0:
+        if isinstance(check_file, list) and check_file:
             logger.warning('File with hash {} already in qbittorrent', hash_torrent)
             return True
 
         return False
 
-    def add_torrent_file(self, file_path, data, verify_cert, hash_torrent):
+    def add_torrent_file(self, file_path, data, verify_cert):
         if not self.connected:
             raise plugin.PluginError('Not connected.')
-
-        if self.check_torrent_exists(file_path, verify_cert, hash_torrent):
-            return
 
         multipart_data = {k: (None, v) for k, v in data.items()}
         with open(file_path, 'rb') as f:
@@ -191,12 +180,9 @@ class OutputQBitTorrent:
             )
         logger.debug('Added torrent file {} to qBittorrent', file_path)
 
-    def add_torrent_url(self, url, data, verify_cert, hash_torrent):
+    def add_torrent_url(self, url, data, verify_cert):
         if not self.connected:
             raise plugin.PluginError('Not connected.')
-
-        if self.check_torrent_exists(url, verify_cert, hash_torrent):
-            return
 
         data['urls'] = url
         multipart_data = {k: (None, v) for k, v in data.items()}
@@ -226,6 +212,7 @@ class OutputQBitTorrent:
 
     def add_entries(self, task, config):
         for entry in task.accepted:
+
             form_data = {}
             try:
                 save_path = entry.render(entry.get('path', config.get('path', '')))
@@ -274,6 +261,11 @@ class OutputQBitTorrent:
                     logger.info('Download Speed Limit: {}', form_data.get('dlLimit'))
                 continue
 
+            if self.check_torrent_exists(
+                entry.get('torrent_info_hash'), config.get('verify_cert')
+            ):
+                continue
+
             if not is_magnet:
                 if 'file' not in entry:
                     entry.fail('File missing?')
@@ -284,13 +276,9 @@ class OutputQBitTorrent:
                     logger.debug('temp: {}', ', '.join(os.listdir(tmp_path)))
                     entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
                     continue
-                self.add_torrent_file(
-                    entry['file'], form_data, config['verify_cert'], entry.get('torrent_info_hash')
-                )
+                self.add_torrent_file(entry['file'], form_data, config['verify_cert'])
             else:
-                self.add_torrent_url(
-                    entry['url'], form_data, config['verify_cert'], entry.get('torrent_info_hash')
-                )
+                self.add_torrent_url(entry['url'], form_data, config['verify_cert'])
 
     @plugin.priority(120)
     def on_task_download(self, task, config):
