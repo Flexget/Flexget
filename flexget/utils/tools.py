@@ -28,6 +28,7 @@ from typing import (
     Union,
 )
 
+import psutil
 import requests
 from loguru import logger
 
@@ -236,45 +237,11 @@ def multiply_timedelta(interval: timedelta, number: Union[int, float]) -> timede
     return timedelta(seconds=interval.total_seconds() * number)
 
 
-if os.name == 'posix':
-
-    def pid_exists(pid: int) -> bool:
-        """Check whether pid exists in the current process table."""
-        import errno
-
-        if pid < 0:
-            return False
-        try:
-            os.kill(pid, 0)
-        except OSError as e:
-            return e.errno == errno.EPERM
-        else:
-            return True
-
-
-else:
-
-    def pid_exists(pid: int) -> bool:
-        import ctypes
-        import ctypes.wintypes
-
-        kernel32 = ctypes.windll.kernel32
-        PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
-        STILL_ACTIVE = 259
-
-        handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, pid)
-        if handle == 0:
-            return False
-
-        # If the process exited recently, a pid may still exist for the handle.
-        # So, check if we can get the exit code.
-        exit_code = ctypes.wintypes.DWORD()
-        is_running = kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code)) == 0
-        kernel32.CloseHandle(handle)
-
-        # See if we couldn't get the exit code or the exit code indicates that the
-        # process is still running.
-        return is_running or exit_code.value == STILL_ACTIVE
+def pid_exists(pid: int):
+    try:
+        return psutil.Process(pid).status() != psutil.STATUS_STOPPED
+    except psutil.NoSuchProcess:
+        return False
 
 
 _binOps = {

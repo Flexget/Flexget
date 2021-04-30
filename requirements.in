@@ -30,3 +30,4 @@ pyparsing>=2.4.7
 zxcvbn-python
 progressbar==2.5
 more-itertools
+psutil>=5.8.0
