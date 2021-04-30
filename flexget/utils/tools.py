@@ -259,10 +259,10 @@ else:
         import ctypes.wintypes
 
         kernel32 = ctypes.windll.kernel32
-        PROCESS_QUERY_INFORMATION = 0x0400
+        PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
         STILL_ACTIVE = 259
 
-        handle = kernel32.OpenProcess(PROCESS_QUERY_INFORMATION, 0, pid)
+        handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, pid)
         if handle == 0:
             return False
 
