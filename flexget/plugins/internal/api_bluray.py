@@ -129,7 +129,7 @@ class BlurayMovie(Base):
             try:
                 movie_info_response = requests.get(self.url).content
             except (requests.RequestException, ConnectionError) as e:
-                raise PluginError("Couldn't connect to blu-ray.com. %s" % self.url)
+                raise LookupError("Couldn't connect to blu-ray.com. %s" % self.url)
 
             movie_info = get_soup(movie_info_response)
 
