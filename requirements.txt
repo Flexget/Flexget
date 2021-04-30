@@ -28,8 +28,6 @@ cherrypy==18.6.0
     # via -r requirements.in
 click==7.1.2
     # via flask
-colorama==0.4.4
-    # via loguru
 colorclass==2.2.0
     # via -r requirements.in
 feedparser==6.0.2
@@ -52,14 +50,14 @@ flask==1.1.2
     #   flask-login
     #   flask-restful
     #   flask-restx
+greenlet==1.0.0
+    # via sqlalchemy
 guessit==3.2.0
     # via -r requirements.in
 html5lib==1.1
     # via -r requirements.in
 idna==2.10
     # via requests
-importlib-metadata==4.0.1
-    # via jsonschema
 itsdangerous==1.1.0
     # via flask
 jaraco.classes==3.2.1
@@ -143,14 +141,12 @@ six==1.15.0
     #   python-dateutil
 soupsieve==2.2.1
     # via beautifulsoup4
-sqlalchemy==1.3.24
+sqlalchemy==1.4.12
     # via -r requirements.in
 tempora==4.0.2
     # via portend
 terminaltables==3.1.0
     # via -r requirements.in
-typing-extensions==3.7.4.3
-    # via importlib-metadata
 tzlocal==2.1
     # via apscheduler
 urllib3==1.26.4
@@ -163,8 +159,6 @@ werkzeug==1.0.1
     #   flask-restx
 zc.lockfile==2.0
     # via cherrypy
-zipp==3.4.1
-    # via importlib-metadata
 zxcvbn-python==4.4.24
     # via -r requirements.in
 
