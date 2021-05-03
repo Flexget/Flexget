@@ -307,10 +307,7 @@ class SearchAlphaRatio:
                     'torrent_leeches': leeches_idx,
                 }
 
-                for mapping in mappings_int:
-                    dest = mapping
-                    src = mappings_int[mapping]
-
+                for dest, src in mappings_int.items():
                     if not src in torrent_info:
                         continue
 
