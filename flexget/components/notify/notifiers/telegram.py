@@ -10,7 +10,7 @@ from flexget.plugin import PluginError, PluginWarning
 
 try:
     import telegram
-    from telegram.error import TelegramError, ChatMigrated
+    from telegram.error import ChatMigrated, TelegramError
     from telegram.utils.request import NetworkError
 except ImportError:
     telegram = None
@@ -97,14 +97,6 @@ class TelegramNotifier:
                 url: socks-proxy-url
                 username: socks-proxy-username
                 password: socks-proxy-password
-
-
-    Bootstrapping and testing the bot::
-
-    * Execute: `flexget telegram bootstrap`.
-      Look at the console output and make sure that the operation was successful.
-    * Execute: `flexget telegram test-msg`.
-      This will send a test message for every recipient you've configured.
 
 
     Configuration notes::
