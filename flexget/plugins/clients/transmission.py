@@ -245,7 +245,7 @@ class PluginTransmissionInput(TransmissionBase):
             bytes_completed = sum(map(lambda x: x['bytesCompleted'], t.fileStats))
             bytes_available = entry['transmission_desiredAvailable']
             available_perc = (bytes_available / bytes_all) * 100 if bytes_all else 0
-            entry['transmission_availability'] = floor(available_perc * 100) / 100
+            entry['transmission_availability'] = floor(available_perc * 100) / 100  # Floor to two digits (e.g. 95.54999 -> 95.54)
             entry['transmission_bytes_completed'] = bytes_completed
 
             entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
