@@ -40,7 +40,7 @@ RUN pip install -U pip && \
                 --no-index \
                 -f /wheels \
                 FlexGet \
-                transmission-rpc \
+                'transmission-rpc>=3.0.0,<4.0.0' \
                 deluge-client \
                 cloudscraper && \
     rm -rf /wheels
