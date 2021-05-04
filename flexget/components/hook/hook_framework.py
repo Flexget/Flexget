@@ -11,7 +11,7 @@ A plugin who wishes to send messages using this hook framework should import thi
 Delivering Messages
 -------------------
 To implement a plugin that can deliver messages, it should implement a `send_hook` method, which takes
-`(title, data, config)` as arguments. The plugin should also have a `schema` attribute which is a JSON schema that
+`(title, send_data, config)` as arguments. The plugin should also have a `schema` attribute which is a JSON schema that
 describes the config format for the plugin.
 """
 
@@ -34,32 +34,32 @@ class HookHolder:
     Hook Holder for template generator
     """
 
-    _data = {}
+    _send_data = {}
 
-    def __init__(self, data):
-        self._data = data
+    def __init__(self, send_data):
+        self._send_data = send_data
 
     def template_renderer(self, template: Union[str, FlexGetTemplate]):
-        return render(template, self._data, False)
+        return render(template, self._send_data, False)
 
 
 class HookFramework:
     @staticmethod
-    def render_config(config, data, plugin_name):
-        holder = HookHolder(data)
+    def render_config(config, send_data, plugin_name):
+        holder = HookHolder(send_data)
         new_config = render_config(config, holder.template_renderer, plugin_name)
         return new_config
 
     @staticmethod
-    def send_hook(title, data: dict, hooks, **kwargs):
+    def send_hook(title, send_data: dict, hooks, **kwargs):
         """
         Send a hook out to the given `hook` with a given `title` and `data`.
         :param str title: Title of the hook. (some hooks may ignore this)
-        :param str|dict data: Main data of the hook.
+        :param str|dict send_data: Main data of the hook.
         :param list hooks: A list of configured hooks output plugins.
         """
 
-        send_data = {**data}
+        data_to_send = {**send_data}
 
         # Get Key Arguments
         event_match = {}
@@ -69,16 +69,16 @@ class HookFramework:
             event_match['stage'] = kwargs.get('stage')
 
         if title:
-            send_data['title'] = title
+            data_to_send['title'] = title
 
         if event_match:
-            send_data['event_type'] = event_match.get('event')
-            send_data['event_name'] = event_match.get('name')
-            send_data['event_stage'] = event_match.get('stage')
+            data_to_send['event_type'] = event_match.get('event')
+            data_to_send['event_name'] = event_match.get('name')
+            data_to_send['event_stage'] = event_match.get('stage')
 
-            send_data['event_tree'] = []
+            data_to_send['event_tree'] = []
             for eve in event_match:
-                send_data['event_tree'].append(event_match[eve])
+                data_to_send['event_tree'].append(event_match[eve])
 
         if isinstance(hooks, str):
             hooks = [{'via': {hooks: {}}}]
@@ -116,15 +116,15 @@ class HookFramework:
                     logger.error('Hook informed with wrong schema, no config for {}', plugin_name)
                     continue
 
-                send_data = jsonify(send_data)
+                data_to_send = jsonify(data_to_send)
 
-                template_data = {**send_data}
-                template_data['data'] = {**send_data}
+                template_data = {**data_to_send}
+                template_data['send_data'] = {**data_to_send}
 
-                new_config = HookFramework.render_config(plugin_config, send_data, plugin_name)
+                new_config = HookFramework.render_config(plugin_config, data_to_send, plugin_name)
 
                 HookFramework.trigger_hook(
-                    plugin_name, title=title, data=send_data, config=new_config
+                    plugin_name, title=title, send_data=data_to_send, config=new_config
                 )
 
     @staticmethod
