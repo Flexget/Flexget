@@ -335,6 +335,7 @@ class SeriesParser(TitleParser):
                 data_parts.remove(part)
             elif part in self.specials:
                 self.special = True
+                self.special_title = True
                 data_parts.remove(part)
 
         data_stripped = ' '.join(data_parts).strip()
@@ -381,6 +382,9 @@ class SeriesParser(TitleParser):
                 self.id = (self.season, self.episode)
                 self.id_type = 'ep'
                 self.valid = True
+                if self.season == 0 and self.episode > 0:
+                    self.special = True
+                    self.special_season = True
                 if not (self.special and self.prefer_specials):
                     return
             else:

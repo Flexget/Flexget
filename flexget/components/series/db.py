@@ -38,7 +38,7 @@ from flexget.utils.sqlalchemy_utils import (
 )
 from flexget.utils.tools import parse_episode_identifier
 
-SCHEMA_VER = 14
+SCHEMA_VER = 15
 logger = logger.bind(name='series.db')
 Base = db_schema.versioned_base('series', SCHEMA_VER)
 
@@ -260,6 +260,7 @@ class Episode(Base):
 
     season = Column(Integer)
     number = Column(Integer)
+    special = Column(Boolean, default=False)
 
     identified_by = Column(String)
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
@@ -314,6 +315,10 @@ class Episode(Base):
         elif self.number in (0, 1):
             return 'Season Premiere'
         return False
+
+    @property
+    def is_special(self):
+        return self.identified_by == 'special' or self.special
 
     @property
     def downloaded_releases(self):
@@ -407,6 +412,7 @@ class Episode(Base):
             'season': self.season,
             'identified_by': self.identified_by,
             'number': self.number,
+            'special': self.special,
             'series_id': self.series_id,
             'first_seen': self.first_seen,
             'premiere': self.is_premiere,
@@ -717,6 +723,11 @@ def upgrade(ver, session):
         # New season_releases table, added by "create_all"
         logger.info('Adding season_releases table')
         ver = 14
+    if ver == 14:
+        # New season_releases table, added by "create_all"
+        logger.info('Adding special column to series_episodes table')
+        table_add_column('series_episodes', 'special', Boolean, session)
+        ver = 15
     return ver
 
 
@@ -1464,6 +1475,7 @@ def store_parser(session, parser, series=None, quality=None):
                 elif parser.id_type == 'sequence':
                     episode.season = 0
                     episode.number = parser.id + ix
+                episode.special = parser.special
                 series.episodes.append(episode)  # pylint:disable=E1103
                 logger.debug('-> added `{}`', episode)
             session.flush()

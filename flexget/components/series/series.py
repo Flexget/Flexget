@@ -696,7 +696,7 @@ class FilterSeries(FilterSeriesBase):
                     continue
 
             # skip special episodes if special handling has been turned off
-            if not config.get('specials', True) and entity.identified_by == 'special':
+            if not config.get('specials', True) and entity.is_special:
                 logger.debug('Skipping special episode as support is turned off.')
                 continue
 
