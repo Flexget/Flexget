@@ -1,7 +1,7 @@
 name: 'Close stale issues and PRs'
 on:
   schedule:
-    - cron: '30 14 * * *'
+    - cron: '30 */8 * * *'
 env:
   DAYS_BEFORE_ISSUE_STALE: 150
   DAYS_BEFORE_ISSUE_CLOSE: 30
