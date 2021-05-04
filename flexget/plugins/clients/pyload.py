@@ -123,15 +123,6 @@ class PluginPyLoad:
 
         self.add_entries(task, config)
 
-    @staticmethod
-    def get_version_from_packaging():
-        version = None
-        try:
-            from packaging import version
-        except ModuleNotFoundError:
-            logger.warning('packaging is not installed')
-        return version
-
     def add_entries(self, task, config):
         """Adds accepted entries"""
 
@@ -147,26 +138,18 @@ class PluginPyLoad:
         except Exception as e:
             raise plugin.PluginError('Unknown error: %s' % str(e), logger)
 
-        remote_version = None
-        try:
-            remote_version = api.get('getServerVersion')
-        except RequestException as e:
-            if e.response is not None and e.response.status_code == 404:
-                remote_version = json.loads(api.get('get_server_version').content)
-            else:
-                raise e
-
+        # old pyload (stable)
+        is_pyload_ng = False
         parse_urls_command = 'parseURLs'
         add_package_command = 'addPackage'
         set_package_data_command = 'setPackageData'
 
-        is_pyload_ng = False
-        version = self.get_version_from_packaging()
-        if version and version.parse(remote_version) >= version.parse('0.5'):
+        # pyload-ng is returning dict instead of session string on login
+        if isinstance(session, dict):
+            is_pyload_ng = True
             parse_urls_command = 'parse_urls'
             add_package_command = 'add_package'
             set_package_data_command = 'set_package_date'
-            is_pyload_ng = True
 
         hoster = config.get('hoster', self.DEFAULT_HOSTER)
 
