@@ -623,7 +623,9 @@ def upgrade(ver: Optional[int], session: Session) -> int:
     if ver == 3:
         # Remove index on Series.name
         try:
-            Index('ix_series_name').drop(bind=session.bind)
+            session.execute("DROP INDEX ix_series_name")
+            # This way doesn't work on sqlalchemy 1.4 for some reason
+            # Index('ix_series_name').drop(bind=session.bind)
         except OperationalError:
             logger.debug('There was no ix_series_name index to remove.')
         # Add Series.name_lower column
@@ -790,7 +792,7 @@ def show_seasons(
     descending: bool = False,
     session: Session = None,
 ) -> Union[int, List[Season]]:
-    """ Return all seasons of a given series """
+    """Return all seasons of a given series"""
     seasons = session.query(Season).filter(Season.series_id == series.id)
     if count:
         return seasons.count()
@@ -822,7 +824,7 @@ def get_episode_releases(
     sort_by: str = None,
     session: Session = None,
 ) -> List[EpisodeRelease]:
-    """ Return all releases for a given episode """
+    """Return all releases for a given episode"""
     releases = session.query(EpisodeRelease).filter(EpisodeRelease.episode_id == episode.id)
     if downloaded is not None:
         releases = releases.filter(EpisodeRelease.downloaded == downloaded)
@@ -846,7 +848,7 @@ def get_season_releases(
     sort_by: str = None,
     session: Session = None,
 ) -> Union[int, List[SeasonRelease]]:
-    """ Return all releases for a given season """
+    """Return all releases for a given season"""
     releases = session.query(SeasonRelease).filter(SeasonRelease.season_id == season.id)
     if downloaded is not None:
         releases = releases.filter(SeasonRelease.downloaded == downloaded)
@@ -861,28 +863,28 @@ def get_season_releases(
 
 
 def episode_in_show(series_id: int, episode_id: int) -> bool:
-    """ Return True if `episode_id` is part of show with `series_id`, else return False """
+    """Return True if `episode_id` is part of show with `series_id`, else return False"""
     with Session() as session:
         episode = session.query(Episode).filter(Episode.id == episode_id).one()
         return episode.series_id == series_id
 
 
 def season_in_show(series_id: int, season_id: int) -> bool:
-    """ Return True if `episode_id` is part of show with `series_id`, else return False """
+    """Return True if `episode_id` is part of show with `series_id`, else return False"""
     with Session() as session:
         season = session.query(Season).filter(Season.id == season_id).one()
         return season.series_id == series_id
 
 
 def release_in_episode(episode_id: int, release_id: int) -> bool:
-    """ Return True if `release_id` is part of episode with `episode_id`, else return False """
+    """Return True if `release_id` is part of episode with `episode_id`, else return False"""
     with Session() as session:
         release = session.query(EpisodeRelease).filter(EpisodeRelease.id == release_id).one()
         return release.episode_id == episode_id
 
 
 def release_in_season(season_id: int, release_id: int) -> bool:
-    """ Return True if `release_id` is part of episode with `episode_id`, else return False """
+    """Return True if `release_id` is part of episode with `episode_id`, else return False"""
     with Session() as session:
         release = session.query(SeasonRelease).filter(SeasonRelease.id == release_id).one()
         return release.season_id == season_id
@@ -1339,7 +1341,7 @@ def delete_season_release_by_id(release_id: int) -> None:
 
 
 def shows_by_name(normalized_name: str, session: Session = None) -> List[Series]:
-    """ Returns all series matching `normalized_name` """
+    """Returns all series matching `normalized_name`"""
     return (
         session.query(Series)
         .filter(Series._name_normalized.contains(normalized_name))
@@ -1349,7 +1351,7 @@ def shows_by_name(normalized_name: str, session: Session = None) -> List[Series]
 
 
 def shows_by_exact_name(normalized_name: str, session: Session = None) -> List[Series]:
-    """ Returns all series matching `normalized_name` """
+    """Returns all series matching `normalized_name`"""
     return (
         session.query(Series)
         .filter(Series._name_normalized == normalized_name)
@@ -1359,27 +1361,27 @@ def shows_by_exact_name(normalized_name: str, session: Session = None) -> List[S
 
 
 def show_by_id(show_id: int, session: Session = None) -> Series:
-    """ Return an instance of a show by querying its ID """
+    """Return an instance of a show by querying its ID"""
     return session.query(Series).filter(Series.id == show_id).one()
 
 
 def season_by_id(season_id: int, session: Session = None) -> Season:
-    """ Return an instance of an season by querying its ID """
+    """Return an instance of an season by querying its ID"""
     return session.query(Season).filter(Season.id == season_id).one()
 
 
 def episode_by_id(episode_id: int, session: Session = None) -> Episode:
-    """ Return an instance of an episode by querying its ID """
+    """Return an instance of an episode by querying its ID"""
     return session.query(Episode).filter(Episode.id == episode_id).one()
 
 
 def episode_release_by_id(release_id: int, session: Session = None) -> EpisodeRelease:
-    """ Return an instance of an episode release by querying its ID """
+    """Return an instance of an episode release by querying its ID"""
     return session.query(EpisodeRelease).filter(EpisodeRelease.id == release_id).one()
 
 
 def season_release_by_id(release_id: int, session: Session = None) -> SeasonRelease:
-    """ Return an instance of an episode release by querying its ID """
+    """Return an instance of an episode release by querying its ID"""
     return session.query(SeasonRelease).filter(SeasonRelease.id == release_id).one()
 
 
@@ -1391,7 +1393,7 @@ def show_episodes(
     descending: bool = False,
     session: Session = None,
 ) -> Union[int, List[Episode]]:
-    """ Return all episodes of a given series """
+    """Return all episodes of a given series"""
     episodes = session.query(Episode).filter(Episode.series_id == series.id)
     if count:
         return episodes.count()
