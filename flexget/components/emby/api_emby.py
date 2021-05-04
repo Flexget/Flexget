@@ -168,9 +168,7 @@ class EmbyAuth(EmbyApiBase):
         userdata = None
 
         if not self._apikey:
-            token_data = persist['token_data']
-
-            userdata = self.check_token_data(token_data)
+            userdata = self.check_token_data(persist.get('token_data'))
             if not userdata:
                 logger.debug('Login to {} with username {}', self.host, self.username)
                 args = {'Username': self._username, 'Pw': self._password}
@@ -218,6 +216,8 @@ class EmbyAuth(EmbyApiBase):
 
     def check_token_data(self, token_data):
         """Checks saved tokens"""
+        if not token_data:
+            return False
 
         if (
             'token' not in token_data
@@ -1113,6 +1113,21 @@ class EmbyApiMedia(EmbyApiBase):
             'library_name': self.library_name,
         }
 
+    @staticmethod
+    def get_mtype(**kwargs) -> str:
+        mtype = None
+        if 'mtype' in kwargs:
+            mtype = kwargs.get('mtype')
+        elif 'Type' in kwargs:
+            mtype = kwargs.get('Type')
+        elif 'emby_type' in kwargs:
+            mtype = kwargs.get('emby_type')
+
+        if mtype:
+            mtype = mtype.lower()
+
+        return mtype
+
     @property
     def fullname(self) -> str:
         return self.name
@@ -1376,14 +1391,7 @@ class EmbyApiSerie(EmbyApiMedia):
 
     @staticmethod
     def is_type(**kwargs) -> bool:
-        mtype = None
-        if 'mtype' in kwargs:
-            mtype = kwargs.get('mtype').lower()
-        elif 'Type' in kwargs:
-            mtype = kwargs.get('Type').lower()
-        elif 'emby_type' in kwargs:
-            mtype = kwargs.get('emby_type').lower()
-
+        mtype = EmbyApiMedia.get_mtype(**kwargs)
         return bool(kwargs.get('series_name') or mtype == EmbyApiSerie.TYPE)
 
 
@@ -1488,13 +1496,7 @@ class EmbyApiSeason(EmbyApiMedia):
 
     @staticmethod
     def is_type(**kwargs) -> bool:
-        mtype = None
-        if 'mtype' in kwargs:
-            mtype = kwargs.get('mtype').lower()
-        elif 'Type' in kwargs:
-            mtype = kwargs.get('Type').lower()
-        elif 'emby_type' in kwargs:
-            mtype = kwargs.get('emby_type').lower()
+        mtype = EmbyApiMedia.get_mtype(**kwargs)
 
         return (
             EmbyApiSerie.is_type(**kwargs)
@@ -1780,13 +1782,7 @@ class EmbyApiEpisode(EmbyApiMedia):
 
     @staticmethod
     def is_type(**kwargs) -> bool:
-        mtype = None
-        if 'mtype' in kwargs:
-            mtype = kwargs.get('mtype').lower()
-        elif 'Type' in kwargs:
-            mtype = kwargs.get('Type').lower()
-        elif 'emby_type' in kwargs:
-            mtype = kwargs.get('emby_type').lower()
+        mtype = EmbyApiMedia.get_mtype(**kwargs)
 
         return (
             EmbyApiSerie.is_type(**kwargs)
@@ -1944,14 +1940,7 @@ class EmbyApiMovie(EmbyApiMedia):
 
     @staticmethod
     def is_type(**kwargs) -> bool:
-        mtype = None
-        if 'mtype' in kwargs:
-            mtype = kwargs.get('mtype').lower()
-        elif 'Type' in kwargs:
-            mtype = kwargs.get('Type').lower()
-        elif 'emby_type' in kwargs:
-            mtype = kwargs.get('emby_type').lower()
-
+        mtype = EmbyApiMedia.get_mtype(**kwargs)
         return bool(kwargs.get('movie_name') or mtype == EmbyApiMovie.TYPE.lower())
 
 
